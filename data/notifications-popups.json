@@ -1,7 +1,7 @@
 {
   "social_proof_toasts": {
     "enabled": true,
-    "interval_seconds": 10,
+    "interval_seconds": 55,
     "items": [
       {
         "name": "रामेश्वर पटेल",
@@ -452,6 +452,330 @@
         "image": "/images/books/fasal-ka-doctor-cover.webp",
         "link": "/ebooks/cart.html",
         "timeAgo": "1 घंटा पहले"
+      },
+      {
+        "name": "धर्मेन्द्र सिंह पटेल",
+        "city": "जबलपुर, MP",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "अभी-अभी"
+      },
+      {
+        "name": "हरविंदर सिंह संधू",
+        "city": "लुधियाना, पंजाब",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "2 मिनट पहले"
+      },
+      {
+        "name": "रामनिवास जाट",
+        "city": "सीकर, राजस्थान",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "4 मिनट पहले"
+      },
+      {
+        "name": "विनोद कुमार मौर्या",
+        "city": "प्रयागराज, UP",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "6 मिनट पहले"
+      },
+      {
+        "name": "सचिन पाटिल",
+        "city": "कोल्हापुर, महाराष्ट्र",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "8 मिनट पहले"
+      },
+      {
+        "name": "कृष्ण कुमार यादव",
+        "city": "रोहतक, हरियाणा",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "11 मिनट पहले"
+      },
+      {
+        "name": "दीपक शर्मा",
+        "city": "इंदौर, MP",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "14 मिनट पहले"
+      },
+      {
+        "name": "बलराम चौधरी",
+        "city": "नागौर, राजस्थान",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "16 मिनट पहले"
+      },
+      {
+        "name": "विजय बहादुर सिंह",
+        "city": "गोरखपुर, UP",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "19 मिनट पहले"
+      },
+      {
+        "name": "अशोक देशमुख",
+        "city": "अमरावती, महाराष्ट्र",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "22 मिनट पहले"
+      },
+      {
+        "name": "मनप्रीत सिंह",
+        "city": "बठिंडा, पंजाब",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "25 मिनट पहले"
+      },
+      {
+        "name": "रवि पटेल",
+        "city": "आनंद, गुजरात",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "28 मिनट पहले"
+      },
+      {
+        "name": "संजय कुशवाहा",
+        "city": "वाराणसी, UP",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "31 मिनट पहले"
+      },
+      {
+        "name": "महेश पाटीदार",
+        "city": "उज्जैन, MP",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "34 मिनट पहले"
+      },
+      {
+        "name": "सुरेन्द्र बिश्नोई",
+        "city": "बीकानेर, राजस्थान",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "38 मिनट पहले"
+      },
+      {
+        "name": "राहुल कुमार झा",
+        "city": "पटना, बिहार",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "41 मिनट पहले"
+      },
+      {
+        "name": "सुखदेव सिंह",
+        "city": "करनाल, हरियाणा",
+        "bookTitle": "कृषि दवा डायरेक्टरी व स्प्रे गाइड",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "45 मिनट पहले"
+      },
+      {
+        "name": "प्रभाकर राव",
+        "city": "नागपुर, महाराष्ट्र",
+        "bookTitle": "कृषि दवा डायरेक्टरी (BK016)",
+        "price": "₹149",
+        "image": "/images/books/bk016-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK016",
+        "timeAgo": "49 मिनट पहले"
+      },
+      {
+        "name": "अमन वर्मा",
+        "city": "लखनऊ, UP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "अभी-अभी"
+      },
+      {
+        "name": "विकास गुप्ता",
+        "city": "जयपुर, राजस्थान",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "3 मिनट पहले"
+      },
+      {
+        "name": "रोहन कुलकर्णी",
+        "city": "पुणे, महाराष्ट्र",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "5 मिनट पहले"
+      },
+      {
+        "name": "आकाशदीप शर्मा",
+        "city": "भोपाल, MP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "7 मिनट पहले"
+      },
+      {
+        "name": "प्रतीक श्रीवास्तव",
+        "city": "कानपुर, UP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "10 मिनट पहले"
+      },
+      {
+        "name": "सौरव दास",
+        "city": "कोलकाता, WB",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "13 मिनट पहले"
+      },
+      {
+        "name": "नवीन कुमार",
+        "city": "पटना, बिहार",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "15 मिनट पहले"
+      },
+      {
+        "name": "अमित जोशी",
+        "city": "देहरादून, उत्तराखंड",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "18 मिनट पहले"
+      },
+      {
+        "name": "मोहित अग्रवाल",
+        "city": "इंदौर, MP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "21 मिनट पहले"
+      },
+      {
+        "name": "राहुल मेहता",
+        "city": "अहमदाबाद, गुजरात",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "24 मिनट पहले"
+      },
+      {
+        "name": "दीपक मिश्रा",
+        "city": "प्रयागराज, UP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "27 मिनट पहले"
+      },
+      {
+        "name": "गौरव सिंह",
+        "city": "चंडीगढ़, पंजाब",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "30 मिनट पहले"
+      },
+      {
+        "name": "सूरज पांडे",
+        "city": "वाराणसी, UP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "33 मिनट पहले"
+      },
+      {
+        "name": "विवेक शर्मा",
+        "city": "दिल्ली NCR",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "36 मिनट पहले"
+      },
+      {
+        "name": "सुमित राजपूत",
+        "city": "ग्वालियर, MP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "40 मिनट पहले"
+      },
+      {
+        "name": "पंकज तिवारी",
+        "city": "रांची, झारखंड",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "43 मिनट पहले"
+      },
+      {
+        "name": "अभिषेक चौहान",
+        "city": "मेरठ, UP",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "46 मिनट पहले"
+      },
+      {
+        "name": "कुणाल भटनागर",
+        "city": "जोधपुर, राजस्थान",
+        "bookTitle": "घर बैठे पैसे कैसे कमाएँ? Income Guide",
+        "price": "₹149",
+        "image": "/images/books/bk018-cover.webp",
+        "link": "/ebooks/book-landing.html?id=BK018",
+        "timeAgo": "50 मिनट पहले"
       }
     ]
   },
