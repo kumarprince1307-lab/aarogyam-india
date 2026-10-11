@@ -1211,6 +1211,14 @@ setTimeout(() => {
 
 function showErrorScreen() {
     if (loadingIndicator) loadingIndicator.style.display = "none";
+    if (isDemoMode) {
+        const canonicalId = (aoiBookId || 'BK001').toUpperCase().replace(/^DEMO[-_]?/i, '');
+        showToast("📖 इस पुस्तक का डेमो उपलब्ध नहीं है, कृपया प्रीव्यू देखें।", 4000);
+        setTimeout(() => {
+            window.location.href = `book-landing.html?id=${encodeURIComponent(canonicalId)}#sec-book-preview`;
+        }, 1500);
+        return;
+    }
     if (pdfErrorScreen) pdfErrorScreen.style.display = "flex";
 }
 

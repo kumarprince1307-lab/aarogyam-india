@@ -2046,7 +2046,12 @@
         "bgm_enabled": true,
         "banner_image": "/images/banners/bk018-sec_audio-banner.webp"
       },
-      "features": [],
+      "features": [
+        "120 पेज की सम्पूर्ण गाइड",
+        "60+ घर बैठे कमाई के तरीके",
+        "150+ वेरिफाइड वेबसाइट्स लिस्ट",
+        "फ्री बोनस PDF व WhatsApp हेल्प"
+      ],
       "totalPages": 120,
       "author": "Dada Avnish Mishra",
       "version": "2026",

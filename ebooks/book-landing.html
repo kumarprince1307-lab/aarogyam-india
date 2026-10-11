@@ -28,6 +28,16 @@
                 el.href = 'javascript:void(0)';
                 el.onclick = function(e) {
                   e.preventDefault();
+                  if (typeof window.checkBookDemoAvailability === 'function' && !window.checkBookDemoAvailability(bookId)) {
+                    if (typeof window.showNoDemoNotification === 'function') {
+                      window.showNoDemoNotification();
+                    } else {
+                      alert('इस पुस्तक का डेमो उपलब्ध नहीं है, कृपया नीचे पुस्तक का लाइव प्रीव्यू देखें।');
+                      const pSec = document.getElementById('sec-book-preview') || document.querySelector('.book-preview-gallery');
+                      if (pSec) pSec.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    return;
+                  }
                   if (typeof window.openDemoReaderWithAuth === 'function') {
                     window.openDemoReaderWithAuth(bookId);
                   } else {
@@ -107,10 +117,8 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Cache Control for Instant Updates -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <!-- Dynamic Revalidation -->
   <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
 
   <!-- CORE STYLESHEETS -->
   <link rel="stylesheet" href="../css/style.css">
@@ -614,7 +622,7 @@
       <div class="hero-container">
         <!-- LEFT: 3D BOOK COVER -->
         <div class="hero-book">
-          <img id="hero-book-cover" src="" alt="Book Cover" class="hero-book-cover" onerror="window.handleImageError && window.handleImageError(this)">
+          <img id="hero-book-cover" src="" alt="Book Cover" class="hero-book-cover" fetchpriority="high" decoding="async" onerror="window.handleImageError && window.handleImageError(this)">
         </div>
 
         <!-- RIGHT: BOOK DETAILS -->

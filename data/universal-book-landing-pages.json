@@ -4893,7 +4893,12 @@
         "rating_count": "120+ Ratings",
         "cover_image": "/images/books/bk018-cover.webp",
         "banner_image": "/images/banners/bk018-hero-banner.webp",
-        "features": []
+        "features": [
+          { "icon": "fa-book-open", "text": "120 पेज की सम्पूर्ण गाइड" },
+          { "icon": "fa-bolt", "text": "60+ घर बैठे कमाई के तरीके" },
+          { "icon": "fa-globe", "text": "150+ वेरिफाइड वेबसाइट्स लिस्ट" },
+          { "icon": "fa-gift", "text": "फ्री बोनस PDF व WhatsApp हेल्प" }
+        ]
       },
       "value_stack": {
         "book_mrp": 299,
@@ -4968,43 +4973,16 @@
       "demoPages": "",
       "suggested_books_list": [
         {
-          "id": "BK016",
-          "link": "BK016",
-          "title": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
-          "image": "/images/books/bk016-cover.webp",
-          "offerPrice": 149,
-          "mrp": 499
-        },
-        {
-          "id": "BK001",
-          "link": "BK001",
-          "title": "खरीफ फसल मास्टर गाइड 2026",
-          "image": "/images/books/kharif-master-guide-2026-cover.webp",
+          "id": "BK006",
+          "link": "BK006",
+          "title": "AI वेबसाइट व डिजिटल बिज़नेस मास्टर गाइड",
+          "image": "/images/books/ai-website-guide-cover.webp",
           "offerPrice": 99,
           "mrp": 299
-        },
-        {
-          "id": "BK002",
-          "link": "BK002",
-          "title": "खेती का डॉक्टर",
-          "image": "/images/books/fasal-ka-doctor-cover.webp",
-          "offerPrice": 99,
-          "mrp": 299
-        },
-        {
-          "id": "BK015",
-          "link": "BK015",
-          "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
-          "image": "/images/books/bk015-cover.webp",
-          "offerPrice": 149,
-          "mrp": 1999
         }
       ],
       "suggested_books": [
-        "BK016",
-        "BK001",
-        "BK002",
-        "BK015"
+        "BK006"
       ],
       "table_of_contents": [
         " ✅ कमाई के 60 आइडिया — ऑनलाइन और ऑफलाइन कमाई के अलग-अलग रास्तों की जानकारी।",

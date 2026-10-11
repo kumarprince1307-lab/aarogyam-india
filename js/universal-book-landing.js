@@ -185,8 +185,91 @@
     }
   };
 
+  window.checkBookDemoAvailability = function(bookId) {
+    const rawId = (bookId || currentBookData?.id || currentBookId || 'BK001').toUpperCase().trim();
+    const demoId = rawId.startsWith('DEMO') ? rawId : ('DEMO-' + rawId);
+
+    // 1. Check in allBooks
+    if (Array.isArray(allBooks) && allBooks.some(b => b && b.id && b.id.toUpperCase() === demoId)) {
+      return true;
+    }
+
+    // 2. Check in custom / studio books
+    try {
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      if (customBooks.some(b => b && b.id && b.id.toUpperCase() === demoId)) return true;
+      const freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+      if (freeDemoBooks.some(b => b && b.id && b.id.toUpperCase() === demoId)) return true;
+    } catch (e) {}
+
+    // 3. Check in landing pages
+    if (Array.isArray(allLandingPages) && allLandingPages.some(p => p && p.id && p.id.toUpperCase() === demoId)) {
+      return true;
+    }
+
+    // 4. Check if active book or landing has demo PDF or dedicated demo reader page ranges
+    const b = currentBookData || {};
+    const l = currentLandingData || {};
+    if ((b.demoPdf && b.demoPdf.trim()) || (l.demoPdf && l.demoPdf.trim())) return true;
+    if ((b.freePdf && b.freePdf.trim()) || (l.freePdf && l.freePdf.trim())) return true;
+    if ((b.demo_reader_pages && b.demo_reader_pages.trim()) || (l.demo_reader_pages && l.demo_reader_pages.trim())) return true;
+
+    return false;
+  };
+
+  window.showNoDemoNotification = function() {
+    let toast = document.getElementById('aoi-no-demo-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'aoi-no-demo-toast';
+      toast.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px); background:#0f172a; color:#ffffff; border:2px solid #f59e0b; border-radius:14px; padding:14px 20px; box-shadow:0 12px 35px rgba(0,0,0,0.55); z-index:999999; display:flex; align-items:center; gap:12px; max-width:92%; width:440px; opacity:0; transition:all 0.35s cubic-bezier(0.16, 1, 0.3, 1); pointer-events:auto;';
+      toast.innerHTML = `
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(245,158,11,0.2);color:#fbbf24;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid rgba(245,158,11,0.4);">
+          📖
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:0.92rem;font-weight:800;color:#fef08a;line-height:1.35;margin-bottom:2px;">
+            इस पुस्तक का डेमो उपलब्ध नहीं है
+          </div>
+          <div style="font-size:0.8rem;font-weight:600;color:#e2e8f0;line-height:1.4;">
+            कृपया नीचे पुस्तक का लाइव <strong>प्रीव्यू (Preview)</strong> देखें।
+          </div>
+        </div>
+        <button type="button" onclick="this.parentElement.style.opacity='0';this.parentElement.style.transform='translateX(-50%) translateY(-20px)';" style="background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;padding:0 4px;line-height:1;">&times;</button>
+      `;
+      document.body.appendChild(toast);
+    }
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    });
+
+    setTimeout(() => {
+      if (toast) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+      }
+    }, 4500);
+
+    const previewSec = document.getElementById('sec-book-preview') || document.getElementById('sec_preview') || document.querySelector('.book-preview-gallery') || document.getElementById('preview-gallery');
+    if (previewSec) {
+      previewSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const origShadow = previewSec.style.boxShadow;
+      previewSec.style.boxShadow = '0 0 35px rgba(245,158,11,0.6)';
+      setTimeout(() => { previewSec.style.boxShadow = origShadow; }, 2200);
+    }
+  };
+
   window.openDemoReaderWithAuth = function(bookId, demoPages) {
     const rawTarget = (bookId || currentBookData?.id || currentBookId || 'BK001').toUpperCase().trim();
+
+    // Check if book has a demo available; if not, show message and preview
+    if (!window.checkBookDemoAvailability(rawTarget)) {
+      window.showNoDemoNotification();
+      return;
+    }
+
     let demoTarget = rawTarget;
     if (!rawTarget.startsWith('DEMO') && !rawTarget.startsWith('FREE') && !rawTarget.startsWith('BONUS')) {
       demoTarget = 'DEMO-' + rawTarget;
@@ -496,8 +579,29 @@
     const primaryPath = isEbooksSubdir ? `../${cleanUrl}` : `/${cleanUrl}`;
     const fallbackPath = isEbooksSubdir ? `/${cleanUrl}` : `../${cleanUrl}`;
 
-    // High-speed CDN/Browser caching with 60-second revalidation for ultra-fast mobile loading
-    const cacheBucket = Math.floor(Date.now() / 60000);
+    const cacheKey = `AOI_CACHE_${cleanUrl.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+    // High-speed Session Storage cache (0ms immediate load)
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const item = JSON.parse(cached);
+        if (item && item.data && (Date.now() - item.time < 300000)) { // 5-minute cache
+          // Background revalidation
+          if (Date.now() - item.time > 60000) {
+            fetch(primaryPath).then(r => r.ok ? r.json() : null).then(fresh => {
+              if (fresh) {
+                try { sessionStorage.setItem(cacheKey, JSON.stringify({ data: fresh, time: Date.now() })); } catch(e) {}
+              }
+            }).catch(() => {});
+          }
+          return item.data;
+        }
+      }
+    } catch (e) {}
+
+    // High-speed CDN/Browser caching with 5-minute revalidation for ultra-fast mobile loading
+    const cacheBucket = Math.floor(Date.now() / 300000);
     const candidates = [
       `${primaryPath}?v=${cacheBucket}`,
       primaryPath,
@@ -508,7 +612,11 @@
       try {
         const res = await fetch(c);
         if (res.ok) {
-          return await res.json();
+          const json = await res.json();
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ data: json, time: Date.now() }));
+          } catch(e) {}
+          return json;
         }
       } catch (e) {}
     }
@@ -598,12 +706,21 @@
             rating_count: '120+ Ratings',
             cover_image: bookInLib.cover || bookInLib.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
             banner_image: bookInLib.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp',
-            features: [
-              { icon: 'fa-seedling', text: `${bookInLib.totalPages || 120}+ रंगीन पेज` },
-              { icon: 'fa-camera', text: '300+ फोटो' },
-              { icon: 'fa-flask', text: 'स्प्रे साइंस' },
-              { icon: 'fa-gift', text: 'Free Bonus' }
-            ]
+            features: (bookInLib.features && bookInLib.features.length > 0)
+              ? bookInLib.features.map(f => typeof f === 'string' ? { icon: 'fa-book-open', text: f } : f)
+              : ((bookInLib.id === 'BK018' || (bookInLib.category || '').toLowerCase().includes('business'))
+                ? [
+                    { icon: 'fa-book-open', text: '120 पेज की सम्पूर्ण गाइड' },
+                    { icon: 'fa-bolt', text: '60+ घर बैठे कमाई के तरीके' },
+                    { icon: 'fa-globe', text: '150+ वेरिफाइड वेबसाइट्स लिस्ट' },
+                    { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+                  ]
+                : [
+                    { icon: 'fa-seedling', text: `${bookInLib.totalPages || 120}+ रंगीन पेज` },
+                    { icon: 'fa-camera', text: '300+ फोटो' },
+                    { icon: 'fa-flask', text: 'स्प्रे साइंस' },
+                    { icon: 'fa-gift', text: 'Free Bonus' }
+                  ])
           }
         };
       } else if (qKey.startsWith('DEMO-') || qKey.startsWith('DEMO_') || qKey.startsWith('FREE-') || qKey.startsWith('BONUS-')) {
@@ -971,16 +1088,24 @@
 
       return { icon, title, subtitle, rawText, leadingEmoji };
     }
+    window.parseKpiItem = parseKpiItem;
 
     // Hero Features / Badges inside hero
     const featWrap = document.getElementById('hero-features-wrap');
     if (featWrap) {
-      const feats = (hero.features && hero.features.length > 0) ? hero.features : [
+      const isBusinessOrIncome = (b.category === 'Business' || b.category === 'Digital AI' || (b.id && b.id.toUpperCase() === 'BK018') || (l.category === 'Business'));
+      const defaultFeats = isBusinessOrIncome ? [
+        { icon: 'fa-book-open', text: `${b.totalPages || 120}+ रंगीन पेज` },
+        { icon: 'fa-bolt', text: '60+ कमाई के तरीके' },
+        { icon: 'fa-globe', text: '150+ उपयोगी वेबसाइट्स' },
+        { icon: 'fa-gift', text: 'Free Bonus PDF' }
+      ] : [
         { icon: 'fa-seedling', text: `${b.totalPages || 120}+ रंगीन पेज` },
         { icon: 'fa-camera', text: '300+ फोटो' },
         { icon: 'fa-circle-check', text: 'Scientific Guide' },
         { icon: 'fa-gift', text: 'Free Bonus PDF' }
       ];
+      const feats = (hero.features && hero.features.length > 0) ? hero.features : ((b.features && b.features.length > 0) ? b.features : defaultFeats);
       featWrap.innerHTML = feats.map(f => {
         const item = parseKpiItem(f);
         let fIconHtml = '<i class="fa-solid fa-check"></i>';
@@ -1801,23 +1926,44 @@
     const b = currentBookData || {};
     const hero = l.hero || {};
 
-    const badges = (hero.features && hero.features.length > 0) ? hero.features : [
-      { icon: 'fa-seedling', text: `${b.totalPages || 120} पेज की प्रीमियम गाइड` },
-      { icon: 'fa-camera', text: '300+ वास्तविक रंगीन फोटो' },
-      { icon: 'fa-flask', text: 'स्प्रे साइंस व सटीक फॉर्मूला' },
-      { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
-    ];
+    let badges = [];
+    if (hero.features && Array.isArray(hero.features) && hero.features.length > 0) {
+      badges = hero.features;
+    } else if (b.features && Array.isArray(b.features) && b.features.length > 0) {
+      badges = b.features;
+    } else if (l.features && Array.isArray(l.features) && l.features.length > 0) {
+      badges = l.features;
+    } else {
+      const isBusinessOrIncome = (b.category === 'Business' || b.category === 'Digital AI' || (b.id && b.id.toUpperCase() === 'BK018') || (l.category === 'Business'));
+      if (isBusinessOrIncome) {
+        badges = [
+          { icon: 'fa-book-open', text: `${b.totalPages || 120} पेज की सम्पूर्ण गाइड` },
+          { icon: 'fa-bolt', text: '60+ घर बैठे कमाई के तरीके' },
+          { icon: 'fa-globe', text: '150+ वेरिफाइड वेबसाइट्स लिस्ट' },
+          { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+        ];
+      } else {
+        badges = [
+          { icon: 'fa-seedling', text: `${b.totalPages || 120} पेज की प्रीमियम गाइड` },
+          { icon: 'fa-camera', text: '300+ वास्तविक रंगीन फोटो' },
+          { icon: 'fa-flask', text: 'स्प्रे साइंस व सटीक फॉर्मूला' },
+          { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+        ];
+      }
+    }
 
     grid.innerHTML = badges.map(badge => {
-      let item;
-      if (typeof parseKpiItem === 'function') {
-        item = parseKpiItem(badge);
-      } else {
-        item = {
-          icon: badge.icon || '',
-          title: badge.text || '',
-          subtitle: ''
-        };
+      let item = (typeof window.parseKpiItem === 'function') ? window.parseKpiItem(badge) : ((typeof parseKpiItem === 'function') ? parseKpiItem(badge) : null);
+      if (!item) {
+        if (typeof badge === 'string') {
+          item = { icon: 'fa-circle-check', title: badge, subtitle: '' };
+        } else {
+          item = {
+            icon: badge.icon || 'fa-circle-check',
+            title: badge.text || badge.title || '',
+            subtitle: badge.desc || badge.subtitle || ''
+          };
+        }
       }
 
       let iconHtml = '<i class="fa-solid fa-circle-check"></i>';
@@ -2066,40 +2212,64 @@
 
     // 2. Determine 2nd book in combo
     const primaryId = (currentBookData.id || currentBookId || 'BK001').trim().toUpperCase();
+    const currentCat = (currentBookData.category || l.category || '').toLowerCase();
+    const isBusinessOrIncome = currentCat.includes('business') || currentCat.includes('digital') || currentCat.includes('income') || primaryId === 'BK018';
+
     if (l.suggested_books_list && l.suggested_books_list.length > 0) {
       l.suggested_books_list.forEach(sb => {
         const suggestedId = (sb.link || sb.id || '').trim().toUpperCase();
         if (!suggestedId || suggestedId === primaryId || comboBooks.some(book => book.id.toUpperCase() === suggestedId)) return;
+        const matchingBook = allBooks.find(b => b && b.id && b.id.toUpperCase() === suggestedId);
+        const autoDesc = sb.desc || (matchingBook && Array.isArray(matchingBook.features) && matchingBook.features[0]) || `${matchingBook?.totalPages || 120}+ पेज • सम्पूर्ण गाइड`;
         comboBooks.push({
           id: suggestedId,
           tag: '🏆 Bestseller Guide',
-          heading: sb.title || 'संबंधित ई-बुक',
-          cover: sb.image || '/images/books/fasal-ka-doctor-cover.webp',
-          offerPrice: parseInt(sb.offerPrice || 99, 10),
-          mrp: parseInt(sb.mrp || 299, 10),
-          desc: '120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस'
+          heading: sb.title || matchingBook?.heading || matchingBook?.name || 'संबंधित ई-बुक',
+          cover: sb.image || matchingBook?.cover || matchingBook?.thumbnail || '/images/books/ai-website-guide-cover.webp',
+          offerPrice: parseInt(sb.offerPrice || matchingBook?.offerPrice || 99, 10),
+          mrp: parseInt(sb.mrp || matchingBook?.mrp || 299, 10),
+          desc: autoDesc
         });
       });
     } else {
-      // Pick alternative companion book from library
-      const otherBook = allBooks.find(b => b.id && b.id.toUpperCase() !== primaryId && (b.status === 'active' || !b.status)) || {
-        id: primaryId === 'BK002' ? 'BK001' : 'BK002',
-        name: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
-        heading: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
-        cover: primaryId === 'BK002' ? '/images/books/kharif-master-guide-2026-cover.webp' : '/images/books/fasal-ka-doctor-cover.webp',
-        offerPrice: 99,
-        mrp: 299,
-        desc: '120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस'
-      };
+      // Pick alternative companion book from library matching category
+      let otherBook = allBooks.find(b => b.id && b.id.toUpperCase() !== primaryId && (b.status === 'active' || !b.status) && (b.category || '').toLowerCase() === currentCat);
+      if (!otherBook) {
+        if (isBusinessOrIncome) {
+          otherBook = allBooks.find(b => b.id && b.id.toUpperCase() === 'BK006') || allBooks.find(b => b.id && b.id.toUpperCase() !== primaryId && (b.status === 'active' || !b.status));
+        } else {
+          otherBook = allBooks.find(b => b.id && b.id.toUpperCase() !== primaryId && (b.status === 'active' || !b.status));
+        }
+      }
 
+      if (!otherBook) {
+        otherBook = isBusinessOrIncome ? {
+          id: 'BK006',
+          heading: 'AI वेबसाइट व डिजिटल बिज़नेस मास्टर गाइड',
+          cover: '/images/books/ai-website-guide-cover.webp',
+          offerPrice: 99,
+          mrp: 299,
+          desc: '120+ रंगीन पेज • 100+ AI टूल्स व प्रैक्टिकल गाइड'
+        } : {
+          id: primaryId === 'BK002' ? 'BK001' : 'BK002',
+          name: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
+          heading: primaryId === 'BK002' ? 'खरीफ फसल मास्टर गाइड 2026' : 'खेती का डॉक्टर (Pocket Doctor)',
+          cover: primaryId === 'BK002' ? '/images/books/kharif-master-guide-2026-cover.webp' : '/images/books/fasal-ka-doctor-cover.webp',
+          offerPrice: 99,
+          mrp: 299,
+          desc: '120+ रंगीन पेज • 300+ फोटो • प्रैक्टिकल गाइड'
+        };
+      }
+
+      const autoDesc = otherBook.desc || (Array.isArray(otherBook.features) && otherBook.features[0]) || `${otherBook.totalPages || 120}+ रंगीन पेज • सम्पूर्ण गाइड`;
       comboBooks.push({
         id: otherBook.id,
-        tag: otherBook.id === 'BK002' ? '🏆 Bestseller Guide' : '🌾 खरीफ मास्टर गाइड',
+        tag: otherBook.id === 'BK002' ? '🏆 Bestseller Guide' : (isBusinessOrIncome ? '🚀 Bestseller Guide' : '🌾 कृषि मास्टर गाइड'),
         heading: otherBook.heading || otherBook.name,
-        cover: otherBook.cover || otherBook.thumbnail || '/images/books/fasal-ka-doctor-cover.webp',
+        cover: otherBook.cover || otherBook.thumbnail || (isBusinessOrIncome ? '/images/books/ai-website-guide-cover.webp' : '/images/books/fasal-ka-doctor-cover.webp'),
         offerPrice: parseInt(otherBook.offerPrice || 99, 10),
         mrp: parseInt(otherBook.mrp || 299, 10),
-        desc: otherBook.desc || '120+ रंगीन पेज • 300+ फोटो • स्प्रे साइंस'
+        desc: autoDesc
       });
     }
 
@@ -2111,7 +2281,7 @@
 
     grid.innerHTML = displayBooks.map((b, idx) => `
       <div class="ubl-combo-book-card">
-        <img src="${window.resolveImageSrc(b.cover)}" alt="${escapeHtml(b.heading)}" class="ubl-combo-book-thumb" onerror="window.handleImageError(this)" style="animation: ublFloatBook3D 4.5s ease-in-out infinite ${idx * 1.5}s;">
+        <img src="${window.resolveImageSrc(b.cover)}" alt="${escapeHtml(b.heading)}" class="ubl-combo-book-thumb" loading="lazy" decoding="async" onerror="window.handleImageError(this)" style="animation: ublFloatSoft2D 3.5s ease-in-out infinite ${idx * 1.2}s;">
         <div style="text-align: left; flex: 1;">
           <span class="ubl-combo-tag" style="background:${idx === 0 ? '#16a34a' : '#0284c7'};">${b.tag || '🏆 Bestseller Guide'}</span>
           <h3 style="font-size: 1.05rem; font-weight: 900; color: #1e293b; margin: 4px 0 2px 0;">${escapeHtml(b.heading)}</h3>

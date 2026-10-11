@@ -2785,6 +2785,18 @@ body {
   }
 }
 
+/* 2D SAFE FLOAT FOR COMBO/SUGGESTED BOOKS (PREVENTS SHADOW CLIPPING IN FB IN-APP BROWSER) */
+@keyframes ublFloatSoft2D {
+  0%, 100% {
+    transform: translateY(0px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+  }
+  50% {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.24);
+  }
+}
+
 .hero-book {
   display: flex;
   justify-content: center;
@@ -2931,8 +2943,12 @@ body {
   height: 125px;
   object-fit: cover;
   border-radius: 8px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18) !important;
   flex-shrink: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 .ubl-combo-tag {
   background: #2E7D32;

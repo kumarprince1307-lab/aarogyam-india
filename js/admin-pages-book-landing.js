@@ -344,6 +344,7 @@ export async function initBookLandingPages() {
                     <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
                     <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
                     <option value="BK017">🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका</option>
+                    <option value="BK018">💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide</option>
                   </select>
                   <button type="button" onclick="window.autoImportDemoFromSelectedBook()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; font-size: 0.75rem; white-space: nowrap;">
                     📥 इम्पोर्ट करें
@@ -1823,6 +1824,7 @@ Instant Download & Lifetime Access
                 <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
                 <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
                 <option value="BK017">🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका</option>
+                <option value="BK018">💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide</option>
                 <option value="ALL">🎁 ALL: सभी पुस्तकों के साथ (Universal Bonus)</option>
               </select>
               <button type="button" onclick="window.autoImportFromTargetMainBook()" class="admin-button small-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; margin-top: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(2,132,199,0.3);">
@@ -1858,6 +1860,8 @@ Instant Download & Lifetime Access
                   <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK008" /> BK008 (जैविक)</label>
                   <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK015" /> BK015 (सब्जी)</label>
                   <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK016" /> BK016 (कृषि दवा)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK017" /> BK017 (गेहूँ)</label>
+                  <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:#fff;cursor:pointer;"><input type="checkbox" name="fd_attached_books" value="BK018" /> BK018 (कमाई गाइड)</label>
                 </div>
               </div>
             </div>
@@ -4807,7 +4811,8 @@ Instant Download & Lifetime Access
       { id: 'BK012', name: '🌱 BK012: सब्जी खेती गाइड' },
       { id: 'BK015', name: '🌱 BK015: सब्जी खेती मास्टर PART 1' },
       { id: 'BK016', name: '🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा' },
-      { id: 'BK017', name: '🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका' }
+      { id: 'BK017', name: '🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका' },
+      { id: 'BK018', name: '💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide' }
     ];
 
     const bookMap = new Map();
@@ -5996,27 +6001,47 @@ Instant Download & Lifetime Access
   function renderKpiBadgesInBuilder() {
     const wrap = document.getElementById('blp_kpi_badges_list_wrap');
     if (!wrap) return;
-    if (currentKpis.length === 0) {
+    if (!currentKpis || currentKpis.length === 0) {
       wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:8px;">कोई KPI बैज नहीं है। "+ नया KPI बैज जोड़ें" पर क्लिक करें।</div>';
       return;
     }
-    wrap.innerHTML = currentKpis.map((kpi, idx) => `
-      <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:1fr 2fr auto;gap:8px;align-items:center;">
-        <select onchange="window.updateKpiField(${idx}, 'icon', this.value)" class="admin-select" style="padding:4px 8px;font-size:0.82rem;font-weight:700;">
-          <option value="fa-seedling" ${kpi.icon === 'fa-seedling' ? 'selected' : ''}>🌱 fa-seedling</option>
-          <option value="fa-camera" ${kpi.icon === 'fa-camera' ? 'selected' : ''}>📷 fa-camera</option>
-          <option value="fa-circle-check" ${kpi.icon === 'fa-circle-check' ? 'selected' : ''}>✅ fa-circle-check</option>
-          <option value="fa-gift" ${kpi.icon === 'fa-gift' ? 'selected' : ''}>🎁 fa-gift</option>
-          <option value="fa-flask" ${kpi.icon === 'fa-flask' ? 'selected' : ''}>🧪 fa-flask</option>
-          <option value="fa-user-doctor" ${kpi.icon === 'fa-user-doctor' ? 'selected' : ''}>🩺 fa-user-doctor</option>
-          <option value="fa-shield-halved" ${kpi.icon === 'fa-shield-halved' ? 'selected' : ''}>🛡️ fa-shield-halved</option>
-          <option value="fa-bolt" ${kpi.icon === 'fa-bolt' ? 'selected' : ''}>⚡ fa-bolt</option>
-          <option value="fa-book-open" ${kpi.icon === 'fa-book-open' ? 'selected' : ''}>📖 fa-book-open</option>
+    // Normalize to objects
+    currentKpis = currentKpis.map(k => {
+      if (typeof k === 'string') return { icon: 'fa-book-open', text: k };
+      return { icon: k.icon || 'fa-book-open', text: k.text || '' };
+    });
+
+    const knownIcons = [
+      { id: 'fa-book-open', label: '📖 fa-book-open (किताब/पेज)' },
+      { id: 'fa-bolt', label: '⚡ fa-bolt (स्पीड/तरीके)' },
+      { id: 'fa-globe', label: '🌐 fa-globe (वेबसाइट/इंटरनेट)' },
+      { id: 'fa-gift', label: '🎁 fa-gift (बोनस/गिफ्ट)' },
+      { id: 'fa-briefcase', label: '💼 fa-briefcase (बिज़नेस/कमाई)' },
+      { id: 'fa-laptop', label: '💻 fa-laptop (ऑनलाइन/वर्क)' },
+      { id: 'fa-money-bill-wave', label: '💵 fa-money-bill-wave (पैसे/इनकम)' },
+      { id: 'fa-chart-line', label: '📈 fa-chart-line (ग्रोथ)' },
+      { id: 'fa-seedling', label: '🌱 fa-seedling (खेती/पौधा)' },
+      { id: 'fa-camera', label: '📷 fa-camera (फोटो)' },
+      { id: 'fa-flask', label: '🧪 fa-flask (फॉर्मूला/साइंस)' },
+      { id: 'fa-circle-check', label: '✅ fa-circle-check (वेरिफाइड)' },
+      { id: 'fa-user-doctor', label: '🩺 fa-user-doctor (एक्सपर्ट)' },
+      { id: 'fa-shield-halved', label: '🛡️ fa-shield-halved (सुरक्षित)' }
+    ];
+
+    wrap.innerHTML = currentKpis.map((kpi, idx) => {
+      const isKnown = knownIcons.some(ki => ki.id === kpi.icon);
+      const customOption = (!isKnown && kpi.icon) ? `<option value="${escapeHtml(kpi.icon)}" selected>${escapeHtml(kpi.icon)}</option>` : '';
+      return `
+      <div class="blp-kpi-row" style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:1.2fr 2fr auto;gap:8px;align-items:center;">
+        <select onchange="window.updateKpiField(${idx}, 'icon', this.value)" class="admin-select kpi-icon-select" style="padding:4px 8px;font-size:0.82rem;font-weight:700;">
+          ${customOption}
+          ${knownIcons.map(ki => `<option value="${ki.id}" ${kpi.icon === ki.id ? 'selected' : ''}>${ki.label}</option>`).join('')}
         </select>
-        <input type="text" placeholder="बैज टेक्स्ट (उदा. 120 पेज की प्रीमियम)" value="${escapeHtml(kpi.text || '')}" onchange="window.updateKpiField(${idx}, 'text', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;" />
+        <input type="text" placeholder="बैज टेक्स्ट (उदा. 120 पेज की सम्पूर्ण गाइड)" value="${escapeHtml(kpi.text || '')}" oninput="window.updateKpiField(${idx}, 'text', this.value)" onchange="window.updateKpiField(${idx}, 'text', this.value)" class="admin-input kpi-text-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;" />
         <button type="button" onclick="window.removeKpiItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;">&times;</button>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderWhyCardsInBuilder() {
@@ -6513,8 +6538,13 @@ Instant Download & Lifetime Access
     showToast('↺ डिफ़ॉल्ट सेक्शन क्रम रीसेट हो गया!', 'info');
   }
 
-  // Window Field Updaters
-  window.updateKpiField = (idx, fld, val) => { if (currentKpis[idx]) currentKpis[idx][fld] = val; };
+  window.updateKpiField = (idx, fld, val) => {
+    if (!currentKpis[idx]) return;
+    if (typeof currentKpis[idx] === 'string') {
+      currentKpis[idx] = { icon: 'fa-book-open', text: currentKpis[idx] };
+    }
+    currentKpis[idx][fld] = val;
+  };
   window.removeKpiItem = (idx) => { currentKpis.splice(idx, 1); renderKpiBadgesInBuilder(); };
   window.updateWhyCardField = (idx, fld, val) => { if (currentWhyCards[idx]) currentWhyCards[idx][fld] = val; };
   window.removeWhyCardItem = (idx) => { currentWhyCards.splice(idx, 1); renderWhyCardsInBuilder(); };
@@ -7132,14 +7162,50 @@ Instant Download & Lifetime Access
     { id: 'BK012', name: '🌱 सब्जी खेती गाइड' },
     { id: 'BK015', name: '🌱 सब्जी खेती मास्टर PART 1' },
     { id: 'BK016', name: '🌾 कृषि दवा डायरेक्टरी' },
-    { id: 'BK017', name: '🌾 गेहूँ की खेती सम्पूर्ण मार्गदर्शिका' }
+    { id: 'BK017', name: '🌾 गेहूँ की खेती सम्पूर्ण मार्गदर्शिका' },
+    { id: 'BK018', name: '💰 घर बैठे पैसे कैसे कमाएँ? Income Guide' }
   ];
+
+  function getAllRegisteredMainBooks() {
+    const map = new Map();
+    ALL_MAIN_BOOKS_LIST.forEach(b => map.set(b.id, b.name));
+
+    if (Array.isArray(allBooks)) {
+      allBooks.forEach(b => {
+        if (!b || !b.id) return;
+        const bId = b.id.trim().toUpperCase();
+        if (bId.startsWith('DEMO') || bId.startsWith('FREE') || bId.startsWith('BONUS') || b.book_type === 'demo' || b.book_type === 'free') return;
+        if (!map.has(bId)) {
+          map.set(bId, b.heading || b.name || bId);
+        }
+      });
+    }
+
+    try {
+      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+      if (Array.isArray(customBooks)) {
+        customBooks.forEach(b => {
+          if (!b || !b.id) return;
+          const bId = b.id.trim().toUpperCase();
+          if (bId.startsWith('DEMO') || bId.startsWith('FREE') || bId.startsWith('BONUS') || b.book_type === 'demo' || b.book_type === 'free') return;
+          if (!map.has(bId)) {
+            map.set(bId, b.heading || b.name || bId);
+          }
+        });
+      }
+    } catch(e) {}
+
+    const result = [];
+    map.forEach((name, id) => result.push({ id, name }));
+    return result;
+  }
 
   window.renderAttachedBooksTray = function(selectedBookIds = []) {
     const tray = document.getElementById('blp_attached_books_tray');
     if (!tray) return;
 
-    tray.innerHTML = ALL_MAIN_BOOKS_LIST.map(b => {
+    const bookList = getAllRegisteredMainBooks();
+    tray.innerHTML = bookList.map(b => {
       const isChecked = selectedBookIds.includes(b.id) || selectedBookIds.includes('ALL');
       return `
         <label style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #e2e8f0; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
@@ -7257,8 +7323,29 @@ Instant Download & Lifetime Access
     if (prevBanner && hero.banner_image) prevBanner.src = hero.banner_image;
 
     // 2. Dynamic KPIs
-    if (hero.features && Array.isArray(hero.features) && hero.features.length > 0) {
-      currentKpis = JSON.parse(JSON.stringify(hero.features));
+    const rawKpis = (hero.features && Array.isArray(hero.features) && hero.features.length > 0)
+      ? hero.features
+      : (page.features && Array.isArray(page.features) && page.features.length > 0 ? page.features : null);
+
+    if (rawKpis && rawKpis.length > 0) {
+      currentKpis = JSON.parse(JSON.stringify(rawKpis)).map(k => {
+        if (typeof k === 'string') return { icon: 'fa-book-open', text: k };
+        return { icon: k.icon || 'fa-book-open', text: k.text || '' };
+      });
+    } else if (sourceId === 'BK018' || newId === 'BK018') {
+      currentKpis = [
+        { icon: 'fa-book-open', text: '120 पेज की सम्पूर्ण गाइड' },
+        { icon: 'fa-bolt', text: '60+ घर बैठे कमाई के तरीके' },
+        { icon: 'fa-globe', text: '150+ वेरिफाइड वेबसाइट्स लिस्ट' },
+        { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+      ];
+    } else {
+      currentKpis = [
+        { icon: 'fa-book-open', text: '120+ रंगीन पेज' },
+        { icon: 'fa-camera', text: '300+ फोटो' },
+        { icon: 'fa-seedling', text: 'सटीक प्रैक्टिकल गाइड' },
+        { icon: 'fa-gift', text: 'फ्री बोनस PDF' }
+      ];
     }
     if (typeof renderKpiBadgesInBuilder === 'function') renderKpiBadgesInBuilder();
 
@@ -7879,10 +7966,27 @@ Instant Download & Lifetime Access
       setVal('blp_ai_support_desc', page.ai_support_desc || '');
 
       // Repeaters data
-      currentKpis = hero.features || [
-        { icon: 'fa-seedling', text: '120 पेज की प्रीमियम' },
-        { icon: 'fa-camera', text: '300+ फोटो' }
-      ];
+      const rawEditKpis = (hero.features && Array.isArray(hero.features) && hero.features.length > 0)
+        ? hero.features
+        : (page.features && Array.isArray(page.features) && page.features.length > 0 ? page.features : null);
+      if (rawEditKpis && rawEditKpis.length > 0) {
+        currentKpis = JSON.parse(JSON.stringify(rawEditKpis)).map(k => {
+          if (typeof k === 'string') return { icon: 'fa-book-open', text: k };
+          return { icon: k.icon || 'fa-book-open', text: k.text || '' };
+        });
+      } else if (bookId === 'BK018' || page.id === 'BK018') {
+        currentKpis = [
+          { icon: 'fa-book-open', text: '120 पेज की सम्पूर्ण गाइड' },
+          { icon: 'fa-bolt', text: '60+ घर बैठे कमाई के तरीके' },
+          { icon: 'fa-globe', text: '150+ वेरिफाइड वेबसाइट्स लिस्ट' },
+          { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+        ];
+      } else {
+        currentKpis = [
+          { icon: 'fa-seedling', text: '120 पेज की प्रीमियम' },
+          { icon: 'fa-camera', text: '300+ फोटो' }
+        ];
+      }
       currentWhyCards = page.why_read?.cards || [];
       setVal('blp_why_title', page.why_read?.title || 'यह पुस्तक क्यों खरीदें?');
       setVal('blp_why_desc', page.why_read?.subtitle || '');
@@ -8305,6 +8409,25 @@ Instant Download & Lifetime Access
     if (isDemoBook && attachedMainBooks.length === 0) {
       const derivedMain = bId.replace(/^DEMO[-_]?/i, '');
       if (derivedMain) attachedMainBooks.push(derivedMain);
+    }
+
+    // Harvest KPI badges directly from DOM if available to ensure zero loss
+    const kpiWrap = document.getElementById('blp_kpi_badges_list_wrap');
+    if (kpiWrap) {
+      const rows = kpiWrap.querySelectorAll('.blp-kpi-row');
+      if (rows && rows.length > 0) {
+        const harvested = Array.from(rows).map(r => {
+          const sel = r.querySelector('select');
+          const inp = r.querySelector('input[type="text"]');
+          return {
+            icon: sel ? sel.value : 'fa-book-open',
+            text: inp ? inp.value.trim() : ''
+          };
+        }).filter(k => k.text.length > 0);
+        if (harvested.length > 0) {
+          currentKpis = harvested;
+        }
+      }
     }
 
     const pageData = {
