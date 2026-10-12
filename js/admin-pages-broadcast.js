@@ -360,12 +360,13 @@ export async function initAdminBroadcast() {
             </label>
             <select id="vip_page_selector" class="admin-select" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1.5px solid #CBD5E1; font-weight: 700;">
               <option value="/index.html" data-title="आरोग्यम इंडिया - मुख्य पोर्टल" data-thumb="/images/banners/hero-banner-1.jpeg">🏠 मुख्य होम पेज (/index.html)</option>
-              <option value="/daily-tips.html" data-title="दैनिक स्वास्थ्य व कृषि टिप्स" data-thumb="/images/banners/daily-tips-banner.jpeg">💡 दैनिक टिप्स (/daily-tips.html)</option>
-              <option value="/franchise.html" data-title="आरोग्यम केंद्र / फ्रैंचाइज़ी पार्टनरशिप" data-thumb="/images/banners/franchise-banner.jpeg">🏢 आरोग्यम केंद्र / फ्रैंचाइज़ी (/franchise.html)</option>
-              <option value="/netsurf-join.html" data-title="नेट्सर्फ डायरेक्ट सेलर सदस्यता व करियर" data-thumb="/images/banners/hero_slide-netsurf-061003-6ii5.webp">💼 नेट्सर्फ सदस्यता (/netsurf-join.html)</option>
-              <option value="/categories/agriculture.html" data-title="कृषि समाधान व जैविक खाद-कीट हब" data-thumb="/images/banners/agri-banner.jpeg">🌾 कृषि समाधान हब (/categories/agriculture.html)</option>
+              <option value="/crop-doctor.html" data-title="फसल का डॉक्टर व कृषि कीट समाधान" data-thumb="/images/banners/agri-banner.jpeg">🌾 फसल का डॉक्टर (/crop-doctor.html)</option>
               <option value="/categories/health.html" data-title="सम्पूर्ण स्वास्थ्य केंद्र - 13+ समाधान" data-thumb="/images/banners/og_image-health-og-676433-sb3k.webp">🌿 स्वास्थ्य केंद्र हब (/categories/health.html)</option>
               <option value="/pashu-palan.html" data-title="पशुपालन व दुग्ध संवर्धन संपूर्ण हब" data-thumb="/images/banners/og_image-pashupalan-029612-sv0a.webp">🐄 पशुपालन संपूर्ण हब (/pashu-palan.html)</option>
+              <option value="/tube.html" data-title="AarogyamTube कृषि व स्वास्थ्य वीडियो हब" data-thumb="/images/banners/aarogyamtube-default-thumb.svg">📺 AarogyamTube हब (/tube.html)</option>
+              <option value="/store.html" data-title="आरोग्यम संपूर्ण प्रोडक्ट व ई-बुक स्टोर" data-thumb="/images/banners/hero-banner-1.jpeg">🛒 सम्पूर्ण स्टोर (/store.html)</option>
+              <option value="/mandi.html" data-title="लाइव मंडी भाव व कृषि बाजार केंद्र" data-thumb="/images/banners/agri-banner.jpeg">📊 लाइव मंडी भाव (/mandi.html)</option>
+              <option value="/weather.html" data-title="मौसम पूर्वानुमान व कृषि सलाह" data-thumb="/images/banners/agri-banner.jpeg">🌤️ मौसम पूर्वानुमान (/weather.html)</option>
             </select>
           </div>
 
@@ -1807,6 +1808,81 @@ export async function initAdminBroadcast() {
     showToast('🔄 डिफ़ॉल्ट पेज थंबनेल सक्रिय हो गया!', 'info');
   });
 
+  // -------------------------------------------------------------
+  // 🛡️ VIP OFFER CRYPTOGRAPHIC SIGNATURE & EXPIRY ENGINE
+  // -------------------------------------------------------------
+  const OFFER_SECURITY_SALT = 'AAROGYAM_OFFER_SIG_SALT_v2026_KARTIK';
+
+  function sha256Hex(ascii) {
+    function rightRotate(value, amount) {
+      return (value >>> amount) | (value << (32 - amount));
+    }
+    const mathPow = Math.pow;
+    let i, j;
+    let result = '';
+    const words = [];
+    const asciiBitLength = ascii.length * 8;
+    let hash = [
+      0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+      0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+    ];
+    const k = [
+      0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+      0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+      0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+      0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+      0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+      0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+      0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+      0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ];
+    let wordsLength = 0;
+    for (i = 0; i < ascii.length; i++) {
+      const charCode = ascii.charCodeAt(i);
+      const wordIndex = i >> 2;
+      words[wordIndex] = (words[wordIndex] || 0) | ((charCode & 255) << (8 * (3 - (i % 4))));
+    }
+    words[asciiBitLength >> 5] = (words[asciiBitLength >> 5] || 0) | (0x80 << (24 - (asciiBitLength % 32)));
+    words[(((asciiBitLength + 64) >> 9) << 4) + 15] = asciiBitLength;
+    wordsLength = words.length;
+    for (i = 0; i < wordsLength; i += 16) {
+      const w = words.slice(i, i + 16);
+      const oldHash = hash.slice(0);
+      for (j = 16; j < 64; j++) {
+        const s0 = rightRotate(w[j - 15], 7) ^ rightRotate(w[j - 15], 18) ^ (w[j - 15] >>> 3);
+        const s1 = rightRotate(w[j - 2], 17) ^ rightRotate(w[j - 2], 19) ^ (w[j - 2] >>> 10);
+        w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
+      }
+      for (j = 0; j < 64; j++) {
+        const s1_ch = rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25);
+        const ch = (hash[4] & hash[5]) ^ ((~hash[4]) & hash[6]);
+        const t1 = (hash[7] + s1_ch + ch + k[j] + w[j]) | 0;
+        const s0_maj = rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22);
+        const maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+        const t2 = (s0_maj + maj) | 0;
+        hash = [(t1 + t2) | 0].concat(hash);
+        hash[4] = (hash[4] + t1) | 0;
+      }
+      for (j = 0; j < 8; j++) hash[j] = (hash[j] + oldHash[j]) | 0;
+    }
+    for (i = 0; i < 8; i++) {
+      for (j = 3; j >= 0; j--) {
+        const b = (hash[i] >> (8 * j)) & 255;
+        result += (b < 16 ? '0' : '') + b.toString(16);
+      }
+    }
+    return result;
+  }
+
+  function generateOfferSignature(bookId, amount, mobile, timerOrExp) {
+    const cleanMobile = (mobile || '').toString().replace(/\D/g, '').slice(-10);
+    const cleanBook = (bookId || '').toUpperCase().trim();
+    const cleanAmount = (amount !== undefined && amount !== null) ? parseInt(amount, 10) : 99;
+    const cleanToken = (timerOrExp || '').toString().trim();
+    const rawPayload = `${cleanBook}|${cleanAmount}|${cleanMobile}|${cleanToken}|${OFFER_SECURITY_SALT}`;
+    return sha256Hex(rawPayload).slice(0, 8);
+  }
+
   // Helper: Extract Target Details & Default Thumbnail & Universal Expiry
   function getCurrentTargetDetails() {
     const targetType = document.getElementById('vip_target_type_selector')?.value || 'ebook';
@@ -1831,7 +1907,8 @@ export async function initAdminBroadcast() {
     } else if (timerVal === '24h') expTimestamp = now + 24 * 3600 * 1000;
     else if (timerVal === '48h') expTimestamp = now + 48 * 3600 * 1000;
 
-    const expQuery = (expTimestamp && timerVal !== 'never') ? `&exp=${expTimestamp}&timer=${timerVal}` : '';
+    const expSec = (expTimestamp && timerVal !== 'never') ? Math.floor(expTimestamp / 1000) : 0;
+    const expQuery = (expSec > 0 && timerVal !== 'never') ? `&exp=${expSec}&timer=${encodeURIComponent(timerVal)}` : '';
 
     let title = 'आरोग्यम इंडिया';
     let path = '/index.html';
@@ -1842,14 +1919,14 @@ export async function initAdminBroadcast() {
     if (targetType === 'ebook') {
       const bookSel = document.getElementById('vip_book_selector');
       const selectedOption = bookSel?.options[bookSel.selectedIndex];
-      const bId = bookSel?.value || 'BK001';
-      title = selectedOption?.textContent.split('(')[0].trim() || 'खरीफ फसल मास्टर गाइड 2026';
-      path = `${selectedOption?.getAttribute('data-page') || '/ebooks/index.html'}?b=${bId}&vip=1&price=${customPrice}${expQuery}`;
+      const bId = (bookSel?.value || 'BK001').toUpperCase();
+      const matched = catalogBooks.find(b => b.id === bId);
+      title = matched?.name || matched?.heading || selectedOption?.textContent.split('(')[0].trim() || 'खरीफ फसल मास्टर गाइड 2026';
+      path = `/ebooks/book-landing.html?id=${bId}`;
       const optThumb = selectedOption?.getAttribute('data-thumb');
       if (optThumb && optThumb.trim()) {
         defaultThumb = optThumb.trim();
       } else {
-        const matched = catalogBooks.find(b => b.id === bId);
         defaultThumb = matched?.cover || matched?.thumbnail || matched?.banner || '/images/banners/ebook-banner.jpeg';
       }
     } else if (targetType === 'page') {
@@ -1867,22 +1944,14 @@ export async function initAdminBroadcast() {
       title = opt?.getAttribute('data-title') || 'सम्पूर्ण स्वास्थ्य केंद्र';
       path = `${hSel?.value || '/categories/health.html'}?ref=crm&vip=1${expQuery}`;
       const optThumb = opt?.getAttribute('data-thumb');
-      if (optThumb && optThumb.trim()) {
-        defaultThumb = optThumb.trim();
-      } else {
-        defaultThumb = '/images/banners/og_image-health-og-676433-sb3k.webp';
-      }
+      defaultThumb = (optThumb && optThumb.trim()) ? optThumb.trim() : '/images/banners/og_image-health-og-676433-sb3k.webp';
     } else if (targetType === 'pashu') {
       const pSel = document.getElementById('vip_pashu_selector');
       const opt = pSel?.options[pSel.selectedIndex];
       title = opt?.getAttribute('data-title') || 'पशुपालन व दुग्ध संवर्धन';
       path = `${pSel?.value || '/pashu-palan.html'}?ref=crm&vip=1${expQuery}`;
       const optThumb = opt?.getAttribute('data-thumb');
-      if (optThumb && optThumb.trim()) {
-        defaultThumb = optThumb.trim();
-      } else {
-        defaultThumb = '/images/banners/og_image-pashupalan-029612-sv0a.webp';
-      }
+      defaultThumb = (optThumb && optThumb.trim()) ? optThumb.trim() : '/images/banners/og_image-pashupalan-029612-sv0a.webp';
     } else if (targetType === 'tube') {
       const tSel = document.getElementById('vip_tube_video_selector');
       if (tSel?.value === 'custom_url') {
@@ -1909,16 +1978,102 @@ export async function initAdminBroadcast() {
       }
     } else if (targetType === 'netsurf') {
       title = 'नेट्सर्फ जैविक कृषि व डायरेक्ट सेलर सदस्यता';
-      path = `/netsurf-join.html?ref=crm&vip=1${expQuery}`;
+      path = `/store.html?ref=crm&vip=1${expQuery}`;
       defaultThumb = '/images/banners/hero_slide-netsurf-061003-6ii5.webp';
     } else if (targetType === 'catalog') {
       title = '7-भाषा संपूर्ण प्रोडक्ट कैटलॉग (डिजिटल PDF)';
-      path = `/catalog.html?ref=crm&vip=1${expQuery}`;
+      path = `/store.html?ref=crm&vip=1${expQuery}`;
       defaultThumb = '/images/banners/digital-training-banner.jpeg';
     }
 
     path = attachAdminShareId(path);
-    return { targetType, title, path, isEbook, customPrice, timerText, extraDesc, defaultThumb, expTimestamp, timerVal };
+    return { targetType, title, path, isEbook, customPrice, timerText, extraDesc, defaultThumb, expTimestamp, expSec, timerVal };
+  }
+
+  // -------------------------------------------------------------
+  // 🎁 HIGH-CONVERSION 2-LINK PERSONALIZED VIP OFFER GENERATOR
+  // -------------------------------------------------------------
+  function buildPersonalizedVipMessage(contact) {
+    const cName = contact?.full_name ? contact.full_name.split(' ')[0].trim() : (contact?.name ? contact.name.split(' ')[0].trim() : 'किसान साथी');
+    const cleanMob = (contact?.mobile || contact?.phone || '').toString().replace(/\D/g, '').slice(-10) || '7974422572';
+    
+    const { targetType, title, path, isEbook, customPrice, timerText, expSec, timerVal } = getCurrentTargetDetails();
+
+    if (isEbook) {
+      const bookSel = document.getElementById('vip_book_selector');
+      const selectedOption = bookSel?.options[bookSel.selectedIndex];
+      const bId = (bookSel?.value || 'BK001').toUpperCase();
+      const matched = catalogBooks.find(b => b.id === bId);
+      const bookTitle = matched?.name || matched?.heading || selectedOption?.textContent.split('(')[0].trim() || 'खरीफ फसल मास्टर गाइड 2026';
+      const bookDesc = matched?.shortTitle || matched?.category || "संपूर्ण प्रैक्टिकल व आधुनिक गाइड";
+      const bookMrp = matched?.mrp || 299;
+      const bookStoreOffer = matched?.offerPrice || 99;
+
+      // Intelligent customer past relationship analysis
+      let contextNote = '';
+      const uPurchases = (contact && contact.purchases) ? contact.purchases : [];
+      if (uPurchases.length > 0) {
+        const boughtList = uPurchases.map(p => {
+          const pId = p.book_id || '';
+          return pId || p.book_name || 'ई-बुक';
+        }).filter(Boolean).join(', ');
+        contextNote = `आपने पहले हमारी पुस्तक (${boughtList}) पढ़ी है और आपका अनुभव हमारे लिए बहुत मायने रखता है।\n`;
+      } else if (contact && contact.interested_book) {
+        contextNote = `आपने हमारी पुस्तक में विशेष रुचि दिखाई थी और आपका जुड़ाव हमारे लिए महत्वपूर्ण है।\n`;
+      }
+
+      // Dynamic Expiry Calculation in Seconds
+      const tQuery = (timerVal && timerVal !== 'never') ? `&t=${encodeURIComponent(timerVal)}` : '';
+      const eQuery = (expSec > 0 && timerVal !== 'never') ? `&e=${expSec}` : '';
+
+      // Tamper-Proof Cryptographic Signature (matches checkout.js verifyOfferSignature)
+      const sig = generateOfferSignature(bId, customPrice, cleanMob, timerVal !== 'never' ? timerVal : expSec);
+
+      // 1-Click Fast Checkout Direct Link (/c.html)
+      const checkoutUrl = `https://aarogyamindia.online/c.html?b=${bId}&p=${customPrice}&m=${cleanMob}&s=${sig}${tQuery}${eQuery}`;
+
+      // Comprehensive Book Overview & Index Link
+      const landingUrl = `https://aarogyamindia.online/ebooks/book-landing.html?id=${bId}`;
+
+      const timerLine = (timerVal && timerVal !== 'never') ? `⏳ *समय सीमा:* केवल *${timerText}* के लिए मान्य!\n` : '';
+      const maskedMobile = cleanMob.length >= 4 ? `+91-XXXXX${cleanMob.slice(-4)}` : '+91-XXXXX';
+
+      const msg = `🌾 *नमस्ते ${cName} जी!* 🙏\n\n${contextNote}आज आपके लिए आरोग्यम इंडिया का विशेष वीआईपी ऑफर है:\n\n📖 *पुस्तक:* ${bookTitle}\n🌱 *संक्षिप्त परिचय:* ${bookDesc}\n💰 *विशेष मूल्य:* मात्र ₹${customPrice} (सामान्य MRP: ~₹${bookMrp}~, स्टोर पर ₹${bookStoreOffer})\n${timerLine}\n👉 *विशेष छूट पर ऑर्डर करने के लिए यहाँ क्लिक करें:*\n${checkoutUrl}\n\n📖 *पुस्तक का संपूर्ण विवरण व इंडेक्स यहाँ देखें:*\n${landingUrl}\n\n🔒 *नोट:* यह विशेष छूट केवल आपके पंजीकृत नंबर (${maskedMobile}) के लिए सुरक्षित है। इसे किसी को शेयर न करें, एक बार खरीदने पर यह ऑफर बंद हो जाएगा।\n\nधन्यवाद!\n_आरोग्यम इंडिया - समृद्ध किसान, समृद्ध भारत_`;
+
+      return {
+        msg,
+        checkoutUrl,
+        landingUrl,
+        title: bookTitle,
+        cleanMob,
+        cName,
+        isEbook: true
+      };
+    }
+
+    // Non-eBook target (Page, Health, Pashu, Tube, etc.)
+    const sep = path.includes('?') ? '&' : '?';
+    const adminShareId = getAdminOutreachShareId();
+    const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
+    const trackedUrl = path.startsWith('http') 
+      ? `${path}${sep}ref=crm&lead=${cleanMob}&cid=${targetType}${shareParam}`
+      : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cleanMob}&cid=${targetType}${shareParam}`;
+
+    let baseTemplate = document.getElementById('vip_message_textarea')?.value.trim() || '';
+    if (!baseTemplate) {
+      baseTemplate = `नमस्ते {name} जी! 🙏\n\nआरोग्यम इंडिया की ओर से विशेष जानकारी:\n\n👉 संपूर्ण जानकारी यहाँ देखें:\n{link}\n\nधन्यवाद!\nआरोग्यम इंडिया परिवार 🌿`;
+    }
+    const msg = baseTemplate.replace(/{name}/g, cName).replace(/{link}/g, trackedUrl);
+
+    return {
+      msg,
+      checkoutUrl: trackedUrl,
+      landingUrl: trackedUrl,
+      title,
+      cleanMob,
+      cName,
+      isEbook: false
+    };
   }
 
   // Update Live Thumbnail Preview Card
@@ -1955,22 +2110,25 @@ export async function initAdminBroadcast() {
   // Generate Personalized VIP / Multi-Page Message Preview
   function updateVipMessagePreview() {
     const { targetType, title, path, isEbook, customPrice, timerText, extraDesc } = getCurrentTargetDetails();
-    const cleanUrl = path.startsWith('http') ? path : `https://aarogyamindia.online${path}`;
 
-    let msg = `नमस्ते {name} जी! 🙏\n\n`;
-
+    let msg = '';
     if (isEbook) {
-      msg += `आरोग्यम इंडिया की ओर से आपके लिए विशेष VIP ऑफर सक्रिय किया गया है!\n\n📚 प्रमाणित गाइड: *${title}*\n💰 VIP ऑफर मूल्य: मात्र *₹${customPrice}*\n⏳ ऑफर वैधता: *${timerText}*\n\n👉 अपनी ई-बुक प्रति यहाँ प्राप्त करें:\n{link}\n\nधन्यवाद!\nआरोग्यम इंडिया परिवार 🌿`;
+      const sample = buildPersonalizedVipMessage({
+        full_name: '{name}',
+        mobile: '7974422572',
+        purchases: [{ book_id: 'BK016', book_name: 'पशुपालन' }]
+      });
+      msg = sample.msg;
     } else if (targetType === 'health') {
-      msg += `आरोग्यम प्राकृतिक स्वास्थ्य केंद्र की ओर से विशेष परामर्श और समाधान:\n\n🌿 विषय: *${title}*\n✅ 100% प्राकृतिक व आयुर्वेदिक मार्गदर्शन।\n\n👉 संपूर्ण जानकारी व समाधान यहाँ देखें:\n{link}\n\nस्वस्थ रहें, दीर्घायु हों!\nआरोग्यम इंडिया टीम 🌿`;
+      msg = `नमस्ते {name} जी! 🙏\n\nआरोग्यम प्राकृतिक स्वास्थ्य केंद्र की ओर से विशेष परामर्श और समाधान:\n\n🌿 विषय: *${title}*\n✅ 100% प्राकृतिक व आयुर्वेदिक मार्गदर्शन।\n\n👉 संपूर्ण जानकारी व समाधान यहाँ देखें:\n{link}\n\nस्वस्थ रहें, दीर्घायु हों!\nआरोग्यम इंडिया टीम 🌿`;
     } else if (targetType === 'pashu') {
-      msg += `पशुपालक भाइयों के लिए विशेष दुग्ध संवर्धन व पोषण समाधान:\n\n🐄 विषय: *${title}*\n🥛 दूध वृद्धि, FAT% संवर्धन व पशु स्वास्थ्य सुरक्षा।\n\n👉 संपूर्ण पशु समाधान यहाँ देखें:\n{link}\n\nधन्यवाद!\nआरोग्यम पशुधन हब 🌾`;
+      msg = `नमस्ते {name} जी! 🙏\n\nपशुपालक भाइयों के लिए विशेष दुग्ध संवर्धन व पोषण समाधान:\n\n🐄 विषय: *${title}*\n🥛 दूध वृद्धि, FAT% संवर्धन व पशु स्वास्थ्य सुरक्षा।\n\n👉 संपूर्ण पशु समाधान यहाँ देखें:\n{link}\n\nधन्यवाद!\nआरोग्यम पशुधन हब 🌾`;
     } else if (targetType === 'tube') {
-      msg += `🎬 *AarogyamTube विशेष वीडियो गाइड:*\n\n🎥 *${title}*\n${extraDesc ? `📝 ${extraDesc}\n` : ''}\n👉 तुरंत वीडियो देखने के लिए यहाँ क्लिक करें:\n{link}\n\nआरोग्यम ट्यूब टीम 🌾`;
-    } else if (targetType === 'netsurf') {
-      msg += `🌟 *नेट्सर्फ जैविक कृषि व डायरेक्ट सेलर बनने का सुनहरा अवसर!*\n\nघर बैठे जैविक कृषि उत्पादों से जुड़ें और आत्मनिर्भर बनें।\n👉 अधिक जानकारी व तुरंत जुड़ने हेतु:\n{link}\n\nआरोग्यम परिवार 🌿`;
-    } else if (targetType === 'catalog') {
-      msg += `📖 *आरोग्यम इंडिया संपूर्ण 7-भाषा प्रोडक्ट कैटलॉग!*\n\nकृषि, पशुपालन और संपूर्ण स्वास्थ्य के सभी प्रमाणित उत्पादों की सूची डाउनलोड करें:\n👉 कैटलॉग लिंक:\n{link}\n\nधन्यवाद! 🙏`;
+      msg = `नमस्ते {name} जी! 🙏\n\n🎬 *AarogyamTube विशेष वीडियो गाइड:*\n\n🎥 *${title}*\n${extraDesc ? `📝 ${extraDesc}\n` : ''}\n👉 तुरंत वीडियो देखने के लिए यहाँ क्लिक करें:\n{link}\n\nआरोग्यम ट्यूब टीम 🌾`;
+    } else if (targetType === 'netsurf' || targetType === 'catalog') {
+      msg = `नमस्ते {name} जी! 🙏\n\n🌟 *आरोग्यम इंडिया संपूर्ण जैविक उत्पाद व ई-बुक स्टोर!*\n\nकृषि, पशुपालन और संपूर्ण स्वास्थ्य के सभी प्रमाणित समाधान देखें:\n👉 स्टोर लिंक:\n{link}\n\nधन्यवाद! 🙏`;
+    } else {
+      msg = `नमस्ते {name} जी! 🙏\n\nआरोग्यम इंडिया की ओर से विशेष जानकारी:\n\n👉 संपूर्ण विवरण यहाँ देखें:\n{link}\n\nधन्यवाद!\nआरोग्यम इंडिया परिवार 🌿`;
     }
 
     const msgBox = document.getElementById('vip_message_textarea');
@@ -2043,8 +2201,12 @@ export async function initAdminBroadcast() {
   }
 
   function getPreparedVipUniversalMessage() {
+    const { targetType, title, path, isEbook } = getCurrentTargetDetails();
+    if (isEbook) {
+      const msgObj = buildPersonalizedVipMessage({ full_name: 'साथी', mobile: '7974422572' });
+      return { msg: msgObj.msg, url: msgObj.checkoutUrl, title: msgObj.title };
+    }
     let msg = document.getElementById('vip_message_textarea')?.value || '';
-    const { title, path } = getCurrentTargetDetails();
     const cleanUrl = attachAdminShareId(path.startsWith('http') ? path : `https://aarogyamindia.online${path}`);
     msg = msg.replace(/{name}/g, 'साथी').replace(/{link}/g, cleanUrl);
     return { msg, url: cleanUrl, title };
@@ -3300,7 +3462,10 @@ export async function initAdminBroadcast() {
     const cName = contact.full_name || contact.name || 'किसान साथी';
     const cMobile = contactMobile;
 
-    let { targetType, title, path } = getCurrentTargetDetails();
+    let { targetType, title, path, isEbook } = getCurrentTargetDetails();
+    let personalizedMsg = '';
+    let targetBookId = targetType;
+
     if (campaignType === 'greetings') {
       const attachChk = document.getElementById('chk_attach_marketing_link');
       if (attachChk && !attachChk.checked) {
@@ -3313,27 +3478,44 @@ export async function initAdminBroadcast() {
           title = 'हुक व शायरी स्टूडियो';
         }
       }
-    }
-
-    let trackedUrl = '';
-    if (path) {
-      const sep = path.includes('?') ? '&' : '?';
-      const adminShareId = getAdminOutreachShareId();
-      const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
-      trackedUrl = path.startsWith('http') 
-        ? `${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`
-        : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`;
-    }
-
-    let msgTemplate = (campaignType === 'greetings')
-      ? (document.getElementById('greeting_custom_textarea')?.value.trim() || 'नमस्ते {name} जी!')
-      : (document.getElementById('vip_message_textarea')?.value.trim() || 'नमस्ते {name} जी!');
-
-    let personalizedMsg = msgTemplate.replace(/{name}/g, cName);
-    if (trackedUrl) {
-      personalizedMsg = personalizedMsg.replace(/{link}/g, trackedUrl);
+      let trackedUrl = '';
+      if (path) {
+        const sep = path.includes('?') ? '&' : '?';
+        const adminShareId = getAdminOutreachShareId();
+        const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
+        trackedUrl = path.startsWith('http') 
+          ? `${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`
+          : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`;
+      }
+      const msgTemplate = document.getElementById('greeting_custom_textarea')?.value.trim() || 'नमस्ते {name} जी!';
+      personalizedMsg = msgTemplate.replace(/{name}/g, cName);
+      if (trackedUrl) {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, trackedUrl);
+      } else {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, '').replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      }
+    } else if (isEbook) {
+      const vipObj = buildPersonalizedVipMessage(contact);
+      personalizedMsg = vipObj.msg;
+      targetBookId = (document.getElementById('vip_book_selector')?.value || 'BK001').toUpperCase();
+      title = vipObj.title;
     } else {
-      personalizedMsg = personalizedMsg.replace(/{link}/g, '').replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      let trackedUrl = '';
+      if (path) {
+        const sep = path.includes('?') ? '&' : '?';
+        const adminShareId = getAdminOutreachShareId();
+        const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
+        trackedUrl = path.startsWith('http') 
+          ? `${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`
+          : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`;
+      }
+      const msgTemplate = document.getElementById('vip_message_textarea')?.value.trim() || 'नमस्ते {name} जी!';
+      personalizedMsg = msgTemplate.replace(/{name}/g, cName);
+      if (trackedUrl) {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, trackedUrl);
+      } else {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, '').replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      }
     }
 
     const recordSuccess = (ch) => {
@@ -3343,7 +3525,7 @@ export async function initAdminBroadcast() {
         contact_id: contact.id || cMobile,
         name: cName,
         mobile: cMobile,
-        book_id: targetType,
+        book_id: targetBookId,
         book_name: title,
         target_type: targetType,
         campaign_type: campaignType,
@@ -3601,7 +3783,10 @@ export async function initAdminBroadcast() {
     const cName = contact.full_name || contact.name || 'किसान साथी';
     const cMobile = (contact.mobile || '').replace(/\D/g, '').slice(-10);
 
-    let { targetType, title, path } = getCurrentTargetDetails();
+    let { targetType, title, path, isEbook } = getCurrentTargetDetails();
+    let personalizedMsg = '';
+    let targetBookId = targetType;
+
     if (isGr) {
       const attachChk = document.getElementById('chk_attach_marketing_link');
       if (attachChk && !attachChk.checked) {
@@ -3614,28 +3799,44 @@ export async function initAdminBroadcast() {
           title = 'हुक व शायरी स्टूडियो';
         }
       }
-    }
-    
-    // Attach Tracking parameters: ref=crm&lead=MOB&cid=TYPE & Admin Share ID
-    let trackedUrl = '';
-    if (path) {
-      const sep = path.includes('?') ? '&' : '?';
-      const adminShareId = getAdminOutreachShareId();
-      const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
-      trackedUrl = path.startsWith('http') 
-        ? `${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`
-        : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`;
-    }
-
-    let msgTemplate = isGr
-      ? (document.getElementById('greeting_custom_textarea')?.value.trim() || 'नमस्ते {name} जी!')
-      : (document.getElementById('vip_message_textarea')?.value.trim() || 'नमस्ते {name} जी!');
-
-    let personalizedMsg = msgTemplate.replace(/{name}/g, cName);
-    if (trackedUrl) {
-      personalizedMsg = personalizedMsg.replace(/{link}/g, trackedUrl);
+      let trackedUrl = '';
+      if (path) {
+        const sep = path.includes('?') ? '&' : '?';
+        const adminShareId = getAdminOutreachShareId();
+        const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
+        trackedUrl = path.startsWith('http') 
+          ? `${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`
+          : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`;
+      }
+      const msgTemplate = document.getElementById('greeting_custom_textarea')?.value.trim() || 'नमस्ते {name} जी!';
+      personalizedMsg = msgTemplate.replace(/{name}/g, cName);
+      if (trackedUrl) {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, trackedUrl);
+      } else {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, '').replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      }
+    } else if (isEbook) {
+      const vipObj = buildPersonalizedVipMessage(contact);
+      personalizedMsg = vipObj.msg;
+      targetBookId = (document.getElementById('vip_book_selector')?.value || 'BK001').toUpperCase();
+      title = vipObj.title;
     } else {
-      personalizedMsg = personalizedMsg.replace(/{link}/g, '').replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      let trackedUrl = '';
+      if (path) {
+        const sep = path.includes('?') ? '&' : '?';
+        const adminShareId = getAdminOutreachShareId();
+        const shareParam = adminShareId ? `&share_id=${encodeURIComponent(adminShareId)}` : '';
+        trackedUrl = path.startsWith('http') 
+          ? `${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`
+          : `https://aarogyamindia.online${path}${sep}ref=crm&lead=${cMobile}&cid=${targetType}${shareParam}`;
+      }
+      const msgTemplate = document.getElementById('vip_message_textarea')?.value.trim() || 'नमस्ते {name} जी!';
+      personalizedMsg = msgTemplate.replace(/{name}/g, cName);
+      if (trackedUrl) {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, trackedUrl);
+      } else {
+        personalizedMsg = personalizedMsg.replace(/{link}/g, '').replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      }
     }
 
     // Set badges and previews
@@ -3657,7 +3858,7 @@ export async function initAdminBroadcast() {
         contact_id: contact.id || cMobile,
         name: cName,
         mobile: cMobile,
-        book_id: targetType,
+        book_id: targetBookId,
         book_name: title,
         target_type: targetType,
         campaign_type: campaignType,
