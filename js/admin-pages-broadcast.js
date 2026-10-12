@@ -151,15 +151,20 @@ export async function initAdminBroadcast() {
     }
   } catch (e) {}
 
-  if (catalogBooks.length === 0) {
-    catalogBooks = [
-      { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', landingPage: '/ebooks/kharif-master-guide-2026.html', cover: '/images/books/kharif-master-guide-2026-cover.webp', mrp: 299, offerPrice: 99, category: 'Agriculture' },
-      { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', landingPage: '/ebooks/kheti-dr.html', cover: '/images/books/fasal-ka-doctor-cover.webp', mrp: 499, offerPrice: 199, category: 'Agriculture' },
-      { id: 'BK016', name: 'कृषि दवा डायरेक्टरी — फसल रोग, कीट व दवा गाइड', landingPage: '/ebooks/book-landing.html?id=BK016', cover: '/images/books/bk016-cover.webp', mrp: 399, offerPrice: 149, category: 'Agriculture' },
-      { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', landingPage: '/ebooks/book-landing.html?id=BK015', cover: '/images/books/bk015-cover.webp', mrp: 399, offerPrice: 149, category: 'Agriculture' },
-      { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता (1 Year)', landingPage: '/ebooks/book-landing.html?id=SUB001', cover: '/images/banners/sub001-hero-banner.webp', mrp: 1999, offerPrice: 499, category: 'VIP' }
-    ];
-  }
+  const mandatoryBooks = [
+    { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', landingPage: '/ebooks/kharif-master-guide-2026.html', cover: '/images/books/kharif-master-guide-2026-cover.webp', mrp: 299, offerPrice: 99, category: 'Agriculture' },
+    { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', landingPage: '/ebooks/kheti-dr.html', cover: '/images/books/fasal-ka-doctor-cover.webp', mrp: 499, offerPrice: 199, category: 'Agriculture' },
+    { id: 'BK016', name: 'कृषि दवा डायरेक्टरी — फसल रोग, कीट व दवा गाइड', landingPage: '/ebooks/book-landing.html?id=BK016', cover: '/images/books/bk016-cover.webp', mrp: 399, offerPrice: 149, category: 'Agriculture' },
+    { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', landingPage: '/ebooks/book-landing.html?id=BK015', cover: '/images/books/bk015-cover.webp', mrp: 399, offerPrice: 149, category: 'Agriculture' },
+    { id: 'BK018', name: 'जैविक खाद, जीवामृत व माइकोराइजा डायरेक्टरी', landingPage: '/ebooks/book-landing.html?id=BK018', cover: '/images/books/bk018-cover.webp', mrp: 399, offerPrice: 149, category: 'Agriculture' },
+    { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता (1 Year)', landingPage: '/ebooks/book-landing.html?id=SUB001', cover: '/images/banners/sub001-hero-banner.webp', mrp: 1999, offerPrice: 499, category: 'VIP' }
+  ];
+
+  mandatoryBooks.forEach(mb => {
+    if (!catalogBooks.some(cb => cb.id === mb.id)) {
+      catalogBooks.push(mb);
+    }
+  });
 
   // Load Real AarogyamTube Videos from webinar-recordings.json
   try {
@@ -510,23 +515,33 @@ export async function initAdminBroadcast() {
 
             <!-- Systematic Grouped Filter Dropdown -->
             <select id="vip_audience_filter" class="admin-select" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1.5px solid #CBD5E1; font-weight: 700; margin-bottom: 8px;">
-              <optgroup label="👥 1. मुख्य ऑडियंस व सदस्य (General Audiences)">
+              <optgroup id="optgroup_target_book_dynamic" label="🎯 1. चुनी गई ई-बुक फ़िल्टर (Target Book Focus)">
+                <option value="target_book_buyers">🎯 इस चुनी गई ई-बुक के सभी खरीदार (Target Book Buyers)</option>
+                <option value="target_book_abandoned">🛒 इस ई-बुक का अधूरा चेकआउट (Target Book Cart Abandoned)</option>
+                <option value="target_book_interested">⭐ इस ई-बुक में रुचि रखने वाले (Target Book Enquiries)</option>
+              </optgroup>
+              <optgroup label="🏆 2. विशिष्ट पुस्तक खरीदार (Direct Book Buyers)">
+                <option value="book_BK016">💊 BK016: कृषि दवा डायरेक्टरी खरीदार</option>
+                <option value="book_BK002">🩺 BK002: खेती का डॉक्टर खरीदार</option>
+                <option value="book_BK001">🌾 BK001: खरीफ फसल मास्टर गाइड खरीदार</option>
+                <option value="book_BK015">🥦 BK015: सब्जी खेती मास्टर गाइड खरीदार</option>
+                <option value="book_BK018">🌱 BK018: जैविक खाद व माइकोराइजा खरीदार</option>
+                <option value="specific_books">🎯 विशिष्ट पुस्तकें मल्टी-सेलेक्ट (Multi-Select Books)</option>
+                <option value="bought_any">🏆 किसी भी पुस्तक के सफल खरीदार (All Paid Buyers)</option>
+                <option value="non_buyers">🆕 पंजीकृत सदस्य (जिन्होंने अभी तक कोई पुस्तक नहीं खरीदी - First Purchase)</option>
+                <option value="cart_abandoned">🛒 चेकआउट अधूरा / कार्ट रिकवरी (Cart Abandoned)</option>
+              </optgroup>
+              <optgroup label="👥 3. मुख्य ऑडियंस व सदस्य (General Audiences)">
                 <option value="all" selected>👥 सभी उपलब्ध संपर्क व लीड्स (All Live Contacts)</option>
                 <option value="phonebook">📇 फोनबुक व ऑफ़लाइन संपर्क सूची (Phonebook)</option>
                 <option value="google_leads">🌐 Google Lead Generator से जुड़े संपर्क</option>
               </optgroup>
-              <optgroup label="🏆 2. ई-बुक खरीद स्थिति (Book Purchase Status)">
-                <option value="bought_any">🏆 सभी सफल पुस्तक खरीदार (All Paid Buyers)</option>
-                <option value="specific_books">🎯 विशिष्ट पुस्तक खरीदार (BK001, BK002, BK016, BK018... Multi-Select)</option>
-                <option value="non_buyers">🆕 पंजीकृत सदस्य (जिन्होंने अभी तक कोई पुस्तक नहीं खरीदी - First Purchase)</option>
-                <option value="cart_abandoned">🛒 चेकआउट अधूरा / कार्ट रिकवरी (Cart Abandoned)</option>
-              </optgroup>
-              <optgroup label="⭐ 3. पूछताछ व सर्वे लीड्स (Inquiries & Surveys)">
+              <optgroup label="⭐ 4. पूछताछ व सर्वे लीड्स (Inquiries & Surveys)">
                 <option value="interested_users">⭐ पुस्तक में रुचि दर्ज करने वाले (Interested Enquiries)</option>
                 <option value="surveys">📝 किसान सर्वे से जुड़े लीड्स (Survey Respondents)</option>
                 <option value="retail_leads">🏪 खुदरा व्यापारी व डीलर लीड्स (Retailers & Dealers)</option>
               </optgroup>
-              <optgroup label="🌾 4. पेशा व समुदाय वर्ग (Occupation & Segment)">
+              <optgroup label="🌾 5. पेशा व समुदाय वर्ग (Occupation & Segment)">
                 <option value="farmers">🚜 किसान व कृषक वर्ग (Farmers by Occupation)</option>
                 <option value="pashupalan">🥛 पशुपालक व डेयरी उत्पादक (Dairy Farmers)</option>
                 <option value="netsurf">🌿 नेट्सर्फ डायरेक्ट सेलर सदस्य (Netsurf Network)</option>
@@ -2163,14 +2178,21 @@ export async function initAdminBroadcast() {
   });
 
   // Event Listeners for VIP form & Target Page Selection
-  document.getElementById('vip_book_selector')?.addEventListener('change', () => {
+  document.getElementById('vip_book_selector')?.addEventListener('change', (e) => {
     activeWebpDataUrl = null;
     const fileInput = document.getElementById('promo_image_file_input');
     if (fileInput) fileInput.value = '';
     const webpWrap = document.getElementById('webp_preview_wrap');
     if (webpWrap) webpWrap.style.display = 'none';
 
+    const newBookId = e.target.value;
+    if (selectedFilterBookIds.size > 0) {
+      selectedFilterBookIds.add(newBookId);
+    }
+
+    updateAudienceFilterOptionLabels();
     updateVipMessagePreview();
+    renderMultiBookCheckboxes();
     currentBatchPage = 1;
     updateBatchDisplayUI();
   });
@@ -2212,15 +2234,62 @@ export async function initAdminBroadcast() {
   document.getElementById('vip_custom_price_input')?.addEventListener('input', updateVipMessagePreview);
   document.getElementById('vip_custom_timer_select')?.addEventListener('change', updateVipMessagePreview);
 
+  // Helper: Dynamically update option labels in vip_audience_filter with live real counts
+  function updateAudienceFilterOptionLabels() {
+    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK016';
+    const filterEl = document.getElementById('vip_audience_filter');
+    if (!filterEl) return;
+
+    const getBuyersCount = (bid) => allUsers.filter(u => (u.purchases || []).some(p => (p.book_id || '').toUpperCase().includes(bid.toUpperCase()))).length;
+    const getAbandonCount = (bid) => checkoutLogs.filter(c => c.status !== 'success' && (c.book_id || '').toUpperCase().includes(bid.toUpperCase())).length;
+    const getInterestCount = (bid) => externalLeads.filter(l => (l.interested_book || '').toUpperCase().includes(bid.toUpperCase())).length;
+
+    const targetBuyersCount = getBuyersCount(selBookId);
+    const targetAbandonCount = getAbandonCount(selBookId);
+    const targetInterestCount = getInterestCount(selBookId);
+
+    const optBuyers = filterEl.querySelector('option[value="target_book_buyers"]');
+    if (optBuyers) optBuyers.textContent = `🎯 इस चुनी गई ई-बुक (${selBookId}) के सभी खरीदार (${targetBuyersCount} खरीदार)`;
+
+    const optAb = filterEl.querySelector('option[value="target_book_abandoned"]');
+    if (optAb) optAb.textContent = `🛒 इस ई-बुक (${selBookId}) का अधूरा चेकआउट (${targetAbandonCount} कार्ट)`;
+
+    const optInt = filterEl.querySelector('option[value="target_book_interested"]');
+    if (optInt) optInt.textContent = `⭐ इस ई-बुक (${selBookId}) में रुचि रखने वाले (${targetInterestCount} लीड्स)`;
+
+    ['BK016', 'BK002', 'BK001', 'BK015', 'BK018'].forEach(id => {
+      const opt = filterEl.querySelector(`option[value="book_${id}"]`);
+      if (opt) {
+        const bObj = catalogBooks.find(b => b.id === id);
+        const bName = bObj ? bObj.name.split('—')[0].trim() : id;
+        const count = getBuyersCount(id);
+        let icon = '📗';
+        if (id === 'BK016') icon = '💊';
+        else if (id === 'BK002') icon = '🩺';
+        else if (id === 'BK001') icon = '🌾';
+        else if (id === 'BK015') icon = '🥦';
+        else if (id === 'BK018') icon = '🌱';
+        opt.textContent = `${icon} ${id}: ${bName} खरीदार (${count} खरीदार)`;
+      }
+    });
+
+    const optAllBuyers = filterEl.querySelector('option[value="bought_any"]');
+    if (optAllBuyers) {
+      const totalBuyers = allUsers.filter(u => (u.purchases && u.purchases.length > 0) || u.has_purchased).length;
+      optAllBuyers.textContent = `🏆 किसी भी पुस्तक के सफल खरीदार (${totalBuyers} खरीदार)`;
+    }
+  }
+
   // Smart Multi-Book Multi-Select Filter State & Functions
-  let selectedFilterBookIds = new Set(['BK001', 'BK002', 'BK016', 'BK018']);
+  let selectedFilterBookIds = new Set(['BK016', 'BK002', 'BK001', 'BK018']);
+  let hasUserClearedMultiBook = false;
 
   function renderMultiBookCheckboxes() {
     const cont = document.getElementById('multibook_checkboxes_container');
     if (!cont) return;
 
-    if (selectedFilterBookIds.size === 0) {
-      ['BK001', 'BK002', 'BK016', 'BK018'].forEach(id => selectedFilterBookIds.add(id));
+    if (selectedFilterBookIds.size === 0 && !hasUserClearedMultiBook) {
+      ['BK016', 'BK002', 'BK001', 'BK018'].forEach(id => selectedFilterBookIds.add(id));
     }
 
     cont.innerHTML = catalogBooks.map(b => {
@@ -2267,6 +2336,7 @@ export async function initAdminBroadcast() {
   });
 
   document.getElementById('btn_multibook_select_all')?.addEventListener('click', () => {
+    hasUserClearedMultiBook = false;
     catalogBooks.forEach(b => selectedFilterBookIds.add(b.id));
     renderMultiBookCheckboxes();
     currentBatchPage = 1;
@@ -2274,6 +2344,7 @@ export async function initAdminBroadcast() {
   });
 
   document.getElementById('btn_multibook_clear_all')?.addEventListener('click', () => {
+    hasUserClearedMultiBook = true;
     selectedFilterBookIds.clear();
     renderMultiBookCheckboxes();
     currentBatchPage = 1;
@@ -2319,6 +2390,47 @@ export async function initAdminBroadcast() {
     try {
       const res = await fetchAllUsersAdmin();
       allUsers = res.data || [];
+
+      // Enrich allUsers with verified WhatsApp offer purchases & local conversions
+      try {
+        const waPurs = JSON.parse(localStorage.getItem('AOI_WHATSAPP_OFFER_PURCHASES') || '[]');
+        if (Array.isArray(waPurs)) {
+          waPurs.forEach(wp => {
+            const cleanMob = (wp.mobile || '').replace(/\D/g, '').slice(-10);
+            let u = allUsers.find(usr => 
+              (cleanMob && (usr.mobile || '').replace(/\D/g, '').slice(-10) === cleanMob) ||
+              (wp.identifier && (usr.share_id === wp.identifier || usr.id === wp.identifier))
+            );
+            if (!u && cleanMob && cleanMob.length === 10) {
+              u = {
+                id: wp.user_id || wp.id || ('usr_' + cleanMob),
+                full_name: wp.name || 'प्रमाणित ग्राहक',
+                mobile: cleanMob,
+                State: wp.state || 'मध्य प्रदेश',
+                purchases: [],
+                has_purchased: true,
+                source: 'whatsapp_offer',
+                created_at: wp.timestamp || new Date().toISOString()
+              };
+              allUsers.push(u);
+            }
+            if (u) {
+              if (!u.purchases) u.purchases = [];
+              const bId = (wp.book_id || 'BK016').toUpperCase();
+              if (!u.purchases.some(p => (p.book_id || '').toUpperCase() === bId)) {
+                u.purchases.push({
+                  id: wp.id || ('wa_' + Date.now()),
+                  book_id: bId,
+                  book_name: wp.book_title || bId,
+                  amount: wp.amount_paid || wp.offer_price || 79,
+                  payment_status: 'success'
+                });
+                u.has_purchased = true;
+              }
+            }
+          });
+        }
+      } catch (e) {}
 
       // Manual leads from storage
       try {
@@ -2657,19 +2769,39 @@ export async function initAdminBroadcast() {
   // Audience Filtering Logic (Covers all 16 Real Audience Categories + Real Database Tables)
   function getFilteredAudienceList() {
     const filter = document.getElementById('vip_audience_filter')?.value || 'all';
-    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK001';
+    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK016';
     let baseList = [];
 
     if (filter === 'all') {
       baseList = [...allUsers, ...externalLeads];
+    } else if (filter === 'target_book_buyers') {
+      const targetB = (selBookId || 'BK016').toUpperCase();
+      baseList = allUsers.filter(u => (u.purchases || []).some(p => (p.book_id || '').toUpperCase().includes(targetB)));
+    } else if (filter === 'target_book_abandoned') {
+      const targetB = (selBookId || 'BK016').toUpperCase();
+      const abandonedLogs = checkoutLogs.filter(c => c.status !== 'success' && (c.book_id || '').toUpperCase().includes(targetB));
+      const abandonedIds = new Set(abandonedLogs.map(c => c.profile_id || c.user_id).filter(Boolean));
+      const abandonedMobiles = new Set(abandonedLogs.map(c => (c.mobile || c.phone || '').replace(/\D/g, '').slice(-10)).filter(Boolean));
+      baseList = allUsers.filter(u => abandonedIds.has(u.id) || abandonedMobiles.has((u.mobile || '').replace(/\D/g, '').slice(-10)));
+    } else if (filter === 'target_book_interested') {
+      const targetB = (selBookId || 'BK016').toUpperCase();
+      baseList = externalLeads.filter(l => (l.interested_book || '').toUpperCase().includes(targetB));
+    } else if (filter.startsWith('book_')) {
+      const targetB = filter.replace('book_', '').toUpperCase();
+      baseList = allUsers.filter(u => (u.purchases || []).some(p => (p.book_id || '').toUpperCase().includes(targetB)));
     } else if (filter === 'specific_books') {
       const targetB = Array.from(selectedFilterBookIds).map(id => id.toUpperCase());
-      baseList = allUsers.filter(u => (u.purchases || []).some(p => {
-        const bId = (p.book_id || '').toUpperCase();
-        return targetB.some(tb => bId.includes(tb));
-      }));
+      if (targetB.length === 0) {
+        const fallbackB = [(selBookId || 'BK016').toUpperCase()];
+        baseList = allUsers.filter(u => (u.purchases || []).some(p => fallbackB.some(tb => (p.book_id || '').toUpperCase().includes(tb))));
+      } else {
+        baseList = allUsers.filter(u => (u.purchases || []).some(p => {
+          const bId = (p.book_id || '').toUpperCase();
+          return targetB.some(tb => bId.includes(tb));
+        }));
+      }
     } else if (filter === 'bought_any') {
-      if (selectedFilterBookIds.size > 0 && selectedFilterBookIds.size < catalogBooks.length) {
+      if (selectedFilterBookIds.size > 0 && selectedFilterBookIds.size < catalogBooks.length && !hasUserClearedMultiBook) {
         const targetB = Array.from(selectedFilterBookIds).map(id => id.toUpperCase());
         baseList = allUsers.filter(u => (u.purchases || []).some(p => {
           const bId = (p.book_id || '').toUpperCase();
@@ -2683,7 +2815,11 @@ export async function initAdminBroadcast() {
     } else if (filter === 'bought_kheti_dr_cross_sell') {
       baseList = allUsers.filter(u => (u.purchases || []).some(p => (p.book_id || '').includes('BK002') || (p.book_name || '').toLowerCase().includes('doctor') || (p.book_name || '').toLowerCase().includes('kheti')));
     } else if (filter === 'bought_dairy') {
-      baseList = allUsers.filter(u => (u.purchases || []).some(p => (p.book_id || '').includes('BK016') || (p.book_id || '').toLowerCase().includes('pashu') || (p.book_name || '').toLowerCase().includes('dairy')));
+      baseList = allUsers.filter(u => (u.purchases || []).some(p => {
+        const b = (p.book_id || '').toUpperCase();
+        const nm = (p.book_name || '').toLowerCase();
+        return b.includes('BK016') || b.includes('PASHU') || nm.includes('dairy') || nm.includes('पशु') || nm.includes('दवा');
+      }));
     } else if (filter === 'non_buyers') {
       baseList = allUsers.filter(u => !u.has_purchased && (!u.purchases || u.purchases.length === 0));
     } else if (filter === 'cart_abandoned') {
@@ -2812,16 +2948,16 @@ export async function initAdminBroadcast() {
   // Active Partition Helpers for Dual Tables (Pending vs Sent)
   function getActiveVipList() {
     const fullList = getFilteredAudienceList();
-    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK001';
+    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK016';
     if (activeTableTabVip === 'pending') {
       return fullList.filter(u => {
         const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
-        return !outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && (h.book_id === selBookId || h.campaign_type === 'vip_offer'));
+        return !outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && h.book_id === selBookId);
       });
     } else {
       return fullList.filter(u => {
         const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
-        return outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && (h.book_id === selBookId || h.campaign_type === 'vip_offer'));
+        return outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && h.book_id === selBookId);
       });
     }
   }
@@ -2880,16 +3016,16 @@ export async function initAdminBroadcast() {
   // Render Dual Table UI (📋 शेष संपर्क vs ✅ संदेश भेजे गए) with 30 Contacts/Page Batching
   function updateBatchDisplayUI() {
     const fullList = getFilteredAudienceList();
-    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK001';
+    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK016';
 
     // 1. Partition VIP Audience into Pending vs Sent Lists
     const vipPendingList = fullList.filter(u => {
       const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
-      return !outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && (h.book_id === selBookId || h.campaign_type === 'vip_offer'));
+      return !outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && h.book_id === selBookId);
     });
     const vipSentList = fullList.filter(u => {
       const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
-      return outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && (h.book_id === selBookId || h.campaign_type === 'vip_offer'));
+      return outreachHistory.some(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && h.book_id === selBookId);
     });
     const currentVipList = (activeTableTabVip === 'pending') ? vipPendingList : vipSentList;
 
@@ -2997,7 +3133,7 @@ export async function initAdminBroadcast() {
 
       return pageSlice.map((u, i) => {
         const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
-        const lastSent = outreachHistory.find(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && (campType === 'greetings' ? (h.campaign_type === 'greetings') : (h.book_id === selBookId || h.campaign_type === 'vip_offer')));
+        const lastSent = outreachHistory.find(h => (h.mobile || '').replace(/\D/g, '').slice(-10) === mob && (campType === 'greetings' ? (h.campaign_type === 'greetings') : (h.book_id === selBookId)));
         const isAlreadySent = Boolean(lastSent);
         const isSelected = selectedContactsSet.has(mob);
 
@@ -3016,15 +3152,20 @@ export async function initAdminBroadcast() {
 
         let historyBadgesHtml = '';
         if (uPurchases.length > 0) {
-          const booksBought = uPurchases.map(p => p.book_id || p.book_name || 'ई-बुक').join(', ');
-          historyBadgesHtml += `<span style="background:#ECFDF5; color:#065F46; padding:1px 6px; border-radius:4px; font-weight:800; font-size:0.69rem; border:1px solid #A7F3D0; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-bag-shopping"></i> 📗 खरीदी: ${booksBought}</span>`;
+          const booksBought = uPurchases.map(p => {
+            const bId = p.book_id || 'ई-बुक';
+            const matchedB = catalogBooks.find(b => b.id === bId);
+            const bTitle = matchedB ? matchedB.name.split('—')[0].trim() : (p.book_name || bId);
+            return `${bId} (${bTitle})`;
+          }).join(', ');
+          historyBadgesHtml += `<span style="background:#ECFDF5; color:#065F46; padding:2px 7px; border-radius:5px; font-weight:800; font-size:0.71rem; border:1px solid #A7F3D0; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-bag-shopping"></i> 📗 खरीदी: ${booksBought}</span>`;
         } else if (uCheckouts.length > 0) {
           const coBooks = uCheckouts.map(c => c.book_id || 'ई-बुक').slice(0, 2).join(', ');
-          historyBadgesHtml += `<span style="background:#FEF3C7; color:#92400E; padding:1px 6px; border-radius:4px; font-weight:800; font-size:0.69rem; border:1px solid #FDE68A; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-cart-shopping"></i> 🛒 अधूरा चेकआउट: ${coBooks}</span>`;
+          historyBadgesHtml += `<span style="background:#FEF3C7; color:#92400E; padding:2px 7px; border-radius:5px; font-weight:800; font-size:0.71rem; border:1px solid #FDE68A; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-cart-shopping"></i> 🛒 अधूरा चेकआउट: ${coBooks}</span>`;
         } else if (u.interested_book) {
-          historyBadgesHtml += `<span style="background:#EFF6FF; color:#1E40AF; padding:1px 6px; border-radius:4px; font-weight:800; font-size:0.69rem; border:1px solid #BFDBFE; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-star"></i> ⭐ रुचि: ${u.interested_book}</span>`;
+          historyBadgesHtml += `<span style="background:#EFF6FF; color:#1E40AF; padding:2px 7px; border-radius:5px; font-weight:800; font-size:0.71rem; border:1px solid #BFDBFE; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-star"></i> ⭐ रुचि: ${u.interested_book}</span>`;
         } else {
-          historyBadgesHtml += `<span style="background:#F1F5F9; color:#64748B; padding:1px 6px; border-radius:4px; font-weight:700; font-size:0.69rem;">🆕 गैर-खरीदार</span>`;
+          historyBadgesHtml += `<span style="background:#F1F5F9; color:#64748B; padding:2px 7px; border-radius:5px; font-weight:700; font-size:0.71rem;">🆕 गैर-खरीदार</span>`;
         }
 
         if (campType === 'vip_offer') {
@@ -3256,8 +3397,8 @@ export async function initAdminBroadcast() {
   });
   document.getElementById('btn_vip_clear_sent_table')?.addEventListener('click', () => {
     if (!confirm('⚠️ क्या आप इस श्रेणी के भेजे गए सभी संदेशों का इतिहास साफ़ करना चाहते हैं? इससे सभी संपर्क पुनः "📋 शेष संपर्क" सूची में आ जाएंगे।')) return;
-    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK001';
-    outreachHistory = outreachHistory.filter(h => !(h.book_id === selBookId || h.campaign_type === 'vip_offer'));
+    const selBookId = document.getElementById('vip_book_selector')?.value || 'BK016';
+    outreachHistory = outreachHistory.filter(h => !(h.book_id === selBookId));
     localStorage.setItem('AI_OUTREACH_HISTORY', JSON.stringify(outreachHistory.slice(0, 1000)));
     const pill = document.getElementById('tab_activity_count_pill');
     if (pill) pill.textContent = outreachHistory.length;
