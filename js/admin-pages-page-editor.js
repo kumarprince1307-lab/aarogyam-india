@@ -558,7 +558,8 @@ export async function initPageEditor() {
         "audio_title": "वैज्ञानिक कृषि व फसल सुरक्षा हब",
         "audio_script": "नमस्ते {name} जी! आरोग्यम कृषि हब में आपका स्वागत है। यहाँ आप खरीफ फसल मास्टर गाइड और फसल का डॉक्टर ई-बुक प्राप्त कर सकते हैं। साथ ही सभी प्रमुख फसलों के रोग, जैविक उपचार और नेटसर्फ बायो-फिट स्प्रे शेड्यूल की पूरी जानकारी देख सकते हैं।"
     },
-    "id": "page_health"h",
+    {
+        "id": "page_health",
         "slug": "health",
         "name": "❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health Hub)",
         "url": "/categories/health.html",
@@ -1364,7 +1365,7 @@ export async function initPageEditor() {
                 "number": "917974422572",
                 "prompt": "नमस्ते, मुझे स्वास्थ्य समस्याओं के बारे में परामर्श चाहिए।"
         }
-,
+    },
     {
         "id": "page_pashu",
         "slug": "pashu-palan",
@@ -3187,9 +3188,9 @@ export async function initPageEditor() {
                 "image": "/images/products/product-889-1-398356-hvb9.webp"
             }
         ]
-    }
-,
-          "id": "page_health_dental_care",
+    },
+    {
+        "id": "page_health_dental_care",
         "slug": "dental-care",
         "name": "दंत व मसूड़े सुरक्षा (Dental & Oral Care)",
         "url": "/health/dental-care.html",
@@ -3492,8 +3493,9 @@ export async function initPageEditor() {
                 "number": "917974422572",
                 "prompt": "नमस्ते, मुझे दांतों व मसूड़ों की समस्या के बारे में परामर्श चाहिए।"
         }
-},
-          "id": "page_health_liver_care",
+    },
+    {
+        "id": "page_health_liver_care",
         "slug": "liver-care",
         "name": "लिवर केयर व फैटी लिवर डिटॉक्स (Liver Care & Detox)",
         "url": "/health/liver-care.html",
@@ -3796,8 +3798,9 @@ export async function initPageEditor() {
                 "number": "917974422572",
                 "prompt": "नमस्ते, मुझे फैटी लिवर व लिवर स्वास्थ्य के बारे में परामर्श चाहिए।"
         }
-},
-          "id": "page_health_thyroid_care",
+    },
+    {
+        "id": "page_health_thyroid_care",
         "slug": "thyroid-care",
         "name": "थायरॉइड व मेटाबॉलिज्म केयर (Thyroid & Metabolism Care)",
         "url": "/health/thyroid-care.html",
@@ -4100,8 +4103,9 @@ export async function initPageEditor() {
                 "number": "917974422572",
                 "prompt": "नमस्ते, मुझे थायरॉइड व हॉर्मोनल असंतुलन के बारे में परामर्श चाहिए।"
         }
-},
-          "id": "page_health_heart_care",
+    },
+    {
+        "id": "page_health_heart_care",
         "slug": "heart-care",
         "name": "हृदय स्वास्थ्य व ब्लॉकेज केयर (Heart & Cardiac Care)",
         "url": "/health/heart-care.html",
