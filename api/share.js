@@ -720,17 +720,38 @@ module.exports = async function handler(req, res) {
     const finalTitle = (bookData.og_title || bookData.hero?.title || queryTitle || 'Aarogyam India eBook Practical Guide').trim();
     const finalDesc = (bookData.og_description || bookData.whatsapp_share_message || bookData.whatsapp_share_text || bookData.hero?.description || queryDesc || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।').slice(0, 200).trim();
     const rawImg = bookData.og_image || bookData.hero?.cover_image || bookData.hero?.banner_image || '/images/books/kharif-master-guide-2026-cover.webp';
-    const finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
+    let finalOgImage = rawImg.startsWith('http') ? rawImg : `${HOST_ORIGIN}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
     
+    // Permanent Failsafe for WhatsApp & Social Crawlers:
+    // Check if companion JPG version exists on disk for 100% WhatsApp crawler compatibility
+    let jpgFallbackUrl = null;
+    if (rawImg && rawImg.toLowerCase().endsWith('.webp')) {
+      const potentialJpg = rawImg.replace(/\.webp$/i, '.jpg');
+      const localJpgPath = path.join(process.cwd(), potentialJpg.startsWith('/') ? potentialJpg.slice(1) : potentialJpg);
+      if (fs.existsSync(localJpgPath)) {
+        jpgFallbackUrl = `${HOST_ORIGIN}${potentialJpg.startsWith('/') ? '' : '/'}${potentialJpg}`;
+      }
+    }
+
     let destUrl = `${HOST_ORIGIN}/ebooks/book-landing.html?id=${encodeURIComponent(bookData.id || lpId)}`;
     if (bookData.landingPage) {
       destUrl = bookData.landingPage.startsWith('http') ? bookData.landingPage : `${HOST_ORIGIN}${bookData.landingPage.startsWith('/') ? '' : '/'}${bookData.landingPage}`;
     }
+    if (queryShareId) {
+      destUrl += (destUrl.includes('?') ? '&' : '?') + `share_id=${encodeURIComponent(queryShareId)}`;
+    }
     
-    const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(bookData.id || lpId)}`;
+    const canonicalShareUrl = `${HOST_ORIGIN}/api/share?id=${encodeURIComponent(bookData.id || lpId)}${queryShareId ? '&share_id=' + encodeURIComponent(queryShareId) : ''}`;
 
     const userAgent = String(req.headers['user-agent'] || '');
     const isCrawler = isBotScraper(userAgent);
+    const isWhatsApp = /WhatsApp/i.test(userAgent);
+
+    // If requested by WhatsApp crawler and companion JPG exists, use JPG as primary for 100% preview reliability
+    let primaryOgImage = finalOgImage;
+    if (isWhatsApp && jpgFallbackUrl) {
+      primaryOgImage = jpgFallbackUrl;
+    }
 
     if (!isCrawler && !query.debug) {
       res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400');
@@ -740,8 +761,8 @@ module.exports = async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400');
     const cleanTitle = finalTitle;
 
-    const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
-    const isPng = finalOgImage.toLowerCase().endsWith('.png');
+    const isWebp = primaryOgImage.toLowerCase().endsWith('.webp');
+    const isPng = primaryOgImage.toLowerCase().endsWith('.png');
     const imgMime = isWebp ? 'image/webp' : (isPng ? 'image/png' : 'image/jpeg');
 
     const html = `<!DOCTYPE html>
@@ -753,25 +774,31 @@ module.exports = async function handler(req, res) {
 
   <!-- Open Graph / WhatsApp & Facebook Crawlers -->
   <meta property="fb:app_id" content="966242223397117">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   <meta property="og:site_name" content="Aarogyam India">
   <meta property="og:title" content="${escapeHtml(finalTitle)}">
   <meta property="og:description" content="${escapeHtml(finalDesc)}">
-  <meta property="og:image" content="${escapeHtml(finalOgImage)}">
-  <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image" content="${escapeHtml(primaryOgImage)}">
+  <meta property="og:image:url" content="${escapeHtml(primaryOgImage)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(primaryOgImage)}">
   <meta property="og:image:type" content="${imgMime}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
+  ${jpgFallbackUrl && jpgFallbackUrl !== primaryOgImage ? `<meta property="og:image" content="${escapeHtml(jpgFallbackUrl)}">
+  <meta property="og:image:url" content="${escapeHtml(jpgFallbackUrl)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(jpgFallbackUrl)}">
+  <meta property="og:image:type" content="image/jpeg">` : ''}
   <meta property="og:url" content="${escapeHtml(canonicalShareUrl)}">
-  <link rel="image_src" href="${escapeHtml(finalOgImage)}">
+  <meta itemprop="image" content="${escapeHtml(primaryOgImage)}">
+  <link rel="image_src" href="${escapeHtml(primaryOgImage)}">
 
   <!-- Twitter Card Tags -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@AarogyamIndia">
   <meta name="twitter:title" content="${escapeHtml(finalTitle)}">
   <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
-  <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
+  <meta name="twitter:image" content="${escapeHtml(primaryOgImage)}">
   <link rel="canonical" href="${escapeHtml(canonicalShareUrl)}">
 
   <!-- Instant Client-Side Redirection for human visitors -->

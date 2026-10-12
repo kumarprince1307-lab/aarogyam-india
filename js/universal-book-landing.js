@@ -371,11 +371,14 @@
 
     // 4. Native Share Trigger (Mobile / Supported Browsers)
     if (navigator.share) {
-      navigator.share({
-        title: title,
-        text: promoText,
-        url: shareUrl
-      }).catch((err) => {
+      const shareData = { title: title };
+      if (promoText.includes(shareUrl)) {
+        shareData.text = promoText;
+      } else {
+        shareData.text = promoText;
+        shareData.url = shareUrl;
+      }
+      navigator.share(shareData).catch((err) => {
         if (err && err.name !== 'AbortError') {
           const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
           const waUrl = isMobile 
