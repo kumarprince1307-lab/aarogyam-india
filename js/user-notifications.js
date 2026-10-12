@@ -21,6 +21,8 @@
             await this.loadUserNotifications();
             this.bindEvents();
             this.setupPeriodicCheck();
+            this.initWebPushPrompt();
+            this.renderFestivalBanner();
         },
 
         // 2. Resolve Current User
@@ -425,13 +427,23 @@
             const unreadBroadcasts = this.items.filter(n => (n.isBroadcast || String(n.id).startsWith('BC_') || String(n.id).startsWith('system_')) && !n.isRead).length;
 
             // Update Bell Badges
-            const badgeEls = document.querySelectorAll('.user-notif-badge');
+            const badgeEls = document.querySelectorAll('.user-notif-badge, #nav-user-notif-badge, #mobile-notif-badge, #pwa-bottom-notif-badge, #profile-notif-badge, .drawer-notif-badge');
             const pill = document.getElementById('userNotifUnreadPill');
 
             badgeEls.forEach(b => {
                 if (unreadCount > 0) {
                     b.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                    b.style.display = 'inline-block';
+                    b.style.display = 'inline-flex';
+                    b.style.alignItems = 'center';
+                    b.style.justifyContent = 'center';
+                    b.style.background = '#EF4444';
+                    b.style.color = '#FFFFFF';
+                    b.style.fontSize = '0.68rem';
+                    b.style.fontWeight = '900';
+                    b.style.borderRadius = '50%';
+                    b.style.minWidth = '18px';
+                    b.style.height = '18px';
+                    b.style.padding = '0 4px';
                 } else {
                     b.style.display = 'none';
                 }
@@ -649,7 +661,197 @@
             // Egress Zero Policy: No periodic background queries. Data loaded on explicit page load/refresh.
         },
 
-        // 13. Relative Time Formatter
+        // 13. Smart Once-a-Day Web Push Permission Prompter
+        initWebPushPrompt: function () {
+            try {
+                if (typeof window === 'undefined' || !('Notification' in window)) return;
+                if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
+
+                const today = new Date().toISOString().split('T')[0];
+                const lastPrompt = localStorage.getItem('AI_PUSH_PROMPT_DATE');
+                if (lastPrompt === today) return; // Strict: only ask once per day
+
+                // Do not display in admin panel
+                if (window.location.pathname.includes('/admin/')) return;
+
+                setTimeout(() => {
+                    if (document.getElementById('ai-push-permission-toast')) return;
+                    const toast = document.createElement('div');
+                    toast.id = 'ai-push-permission-toast';
+                    toast.innerHTML = `
+                        <div style="position:fixed;bottom:76px;left:50%;transform:translateX(-50%);max-width:92vw;width:420px;background:#0F172A;color:#fff;border:1.5px solid #38BDF8;border-radius:14px;padding:12px 16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);z-index:99990;display:flex;align-items:center;gap:12px;font-family:sans-serif;">
+                            <div style="font-size:1.6rem;background:rgba(56,189,248,0.15);width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔔</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:800;font-size:0.88rem;color:#F8FAFC;">अपडेट्स नोटिफिकेशन चालू करें?</div>
+                                <div style="font-size:0.75rem;color:#94A3B8;margin-top:2px;">कृषि व स्वास्थ्य की नई ई-बुक्स, वीडियो व विशेष छूट अलर्ट तुरंत पाएं।</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+                                <button type="button" id="btnAiPushAllow" style="background:#0284C7;border:none;color:#fff;font-weight:800;font-size:0.78rem;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;">चालू करें</button>
+                                <button type="button" id="btnAiPushDeny" style="background:transparent;border:none;color:#94A3B8;font-size:0.75rem;padding:4px;cursor:pointer;white-space:nowrap;">बाद में</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(toast);
+
+                    document.getElementById('btnAiPushDeny')?.addEventListener('click', () => {
+                        localStorage.setItem('AI_PUSH_PROMPT_DATE', today);
+                        toast.remove();
+                    });
+
+                    document.getElementById('btnAiPushAllow')?.addEventListener('click', async () => {
+                        localStorage.setItem('AI_PUSH_PROMPT_DATE', today);
+                        try {
+                            const res = await Notification.requestPermission();
+                            if (res === 'granted' && 'serviceWorker' in navigator) {
+                                navigator.serviceWorker.ready.then(reg => {
+                                    reg.showNotification('आरोग्यम इंडिया में स्वागत है! 🌾', {
+                                        body: 'आपको सभी महत्वपूर्ण अपडेट्स व विशेष ऑफर्स की सूचना समय पर मिलेगी।',
+                                        icon: '/images/icons/pwa-icon-192x192.png',
+                                        badge: '/images/icons/pwa-icon-96x96.png'
+                                    });
+                                });
+                            }
+                        } catch (e) {}
+                        toast.remove();
+                    });
+                }, 4000);
+            } catch (err) {}
+        },
+
+        // 14. Universal Festival & Flash Sale Banner (Flipkart / Amazon Style)
+        renderFestivalBanner: async function () {
+            try {
+                if (typeof window === 'undefined' || window.location.pathname.includes('/admin/')) return;
+                if (document.getElementById('ai-universal-festival-bar')) return;
+
+                let conf = null;
+                try {
+                    const local = JSON.parse(localStorage.getItem('AAROGYAM_FESTIVAL_CAMPAIGN') || '{}');
+                    if (local && typeof local.active === 'boolean') {
+                        conf = local;
+                    }
+                } catch (e) {}
+
+                if (!conf || typeof conf.active !== 'boolean') {
+                    try {
+                        const resp = await fetch('/data/festival-campaign.json?v=' + Math.floor(Date.now() / 300000));
+                        if (resp.ok) conf = await resp.json();
+                    } catch (e) {}
+                }
+
+                if (!conf || !conf.active) return;
+
+                const endTime = conf.timer_end ? new Date(conf.timer_end).getTime() : 0;
+                if (endTime && Date.now() > endTime) return; // Campaign ended
+
+                const bar = document.createElement('div');
+                bar.id = 'ai-universal-festival-bar';
+                bar.innerHTML = `
+                    <style>
+                        #ai-universal-festival-bar {
+                            background: ${conf.banner_bg || 'linear-gradient(90deg, #b91c1c 0%, #ea580c 50%, #dc2626 100%)'};
+                            color: #ffffff;
+                            font-family: system-ui, -apple-system, sans-serif;
+                            font-size: 0.84rem;
+                            padding: 8px 12px;
+                            position: sticky;
+                            top: 0;
+                            z-index: 99992;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+                            border-bottom: 1.5px solid rgba(255,255,255,0.2);
+                        }
+                        .ai-fest-container {
+                            max-width: 1200px;
+                            margin: 0 auto;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            flex-wrap: wrap;
+                            gap: 8px;
+                        }
+                        .ai-fest-tag {
+                            background: #FEE2E2;
+                            color: #991B1B;
+                            font-size: 0.72rem;
+                            font-weight: 900;
+                            padding: 2px 8px;
+                            border-radius: 4px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .ai-fest-timer-box {
+                            background: rgba(0,0,0,0.3);
+                            padding: 3px 8px;
+                            border-radius: 6px;
+                            font-family: monospace;
+                            font-weight: 800;
+                            font-size: 0.85rem;
+                            border: 1px solid rgba(255,255,255,0.2);
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 4px;
+                        }
+                        .ai-fest-cta-btn {
+                            background: #ffffff;
+                            color: #b91c1c;
+                            font-weight: 900;
+                            font-size: 0.78rem;
+                            padding: 5px 12px;
+                            border-radius: 20px;
+                            text-decoration: none;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                            transition: transform 0.2s;
+                            white-space: nowrap;
+                        }
+                        .ai-fest-cta-btn:hover {
+                            transform: scale(1.04);
+                        }
+                    </style>
+                    <div class="ai-fest-container">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <span class="ai-fest-tag">${conf.badge || '🔥 MEGA OFFER'}</span>
+                            <span style="font-weight:800;letter-spacing:0.2px;">${conf.title}</span>
+                            ${conf.coupon_code ? `<span style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:4px;font-size:0.75rem;font-weight:700;">कूपन: <strong>${conf.coupon_code}</strong></span>` : ''}
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            ${endTime ? `
+                                <div class="ai-fest-timer-box">
+                                    <span>⏰ समाप्त:</span>
+                                    <span id="ai-fest-countdown">गणना हो रही है...</span>
+                                </div>
+                            ` : ''}
+                            <a href="${conf.target_url || '/ebooks/index.html'}" class="ai-fest-cta-btn">
+                                ${conf.cta_text || '📖 अभी ऑफर प्राप्त करें →'}
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentElement('afterbegin', bar);
+
+                if (endTime) {
+                    const timerEl = document.getElementById('ai-fest-countdown');
+                    const updateCountdown = () => {
+                        const now = Date.now();
+                        const diff = endTime - now;
+                        if (diff <= 0) {
+                            if (timerEl) timerEl.textContent = "समाप्त";
+                            return;
+                        }
+                        const hrs = Math.floor(diff / (1000 * 60 * 60));
+                        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                        if (timerEl) {
+                            timerEl.textContent = `${hrs.toString().padStart(2, '0')}h : ${mins.toString().padStart(2, '0')}m : ${secs.toString().padStart(2, '0')}s`;
+                        }
+                    };
+                    updateCountdown();
+                    setInterval(updateCountdown, 1000);
+                }
+            } catch (err) {}
+        },
+
+        // 15. Relative Time Formatter
         formatTimeAgo: function (dateStr) {
             if (!dateStr) return 'अभी-अभी';
             const diff = Date.now() - new Date(dateStr).getTime();

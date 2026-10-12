@@ -24,7 +24,9 @@ const ROUTES = {
   'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
   'reports': () => import('./admin-pages-reports.js?v=5.0').then(m => (m.initReports ? m.initReports() : m.renderReports(document.getElementById('page-content')))),
   'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),
-  'broadcast': () => import('./admin-pages-broadcast.js').then(m => m.initAdminBroadcast()),
+  'broadcast': () => import('./admin-pages-broadcast.js?v=3.2').then(m => m.initAdminBroadcast()),
+  'google-leads': () => import('./admin-pages-google-leads.js?v=1.0').then(m => m.initGoogleLeads()),
+  'auto-whatsapp': () => import('./admin-pages-auto-whatsapp.js?v=1.0').then(m => m.initAutoWhatsapp()),
   'all-webinars': () => import(`./admin-pages-webinars.js?v=34.1`).then(m => m.initWebinars()),
   'webinars': () => import(`./admin-pages-webinars.js?v=34.1`).then(m => m.initWebinars()),
   'webinar-reports': () => import('./admin-pages-webinar-reports.js?v=33.5').then(m => m.initWebinarReports()),
@@ -61,6 +63,11 @@ const ROUTE_ALIASES = {
   'books': 'book-landing-pages',
   'categories': 'product-landing-pages',
   'demo-books': 'book-landing-pages',
+  'google-lead': 'google-leads',
+  'lead-generation': 'google-leads',
+  'leads': 'google-leads',
+  'auto-wa': 'auto-whatsapp',
+  'whatsapp-bot': 'auto-whatsapp',
   'help': 'support'
 };
 

@@ -318,6 +318,57 @@
     }
 
     /**
+     * Universal Promotional Link Expiry Check
+     * Detects &exp=<timestamp> parameter across all website pages.
+     * If expired, renders an alert banner informing the visitor and offering WhatsApp support.
+     */
+    function checkUniversalOfferExpiry() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const expParam = urlParams.get('exp');
+            if (!expParam) return;
+
+            const expTimestamp = parseInt(expParam, 10);
+            if (isNaN(expTimestamp) || expTimestamp <= 0) return;
+
+            const now = Date.now();
+            const isExpired = now > expTimestamp;
+
+            if (isExpired) {
+                sessionStorage.setItem('AI_OFFER_EXPIRED', 'true');
+                if (window.location.pathname.includes('checkout.html')) return;
+                
+                const injectExpiredBanner = () => {
+                    if (document.getElementById('ai-universal-expired-banner')) return;
+                    const banner = document.createElement('div');
+                    banner.id = 'ai-universal-expired-banner';
+                    banner.style.cssText = 'position:sticky; top:0; z-index:999999; background:linear-gradient(135deg, #7F1D1D 0%, #991B1B 100%); color:#fff; padding:10px 16px; font-family:system-ui,-apple-system,sans-serif; box-shadow:0 4px 14px rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; border-bottom:2px solid #EF4444;';
+                    banner.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px; font-size:0.88rem; font-weight:700;">
+                            <span style="font-size:1.25rem;">⚠️</span>
+                            <span>यह विशेष ऑफर लिंक समाप्त (Expired) हो चुका है! अब मानक मूल्य लागू हैं।</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <a href="https://wa.me/919999999999?text=${encodeURIComponent('नमस्ते! मेरा विशेष प्रोमो लिंक एक्सपायर हो गया है, कृपया नया ऑफर लिंक प्रदान करें।')}" target="_blank" style="background:#22C55E; color:#fff; font-weight:800; font-size:0.78rem; padding:6px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+                                💬 नया लिंक मांगें (WhatsApp)
+                            </a>
+                            <button type="button" onclick="this.closest('#ai-universal-expired-banner').remove()" style="background:transparent; border:none; color:#FCA5A5; font-size:1.2rem; cursor:pointer; line-height:1; padding:0 4px;">&times;</button>
+                        </div>
+                    `;
+                    document.body.prepend(banner);
+                };
+
+                if (document.body) injectExpiredBanner();
+                else document.addEventListener('DOMContentLoaded', injectExpiredBanner);
+            } else {
+                sessionStorage.setItem('AI_OFFER_EXPIRES_AT', expTimestamp.toString());
+            }
+        } catch (e) {
+            console.warn("Universal offer expiry check warning:", e);
+        }
+    }
+
+    /**
      * If the user is not logged in, redirects them to the My Library page
      * to trigger the login popup.
      * @param {string} [redirectTo='../ebooks/my-library.html'] - The URL to redirect to.
@@ -344,7 +395,8 @@
         saveSession,
         getUnifiedShareId,
         getUserShareId: getUnifiedShareId,
-        syncAndHealSession
+        syncAndHealSession,
+        checkUniversalOfferExpiry
     };
 
     // Cross-compatibility aliases
@@ -355,8 +407,9 @@
     window.getUnifiedShareId = getUnifiedShareId;
     window.logoutUniversalUser = logout;
 
-    // Run referral capture and automated session reconciliation
+    // Run referral capture, offer expiry validation, and automated session reconciliation
     captureReferral();
+    checkUniversalOfferExpiry();
     syncAndHealSession();
 
     console.log("✅ V1 Common Session Module Loaded & Unified.");

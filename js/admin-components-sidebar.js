@@ -59,6 +59,8 @@ const MENU = [
   ] },
   { label: 'Marketing (मार्केटिंग)', icon: '📣', children: [ 
     { label: 'UCAS Landing Pages', href: 'all-landing-pages.html', route: 'all-landing-pages' }, 
+    { label: '🌐 Google Lead Generation', href: 'google-leads.html', route: 'google-leads' },
+    { label: '🤖 Auto WhatsApp Bot', href: 'auto-whatsapp.html', route: 'auto-whatsapp' },
     { label: 'Hook Templates & Shayari', href: 'smart-etailer.html?tab=adm-sec-marketing', route: 'marketing-templates' }, 
     { label: '👥 Share Links Analytics', href: 'reports.html#share-report', route: 'reports' }, 
     { label: '🎯 Campaigns Analytics', href: 'reports.html#lead-report', route: 'reports' } 
@@ -66,7 +68,7 @@ const MENU = [
   { label: 'Webinars (वेबिनार हब)', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
   { label: 'Notifications (सूचनाएं)', icon: '🔔', children: [ 
     { label: 'All Notifications', href: 'notifications.html', route: 'notifications' }, 
-    { label: '📢 Broadcast Center', href: 'broadcast.html', route: 'broadcast' } 
+    { label: '📢 Broadcast & 1-Tap Outreach', href: 'broadcast.html', route: 'broadcast' } 
   ] },
 
   /* ========================================================
