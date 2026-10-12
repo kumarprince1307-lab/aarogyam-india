@@ -741,6 +741,8 @@ function startCheckoutCountdown(expTimestamp) {
                 const tpEl = document.getElementById("totalPrice");
                 if (tpEl) tpEl.textContent = "₹" + revertPrice;
             }
+            // 📲 Launch Smart Floating WhatsApp Button on Checkout
+            showCheckoutExpiredWhatsAppButton();
             return;
         }
 
@@ -751,6 +753,116 @@ function startCheckoutCountdown(expTimestamp) {
 
     tick();
     checkoutCountdownTimerId = setInterval(tick, 1000);
+}
+
+// 📲 Smart Floating Animated WhatsApp Icon (Triggered ONLY on Checkout when VIP Offer Expires)
+function showCheckoutExpiredWhatsAppButton() {
+    if (document.getElementById("checkoutFloatingExpiredWhatsApp")) return;
+
+    const b = window.currentCheckoutBook || {};
+    const bookTitle = b.title || b.name || "ई-बुक";
+    const waText = `🌾 नमस्ते Aarogyam India,\nमेरा विशेष वीआईपी ऑफर लिंक (${bookTitle}) का समय समाप्त हो चुका है।\nमैं इस पुस्तक को विशेष छूट पर खरीदना चाहता हूँ, कृपया मुझे नया ऑफर लिंक भेजें।\nलिंक: ${window.location.href}`;
+    const waUrl = `https://wa.me/917974422572?text=${encodeURIComponent(waText)}`;
+
+    // Inject dedicated responsive styles
+    if (!document.getElementById("checkout-floating-wa-styles")) {
+        const style = document.createElement("style");
+        style.id = "checkout-floating-wa-styles";
+        style.textContent = `
+          .checkout-floating-expired-whatsapp {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            z-index: 999999;
+            display: flex;
+            align-items: flex-end;
+            animation: chkWaFloatAnim 3s ease-in-out infinite;
+          }
+          .checkout-floating-wa-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+          }
+          .checkout-floating-wa-bubble {
+            background: #0f172a;
+            color: #fef08a;
+            border: 1.5px solid #22c55e;
+            border-radius: 24px;
+            padding: 8px 14px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(34, 197, 94, 0.4);
+            white-space: nowrap;
+          }
+          .checkout-bubble-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+          }
+          .checkout-floating-wa-icon-box {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5);
+            position: relative;
+            transition: transform 0.25s ease;
+          }
+          .checkout-floating-wa-link:hover .checkout-floating-wa-icon-box {
+            transform: scale(1.12);
+          }
+          .checkout-floating-wa-pulse-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid #25D366;
+            opacity: 0.8;
+            animation: chkWaPulseRing 2s infinite;
+          }
+          @keyframes chkWaFloatAnim {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+          }
+          @keyframes chkWaPulseRing {
+            0% { transform: scale(0.9); opacity: 0.9; }
+            70% { transform: scale(1.4); opacity: 0; }
+            100% { transform: scale(1.5); opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
+    }
+
+    const floatingDiv = document.createElement("div");
+    floatingDiv.id = "checkoutFloatingExpiredWhatsApp";
+    floatingDiv.className = "checkout-floating-expired-whatsapp";
+    floatingDiv.innerHTML = `
+      <a href="${waUrl}" target="_blank" class="checkout-floating-wa-link" title="WhatsApp पर नया ऑफर मांगें">
+        <div class="checkout-floating-wa-bubble">
+          <span>🔥</span>
+          <span>ऑफर खत्म? नया लिंक WhatsApp पर मांगें!</span>
+          <button type="button" class="checkout-bubble-close" onclick="event.preventDefault(); event.stopPropagation(); this.parentElement.style.display='none';">&times;</button>
+        </div>
+        <div class="checkout-floating-wa-icon-box">
+          <div class="checkout-floating-wa-pulse-ring"></div>
+          <i class="fa-brands fa-whatsapp"></i>
+        </div>
+      </a>
+    `;
+    document.body.appendChild(floatingDiv);
 }
 
 async function loadBook() {
@@ -765,7 +877,8 @@ async function loadBook() {
         const offerSig = (params.get("s") || params.get("sig") || params.get("signature") || "").trim();
         const offerMobile = (params.get("m") || params.get("mobile") || "").trim();
         const offerName = (params.get("n") || params.get("name") || "").trim();
-        const offerExp = parseInt(params.get("e") || params.get("exp") || "0", 10);
+        const rawExp = parseInt(params.get("e") || params.get("exp") || "0", 10);
+        const offerExp = rawExp > 0 ? (rawExp < 10000000000 ? rawExp * 1000 : rawExp) : 0;
         const offerAudio = (params.get("a") || params.get("audio") || "").trim();
         const offerTimer = (params.get("t") || params.get("timer") || "").trim();
         let verifiedOfferAmount = null;
@@ -868,6 +981,7 @@ async function loadBook() {
                         offerSecurityError = "⚠️ अनधिकृत कॉम्बो डिस्काउंट लिंक: कोई सुरक्षा डिजिटल हस्ताक्षर नहीं मिला।";
                     } else if (offerExp > 0 && Date.now() > offerExp) {
                         offerSecurityError = "⏳ समय सीमा समाप्त: यह कॉम्बो ऑफर समाप्त हो चुका है। मूल मूल्य लागू किया गया।";
+                        showCheckoutExpiredWhatsAppButton();
                     } else {
                         const isSigValid = verifyOfferSignature(targetCheckId, rawAmt, offerMobile, offerSig, offerTimer, offerExp);
                         if (!isSigValid) {
@@ -1027,6 +1141,7 @@ async function loadBook() {
                 offerSecurityError = "⚠️ अनधिकृत डिस्काउंट लिंक: कोई डिजिटल सुरक्षा हस्ताक्षर नहीं मिला।";
             } else if (offerExp > 0 && Date.now() > offerExp) {
                 offerSecurityError = "⏳ समय सीमा समाप्त: यह विशेष ऑफर समाप्त हो चुका है। मूल मूल्य लागू किया गया।";
+                showCheckoutExpiredWhatsAppButton();
             } else {
                 const isSigValid = verifyOfferSignature(targetCheckId, rawAmt, offerMobile, offerSig, offerTimer, offerExp);
                 if (!isSigValid) {

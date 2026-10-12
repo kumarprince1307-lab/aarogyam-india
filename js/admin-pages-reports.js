@@ -921,6 +921,71 @@ function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
       </div>
     </div>
 
+    <!-- 👤➕ डायरेक्ट वीआईपी लिंक जनरेटर (नया/पुराना ग्राहक का नाम व नंबर डालकर 1-क्लिक ऑफर बनाएं) -->
+    <div style="background:linear-gradient(135deg, rgba(16,185,129,0.14), rgba(15,23,42,0.92)); border:1.5px solid #10b981; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">👤➕</span>
+          <div>
+            <h3 style="margin:0; font-size:1.1rem; font-weight:900; color:#34d399;">
+              डायरेक्ट वीआईपी लिंक जनरेटर (Direct Customer Name & Mobile No)
+            </h3>
+            <p style="margin:2px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              ग्राहक लिस्ट में रजिस्टर्ड हो या बिल्कुल नया—यहाँ नाम और 10 अंकों का मोबाइल नंबर डालें, ऊपर चुने गए ऑफर के अनुसार 1-क्लिक में पर्सनलाइज्ड VIP लिंक व WhatsApp संदेश बन जाएगा!
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid #10b981; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.74rem;">
+          ⚡ Instant Custom VIP Offer
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">1. ग्राहक का नाम (Full Name):</label>
+          <input type="text" id="mkt-manual-name" placeholder="उदा. मणिकराव (Manikrao)" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:9px 12px; border-radius:8px; font-size:0.85rem;" />
+        </div>
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">2. 10 अंकों का मोबाइल नंबर (Mobile No):</label>
+          <input type="tel" id="mkt-manual-mobile" maxlength="10" placeholder="उदा. 9764566930" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:9px 12px; border-radius:8px; font-size:0.85rem;" />
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button type="button" id="btn-generate-manual-offer" style="width:100%; background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:800; font-size:0.86rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 15px rgba(16,185,129,0.35); transition:transform 0.2s ease;">
+            <span>⚡ VIP लिंक व संदेश जनरेट करें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Generated Result Box (Displays generated link, buttons, message preview) -->
+      <div id="mkt-manual-result-box" style="display:none; background:#070d19; border:1.5px solid #22c55e; border-radius:12px; padding:16px; margin-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:1.1rem;">🎉</span>
+            <strong style="color:#4ade80; font-size:0.88rem;" id="mkt-manual-target-heading">वीआईपी ऑफर लिंक तैयार:</strong>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a id="mkt-manual-wa-btn" href="#" target="_blank" style="background:#25D366; color:#fff; font-weight:800; padding:7px 14px; border-radius:8px; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(37,211,102,0.35);">
+              <span>📲 WhatsApp पर सीधे भेजें</span>
+            </a>
+            <button type="button" id="mkt-manual-copy-msg" style="background:#2563eb; color:#fff; border:none; font-weight:800; padding:7px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">
+              📋 पूरा संदेश कॉपी
+            </button>
+            <button type="button" id="mkt-manual-copy-link" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; font-weight:700; padding:7px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">
+              🔗 सिर्फ लिंक कॉपी
+            </button>
+          </div>
+        </div>
+        <div style="margin-bottom:10px; background:#0f172a; padding:8px 12px; border-radius:8px; border:1px solid #1e293b;">
+          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 सुपर-शॉर्ट VIP चेकआउट लिंक:</span>
+          <code id="mkt-manual-link-text" style="color:#38bdf8; font-size:0.84rem; word-break:break-all; font-weight:700;"></code>
+        </div>
+        <div>
+          <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-bottom:4px;">💬 तैयार WhatsApp संदेश पूर्वावलोकन (Message Preview):</span>
+          <div id="mkt-manual-msg-preview" style="background:#1e293b; border-radius:8px; padding:12px; color:#e2e8f0; font-size:0.82rem; line-height:1.6; white-space:pre-wrap; max-height:220px; overflow-y:auto; border:1px solid #334155; font-family:sans-serif;"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- 🧠 AI MARKETING DECISION BRAIN: 4 PILLARS & 1-CLICK BROADCAST COMMAND CENTER -->
     ${(() => {
       const allSurveys = mktState.surveys || [];
@@ -1305,6 +1370,7 @@ function getGeneratedOfferUrlAndMsg(user) {
   const cleanMobile = (user.mobile || '').toString().replace(/\D/g, '').slice(-10) || '7974422572';
   const targetMobile = user.isAdminTest ? 'ADMIN_TEST' : cleanMobile;
   const timerQuery = ob.timer !== 'none' ? `&t=${ob.timer}` : '';
+  const expQuery = (exp > 0 && ob.timer !== 'none') ? `&e=${Math.floor(exp / 1000)}` : '';
 
   // Personalized condition analysis for intelligent marketing
   let userConditionText = "आप हमारे अति महत्वपूर्ण पाठक हैं।";
@@ -1332,8 +1398,8 @@ function getGeneratedOfferUrlAndMsg(user) {
   if (ob.type === 'bogo') {
     const bookPair = `${ob.primaryBook},${ob.bonusBook}`;
     const sig = generateOfferSignature(bookPair, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
-    // Ultra-short clean URL (/c.html?bs=...&p=...&m=...&s=...&t=...)
-    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
+    // Ultra-short clean URL (/c.html?bs=...&p=...&m=...&s=...&t=...&e=...)
+    checkoutUrl = `/c.html?bs=${ob.primaryBook},${ob.bonusBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}${expQuery}`;
     const bonusTitle = bonusBookObj.name || bonusBookObj.heading || ob.bonusBook;
     const bonusMrp = bonusBookObj.mrp || 299;
     const bonusStoreOffer = bonusBookObj.offerPrice || 99;
@@ -1349,8 +1415,8 @@ function getGeneratedOfferUrlAndMsg(user) {
     shortSms = `नमस्ते ${name} जी! पुस्तक ${bookTitle} का रिव्यू दें और 50% छूट वाउचर पाएं: https://aarogyamindia.online${checkoutUrl}`;
   } else {
     const sig = generateOfferSignature(ob.primaryBook, ob.price, targetMobile, ob.timer !== 'none' ? ob.timer : exp);
-    // Ultra-short clean URL (/c.html?b=...&p=...&m=...&s=...&t=...)
-    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}`;
+    // Ultra-short clean URL (/c.html?b=...&p=...&m=...&s=...&t=...&e=...)
+    checkoutUrl = `/c.html?b=${ob.primaryBook}&p=${ob.price}&m=${targetMobile}&s=${sig}${timerQuery}${expQuery}`;
 
     msg = `🌾 *नमस्ते ${name} जी!* 🙏\n\n${userConditionText} आज आपके लिए आरोग्यम इंडिया का विशेष वीआईपी ऑफर है:\n\n📖 *पुस्तक:* ${bookTitle}\n🌱 *संक्षिप्त परिचय:* ${bookDesc}\n💰 *विशेष मूल्य:* ${priceText} (सामान्य MRP: ~₹${bookMrp}~, स्टोर पर ₹${bookStoreOffer})\n${ob.timer !== 'none' ? `⏳ *समय सीमा:* केवल *${timerText}* के लिए मान्य!\n` : ''}\n👉 *विशेष छूट पर ऑर्डर करने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online${checkoutUrl}\n\n📖 *पुस्तक का संपूर्ण विवरण व इंडेक्स यहाँ देखें:*\n${landingUrl}\n\n🔒 *नोट:* यह विशेष छूट केवल आपके पंजीकृत नंबर (+91-XXXXX${cleanMobile.slice(-4)}) के लिए सुरक्षित है। इसे किसी को शेयर न करें, एक बार खरीदने पर यह ऑफर बंद हो जाएगा।\n\nधन्यवाद!\n_आरोग्यम इंडिया - समृद्ध किसान, समृद्ध भारत_`;
 
@@ -4702,6 +4768,64 @@ function attachMarketingHubEvents(container) {
       }).catch(() => {
         prompt("लिंक कॉपी करें:", fullUrl);
       });
+    });
+  }
+
+  // 👤➕ Manual Customer Offer Generator Event Handlers
+  const btnManualGen = document.getElementById('btn-generate-manual-offer');
+  if (btnManualGen) {
+    btnManualGen.addEventListener('click', () => {
+      const nameInp = document.getElementById('mkt-manual-name');
+      const mobInp = document.getElementById('mkt-manual-mobile');
+      const rawName = (nameInp ? nameInp.value : '').trim() || 'किसान मित्र';
+      const rawMob = (mobInp ? mobInp.value : '').trim();
+      const cleanMob = rawMob.replace(/\D/g, '').slice(-10);
+
+      if (!cleanMob || cleanMob.length !== 10) {
+        alert("कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें!");
+        if (mobInp) mobInp.focus();
+        return;
+      }
+
+      const userObj = { full_name: rawName, mobile: cleanMob };
+      const { checkoutUrl, msg } = getGeneratedOfferUrlAndMsg(userObj);
+      const fullUrl = `https://aarogyamindia.online${checkoutUrl}`;
+      const targetPhone = cleanMob.startsWith('91') && cleanMob.length === 12 ? cleanMob : ('91' + cleanMob);
+      const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
+
+      const resBox = document.getElementById('mkt-manual-result-box');
+      const headEl = document.getElementById('mkt-manual-target-heading');
+      const linkEl = document.getElementById('mkt-manual-link-text');
+      const msgEl = document.getElementById('mkt-manual-msg-preview');
+      const waBtn = document.getElementById('mkt-manual-wa-btn');
+
+      if (headEl) headEl.textContent = `${rawName} (+91-${cleanMob}) के लिए वीआईपी लिंक तैयार:`;
+      if (linkEl) linkEl.textContent = fullUrl;
+      if (msgEl) msgEl.textContent = msg;
+      if (waBtn) waBtn.href = waUrl;
+      if (resBox) resBox.style.display = 'block';
+
+      const copyMsgBtn = document.getElementById('mkt-manual-copy-msg');
+      if (copyMsgBtn) {
+        copyMsgBtn.onclick = () => {
+          navigator.clipboard.writeText(msg).then(() => {
+            alert("✅ पूरा WhatsApp संदेश कॉपी हो गया!");
+          }).catch(() => {
+            prompt("संदेश कॉपी करें:", msg);
+          });
+        };
+      }
+
+      const copyLinkBtn = document.getElementById('mkt-manual-copy-link');
+      if (copyLinkBtn) {
+        copyLinkBtn.onclick = () => {
+          navigator.clipboard.writeText(fullUrl).then(() => {
+            alert("✅ वीआईपी लिंक कॉपी हो गया:\n" + fullUrl);
+          }).catch(() => {
+            prompt("लिंक कॉपी करें:", fullUrl);
+          });
+        };
+      }
     });
   }
 

@@ -2010,184 +2010,35 @@
     }
 
     section.style.display = 'block';
-
-    const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
-    const title = l.hero?.title || currentBookData?.heading || currentBookData?.name || 'ई-बुक';
-    const timerStorageKey = `AAROGYAM_OFFER_TIMER_${bId}`;
-
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.has('reset_timer') || searchParams.has('reset') || searchParams.has('test')) {
-      try { localStorage.removeItem(timerStorageKey); } catch(e) {}
-    }
-
-    // Immediate testing: ?expire=1 or ?expired=1 activates expired offer state right away
-    if (searchParams.has('expire') || searchParams.has('expired')) {
-      triggerOfferExpiredState(bId, title);
-      return;
-    }
-
-    let durationMinutes = parseInt(timerCfg.minutes, 10) || 15;
-    let durationMs = durationMinutes * 60 * 1000;
-
-    // Fast-testing live countdown: e.g. ?timer=10s or ?timer=15s or ?time=10s
-    const testTimerParam = searchParams.get('timer') || searchParams.get('time');
-    if (testTimerParam && testTimerParam.endsWith('s')) {
-      const testSec = parseInt(testTimerParam, 10) || 10;
-      durationMs = testSec * 1000;
-      try { localStorage.removeItem(timerStorageKey); } catch(e) {}
-    }
-
-    let storedTimer = null;
-    try {
-      const raw = localStorage.getItem(timerStorageKey);
-      if (raw) storedTimer = JSON.parse(raw);
-    } catch(e) {}
-
-    const now = Date.now();
-    if (!storedTimer || !storedTimer.expiryTime) {
-      storedTimer = {
-        startTime: now,
-        durationMinutes: durationMinutes,
-        expiryTime: now + durationMs,
-        bookId: bId
-      };
-      try {
-        localStorage.setItem(timerStorageKey, JSON.stringify(storedTimer));
-      } catch(e) {}
-    }
-
-    const remainingMs = storedTimer.expiryTime - now;
-
-    if (remainingMs <= 0) {
-      // Offer has already expired for this user/session!
-      triggerOfferExpiredState(bId, title);
-      return;
-    }
-
-    // Still active: configure UI
     setElemText('timer-badge-text', timerCfg.badge || '⚡ सीमित समय ऑफर');
     if (timerCfg.text) {
       setElemText('timer-message-text', timerCfg.text);
     }
 
+    let minutes = timerCfg.minutes || 15;
+    let seconds = 0;
+
     const minEl = document.getElementById('ubl-clock-minutes');
     const secEl = document.getElementById('ubl-clock-seconds');
-
-    function updateClockDisplay(totalSecondsLeft) {
-      const m = Math.floor(totalSecondsLeft / 60);
-      const s = totalSecondsLeft % 60;
-      if (minEl) minEl.textContent = String(m).padStart(2, '0');
-      if (secEl) secEl.textContent = String(s).padStart(2, '0');
-    }
-
-    const initialSecs = Math.max(0, Math.floor((storedTimer.expiryTime - Date.now()) / 1000));
-    updateClockDisplay(initialSecs);
 
     if (timerInterval) clearInterval(timerInterval);
 
     timerInterval = setInterval(() => {
-      const curRemainingSecs = Math.floor((storedTimer.expiryTime - Date.now()) / 1000);
-      if (curRemainingSecs <= 0) {
-        clearInterval(timerInterval);
-        try {
-          // Persist permanent expired state so subsequent reloads stay expired
-          localStorage.setItem(timerStorageKey, JSON.stringify({
-            startTime: storedTimer.startTime || (Date.now() - durationMs),
-            durationMinutes: durationMinutes,
-            expiryTime: Date.now() - 1000,
-            bookId: bId
-          }));
-        } catch(e) {}
-        triggerOfferExpiredState(bId, title);
+      if (seconds === 0) {
+        if (minutes === 0) {
+          minutes = 14;
+          seconds = 59;
+        } else {
+          minutes--;
+          seconds = 59;
+        }
       } else {
-        updateClockDisplay(curRemainingSecs);
+        seconds--;
       }
+
+      if (minEl) minEl.textContent = String(minutes).padStart(2, '0');
+      if (secEl) secEl.textContent = String(seconds).padStart(2, '0');
     }, 1000);
-  }
-
-  // Handle Expired Offer State (Banner + Inline WhatsApp CTA + Smart Floating Icon)
-  function triggerOfferExpiredState(bId, title) {
-    const section = document.getElementById('sec-offer-timer');
-    const l = currentLandingData || {};
-    const b = currentBookData || {};
-    const bookTitle = title || l.hero?.title || b.heading || b.name || 'ई-बुक';
-
-    // Pre-filled WhatsApp inquiry for expired special offer
-    const waText = `🌾 नमस्ते Aarogyam India,\nमैंने '${bookTitle}' (बुक कोड: ${bId}) ई-बुक का ऑफर देखा था, लेकिन वेबसाइट पर विशेष ऑफर का समय समाप्त हो चुका है।\nमैं इस पुस्तक को खरीदने में Interested हूँ। क्या मुझे अभी भी यह पुस्तक विशेष छूट/ऑफर में मिल सकती है?\nलिंक: ${window.location.href}`;
-    const waUrl = `https://wa.me/917974422572?text=${encodeURIComponent(waText)}`;
-
-    if (section) {
-      section.style.display = 'block';
-      const container = section.querySelector('.ubl-timer-container');
-      if (container) {
-        container.style.background = 'linear-gradient(135deg, rgba(69, 10, 10, 0.95), rgba(30, 4, 4, 0.95))';
-        container.style.border = '2px solid #ef4444';
-        container.style.boxShadow = '0 0 25px rgba(239, 68, 68, 0.35)';
-      }
-
-      const badgeText = document.getElementById('timer-badge-text');
-      if (badgeText) badgeText.textContent = 'ऑफर समाप्त (Offer Expired)';
-      const badgeEl = section.querySelector('.ubl-timer-badge');
-      if (badgeEl) {
-        badgeEl.style.background = 'linear-gradient(135deg, #dc2626, #b91c1c)';
-        badgeEl.style.color = '#ffffff';
-        badgeEl.style.boxShadow = '0 0 14px rgba(220, 38, 38, 0.6)';
-      }
-
-      const msgText = document.getElementById('timer-message-text');
-      if (msgText) {
-        msgText.innerHTML = `⚠️ <strong>यह ऑफर का समय समाप्त हुआ!</strong> यदि अभी भी आप Interested हैं तो WhatsApp करें:`;
-        msgText.style.color = '#fecaca';
-      }
-
-      const minEl = document.getElementById('ubl-clock-minutes');
-      const secEl = document.getElementById('ubl-clock-seconds');
-      if (minEl) minEl.textContent = '00';
-      if (secEl) secEl.textContent = '00';
-
-      const clockEl = section.querySelector('.ubl-countdown-clock');
-      if (clockEl) {
-        clockEl.style.background = 'rgba(220, 38, 38, 0.25)';
-        clockEl.style.borderColor = '#ef4444';
-        clockEl.style.color = '#fca5a5';
-      }
-
-      // Add inline WhatsApp CTA in Timer Section if not present
-      if (!document.getElementById('ubl-timer-expired-wa-btn')) {
-        const waBtn = document.createElement('a');
-        waBtn.id = 'ubl-timer-expired-wa-btn';
-        waBtn.href = waUrl;
-        waBtn.target = '_blank';
-        waBtn.className = 'ubl-timer-expired-wa-btn';
-        waBtn.innerHTML = `<span>💬 WhatsApp पर स्पेशल ऑफर मांगें &rarr;</span>`;
-        container?.appendChild(waBtn);
-      }
-    }
-
-    // Launch Smart Animated Floating WhatsApp Icon
-    renderSmartFloatingWhatsAppIcon(bId, bookTitle, waUrl);
-  }
-
-  function renderSmartFloatingWhatsAppIcon(bId, bookTitle, waUrl) {
-    if (document.getElementById('ubl-floating-expired-whatsapp')) return;
-
-    const floatingDiv = document.createElement('div');
-    floatingDiv.id = 'ubl-floating-expired-whatsapp';
-    floatingDiv.className = 'ubl-floating-expired-whatsapp';
-    floatingDiv.innerHTML = `
-      <a href="${waUrl}" target="_blank" class="ubl-floating-wa-link" title="WhatsApp पर ऑफर मांगें">
-        <div class="ubl-floating-wa-bubble" id="ubl-floating-wa-bubble">
-          <span>🔥</span>
-          <span>ऑफर खत्म? WhatsApp पर छूट मांगें!</span>
-          <button type="button" class="ubl-bubble-close" onclick="event.preventDefault(); event.stopPropagation(); document.getElementById('ubl-floating-wa-bubble').style.display='none';" title="Dismiss">&times;</button>
-        </div>
-        <div class="ubl-floating-wa-icon-box">
-          <div class="ubl-floating-wa-pulse-ring"></div>
-          <i class="fa-brands fa-whatsapp"></i>
-        </div>
-      </a>
-    `;
-    document.body.appendChild(floatingDiv);
   }
 
   // ==========================================================
