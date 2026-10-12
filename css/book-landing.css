@@ -3355,6 +3355,112 @@ body {
   object-fit: contain;
   transition: transform 0.15s ease-out;
   user-select: none;
+  -webkit-user-select: none;
+}
+.ubl-pinch-img.sliding-next {
+  animation: ublSlideInFromRight 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+.ubl-pinch-img.sliding-prev {
+  animation: ublSlideInFromLeft 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes ublSlideInFromRight {
+  0% { transform: translateX(80px) scale(0.95); opacity: 0.3; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+@keyframes ublSlideInFromLeft {
+  0% { transform: translateX(-80px) scale(0.95); opacity: 0.3; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+/* DESKTOP GALLERY NAVIGATION ARROWS */
+.ubl-lightbox-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  background: rgba(30, 41, 59, 0.85);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  font-size: 26px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100005;
+  transition: all 0.25s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+.ubl-lightbox-nav-arrow:hover {
+  background: #16a34a;
+  border-color: #22c55e;
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 0 20px rgba(22, 163, 74, 0.6);
+}
+.ubl-arrow-prev {
+  left: 20px;
+}
+.ubl-arrow-next {
+  right: 20px;
+}
+.ubl-lightbox-counter-badge {
+  background: rgba(15, 23, 42, 0.9);
+  color: #fef08a;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.ubl-lightbox-swipe-hint {
+  position: absolute;
+  bottom: 46px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  pointer-events: none;
+  z-index: 100004;
+  letter-spacing: 0.3px;
+}
+.ubl-lightbox-dots-container {
+  position: absolute;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.75);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 100005;
+  max-width: 90vw;
+  overflow-x: auto;
+}
+.ubl-lightbox-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.ubl-lightbox-dot.active {
+  background: #22c55e;
+  width: 22px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px #22c55e;
+}
+@media (max-width: 768px) {
+  .ubl-lightbox-nav-arrow {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    background: rgba(15, 23, 42, 0.75);
+  }
+  .ubl-arrow-prev { left: 8px; }
+  .ubl-arrow-next { right: 8px; }
 }
 
 /* REVIEW AVATAR STYLES */

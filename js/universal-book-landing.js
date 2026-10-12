@@ -2015,13 +2015,27 @@
     const title = l.hero?.title || currentBookData?.heading || currentBookData?.name || 'ई-बुक';
     const timerStorageKey = `AAROGYAM_OFFER_TIMER_${bId}`;
 
-    // Admin / Developer reset support: ?reset_timer=1
-    if (window.location.search.includes('reset_timer=1')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('reset_timer') || searchParams.has('reset') || searchParams.has('test')) {
       try { localStorage.removeItem(timerStorageKey); } catch(e) {}
     }
 
-    const durationMinutes = parseInt(timerCfg.minutes, 10) || 15;
-    const durationMs = durationMinutes * 60 * 1000;
+    // Immediate testing: ?expire=1 or ?expired=1 activates expired offer state right away
+    if (searchParams.has('expire') || searchParams.has('expired')) {
+      triggerOfferExpiredState(bId, title);
+      return;
+    }
+
+    let durationMinutes = parseInt(timerCfg.minutes, 10) || 15;
+    let durationMs = durationMinutes * 60 * 1000;
+
+    // Fast-testing live countdown: e.g. ?timer=10s or ?timer=15s or ?time=10s
+    const testTimerParam = searchParams.get('timer') || searchParams.get('time');
+    if (testTimerParam && testTimerParam.endsWith('s')) {
+      const testSec = parseInt(testTimerParam, 10) || 10;
+      durationMs = testSec * 1000;
+      try { localStorage.removeItem(timerStorageKey); } catch(e) {}
+    }
 
     let storedTimer = null;
     try {
@@ -2075,6 +2089,15 @@
       const curRemainingSecs = Math.floor((storedTimer.expiryTime - Date.now()) / 1000);
       if (curRemainingSecs <= 0) {
         clearInterval(timerInterval);
+        try {
+          // Persist permanent expired state so subsequent reloads stay expired
+          localStorage.setItem(timerStorageKey, JSON.stringify({
+            startTime: storedTimer.startTime || (Date.now() - durationMs),
+            durationMinutes: durationMinutes,
+            expiryTime: Date.now() - 1000,
+            bookId: bId
+          }));
+        } catch(e) {}
         triggerOfferExpiredState(bId, title);
       } else {
         updateClockDisplay(curRemainingSecs);
@@ -2113,7 +2136,7 @@
 
       const msgText = document.getElementById('timer-message-text');
       if (msgText) {
-        msgText.innerHTML = `⚠️ <strong>इस विशेष ऑफर का समय समाप्त हो चुका है!</strong> यदि आप अभी भी इस ई-बुक में Interested हैं, तो नीचे WhatsApp पर संपर्क करें:`;
+        msgText.innerHTML = `⚠️ <strong>यह ऑफर का समय समाप्त हुआ!</strong> यदि अभी भी आप Interested हैं तो WhatsApp करें:`;
         msgText.style.color = '#fecaca';
       }
 
@@ -2262,59 +2285,27 @@
   }
 
   // ==========================================================
-  // PINCH-TO-ZOOM INTERACTIVE LIGHTBOX
+  // PINCH-TO-ZOOM INTERACTIVE LIGHTBOX & SLIDER DELEGATION
   // ==========================================================
   function renderPinchZoomLightbox() {
-    const modal = document.getElementById('ubl-pinch-lightbox');
-    const img = document.getElementById('ubl-pinch-img');
-    const closeBtn = document.getElementById('ubl-lightbox-close');
-    const zoomInBtn = document.getElementById('btn-zoom-in');
-    const zoomOutBtn = document.getElementById('btn-zoom-out');
-    const zoomResetBtn = document.getElementById('btn-zoom-reset');
-    const zoomText = document.getElementById('zoom-level-text');
-
     window.openPinchZoomLightbox = function (url) {
+      const activeList = (window.activePreviewGalleryList && window.activePreviewGalleryList.length > 0)
+        ? window.activePreviewGalleryList
+        : null;
+
+      if (typeof window.openUniversalGalleryLightbox === 'function') {
+        window.openUniversalGalleryLightbox(url, activeList);
+        return;
+      }
+
+      // Safe fallback if standalone lightbox is still preparing
+      const modal = document.getElementById('ubl-pinch-lightbox');
+      const img = document.getElementById('ubl-pinch-img');
       if (!modal || !img) return;
       img.src = window.resolveImageSrc(url);
-      img.onerror = function() { window.handleImageError(this); };
-      currentZoom = 1;
-      applyZoom();
+      img.onerror = function() { if (window.handleImageError) window.handleImageError(this); };
       modal.style.display = 'flex';
     };
-
-    function applyZoom() {
-      if (img) img.style.transform = `scale(${currentZoom})`;
-      if (zoomText) zoomText.textContent = `${Math.round(currentZoom * 100)}%`;
-    }
-
-    zoomInBtn?.addEventListener('click', () => {
-      if (currentZoom < 3) { currentZoom += 0.25; applyZoom(); }
-    });
-
-    zoomOutBtn?.addEventListener('click', () => {
-      if (currentZoom > 0.5) { currentZoom -= 0.25; applyZoom(); }
-    });
-
-    zoomResetBtn?.addEventListener('click', () => {
-      currentZoom = 1;
-      applyZoom();
-    });
-
-    closeBtn?.addEventListener('click', () => {
-      if (modal) modal.style.display = 'none';
-    });
-
-    modal?.addEventListener('click', (e) => {
-      if (e.target === modal) modal.style.display = 'none';
-    });
-
-    // Touch Pinch & Mouse Wheel
-    img?.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      if (e.deltaY < 0 && currentZoom < 3) currentZoom += 0.15;
-      else if (e.deltaY > 0 && currentZoom > 0.5) currentZoom -= 0.15;
-      applyZoom();
-    }, { passive: false });
   }
 
   // ==========================================================

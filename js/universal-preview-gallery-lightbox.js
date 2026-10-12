@@ -433,7 +433,15 @@
       startIdx = targetUrlOrIndex;
     } else if (typeof targetUrlOrIndex === 'string') {
       const cleanTarget = cleanUrl(targetUrlOrIndex);
-      const foundIdx = galleryImages.findIndex(u => u.includes(cleanTarget) || cleanTarget.includes(u));
+      const targetBase = cleanTarget.split('?')[0].split('#')[0].split('/').pop();
+      const foundIdx = galleryImages.findIndex(u => {
+        if (!u) return false;
+        if (u === cleanTarget) return true;
+        if (u.includes(cleanTarget) || cleanTarget.includes(u)) return true;
+        const uBase = u.split('?')[0].split('#')[0].split('/').pop();
+        if (targetBase && uBase === targetBase) return true;
+        return false;
+      });
       if (foundIdx !== -1) {
         startIdx = foundIdx;
       } else {
@@ -453,7 +461,8 @@
 
   // Backwards compatibility hook: Replace old openPinchZoomLightbox
   window.openPinchZoomLightbox = function (url) {
-    window.openUniversalGalleryLightbox(url);
+    const list = window.activePreviewGalleryList || [];
+    window.openUniversalGalleryLightbox(url, list);
   };
 
   function closeModal() {
