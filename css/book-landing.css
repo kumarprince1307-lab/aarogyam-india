@@ -4015,4 +4015,145 @@ body {
     font-weight: 600 !important;
 }
 
+/* ==========================================================
+   4. EXPIRED OFFER TIMER BANNER & SMART FLOATING WHATSAPP ICON
+   ========================================================== */
+.ubl-timer-expired-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 8px 18px;
+  border-radius: 25px;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(37, 211, 102, 0.45);
+  margin-left: 12px;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.ubl-timer-expired-wa-btn:hover {
+  background: linear-gradient(135deg, #1fa855, #0d7065);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(37, 211, 102, 0.65);
+}
+
+/* SMART FLOATING ANIMATED WHATSAPP ICON (EXPIRED OFFER) */
+.ubl-floating-expired-whatsapp {
+  position: fixed;
+  bottom: 88px;
+  right: 20px;
+  z-index: 99998;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: auto;
+  animation: ublWaFloatAnim 3s ease-in-out infinite;
+}
+.ubl-floating-wa-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  position: relative;
+}
+.ubl-floating-wa-bubble {
+  background: #0f172a;
+  color: #fef08a;
+  border: 1.5px solid #22c55e;
+  border-radius: 24px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45), 0 0 15px rgba(34, 197, 94, 0.35);
+  white-space: nowrap;
+  animation: ublWaPulseBubble 2.5s infinite;
+  position: relative;
+}
+.ubl-bubble-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-left: 4px;
+  padding: 0 4px;
+  line-height: 1;
+}
+.ubl-bubble-close:hover {
+  color: #ef4444;
+}
+.ubl-floating-wa-icon-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 10px 25px rgba(37, 211, 102, 0.5);
+  position: relative;
+  transition: transform 0.25s ease;
+}
+.ubl-floating-wa-link:hover .ubl-floating-wa-icon-box {
+  transform: scale(1.12);
+}
+.ubl-floating-wa-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid #25D366;
+  opacity: 0.8;
+  animation: ublWaPulseRing 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes ublWaFloatAnim {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes ublWaPulseRing {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes ublWaPulseBubble {
+  0%, 100% {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45), 0 0 12px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45), 0 0 22px rgba(34, 197, 94, 0.65);
+  }
+}
+
+@media (min-width: 769px) {
+  .ubl-floating-expired-whatsapp {
+    bottom: 35px;
+    right: 30px;
+  }
+}
+
+
 
