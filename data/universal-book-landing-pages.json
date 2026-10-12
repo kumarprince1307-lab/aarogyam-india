@@ -4754,7 +4754,7 @@
     },
     {
       "id": "BK018",
-      "updated_at": "2026-10-11T17:50:25.613Z",
+      "updated_at": "2026-10-12T01:08:31.888Z",
       "admin_edited": true,
       "slug": "bk018",
       "book_type": "paid",
@@ -4985,16 +4985,52 @@
       "demoPages": "",
       "suggested_books_list": [
         {
-          "id": "BK006",
-          "link": "BK006",
-          "title": "AI वेबसाइट व डिजिटल बिज़नेस मास्टर गाइड",
-          "image": "/images/books/ai-website-guide-cover.webp",
+          "id": "BK018",
+          "link": "BK018",
+          "title": "घर बैठे पैसे कैसे कमाएँ?  Income Guide",
+          "image": "/images/books/bk018-cover.webp",
+          "offerPrice": 149,
+          "mrp": 1001
+        },
+        {
+          "id": "BK016",
+          "link": "BK016",
+          "title": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
+          "image": "/images/books/bk016-cover.webp",
+          "offerPrice": 149,
+          "mrp": 499
+        },
+        {
+          "id": "BK015",
+          "link": "BK015",
+          "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
+          "image": "/images/books/bk015-cover.webp",
+          "offerPrice": 149,
+          "mrp": 1999
+        },
+        {
+          "id": "BK002",
+          "link": "BK002",
+          "title": "खेती का डॉक्टर",
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "offerPrice": 99,
+          "mrp": 299
+        },
+        {
+          "id": "BK001",
+          "link": "BK001",
+          "title": "खरीफ फसल मास्टर गाइड 2026",
+          "image": "/images/books/kharif-master-guide-2026-cover.webp",
           "offerPrice": 99,
           "mrp": 299
         }
       ],
       "suggested_books": [
-        "BK006"
+        "BK018",
+        "BK016",
+        "BK015",
+        "BK002",
+        "BK001"
       ],
       "table_of_contents": [
         " ✅ कमाई के 60 आइडिया — ऑनलाइन और ऑफलाइन कमाई के अलग-अलग रास्तों की जानकारी।",
