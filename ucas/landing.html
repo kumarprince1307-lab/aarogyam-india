@@ -1009,6 +1009,16 @@
       <a href="/ucas/index.html">My Profile</a>
       <span>•</span>
       <a href="/privacy-policy.html">गोपनीयता नीति</a>
+    
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:0.8rem;font-weight:700;">
+        <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 Privacy Policy</a>
+        <span style="color:#64748b;">•</span>
+        <a href="/terms.html" style="color:#cbd5e1;text-decoration:none;">📜 Terms & Conditions</a>
+        <span style="color:#64748b;">•</span>
+        <a href="/faq.html" style="color:#cbd5e1;text-decoration:none;">❓ FAQ</a>
+        <span style="color:#64748b;">•</span>
+        <a href="/return-refund.html" style="color:#cbd5e1;text-decoration:none;">💳 Refund Policy</a>
+      </div>
     </div>
   </footer>
 
@@ -1364,7 +1374,7 @@
               fbBox.innerHTML = `
                 <div style="position:relative;width:100%;height:240px;">
                   <img src="${fbThumb}" alt="${finalTitle}" style="width:100%;height:100%;object-fit:cover;opacity:0.92;">
-                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:62px;height:62px;background:rgba(24,119,242,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;box-shadow:0 4px 18px rgba(0,0,0,0.4);border:2.5px solid #fff;text-decoration:none;">
+                  <a href="javascript:void(0)" onclick="if(window.shareOnFacebook)window.shareOnFacebook();" target="_blank" rel="noopener noreferrer" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:62px;height:62px;background:rgba(24,119,242,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.6rem;box-shadow:0 4px 18px rgba(0,0,0,0.4);border:2.5px solid #fff;text-decoration:none;">
                     <i class="fa-solid fa-play" style="margin-left:4px;"></i>
                   </a>
                   <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:4px;">
@@ -1372,7 +1382,7 @@
                   </div>
                 </div>
                 <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
-                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#1877F2;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(24,119,242,0.3);">
+                  <a href="javascript:void(0)" onclick="if(window.shareOnFacebook)window.shareOnFacebook();" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#1877F2;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(24,119,242,0.3);">
                     <i class="${isInsta ? 'fa-brands fa-instagram' : 'fa-brands fa-facebook'}"></i> ${isInsta ? 'Instagram' : 'Facebook'} पर वीडियो/रील देखें
                   </a>
                 </div>
@@ -1383,7 +1393,7 @@
                 : 'linear-gradient(135deg, #1877F2 0%, #0d233a 100%)';
               fbBox.innerHTML = `
                 <div style="padding:2.5rem 1.5rem;text-align:center;color:#fff;">
-                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" style="width:68px;height:68px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;box-shadow:0 6px 20px rgba(0,0,0,0.3);border:3px solid #fff;text-decoration:none;margin-bottom:14px;">
+                  <a href="javascript:void(0)" onclick="if(window.shareOnFacebook)window.shareOnFacebook();" target="_blank" rel="noopener noreferrer" style="width:68px;height:68px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;box-shadow:0 6px 20px rgba(0,0,0,0.3);border:3px solid #fff;text-decoration:none;margin-bottom:14px;">
                     <i class="fa-solid fa-play" style="margin-left:4px;"></i>
                   </a>
                   <div style="font-weight:800;font-size:1.15rem;line-height:1.4;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.3);">${finalTitle}</div>
@@ -1392,7 +1402,7 @@
                   </div>
                 </div>
                 <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
-                  <a href="${fbUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#1877F2;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(24,119,242,0.3);">
+                  <a href="javascript:void(0)" onclick="if(window.shareOnFacebook)window.shareOnFacebook();" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#1877F2;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(24,119,242,0.3);">
                     <i class="${isInsta ? 'fa-brands fa-instagram' : 'fa-brands fa-facebook'}"></i> ${isInsta ? 'Instagram' : 'Facebook'} पर वीडियो/रील देखें
                   </a>
                 </div>
@@ -1417,7 +1427,7 @@
               linkBox.innerHTML = `
                 <div style="position:relative;width:100%;height:240px;">
                   <img src="${linkThumb}" alt="${finalTitle}" style="width:100%;height:100%;object-fit:cover;opacity:0.92;">
-                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:rgba(5,150,105,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;box-shadow:0 4px 18px rgba(0,0,0,0.4);border:2.5px solid #fff;text-decoration:none;">
+                  <a href="javascript:void(0)" onclick="if(window.copyShareLink)window.copyShareLink();" target="_blank" rel="noopener noreferrer" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:rgba(5,150,105,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;box-shadow:0 4px 18px rgba(0,0,0,0.4);border:2.5px solid #fff;text-decoration:none;">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                   </a>
                   <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.8);color:#fff;font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:4px;">
@@ -1425,7 +1435,7 @@
                   </div>
                 </div>
                 <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
-                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#059669;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                  <a href="javascript:void(0)" onclick="if(window.copyShareLink)window.copyShareLink();" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#059669;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> मूल समाचार / आर्टिकल पढ़ें (Read Article)
                   </a>
                 </div>
@@ -1434,7 +1444,7 @@
               linkBox.style.background = 'linear-gradient(135deg, #059669 0%, #0f172a 100%)';
               linkBox.innerHTML = `
                 <div style="padding:2.5rem 1.5rem;text-align:center;color:#fff;">
-                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="width:68px;height:68px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:1.8rem;box-shadow:0 6px 20px rgba(0,0,0,0.3);border:3px solid #fff;text-decoration:none;margin-bottom:14px;">
+                  <a href="javascript:void(0)" onclick="if(window.copyShareLink)window.copyShareLink();" target="_blank" rel="noopener noreferrer" style="width:68px;height:68px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:1.8rem;box-shadow:0 6px 20px rgba(0,0,0,0.3);border:3px solid #fff;text-decoration:none;margin-bottom:14px;">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                   </a>
                   <div style="font-weight:800;font-size:1.15rem;line-height:1.4;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.3);">${finalTitle}</div>
@@ -1443,7 +1453,7 @@
                   </div>
                 </div>
                 <div style="padding:12px;background:#F8FAFC;border-top:1px solid #E2E8F0;text-align:center;">
-                  <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#059669;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                  <a href="javascript:void(0)" onclick="if(window.copyShareLink)window.copyShareLink();" target="_blank" rel="noopener noreferrer" class="pub-btn-cta" style="background:#059669;color:#fff;padding:10px 20px;font-size:0.92rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;margin:0 auto;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> मूल समाचार / आर्टिकल पढ़ें (Read Article)
                   </a>
                 </div>

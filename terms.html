@@ -245,88 +245,7 @@ HEADER START
     </div>
 </header>
 
-<!-- =========================================
-MOBILE NAVIGATION START
-========================================== -->
-<div class="mobile-menu" id="mobileMenu">
-    
-    <!-- User Profile Card (Visible when logged in) -->
-    <div id="mobile-user-card" class="mobile-user-card" style="display: none;">
-        <button id="closeMenu">
-            <img src="images/icons/close.png" alt="Close">
-        </button>
-        <img src="/images/logo/fevicon.png" alt="User" class="mobile-user-avatar">
-        <div class="mobile-user-info">
-            <h3 id="mobile-user-name">Guest User</h3>
-            <p id="mobile-user-meta">
-                <span id="mobile-member-status"</span><span id="mobile-user-mobile"></span>
-            </p>
-        </div>
-        <a href="#" id="mobile-logout-btn" class="mobile-logout-btn">Logout</a>
-    </div>
-
-    <!-- Login Prompt (Visible when logged out) -->
-    <div id="mobile-login-prompt" class="mobile-login-prompt">
-        <button class="close-btn-alt" id="altCloseMenu">
-            <img src="images/icons/close.png" alt="Close">
-        </button>
-        <a href="#" id="mobileLoginBtn" class="login-prompt-btn">
-            <img src="images/icons/login.png" alt="Login">
-            <span id="mobileLoginBtnText">Login / Register</span>
-        </a>
-    </div>
-
-    <ul class="mobile-nav">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="ebooks/my-library.html">My Library</a></li>
-        <li><a href="purchases.html">My Purchases & Invoices</a></li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Categories ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                <li><a href="pages/health.html">Health</a></li>
-                <li><a href="categories/business.html">Business</a></li>
-                <li><a href="categories/netsurf.html">NetSurf</a></li>
-                <li><a href="categories/education.html">Education</a></li>
-                <li><a href="categories/digital-ai.html">Digital AI</a></li>
-            </ul>
-        </li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Services ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/agriculture.html">Agriculture</a></li>
-                <li><a href="crop-doctor.html">Crop Doctor</a></li>
-                <li><a href="weather.html">Weather</a></li>
-                <li><a href="mandi.html">Mandi Bhav</a></li>
-            </ul>
-        </li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">eBooks ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="ebooks/ebook.html">All eBooks</a></li>
-                <li><a href="ebooks/agriculture.html">Agriculture Books</a></li>
-                <li><a href="pages/health.html">Health Books</a></li>
-                <li><a href="pages/digital-training.html">Digital Training</a></li>
-                <li><a href="pages/self-help.html">Self Help</a></li>
-            </ul>
-        </li>
-        <li class="mobile-dropdown">
-            <a href="#" class="dropdown-toggle">Support ▼</a>
-            <ul class="mobile-dropdown-menu">
-                <li><a href="faq.html">FAQ</a></li>
-                <li><a href="terms-conditions.html">Terms & Conditions</a></li>
-                <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                <li><a href="shipping-policy.html">Shipping & Return Policy</a></li>
-            </ul>
-        </li>
-    </ul>
-</div>
-
-<!-- =========================================
-MOBILE NAVIGATION END
-========================================== -->
+<!-- Standardized Universal Nav Drawer Activated -->
     <!-- ==========================================
      INFORMATION CENTER
 =========================================== -->
@@ -492,8 +411,19 @@ FOOTER START
 
       </div>
 
-      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
-        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+            <div style="border-top:1.5px solid #1e293b;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:0.82rem;color:#94a3b8;">
+        <div>
+          © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-weight:700;">
+          <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 गोपनीयता नीति (Privacy)</a>
+          <span style="color:#475569;">•</span>
+          <a href="/terms.html" style="color:#cbd5e1;text-decoration:none;">📜 नियम एवं शर्तें (Terms)</a>
+          <span style="color:#475569;">•</span>
+          <a href="/faq.html" style="color:#cbd5e1;text-decoration:none;">❓ सवाल-जवाब (FAQ)</a>
+          <span style="color:#475569;">•</span>
+          <a href="/return-refund.html" style="color:#cbd5e1;text-decoration:none;">💳 रिफंड नीति (Refund)</a>
+        </div>
       </div>
     </div>
   </footer>

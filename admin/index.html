@@ -20,12 +20,8 @@
 
   <!-- Security & Cache Sync -->
   <script>
-    const isLocal = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
-    if (isLocal && !localStorage.getItem('admin_session')) {
-      localStorage.setItem('admin_session', 'true');
-    }
     const adminSession = localStorage.getItem('admin_session');
-    if (!adminSession && !isLocal) {
+    if (adminSession !== 'true') {
       window.location.replace('login.html');
     }
     // Force immediate Service Worker and Cache update - purge legacy caches

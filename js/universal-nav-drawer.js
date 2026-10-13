@@ -348,22 +348,29 @@
         <div class="drawer-user-meta">
           <h3 class="drawer-user-name">${userName}</h3>
           <span class="drawer-user-role">${userRole}</span>
-          ${userPhone ? `<div style="font-size:0.72rem;color:#cbd5e1;font-weight:600;">📱 +91 ${userPhone}</div>` : ''}
-          <div style="font-size:0.7rem;color:#fde047;font-weight:800;margin-top:2px;">🎯 Share ID: ${shareId}</div>
+          ${userPhone ? `<div style="font-size:0.78rem;color:#93c5fd;font-weight:700;margin-top:2px;"><i class="fa-solid fa-phone" style="font-size:0.72rem;margin-right:5px;color:#38bdf8;"></i>+91 ${userPhone}</div>` : ''}
+          <div style="font-size:0.72rem;color:#34d399;font-weight:800;margin-top:3px;display:inline-flex;align-items:center;gap:5px;background:rgba(52,211,153,0.15);padding:2px 8px;border-radius:6px;border:1px solid rgba(52,211,153,0.35);">
+            <span>🎯 Share ID:</span>
+            <span style="letter-spacing:0.5px;">${shareId}</span>
+          </div>
         </div>
       </div>
 
       <!-- Profile & Login / Logout Action -->
-      <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+      <div class="drawer-hdr-actions">
         ${isLogged ? `
-          <a href="/ucas/index.html" style="background:#fde047;color:#000;font-size:0.78rem;font-weight:800;padding:5px 14px;border-radius:20px;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,0.2);">
-            👤 My Profile
+          <a href="/ucas/index.html" class="drawer-hdr-pill-btn drawer-hdr-profile-btn">
+            <i class="fa-solid fa-user-circle"></i>
+            <span>My Profile</span>
           </a>
-          <button type="button" onclick="window.logoutUniversalUser()" style="background:rgba(239,68,68,0.25);color:#fff;border:1px solid #ef4444;font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;">
-            Logout
+          <button type="button" onclick="window.logoutUniversalUser()" class="drawer-hdr-pill-btn drawer-hdr-logout-btn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
         ` : `
-          <button type="button" onclick="window.openUniversalLoginHandler()" style="background:#fde047;color:#000;font-size:0.8rem;font-weight:900;padding:6px 16px;border-radius:20px;border:none;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.2);">
-            🔑 Login / Register
+          <button type="button" onclick="window.openUniversalLoginHandler()" class="drawer-hdr-pill-btn drawer-hdr-login-btn">
+            <i class="fa-solid fa-key"></i>
+            <span>Login / Register</span>
           </button>
         `}
       </div>
@@ -479,279 +486,278 @@
             ${generateDrawerProfileHeaderHtml()}
           </div>
 
-          <!-- Pure White Canvas Menu List -->
+          <!-- Clean Executive Blue Canvas Menu List -->
           <div class="drawer-menu-list" style="flex:1;overflow-y:auto;">
 
-            <!-- 1. HOME (Direct Link) -->
+            <!-- 1. HOME (Main Menu Direct Button) -->
             <a href="/index.html" class="drawer-nav-item-btn ${currentPath === '/' || currentPath.endsWith('index.html') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-house drawer-item-icon" style="color:#10b981;"></i>
-                <span>Home</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-house"></i></div>
+                <span class="drawer-item-title">होम (Home)</span>
               </div>
             </a>
 
-            <!-- 1.05 USER NOTIFICATIONS (Direct Drawer Action) -->
-            <button type="button" class="drawer-nav-item-btn" onclick="window.closeUniversalDrawer(); window.USER_NOTIFICATIONS && window.USER_NOTIFICATIONS.openPanel();" style="width:100%;text-align:left;border:none;background:transparent;cursor:pointer;">
-              <div class="drawer-item-left">
-                <i class="fa-solid fa-bell drawer-item-icon" style="color:#f59e0b;"></i>
-                <span style="font-weight:700;">मेरी सूचनाएं (Notifications)</span>
-              </div>
-              <span class="drawer-notif-badge" style="display:none;background:#ef4444;color:#fff;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:900;">0</span>
-            </button>
-
-            <!-- 1.1 ALL NETSURF PRODUCTS (Prominent Direct Super Link) -->
-            <a href="/categories/netsurf-products.html" class="drawer-nav-item-btn ${currentPath.includes('netsurf-products') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <i class="fa-solid fa-boxes-stacked drawer-item-icon" style="color:#10b981;"></i>
-                <span style="font-weight: 800; color:#10b981;">🌟 All Netsurf Products (सम्पूर्ण कैटलॉग)</span>
-              </div>
-              <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;font-weight:900;">7 भाषा PDF 📥</span>
-            </a>
-
-            <!-- 2. SMART eTAILER / MISSION 8,19,250 (Direct Super Link) -->
-            <a href="/pages/smart-etailer.html" class="drawer-nav-item-btn ${currentPath.includes('smart-etailer') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <i class="fa-solid fa-crown drawer-item-icon" style="color:#10b981;"></i>
-                <span style="font-weight: 800;">स्मार्ट ई-टेलर (₹8.19L)</span>
-              </div>
-              <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;font-weight:900;">NEW 🔥</span>
-            </a>
-
-            <!-- 2.1 MY PROFILE ▼ (Accordion) -->
-            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-profile" onclick="window.toggleDrawerAccordion('profile', event)">
-              <div class="drawer-item-left">
-                <i class="fa-solid fa-user-gear drawer-item-icon" style="color:#0ea5e9;"></i>
-                <span>My Profile</span>
-              </div>
-              <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
-            </button>
-            <div class="drawer-submenu-panel" id="drawer-panel-profile">
-              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-crown" style="color:#10b981;"></i><span>स्मार्ट ई-टेलर खाता (₹8.19L)</span></div>
-                <span class="drawer-cat-badge" style="background:#10b981;color:#fff;">HOT</span>
-              </a>
-              <a href="/ucas/index.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-user-gear" style="color:#0ea5e9;"></i><span>My Profile & UCAS</span></div>
-              </a>
-              <a href="/subscription.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-crown" style="color:#f59e0b;"></i><span>VIP Pass (Subscription)</span></div>
-                <span class="drawer-cat-badge" style="background:#fef3c7;color:#b45309;">₹99</span>
-              </a>
-              <a href="/purchases.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-file-invoice" style="color:#10b981;"></i><span>My Purchases & Invoices</span></div>
-              </a>
-              <a href="/pages/smart-etailer.html?tab=survey" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-clipboard-list" style="color:#0284c7;"></i><span>30-Sec Smart Survey</span></div>
-              </a>
-              <a href="/pages/smart-etailer.html?tab=marketing" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-rocket" style="color:#ec4899;"></i><span>Marketing Engine & Hooks</span></div>
-                <span class="drawer-cat-badge" style="background:#dbeafe;color:#1d4ed8;font-weight:800;">SHARE</span>
-              </a>
-              <a href="/ucas/index.html?tab=phonebook" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-address-book" style="color:#8b5cf6;"></i><span>My Phonebook</span></div>
-              </a>
-              <a href="/ucas/index.html?tab=leads" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-user-group" style="color:#ea580c;"></i><span>My Share Leads</span></div>
-              </a>
-              <a href="/ucas/index.html?tab=sandesh" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-bullhorn" style="color:#ef4444;"></i><span>आरोग्यम संदेश</span></div>
-              </a>
-              <a href="/ucas/index.html?tab=permissions" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-shield-halved" style="color:#64748b;"></i><span>Permissions</span></div>
-              </a>
-              <a href="/admin.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-screwdriver-wrench" style="color:#ea580c;"></i><span style="color:#ea580c;font-weight:800;">Admin Center</span></div>
-              </a>
-            </div>
-
-            <!-- 3. MY LIBRARY (Direct Link) -->
+            <!-- 2. MY LIBRARY (Main Menu Direct Button) -->
             <a href="/ebooks/my-library.html" class="drawer-nav-item-btn ${currentPath.includes('my-library') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-book-open drawer-item-icon" style="color:#2563eb;"></i>
-                <span>My Library</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-book-open-reader"></i></div>
+                <span class="drawer-item-title">मेरी लाइब्रेरी (My Library)</span>
               </div>
+              <span class="drawer-tag-pill">रीडर 📖</span>
             </a>
 
-            <!-- 4. LIVE ZOOM WEBINAR (Prominent Top-Level Link) -->
-            <a href="/webinar.html" class="drawer-nav-item-btn ${currentPath.includes('webinar') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <i class="fa-solid fa-video drawer-item-icon" style="color:#dc2626;"></i>
-                <span>लाइव ज़ूम वेबिनार</span>
-              </div>
-              <span class="drawer-cat-badge" style="background:#fee2e2;color:#dc2626;font-weight:900;">LIVE 🔴</span>
-            </a>
-
-            <!-- 4.1 AAROGYAM TUBE (Shorts & Masterclass Hub) -->
-            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <i class="fa-brands fa-youtube drawer-item-icon" style="color:#ef4444;font-size:1.15rem;"></i>
-                <span>AarogyamTube Hub</span>
-              </div>
-              <span class="drawer-cat-badge" style="background:#fee2e2;color:#ef4444;font-weight:900;">VIDEOS</span>
-            </a>
-
-            <!-- 5. EBOOKS ▼ (Accordion) -->
+            <!-- 2. E-BOOKS (Accordion with Submenus) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-ebooks" onclick="window.toggleDrawerAccordion('ebooks', event)">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-book-bookmark drawer-item-icon" style="color:#10b981;"></i>
-                <span>eBooks</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-book-bookmark"></i></div>
+                <span class="drawer-item-title">ई-बुक्स (eBooks)</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-ebooks">
               <a href="/ebooks/ebook.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-store" style="color:#2563eb;"></i><span>All eBooks Store</span></div>
-              </a>
-              <a href="/ebooks/kharif-master-guide-2026.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-wheat-awn" style="color:#d97706;"></i><span>Kharif Master Guide 2026</span></div>
-                <span class="drawer-cat-badge" style="background:#fef3c7;color:#b45309;">Best Seller</span>
-              </a>
-              <a href="/ebooks/kheti-dr.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-stethoscope" style="color:#dc2626;"></i><span>Kheti Ka Doctor</span></div>
-                <span class="drawer-cat-badge" style="background:#fee2e2;color:#991b1b;">Top Seller</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-store"></i></div>
+                  <span>सभी ई-बुक्स स्टोर (Store)</span>
+                </div>
               </a>
               <a href="/ebooks/agriculture.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-seedling" style="color:#16a34a;"></i><span>Agriculture Books</span></div>
-              </a>
-              <a href="/ebooks/ai-website-guide.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-laptop-code" style="color:#0284c7;"></i><span>AI Website Guide</span></div>
-              </a>
-              <a href="/ebooks/business.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-chart-line" style="color:#8b5cf6;"></i><span>Business eBooks</span></div>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-seedling"></i></div>
+                  <span>कृषि ई-बुक्स (Agriculture)</span>
+                </div>
               </a>
               <a href="/ebooks/wishlist.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-heart" style="color:#ef4444;"></i><span>Wishlist</span></div>
-                <span class="drawer-cat-badge" style="background:#fee2e2;color:#991b1b;display:${wishCount > 0 ? 'inline-block' : 'none'};">${wishCount}</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-heart"></i></div>
+                  <span>पसंदीदा ई-बुक्स (Wishlist)</span>
+                </div>
+                <span class="drawer-tag-pill" style="display:${wishCount > 0 ? 'inline-block' : 'none'};">${wishCount}</span>
               </a>
               <a href="/ebooks/cart.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-cart-shopping" style="color:#059669;"></i><span>Shopping Cart</span></div>
-                <span class="drawer-cat-badge" style="background:#dcfce7;color:#166534;display:${cartCount > 0 ? 'inline-block' : 'none'};">${cartCount}</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-cart-shopping"></i></div>
+                  <span>शॉपिंग कार्ट (Shopping Cart)</span>
+                </div>
+                <span class="drawer-tag-pill" style="display:${cartCount > 0 ? 'inline-block' : 'none'};">${cartCount}</span>
               </a>
             </div>
 
-            <!-- 6. CATEGORIES ▼ (Accordion) -->
-            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-categories" onclick="window.toggleDrawerAccordion('categories', event)">
+            <!-- 3. NETSURF (Main Menu with Submenus: Agri, Pashu Palan, Health & Sub-pages) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-netsurf" onclick="window.toggleDrawerAccordion('netsurf', event)">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-layer-group drawer-item-icon" style="color:#f59e0b;"></i>
-                <span>Categories</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <span class="drawer-item-title">नेटसर्फ (NetSurf)</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
-            <div class="drawer-submenu-panel" id="drawer-panel-categories">
-              <a href="/categories/netsurf.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-briefcase" style="color:#059669;"></i><span>💼 NetSurf Career (डायरेक्ट सेलिंग)</span></div>
-                <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;">करियर 4.0</span>
-              </a>
+            <div class="drawer-submenu-panel" id="drawer-panel-netsurf">
               <a href="/categories/netsurf-products.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-boxes-stacked" style="color:#10b981;"></i><span>🌟 All Netsurf Products (उत्पाद कैटलॉग)</span></div>
-                <span class="drawer-cat-badge" style="background:#dbeafe;color:#1e40af;">सभी उत्पाद</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                  <span>सम्पूर्ण कैटलॉग (All Products)</span>
+                </div>
+                <span class="drawer-tag-pill">7 भाषा PDF</span>
               </a>
-              <a href="/categories/health.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-heart-pulse" style="color:#ec4899;"></i><span>❤️ Health & Wellness (स्वास्थ्य केंद्र)</span></div>
+              <a href="/categories/netsurf.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-briefcase"></i></div>
+                  <span>नेटसर्फ करियर (Direct Selling)</span>
+                </div>
+              </a>
+
+              <!-- Agriculture & Pashupalan Subsection -->
+              <div class="drawer-sub-section-title"><i class="fa-solid fa-seedling"></i> कृषि व पशु पालन</div>
+              <a href="/ebooks/agriculture.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-wheat-awn"></i></div>
+                  <span>कृषि मुख्य पृष्ठ (Agriculture)</span>
+                </div>
               </a>
               <a href="/pashu-palan.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-cow" style="color:#0284c7;"></i><span>🐄 Livestock & Dairy (पशु पालन हब)</span></div>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-cow"></i></div>
+                  <span>पशु पालन व डेयरी हब (Pashu Palan)</span>
+                </div>
               </a>
-              <a href="/ebooks/agriculture.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-seedling" style="color:#16a34a;"></i><span>🌾 Agriculture (कृषि हब)</span></div>
+
+              <!-- Health Subsection & All Health Subpages -->
+              <div class="drawer-sub-section-title"><i class="fa-solid fa-heart-pulse"></i> स्वास्थ्य व वेलनेस (Health)</div>
+              <a href="/categories/health.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-hospital"></i></div>
+                  <span>स्वास्थ्य मुख्य पृष्ठ (Health Hub)</span>
+                </div>
+                <span class="drawer-tag-pill">MAIN</span>
               </a>
-              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-crown" style="color:#10b981;"></i><span>👑 Smart eTailer टूल</span></div>
+              <a href="/health/diabetes.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-droplet"></i></div><span>डायबिटीज केयर (Diabetes)</span></div>
               </a>
-              <a href="/ebooks/business.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-chart-line" style="color:#8b5cf6;"></i><span>📊 Business (बिज़नेस)</span></div>
+              <a href="/health/joint-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-bone"></i></div><span>जोड़ों का दर्द (Joint Care)</span></div>
               </a>
-              <a href="/ebooks/education.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-graduation-cap" style="color:#0284c7;"></i><span>🎓 Education & Training</span></div>
+              <a href="/health/heart-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-heart"></i></div><span>हृदय स्वास्थ्य (Heart Care)</span></div>
               </a>
-              <a href="/ebooks/digital-ai.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-robot" style="color:#d97706;"></i><span>🤖 Digital AI Tools</span></div>
+              <a href="/health/womens-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-person-dress"></i></div><span>महिला स्वास्थ्य (Women's Care)</span></div>
+              </a>
+              <a href="/health/weight-loss.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-weight-scale"></i></div><span>वजन नियंत्रण (Weight Loss)</span></div>
+              </a>
+              <a href="/health/liver-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-shield-virus"></i></div><span>लिवर केयर (Liver Care)</span></div>
+              </a>
+              <a href="/health/thyroid-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-dna"></i></div><span>थायराइड केयर (Thyroid Care)</span></div>
+              </a>
+              <a href="/health/skin-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-spa"></i></div><span>स्किन केयर (Skin Care)</span></div>
+              </a>
+              <a href="/health/hair-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-wind"></i></div><span>हेयर केयर (Hair Care)</span></div>
+              </a>
+              <a href="/health/kids-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-child"></i></div><span>किड्स केयर (Kids Care)</span></div>
+              </a>
+              <a href="/health/dental-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-tooth"></i></div><span>डेंटल केयर (Dental Care)</span></div>
+              </a>
+              <a href="/health/home-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-house-chimney-medical"></i></div><span>होम केयर (Home Care)</span></div>
+              </a>
+              <a href="/health/sexual-wellness.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-venus-mars"></i></div><span>सेक्सुअल वेलनेस (Wellness)</span></div>
               </a>
             </div>
 
-            <!-- 7. SERVICES ▼ (Accordion) -->
+            <!-- 4. KISAN SERVICES (Accordion: Mandi Bhav, Weather, Crop Doctor, Webinar, WhatsApp) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-services" onclick="window.toggleDrawerAccordion('services', event)">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-screwdriver-wrench drawer-item-icon" style="color:#8b5cf6;"></i>
-                <span>Services</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <span class="drawer-item-title">किसान सेवाएं (Kisan Services)</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-services">
               <a href="/mandi.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-seedling" style="color:#10b981;"></i><span>कृषि मंडी भाव (Mandi Bhav)</span></div>
-                <span class="drawer-cat-badge" style="background:#fef3c7;color:#b45309;">Live</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                  <span>लाइव कृषि मंडी भाव (Mandi Bhav)</span>
+                </div>
+                <span class="drawer-tag-pill">LIVE 🔴</span>
               </a>
               <a href="/weather.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-cloud-sun" style="color:#0284c7;"></i><span>मौसम अपडेट (Weather)</span></div>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-cloud-sun"></i></div>
+                  <span>7-दिवसीय मौसम पूर्वानुमान (Weather)</span>
+                </div>
               </a>
               <a href="/crop-doctor.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-microscope" style="color:#0ea5e9;"></i><span>फसल डॉक्टर AI (Crop Doctor)</span></div>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-microscope"></i></div>
+                  <span>फसल डॉक्टर AI स्कैनर (Crop Doctor)</span>
+                </div>
+                <span class="drawer-tag-pill">AI 🔬</span>
               </a>
               <a href="/webinar.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-video" style="color:#dc2626;"></i><span>🔴 लाइव ज़ूम वेबिनार</span></div>
-                <span class="drawer-cat-badge" style="background:#fee2e2;color:#dc2626;">Live</span>
-              </a>
-              <a href="/tube.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-brands fa-youtube" style="color:#ef4444;"></i><span>🎬 AarogyamTube (Videos & Reels)</span></div>
-                <span class="drawer-cat-badge" style="background:#fee2e2;color:#ef4444;">HD</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-video"></i></div>
+                  <span>लाइव ज़ूम वेबिनार (Live Webinar)</span>
+                </div>
+                <span class="drawer-tag-pill">ज़ूम</span>
               </a>
               <a href="javascript:void(0)" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 AI Expert Consultation'); window.closeUniversalDrawer();" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-brands fa-whatsapp" style="color:#25d366;"></i><span>AI Expert Consultation</span></div>
-                <span class="drawer-cat-badge" style="background:#dcfce7;color:#15803d;">24×7</span>
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-brands fa-whatsapp"></i></div>
+                  <span>24×7 WhatsApp AI एक्सपर्ट परामर्श</span>
+                </div>
+                <span class="drawer-tag-pill">24×7</span>
               </a>
             </div>
 
-            <!-- 8. ABOUT (Direct Link) -->
-            <a href="/about.html" class="drawer-nav-item-btn ${currentPath.includes('about') ? 'active-pill' : ''}">
+            <!-- 5. LIVE WEBINAR (Main Menu Direct Button) -->
+            <a href="/webinar.html" class="drawer-nav-item-btn ${currentPath.includes('webinar') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-circle-info drawer-item-icon" style="color:#0284c7;"></i>
-                <span>About</span>
+                <div class="drawer-icon-box" style="background:#dc2626;"><i class="fa-solid fa-video"></i></div>
+                <span class="drawer-item-title">लाइव वेबिनार (Live Webinar)</span>
               </div>
+              <span class="drawer-tag-pill" style="background:#dc2626;">LIVE 🔴</span>
             </a>
 
-            <!-- 9. BLOG (Direct Link) -->
-            <a href="/blog.html" class="drawer-nav-item-btn ${currentPath.includes('blog') ? 'active-pill' : ''}">
+            <!-- 6. AAROGYAM TUBE (Main Menu Direct Button) -->
+            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-newspaper drawer-item-icon" style="color:#8b5cf6;"></i>
-                <span>Blog & News</span>
+                <div class="drawer-icon-box" style="background:#ef4444;"><i class="fa-brands fa-youtube"></i></div>
+                <span class="drawer-item-title">आरोग्यम ट्यूब (AarogyamTube)</span>
               </div>
+              <span class="drawer-tag-pill" style="background:#dc2626;">HD 🎬</span>
             </a>
 
-            <!-- 10. CONTACT (Direct Link) -->
-            <a href="/contact.html" class="drawer-nav-item-btn ${currentPath.includes('contact') ? 'active-pill' : ''}">
+            <!-- 6. PROFILE & ACCOUNT (Accordion) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-profile" onclick="window.toggleDrawerAccordion('profile', event)">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-phone-volume drawer-item-icon" style="color:#10b981;"></i>
-                <span>Contact</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-user-gear"></i></div>
+                <span class="drawer-item-title">प्रोफाइल व खाता (Profile)</span>
               </div>
-            </a>
+              <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
+            </button>
+            <div class="drawer-submenu-panel" id="drawer-panel-profile">
+              <a href="/purchases.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                  <span>मेरी खरीद व टैक्स इनवॉइस</span>
+                </div>
+                <span class="drawer-tag-pill">बिल 🧾</span>
+              </a>
+              <a href="/subscription.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-crown"></i></div>
+                  <span>VIP पास सदस्यता (₹99)</span>
+                </div>
+                <span class="drawer-tag-pill">VIP</span>
+              </a>
+              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-wallet"></i></div>
+                  <span>स्मार्ट ई-टेलर खाता (₹8.19L)</span>
+                </div>
+                <span class="drawer-tag-pill">HOT 🔥</span>
+              </a>
+              <a href="/ucas/index.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-sliders"></i></div>
+                  <span>UCAS प्रोफाइल डैशबोर्ड</span>
+                </div>
+              </a>
+            </div>
 
-            <!-- 11. SUPPORT ▼ (Accordion) -->
+            <!-- 7. SUPPORT & POLICIES (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-support" onclick="window.toggleDrawerAccordion('support', event)">
               <div class="drawer-item-left">
-                <i class="fa-solid fa-headset drawer-item-icon" style="color:#ea580c;"></i>
-                <span>Support</span>
+                <div class="drawer-icon-box"><i class="fa-solid fa-headset"></i></div>
+                <span class="drawer-item-title">सहायता व नीतियां (Support)</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-support">
               <a href="/faq.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-circle-question" style="color:#0284c7;"></i><span>FAQ</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-circle-question"></i></div><span>अक्सर पूछे जाने वाले सवाल (FAQ)</span></div>
               </a>
               <a href="/terms.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-file-contract" style="color:#64748b;"></i><span>Terms & Conditions</span></div>
-              </a>
-              <a href="/shipping-policy.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-truck" style="color:#0ea5e9;"></i><span>Shipping Policy</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-file-contract"></i></div><span>नियम व शर्तें (Terms & Conditions)</span></div>
               </a>
               <a href="/privacy-policy.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-shield-halved" style="color:#10b981;"></i><span>Privacy Policy</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-shield-halved"></i></div><span>गोपनीयता नीति (Privacy Policy)</span></div>
+              </a>
+              <a href="/shipping-policy.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-truck"></i></div><span>शिपिंग व डिलीवरी नीति</span></div>
               </a>
               <a href="/refund-policy.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-rotate-left" style="color:#f59e0b;"></i><span>Refund Policy</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-rotate-left"></i></div><span>रिफंड नीति (Refund Policy)</span></div>
               </a>
-              <a href="/disclaimer.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><i class="fa-solid fa-triangle-exclamation" style="color:#dc2626;"></i><span>Disclaimer</span></div>
+              <a href="/contact.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-phone-volume"></i></div><span>संपर्क सूत्र (Contact Us)</span></div>
               </a>
             </div>
 

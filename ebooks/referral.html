@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/my-library.css">
     <!-- FontAwesome for Icons & Heart -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css">
 </head>
 <body>
 
@@ -46,7 +47,7 @@
         <nav class="desktop-nav">
             <a href="/index.html"><i class="fa-solid fa-house"></i> Home</a>
             <a href="/ebooks/my-library.html" class="active"><i class="fa-solid fa-book-open"></i> My Library</a>
-            <a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
+            <a href="/purchases.html"><i class="fa-solid fa-file-invoice"></i> My Purchase</a>
             <a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a>
             <a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a>
             <a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms</a>
@@ -55,28 +56,11 @@
 
         <div style="display: flex; align-items: center; gap: 10px;">
             <button class="back-btn" onclick="window.location.href='/index.html'"><i class="fa-solid fa-arrow-left"></i></button>
-            <button class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <button class="menu-btn" onclick="window.openUniversalDrawer()"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
-    <!-- Slide-out Mobile & Quick Menu Drawer (Right Side) -->
-    <div class="side-menu" id="sideMenu">
-        <button class="close-menu" onclick="toggleMenu()">&times;</button>
-        <div style="text-align: center; padding: 12px 0; border-bottom: 1px solid #eee; margin-bottom: 10px; background: #f9f9f9; border-radius: 8px;">
-            <h3 style="font-size: 1rem; color: #333; margin-bottom: 4px;">नमस्ते, <span id="menuUserName">अविनाश मिश्रा</span></h3>
-            <p style="font-size: 0.75rem; color: #28a745; font-weight: bold; margin: 0;">👑 Premium Member</p>
-        </div>
-        <ul>
-            <li><a href="/index.html"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="/ebooks/my-library.html"><i class="fa-solid fa-book-open"></i> My Library</a></li>
-            <li><a href="/ebooks/mypurchase.html"><i class="fa-solid fa-file-invoice"></i> My Purchases & Invoices</a></li>
-            <li><a href="/ebooks/wishlist.html"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
-            <li><a href="/faq.html"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
-            <li><a href="/terms.html"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a></li>
-            <li><a href="/shipping-policy.html"><i class="fa-solid fa-truck"></i> Shipping & Return Policy</a></li>
-            <li><a href="#" class="logout-link" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-        </ul>
-    </div>
+    <!-- Standardized Universal Nav Drawer Activated -->
 
     <!-- Dashboard Style Welcome Card (Digital Locker View) -->
     <div class="welcome-card-soft" style="background: linear-gradient(135deg, #ffffff 0%, #f4fdf4 100%); border: 1px solid #d4edda; border-radius: 12px; padding: 20px; margin: 15px auto; max-width: 1200px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
@@ -237,7 +221,7 @@
         <a href="/ebooks/my-library.html" class="nav-item active">
             <span><i class="fa-solid fa-book-bookmark"></i></span>Library
         </a>
-        <a href="/ebooks/mypurchase.html" class="nav-item">
+        <a href="/purchases.html" class="nav-item">
             <span><i class="fa-solid fa-file-invoice"></i></span>Purchase
         </a>
     </div>
@@ -246,5 +230,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="../js/supabase.js"></script>
     <script src="/js/my-library.js"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261001_v3"></script>
 </body>
 </html>

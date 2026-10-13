@@ -3,13 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aarogyam India Admin</title>
-  <meta http-equiv="refresh" content="0; url=/admin/index.html">
+  <title>Aarogyam India Admin Portal</title>
   <script>
-    window.location.replace('/admin/index.html' + window.location.hash);
+    // Enforce Password Protected Admin Entry
+    var session = localStorage.getItem('admin_session');
+    if (session === 'true') {
+      window.location.replace('/admin/index.html' + window.location.hash);
+    } else {
+      window.location.replace('/admin/login.html');
+    }
   </script>
 </head>
 <body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
-  <p>Redirecting to <a href="/admin/index.html" style="color: #6366f1;">Admin Panel</a>...</p>
+  <p>Secured Admin Portal Redirecting...</p>
 </body>
 </html>

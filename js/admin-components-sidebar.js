@@ -71,31 +71,6 @@ const MENU = [
     { label: '📢 VIP Outreach & Offers (स्मार्ट आउटरीच)', href: 'reports.html', route: 'reports' } 
   ] },
 
-  /* ========================================================
-     🌟 1. DUPLICATE / REVIEW HUB (2 दिन तुलना और परीक्षण हेतु)
-     ======================================================== */
-  { label: '🔄 डुप्लीकेट मेनू (Duplicate Hub)', icon: '🔄', children: [
-    { label: '📑 1. UCAS Landing Pages (v1)', href: 'all-landing-pages.html', route: 'all-landing-pages' },
-    { label: '🛡️ 2. Landing & Webinar Review Shield', href: 'landing-page-control.html', route: 'landing-page-control' },
-    { label: '✍️ 3. Marketing Templates (स्टैंडअलोन CRUD)', href: 'marketing-templates.html', route: 'marketing-templates-standalone' },
-    { label: '👑 4. Smart eTailer Marketing Hooks Tab', href: 'smart-etailer.html?tab=adm-sec-marketing', route: 'marketing-templates' },
-    { label: '📊 5. Marketing Hub (Full Page View)', href: 'reports.html', route: 'reports' },
-    { label: '🎥 6. Webinar Reports (Users Sub-Report)', href: 'webinar-reports.html', route: 'webinar-reports' },
-    { label: '🎬 7. Webinars Hub (Main Video Hub)', href: 'all-webinars.html', route: 'all-webinars' }
-  ] },
-
-  /* ========================================================
-     🌟 2. UNUSED / ARCHIVES HUB (सुरक्षित परीक्षण हेतु)
-     ======================================================== */
-  { label: '📦 अनयूज़्ड व आर्काइव (Archive Hub)', icon: '📦', children: [
-    { label: '🎙️ 1. Audio Studio Prototype v1', href: 'book-audio-studio.html?v=1', route: 'audio-studio-v1' },
-    { label: '📱 2. Admin App Standalone PWA', href: 'admin-app.html', route: 'admin-app' },
-    { label: '📶 3. Offline Mode Screen Check', href: 'offline.html', route: 'offline-preview' },
-    { label: '🔐 4. Auth & Session Diagnostics', href: 'settings.html#auth', route: 'auth-diagnostics' },
-    { label: '🛒 5. Standalone Checkout Funnel', href: 'checkout-funnel.html', route: 'checkout-funnel' },
-    { label: '📥 6. Standalone Downloads', href: 'downloads.html', route: 'downloads' }
-  ] },
-
   { label: 'Admin App', href: 'admin-app.html', icon: '📱', route: 'admin-app' },
   { label: 'Settings', href: 'settings.html', icon: '⚙️', route: 'settings' },
   { label: 'Support (सहायता)', href: 'support.html', icon: '🆘', route: 'support' },

@@ -36,15 +36,20 @@
   <header class="header-tiranga-animated">
     <div class="container header-container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
       
-      <!-- Brand Logo + Name + Active Page Badge -->
-      <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-        <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:40px;width:auto;" />
-        <div style="display:flex;flex-direction:column;">
-          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#2563eb;">INDIA</span></span>
-          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">डिजिटल क्रांति • समृद्ध किसान</span>
-        </div>
-        <span class="header-current-page-badge" style="background:#0f172a;color:#fde047;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:6px;">🧾 मेरी खरीद</span>
-      </a>
+      <!-- Back Button + Brand Logo + Name + Active Page Badge -->
+      <div style="display:flex;align-items:center;gap:10px;">
+        <a href="/ucas/index.html" title="Back to My Profile (मेरी प्रोफाइल)" style="background:#0f172a;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:0.95rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:40px;width:auto;" />
+          <div style="display:flex;flex-direction:column;">
+            <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#2563eb;">INDIA</span></span>
+            <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">डिजिटल क्रांति • समृद्ध किसान</span>
+          </div>
+          <span class="header-current-page-badge" style="background:#0f172a;color:#fde047;font-size:0.72rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:6px;">🧾 मेरी खरीद</span>
+        </a>
+      </div>
 
       <!-- Header Actions Right: Install App, Cart, 3-Line Menu -->
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
@@ -64,26 +69,6 @@
 
     </div>
   </header>
-
-    <!-- 1. Premium Header -->
-    <header class="purchases-header" style="display:flex; justify-content:space-between; align-items:center;">
-        <div class="header-left">
-            <button class="back-btn" onclick="window.location.href='/ebooks/my-library.html'" title="Back to My Library">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <div class="brand-box">
-                <img src="/images/logo/logo.png" alt="Logo" class="brand-logo">
-                <span class="brand-title">Aarogyam India</span>
-            </div>
-        </div>
-        <h1 class="page-main-title" style="margin:0;">My Purchases & Invoices</h1>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <button class="user-notif-bell-btn" title="सूचनाएं (Notifications)" aria-label="Notifications">
-                <i class="fa-regular fa-bell"></i>
-                <span class="user-notif-badge" style="display: none;">0</span>
-            </button>
-        </div>
-    </header>
 
     <!-- 2. Main Content Area -->
     <main class="purchases-main">
@@ -233,9 +218,22 @@
         </div>
     </div>
 
-    <!-- 3. Footer -->
-    <footer class="purchases-footer">
-        &copy; 2026 Aarogyam India. All Rights Reserved.
+    <!-- 3. Standard Dark Footer -->
+    <footer class="purchases-footer" style="background:#090d16;color:#cbd5e1;padding:25px 0;border-top:1.5px solid #1e293b;margin-top:40px;">
+      <div class="container" style="max-width:1100px;margin:0 auto;padding:0 16px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:0.82rem;color:#94a3b8;">
+        <div>
+          © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-weight:700;">
+          <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 गोपनीयता नीति (Privacy)</a>
+          <span style="color:#475569;">•</span>
+          <a href="/terms.html" style="color:#cbd5e1;text-decoration:none;">📜 नियम एवं शर्तें (Terms)</a>
+          <span style="color:#475569;">•</span>
+          <a href="/faq.html" style="color:#cbd5e1;text-decoration:none;">❓ सवाल-जवाब (FAQ)</a>
+          <span style="color:#475569;">•</span>
+          <a href="/return-refund.html" style="color:#cbd5e1;text-decoration:none;">💳 रिफंड नीति (Refund)</a>
+        </div>
+      </div>
     </footer>
 
     <!-- JavaScript Links -->

@@ -254,13 +254,15 @@ async function fetchPurchaseRecord(userId, bookId) {
             const orderId = urlParams.get('order_id') || urlParams.get('order');
             const paymentId = urlParams.get('payment_id') || urlParams.get('payment');
             
+            const purchaseFields = 'id, profile_id, book_id, order_id, payment_id, status, amount, download_count, created_at, phone, customer_name';
+            
             // Check by order_id or payment_id if available in URL
             if (orderId) {
-                const { data } = await client.from('purchases').select('*').eq('order_id', orderId).eq('book_id', cleanId).maybeSingle();
+                const { data } = await client.from('purchases').select(purchaseFields).eq('order_id', orderId).eq('book_id', cleanId).maybeSingle();
                 if (data) return data;
             }
             if (paymentId) {
-                const { data } = await client.from('purchases').select('*').eq('payment_id', paymentId).eq('book_id', cleanId).maybeSingle();
+                const { data } = await client.from('purchases').select(purchaseFields).eq('payment_id', paymentId).eq('book_id', cleanId).maybeSingle();
                 if (data) return data;
             }
 
@@ -279,7 +281,7 @@ async function fetchPurchaseRecord(userId, bookId) {
                         state.userData = { ...state.userData, id: profData.id, full_name: profData.full_name || state.userData.full_name, mobile: profData.mobile };
                         const { data: pData } = await client
                             .from('purchases')
-                            .select('*')
+                            .select(purchaseFields)
                             .eq('profile_id', profData.id)
                             .eq('book_id', cleanId)
                             .order('created_at', { ascending: false })
@@ -294,7 +296,7 @@ async function fetchPurchaseRecord(userId, bookId) {
             if (userId && !String(userId).startsWith('local_usr_')) {
                 const { data, error } = await client
                     .from('purchases')
-                    .select('*')
+                    .select(purchaseFields)
                     .eq('profile_id', userId)
                     .eq('book_id', cleanId)
                     .order('created_at', { ascending: false })

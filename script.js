@@ -8,20 +8,35 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // --- Existing Mobile Menu Logic ---
+    // --- Standard Universal Side Drawer Delegation ---
     const menuBtn = document.getElementById("menuBtn");
     const closeMenu = document.getElementById("closeMenu");
     const mobileMenu = document.getElementById("mobileMenu");
 
-    if (menuBtn && mobileMenu) {
-        menuBtn.addEventListener("click", () => {
-            mobileMenu.classList.add("active");
+    if (menuBtn) {
+        menuBtn.addEventListener("click", (e) => {
+            if (typeof window.openUniversalDrawer === 'function') {
+                e.preventDefault();
+                e.stopPropagation();
+                window.openUniversalDrawer(e);
+                return;
+            }
+            if (mobileMenu) {
+                mobileMenu.classList.add("active");
+            }
         });
     }
 
-    if (closeMenu && mobileMenu) {
-        closeMenu.addEventListener("click", () => {
-            mobileMenu.classList.remove("active");
+    if (closeMenu) {
+        closeMenu.addEventListener("click", (e) => {
+            if (typeof window.closeUniversalDrawer === 'function') {
+                e.preventDefault();
+                window.closeUniversalDrawer();
+                return;
+            }
+            if (mobileMenu) {
+                mobileMenu.classList.remove("active");
+            }
         });
     }
 

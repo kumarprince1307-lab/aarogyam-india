@@ -29,6 +29,7 @@
     <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
     <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
     <link rel="stylesheet" href="../css/landingpage.css">
+    <link rel="stylesheet" href="/css/universal-nav-drawer.css">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#28a745">
 </head>
@@ -76,28 +77,7 @@
     </header>
     <!-- HEADER SECTION END -->
 
-    <!-- ==========================================================
-        MOBILE MENU & OVERLAY START
-    ========================================================== -->
-    <div class="mobile-overlay"></div>
-    <nav class="mobile-menu">
-        <div class="mobile-menu-header">
-            <img src="../images/logo/logo.png" alt="Aarogyam India">
-            <div class="menu-close">✕</div>
-        </div>
-        <ul>
-            <li><a href="../index.html">🏠 Home</a></li>
-            <li><a href="agriculture.html">🌾 Agriculture</a></li>
-            <li><a href="health.html">❤️ Health</a></li>
-            <li><a href="business.html">💼 Business</a></li>
-            <li><a href="netsurf.html">🌿 NETSURF</a></li>
-            <li><a href="education.html">📘 Education</a></li>
-            <li><a href="digital-ai.html">🤖 Digital AI</a></li>
-            <li><a href="my-library.html">📚 My Library</a></li>
-            <li><a href="cart.html">🛒 Cart</a></li>
-        </ul>
-    </nav>
-    <!-- MOBILE MENU END -->
+    <!-- Standardized Universal Nav Drawer Activated -->
 
     <!-- ==========================================================
         HERO SELLING SECTION START
@@ -399,8 +379,17 @@
                 <a href="../privacy-policy.html">Privacy Policy</a>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2026 Aarogyam India. All Rights Reserved.</p>
+        <div class="footer-bottom" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);">
+            <p style="margin:0;">© 2026 Aarogyam India. All Rights Reserved.</p>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:0.85rem;">
+                <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 Privacy Policy</a>
+                <span>•</span>
+                <a href="/terms.html" style="color:#cbd5e1;text-decoration:none;">📜 Terms & Conditions</a>
+                <span>•</span>
+                <a href="/faq.html" style="color:#cbd5e1;text-decoration:none;">❓ FAQ</a>
+                <span>•</span>
+                <a href="/return-refund.html" style="color:#cbd5e1;text-decoration:none;">💳 Refund Policy</a>
+            </div>
         </div>
     </footer>
     <!-- FOOTER END -->
@@ -409,6 +398,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/landingpage.js"></script>
+    <script src="/js/universal-nav-drawer.js?v=20261001_v3"></script>
     <script type="module" src="/js/public-pwa.js"></script>
 </body>
 </html>
