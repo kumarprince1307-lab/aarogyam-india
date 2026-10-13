@@ -1,0 +1,18 @@
+# Vercel Deployment Ignore
+# Prevents non-production, scratch, and backup files from consuming Vercel deployment quotas & build memory.
+# Note: Production assets (images, pdf, css, js, html, data) remain 100% accessible.
+
+# Scratch & temporary workspace files (10+ MB)
+scratch/
+
+# Local backup snapshots (2+ MB)
+data/backups/
+
+# Development, audit & helper scripts
+*.py
+*.php
+*.bak
+__pycache__/
+.vscode/
+database/
+docs/
