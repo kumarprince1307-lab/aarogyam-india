@@ -279,9 +279,16 @@
       white-space: nowrap;
     }
 
-    @media (max-width: 600px) {
-      .header-current-page-badge {
-        display: none;
+    @media (max-width: 768px) {
+      .header-current-page-badge,
+      .btn-header-subscribe,
+      .btn-header-zoom,
+      .at-subscribe-btn-inline,
+      .at-sub-toast,
+      #wb_youtube_subscribe_toast,
+      .floating-subscribe-pill {
+        display: none !important;
+        visibility: hidden !important;
       }
     }
 
@@ -2936,8 +2943,8 @@
         </div>
 
         <!-- Header Actions Right: Subscribe, Dark/Light Switcher, Zoom Live Pass, PWA, Cart, 3-Line Menu -->
-        <div style="display:flex;align-items:center;gap:8px;">
-          <!-- YouTube Subscribe Button -->
+        <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+          <!-- YouTube Subscribe Button (Desktop only) -->
           <button type="button" class="btn-header-subscribe" onclick="window.openSubscribeModal()" title="🔴 YouTube चैनल सब्सक्राइब करें">
             <i class="fa-brands fa-youtube" style="color:#ef4444;font-size:0.9rem;"></i>
             <span>Subscribe</span>
@@ -2948,10 +2955,19 @@
             <i class="fa-solid fa-moon" id="theme_icon"></i>
           </button>
 
-          <!-- Direct Link to Live Zoom Webinar -->
+          <!-- Direct Link to Live Zoom Webinar (Desktop only) -->
           <a href="/webinar.html" class="btn-header-zoom" title="🔴 लाइव ज़ूम वेबिनार खोलें">
             <i class="fa-solid fa-video"></i> <span>ज़ूम मीटिंग</span>
           </a>
+
+          <!-- 🔔 Notification Center Trigger -->
+          <button type="button" class="user-notif-bell-btn" id="headerUserNotifBellBtn" title="मेरी सूचनाएं (Notifications)" aria-label="Notifications" style="background:var(--yt-pill);border:1.5px solid var(--yt-border);color:var(--yt-text);width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="user-notif-badge" style="display:none;">0</span>
+          </button>
 
           <!-- Shopping Cart Icon -->
           <a href="/ebooks/cart.html" title="Shopping Cart" style="background:var(--yt-pill);border:1.5px solid var(--yt-border);color:var(--yt-text);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;">

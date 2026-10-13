@@ -235,17 +235,22 @@ function generateOfferSignature(bookId, amount, mobile, timerOrExp) {
 
 function verifyOfferSignature(targetBookId, amount, mobile, sig, timer, exp) {
   if (!sig) return false;
-  const sigTrim = sig.trim();
+  const sigTrim = sig.trim().toLowerCase();
+  const rawExpSec = (exp > 0 ? (exp > 10000000000 ? Math.floor(exp / 1000) : exp) : 0);
+  const rawExpMs = (exp > 0 ? (exp < 10000000000 ? exp * 1000 : exp) : 0);
   const candidates = [
     generateOfferSignature(targetBookId, amount, mobile, timer),
+    generateOfferSignature(targetBookId, amount, mobile, rawExpSec),
+    generateOfferSignature(targetBookId, amount, mobile, rawExpMs),
     generateOfferSignature(targetBookId, amount, mobile, exp),
     generateOfferSignature(targetBookId, amount, mobile, '')
   ];
-  return candidates.some(cand => 
-    sigTrim === cand || 
-    sigTrim === cand.slice(0, sigTrim.length) || 
-    sigTrim.slice(0, 8) === cand.slice(0, 8)
-  );
+  return candidates.some(cand => {
+    const cLow = cand.toLowerCase();
+    return sigTrim === cLow || 
+           sigTrim === cLow.slice(0, sigTrim.length) || 
+           sigTrim.slice(0, 8) === cLow.slice(0, 8);
+  });
 }
 
 // -------------------------------------------------------------
@@ -1249,13 +1254,24 @@ async function loadBook() {
                 if (resolvedName) {
                     custNameEl.value = resolvedName;
                 }
-                // 🔒 Lock Name as well so it cannot be modified
-                custNameEl.readOnly = true;
-                custNameEl.style.backgroundColor = "rgba(16, 185, 129, 0.08)";
-                custNameEl.style.borderColor = "#10b981";
-                custNameEl.style.color = "#10b981";
-                custNameEl.style.fontWeight = "800";
-                custNameEl.style.cursor = "not-allowed";
+                // 🔓 UNLOCK Name: Keep editable so new customer or contact can easily type or correct their name!
+                custNameEl.readOnly = false;
+                custNameEl.removeAttribute('readonly');
+                custNameEl.style.backgroundColor = "#ffffff";
+                custNameEl.style.borderColor = resolvedName ? "#10b981" : "#cbd5e1";
+                custNameEl.style.color = "#0f172a";
+                custNameEl.style.fontWeight = "600";
+                custNameEl.style.cursor = "text";
+                custNameEl.placeholder = "अपना पूरा नाम लिखें (उदा. रमेश कुमार)";
+
+                // Real-time badge name sync as farmer types
+                custNameEl.addEventListener('input', () => {
+                    const currentName = custNameEl.value.trim();
+                    const badge = document.getElementById("checkout-verified-farmer-badge");
+                    if (badge) {
+                        badge.innerHTML = `🔒 <span>अधिकृत किसान: <strong>${currentName || 'पंजीकृत पाठक'}</strong> (+91 ${offerMobileTarget}) — सुरक्षित लिंक</span>`;
+                    }
+                });
             }
 
             // Inject Verified Farmer Badge
@@ -1551,7 +1567,12 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
     const enteredReferral = refInputEl ? refInputEl.value.trim() : 'AI000004';
 
     if (name === "") {
-        alert("Please Enter Full Name");
+        alert("कृपया अपना पूरा नाम लिखें (Please Enter Your Full Name)");
+        const nameEl = document.getElementById("customerName");
+        if (nameEl) {
+            nameEl.focus();
+            nameEl.style.borderColor = "#ef4444";
+        }
         return;
     }
 

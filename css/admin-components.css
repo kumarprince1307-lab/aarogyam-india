@@ -1915,6 +1915,103 @@ body.light-theme .theme-switch input:checked + .slider {
   }
 }
 
+/* ==========================================================================
+   ✨ 1000 CR EXECUTIVE HIGH-CONTRAST DARK MODE STYLING & SMART NAV
+   ========================================================================== */
+.mkt-smart-nav-box {
+  background: linear-gradient(135deg, #090e1a, #0f172a);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 14px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.mkt-smart-select {
+  background: #1e293b;
+  color: #38bdf8;
+  border: 2px solid #3b82f6;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 900;
+  font-size: 0.92rem;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+  transition: all 0.2s ease;
+  min-width: 280px;
+  max-width: 100%;
+}
+
+.mkt-smart-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.mkt-smart-filter-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(9, 14, 26, 0.95));
+  border: 1.5px solid rgba(59, 130, 246, 0.35);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.mkt-filter-grid-simple {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.mkt-input-dark {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1.5px solid #334155 !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  outline: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.mkt-input-dark:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3) !important;
+}
+
+.mkt-btn-emerald {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 800 !important;
+  padding: 10px 18px !important;
+  border-radius: 8px !important;
+  font-size: 0.88rem !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.mkt-btn-emerald:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+}
+
+
 
 
 

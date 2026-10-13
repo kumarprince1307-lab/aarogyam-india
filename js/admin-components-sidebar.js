@@ -2,7 +2,7 @@
 
 const MENU = [
   { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
-  { label: '🚀 Marketing Hub (मार्केटिंग हब)', href: 'reports.html', icon: '📈', route: 'reports' },
+  { label: '🚀 Marketing & Outreach Hub (मार्केटिंग व आउटरीच)', href: 'reports.html', icon: '🎯', route: 'reports' },
   { label: 'Users (उपयोगकर्ता)', icon: '👥', children: [ 
     { label: 'All Users (सभी यूजर)', href: 'users.html', route: 'users' }, 
     { label: '🔍 User Details & Search', href: 'user-details.html', route: 'user-details' },
@@ -68,7 +68,7 @@ const MENU = [
   { label: 'Webinars (वेबिनार हब)', href: 'all-webinars.html', icon: '🎥', route: 'all-webinars' },
   { label: 'Notifications (सूचनाएं)', icon: '🔔', children: [ 
     { label: 'All Notifications', href: 'notifications.html', route: 'notifications' }, 
-    { label: '📢 Broadcast & 1-Tap Outreach', href: 'broadcast.html', route: 'broadcast' } 
+    { label: '📢 VIP Outreach & Offers (स्मार्ट आउटरीच)', href: 'reports.html', route: 'reports' } 
   ] },
 
   /* ========================================================

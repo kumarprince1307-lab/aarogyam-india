@@ -442,6 +442,9 @@
 
   function injectUniversalSideDrawer() {
     updateHeaderUserBadge();
+    if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.ensureBellIcon === 'function') {
+      window.USER_NOTIFICATIONS.ensureBellIcon();
+    }
     if (document.getElementById('universal-side-drawer-wrap')) {
       window.updateUniversalDrawerProfile();
       return;
@@ -486,6 +489,15 @@
                 <span>Home</span>
               </div>
             </a>
+
+            <!-- 1.05 USER NOTIFICATIONS (Direct Drawer Action) -->
+            <button type="button" class="drawer-nav-item-btn" onclick="window.closeUniversalDrawer(); window.USER_NOTIFICATIONS && window.USER_NOTIFICATIONS.openPanel();" style="width:100%;text-align:left;border:none;background:transparent;cursor:pointer;">
+              <div class="drawer-item-left">
+                <i class="fa-solid fa-bell drawer-item-icon" style="color:#f59e0b;"></i>
+                <span style="font-weight:700;">मेरी सूचनाएं (Notifications)</span>
+              </div>
+              <span class="drawer-notif-badge" style="display:none;background:#ef4444;color:#fff;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:900;">0</span>
+            </button>
 
             <!-- 1.1 ALL NETSURF PRODUCTS (Prominent Direct Super Link) -->
             <a href="/categories/netsurf-products.html" class="drawer-nav-item-btn ${currentPath.includes('netsurf-products') ? 'active-pill' : ''}">
@@ -852,6 +864,9 @@
   window.openUniversalDrawer = function (e) {
     if (e && typeof e.preventDefault === 'function') {
       e.preventDefault();
+    }
+    if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.updateBadgeCount === 'function') {
+      window.USER_NOTIFICATIONS.updateBadgeCount();
     }
     const backdrop = document.getElementById('universal-drawer-backdrop');
     const card = document.getElementById('universal-drawer-card');

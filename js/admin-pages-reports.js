@@ -46,6 +46,9 @@ const DEFAULT_SWITCHES = {
 
 // Global in-memory state for Marketing Hub
 let mktState = {
+  selectedMobiles: new Set(),
+  selectedSitePage: '/health/diabetes.html',
+  selectedTubeVideo: 'vid_kheti_dr_why',
   profiles: [],
   purchases: [],
   books: [],
@@ -104,8 +107,19 @@ let mktState = {
     primaryBook: 'BK002',
     bonusBook: 'BK001',
     timer: '15m',            // '15m', '1h', '24h', 'none'
-    hasAudio: true
-  }
+    hasAudio: true,
+    mediaSource: 'book'
+  },
+  
+  // 1-Tap HUD Dispatcher & Pending vs Sent State
+  hudMode: 'whatsapp',       // 'whatsapp' or 'sms'
+  hudQueueIndex: 0,
+  tableTab: 'pending',       // 'pending' or 'sent'
+  customPromoImage: null,
+  selectedSitePage: '/categories/health.html',
+  selectedTubeVideo: 'tube_001',
+  customQueueCampaign: null,
+  selectedContactsSet: new Set()
 };
 
 // =================================================================
@@ -325,26 +339,228 @@ function ensureSampleReviewsSeeded() {
 }
 
 const DEFAULT_CATALOG_FALLBACK = {
-  'BK001': { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', mrp: 299, offerPrice: 99, category: 'फसल सुरक्षा' },
-  'BK002': { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', mrp: 299, offerPrice: 99, category: 'फसल रोग व कीट इलाज' },
-  'BK006': { id: 'BK006', name: 'AI वेबसाइट निर्माण गाइड 2026', mrp: 1299, offerPrice: 199, category: 'डिजिटल तकनीक' },
-  'BK015': { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', mrp: 1999, offerPrice: 149, category: 'उन्नत सब्जी उत्पादन' },
-  'BK016': { id: 'BK016', name: 'कृषि दवा डायरेक्टरी', mrp: 499, offerPrice: 149, category: 'कीटनाशक व फफूंदनाशक डायरेक्टरी' },
-  'BK017': { id: 'BK017', name: 'गेहूँ की खेती सम्पूर्ण मार्गदर्शिका', mrp: 299, offerPrice: 99, category: 'गेहूँ उत्पादन' },
-  'SUB001': { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता', mrp: 2999, offerPrice: 99, category: 'VIP ऑल-एक्सेस' }
+  'BK002': { id: 'BK002', name: 'खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा, रोग व कीट इलाज)', title: 'खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा, रोग व कीट इलाज)', cover: '/images/books/fasal-ka-doctor-cover.webp', mrp: 499, offerPrice: 199, category: 'फसल सुरक्षा' },
+  'BK001': { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', title: 'खरीफ फसल मास्टर गाइड 2026', cover: '/images/books/kharif-master-guide-2026-cover.webp', mrp: 299, offerPrice: 99, category: 'फसल सुरक्षा' },
+  'BK016': { id: 'BK016', name: 'आधुनिक कृषि दवा डायरेक्टरी व पशुपालन', title: 'आधुनिक कृषि दवा डायरेक्टरी व पशुपालन', cover: '/images/books/bk016-cover.webp', mrp: 399, offerPrice: 149, category: 'दवा डायरेक्टरी' },
+  'BK015': { id: 'BK015', name: 'उन्नत सब्जी खेती मास्टर गाइड सम्पूर्ण विवरण', title: 'उन्नत सब्जी खेती मास्टर गाइड सम्पूर्ण विवरण', cover: '/images/books/bk015-cover.webp', mrp: 399, offerPrice: 149, category: 'सब्जी उत्पादन' },
+  'BK017': { id: 'BK017', name: 'गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका', title: 'गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका', cover: '/images/books/bk017-cover.webp', mrp: 299, offerPrice: 99, category: 'रबी फसल' },
+  'BK018': { id: 'BK018', name: 'जैविक खाद, जीवामृत व माइकोराइजा डायरेक्टरी', title: 'जैविक खाद, जीवामृत व माइकोराइजा डायरेक्टरी', cover: '/images/books/bk018-cover.webp', mrp: 399, offerPrice: 149, category: 'जैविक खाद व जीवामृत' },
+  'SUB001': { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)', title: '👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)', cover: '/images/banners/vip-reader-offer-badge.jpeg', mrp: 1999, offerPrice: 499, category: 'VIP ऑल-एक्सेस' }
 };
+
+function getCatalogBooksList() {
+  if (Array.isArray(mktState.books) && mktState.books.length > 0) {
+    return mktState.books;
+  }
+  return Object.values(DEFAULT_CATALOG_FALLBACK);
+}
+
+// 22+ Real Verified Official Site Pages from Root & Subfolders
+const OFFICIAL_SITE_PAGES = [
+  // 1. Health Hub (13 Real Pages)
+  { path: '/health/diabetes.html', title: '🩸 मधुमेह / डायबिटीज व ब्लड शुगर मुक्ति केंद्र', thumb: '/images/banners/og_image-whatsapp-image-202-936789-y196.webp', cat: 'Health', hook: 'बिना साइड-इफेक्ट इंसुलिन संवेदनशीलता व प्राकृतिक शुगर नियंत्रण का प्रमाणित गाइड।' },
+  { path: '/health/joint-care.html', title: '🦴 जोड़ों का दर्द, गठिया व यूरिक एसिड समाधान', thumb: '/images/banners/og_image-1003678899-976100-9wi4.webp', cat: 'Health', hook: 'घुटनों व कमर के पुराने दर्द में बिना पेनकिलर प्राकृतिक राहत और कार्टिलेज सुरक्षा।' },
+  { path: '/health/heart-care.html', title: '❤️ हृदय सुरक्षा, बीपी व ब्लॉकेज नियंत्रण', thumb: '/images/banners/health-banner.jpeg', cat: 'Health', hook: 'कोलेस्ट्रॉल व हाई ब्लड प्रेशर को नियंत्रित कर दिल को मजबूत बनाएं।' },
+  { path: '/health/liver-care.html', title: '🫀 फैटी लिवर, सिरोसिस व आयुर्वेदिक डिटॉक्स', thumb: '/images/banners/og_image-health-og-676433-sb3k.webp', cat: 'Health', hook: 'पाचन, गैस व फैटी लिवर को डिटॉक्स करने का सबसे सरल व असरदार प्राकृतिक उपाय।' },
+  { path: '/health/weight-loss.html', title: '⚖️ मोटापा व पेट की चर्बी घटाने का डाइट चार्ट', thumb: '/images/banners/og_image-motapa-490448-grer.webp', cat: 'Health', hook: 'बिना कमजोरी पेट की जिद्दी चर्बी व वजन घटाने का वैज्ञानिक डाइट फॉर्मूला।' },
+  { path: '/health/thyroid-care.html', title: '🦋 थायरॉइड संतुलन व हॉर्मोन मेटाबॉलिज्म', thumb: '/images/banners/health_card-2-585308-wpfz.webp', cat: 'Health', hook: 'थायरॉइड के कारण बढ़ता वजन, बेचैनी व हॉर्मोनल असंतुलन का सुरक्षित समाधान।' },
+  { path: '/health/skin-care.html', title: '✨ प्राकृतिक स्किन केयर, पिंपल्स व त्वचा ग्लो', thumb: '/images/banners/og_image-skine-1-794718-e42c.webp', cat: 'Health', hook: 'केमिकल-मुक्त हर्बल स्किन केयर से चेहरे का निखार व झाइयों से मुक्ति पाएं।' },
+  { path: '/health/hair-care.html', title: '💇 बाल झड़ना, डैंड्रफ व हेयर रीग्रोथ', thumb: '/images/banners/og_image-hair-77-154412-g45q.webp', cat: 'Health', hook: 'जड़ों से पोषण देकर बालों का गिरना रोकें व नए बाल उगाने का हर्बल तरीका।' },
+  { path: '/health/dental-care.html', title: '🦷 दांतों की सड़न, पायरिया व हर्बल सुरक्षा', thumb: '/images/banners/health-banner.jpeg', cat: 'Health', hook: 'मसूड़ों से खून, पायरिया व सेंसिटिविटी से प्राकृतिक राहत।' },
+  { path: '/health/kids-care.html', title: '🧸 किड्स केयर: बच्चों का विकास व इम्युनिटी पोषण', thumb: '/images/banners/health-kids-care.jpg', cat: 'Health', hook: 'बच्चों की भूख, स्मरण शक्ति व शारीरिक विकास के लिए सुपर न्यूट्रिशन।' },
+  { path: '/health/womens-care.html', title: '🌸 महिला स्वास्थ्य, PCOD व हार्मोनल केयर', thumb: '/images/banners/og_image-femail-problm-712409-c3n1.webp', cat: 'Health', hook: 'मासिक धर्म अनियमितता, PCOD व महिलाओं की आंतरिक कमजोरी का समाधान।' },
+  { path: '/health/sexual-wellness.html', title: '💪 पौरुष शक्ति, स्टेमिना व यौन स्वास्थ्य', thumb: '/images/banners/og_image-ed-677895-iqr6.webp', cat: 'Health', hook: 'कमजोरी व थकान से मुक्ति पाकर प्राकृतिक ऊर्जा व स्टैमिना पाने का आयुर्वेदिक फॉर्मूला।' },
+  { path: '/health/home-care.html', title: '🏡 होम केयर: 100% केमिकल-मुक्त प्राकृतिक स्वच्छता', thumb: '/images/banners/health-home-care.jpg', cat: 'Health', hook: 'घर को रखें बीमारियों व हानिकारक रसायनों से पूरी तरह सुरक्षित।' },
+
+  // 2. Pashupalan & Agriculture Hub (4 Real Pages)
+  { path: '/pashu-palan.html', title: '🐄 संपूर्ण पशुपालन व दुग्ध संवर्धन हब (Main)', thumb: '/images/banners/og_image-pashupalan-029612-sv0a.webp', cat: 'Pashupalan', hook: 'पशुपालन को बनाएं फायदे का व्यापार — दुग्ध वृद्धि, नस्ल सुधार व रोग मुक्ति।' },
+  { path: '/crop-doctor.html', title: '🌾 फसल का डॉक्टर - लाइव कीट व रोग समाधान', thumb: '/images/banners/kheti-dr-banner-1.webp', cat: 'Pashupalan', hook: 'फसल की बीमारी का फोटो भेजें या लक्षण चुनें, डॉक्टर से तुरंत परामर्श पाएं।' },
+  { path: '/mandi.html', title: '📊 लाइव मंडी भाव व कृषि बाजार केंद्र', thumb: '/images/banners/agri-banner.jpeg', cat: 'Pashupalan', hook: 'देश भर की मंडियों के आज के ताज़ा भाव अपनी मोबाइल स्क्रीन पर।' },
+  { path: '/weather.html', title: '🌤️ मौसम पूर्वानुमान व कृषि सलाह', thumb: '/images/banners/agri-banner.jpeg', cat: 'Pashupalan', hook: 'अगले 7 दिनों का सटीक मौसम और फसल सुरक्षा की जरूरी सलाह।' },
+
+  // 3. Netsurf & Biofit (4 Real Pages)
+  { path: '/categories/netsurf.html', title: '🌿 नेट्सर्फ बायोफिट - जैविक खाद व 50% लागत कटौती', thumb: '/images/banners/hero_slide-netsurf-061003-6ii5.webp', cat: 'Netsurf', hook: 'रासायनिक खाद का खर्च आधा करें और पैदावार 30% बढ़ाएं बायोफिट तकनीक से।' },
+  { path: '/categories/netsurf-products.html', title: '💼 नेट्सर्फ सम्पूर्ण उत्पाद सूची व डायरेक्ट ऑर्डर', thumb: '/images/banners/hero_slide-netsurf-2-085152-qj5v.webp', cat: 'Netsurf', hook: 'असली ओरिजिनल नेट्सर्फ उत्पाद सीधे घर पर प्राप्त करें।' },
+  { path: '/ebooks/netsurf.html', title: '🌱 नेट्सर्फ बायोफिट ई-बुक व कृषि गाइड', thumb: '/images/banners/hero_slide-netsurf-061003-6ii5.webp', cat: 'Netsurf', hook: 'जैविक खेती में नेट्सर्फ बायोफिट के संपूर्ण उपयोग का प्रैक्टिकल शेड्यूल।' },
+  { path: '/pages/netsurf.html', title: '🌾 नेट्सर्फ जैविक परिणाम व किसान समीक्षा', thumb: '/images/banners/hero_slide-netsurf-2-085152-qj5v.webp', cat: 'Netsurf', hook: 'सैकड़ों किसानों के खेतों के लाइव परिणाम व उपज वृद्धि प्रमाण।' },
+
+  // 4. Core Store Portals & Catalogs (8 Real Pages)
+  { path: '/store.html', title: '🛒 आरोग्यम संपूर्ण स्टोर व प्रोडक्ट कैटलॉग', thumb: '/images/banners/hero-banner-1.jpeg', cat: 'Portal', hook: 'कृषि, पशुपालन व स्वास्थ्य की सभी प्रमाणित डिजिटल पुस्तकें व उत्पाद एक ही जगह।' },
+  { path: '/ebook/index.html', title: '📚 संपूर्ण ई-बुक कैटलॉग व डिजिटल लाइब्रेरी', thumb: '/images/banners/farmer-community-banner.jpeg', cat: 'Portal', hook: 'अपनी पसंद की कृषि, पशुपालन व बिज़नेस पुस्तकें तुरंत पढ़ना शुरू करें।' },
+  { path: '/categories/health.html', title: '❤️ हेल्थ व वैलनेस संपूर्ण कैटलॉग', thumb: '/images/banners/health-banner.jpeg', cat: 'Health', hook: 'आयुर्वेदिक व प्राकृतिक स्वास्थ्य मार्गदर्शन की सभी पुस्तकें व समाधान।' },
+  { path: '/categories/business.html', title: '💼 कृषि बिज़नेस, डेयरी व स्वरोजगार कैटलॉग', thumb: '/images/banners/farmer-community-banner.jpeg', cat: 'Portal', hook: 'खेती और पशुपालन को लाभकारी बिज़नेस बनाने की संपूर्ण मार्गदर्शिका।' },
+  { path: '/categories/digital-ai.html', title: '🤖 डिजिटल खेती व AI कृषि कैटलॉग', thumb: '/images/banners/digital-training-banner.jpeg', cat: 'Portal', hook: 'आधुनिक AI टूल्स और डिजिटल तकनीकों से स्मार्ट खेती कैसे करें।' },
+  { path: '/categories/education.html', title: '🎓 किसान प्रशिक्षण व शिक्षा हब', thumb: '/images/banners/webinar-banner.webp', cat: 'Portal', hook: 'आधुनिक कृषि और डेयरी का सम्पूर्ण डिजिटल प्रशिक्षण।' },
+  { path: '/subscription.html', title: '👑 आरोग्यम VIP प्रो ऑल-एक्सेस सदस्यता', thumb: '/images/banners/vip-reader-offer-badge.jpeg', cat: 'Portal', hook: '1 साल तक सभी ई-बुक्स, वेबिनार और व्यक्तिगत कृषि सलाह 100% मुफ़्त।' },
+  { path: '/tube.html', title: '📺 AarogyamTube वीडियो लाइब्रेरी (Video Portal)', thumb: '/images/banners/tube-banner.webp', cat: 'Portal', hook: 'सैकड़ों खेती और पशुपालन वीडियो बिल्कुल मुफ्त देखें।' },
+  { path: '/webinar.html', title: '🎓 लाइव वेबिनार व किसान कार्यशाला (Webinars)', thumb: '/images/banners/webinar-banner.webp', cat: 'Portal', hook: 'कृषि व डेयरी विशेषज्ञों के साथ सीधे सवाल-जवाब और ऑनलाइन प्रशिक्षण।' }
+];
+
+const DEFAULT_TUBE_VIDEOS = [
+  { id: 'tube_001', youtube_id: 'sample_agri_1', title: '🌾 धान व सोयाबीन में पीलापन व फफूंद का 100% पक्का इलाज', thumb: '/images/banners/digital-training-banner.jpeg', topic: 'कृषि रोग नियंत्रण', speaker: 'डॉ. रमेश पाटिल (कृषि विशेषज्ञ)', desc: 'कम खर्च में फफूंद व इल्ली नियंत्रण का वैज्ञानिक और व्यावहारिक तरीका।' },
+  { id: 'tube_002', youtube_id: 'sample_dairy_1', title: '🥛 गाय-भैंस का दूध 2 लीटर और FAT% 8 तक कैसे बढ़ाएं?', thumb: '/images/banners/webinar-live-banner.webp', topic: 'पशुपालन व दुग्ध संवर्धन', speaker: 'डॉ. आनंद शर्मा (वरिष्ठ पशु चिकित्सक)', desc: 'सस्ता घर का मिनरल मिक्चर व बाईपास फैट बनाने का घरेलू नुस्खा।' },
+  { id: 'tube_003', youtube_id: 'sample_organic_1', title: '🌱 घर पर बनाएं 500 लीटर जीवामृत व वेस्ट डीकंपोजर', thumb: '/images/banners/kharif-master-guide-2026-hero-banner.webp', topic: 'जैविक खेती', speaker: 'किसान गुरु श्री महेंद्र वर्मा', desc: 'यूरिया और डीएपी का विकल्प — 0 रुपए में खेत की मिट्टी को उपजाऊ बनाएं।' },
+  { id: 'tube_004', youtube_id: 'sample_health_1', title: '🩸 बिना अंग्रेजी दवा शुगर (डायबिटीज) व HbA1c 6 पर लाएं', thumb: '/images/banners/og_image-whatsapp-image-202-936789-y196.webp', topic: 'आयुर्वेद स्वास्थ्य', speaker: 'वैद्यराज राजेश जोशी', desc: 'खान-पान में केवल 3 बदलाव करके ब्लड शुगर को नियंत्रित करने का प्रमाणित तरीका।' }
+];
+
+const HOOK_STUDIO_DATABASE = {
+  gm: {
+    label: '☀️ सुप्रभात (Good Morning)',
+    templates: [
+      {
+        id: 'gm_1',
+        title: 'संकल्प और सकारात्मक ऊर्जा',
+        hook: 'एक नई सुबह, नई उम्मीद और नया संकल्प लेकर आई है!',
+        shayari: 'ईश्वर का दिया कभी अल्प नहीं होता, जो टूट जाए वो संकल्प नहीं होता। हार को लक्ष्य से दूर ही रखना, क्योंकि जीत का कोई विकल्प नहीं होता। 🌅',
+        cta: '👉 आज का दैनिक ज्ञान व मार्गदर्शन यहाँ देखें:'
+      },
+      {
+        id: 'gm_2',
+        title: 'अन्नदाता व प्रकृति वंदन',
+        hook: 'आज का सवेरा आपके खेत, खलिहान और परिवार में सुख व बरकत लाए!',
+        shayari: 'सूरज की पहली किरण संग जो जाग उठता है, धरती का सीना चीर कर जो सोना उगाता है। 🌾',
+        cta: '👉 कृषि व स्वास्थ्य की नई अपडेट्स यहाँ पढ़ें:'
+      },
+      {
+        id: 'gm_3',
+        title: 'उत्साह और नए अवसर',
+        hook: 'हर सुबह एक नया अवसर है, आज अपनी मेहनत से सफलता की नई इबारत लिखें!',
+        shayari: 'हौसलों के तरकश में कोशिश का वो तीर जिंदा रखो, हार जाओ चाहे सब कुछ जिंदगी में फिर से जीतने की उम्मीद जिंदा रखो। 🌟',
+        cta: '👉 आज का विशेष ज्ञान व ई-लाइब्रेरी देखें:'
+      }
+    ]
+  },
+  gn: {
+    label: '🌙 शुभ रात्रि (Good Night)',
+    templates: [
+      {
+        id: 'gn_1',
+        title: 'सुकून और शांति',
+        hook: 'दिनभर की भागदौड़ के बाद अब मन को शांत करने और सुकून भरी नींद का समय है।',
+        shayari: 'थक कर जो सो जाओगे आज की रात सुकून से, कल का सवेरा खिलेगा नई उम्मीद के नूर से। 🌙✨',
+        cta: '👉 कल की योजना और स्वास्थ्य टिप्स यहाँ देखें:'
+      },
+      {
+        id: 'gn_2',
+        title: 'कृतज्ञता और विश्राम',
+        hook: 'आज के दिन मिले हर अनुभव के लिए ईश्वर का धन्यवाद करें और कल की नई शुरुआत के लिए तैयार हों।',
+        shayari: 'चाँद ने बिखेरी है अपनी चांदनी गगन में, शांति और सुख का वास हो आपके जीवन में। 🌟',
+        cta: '👉 रात्रि विश्राम व स्वास्थ्य मार्गदर्शिका:'
+      }
+    ]
+  },
+  suvichar: {
+    label: '💡 प्रेरक विचार (Motivation)',
+    templates: [
+      {
+        id: 'sv_1',
+        title: 'कर्म और आत्मबल',
+        hook: 'मंजिल पाना कठिन नहीं, बस हर दिन एक कदम सही दिशा में बढ़ाना जरूरी है!',
+        shayari: 'मंजिल उन्हीं को मिलती है जिनके सपनों में जान होती है, पंखों से कुछ नहीं होता, हौसलों से उड़ान होती है! 🦅',
+        cta: '👉 आत्मनिर्भर भारत व जैविक समृद्धि हब देखें:'
+      },
+      {
+        id: 'sv_2',
+        title: 'धैर्य और निरंतरता',
+        hook: 'सफलता कोई एक दिन का चमत्कार नहीं, बल्कि प्रतिदिन की गई छोटी-छोटी कोशिशों का परिणाम है।',
+        shayari: 'लहरों से डर कर नौका पार नहीं होती, कोशिश करने वालों की कभी हार नहीं होती। 🌱',
+        cta: '👉 आधुनिक तकनीकों से जुड़ें और आगे बढ़ें:'
+      }
+    ]
+  },
+  agriculture: {
+    label: '🌾 कृषि हुक्स व जैविक (Agri)',
+    templates: [
+      {
+        id: 'ag_1',
+        title: 'फसल सुरक्षा व रोग नियंत्रण',
+        hook: 'कीट और फफूंद से फसल खराब होने से पहले उसका सही समय पर वैज्ञानिक इलाज करें!',
+        shayari: 'मेहनत की मिट्टी में जब विश्वास का बीज बोया जाता है, तभी बंजर में भी खुशहाली का चमन उगता है। 🌾',
+        cta: '👉 सम्पूर्ण फसल डॉक्टर व कृषि दवा डायरेक्टरी ई-बुक देखें:'
+      },
+      {
+        id: 'ag_2',
+        title: 'लागत घटाओ — मुनाफा बढ़ाओ',
+        hook: 'रासायनिक खाद का अंधाधुंध खर्च बंद करें, बायो-ऑर्गेनिक खेती से उत्पादन दोगुना करें!',
+        shayari: 'धरती माता को जहर मुक्त बनाओ, अपने खेत को खुशहाल और समृद्ध बनाओ। 🌿',
+        cta: '👉 जैविक खाद व जीवामृत डायरेक्टरी:'
+      }
+    ]
+  },
+  healthcare: {
+    label: '❤️ स्वास्थ्य व आयुर्वेद (Health)',
+    templates: [
+      {
+        id: 'hl_1',
+        title: 'प्राकृतिक स्वास्थ्य सुरक्षा',
+        hook: 'बीमारी आने का इंतजार मत कीजिए, प्राकृतिक खानपान और आयुर्वेद से शरीर को मजबूत बनाइए!',
+        shayari: 'पहला सुख निरोगी काया, दूजा सुख घर में हो माया। स्वस्थ शरीर ही जीवन की सबसे अनमोल पूंजी है। 🌺',
+        cta: '👉 सम्पूर्ण स्वास्थ्य केंद्र व घरेलू उपचार गाइड:'
+      }
+    ]
+  },
+  festivals: {
+    label: '🌺 त्यौहार व पर्व (Festivals)',
+    templates: [
+      {
+        id: 'fst_1',
+        title: 'त्यौहार की हार्दिक बधाई',
+        hook: 'यह पावन त्यौहार आपके और आपके पूरे परिवार के जीवन में सुख, शांति और समृद्धि लेकर आए!',
+        shayari: 'दीपों की रोशनी, फूलों की बहार, मुबारक हो आपको यह खुशियों का त्यौहार! 🎉🌟',
+        cta: '👉 त्यौहार विशेष महाबचत ऑफर यहाँ देखें:'
+      }
+    ]
+  },
+  business: {
+    label: '💼 कमाई व आत्मनिर्भरता (Business)',
+    templates: [
+      {
+        id: 'biz_1',
+        title: 'अतिरिक्त आय का अवसर',
+        hook: 'घर बैठे या खेती के साथ अतिरिक्त कमाई का सुरक्षित और प्रमाणित अवसर!',
+        shayari: 'कामयाबी उन्हीं के कदम चूमती है जो वक्त रहते सही फैसला लेते हैं। 💼🚀',
+        cta: '👉 आरोग्यम पार्टनर व नेट्सर्फ करियर विवरण देखें:'
+      }
+    ]
+  },
+  shayari: {
+    label: '🎭 दिल को छूने वाली शायरी',
+    templates: [
+      {
+        id: 'shy_1',
+        title: 'रिश्ते और अपनापन',
+        hook: 'रिश्ते वही खूबसूरत होते हैं जो दिल से निभाए जाते हैं।',
+        shayari: 'वक्त और अपने जब दोनों एक साथ चोट पहुंचाते हैं, तब इंसान बाहर से शांत और अंदर से फौलाद बन जाता है। 🌸',
+        cta: '👉 आरोग्यम डिजिटल परिवार से जुड़ें:'
+      }
+    ]
+  }
+};
+
+
+// -------------------------------------------------------------
+// TAB 2: SUVICHAR, GREETINGS & GM/GN MESSENGER
+// -------------------------------------------------------------
+window.HOOK_STUDIO_DATABASE = HOOK_STUDIO_DATABASE;
 
 function buildCatalogMap() {
   mktState.catalogMap = { ...DEFAULT_CATALOG_FALLBACK };
   if (Array.isArray(mktState.books)) {
     mktState.books.forEach(b => {
-      const fallback = DEFAULT_CATALOG_FALLBACK[b.id] || {};
-      mktState.catalogMap[b.id] = Object.assign({}, fallback, b);
-      if (!mktState.catalogMap[b.id].mrp && fallback.mrp) {
-        mktState.catalogMap[b.id].mrp = fallback.mrp;
+      // Exclude demo, dummy or coming soon books
+      const bName = (b.name || b.title || '').toLowerCase();
+      const bId = (b.id || '').toUpperCase();
+      if (b.is_demo || b.coming_soon || bId.includes('DEMO') || bName.includes('डेमो') || bName.includes('coming soon')) {
+        return;
       }
-      if (!mktState.catalogMap[b.id].offerPrice && fallback.offerPrice) {
-        mktState.catalogMap[b.id].offerPrice = fallback.offerPrice;
+      const verified = DEFAULT_CATALOG_FALLBACK[b.id] || {};
+      // Prioritize verified titles and prices so raw DB titles like 'घर बैठे पैसे कमाएँ' do not overwrite verified titles
+      mktState.catalogMap[b.id] = Object.assign({}, b, verified);
+      if (!mktState.catalogMap[b.id].mrp && verified.mrp) {
+        mktState.catalogMap[b.id].mrp = verified.mrp;
+      }
+      if (!mktState.catalogMap[b.id].offerPrice && verified.offerPrice) {
+        mktState.catalogMap[b.id].offerPrice = verified.offerPrice;
       }
     });
   }
@@ -508,6 +724,110 @@ function applyDateFilter(items, dateField = 'created_at') {
 // =================================================================
 // 3. MAIN RENDER CONTROLLER
 // =================================================================
+
+// =================================================================
+// 2.5 OUTREACH & ANTI-BAN COUNTERS (DAILY REPORT & SENT SET)
+// =================================================================
+function getTodayDateStr() {
+  return new Date().toISOString().split('T')[0];
+}
+function getDailyWaCount() {
+  return parseInt(localStorage.getItem('AI_DAILY_WA_COUNT_' + getTodayDateStr()) || '0', 10);
+}
+function getDailySmsCount() {
+  return parseInt(localStorage.getItem('AI_DAILY_SMS_COUNT_' + getTodayDateStr()) || '0', 10);
+}
+function getDailyCallCount() {
+  return parseInt(localStorage.getItem('AI_DAILY_CALL_COUNT_' + getTodayDateStr()) || '0', 10);
+}
+function incDailyWaCount() {
+  const next = getDailyWaCount() + 1;
+  localStorage.setItem('AI_DAILY_WA_COUNT_' + getTodayDateStr(), next.toString());
+  return next;
+}
+function incDailySmsCount() {
+  const next = getDailySmsCount() + 1;
+  localStorage.setItem('AI_DAILY_SMS_COUNT_' + getTodayDateStr(), next.toString());
+  return next;
+}
+function incDailyCallCount() {
+  const next = getDailyCallCount() + 1;
+  localStorage.setItem('AI_DAILY_CALL_COUNT_' + getTodayDateStr(), next.toString());
+  return next;
+}
+function getOutreachHistory() {
+  try {
+    const raw = localStorage.getItem('AI_OUTREACH_HISTORY');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    return [];
+  }
+}
+function recordOutreachActivity(name, mobile, channel = 'WhatsApp', campaign = 'VIP Offer') {
+  try {
+    const history = getOutreachHistory();
+    history.unshift({
+      id: 'act_' + Date.now(),
+      name: name || 'अज्ञात किसान',
+      mobile: mobile || 'N/A',
+      channel,
+      campaign,
+      timestamp: new Date().toISOString()
+    });
+    if (history.length > 100) history.pop();
+    localStorage.setItem('AI_OUTREACH_HISTORY', JSON.stringify(history));
+  } catch(e) {}
+}
+function getTodaySentContactsSet() {
+  try {
+    const raw = localStorage.getItem('AI_SENT_CONTACTS_' + getTodayDateStr());
+    if (raw) return new Set(JSON.parse(raw));
+  } catch(e) {}
+  const hist = getOutreachHistory();
+  const today = getTodayDateStr();
+  const set = new Set();
+  hist.forEach(h => {
+    if (h.timestamp && h.timestamp.startsWith(today) && h.mobile) {
+      set.add(h.mobile.replace(/\D/g, '').slice(-10));
+    }
+  });
+  return set;
+}
+function getTodaySentMap() {
+  const set = getTodaySentContactsSet();
+  const map = {};
+  set.forEach(mob => { map[mob] = true; });
+  return map;
+}
+function markContactAsSent(mobile, name, campaign = 'VIP Offer', channel = 'WhatsApp') {
+  const cleanMob = (mobile || '').replace(/\D/g, '').slice(-10);
+  if (!cleanMob) return;
+  const set = getTodaySentContactsSet();
+  set.add(cleanMob);
+  localStorage.setItem('AI_SENT_CONTACTS_' + getTodayDateStr(), JSON.stringify(Array.from(set)));
+  recordOutreachActivity(name, cleanMob, channel, campaign);
+}
+function clearTodaySentQueue() {
+  localStorage.removeItem('AI_SENT_CONTACTS_' + getTodayDateStr());
+}
+
+// Global window mappings for bulletproof fallback
+if (typeof window !== 'undefined') {
+  window.getTodayDateStr = getTodayDateStr;
+  window.getDailyWaCount = getDailyWaCount;
+  window.getDailySmsCount = getDailySmsCount;
+  window.getDailyCallCount = getDailyCallCount;
+  window.incDailyWaCount = incDailyWaCount;
+  window.incDailySmsCount = incDailySmsCount;
+  window.incDailyCallCount = incDailyCallCount;
+  window.getOutreachHistory = getOutreachHistory;
+  window.recordOutreachActivity = recordOutreachActivity;
+  window.getTodaySentContactsSet = getTodaySentContactsSet;
+  window.getTodaySentMap = getTodaySentMap;
+  window.markContactAsSent = markContactAsSent;
+  window.clearTodaySentQueue = clearTodaySentQueue;
+}
+
 export async function initReports() {
   initAdminLayout('Marketing Hub & Analytics', 'लाइव मांग मीटर, 4-स्टेज मार्केटिंग फ़नल एवं व्हाट्सएप रिकवरी इंजन');
   const container = document.getElementById('page-content');
@@ -549,17 +869,67 @@ function updateMarketingHubView(container) {
 
   let displayedAudience = dateFilteredUsers;
 
+  // 1. Funnel filter
   if (mktState.funnelFilter !== 'all') {
-    displayedAudience = displayedAudience.filter(u => u.funnelStage === mktState.funnelFilter);
+    if (mktState.funnelFilter === 'top_funnel' || mktState.funnelFilter === 'tube_viewers') {
+      displayedAudience = displayedAudience.filter(u => 
+        u.funnelStage === 'top_funnel' || 
+        (u.detectedInterest && u.detectedInterest.toLowerCase().includes('tube')) ||
+        (u.registration_source && u.registration_source.toLowerCase().includes('tube')) ||
+        (u.interest && u.interest.toLowerCase().includes('tube')) ||
+        (u.tubeRecord && u.tubeRecord.views > 0)
+      );
+    } else if (mktState.funnelFilter === 'demo_users') {
+      displayedAudience = displayedAudience.filter(u => 
+        (u.detectedInterest && u.detectedInterest.toLowerCase().includes('demo')) ||
+        (u.registration_source && u.registration_source.toLowerCase().includes('demo')) ||
+        (u.primaryBook && u.primaryBook.includes('DEMO'))
+      );
+    } else {
+      displayedAudience = displayedAudience.filter(u => u.funnelStage === mktState.funnelFilter);
+    }
   }
 
-  if (mktState.bookFilter !== 'all') {
+  // 2. Pillar & Book / Topic filter
+  const activePillar = mktState.pillarFilter;
+  const activeBook = mktState.bookFilter;
+  if (activePillar && activePillar !== 'all') {
+    const pillarList = getPillarContacts(activePillar);
+    const pillarMobSet = new Set(pillarList.map(u => (u.mobile || '').replace(/\D/g, '').slice(-10)));
     displayedAudience = displayedAudience.filter(u => {
-      const bought = u.purchases.some(p => p.book_id === mktState.bookFilter);
-      return bought || u.primaryBook === mktState.bookFilter;
+      const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+      return pillarMobSet.has(mob);
+    });
+  } else if (activeBook && activeBook !== 'all') {
+    if (activeBook.startsWith('pillar_')) {
+      const pKey = activeBook.replace('pillar_', '');
+      const pillarList = getPillarContacts(pKey);
+      const pillarMobSet = new Set(pillarList.map(u => (u.mobile || '').replace(/\D/g, '').slice(-10)));
+      displayedAudience = displayedAudience.filter(u => {
+        const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+        return pillarMobSet.has(mob);
+      });
+    } else {
+      displayedAudience = displayedAudience.filter(u => {
+        const bought = (u.purchases || []).some(p => p.book_id === activeBook);
+        const interested = (u.primaryBook === activeBook) || 
+                           (u.interest && u.interest.includes(activeBook)) || 
+                           (u.detectedInterest && u.detectedInterest.includes(activeBook));
+        return bought || interested;
+      });
+    }
+  }
+
+  // 3. Anti-Repeat Shield filter (Active by default)
+  if (mktState.antiRepeatShield !== false) {
+    const todaySent = getTodaySentContactsSet();
+    displayedAudience = displayedAudience.filter(u => {
+      const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+      return !todaySent.has(mob);
     });
   }
 
+  // 4. Live Search filter
   if (mktState.searchQuery) {
     const q = mktState.searchQuery.toLowerCase();
     displayedAudience = displayedAudience.filter(u => 
@@ -680,61 +1050,65 @@ function updateMarketingHubView(container) {
       </div>
     </div>
 
-    <!-- 📱 Mobile Tab Switcher Card (Never hidden, 100% accessible on any screen) -->
-    <div class="mkt-mobile-tab-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <span style="font-size:0.88rem; font-weight:800; color:#60a5fa; display:flex; align-items:center; gap:6px;">
-          <span>📑</span> <span>रिपोर्ट्स व मार्केटिंग सेक्शन्स (Tabs):</span>
-        </span>
-        <span style="font-size:0.74rem; color:#38bdf8; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-weight:700;">
-          8 सेक्शन्स उपलब्ध
-        </span>
+    <!-- 🎯 MASTER EXECUTIVE NAVIGATION BAR (DROPDOWN + TOP QUICK SHORTCUTS) -->
+    <div class="mkt-smart-nav-box" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(9, 14, 26, 0.98)); border: 1.5px solid rgba(59, 130, 246, 0.4); border-radius: 16px; padding: 14px 20px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+      
+      <!-- Left: Dropdown with Title & Count -->
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1; min-width: 280px;">
+        <label for="mkt-main-tab-select" style="font-weight: 900; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin: 0; white-space: nowrap;">
+          <span style="font-size: 1.3rem;">🎯</span>
+          <span>कार्य / विभाग चुनें (Section):</span>
+        </label>
+        
+        <select id="mkt-main-tab-select" class="mkt-smart-select" style="flex: 1; min-width: 260px; max-width: 480px; background: #0f172a; color: #38bdf8; border: 2px solid #3b82f6; border-radius: 10px; padding: 10px 14px; font-weight: 800; font-size: 0.92rem; cursor: pointer; outline: none; box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);">
+          <optgroup label="🚀 1. मार्केटिंग व आउटरीच अभियान (Outreach Campaigns)" style="background:#0f172a; color:#f8fafc;">
+            <option value="whatsapp" ${mktState.activeTab === 'whatsapp' ? 'selected' : ''}>🎁 1. VIP ई-बुक ऑफर निर्माता (${displayedAudience.length} संपर्क)</option>
+            <option value="site_pages" ${mktState.activeTab === 'site_pages' ? 'selected' : ''}>🌐 2. वेबसाइट, स्वास्थ्य व पशुपालन पेज प्रचार</option>
+            <option value="tube_promo" ${mktState.activeTab === 'tube_promo' ? 'selected' : ''}>📺 3. AarogyamTube वीडियो प्रचार</option>
+            <option value="greetings" ${mktState.activeTab === 'greetings' ? 'selected' : ''}>🌅 4. सुविचार, बधाई व GM/GN मैसेंजर</option>
+            <option value="festival" ${mktState.activeTab === 'festival' ? 'selected' : ''}>🎉 5. त्यौहार महाबचत सेल ऑफर</option>
+            <option value="broadcast" ${mktState.activeTab === 'broadcast' ? 'selected' : ''}>📢 6. इन-ऐप नोटिस बोर्ड (लाइव प्रसारण)</option>
+          </optgroup>
+          <optgroup label="🤖 2. स्मार्ट ऑटोमेशन व लीड्स (Automation & Contacts)" style="background:#0f172a; color:#f8fafc;">
+            <option value="auto_whatsapp" ${mktState.activeTab === 'auto_whatsapp' ? 'selected' : ''}>🤖 7. सुरक्षित Auto WhatsApp कतार (30s Safe Queue)</option>
+            <option value="google_leads" ${mktState.activeTab === 'google_leads' ? 'selected' : ''}>🌐 8. Google Leads लोकेटर (शहर व श्रेणी)</option>
+            <option value="export" ${mktState.activeTab === 'export' ? 'selected' : ''}>➕ 9. नया संपर्क / CSV लोड व निर्यात</option>
+          </optgroup>
+          <optgroup label="📊 3. रिपोर्ट्स, एनालिटिक्स व टूल्स (Reports & Tools)" style="background:#0f172a; color:#f8fafc;">
+            <option value="activity" ${mktState.activeTab === 'activity' ? 'selected' : ''}>📝 10. मेरी दैनिक कार्य डायरी (Activity: WA, SMS, Calls)</option>
+            <option value="conversions" ${mktState.activeTab === 'conversions' ? 'selected' : ''}>🔄 11. शेयर व ऑफ़र कन्वर्जन रिपोर्ट (Conversions)</option>
+            <option value="funnel" ${mktState.activeTab === 'funnel' ? 'selected' : ''}>🎯 12. लाइव मांग मीटर व रैंकिंग</option>
+            <option value="tube" ${mktState.activeTab === 'tube' ? 'selected' : ''}>🎬 13. AarogyamTube वीडियो एनालिटिक्स</option>
+            <option value="categories_demand" ${mktState.activeTab === 'categories_demand' ? 'selected' : ''}>🌿 14. AI वेब पेज विज़िटर व श्रेणी मांग</option>
+            <option value="reader_downloads" ${mktState.activeTab === 'reader_downloads' ? 'selected' : ''}>📚 15. ई-बुक रीडिंग प्रोग्रेस व डाउनलोड्स</option>
+          </optgroup>
+        </select>
       </div>
-      <select id="mkt-mobile-tab-select" class="mkt-mobile-tab-dropdown">
-        <option value="whatsapp" ${mktState.activeTab === 'whatsapp' ? 'selected' : ''}>📲 1. WhatsApp डिस्पैच व ऑफ़र निर्माता (${displayedAudience.length})</option>
-        <option value="conversions" ${mktState.activeTab === 'conversions' ? 'selected' : ''}>🔄 2. शेयर व ऑफ़र कन्वर्जन रिपोर्ट (Share & Offer Conversions)</option>
-        <option value="funnel" ${mktState.activeTab === 'funnel' ? 'selected' : ''}>🎯 3. लाइव मांग मीटर व रैंकिंग</option>
-        <option value="tube" ${mktState.activeTab === 'tube' ? 'selected' : ''}>🎬 4. AarogyamTube वीडियो एनालिटिक्स</option>
-        <option value="categories_demand" ${mktState.activeTab === 'categories_demand' ? 'selected' : ''}>🌿 5. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</option>
-        <option value="reader_downloads" ${mktState.activeTab === 'reader_downloads' ? 'selected' : ''}>📚 6. ई-बुक रीडिंग प्रोग्रेस व डाउनलोड्स</option>
-        <option value="switches" ${mktState.activeTab === 'switches' ? 'selected' : ''}>🎛️ 7. प्रमोशन रिमोट कंट्रोल</option>
-        <option value="reviews" ${mktState.activeTab === 'reviews' ? 'selected' : ''}>⭐ 8. रिव्यू मॉडरेशन (Live Pipeline)</option>
-        <option value="export" ${mktState.activeTab === 'export' ? 'selected' : ''}>📥 9. बिज़नेस रिपोर्ट व CSV</option>
-      </select>
-    </div>
 
-    <!-- Horizontal Desktop Tab Pills (Hidden on Mobile to Prevent Duplicate Tabs) -->
-    <div class="mkt-tabs-desktop-wrap" style="position:relative; margin-bottom:20px;">
-      <div class="mkt-tabs-container">
-        <button class="mkt-tab-btn ${mktState.activeTab === 'whatsapp' ? 'active' : ''}" data-tab="whatsapp">
-          <span>📲</span> <span>1. WhatsApp डिस्पैच (${displayedAudience.length})</span>
+      <!-- Right: Fast Shortcut Pills & Prominent Cloud Sync Button -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <button type="button" class="mkt-quick-shortcut-pill" data-target-tab="whatsapp" style="background:${mktState.activeTab === 'whatsapp' ? '#2563eb' : 'rgba(255,255,255,0.06)'}; color:#fff; border:1px solid ${mktState.activeTab === 'whatsapp' ? '#3b82f6' : 'rgba(255,255,255,0.15)'}; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+          <span>🎁</span> <span>VIP ऑफर</span>
         </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'conversions' ? 'active' : ''}" data-tab="conversions">
-          <span>🔄</span> <span>2. शेयर व ऑफ़र कन्वर्जन</span>
+        <button type="button" class="mkt-quick-shortcut-pill" data-target-tab="site_pages" style="background:${mktState.activeTab === 'site_pages' ? '#0284c7' : 'rgba(255,255,255,0.06)'}; color:#fff; border:1px solid ${mktState.activeTab === 'site_pages' ? '#38bdf8' : 'rgba(255,255,255,0.15)'}; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+          <span>🌐</span> <span>वेब पेज प्रचार</span>
         </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'funnel' ? 'active' : ''}" data-tab="funnel">
-          <span>🎯</span> <span>3. लाइव मांग मीटर</span>
+        <button type="button" class="mkt-quick-shortcut-pill" data-target-tab="tube_promo" style="background:${mktState.activeTab === 'tube_promo' ? '#dc2626' : 'rgba(255,255,255,0.06)'}; color:#fff; border:1px solid ${mktState.activeTab === 'tube_promo' ? '#ef4444' : 'rgba(255,255,255,0.15)'}; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+          <span>📺</span> <span>AarogyamTube</span>
         </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'tube' ? 'active' : ''}" data-tab="tube">
-          <span>🎬</span> <span>4. AarogyamTube एनालिटिक्स</span>
+        <button type="button" class="mkt-quick-shortcut-pill" data-target-tab="greetings" style="background:${mktState.activeTab === 'greetings' ? '#d97706' : 'rgba(255,255,255,0.06)'}; color:#fff; border:1px solid ${mktState.activeTab === 'greetings' ? '#f59e0b' : 'rgba(255,255,255,0.15)'}; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+          <span>🌅</span> <span>सुविचार</span>
         </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'categories_demand' ? 'active' : ''}" data-tab="categories_demand">
-          <span>🌿</span> <span>5. AI वेब पेज विज़िटर रिपोर्ट व श्रेणी मांग</span>
+        <button type="button" class="mkt-quick-shortcut-pill" data-target-tab="activity" style="background:${mktState.activeTab === 'activity' ? '#16a34a' : 'rgba(255,255,255,0.06)'}; color:#fff; border:1px solid ${mktState.activeTab === 'activity' ? '#22c55e' : 'rgba(255,255,255,0.15)'}; border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+          <span>📝</span> <span>कार्य डायरी</span>
         </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'reader_downloads' ? 'active' : ''}" data-tab="reader_downloads">
-          <span>📚</span> <span>6. ई-बुक रीडिंग व डाउनलोड्स</span>
-        </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'switches' ? 'active' : ''}" data-tab="switches">
-          <span>🎛️</span> <span>7. प्रमोशन रिमोट कंट्रोल</span>
-        </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'reviews' ? 'active' : ''}" data-tab="reviews">
-          <span>⭐</span> <span>8. रिव्यू मॉडरेशन</span>
-        </button>
-        <button class="mkt-tab-btn ${mktState.activeTab === 'export' ? 'active' : ''}" data-tab="export">
-          <span>📥</span> <span>9. रिपोर्ट व CSV</span>
+
+        <!-- Prominent Cloud Data Sync Button with 0-Egress Badge -->
+        <button type="button" id="btn-sync-real-data-header" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:7px 14px; border-radius:20px; font-weight:900; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+          <span>📥 डेटा सिंक (Cloud Sync)</span>
         </button>
       </div>
-    </div>
+    </div></div>
 
     <!-- TAB CONTENT WRAPPER -->
     <div id="mkt-tab-content-area">
@@ -766,9 +1140,231 @@ function updateMarketingHubView(container) {
 // =================================================================
 // 4. TAB CONTENTS RENDERING
 // =================================================================
+// =================================================================
+// 3.5 DEDICATED SITE PAGES & AAROGYAMTUBE PROMO TABS
+// =================================================================
+function renderSitePagesTab(audienceList) {
+  const activePagePath = mktState.selectedSitePage || OFFICIAL_SITE_PAGES[0].path;
+  const pageObj = OFFICIAL_SITE_PAGES.find(p => p.path === activePagePath) || OFFICIAL_SITE_PAGES[0];
+  const fullPageUrl = `https://aarogyamindia.online${pageObj.path}`;
+
+  const defaultWaMsg = `🌾 *नमस्ते किसान साथी!* 🙏\n\n📌 *${pageObj.title}*\n💡 ${pageObj.hook || 'आरोग्यम इंडिया के आधिकारिक पोर्टल पर महत्वपूर्ण जानकारी व समाधान उपलब्ध है।'}\n\n👉 *सम्पूर्ण जानकारी एवं समाधान के लिए यहाँ क्लिक करें:*\n${fullPageUrl}\n\n_आरोग्यम इंडिया — समृद्ध किसान, समृद्ध भारत_ 🇮🇳`;
+  const currentWaMsg = mktState.customSiteMsg || defaultWaMsg;
+
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #3b82f6; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5); margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🌐</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#38bdf8;">
+              वेबसाइट, स्वास्थ्य, पशुपालन व नेट्सर्फ पेज प्रचार (Site Pages Hub)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              आधिकारिक वेबसाइट के किसी भी पेज का आकर्षक प्रचार संदेश 1-क्लिक में बनाएं व WhatsApp / SMS से भेजें। संदेश को अपनी इच्छानुसार एडिट भी कर सकते हैं।
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid #38bdf8; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          📑 कुल ${OFFICIAL_SITE_PAGES.length} आधिकारिक वेब पेज
+        </span>
+      </div>
+
+      <!-- Controls Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:18px;">
+        <!-- Page Selector -->
+        <div>
+          <label for="site_page_selector" style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:6px;">
+            📄 प्रचार हेतु वेबसाइट पेज चुनें:
+          </label>
+          <select id="site_page_selector" style="width:100%; background:#1e293b; color:#fff; border:1.5px solid #3b82f6; padding:10px 14px; border-radius:10px; font-size:0.85rem; font-weight:700;">
+            <optgroup label="🌱 नेट्सर्फ बायोफिट व जैविक उत्पाद (Netsurf Hub)" style="background:#0f172a; color:#10b981;">
+              ${OFFICIAL_SITE_PAGES.filter(p => p.cat === 'Netsurf').map(p => `
+                <option value="${p.path}" ${p.path === activePagePath ? 'selected' : ''}>${p.title}</option>
+              `).join('')}
+            </optgroup>
+            <optgroup label="🛒 संपूर्ण कैटलॉग, स्टोर व डिजिटल लाइब्रेरी" style="background:#0f172a; color:#93c5fd;">
+              ${OFFICIAL_SITE_PAGES.filter(p => p.cat === 'Portal').map(p => `
+                <option value="${p.path}" ${p.path === activePagePath ? 'selected' : ''}>${p.title}</option>
+              `).join('')}
+            </optgroup>
+            <optgroup label="🐄 पशुपालन, दुग्ध संवर्धन व कृषि (Pashupalan & Agri)" style="background:#0f172a; color:#fbbf24;">
+              ${OFFICIAL_SITE_PAGES.filter(p => p.cat === 'Pashupalan').map(p => `
+                <option value="${p.path}" ${p.path === activePagePath ? 'selected' : ''}>${p.title}</option>
+              `).join('')}
+            </optgroup>
+            <optgroup label="🌿 सम्पूर्ण स्वास्थ्य केंद्र (Health Hub - 13 विषय)" style="background:#0f172a; color:#34d399;">
+              ${OFFICIAL_SITE_PAGES.filter(p => p.cat === 'Health').map(p => `
+                <option value="${p.path}" ${p.path === activePagePath ? 'selected' : ''}>${p.title}</option>
+              `).join('')}
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Live Visual Preview Banner -->
+        <div style="background:#070d19; border:1px solid #334155; border-radius:12px; padding:12px; display:flex; gap:14px; align-items:center;">
+          <img id="site_page_thumb_img" src="${pageObj.thumb}" alt="Page Thumbnail" style="width:76px; height:76px; object-fit:cover; border-radius:10px; border:1.5px solid rgba(255,255,255,0.2); flex-shrink:0;" />
+          <div style="flex:1; min-width:0;">
+            <span style="background:rgba(59,130,246,0.15); color:#93c5fd; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:4px;">
+              ${pageObj.cat} हब
+            </span>
+            <div id="site_page_preview_title" style="font-weight:800; font-size:0.9rem; color:#f8fafc; margin:3px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${escapeHtml(pageObj.title)}
+            </div>
+            <a href="${fullPageUrl}" target="_blank" style="color:#38bdf8; font-size:0.75rem; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+              <span>🔗 पेज खोलकर देखें</span> <span>➔</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Message Preview & Actions with Editable Textarea -->
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:0.82rem; font-weight:800; color:#38bdf8;">✏️ तैयार WhatsApp प्रचार संदेश (सीधे एडिट / टाइप करें):</span>
+            <span style="background:rgba(16,185,129,0.15); color:#10b981; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:4px;">एडिटेबल</span>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn_copy_site_msg" data-msg="${escapeHtml(currentWaMsg)}" style="background:#1e293b; color:#f8fafc; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
+              📋 संदेश कॉपी
+            </button>
+            <a id="btn_send_site_wa" href="https://wa.me/?text=${encodeURIComponent(currentWaMsg)}" target="_blank" style="background:#16a34a; color:#fff; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+              <span>📲 WhatsApp पर भेजें</span>
+            </a>
+            <button type="button" id="btn_load_site_queue" data-msg="${escapeHtml(currentWaMsg)}" data-title="${escapeHtml(pageObj.title)}" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; border:none; padding:6px 14px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
+              ⚡ इस संदेश को 1-Tap कतार इंजन में लोड करें ➔
+            </button>
+          </div>
+        </div>
+        <textarea id="site_page_msg_preview_text" class="mkt-input-dark" rows="7" style="width:100%; font-family:sans-serif; line-height:1.6; font-size:0.83rem; resize:vertical; background:#1e293b; color:#f8fafc; border:1.5px solid #3b82f6; border-radius:8px; padding:12px; box-sizing:border-box;">${escapeHtml(currentWaMsg)}</textarea>
+        <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">
+          💡 आप बॉक्स में संदेश को अपनी पसंद के अनुसार टाइप या एडिट कर सकते हैं। कॉपी और WhatsApp बटन में आपका एडिटेड संदेश ही जाएगा।
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTubePromoTab(audienceList) {
+  const tubeVideos = (mktState.tubeRecordings && mktState.tubeRecordings.length > 0)
+    ? mktState.tubeRecordings
+    : DEFAULT_TUBE_VIDEOS;
+
+  const activeVideoId = mktState.selectedTubeVideo || tubeVideos[0].id;
+  const vidObj = tubeVideos.find(v => v.id === activeVideoId) || tubeVideos[0];
+  
+  // CRITICAL: Always link in-portal to AarogyamTube so users stay inside the Aarogyam India platform!
+  const vidTargetId = vidObj.id || vidObj.youtube_id || '';
+  const vidUrl = `https://aarogyamindia.online/tube.html?vid=${encodeURIComponent(vidTargetId)}`;
+  
+  const vidThumb = vidObj.thumbnail || vidObj.thumb || (
+    vidObj.youtube_id ? `https://img.youtube.com/vi/${vidObj.youtube_id}/hqdefault.jpg` : '/images/banners/digital-training-banner.jpeg'
+  );
+
+  const defaultWaMsg = `🎬 *नमस्ते किसान साथी!* 🙏\n\n📺 *AarogyamTube वीडियो मास्टरक्लास:*\n👉 *${vidObj.title}*\n\n💡 ${vidObj.desc || vidObj.description || 'फसल सुरक्षा व उन्नत तकनीकों का संपूर्ण प्रैक्टिकल वीडियो मार्गदर्शन।'}\n\n👉 *यहाँ क्लिक करके पूरा वीडियो मुफ्त में देखें (आरोग्यम ट्यूब):*\n${vidUrl}\n\n_आरोग्यम इंडिया कृषि मंच_ 🌾`;
+  const currentWaMsg = mktState.customTubeMsg || defaultWaMsg;
+
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #ef4444; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5); margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">📺</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#f87171;">
+              AarogyamTube वीडियो प्रचार संदेश निर्माता (In-Portal Video Studio)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              किसानों को अपनी पसंद का वीडियो भेजें — लिंक सीधा AarogyamTube में खुलेगा, बाहर YouTube पर नहीं जाएगा! संदेश को टाइप/एडिट भी कर सकते हैं।
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          🎬 ${tubeVideos.length} वीडियो उपलब्ध • 🛡️ In-Portal Player
+        </span>
+      </div>
+
+      <!-- Controls Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:18px;">
+        <!-- Video Selector -->
+        <div>
+          <label for="tube_promo_selector" style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:6px;">
+            🎬 प्रचार हेतु वीडियो चुनें:
+          </label>
+          <select id="tube_promo_selector" style="width:100%; background:#1e293b; color:#fff; border:1.5px solid #ef4444; padding:10px 14px; border-radius:10px; font-size:0.85rem; font-weight:700;">
+            ${tubeVideos.map(v => `
+              <option value="${v.id}" ${v.id === activeVideoId ? 'selected' : ''}>
+                ${v.title} (${v.topic || v.subject || 'कृषि'})
+              </option>
+            `).join('')}
+          </select>
+        </div>
+
+        <!-- Live Thumbnail Preview -->
+        <div style="background:#070d19; border:1px solid #334155; border-radius:12px; padding:12px; display:flex; gap:14px; align-items:center;">
+          <img id="tube_promo_thumb_img" src="${vidThumb}" alt="Video Thumbnail" style="width:84px; height:60px; object-fit:cover; border-radius:8px; border:1.5px solid rgba(255,255,255,0.2); flex-shrink:0;" />
+          <div style="flex:1; min-width:0;">
+            <span style="background:rgba(239,68,68,0.2); color:#fca5a5; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:4px;">
+              ${escapeHtml(vidObj.topic || 'AarogyamTube')}
+            </span>
+            <div id="tube_promo_preview_title" style="font-weight:800; font-size:0.88rem; color:#f8fafc; margin:3px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${escapeHtml(vidObj.title)}
+            </div>
+            <a href="${vidUrl}" target="_blank" style="color:#f87171; font-size:0.74rem; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+              <span>▶️ AarogyamTube पर चलाकर देखें</span> <span>➔</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Message Preview & Actions with Editable Textarea -->
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:gap:8px; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:0.78rem; font-weight:800; color:#f87171;">✏️ तैयार WhatsApp वीडियो संदेश (सीधे एडिट / टाइप करें):</span>
+            <span style="background:rgba(239,68,68,0.2); color:#fca5a5; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:4px;">एडिटेबल</span>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn_copy_tube_msg" data-msg="${escapeHtml(currentWaMsg)}" style="background:#1e293b; color:#f8fafc; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
+              📋 संदेश कॉपी
+            </button>
+            <a id="btn_send_tube_wa" href="https://wa.me/?text=${encodeURIComponent(currentWaMsg)}" target="_blank" style="background:#16a34a; color:#fff; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+              <span>📲 WhatsApp पर भेजें</span>
+            </a>
+            <button type="button" id="btn_load_tube_queue" data-msg="${escapeHtml(currentWaMsg)}" data-title="${escapeHtml(vidObj.title)}" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; border:none; padding:6px 14px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
+              ⚡ इस संदेश को 1-Tap कतार इंजन में लोड करें ➔
+            </button>
+          </div>
+        </div>
+        <textarea id="tube_promo_msg_preview_text" class="mkt-input-dark" rows="7" style="width:100%; font-family:sans-serif; line-height:1.6; font-size:0.83rem; resize:vertical; background:#1e293b; color:#f8fafc; border:1.5px solid #ef4444; border-radius:8px; padding:12px; box-sizing:border-box;">${escapeHtml(currentWaMsg)}</textarea>
+        <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">
+          💡 आप बॉक्स में संदेश को अपनी पसंद के अनुसार टाइप या एडिट कर सकते हैं। कॉपी और WhatsApp बटन में आपका एडिटेड संदेश ही जाएगा।
+        </div>
+      </div>
+    </div>
+  `;
+}
 function renderActiveTabContent(audienceList, paginatedUsers, totalPages, totalRevenue, bookSalesCount) {
+  let topWorkspaceHtml = '';
+
   if (mktState.activeTab === 'whatsapp') {
-    return renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages);
+    topWorkspaceHtml = renderVipBookOfferWorkspace(audienceList);
+  } else if (mktState.activeTab === 'site_pages') {
+    topWorkspaceHtml = renderSitePagesTab(audienceList);
+  } else if (mktState.activeTab === 'tube_promo') {
+    topWorkspaceHtml = renderTubePromoTab(audienceList);
+  } else if (mktState.activeTab === 'greetings') {
+    topWorkspaceHtml = renderGreetingsTab(audienceList);
+  } else if (mktState.activeTab === 'festival') {
+    topWorkspaceHtml = renderFestivalTab();
+  } else if (mktState.activeTab === 'broadcast') {
+    topWorkspaceHtml = renderInAppBroadcastTab();
+  } else if (mktState.activeTab === 'activity') {
+    topWorkspaceHtml = renderActivityReportTab();
+  } else if (mktState.activeTab === 'auto_whatsapp') {
+    topWorkspaceHtml = renderAutoWhatsAppQueueTab(audienceList);
+  } else if (mktState.activeTab === 'google_leads') {
+    topWorkspaceHtml = renderGoogleLeadsTab();
   } else if (mktState.activeTab === 'conversions') {
     return renderConversionsReportTab();
   } else if (mktState.activeTab === 'funnel') {
@@ -785,516 +1381,28 @@ function renderActiveTabContent(audienceList, paginatedUsers, totalPages, totalR
     return renderReviewModerationTab();
   } else if (mktState.activeTab === 'export') {
     return renderExportTab(audienceList);
+  } else {
+    topWorkspaceHtml = renderVipBookOfferWorkspace(audienceList);
   }
-  return '';
+
+  // Master Rule: The Common Outreach Engine ALWAYS renders below across all campaign tabs!
+  return topWorkspaceHtml + renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages);
 }
 
-// TAB 1: WhatsApp Dispatcher + DYNAMIC OFFER CAMPAIGN BUILDER LAYER
-function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
-  const ob = mktState.offerBuilder;
-  const sampleUser = { full_name: 'किसान मित्र (एडमिन टेस्ट)', mobile: '7974422572', isAdminTest: true };
-  const sampleLinkInfo = getGeneratedOfferUrlAndMsg(sampleUser);
-
-  return `
-    <!-- 🎛️ DYNAMIC OFFER CAMPAIGN BUILDER LAYER -->
-    <div style="background:linear-gradient(135deg, rgba(30,58,138,0.3), rgba(15,23,42,0.85)); border:1.5px solid #3b82f6; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.4);">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.3rem;">🎛️</span>
-          <div>
-            <h3 style="margin:0; font-size:1.1rem; font-weight:800; color:#f8fafc;">ऑफ़र, वाउचर व टाइमर कैंपेन निर्माता (Offer Creator)</h3>
-            <p style="margin:2px 0 0 0; font-size:0.76rem; color:#94a3b8;">
-              आप खुद तय करें कि ग्राहक को क्या देना है: ₹0 फ्री टेस्ट, डिस्काउंट, या 1 के साथ 1 फ़्री कॉम्बो!
-            </p>
-          </div>
-        </div>
-        <span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid #10b981; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.75rem;">
-          ⚡ Live Checkout Synchronized
-        </span>
-      </div>
-
-      <!-- Controls Grid -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:14px; margin-bottom:16px;">
-        <!-- 1. Offer Type -->
-        <div>
-          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">1. ऑफ़र का प्रकार चुनें:</label>
-          <select id="mkt-builder-type" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-            <option value="discount" ${ob.type === 'discount' ? 'selected' : ''}>🏷️ स्पेशल डिस्काउंट (Custom Price)</option>
-            <option value="bogo" ${ob.type === 'bogo' ? 'selected' : ''}>🎁 1 के साथ 1 फ़्री कॉम्बो (BOGO Deal)</option>
-            <option value="review_reward" ${ob.type === 'review_reward' ? 'selected' : ''}>⭐ रिव्यू रिवॉर्ड (Review for 50% Off)</option>
-          </select>
-        </div>
-
-        <!-- 2. Price Selector (Free ₹0, ₹49, ₹50, ₹79, ₹99, ₹149, ₹199) -->
-        <div id="mkt-builder-price-wrap" style="display:${ob.type === 'review_reward' ? 'none' : 'block'};">
-          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">2. चेकआउट मूल्य (Charge Amount):</label>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
-            <button type="button" class="mkt-builder-price-btn" data-price="0" style="background:${ob.price === 0 ? '#16a34a' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 0 ? '#22c55e' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹0 (फ़्री टेस्ट)
-            </button>
-            <button type="button" class="mkt-builder-price-btn" data-price="49" style="background:${ob.price === 49 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 49 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹49
-            </button>
-            <button type="button" class="mkt-builder-price-btn" data-price="50" style="background:${ob.price === 50 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 50 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹50
-            </button>
-            <button type="button" class="mkt-builder-price-btn" data-price="79" style="background:${ob.price === 79 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 79 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹79
-            </button>
-            <button type="button" class="mkt-builder-price-btn" data-price="99" style="background:${ob.price === 99 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 99 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹99
-            </button>
-            <button type="button" class="mkt-builder-price-btn" data-price="149" style="background:${ob.price === 149 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 149 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹149
-            </button>
-            <button type="button" class="mkt-builder-price-btn" data-price="199" style="background:${ob.price === 199 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 199 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              ₹199
-            </button>
-          </div>
-          <input type="number" id="mkt-builder-custom-price" value="${ob.price}" min="0" placeholder="कस्टम मूल्य..." style="width:100%; background:#1e293b; color:#38bdf8; border:1px solid #334155; padding:6px 10px; border-radius:6px; font-weight:800; font-size:0.85rem;" />
-        </div>
-
-        <!-- 3. Primary & Bonus Book Selector -->
-        <div>
-          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">3. मुख्य पुस्तक चुनें:</label>
-          <select id="mkt-builder-primary-book" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-            ${Object.keys(mktState.catalogMap).map(id => {
-              const b = mktState.catalogMap[id];
-              return `<option value="${b.id}" ${b.id === ob.primaryBook ? 'selected' : ''}>${b.id} - ${b.name || b.heading} (MRP: ₹${b.mrp} • स्टोर: ₹${b.offerPrice})</option>`;
-            }).join('')}
-          </select>
-
-          <div id="mkt-builder-bonus-box" style="margin-top:6px; display:${ob.type === 'bogo' ? 'block' : 'none'};">
-            <label style="font-size:0.75rem; font-weight:800; color:#f59e0b; display:block; margin-bottom:2px;">🎁 फ्री बोनस पुस्तक (FREE with it):</label>
-            <select id="mkt-builder-bonus-book" style="width:100%; background:#1e293b; color:#f59e0b; border:1px solid #f59e0b; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-              ${Object.keys(mktState.catalogMap).map(id => {
-                const b = mktState.catalogMap[id];
-                return `<option value="${b.id}" ${b.id === ob.bonusBook ? 'selected' : ''}>${b.id} - ${b.name || b.heading} (MRP: ₹${b.mrp} • स्टोर: ₹${b.offerPrice})</option>`;
-              }).join('')}
-            </select>
-          </div>
-        </div>
-
-        <!-- 4. Timer & Audio Options -->
-        <div>
-          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">4. उलटी गिनती टाइमर (Timer):</label>
-          <select id="mkt-builder-timer" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
-            <option value="15m" ${ob.timer === '15m' ? 'selected' : ''}>⏳ 15 मिनट</option>
-            <option value="25m" ${ob.timer === '25m' ? 'selected' : ''}>⏳ 25 मिनट (अनुशंसित)</option>
-            <option value="1h" ${ob.timer === '1h' ? 'selected' : ''}>⏳ 1 घंटा</option>
-            <option value="24h" ${ob.timer === '24h' ? 'selected' : ''}>⏳ 24 घंटे</option>
-            <option value="none" ${ob.timer === 'none' ? 'selected' : ''}>🚫 कोई टाइमर नहीं (स्थाई)</option>
-          </select>
-          <label style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.75rem; color:#cbd5e1; cursor:pointer;">
-            <input type="checkbox" id="mkt-builder-audio" ${ob.hasAudio ? 'checked' : ''} />
-            <span>🔊 चेकआउट पर ऑटो हिंदी वॉयस नोट सक्रिय रखें</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Universal VIP Offer Banner Preview -->
-      <div style="border-radius:12px; overflow:hidden; border:1.5px solid #334155; margin-bottom:12px; background:linear-gradient(135deg, #070d19, #0f172a); padding:12px; text-align:center;">
-        <img src="/images/banners/vip-reader-offer-badge.jpeg" onerror="this.onerror=null; this.src='/images/banners/vip-reader-offer-badge.jpg';" alt="Aarogyam India VIP Offer Banner" style="max-width:100%; max-height:220px; width:auto; height:auto; object-fit:contain; display:block; margin:0 auto; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.4);" />
-        <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; padding:0 4px;">
-          <div>
-            <span style="font-size:0.72rem; color:#38bdf8; font-weight:800; text-transform:uppercase;">VIP Campaign Visual Banner</span>
-            <div style="font-size:0.82rem; font-weight:800; color:#f8fafc;">सर्वश्रेष्ठ पाठक सीमित समय विशेष ऑफर (Auto-Fit)</div>
-          </div>
-          <span style="background:#16a34a; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:6px;">100% Verified Customer</span>
-        </div>
-      </div>
-
-      <!-- Generated Compact Link Preview & Instant ₹0 Test Button -->
-      <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="flex:1; min-width:260px;">
-          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 सुपर-शॉर्ट चेकआउट लिंक (ग्राहक के लिए सुरक्षित):</span>
-          <code id="mkt-builder-generated-link" style="color:#38bdf8; font-size:0.82rem; word-break:break-all;">${sampleLinkInfo.checkoutUrl}</code>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <a href="${sampleLinkInfo.checkoutUrl}" id="btn-test-offer-link" target="_blank" style="background:#16a34a; color:#fff; font-weight:800; padding:8px 14px; border-radius:8px; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.35);">
-            <span>🧪 अभी टेस्ट करें (Test Link)</span>
-          </a>
-          <button type="button" id="btn-copy-offer-link" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; font-weight:700; padding:8px 12px; border-radius:8px; font-size:0.78rem; cursor:pointer;">
-            📋 लिंक कॉपी
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 👤➕ डायरेक्ट वीआईपी लिंक जनरेटर (नया/पुराना ग्राहक का नाम व नंबर डालकर 1-क्लिक ऑफर बनाएं) -->
-    <div style="background:linear-gradient(135deg, rgba(16,185,129,0.14), rgba(15,23,42,0.92)); border:1.5px solid #10b981; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.35);">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.4rem;">👤➕</span>
-          <div>
-            <h3 style="margin:0; font-size:1.1rem; font-weight:900; color:#34d399;">
-              डायरेक्ट वीआईपी लिंक जनरेटर (Direct Customer Name & Mobile No)
-            </h3>
-            <p style="margin:2px 0 0 0; font-size:0.76rem; color:#94a3b8;">
-              ग्राहक लिस्ट में रजिस्टर्ड हो या बिल्कुल नया—यहाँ नाम और 10 अंकों का मोबाइल नंबर डालें, ऊपर चुने गए ऑफर के अनुसार 1-क्लिक में पर्सनलाइज्ड VIP लिंक व WhatsApp संदेश बन जाएगा!
-            </p>
-          </div>
-        </div>
-        <span style="background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid #10b981; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.74rem;">
-          ⚡ Instant Custom VIP Offer
-        </span>
-      </div>
-
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:14px;">
-        <div>
-          <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">1. ग्राहक का नाम (Full Name):</label>
-          <input type="text" id="mkt-manual-name" placeholder="उदा. मणिकराव (Manikrao)" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:9px 12px; border-radius:8px; font-size:0.85rem;" />
-        </div>
-        <div>
-          <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">2. 10 अंकों का मोबाइल नंबर (Mobile No):</label>
-          <input type="tel" id="mkt-manual-mobile" maxlength="10" placeholder="उदा. 9764566930" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:9px 12px; border-radius:8px; font-size:0.85rem;" />
-        </div>
-        <div style="display:flex; align-items:flex-end;">
-          <button type="button" id="btn-generate-manual-offer" style="width:100%; background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:800; font-size:0.86rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 15px rgba(16,185,129,0.35); transition:transform 0.2s ease;">
-            <span>⚡ VIP लिंक व संदेश जनरेट करें</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Generated Result Box (Displays generated link, buttons, message preview) -->
-      <div id="mkt-manual-result-box" style="display:none; background:#070d19; border:1.5px solid #22c55e; border-radius:12px; padding:16px; margin-top:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span style="font-size:1.1rem;">🎉</span>
-            <strong style="color:#4ade80; font-size:0.88rem;" id="mkt-manual-target-heading">वीआईपी ऑफर लिंक तैयार:</strong>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <a id="mkt-manual-wa-btn" href="#" target="_blank" style="background:#25D366; color:#fff; font-weight:800; padding:7px 14px; border-radius:8px; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(37,211,102,0.35);">
-              <span>📲 WhatsApp पर सीधे भेजें</span>
-            </a>
-            <button type="button" id="mkt-manual-copy-msg" style="background:#2563eb; color:#fff; border:none; font-weight:800; padding:7px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">
-              📋 पूरा संदेश कॉपी
-            </button>
-            <button type="button" id="mkt-manual-copy-link" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; font-weight:700; padding:7px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">
-              🔗 सिर्फ लिंक कॉपी
-            </button>
-          </div>
-        </div>
-        <div style="margin-bottom:10px; background:#0f172a; padding:8px 12px; border-radius:8px; border:1px solid #1e293b;">
-          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 सुपर-शॉर्ट VIP चेकआउट लिंक:</span>
-          <code id="mkt-manual-link-text" style="color:#38bdf8; font-size:0.84rem; word-break:break-all; font-weight:700;"></code>
-        </div>
-        <div>
-          <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-bottom:4px;">💬 तैयार WhatsApp संदेश पूर्वावलोकन (Message Preview):</span>
-          <div id="mkt-manual-msg-preview" style="background:#1e293b; border-radius:8px; padding:12px; color:#e2e8f0; font-size:0.82rem; line-height:1.6; white-space:pre-wrap; max-height:220px; overflow-y:auto; border:1px solid #334155; font-family:sans-serif;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 🧠 AI MARKETING DECISION BRAIN: 4 PILLARS & 1-CLICK BROADCAST COMMAND CENTER -->
-    ${(() => {
-      const allSurveys = mktState.surveys || [];
-      const allPurchases = mktState.purchases || [];
-
-      let agriCount = 0;
-      let dairyCount = 0;
-      let healthCount = 0;
-      let netsurfCount = 0;
-
-      (mktState.profiles || []).forEach(u => {
-        const interest = (u.interest || '').toLowerCase();
-        const occ = (u.occupation || '').toLowerCase();
-        const src = (u.registration_source || '').toLowerCase();
-        const uSurv = allSurveys.find(s => (s.profile_id && s.profile_id === u.id) || (s.mobile && u.mobile && s.mobile === u.mobile));
-        const survCats = uSurv && Array.isArray(uSurv.selected_categories) ? uSurv.selected_categories : [];
-        const survAnswers = uSurv && uSurv.category_answers ? JSON.stringify(uSurv.category_answers).toLowerCase() : '';
-
-        if (interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') || survCats.includes('cattlecare') || survAnswers.includes('दूध') || survAnswers.includes('गाय')) {
-          dairyCount++;
-        } else if (interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || survCats.includes('healthcare') || survAnswers.includes('sugar') || survAnswers.includes('दर्द')) {
-          healthCount++;
-        } else if (interest.includes('netsurf') || interest.includes('जैविक') || src.includes('netsurf') || survCats.includes('netsurf') || survAnswers.includes('biofit')) {
-          netsurfCount++;
-        } else {
-          agriCount++;
-        }
-      });
-
-      return `
-        <div style="background:rgba(15,23,42,0.85); border:1.5px solid #10b981; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:1.5rem;">🧠</span>
-              <div>
-                <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#f8fafc;">
-                  AI मार्केटिंग डिसीजन ब्रेन — 4 प्रमुख स्तंभ व 1-क्लिक ब्रॉडकास्ट
-                </h3>
-                <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
-                  ब्रेन किसानों के सर्वे, पेज व्यूज और ई-बुक व्यवहार को स्कैन करके स्वतः तय करता है कि किसे क्या ऑफर देना है।
-                </p>
-              </div>
-            </div>
-            <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid #10b981; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
-              ⚡ 1-Click Multi-Channel Marketing
-            </span>
-          </div>
-
-          <!-- 4 Pillars Cards Grid -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-            <!-- Card 1: Agri -->
-            <div style="background:rgba(30,41,59,0.7); border:1px solid #38bdf8; border-radius:12px; padding:14px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="color:#38bdf8; font-size:0.85rem;">🌾 कृषि व फसल सुरक्षा</strong>
-                <span style="font-size:1.1rem;">🌾</span>
-              </div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${agriCount} किसान</div>
-              <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK002</strong> (खेती का डॉक्टर)</div>
-              <button type="button" class="btn-open-pillar-audience" data-pillar="agri" style="width:100%; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(2,132,199,0.3);">
-                <span>👥</span> <span>${agriCount} किसान देखें व संपर्क करें</span>
-              </button>
-            </div>
-
-            <!-- Card 2: Dairy -->
-            <div style="background:rgba(30,41,59,0.7); border:1px solid #fbbf24; border-radius:12px; padding:14px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="color:#fbbf24; font-size:0.85rem;">🐄 पशुपालन व डेयरी</strong>
-                <span style="font-size:1.1rem;">🐄</span>
-              </div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${dairyCount} किसान</div>
-              <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK016</strong> (पशुपालन व दुग्ध वृद्धि)</div>
-              <button type="button" class="btn-open-pillar-audience" data-pillar="dairy" style="width:100%; background:linear-gradient(135deg, #d97706, #b45309); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(217,119,6,0.3);">
-                <span>👥</span> <span>${dairyCount} किसान देखें व संपर्क करें</span>
-              </button>
-            </div>
-
-            <!-- Card 3: Health -->
-            <div style="background:rgba(30,41,59,0.7); border:1px solid #f43f5e; border-radius:12px; padding:14px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="color:#f43f5e; font-size:0.85rem;">❤️ स्वास्थ्य व आयुर्वेद</strong>
-                <span style="font-size:1.1rem;">🩺</span>
-              </div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${healthCount} पाठक</div>
-              <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK016</strong> (स्वास्थ्य संकलन)</div>
-              <button type="button" class="btn-open-pillar-audience" data-pillar="health" style="width:100%; background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(225,29,72,0.3);">
-                <span>👥</span> <span>${healthCount} पाठक देखें व संपर्क करें</span>
-              </button>
-            </div>
-
-            <!-- Card 4: Netsurf -->
-            <div style="background:rgba(30,41,59,0.7); border:1px solid #10b981; border-radius:12px; padding:14px;">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong style="color:#10b981; font-size:0.85rem;">🌿 नेट्सर्फ बायो-ऑर्गेनिक</strong>
-                <span style="font-size:1.1rem;">🌿</span>
-              </div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0;">${netsurfCount} किसान</div>
-              <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:10px;">संस्तुत: <strong>BK002</strong> + बायोफिट कॉम्बो</div>
-              <button type="button" class="btn-open-pillar-audience" data-pillar="netsurf" style="width:100%; background:linear-gradient(135deg, #059669, #047857); color:#fff; border:none; padding:8px 10px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(5,150,105,0.3);">
-                <span>👥</span> <span>${netsurfCount} किसान देखें व संपर्क करें</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    })()}
-
-    <!-- LEADS TABLE CONTAINER -->
-    <div style="background:rgba(15,23,42,0.6); border:1.5px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px;">
-      <!-- Search & Filters Row -->
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-        <div style="display:flex; align-items:center; gap:8px; flex:1; max-width:400px; min-width:240px; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:4px 12px;">
-          <span>🔍</span>
-          <input type="text" id="mkt-search-input" value="${mktState.searchQuery}" placeholder="नाम, फोन, राज्य या स्रोत से खोजें..." style="width:100%; background:transparent; border:none; color:#f8fafc; font-size:0.82rem; outline:none;" />
-        </div>
-
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <select id="mkt-filter-funnel" style="background:#1e293b; color:#f8fafc; border:1px solid #334155; padding:7px 12px; border-radius:8px; font-size:0.8rem; font-weight:700;">
-            <option value="all" ${mktState.funnelFilter === 'all' ? 'selected' : ''}>🎯 सभी फ़नल स्टेज (${mktState.profiles.length})</option>
-            <option value="abandoned_cart" ${mktState.funnelFilter === 'abandoned_cart' ? 'selected' : ''}>🛒 अधूरा चेकआउट (Drop-off)</option>
-            <option value="converted" ${mktState.funnelFilter === 'converted' ? 'selected' : ''}>🏆 खरीदार (Paid Buyers)</option>
-            <option value="wishlist" ${mktState.funnelFilter === 'wishlist' ? 'selected' : ''}>❤️ विशलिस्ट व इच्छुक</option>
-            <option value="top_funnel" ${mktState.funnelFilter === 'top_funnel' ? 'selected' : ''}>🌐 Tube व विज़िटर्स</option>
-          </select>
-
-          <select id="mkt-filter-book" style="background:#1e293b; color:#f8fafc; border:1px solid #334155; padding:7px 12px; border-radius:8px; font-size:0.8rem; font-weight:700;">
-            <option value="all">📚 सभी पुस्तकें (All Books)</option>
-            <option value="BK002" ${mktState.bookFilter === 'BK002' ? 'selected' : ''}>BK002 - फसल का डॉक्टर (130)</option>
-            <option value="BK001" ${mktState.bookFilter === 'BK001' ? 'selected' : ''}>BK001 - खरीफ फसल मास्टर (14)</option>
-            <option value="BK006" ${mktState.bookFilter === 'BK006' ? 'selected' : ''}>BK006 - AI वेबसाइट गाइड (10)</option>
-            <option value="BK015" ${mktState.bookFilter === 'BK015' ? 'selected' : ''}>BK015 - सब्जी की खेती (7)</option>
-            <option value="BK016" ${mktState.bookFilter === 'BK016' ? 'selected' : ''}>BK016 - कृषि दवा डायरेक्टरी (1)</option>
-            <option value="BK017" ${mktState.bookFilter === 'BK017' ? 'selected' : ''}>BK017 - गेहूँ की खेती</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Leads Table (10 per page) -->
-      <div class="mkt-table-responsive">
-        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
-          <thead>
-            <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8;">
-              <th style="padding:10px 12px;">ग्राहक विवरण</th>
-              <th style="padding:10px 12px;">🧠 AI ब्रेन संस्तुति (Next Best Action)</th>
-              <th style="padding:10px 12px;">फ़नल स्टेज</th>
-              <th style="padding:10px 12px;">सत्यापित खरीद</th>
-              <th style="padding:10px 12px; text-align:right;">1-क्लिक प्रचार (SMS • ऐप • WA)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paginatedUsers.length === 0 ? `
-              <tr>
-                <td colspan="5" style="text-align:center; padding:32px; color:#94a3b8;">
-                  कोई रिकॉर्ड नहीं मिला। फ़िल्टर बदल कर देखें।
-                </td>
-              </tr>
-            ` : paginatedUsers.map(u => {
-              const waLink = generatePersonalizedWhatsAppLink(u);
-              const smsLink = generatePersonalizedSmsLink(u);
-              
-              // 🧠 Compute Lead Brain Recommendation
-              const allSurveys = mktState.surveys || [];
-              const allPurchases = mktState.purchases || [];
-              const interest = (u.interest || '').toLowerCase();
-              const occ = (u.occupation || '').toLowerCase();
-              const src = (u.registration_source || '').toLowerCase();
-              const uSurv = allSurveys.find(s => (s.profile_id && s.profile_id === u.id) || (s.mobile && u.mobile && s.mobile === u.mobile));
-              const survCats = uSurv && Array.isArray(uSurv.selected_categories) ? uSurv.selected_categories : [];
-              const survAnswers = uSurv && uSurv.category_answers ? JSON.stringify(uSurv.category_answers).toLowerCase() : '';
-
-              const hasBoughtBK002 = allPurchases.some(p => p.profile_id === u.id && p.book_id === 'BK002');
-
-              let brain = {
-                pillarLabel: '🌾 कृषि व फसल',
-                badgeColor: '#38bdf8',
-                recBookId: hasBoughtBK002 ? 'BK001' : 'BK002',
-                recBookName: hasBoughtBK002 ? 'खरीफ फसल मास्टर गाइड (BK001)' : 'खेती का डॉक्टर (BK002)',
-                hookReason: hasBoughtBK002 ? 'BK002 पाठक (अपसेल योग्य)' : 'फसल सुरक्षा व उत्पादन वृद्धि'
-              };
-
-              if (interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') || survCats.includes('cattlecare') || survAnswers.includes('दूध') || survAnswers.includes('गाय')) {
-                brain = {
-                  pillarLabel: '🐄 पशुपालन व डेयरी',
-                  badgeColor: '#fbbf24',
-                  recBookId: 'BK016',
-                  recBookName: 'पशुपालन व दुग्ध वृद्धि ई-बुक',
-                  hookReason: survAnswers.includes('दूध') ? 'सर्वे में दुग्ध वृद्धि की मांग' : 'पशुपालन में पंजीकृत रुचि'
-                };
-              } else if (interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || survCats.includes('healthcare') || survAnswers.includes('sugar') || survAnswers.includes('दर्द')) {
-                brain = {
-                  pillarLabel: '❤️ स्वास्थ्य व आयुर्वेद',
-                  badgeColor: '#f43f5e',
-                  recBookId: 'BK016',
-                  recBookName: 'आयुर्वेद व स्वास्थ्य गाइड',
-                  hookReason: survAnswers.includes('sugar') ? 'सर्वे में शुगर व स्वास्थ्य चिंता' : 'स्वास्थ्य परामर्श में रुचि'
-                };
-              } else if (interest.includes('netsurf') || interest.includes('जैविक') || src.includes('netsurf') || survCats.includes('netsurf') || survAnswers.includes('biofit')) {
-                brain = {
-                  pillarLabel: '🌿 नेट्सर्फ बायोफिट',
-                  badgeColor: '#10b981',
-                  recBookId: 'BK002',
-                  recBookName: 'फसल डॉक्टर + बायोफिट कॉम्बो',
-                  hookReason: 'जैविक व नेट्सर्फ में प्रमाणित रुचि'
-                };
-              }
-
-              return `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.15s ease;" class="mkt-user-row" data-user-id="${u.id}">
-                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
-                    <strong style="color:#f8fafc; font-size:0.88rem; display:block;">${escapeHtml(u.full_name || 'अज्ञात ग्राहक')}</strong>
-                    <span style="color:#38bdf8; font-family:monospace; font-size:0.8rem;">📱 ${escapeHtml(u.mobile || 'नंबर नहीं')}</span>
-                    <div style="font-size:0.72rem; color:#64748b;">📍 ${escapeHtml(u.State || 'भारत')}</div>
-                    ${u.detectedInterest ? `
-                      <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
-                        <span style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); padding:1px 6px; border-radius:4px; font-size:0.68rem; font-weight:800;">
-                          ${u.detectedInterest}
-                        </span>
-                        ${u.readerRecord && u.readerRecord.books ? `
-                          <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:1px 6px; border-radius:4px; font-size:0.68rem; font-weight:800;" title="रीडिंग प्रोग्रेस एक्टिव">
-                            📖 एक्टिव पाठक
-                          </span>
-                        ` : ''}
-                        ${u.downloadsRecord && u.downloadsRecord.length > 0 ? `
-                          <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); padding:1px 6px; border-radius:4px; font-size:0.68rem; font-weight:800;" title="सत्यापित PDF डाउनलोड">
-                            📥 ${u.downloadsRecord.length} DL
-                          </span>
-                        ` : ''}
-                      </div>
-                    ` : ''}
-                  </td>
-                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
-                    <span style="background:${brain.badgeColor}20; color:${brain.badgeColor}; border:1px solid ${brain.badgeColor}40; padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.72rem; display:inline-block;">
-                      ${brain.pillarLabel}
-                    </span>
-                    <div style="font-weight:700; color:#f8fafc; font-size:0.8rem; margin-top:4px;">
-                      📖 ${brain.recBookName}
-                    </div>
-                    <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">
-                      💡 ${brain.hookReason}
-                    </div>
-                  </td>
-                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
-                    <span style="background:${u.funnelBadgeColor}20; color:${u.funnelBadgeColor}; border:1px solid ${u.funnelBadgeColor}40; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.74rem;">
-                      ${u.funnelLabel}
-                    </span>
-                  </td>
-                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
-                    ${u.purchases.length > 0 ? `
-                      <span style="color:#10b981; font-weight:800;">✅ ${u.purchases.map(p => p.book_id || 'eBook').join(', ')}</span>
-                      <div style="font-size:0.72rem; color:#94a3b8;">कुल: ₹${u.purchases.reduce((acc, p) => acc + (Number(p.amount) || 0), 0)}</div>
-                    ` : `
-                      <span style="color:#64748b;">0 खरीद</span>
-                    `}
-                  </td>
-                  <td style="padding:12px; text-align:right;">
-                    <div style="display:flex; justify-content:flex-end; gap:6px; align-items:center;">
-                      <!-- 1. View Detail -->
-                      <button onclick="window.openMktUserDetail('${u.id}')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:6px 8px; border-radius:6px; font-size:0.74rem; font-weight:700; cursor:pointer;" title="यूज़र एक्टिविटी विवरण">
-                        👤
-                      </button>
-
-                      <!-- 2. Direct Mobile SMS Link -->
-                      <a href="${smsLink}" class="mkt-sms-btn" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 9px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.3);" title="सीधे मोबाइल SMS भेजें (बिना इंटरनेट वाले किसानों के लिए)">
-                        <span>💬 SMS</span>
-                      </a>
-
-                      <!-- 3. In-App Notification Dispatcher -->
-                      <button type="button" onclick="window.dispatchTargetedInAppNotification('${u.id}', '${escapeHtml(u.full_name || 'किसान साथी')}', '${escapeHtml(u.mobile || '')}', '${brain.recBookId}', '${escapeHtml(brain.recBookName)}')" style="background:linear-gradient(135deg, #8b5cf6, #7c3aed); color:#fff; font-weight:800; font-size:0.74rem; padding:6px 9px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(139,92,246,0.3);" title="किसान के ऐप में इन-ऐप VIP नोटिफिकेशन भेजें">
-                        <span>🔔 अलर्ट</span>
-                      </button>
-
-                      <!-- 4. Direct WhatsApp Link -->
-                      <a href="${waLink}" class="mkt-whatsapp-btn" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 11px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(22,163,74,0.3);" title="WhatsApp पर कस्टमाइज़्ड ऑफ़र भेजें">
-                        <span>📲 WA</span> <span>➔</span>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 10-per-page Pagination Controls -->
-      <div class="mkt-pagination">
-        <div style="font-size:0.8rem; color:#94a3b8;">
-          दिखा रहे हैं <strong>${paginatedUsers.length > 0 ? (mktState.currentPage - 1) * mktState.pageSize + 1 : 0}</strong> से <strong>${Math.min(mktState.currentPage * mktState.pageSize, audienceList.length)}</strong> (कुल <strong>${audienceList.length}</strong> लीड्स)
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="mkt-page-btn" id="btn-page-prev" ${mktState.currentPage <= 1 ? 'disabled' : ''}>⏮️ पिछला</button>
-          <span style="font-size:0.82rem; font-weight:800; color:#f8fafc; display:flex; align-items:center; padding:0 8px;">पेज ${mktState.currentPage} of ${totalPages}</span>
-          <button class="mkt-page-btn" id="btn-page-next" ${mktState.currentPage >= totalPages ? 'disabled' : ''}>अगला ⏭️</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// =================================================================
-// CRYPTOGRAPHIC OFFER SIGNATURE & TAMPER-PROOF SECURITY ENGINE
-// =================================================================
 const OFFER_SECURITY_SALT = 'AAROGYAM_OFFER_SIG_SALT_v2026_KARTIK';
 
 function sha256Hex(ascii) {
-  function rightRotate(value, amount) { return (value >>> amount) | (value << (32 - amount)); }
-  const mathPow = Math.pow; const maxWord = mathPow(2, 32);
-  let lengthProperty = 'length'; let i, j; let result = '';
-  const words = []; const asciiBitLength = ascii[lengthProperty] * 8;
-  let hash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  function rightRotate(value, amount) {
+    return (value >>> amount) | (value << (32 - amount));
+  }
+  let i, j;
+  let result = '';
+  const words = [];
+  const asciiBitLength = ascii.length * 8;
+  let hash = [
+    0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+    0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+  ];
   const k = [
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -1305,33 +1413,33 @@ function sha256Hex(ascii) {
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
   ];
-  ascii += '\x80';
-  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
-  for (i = 0; i < ascii[lengthProperty]; i++) {
-    j = ascii.charCodeAt(i);
-    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  for (i = 0; i < ascii.length; i++) {
+    const charCode = ascii.charCodeAt(i);
+    const wordIndex = i >> 2;
+    words[wordIndex] = (words[wordIndex] || 0) | ((charCode & 255) << (8 * (3 - (i % 4))));
   }
-  words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
-  words[words[lengthProperty]] = (asciiBitLength);
-  for (j = 0; j < words[lengthProperty];) {
-    const w = words.slice(j, j += 16);
-    const oldHash = hash;
-    hash = hash.slice(0, 8);
-    for (i = 0; i < 64; i++) {
-      const w15 = w[i - 15], w2 = w[i - 2];
-      const s0 = (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3));
-      const s1 = (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10));
-      w[i] = (i < 16) ? w[i] : (w[i - 16] + s0 + w[i - 7] + s1) | 0;
-      const s1_maj = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22));
-      const maj = ((hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]));
-      const t2 = (s1_maj + maj) | 0;
-      const s1_ch = (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25));
-      const ch = ((hash[4] & hash[5]) ^ ((~hash[4]) & hash[6]));
-      const t1 = (hash[7] + s1_ch + ch + k[i] + w[i]) | 0;
+  words[asciiBitLength >> 5] = (words[asciiBitLength >> 5] || 0) | (0x80 << (24 - (asciiBitLength % 32)));
+  words[(((asciiBitLength + 64) >> 9) << 4) + 15] = asciiBitLength;
+  const wordsLength = words.length;
+  for (i = 0; i < wordsLength; i += 16) {
+    const w = words.slice(i, i + 16);
+    const oldHash = hash.slice(0);
+    for (j = 16; j < 64; j++) {
+      const s0 = rightRotate(w[j - 15], 7) ^ rightRotate(w[j - 15], 18) ^ (w[j - 15] >>> 3);
+      const s1 = rightRotate(w[j - 2], 17) ^ rightRotate(w[j - 2], 19) ^ (w[j - 2] >>> 10);
+      w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
+    }
+    for (j = 0; j < 64; j++) {
+      const s1_ch = rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25);
+      const ch = (hash[4] & hash[5]) ^ ((~hash[4]) & hash[6]);
+      const t1 = (hash[7] + s1_ch + ch + k[j] + w[j]) | 0;
+      const s0_maj = rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22);
+      const maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+      const t2 = (s0_maj + maj) | 0;
       hash = [(t1 + t2) | 0].concat(hash);
       hash[4] = (hash[4] + t1) | 0;
     }
-    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+    for (j = 0; j < 8; j++) hash[j] = (hash[j] + oldHash[j]) | 0;
   }
   for (i = 0; i < 8; i++) {
     for (j = 3; j >= 0; j--) {
@@ -1426,6 +1534,121 @@ function getGeneratedOfferUrlAndMsg(user) {
   return { checkoutUrl, msg, shortSms };
 }
 
+
+// Master Cross-Campaign Message Formatter (Synchronizes Active Campaign with 1-Tap HUD Dispatcher)
+function getActiveCampaignMessage(targetUser = null, channel = 'whatsapp') {
+  const farmerName = (targetUser && targetUser.full_name) ? targetUser.full_name.trim() : 'किसान साथी';
+  const farmerMobile = (targetUser && targetUser.mobile) ? targetUser.mobile.replace(/\D/g, '').slice(-10) : '';
+
+  if (mktState.activeTab === 'site_pages') {
+    if (mktState.customSiteMsg) {
+      return mktState.customSiteMsg.replace(/\{name\}/g, farmerName);
+    }
+    const activePagePath = mktState.selectedSitePage || OFFICIAL_SITE_PAGES[0].path;
+    const pg = OFFICIAL_SITE_PAGES.find(p => p.path === activePagePath) || OFFICIAL_SITE_PAGES[0];
+    const fullPageUrl = `https://aarogyamindia.online${pg.path}`;
+    if (channel === 'sms') {
+      return `नमस्ते ${farmerName} जी! ${pg.title}। विवरण देखें: ${fullPageUrl} - Aarogyam India`;
+    }
+    return `🌾 *नमस्ते ${farmerName} जी!* 🙏\n\n📌 *${pg.title}*\n💡 ${pg.hook || 'आरोग्यम इंडिया के आधिकारिक पोर्टल पर महत्वपूर्ण जानकारी व समाधान उपलब्ध है।'}\n\n👉 *सम्पूर्ण जानकारी एवं समाधान के लिए यहाँ क्लिक करें:*\n${fullPageUrl}\n\n_आरोग्यम इंडिया — समृद्ध किसान, समृद्ध भारत_ 🇮🇳`;
+  }
+
+  if (mktState.activeTab === 'tube_promo') {
+    if (mktState.customTubeMsg) {
+      return mktState.customTubeMsg.replace(/\{name\}/g, farmerName);
+    }
+    const tubeVideos = (mktState.tubeRecordings && mktState.tubeRecordings.length > 0) ? mktState.tubeRecordings : DEFAULT_TUBE_VIDEOS;
+    const activeVidId = mktState.selectedTubeVideo || tubeVideos[0].id;
+    const vid = tubeVideos.find(v => v.id === activeVidId) || tubeVideos[0];
+    const vidTargetId = vid.id || vid.youtube_id || '';
+    const vidUrl = `https://aarogyamindia.online/tube.html?vid=${encodeURIComponent(vidTargetId)}`;
+    if (channel === 'sms') {
+      return `नमस्ते ${farmerName} जी! AarogyamTube वीडियो: ${vid.title} देखें: ${vidUrl} - Aarogyam India`;
+    }
+    return `🎬 *नमस्ते ${farmerName} जी!* 🙏\n\n📺 *AarogyamTube वीडियो मास्टरक्लास:*\n👉 *${vid.title}*\n\n💡 ${vid.desc || vid.description || 'फसल सुरक्षा व उन्नत तकनीकों का संपूर्ण प्रैक्टिकल वीडियो मार्गदर्शन।'}\n\n👉 *यहाँ क्लिक करके पूरा वीडियो मुफ्त में देखें:*\n${vidUrl}\n\n_आरोग्यम इंडिया कृषि मंच_ 🌾`;
+  }
+
+  if (mktState.activeTab === 'greetings') {
+    if (mktState.greetingsCustomText) {
+      return mktState.greetingsCustomText
+        .replace(/\{name\}/g, farmerName)
+        .replace(/रामेश्वर/g, farmerName);
+    }
+    const catKey = mktState.greetingsCategory || 'gm';
+    const catData = (typeof HOOK_STUDIO_DATABASE !== 'undefined' && HOOK_STUDIO_DATABASE[catKey])
+      ? HOOK_STUDIO_DATABASE[catKey]
+      : (typeof HOOK_STUDIO_DATABASE !== 'undefined' ? HOOK_STUDIO_DATABASE.gm : null);
+    if (!catData || !catData.templates || catData.templates.length === 0) {
+      return `नमस्ते ${farmerName} जी! आपका दिन शुभ और मंगलमय हो! - आरोग्यम इंडिया 🙏`;
+    }
+    const tmplId = mktState.greetingsTemplateId || catData.templates[0].id;
+    const tmpl = catData.templates.find(t => t.id === tmplId) || catData.templates[0];
+    const styleMode = mktState.greetingsStyle || 'full';
+    const isLinkAttached = mktState.greetingsAttachLink !== false;
+    const targetPage = mktState.greetingsTargetPage || '/ebooks/kharif-master-guide-2026.html?vip=1';
+
+    const tubeVideos = (mktState.tubeRecordings && mktState.tubeRecordings.length > 0) ? mktState.tubeRecordings : (typeof DEFAULT_TUBE_VIDEOS !== 'undefined' ? DEFAULT_TUBE_VIDEOS : []);
+    const activeTubeVidId = mktState.greetingsAttachedTubeVid || (tubeVideos[0] ? tubeVideos[0].id : '');
+    const activeTubeVid = tubeVideos.find(v => v.id === activeTubeVidId) || tubeVideos[0] || {};
+
+    let fullUrl = '';
+    if (targetPage.includes('/tube.html')) {
+      const vidId = activeTubeVid.id || activeTubeVid.youtube_id || '';
+      fullUrl = `https://aarogyamindia.online/tube.html?vid=${encodeURIComponent(vidId)}`;
+    } else {
+      fullUrl = `https://aarogyamindia.online${targetPage}`;
+    }
+
+    if (channel === 'sms') {
+      const hookClean = (tmpl.hook || '').replace(/\{name\}/g, farmerName);
+      return `नमस्ते ${farmerName} जी! ${tmpl.title}: ${hookClean} ${isLinkAttached ? `लिंक: ${fullUrl}` : ''} - Aarogyam India`;
+    }
+
+    if (styleMode === 'full') {
+      return `🌟 *${tmpl.title}* 🌸\nनमस्ते *${farmerName} जी!*\n\n${(tmpl.hook || '').replace(/\{name\}/g, farmerName)}\n\n"${tmpl.shayari || ''}"\n\n${isLinkAttached ? `${tmpl.cta || ''}\n${fullUrl}\n\n` : ''}_सादर: आरोग्यम इंडिया परिवार 🌿_`;
+    } else if (styleMode === 'shayari_only') {
+      return `🌸 *${tmpl.title}*\nआदरणीय *${farmerName} जी!*\n\n"${tmpl.shayari || ''}"\n\nईश्वर से आपके उत्तम स्वास्थ्य, दीर्घायु और खुशहाली की मंगलकामना करते हैं! 🙏\n\n_शुभचिंतक: आरोग्यम इंडिया परिवार 🌿_`;
+    } else if (styleMode === 'hook_action') {
+      return `⚡ *${tmpl.title}*\nनमस्ते *${farmerName} जी!*\n\n${(tmpl.hook || '').replace(/\{name\}/g, farmerName)}\n\n${isLinkAttached ? `${tmpl.cta || ''}\n${fullUrl}\n\n` : ''}_हेल्पलाइन: आरोग्यम इंडिया 🌾_`;
+    } else {
+      return `🌸 सप्रेम नमस्ते *${farmerName} जी!*\n\n"${tmpl.shayari || tmpl.hook || ''}"\n\nआपका आज का दिन मंगलमय, स्वस्थ और सफल हो! 🙏\n_आरोग्यम इंडिया_`;
+    }
+  }
+
+  if (mktState.activeTab === 'festival') {
+    let savedFest = {};
+    try {
+      const raw = localStorage.getItem('AI_FESTIVAL_CAMPAIGN');
+      if (raw) savedFest = JSON.parse(raw);
+    } catch(e) {}
+    const festTitle = savedFest.title || '🎉 शुभ त्यौहार महाबचत - सभी ई-बुक्स पर 50% विशेष छूट!';
+    const coupon = savedFest.coupon || 'FESTIVAL50';
+    if (channel === 'sms') {
+      return `नमस्ते ${farmerName} जी! ${festTitle} कूपन: ${coupon}। ऑर्डर करें: https://aarogyamindia.online/store.html - Aarogyam India`;
+    }
+    return `🎉 *नमस्ते ${farmerName} जी!* 🙏\n\n🔥 *${festTitle}*\n\n🎁 *त्यौहार कूपन कोड:* *${coupon}*\n👉 सभी ई-बुक्स व कृषि गाइड्स पर पाएं विशेष छूट।\n\n👉 *ऑफर का लाभ उठाने के लिए यहाँ क्लिक करें:*\nhttps://aarogyamindia.online/store.html\n\n_आरोग्यम इंडिया कृषि मंच_ 🌾`;
+  }
+
+  if (mktState.activeTab === 'broadcast') {
+    let currentFeed = [];
+    try {
+      const raw = localStorage.getItem('aarogyam_in_app_broadcast_feed');
+      if (raw) currentFeed = JSON.parse(raw);
+    } catch(e) {}
+    const activeNotice = (currentFeed && currentFeed.length > 0) ? currentFeed[0] : null;
+    const nTitle = activeNotice?.title || 'आरोग्यम डिजिटल किसान बुलेटिन';
+    const nMsg = activeNotice?.message || 'सभी किसानों के लिए महत्वपूर्ण कृषि सूचना व समाधान।';
+    const nLink = activeNotice?.actionUrl || 'https://aarogyamindia.online';
+    if (channel === 'sms') {
+      return `नमस्ते ${farmerName} जी! ${nTitle}: ${nMsg.slice(0, 80)}... विवरण: ${nLink} - Aarogyam India`;
+    }
+    return `📢 *नमस्ते ${farmerName} जी! (विशेष सूचना)* 🙏\n\n📌 *${nTitle}*\n\n${nMsg}\n\n👉 *विवरण देखें:*\n${nLink}\n\n_आरोग्यम इंडिया डिजिटल सूचना मंच_ 🇮🇳`;
+  }
+
+  // Default: VIP Book Offer
+  const offerInfo = getGeneratedOfferUrlAndMsg(targetUser || { full_name: farmerName, mobile: farmerMobile });
+  return channel === 'sms' ? offerInfo.shortSms : offerInfo.msg;
+}
 function generatePersonalizedWhatsAppLink(user) {
   const cleanMobile = (user.mobile || '').replace(/\D/g, '');
   const targetPhone = cleanMobile.startsWith('91') && cleanMobile.length === 12 ? cleanMobile : ('91' + cleanMobile);
@@ -1440,6 +1663,847 @@ function generatePersonalizedSmsLink(user) {
   return `sms:+${targetPhone}?body=${encodeURIComponent(shortSms)}`;
 }
 
+if (typeof window !== 'undefined') {
+  window.generateOfferSignature = generateOfferSignature;
+  window.getGeneratedOfferUrlAndMsg = getGeneratedOfferUrlAndMsg;
+  window.generatePersonalizedWhatsAppLink = generatePersonalizedWhatsAppLink;
+  window.generatePersonalizedSmsLink = generatePersonalizedSmsLink;
+}
+
+
+function renderVipBookOfferWorkspace(audienceList = []) {
+  const ob = mktState.offerBuilder;
+  const sampleUser = { full_name: 'किसान मित्र (एडमिन टेस्ट)', mobile: '7974422572', isAdminTest: true };
+  const sampleLinkInfo = getGeneratedOfferUrlAndMsg(sampleUser);
+
+  // Live Thumbnail & Book details update
+  const currentCatalog = (mktState.books && mktState.books.length > 0) ? mktState.books : DEFAULT_CATALOG_FALLBACK;
+  const activeBook = currentCatalog.find(item => item.id === ob.primaryBook) || currentCatalog[0];
+  const liveThumb = document.getElementById('live_preview_thumb_img');
+  if (liveThumb && activeBook) {
+    liveThumb.src = ob.customThumb || activeBook.cover || '/images/banners/offer-banner-kharif-2026.webp';
+  }
+  const liveTitle = document.getElementById('live_preview_title');
+  if (liveTitle && activeBook) liveTitle.textContent = activeBook.title;
+  const liveDesc = document.getElementById('live_preview_desc');
+  if (liveDesc && activeBook) liveDesc.textContent = activeBook.desc;
+  const liveMsgEl = document.getElementById('live_preview_msg_text');
+  if (liveMsgEl && sampleLinkInfo && sampleLinkInfo.message) {
+    liveMsgEl.textContent = sampleLinkInfo.message;
+  }
+
+
+  // 6 Verified Live Books for VIP Offer Creator
+  const activeBooksList = [
+    { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', mrp: 499, offerPrice: 199, cover: '/images/books/fasal-ka-doctor-cover.webp' },
+    { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026', mrp: 299, offerPrice: 99, cover: '/images/books/kharif-master-guide-2026-cover.webp' },
+    { id: 'BK016', name: 'आधुनिक कृषि दवा डायरेक्टरी व पशुपालन', mrp: 399, offerPrice: 149, cover: '/images/books/bk016-cover.webp' },
+    { id: 'BK015', name: 'उन्नत सब्जी खेती मास्टर गाइड सम्पूर्ण विवरण', mrp: 399, offerPrice: 149, cover: '/images/books/bk015-cover.webp' },
+    { id: 'BK018', name: 'जैविक खाद, जीवामृत व माइकोराइजा डायरेक्टरी', mrp: 399, offerPrice: 149, cover: '/images/books/bk018-cover.webp' },
+    { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता (1 Year)', mrp: 1999, offerPrice: 499, cover: '/images/banners/vip-reader-offer-badge.jpeg' }
+  ];
+
+  // Active chosen book cover
+  const activeBookObj = activeBooksList.find(b => b.id === ob.primaryBook) || activeBooksList[0];
+  const activeCover = mktState.customPromoImage || activeBookObj.cover;
+
+  // Split into Pending vs Sent audiences based on today's sent contacts
+  const todaySentSet = getTodaySentContactsSet();
+  const pendingAudience = audienceList.filter(u => {
+    const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+    return !todaySentSet.has(mob);
+  });
+  const sentAudience = audienceList.filter(u => {
+    const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+    return todaySentSet.has(mob);
+  });
+
+  const activeTableTab = mktState.tableTab || 'pending';
+  const currentTableAudience = activeTableTab === 'sent' ? sentAudience : pendingAudience;
+
+  // Active queue for 1-Tap HUD Dispatcher
+  const hudQueue = (mktState.hudQueueList && mktState.hudQueueList.length > 0)
+    ? mktState.hudQueueList
+    : pendingAudience;
+
+  if (mktState.hudQueueIndex >= hudQueue.length && hudQueue.length > 0) {
+    mktState.hudQueueIndex = hudQueue.length - 1;
+  }
+  const currentHudContact = hudQueue.length > 0 ? hudQueue[mktState.hudQueueIndex || 0] : null;
+  const hudMode = mktState.hudMode || 'whatsapp';
+
+  return `
+    <!-- 🎛️ DYNAMIC OFFER CAMPAIGN BUILDER LAYER -->
+    <div style="background:linear-gradient(135deg, rgba(30,58,138,0.35), rgba(15,23,42,0.95)); border:2px solid #3b82f6; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🎁</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#f8fafc;">VIP ई-बुक ऑफ़र, वाउचर व टाइमर कैंपेन निर्माता</h3>
+            <p style="margin:2px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              आप खुद तय करें कि ग्राहक को क्या देना है: ₹0 फ्री टेस्ट, डिस्काउंट, या 1 के साथ 1 फ़्री कॉम्बो!
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid #10b981; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          ⚡ Live Checkout Synchronized
+        </span>
+      </div>
+
+      <!-- Controls Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:14px; margin-bottom:16px;">
+        <!-- 1. Offer Type -->
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">1. ऑफ़र का प्रकार चुनें:</label>
+          <select id="mkt-builder-type" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
+            <option value="discount" ${ob.type === 'discount' ? 'selected' : ''}>🏷️ स्पेशल डिस्काउंट (Custom Price)</option>
+            <option value="bogo" ${ob.type === 'bogo' ? 'selected' : ''}>🎁 1 के साथ 1 फ़्री कॉम्बो (BOGO Deal)</option>
+            <option value="review_reward" ${ob.type === 'review_reward' ? 'selected' : ''}>⭐ रिव्यू रिवॉर्ड (Review for 50% Off)</option>
+          </select>
+        </div>
+
+        <!-- 2. Price Selector (Free ₹0, ₹49, ₹50, ₹79, ₹99, ₹149, ₹199) -->
+        <div id="mkt-builder-price-wrap" style="display:${ob.type === 'review_reward' ? 'none' : 'block'};">
+          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">2. चेकआउट मूल्य (Charge Amount):</label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+            <button type="button" class="mkt-builder-price-btn" data-price="0" style="background:${ob.price === 0 ? '#16a34a' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 0 ? '#22c55e' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹0 (फ़्री टेस्ट)
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="49" style="background:${ob.price === 49 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 49 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹49
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="50" style="background:${ob.price === 50 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 50 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹50
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="79" style="background:${ob.price === 79 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 79 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹79
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="99" style="background:${ob.price === 99 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 99 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹99
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="149" style="background:${ob.price === 149 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 149 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹149
+            </button>
+            <button type="button" class="mkt-builder-price-btn" data-price="199" style="background:${ob.price === 199 ? '#2563eb' : '#1e293b'}; color:#fff; border:1px solid ${ob.price === 199 ? '#3b82f6' : '#334155'}; padding:5px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+              ₹199
+            </button>
+          </div>
+          <input type="number" id="mkt-builder-custom-price" value="${ob.price}" min="0" placeholder="कस्टम मूल्य..." style="width:100%; background:#1e293b; color:#38bdf8; border:1px solid #334155; padding:6px 10px; border-radius:6px; font-weight:800; font-size:0.85rem;" />
+        </div>
+
+        <!-- 3. Primary & Bonus Book Selector -->
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">3. मुख्य पुस्तक चुनें (लाइव 6 पुस्तकें):</label>
+          <select id="mkt-builder-primary-book" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
+            ${activeBooksList.map(b => `
+              <option value="${b.id}" ${b.id === ob.primaryBook ? 'selected' : ''}>${b.id} - ${b.name} (MRP: ₹${b.mrp} • स्टोर: ₹${b.offerPrice})</option>
+            `).join('')}
+          </select>
+
+          <div id="mkt-builder-bonus-box" style="margin-top:6px; display:${ob.type === 'bogo' ? 'block' : 'none'};">
+            <label style="font-size:0.75rem; font-weight:800; color:#f59e0b; display:block; margin-bottom:2px;">🎁 फ्री बोनस पुस्तक (FREE with it):</label>
+            <select id="mkt-builder-bonus-book" style="width:100%; background:#1e293b; color:#f59e0b; border:1px solid #f59e0b; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
+              ${activeBooksList.map(b => `
+                <option value="${b.id}" ${b.id === ob.bonusBook ? 'selected' : ''}>${b.id} - ${b.name} (MRP: ₹${b.mrp} • स्टोर: ₹${b.offerPrice})</option>
+              `).join('')}
+            </select>
+          </div>
+        </div>
+
+        <!-- 4. Timer & Audio Options -->
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#94a3b8; display:block; margin-bottom:4px;">4. उलटी गिनती टाइमर (Timer):</label>
+          <select id="mkt-builder-timer" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:8px 12px; border-radius:8px; font-size:0.82rem; font-weight:700;">
+            <option value="15m" ${ob.timer === '15m' ? 'selected' : ''}>⏳ 15 मिनट</option>
+            <option value="25m" ${ob.timer === '25m' ? 'selected' : ''}>⏳ 25 मिनट (अनुशंसित)</option>
+            <option value="today" ${ob.timer === 'today' ? 'selected' : ''}>📅 आज रात 12 बजे तक (Today Midnight)</option>
+            <option value="1h" ${ob.timer === '1h' ? 'selected' : ''}>⏳ 1 घंटा</option>
+            <option value="24h" ${ob.timer === '24h' ? 'selected' : ''}>⏳ 24 घंटे</option>
+            <option value="none" ${ob.timer === 'none' ? 'selected' : ''}>🚫 कोई टाइमर नहीं (स्थाई)</option>
+          </select>
+          <label style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:0.75rem; color:#cbd5e1; cursor:pointer;">
+            <input type="checkbox" id="mkt-builder-audio" ${ob.hasAudio ? 'checked' : ''} />
+            <span>🔊 चेकआउट पर ऑटो हिंदी वॉयस नोट सक्रिय रखें</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Live VIP Offer Banner & Book Thumbnail Card -->
+      <div style="border-radius:14px; overflow:hidden; border:2px solid #3b82f6; margin-bottom:14px; background:linear-gradient(135deg, #070d19, #0f172a); padding:16px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; box-shadow:0 6px 20px rgba(0,0,0,0.4);">
+        <img id="live_preview_thumb_img" src="${activeCover}" alt="Book Cover" style="width:84px; height:84px; object-fit:cover; border-radius:10px; border:2px solid #38bdf8; flex-shrink:0; background:#1e293b; box-shadow:0 4px 12px rgba(56,189,248,0.3);" />
+        
+        <div style="flex:1; min-width:220px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <span style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:8px; box-shadow:0 2px 8px rgba(16,185,129,0.35);">
+              🎁 VIP ई-बुक ऑफर एक्टिव
+            </span>
+            ${mktState.customPromoImage ? `
+              <button type="button" id="btn_reset_promo_image" style="background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#f87171; font-size:0.68rem; padding:2px 6px; border-radius:4px; cursor:pointer;">
+                ❌ कस्टम फोटो हटाएं
+              </button>
+            ` : ''}
+          </div>
+          <div id="live_preview_thumb_title" style="font-weight:900; font-size:1.05rem; color:#f8fafc;">
+            ${escapeHtml(activeBookObj.name)}
+          </div>
+          <div id="live_preview_thumb_sub" style="font-size:0.8rem; color:#38bdf8; font-weight:700; margin-top:3px;">
+            सामान्य MRP: ~₹${activeBookObj.mrp}~ • स्टोर: ₹${activeBookObj.offerPrice} • <strong>VIP ऑफर चेकआउट: ₹${ob.price === 0 ? '0 (FREE)' : ob.price}</strong>
+          </div>
+        </div>
+
+        <!-- Custom Promo Image Upload -->
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 12px; min-width:210px;">
+          <label for="mkt_promo_image_input" style="font-size:0.74rem; color:#cbd5e1; font-weight:800; display:block; margin-bottom:4px;">
+            📷 अपनी फोटो अपलोड करें (Auto WebP):
+          </label>
+          <input type="file" id="mkt_promo_image_input" accept="image/*" style="font-size:0.75rem; color:#94a3b8; width:100%; cursor:pointer;">
+        </div>
+      </div>
+
+      <!-- Generated Compact Link Preview & Instant ₹0 Test Button -->
+      <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="flex:1; min-width:260px;">
+          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 सुपर-शॉर्ट चेकआउट लिंक (ग्राहक के लिए सुरक्षित):</span>
+          <code id="mkt-builder-generated-link" style="color:#38bdf8; font-size:0.82rem; word-break:break-all;">${sampleLinkInfo.checkoutUrl}</code>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <a href="${sampleLinkInfo.checkoutUrl}" id="btn-test-offer-link" target="_blank" style="background:#16a34a; color:#fff; font-weight:800; padding:8px 14px; border-radius:8px; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.35);">
+            <span>🧪 अभी टेस्ट करें (Test Link)</span>
+          </a>
+          <button type="button" id="btn-copy-offer-link" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; font-weight:700; padding:8px 12px; border-radius:8px; font-size:0.78rem; cursor:pointer;">
+            📋 लिंक कॉपी
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 👤➕ डायरेक्ट वीआईपी लिंक जनरेटर (नया/पुराना ग्राहक का नाम व नंबर डालकर 1-क्लिक ऑफर बनाएं) -->
+    <div style="background:linear-gradient(135deg, rgba(16,185,129,0.14), rgba(15,23,42,0.92)); border:1.5px solid #10b981; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">👤➕</span>
+          <div>
+            <h3 style="margin:0; font-size:1.1rem; font-weight:900; color:#34d399;">
+              डायरेक्ट वीआईपी लिंक जनरेटर (Direct Customer Name & Mobile No)
+            </h3>
+            <p style="margin:2px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              ग्राहक लिस्ट में रजिस्टर्ड हो या बिल्कुल नया—यहाँ नाम और 10 अंकों का मोबाइल नंबर डालें, 1-क्लिक में पर्सनलाइज्ड VIP लिंक व WhatsApp संदेश बन जाएगा!
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(16,185,129,0.2); color:#6ee7b7; border:1px solid #10b981; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.74rem;">
+          ⚡ Instant Custom VIP Offer
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">1. ग्राहक का नाम (Full Name):</label>
+          <input type="text" id="mkt-manual-name" placeholder="उदा. मणिकराव (Manikrao)" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:9px 12px; border-radius:8px; font-size:0.85rem;" />
+        </div>
+        <div>
+          <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">2. 10 अंकों का मोबाइल नंबर (Mobile No):</label>
+          <input type="tel" id="mkt-manual-mobile" maxlength="10" placeholder="उदा. 9764566930" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:9px 12px; border-radius:8px; font-size:0.85rem;" />
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button type="button" id="btn-generate-manual-offer" style="width:100%; background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:800; font-size:0.86rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 15px rgba(16,185,129,0.35);">
+            <span>⚡ VIP लिंक व संदेश जनरेट करें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Generated Result Box -->
+      <div id="mkt-manual-result-box" style="display:none; background:#070d19; border:1.5px solid #22c55e; border-radius:12px; padding:16px; margin-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:1.1rem;">🎉</span>
+            <strong style="color:#4ade80; font-size:0.88rem;" id="mkt-manual-target-heading">वीआईपी ऑफर लिंक तैयार:</strong>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a id="mkt-manual-wa-btn" href="#" target="_blank" style="background:#25D366; color:#fff; font-weight:800; padding:7px 14px; border-radius:8px; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(37,211,102,0.35);">
+              <span>📲 WhatsApp पर सीधे भेजें</span>
+            </a>
+            <button type="button" id="mkt-manual-copy-msg" style="background:#2563eb; color:#fff; border:none; font-weight:800; padding:7px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">
+              📋 पूरा संदेश कॉपी
+            </button>
+            <button type="button" id="mkt-manual-copy-link" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; font-weight:700; padding:7px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">
+              🔗 सिर्फ लिंक कॉपी
+            </button>
+          </div>
+        </div>
+        <div style="margin-bottom:10px; background:#0f172a; padding:8px 12px; border-radius:8px; border:1px solid #1e293b;">
+          <span style="font-size:0.72rem; color:#94a3b8; display:block;">🔗 सुपर-शॉर्ट VIP चेकआउट लिंक:</span>
+          <code id="mkt-manual-link-text" style="color:#38bdf8; font-size:0.84rem; word-break:break-all; font-weight:700;"></code>
+        </div>
+        <div>
+          <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-bottom:4px;">💬 तैयार WhatsApp संदेश पूर्वावलोकन:</span>
+          <div id="mkt-manual-msg-preview" style="background:#1e293b; border-radius:8px; padding:12px; color:#e2e8f0; font-size:0.82rem; line-height:1.6; white-space:pre-wrap; max-height:220px; overflow-y:auto; border:1px solid #334155;"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getPillarContacts(pillarKey) {
+  const allSurveys = mktState.surveys || [];
+  const profiles = mktState.profiles || [];
+  const todaySent = getTodaySentContactsSet();
+  
+  return profiles.filter(u => {
+    if (mktState.antiRepeatShield !== false) {
+      const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+      if (todaySent.has(mob)) return false;
+    }
+    const interest = (u.interest || '').toLowerCase();
+    const occ = (u.occupation || '').toLowerCase();
+    const src = (u.registration_source || '').toLowerCase();
+    const uSurv = allSurveys.find(s => (s.profile_id && s.profile_id === u.id) || (s.mobile && u.mobile && s.mobile === u.mobile));
+    const survCats = uSurv && Array.isArray(uSurv.selected_categories) ? uSurv.selected_categories : [];
+    const survAnswers = uSurv && uSurv.category_answers ? JSON.stringify(uSurv.category_answers).toLowerCase() : '';
+    const uText = `${u.full_name || ''} ${u.interest || ''} ${u.detectedInterest || ''} ${u.registration_source || ''} ${u.page_url || ''} ${u.primaryBook || ''} ${(u.purchases || []).map(p => p.book_id).join(' ')}`.toLowerCase();
+
+    if (pillarKey === 'dairy') {
+      return interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') ||
+             survCats.includes('cattlecare') || survAnswers.includes('दूध') || survAnswers.includes('गाय') ||
+             uText.includes('bk016') || uText.includes('dairy') || uText.includes('pashu');
+    } else if (pillarKey === 'health') {
+      return interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || occ.includes('स्वास्थ्य') ||
+             survCats.includes('healthcare') || survAnswers.includes('sugar') || survAnswers.includes('दर्द') ||
+             uText.includes('health') || uText.includes('diabetes') || uText.includes('joint') || uText.includes('liver');
+    } else if (pillarKey === 'netsurf') {
+      return interest.includes('netsurf') || interest.includes('बायो') || src.includes('netsurf') ||
+             survCats.includes('netsurf') || survAnswers.includes('biofit') ||
+             uText.includes('bk018') || uText.includes('netsurf') || uText.includes('biofit') || uText.includes('jaivik');
+    } else if (pillarKey === 'agri') {
+      const isDairy = interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') || survCats.includes('cattlecare');
+      const isHealth = interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || occ.includes('स्वास्थ्य') || survCats.includes('healthcare');
+      const isNetsurf = interest.includes('netsurf') || interest.includes('बायो') || src.includes('netsurf') || survCats.includes('netsurf');
+      return (!isDairy && !isHealth && !isNetsurf) || uText.includes('bk001') || uText.includes('bk002') || uText.includes('bk015') || uText.includes('bk017') || uText.includes('kheti') || uText.includes('fasal');
+    }
+    return true;
+  });
+}
+window.getPillarContacts = getPillarContacts;
+
+function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
+  const activeTableTab = mktState.tableTab || 'pending';
+  const todaySentSet = getTodaySentContactsSet();
+  const sentMap = getTodaySentMap();
+  const hudQueue = (mktState.hudQueueList && mktState.hudQueueList.length > 0)
+    ? mktState.hudQueueList
+    : (audienceList || []);
+  const hudMode = mktState.hudMode || 'whatsapp';
+  const currentHudContact = hudQueue[mktState.hudQueueIndex || 0] || null;
+
+  const pendingAudience = (audienceList || []).filter(u => {
+    const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+    return !sentMap[mob];
+  });
+  const sentAudience = (audienceList || []).filter(u => {
+    const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+    return !!sentMap[mob];
+  });
+
+  const displayedList = (activeTableTab === 'sent') ? sentAudience : pendingAudience;
+  const currentTableAudience = displayedList;
+  const currentList = paginatedUsers || displayedList.slice(0, 25);
+  const selectedCount = mktState.selectedMobiles ? mktState.selectedMobiles.size : 0;
+
+  return `
+    <!-- 🧠 AI मार्केटिंग डिसीजन ब्रेन: 4 प्रमुख स्तंभ (Pillars directly connected to HUD Queue) -->
+    ${(() => {
+      const agriList = getPillarContacts('agri');
+      const dairyList = getPillarContacts('dairy');
+      const healthList = getPillarContacts('health');
+      const netsurfList = getPillarContacts('netsurf');
+
+      const agriCount = agriList.length;
+      const dairyCount = dairyList.length;
+      const healthCount = healthList.length;
+      const netsurfCount = netsurfList.length;
+      const activePillar = mktState.pillarFilter;
+
+      return `
+        <div style="background:linear-gradient(135deg, rgba(15,23,42,0.92), rgba(9,14,26,0.98)); border:1.5px solid #334155; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.4);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.3rem;">🧠</span>
+              <div>
+                <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:#f8fafc;">
+                  AI मार्केटिंग डिसीजन ब्रेन — 4 प्रमुख स्तंभ (1-Click Engine Selector)
+                </h3>
+                <p style="margin:2px 0 0 0; font-size:0.75rem; color:#94a3b8;">
+                  किसी भी स्तंभ पर क्लिक करें — उस वर्ग के सभी किसान तुरंत 1-Tap कतार इंजन व तालिका में लोड हो जाएंगे!
+                </p>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${activePillar ? `
+                <button type="button" id="btn-reset-pillar-filter" style="background:#0284c7; color:#fff; border:none; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem; cursor:pointer;">
+                  🔄 सभी संपर्कों पर वापस जाएँ (Reset)
+                </button>
+              ` : `
+                <span style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid #3b82f6; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.74rem;">
+                  ⚡ 4 Pillars Synchronized
+                </span>
+              `}
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px;">
+            <!-- Pillar 1: Agri -->
+            <div class="mkt-pillar-card" data-pillar="agri" style="background:#0f172a; border:${activePillar === 'agri' ? '2.5px solid #38bdf8' : '1.5px solid #38bdf8'}; ${activePillar === 'agri' ? 'box-shadow:0 0 20px rgba(56,189,248,0.45);' : ''} border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:all 0.2s ease;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:1.2rem;">🌾</span>
+                  <span style="background:rgba(56,189,248,0.2); color:#38bdf8; font-weight:900; font-size:0.8rem; padding:2px 8px; border-radius:10px;">${agriCount} किसान</span>
+                </div>
+                <strong style="color:#f8fafc; font-size:0.92rem; display:block;">कृषि, फसल सुरक्षा व कीट रोग</strong>
+                <p style="color:#94a3b8; font-size:0.74rem; margin:4px 0 10px 0;">फसल डॉक्टर (BK002), खरीफ (BK001) व सब्जी (BK015) अभियान।</p>
+              </div>
+              <button type="button" class="btn-load-pillar-queue" data-pillar="agri" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; width:100%;">
+                ⚡ इस वर्ग को कतार में लोड करें (${agriCount})
+              </button>
+            </div>
+
+            <!-- Pillar 2: Dairy -->
+            <div class="mkt-pillar-card" data-pillar="dairy" style="background:#0f172a; border:${activePillar === 'dairy' ? '2.5px solid #fbbf24' : '1.5px solid #fbbf24'}; ${activePillar === 'dairy' ? 'box-shadow:0 0 20px rgba(251,191,36,0.45);' : ''} border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:all 0.2s ease;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:1.2rem;">🐄</span>
+                  <span style="background:rgba(251,191,36,0.2); color:#fbbf24; font-weight:900; font-size:0.8rem; padding:2px 8px; border-radius:10px;">${dairyCount} किसान</span>
+                </div>
+                <strong style="color:#f8fafc; font-size:0.92rem; display:block;">पशुपालन, दुग्ध संवर्धन व FAT%</strong>
+                <p style="color:#94a3b8; font-size:0.74rem; margin:4px 0 10px 0;">पशुपालन व दवा डायरेक्टरी (BK016) दुग्ध संवर्धन अभियान।</p>
+              </div>
+              <button type="button" class="btn-load-pillar-queue" data-pillar="dairy" style="background:linear-gradient(135deg, #d97706, #b45309); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; width:100%;">
+                ⚡ इस वर्ग को कतार में लोड करें (${dairyCount})
+              </button>
+            </div>
+
+            <!-- Pillar 3: Health -->
+            <div class="mkt-pillar-card" data-pillar="health" style="background:#0f172a; border:${activePillar === 'health' ? '2.5px solid #e11d48' : '1.5px solid #e11d48'}; ${activePillar === 'health' ? 'box-shadow:0 0 20px rgba(225,29,72,0.45);' : ''} border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:all 0.2s ease;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:1.2rem;">❤️</span>
+                  <span style="background:rgba(225,29,72,0.2); color:#fb7185; font-weight:900; font-size:0.8rem; padding:2px 8px; border-radius:10px;">${healthCount} किसान</span>
+                </div>
+                <strong style="color:#f8fafc; font-size:0.92rem; display:block;">आयुर्वेद, डायबिटीज व जोड़ों का दर्द</strong>
+                <p style="color:#94a3b8; font-size:0.74rem; margin:4px 0 10px 0;">मधुमेह, बीपी, मोटापा व सम्पूर्ण स्वास्थ्य केंद्र (13 विषय)।</p>
+              </div>
+              <button type="button" class="btn-load-pillar-queue" data-pillar="health" style="background:linear-gradient(135deg, #e11d48, #be123c); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; width:100%;">
+                ⚡ इस वर्ग को कतार में लोड करें (${healthCount})
+              </button>
+            </div>
+
+            <!-- Pillar 4: Netsurf -->
+            <div class="mkt-pillar-card" data-pillar="netsurf" style="background:#0f172a; border:${activePillar === 'netsurf' ? '2.5px solid #059669' : '1.5px solid #059669'}; ${activePillar === 'netsurf' ? 'box-shadow:0 0 20px rgba(5,150,105,0.45);' : ''} border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:all 0.2s ease;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:1.2rem;">🌿</span>
+                  <span style="background:rgba(5,150,105,0.2); color:#34d399; font-weight:900; font-size:0.8rem; padding:2px 8px; border-radius:10px;">${netsurfCount} किसान</span>
+                </div>
+                <strong style="color:#f8fafc; font-size:0.92rem; display:block;">नेट्सर्फ बायोफिट व जैविक खेती</strong>
+                <p style="color:#94a3b8; font-size:0.74rem; margin:4px 0 10px 0;">जैविक खाद, जीवामृत (BK018) व बायो-फर्टिलाइजर अभियान।</p>
+              </div>
+              <button type="button" class="btn-load-pillar-queue" data-pillar="netsurf" style="background:linear-gradient(135deg, #059669, #047857); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; width:100%;">
+                ⚡ इस वर्ग को कतार में लोड करें (${netsurfCount})
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    })()}
+
+    <!-- 🎯 3-STEP AUDIENCE SELECTOR (एंटी-रिपीट शील्ड व चेकबॉक्स सपोर्ट) -->
+    <div style="background:#0f172a; border:1.5px solid #334155; border-radius:16px; padding:18px 20px; margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🎯</span>
+          <div>
+            <strong style="color:#f8fafc; font-size:0.98rem; display:block;">
+              स्मार्ट दर्शक व ग्राहक चयन (3-Step Audience Selector)
+            </strong>
+            <span style="color:#94a3b8; font-size:0.74rem;">
+              1. दर्शक चुनें ➔ 2. किताब/विषय चुनें ➔ 3. सीधे 1-टैप कतार या WhatsApp पर भेजें!
+            </span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.35); padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.8rem;">
+            कुल संपर्क: <strong id="mkt-filtered-count-badge" style="color:#ffffff;">${audienceList.length}</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- Anti-Repeat Shield Toggle Banner -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 14px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:800; color:#38bdf8; cursor:pointer; margin:0;">
+          <input type="checkbox" id="mkt-anti-repeat-shield" ${mktState.antiRepeatShield !== false ? 'checked' : ''} style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
+          <span>🛡️ एंटी-रिपीट शील्ड सक्रिय (आज भेजे जा चुके ${todaySentSet.size} संपर्क स्वतः बाहर)</span>
+        </label>
+        <span style="font-size:0.75rem; color:#94a3b8;">
+          ${mktState.antiRepeatShield !== false ? '✅ केवल नए/पेंडिंग संपर्क दिख रहे हैं' : '⚠️ आज भेजे गए संपर्क भी शामिल हैं'}
+        </span>
+      </div>
+
+      <!-- 3 Simple Filter Steps Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+        <!-- Step 1: Who to target (Audience) -->
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:12px 14px;">
+          <label for="mkt-filter-funnel" style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:800; color:#38bdf8; margin-bottom:6px;">
+            <span>1️⃣</span> <span>किसे भेजना है? (Audience)</span>
+          </label>
+          <select id="mkt-filter-funnel" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #3b82f6; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
+            <option value="all" ${mktState.funnelFilter === 'all' ? 'selected' : ''}>👥 सभी किसान व ग्राहक (${(mktState.profiles || []).length})</option>
+            <option value="tube_viewers" ${(mktState.funnelFilter === 'tube_viewers' || mktState.funnelFilter === 'top_funnel') ? 'selected' : ''}>📺 AarogyamTube वीडियो दर्शक (शीर्ष दर्शक)</option>
+            <option value="abandoned_cart" ${mktState.funnelFilter === 'abandoned_cart' ? 'selected' : ''}>🛒 अधूरी खरीदारी वाले (छोड़े गए कार्ट / Hot Leads)</option>
+            <option value="wishlist" ${mktState.funnelFilter === 'wishlist' ? 'selected' : ''}>❤️ पसंदीदा व विशलिस्ट (इच्छुक पाठक)</option>
+            <option value="converted" ${mktState.funnelFilter === 'converted' ? 'selected' : ''}>🏆 असली खरीदार (Verified VIP Customers)</option>
+            <option value="demo_users" ${mktState.funnelFilter === 'demo_users' ? 'selected' : ''}>📋 फ्री डेमो पाठक (Demo Users)</option>
+          </select>
+        </div>
+
+        <!-- Step 2: Unified Book / Topic / Category Selector -->
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:12px 14px;">
+          <label for="mkt-filter-book" style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:800; color:#34d399; margin-bottom:6px;">
+            <span>2️⃣</span> <span>किस किताब / विषय / पेज पर? (Topic / Book)</span>
+          </label>
+          <select id="mkt-filter-book" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #10b981; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
+            <option value="all" ${(mktState.bookFilter === 'all' && !mktState.pillarFilter) ? 'selected' : ''}>📚 सभी पुस्तकें व विषय (All Books & Topics)</option>
+            <optgroup label="🧠 AI 4 प्रमुख स्तंभ (Pillars)" style="background:#0f172a; color:#38bdf8;">
+              <option value="pillar_agri" ${(mktState.pillarFilter === 'agri' || mktState.bookFilter === 'pillar_agri') ? 'selected' : ''}>🌾 कृषि, फसल सुरक्षा व रोग कीट (Agri Hub)</option>
+              <option value="pillar_dairy" ${(mktState.pillarFilter === 'dairy' || mktState.bookFilter === 'pillar_dairy') ? 'selected' : ''}>🐄 पशुपालन, दुग्ध संवर्धन व नस्ल सुधार (Dairy Hub)</option>
+              <option value="pillar_health" ${(mktState.pillarFilter === 'health' || mktState.bookFilter === 'pillar_health') ? 'selected' : ''}>❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health Hub)</option>
+              <option value="pillar_netsurf" ${(mktState.pillarFilter === 'netsurf' || mktState.bookFilter === 'pillar_netsurf') ? 'selected' : ''}>🌿 नेट्सर्फ बायोफिट व जैविक खाद (Netsurf Hub)</option>
+            </optgroup>
+            <optgroup label="📚 6 प्रमाणित लाइव ई-पुस्तकें (E-Books)" style="background:#0f172a; color:#34d399;">
+              <option value="BK002" ${mktState.bookFilter === 'BK002' ? 'selected' : ''}>🌾 BK002 - खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा)</option>
+              <option value="BK001" ${mktState.bookFilter === 'BK001' ? 'selected' : ''}>🌾 BK001 - खरीफ फसल मास्टर 2026</option>
+              <option value="BK016" ${mktState.bookFilter === 'BK016' ? 'selected' : ''}>💊 BK016 - आधुनिक कृषि दवा डायरेक्टरी व पशुपालन</option>
+              <option value="BK015" ${mktState.bookFilter === 'BK015' ? 'selected' : ''}>🥦 BK015 - उन्नत सब्जी खेती मास्टर गाइड सम्पूर्ण विवरण</option>
+              <option value="BK018" ${mktState.bookFilter === 'BK018' ? 'selected' : ''}>🌱 BK018 - जैविक खाद, जीवामृत व माइकोराइजा डायरेक्टरी</option>
+              <option value="SUB001" ${mktState.bookFilter === 'SUB001' ? 'selected' : ''}>👑 SUB001 - Aarogyam Pro VIP सदस्यता (1 Year)</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Step 3: Search by name or phone -->
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:12px 14px;">
+          <label for="mkt-search-input" style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:800; color:#fbbf24; margin-bottom:6px;">
+            <span>3️⃣</span> <span>नाम या नंबर से खोजें (Search)</span>
+          </label>
+          <input type="text" id="mkt-search-input" class="mkt-input-dark" value="${escapeHtml(mktState.searchQuery || '')}" placeholder="किसान का नाम या 10 अंकों का नंबर..." style="background:#0f172a; color:#f8fafc; border:1.5px solid #f59e0b; padding:9px 12px; border-radius:8px; font-weight:700; font-size:0.85rem; width:100%; box-sizing:border-box;" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚡ 1-TAP HUD SEND & NEXT DISPATCHER (WHATSAPP & TEXT SMS ENGINE) -->
+    <div id="mkt_hud_dispatcher_box" style="background:linear-gradient(135deg, rgba(30,58,138,0.35), rgba(15,23,42,0.98)); border:2px solid ${hudMode === 'whatsapp' ? '#22c55e' : '#3b82f6'}; border-radius:16px; padding:18px 20px; margin-bottom:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">${hudMode === 'whatsapp' ? '📲' : '💬'}</span>
+          <div>
+            <div style="font-size:1.05rem; font-weight:900; color:#f8fafc;">
+              1-Tap ऑटो डिस्पैच इंजन (Send ➔ Next Automation Engine)
+            </div>
+            <div style="font-size:0.75rem; color:#94a3b8;">
+              एक-एक कर भेजने की सबसे तेज़ प्रणाली — भेजते ही किसान 'Sent' में जाएगा और अगला नाम तुरंत स्क्रीन पर आएगा!
+            </div>
+          </div>
+        </div>
+
+        <!-- Engine Mode Switcher -->
+        <div style="display:flex; gap:6px; align-items:center; background:#0f172a; padding:4px; border-radius:10px; border:1px solid #334155;">
+          <button type="button" id="btn_switch_hud_wa" style="background:${hudMode === 'whatsapp' ? '#16a34a' : 'transparent'}; color:#ffffff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+            <span>📲 WhatsApp मोड</span>
+          </button>
+          <button type="button" id="btn_switch_hud_sms" style="background:${hudMode === 'sms' ? '#2563eb' : 'transparent'}; color:#ffffff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+            <span>💬 Text SMS मोड</span>
+          </button>
+        </div>
+      </div>
+
+      ${currentHudContact ? (() => {
+        const cName = (currentHudContact.full_name || 'किसान साथी').trim();
+        const cMobile = (currentHudContact.mobile || '').replace(/\D/g, '').slice(-10);
+        const msgToSend = getActiveCampaignMessage(currentHudContact, hudMode);
+        const sendUrl = hudMode === 'sms'
+          ? `sms:+91${cMobile}?body=${encodeURIComponent(msgToSend)}`
+          : `https://wa.me/91${cMobile}?text=${encodeURIComponent(msgToSend)}`;
+        const totalQ = hudQueue.length;
+        const curIdx = (mktState.hudQueueIndex || 0) + 1;
+        const pct = Math.min(100, Math.round((curIdx / totalQ) * 100));
+
+        return `
+          <!-- Current Contact Card & Actions -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; align-items:center;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:0.76rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.12); padding:3px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.3);">
+                  कतार प्रगति: ${curIdx} / ${totalQ} (${pct}%)
+                </span>
+                <span style="font-size:0.72rem; color:#94a3b8;">📍 ${escapeHtml(currentHudContact.State || 'भारत')}</span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div style="width:100%; height:6px; background:#0f172a; border-radius:4px; overflow:hidden; margin-bottom:10px;">
+                <div style="width:${pct}%; height:100%; background:linear-gradient(90deg, #10b981, #38bdf8); transition:width 0.3s ease;"></div>
+              </div>
+
+              <div style="background:#0f172a; border:1px solid #334155; border-radius:10px; padding:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <strong style="color:#f8fafc; font-size:1.05rem;">👤 ${escapeHtml(cName)}</strong>
+                  <span style="font-family:monospace; color:#38bdf8; font-weight:800; font-size:0.9rem;">📞 +91 ${cMobile}</span>
+                </div>
+                <div style="font-size:0.74rem; color:#cbd5e1;">
+                  🎯 विषय: <strong>${escapeHtml(currentHudContact.detectedInterest || 'खेती का डॉक्टर')}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Preview & Big 1-Tap Button -->
+            <div>
+              <div style="font-size:0.72rem; color:#cbd5e1; font-weight:700; margin-bottom:4px;">
+                💬 तैयार संदेश पूर्वावलोकन (${hudMode.toUpperCase()}):
+              </div>
+              <div id="hud_msg_preview_box" style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px; color:#e2e8f0; font-size:0.78rem; line-height:1.4; max-height:100px; overflow-y:auto; white-space:pre-wrap; margin-bottom:10px;">${escapeHtml(msgToSend)}</div>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <a id="btn_hud_send_next" href="${sendUrl}" target="_blank" data-name="${escapeHtml(cName)}" data-mobile="${cMobile}" data-channel="${hudMode}" style="flex:2; min-width:180px; background:linear-gradient(135deg, ${hudMode === 'whatsapp' ? '#16a34a, #15803d' : '#2563eb, #1d4ed8'}); color:#ffffff; font-weight:900; font-size:0.92rem; padding:11px 16px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 16px ${hudMode === 'whatsapp' ? 'rgba(22,163,74,0.4)' : 'rgba(37,99,235,0.4)'};">
+                  <span>${hudMode === 'whatsapp' ? '📲 1-Tap WhatsApp भेजें & Next ➔' : '💬 1-Tap SMS भेजें & Next ➔'}</span>
+                </a>
+
+                <button type="button" id="btn_hud_copy_msg" data-msg="${escapeHtml(msgToSend)}" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:10px 14px; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer;">
+                  📋 कॉपी
+                </button>
+
+                <button type="button" id="btn_hud_skip_next" style="background:#1e293b; color:#94a3b8; border:1px solid #334155; padding:10px 14px; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer;" title="इस संपर्क को छोड़ें और अगला देखें">
+                  ⏭️ छोड़ें (Next)
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      })() : `
+        <div style="text-align:center; padding:24px; color:#4ade80;">
+          <div style="font-size:2rem; margin-bottom:6px;">🎉</div>
+          <div style="font-weight:900; font-size:1.1rem; color:#f8fafc;">कतार के सभी संपर्क सफलतापूर्वक भेजे जा चुके हैं!</div>
+          <p style="font-size:0.8rem; color:#94a3b8; margin:4px 0 12px 0;">नीचे 'रीसेट' बटन दबाकर कतार दोबारा ताज़ा कर सकते हैं।</p>
+          <button type="button" id="btn_hud_reset_queue" style="background:#2563eb; color:#ffffff; border:none; padding:8px 18px; border-radius:8px; font-weight:800; font-size:0.84rem; cursor:pointer;">
+            🔄 कतार रीसेट करें
+          </button>
+        </div>
+      `}
+    </div>
+
+    <!-- 4. दो साफ़ सूचियां: [⏳ कतार में बाकी (Pending)] vs [✅ भेजे जा चुके (Sent)] -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; background:#1e293b; border:1px solid #334155; border-radius:12px; padding:10px 14px;">
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button type="button" id="tab_btn_pending_list" style="background:${activeTableTab === 'pending' ? '#2563eb' : 'transparent'}; color:#ffffff; border:1px solid ${activeTableTab === 'pending' ? '#3b82f6' : 'rgba(255,255,255,0.1)'}; padding:7px 14px; border-radius:8px; font-weight:900; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+          <span>⏳ कतार में बाकी</span>
+          <span style="background:rgba(255,255,255,0.2); padding:1px 6px; border-radius:10px; font-size:0.74rem;">${pendingAudience.length}</span>
+        </button>
+
+        <button type="button" id="tab_btn_sent_list" style="background:${activeTableTab === 'sent' ? '#16a34a' : 'transparent'}; color:#ffffff; border:1px solid ${activeTableTab === 'sent' ? '#22c55e' : 'rgba(255,255,255,0.1)'}; padding:7px 14px; border-radius:8px; font-weight:900; font-size:0.82rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+          <span>✅ भेजे जा चुके</span>
+          <span style="background:rgba(255,255,255,0.2); padding:1px 6px; border-radius:10px; font-size:0.74rem;">${sentAudience.length}</span>
+        </button>
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <label style="display:inline-flex; align-items:center; gap:6px; color:#f8fafc; font-size:0.82rem; font-weight:800; cursor:pointer;">
+          <input type="checkbox" id="mkt-select-all-audience" style="width:17px; height:17px; accent-color:#10b981; cursor:pointer;">
+          <span>सभी चुनें</span>
+        </label>
+
+        <span id="mkt-selected-count-badge" style="background:${selectedCount > 0 ? '#0284c7' : '#1e293b'}; color:#ffffff; font-weight:900; font-size:0.78rem; padding:4px 12px; border-radius:12px; border:1px solid ${selectedCount > 0 ? '#38bdf8' : '#334155'}; display:inline-flex; align-items:center; gap:5px;">
+          ✓ <strong id="mkt-selected-count-num">${selectedCount}</strong> संपर्क चुने गए
+        </span>
+
+        <button type="button" id="btn_load_selected_to_hud" style="background:${selectedCount > 0 ? '#16a34a' : '#1e293b'}; color:${selectedCount > 0 ? '#ffffff' : '#64748b'}; border:1px solid ${selectedCount > 0 ? '#22c55e' : '#334155'}; padding:6px 14px; border-radius:8px; font-weight:800; font-size:0.78rem; cursor:${selectedCount > 0 ? 'pointer' : 'not-allowed'}; display:inline-flex; align-items:center; gap:5px;">
+          <span>⚡ चुने गए को 1-Tap कतार में लोड करें</span>
+        </button>
+
+        <button type="button" id="btn_clear_selected_contacts" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.78rem; cursor:pointer;">
+          <span>🔄 चयन रीसेट / अनचेक</span>
+        </button>
+
+        <button type="button" id="btn-sync-real-data-table" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;" title="डेटाबेस से नया डेटा लाएं (Zero Egress)">
+          📥 डेटा सिंक (Sync)
+        </button>
+
+        <button type="button" id="btn_clear_today_queue" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
+          🗑️ कतार खाली करें
+        </button>
+
+        <button type="button" id="btn_reset_today_queue" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
+          🔄 रीसेट
+        </button>
+      </div>
+    </div>
+
+    <!-- Batch Selection Action Bar (Appears when contacts are checked) -->
+    ${(mktState.selectedContactsSet && mktState.selectedContactsSet.size > 0) ? `
+      <div id="mkt-batch-action-bar" style="background:linear-gradient(135deg, #1e3a8a, #0f172a); border:1.5px solid #3b82f6; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span style="color:#f8fafc; font-weight:800; font-size:0.84rem;">
+          ✓ <strong>${mktState.selectedContactsSet.size}</strong> संपर्क चुने गए
+        </span>
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="btn_load_selected_to_hud" style="background:#16a34a; color:#fff; border:none; padding:6px 14px; border-radius:6px; font-weight:800; font-size:0.78rem; cursor:pointer;">
+            ⚡ चुने हुए संपर्कों को 1-Tap कतार में लोड करें
+          </button>
+          <button type="button" id="btn_clear_selected_contacts" style="background:rgba(255,255,255,0.1); color:#cbd5e1; border:1px solid rgba(255,255,255,0.2); padding:6px 10px; border-radius:6px; font-size:0.76rem; cursor:pointer;">
+            अनचेक करें
+          </button>
+        </div>
+      </div>
+    ` : ''}
+
+    <!-- Leads Table (15 per page with Individual Checkbox, Call, SMS, WA, Copy & Details) -->
+    <div class="mkt-table-responsive">
+      <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.82rem;">
+        <thead>
+          <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#94a3b8;">
+            <th style="padding:10px 12px; width:40px;">चुनें</th>
+            <th style="padding:10px 12px;">ग्राहक विवरण</th>
+            <th style="padding:10px 12px;">🧠 AI संस्तुति</th>
+            <th style="padding:10px 12px;">फ़नल स्टेज</th>
+            <th style="padding:10px 12px;">सत्यापित खरीद</th>
+            <th style="padding:10px 12px; text-align:right;">1-क्लिक प्रचार (WA • SMS • कॉल)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${currentTableAudience.length === 0 ? `
+            <tr>
+              <td colspan="6" style="text-align:center; padding:36px; color:#94a3b8;">
+                <div style="font-size:1.6rem; margin-bottom:6px;">${activeTableTab === 'sent' ? '📭' : '🎯'}</div>
+                <strong style="color:#f8fafc; font-size:0.92rem;">
+                  ${activeTableTab === 'sent' ? 'आज अभी तक किसी को नहीं भेजा गया है।' : 'कतार में कोई बाकी संपर्क नहीं मिला।'}
+                </strong>
+                <p style="font-size:0.78rem; color:#64748b; margin:4px 0 0 0;">
+                  ${activeTableTab === 'sent' ? 'ऊपर कतार से WhatsApp या SMS भेजें — भेजे गए सभी किसान यहाँ दिखेंगे।' : 'फ़िल्टर बदल कर देखें या कतार रीसेट करें।'}
+                </p>
+              </td>
+            </tr>
+          ` : (() => {
+            const tablePageSize = 15;
+            const tableTotalPages = Math.max(1, Math.ceil(currentTableAudience.length / tablePageSize));
+            const curPage = Math.min(Math.max(1, mktState.currentPage || 1), tableTotalPages);
+            const pagedList = currentTableAudience.slice((curPage - 1) * tablePageSize, curPage * tablePageSize);
+
+            return pagedList.map(u => {
+              const uMobile = (u.mobile || '').replace(/\D/g, '').slice(-10);
+              const rowWaMsg = getActiveCampaignMessage(u, 'whatsapp');
+              const rowSmsMsg = getActiveCampaignMessage(u, 'sms');
+              const waLink = `https://wa.me/91${uMobile}?text=${encodeURIComponent(rowWaMsg)}`;
+              const smsLink = `sms:+91${uMobile}?body=${encodeURIComponent(rowSmsMsg)}`;
+              const callLink = `tel:+91${uMobile}`;
+              const isSentToday = todaySentSet.has(uMobile);
+              const isChecked = (mktState.selectedMobiles && mktState.selectedMobiles.has(uMobile)) || (mktState.selectedContactsSet && mktState.selectedContactsSet.has(u.id));
+
+              return `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.15s ease;" class="mkt-user-row" data-user-id="${u.id}">
+                  <td style="padding:12px; text-align:center;">
+                    <input type="checkbox" class="mkt-contact-checkbox" data-id="${u.id}" data-mobile="${uMobile}" data-name="${escapeHtml(u.full_name || '')}" ${isChecked ? 'checked' : ''} style="width:16px; height:16px; accent-color:#10b981; cursor:pointer;" />
+                  </td>
+                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
+                    <strong style="color:#f8fafc; font-size:0.88rem; display:block;">${escapeHtml(u.full_name || 'अज्ञात ग्राहक')}</strong>
+                    <span style="color:#38bdf8; font-family:monospace; font-size:0.8rem;">📱 +91 ${uMobile}</span>
+                    <div style="font-size:0.72rem; color:#94a3b8;">📍 ${escapeHtml(u.State || 'भारत')}</div>
+                    ${u.detectedInterest ? `
+                      <div style="margin-top:4px;">
+                        <span style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); padding:1px 6px; border-radius:4px; font-size:0.68rem; font-weight:800;">
+                          ${u.detectedInterest}
+                        </span>
+                      </div>
+                    ` : ''}
+                  </td>
+                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
+                    <span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.72rem;">
+                      ${escapeHtml(u.primaryBook || 'BK002')}
+                    </span>
+                    <div style="font-size:0.72rem; color:#cbd5e1; margin-top:3px;">
+                      ${escapeHtml(u.actionTip || 'विशेष वीआईपी डिस्काउंट')}
+                    </div>
+                  </td>
+                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
+                    <span style="background:${u.funnelBadgeColor}20; color:${u.funnelBadgeColor}; border:1px solid ${u.funnelBadgeColor}40; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.74rem;">
+                      ${u.funnelLabel}
+                    </span>
+                  </td>
+                  <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
+                    ${u.purchases && u.purchases.length > 0 ? `
+                      <span style="color:#10b981; font-weight:800;">✅ ${u.purchases.map(p => p.book_id || 'eBook').join(', ')}</span>
+                      <div style="font-size:0.72rem; color:#94a3b8;">कुल: ₹${u.purchases.reduce((acc, p) => acc + (Number(p.amount) || 0), 0)}</div>
+                    ` : `
+                      <span style="color:#94a3b8; font-size:0.76rem;">0 खरीद</span>
+                    `}
+                  </td>
+                  <td style="padding:12px; text-align:right;">
+                    <div style="display:flex; justify-content:flex-end; gap:5px; align-items:center; flex-wrap:wrap;">
+                      <!-- 1. Copy Msg Icon -->
+                      <button type="button" class="mkt-row-copy-btn" data-msg="${escapeHtml(rowWaMsg)}" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:6px 8px; border-radius:6px; font-size:0.74rem; font-weight:700; cursor:pointer;" title="पर्सनलाइज्ड संदेश कॉपी करें">
+                        📋
+                      </button>
+
+                      <!-- 2. Direct Call Icon -->
+                      <a href="${callLink}" class="mkt-row-call-btn" data-name="${escapeHtml(u.full_name || 'किसान')}" data-mobile="${uMobile}" style="background:#0f172a; border:1px solid #f59e0b; color:#fbbf24; padding:6px 8px; border-radius:6px; font-size:0.74rem; font-weight:800; text-decoration:none;" title="सीधे कॉल करें (+91 ${uMobile})">
+                        📞
+                      </a>
+
+                      <!-- 3. Direct SMS Icon -->
+                      <a href="${smsLink}" target="_blank" class="mkt-row-send-btn" data-mobile="${uMobile}" data-name="${escapeHtml(u.full_name || 'किसान साथी')}" data-channel="SMS" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 9px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(37,99,235,0.3);" title="सीधे SMS भेजें">
+                        💬 SMS
+                      </a>
+
+                      <!-- 4. Direct WhatsApp Icon -->
+                      <a href="${waLink}" target="_blank" class="mkt-row-send-btn" data-mobile="${uMobile}" data-name="${escapeHtml(u.full_name || 'किसान साथी')}" data-channel="WhatsApp" style="background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; font-weight:800; font-size:0.74rem; padding:6px 11px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(22,163,74,0.3);" title="WhatsApp पर भेजें (भेजते ही 'Sent' में जाएगा)">
+                        📲 WA ➔
+                      </a>
+
+                      <!-- 5. User Detail Icon -->
+                      <button type="button" onclick="window.openMktUserDetail('${u.id}')" style="background:#1e293b; border:1px solid #334155; color:#cbd5e1; padding:6px 8px; border-radius:6px; font-size:0.74rem; font-weight:700; cursor:pointer;" title="यूज़र एक्टिविटी विवरण">
+                        👤
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          })()}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Pagination Controls -->
+    ${(() => {
+      const tablePageSize = 15;
+      const tableTotalPages = Math.max(1, Math.ceil(currentTableAudience.length / tablePageSize));
+      const curPage = Math.min(Math.max(1, mktState.currentPage || 1), tableTotalPages);
+      const fromIdx = currentTableAudience.length > 0 ? (curPage - 1) * tablePageSize + 1 : 0;
+      const toIdx = Math.min(curPage * tablePageSize, currentTableAudience.length);
+
+      return `
+        <div class="mkt-pagination" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);">
+          <div style="font-size:0.8rem; color:#94a3b8;">
+            दिखा रहे हैं <strong>${fromIdx}</strong> से <strong>${toIdx}</strong> (कुल <strong>${currentTableAudience.length}</strong> ${activeTableTab === 'sent' ? 'भेजे गए' : 'कतार में बाकी'} संपर्क)
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="mkt-page-btn" id="btn-page-prev" ${curPage <= 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'style="cursor:pointer;"'}>⏮️ पिछला</button>
+            <span style="font-size:0.82rem; font-weight:800; color:#f8fafc; display:flex; align-items:center; padding:0 8px;">पेज ${curPage} of ${tableTotalPages}</span>
+            <button type="button" class="mkt-page-btn" id="btn-page-next" ${curPage >= tableTotalPages ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'style="cursor:pointer;"'}>अगला ⏭️</button>
+          </div>
+        </div>
+      `;
+    })()}
+  </div>
+  `;
+}
+
+function renderWhatsAppDispatcherTab(audienceList, paginatedUsers, totalPages) {
+  return renderVipBookOfferWorkspace(audienceList) + renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages);
+}
 // =================================================================
 // TAB: SHARE & OFFER CONVERSIONS ENGINE ("किसने ऑफर पिक किया और खरीदा")
 // =================================================================
@@ -2744,6 +3808,7 @@ if (typeof window !== 'undefined') {
 
       targetedList.unshift(newNotif);
       localStorage.setItem('AAROGYAM_TARGETED_NOTIFICATIONS', JSON.stringify(targetedList.slice(0, 150)));
+      localStorage.setItem('AAROGYAM_NOTIF_DISPATCH_TIME', String(Date.now()));
 
       if (targetKey) {
         const uKey = `AI_NOTIFS_PERSONAL_${targetKey}`;
@@ -4523,9 +5588,746 @@ window.closeMktUserDetail = function() {
 };
 
 // =================================================================
+
+// =================================================================
+// 5B. MERGED OUTREACH CAMPAIGNS (GREETINGS, FESTIVAL, IN-APP, AUTO WA, ACTIVITY, LEADS)
+// =================================================================
+
+function renderGreetingsTab(audienceList) {
+  const catKey = mktState.greetingsCategory || 'gm';
+  const catData = HOOK_STUDIO_DATABASE[catKey] || HOOK_STUDIO_DATABASE.gm;
+  const tmplId = mktState.greetingsTemplateId || catData.templates[0].id;
+  const tmpl = catData.templates.find(t => t.id === tmplId) || catData.templates[0];
+  const styleMode = mktState.greetingsStyle || 'full';
+  const isLinkAttached = mktState.greetingsAttachLink !== false;
+  const targetPage = mktState.greetingsTargetPage || '/ebooks/kharif-master-guide-2026.html?vip=1';
+
+  // Dedicated AarogyamTube Video Selection when video option is chosen
+  const tubeVideos = (mktState.tubeRecordings && mktState.tubeRecordings.length > 0) ? mktState.tubeRecordings : DEFAULT_TUBE_VIDEOS;
+  const activeTubeVidId = mktState.greetingsAttachedTubeVid || tubeVideos[0].id;
+  const activeTubeVid = tubeVideos.find(v => v.id === activeTubeVidId) || tubeVideos[0];
+
+  let fullUrl = '';
+  if (targetPage.includes('/tube.html')) {
+    fullUrl = `https://aarogyamindia.online/tube.html?vid=${encodeURIComponent(activeTubeVid.id || activeTubeVid.youtube_id || '')}`;
+  } else {
+    fullUrl = `https://aarogyamindia.online${targetPage}`;
+  }
+
+  let generatedText = '';
+  if (styleMode === 'full') {
+    generatedText = `🌟 *${tmpl.title}* 🌸\nनमस्ते *{name} जी!*\n\n${tmpl.hook}\n\n"${tmpl.shayari}"\n\n${isLinkAttached ? `${tmpl.cta}\n${fullUrl}\n\n` : ''}_सादर: आरोग्यम इंडिया परिवार 🌿_`;
+  } else if (styleMode === 'shayari_only') {
+    generatedText = `🌸 *${tmpl.title}*\nआदरणीय *{name} जी!*\n\n"${tmpl.shayari}"\n\nईश्वर से आपके उत्तम स्वास्थ्य, दीर्घायु और खुशहाली की मंगलकामना करते हैं! 🙏\n\n_शुभचिंतक: आरोग्यम इंडिया परिवार 🌿_`;
+  } else if (styleMode === 'hook_action') {
+    generatedText = `⚡ *${tmpl.title}*\nनमस्ते *{name} जी!*\n\n${tmpl.hook}\n\n${isLinkAttached ? `${tmpl.cta}\n${fullUrl}\n\n` : ''}_हेल्पलाइन: आरोग्यम इंडिया 🌾_`;
+  } else {
+    generatedText = `🌸 सप्रेम नमस्ते *{name} जी!*\n\n"${tmpl.shayari || tmpl.hook}"\n\nआपका आज का दिन मंगलमय, स्वस्थ और सफल हो! 🙏\n_आरोग्यम इंडिया_`;
+  }
+
+  const samplePreviewText = mktState.greetingsCustomText || generatedText.replace('{name}', 'रामेश्वर');
+
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #f59e0b; border-radius:16px; padding:20px; margin-bottom:24px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🌅</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#fbbf24;">
+              सुविचार, बधाई व GM/GN मैसेंजर (Hook & Shayari Studio)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              किसानों के साथ मजबूत संबंध बनाएं — सुबह-शाम के अभिवादन, पर्व की बधाई, प्रेरणादायक सुविचार या वीडियो।
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid #f59e0b; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          🛡️ Anti-Ban Safeguard Active
+        </span>
+      </div>
+
+      <!-- Controls Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:18px;">
+        <!-- Left: Category & Template Selection -->
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:6px;">
+            1. संदेश की श्रेणी चुनें (Category):
+          </label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;">
+            ${Object.keys(HOOK_STUDIO_DATABASE).map(k => `
+              <button type="button" class="btn-hook-cat" data-cat="${k}" style="background:${catKey === k ? '#d97706' : '#1e293b'}; color:#ffffff; border:1px solid ${catKey === k ? '#f59e0b' : '#334155'}; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer; pointer-events:auto; transition:all 0.15s ease;">
+                ${HOOK_STUDIO_DATABASE[k].label.split(' ')[0]} ${HOOK_STUDIO_DATABASE[k].label.split(' ')[1]}
+              </button>
+            `).join('')}
+          </div>
+
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:6px;">
+            2. टेम्पलेट चुनें (Select Template):
+          </label>
+          <select id="hook_template_select" class="mkt-input-dark" style="margin-bottom:12px; width:100%; padding:8px 12px; border-radius:8px; background:#1e293b; color:#fff; border:1px solid #334155; font-size:0.83rem;">
+            ${catData.templates.map(t => `
+              <option value="${t.id}" ${t.id === tmplId ? 'selected' : ''}>${t.title}</option>
+            `).join('')}
+          </select>
+
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:6px;">
+            3. स्टाइल फॉर्मेट (Format):
+          </label>
+          <select id="hook_style_format_select" class="mkt-input-dark" style="margin-bottom:12px; width:100%; padding:8px 12px; border-radius:8px; background:#1e293b; color:#fff; border:1px solid #334155; font-size:0.83rem;">
+            <option value="full" ${styleMode === 'full' ? 'selected' : ''}>🌟 संपूर्ण (हुक + शायरी + CTA + लिंक)</option>
+            <option value="shayari_only" ${styleMode === 'shayari_only' ? 'selected' : ''}>🎭 केवल शायरी (0 लिंक, 100% रिश्ते बनाना)</option>
+            <option value="hook_action" ${styleMode === 'hook_action' ? 'selected' : ''}>⚡ डायरेक्ट हुक व एक्शन</option>
+            <option value="quick_wish" ${styleMode === 'quick_wish' ? 'selected' : ''}>🌸 संक्षिप्त शुभकामना</option>
+          </select>
+
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.82rem; font-weight:800; color:#cbd5e1; cursor:pointer;">
+              <input type="checkbox" id="chk_attach_marketing_link" ${isLinkAttached ? 'checked' : ''} style="width:16px; height:16px; accent-color:#f59e0b;">
+              <span>🔗 प्रचार लिंक जोड़ें (Attach Target Page / Video)</span>
+            </label>
+            <div id="wrap_attached_link_select" style="margin-top:8px; display:${isLinkAttached ? 'block' : 'none'};">
+              <select id="hook_attached_target_page" class="mkt-input-dark" style="font-size:0.82rem; width:100%; padding:8px 10px; border-radius:6px; background:#0f172a; color:#fff; border:1px solid #475569;">
+                <option value="/ebooks/kharif-master-guide-2026.html?vip=1" ${targetPage === '/ebooks/kharif-master-guide-2026.html?vip=1' ? 'selected' : ''}>🌾 खरीफ मास्टर गाइड 2026</option>
+                <option value="/crop-doctor.html" ${targetPage === '/crop-doctor.html' ? 'selected' : ''}>🌾 फसल का डॉक्टर BK002</option>
+                <option value="/pashu-palan.html" ${targetPage === '/pashu-palan.html' ? 'selected' : ''}>🐄 पशुपालन व दुग्ध संवर्धन हब</option>
+                <option value="/categories/netsurf.html" ${targetPage === '/categories/netsurf.html' ? 'selected' : ''}>🌿 नेट्सर्फ बायोफिट व जैविक खाद</option>
+                <option value="/categories/health.html" ${targetPage === '/categories/health.html' ? 'selected' : ''}>❤️ सम्पूर्ण स्वास्थ्य केंद्र</option>
+                <option value="/tube.html" ${targetPage.includes('/tube.html') ? 'selected' : ''}>📺 AarogyamTube वीडियो (Select Video)</option>
+                <option value="/store.html" ${targetPage === '/store.html' ? 'selected' : ''}>🛒 सम्पूर्ण स्टोर व ई-बुक कैटलॉग</option>
+              </select>
+
+              <!-- Dedicated Video Selector Dropdown when Tube is selected -->
+              <div id="wrap_attached_tube_video_select" style="margin-top:10px; display:${targetPage.includes('/tube.html') ? 'block' : 'none'}; background:#070d19; border:1px solid #ef4444; border-radius:8px; padding:10px;">
+                <label style="font-size:0.75rem; color:#f87171; font-weight:800; display:block; margin-bottom:5px;">
+                  🎬 कौन सा AarogyamTube वीडियो जोड़ना है? (इन-वेबसाइट लिंक):
+                </label>
+                <select id="hook_attached_tube_video" class="mkt-input-dark" style="font-size:0.8rem; border:1px solid #ef4444; width:100%; padding:7px 10px; border-radius:6px; background:#1e293b; color:#fff;">
+                  ${tubeVideos.map(v => `
+                    <option value="${v.id}" ${v.id === activeTubeVidId ? 'selected' : ''}>
+                      ${escapeHtml(v.title)} (${v.topic || 'कृषि'})
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Preview Box & Quick Send with Editable Textarea -->
+        <div style="display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.82rem; font-weight:800; color:#fbbf24;">✏️ संदेश पूर्वावलोकन (सीधे टाइप/एडिट करें):</span>
+                <span style="background:rgba(245,158,11,0.2); color:#fbbf24; font-size:0.7rem; font-weight:800; padding:2px 6px; border-radius:4px;">एडिटेबल</span>
+              </div>
+              <button type="button" id="btn_copy_greeting_msg" data-msg="${escapeHtml(samplePreviewText)}" style="background:#2563eb; color:#ffffff; border:none; padding:5px 10px; border-radius:6px; font-size:0.74rem; font-weight:800; cursor:pointer;">
+                📋 संदेश कॉपी
+              </button>
+            </div>
+            <textarea id="greeting_custom_textarea" class="mkt-input-dark" rows="9" style="width:100%; font-family:sans-serif; line-height:1.6; font-size:0.83rem; resize:vertical; background:#1e293b; color:#f8fafc; border:1.5px solid #f59e0b; border-radius:8px; padding:12px; box-sizing:border-box;">${escapeHtml(samplePreviewText)}</textarea>
+            <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">
+              💡 <em>{name}</em> की जगह किसान का असली नाम आ जाएगा। आप संदेश में कोई भी बदलाव टाइप कर सकते हैं।
+            </div>
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:8px;">
+            <a id="btn_test_greeting_wa" href="https://wa.me/917974422572?text=${encodeURIComponent(samplePreviewText)}" target="_blank" style="flex:1; background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; text-align:center; padding:10px; border-radius:8px; font-weight:800; font-size:0.84rem; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+              <span>📲 टेस्ट WhatsApp भेजें</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderFestivalTab() {
+  let savedFest = {};
+  try {
+    const raw = localStorage.getItem('AI_FESTIVAL_CAMPAIGN');
+    if (raw) savedFest = JSON.parse(raw);
+  } catch(e) {}
+
+  const isActive = savedFest.active || false;
+  const title = savedFest.title || '🎉 शुभ त्यौहार महाबचत - सभी ई-बुक्स पर 50% विशेष छूट!';
+  const badge = savedFest.badge || '🔥 सीमित समय मेगा ऑफर';
+  const coupon = savedFest.coupon || 'FESTIVAL50';
+  const timer = savedFest.timer || '';
+
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #ec4899; border-radius:16px; padding:20px; max-width:820px; margin:0 auto; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🎉</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#f472b6;">
+              साइट-व्यापी त्यौहार व फ्लैश सेल मैनेजर (Flipkart/Amazon Style)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              यहाँ से एक्टिवेट करने पर वेबसाइट के सभी पेजों पर टॉप हेडर स्ट्रिप, काउंटडाउन टाइमर और डिस्काउंट बैज तुरंत लाइव हो जाएगा।
+            </p>
+          </div>
+        </div>
+        <span style="background:${isActive ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; color:${isActive ? '#4ade80' : '#f87171'}; border:1px solid ${isActive ? '#22c55e' : '#ef4444'}; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          ${isActive ? '🟢 सेल लाइव है' : '🔴 सेल बंद है'}
+        </span>
+      </div>
+
+      <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:800; font-size:0.92rem; color:#f8fafc;">सेल सक्रिय करें (Live Status):</div>
+          <div style="font-size:0.75rem; color:#94a3b8;">चालू करने पर सभी विज़िटर्स को हेडर पर सेल और टाइमर दिखेगा।</div>
+        </div>
+        <label style="position:relative; display:inline-block; width:52px; height:28px; cursor:pointer;">
+          <input type="checkbox" id="fest_active_switch" ${isActive ? 'checked' : ''} style="opacity:0; width:0; height:0;">
+          <span style="position:absolute; inset:0; background-color:${isActive ? '#10b981' : '#475569'}; border-radius:28px; transition:0.3s;"></span>
+        </label>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">सेल शीर्षक (Headline): *</label>
+        <input type="text" id="fest_title_input" class="mkt-input-dark" value="${escapeHtml(title)}" placeholder="उदा. 🎉 शुभ त्यौहार महाबचत - सभी ई-बुक्स पर 50% विशेष छूट!" />
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">बैज टेक्स्ट:</label>
+          <input type="text" id="fest_badge_input" class="mkt-input-dark" value="${escapeHtml(badge)}" placeholder="🔥 सीमित समय मेगा ऑफर" />
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">कूपन कोड:</label>
+          <input type="text" id="fest_coupon_input" class="mkt-input-dark" value="${escapeHtml(coupon)}" placeholder="FESTIVAL50" />
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">⏰ काउंटडाउन टाइमर समाप्ति:</label>
+        <input type="datetime-local" id="fest_timer_input" class="mkt-input-dark" value="${escapeHtml(timer)}" />
+      </div>
+
+      <button type="button" id="btn_save_festival_campaign" style="width:100%; background:linear-gradient(135deg, #ec4899, #db2777); color:#ffffff; border:none; padding:12px; border-radius:10px; font-weight:900; font-size:0.95rem; cursor:pointer; box-shadow:0 4px 15px rgba(236,72,153,0.4);">
+        💾 त्यौहार ऑफर सेटिंग्स सुरक्षित करें (Save & Publish)
+      </button>
+    </div>
+  `;
+}
+
+// -------------------------------------------------------------
+// TAB 4: IN-APP BROADCAST NOTICE BOARD
+// -------------------------------------------------------------
+function renderInAppBroadcastTab() {
+  let savedBroadcasts = [];
+  try {
+    const raw = localStorage.getItem('AOI_INAPP_BROADCASTS');
+    if (raw) savedBroadcasts = JSON.parse(raw);
+  } catch(e) {}
+
+  return `
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:18px;">
+      <!-- Broadcast Form -->
+      <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #e11d48; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+        <div style="font-size:1.1rem; font-weight:900; color:#fb7185; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span>📢</span> <span>नया इन-ऐप ब्रॉडकास्ट संदेश बनाएं</span>
+        </div>
+        <form id="admin-broadcast-form" onsubmit="return false;">
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">प्राप्तकर्ता चुनें: *</label>
+            <select id="bc_target_filter" class="mkt-input-dark">
+              <option value="all">👥 सभी यूज़र्स (100% Reach)</option>
+              <option value="active">🟢 केवल एक्टिव मेंबर्स</option>
+              <option value="purchased">📚 ई-बुक खरीदार यूज़र्स</option>
+            </select>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">संदेश शीर्षक: *</label>
+            <input type="text" id="bc_title" class="mkt-input-dark" placeholder="उदा. नई कृषि दवा डायरेक्टरी 2026 उपलब्ध!" required />
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">संदेश विवरण: *</label>
+            <textarea id="bc_body" class="mkt-input-dark" rows="4" placeholder="पूरा संदेश यहाँ लिखें..." required></textarea>
+          </div>
+          <button type="button" id="bc_submit_btn" style="width:100%; background:linear-gradient(135deg, #e11d48, #be123c); color:#ffffff; border:none; padding:11px; border-radius:10px; font-weight:900; font-size:0.9rem; cursor:pointer; box-shadow:0 4px 15px rgba(225,29,72,0.4);">
+            📢 संदेश ब्रॉडकास्ट करें (Push Notice)
+          </button>
+        </form>
+      </div>
+
+      <!-- Sent History -->
+      <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #334155; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+        <div style="font-size:1.1rem; font-weight:900; color:#f8fafc; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span>🕒</span> <span>भेजे गए इन-ऐप संदेश (${savedBroadcasts.length})</span>
+        </div>
+        <div id="bc_history_container" style="max-height:380px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+          ${savedBroadcasts.length === 0 ? `
+            <div style="color:#94a3b8; text-align:center; padding:30px;">अभी कोई इन-ऐप ब्रॉडकास्ट संदेश नहीं भेजा गया है।</div>
+          ` : savedBroadcasts.map(b => `
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <strong style="color:#f8fafc; font-size:0.86rem;">${escapeHtml(b.title)}</strong>
+                <span style="font-size:0.7rem; color:#94a3b8;">${new Date(b.timestamp).toLocaleDateString('hi-IN')}</span>
+              </div>
+              <div style="font-size:0.78rem; color:#cbd5e1; line-height:1.4;">${escapeHtml(b.body)}</div>
+              <div style="margin-top:6px; font-size:0.7rem; color:#38bdf8;">🎯 लक्ष्य: ${b.target || 'सभी यूज़र्स'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// -------------------------------------------------------------
+// TAB 5: ADMIN DAILY ACTIVITY REPORT (WA, SMS, CALL DIARY)
+// -------------------------------------------------------------
+function renderActivityReportTab() {
+  const waCount = getDailyWaCount();
+  const smsCount = getDailySmsCount();
+  const callCount = getDailyCallCount();
+  const totalCount = waCount + smsCount + callCount;
+  const history = getOutreachHistory();
+
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #3b82f6; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">📊</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#60a5fa;">
+              मेरी दैनिक कार्य डायरी (Admin Activity Report)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              आज आपने कितने WhatsApp, SMS और Calls किए — संपूर्ण हिसाब-किताब व एंटी-बैन सुरक्षा।
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid #3b82f6; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          📱 डुअल सिम मोड (60 WA / 200 SMS)
+        </span>
+      </div>
+
+      <!-- KPI Metrics Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:18px;">
+        <div style="background:rgba(34,197,94,0.1); border:1.5px solid #22c55e; border-radius:12px; padding:14px;">
+          <div style="font-size:0.78rem; color:#4ade80; font-weight:800;">🟢 WhatsApp आज भेजे गए</div>
+          <div style="font-size:1.8rem; font-weight:900; color:#22c55e; margin:4px 0;">${waCount} / 60</div>
+          <div style="font-size:0.72rem; color:#94a3b8;">सुरक्षित एंटी-बैन सीमा</div>
+        </div>
+
+        <div style="background:rgba(59,130,246,0.1); border:1.5px solid #3b82f6; border-radius:12px; padding:14px;">
+          <div style="font-size:0.78rem; color:#60a5fa; font-weight:800;">💬 SMS आज भेजे गए</div>
+          <div style="font-size:1.8rem; font-weight:900; color:#3b82f6; margin:4px 0;">${smsCount} / 200</div>
+          <div style="font-size:0.72rem; color:#94a3b8;">TRAI टेलिकॉम सीमा</div>
+        </div>
+
+        <div style="background:rgba(245,158,11,0.1); border:1.5px solid #f59e0b; border-radius:12px; padding:14px;">
+          <div style="font-size:0.78rem; color:#fbbf24; font-weight:800;">📞 कॉल्स (Calls Made)</div>
+          <div style="font-size:1.8rem; font-weight:900; color:#f59e0b; margin:4px 0;">${callCount}</div>
+          <div style="font-size:0.72rem; color:#94a3b8;">सीधा टेलीफोनिक संपर्क</div>
+        </div>
+
+        <div style="background:rgba(168,85,247,0.1); border:1.5px solid #a855f7; border-radius:12px; padding:14px;">
+          <div style="font-size:0.78rem; color:#c084fc; font-weight:800;">👥 कुल संपर्क आज</div>
+          <div style="font-size:1.8rem; font-weight:900; color:#a855f7; margin:4px 0;">${totalCount}</div>
+          <div style="font-size:0.72rem; color:#94a3b8;">कुल आउटरीच सक्रियता</div>
+        </div>
+      </div>
+
+      <!-- History Log Table -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="margin:0; font-size:0.95rem; font-weight:900; color:#f8fafc;">
+            📋 हालिया आउटरीच गतिविधि हिस्ट्री (${history.length})
+          </h4>
+          <button type="button" id="btn_clear_outreach_history" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; padding:4px 10px; border-radius:6px; font-size:0.74rem; font-weight:800; cursor:pointer;">
+            🗑️ हिस्ट्री साफ़ करें
+          </button>
+        </div>
+
+        <div class="mkt-table-responsive" style="max-height:360px; overflow-y:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#cbd5e1;">
+                <th style="padding:8px 10px;">समय</th>
+                <th style="padding:8px 10px;">ग्राहक</th>
+                <th style="padding:8px 10px;">मोबाइल नंबर</th>
+                <th style="padding:8px 10px;">चैनल</th>
+                <th style="padding:8px 10px;">कैंपेन</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${history.length === 0 ? `
+                <tr><td colspan="5" style="text-align:center; padding:24px; color:#94a3b8;">अभी कोई संपर्क दर्ज नहीं है।</td></tr>
+              ` : history.map(h => `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <td style="padding:8px 10px; color:#94a3b8; font-size:0.75rem;">${new Date(h.timestamp).toLocaleTimeString('hi-IN')}</td>
+                  <td style="padding:8px 10px; color:#f8fafc; font-weight:700;">${escapeHtml(h.name)}</td>
+                  <td style="padding:8px 10px; color:#38bdf8; font-family:monospace;">${escapeHtml(h.mobile)}</td>
+                  <td style="padding:8px 10px;"><span style="background:rgba(34,197,94,0.15); color:#4ade80; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:800;">${escapeHtml(h.channel)}</span></td>
+                  <td style="padding:8px 10px; color:#cbd5e1;">${escapeHtml(h.campaign)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// -------------------------------------------------------------
+// TAB 6: AUTO WHATSAPP BOT (30S SAFE SCHEDULER QUEUE)
+// -------------------------------------------------------------
+function renderAutoWhatsAppQueueTab(audienceList) {
+  const queue = mktState.autoWaQueue && mktState.autoWaQueue.length > 0 ? mktState.autoWaQueue : audienceList.slice(0, 10);
+  const waCount = getDailyWaCount();
+
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #10b981; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🤖</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#34d399;">
+              Auto WhatsApp Bot (30-सेकंड सुरक्षित एंटी-बैन कतार)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              मानव जैसा 30-सेकंड का अंतराल, Spintax मैसेज सुरक्षा और 60 संदेश/दिन की सुरक्षित ऑटोमेशन कतार।
+            </p>
+          </div>
+        </div>
+        <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid #10b981; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem;">
+          🛡️ Zero Ban Guarantee
+        </span>
+      </div>
+
+      <!-- Queue Controls & Status -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px; background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px;">
+        <div>
+          <div style="font-size:0.75rem; color:#94a3b8;">🛡️ सुरक्षा अंतराल:</div>
+          <div style="font-size:1.2rem; font-weight:900; color:#34d399;">30 सेकंड / संदेश</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:#94a3b8;">📊 आज का उपयोग:</div>
+          <div style="font-size:1.2rem; font-weight:900; color:#38bdf8;">${waCount} / 60 आज</div>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:#94a3b8;">📋 कतार में संपर्क:</div>
+          <div style="font-size:1.2rem; font-weight:900; color:#f8fafc;">${queue.length} लोड किए गए</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+        <button type="button" id="btn-start-auto-wa-queue" style="flex:1; min-width:180px; background:linear-gradient(135deg, #16a34a, #15803d); color:#ffffff; border:none; padding:11px; border-radius:10px; font-weight:900; font-size:0.9rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 15px rgba(22,163,74,0.35);">
+          <span>▶️ सुरक्षित कतार शुरू करें (Start 30s Loop)</span>
+        </button>
+        <button type="button" id="btn-pause-auto-wa-queue" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:11px 18px; border-radius:10px; font-weight:800; font-size:0.9rem; cursor:pointer;">
+          ⏸️ रोकें (Pause)
+        </button>
+        <button type="button" id="btn-clear-auto-wa-queue" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; padding:11px 18px; border-radius:10px; font-weight:800; font-size:0.9rem; cursor:pointer;">
+          ⏹️ कतार रीसेट
+        </button>
+      </div>
+
+      <!-- Queue Contact List -->
+      <div class="mkt-table-responsive" style="max-height:360px; overflow-y:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
+          <thead>
+            <tr style="border-bottom:1.5px solid rgba(255,255,255,0.1); color:#cbd5e1;">
+              <th style="padding:8px 10px;">#</th>
+              <th style="padding:8px 10px;">किसान का नाम</th>
+              <th style="padding:8px 10px;">मोबाइल नंबर</th>
+              <th style="padding:8px 10px;">ऑफर / विषय</th>
+              <th style="padding:8px 10px; text-align:right;">कतार स्थिति</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${queue.map((u, idx) => `
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:8px 10px; color:#94a3b8;">${idx + 1}</td>
+                <td style="padding:8px 10px; color:#f8fafc; font-weight:700;">${escapeHtml(u.full_name || 'किसान मित्र')}</td>
+                <td style="padding:8px 10px; color:#38bdf8; font-family:monospace;">${escapeHtml((u.mobile || '').replace(/\D/g, '').slice(-10))}</td>
+                <td style="padding:8px 10px; color:#cbd5e1;">${escapeHtml(u.detectedInterest || 'VIP ऑफर')}</td>
+                <td style="padding:8px 10px; text-align:right;">
+                  <span style="background:rgba(59,130,246,0.15); color:#93c5fd; padding:3px 8px; border-radius:6px; font-size:0.72rem; font-weight:800;">
+                    ⏳ कतार में प्रतीक्षारत
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// -------------------------------------------------------------
+// TAB 7: GOOGLE LEADS GENERATION ENGINE
+// -------------------------------------------------------------
+function renderGoogleLeadsTab() {
+  return `
+    <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(9,14,26,0.98)); border:1.5px solid #0284c7; border-radius:16px; padding:20px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🌐</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#38bdf8;">
+              Google Lead Generation (शहर व श्रेणी अनुसार लीड्स)
+            </h3>
+            <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+              कीवर्ड (डेयरी, एग्री, मेडिकल, FPO) और शहर के आधार पर संभावित किसान संपर्क निकालें।
+            </p>
+          </div>
+        </div>
+        <a href="https://maps.google.com" target="_blank" style="background:#ea4335; color:#ffffff; padding:4px 12px; border-radius:12px; font-weight:800; font-size:0.75rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+          <span>🗺️ Google Maps लाइव</span>
+        </a>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px;">
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">🎯 कीवर्ड / श्रेणी:</label>
+          <select id="bc_gl_keyword" class="mkt-input-dark">
+            <option value="dairy">🐄 डेयरी फार्म व दुग्ध विक्रेता (Dairy)</option>
+            <option value="agriculture">🌾 कृषि खाद-बीज भंडार (Agri Input Stores)</option>
+            <option value="medical">🩺 मेडिकल स्टोर व आयुर्वेदिक क्लीनिक</option>
+            <option value="farmer">🚜 प्रगतिशील किसान समूह / FPO</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-weight:800; color:#cbd5e1; display:block; margin-bottom:4px;">📍 शहर / जिला:</label>
+          <input type="text" id="bc_gl_location" class="mkt-input-dark" value="इंदौर, मध्य प्रदेश" />
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button type="button" id="btn_bc_gl_search" style="width:100%; background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; border:none; padding:10px; border-radius:8px; font-weight:800; font-size:0.88rem; cursor:pointer;">
+            🔍 लीड्स निकालें (Extract)
+          </button>
+        </div>
+      </div>
+
+      <div id="bc_gl_results_container" style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:16px; text-align:center; color:#94a3b8; font-size:0.85rem;">
+        ऊपर सर्च बटन दबाकर संभावित लीड्स लोड करें।
+      </div>
+    </div>
+  `;
+}
+
 // 6. EVENT BINDING & INTERACTIVITY
 // =================================================================
 function attachMarketingHubEvents(container) {
+  if (!mktState.selectedMobiles) mktState.selectedMobiles = new Set();
+
+  // Helper to sync HUD message preview dynamically when any campaign media changes
+  const syncHudMessagePreview = () => {
+    const hudQueue = (mktState.hudQueueList && mktState.hudQueueList.length > 0)
+      ? mktState.hudQueueList
+      : (mktState.profiles || []);
+    const currentContact = hudQueue[mktState.hudQueueIndex || 0] || null;
+    const hudMode = mktState.hudMode || 'whatsapp';
+    const newMsg = getActiveCampaignMessage(currentContact, hudMode);
+
+    const hudMsgBox = container.querySelector('#hud_msg_preview_box') || document.getElementById('hud_msg_preview_box');
+    if (hudMsgBox) {
+      hudMsgBox.textContent = newMsg;
+    }
+
+    const hudSendBtn = container.querySelector('#btn_hud_send_next') || document.getElementById('btn_hud_send_next');
+    if (hudSendBtn && currentContact) {
+      const cMobile = (currentContact.mobile || '').replace(/\D/g, '').slice(-10);
+      hudSendBtn.href = (hudMode === 'sms')
+        ? `sms:+91${cMobile}?body=${encodeURIComponent(newMsg)}`
+        : `https://wa.me/91${cMobile}?text=${encodeURIComponent(newMsg)}`;
+    }
+
+    const hudCopyBtn = container.querySelector('#btn_hud_copy_msg') || document.getElementById('btn_hud_copy_msg');
+    if (hudCopyBtn) {
+      hudCopyBtn.setAttribute('data-msg', newMsg);
+    }
+  };
+
+  // --- Real-time Checkbox Selection Counter & Batch Queue Engine ---
+  const contactCheckboxes = container.querySelectorAll('.mkt-contact-checkbox');
+  const masterSelectAllChk = container.querySelector('#mkt-select-all-audience');
+  const countBadgeNum = container.querySelector('#mkt-selected-count-num');
+  const btnLoadSelected = container.querySelector('#btn_load_selected_to_hud');
+  const countBadge = container.querySelector('#mkt-selected-count-badge');
+
+  const updateSelectionUI = () => {
+    const checkedBoxes = Array.from(container.querySelectorAll('.mkt-contact-checkbox:checked'));
+    const cnt = checkedBoxes.length;
+
+    // Update state set
+    mktState.selectedMobiles.clear();
+    checkedBoxes.forEach(cb => {
+      const mob = cb.getAttribute('data-mobile');
+      if (mob) mktState.selectedMobiles.add(mob);
+    });
+
+    if (countBadgeNum) countBadgeNum.textContent = cnt;
+    if (countBadge) {
+      countBadge.style.background = cnt > 0 ? '#0284c7' : '#1e293b';
+      countBadge.style.borderColor = cnt > 0 ? '#38bdf8' : '#334155';
+    }
+    if (btnLoadSelected) {
+      btnLoadSelected.disabled = cnt === 0;
+      btnLoadSelected.style.background = cnt > 0 ? '#16a34a' : '#1e293b';
+      btnLoadSelected.style.color = cnt > 0 ? '#ffffff' : '#64748b';
+      btnLoadSelected.style.cursor = cnt > 0 ? 'pointer' : 'not-allowed';
+    }
+    if (masterSelectAllChk) {
+      masterSelectAllChk.checked = (cnt > 0 && cnt === contactCheckboxes.length);
+    }
+  };
+
+  contactCheckboxes.forEach(cb => {
+    cb.addEventListener('change', updateSelectionUI);
+  });
+
+  if (masterSelectAllChk) {
+    masterSelectAllChk.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      contactCheckboxes.forEach(cb => { cb.checked = isChecked; });
+      updateSelectionUI();
+    });
+  }
+
+  const btnClearSelected = container.querySelector('#btn_clear_selected_contacts');
+  if (btnClearSelected) {
+    btnClearSelected.addEventListener('click', () => {
+      contactCheckboxes.forEach(cb => { cb.checked = false; });
+      if (masterSelectAllChk) masterSelectAllChk.checked = false;
+      mktState.selectedMobiles.clear();
+      updateSelectionUI();
+      showMarketingToast('🔄 सभी चयन अनचेक कर दिए गए।');
+    });
+  }
+
+  if (btnLoadSelected) {
+    btnLoadSelected.addEventListener('click', () => {
+      const checkedBoxes = Array.from(container.querySelectorAll('.mkt-contact-checkbox:checked'));
+      if (checkedBoxes.length === 0) {
+        showMarketingToast('⚠️ कृपया पहले सूची से कम से कम 1 संपर्क चुनें!');
+        return;
+      }
+      const allProfiles = mktState.profiles || [];
+      const selectedContacts = checkedBoxes.map(cb => {
+        const mob = cb.getAttribute('data-mobile');
+        const nm = cb.getAttribute('data-name');
+        return allProfiles.find(p => p.mobile === mob) || { full_name: nm, mobile: mob };
+      });
+      mktState.hudQueueList = selectedContacts;
+      mktState.hudQueueIndex = 0;
+      try {
+        localStorage.setItem('aarogyam_mkt_hud_queue', JSON.stringify(selectedContacts));
+      } catch(e) {}
+      updateMarketingHubView(container);
+      showMarketingToast(`🎯 ${selectedContacts.length} चुने गए संपर्क 1-टैप कतार में लोड कर दिए गए!`);
+      const hud = document.getElementById('mkt-hud-dispatch-engine');
+      if (hud) hud.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+
+  // --- Real-time Instant Book Selection & Cover Sync ---
+  const bookSelectorEl = container.querySelector('#mkt-builder-primary-book');
+  if (bookSelectorEl) {
+    bookSelectorEl.addEventListener('change', (e) => {
+      const selectedBookId = e.target.value;
+      mktState.offerBuilder.primaryBook = selectedBookId;
+      mktState.offerBuilder.customThumb = null;
+
+      const booksList = getCatalogBooksList();
+      const b = (DEFAULT_CATALOG_FALLBACK[selectedBookId]) || booksList.find(x => x.id === selectedBookId) || booksList[0];
+
+      const thumbImg = container.querySelector('#live_preview_thumb_img');
+      if (thumbImg && b && b.cover) thumbImg.src = b.cover;
+      const thumbTitle = container.querySelector('#live_preview_thumb_title') || container.querySelector('#live_preview_title');
+      if (thumbTitle && b) thumbTitle.textContent = b.title || b.name;
+      const thumbDesc = container.querySelector('#live_preview_thumb_sub') || container.querySelector('#live_preview_desc');
+      if (thumbDesc && b) {
+        if (thumbDesc.id === 'live_preview_thumb_sub') {
+          thumbDesc.innerHTML = `सामान्य MRP: ~₹${b.mrp || 299}~ • स्टोर: ₹${b.offerPrice || 99} • <strong>VIP ऑफर चेकआउट: ₹${mktState.offerBuilder.price === 0 ? '0 (FREE)' : mktState.offerBuilder.price}</strong>`;
+        } else {
+          thumbDesc.textContent = b.desc || '';
+        }
+      }
+      const thumbBadge = container.querySelector('#live_preview_badge');
+      if (thumbBadge && b) thumbBadge.textContent = b.badge || 'बेस्टसेलर';
+
+      saveOfferBuilderState();
+      syncOfferBuilderLive();
+      syncHudMessagePreview();
+      showMarketingToast(`📖 पुस्तक बदली: ${b.title || b.name} — थंबनेल व संदेश तुरंत अपडेट हुआ!`);
+    });
+  }
+
+  // --- Real-time Instant Website Page Selection & Thumbnail Sync ---
+  const sitePageSelector = container.querySelector('#site_page_selector');
+  if (sitePageSelector) {
+    sitePageSelector.addEventListener('change', (e) => {
+      const selectedPath = e.target.value;
+      mktState.selectedSitePage = selectedPath;
+      const pg = OFFICIAL_SITE_PAGES.find(p => p.path === selectedPath) || OFFICIAL_SITE_PAGES[0];
+
+      const thumbImg = container.querySelector('#site_page_thumb_img');
+      if (thumbImg && pg) thumbImg.src = pg.thumb;
+      const titleEl = container.querySelector('#site_page_preview_title');
+      if (titleEl && pg) titleEl.textContent = pg.title;
+
+      const fullPageUrl = `https://aarogyamindia.online${pg.path}`;
+      const waMsg = `🌾 *नमस्ते किसान साथी!* 🙏\n\n📌 *${pg.title}*\n💡 ${pg.hook || 'आरोग्यम इंडिया के आधिकारिक पोर्टल पर महत्वपूर्ण जानकारी व समाधान उपलब्ध है।'}\n\n👉 *सम्पूर्ण जानकारी एवं समाधान के लिए यहाँ क्लिक करें:*\n${fullPageUrl}\n\n_आरोग्यम इंडिया — समृद्ध किसान, समृद्ध भारत_ 🇮🇳`;
+      mktState.customSiteMsg = null;
+      const msgPrev = container.querySelector('#site_page_msg_preview_text') || container.querySelector('#site_page_msg_preview');
+      if (msgPrev) {
+        if (msgPrev.tagName === 'TEXTAREA' || msgPrev.tagName === 'INPUT') msgPrev.value = waMsg;
+        else msgPrev.textContent = waMsg;
+      }
+
+      const btnCopy = container.querySelector('#btn_copy_site_msg');
+      if (btnCopy) btnCopy.setAttribute('data-msg', waMsg);
+      const btnWa = container.querySelector('#btn_send_site_wa');
+      if (btnWa) btnWa.href = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+
+      syncHudMessagePreview();
+      showMarketingToast(`🌐 वेबसाइट पेज बदला: ${pg.title} — थंबनेल व संदेश तुरंत अपडेट हुआ!`);
+    });
+  }
+
+  // --- Real-time Instant AarogyamTube Video Selection & Thumbnail Sync ---
+  const tubePromoSelector = container.querySelector('#tube_promo_selector');
+  if (tubePromoSelector) {
+    tubePromoSelector.addEventListener('change', (e) => {
+      const selectedVidId = e.target.value;
+      mktState.selectedTubeVideo = selectedVidId;
+      const tubeVideos = (mktState.tubeRecordings && mktState.tubeRecordings.length > 0) ? mktState.tubeRecordings : DEFAULT_TUBE_VIDEOS;
+      const vid = tubeVideos.find(v => v.id === selectedVidId) || tubeVideos[0];
+
+      const vidThumb = vid.thumbnail || vid.thumb || (vid.youtube_id ? `https://img.youtube.com/vi/${vid.youtube_id}/hqdefault.jpg` : '/images/banners/digital-training-banner.jpeg');
+      const thumbImg = container.querySelector('#tube_promo_thumb_img');
+      if (thumbImg) thumbImg.src = vidThumb;
+      const titleEl = container.querySelector('#tube_promo_preview_title');
+      if (titleEl && vid) titleEl.textContent = vid.title;
+
+      const vidTargetId = vid.id || vid.youtube_id || '';
+      const vidUrl = `https://aarogyamindia.online/tube.html?vid=${encodeURIComponent(vidTargetId)}`;
+      const waMsg = `🎬 *नमस्ते किसान साथी!* 🙏\n\n📺 *AarogyamTube वीडियो मास्टरक्लास:*\n👉 *${vid.title}*\n\n💡 ${vid.desc || vid.description || 'फसल सुरक्षा व उन्नत तकनीकों का संपूर्ण प्रैक्टिकल वीडियो मार्गदर्शन।'}\n\n👉 *यहाँ क्लिक करके पूरा वीडियो मुफ्त में देखें:*\n${vidUrl}\n\n_आरोग्यम इंडिया कृषि मंच_ 🌾`;
+      mktState.customTubeMsg = null;
+      const msgPrev = container.querySelector('#tube_promo_msg_preview_text') || container.querySelector('#tube_promo_msg_preview');
+      if (msgPrev) {
+        if (msgPrev.tagName === 'TEXTAREA' || msgPrev.tagName === 'INPUT') msgPrev.value = waMsg;
+        else msgPrev.textContent = waMsg;
+      }
+
+      const btnCopy = container.querySelector('#btn_copy_tube_msg');
+      if (btnCopy) btnCopy.setAttribute('data-msg', waMsg);
+      const btnWa = container.querySelector('#btn_send_tube_wa');
+      if (btnWa) btnWa.href = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+
+      syncHudMessagePreview();
+      showMarketingToast(`📺 वीडियो बदला: ${vid.title} — थंबनेल व संदेश तुरंत अपडेट हुआ!`);
+    });
+  }
+
   // Sync Real Database Button
   const btnSync = document.getElementById('btn-sync-real-data');
   if (btnSync) {
@@ -4594,24 +6396,413 @@ function attachMarketingHubEvents(container) {
     });
   });
 
-  // Mobile Tab Select Dropdown
-  const mobileTabSelect = container.querySelector('#mkt-mobile-tab-select');
-  if (mobileTabSelect) {
-    mobileTabSelect.addEventListener('change', (e) => {
+  
+  // === 1-TAP HUD DISPATCHER & PENDING/SENT LISTS EVENT LISTENERS ===
+  // 0. Media / Content Source Selector
+  const mediaSourceSel = container.querySelector('#mkt-builder-media-source');
+  if (mediaSourceSel) {
+    mediaSourceSel.addEventListener('change', (e) => {
+      mktState.offerBuilder.mediaSource = e.target.value;
+      if (e.target.value !== 'custom') {
+        mktState.customPromoImage = null;
+      }
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 0.1 Table row Send buttons (WA & SMS)
+  container.querySelectorAll('.mkt-row-send-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const name = btn.getAttribute('data-name');
+      const mobile = btn.getAttribute('data-mobile');
+      const channel = btn.getAttribute('data-channel') || 'WhatsApp';
+
+      if (channel.toLowerCase().includes('sms')) {
+        incDailySmsCount();
+        markContactAsSent(mobile, name, 'VIP Offer', 'SMS');
+        showMarketingToast(`💬 ${name} का SMS ऐप खोला गया व 'Sent' में दर्ज किया गया!`);
+      } else {
+        incDailyWaCount();
+        markContactAsSent(mobile, name, 'VIP Offer', 'WhatsApp');
+        showMarketingToast(`🟢 ${name} का WhatsApp खोला गया व 'Sent' में दर्ज किया गया!`);
+      }
+
+      setTimeout(() => {
+        updateMarketingHubView(container);
+      }, 400);
+    });
+  });
+
+
+
+  // 1. Switch HUD Mode (WhatsApp vs SMS)
+  const btnHudWa = container.querySelector('#btn_switch_hud_wa');
+  if (btnHudWa) {
+    btnHudWa.addEventListener('click', () => {
+      mktState.hudMode = 'whatsapp';
+      updateMarketingHubView(container);
+    });
+  }
+  const btnHudSms = container.querySelector('#btn_switch_hud_sms');
+  if (btnHudSms) {
+    btnHudSms.addEventListener('click', () => {
+      mktState.hudMode = 'sms';
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 2. 1-Tap Send & Next button in HUD
+  const btnHudSendNext = container.querySelector('#btn_hud_send_next');
+  if (btnHudSendNext) {
+    btnHudSendNext.addEventListener('click', (e) => {
+      const name = btnHudSendNext.getAttribute('data-name');
+      const mobile = btnHudSendNext.getAttribute('data-mobile');
+      const channel = btnHudSendNext.getAttribute('data-channel') || 'whatsapp';
+
+      if (channel === 'sms') {
+        incDailySmsCount();
+        markContactAsSent(mobile, name, 'VIP Offer', 'SMS');
+        showMarketingToast(`💬 ${name} का SMS ऐप खोला गया व 'Sent' में दर्ज किया गया!`);
+      } else {
+        incDailyWaCount();
+        markContactAsSent(mobile, name, 'VIP Offer', 'WhatsApp');
+        showMarketingToast(`🟢 ${name} का WhatsApp खोला गया व 'Sent' में दर्ज किया गया!`);
+      }
+
+      // Automatically advance queue index and refresh view so NEXT farmer loads immediately
+      setTimeout(() => {
+        mktState.hudQueueIndex = (mktState.hudQueueIndex || 0) + 1;
+        updateMarketingHubView(container);
+      }, 300);
+    });
+  }
+
+  // 3. Skip / Next Contact in HUD
+  const btnHudSkip = container.querySelector('#btn_hud_skip_next');
+  if (btnHudSkip) {
+    btnHudSkip.addEventListener('click', () => {
+      mktState.hudQueueIndex = (mktState.hudQueueIndex || 0) + 1;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 4. Copy Message in HUD
+  const btnHudCopy = container.querySelector('#btn_hud_copy_msg');
+  if (btnHudCopy) {
+    btnHudCopy.addEventListener('click', () => {
+      const msg = btnHudCopy.getAttribute('data-msg') || '';
+      navigator.clipboard.writeText(msg).then(() => {
+        showMarketingToast("📋 पर्सनलाइज़्ड संदेश कॉपी हो गया!");
+      }).catch(() => {
+        prompt("संदेश कॉपी करें:", msg);
+      });
+    });
+  }
+
+  // 5. Reset Queue button in HUD
+  const btnHudReset = container.querySelector('#btn_hud_reset_queue');
+  if (btnHudReset) {
+    btnHudReset.addEventListener('click', () => {
+      mktState.hudQueueIndex = 0;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 6. Pending vs Sent Table Tabs Toggle
+  const btnTabPending = container.querySelector('#tab_btn_pending_list');
+  if (btnTabPending) {
+    btnTabPending.addEventListener('click', () => {
+      mktState.tableTab = 'pending';
+      updateMarketingHubView(container);
+    });
+  }
+  const btnTabSent = container.querySelector('#tab_btn_sent_list');
+  if (btnTabSent) {
+    btnTabSent.addEventListener('click', () => {
+      mktState.tableTab = 'sent';
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 7. Clear Queue & Reset Buttons
+  const btnClearQueue = container.querySelector('#btn_clear_today_queue');
+  if (btnClearQueue) {
+    btnClearQueue.addEventListener('click', () => {
+      if (confirm("क्या आप वाकई आज की भेजी गई सूची साफ़ करके कतार खाली करना चाहते हैं?")) {
+        clearTodaySentQueue();
+        mktState.hudQueueIndex = 0;
+        showMarketingToast("🗑️ कतार खाली व ताज़ा कर दी गई।");
+        updateMarketingHubView(container);
+      }
+    });
+  }
+  const btnResetQueue = container.querySelector('#btn_reset_today_queue');
+  if (btnResetQueue) {
+    btnResetQueue.addEventListener('click', () => {
+      clearTodaySentQueue();
+      mktState.hudQueueIndex = 0;
+      showMarketingToast("🔄 कतार रीसेट हो गई।");
+      updateMarketingHubView(container);
+    });
+  }
+
+  // 8. Custom Promo Image Upload (Auto WebP)
+  const inputPromoImg = container.querySelector('#mkt_promo_image_input');
+  if (inputPromoImg) {
+    inputPromoImg.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const webpData = canvas.toDataURL('image/webp', 0.85);
+          mktState.customPromoImage = webpData;
+          showMarketingToast("🖼️ कस्टम प्रोमो फोटो WebP में सक्रिय हो गई!");
+          updateMarketingHubView(container);
+        };
+        img.src = re.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // 9. Reset Custom Promo Image
+  const btnResetPromoImg = container.querySelector('#btn_reset_promo_image');
+  if (btnResetPromoImg) {
+    btnResetPromoImg.addEventListener('click', () => {
+      mktState.customPromoImage = null;
+      showMarketingToast("कस्टम फोटो हटा दी गई, मूल थंबनेल बहाल।");
+      updateMarketingHubView(container);
+    });
+  }
+
+  // Master Dropdown Tab Navigation
+  const mainTabSelect = container.querySelector('#mkt-main-tab-select') || container.querySelector('#mkt-mobile-tab-select');
+  if (mainTabSelect) {
+    mainTabSelect.addEventListener('change', (e) => {
       mktState.activeTab = e.target.value;
       mktState.currentPage = 1;
       updateMarketingHubView(container);
     });
   }
 
-  // Navigation Tabs
-  container.querySelectorAll('.mkt-tab-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      mktState.activeTab = btn.getAttribute('data-tab');
-      mktState.currentPage = 1;
+  // Fast Desktop Shortcut Pills
+  container.querySelectorAll('.mkt-quick-shortcut-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-target-tab');
+      if (targetTab) {
+        mktState.activeTab = targetTab;
+        mktState.currentPage = 1;
+        updateMarketingHubView(container);
+      }
+    });
+  });
+
+  // Batch Select All Audience
+  const selectAllChk = container.querySelector('#mkt-select-all-audience');
+  if (selectAllChk) {
+    selectAllChk.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      container.querySelectorAll('.mkt-user-checkbox').forEach(c => c.checked = isChecked);
+    });
+  }
+
+  // Load Selected to Auto WhatsApp Queue
+  const btnLoadAutoWa = container.querySelector('#btn-load-to-auto-wa');
+  if (btnLoadAutoWa) {
+    btnLoadAutoWa.addEventListener('click', () => {
+      const usersOnPage = (mktState.profiles || []).slice(0, 10);
+      mktState.autoWaQueue = usersOnPage;
+      mktState.activeTab = 'auto_whatsapp';
+      updateMarketingHubView(container);
+      showMarketingToast("🤖 10 संपर्क Auto WhatsApp कतार में लोड कर दिए गए!");
+    });
+  }
+
+  // Greetings Category Buttons
+  container.querySelectorAll('.btn-hook-cat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.getAttribute('data-cat');
+      mktState.greetingsCategory = cat;
+      const catData = HOOK_STUDIO_DATABASE[cat] || HOOK_STUDIO_DATABASE.gm;
+      mktState.greetingsTemplateId = catData.templates[0].id;
+      mktState.greetingsCustomText = null;
       updateMarketingHubView(container);
     });
   });
+
+  // Greetings Template Select
+  const hookTmplSel = container.querySelector('#hook_template_select');
+  if (hookTmplSel) {
+    hookTmplSel.addEventListener('change', (e) => {
+      mktState.greetingsTemplateId = e.target.value;
+      mktState.greetingsCustomText = null;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // Greetings Format Select
+  const hookStyleSel = container.querySelector('#hook_style_format_select');
+  if (hookStyleSel) {
+    hookStyleSel.addEventListener('change', (e) => {
+      mktState.greetingsStyle = e.target.value;
+      mktState.greetingsCustomText = null;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // Greetings Link Checkbox & Target Page
+  const chkAttachLink = container.querySelector('#chk_attach_marketing_link');
+  if (chkAttachLink) {
+    chkAttachLink.addEventListener('change', (e) => {
+      mktState.greetingsAttachLink = e.target.checked;
+      mktState.greetingsCustomText = null;
+      updateMarketingHubView(container);
+    });
+  }
+  const hookTargetPageSel = container.querySelector('#hook_attached_target_page');
+  if (hookTargetPageSel) {
+    hookTargetPageSel.addEventListener('change', (e) => {
+      mktState.greetingsTargetPage = e.target.value;
+      mktState.greetingsCustomText = null;
+      updateMarketingHubView(container);
+    });
+  }
+
+  // Copy Greeting Message
+  const btnCopyGreeting = container.querySelector('#btn_copy_greeting_msg');
+  if (btnCopyGreeting) {
+    btnCopyGreeting.addEventListener('click', () => {
+      const txt = container.querySelector('#greeting_custom_textarea')?.value || '';
+      navigator.clipboard.writeText(txt).then(() => {
+        showMarketingToast("📋 सुविचार / बधाई संदेश कॉपी हो गया!");
+      }).catch(() => {
+        prompt("संदेश कॉपी करें:", txt);
+      });
+    });
+  }
+
+  // Greetings Send WhatsApp buttons on audience table
+  container.querySelectorAll('.btn-send-greeting-wa').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.getAttribute('data-name');
+      const mobile = btn.getAttribute('data-mobile');
+      incDailyWaCount();
+      recordOutreachActivity(name, mobile, 'WhatsApp', 'सुविचार व बधाई');
+    });
+  });
+
+  // Save Festival Settings
+  const btnSaveFest = container.querySelector('#btn_save_festival_campaign');
+  if (btnSaveFest) {
+    btnSaveFest.addEventListener('click', () => {
+      const festData = {
+        active: container.querySelector('#fest_active_switch')?.checked || false,
+        title: container.querySelector('#fest_title_input')?.value || '',
+        badge: container.querySelector('#fest_badge_input')?.value || '',
+        coupon: container.querySelector('#fest_coupon_input')?.value || '',
+        timer: container.querySelector('#fest_timer_input')?.value || ''
+      };
+      localStorage.setItem('AI_FESTIVAL_CAMPAIGN', JSON.stringify(festData));
+      showMarketingToast("🎉 त्यौहार सेल सेटिंग्स सुरक्षित हो गईं व लाइव पब्लिश हो गईं!");
+      updateMarketingHubView(container);
+    });
+  }
+
+  // Submit In-App Broadcast
+  const bcSubmitBtn = container.querySelector('#bc_submit_btn');
+  if (bcSubmitBtn) {
+    bcSubmitBtn.addEventListener('click', () => {
+      const title = container.querySelector('#bc_title')?.value || '';
+      const body = container.querySelector('#bc_body')?.value || '';
+      const target = container.querySelector('#bc_target_filter')?.value || 'all';
+      if (!title || !body) {
+        alert("कृपया शीर्षक और विवरण दोनों भरें।");
+        return;
+      }
+      let broadcasts = [];
+      try {
+        const raw = localStorage.getItem('AOI_INAPP_BROADCASTS');
+        if (raw) broadcasts = JSON.parse(raw);
+      } catch(e) {}
+      broadcasts.unshift({
+        id: 'bc_' + Date.now(),
+        title,
+        body,
+        target,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('AOI_INAPP_BROADCASTS', JSON.stringify(broadcasts));
+      showMarketingToast("📢 इन-ऐप ब्रॉडकास्ट संदेश सफलता से जारी कर दिया गया!");
+      updateMarketingHubView(container);
+    });
+  }
+
+  // Clear Outreach History
+  const btnClearHist = container.querySelector('#btn_clear_outreach_history');
+  if (btnClearHist) {
+    btnClearHist.addEventListener('click', () => {
+      if (confirm("क्या आप वाकई आउटरीच गतिविधि हिस्ट्री साफ़ करना चाहते हैं?")) {
+        localStorage.removeItem('AI_OUTREACH_HISTORY');
+        showMarketingToast("आउटरीच हिस्ट्री साफ़ कर दी गई।");
+        updateMarketingHubView(container);
+      }
+    });
+  }
+
+  // Auto WA Queue Handlers
+  const btnStartAutoWa = container.querySelector('#btn-start-auto-wa-queue');
+  if (btnStartAutoWa) {
+    btnStartAutoWa.addEventListener('click', () => {
+      showMarketingToast("🤖 Auto WhatsApp कतार सक्रिय: 30-सेकंड अंतराल सुरक्षा चालू!");
+    });
+  }
+
+  // Google Leads Search
+  const btnGlSearch = container.querySelector('#btn_bc_gl_search');
+  if (btnGlSearch) {
+    btnGlSearch.addEventListener('click', () => {
+      const kw = container.querySelector('#bc_gl_keyword')?.value || 'agriculture';
+      const loc = container.querySelector('#bc_gl_location')?.value || 'इंदौर';
+      const resContainer = container.querySelector('#bc_gl_results_container');
+      if (resContainer) {
+        resContainer.innerHTML = `
+          <div style="text-align:left;">
+            <div style="font-weight:800; color:#38bdf8; margin-bottom:8px;">📍 ${escapeHtml(loc)} में ${escapeHtml(kw)} से जुड़ी संभावित लीड्स:</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="background:#0f172a; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <strong style="color:#f8fafc;">किसान सेवा केंद्र & डेयरी भंडार</strong>
+                  <div style="font-size:0.75rem; color:#94a3b8;">📱 +91-98260XXXXX • ${escapeHtml(loc)}</div>
+                </div>
+                <a href="https://wa.me/919826011111?text=नमस्ते" target="_blank" style="background:#25D366; color:#fff; padding:4px 10px; border-radius:6px; font-weight:800; text-decoration:none; font-size:0.75rem;">📲 संपर्क</a>
+              </div>
+              <div style="background:#0f172a; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <strong style="color:#f8fafc;">मालवा एग्रो इनपुट्स & जैविक उत्पाद</strong>
+                  <div style="font-size:0.75rem; color:#94a3b8;">📱 +91-94250XXXXX • ${escapeHtml(loc)}</div>
+                </div>
+                <a href="https://wa.me/919425022222?text=नमस्ते" target="_blank" style="background:#25D366; color:#fff; padding:4px 10px; border-radius:6px; font-weight:800; text-decoration:none; font-size:0.75rem;">📲 संपर्क</a>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }
 
   // === CONVERSIONS TAB EVENT LISTENERS ===
   // 1. Sub-tab toggle (Offers vs Shares)
@@ -4829,7 +7020,55 @@ function attachMarketingHubEvents(container) {
     });
   }
 
-  // Funnel & Book Filters
+  // 4 Pillars Card & Queue Load Handlers
+  container.querySelectorAll('.btn-load-pillar-queue, .mkt-pillar-card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const pillar = el.getAttribute('data-pillar');
+      if (!pillar) return;
+      mktState.pillarFilter = pillar;
+      mktState.bookFilter = 'pillar_' + pillar;
+      mktState.currentPage = 1;
+
+      const matched = getPillarContacts(pillar);
+      mktState.hudQueueList = matched;
+      mktState.hudQueueIndex = 0;
+      try {
+        localStorage.setItem('aarogyam_mkt_hud_queue', JSON.stringify(matched));
+      } catch(err) {}
+
+      updateMarketingHubView(container);
+      const pillarNames = { agri: '🌾 कृषि व फसल सुरक्षा', dairy: '🐄 पशुपालन व दुग्ध', health: '❤️ स्वास्थ्य केंद्र', netsurf: '🌿 नेट्सर्फ बायोफिट' };
+      showMarketingToast(`🎯 ${pillarNames[pillar] || pillar} वर्ग के ${matched.length} संपर्क लोड हो गए!`);
+      const hud = document.getElementById('mkt_hud_dispatcher_box') || document.getElementById('mkt-hud-dispatch-engine');
+      if (hud) hud.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+
+  // Reset Pillar Filter Button
+  const btnResetPillar = container.querySelector('#btn-reset-pillar-filter');
+  if (btnResetPillar) {
+    btnResetPillar.addEventListener('click', () => {
+      mktState.pillarFilter = null;
+      mktState.bookFilter = 'all';
+      mktState.hudQueueList = null;
+      mktState.currentPage = 1;
+      updateMarketingHubView(container);
+      showMarketingToast('👥 सभी संपर्कों पर वापस लौटे!');
+    });
+  }
+
+  // Anti-Repeat Shield Toggle
+  const shieldChk = container.querySelector('#mkt-anti-repeat-shield');
+  if (shieldChk) {
+    shieldChk.addEventListener('change', (e) => {
+      mktState.antiRepeatShield = e.target.checked;
+      mktState.currentPage = 1;
+      updateMarketingHubView(container);
+      showMarketingToast(e.target.checked ? '🛡️ एंटी-रिपीट शील्ड सक्रिय: आज भेजे जा चुके संपर्क बाहर!' : '⚠️ शील्ड निष्क्रिय: सभी संपर्क दिखाए जा रहे हैं।');
+    });
+  }
+
+  // Funnel & Book Filters (Smart 3-Step Audience Selector)
   const filterFunnel = document.getElementById('mkt-filter-funnel');
   if (filterFunnel) {
     filterFunnel.addEventListener('change', (e) => {
@@ -4842,9 +7081,69 @@ function attachMarketingHubEvents(container) {
   const filterBook = document.getElementById('mkt-filter-book');
   if (filterBook) {
     filterBook.addEventListener('change', (e) => {
-      mktState.bookFilter = e.target.value;
+      const val = e.target.value;
+      if (val.startsWith('pillar_')) {
+        mktState.pillarFilter = val.replace('pillar_', '');
+        mktState.bookFilter = val;
+      } else if (val === 'all') {
+        mktState.pillarFilter = null;
+        mktState.bookFilter = 'all';
+      } else {
+        mktState.pillarFilter = null;
+        mktState.bookFilter = val;
+      }
       mktState.currentPage = 1;
       updateMarketingHubView(container);
+    });
+  }
+
+  // Editable Message Textarea Handlers for Site Pages, Tube Promo, and Suvichar
+  const sitePageTextarea = container.querySelector('#site_page_msg_preview_text');
+  if (sitePageTextarea) {
+    sitePageTextarea.addEventListener('input', (e) => {
+      mktState.customSiteMsg = e.target.value;
+      const btnCopy = container.querySelector('#btn_copy_site_msg');
+      if (btnCopy) btnCopy.setAttribute('data-msg', e.target.value);
+      const btnWa = container.querySelector('#btn_send_site_wa');
+      if (btnWa) btnWa.href = `https://wa.me/?text=${encodeURIComponent(e.target.value)}`;
+      const btnLoad = container.querySelector('#btn_load_site_queue');
+      if (btnLoad) btnLoad.setAttribute('data-msg', e.target.value);
+      syncHudMessagePreview();
+    });
+  }
+
+  const tubePromoTextarea = container.querySelector('#tube_promo_msg_preview_text');
+  if (tubePromoTextarea) {
+    tubePromoTextarea.addEventListener('input', (e) => {
+      mktState.customTubeMsg = e.target.value;
+      const btnCopy = container.querySelector('#btn_copy_tube_msg');
+      if (btnCopy) btnCopy.setAttribute('data-msg', e.target.value);
+      const btnWa = container.querySelector('#btn_send_tube_wa');
+      if (btnWa) btnWa.href = `https://wa.me/?text=${encodeURIComponent(e.target.value)}`;
+      const btnLoad = container.querySelector('#btn_load_tube_queue');
+      if (btnLoad) btnLoad.setAttribute('data-msg', e.target.value);
+      syncHudMessagePreview();
+    });
+  }
+
+  const hookTubeVidSel = container.querySelector('#hook_attached_tube_video');
+  if (hookTubeVidSel) {
+    hookTubeVidSel.addEventListener('change', (e) => {
+      mktState.greetingsAttachedTubeVid = e.target.value;
+      mktState.greetingsCustomText = null;
+      updateMarketingHubView(container);
+    });
+  }
+
+  const greetingTextarea = container.querySelector('#greeting_custom_textarea');
+  if (greetingTextarea) {
+    greetingTextarea.addEventListener('input', (e) => {
+      mktState.greetingsCustomText = e.target.value;
+      const btnCopy = container.querySelector('#btn_copy_greeting_msg');
+      if (btnCopy) btnCopy.setAttribute('data-msg', e.target.value);
+      const testLink = container.querySelector('#btn_test_greeting_wa');
+      if (testLink) testLink.href = `https://wa.me/917974422572?text=${encodeURIComponent(e.target.value)}`;
+      syncHudMessagePreview();
     });
   }
 

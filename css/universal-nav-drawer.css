@@ -1078,10 +1078,46 @@
   .header-current-page-badge,
   .btn-pwa-install,
   #header-pwa-install-btn,
-  .header-actions .btn-pwa-install,
-  .header-actions button:not(.menu-button),
-  .header-actions .btn:not(.menu-button):not(.cart-btn) {
+  .header-actions button:not(.menu-button):not(.user-notif-bell-btn),
+  .header-actions .btn:not(.menu-button):not(.cart-btn):not(.user-notif-bell-btn) {
     display: none !important;
+  }
+
+  /* Smart & Sleek Bell Icon on Mobile Header (Zero Clutter) */
+  .header-actions .user-notif-bell-btn,
+  .user-notif-bell-btn {
+    display: inline-flex !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+  }
+
+  .user-notif-bell-btn svg,
+  .user-notif-bell-btn i {
+    width: 15px !important;
+    height: 15px !important;
+    font-size: 0.88rem !important;
+    color: #0f172a !important;
+  }
+
+  .user-notif-bell-btn .user-notif-badge {
+    top: -3px !important;
+    right: -3px !important;
+    min-width: 15px !important;
+    height: 15px !important;
+    line-height: 15px !important;
+    font-size: 0.58rem !important;
+    border-width: 1.5px !important;
+    padding: 0 2px !important;
   }
 
   /* Compact brand logo & text */

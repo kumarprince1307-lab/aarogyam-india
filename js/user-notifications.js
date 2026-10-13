@@ -11,12 +11,141 @@
         currentFilter: 'all',
         audioCtx: null,
 
+        // 0. Strict Landing Page / Conversion Funnel Detector
+        isLandingPage: function () {
+            try {
+                const path = (window.location.pathname || '').toLowerCase();
+                const search = (window.location.search || '').toLowerCase();
+
+                // Explicit exception: Reader and Download pages MUST show notifications!
+                if (path.includes('reader') || path.includes('download')) {
+                    return false;
+                }
+
+                // Admin dashboard / portals
+                if (path.includes('/admin') || path.endsWith('admin.html')) return true;
+
+                // Strict single-product book marketing landing pages and checkout funnels
+                const landingSubstrings = [
+                    'landing',
+                    'checkout',
+                    'payment-',
+                    'demo-',
+                    'sample-ai-book',
+                    'kharif-master-guide',
+                    'kheti-dr',
+                    'fasal-ka-doctor',
+                    'digital-training',
+                    'training.html'
+                ];
+
+                for (const sub of landingSubstrings) {
+                    if (path.includes(sub)) return true;
+                }
+
+                // Query string indicators
+                if (search.includes('landing')) {
+                    return true;
+                }
+
+                // Title or og:title with Landing Page
+                if (document.title && /landing\s*page/i.test(document.title)) return true;
+                const ogTitle = document.querySelector('meta[property="og:title"]');
+                if (ogTitle && /landing\s*page/i.test(ogTitle.getAttribute('content') || '')) return true;
+
+                // DOM markers (excluding reader & download)
+                if (
+                    document.querySelector('.book-landing-body, .landing-hero, .landing-wrapper, .checkout-container, [data-page-type="landing"]') ||
+                    document.body.classList.contains('book-landing-page') ||
+                    document.body.getAttribute('data-page-type') === 'landing'
+                ) {
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        },
+
+        // 0.1 Universal Smart Header Bell Icon Injector (Non-landing pages only)
+        ensureBellIcon: function () {
+            if (this.isLandingPage()) {
+                document.querySelectorAll('.user-notif-bell-btn').forEach(b => b.remove());
+                return;
+            }
+
+            let bellBtn = document.querySelector('.user-notif-bell-btn');
+            if (!bellBtn) {
+                const headerActions = document.querySelector('.header-actions') || 
+                                      document.querySelector('.reader-header .header-right') ||
+                                      document.querySelector('.vip-header .header-inner') ||
+                                      document.querySelector('.header-inner') ||
+                                      document.querySelector('.header .nav-actions') || 
+                                      document.querySelector('.nav-actions') || 
+                                      document.querySelector('.header-right') || 
+                                      document.querySelector('header .actions');
+
+                if (headerActions) {
+                    bellBtn = document.createElement('button');
+                    bellBtn.type = 'button';
+                    bellBtn.className = 'user-notif-bell-btn';
+                    bellBtn.id = 'headerUserNotifBellBtn';
+                    bellBtn.title = 'मेरी सूचनाएं (Notifications)';
+                    bellBtn.setAttribute('aria-label', 'मेरी सूचनाएं (Notifications)');
+                    bellBtn.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;display:block;">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="user-notif-badge" style="display:none;">0</span>
+                    `;
+
+                    // Smart placement: Right before Cart link, Library button, theme switcher, or Menu button
+                    const cartLink = headerActions.querySelector('a[href*="cart"], .cart-btn, .cart-button, #cart-btn, .header-cart-icon');
+                    const libraryLink = headerActions.querySelector('.vip-header-library-btn, a[href*="my-library"]');
+                    const themeBtn = headerActions.querySelector('#themeToggleBtn, #btn_theme_toggle');
+                    const userBadge = headerActions.querySelector('#header-unified-user-badge, .header-user-status-pill');
+                    const menuBtn = headerActions.querySelector('.menu-button, .menu-btn, .hamburger, #menu-btn');
+
+                    if (cartLink) {
+                        headerActions.insertBefore(bellBtn, cartLink);
+                    } else if (libraryLink) {
+                        headerActions.insertBefore(bellBtn, libraryLink);
+                    } else if (themeBtn) {
+                        headerActions.insertBefore(bellBtn, themeBtn);
+                    } else if (userBadge) {
+                        headerActions.insertBefore(bellBtn, userBadge);
+                    } else if (menuBtn) {
+                        headerActions.insertBefore(bellBtn, menuBtn);
+                    } else {
+                        headerActions.appendChild(bellBtn);
+                    }
+                }
+            }
+
+            if (bellBtn && !bellBtn.dataset.bound) {
+                bellBtn.dataset.bound = 'true';
+                bellBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.togglePanel();
+                });
+            }
+
+            this.updateBadgeCount();
+        },
+
         // 1. Initialize Engine on DOM Ready
         init: async function () {
+            // Strict Landing Page Filter: Zero overhead and zero icons on landing pages
+            if (this.isLandingPage()) {
+                document.querySelectorAll('.user-notif-bell-btn').forEach(b => b.remove());
+                return;
+            }
+
             // Ensure no intrusive broadcast popup overlay is displayed
             const existingPopup = document.getElementById('ai-broadcast-popup-overlay');
             if (existingPopup) existingPopup.remove();
 
+            this.ensureBellIcon();
             this.ensureDomElements();
             await this.loadUserNotifications();
             this.bindEvents();
@@ -93,20 +222,45 @@
 
         // 4. Load User's Personal Real-time & Stored Notifications
         loadUserNotifications: async function (forceRefresh = false) {
-            const now = Date.now();
-            // ✅ EGRESS FIX: Cache 90s → 30 minutes to massively reduce Supabase queries
-            if (!forceRefresh && this._cache && (now - this._cacheTime < 1800000)) {
-                this.items = this._cache;
-                this.updateBadgeCount();
-                this.renderList();
-                return;
+            const user = this.getUser();
+            const userKey = user.id || user.mobile || 'guest';
+            const cacheKey = `AI_NOTIFS_CACHE_${userKey}`;
+            const lastFetchDateKey = `AI_NOTIFS_LAST_FETCH_DATE_${userKey}`;
+            const processedDispatchKey = `AI_NOTIFS_PROCESSED_DISPATCH_${userKey}`;
+
+            const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const lastFetchDate = localStorage.getItem(lastFetchDateKey) || '';
+            const lastAdminDispatch = parseInt(localStorage.getItem('AAROGYAM_NOTIF_DISPATCH_TIME') || '0', 10);
+            const processedDispatch = parseInt(localStorage.getItem(processedDispatchKey) || '0', 10);
+
+            const hasNewAdminDispatch = (lastAdminDispatch > 0 && lastAdminDispatch > processedDispatch);
+            const isAlreadyFetchedToday = (lastFetchDate === todayStr);
+
+            // ✅ SUPER STRICT EGRESS SHIELD:
+            // "subah ek bar ho fir nahi data fetch ho, jab tak admin panel se naya notification n bheju"
+            // If already fetched once today AND no new notification dispatched from admin panel:
+            // READ 100% FROM LOCAL CACHE! ZERO DATABASE EGRESS!
+            if (!forceRefresh && !hasNewAdminDispatch && isAlreadyFetchedToday) {
+                try {
+                    const cachedRaw = localStorage.getItem(cacheKey);
+                    if (cachedRaw) {
+                        const cachedItems = JSON.parse(cachedRaw);
+                        if (Array.isArray(cachedItems) && cachedItems.length > 0) {
+                            this.items = cachedItems;
+                            this._cache = cachedItems;
+                            this._cacheTime = Date.now();
+                            this.updateBadgeCount();
+                            this.renderList();
+                            return; // 🛡️ 100% ZERO EGRESS
+                        }
+                    }
+                } catch (e) {}
             }
 
-            const user = this.getUser();
-            const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`) || '[]');
+            const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${userKey}`) || '[]');
             const list = [];
 
-            // ✅ EGRESS FIX: Skip ALL Supabase queries for guests (no login = no DB egress)
+            // ✅ EGRESS FIX: Skip ALL Supabase queries for guests (no login = 0 DB egress)
             const isLoggedIn = Boolean(user.id || user.mobile);
             const db = isLoggedIn ? this.getDb() : null;
             const shareId = user.share_id || user.referral_code || '';
@@ -361,6 +515,11 @@
             this.items = list;
             this._cache = list;
             this._cacheTime = Date.now();
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify(list));
+                localStorage.setItem(lastFetchDateKey, todayStr);
+                localStorage.setItem(processedDispatchKey, String(lastAdminDispatch || Date.now()));
+            } catch (e) {}
             this.updateBadgeCount();
             this.renderList();
         },
@@ -380,6 +539,7 @@
                                 <span class="user-notif-unread-pill" id="userNotifUnreadPill">0 नई</span>
                             </div>
                             <div class="user-notif-header-actions">
+                                <button type="button" class="user-notif-btn-action" id="btnRefreshNotifs" onclick="window.USER_NOTIFICATIONS.loadUserNotifications(true)" title="ताज़ा करें">↻ रिफ्रेश</button>
                                 <button type="button" class="user-notif-btn-action" id="btnMarkAllRead">✓ सभी पढ़ें</button>
                                 <button type="button" class="user-notif-btn-close" id="btnCloseNotifPanel">&times;</button>
                             </div>
@@ -543,14 +703,19 @@
         // 9. Mark As Read Logic
         markAsRead: function (notifId) {
             const user = this.getUser();
-            const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`) || '[]');
+            const userKey = user.id || user.mobile || 'guest';
+            const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${userKey}`) || '[]');
             if (!readStore.includes(notifId)) {
                 readStore.push(notifId);
-                localStorage.setItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`, JSON.stringify(readStore));
+                localStorage.setItem(`AI_NOTIFS_READ_${userKey}`, JSON.stringify(readStore));
             }
 
             const item = this.items.find(n => n.id === notifId);
             if (item) item.isRead = true;
+
+            try {
+                localStorage.setItem(`AI_NOTIFS_CACHE_${userKey}`, JSON.stringify(this.items));
+            } catch (e) {}
 
             this.updateBadgeCount();
             this.renderList();
@@ -558,10 +723,16 @@
 
         markAllAsRead: function () {
             const user = this.getUser();
+            const userKey = user.id || user.mobile || 'guest';
             const allIds = this.items.map(n => n.id);
-            localStorage.setItem(`AI_NOTIFS_READ_${user.id || user.mobile || 'guest'}`, JSON.stringify(allIds));
+            localStorage.setItem(`AI_NOTIFS_READ_${userKey}`, JSON.stringify(allIds));
 
             this.items.forEach(n => n.isRead = true);
+
+            try {
+                localStorage.setItem(`AI_NOTIFS_CACHE_${userKey}`, JSON.stringify(this.items));
+            } catch (e) {}
+
             this.updateBadgeCount();
             this.renderList();
         },
@@ -648,11 +819,14 @@
 
             // Connect any button with class .user-notif-bell-btn
             document.querySelectorAll('.user-notif-bell-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.togglePanel();
-                });
+                if (!btn.dataset.bound) {
+                    btn.dataset.bound = 'true';
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.togglePanel();
+                    });
+                }
             });
         },
 
@@ -672,7 +846,7 @@
                 if (lastPrompt === today) return; // Strict: only ask once per day
 
                 // Do not display in admin panel
-                if (window.location.pathname.includes('/admin/')) return;
+                if (window.location.pathname.includes('/admin/') || this.isLandingPage()) return;
 
                 setTimeout(() => {
                     if (document.getElementById('ai-push-permission-toast')) return;
@@ -721,7 +895,7 @@
         // 14. Universal Festival & Flash Sale Banner (Flipkart / Amazon Style)
         renderFestivalBanner: async function () {
             try {
-                if (typeof window === 'undefined' || window.location.pathname.includes('/admin/')) return;
+                if (typeof window === 'undefined' || window.location.pathname.includes('/admin/') || this.isLandingPage()) return;
                 if (document.getElementById('ai-universal-festival-bar')) return;
 
                 let conf = null;
@@ -867,10 +1041,22 @@
         }
     };
 
-    // Auto-init on page load
+    // Auto-init on page load & re-ensure on load / dynamic nav
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => window.USER_NOTIFICATIONS.init());
     } else {
         window.USER_NOTIFICATIONS.init();
     }
+
+    window.addEventListener('load', () => {
+        if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.ensureBellIcon === 'function') {
+            window.USER_NOTIFICATIONS.ensureBellIcon();
+        }
+    });
+
+    window.addEventListener('ai:nav-ready', () => {
+        if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.ensureBellIcon === 'function') {
+            window.USER_NOTIFICATIONS.ensureBellIcon();
+        }
+    });
 })();

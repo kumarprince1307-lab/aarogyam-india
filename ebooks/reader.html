@@ -16,6 +16,7 @@
     
     <!-- Custom Reader CSS -->
     <link rel="stylesheet" href="../css/reader.css?v=20260918_v10_clear_audio_bar">
+    <link rel="stylesheet" href="/css/user-notifications.css">
 </head>
 <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
 
@@ -44,7 +45,15 @@
                 <span id="headerPercentInfo">0%</span>
             </div>
         </div>
-        <div class="header-right">
+        <div class="header-right header-actions" style="display:flex;align-items:center;gap:6px;">
+            <!-- 🔔 User Notification Bell Icon -->
+            <button type="button" class="user-notif-bell-btn" id="headerUserNotifBellBtn" title="मेरी सूचनाएं (Notifications)" aria-label="Notifications" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);color:#ffffff;width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="user-notif-badge" style="display:none;">0</span>
+            </button>
             <!-- Reading Theme Switcher (Dark / Light) -->
             <button id="themeToggleBtn" class="theme-toggle-btn" title="थीम बदलें (Dark / Light Mode)">
                 <span id="themeToggleIcon">🌙</span>
@@ -189,5 +198,6 @@
     <script src="../js/aarogyam-telemetry.js?v=20261002_v1"></script>
     <script src="../js/reader.js?v=20260930_v13_smooth_reader"></script>
     <script src="../js/audio-book-engine.js?v=20260930_v12_smooth_sync"></script>
+    <script src="/js/user-notifications.js"></script>
 </body>
 </html>

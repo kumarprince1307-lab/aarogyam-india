@@ -26,6 +26,14 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
+.user-notif-bell-btn svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    stroke: currentColor;
+    pointer-events: none;
+}
+
 .user-notif-badge {
     position: absolute;
     top: -4px;

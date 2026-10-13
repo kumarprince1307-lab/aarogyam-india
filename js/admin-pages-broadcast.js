@@ -19,13 +19,17 @@
    ========================================================================== */
 
 import { initAdminLayout, showToast } from './admin-main.js';
-import { fetchAllUsersAdmin } from './admin-api.js';
 
 export async function initAdminBroadcast() {
-  initAdminLayout('Smart Outreach CRM & VIP Offer Engine', 'VIP offers, Health, Pashupalan, Tube, Google Leads, Auto WA & live conversion analytics.');
+  const reportsMod = await import('./admin-pages-reports.js?v=19.0');
+  if (reportsMod.initReports) {
+    return reportsMod.initReports();
+  } else if (reportsMod.renderReports) {
+    return reportsMod.renderReports(document.getElementById('page-content'));
+  }
+}
 
-  const content = document.getElementById('page-content');
-  if (!content) return;
+async function unusedOldBroadcast() {
 
   // Master State
   let allUsers = [];

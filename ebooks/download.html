@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>👑 VIP ई-बुक डाउनलोड व ऐप हब — Aarogyam India</title>
     <link rel="stylesheet" href="../css/download.css?v=20260916_v6">
+    <link rel="stylesheet" href="/css/user-notifications.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,11 +31,21 @@
                     <span class="brand-sub-badge"><i class="fa-solid fa-crown" style="color:#f59e0b;"></i> VIP Delivery Hub</span>
                 </div>
             </div>
-            <a href="my-library.html" class="vip-header-library-btn" title="सीधे My Library में जाएं">
-                <i class="fa-solid fa-book-bookmark"></i>
-                <span>My Library में जाएं</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+                <!-- 🔔 User Notification Bell Icon -->
+                <button type="button" class="user-notif-bell-btn" id="headerUserNotifBellBtn" title="मेरी सूचनाएं (Notifications)" aria-label="Notifications" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="user-notif-badge" style="display:none;">0</span>
+                </button>
+                <a href="my-library.html" class="vip-header-library-btn" title="सीधे My Library में जाएं">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    <span>My Library में जाएं</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -454,5 +465,6 @@
     <script src="/js/supabase.js"></script>
     <script src="/session.js"></script>
     <script src="/js/download.js?v=20260916_v6"></script>
+    <script src="/js/user-notifications.js"></script>
 </body>
 </html>
