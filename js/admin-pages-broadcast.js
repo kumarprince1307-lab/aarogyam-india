@@ -21,7 +21,7 @@
 import { initAdminLayout, showToast } from './admin-main.js';
 
 export async function initAdminBroadcast() {
-  const reportsMod = await import('./admin-pages-reports.js?v=19.0');
+  const reportsMod = await import('./admin-pages-reports.js?v=21.0');
   if (reportsMod.initReports) {
     return reportsMod.initReports();
   } else if (reportsMod.renderReports) {

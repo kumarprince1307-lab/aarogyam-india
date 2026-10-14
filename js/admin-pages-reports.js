@@ -2157,6 +2157,7 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
   const campKey = getActiveCampaignKey();
   const campTitle = getActiveCampaignTitle();
   const sentSet = getCampaignSentSet(campKey);
+  const todaySentSet = sentSet;
   const sentMap = getCampaignSentMap(campKey);
 
   const pendingAudience = (audienceList || []).filter(u => {
@@ -2575,8 +2576,8 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
               const rowSmsMsg = getActiveCampaignMessage(u, 'sms');
               const waLink = `https://wa.me/91${uMobile}?text=${encodeURIComponent(rowWaMsg)}`;
               const smsLink = `sms:+91${uMobile}?body=${encodeURIComponent(rowSmsMsg)}`;
-              const callLink = `tel:+91${uMobile}`;
-              const isSentToday = todaySentSet.has(uMobile);
+              const callLink = uMobile ? `tel:+91${uMobile}` : '#';
+              const isSentToday = (typeof sentSet !== 'undefined' ? sentSet : (typeof todaySentSet !== 'undefined' ? todaySentSet : getCampaignSentSet())).has(uMobile);
               const isChecked = (mktState.selectedMobiles && mktState.selectedMobiles.has(uMobile)) || (mktState.selectedContactsSet && mktState.selectedContactsSet.has(u.id));
               const sentRec = getCampaignSentRecord(uMobile, campKey);
 
