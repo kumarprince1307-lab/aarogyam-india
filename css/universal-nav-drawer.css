@@ -1351,37 +1351,43 @@
 
   .brand-logo-pill img,
   .header-brand-wrap img {
-    height: 32px !important;
+    height: 28px !important;
     width: auto !important;
     flex-shrink: 0 !important;
   }
 
   .brand-title-text {
-    font-size: 1.02rem !important;
+    font-size: 0.90rem !important;
     letter-spacing: -0.3px !important;
     line-height: 1.1 !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .brand-sub-text {
-    font-size: 0.62rem !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    display: none !important;
+  }
+
+  /* Hide badge on mobile header to prevent 360px overflow */
+  #header-unified-user-badge,
+  .header-user-status-pill,
+  .header-login-quick-btn {
+    display: none !important;
   }
 
   /* Clean header actions layout */
   .header-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 6px !important;
     flex-shrink: 0 !important;
   }
 
   .header-actions .menu-button {
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 1.1rem !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1.05rem !important;
     border-radius: 8px !important;
   }
 }

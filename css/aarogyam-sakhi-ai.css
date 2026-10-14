@@ -20,28 +20,29 @@ html, body {
   box-sizing: border-box;
 }
 
-/* 1. FLOATING ACTION PILL (FAB - LEFT ALIGNED BENEATH AAROGYAMTUBE) */
+/* 1. FLOATING ACTION PILL (FAB - TOP LEFT ALIGNED WITH 5-SEC AUTO-COLLAPSE) */
 .sakhi-floating-pill {
   position: fixed;
-  bottom: 24px;
+  top: 75px;
   left: 16px;
+  bottom: auto;
   right: auto;
   z-index: 99998;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: linear-gradient(135deg, #166534 0%, #15803d 50%, #16a34a 100%);
   color: #ffffff;
-  padding: 8px 18px 8px 10px;
+  padding: 6px 16px 6px 6px;
   border-radius: 40px;
   border: 2px solid #86efac;
   box-shadow: 0 8px 24px rgba(22, 101, 52, 0.45);
   font-family: 'Outfit', 'Noto Sans Devanagari', sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 900;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   user-select: none;
   max-width: calc(100vw - 32px);
   box-sizing: border-box;
@@ -50,17 +51,60 @@ html, body {
 
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    bottom: 70px !important;
-    left: 12px !important;
-    padding: 6px 14px 6px 8px !important;
-    font-size: 0.85rem !important;
-    max-width: calc(100vw - 24px) !important;
+    top: 65px !important;
+    left: 10px !important;
+    bottom: auto !important;
+    padding: 5px 12px 5px 5px !important;
+    font-size: 0.82rem !important;
+    max-width: calc(100vw - 20px) !important;
   }
 }
 
+/* SMART 5-SECOND AUTO-COLLAPSED STATE (COMPACT CIRCULAR AVATAR) */
+.sakhi-floating-pill.collapsed {
+  padding: 3px !important;
+  border-radius: 50% !important;
+  gap: 0 !important;
+  background: #14532d;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), 0 0 12px rgba(34, 197, 94, 0.5);
+  border-color: #facc15;
+}
+
+.sakhi-floating-pill .sakhi-pill-label,
+.sakhi-floating-pill .sakhi-pill-live-dot {
+  transition: max-width 0.35s ease, opacity 0.25s ease, transform 0.3s ease;
+  max-width: 150px;
+  opacity: 1;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.sakhi-floating-pill.collapsed .sakhi-pill-label,
+.sakhi-floating-pill.collapsed .sakhi-pill-live-dot {
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
 .sakhi-floating-pill:hover {
-  transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 14px 32px rgba(22, 101, 52, 0.55);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(22, 101, 52, 0.6);
+}
+
+/* On hover over collapsed pill, briefly expand */
+.sakhi-floating-pill.collapsed:hover {
+  border-radius: 40px !important;
+  padding: 6px 16px 6px 6px !important;
+  gap: 8px !important;
+}
+
+.sakhi-floating-pill.collapsed:hover .sakhi-pill-label,
+.sakhi-floating-pill.collapsed:hover .sakhi-pill-live-dot {
+  max-width: 150px !important;
+  opacity: 1 !important;
 }
 
 .sakhi-floating-pill:active {
@@ -139,6 +183,7 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-sizing: border-box;
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: 'Outfit', 'Noto Sans Devanagari', -apple-system, sans-serif;
@@ -164,24 +209,32 @@ html, body {
 .sakhi-header {
   background: linear-gradient(135deg, #052e16 0%, #14532d 60%, #166534 100%);
   color: #ffffff;
-  padding: 14px 18px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 2px solid #22c55e;
   position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  gap: 8px;
 }
 
 .sakhi-header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 /* ANIMATED SAKHI AVATAR */
 .sakhi-avatar-frame {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: #fef08a;
   border: 2.5px solid #86efac;
@@ -212,27 +265,40 @@ html, body {
   100% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0.8); transform: scale(1.05); }
 }
 
+.sakhi-header-info {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
 .sakhi-header-info h3 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: #ffffff;
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sakhi-header-info p {
   margin: 2px 0 0 0;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   color: #bbf7d0;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sakhi-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .sakhi-sound-toggle-btn,
@@ -347,6 +413,44 @@ html, body {
   border: 1.5px solid #e2e8f0;
   border-radius: 18px 18px 18px 4px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+/* IN-MESSAGE AUDIO LISTEN / MUTE PILL */
+.sakhi-msg-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.sakhi-msg-audio-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+  transform: scale(1.03);
+}
+
+.sakhi-msg-audio-btn.speaking {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  animation: sakhiAudioBtnPulse 1.2s infinite alternate;
+}
+
+@keyframes sakhiAudioBtnPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
 }
 
 /* SPEECH WAVEFORM / AUDIO PLAYING INDICATOR */
@@ -503,11 +607,15 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .sakhi-mic-btn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #f1f5f9;
   border: 2px solid #cbd5e1;
@@ -515,7 +623,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.25s ease;
   flex-shrink: 0;
@@ -536,7 +644,8 @@ html, body {
 }
 
 .sakhi-text-input {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0; /* CRITICAL: ensures send button is never pushed off screen */
   height: 46px;
   background: #f8fafc;
   border: 1.5px solid #cbd5e1;
@@ -547,6 +656,7 @@ html, body {
   outline: none;
   font-family: inherit;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .sakhi-text-input:focus {
@@ -555,8 +665,8 @@ html, body {
 }
 
 .sakhi-send-btn {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #15803d;
   border: none;
@@ -1003,6 +1113,100 @@ body.sakhi-page-body {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+}
+
+/* 16. MOBILE SCREEN ADAPTATIONS (<= 520px) */
+@media (max-width: 520px) {
+  .sakhi-modal-backdrop {
+    padding: 0 !important;
+  }
+  
+  .sakhi-chat-window {
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 92vh !important;
+    border-radius: 22px 22px 0 0 !important;
+  }
+
+  .sakhi-header {
+    padding: 10px 10px !important;
+    gap: 6px !important;
+  }
+
+  .sakhi-avatar-frame {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .sakhi-header-info h3 {
+    font-size: 0.95rem !important;
+  }
+
+  .sakhi-header-info h3 span {
+    font-size: 0.6rem !important;
+    padding: 1px 5px !important;
+  }
+
+  .sakhi-header-info p {
+    font-size: 0.68rem !important;
+  }
+
+  .sakhi-header-actions {
+    gap: 4px !important;
+  }
+
+  .sakhi-share-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+  }
+
+  .sakhi-share-btn span {
+    display: none !important;
+  }
+
+  .sakhi-sound-toggle-btn,
+  .sakhi-close-btn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .sakhi-quota-bar {
+    padding: 6px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .sakhi-input-footer {
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)) 8px !important;
+    gap: 6px !important;
+  }
+
+  .sakhi-mic-btn {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1.05rem !important;
+  }
+
+  .sakhi-text-input {
+    height: 40px !important;
+    padding: 0 12px !important;
+    font-size: 0.88rem !important;
+    min-width: 0 !important;
+  }
+
+  .sakhi-send-btn {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 0.95rem !important;
+  }
+
+  .sakhi-choice-btn {
+    padding: 8px 10px !important;
+    font-size: 0.85rem !important;
+  }
 }
 
 

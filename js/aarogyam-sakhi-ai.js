@@ -232,6 +232,73 @@
     };
 
     window.speechSynthesis.speak(utterance);
+  let activeSpeechBtn = null;
+
+  window.toggleMessageSpeech = function (btn, encodedText) {
+    if (!window.speechSynthesis) return;
+
+    const text = decodeURIComponent(encodedText || '').trim();
+
+    // If currently speaking this exact message, mute it!
+    if (activeSpeechBtn === btn) {
+      window.speechSynthesis.cancel();
+      btn.classList.remove('speaking');
+      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>सुनें</span>';
+      activeSpeechBtn = null;
+      const avatar = document.getElementById('sakhiAvatarFrame');
+      if (avatar) avatar.classList.remove('speaking');
+      return;
+    }
+
+    // Stop any other active speech
+    if (activeSpeechBtn) {
+      activeSpeechBtn.classList.remove('speaking');
+      activeSpeechBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>सुनें</span>';
+    }
+
+    window.speechSynthesis.cancel();
+
+    btn.classList.add('speaking');
+    btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> <span>म्यूट करें</span>';
+    activeSpeechBtn = btn;
+
+    const avatar = document.getElementById('sakhiAvatarFrame');
+    if (avatar) avatar.classList.add('speaking');
+
+    const cleanText = text.replace(/[*#_~`]/g, '').trim();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.05;
+
+    utterance.onend = function () {
+      btn.classList.remove('speaking');
+      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>सुनें</span>';
+      if (avatar) avatar.classList.remove('speaking');
+      activeSpeechBtn = null;
+    };
+
+    utterance.onerror = function () {
+      btn.classList.remove('speaking');
+      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>सुनें</span>';
+      if (avatar) avatar.classList.remove('speaking');
+      activeSpeechBtn = null;
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  function buildMsgAudioBtnMarkup(text) {
+    if (!text) return '';
+    const safeText = encodeURIComponent(text.replace(/<[^>]*>/g, '').trim());
+    return `
+      <div style="margin-top:8px;">
+        <button type="button" class="sakhi-msg-audio-btn" onclick="window.toggleMessageSpeech(this, '${safeText}')" title="आवाज़ में सुनें या म्यूट करें">
+          <i class="fa-solid fa-volume-high"></i>
+          <span>सुनें</span>
+        </button>
+      </div>
+    `;
   }
 
   // 8. BUILD UI DOM ELEMENTS (LEFT ALIGNED FAB & MODAL)
@@ -265,11 +332,27 @@
       <div class="sakhi-pill-avatar-wrap">
         <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
       </div>
-      <span>${pillLabel}</span>
+      <span class="sakhi-pill-label">${pillLabel}</span>
       <span class="sakhi-pill-live-dot"></span>
     `;
     pill.onclick = openSakhiModal;
     document.body.appendChild(pill);
+
+    // 5-SECOND SMART AUTO-COLLAPSE (TO COMPACT FLOATING AVATAR)
+    let collapseTimer = setTimeout(() => {
+      if (pill) pill.classList.add('collapsed');
+    }, 5000);
+
+    pill.addEventListener('mouseenter', () => {
+      clearTimeout(collapseTimer);
+      pill.classList.remove('collapsed');
+    });
+
+    pill.addEventListener('mouseleave', () => {
+      collapseTimer = setTimeout(() => {
+        if (pill) pill.classList.add('collapsed');
+      }, 3000);
+    });
 
     const backdrop = document.createElement('div');
     backdrop.id = 'sakhiModalBackdrop';
@@ -542,6 +625,8 @@
       </div>
     `;
 
+    const greetingSpeechText = `नमस्ते ${cleanName} जी! मैं आपकी आरोग्यम सखी हूँ। आज मैं आपकी क्या मदद कर सकती हूँ?`;
+
     if (userName || userPhone) {
       wrap.innerHTML = `
         <div class="sakhi-msg-row bot">
@@ -555,11 +640,12 @@
             </div>
             आज मैं आपकी क्या मदद कर सकती हूँ? आप मुझसे कृषि, स्वास्थ्य, सौंदर्य/त्वचा, पशुपालन या किसी भी विषय पर बेझिझक सवाल पूछ सकते हैं।
 
+            ${buildMsgAudioBtnMarkup(greetingSpeechText)}
+
             ${universalFourPills}
           </div>
         </div>
       `;
-      speakResponse(`नमस्ते ${cleanName} जी! मैं आपकी आरोग्यम सखी हूँ। आज मैं आपकी क्या मदद कर सकती हूँ?`);
     } else {
       wrap.innerHTML = `
         <div class="sakhi-msg-row bot">
@@ -594,7 +680,6 @@
           </div>
         </div>
       `;
-      speakResponse('नमस्ते! मैं आपकी आरोग्यम सखी हूँ। बातचीत शुरू करने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।');
     }
   }
 
@@ -859,12 +944,12 @@
             <span>✨</span> <strong>सखी का दादी-नानी का प्रमाणित नुस्खा</strong>
           </div>
           ${nuskhaInner}
+          ${buildMsgAudioBtnMarkup(speechText)}
         </div>
       </div>
     `;
     wrap.appendChild(row);
     wrap.scrollTop = wrap.scrollHeight;
-    speakResponse(speechText);
   };
 
   // 14. MAIN SUBMISSION WITH PROFANITY SHIELD & 2.2s DELAY
@@ -955,9 +1040,10 @@
       <div style="font-weight:900;color:#15803d;font-size:1.02rem;margin-bottom:6px;">
         ${escapeHtml(subTopic.title)}
       </div>
-      <div style="font-size:0.95rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
+      <div style="font-size:0.95rem;line-height:1.6;color:#1e293b;margin-bottom:6px;">
         ${escapeHtml(subTopic.content)}
       </div>
+      ${buildMsgAudioBtnMarkup(subTopic.content)}
 
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
         <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;">
@@ -1025,9 +1111,10 @@
         ${escapeHtml(title)}
       </div>
 
-      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
+      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:6px;">
         ${escapeHtml(combinedCrisp)}
       </div>
+      ${buildMsgAudioBtnMarkup(combinedCrisp)}
 
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
         <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
@@ -1114,9 +1201,10 @@
       <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:6px;">
         🌿 ${escapeHtml(query)} - सटीक समाधान
       </div>
-      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
+      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:6px;">
         ${escapeHtml(crispAnswer)}
       </div>
+      ${buildMsgAudioBtnMarkup(crispAnswer)}
 
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
         <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;">

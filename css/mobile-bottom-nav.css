@@ -237,6 +237,13 @@ header.header-tiranga-animated > .container {
 }
 
 @media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+
   body {
     padding-bottom: 70px !important;
   }
@@ -248,13 +255,17 @@ header.header-tiranga-animated > .container {
   /* Standardize mobile container width and breathing space */
   header.header > .container,
   header.header-tiranga-animated > .container {
-    padding: 6px 12px !important;
+    padding: 6px 10px !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
-  /* Hide crowded secondary items in mobile header */
+  /* Hide crowded secondary items in mobile header that cause page blowout */
+  #header-unified-user-badge,
+  .header-user-status-pill,
+  .header-login-quick-btn,
   .header .header-current-page-badge,
   .header-tiranga-animated .header-current-page-badge,
   .header .btn-pwa-install,
@@ -266,21 +277,47 @@ header.header-tiranga-animated > .container {
 
   .brand-logo-pill,
   .header-brand-wrap {
-    padding: 3px 8px !important;
-    gap: 8px !important;
+    padding: 3px 6px !important;
+    gap: 6px !important;
+    max-width: 175px !important;
+    overflow: hidden !important;
+    flex-shrink: 1 !important;
   }
 
   .brand-logo-pill img,
   .header-brand-wrap img {
-    height: 32px !important;
+    height: 28px !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
   }
 
   .brand-title-text {
-    font-size: 1.05rem !important;
+    font-size: 0.92rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .brand-sub-text {
     display: none !important;
+  }
+
+  .header-actions {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .header-actions a[href*="cart"],
+  .user-notif-bell-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .menu-button {
+    width: 34px !important;
+    height: 34px !important;
   }
 }
 
