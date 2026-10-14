@@ -315,8 +315,32 @@
     const mobileInput = overlay.querySelector('#ai-auth-input-mobile');
     const nameInput = overlay.querySelector('#ai-auth-input-name');
 
+    let phoneCheckTimer = null;
     mobileInput?.addEventListener('input', () => {
       mobileInput.value = mobileInput.value.replace(/\D/g, '').slice(0, 10);
+      const clean = mobileInput.value;
+      clearTimeout(phoneCheckTimer);
+      if (clean.length === 10) {
+        phoneCheckTimer = setTimeout(async () => {
+          const db = getDb();
+          if (db) {
+            try {
+              const { data } = await db.from('profiles').select('full_name').eq('mobile', clean).limit(1).maybeSingle();
+              if (data && data.full_name && nameInput) {
+                nameInput.value = data.full_name;
+                const msgBox = document.getElementById('ai-auth-form-msg');
+                if (msgBox) {
+                  msgBox.style.display = 'block';
+                  msgBox.style.background = '#dcfce7';
+                  msgBox.style.color = '#15803d';
+                  msgBox.style.borderColor = '#86efac';
+                  msgBox.innerHTML = `✅ पूर्व पंजीकृत खाता: <strong>${data.full_name}</strong>`;
+                }
+              }
+            } catch (e) {}
+          }
+        }, 300);
+      }
     });
 
     function dismissModal() {
@@ -461,6 +485,8 @@
           localStorage.setItem('user_name', officialName);
           localStorage.setItem('aarogyam_user_name', officialName);
           localStorage.setItem('aarogyam_user_phone', mobile);
+          localStorage.setItem('SAKHI_USER_NAME', officialName);
+          localStorage.setItem('SAKHI_USER_PHONE', mobile);
           localStorage.setItem('aarogyam_user_registered', 'true');
           localStorage.setItem('AI_USER', JSON.stringify(userObj));
           localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));

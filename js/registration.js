@@ -437,8 +437,8 @@ function validateForm() {
     const emailId = email.value.trim();
     const referral = referralMobile ? referralMobile.value.trim() : '';
 
-    if (name.length < 3) {
-        showMessage("Please enter your full name.");
+    if (name.length < 3 || name.toLowerCase() === 'kisan mitra' || name.toLowerCase() === 'null' || name.toLowerCase() === 'guest') {
+        showMessage("कृपया अपना पूरा और सही नाम दर्ज करें।");
         fullName.focus();
         return false;
     }

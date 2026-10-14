@@ -307,11 +307,14 @@
     if (modal) modal.classList.remove('active');
   };
 
+  let sakhiPhoneTimer = null;
   window.checkExistingSakhiModalPhone = function(val) {
     const clean = String(val || '').replace(/\D/g, '').slice(-10);
     const notice = document.getElementById('sakhiModalPhoneNotice');
     const nameInput = document.getElementById('sakhiModalName');
     if (!notice) return;
+
+    clearTimeout(sakhiPhoneTimer);
 
     if (clean.length === 10) {
       let foundName = '';
@@ -324,8 +327,8 @@
       if (!foundName) {
         try {
           const sess = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
-          if (sess && (sess.mobile || sess.phone) && String(sess.mobile || sess.phone).slice(-10) === clean && sess.name) {
-            foundName = sess.name;
+          if (sess && (sess.mobile || sess.phone) && String(sess.mobile || sess.phone).slice(-10) === clean && (sess.name || sess.full_name)) {
+            foundName = sess.name || sess.full_name;
           }
         } catch (e) {}
       }
@@ -339,54 +342,137 @@
         } catch (e) {}
       }
 
-      if (!foundName) {
-        try {
-          const users = JSON.parse(localStorage.getItem('aarogyam_users') || '[]');
-          const u = users.find(x => x.mobile && String(x.mobile).slice(-10) === clean);
-          if (u && u.name) foundName = u.name;
-        } catch (e) {}
-      }
-
-      if (foundName) {
+      const applyFound = (name) => {
         notice.style.display = 'block';
         notice.style.color = '#15803d';
-        notice.innerHTML = `✅ पूर्व पंजीकृत खाता मिला: <strong>${escapeHtml(foundName)}</strong> (आगे बढ़ें दबाएं)`;
-        if (nameInput) nameInput.value = foundName;
+        notice.innerHTML = `✅ पूर्व पंजीकृत खाता: <strong>${escapeHtml(name)}</strong> (आगे बढ़ें दबाएं)`;
+        if (nameInput) {
+          nameInput.value = name;
+          nameInput.readOnly = true;
+          nameInput.style.backgroundColor = '#f1f5f9';
+        }
+      };
+
+      if (foundName) {
+        applyFound(foundName);
       } else {
         notice.style.display = 'block';
-        notice.style.color = '#0284c7';
-        notice.innerHTML = `✨ नया खाता: कृपया नीचे अपना शुभ नाम लिखें।`;
-        if (nameInput && !nameInput.value) nameInput.focus();
+        notice.style.color = '#d97706';
+        notice.innerHTML = `⏳ खाता जाँचा जा रहा है...`;
       }
+
+      // Supabase Live Database Verification
+      sakhiPhoneTimer = setTimeout(async () => {
+        try {
+          let dbUser = null;
+          if (typeof isMobileRegistered === 'function') {
+            dbUser = await isMobileRegistered(clean);
+          } else if (window.dbClient || window.supabase) {
+            const client = window.dbClient || window.supabase;
+            const { data } = await client.from('profiles').select('id, full_name, mobile, share_id').eq('mobile', clean).limit(1).maybeSingle();
+            dbUser = data;
+          }
+
+          if (dbUser && dbUser.full_name && dbUser.full_name.trim()) {
+            applyFound(dbUser.full_name.trim());
+          } else if (!foundName) {
+            notice.style.display = 'block';
+            notice.style.color = '#0284c7';
+            notice.innerHTML = `✨ नया खाता: कृपया नीचे अपना शुभ नाम लिखें।`;
+            if (nameInput) {
+              nameInput.readOnly = false;
+              nameInput.style.backgroundColor = '#f8fafc';
+              if (!nameInput.value) nameInput.focus();
+            }
+          }
+        } catch (e) {
+          console.warn('DB check note:', e);
+        }
+      }, 250);
     } else {
       notice.style.display = 'none';
+      if (nameInput) {
+        nameInput.readOnly = false;
+        nameInput.style.backgroundColor = '#f8fafc';
+      }
     }
   };
 
-  window.submitSakhiAuthModal = function() {
+  window.submitSakhiAuthModal = async function() {
     const phoneEl = document.getElementById('sakhiModalPhone');
     const nameEl = document.getElementById('sakhiModalName');
     const rawPhone = phoneEl ? phoneEl.value.replace(/\D/g, '').slice(-10) : '';
     const rawName = nameEl ? nameEl.value.trim() : '';
 
-    if (!rawPhone || rawPhone.length !== 10) {
-      alert('कृपया 10 अंकों का सही WhatsApp मोबाइल नंबर दर्ज करें।');
+    if (!rawPhone || !/^[6-9]\d{9}$/.test(rawPhone)) {
+      alert('कृपया 10 अंकों का सही भारतीय WhatsApp मोबाइल नंबर दर्ज करें।');
       if (phoneEl) phoneEl.focus();
       return;
     }
 
-    if (!rawName || rawName.length < 2) {
+    if (!rawName || rawName.length < 2 || rawName.toLowerCase() === 'kisan mitra' || rawName.toLowerCase() === 'null') {
       alert('कृपया अपना शुभ नाम दर्ज करें। बिना नाम के रजिस्ट्रेशन पूरा नहीं हो सकता।');
       if (nameEl) nameEl.focus();
       return;
     }
 
-    syncUnifiedUserAuth(rawName, rawPhone);
+    const submitBtn = document.querySelector('#sakhiAuthModalBackdrop button[onclick*="submitSakhiAuthModal"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>सत्यापित हो रहा है...</span> ⏳';
+    }
+
+    let officialName = rawName;
+
+    try {
+      // 1. Check if user already exists in Supabase
+      let existingProfile = null;
+      if (typeof isMobileRegistered === 'function') {
+        existingProfile = await isMobileRegistered(rawPhone);
+      } else if (window.dbClient || window.supabase) {
+        const client = window.dbClient || window.supabase;
+        const { data } = await client.from('profiles').select('*').eq('mobile', rawPhone).limit(1).maybeSingle();
+        existingProfile = data;
+      }
+
+      if (existingProfile) {
+        // PRESERVE DATABASE PROFILE NAME: Never overwrite with typo
+        if (existingProfile.full_name && existingProfile.full_name.trim()) {
+          officialName = existingProfile.full_name.trim();
+        }
+        if (typeof createLoginSession === 'function') {
+          createLoginSession(existingProfile);
+        }
+      } else if (typeof registerUser === 'function') {
+        // Register new user in Supabase
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref') || urlParams.get('share_id') || 'AI000004';
+        const res = await registerUser({
+          fullName: rawName,
+          mobile: rawPhone,
+          source: 'aarogyam-sakhi',
+          referralCode: refCode,
+          landing_page: window.location.pathname
+        });
+        if (res && res.profile && res.profile.full_name) {
+          officialName = res.profile.full_name;
+        }
+      }
+    } catch (e) {
+      console.warn('Auth submit sync note:', e);
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>प्रवेश करें / आगे बढ़ें</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    syncUnifiedUserAuth(officialName, rawPhone);
     window.closeSakhiAuthModal();
     updateSakhiHeaderUserBadge();
 
-    const welcomeMsg = `नमस्ते ${rawName} जी! 🙏 आपका खाता सफलतापूर्वक सत्यापित हो गया है।`;
-    speakResponse(`स्वागत है ${rawName} जी!`);
+    const welcomeMsg = `नमस्ते ${officialName} जी! 🙏 आपका खाता सफलतापूर्वक सत्यापित हो गया है।`;
+    speakResponse(`स्वागत है ${officialName} जी!`);
 
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (wrap) {
@@ -396,7 +482,7 @@
         <div class="sakhi-msg-bubble" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <span style="font-size:1.4rem;">🎉</span>
-            <div style="font-weight:900;color:#15803d;font-size:1rem;">स्वागत है ${escapeHtml(rawName)} जी!</div>
+            <div style="font-weight:900;color:#15803d;font-size:1rem;">स्वागत है ${escapeHtml(officialName)} जी!</div>
           </div>
           <div style="font-size:0.88rem;color:#334155;line-height:1.5;">
             आपका WhatsApp नंबर <strong>${escapeHtml(rawPhone)}</strong> सत्यापित हो गया है। ${pendingUserQuery ? 'अब आपके सवाल का उत्तर प्रस्तुत किया जा रहा है...' : 'अब आप नीचे अपना सवाल पूछ सकते हैं।'}
@@ -1600,8 +1686,22 @@
       }
 
       if (potentialName && potentialName.length >= 2) {
-        syncUnifiedUserAuth(potentialName, extractedPhone);
-        updateSakhiHeaderUserBadge();
+        let officialName = potentialName;
+        (async () => {
+          try {
+            if (typeof isMobileRegistered === 'function') {
+              const existing = await isMobileRegistered(extractedPhone);
+              if (existing && existing.full_name && existing.full_name.trim()) {
+                officialName = existing.full_name.trim();
+              } else if (typeof registerUser === 'function') {
+                const res = await registerUser({ fullName: potentialName, mobile: extractedPhone, source: 'aarogyam-sakhi' });
+                if (res && res.profile && res.profile.full_name) officialName = res.profile.full_name;
+              }
+            }
+          } catch (e) {}
+          syncUnifiedUserAuth(officialName, extractedPhone);
+          updateSakhiHeaderUserBadge();
+        })();
         const successSpeech = `धन्यवाद ${potentialName} जी! आपका नंबर रजिस्टर हो गया है।`;
         const successHtml = `
           <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">

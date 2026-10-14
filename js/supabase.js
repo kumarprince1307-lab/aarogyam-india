@@ -262,13 +262,18 @@ async function createUserProfile(userData) {
             }
         }
 
+        const validName = String(userData.fullName || userData.name || '').trim();
+        if (!validName || validName.length < 2 || validName.toLowerCase() === 'kisan mitra' || validName.toLowerCase() === 'null') {
+            throw new Error("वैध नाम अनिवार्य है। बिना नाम के प्रोफाइल नहीं बन सकती।");
+        }
+
         const activeDb = window.dbClient || window.supabase || db;
         if (!activeDb) throw new Error("Database client not available");
 
         const { data, error } = await activeDb
             .from("profiles")
             .insert([{
-                full_name: userData.fullName || userData.name,
+                full_name: validName,
                 mobile: cleanMobile || userData.mobile,
                 email: userData.email || null,
                 gender: userData.gender || null,
@@ -322,11 +327,16 @@ async function createUserProfile(userData) {
 }
 
 function createLoginSession(profile) {
+    if (!profile) return null;
+    const cleanPhone = String(profile.mobile || '').replace(/\D/g, '').slice(-10);
+    const officialName = String(profile.full_name || profile.name || '').trim();
+
     const session = {
         id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('SES_' + Date.now()),
         userId: profile.id,
         user_id: profile.id,
-        mobile: profile.mobile,
+        name: officialName,
+        mobile: cleanPhone,
         share_id: profile.share_id || profile.referral_code || 'AI000004',
         loginTime: new Date().toISOString(),
         active: true
@@ -336,7 +346,19 @@ function createLoginSession(profile) {
         localStorage.setItem("AI_USER", JSON.stringify(profile));
         localStorage.setItem("AI_PROFILE", JSON.stringify(profile));
         localStorage.setItem("UCAS_USER", JSON.stringify(profile));
-        localStorage.setItem("aim_user_mobile", profile.mobile || '');
+        if (cleanPhone) {
+            localStorage.setItem("aim_user_mobile", cleanPhone);
+            localStorage.setItem("aarogyam_user_phone", cleanPhone);
+            localStorage.setItem("SAKHI_USER_PHONE", cleanPhone);
+        }
+        if (officialName) {
+            localStorage.setItem("aarogyam_user_name", officialName);
+            localStorage.setItem("aim_user_name", officialName);
+            localStorage.setItem("SAKHI_USER_NAME", officialName);
+        }
+        if (typeof window.updateUniversalDrawerProfile === 'function') {
+            window.updateUniversalDrawerProfile();
+        }
     } catch (e) {
         console.warn("Storage save notice:", e);
     }
@@ -349,17 +371,37 @@ async function registerUser(formData) {
     const rawMobile = formData ? (formData.mobile || '') : '';
     const cleanMobile = String(rawMobile).replace(/\D/g, '').slice(-10);
 
-    if (cleanMobile && cleanMobile.length === 10 && _registrationInFlight.has(cleanMobile)) {
+    if (!cleanMobile || !/^[6-9]\d{9}$/.test(cleanMobile)) {
+        return { success: false, message: "कृपया 10 अंकों का मान्य भारतीय मोबाइल नंबर दर्ज करें।" };
+    }
+
+    if (_registrationInFlight.has(cleanMobile)) {
         console.warn("⏳ Registration already in progress for:", cleanMobile, "- Reusing pending request");
         return _registrationInFlight.get(cleanMobile);
     }
 
     const regPromise = (async () => {
         try {
+            // 1. यदि यूजर पहले से रजिस्टर्ड है: डेटाबेस का असली नाम सुरक्षित रखते हुए लॉगिन करें (कोई नया खाता नहीं बनेगा)
+            const existingUser = await isMobileRegistered(cleanMobile);
+            if (existingUser) {
+                console.log(`ℹ️ Existing user verified for ${cleanMobile}. Preserving database profile name: "${existingUser.full_name}"`);
+                createLoginSession(existingUser);
+                return { success: true, type: "existing", profile: existingUser };
+            }
+
+            // 2. नए यूजर के लिए: नाम अनिवार्य (Strict Name Guard)
+            const rawName = String(formData.fullName || formData.name || '').trim();
+            if (!rawName || rawName.length < 2 || rawName.toLowerCase() === 'null' || rawName.toLowerCase() === 'undefined' || rawName.toLowerCase() === 'guest' || rawName === 'किसान मित्र') {
+                return { success: false, message: "कृपया अपना पूरा और सही नाम दर्ज करें। बिना नाम के नया खाता नहीं बनाया जा सकता।" };
+            }
+
             const attribution = resolveProfileAttribution(formData);
             const registrationPayload = {
                 ...formData,
-                mobile: cleanMobile || formData.mobile,
+                fullName: rawName,
+                name: rawName,
+                mobile: cleanMobile,
                 source: attribution.source,
                 referralCode: formData.referralCode || attribution.shareToken,
                 referralMobile: formData.referralMobile || attribution.referralCode,
@@ -367,12 +409,6 @@ async function registerUser(formData) {
                 shareToken: attribution.shareToken,
                 shareChannel: attribution.shareChannel
             };
-
-            const existingUser = await isMobileRegistered(registrationPayload.mobile);
-            if (existingUser) {
-                createLoginSession(existingUser);
-                return { success: true, type: "existing", profile: existingUser };
-            }
 
             if (registrationPayload.email) {
                 const emailExists = await isEmailRegistered(registrationPayload.email);
@@ -393,12 +429,10 @@ async function registerUser(formData) {
         }
     })();
 
-    if (cleanMobile && cleanMobile.length === 10) {
-        _registrationInFlight.set(cleanMobile, regPromise);
-        regPromise.finally(() => {
-            setTimeout(() => _registrationInFlight.delete(cleanMobile), 2000);
-        });
-    }
+    _registrationInFlight.set(cleanMobile, regPromise);
+    regPromise.finally(() => {
+        setTimeout(() => _registrationInFlight.delete(cleanMobile), 2000);
+    });
 
     return regPromise;
 }
