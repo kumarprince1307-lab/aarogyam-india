@@ -1,0 +1,579 @@
+/* ====================================================================
+   AAROGYAM SAKHI AI - BUTTER-SMOOTH VOICE & DIAGNOSTIC CHATBOT
+   Aarogyam India Next-Gen Agri AI Assistant
+   ==================================================================== */
+
+:root {
+  --sakhi-green: #15803d;
+  --sakhi-green-light: #dcfce7;
+  --sakhi-gold: #f59e0b;
+  --sakhi-dark: #0f172a;
+  --sakhi-bg: #f8fafc;
+  --sakhi-white: #ffffff;
+  --sakhi-shadow: 0 12px 36px rgba(15, 23, 42, 0.22);
+}
+
+/* 1. FLOATING ACTION PILL (FAB) */
+.sakhi-floating-pill {
+  position: fixed;
+  bottom: 80px;
+  right: 18px;
+  z-index: 99998;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #166534 0%, #15803d 50%, #16a34a 100%);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 40px;
+  border: 2px solid #86efac;
+  box-shadow: 0 8px 24px rgba(22, 101, 52, 0.45);
+  font-family: 'Outfit', 'Noto Sans Devanagari', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  animation: sakhiPillFloat 3s ease-in-out infinite alternate;
+}
+
+.sakhi-floating-pill:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 14px 32px rgba(22, 101, 52, 0.55);
+}
+
+.sakhi-floating-pill:active {
+  transform: scale(0.96);
+}
+
+.sakhi-pill-avatar-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fef08a;
+  border: 1.5px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.sakhi-pill-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  animation: sakhiLivePulse 1.8s infinite;
+}
+
+@keyframes sakhiLivePulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes sakhiPillFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-5px); }
+}
+
+/* 2. CHAT DRAWER / MODAL CONTAINER */
+.sakhi-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sakhi-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sakhi-chat-window {
+  width: 100%;
+  max-width: 520px;
+  height: 90vh;
+  max-height: 740px;
+  background: #ffffff;
+  border-radius: 28px 28px 0 0;
+  box-shadow: var(--sakhi-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Outfit', 'Noto Sans Devanagari', -apple-system, sans-serif;
+}
+
+@media (min-width: 640px) {
+  .sakhi-modal-backdrop {
+    align-items: center;
+    padding: 20px;
+  }
+  .sakhi-chat-window {
+    border-radius: 26px;
+    height: 82vh;
+    max-height: 720px;
+  }
+}
+
+.sakhi-modal-backdrop.active .sakhi-chat-window {
+  transform: translateY(0);
+}
+
+/* 3. CHAT HEADER */
+.sakhi-header {
+  background: linear-gradient(135deg, #052e16 0%, #14532d 60%, #166534 100%);
+  color: #ffffff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #22c55e;
+  position: relative;
+}
+
+.sakhi-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ANIMATED SAKHI AVATAR */
+.sakhi-avatar-frame {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef08a, #fde047);
+  border: 2px solid #86efac;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sakhi-avatar-frame.speaking {
+  animation: sakhiSpeakingAura 1.2s infinite alternate;
+  border-color: #facc15;
+}
+
+@keyframes sakhiSpeakingAura {
+  0% { box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.4); transform: scale(1); }
+  100% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0.8); transform: scale(1.05); }
+}
+
+.sakhi-header-info h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sakhi-header-info p {
+  margin: 2px 0 0 0;
+  font-size: 0.78rem;
+  color: #bbf7d0;
+  font-weight: 700;
+}
+
+.sakhi-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sakhi-sound-toggle-btn,
+.sakhi-close-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.sakhi-sound-toggle-btn:hover,
+.sakhi-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+/* 4. QUOTA TRACKER BANNER */
+.sakhi-quota-bar {
+  background: #f1f5f9;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sakhi-quota-pill {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sakhi-quota-pill.unlimited {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.sakhi-quota-pill.low {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* 5. CHAT MESSAGES BODY */
+.sakhi-messages-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #f8fafc;
+  scroll-behavior: smooth;
+}
+
+.sakhi-msg-row {
+  display: flex;
+  gap: 10px;
+  max-width: 92%;
+  animation: sakhiMsgFadeIn 0.25s ease-out;
+}
+
+@keyframes sakhiMsgFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sakhi-msg-row.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.sakhi-msg-row.bot {
+  align-self: flex-start;
+}
+
+.sakhi-msg-bubble {
+  padding: 14px 16px;
+  border-radius: 18px;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: #0f172a;
+  position: relative;
+}
+
+.sakhi-msg-row.user .sakhi-msg-bubble {
+  background: linear-gradient(135deg, #15803d, #16a34a);
+  color: #ffffff;
+  border-radius: 18px 18px 4px 18px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+}
+
+.sakhi-msg-row.bot .sakhi-msg-bubble {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+/* SPEECH WAVEFORM / AUDIO PLAYING INDICATOR */
+.sakhi-tts-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.sakhi-tts-bar {
+  width: 3px;
+  height: 12px;
+  background: #15803d;
+  border-radius: 2px;
+  animation: sakhiSoundWave 0.8s ease-in-out infinite alternate;
+}
+.sakhi-tts-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+.sakhi-tts-bar:nth-child(3) { animation-delay: 0.4s; height: 10px; }
+
+@keyframes sakhiSoundWave {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1.3); }
+}
+
+/* FIRST AID & CURIOSITY HIGHLIGHT BOXES */
+.sakhi-solution-box {
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+
+.sakhi-solution-header {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #15803d;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sakhi-curiosity-box {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  font-size: 0.92rem;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+.sakhi-curiosity-header {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #b45309;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* IN-CHAT HIGH CONVERTING BOOK CTA CARD */
+.sakhi-book-cta-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  border: 2px solid #facc15;
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 12px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.3);
+}
+
+.sakhi-book-cta-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: #facc15;
+}
+
+.sakhi-book-cta-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.sakhi-book-buy-btn {
+  background: #facc15;
+  color: #000000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
+  transition: transform 0.2s;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sakhi-book-buy-btn:hover {
+  transform: scale(1.05);
+}
+
+/* INTERACTIVE CHOICE PILLS (TAPPABLE CHIPS) */
+.sakhi-choice-pills-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sakhi-choice-btn {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.sakhi-choice-btn:hover {
+  background: #f0fdf4;
+  border-color: #15803d;
+  color: #15803d;
+  transform: translateX(4px);
+}
+
+/* 6. CHAT INPUT BAR */
+.sakhi-input-footer {
+  background: #ffffff;
+  padding: 12px 14px;
+  border-top: 1.5px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sakhi-mic-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.sakhi-mic-btn.recording {
+  background: #dc2626;
+  border-color: #ef4444;
+  color: #ffffff;
+  animation: sakhiMicPulse 1.2s infinite;
+}
+
+@keyframes sakhiMicPulse {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+  70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.sakhi-text-input {
+  flex: 1;
+  height: 46px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 24px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.sakhi-text-input:focus {
+  border-color: #15803d;
+  background: #ffffff;
+}
+
+.sakhi-send-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #15803d;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sakhi-send-btn:hover {
+  background: #166534;
+  transform: scale(1.05);
+}
+
+.sakhi-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 7. LIMIT EXHAUSTED CARD (IN CHAT) */
+.sakhi-limit-exhausted-box {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #ef4444;
+  border-radius: 18px;
+  padding: 18px;
+  text-align: center;
+  color: #991b1b;
+  margin-top: 10px;
+}
+
+.sakhi-limit-exhausted-box h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #b91c1c;
+}
+
+.sakhi-limit-exhausted-box p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0 0 14px 0;
+}
+
+/* 8. LEGAL DISCLAIMER FOOTNOTE */
+.sakhi-legal-note {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 4px 10px;
+  background: #ffffff;
+}
