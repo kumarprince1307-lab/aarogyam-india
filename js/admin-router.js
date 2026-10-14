@@ -34,6 +34,7 @@ const ROUTES = {
   'landing-page-control': () => import('./admin-pages-landing-page-control.js?v=2.0').then(m => m.initLandingPageControl()),
   'admin-app': () => import('./admin-pages-admin-app.js').then(m => m.initAdminApp()),
   'smart-etailer': () => import('./admin-pages-smart-etailer.js?v=1.0').then(m => m.initSmartEtailerAdmin()),
+  'sakhi-ai-hub': () => import('./admin-pages-sakhi-ai-hub.js?v=1.0').then(m => m.initSakhiAiHub()),
   'settings': () => import('./admin-pages-settings.js?v=2.0').then(m => m.initSettings()).catch(() => {}),
   'support': () => renderSupportModule(),
   'crop-doctor': () => renderCropDoctorModule(),
@@ -68,6 +69,8 @@ const ROUTE_ALIASES = {
   'leads': 'google-leads',
   'auto-wa': 'auto-whatsapp',
   'whatsapp-bot': 'auto-whatsapp',
+  'sakhi-ai': 'sakhi-ai-hub',
+  'sakhi': 'sakhi-ai-hub',
   'help': 'support'
 };
 

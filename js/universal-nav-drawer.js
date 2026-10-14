@@ -1168,7 +1168,7 @@
     pill.setAttribute('aria-label', pillLabel);
     pill.innerHTML = `
       <div class="sakhi-pill-avatar-wrap">
-        <img src="/images/sakhi/aarogyam-sakhi.jpg" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
+        <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" onerror="this.src='/images/sakhi/aarogyam-sakhi.jpg'" />
       </div>
       <span class="sakhi-pill-label">${pillLabel}</span>
       <span class="sakhi-pill-live-dot"></span>
@@ -1220,12 +1220,12 @@
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v90';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v91';
       document.head.appendChild(link);
     }
     if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
       const script = document.createElement('script');
-      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v90';
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v91';
       script.async = true;
       document.body.appendChild(script);
     }

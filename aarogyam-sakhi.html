@@ -11,18 +11,18 @@
   <!-- OpenGraph Metadata -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Aarogyam India">
-  <meta property="og:title" content="आरोग्यम सखी AI - खेती के हर सवाल का वैज्ञानिक समाधान 🌾">
-  <meta property="og:description" content="गेहूं, सरसों, चना, धान, सब्जियां व दवाओं की डोज का तुरंत फ्री जवाब पाएं। आरोग्यम सखी AI से सीधे बात करें!">
-  <meta property="og:image" content="https://aarogyamindia.online/images/sakhi/aarogyam-sakhi.jpg">
+  <meta property="og:title" content="🌿 किसान व परिवारजनों के लिए बड़ी खुशखबरी! - आरोग्यम सखी AI">
+  <meta property="og:description" content="खेती, गेहूं, सरसों, धान, पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द), सौंदर्य व बिज़नेस के 100% सही व वैज्ञानिक जवाब!">
+  <meta property="og:image" content="https://aarogyamindia.online/images/sakhi/aarogyam-sakhi-og.webp">
   <meta property="og:image:width" content="1024">
   <meta property="og:image:height" content="768">
   <meta property="og:url" content="https://aarogyamindia.online/aarogyam-sakhi.html">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="आरोग्यम सखी AI - खेती के हर सवाल का वैज्ञानिक समाधान 🌾">
-  <meta name="twitter:description" content="गेहूं, सरसों, चना, धान, सब्जियां व दवाओं की डोज का तुरंत फ्री जवाब पाएं। आरोग्यम सखी AI से सीधे बात करें!">
-  <meta name="twitter:image" content="https://aarogyamindia.online/images/sakhi/aarogyam-sakhi.jpg">
+  <meta name="twitter:title" content="🌿 किसान व परिवारजनों के लिए बड़ी खुशखबरी! - आरोग्यम सखी AI">
+  <meta name="twitter:description" content="खेती, गेहूं, सरसों, धान, पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द), सौंदर्य व बिज़नेस के 100% सही व वैज्ञानिक जवाब!">
+  <meta name="twitter:image" content="https://aarogyamindia.online/images/sakhi/aarogyam-sakhi-og.webp">
 
   <!-- Favicons -->
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Sakhi AI Styles -->
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v90">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v91">
 
   <style>
     /* Full Viewport App Fit */
@@ -71,14 +71,16 @@
               <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div class="sakhi-avatar-frame" id="sakhiAvatarFrame">
-              <img src="/images/sakhi/aarogyam-sakhi.jpg" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
+              <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
             </div>
             <div class="sakhi-header-info">
               <h3>आरोग्यम सखी AI <span style="font-size:0.7rem;background:#22c55e;color:#fff;padding:2px 8px;border-radius:10px;">ऑनलाइन 24×7</span></h3>
-              <p>आपकी अपनी डिजिटल कृषि, स्वास्थ्य, सौंदर्य व पशु विशेषज्ञ</p>
             </div>
           </div>
           <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:6px;">
+            <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="फुल स्क्रीन">
+              <i class="fa-solid fa-expand"></i>
+            </button>
             <button type="button" class="sakhi-share-btn" onclick="window.shareAarogyamSakhi()" title="सखी AI को शेयर करें">
               <i class="fa-solid fa-share-nodes"></i>
               <span>शेयर</span>
@@ -89,44 +91,98 @@
           </div>
         </div>
 
-        <!-- Quota Bar -->
-        <div class="sakhi-quota-bar" id="sakhiQuotaBar">
-          <span style="color:#15803d;font-weight:800;">🌿 संपूर्ण किसान व परिवार सेवा:</span>
-          <span class="sakhi-quota-pill unlimited" id="sakhiQuotaBadge">✨ 100% निशुल्क असीमित सलाह</span>
-        </div>
-
         <!-- Messages Area -->
         <div class="sakhi-messages-wrap" id="sakhiMessagesWrap">
           <div class="sakhi-msg-row bot">
-            <div class="sakhi-msg-bubble">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                <img src="/images/sakhi/aarogyam-sakhi.jpg" alt="Aarogyam Sakhi" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #16a34a;" onerror="this.style.display='none'">
+            <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:16px;">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #16a34a;box-shadow:0 2px 8px rgba(22,163,74,0.3);" onerror="this.src='/images/logo/fevicon.png'">
                 <div>
-                  <strong>नमस्ते अवनीश जी! 🙏</strong><br>
-                  <span style="font-size:0.8rem;color:#166534;">मैं आपकी <strong>आरोग्यम सखी</strong> हूँ।</span>
+                  <div style="font-size:1.05rem;font-weight:800;color:#0f172a;">नमस्ते <span id="sakhiHeroDynamicName">किसान साथी</span>! 🙏</div>
+                  <div style="font-size:0.84rem;color:#166534;font-weight:600;">मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ।</div>
                 </div>
               </div>
-              आज मैं आपकी क्या मदद कर सकती हूँ? आप मुझसे कृषि, स्वास्थ्य, सौंदर्य/त्वचा, पशुपालन या किसी भी विषय पर बेझिझक सवाल पूछ सकते हैं।
 
-              <div class="sakhi-choice-pills-wrap" style="margin-top:12px;">
-                <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
-                  <span>🌾 <strong>कृषि व फसल रक्षा</strong> (गेहूं, सरसों, कीटनाशक डोज)</span>
-                  <span>→</span>
-                </button>
-                <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('मधुमेह और शुगर कंट्रोल का फॉर्मूला')">
-                  <span>🩺 <strong>स्वास्थ्य व पुरानी बीमारियां</strong> (डायबिटीज, जोड़ों का दर्द, बीपी, लिवर)</span>
-                  <span>→</span>
-                </button>
-                <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
-                  <span>✨ <strong>सौंदर्य, त्वचा व बाल</strong> (झाइयां, झुर्रियां, बाल झड़ना, विटामिन ई)</span>
-                  <span>→</span>
-                </button>
-                <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-                  <span>🐄 <strong>पशुपालन, डेयरी व पोल्ट्री</strong> (दूध व फैट वृद्धि, सीएफसी, थनैला)</span>
-                  <span>→</span>
+              <div style="color:#334155;font-size:0.88rem;line-height:1.55;margin-bottom:12px;">
+                खेती (गेहूं, सरसों, खाद), पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द), सौंदर्य या घर बैठे कमाई से जुड़ा कोई भी सवाल नीचे पूछें।
+              </div>
+
+              <!-- Quick Tip with Plus Button Trigger -->
+              <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                <div style="font-size:0.80rem;color:#475569;">
+                  ✨ नीचे <strong>[+]</strong> बटन दबाकर किसी भी विषय का सवाल चुनें।
+                </div>
+                <button type="button" class="sakhi-choice-btn" style="padding:4px 10px;font-size:0.78rem;margin:0;width:auto;" onclick="window.toggleSakhiPlusMenu(true)">
+                  विषय सूची (+)
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ChatGPT-Style Plus Menu (Opened by [+] Button) -->
+        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none;">
+          <div class="sakhi-plus-menu-header">
+            <span>✨ विषय चुनें (Categories)</span>
+            <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)">✕</button>
+          </div>
+          <div class="sakhi-plus-grid">
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('🌾 गेहूं व फसलों में कल्ले व पैदावार 2x बढ़ाना')">
+              <span class="sakhi-item-icon">🌿</span>
+              <div class="sakhi-item-text">
+                <strong>खेती व फसलें</strong>
+                <small>गेहूं, सरसों, खाद, स्प्रे डोज</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('🐄 गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
+              <span class="sakhi-item-icon">🐄</span>
+              <div class="sakhi-item-text">
+                <strong>पशुपालन</strong>
+                <small>दूध-फैट 8%+, थनैला उपचार</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('🩺 डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">
+              <span class="sakhi-item-icon">🩺</span>
+              <div class="sakhi-item-text">
+                <strong>स्वास्थ्य व रोग</strong>
+                <small>शुगर, जोड़ दर्द, बीपी, डाइट</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('💄 चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">
+              <span class="sakhi-item-icon">💄</span>
+              <div class="sakhi-item-text">
+                <strong>सौंदर्य व त्वचा</strong>
+                <small>झाइयां, झुर्रियां, एलोवेरा लेप</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('🧴 नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">
+              <span class="sakhi-item-icon">🧴</span>
+              <div class="sakhi-item-text">
+                <strong>नेट्सर्फ प्रॉडक्ट्स</strong>
+                <small>बायोफिट, नेचुरामोर, 20%-40% छूट</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('🥣 दादी के असली आयुर्वेदिक घरेलू नुस्खे')">
+              <span class="sakhi-item-icon">🥣</span>
+              <div class="sakhi-item-text">
+                <strong>दादी के नुस्खे</strong>
+                <small>प्रामाणिक घरेलू व आयुर्वेदिक उपाय</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('💼 आरोग्यम डिजिटल ई-टेलर व एफिलिएट कमाई')">
+              <span class="sakhi-item-icon">💼</span>
+              <div class="sakhi-item-text">
+                <strong>कमाई व करियर</strong>
+                <small>घर बैठे स्मार्ट ई-टेलर लिंक शेयर</small>
+              </div>
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('👑 फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क')">
+              <span class="sakhi-item-icon">👑</span>
+              <div class="sakhi-item-text">
+                <strong>अवनीश जी से बात</strong>
+                <small>डायरेक्ट WhatsApp कंसल्टेशन</small>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -135,12 +191,15 @@
           ⚖️ सूचनात्मक मार्गदर्शन: उपयोग से पूर्व उत्पाद लेबल निर्देश व स्थानीय विशेषज्ञ की अनुशंसा का संज्ञान अवश्य लें।
         </div>
 
-        <!-- Input Footer -->
+        <!-- Input Footer (ChatGPT Layout: [+] [Mic] [Input] [Send]) -->
         <div class="sakhi-input-footer">
+          <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="विषय व टूल्स चुनें" onclick="window.toggleSakhiPlusMenu()">
+            <i class="fa-solid fa-plus"></i>
+          </button>
           <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="खेत, सेहत, पशु या ब्यूटी का सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
+          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
           <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें" onclick="window.submitSakhiFromInput();">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -151,6 +210,37 @@
 
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261014_v90"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261014_v91"></script>
+  <script>
+    (function () {
+      function resolveHeroName() {
+        let name = '';
+        try {
+          const sess = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
+          if (sess && sess.name && sess.name.trim()) name = sess.name.trim();
+        } catch (e) {}
+        if (!name) {
+          try {
+            const user = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+            if (user && user.name && user.name.trim()) name = user.name.trim();
+          } catch (e) {}
+        }
+        if (!name) {
+          name = localStorage.getItem('SAKHI_USER_NAME') || '';
+        }
+        name = name.trim();
+        const el = document.getElementById('sakhiHeroDynamicName');
+        if (el) {
+          if (name && name.toLowerCase() !== 'null' && name.toLowerCase() !== 'undefined' && name.toLowerCase() !== 'admin') {
+            el.textContent = name + ' जी';
+          } else {
+            el.textContent = 'किसान साथी';
+          }
+        }
+      }
+      resolveHeroName();
+      document.addEventListener('DOMContentLoaded', resolveHeroName);
+    })();
+  </script>
 </body>
 </html>
