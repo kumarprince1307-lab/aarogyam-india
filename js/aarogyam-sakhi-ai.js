@@ -232,6 +232,8 @@
     };
 
     window.speechSynthesis.speak(utterance);
+  }
+
   let activeSpeechBtn = null;
 
   window.toggleMessageSpeech = function (btn, encodedText) {
@@ -442,17 +444,30 @@
 
         <!-- Input Footer -->
         <div class="sakhi-input-footer">
-          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)">
+          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="खेत, सेहत, पशु या ब्यूटी का सवाल बोलें या लिखें..." autocomplete="off" />
-          <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें">
+          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="खेत, सेहत, पशु या ब्यूटी का सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
+          <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें" onclick="window.submitSakhiFromInput();">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
         </div>
       </div>
     `;
   }
+
+  window.submitSakhiFromInput = function () {
+    const input = document.getElementById('sakhiTextInput');
+    if (input && input.value.trim()) {
+      const q = input.value.trim();
+      input.value = '';
+      handleUserSubmit(q);
+    }
+  };
+
+  window.AarogyamSakhiToggleRec = function () {
+    toggleRecording();
+  };
 
   function setupEventListeners(isFullscreen) {
     const backdrop = document.getElementById('sakhiModalBackdrop');
@@ -473,10 +488,7 @@
     const sendBtn = document.getElementById('sakhiSendBtn');
     if (sendBtn) {
       sendBtn.onclick = function () {
-        const input = document.getElementById('sakhiTextInput');
-        if (input && input.value.trim()) {
-          handleUserSubmit(input.value.trim());
-        }
+        window.submitSakhiFromInput();
       };
     }
 
@@ -484,8 +496,8 @@
     if (textInput) {
       textInput.onkeydown = function (e) {
         if (e.key === 'Enter') {
-          const val = this.value.trim();
-          if (val) handleUserSubmit(val);
+          e.preventDefault();
+          window.submitSakhiFromInput();
         }
       };
     }
@@ -1012,7 +1024,7 @@
     const cleanQ = query.toLowerCase();
 
     if (!knowledgeData || !knowledgeData.intents) {
-      fallbackUnanswered(query);
+      synthesizeDynamicMedicalAgriAnswer(query);
       return;
     }
 

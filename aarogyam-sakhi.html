@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Sakhi AI Styles -->
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v89">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v90">
 
   <style>
     /* Full Viewport App Fit */
@@ -137,11 +137,11 @@
 
         <!-- Input Footer -->
         <div class="sakhi-input-footer">
-          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)">
+          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="खेत, सेहत, पशु या ब्यूटी का सवाल बोलें या लिखें..." autocomplete="off" />
-          <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें">
+          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="खेत, सेहत, पशु या ब्यूटी का सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
+          <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें" onclick="window.submitSakhiFromInput();">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
         </div>
@@ -151,6 +151,6 @@
 
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261014_v89"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261014_v90"></script>
 </body>
 </html>

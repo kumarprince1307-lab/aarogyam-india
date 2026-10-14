@@ -1174,27 +1174,23 @@
       <span class="sakhi-pill-live-dot"></span>
     `;
 
-    pill.onclick = function() {
+    pill.onclick = function(e) {
+      if (e) e.preventDefault();
       if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
         window.AarogyamSakhi.open();
-      } else {
-        ensureAarogyamSakhiLoaded();
-        let retries = 0;
-        const checkInterval = setInterval(() => {
-          retries++;
-          if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-            clearInterval(checkInterval);
-            window.AarogyamSakhi.open();
-          } else if (retries > 35) {
-            clearInterval(checkInterval);
-            if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-              window.AarogyamSakhi.open();
-            } else {
-              window.location.href = '/aarogyam-sakhi.html';
-            }
-          }
-        }, 50);
+        return;
       }
+      ensureAarogyamSakhiLoaded();
+      let retries = 0;
+      const checkInterval = setInterval(() => {
+        retries++;
+        if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
+          clearInterval(checkInterval);
+          window.AarogyamSakhi.open();
+        } else if (retries > 60) {
+          clearInterval(checkInterval);
+        }
+      }, 50);
     };
 
     if (document.body) {
@@ -1224,12 +1220,12 @@
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v89';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v90';
       document.head.appendChild(link);
     }
     if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
       const script = document.createElement('script');
-      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v89';
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v90';
       script.async = true;
       document.body.appendChild(script);
     }
