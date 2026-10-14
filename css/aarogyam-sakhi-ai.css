@@ -920,5 +920,72 @@ body.sakhi-page-body {
   gap: 4px;
 }
 
+/* 14. SAKHI'S SECRET REMEDY BOX (सखी के दादी-नानी के नुस्खे) */
+.sakhi-nuskha-box {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px solid #f59e0b;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12);
+  color: #78350f;
+  animation: sakhiSlideIn 0.3s ease-out;
+}
+
+.sakhi-nuskha-header {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #92400e;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sakhi-nuskha-text {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: #78350f;
+}
+
+.sakhi-nuskha-trigger-btn {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  transition: all 0.2s ease;
+}
+
+.sakhi-nuskha-trigger-btn:hover {
+  background: #b45309;
+  transform: translateY(-2px);
+}
+
+/* 15. EMERGENCY MEDICAL ALERT */
+.sakhi-emergency-alert {
+  background: #fef2f2;
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  color: #991b1b;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+
 
 

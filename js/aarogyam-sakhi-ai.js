@@ -1,8 +1,8 @@
 /**
  * ====================================================================
  * AAROGYAM SAKHI AI - OMNI-DOMAIN AI (KRISHI, SEHAT, PASHU, BEAUTY)
- * Version: 5.0 (Cross-Domain Universal Engine, Context-Aware Greetings,
- *               Aarogyam Tube Integration, Profanity Shield & 2.2s Streaming)
+ * Version: 6.0 (Sakhi's Secret Nuskhe, Emergency Alert, Symptom Synthesizer,
+ *               Cross-Domain Universal Intelligence & 2.2s Streaming)
  * ====================================================================
  */
 
@@ -18,7 +18,7 @@
   let isRecording = false;
   let currentDiagnosticIntent = null;
 
-  // 1. PAGE DOMAIN DETECTION (कृषि, सेहत, पशु, सौंदर्य या यूनिवर्सल)
+  // 1. PAGE DOMAIN DETECTION
   function detectCurrentPageDomain() {
     const path = (window.location.pathname || '').toLowerCase();
 
@@ -114,10 +114,10 @@
     }
   }
 
-  // 4. LOAD OMNI-DOMAIN KNOWLEDGE BASE (v5.0)
+  // 4. LOAD OMNI-DOMAIN KNOWLEDGE BASE (v6.0)
   async function loadKnowledgeBase() {
     try {
-      const res = await fetch('/data/krishi-ai-knowledge.json?v=' + Math.floor(Date.now() / 300000));
+      const res = await fetch('/data/krishi-ai-knowledge.json?v=' + Math.floor(Date.now() / 180000));
       if (res.ok) {
         knowledgeData = await res.json();
       }
@@ -126,8 +126,8 @@
     }
   }
 
-  // 5. PROFANITY & SAFETY SHIELD
-  const PROFANITY_REGEX = /(गाली|madarchod|bhenchod|chutiya|harami|bhosdi|gaand|sex|porn|nude|xxx|randi|suicide|zeher|poison\s*dose)/i;
+  // 5. PROFANITY & EMERGENCY SHIELD
+  const PROFANITY_REGEX = /(गाली|madarchod|bhenchod|chutiya|harami|bhosdi|gaand|porn|nude|xxx|randi|suicide|zeher|poison\s*dose)/i;
 
   function checkSafetyAndProfanity(query) {
     if (PROFANITY_REGEX.test(query)) {
@@ -137,6 +137,11 @@
       };
     }
     return { isSafe: true };
+  }
+
+  function isEmergencyQuery(query) {
+    const q = query.toLowerCase();
+    return q.includes('सीने में दर्द') || q.includes('chest pain') || q.includes('हार्ट अटैक') || q.includes('heart attack') || q.includes('बेहोश');
   }
 
   // 6. SPEECH RECOGNITION (बोलकर पूछें)
@@ -247,7 +252,6 @@
 
     if (document.getElementById('sakhiFloatingPill')) return;
 
-    // 1. Floating Action Pill (LEFT ALIGNED)
     const currentDomain = detectCurrentPageDomain();
     let pillLabel = 'आरोग्यम सखी AI';
     if (currentDomain === 'health') pillLabel = 'स्वास्थ्य सखी AI';
@@ -267,7 +271,6 @@
     pill.onclick = openSakhiModal;
     document.body.appendChild(pill);
 
-    // 2. Chat Modal Window
     const backdrop = document.createElement('div');
     backdrop.id = 'sakhiModalBackdrop';
     backdrop.className = 'sakhi-modal-backdrop';
@@ -437,10 +440,6 @@
         <span>🟡 सरसों: माहू (चेपा) व सफेद रतुआ से सुरक्षा</span>
         <span>→</span>
       </button>
-      <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चने में उकठा और फली छेदक इल्ली नियंत्रण')">
-        <span>🌰 चना: उकठा (Wilt) व फली छेदक का जैविक इलाज</span>
-        <span>→</span>
-      </button>
       <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('कोराजन और इमामेक्टिन की सही डोज क्या है?')">
         <span>🧪 किसी भी दवा की डोज व उपयोग पूछें</span>
         <span>→</span>
@@ -448,22 +447,22 @@
     `;
 
     if (domain === 'health') {
-      domainGreeting = 'अपनी सेहत की चिंता छोड़िए! डायबिटीज, जोड़ों का दर्द, थायरॉइड, वेट लॉस, हृदय स्वास्थ्य व नेचुरामोरे के बारे में बेझिझक पूछें।';
+      domainGreeting = 'अपनी सेहत की चिंता छोड़िए! जोड़ों का दर्द, उंगली में दर्द, डायबिटीज, थायरॉइड, नींद न आना या लिवर-किडनी के बारे में पूछें।';
       domainChips = `
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('जोड़ों में दर्द और उंगलियों में अकड़न का इलाज')">
+          <span>🦴 जोड़ों व उंगलियों में दर्द (यूरिक एसिड व ग्रीस)</span>
+          <span>→</span>
+        </button>
         <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('डायबिटीज और ब्लड शुगर कंट्रोल का फॉर्मूला')">
           <span>🩺 डायबिटीज व शुगर नियंत्रण (डाइट + नेचुरामोरे)</span>
           <span>→</span>
         </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('घुटने व जोड़ों के दर्द का पक्का इलाज')">
-          <span>🦴 जोड़ों का दर्द व गठिया (Joint Care प्रोटोकॉल)</span>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('नींद नहीं आती और तनाव रहता है क्या करें')">
+          <span>🌙 गहरी नींद व अनिद्रा का पादभ्यंग नुस्खा</span>
           <span>→</span>
         </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('पेट की चर्बी और वजन घटाने का डाइट प्लान')">
-          <span>⚡ मोटापा व वजन घटाना (30-दिवसीय चार्ट)</span>
-          <span>→</span>
-        </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('थायरॉइड हॉर्मोन बैलेंस करने का आयुर्वेदिक तरीका')">
-          <span>🦋 थायरॉइड हॉर्मोनल संतुलन व धनिया काढ़ा</span>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('पौरुष कमजोरी और ED का समाधान')">
+          <span>⚡ पौरुष स्वास्थ्य व स्टैमिना (Man Wellness)</span>
           <span>→</span>
         </button>
       `;
@@ -482,40 +481,36 @@
           <span>🐔 मुर्गी पालन: रानीखेत, CRD व वजन वृद्धि</span>
           <span>→</span>
         </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('तालाब में मछली पालन और प्लवक निर्माण')">
-          <span>🐟 मछली पालन: तालाब प्रबंधन व तेजी से वजन</span>
-          <span>→</span>
-        </button>
       `;
     } else if (domain === 'beauty') {
-      domainGreeting = 'प्राकृतिक सौंदर्य की बात सखी के साथ! बाल झड़ना, डैंड्रफ, पिंपल्स, चेहरे का ग्लो व हर्बल स्किन केयर के बारे में पूछें।';
+      domainGreeting = 'प्राकृतिक सौंदर्य की बात सखी के साथ! चेहरे पर झुर्रियां, झाइयां, पिंपल्स, बाल झड़ना व विटामिन-ई के बारे में पूछें।';
       domainChips = `
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('बाल झड़ना रोकने और नए बाल उगाने का उपाय')">
-          <span>✨ बाल झड़ना, रूसी व हेयर सीरम फॉर्मूला</span>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
+          <span>🌟 झाइयां, झुर्रियां व जायफल-एलोवेरा लेप</span>
           <span>→</span>
         </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चेहरे के पिंपल्स और झाइयां हटाने का नुस्खा')">
-          <span>🌟 ग्लोइंग स्किन, पिंपल्स व विटामिन थेरेपी</span>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('बालों में विटामिन ई कैसे लगाएं और बाल झड़ना रोकें')">
+          <span>✨ बाल झड़ना, रूसी व विटामिन-E का सही प्रयोग</span>
           <span>→</span>
         </button>
       `;
     } else if (domain === 'omni') {
       domainGreeting = 'खेत, सेहत, पशुपालन व सौंदर्य का एक मंच! आप किसी भी विषय पर मुझसे बेझिझक सवाल पूछ सकते हैं।';
       domainChips = `
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('जोड़ों में दर्द और उंगलियों में अकड़न का इलाज')">
+          <span>🦴 जोड़ों का दर्द व यूरिक एसिड नुस्खा</span>
+          <span>→</span>
+        </button>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
+          <span>🌟 चेहरे की झाइयां व झुर्रियां (जायफल लेप)</span>
+          <span>→</span>
+        </button>
         <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
           <span>🌾 कृषि: गेहूं में कल्ले 2x व रतुआ रोकथाम</span>
           <span>→</span>
         </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('डायबिटीज और ब्लड शुगर कंट्रोल का फॉर्मूला')">
-          <span>🩺 सेहत: डायबिटीज व शुगर नियंत्रण गाइड</span>
-          <span>→</span>
-        </button>
         <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
           <span>🐄 पशुपालन: दूध व फैट 8%+ वृद्धि फॉर्मूला</span>
-          <span>→</span>
-        </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('बाल झड़ना रोकने का आयुर्वेदिक तरीका')">
-          <span>✨ सौंदर्य: बाल झड़ना व हेयर केयर गाइड</span>
           <span>→</span>
         </button>
       `;
@@ -548,7 +543,7 @@
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
               <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #16a34a;" onerror="this.style.display='none'">
               <div>
-                <strong>राम-राम किसान व मित्र भाई! 🙏</strong><br>
+                <strong>राम-राम किसान व परिवार मित्र! 🙏</strong><br>
                 <span style="font-size:0.8rem;color:#166534;">मैं आपकी <strong>आरोग्यम सखी</strong> हूँ।</span>
               </div>
             </div>
@@ -581,7 +576,7 @@
     }
   }
 
-  // 10. GUEST ONBOARDING SUBMIT
+  // 10. GUEST ONBOARDING SUBMISSION
   window.submitSakhiOnboarding = function () {
     const nameInput = document.getElementById('sakhiOnboardName');
     const phoneInput = document.getElementById('sakhiOnboardPhone');
@@ -623,16 +618,16 @@
         आपका नंबर दर्ज हो गया है। अब आप बेझिझक कोई भी सवाल पूछ सकते हैं—खेत, सेहत, पशुपालन, पोल्ट्री या ब्यूटी के बारे में!
       </div>
       <div class="sakhi-choice-pills-wrap" style="margin-top:12px;">
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('जोड़ों में दर्द और उंगलियों में अकड़न का इलाज')">
+          <span>🦴 जोड़ों का दर्द व यूरिक एसिड नुस्खा</span>
+          <span>→</span>
+        </button>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
+          <span>🌟 चेहरे की झाइयां व झुर्रियां (जायफल लेप)</span>
+          <span>→</span>
+        </button>
         <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
           <span>🌾 गेहूं में कल्ले 2x बढ़ाना</span>
-          <span>→</span>
-        </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('डायबिटीज और ब्लड शुगर कंट्रोल का फॉर्मूला')">
-          <span>🩺 डायबिटीज व शुगर नियंत्रण</span>
-          <span>→</span>
-        </button>
-        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-          <span>🐄 गाय-भैंस दूध व फैट 8%+</span>
           <span>→</span>
         </button>
       </div>
@@ -674,7 +669,7 @@
     if (el) el.remove();
   }
 
-  function streamBotMessage(fullHtmlContent, speechText, bookCardHtml, tubeCardHtml, followupChipsHtml) {
+  function streamBotMessage(fullHtmlContent, speechText, bookCardHtml, tubeCardHtml, followupChipsHtml, nuskhaBtnHtml) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
@@ -709,6 +704,9 @@
         if (caret) caret.remove();
 
         let finalHtml = fullHtmlContent;
+        if (nuskhaBtnHtml) {
+          finalHtml += nuskhaBtnHtml;
+        }
         if (tubeCardHtml) {
           finalHtml += tubeCardHtml;
         }
@@ -756,11 +754,11 @@
         link: '/pashu-palan.html'
       };
     }
-    if (q.includes('शुगर') || q.includes('डायबिटीज') || q.includes('गठिया') || q.includes('जोड़') || q.includes('वजन') || q.includes('थायरॉइड') || q.includes('हार्ट') || q.includes('बाल') || q.includes('स्किन')) {
+    if (q.includes('शुगर') || q.includes('डायबिटीज') || q.includes('गठिया') || q.includes('जोड़') || q.includes('उंगली') || q.includes('वजन') || q.includes('थायरॉइड') || q.includes('हार्ट') || q.includes('नींद') || q.includes('खून') || q.includes('sexual') || q.includes('पौरुष') || q.includes('बाल') || q.includes('स्किन') || q.includes('झाइयां')) {
       return {
         id: 'HLT01',
         title: 'आरोग्यम संपूर्ण स्वास्थ्य व आयुर्वेद अमृत गाइड',
-        desc: 'डायबिटीज, जोड़ों का दर्द, मोटापा, थायरॉइड व संपूर्ण स्वास्थ्य सुधार चार्ट',
+        desc: 'डायबिटीज, जोड़ों का दर्द, मोटापा, थायरॉइड, त्वचा व संपूर्ण स्वास्थ्य सुधार चार्ट',
         price: 99,
         link: '/health/diabetes.html'
       };
@@ -803,7 +801,37 @@
     `;
   }
 
-  // 13. MAIN SUBMISSION WITH PROFANITY SHIELD & TYPING DELAY
+  // 13. SAKHI'S SECRET NUSKHA REVEAL HANDLER
+  window.revealSakhiNuskha = function (intentId, btn) {
+    if (!knowledgeData || !knowledgeData.intents) return;
+    const intent = knowledgeData.intents.find(i => i.id === intentId);
+    if (!intent || !intent.sakhi_nuskha) return;
+
+    if (btn) btn.style.display = 'none';
+
+    const wrap = document.getElementById('sakhiMessagesWrap');
+    if (!wrap) return;
+
+    const row = document.createElement('div');
+    row.className = 'sakhi-msg-row bot';
+    row.innerHTML = `
+      <div class="sakhi-msg-bubble">
+        <div class="sakhi-nuskha-box">
+          <div class="sakhi-nuskha-header">
+            <span>✨</span> <strong>${escapeHtml(intent.sakhi_nuskha.title || 'सखी का दादी-नानी का नुस्खा')}</strong>
+          </div>
+          <div class="sakhi-nuskha-text">
+            ${escapeHtml(intent.sakhi_nuskha.content)}
+          </div>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(row);
+    wrap.scrollTop = wrap.scrollHeight;
+    speakResponse(intent.sakhi_nuskha.content);
+  };
+
+  // 14. MAIN SUBMISSION WITH PROFANITY SHIELD & 2.2s DELAY
   function handleUserSubmit(userQuery) {
     const query = (userQuery || '').trim();
     if (!query) return;
@@ -813,7 +841,7 @@
 
     appendUserMessage(query);
 
-    // Check Safety / Profanity
+    // Safety / Profanity Check
     const safetyCheck = checkSafetyAndProfanity(query);
     if (!safetyCheck.isSafe) {
       appendTypingIndicator();
@@ -828,7 +856,6 @@
     }
 
     incrementDailyQuestions();
-
     appendTypingIndicator();
 
     setTimeout(() => {
@@ -837,7 +864,7 @@
     }, 2200);
   }
 
-  // 14. OMNI-DOMAIN INTENT MATCHER (ACROSS ALL SUBJECTS)
+  // 15. DYNAMIC SYMPTOM SYNTHESIZER & KNOWLEDGE MATCHER
   function processKnowledgeQuery(query) {
     const cleanQ = query.toLowerCase();
 
@@ -865,21 +892,10 @@
 
     if (matchedIntent && maxScore > 0) {
       currentDiagnosticIntent = matchedIntent;
-
-      if (matchedIntent.direct_summary) {
-        renderDirectSummaryWithSubOptions(matchedIntent, query);
-      } else if (matchedIntent.responses) {
-        const defaultResp = Object.values(matchedIntent.responses)[0];
-        if (defaultResp) {
-          renderFinalSolution(defaultResp, query);
-        } else {
-          fallbackUnanswered(query);
-        }
-      } else {
-        fallbackUnanswered(query);
-      }
+      renderDirectSummaryWithSubOptions(matchedIntent, query);
     } else {
-      fallbackUnanswered(query);
+      // Dynamic Intelligent Symptom Synthesizer Fallback
+      synthesizeDynamicMedicalAgriAnswer(query);
     }
   }
 
@@ -887,7 +903,21 @@
     const summary = intent.direct_summary;
     const matchedBook = getRelevantBookForQuery(originalQuery);
 
-    let html = `
+    let html = '';
+
+    // If emergency query (e.g. Chest pain), render critical alert first!
+    if (isEmergencyQuery(originalQuery)) {
+      html += `
+        <div class="sakhi-emergency-alert">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size:1.2rem;margin-top:2px;"></i>
+          <div>
+            <strong>आपातकालीन चेतावनी (Emergency Alert):</strong> सीने में तेज दबाव, दर्द, पसीना या बाएं हाथ में दर्द हार्ट अटैक का संकेत हो सकता है। तुरंत 108 पर कॉल करें या नजदीकी अस्पताल जाएं!
+          </div>
+        </div>
+      `;
+    }
+
+    html += `
       <div style="margin-bottom:10px;">
         <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(summary.title || '🌿 सम्पूर्ण वैज्ञानिक मार्गदर्शन')}</h4>
       </div>
@@ -902,6 +932,19 @@
         <div>${escapeHtml(summary.curiosity_hook)}</div>
       </div>
     `;
+
+    // Sakhi's Secret Nuskha Button
+    let nuskhaBtnHtml = '';
+    if (intent.sakhi_nuskha) {
+      nuskhaBtnHtml = `
+        <div style="margin-top:10px;">
+          <button type="button" class="sakhi-nuskha-trigger-btn" onclick="window.revealSakhiNuskha('${intent.id}', this)">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>सखी का देसी नुस्खा सुनोगे क्या? →</span>
+          </button>
+        </div>
+      `;
+    }
 
     const tubeCardHtml = buildTubeCardMarkup(summary.tube_url, summary.tube_title);
     const bookCardHtml = buildBookCardMarkup(matchedBook);
@@ -923,49 +966,11 @@
       `;
     }
 
-    streamBotMessage(html, summary.audio_text || summary.first_aid, bookCardHtml, tubeCardHtml, followupChipsHtml);
+    streamBotMessage(html, summary.audio_text || summary.first_aid, bookCardHtml, tubeCardHtml, followupChipsHtml, nuskhaBtnHtml);
   }
 
-  function renderFinalSolution(resp, query) {
-    const matchedBook = getRelevantBookForQuery(query || resp.book_name);
-
-    let html = `
-      <div class="sakhi-solution-box">
-        <div class="sakhi-solution-header">🌿 1. तुरंत प्रभावी उपचार (First Aid):</div>
-        <div>${escapeHtml(resp.first_aid)}</div>
-      </div>
-
-      <div class="sakhi-curiosity-box">
-        <div class="sakhi-curiosity-header">⚠️ 2. वैज्ञानिक चेतावनी व स्थायी समाधान:</div>
-        <div>${escapeHtml(resp.curiosity_hook)}</div>
-      </div>
-    `;
-
-    const tubeCardHtml = buildTubeCardMarkup(resp.tube_url, resp.tube_title);
-    const bookCardHtml = buildBookCardMarkup(matchedBook);
-
-    let followupChipsHtml = '';
-    if (resp.follow_up_suggestions && resp.follow_up_suggestions.length > 0) {
-      followupChipsHtml = `
-        <div class="sakhi-followup-container">
-          <div class="sakhi-followup-title">💡 क्या आप यह भी जानना चाहते हैं?</div>
-          <div class="sakhi-followup-list">
-            ${resp.follow_up_suggestions.map((sug) => `
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(sug)}')">
-                <span>${escapeHtml(sug)}</span>
-                <span>→</span>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    streamBotMessage(html, resp.audio_text || resp.first_aid, bookCardHtml, tubeCardHtml, followupChipsHtml);
-  }
-
-  // 15. UNANSWERED LOGGING & SMART WHATSAPP FALLBACK
-  function fallbackUnanswered(query) {
+  // 16. DYNAMIC SYMPTOM SYNTHESIZER (WHEN NO EXACT STATIC INTENT MATCHES)
+  function synthesizeDynamicMedicalAgriAnswer(query) {
     try {
       const logs = JSON.parse(localStorage.getItem('SAKHI_UNANSWERED_LOGS') || '[]');
       logs.push({
@@ -977,50 +982,77 @@
       localStorage.setItem('SAKHI_UNANSWERED_LOGS', JSON.stringify(logs.slice(-50)));
     } catch (e) {}
 
-    const waMsg = `नमस्ते आरोग्यम सखी AI जी! 🙏\nमेरा सवाल है: "${query}"\nकृपया इस पर सटीक वैज्ञानिक सलाह और सही समाधान बताएं।`;
+    const q = query.toLowerCase();
+    const domain = detectCurrentPageDomain();
+    const matchedBook = getRelevantBookForQuery(query);
+
+    let synthesizedTitle = `🌿 ${query} - आयुर्वेदिक व वैज्ञानिक परामर्श`;
+    let firstAid = `इस समस्या में सबसे पहले शरीर/फसल को विषाक्त पदार्थों (Toxins) से मुक्त रखें। पर्याप्त गुनगुना पानी पिएं, ताजा सात्विक आहार लें और रात को सोते समय 1 चम्मच त्रिफला या नेट्सर्फ De-Tox का सेवन करें।`;
+    let curiosity = `समस्या की जड़ को समझने हेतु जीवनशैली और डाइट में सुधार आवश्यक है। अत्यधिक खट्टी, तली-भुनी चीजें व तनाव बंद करें। रोजाना 30 मिनट प्राणायाम व सूक्ष्म व्यायाम करें।`;
+    let speech = `आपके प्रश्न पर प्राथमिक आयुर्वेदिक उपचार और जीवनशैली सुधार आवश्यक है। संपूर्ण मार्गदर्शन यहाँ दिया गया है।`;
+
+    if (q.includes('दर्द') || q.includes('सूजन') || q.includes('चोट')) {
+      firstAid = `दर्द व सूजन वाले स्थान पर तिल या अरंडी के तेल में लहसुन व मेथी पकाकर गुनगुनी मालिश करें। रात को 1 चम्मच सोंठ चूर्ण गुनगुने पानी से लें और ठंडी चीजों से परहेज रखें।`;
+      curiosity = `लगातार दर्द वात दोष बढ़ने का संकेत है। यूरिक एसिड या एक्स-रे की जांच अवश्य कराएं। नेट्सर्फ Joint Care व नेचुरामोरे शरीर की मांसपेशियों को पोषण देते हैं।`;
+    } else if (q.includes('पेट') || q.includes('गैस') || q.includes('कब्ज') || q.includes('अपच')) {
+      firstAid = `सुबह खाली पेट 1 गिलास गुनगुने पानी में चुटकीभर हींग, काला नमक व आधा चम्मच जीरा चूर्ण मिलाकर पिएं। भोजन के 1 घंटे बाद ही पानी पिएं।`;
+      curiosity = `कब्ज 100 बीमारियों की जड़ है। मैदे और रात में देर से खाने की आदत छोड़ें। फाइबर युक्त फल पपीता और नेट्सर्फ De-Tox आंतों को साफ रखते हैं।`;
+    } else if (q.includes('पौधा') || q.includes('पत्ती') || q.includes('कीड़ा') || q.includes('फसल')) {
+      firstAid = `फसल में पत्तियों के पीलेपन व कमजोरी हेतु 15L टंकी में 25ml StimRich + 5ml Bio-99 मिलाकर छिड़काव करें। मिट्टी में नमी बनाकर रखें।`;
+      curiosity = `फसल के रोग की स्पष्ट पहचान हेतु जड़ और तने का निरीक्षण करें। रासायनिक दवाओं के अंधाधुंध उपयोग से बचें और Biofit जैविक स्प्रे कैलेंडर अपनाएं।`;
+    }
+
+    const waMsg = `नमस्ते आरोग्यम सखी AI जी! 🙏\nमेरा सवाल है: "${query}"\nकृपया इस पर सटीक वैज्ञानिक सलाह और दवा बताएं।`;
     const waUrl = `https://wa.me/91${MASTER_ADMIN_PHONE}?text=${encodeURIComponent(waMsg)}`;
 
     let html = `
-      <div>
-        <strong>🌿 यह एक विशेष एवं महत्वपूर्ण प्रश्न है!</strong><br><br>
-        इस प्रश्न का अध्ययन हमारे मुख्य विशेषज्ञ कर रहे हैं और इसका समाधान हमारे AI सिस्टम में अपडेट किया जा रहा है।<br><br>
-        तुरंत प्रत्यक्ष सहायता के लिए आप हमारे मुख्य विशेषज्ञ से सीधे WhatsApp पर जुड़ सकते हैं:
+      <div style="margin-bottom:10px;">
+        <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(synthesizedTitle)}</h4>
+      </div>
+
+      <div class="sakhi-solution-box">
+        <div class="sakhi-solution-header">🌿 1. तुरंत प्राकृतिक व प्राथमिक राहत:</div>
+        <div>${escapeHtml(firstAid)}</div>
+      </div>
+
+      <div class="sakhi-curiosity-box">
+        <div class="sakhi-curiosity-header">⚠️ 2. वैज्ञानिक सावधानी व स्थायी समाधान:</div>
+        <div>${escapeHtml(curiosity)}</div>
       </div>
 
       <div style="margin-top:14px;">
-        <a href="${escapeHtml(waUrl)}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#ffffff;padding:12px 20px;border-radius:24px;text-decoration:none;font-weight:900;font-size:0.95rem;box-shadow:0 4px 14px rgba(22,163,74,0.3);">
-          <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i>
-          <span>विशेषज्ञ से WhatsApp पर पूछें →</span>
+        <a href="${escapeHtml(waUrl)}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#ffffff;padding:10px 18px;border-radius:24px;text-decoration:none;font-weight:900;font-size:0.88rem;box-shadow:0 4px 14px rgba(22,163,74,0.3);">
+          <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i>
+          <span>मुख्य विशेषज्ञ से WhatsApp पर व्यक्तिगत सलाह लें →</span>
         </a>
       </div>
+    `;
 
-      <div class="sakhi-followup-container" style="margin-top:16px;">
+    const bookCardHtml = buildBookCardMarkup(matchedBook);
+    const followupChipsHtml = `
+      <div class="sakhi-followup-container">
         <div class="sakhi-followup-title">💡 आप इन प्रमुख विषयों पर भी पूछ सकते हैं:</div>
         <div class="sakhi-followup-list">
+          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('जोड़ों में दर्द और उंगलियों में अकड़न का इलाज')">
+            <span>🦴 जोड़ों का दर्द व यूरिक एसिड नुस्खा</span>
+            <span>→</span>
+          </button>
+          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
+            <span>🌟 चेहरे की झाइयां व झुर्रियां (जायफल लेप)</span>
+            <span>→</span>
+          </button>
           <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
-            <span>🌾 गेहूं की पहली सिंचाई व कल्ले बढ़ाना</span>
-            <span>→</span>
-          </button>
-          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('डायबिटीज और ब्लड शुगर कंट्रोल का फॉर्मूला')">
-            <span>🩺 डायबिटीज व शुगर नियंत्रण डाइट</span>
-            <span>→</span>
-          </button>
-          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस में दूध और फैट बढ़ाने का फॉर्मूला')">
-            <span>🐄 पशुपालन: दूध व फैट 8%+ वृद्धि</span>
-            <span>→</span>
-          </button>
-          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('बाल झड़ना रोकने का नुस्खा')">
-            <span>✨ सौंदर्य: बाल झड़ना व डैंड्रफ मुक्ति</span>
+            <span>🌾 गेहूं में कल्ले 2x बढ़ाना</span>
             <span>→</span>
           </button>
         </div>
       </div>
     `;
 
-    streamBotMessage(html, "यह एक विशेष प्रश्न है। तुरंत समाधान के लिए हमारे मुख्य विशेषज्ञ से व्हाट्सएप पर संपर्क करें।");
+    streamBotMessage(html, speech, bookCardHtml, '', followupChipsHtml, '');
   }
 
-  // 16. VIRAL SHARE
+  // 17. VIRAL SHARE
   window.shareAarogyamSakhi = function () {
     const refCode = getBestReferralCode();
     const shareUrl = `${window.location.origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(refCode)}`;
@@ -1050,7 +1082,7 @@
     handleUserSubmit(query);
   };
 
-  // 17. GLOBAL BRIDGE FOR CONSULT AI EXPERT BUTTONS
+  // 18. GLOBAL BRIDGE FOR CONSULT AI EXPERT BUTTONS
   window.consultAiExpert = function (topic, details) {
     openSakhiModal();
     const query = `${topic || 'परामर्श'}${details ? ': ' + details : ''}`;
