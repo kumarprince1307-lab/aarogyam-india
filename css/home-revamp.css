@@ -172,34 +172,45 @@ body {
 }
 
 /* Mobile Header Optimization */
-@media (max-width: 640px) {
-  .header-tiranga-animated .container {
-    padding: 6px 8px !important;
+@media (max-width: 768px) {
+  .header-tiranga-animated .container,
+  .header .container {
+    padding: 6px 10px !important;
     gap: 6px !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
   .brand-logo-pill {
-    padding: 3px 8px !important;
+    padding: 3px 6px !important;
     gap: 6px !important;
+    max-width: 165px !important;
+    overflow: hidden !important;
   }
   .brand-logo-pill img {
-    height: 30px !important;
+    height: 28px !important;
+    width: auto !important;
   }
   .brand-title-text {
-    font-size: 0.92rem !important;
+    font-size: 0.90rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   .brand-sub-text {
     display: none !important;
   }
   .header-current-page-badge {
-    font-size: 0.68rem !important;
-    padding: 2px 7px !important;
+    display: none !important;
   }
   #header-pwa-install-btn {
-    padding: 5px 8px !important;
-    font-size: 0.72rem !important;
+    display: none !important;
   }
-  #header-pwa-install-btn span:last-child {
-    display: none;
+  .header-actions .btn:not(.menu-button),
+  #header-unified-user-badge,
+  .header-user-status-pill,
+  .header-login-quick-btn {
+    display: none !important;
   }
   .user-notif-bell-btn,
   .header-actions a[href*="cart"] {
@@ -210,12 +221,6 @@ body {
     width: 34px !important;
     height: 34px !important;
     font-size: 1.05rem !important;
-  }
-}
-
-@media (max-width: 380px) {
-  .header-current-page-badge {
-    display: none;
   }
 }
 

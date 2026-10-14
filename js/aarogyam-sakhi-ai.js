@@ -487,6 +487,10 @@
   }
 
   function openSakhiModal() {
+    // If background page audio greeting is playing, stop it so only Sakhi talks
+    if (typeof window.stopPageAudioGreeting === 'function') {
+      try { window.stopPageAudioGreeting(); } catch (e) {}
+    }
     const backdrop = document.getElementById('sakhiModalBackdrop');
     if (backdrop) {
       backdrop.classList.add('active');
