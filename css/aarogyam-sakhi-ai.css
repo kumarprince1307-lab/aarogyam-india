@@ -404,21 +404,21 @@ html, body {
 .sakhi-plus-menu {
   position: absolute;
   bottom: 66px;
-  left: 10px;
-  right: 10px;
+  left: 12px;
+  right: 12px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 20px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
-  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  padding: 10px;
   z-index: 10000;
-  animation: sakhiSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  max-height: 70vh;
+  animation: sakhiSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 60vh;
   overflow-y: auto;
 }
 
 @keyframes sakhiSlideUp {
-  from { opacity: 0; transform: translateY(15px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -426,28 +426,32 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 6px 10px;
+  padding: 4px 8px 8px;
   border-bottom: 1px solid #f1f5f9;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #64748b;
+  letter-spacing: 0.3px;
 }
 .sakhi-plus-menu-close {
   background: #f1f5f9;
   border: none;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
   color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sakhi-plus-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 @media (max-width: 480px) {
@@ -459,35 +463,23 @@ html, body {
 .sakhi-menu-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 10px 14px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
 }
 .sakhi-menu-item:hover {
   background: #f0fdf4;
-  border-color: #86efac;
-  transform: translateY(-1px);
-}
-.sakhi-item-icon {
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.sakhi-item-text strong {
-  display: block;
-  font-size: 0.84rem;
-  color: #0f172a;
-}
-.sakhi-item-text small {
-  display: block;
-  font-size: 0.72rem;
-  color: #64748b;
-  margin-top: 2px;
+  border-color: #bbf7d0;
+  color: #15803d;
+  transform: translateX(2px);
 }
 
 /* 4. QUOTA TRACKER BANNER */
