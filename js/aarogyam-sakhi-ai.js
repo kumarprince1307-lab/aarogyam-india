@@ -547,30 +547,176 @@
     return t;
   }
 
-  function speakResponse(text) {
-    if (!isSoundEnabled || !window.speechSynthesis || !text) return;
+  // 8. TEXT-TO-SPEECH (TTS) CLEANER & CONTINUOUS SPEECH ENGINE
+  let speechChunkWatchdog = null;
+  window._sakhiSpeechUtterances = [];
 
-    window.speechSynthesis.cancel();
+  function stopAllSpeech() {
+    if (speechChunkWatchdog) {
+      clearTimeout(speechChunkWatchdog);
+      speechChunkWatchdog = null;
+    }
+    window._sakhiSpeechUtterances = [];
+    if (window.speechSynthesis) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
+    const avatar = document.getElementById('sakhiAvatarFrame');
+    if (avatar) avatar.classList.remove('speaking');
+    if (activeSpeechBtn) {
+      activeSpeechBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>सुनें</span>';
+      activeSpeechBtn.classList.remove('speaking');
+      activeSpeechBtn = null;
+    }
+  }
+
+  function getBestHindiVoice() {
+    if (!window.speechSynthesis) return null;
+    try {
+      const voices = window.speechSynthesis.getVoices() || [];
+      const hi = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi_IN' || (v.lang && v.lang.startsWith('hi')));
+      if (hi) return hi;
+      const inEn = voices.find(v => v.lang === 'en-IN' || v.lang === 'en_IN');
+      if (inEn) return inEn;
+    } catch (e) {}
+    return null;
+  }
+
+  function splitTextIntoSentences(text) {
+    if (!text) return [];
+    // Split on Hindi purna viram (।), newline (\n), question (?), exclamation (!), semicolon (;)
+    const rawTokens = text.split(/([।\n?!;]+)/);
+    const chunks = [];
+    let current = '';
+
+    for (let i = 0; i < rawTokens.length; i++) {
+      const tok = rawTokens[i];
+      if (/^[।\n?!;]+$/.test(tok)) {
+        current += tok;
+        const trimmed = current.trim();
+        if (trimmed) chunks.push(trimmed);
+        current = '';
+      } else {
+        if (tok.length > 85) {
+          const parts = tok.split(/([,]+)/);
+          for (let j = 0; j < parts.length; j++) {
+            current += parts[j];
+            if (current.length >= 65 || parts[j] === ',') {
+              const tr = current.trim();
+              if (tr) chunks.push(tr);
+              current = '';
+            }
+          }
+        } else {
+          current += tok;
+        }
+      }
+    }
+    if (current.trim()) {
+      chunks.push(current.trim());
+    }
+    return chunks.length > 0 ? chunks : [text];
+  }
+
+  function playChunkedSpeech(text, onStart, onFinish) {
+    if (!window.speechSynthesis || !text) {
+      if (typeof onFinish === 'function') onFinish();
+      return;
+    }
+
+    stopAllSpeech();
 
     const cleanText = cleanTextForTTS(text);
-    if (!cleanText) return;
+    if (!cleanText) {
+      if (typeof onFinish === 'function') onFinish();
+      return;
+    }
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'hi-IN';
-    utterance.rate = 0.95;
-    utterance.pitch = 1.05;
+    const chunks = splitTextIntoSentences(cleanText);
+    if (!chunks.length) {
+      if (typeof onFinish === 'function') onFinish();
+      return;
+    }
 
-    const avatar = document.getElementById('sakhiAvatarFrame');
-    if (avatar) avatar.classList.add('speaking');
+    // Small delay ensures previous speech synthesizer queue is flushed
+    setTimeout(() => {
+      if (typeof onStart === 'function') onStart();
+      let currentIndex = 0;
 
-    utterance.onend = function () {
+      function speakNextChunk() {
+        if (speechChunkWatchdog) {
+          clearTimeout(speechChunkWatchdog);
+          speechChunkWatchdog = null;
+        }
+
+        if (currentIndex >= chunks.length) {
+          stopAllSpeech();
+          if (typeof onFinish === 'function') onFinish();
+          return;
+        }
+
+        const chunkText = chunks[currentIndex++];
+        if (!chunkText || !chunkText.trim()) {
+          speakNextChunk();
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(chunkText);
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+
+        const voice = getBestHindiVoice();
+        if (voice) utterance.voice = voice;
+
+        // Prevent V8 garbage collection
+        window._sakhiSpeechUtterances.push(utterance);
+
+        let advanced = false;
+        function proceed() {
+          if (advanced) return;
+          advanced = true;
+          if (speechChunkWatchdog) {
+            clearTimeout(speechChunkWatchdog);
+            speechChunkWatchdog = null;
+          }
+          speakNextChunk();
+        }
+
+        utterance.onend = proceed;
+        utterance.onerror = function (e) {
+          if (e && e.error === 'canceled') return;
+          proceed();
+        };
+
+        // Watchdog: If browser drops onend event, advance automatically after estimated reading time
+        const maxTime = Math.max(3000, chunkText.length * 150 + 2000);
+        speechChunkWatchdog = setTimeout(() => {
+          proceed();
+        }, maxTime);
+
+        try {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          proceed();
+        }
+      }
+
+      speakNextChunk();
+    }, 50);
+  }
+
+  function speakResponse(text) {
+    if (!isSoundEnabled || !window.speechSynthesis || !text) return;
+    playChunkedSpeech(text, () => {
+      const avatar = document.getElementById('sakhiAvatarFrame');
+      if (avatar) avatar.classList.add('speaking');
+    }, () => {
+      const avatar = document.getElementById('sakhiAvatarFrame');
       if (avatar) avatar.classList.remove('speaking');
-    };
-    utterance.onerror = function () {
-      if (avatar) avatar.classList.remove('speaking');
-    };
-
-    window.speechSynthesis.speak(utterance);
+    });
   }
 
   window.toggleMessageSpeech = function (btn, encodedText) {
@@ -578,42 +724,24 @@
     if (!window.speechSynthesis) return;
 
     if (activeSpeechBtn === btn && window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-      btn.classList.remove('speaking');
-      activeSpeechBtn = null;
+      stopAllSpeech();
       return;
     }
 
     if (activeSpeechBtn && activeSpeechBtn !== btn) {
-      window.speechSynthesis.cancel();
-      activeSpeechBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-      activeSpeechBtn.classList.remove('speaking');
+      stopAllSpeech();
     }
 
-    const cleanText = cleanTextForTTS(text);
-    if (!cleanText) return;
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'hi-IN';
-    utterance.rate = 0.95;
-
-    btn.innerHTML = '<i class="fa-solid fa-stop"></i>';
-    btn.classList.add('speaking');
     activeSpeechBtn = btn;
+    btn.innerHTML = '<i class="fa-solid fa-stop"></i> <span>रोकें</span>';
+    btn.classList.add('speaking');
 
-    utterance.onend = function () {
-      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-      btn.classList.remove('speaking');
-      activeSpeechBtn = null;
-    };
-    utterance.onerror = function () {
-      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-      btn.classList.remove('speaking');
-      activeSpeechBtn = null;
-    };
-
-    window.speechSynthesis.speak(utterance);
+    playChunkedSpeech(text, () => {
+      const avatar = document.getElementById('sakhiAvatarFrame');
+      if (avatar) avatar.classList.add('speaking');
+    }, () => {
+      stopAllSpeech();
+    });
   };
 
   function buildMsgAudioBtnMarkup(text) {
@@ -725,15 +853,19 @@
             खेती (गेहूं, सरसों, खाद, स्प्रे), स्वास्थ्य (डायबिटीज, जोड़ दर्द, बीपी), पशुपालन (दूध-फैट), सौंदर्य व नेट्सर्फ बिज़नेस से जुड़ा कोई भी सवाल बेझिझक पूछें।
           </div>
 
-          <!-- Quick Topic Pills -->
+          <!-- Quick Topic Pills (Same as Plus Menu) -->
           <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:10px 12px;margin-bottom:8px;">
             <div style="font-size:0.80rem;font-weight:800;color:#166534;margin-bottom:6px;">👉 मुख्य विषय चुनें:</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं की फसल में खाद व स्प्रे कैलेंडर बताएं')">🌾 गेहूं स्प्रे कैलेंडर</button>
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">📚 कृषि ई-बुक्स गाइड</button>
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">🐄 दूध व फैट वृद्धि</button>
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">🩺 शुगर व स्वास्थ्य</button>
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ बिज़नेस प्लान और ₹8,19,250 साप्ताहिक कैपिंग')">💼 नेट्सर्फ प्लान</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">🌾 खेती व फसलें</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">🐄 पशुपालन व डेयरी</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">🩺 स्वास्थ्य व रोग</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">✨ सौंदर्य व त्वचा</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">💼 नेट्सर्फ प्रोडक्ट्स</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">📚 ई-बुक्स</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">🌸 दादी के नुस्खे</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('आरोग्यम डिजिटल ई-टेलर व एफिलिएट कमाई')">💰 कमाई व करियर</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क')">💬 अवनीश जी से संपर्क</button>
             </div>
           </div>
         </div>
@@ -1325,9 +1457,6 @@
     return false;
   }
 
-    return false;
-  }
-
   // 16. COMPREHENSIVE NETSURF & AGRI PRODUCT CATALOG HANDLER
   function handleComprehensiveNetsurfCatalog(cleanQ, rawQ) {
     // A. Naturamore Joint Care
@@ -1884,20 +2013,29 @@
       </div>
 
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं व सरसों की फसल में खाद व स्प्रे')">
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">
           🌾 <span>खेती व फसलें</span>
         </button>
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
-          📚 <span>कृषि ई-बुक्स गाइड</span>
-        </button>
         <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-          🐄 <span>पशुपालन (दूध-फैट)</span>
+          🐄 <span>पशुपालन व डेयरी</span>
         </button>
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर जॉइंट केयर के बारे में बताओ')">
-          🦴 <span>जोड़ों का दर्द (जॉइंट केयर)</span>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">
+          🩺 <span>स्वास्थ्य व रोग</span>
+        </button>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">
+          ✨ <span>सौंदर्य व त्वचा</span>
         </button>
         <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">
-          💼 <span>नेट्सर्फ प्लान</span>
+          💼 <span>नेट्सर्फ प्रोडक्ट्स</span>
+        </button>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
+          📚 <span>ई-बुक्स</span>
+        </button>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">
+          🌸 <span>दादी के नुस्खे</span>
+        </button>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('आरोग्यम डिजिटल ई-टेलर व एफिलिएट कमाई')">
+          💰 <span>कमाई व करियर</span>
         </button>
       </div>
 
@@ -1979,10 +2117,16 @@
               ✨ सौंदर्य व त्वचा
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">
-              💼 नेट्सर्फ प्लान
+              💼 नेट्सर्फ प्रोडक्ट्स
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
+              📚 ई-बुक्स
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">
               🌸 दादी के नुस्खे
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('आरोग्यम डिजिटल ई-टेलर व एफिलिएट कमाई')">
+              💰 कमाई व करियर
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क')">
               💬 अवनीश जी से संपर्क
