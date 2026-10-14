@@ -3,5 +3,9 @@ User-agent: *
 Allow: /
 
 Disallow: /404.html
+Disallow: /pdf/
+Disallow: /data/
+Disallow: /admin/
 
 Sitemap: https://aarogyamindia.online/sitemap.xml
+

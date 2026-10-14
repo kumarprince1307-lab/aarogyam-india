@@ -12,8 +12,9 @@
   async function fetchRecordings() {
     if (_cachedRecordings) return _cachedRecordings;
     try {
-      let res = await fetch(`/data/webinar-recordings.json?v=${Date.now()}`);
-      if (!res.ok) res = await fetch(`../data/webinar-recordings.json?v=${Date.now()}`);
+      const cacheBucket = Math.floor(Date.now() / 3600000);
+      let res = await fetch(`/data/webinar-recordings.json?v=${cacheBucket}`);
+      if (!res.ok) res = await fetch(`../data/webinar-recordings.json?v=${cacheBucket}`);
       if (res.ok) {
         const data = await res.json();
         _cachedRecordings = data.recordings || [];

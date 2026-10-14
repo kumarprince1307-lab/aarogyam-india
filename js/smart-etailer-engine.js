@@ -355,11 +355,12 @@
   // 4. DIAGNOSIS CATALOG & CAREER LADDER
   // -------------------------------------------------------------
   async function loadDiagnosisCatalog() {
+    const cacheBucket = Math.floor(Date.now() / 3600000);
     // 1. Diagnosis Catalog
     try {
-      let res = await fetch('/data/netsurf-diagnosis-catalog.json?v=' + Date.now()).catch(() => null);
-      if (!res || !res.ok) res = await fetch('../data/netsurf-diagnosis-catalog.json?v=' + Date.now()).catch(() => null);
-      if (!res || !res.ok) res = await fetch('data/netsurf-diagnosis-catalog.json?v=' + Date.now()).catch(() => null);
+      let res = await fetch('/data/netsurf-diagnosis-catalog.json?v=' + cacheBucket).catch(() => null);
+      if (!res || !res.ok) res = await fetch('../data/netsurf-diagnosis-catalog.json?v=' + cacheBucket).catch(() => null);
+      if (!res || !res.ok) res = await fetch('data/netsurf-diagnosis-catalog.json?v=' + cacheBucket).catch(() => null);
       if (res && res.ok) {
         catalogData = await res.json();
       }
@@ -367,9 +368,9 @@
 
     // 2. Marketing Hooks Seed
     try {
-      let mktRes = await fetch('/data/netsurf-marketing-hooks.json?v=' + Date.now()).catch(() => null);
-      if (!mktRes || !mktRes.ok) mktRes = await fetch('../data/netsurf-marketing-hooks.json?v=' + Date.now()).catch(() => null);
-      if (!mktRes || !mktRes.ok) mktRes = await fetch('data/netsurf-marketing-hooks.json?v=' + Date.now()).catch(() => null);
+      let mktRes = await fetch('/data/netsurf-marketing-hooks.json?v=' + cacheBucket).catch(() => null);
+      if (!mktRes || !mktRes.ok) mktRes = await fetch('../data/netsurf-marketing-hooks.json?v=' + cacheBucket).catch(() => null);
+      if (!mktRes || !mktRes.ok) mktRes = await fetch('data/netsurf-marketing-hooks.json?v=' + cacheBucket).catch(() => null);
       if (mktRes && mktRes.ok) {
         const hooks = await mktRes.json();
         if (Array.isArray(hooks) && hooks.length) {
@@ -380,9 +381,9 @@
 
     // 3. Audio Training Scripts Seed
     try {
-      let audRes = await fetch('/data/netsurf-audio-scripts.json?v=' + Date.now()).catch(() => null);
-      if (!audRes || !audRes.ok) audRes = await fetch('../data/netsurf-audio-scripts.json?v=' + Date.now()).catch(() => null);
-      if (!audRes || !audRes.ok) audRes = await fetch('data/netsurf-audio-scripts.json?v=' + Date.now()).catch(() => null);
+      let audRes = await fetch('/data/netsurf-audio-scripts.json?v=' + cacheBucket).catch(() => null);
+      if (!audRes || !audRes.ok) audRes = await fetch('../data/netsurf-audio-scripts.json?v=' + cacheBucket).catch(() => null);
+      if (!audRes || !audRes.ok) audRes = await fetch('data/netsurf-audio-scripts.json?v=' + cacheBucket).catch(() => null);
       if (audRes && audRes.ok) {
         const auds = await audRes.json();
         if (Array.isArray(auds) && auds.length) {
@@ -427,9 +428,9 @@
     } catch (e) {}
 
     try {
-      let cRes = await fetch('/data/netsurf-career-ladder.json?v=' + Date.now()).catch(() => null);
-      if (!cRes || !cRes.ok) cRes = await fetch('../data/netsurf-career-ladder.json?v=' + Date.now()).catch(() => null);
-      if (!cRes || !cRes.ok) cRes = await fetch('data/netsurf-career-ladder.json?v=' + Date.now()).catch(() => null);
+      let cRes = await fetch('/data/netsurf-career-ladder.json?v=' + cacheBucket).catch(() => null);
+      if (!cRes || !cRes.ok) cRes = await fetch('../data/netsurf-career-ladder.json?v=' + cacheBucket).catch(() => null);
+      if (!cRes || !cRes.ok) cRes = await fetch('data/netsurf-career-ladder.json?v=' + cacheBucket).catch(() => null);
       if (cRes && cRes.ok) {
         careerLadderData = await cRes.json();
       }
