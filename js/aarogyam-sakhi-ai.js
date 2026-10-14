@@ -514,13 +514,47 @@
     if (input) input.placeholder = 'सवाल बोलें या लिखें...';
   }
 
-  // 8. TEXT-TO-SPEECH (TTS)
+  // 8. TEXT-TO-SPEECH (TTS) CLEANER & SPEECH ENGINE
+  function cleanTextForTTS(rawText) {
+    if (!rawText) return '';
+    let t = String(rawText);
+
+    // 1. Remove HTML tags
+    t = t.replace(/<[^>]*>/g, ' ');
+
+    // 2. Fix NPK Ratios & Time-Like Colon Patterns (Prevent "19 bajke 19 minute 19 second")
+    t = t.replace(/\b19\s*:\s*19\s*:\s*19\b/gi, 'उन्नीस उन्नीस उन्नीस')
+         .replace(/\b0\s*:\s*52\s*:\s*34\b/gi, 'जीरो बावन चौंतीस')
+         .replace(/\b0\s*:\s*0\s*:\s*50\b/gi, 'जीरो जीरो पचास')
+         .replace(/\b12\s*:\s*61\s*:\s*0\b/gi, 'बारह इकसठ जीरो')
+         .replace(/\b13\s*:\s*0\s*:\s*45\b/gi, 'तेरह जीरो पैंतालीस')
+         .replace(/\b(\d+)\s*:\s*(\d+)\s*:\s*(\d+)\b/g, '$1 $2 $3')
+         .replace(/\b(\d+)\s*:\s*(\d+)\b/g, '$1 अनुपात $2');
+
+    // 3. Fix '+' symbol (Prevent TTS reading it as 'जोड़')
+    // e.g. "स्टिमरिच + बायो-99" -> "स्टिमरिच और बायो-99"
+    t = t.replace(/\s*\+\s*/g, ' और ');
+
+    // 4. Strip ALL Unicode Emojis (Prevents TTS reading emojis as "jadi buti", "haddi", etc.)
+    t = t.replace(/[\u{1F300}-\u{1F9FF}\u{1FA00}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{200D}\u{FE0F}]/gu, '');
+
+    // 5. Clean arrows, bullets, symbols & markdown
+    t = t.replace(/[→⇒•●★☆✔✓👉👉🏻👉🏼👉🏽👉🏾👉🏿]/gu, ' ')
+         .replace(/[*#_~`|]/g, ' ')
+         .replace(/\s+/g, ' ')
+         .trim();
+
+    return t;
+  }
+
   function speakResponse(text) {
     if (!isSoundEnabled || !window.speechSynthesis || !text) return;
 
     window.speechSynthesis.cancel();
 
-    const cleanText = text.replace(/[*#_~`•]/g, '').trim();
+    const cleanText = cleanTextForTTS(text);
+    if (!cleanText) return;
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'hi-IN';
     utterance.rate = 0.95;
@@ -557,7 +591,9 @@
       activeSpeechBtn.classList.remove('speaking');
     }
 
-    const cleanText = text.replace(/[*#_~`•]/g, '').trim();
+    const cleanText = cleanTextForTTS(text);
+    if (!cleanText) return;
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'hi-IN';
     utterance.rate = 0.95;
@@ -582,7 +618,8 @@
 
   function buildMsgAudioBtnMarkup(text) {
     if (!text) return '';
-    const enc = encodeURIComponent(text.replace(/<[^>]*>/g, '').trim());
+    const cleanForSpeech = cleanTextForTTS(text);
+    const enc = encodeURIComponent(cleanForSpeech);
     return `
       <div style="display:inline-flex;margin-top:6px;">
         <button type="button" class="sakhi-msg-audio-btn" onclick="window.toggleMessageSpeech(this, '${enc}')" title="आवाज़ में सुनें" style="background:transparent;border:1px solid #cbd5e1;border-radius:20px;padding:3px 10px;font-size:0.75rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:#475569;">
@@ -693,7 +730,7 @@
             <div style="font-size:0.80rem;font-weight:800;color:#166534;margin-bottom:6px;">👉 मुख्य विषय चुनें:</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;">
               <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं की फसल में खाद व स्प्रे कैलेंडर बताएं')">🌾 गेहूं स्प्रे कैलेंडर</button>
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('स्टिमरिच और बायो-99 की सही डोज क्या है?')">🧪 स्टिमरिच व बायो-99</button>
+              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">📚 कृषि ई-बुक्स गाइड</button>
               <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">🐄 दूध व फैट वृद्धि</button>
               <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">🩺 शुगर व स्वास्थ्य</button>
               <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ बिज़नेस प्लान और ₹8,19,250 साप्ताहिक कैपिंग')">💼 नेट्सर्फ प्लान</button>
@@ -820,7 +857,7 @@
       const resp = `नमस्ते! 🙏 मैं बिल्कुल स्वस्थ और आपकी सेवा में सदैव तत्पर हूँ। आप कैसे हैं? आशा है आपकी खेती व परिवार में सब कुशल-मंगल होगा।\n\nआज मैं आपकी खेती (खाद-स्प्रे), पशुपालन (दूध-फैट), सेहत या नेट्सर्फ में किस विषय पर सहायता करूँ?`;
       renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
         { text: '🌾 गेहूं/सरसों स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
-        { text: '🧪 स्टिमरिच व बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '📚 कृषि ई-बुक्स गाइड', query: 'खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी' },
         { text: '🐄 गाय-भैंस का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
         { text: '🩺 जोड़ों का दर्द व गठिया इलाज', query: 'नेचुरामोर जॉइंट केयर के बारे में बताओ' }
       ], 'casual', 'greeting');
@@ -899,6 +936,275 @@
         { text: '🛒 नेट्सर्फ उत्पाद सूची', query: 'बायोफिट उत्पाद गाइड' }
       ], 'casual', 'thanks');
       return true;
+    }
+
+    return false;
+  }
+
+  // 14.5 COMPREHENSIVE E-BOOKS & PAYMENT ASSISTANCE ROUTER (BK001, BK002, BK015, BK016, BK018)
+  function handleBookInquiriesAndFaq(cleanQ, rawQ) {
+    const isBookGeneral = cleanQ.includes('e-book') || cleanQ.includes('ebook') || cleanQ.includes('किताब') || cleanQ.includes('पुस्तक') || cleanQ.includes('pdf') || cleanQ.includes('लाइब्रेरी') || cleanQ.includes('बुक');
+    const isPaymentIssue = cleanQ.includes('payment fail') || cleanQ.includes('पेमेंट फेल') || cleanQ.includes('पेमेंट नहीं') || cleanQ.includes('pay nahi') || cleanQ.includes('upi se') || cleanQ.includes('upi') || cleanQ.includes('phonepe') || cleanQ.includes('gpay') || cleanQ.includes('paytm') || cleanQ.includes('पैसे कट') || cleanQ.includes('khareed nahi pa');
+    const isWhyBuy = cleanQ.includes('kyo kharide') || cleanQ.includes('क्यों खरीदें') || cleanQ.includes('kya fayda') || cleanQ.includes('क्या फायदा') || cleanQ.includes('kyo padhe');
+
+    // 1. Direct UPI / Payment Failure Assistance
+    if (isPaymentIssue) {
+      const resp = `💳 **पेमेंट समस्या व डायरेक्ट UPI सहायता:**\nक्या आपका पेमेंट गेटवे पर फेल हुआ या ऑनलाइन भुगतान में कोई रुकावट आ रही है? चिंता न करें!\n\nआप बिना किसी झंझट के सीधे हमारे अधिकृत खाते पर भुगतान कर सकते हैं:\n• **PhonePe / Google Pay / Paytm नंबर:** 7974422572\n• **UPI ID:** 7974422572@upi\n• **नाम:** अवनीश कुमार मिश्रा (संस्थापक, आरोग्यम इंडिया)\n\n👉 **प्रक्रिया:** मात्र ₹99 या ₹149 का भुगतान कर उसका स्क्रीनशॉट हमारे WhatsApp नंबर (7974422572) पर भेजें। 2 मिनट के भीतर आपकी ई-बुक और डिजिटल लाइब्रेरी में आजीवन (Lifetime) एक्सेस एक्टिवेट कर दिया जाएगा!`;
+      const waUrl = buildAvneeshWhatsAppHandoffUrl('पेमेंट स्क्रीनशॉट व ई-बुक एक्टिवेशन');
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          💳 डायरेक्ट UPI भुगतान व तुरंत एक्टिवेशन सहायता
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${escapeHtml(resp)}
+        </div>
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;font-weight:800;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp पर पेमेंट स्क्रीनशॉट भेजें →
+          </a>
+        </div>
+      `;
+      sakhiConversationState.lastActiveDomain = 'business';
+      sakhiConversationState.lastActiveEntity = 'book_payment_upi';
+      sakhiConversationState.lastActiveEntityName = 'डायरेक्ट UPI भुगतान';
+      streamBotMessage(html, 'आप सीधे 7974422572 पर फोनपे या गूगलपे से भुगतान करके व्हाट्सएप पर स्क्रीनशॉट भेज सकते हैं। 2 मिनट में ई-बुक शुरू हो जाएगी।');
+      return true;
+    }
+
+    // 2. Kheti Ka Doctor (BK002)
+    if (cleanQ.includes('bk002') || cleanQ.includes('bk 002') || cleanQ.includes('kheti ka doctor') || cleanQ.includes('खेती का डॉक्टर') || cleanQ.includes('fasal ka doctor') || cleanQ.includes('फसल का डॉक्टर') || cleanQ.includes('pocket doctor') || cleanQ.includes('रोग पहचान की बुक') || cleanQ.includes('रोग पहचान')) {
+      const resp = `🌾 **'खेती का डॉक्टर' (Pocket Doctor) — अपनी फसल के खुद डॉक्टर बनें:**\n• **यह पुस्तक क्यों जरूरी है?** खेत में जब पत्तियां पीली होती हैं या धब्बे पड़ते हैं, तो दुकानदार के पास जाने पर बिना जरूरत ₹1,500 की दवा पकड़ा दी जाती है। इस पुस्तक में 300+ असली एचडी फोटो देखकर आप खुद पहचान सकते हैं कि समस्या फंगस की है, कीट की या पोषण कमी की।\n• **मुख्य विशेषताएं:** 120 पेज की प्रैक्टिकल गाइड, 300+ वास्तविक फोटो, फसलवार रोग-कीट निदान चार्ट व स्प्रे साइंस।\n• **व्यावहारिक लाभ:** आप न सिर्फ अपने खेत के हजारों रुपये बचा सकते हैं, बल्कि अपने पड़ोसियों व गांव के खेतों में भी सही जानकारी दे सकते हैं।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹299)।`;
+      renderCrispSpecialBox('🌾 खेती का डॉक्टर — फोटो सहित रोग पहचान ई-बुक', resp, [
+        { text: '📖 खेती का डॉक्टर अभी पढ़ें', query: 'खेती का डॉक्टर ई-बुक कैसे प्राप्त करें' },
+        { text: '🧪 कृषि दवा डायरेक्टरी देखें', query: 'कृषि दवा डायरेक्टरी के बारे में बताओ' },
+        { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
+      ], 'agri', 'book_kheti_dr');
+      return true;
+    }
+
+    // 3. Krishi Dawa Directory (BK016)
+    if (cleanQ.includes('bk016') || cleanQ.includes('bk 016') || cleanQ.includes('krishi dawa directory') || cleanQ.includes('कृषि दवा डायरेक्टरी') || cleanQ.includes('dawa directory') || cleanQ.includes('दवा डायरेक्टरी') || cleanQ.includes('दवा की गाइड') || cleanQ.includes('chemical dawa')) {
+      const resp = `🧪 **'कृषि दवा डायरेक्टरी' — फसल के रोग, कीट और असली दवा की संपूर्ण गाइड:**\n• **दुकानदार के झांसे से मुक्ति:** दवा की दुकान पर एक ही दवा के 50 अलग-अलग नाम होते हैं। इस डायरेक्टरी से आप असली टेक्निकल (Active Ingredient) समझेंगे ताकि कोई आपको महंगी दवा न बेच सके।\n• **मुख्य विशेषताएं:** फफूंदनाशी, कीटनाशक व खरपतवारनाशक की संपूर्ण गाइड, कम खर्च वाले जैविक व देसी नुस्खे, 4-पेज Quick Reference (रोग ➔ फसल और Chemical ➔ रोग)।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹499)।`;
+      renderCrispSpecialBox('🧪 कृषि दवा डायरेक्टरी — रोग, कीट व दवा की पूरी गाइड', resp, [
+        { text: '📖 कृषि दवा डायरेक्टरी पढ़ें', query: 'कृषि दवा डायरेक्टरी कैसे प्राप्त करें' },
+        { text: '🌾 खेती का डॉक्टर ई-बुक', query: 'खेती का डॉक्टर के बारे में बताओ' },
+        { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
+      ], 'agri', 'book_dawa_dir');
+      return true;
+    }
+
+    // 4. Kharif Fasal Master Guide 2026 (BK001)
+    if (cleanQ.includes('bk001') || cleanQ.includes('bk 001') || cleanQ.includes('kharif') || cleanQ.includes('खरीफ फसल') || cleanQ.includes('धान सोयाबीन मक्का') || cleanQ.includes('खरीफ गाइड')) {
+      const resp = `🌾 **'खरीफ फसल मास्टर गाइड 2026' — धान, सोयाबीन व मक्का उत्पादन की सम्पूर्ण गाइड:**\n• **विशेषताएं:** 150+ रंगीन पेज, 300+ वास्तविक फोटो, बीज उपचार से लेकर कटाई तक का सम्पूर्ण वैज्ञानिक प्रबंधन।\n• **कवर विषय:** खरपतवार नियंत्रण, खाद व पोषण प्रबंधन, कल्ले बढ़ाने का फॉर्मूला और कीट-रोग का वैज्ञानिक स्प्रे शेड्यूल।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹299)।`;
+      renderCrispSpecialBox('🌾 खरीफ फसल मास्टर गाइड 2026 — सम्पूर्ण उत्पादन गाइड', resp, [
+        { text: '📖 खरीफ मास्टर गाइड अभी पढ़ें', query: 'खरीफ फसल मास्टर गाइड कैसे प्राप्त करें' },
+        { text: '🌾 खेती का डॉक्टर ई-बुक', query: 'खेती का डॉक्टर के बारे में बताओ' },
+        { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
+      ], 'agri', 'book_kharif');
+      return true;
+    }
+
+    // 5. Sabji Kheti Master (BK015)
+    if (cleanQ.includes('bk015') || cleanQ.includes('bk 015') || cleanQ.includes('sabji kheti') || cleanQ.includes('सब्जी खेती मास्टर') || cleanQ.includes('सब्जी खेती') || cleanQ.includes('सब्जी की किताब')) {
+      const resp = `🥦 **'सब्जी खेती मास्टर (PART 1)' — 11 प्रमुख सब्जियों की वैज्ञानिक खेती:**\n• **कवर फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **विशेषताएं:** 154 पेज, बीज चयन से लेकर नर्सरी, पौधों की दूरी, ड्रिप-मल्चिंग, खाद-स्प्रे कैलेंडर और बाजार भाव तक सम्पूर्ण गाइड।\n💰 **ऑफर मूल्य:** मात्र ₹149 (MRP ₹1999)।`;
+      renderCrispSpecialBox('🥦 सब्जी खेती मास्टर (Part 1) — 11 प्रमुख सब्जियों की खेती', resp, [
+        { text: '📖 सब्जी खेती मास्टर पढ़ें', query: 'सब्जी खेती मास्टर कैसे प्राप्त करें' },
+        { text: '🧪 कृषि दवा डायरेक्टरी देखें', query: 'कृषि दवा डायरेक्टरी के बारे बताओ' },
+        { text: '💳 डायरेक्ट UPI से ₹149 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
+      ], 'agri', 'book_sabji');
+      return true;
+    }
+
+    // 6. Ghar Baithe Paise Kaise Kamaye (BK018)
+    if (cleanQ.includes('ghar baithe paise') || cleanQ.includes('घर बैठे पैसे') || cleanQ.includes('income guide') || cleanQ.includes('कमाई की किताब') || cleanQ.includes('कमाई कैसे करें') || cleanQ.includes('nk018') || cleanQ.includes('bk018')) {
+      const resp = `💼 **'घर बैठे पैसे कैसे कमाएँ? Income Guide' — डिजिटल व ऑफलाइन कमाई की संपूर्ण गाइड:**\n• **विशेषताएं:** 60 ऑनलाइन और ऑफलाइन कमाई के वास्तविक तरीके, 150+ जांची-परखी वेबसाइट्स की लिस्ट, बिना किसी बड़े बजट के शुरुआत करने की व्यावहारिक तकनीक।\n• **सुरक्षा:** ऑनलाइन फ्रॉड और धोखाधड़ी से बचने के सुनहरे नियम।\n💰 **ऑफर मूल्य:** मात्र ₹149 (MRP ₹1001)।`;
+      renderCrispSpecialBox('💼 घर बैठे पैसे कैसे कमाएँ? — 60 कमाई के तरीके', resp, [
+        { text: '📖 इनकम गाइड अभी पढ़ें', query: 'घर बैठे पैसे कैसे कमाएं ई-बुक कैसे प्राप्त करें' },
+        { text: '💳 डायरेक्ट UPI से ₹149 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
+      ], 'business', 'book_income');
+      return true;
+    }
+
+    // 7. General: Why Buy E-Books? (किताब क्यों खरीदें?)
+    if (isWhyBuy || (isBookGeneral && (cleanQ.includes('list') || cleanQ.includes('guide') || cleanQ.includes('faq')))) {
+      const resp = `📚 **आरोग्यम इंडिया की ई-बुक्स क्यों खरीदें? — ज्ञान जो हर साल हजारों रुपये बचाए:**\n• 1. **खुद डॉक्टर बनें:** 300+ असली फोटो देखकर खेत में कीट व बीमारी खुद पहचानें और सही दवा चुनें।\n• 2. **दुकानदारों के कमीशन से मुक्ति:** गैर-जरूरी और नकली रसायनों के चक्कर से छुटकारा पाएं।\n• 3. **आजीवन डिजिटल लाइब्रेरी:** फोन में कभी भी, कहीं भी ऑफलाइन पढ़ने व सुनने की सुविधा।\n• 4. **मात्र ₹99 से शुरुआत:** एक स्प्रे के खर्च से भी कम में पूरे जीवन का ज्ञान!`;
+      renderCrispSpecialBox('📚 आरोग्यम डिजिटल लाइब्रेरी — सम्पूर्ण पुस्तक सूची', resp, [
+        { text: '🌾 खेती का डॉक्टर (₹99)', query: 'खेती का डॉक्टर के बारे में बताओ' },
+        { text: '🧪 कृषि दवा डायरेक्टरी (₹99)', query: 'कृषि दवा डायरेक्टरी के बारे में बताओ' },
+        { text: '🥦 सब्जी खेती मास्टर (₹149)', query: 'सब्जी खेती मास्टर के बारे में बताओ' },
+        { text: '💳 डायरेक्ट UPI से भुगतान विधि', query: 'UPI से पेमेंट कैसे करें' }
+      ], 'business', 'books_catalog');
+      return true;
+    }
+
+    return false;
+  }
+
+  // 14.6 13 HEALTH PAGES, MEDICAL SCIENCE, DIET CHARTS & SPONSOR HANDOFF ROUTER
+  function handle13HealthPagesAndSponsor(cleanQ, rawQ) {
+    const isNetsurfBuy = cleanQ.includes('netsurf product') || cleanQ.includes('product lena') || cleanQ.includes('product kharid') || cleanQ.includes('order karna') || cleanQ.includes('प्रोडक्ट लेना') || cleanQ.includes('सामान लेना') || cleanQ.includes('दवा मंगवाना') || cleanQ.includes('order kaise kare') || cleanQ.includes('product kaise le');
+
+    // Case 1: General "Netsurf Product Lena Hai"
+    if (isNetsurfBuy && !cleanQ.includes('joint') && !cleanQ.includes('heart') && !cleanQ.includes('sugar') && !cleanQ.includes('liver') && !cleanQ.includes('pet') && !cleanQ.includes('dard')) {
+      const resp = `आरोग्यम इंडिया पर नेट्सर्फ के 100% प्रामाणिक आयुर्वेदिक व जैविक उत्पाद उपलब्ध हैं।\n\nकृपया नीचे से अपनी मुख्य समस्या या विषय चुनें, ताकि मैं आपको सही डाइट चार्ट, वैज्ञानिक इलाज और सीधे प्रोडक्ट पेज का लिंक दे सकूँ:`;
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          🛒 नेट्सर्फ उत्पाद चयन व स्वास्थ्य समाधान
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
+          ${escapeHtml(resp)}
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <a href="/health/joint-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🦴 जोड़ों का दर्द (जॉइंट केयर)</a>
+          <a href="/health/diabetes.html" class="sakhi-followup-chip" style="text-decoration:none;">🩸 शुगर व डायबिटीज केयर</a>
+          <a href="/health/heart-care.html" class="sakhi-followup-chip" style="text-decoration:none;">❤️ हार्ट व कोलेस्ट्रॉल केयर</a>
+          <a href="/health/liver-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🍃 लिवर डिटॉक्स व गैस-कब्ज</a>
+          <a href="/health/womens-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🌸 महिला स्वास्थ्य (PCOD/PCOS)</a>
+          <a href="/health/sexual-wellness.html" class="sakhi-followup-chip" style="text-decoration:none;">⚡ पुरुष स्टैमिना व ऊर्जा</a>
+          <a href="/health/weight-loss.html" class="sakhi-followup-chip" style="text-decoration:none;">⚖️ मोटापा व वजन घटाना</a>
+          <a href="/health/skin-care.html" class="sakhi-followup-chip" style="text-decoration:none;">✨ त्वचा रोग व ग्लो</a>
+          <a href="/health/hair-care.html" class="sakhi-followup-chip" style="text-decoration:none;">💇 बाल झड़ना व डैंड्रफ</a>
+          <a href="/health/thyroid-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🦋 थायरॉयड केयर</a>
+        </div>
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px;font-size:0.88rem;color:#166534;line-height:1.5;">
+          👉 <strong>खरीदने का सही नियम:</strong> संबंधित पेज पर जाकर उत्पाद को <strong>कार्ट (Add to Cart)</strong> में जोड़ें और जिस <strong>प्रायोजक (Sponsor)</strong> ने आपको आरोग्यम इंडिया ऐप डाउनलोड कराया है, उन्हें तुरंत कॉल या WhatsApp करें ताकि वे आपको विशेष छूट व समय पर होम डिलीवरी में पूरी सहायता कर सकें!
+        </div>
+      `;
+      streamBotMessage(html, 'कृपया अपनी स्वास्थ्य समस्या चुनें। उत्पाद को कार्ट में डालकर अपने प्रायोजक को संपर्क करें।');
+      return true;
+    }
+
+    // Helper for rendering Health Science, Diet Chart, Page Link & Sponsor instructions
+    function renderHealthTopicPage(title, organFunction, dietDo, dietDont, products, pageUrl, domainKey, entityKey) {
+      const resp = `🩺 **${title}:**\n• **ऑर्गन कार्यप्रणाली व कारण:** ${organFunction}\n\n🥗 **डाइट चार्ट (पथ्य व अपथ्य):**\n✅ **क्या खाएं:** ${dietDo}\n❌ **क्या न खाएं:** ${dietDont}\n\n💊 **प्रमाणित नेट्सर्फ समाधान:** ${products}\n\n👉 **ऑर्डर व डिलीवरी नियम:** नीचे दिए गए लिंक से पेज खोलकर उत्पाद को कार्ट (Add to Cart) में डालें और जिस **प्रायोजक (Sponsor)** ने आपको ऐप डाउनलोड कराया है, उन्हें तुरंत कॉल या WhatsApp करें।`;
+
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          ${escapeHtml(title)}
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${escapeHtml(resp)}
+        </div>
+        ${buildMsgAudioBtnMarkup(resp)}
+
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 उत्पाद देखें व कार्ट में जोड़ें:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <a href="${pageUrl}" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              🛒 ${escapeHtml(title)} पेज खोलें व कार्ट में डालें →
+            </a>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ उत्पाद खरीदने के लिए प्रायोजक से संपर्क')">
+              👥 प्रायोजक से संपर्क विधि
+            </button>
+          </div>
+          <div style="font-size:0.82rem;color:#166534;line-height:1.4;">
+            💡 <strong>नोट:</strong> जिस प्रायोजक (Sponsor) ने आपको आरोग्यम इंडिया ऐप डाउनलोड कराया है, वे आपकी डिलीवरी और अतिरिक्त छूट में पूरी मदद करेंगे।
+          </div>
+        </div>
+      `;
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = entityKey;
+      sakhiConversationState.lastActiveEntityName = title;
+      streamBotMessage(html, title + ' की संपूर्ण कार्यप्रणाली, डाइट चार्ट और नेट्सर्फ समाधान प्रस्तुत है।');
+      return true;
+    }
+
+    // 1. Diabetes / Sugar
+    if (cleanQ.includes('diabetes') || cleanQ.includes('डायबिटीज') || cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('मधुमेह')) {
+      return renderHealthTopicPage(
+        'मधुमेह व ब्लड शुगर नियंत्रण',
+        'पैंक्रियाज (Pancreas) की बीटा कोशिकाएं जब पर्याप्त इंसुलिन नहीं बनातीं, तो ग्लूकोज कोशिकाओं में जाने की बजाय खून में बढ़ने लगता है।',
+        'मेथी दाना, करेला, जामुन सिरका, जौ-चना मिश्रित आटा, हरी पत्तेदार सब्जियां व पर्याप्त पानी।',
+        'चीनी, गुड़, मैदा, आलू, सफेद चावल, डिब्बा बंद जूस व तला-भुना भोजन।',
+        'नेचुरामोर लाइफस्टाइल प्लस कैप्सूल (भोजन से 30 मिनट पहले 1 कैप्सूल सुबह-शाम) + नेचुरामोर मसाला मिल्क पाउडर।',
+        '/health/diabetes.html',
+        'health',
+        'diabetes'
+      );
+    }
+
+    // 2. Liver Care & Digestion
+    if (cleanQ.includes('liver') || cleanQ.includes('लिवर') || cleanQ.includes('fatty liver') || cleanQ.includes('फैटी लिवर') || cleanQ.includes('कब्ज') || cleanQ.includes('constipation') || cleanQ.includes('एसिडिटी')) {
+      return renderHealthTopicPage(
+        'लिवर डिटॉक्स, फैटी लिवर व पेट शुद्धि',
+        'लिवर शरीर का मुख्य केमिकल फिल्टर है। वसा जमने (Fatty Liver) व टॉक्सिन्स जमा होने से पाचन रस (Bile) नहीं बनता और गैस, कब्ज व भारीपन शुरू होता है।',
+        'पपीता, चुकंदर, आंवला, लौकी सूप, रात में गुनगुना पानी व फाइबर युक्त आहार।',
+        'शराब, तंबाकू, अत्यधिक मिर्च-मसाला, रिफाइंड तेल, मैदा व देर रात भारी भोजन।',
+        'नेचुरामोर ईजी डिटॉक्स (Easy Detox - रात को 1-2 गोली गुनगुने पानी से) + नेचुरामोर पाउडर।',
+        '/health/liver-care.html',
+        'health',
+        'liver_care'
+      );
+    }
+
+    // 3. Heart & BP
+    if (cleanQ.includes('heart') || cleanQ.includes('हार्ट') || cleanQ.includes('dil') || cleanQ.includes('बीपी') || cleanQ.includes('कोलेस्ट्रॉल') || cleanQ.includes('ब्लॉकेज')) {
+      return renderHealthTopicPage(
+        'हार्ट सुरक्षा, बीपी व कोलेस्ट्रॉल संतुलन',
+        'धमनियों (Arteries) में खराब कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स जमने से नसों का लचीलापन घटता है, जिससे ब्लड प्रेशर बढ़ता है और हार्ट अटैक का खतरा होता है।',
+        'अर्जुन छाल का काढ़ा, लहसुन की कली, लौकी का जूस, अलसी के बीज व हरी सब्जियां।',
+        'अत्यधिक नमक, डालडा, रिफाइंड तेल, रेड मीट, मैदा व मानसिक तनाव।',
+        'नेचुरामोर न्यूट्री हार्ट कैप्सूल (1 कैप्सूल सुबह और 1 शाम भोजनोपरांत) + नेचुरामोर प्लस पाउडर।',
+        '/health/heart-care.html',
+        'health',
+        'nutri_heart'
+      );
+    }
+
+    // 4. Women Care & PCOD
+    if (cleanQ.includes('pcod') || cleanQ.includes('pcos') || cleanQ.includes('महिला') || cleanQ.includes('मासिक धर्म') || cleanQ.includes('पीरियड्स') || cleanQ.includes('कमर दर्द')) {
+      return renderHealthTopicPage(
+        'महिला स्वास्थ्य, PCOD/PCOS व हार्मोनल संतुलन',
+        'एस्ट्रोजन और प्रोजेस्टेरोन हार्मोन के असंतुलन से ओवरी में छोटे सिस्ट बनते हैं, जिससे अनियमित माहवारी, वजन बढ़ना व चेहरे पर अनचाहे बाल आते हैं।',
+        'शतावरी, दालचीनी, कद्दू व अलसी के बीज, नारियल पानी, हरी पत्तेदार सब्जियां।',
+        'जंक फूड, अत्यधिक चीनी, कोल्ड ड्रिंक्स, डेयरी प्रोडक्ट्स का अत्यधिक सेवन।',
+        'नेचुरामोर फॉर विमेन (Masala Milk / French Vanilla) 1 चम्मच सुबह दूध में + वुमन केयर कैप्सूल।',
+        '/health/womens-care.html',
+        'health',
+        'womens_care'
+      );
+    }
+
+    // 5. Weight Loss & Obesity
+    if (cleanQ.includes('weight loss') || cleanQ.includes('वजन घटाना') || cleanQ.includes('मोटापा') || cleanQ.includes('चर्बी') || cleanQ.includes('fat kam')) {
+      return renderHealthTopicPage(
+        'प्राकृतिक मोटापा व वजन नियंत्रण',
+        'धीमा मेटाबॉलिज्म (Metabolism) और थायरॉयड की सुस्ती भोजन की कैलोरी को फैट में बदलकर पेट व कमर पर जमा करती है।',
+        'खीरा-सलाद, ग्रीन टी, अंकुरित मूंग, नींबू-गुनगुना पानी, दलिया व छाछ।',
+        'चीनी, कोल्ड ड्रिंक, सफेद चावल, मैदा, समोसे-पकौड़े व रात का भारी डिनर।',
+        'नेचुरामोर ईजी डिटॉक्स (रात को 1 गोली) + नेचुरामोर फ्रेंच वैनिला पाउडर (सुबह नाश्ते की जगह गुनगुने पानी से)।',
+        '/health/weight-loss.html',
+        'health',
+        'weight_loss'
+      );
+    }
+
+    // 6. Men Vitality & Stamina
+    if (cleanQ.includes('stamina') || cleanQ.includes('पुरुष') || cleanQ.includes('पौरुष') || cleanQ.includes('कमजोरी') || cleanQ.includes('शुक्राणु') || cleanQ.includes('मर्दाना')) {
+      return renderHealthTopicPage(
+        'पुरुष स्वास्थ्य, ऊर्जा व स्टैमिना वृद्धि',
+        'टेस्टोस्टेरोन हार्मोन की कमी, तनाव व खराब रक्त संचार से दिनभर थकान और पौरुष कमजोरी महसूस होती है।',
+        'अश्वगंधा, सफेद मूसली, खजूर, दूध, बादाम, अखरोट व केला।',
+        'तंबाकू, गुटखा, शराब, अत्यधिक चाय-कॉफी व तनाव।',
+        'नेचुरामोर प्लस पाउडर (सुबह दूध के साथ 1 चम्मच) + लाइफस्टाइल मेन कैप्सूल।',
+        '/health/sexual-wellness.html',
+        'health',
+        'mens_care'
+      );
+    }
+
+    // 7. Lungs & Respiratory Care
+    if (cleanQ.includes('lungs') || cleanQ.includes('फेफड़े') || cleanQ.includes('अस्थमा') || cleanQ.includes('दमा') || cleanQ.includes('खांसी') || cleanQ.includes('सांस फूलना')) {
+      return renderHealthTopicPage(
+        'फेफड़ों की मजबूती व श्वसन तंत्र सुरक्षा',
+        'प्रदूषण, धूल व कफ जमा होने से ब्रोंकियल नलियों में सूजन आती है, जिससे ऑक्सीजन का प्रवाह बाधित होता है और सांस फूलती है।',
+        'तुलसी, अदरक, काली मिर्च, मुलेठी, गुनगुना पानी व भाप (Steam)।',
+        'ठंडा पानी, आइसक्रीम, सिगरेट/धुआं, दही व रात में भारी चावल।',
+        'नेचुरामोर इम्यून प्लस कैप्सूल (1 कैप्सूल सुबह-शाम गुनगुने पानी से) + नेचुरामोर पाउडर।',
+        '/health/home-care.html',
+        'health',
+        'respiratory_care'
+      );
     }
 
     return false;
@@ -991,6 +1297,33 @@
         return true;
       }
     }
+
+    // Entity 6: Book Kheti Dr Follow-ups
+    if (activeEntity === 'book_kheti_dr') {
+      if (isPrice || isBenefits || isMore) {
+        const resp = `🌾 **'खेती का डॉक्टर' ई-बुक:**\n• **कीमत:** मात्र ₹99 (MRP ₹299)।\n• **लाभ:** 300+ असली फोटो देखकर खुद रोग पहचानें, गलत दवाओं के हजारों रुपये बचाएं।\n• **भुगतान:** आप सीधे 7974422572 पर UPI से भुगतान कर सकते हैं।`;
+        renderCrispSpecialBox('🌾 खेती का डॉक्टर — कीमत व लाभ', resp, [
+          { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' },
+          { text: '🧪 कृषि दवा डायरेक्टरी देखें', query: 'कृषि दवा डायरेक्टरी के बारे में बताओ' }
+        ], 'agri', 'book_kheti_dr');
+        return true;
+      }
+    }
+
+    // Entity 7: Book Dawa Directory Follow-ups
+    if (activeEntity === 'book_dawa_dir') {
+      if (isPrice || isBenefits || isMore) {
+        const resp = `🧪 **'कृषि दवा डायरेक्टरी' ई-बुक:**\n• **कीमत:** मात्र ₹99 (MRP ₹499)।\n• **लाभ:** टेक्निकल (Active Ingredient) समझें, दुकानदार के झांसे से बचें, जैविक व देसी नुस्खे सीखें।\n• **भुगतान:** 7974422572 पर PhonePe/GooglePay से ₹99 भेजकर तुरंत एक्टिवेट कराएं।`;
+        renderCrispSpecialBox('🧪 कृषि दवा डायरेक्टरी — कीमत व लाभ', resp, [
+          { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' },
+          { text: '🌾 खेती का डॉक्टर ई-बुक', query: 'खेती का डॉक्टर के बारे में बताओ' }
+        ], 'agri', 'book_dawa_dir');
+        return true;
+      }
+    }
+
+    return false;
+  }
 
     return false;
   }
@@ -1249,6 +1582,16 @@
 
     // 1. Everyday Conversational & Casual Social Router
     if (handleEverydayConversations(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 1.1 E-Books Intelligence, FAQs & Direct UPI Payment Assistance (BK001, BK002, BK015, BK016, BK018)
+    if (handleBookInquiriesAndFaq(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 1.2 13 Specialized Health Pages, Medical Science, Diet Charts & Sponsor Guidance Router
+    if (handle13HealthPagesAndSponsor(cleanQ, rawQ)) {
       return;
     }
 
@@ -1544,8 +1887,8 @@
         <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं व सरसों की फसल में खाद व स्प्रे')">
           🌾 <span>खेती व फसलें</span>
         </button>
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('स्टिमरिच और बायो-99 की खुराक व उपयोग')">
-          🧪 <span>बायोफिट उत्पाद</span>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
+          📚 <span>कृषि ई-बुक्स गाइड</span>
         </button>
         <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
           🐄 <span>पशुपालन (दूध-फैट)</span>
