@@ -302,10 +302,15 @@
   }
 
   // 8. BUILD UI DOM ELEMENTS (LEFT ALIGNED FAB & MODAL)
-  const isDedicatedPage = window.location.pathname.includes('aarogyam-sakhi.html') || document.body.classList.contains('sakhi-page-body');
+  function checkIsDedicatedPage() {
+    return Boolean(
+      (window.location.pathname && window.location.pathname.includes('aarogyam-sakhi.html')) ||
+      (document.body && document.body.classList && document.body.classList.contains('sakhi-page-body'))
+    );
+  }
 
   function injectSakhiUI() {
-    if (isDedicatedPage) {
+    if (checkIsDedicatedPage()) {
       const container = document.getElementById('sakhiFullscreenContainer') || document.body;
       container.innerHTML = `
         <div class="sakhi-fullscreen-wrapper">

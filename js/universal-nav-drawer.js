@@ -1146,32 +1146,105 @@
     setTimeout(() => { toast.remove(); }, 3500);
   }
 
-  // Universal Auto-Loader for Aarogyam Sakhi AI Omni-Domain Engine
+  // Universal Auto-Loader & Direct FAB Injector for Aarogyam Sakhi AI Omni-Domain Engine
+  function injectSakhiPillDirectly() {
+    if (document.getElementById('sakhiFloatingPill')) return;
+    const path = (window.location.pathname || '').toLowerCase();
+    if (path.includes('aarogyam-sakhi.html')) return;
+
+    let pillLabel = 'आरोग्यम सखी AI';
+    if (path.includes('hair') || path.includes('skin') || path.includes('beauty')) {
+      pillLabel = 'सौंदर्य सखी AI';
+    } else if (path.includes('pashu') || path.includes('dairy')) {
+      pillLabel = 'पशु सखी AI';
+    } else if (path.includes('health') || path.includes('diabetes') || path.includes('joint') || path.includes('thyroid')) {
+      pillLabel = 'स्वास्थ्य सखी AI';
+    }
+
+    const pill = document.createElement('div');
+    pill.id = 'sakhiFloatingPill';
+    pill.className = 'sakhi-floating-pill';
+    pill.setAttribute('role', 'button');
+    pill.setAttribute('aria-label', pillLabel);
+    pill.innerHTML = `
+      <div class="sakhi-pill-avatar-wrap">
+        <img src="/images/sakhi/aarogyam-sakhi.jpg" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
+      </div>
+      <span class="sakhi-pill-label">${pillLabel}</span>
+      <span class="sakhi-pill-live-dot"></span>
+    `;
+
+    pill.onclick = function() {
+      if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
+        window.AarogyamSakhi.open();
+      } else {
+        ensureAarogyamSakhiLoaded();
+        let retries = 0;
+        const checkInterval = setInterval(() => {
+          retries++;
+          if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
+            clearInterval(checkInterval);
+            window.AarogyamSakhi.open();
+          } else if (retries > 25) {
+            clearInterval(checkInterval);
+            window.location.href = '/aarogyam-sakhi.html';
+          }
+        }, 100);
+      }
+    };
+
+    if (document.body) {
+      document.body.appendChild(pill);
+    } else {
+      document.addEventListener('DOMContentLoaded', () => document.body.appendChild(pill));
+    }
+
+    // 5-SECOND SMART AUTO-COLLAPSE (CUT TEXT, KEEP AVATAR COIN)
+    let collapseTimer = setTimeout(() => {
+      if (pill) pill.classList.add('collapsed');
+    }, 5000);
+
+    pill.addEventListener('mouseenter', () => {
+      clearTimeout(collapseTimer);
+      pill.classList.remove('collapsed');
+    });
+
+    pill.addEventListener('mouseleave', () => {
+      collapseTimer = setTimeout(() => {
+        if (pill) pill.classList.add('collapsed');
+      }, 3000);
+    });
+  }
+
   function ensureAarogyamSakhiLoaded() {
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v80';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v88';
       document.head.appendChild(link);
     }
     if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
       const script = document.createElement('script');
-      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v80';
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v88';
       script.async = true;
       document.body.appendChild(script);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      injectUniversalSideDrawer();
-      checkPwaInstallState();
-      ensureAarogyamSakhiLoaded();
-    });
-  } else {
+  function initUniversalDrawerAndSakhi() {
     injectUniversalSideDrawer();
     checkPwaInstallState();
     ensureAarogyamSakhiLoaded();
+    injectSakhiPillDirectly();
   }
-  window.addEventListener('load', checkPwaInstallState);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUniversalDrawerAndSakhi);
+  } else {
+    initUniversalDrawerAndSakhi();
+  }
+  window.addEventListener('load', () => {
+    checkPwaInstallState();
+    injectSakhiPillDirectly();
+  });
 })();
