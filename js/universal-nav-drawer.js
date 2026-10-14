@@ -1256,7 +1256,7 @@
     }
     if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
       const script = document.createElement('script');
-      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v91';
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v99';
       script.async = true;
       document.body.appendChild(script);
     }

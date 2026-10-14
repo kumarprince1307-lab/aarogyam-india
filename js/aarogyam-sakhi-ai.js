@@ -1785,9 +1785,148 @@
     }, 1200);
   }
 
-  // 12. MATCH INTENT WITH DOMAIN ISOLATION
+  // 12. HIGH-PRECISION KNOWLEDGE MATCHER & CRISP ANSWER ENGINE
+
+  // Normalize user query tokens for robust matching
+  function normalizeQueryText(text) {
+    return (text || '').toLowerCase()
+      .replace(/bio\s*99/gi, 'bio-99')
+      .replace(/बायो\s*99/gi, 'बायो-99')
+      .replace(/stim\s*rich/gi, 'stimrich')
+      .replace(/स्टिम\s*रिच/gi, 'स्टिमरिच')
+      .replace(/cfc\s*plus/gi, 'cfc')
+      .replace(/सी\s*एफ\s*सी/gi, 'सीएफसी')
+      .replace(/life\s*style\s*plus/gi, 'lifestyle plus')
+      .replace(/लाइफ\s*स्टाइल\s*प्लस/gi, 'लाइफस्टाइल प्लस')
+      .replace(/wrap\s*up/gi, 'wrap-up')
+      .replace(/रैप\s*अप/gi, 'रैपअप')
+      .replace(/easy\s*detox/gi, 'detox')
+      .replace(/डी\s*टॉक्स/gi, 'डिटॉक्स');
+  }
+
+  // Extract high-value keyword entities from a subtopic
+  function extractSubTopicKeywords(st) {
+    const keywords = new Set();
+    const rawTitle = (st.title || '').toLowerCase();
+    
+    // 1. Text inside parentheses (brand name / English terms)
+    const parenMatches = rawTitle.match(/\(([^)]+)\)/g);
+    if (parenMatches) {
+      parenMatches.forEach(p => {
+        const cleanP = p.replace(/[()]/g, '').trim();
+        if (cleanP.length >= 2) {
+          keywords.add(cleanP);
+          keywords.add(cleanP.replace(/[-\s]/g, ''));
+          cleanP.split(/[\s,]+/).forEach(w => {
+            if (w.length >= 3) keywords.add(w);
+          });
+        }
+      });
+    }
+
+    // 2. Hindi product names before hyphens/parens
+    const cleanTitle = rawTitle
+      .replace(/\([^)]*\)/g, ' ')
+      .replace(/[\u{1F300}-\u{1FAFF}]/gu, ' ')
+      .replace(/[-–—:]/g, ' ')
+      .trim();
+
+    cleanTitle.split(/\s+/).forEach(w => {
+      const cleanW = w.replace(/[^a-z0-9\u0900-\u097F]/g, '');
+      if (cleanW.length >= 3 && !['वानस्पतिक', 'वृद्धि', 'आधारित', 'सुपर', 'संपूर्ण', 'गाइड', 'सामान्य', 'स्तर', 'रोग', 'नियम'].includes(cleanW)) {
+        keywords.add(cleanW);
+      }
+    });
+
+    return Array.from(keywords);
+  }
+
+  // Dedicated Spray Calendar Handler (Crop-specific & Interactive)
+  function handleSprayCalendarQuery(query) {
+    const qLower = query.toLowerCase();
+    const isCalendar = qLower.includes('स्प्रे कैलेंडर') || qLower.includes('spray calendar') || (qLower.includes('कैलेंडर') && (qLower.includes('स्प्रे') || qLower.includes('दवा') || qLower.includes('शेड्यूल')));
+    if (!isCalendar) return false;
+
+    const isWheat = qLower.includes('गेहूं') || qLower.includes('wheat');
+    const isMustard = qLower.includes('सरसों') || qLower.includes('mustard') || qLower.includes('sarso');
+    const isChana = qLower.includes('चना') || qLower.includes('gram') || qLower.includes('chana');
+    const isVeg = qLower.includes('सब्जी') || qLower.includes('टमाटर') || qLower.includes('मिर्च') || qLower.includes('veg');
+
+    if (isWheat) {
+      const resp = `🌾 गेहूं फसल का 4-चरण वैज्ञानिक स्प्रे कैलेंडर:\n• 1. कल्ले व फुटाव (21-25 दिन, पहली सिंचाई बाद): स्टिमरिच 30ml + बायो-99 5ml + 19:19:19 खाद 75 ग्राम प्रति 15L पंप।\n• 2. गांठ बनते समय (40-45 दिन): एनपीके 12:61:0 75 ग्राम + बायो-99 5ml।\n• 3. गभोट अवस्था (60-65 दिन): एनपीके 0:52:34 75 ग्राम + बोरॉन 20% 20 ग्राम (लंबी बालियां)।\n• 4. दूधिया अवस्था: एनपीके 0:0:50 (पोटाश) 75 ग्राम प्रति पंप (वजनदार व चमकदार दाने)।`;
+      renderCrispSpecialBox('🌾 गेहूं फसल का वैज्ञानिक 4-चरण स्प्रे कैलेंडर', resp, [
+        { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' },
+        { text: '🌿 चना स्प्रे कैलेंडर', query: 'चना का स्प्रे कैलेंडर' },
+        { text: '🥦 सब्जी व मिर्च कैलेंडर', query: 'सब्जी व मिर्च का स्प्रे कैलेंडर' }
+      ]);
+      return true;
+    }
+
+    if (isMustard) {
+      const resp = `🌱 सरसों फसल का वैज्ञानिक स्प्रे कैलेंडर:\n• 1. शाखा फुटाव (25-30 दिन): स्टिमरिच 30ml + बायो-99 5ml + घुलनशील सल्फर 40 ग्राम।\n• 2. फूल आने से पूर्व (45-50 दिन): बोरॉन 20% 20 ग्राम + 19:19:19 75 ग्राम प्रति पंप।\n• 3. माहू/चेपा दिखने पर: इमिडाक्लोप्रिड 17.8% SL 5 से 7 ml + बायो-99 5ml प्रति 15L पंप।\n• 4. फली दाना बनते समय: 0:0:50 75 ग्राम (तेल प्रतिशत व दाना वजन बढ़ाने हेतु)।`;
+      renderCrispSpecialBox('🌱 सरसों फसल का वैज्ञानिक स्प्रे कैलेंडर', resp, [
+        { text: '🌾 गेहूं स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
+        { text: '🌿 चना स्प्रे कैलेंडर', query: 'चना का स्प्रे कैलेंडर' },
+        { text: '🥦 सब्जी व मिर्च कैलेंडर', query: 'सब्जी व मिर्च का स्प्रे कैलेंडर' }
+      ]);
+      return true;
+    }
+
+    if (isChana) {
+      const resp = `🌿 चना फसल का वैज्ञानिक स्प्रे कैलेंडर:\n• 1. शाखाएं व कल्ले (30-35 दिन): स्टिमरिच 30ml + बायो-99 5ml + 19:19:19 75 ग्राम।\n• 2. फूल आने से पूर्व: बोरॉन 20% 20 ग्राम प्रति 15L पंप (फूल झड़ने से रोकने हेतु)।\n• 3. घटी-इल्ली रोकथाम: इमामेक्टिन बेंजोएट 5% SG 8 ग्राम + बायो-99 5ml।\n• 4. दाना भराव: 0:0:50 75 ग्राम प्रति 15L पंप।`;
+      renderCrispSpecialBox('🌿 चना फसल का वैज्ञानिक स्प्रे कैलेंडर', resp, [
+        { text: '🌾 गेहूं स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
+        { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' }
+      ]);
+      return true;
+    }
+
+    // Generic Spray Calendar Menu (When user didn't specify crop)
+    const prompt = `किसान साथी! हर फसल का स्प्रे समय और दवाओं का कॉम्बिनेशन अलग होता है। कृपया नीचे अपनी फसल चुनें ताकि उसका सटीक 4-चरण स्प्रे कैलेंडर देख सकें:`;
+    renderCrispSpecialBox('📅 फसलों का संपूर्ण वैज्ञानिक स्प्रे कैलेंडर', prompt, [
+      { text: '🌾 गेहूं स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
+      { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' },
+      { text: '🌿 चना स्प्रे कैलेंडर', query: 'चना का स्प्रे कैलेंडर' },
+      { text: '🥦 सब्जी व मिर्च कैलेंडर', query: 'सब्जी व मिर्च का स्प्रे कैलेंडर' }
+    ]);
+    return true;
+  }
+
+  function renderCrispSpecialBox(title, bodyText, chips) {
+    let chipsHtml = '';
+    (chips || []).forEach(c => {
+      chipsHtml += `
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(c.query)}')">
+          <span>${escapeHtml(c.text)}</span> →
+        </button>
+      `;
+    });
+
+    const html = `
+      <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+        ${escapeHtml(title)}
+      </div>
+      <div style="font-size:0.94rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:10px;">
+        ${escapeHtml(bodyText)}
+      </div>
+      ${buildMsgAudioBtnMarkup(bodyText)}
+
+      ${chipsHtml ? `
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:6px;">👉 विकल्प चुनें:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            ${chipsHtml}
+          </div>
+        </div>
+      ` : ''}
+    `;
+    const speech = bodyText.replace(/[*#_`•]/g, '').slice(0, 180);
+    streamBotMessage(html, speech);
+  }
+
   function processKnowledgeQuery(query) {
-    const cleanQ = query.toLowerCase();
+    const rawQ = query.trim();
+    const cleanQ = normalizeQueryText(rawQ);
     const targetDomain = classifyQueryDomain(cleanQ);
 
     if (!knowledgeData || !knowledgeData.intents) {
@@ -1795,19 +1934,27 @@
       return;
     }
 
-    // Check Subtopic Direct Matches
-    for (const item of knowledgeData.intents) {
-      if (item.sub_topics) {
-        for (const st of item.sub_topics) {
-          if (cleanQ.includes(st.title.toLowerCase().replace(/[^a-z0-9\u0900-\u097F]/g, '')) || cleanQ === st.title.toLowerCase()) {
-            renderSubTopicDirect(st, item);
-            return;
+    // 1. Dedicated Spray Calendar Router
+    if (handleSprayCalendarQuery(query)) {
+      return;
+    }
+
+    // 2. High-Precision Subtopic / Product Entity Matcher across ALL intents
+    for (const intent of knowledgeData.intents) {
+      if (intent.sub_topics && intent.sub_topics.length > 0) {
+        for (const st of intent.sub_topics) {
+          const kws = extractSubTopicKeywords(st);
+          for (const kw of kws) {
+            if (kw && kw.length >= 3 && cleanQ.includes(kw)) {
+              renderSubTopicDirect(st, intent);
+              return;
+            }
           }
         }
       }
     }
 
-    // Filter intents by targetDomain for STRICT ZERO-LEAKAGE
+    // 3. Domain Isolation Filter
     let candidateIntents = knowledgeData.intents;
     if (targetDomain !== 'omni') {
       const filtered = candidateIntents.filter(item => {
@@ -1816,35 +1963,48 @@
         if (targetDomain === 'pashu') return itemDom === 'pashu' || itemDom === 'veterinary';
         if (targetDomain === 'health') return itemDom === 'health' || itemDom === 'ayurveda';
         if (targetDomain === 'beauty') return itemDom === 'beauty' || itemDom === 'dermatology';
-        if (targetDomain === 'netsurf') return itemDom === 'netsurf' || itemDom === 'business';
+        if (targetDomain === 'netsurf') return itemDom === 'netsurf' || itemDom === 'business' || itemDom === 'agri';
         if (targetDomain === 'business') return itemDom === 'business' || itemDom === 'netsurf';
         if (targetDomain === 'founder') return itemDom === 'founder';
         if (targetDomain === 'nuskhe') return itemDom === 'nuskhe' || itemDom === 'health';
         return true;
       });
-      if (filtered.length > 0) {
-        candidateIntents = filtered;
-      }
+      if (filtered.length > 0) candidateIntents = filtered;
     }
+
+    // 4. Token-Weighted Intent Scorer
+    const STOP_WORDS = new Set(['का','की','के','में','पर','और','हैं','है','यह','से','को','ने','या','तो','बताओ','बताइए','दीजिए','दवा','स्प्रे','इलाज','उपचार','डोज','मात्रा','बारे','mein','bare','kare','kaise','kya','batao','dawa','spray','dose','ilaj']);
+    const qTokens = cleanQ.split(/[\s,?!।]+/).filter(t => t.length >= 2 && !STOP_WORDS.has(t));
 
     let matchedIntent = null;
     let maxScore = 0;
 
     candidateIntents.forEach((intent) => {
       let score = 0;
-      (intent.keywords || []).forEach((kw) => {
-        const kwLower = kw.toLowerCase();
+      const titleLower = (intent.title || '').toLowerCase();
+
+      // Title exact / partial match
+      if (cleanQ.includes(titleLower)) score += 30;
+      qTokens.forEach(token => {
+        if (titleLower.includes(token)) score += 12;
+      });
+
+      // Keywords match
+      (intent.keywords || []).forEach(kw => {
+        const kwLower = kw.toLowerCase().trim();
+        if (!kwLower || STOP_WORDS.has(kwLower)) return;
         if (cleanQ.includes(kwLower)) {
-          score += (kwLower.length >= 4 ? 4 : 2);
+          score += (kwLower.length >= 5 ? 8 : 4);
         }
       });
+
       if (score > maxScore) {
         maxScore = score;
         matchedIntent = intent;
       }
     });
 
-    if (matchedIntent && maxScore > 0) {
+    if (matchedIntent && maxScore >= 4) {
       renderDirectSummary(matchedIntent, query, targetDomain);
     } else {
       synthesizeDynamicAnswer(query, targetDomain);
@@ -1852,27 +2012,29 @@
   }
 
   function renderSubTopicDirect(subTopic, parentIntent) {
-    const parentDomain = (parentIntent.domain || 'omni').toLowerCase();
     const title = subTopic.title;
     const content = subTopic.content;
+    const isBiofit = (parentIntent.id || '').includes('biofit') || title.toLowerCase().includes('stimrich') || title.toLowerCase().includes('bio-99') || title.toLowerCase().includes('shet') || title.toLowerCase().includes('wrapup');
 
-    let actionChips = '';
-    if (parentDomain === 'agri') {
-      actionChips = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती डॉक्टर ई-बुक कैसे खरीदें?')">
-          <span>📚 संपूर्ण स्प्रे कैलेंडर व ई-बुक गाइड</span> →
-        </button>
-      `;
-    } else if (parentDomain === 'pashu') {
-      actionChips = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-          <span>🐄 आहार व खुराक (Dose) नियम</span> →
-        </button>
-      `;
-    } else if (parentDomain === 'health') {
-      actionChips = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मधुमेह और शुगर कंट्रोल का फॉर्मूला')">
-          <span>🩺 सात्विक डाइट व परहेज</span> →
+    let siblingChips = '';
+    if (parentIntent.sub_topics && parentIntent.sub_topics.length > 1) {
+      parentIntent.sub_topics.forEach(st => {
+        if (st.title !== subTopic.title) {
+          const shortLabel = st.title.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').split('-')[0].trim();
+          siblingChips += `
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(st.title)}')">
+              <span>${escapeHtml(shortLabel)}</span> →
+            </button>
+          `;
+        }
+      });
+    }
+
+    let extraChip = '';
+    if (isBiofit) {
+      extraChip = `
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('बायोफिट कॉम्बो स्प्रे कैसे करें?')">
+          <span>💧 बायोफिट कॉम्बो स्प्रे नियम</span> →
         </button>
       `;
     }
@@ -1881,25 +2043,24 @@
       <div style="font-weight:900;color:#15803d;font-size:1.02rem;margin-bottom:6px;">
         ${escapeHtml(title)}
       </div>
-      <div style="font-size:0.95rem;line-height:1.6;color:#1e293b;margin-bottom:6px;">
+      <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:8px;">
         ${escapeHtml(content)}
       </div>
       ${buildMsgAudioBtnMarkup(content)}
 
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-        <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;">
-          👉 आगे यह भी जानिए:
+        <div style="font-weight:900;color:#15803d;font-size:0.88rem;margin-bottom:6px;">
+          👉 संबंधित अन्य उत्पाद व जानकारी:
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${actionChips}
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(parentIntent.title)}')">
-            <span>🌿 इस विषय की मुख्य जानकारी</span> →
-          </button>
+          ${siblingChips}
+          ${extraChip}
         </div>
       </div>
     `;
 
-    streamBotMessage(html, content);
+    const speech = content.replace(/[*#_`•]/g, '').slice(0, 180);
+    streamBotMessage(html, speech);
   }
 
   function renderDirectSummary(intent, originalQuery, domain) {
@@ -1908,134 +2069,74 @@
     const mainAnatomy = intent.anatomy_physiology || intent.scientific_cause || '';
     const reference = intent.reference || '';
 
-    // Analyze exact aspect queried by the user
-    const qLower = (originalQuery || '').toLowerCase();
-    const asksCause = qLower.includes('कारण') || qLower.includes('वजह') || qLower.includes('लक्षण') || qLower.includes('पहचान') || qLower.includes('क्यों') || qLower.includes('क्यो');
-    const asksTreatment = qLower.includes('दवा') || qLower.includes('इलाज') || qLower.includes('स्प्रे') || qLower.includes('उपचार') || qLower.includes('डोज') || qLower.includes('रोकथाम') || qLower.includes('मात्रा') || qLower.includes('समय') || qLower.includes('कैसे ठीक') || qLower.includes('कैसे बढाएं') || qLower.includes('कैसे बढाए') || qLower.includes('formula') || qLower.includes('फॉर्मूला');
-
-    let directAnswer = '';
-    let followUpChips = [];
-
-    if (asksCause && !asksTreatment && mainAnatomy) {
-      // User ONLY asked for cause/symptoms -> Return ONLY 1-2 sentence cause
-      directAnswer = (mainAnatomy.split('।').slice(0, 2).join('।') + '।').trim();
-      followUpChips.push({ text: '🧪 सही स्प्रे दवा व डोज', query: `${title} की सही दवा और स्प्रे डोज क्या है?` });
-      followUpChips.push({ text: '🛡️ जैविक व घरेलू रोकथाम', query: `${title} का जैविक व घरेलू उपचार क्या है?` });
-    } else if (asksTreatment && !asksCause && mainFirstAid) {
-      // User ONLY asked for treatment/dose -> Return ONLY 1-2 sentence treatment
-      directAnswer = (mainFirstAid.split('।').slice(0, 2).join('।') + '।').trim();
-      followUpChips.push({ text: '🔬 रोग का मुख्य कारण व लक्षण पहचान', query: `${title} का मुख्य कारण और लक्षण पहचान क्या है?` });
-      followUpChips.push({ text: '📅 स्प्रे का सही समय व सावधानियां', query: `${title} में स्प्रे का सही समय व सावधानियां` });
-    } else {
-      // General or balanced query: Return single crisp core solution (no dumping)
-      if (mainFirstAid) {
-        directAnswer = (mainFirstAid.split('।').slice(0, 2).join('।') + '।').trim();
-      } else if (mainAnatomy) {
-        directAnswer = (mainAnatomy.split('।').slice(0, 2).join('।') + '।').trim();
-      } else {
-        directAnswer = title;
+    // If intent has subtopics, check if one matches query specifically
+    const qLower = originalQuery.toLowerCase();
+    if (intent.sub_topics && intent.sub_topics.length > 0) {
+      for (const st of intent.sub_topics) {
+        const kws = extractSubTopicKeywords(st);
+        for (const kw of kws) {
+          if (kw && kw.length >= 3 && qLower.includes(kw)) {
+            renderSubTopicDirect(st, intent);
+            return;
+          }
+        }
       }
-      followUpChips.push({ text: '🔬 मुख्य कारण व लक्षण पहचान', query: `${title} का मुख्य कारण और लक्षण पहचान क्या है?` });
-      followUpChips.push({ text: '🧪 स्प्रे दवा व सटीक डोज', query: `${title} की सही दवा और स्प्रे डोज क्या है?` });
     }
 
-    if (!directAnswer) directAnswer = mainFirstAid || mainAnatomy || title;
-
-    let emergencyAlert = '';
-    if (isEmergencyQuery(originalQuery)) {
-      emergencyAlert = `
-        <div class="sakhi-emergency-alert" style="background:#fee2e2;border:1.5px solid #ef4444;border-radius:12px;padding:10px;margin-bottom:8px;color:#991b1b;display:flex;gap:8px;">
-          <i class="fa-solid fa-triangle-exclamation" style="font-size:1.2rem;"></i>
-          <div><strong>आपातकालीन चेतावनी:</strong> सीने में तेज दर्द, पसीना या सांस फूलना हार्ट अटैक का लक्षण हो सकता है। तुरंत 108 एम्बुलेंस बुलाएं या नजदीकी अस्पताल जाएं!</div>
-        </div>
-      `;
+    // Keep direct answer crisp: max 2-3 sentences (under 60 words)
+    let directAnswer = '';
+    if (mainFirstAid) {
+      const sentences = mainFirstAid.split('।').filter(s => s.trim().length > 5);
+      directAnswer = sentences.slice(0, 2).join('।') + '।';
+    } else if (mainAnatomy) {
+      const sentences = mainAnatomy.split('।').filter(s => s.trim().length > 5);
+      directAnswer = sentences.slice(0, 2).join('।') + '।';
+    } else {
+      directAnswer = title;
     }
 
-    // Interactive Follow-up Question Chips
-    let followUpChipsHtml = '';
-    followUpChips.forEach(chip => {
-      followUpChipsHtml += `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(chip.query)}')">
-          <span>${escapeHtml(chip.text)}</span> →
-        </button>
-      `;
-    });
-
-    // Action Chips based on STRICT Domain (NO DADI KE NUSKHE ON CROPS!)
-    let domainActionPills = '';
-    if (domain === 'agri') {
-      domainActionPills = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती डॉक्टर ई-बुक कैसे खरीदें?')">
-          <span>📚 खेती डॉक्टर ई-बुक (ऑफर ₹99)</span> →
-        </button>
-      `;
-    } else if (domain === 'pashu') {
-      domainActionPills = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-          <span>🐄 आहार व खुराक (Dose) नियम</span> →
-        </button>
-      `;
-    } else if (domain === 'health') {
-      domainActionPills = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर आयुर्वेदिक सप्लीमेंट का उपयोग')">
-          <span>🌿 नेचुरामोर संपूर्ण पोषण</span> →
-        </button>
-      `;
-    } else if (domain === 'beauty' || domain === 'nuskhe') {
-      domainActionPills = `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('दादी-नानी के घरेलू नुस्खे बताएं')">
-          <span>🌸 सिद्ध घरेलू लेप व नुस्खा</span> →
-        </button>
-      `;
-    } else if (domain === 'netsurf' || domain === 'business') {
-      const waOfferMsg = `नमस्ते अवनीश सर! 🙏\nमैं आरोग्यम सखी AI पर नेट्सर्फ बिज़नेस प्लान व स्पेशल ई-बुक ऑफर के बारे में बात कर रहा हूँ। कृपया मुझे विशेष ऑफर प्रदान करें।`;
-      const waUrl = `https://wa.me/91${MASTER_ADMIN_PHONE}?text=${encodeURIComponent(waOfferMsg)}`;
-      domainActionPills = `
-        <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;">
-          <i class="fa-brands fa-whatsapp"></i> अवनीश सर से स्पेशल ऑफर लें →
-        </a>
-      `;
-    } else if (domain === 'founder') {
-      const waFounderMsg = `प्रणाम अवनीश सर! 🙏\nमैं आरोग्यम सखी AI के माध्यम से आपसे सीधे मार्गदर्शन हेतु संपर्क कर रहा हूँ।`;
-      const waUrl = `https://wa.me/91${MASTER_ADMIN_PHONE}?text=${encodeURIComponent(waFounderMsg)}`;
-      domainActionPills = `
-        <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;">
-          <i class="fa-brands fa-whatsapp"></i> अवनीश जी से सीधे WhatsApp पर बात करें →
-        </a>
-      `;
-    }
-
-    // Subtopics from intent
     let subTopicsHtml = '';
     if (intent.sub_topics && intent.sub_topics.length > 0) {
-      intent.sub_topics.forEach((st) => {
+      intent.sub_topics.slice(0, 4).forEach((st) => {
+        const shortLabel = st.title.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').split('-')[0].trim();
         subTopicsHtml += `
           <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(st.title)}')">
-            <span>${escapeHtml(st.title)}</span> →
+            <span>${escapeHtml(shortLabel)}</span> →
           </button>
         `;
       });
     }
 
+    const isDisease = title.includes('रोग') || title.includes('कीट') || title.includes('इलाज') || title.includes('रोकथाम') || title.includes('दर्द');
+    let followUpChipsHtml = '';
+    if (isDisease) {
+      followUpChipsHtml = `
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(title)} की सही दवा और स्प्रे डोज क्या है?')">
+          <span>🧪 सही दवा व सटीक डोज</span> →
+        </button>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(title)} का जैविक व घरेलू उपचार क्या है?')">
+          <span>🛡️ जैविक रोकथाम</span> →
+        </button>
+      `;
+    }
+
     const html = `
-      ${emergencyAlert}
       <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:6px;">
         ${escapeHtml(title)}
       </div>
 
-      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:6px;">
+      <div style="font-size:0.95rem;line-height:1.6;color:#1e293b;margin-bottom:6px;">
         ${escapeHtml(directAnswer)}
       </div>
       ${buildMsgAudioBtnMarkup(directAnswer)}
 
       <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-        <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;">
-          👉 क्या आप इसके बारे में आगे यह जानना चाहते हैं?
+        <div style="font-weight:900;color:#15803d;font-size:0.88rem;margin-bottom:8px;">
+          👉 संबंधित विषय व विकल्प:
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${followUpChipsHtml}
-          ${domainActionPills}
           ${subTopicsHtml}
+          ${followUpChipsHtml}
         </div>
       </div>
 
@@ -2044,11 +2145,11 @@
           📜 <strong>संदर्भ:</strong> ${escapeHtml(reference)}
         </div>
       ` : ''}
-      ${buildGuestLeadCardHtml()}
     `;
 
     consecutiveAmbiguousCount = 0;
-    streamBotMessage(html, directAnswer);
+    const speech = directAnswer.replace(/[*#_`•]/g, '').slice(0, 180);
+    streamBotMessage(html, speech);
   }
 
   // 13. MASTER E-BOOK RECOMMENDATION ENGINE (ONE BY ONE INTERACTIVE)
