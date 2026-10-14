@@ -1146,14 +1146,32 @@
     setTimeout(() => { toast.remove(); }, 3500);
   }
 
+  // Universal Auto-Loader for Aarogyam Sakhi AI Omni-Domain Engine
+  function ensureAarogyamSakhiLoaded() {
+    if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v50';
+      document.head.appendChild(link);
+    }
+    if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
+      const script = document.createElement('script');
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v50';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       injectUniversalSideDrawer();
       checkPwaInstallState();
+      ensureAarogyamSakhiLoaded();
     });
   } else {
     injectUniversalSideDrawer();
     checkPwaInstallState();
+    ensureAarogyamSakhiLoaded();
   }
   window.addEventListener('load', checkPwaInstallState);
 })();
