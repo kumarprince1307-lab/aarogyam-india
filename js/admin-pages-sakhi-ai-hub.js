@@ -112,21 +112,95 @@ https://aarogyamindia.online/aarogyam-sakhi.html?ref=AGRI2026</div>
 
         <div id="sakhiTestOutput" style="min-height:160px;background:var(--bg-dark,#0f172a);border-radius:10px;padding:14px;border:1px solid #334155;font-size:0.85rem;color:#cbd5e1;overflow-y:auto;max-height:360px;">
           <div style="color:#64748b;text-align:center;padding-top:40px;">ऊपर कोई सवाल लिखकर 'टेस्ट करें' दबाएं।</div>
+    <!-- Unanswered Questions Log & Intent Builder Section -->
+    <div class="admin-card" style="padding:22px;margin-top:24px;border:1px solid #ef444433;background:linear-gradient(135deg,rgba(239,68,68,0.04),transparent);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div>
+          <h3 style="font-size:1.2rem;font-weight:800;color:#f87171;display:flex;align-items:center;gap:8px;">
+            <span>❓</span> छूटे हुए सवाल (Unanswered Queries Log)
+          </h3>
+          <p style="font-size:0.83rem;color:var(--text-muted,#94a3b8);margin-top:4px;">
+            जब यूजर ऐसा सवाल पूछता है जिसका सटीक उत्तर AI में नहीं होता, तो वे सवाल यहाँ दर्ज होते हैं। आप 1-क्लिक में उनका नया उत्तर जोड़ सकते हैं।
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="admin-btn admin-btn-primary" style="background:#16a34a;border-color:#16a34a;" id="sakhiOpenAddIntentBtn">
+            <span>+ नया सवाल व उत्तर जोड़ें</span>
+          </button>
+          <button type="button" class="admin-btn admin-btn-secondary" id="sakhiClearUnansweredBtn">
+            <span>🗑️ लॉग साफ करें</span>
+          </button>
         </div>
       </div>
 
-      <!-- Column 2: Knowledge Base Master List & Search -->
-      <div class="admin-card" style="padding:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-          <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary,#f8fafc);display:flex;align-items:center;gap:8px;">
-            <span>📚</span> मास्टर नॉलेज बेस (43+ सवाल-जवाब)
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.84rem;color:#cbd5e1;">
+          <thead>
+            <tr style="background:#0f172a;border-bottom:1.5px solid #334155;text-align:left;">
+              <th style="padding:10px 12px;color:#94a3b8;">#</th>
+              <th style="padding:10px 12px;color:#94a3b8;">यूजर का सवाल</th>
+              <th style="padding:10px 12px;color:#94a3b8;">डोमेन</th>
+              <th style="padding:10px 12px;color:#94a3b8;">यूजर / फोन</th>
+              <th style="padding:10px 12px;color:#94a3b8;">बारम्बारता</th>
+              <th style="padding:10px 12px;color:#94a3b8;">समय</th>
+              <th style="padding:10px 12px;color:#94a3b8;text-align:right;">एक्शन</th>
+            </tr>
+          </thead>
+          <tbody id="sakhiUnansweredTableBody">
+            <tr>
+              <td colspan="7" style="text-align:center;padding:24px;color:#64748b;">लॉग लोड हो रहा है...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- No-Code Intent Creator Modal -->
+    <div id="sakhiAddIntentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999999;align-items:center;justify-content:center;padding:16px;">
+      <div style="background:#1e293b;border:1.5px solid #3b82f6;border-radius:14px;max-width:550px;width:100%;padding:24px;box-shadow:0 12px 36px rgba(0,0,0,0.6);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="font-size:1.2rem;font-weight:800;color:#f8fafc;margin:0;">
+            ✨ + नया सवाल व सटीक उत्तर जोड़ें
           </h3>
-          <input type="text" id="sakhiKbSearch" class="admin-input" placeholder="कीवर्ड खोजें..." style="width:180px;padding:6px 10px;font-size:0.82rem;" />
+          <button type="button" id="sakhiCloseModalBtn" style="background:none;border:none;color:#94a3b8;font-size:1.4rem;cursor:pointer;">&times;</button>
         </div>
 
-        <div id="sakhiKbList" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;padding-right:4px;">
-          <div class="admin-loading">नॉलेज बेस लोड हो रहा है...</div>
-        </div>
+        <form id="sakhiAddIntentForm" onsubmit="event.preventDefault();">
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#cbd5e1;margin-bottom:4px;">श्रेणी / डोमेन चुनें:</label>
+            <select id="modalIntentDomain" class="admin-input" style="width:100%;background:#0f172a;">
+              <option value="agri">🌾 कृषि व फसलें (Agri)</option>
+              <option value="pashu">🐄 पशुपालन व डेयरी (Dairy)</option>
+              <option value="health">🩺 स्वास्थ्य व आयुर्वेद (Health)</option>
+              <option value="beauty">💄 सौंदर्य व त्वचा (Beauty)</option>
+              <option value="netsurf">🧴 नेट्सर्फ व बायोफिट (Netsurf)</option>
+              <option value="business">💼 कमाई व बिज़नेस (Business)</option>
+              <option value="omni">🌐 सामान्य (General)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#cbd5e1;margin-bottom:4px;">सवाल का शीर्षक:</label>
+            <input type="text" id="modalIntentTitle" class="admin-input" placeholder="उदा: गेहूं में पीला रतुआ का इलाज" style="width:100%;background:#0f172a;" required />
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#cbd5e1;margin-bottom:4px;">ट्रिगर कीवर्ड्स (अल्पविराम से अलग करें):</label>
+            <input type="text" id="modalIntentKeywords" class="admin-input" placeholder="उदा: पीला रतुआ, रतुआ, गेहूं पीलापन, rust" style="width:100%;background:#0f172a;" required />
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#cbd5e1;margin-bottom:4px;">सटीक 2-3 लाइन का वैज्ञानिक उत्तर:</label>
+            <textarea id="modalIntentAnswer" class="admin-input" rows="4" placeholder="वैज्ञानिक समाधान, सही स्प्रे दवा, डोज और सावधानियां लिखें..." style="width:100%;background:#0f172a;resize:vertical;" required></textarea>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px;">
+            <button type="button" class="admin-btn admin-btn-secondary" id="sakhiCancelModalBtn">रद्द करें</button>
+            <button type="button" class="admin-btn admin-btn-primary" style="background:#16a34a;border-color:#16a34a;" id="sakhiSaveIntentBtn">
+              <span>सुरक्षित करें ✔</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   `;
@@ -134,6 +208,7 @@ https://aarogyamindia.online/aarogyam-sakhi.html?ref=AGRI2026</div>
   // Attach Event Handlers & Load Data
   setupSakhiAdminEvents();
   loadKnowledgeDataForAdmin();
+  renderUnansweredQueries();
 }
 
 let loadedKnowledge = null;
@@ -269,7 +344,7 @@ function setupSakhiAdminEvents() {
     };
   }
 
-  if (exportBtn) {
+    if (exportBtn) {
     exportBtn.onclick = () => {
       if (!loadedKnowledge) return;
       const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(loadedKnowledge, null, 2));
@@ -281,7 +356,185 @@ function setupSakhiAdminEvents() {
       downloadAnchor.remove();
     };
   }
+
+  // Modal and Unanswered Events
+  const openAddModalBtn = document.getElementById('sakhiOpenAddIntentBtn');
+  const closeModalBtn = document.getElementById('sakhiCloseModalBtn');
+  const cancelModalBtn = document.getElementById('sakhiCancelModalBtn');
+  const saveIntentBtn = document.getElementById('sakhiSaveIntentBtn');
+  const clearUnansweredBtn = document.getElementById('sakhiClearUnansweredBtn');
+  const addModal = document.getElementById('sakhiAddIntentModal');
+
+  if (openAddModalBtn && addModal) {
+    openAddModalBtn.onclick = () => {
+      openSakhiIntentModal('', 'agri');
+    };
+  }
+
+  if (closeModalBtn && addModal) {
+    closeModalBtn.onclick = () => {
+      addModal.style.display = 'none';
+    };
+  }
+
+  if (cancelModalBtn && addModal) {
+    cancelModalBtn.onclick = () => {
+      addModal.style.display = 'none';
+    };
+  }
+
+  if (clearUnansweredBtn) {
+    clearUnansweredBtn.onclick = () => {
+      if (confirm('क्या आप सच में सभी छूटे हुए सवालों का लॉग साफ करना चाहते हैं?')) {
+        localStorage.removeItem('sakhi_unanswered_queries');
+        renderUnansweredQueries();
+      }
+    };
+  }
+
+  if (saveIntentBtn) {
+    saveIntentBtn.onclick = saveCustomIntentFromModal;
+  }
 }
+
+function openSakhiIntentModal(prefillTitle = '', prefillDomain = 'agri') {
+  const modal = document.getElementById('sakhiAddIntentModal');
+  if (!modal) return;
+
+  const domainEl = document.getElementById('modalIntentDomain');
+  const titleEl = document.getElementById('modalIntentTitle');
+  const keywordsEl = document.getElementById('modalIntentKeywords');
+  const answerEl = document.getElementById('modalIntentAnswer');
+
+  if (domainEl) domainEl.value = prefillDomain || 'agri';
+  if (titleEl) titleEl.value = prefillTitle || '';
+  if (keywordsEl) {
+    keywordsEl.value = prefillTitle
+      ? prefillTitle.replace(/[?,।!]/g, '').trim().split(' ').filter(w => w.length > 2).join(', ')
+      : '';
+  }
+  if (answerEl) answerEl.value = '';
+
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    if (answerEl) answerEl.focus();
+  }, 200);
+}
+
+function saveCustomIntentFromModal() {
+  const domainEl = document.getElementById('modalIntentDomain');
+  const titleEl = document.getElementById('modalIntentTitle');
+  const keywordsEl = document.getElementById('modalIntentKeywords');
+  const answerEl = document.getElementById('modalIntentAnswer');
+
+  const domain = domainEl ? domainEl.value : 'agri';
+  const title = titleEl ? titleEl.value.trim() : '';
+  const keywordsStr = keywordsEl ? keywordsEl.value.trim() : '';
+  const answer = answerEl ? answerEl.value.trim() : '';
+
+  if (!title || !keywordsStr || !answer) {
+    alert('कृपया शीर्षक, कीवर्ड्स और उत्तर तीनों आवश्यक फ़ील्ड भरें।');
+    return;
+  }
+
+  const keywords = keywordsStr.split(',').map(k => k.trim()).filter(Boolean);
+  const newIntent = {
+    tag: title,
+    title: title,
+    domain: domain,
+    keywords: keywords,
+    patterns: keywords,
+    responses: [answer],
+    ayurvedic_protocol: answer,
+    anatomy_physiology: `प्रामाणिक वैज्ञानिक व जैविक कृषि/स्वास्थ्य समाधान।`,
+    reference: `आरोग्यम इंडिया रिसर्च विंग • अवनीश मिश्रा जी द्वारा अनुमोदित`
+  };
+
+  if (!loadedKnowledge) loadedKnowledge = { intents: [] };
+  if (!loadedKnowledge.intents) loadedKnowledge.intents = [];
+  loadedKnowledge.intents.unshift(newIntent);
+
+  // Save to Local Custom Knowledge Storage
+  try {
+    const customList = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_INTENTS') || '[]');
+    customList.unshift(newIntent);
+    localStorage.setItem('AAROGYAM_CUSTOM_INTENTS', JSON.stringify(customList));
+
+    // Remove resolved query from unanswered log
+    const uList = JSON.parse(localStorage.getItem('sakhi_unanswered_queries') || '[]');
+    const updatedUList = uList.filter(item => (item.query || '').toLowerCase() !== title.toLowerCase());
+    localStorage.setItem('sakhi_unanswered_queries', JSON.stringify(updatedUList));
+  } catch (e) {}
+
+  alert(`✅ बधाई! "${title}" सवाल नॉलेज बेस में सफलतापूर्वक जुड़ गया है।`);
+  const modal = document.getElementById('sakhiAddIntentModal');
+  if (modal) modal.style.display = 'none';
+
+  renderKnowledgeList(loadedKnowledge.intents);
+  renderUnansweredQueries();
+}
+
+function renderUnansweredQueries() {
+  const tbody = document.getElementById('sakhiUnansweredTableBody');
+  if (!tbody) return;
+
+  let list = [];
+  try {
+    list = JSON.parse(localStorage.getItem('sakhi_unanswered_queries') || '[]');
+  } catch (e) {}
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center;padding:24px;color:#10b981;font-weight:700;">
+          🎉 बहुत बढ़िया! अभी कोई छूटा हुआ सवाल नहीं है। सभी सवालों के सटीक उत्तर उपलब्ध हैं।
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map((item, idx) => {
+    const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString('hi-IN') : 'हाल ही में';
+    const userDisplay = item.user ? `${item.user} ${item.phone ? '(' + item.phone + ')' : ''}` : (item.phone || 'अज्ञात यूजर');
+    const safeQ = encodeURIComponent(item.query || '');
+    const safeDom = encodeURIComponent(item.domain || 'agri');
+
+    return `
+      <tr style="border-bottom:1px solid #334155;">
+        <td style="padding:10px 12px;color:#94a3b8;">${idx + 1}</td>
+        <td style="padding:10px 12px;font-weight:700;color:#f8fafc;">
+          "${escapeHtml(item.query || '')}"
+        </td>
+        <td style="padding:10px 12px;">
+          ${getCategoryBadge(item.domain || '')}
+        </td>
+        <td style="padding:10px 12px;color:#cbd5e1;font-size:0.78rem;">
+          ${escapeHtml(userDisplay)}
+        </td>
+        <td style="padding:10px 12px;text-align:center;">
+          <span style="background:#ef444422;color:#f87171;padding:2px 8px;border-radius:10px;font-weight:800;font-size:0.75rem;">
+            ${item.count || 1} बार
+          </span>
+        </td>
+        <td style="padding:10px 12px;color:#94a3b8;font-size:0.75rem;">
+          ${timeStr}
+        </td>
+        <td style="padding:10px 12px;text-align:right;">
+          <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 10px;font-size:0.75rem;background:#16a34a;border:none;" onclick="window.sakhiAnswerUnanswered('${safeQ}', '${safeDom}')">
+            + उत्तर जोड़ें
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.sakhiAnswerUnanswered = function (encodedQ, encodedDom) {
+  const q = decodeURIComponent(encodedQ || '');
+  const dom = decodeURIComponent(encodedDom || 'agri');
+  openSakhiIntentModal(q, dom);
+};
 
 function runAdminSakhiTest(query) {
   const output = document.getElementById('sakhiTestOutput');

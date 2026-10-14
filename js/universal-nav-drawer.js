@@ -329,12 +329,15 @@
   function generateDrawerProfileHeaderHtml() {
     let savedUser = {};
     try {
-      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || localStorage.getItem('AI_SESSION') || '{}');
     } catch (e) {}
 
-    const isLogged = typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : Boolean(savedUser.mobile || savedUser.phone || localStorage.getItem('aim_user_mobile'));
-    const userName = localStorage.getItem('aim_user_name') || savedUser.full_name || savedUser.name || savedUser.fullName || 'Guest User';
-    const userPhone = localStorage.getItem('aim_user_mobile') || savedUser.mobile || savedUser.phone || '';
+    const userPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('SAKHI_USER_PHONE') || savedUser.mobile || savedUser.phone || '').replace(/\D/g, '').slice(-10);
+    const isLogged = typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : (userPhone.length === 10);
+    let userName = localStorage.getItem('aim_user_name') || localStorage.getItem('aarogyam_user_name') || localStorage.getItem('SAKHI_USER_NAME') || savedUser.full_name || savedUser.name || savedUser.fullName || '';
+    if (!userName || userName.toLowerCase() === 'null' || userName.toLowerCase() === 'undefined' || userName.toLowerCase().includes('guest')) {
+      userName = isLogged ? 'किसान साथी' : 'Guest User';
+    }
     const userRole = savedUser.isVip ? '👑 Pro VIP Member' : (isLogged ? '🌱 Verified Member' : 'Guest Mode');
     const shareId = window.getUserShareId();
 
@@ -377,11 +380,39 @@
     `;
   }
 
+  window.logoutUniversalUser = function() {
+    if (!confirm('क्या आप सचमुच लॉग आउट करना चाहते हैं?')) return;
+    localStorage.removeItem('aim_user_name');
+    localStorage.removeItem('aim_user_mobile');
+    localStorage.removeItem('aarogyam_user_name');
+    localStorage.removeItem('aarogyam_user_phone');
+    localStorage.removeItem('SAKHI_USER_NAME');
+    localStorage.removeItem('SAKHI_USER_PHONE');
+    localStorage.removeItem('AI_USER');
+    localStorage.removeItem('AI_PROFILE');
+    localStorage.removeItem('UCAS_USER');
+    try {
+      const sess = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
+      delete sess.name;
+      delete sess.mobile;
+      delete sess.phone;
+      delete sess.loggedIn;
+      localStorage.setItem('AI_SESSION', JSON.stringify(sess));
+    } catch (e) {}
+    window.updateUniversalDrawerProfile();
+    window.dispatchEvent(new CustomEvent('ai:user-logged-out'));
+    if (typeof window.renderInitialGreeting === 'function') {
+      window.renderInitialGreeting();
+    }
+  };
+
   window.openUniversalLoginHandler = function() {
     if (typeof window.closeUniversalDrawer === 'function') {
       window.closeUniversalDrawer();
     }
-    if (typeof window.openGuestLoginModal === 'function') {
+    if (typeof window.openSakhiAuthModal === 'function') {
+      window.openSakhiAuthModal();
+    } else if (typeof window.openGuestLoginModal === 'function') {
       window.openGuestLoginModal(null, { force: true });
     } else {
       window.location.href = '/registration.html';
@@ -1168,7 +1199,7 @@
     pill.setAttribute('aria-label', pillLabel);
     pill.innerHTML = `
       <div class="sakhi-pill-avatar-wrap">
-        <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" onerror="this.src='/images/sakhi/aarogyam-sakhi.jpg'" />
+        <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
       </div>
       <span class="sakhi-pill-label">${pillLabel}</span>
       <span class="sakhi-pill-live-dot"></span>

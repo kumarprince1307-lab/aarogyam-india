@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Sakhi AI Styles -->
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v91">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v97">
 
   <style>
     /* Full Viewport App Fit */
@@ -78,6 +78,7 @@
             </div>
           </div>
           <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:6px;">
+            <div id="sakhiHeaderUserBadgeWrap" style="display:inline-flex;align-items:center;"></div>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="फुल स्क्रीन">
               <i class="fa-solid fa-expand"></i>
             </button>
@@ -178,28 +179,37 @@
 
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261014_v91"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261014_v97"></script>
   <script>
     (function () {
       function resolveHeroName() {
+        let phone = (
+          localStorage.getItem('aarogyam_user_phone') ||
+          localStorage.getItem('aim_user_mobile') ||
+          localStorage.getItem('user_phone') ||
+          localStorage.getItem('SAKHI_USER_PHONE') ||
+          ''
+        ).replace(/\D/g, '').slice(-10);
+
         let name = '';
-        try {
-          const sess = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
-          if (sess && sess.name && sess.name.trim()) name = sess.name.trim();
-        } catch (e) {}
-        if (!name) {
-          try {
-            const user = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-            if (user && user.name && user.name.trim()) name = user.name.trim();
-          } catch (e) {}
+        if (phone.length === 10) {
+          name = (
+            localStorage.getItem('aarogyam_user_name') ||
+            localStorage.getItem('aim_user_name') ||
+            localStorage.getItem('SAKHI_USER_NAME') ||
+            ''
+          ).trim();
+          if (!name || name.toLowerCase() === 'null' || name.toLowerCase() === 'undefined' || name.toLowerCase().includes('guest')) {
+            try {
+              const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+              name = (u.name || u.full_name || '').trim();
+            } catch (e) {}
+          }
         }
-        if (!name) {
-          name = localStorage.getItem('SAKHI_USER_NAME') || '';
-        }
-        name = name.trim();
+
         const el = document.getElementById('sakhiHeroDynamicName');
         if (el) {
-          if (name && name.toLowerCase() !== 'null' && name.toLowerCase() !== 'undefined' && name.toLowerCase() !== 'admin') {
+          if (name && phone.length === 10) {
             el.textContent = name + ' जी';
           } else {
             el.textContent = 'किसान साथी';

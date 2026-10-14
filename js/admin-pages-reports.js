@@ -393,7 +393,10 @@ const OFFICIAL_SITE_PAGES = [
   { path: '/categories/education.html', title: '🎓 किसान प्रशिक्षण व शिक्षा हब', thumb: '/images/banners/webinar-banner.webp', cat: 'Portal', hook: 'आधुनिक कृषि और डेयरी का सम्पूर्ण डिजिटल प्रशिक्षण।' },
   { path: '/subscription.html', title: '👑 आरोग्यम VIP प्रो ऑल-एक्सेस सदस्यता', thumb: '/images/banners/vip-reader-offer-badge.jpeg', cat: 'Portal', hook: '1 साल तक सभी ई-बुक्स, वेबिनार और व्यक्तिगत कृषि सलाह 100% मुफ़्त।' },
   { path: '/tube.html', title: '📺 AarogyamTube वीडियो लाइब्रेरी (Video Portal)', thumb: '/images/banners/tube-banner.webp', cat: 'Portal', hook: 'सैकड़ों खेती और पशुपालन वीडियो बिल्कुल मुफ्त देखें।' },
-  { path: '/webinar.html', title: '🎓 लाइव वेबिनार व किसान कार्यशाला (Webinars)', thumb: '/images/banners/webinar-banner.webp', cat: 'Portal', hook: 'कृषि व डेयरी विशेषज्ञों के साथ सीधे सवाल-जवाब और ऑनलाइन प्रशिक्षण।' }
+  { path: '/webinar.html', title: '🎓 लाइव वेबिनार व किसान कार्यशाला (Webinars)', thumb: '/images/banners/webinar-banner.webp', cat: 'Portal', hook: 'कृषि व डेयरी विशेषज्ञों के साथ सीधे सवाल-जवाब और ऑनलाइन प्रशिक्षण।' },
+
+  // 5. Official AI Doctor Assistant (1 Real Page)
+  { path: '/aarogyam-sakhi.html', title: '🤖 आरोग्यम सखी AI — 24×7 किसान व परिवार डिजिटल डॉक्टर', thumb: '/images/sakhi/aarogyam-sakhi-banner.webp', cat: 'AI', hook: 'खेती, पशुपालन, सेहत व सौंदर्य का 24×7 वैज्ञानिक समाधान और मुफ़्त AI सलाह।' }
 ];
 
 const DEFAULT_TUBE_VIDEOS = [
@@ -1148,7 +1151,10 @@ function renderSitePagesTab(audienceList) {
   const pageObj = OFFICIAL_SITE_PAGES.find(p => p.path === activePagePath) || OFFICIAL_SITE_PAGES[0];
   const fullPageUrl = `https://aarogyamindia.online${pageObj.path}`;
 
-  const defaultWaMsg = `🌾 *नमस्ते किसान साथी!* 🙏\n\n📌 *${pageObj.title}*\n💡 ${pageObj.hook || 'आरोग्यम इंडिया के आधिकारिक पोर्टल पर महत्वपूर्ण जानकारी व समाधान उपलब्ध है।'}\n\n👉 *सम्पूर्ण जानकारी एवं समाधान के लिए यहाँ क्लिक करें:*\n${fullPageUrl}\n\n_आरोग्यम इंडिया — समृद्ध किसान, समृद्ध भारत_ 🇮🇳`;
+  let defaultWaMsg = `🌾 *नमस्ते किसान साथी!* 🙏\n\n📌 *${pageObj.title}*\n💡 ${pageObj.hook || 'आरोग्यम इंडिया के आधिकारिक पोर्टल पर महत्वपूर्ण जानकारी व समाधान उपलब्ध है।'}\n\n👉 *सम्पूर्ण जानकारी एवं समाधान के लिए यहाँ क्लिक करें:*\n${fullPageUrl}\n\n_आरोग्यम इंडिया — समृद्ध किसान, समृद्ध भारत_ 🇮🇳`;
+  if (pageObj.path === '/aarogyam-sakhi.html') {
+    defaultWaMsg = `🌿 *किसान व परिवारजनों के लिए बड़ी खुशखबरी!* 🌿\n\nअब खेती (गेहूं, सरसों, खाद), पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द) और सौंदर्य के लिए किसी के चक्कर काटने की जरूरत नहीं!\n\nमिलिए *"आरोग्यम सखी AI"* से — जो देती हैं हर सवाल का 100% सही व वैज्ञानिक जवाब! 👩‍🌾🩺\n\n👉 *अभी अपना सवाल पूछें बिल्कुल फ्री:*\n${fullPageUrl}\n\n_आरोग्यम इंडिया — 24×7 डिजिटल डॉक्टर सेवा_ 🇮🇳`;
+  }
   const currentWaMsg = mktState.customSiteMsg || defaultWaMsg;
 
   return `
@@ -1178,6 +1184,11 @@ function renderSitePagesTab(audienceList) {
             📄 प्रचार हेतु वेबसाइट पेज चुनें:
           </label>
           <select id="site_page_selector" style="width:100%; background:#1e293b; color:#fff; border:1.5px solid #3b82f6; padding:10px 14px; border-radius:10px; font-size:0.85rem; font-weight:700;">
+            <optgroup label="🤖 आरोग्यम सखी AI (24×7 डिजिटल डॉक्टर)" style="background:#0f172a; color:#a855f7;">
+              ${OFFICIAL_SITE_PAGES.filter(p => p.cat === 'AI').map(p => `
+                <option value="${p.path}" ${p.path === activePagePath ? 'selected' : ''}>${p.title}</option>
+              `).join('')}
+            </optgroup>
             <optgroup label="🌱 नेट्सर्फ बायोफिट व जैविक उत्पाद (Netsurf Hub)" style="background:#0f172a; color:#10b981;">
               ${OFFICIAL_SITE_PAGES.filter(p => p.cat === 'Netsurf').map(p => `
                 <option value="${p.path}" ${p.path === activePagePath ? 'selected' : ''}>${p.title}</option>
