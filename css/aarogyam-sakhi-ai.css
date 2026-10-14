@@ -793,3 +793,68 @@ body.sakhi-page-body {
   color: #15803d;
 }
 
+/* 12. TYPING INDICATOR (CHATTING REAL ANIMATION) */
+.sakhi-typing-bubble {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  background: #f0fdf4 !important;
+  border: 1.5px solid #86efac !important;
+  padding: 10px 16px !important;
+  border-radius: 18px 18px 18px 4px !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1);
+}
+
+.sakhi-typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sakhi-typing-dots span {
+  width: 7px;
+  height: 7px;
+  background: #16a34a;
+  border-radius: 50%;
+  display: inline-block;
+  animation: sakhiDotBounce 1.4s infinite ease-in-out both;
+}
+
+.sakhi-typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.sakhi-typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+.sakhi-typing-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes sakhiDotBounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.sakhi-typing-label {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #15803d;
+}
+
+/* STREAMING TEXT BLINKING CARET */
+.sakhi-streaming-caret {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: #16a34a;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: sakhiCaretBlink 0.7s infinite;
+}
+
+@keyframes sakhiCaretBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+

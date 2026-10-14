@@ -1,8 +1,7 @@
 /**
  * ====================================================================
  * AAROGYAM SAKHI AI - UNIVERSAL KRISHI ENCYCLOPEDIA & VOICE DOCTOR
- * Version: 3.5 (Real Avatar Photo, 100% Free Unlimited, Guest Onboarding,
- *               Instant Comprehensive Answers, Proactive Chips & Viral Share)
+ * Version: 4.0 (2-3s Typing Indicator, Character Streaming, Smart Crop Book Match)
  * ====================================================================
  */
 
@@ -17,13 +16,6 @@
   let recognitionInstance = null;
   let isRecording = false;
   let currentDiagnosticIntent = null;
-  let lastMatchedBook = {
-    id: 'BK002',
-    name: 'खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा)',
-    mrp: 299,
-    price: 99,
-    link: '/ebooks/kheti-dr.html'
-  };
 
   // 1. USER PROFILE HELPERS
   function getUserPhone() {
@@ -56,7 +48,7 @@
     );
   }
 
-  // 2. UNLIMITED QUOTA (100% FREE FOR ALL FARMERS)
+  // 2. UNLIMITED ACCESS FOR ALL FARMERS
   function isUnlimitedUser() {
     return true;
   }
@@ -83,10 +75,10 @@
     }
   }
 
-  // 3. LOAD KNOWLEDGE BASE
+  // 3. LOAD KNOWLEDGE BASE (v4.0)
   async function loadKnowledgeBase() {
     try {
-      const res = await fetch('/data/krishi-ai-knowledge.json?v=' + Math.floor(Date.now() / 1800000));
+      const res = await fetch('/data/krishi-ai-knowledge.json?v=' + Math.floor(Date.now() / 600000));
       if (res.ok) {
         knowledgeData = await res.json();
       }
@@ -160,7 +152,7 @@
     if (input) input.placeholder = 'अपना सवाल बोलें या लिखें (जैसे: गेहूं में कल्ले, धान में पीलापन)...';
   }
 
-  // 5. TEXT-TO-SPEECH (TTS - आवाज़ में उत्तर)
+  // 5. TEXT-TO-SPEECH (TTS)
   function speakResponse(text) {
     if (!isSoundEnabled || !window.speechSynthesis || !text) return;
 
@@ -190,7 +182,6 @@
 
   function injectSakhiUI() {
     if (isDedicatedPage) {
-      // Standalone Fullscreen Mode
       const container = document.getElementById('sakhiFullscreenContainer') || document.body;
       container.innerHTML = `
         <div class="sakhi-fullscreen-wrapper">
@@ -363,7 +354,7 @@
     stopRecording();
   }
 
-  // 7. INITIAL GREETING & GUEST ONBOARDING FLOW
+  // 7. INITIAL GREETING & GUEST ONBOARDING
   function renderInitialGreeting() {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
@@ -372,7 +363,6 @@
     const userPhone = getUserPhone();
 
     if (userName && userPhone) {
-      // Registered User Greeting
       wrap.innerHTML = `
         <div class="sakhi-msg-row bot">
           <div class="sakhi-msg-bubble">
@@ -383,7 +373,7 @@
                 <span style="font-size:0.8rem;color:#166534;">मैं आपकी <strong>आरोग्यम सखी</strong> हूँ।</span>
               </div>
             </div>
-            खेत की चिंता छोड़िए! गेहूं, धान, सरसों, चना, सब्जियां या किसी भी कृषि दवा (जैसे कोराजन, साफ, टिल्ट) के बारे में बेझिझक पूछें।
+            खेत की चिंता छोड़िए! गेहूं, धान, सरसों, चना, सब्जियां, मक्का या किसी भी कृषि दवा (कोराजन, साफ, टिल्ट) के बारे में बेझिझक पूछें।
 
             <div class="sakhi-choice-pills-wrap" style="margin-top:12px;">
               <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
@@ -412,7 +402,6 @@
       `;
       speakResponse(`राम-राम ${userName} जी! मैं आपकी आरोग्यम सखी हूँ। बताइए आज आपकी फसल में क्या सेवा करूँ?`);
     } else {
-      // Guest Onboarding Greeting
       wrap.innerHTML = `
         <div class="sakhi-msg-row bot">
           <div class="sakhi-msg-bubble">
@@ -423,7 +412,7 @@
                 <span style="font-size:0.8rem;color:#166534;">मैं आपकी <strong>आरोग्यम सखी</strong> हूँ।</span>
               </div>
             </div>
-            आपसे बातचीत शुरू करने और आपकी फसल के अनुसार व्यक्तिगत सलाह देने के लिए कृपया अपना नाम व मोबाइल नंबर दर्ज करें:
+            आपसे बातचीत शुरू करने और आपकी फसल के अनुसार सटीक सलाह देने के लिए कृपया अपना नाम व मोबाइल नंबर दर्ज करें:
 
             <div class="sakhi-onboard-card" id="sakhiGuestOnboardCard">
               <h4>🌾 किसान प्रोफाइल (1-क्लिक निशुल्क रजिस्ट्रेशन)</h4>
@@ -495,7 +484,7 @@
       `;
     }
 
-    appendBotMessage(`
+    streamBotMessage(`
       <div>
         <strong>राम-राम ${escapeHtml(name)} जी! 🙏</strong><br><br>
         आपका नंबर दर्ज हो गया है। अब आप बेझिझक कोई भी सवाल पूछ सकते हैं—गेहूं, सरसों, चना, धान, सब्जियों या किसी भी दवा के बारे में!
@@ -517,7 +506,7 @@
     `, `धन्यवाद ${name} जी! अब बताइए आपका क्या सवाल है?`);
   };
 
-  // 9. MESSAGE RENDERING
+  // 9. MESSAGE RENDERING WITH STREAMING & 2-3s TYPING INDICATOR
   function appendUserMessage(text) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
@@ -528,30 +517,18 @@
     wrap.scrollTop = wrap.scrollHeight;
   }
 
-  function appendBotMessage(htmlContent, speechText) {
-    const wrap = document.getElementById('sakhiMessagesWrap');
-    if (!wrap) return;
-    const row = document.createElement('div');
-    row.className = 'sakhi-msg-row bot';
-    row.innerHTML = `<div class="sakhi-msg-bubble">${htmlContent}</div>`;
-    wrap.appendChild(row);
-    wrap.scrollTop = wrap.scrollHeight;
-
-    if (speechText) {
-      speakResponse(speechText);
-    }
-  }
-
-  function appendThinkingMessage() {
+  function appendTypingIndicator() {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return null;
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row bot thinking-row';
     row.id = 'sakhiThinkingRow';
     row.innerHTML = `
-      <div class="sakhi-msg-bubble" style="color:#15803d;font-weight:800;display:flex;align-items:center;gap:8px;">
-        <span class="sakhi-tts-indicator"><span class="sakhi-tts-bar"></span><span class="sakhi-tts-bar"></span><span class="sakhi-tts-bar"></span></span>
-        <span>सखी सोच रही हैं... सटीक वैज्ञानिक उत्तर तैयार किया जा रहा है...</span>
+      <div class="sakhi-msg-bubble sakhi-typing-bubble">
+        <div class="sakhi-typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="sakhi-typing-label">आरोग्यम सखी टाइप कर रही हैं... ✍️</span>
       </div>
     `;
     wrap.appendChild(row);
@@ -559,12 +536,126 @@
     return row;
   }
 
-  function removeThinkingMessage() {
+  function removeTypingIndicator() {
     const el = document.getElementById('sakhiThinkingRow');
     if (el) el.remove();
   }
 
-  // 10. CORE QUESTION SUBMISSION & FUZZY MATCHING
+  // CHARACTER-BY-CHARACTER / WORD STREAMING ENGINE
+  function streamBotMessage(fullHtmlContent, speechText, bookCardHtml, followupChipsHtml) {
+    const wrap = document.getElementById('sakhiMessagesWrap');
+    if (!wrap) return;
+
+    const row = document.createElement('div');
+    row.className = 'sakhi-msg-row bot';
+    const bubble = document.createElement('div');
+    bubble.className = 'sakhi-msg-bubble';
+    row.appendChild(bubble);
+    wrap.appendChild(row);
+
+    // Temp container to parse the solution text for streaming
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = fullHtmlContent;
+    const solutionText = tempDiv.innerText || tempDiv.textContent || '';
+    const words = solutionText.split(' ');
+
+    let wordIdx = 0;
+    bubble.innerHTML = `<span class="sakhi-streaming-text"></span><span class="sakhi-streaming-caret"></span>`;
+    const textSpan = bubble.querySelector('.sakhi-streaming-text');
+    const caret = bubble.querySelector('.sakhi-streaming-caret');
+
+    // Trigger Speech early if enabled
+    if (speechText) {
+      speakResponse(speechText);
+    }
+
+    const streamInterval = setInterval(() => {
+      if (wordIdx < words.length) {
+        textSpan.textContent += (wordIdx === 0 ? '' : ' ') + words[wordIdx];
+        wordIdx++;
+        wrap.scrollTop = wrap.scrollHeight;
+      } else {
+        clearInterval(streamInterval);
+        if (caret) caret.remove();
+        
+        // After streaming finishes: render the rich HTML content + relevant book card + follow-up chips
+        let finalHtml = fullHtmlContent;
+        if (bookCardHtml) {
+          finalHtml += bookCardHtml;
+        }
+        if (followupChipsHtml) {
+          finalHtml += followupChipsHtml;
+        }
+
+        bubble.innerHTML = finalHtml;
+        wrap.scrollTop = wrap.scrollHeight;
+      }
+    }, 28); // Smooth natural typing pace ~35 words/sec
+  }
+
+  // 10. RELEVANT BOOK MATCHING ENGINE BASED ON USER QUERY KEYWORDS
+  function getRelevantBookForQuery(query) {
+    const q = (query || '').toLowerCase();
+
+    // 1. Vegetables -> BK015 Sabji Master Guide
+    if (q.includes('सब्जी') || q.includes('टमाटर') || q.includes('मिर्च') || q.includes('आलू') || q.includes('प्याज') || q.includes('लहसुन') || q.includes('गोभी') || q.includes('बैंगन') || q.includes('भिंडी') || q.includes('मरोड़िया')) {
+      return {
+        id: 'BK015',
+        title: 'सब्जी मास्टर गाइड (11 प्रमुख सब्जियां)',
+        desc: 'टमाटर, मिर्च, आलू व 11 सब्जियों का सम्पूर्ण वैज्ञानिक स्प्रे कैलेंडर व रोग नियंत्रण तालिका',
+        price: 99,
+        link: '/ebooks/book-landing.html?id=BK015'
+      };
+    }
+
+    // 2. Kharif Crops (Paddy, Soybean, Maize, Cotton) -> BK001 Kharif Master Guide
+    if (q.includes('धान') || q.includes('चावल') || q.includes('paddy') || q.includes('सोयाबीन') || q.includes('soybean') || q.includes('मक्का') || q.includes('कपास') || q.includes('फॉल आर्मीवर्म') || q.includes('शीथ ब्लाइट')) {
+      return {
+        id: 'BK001',
+        title: 'खरीफ फसल मास्टर गाइड 2026',
+        desc: 'धान, सोयाबीन, कपास व मक्का की बुआई से कटाई तक सम्पूर्ण प्रैक्टिकल सचित्र गाइड',
+        price: 99,
+        link: '/ebooks/kharif-master-guide-2026.html'
+      };
+    }
+
+    // 3. Dairy / Livestock -> Pashu Palan Hub
+    if (q.includes('पशु') || q.includes('गाय') || q.includes('भैंस') || q.includes('दूध') || q.includes('फैट') || q.includes('थनैला') || q.includes('बांझपन')) {
+      return {
+        id: 'PASHU01',
+        title: 'खेती का डॉक्टर व पशु मित्र गाइड',
+        desc: 'गाय-भैंस का दूध व फैट 2x करने, थनैला व बांझपन मुक्ति का 100% हर्बल आयुर्वेदिक चार्ट',
+        price: 99,
+        link: '/pashu-palan.html'
+      };
+    }
+
+    // 4. Wheat, Gram, Mustard, Chemicals & General -> BK002 Kheti Ka Doctor
+    return {
+      id: 'BK002',
+      title: 'खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा)',
+      desc: 'गेहूं, चना, सरसों, सभी रोग, कीड़े व 50+ रासायनिक व जैविक दवाओं का मास्टर स्प्रे कैलेंडर',
+      price: 99,
+      link: '/ebooks/kheti-dr.html'
+    };
+  }
+
+  function buildBookCardMarkup(book) {
+    if (!book) return '';
+    return `
+      <div class="sakhi-book-cta-card" style="margin-top:14px;">
+        <div class="sakhi-book-cta-info">
+          <h4>📖 ${escapeHtml(book.title)}</h4>
+          <p>${escapeHtml(book.desc)}</p>
+        </div>
+        <a href="${escapeHtml(book.link)}" class="sakhi-book-buy-btn">
+          <span>₹${book.price || 99} में पढ़ें →</span>
+        </a>
+      </div>
+    `;
+  }
+
+  // 11. CORE QUERY SUBMISSION WITH 2-3s TYPING DELAY
   function handleUserSubmit(userQuery) {
     const query = (userQuery || '').trim();
     if (!query) return;
@@ -575,12 +666,13 @@
     appendUserMessage(query);
     incrementDailyQuestions();
 
-    appendThinkingMessage();
+    // Realistic Typing Indicator for 2.2 seconds
+    appendTypingIndicator();
 
     setTimeout(() => {
-      removeThinkingMessage();
+      removeTypingIndicator();
       processKnowledgeQuery(query);
-    }, 350);
+    }, 2200); // 2.2 seconds realistic human typing animation
   }
 
   function processKnowledgeQuery(query) {
@@ -611,7 +703,7 @@
     if (matchedIntent && maxScore > 0) {
       currentDiagnosticIntent = matchedIntent;
 
-      // Check if user asked for a sub-option directly
+      // Check for direct sub-response match
       let directSubResponse = null;
       if (matchedIntent.responses) {
         for (const [key, resp] of Object.entries(matchedIntent.responses)) {
@@ -623,17 +715,17 @@
       }
 
       if (directSubResponse) {
-        renderFinalSolution(directSubResponse);
+        renderFinalSolution(directSubResponse, query);
         return;
       }
 
-      // If intent has direct_summary (e.g. for "गेहूं के बारे में बताओ"):
+      // If intent has direct_summary (e.g. "गेहूं के बारे में बताओ")
       if (matchedIntent.direct_summary) {
-        renderDirectSummaryWithSubOptions(matchedIntent);
+        renderDirectSummaryWithSubOptions(matchedIntent, query);
       } else if (matchedIntent.responses) {
         const defaultResp = Object.values(matchedIntent.responses)[0];
         if (defaultResp) {
-          renderFinalSolution(defaultResp);
+          renderFinalSolution(defaultResp, query);
         } else {
           fallbackUnanswered(query);
         }
@@ -645,8 +737,10 @@
     }
   }
 
-  function renderDirectSummaryWithSubOptions(intent) {
+  function renderDirectSummaryWithSubOptions(intent, originalQuery) {
     const summary = intent.direct_summary;
+    const matchedBook = getRelevantBookForQuery(originalQuery);
+
     let html = `
       <div style="margin-bottom:10px;">
         <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(summary.title || '🌾 फसल संपूर्ण मार्गदर्शन')}</h4>
@@ -661,19 +755,9 @@
         <div class="sakhi-curiosity-header">⚠️ 2. वैज्ञानिक चेतावनी एवं उत्पादन बढ़ाने का सीक्रेट:</div>
         <div>${escapeHtml(summary.curiosity_hook)}</div>
       </div>
-
-      <div class="sakhi-book-cta-card">
-        <div class="sakhi-book-cta-info">
-          <h4>📖 ${escapeHtml(summary.book_name || 'खेती का डॉक्टर ई-बुक')}</h4>
-          <p>सम्पूर्ण 120+ पेज वैज्ञानिक स्प्रे कैलेंडर व गाइड</p>
-        </div>
-        <a href="${escapeHtml(summary.book_link || '/ebooks/kheti-dr.html')}" class="sakhi-book-buy-btn">
-          <span>₹${summary.book_price || 99} में पढ़ें →</span>
-        </a>
-      </div>
     `;
 
-    // Add drill-down options if available
+    // Drill down options if available
     if (intent.diagnostic_question && intent.diagnostic_question.options) {
       html += `
         <div style="margin-top:14px;padding:12px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
@@ -692,9 +776,11 @@
       `;
     }
 
-    // Follow-up prompt chips
+    const bookCardHtml = buildBookCardMarkup(matchedBook);
+
+    let followupChipsHtml = '';
     if (summary.follow_up_suggestions && summary.follow_up_suggestions.length > 0) {
-      html += `
+      followupChipsHtml = `
         <div class="sakhi-followup-container">
           <div class="sakhi-followup-title">💡 किसान भाई, क्या आप यह भी जानना चाहते हैं?</div>
           <div class="sakhi-followup-list">
@@ -709,30 +795,24 @@
       `;
     }
 
-    appendBotMessage(html, summary.audio_text || summary.first_aid);
+    streamBotMessage(html, summary.audio_text || summary.first_aid, bookCardHtml, followupChipsHtml);
   }
 
   window.selectSakhiOption = function (optionValue) {
     if (!currentDiagnosticIntent || !currentDiagnosticIntent.responses) return;
 
-    const resp = currentDiagnosticIntent.responses[optionValue];
-    if (resp) {
-      renderFinalSolution(resp);
-    } else {
-      const first = Object.values(currentDiagnosticIntent.responses)[0];
-      if (first) renderFinalSolution(first);
-    }
+    appendTypingIndicator();
+    setTimeout(() => {
+      removeTypingIndicator();
+      const resp = currentDiagnosticIntent.responses[optionValue] || Object.values(currentDiagnosticIntent.responses)[0];
+      if (resp) {
+        renderFinalSolution(resp, optionValue);
+      }
+    }, 1800);
   };
 
-  function renderFinalSolution(resp) {
-    if (resp.book_id) {
-      lastMatchedBook = {
-        id: resp.book_id,
-        name: resp.book_name,
-        price: resp.book_price || 99,
-        link: resp.book_link || '/ebooks/kheti-dr.html'
-      };
-    }
+  function renderFinalSolution(resp, query) {
+    const matchedBook = getRelevantBookForQuery(query || resp.book_name);
 
     let html = `
       <div class="sakhi-solution-box">
@@ -744,21 +824,13 @@
         <div class="sakhi-curiosity-header">⚠️ 2. वैज्ञानिक चेतावनी एवं स्थायी समाधान:</div>
         <div>${escapeHtml(resp.curiosity_hook)}</div>
       </div>
-
-      <div class="sakhi-book-cta-card">
-        <div class="sakhi-book-cta-info">
-          <h4>📖 ${escapeHtml(resp.book_name || 'खेती का डॉक्टर ई-बुक')}</h4>
-          <p>सम्पूर्ण 120+ पेज वैज्ञानिक सारणी व स्प्रे कैलेंडर</p>
-        </div>
-        <a href="${escapeHtml(resp.book_link || '/ebooks/kheti-dr.html')}" class="sakhi-book-buy-btn">
-          <span>₹${resp.book_price || 99} में पढ़ें →</span>
-        </a>
-      </div>
     `;
 
-    // PROACTIVE FOLLOW-UP SUGGESTIONS
+    const bookCardHtml = buildBookCardMarkup(matchedBook);
+
+    let followupChipsHtml = '';
     if (resp.follow_up_suggestions && resp.follow_up_suggestions.length > 0) {
-      html += `
+      followupChipsHtml = `
         <div class="sakhi-followup-container">
           <div class="sakhi-followup-title">💡 किसान भाई, क्या आप यह भी जानना चाहते हैं?</div>
           <div class="sakhi-followup-list">
@@ -773,10 +845,10 @@
       `;
     }
 
-    appendBotMessage(html, resp.audio_text || resp.first_aid);
+    streamBotMessage(html, resp.audio_text || resp.first_aid, bookCardHtml, followupChipsHtml);
   }
 
-  // 11. SMART FALLBACK FOR UNANSWERED QUESTIONS
+  // 12. SMART FALLBACK FOR UNANSWERED QUESTIONS
   function fallbackUnanswered(query) {
     try {
       const logs = JSON.parse(localStorage.getItem('SAKHI_UNANSWERED_LOGS') || '[]');
@@ -828,10 +900,10 @@
       </div>
     `;
 
-    appendBotMessage(html, "यह एक विशेष प्रश्न है। तुरंत समाधान के लिए हमारे मुख्य कृषि विशेषज्ञ से व्हाट्सएप पर संपर्क करें।");
+    streamBotMessage(html, "यह एक विशेष प्रश्न है। तुरंत समाधान के लिए हमारे मुख्य कृषि विशेषज्ञ से व्हाट्सएप पर संपर्क करें।");
   }
 
-  // 12. VIRAL SHARE FUNCTION
+  // 13. VIRAL SHARE FUNCTION
   window.shareAarogyamSakhi = function () {
     const refCode = getBestReferralCode();
     const shareUrl = `${window.location.origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(refCode)}`;
@@ -861,7 +933,7 @@
     handleUserSubmit(query);
   };
 
-  // 13. GLOBAL BRIDGE FOR CONSULT AI EXPERT BUTTONS
+  // 14. GLOBAL BRIDGE FOR CONSULT AI EXPERT BUTTONS
   window.consultAiExpert = function (topic, details) {
     openSakhiModal();
     const query = `${topic || 'कृषि समस्या'}${details ? ': ' + details : ''}`;
