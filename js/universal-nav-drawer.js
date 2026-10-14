@@ -410,12 +410,13 @@
     if (typeof window.closeUniversalDrawer === 'function') {
       window.closeUniversalDrawer();
     }
-    if (typeof window.openSakhiAuthModal === 'function') {
+    const isSakhiPage = window.location.pathname.includes('aarogyam-sakhi');
+    if (isSakhiPage && typeof window.openSakhiAuthModal === 'function') {
       window.openSakhiAuthModal();
     } else if (typeof window.openGuestLoginModal === 'function') {
-      window.openGuestLoginModal(null, { force: true });
+      window.openGuestLoginModal(null, { force: true, fastForm: true });
     } else {
-      window.location.href = '/registration.html';
+      window.location.href = '/registration.html?mode=login';
     }
   };
 
