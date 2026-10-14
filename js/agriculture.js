@@ -279,7 +279,30 @@
         p.classList.add('active');
         activeCrop = p.getAttribute('data-crop') || 'all';
         renderAgriBooks();
+        filterDiseaseCardsByCrop(activeCrop);
       });
+    });
+  }
+
+  function filterDiseaseCardsByCrop(crop) {
+    const cards = document.querySelectorAll('.crop-disease-card-item');
+    if (!cards || cards.length === 0) return;
+
+    cards.forEach(card => {
+      if (crop === 'all') {
+        card.style.display = 'flex';
+        return;
+      }
+      const text = (card.textContent || '').toLowerCase();
+      let match = false;
+      if (crop === 'paddy' && (text.includes('धान') || text.includes('paddy') || text.includes('ब्लास्ट'))) match = true;
+      else if (crop === 'soybean' && (text.includes('सोयाबीन') || text.includes('soybean') || text.includes('मोज़ेक'))) match = true;
+      else if (crop === 'cotton' && (text.includes('कपास') || text.includes('cotton') || text.includes('सुंडी') || card.getAttribute('data-category') === 'grain')) match = true;
+      else if (crop === 'maize' && (text.includes('मक्का') || text.includes('maize') || text.includes('आर्मीवर्म'))) match = true;
+      else if (crop === 'wheat' && (text.includes('गेहूं') || text.includes('चना') || text.includes('उकठा') || text.includes('wheat'))) match = true;
+      else if (crop === 'vegetables' && (text.includes('टमाटर') || text.includes('मिर्च') || text.includes('सब्जी') || text.includes('झुलसा') || card.getAttribute('data-category') === 'veg' || card.getAttribute('data-category') === 'horti')) match = true;
+
+      card.style.display = match ? 'flex' : 'none';
     });
   }
 

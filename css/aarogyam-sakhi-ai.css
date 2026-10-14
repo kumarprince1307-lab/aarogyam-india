@@ -13,18 +13,19 @@
   --sakhi-shadow: 0 12px 36px rgba(15, 23, 42, 0.22);
 }
 
-/* 1. FLOATING ACTION PILL (FAB) */
+/* 1. FLOATING ACTION PILL (FAB - LEFT ALIGNED) */
 .sakhi-floating-pill {
   position: fixed;
-  bottom: 80px;
-  right: 18px;
+  bottom: 85px;
+  left: 18px;
+  right: auto;
   z-index: 99998;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: linear-gradient(135deg, #166534 0%, #15803d 50%, #16a34a 100%);
   color: #ffffff;
-  padding: 10px 18px;
+  padding: 8px 18px 8px 10px;
   border-radius: 40px;
   border: 2px solid #86efac;
   box-shadow: 0 8px 24px rgba(22, 101, 52, 0.45);
@@ -48,16 +49,24 @@
 }
 
 .sakhi-pill-avatar-wrap {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: #fef08a;
-  border: 1.5px solid #ffffff;
+  border: 2px solid #ffffff;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.sakhi-pill-avatar-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
 }
 
 .sakhi-pill-live-dot {
@@ -152,19 +161,26 @@
 
 /* ANIMATED SAKHI AVATAR */
 .sakhi-avatar-frame {
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #fef08a, #fde047);
-  border: 2px solid #86efac;
+  background: #fef08a;
+  border: 2.5px solid #86efac;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.85rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.sakhi-avatar-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
 }
 
 .sakhi-avatar-frame.speaking {
@@ -577,3 +593,203 @@
   padding: 4px 10px;
   background: #ffffff;
 }
+
+/* 9. PROACTIVE FOLLOW-UP SUGGESTIONS */
+.sakhi-followup-container {
+  margin-top: 12px;
+  background: #f0fdf4;
+  border: 1.5px dashed #86efac;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.sakhi-followup-title {
+  font-size: 0.84rem;
+  font-weight: 900;
+  color: #15803d;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sakhi-followup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sakhi-followup-chip {
+  background: #ffffff;
+  border: 1.5px solid #bbf7d0;
+  color: #166534;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.sakhi-followup-chip:hover {
+  background: #15803d;
+  color: #ffffff;
+  border-color: #15803d;
+  transform: translateX(4px);
+}
+
+/* 10. GUEST ONBOARDING CARD IN CHAT */
+.sakhi-onboard-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 2px solid #86efac;
+  border-radius: 18px;
+  padding: 16px;
+  margin-top: 10px;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.12);
+}
+
+.sakhi-onboard-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #166534;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sakhi-onboard-card p {
+  margin: 0 0 12px 0;
+  font-size: 0.84rem;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.sakhi-onboard-inputs-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sakhi-onboard-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.92rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sakhi-onboard-input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.sakhi-onboard-submit-btn {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.sakhi-onboard-submit-btn:hover {
+  background: #14532d;
+  transform: translateY(-2px);
+}
+
+/* 11. HEADER SHARE BUTTON & FULLSCREEN MODE */
+.sakhi-share-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.sakhi-share-btn:hover {
+  background: #ffffff;
+  color: #15803d;
+}
+
+/* FULLSCREEN STANDALONE PAGE */
+body.sakhi-page-body {
+  margin: 0;
+  padding: 0;
+  background: #0f172a;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  font-family: 'Outfit', 'Noto Sans Devanagari', -apple-system, sans-serif;
+}
+
+.sakhi-fullscreen-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  position: relative;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.sakhi-fullscreen-wrapper .sakhi-chat-window {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+  transform: none !important;
+  box-shadow: none;
+}
+
+.sakhi-back-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.sakhi-back-btn:hover {
+  background: #ffffff;
+  color: #15803d;
+}
+

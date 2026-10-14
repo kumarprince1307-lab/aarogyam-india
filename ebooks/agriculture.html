@@ -1064,6 +1064,73 @@
       }
     });
 
+    // 1. Direct Ungated Audio Player for Disease/KPI Cards
+    window.playKpiCardAudio = function(event, title, text) {
+      if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+      }
+      if (!('speechSynthesis' in window)) {
+        alert('आपके डिवाइस में हिंदी ऑडियो सिंथेसाइज़र समर्थित नहीं है।');
+        return;
+      }
+      const targetBtn = event?.currentTarget || (event?.target?.closest ? event.target.closest('.kpi-audio-btn') : null);
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('.kpi-audio-btn').forEach(b => b.classList.remove('playing'));
+        return;
+      }
+      const cleanTitle = (title || 'आरोग्यम समाधान').replace(/<[^>]+>/g, '');
+      const cleanText = (text || '').replace(/<[^>]+>/g, '');
+      const speechStr = `${cleanTitle}। ${cleanText}। सम्पूर्ण वैज्ञानिक समाधान हेतु आरोग्यम सखी AI से सलाह लें।`;
+      const utterance = new SpeechSynthesisUtterance(speechStr);
+      utterance.lang = 'hi-IN';
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+
+      if (targetBtn) targetBtn.classList.add('playing');
+
+      utterance.onend = function() {
+        if (targetBtn) targetBtn.classList.remove('playing');
+      };
+      utterance.onerror = function() {
+        if (targetBtn) targetBtn.classList.remove('playing');
+      };
+      window.speechSynthesis.speak(utterance);
+    };
+
+    // 2. Direct Share Handler for Disease/KPI Cards
+    window.triggerKpiNativeShare = function(event, title, text, targetUrl) {
+      if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+      }
+      const pageUrl = new URL(targetUrl || window.location.href, window.location.origin).href;
+      const fullText = `🌾 *${title || 'आरोग्यम फसल सुरक्षा'}*\n\n${text || ''}\n\nसंपूर्ण वैज्ञानिक उपचार देखें:\n${pageUrl}`;
+      if (navigator.share) {
+        navigator.share({ title: title || 'आरोग्यम कृषि', text: fullText, url: pageUrl }).catch(() => {
+          window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
+        });
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(fullText)}`, '_blank');
+      }
+    };
+
+    // 3. Consult AI Expert routes straight to Aarogyam Sakhi AI
+    window.consultAiExpert = function(topic, desc) {
+      if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
+        window.AarogyamSakhi.open();
+        const q = `${topic || 'कृषि समस्या'}${desc ? ': ' + desc : ''}`;
+        setTimeout(() => {
+          if (typeof window.AarogyamSakhi.ask === 'function') {
+            window.AarogyamSakhi.ask(q);
+          }
+        }, 400);
+      } else {
+        window.openFasalDoctorWhatsApp();
+      }
+    };
+
     window.openFasalDoctorWhatsApp = function() {
       if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
         window.AarogyamSakhi.open();
@@ -1091,6 +1158,7 @@
       }
     };
 
+    // 4. Crop Category Card Filtering
     window.filterCropCategoryCards = function(category, btn) {
       document.querySelectorAll('.crop-cat-tab').forEach(t => {
         t.classList.remove('active');
