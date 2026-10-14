@@ -3825,6 +3825,15 @@ section{
   border-color: #f87171;
 }
 
+@media (max-width: 768px) {
+  .at-floating-pill {
+    bottom: 122px !important;
+    left: 12px !important;
+    padding: 5px 12px 5px 5px !important;
+    font-size: 0.8rem !important;
+  }
+}
+
 .at-pill-logo {
   width: 30px;
   height: 30px;

@@ -516,26 +516,50 @@
       `;
     }
 
-    if (userName && userPhone) {
+    let cleanName = userName;
+    if (!cleanName || cleanName.toLowerCase() === 'aarogyam master' || cleanName.toLowerCase() === 'admin') {
+      cleanName = 'अवनीश';
+    }
+
+    const universalFourPills = `
+      <div class="sakhi-choice-pills-wrap" style="margin-top:12px;">
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
+          <span>🌾 <strong>कृषि व फसल रक्षा</strong> (गेहूं, सरसों, कीटनाशक डोज)</span>
+          <span>→</span>
+        </button>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('मधुमेह और शुगर कंट्रोल का फॉर्मूला')">
+          <span>🩺 <strong>स्वास्थ्य व पुरानी बीमारियां</strong> (डायबिटीज, जोड़ों का दर्द, बीपी, लिवर)</span>
+          <span>→</span>
+        </button>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
+          <span>✨ <strong>सौंदर्य, त्वचा व बाल</strong> (झाइयां, झुर्रियां, बाल झड़ना, विटामिन ई)</span>
+          <span>→</span>
+        </button>
+        <button class="sakhi-choice-btn" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
+          <span>🐄 <strong>पशुपालन, डेयरी व पोल्ट्री</strong> (दूध व फैट वृद्धि, सीएफसी, थनैला)</span>
+          <span>→</span>
+        </button>
+      </div>
+    `;
+
+    if (userName || userPhone) {
       wrap.innerHTML = `
         <div class="sakhi-msg-row bot">
           <div class="sakhi-msg-bubble">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
               <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #16a34a;" onerror="this.style.display='none'">
               <div>
-                <strong>राम-राम ${escapeHtml(userName)} जी! 🙏</strong><br>
+                <strong>नमस्ते ${escapeHtml(cleanName)} जी! 🙏</strong><br>
                 <span style="font-size:0.8rem;color:#166534;">मैं आपकी <strong>आरोग्यम सखी</strong> हूँ।</span>
               </div>
             </div>
-            ${domainGreeting}
+            आज मैं आपकी क्या मदद कर सकती हूँ? आप मुझसे कृषि, स्वास्थ्य, सौंदर्य/त्वचा, पशुपालन या किसी भी विषय पर बेझिझक सवाल पूछ सकते हैं।
 
-            <div class="sakhi-choice-pills-wrap" style="margin-top:12px;">
-              ${domainChips}
-            </div>
+            ${universalFourPills}
           </div>
         </div>
       `;
-      speakResponse(`राम-राम ${userName} जी! मैं आपकी आरोग्यम सखी हूँ। बताइए आज मैं आपकी क्या सेवा करूँ?`);
+      speakResponse(`नमस्ते ${cleanName} जी! मैं आपकी आरोग्यम सखी हूँ। आज मैं आपकी क्या मदद कर सकती हूँ?`);
     } else {
       wrap.innerHTML = `
         <div class="sakhi-msg-row bot">
@@ -543,7 +567,7 @@
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
               <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #16a34a;" onerror="this.style.display='none'">
               <div>
-                <strong>राम-राम किसान व परिवार मित्र! 🙏</strong><br>
+                <strong>नमस्ते! 🙏</strong><br>
                 <span style="font-size:0.8rem;color:#166534;">मैं आपकी <strong>आरोग्यम सखी</strong> हूँ।</span>
               </div>
             </div>
@@ -553,7 +577,7 @@
               <h4>🌿 आरोग्यम प्रोफाइल (1-क्लिक निशुल्क रजिस्ट्रेशन)</h4>
               <p>खेत, सेहत, पशु व सौंदर्य की निशुल्क असीमित सलाह हेतु:</p>
               <div class="sakhi-onboard-inputs-row">
-                <input type="text" class="sakhi-onboard-input" id="sakhiOnboardName" placeholder="आपका शुभ नाम (जैसे: रमेश कुमार)" />
+                <input type="text" class="sakhi-onboard-input" id="sakhiOnboardName" placeholder="आपका शुभ नाम (जैसे: अवनीश कुमार)" />
                 <input type="tel" class="sakhi-onboard-input" id="sakhiOnboardPhone" placeholder="10-अंकों का मोबाइल नंबर" maxlength="10" />
               </div>
               <button type="button" class="sakhi-onboard-submit-btn" onclick="window.submitSakhiOnboarding()">
@@ -566,13 +590,11 @@
               या नीचे दिए गए सीधे विषय पर क्लिक करें:
             </div>
 
-            <div class="sakhi-choice-pills-wrap" style="margin-top:8px;">
-              ${domainChips}
-            </div>
+            ${universalFourPills}
           </div>
         </div>
       `;
-      speakResponse('राम-राम! मैं आपकी आरोग्यम सखी हूँ। बातचीत शुरू करने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।');
+      speakResponse('नमस्ते! मैं आपकी आरोग्यम सखी हूँ। बातचीत शुरू करने के लिए अपना नाम और मोबाइल नंबर दर्ज करें।');
     }
   }
 
@@ -812,23 +834,37 @@
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
+    let nuskhaInner = '';
+    let speechText = '';
+    const n = intent.sakhi_nuskha;
+    if (typeof n === 'string') {
+      nuskhaInner = `<div class="sakhi-nuskha-text">${escapeHtml(n)}</div>`;
+      speechText = n;
+    } else {
+      speechText = `${n.title || 'सखी का नुस्खा'}। आवश्यक सामग्री: ${n.ingredients || ''}। प्रयोग विधि: ${n.usage || ''}`;
+      nuskhaInner = `
+        <div style="font-weight:900;color:#9d174d;font-size:1.02rem;margin-bottom:8px;">🌸 ${escapeHtml(n.title || 'सखी का दादी-नानी का नुस्खा')}</div>
+        ${n.ingredients ? `<div style="margin-bottom:6px;font-size:0.9rem;"><strong>🌿 आवश्यक सामग्री:</strong> ${escapeHtml(n.ingredients)}</div>` : ''}
+        ${n.method ? `<div style="margin-bottom:6px;font-size:0.9rem;"><strong>🥣 बनाने की विधि:</strong> ${escapeHtml(n.method)}</div>` : ''}
+        ${n.usage ? `<div style="margin-bottom:6px;font-size:0.9rem;color:#166534;"><strong>✨ सेवन व प्रयोग विधि:</strong> ${escapeHtml(n.usage)}</div>` : ''}
+      `;
+    }
+
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row bot';
     row.innerHTML = `
       <div class="sakhi-msg-bubble">
         <div class="sakhi-nuskha-box">
           <div class="sakhi-nuskha-header">
-            <span>✨</span> <strong>${escapeHtml(intent.sakhi_nuskha.title || 'सखी का दादी-नानी का नुस्खा')}</strong>
+            <span>✨</span> <strong>सखी का दादी-नानी का प्रमाणित नुस्खा</strong>
           </div>
-          <div class="sakhi-nuskha-text">
-            ${escapeHtml(intent.sakhi_nuskha.content)}
-          </div>
+          ${nuskhaInner}
         </div>
       </div>
     `;
     wrap.appendChild(row);
     wrap.scrollTop = wrap.scrollHeight;
-    speakResponse(intent.sakhi_nuskha.content);
+    speakResponse(speechText);
   };
 
   // 14. MAIN SUBMISSION WITH PROFANITY SHIELD & 2.2s DELAY
@@ -900,7 +936,11 @@
   }
 
   function renderDirectSummaryWithSubOptions(intent, originalQuery) {
-    const summary = intent.direct_summary;
+    const summary = intent.direct_summary || {};
+    const title = intent.title || summary.title || '🌿 सम्पूर्ण वैज्ञानिक मार्गदर्शन';
+    const mainFirstAid = intent.ayurvedic_protocol || summary.first_aid || '';
+    const mainAnatomy = intent.anatomy_physiology || intent.scientific_cause || summary.curiosity_hook || '';
+    const reference = intent.reference || '';
     const matchedBook = getRelevantBookForQuery(originalQuery);
 
     let html = '';
@@ -919,54 +959,74 @@
 
     html += `
       <div style="margin-bottom:10px;">
-        <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(summary.title || '🌿 सम्पूर्ण वैज्ञानिक मार्गदर्शन')}</h4>
+        <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(title)}</h4>
       </div>
 
-      <div class="sakhi-solution-box">
-        <div class="sakhi-solution-header">🌿 1. तुरंत प्रभावी उपचार व डोज (First Aid Protocol):</div>
-        <div>${escapeHtml(summary.first_aid)}</div>
-      </div>
+      ${mainAnatomy ? `
+        <div class="sakhi-curiosity-box" style="margin-top:6px;background:#f8fafc;border-color:#cbd5e1;color:#1e293b;">
+          <div class="sakhi-curiosity-header" style="color:#0f172a;"><i class="fa-solid fa-microscope"></i> 🔬 1. शारीरिक/जैविक कारण व क्रिया विज्ञान (Anatomy & Cause):</div>
+          <div style="line-height:1.6;">${escapeHtml(mainAnatomy)}</div>
+        </div>
+      ` : ''}
 
-      <div class="sakhi-curiosity-box">
-        <div class="sakhi-curiosity-header">⚠️ 2. वैज्ञानिक चेतावनी, डाइट व स्थायी समाधान:</div>
-        <div>${escapeHtml(summary.curiosity_hook)}</div>
-      </div>
+      ${mainFirstAid ? `
+        <div class="sakhi-solution-box" style="margin-top:10px;">
+          <div class="sakhi-solution-header">🌿 2. तुरंत प्रभावी उपचार व आयुर्वेदिक/जैविक प्रोटोकॉल:</div>
+          <div style="line-height:1.6;">${escapeHtml(mainFirstAid)}</div>
+        </div>
+      ` : ''}
     `;
 
-    // Sakhi's Secret Nuskha Button
-    let nuskhaBtnHtml = '';
-    if (intent.sakhi_nuskha) {
-      nuskhaBtnHtml = `
-        <div style="margin-top:10px;">
-          <button type="button" class="sakhi-nuskha-trigger-btn" onclick="window.revealSakhiNuskha('${intent.id}', this)">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>सखी का देसी नुस्खा सुनोगे क्या? →</span>
-          </button>
-        </div>
-      `;
-    }
-
-    const tubeCardHtml = buildTubeCardMarkup(summary.tube_url, summary.tube_title);
-    const bookCardHtml = buildBookCardMarkup(matchedBook);
-
-    let followupChipsHtml = '';
-    if (summary.follow_up_suggestions && summary.follow_up_suggestions.length > 0) {
-      followupChipsHtml = `
-        <div class="sakhi-followup-container">
-          <div class="sakhi-followup-title">💡 किसान व परिवार मित्र, क्या आप यह भी जानना चाहते हैं?</div>
-          <div class="sakhi-followup-list">
-            ${summary.follow_up_suggestions.map((sug) => `
-              <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(sug)}')">
-                <span>${escapeHtml(sug)}</span>
-                <span>→</span>
-              </button>
+    // Render Sub-Topics if available (e.g. for Diabetes, Liver, Wheat, etc.)
+    if (intent.sub_topics && intent.sub_topics.length > 0) {
+      html += `
+        <div style="margin-top:14px;background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:14px;padding:12px;">
+          <div style="font-weight:900;color:#0369a1;font-size:0.9rem;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <i class="fa-solid fa-layer-group"></i> <strong>इस विषय के विस्तृत पहलू (विस्तार से पढ़ने हेतु क्लिक करें):</strong>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${intent.sub_topics.map((st, idx) => `
+              <div style="background:#ffffff;border:1px solid #93c5fd;border-radius:10px;padding:10px;cursor:pointer;" onclick="const c = this.querySelector('.st-content'); c.style.display = c.style.display === 'none' ? 'block' : 'none';">
+                <div style="font-weight:800;color:#1d4ed8;font-size:0.9rem;display:flex;justify-content:space-between;align-items:center;">
+                  <span>${escapeHtml(st.title)}</span>
+                  <span style="font-size:0.8rem;color:#6b7280;">▼</span>
+                </div>
+                <div class="st-content" style="display:${idx === 0 ? 'block' : 'none'};margin-top:8px;font-size:0.88rem;color:#334155;line-height:1.55;border-top:1px dashed #e2e8f0;padding-top:6px;">
+                  ${escapeHtml(st.content)}
+                </div>
+              </div>
             `).join('')}
           </div>
         </div>
       `;
     }
 
-    streamBotMessage(html, summary.audio_text || summary.first_aid, bookCardHtml, tubeCardHtml, followupChipsHtml, nuskhaBtnHtml);
+    if (reference) {
+      html += `
+        <div style="margin-top:10px;font-size:0.78rem;color:#64748b;font-style:italic;">
+          📜 <strong>शास्त्रीय व वैज्ञानिक संदर्भ:</strong> ${escapeHtml(reference)}
+        </div>
+      `;
+    }
+
+    // Sakhi's Secret Nuskha Button
+    let nuskhaBtnHtml = '';
+    if (intent.sakhi_nuskha) {
+      nuskhaBtnHtml = `
+        <div style="margin-top:12px;">
+          <button type="button" class="sakhi-nuskha-trigger-btn" onclick="window.revealSakhiNuskha('${intent.id}', this)">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>🌸 सखी का दादी-नानी का नुस्खा जानना चाहते हैं? (यहाँ क्लिक करें) →</span>
+          </button>
+        </div>
+      `;
+    }
+
+    const tubeUrl = intent.tube_url || summary.tube_url || '/tube.html';
+    const tubeCardHtml = buildTubeCardMarkup(tubeUrl, '📺 आरोग्यम ट्यूब: लाइव प्रैक्टिकल परिणाम व वीडियो देखें');
+    const bookCardHtml = buildBookCardMarkup(matchedBook);
+
+    streamBotMessage(html, mainFirstAid || mainAnatomy, bookCardHtml, tubeCardHtml, '', nuskhaBtnHtml);
   }
 
   // 16. DYNAMIC SYMPTOM SYNTHESIZER (WHEN NO EXACT STATIC INTENT MATCHES)
