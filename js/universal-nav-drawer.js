@@ -737,6 +737,15 @@
               </div>
             </a>
 
+            <!-- 1.1 AAROGYAM SAKHI AI (24x7 Digital Doctor & Kisan Sakhi) -->
+            <a href="/aarogyam-sakhi.html" onclick="if(window.openSakhiModal){window.openSakhiModal();window.closeUniversalDrawer();return false;}" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-sakhi') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important; border-color:#86efac !important; box-shadow:0 4px 14px rgba(22,163,74,0.45) !important;">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#0f172a; border-color:#4ade80;"><i class="fa-solid fa-robot" style="color:#4ade80;"></i></div>
+                <span class="drawer-item-title">आरोग्यम सखी AI (24×7 डॉक्टर)</span>
+              </div>
+              <span class="drawer-tag-pill" style="background:#fde047; color:#0f172a; font-weight:900;">AI 👩‍🌾</span>
+            </a>
+
             <!-- 2. MY LIBRARY (Main Menu Direct Button) -->
             <a href="/ebooks/my-library.html" class="drawer-nav-item-btn ${currentPath.includes('my-library') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
@@ -893,12 +902,12 @@
                   <span>7-दिवसीय मौसम पूर्वानुमान (Weather)</span>
                 </div>
               </a>
-              <a href="/crop-doctor.html" class="drawer-sub-link-item">
+              <a href="/aarogyam-sakhi.html" onclick="if(window.openSakhiModal){window.openSakhiModal();window.closeUniversalDrawer();return false;}" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-microscope"></i></div>
-                  <span>फसल डॉक्टर AI स्कैनर (Crop Doctor)</span>
+                  <div class="drawer-sub-icon-box" style="background:#15803d; color:#ffffff;"><i class="fa-solid fa-robot"></i></div>
+                  <span>आरोग्यम सखी AI (फसल, पशु व सेहत डॉक्टर)</span>
                 </div>
-                <span class="drawer-tag-pill">AI 🔬</span>
+                <span class="drawer-tag-pill" style="background:#22c55e; color:#0f172a; font-weight:900;">AI 🔬</span>
               </a>
               <a href="/webinar.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
@@ -1209,8 +1218,14 @@
     pill.onclick = function(e) {
       if (e) e.preventDefault();
       if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-        window.AarogyamSakhi.open();
-        return;
+        try {
+          window.AarogyamSakhi.open();
+          return;
+        } catch(err) {
+          console.warn('[Sakhi FAB] modal error, navigating to dedicated page:', err);
+          window.location.href = '/aarogyam-sakhi.html';
+          return;
+        }
       }
       ensureAarogyamSakhiLoaded();
       let retries = 0;
@@ -1218,9 +1233,14 @@
         retries++;
         if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
           clearInterval(checkInterval);
-          window.AarogyamSakhi.open();
-        } else if (retries > 60) {
+          try {
+            window.AarogyamSakhi.open();
+          } catch(err) {
+            window.location.href = '/aarogyam-sakhi.html';
+          }
+        } else if (retries > 12) {
           clearInterval(checkInterval);
+          window.location.href = '/aarogyam-sakhi.html';
         }
       }, 50);
     };

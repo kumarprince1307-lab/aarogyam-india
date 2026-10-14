@@ -28,6 +28,16 @@
   let consecutiveAmbiguousCount = 0;
   let pendingUserQuery = null;
 
+  // Multi-Turn Conversation Memory State
+  const sakhiConversationState = {
+    lastActiveDomain: null,
+    lastActiveEntity: null,
+    lastActiveEntityName: '',
+    lastActiveCrop: null,
+    lastAnswerSnippet: '',
+    history: []
+  };
+
   // 1. PAGE HELPERS
   function checkIsDedicatedPage() {
     const path = (window.location.pathname || '').toLowerCase();
@@ -758,6 +768,7 @@
       .replace(/बायो\s*99/gi, 'बायो-99')
       .replace(/stim\s*rich/gi, 'stimrich')
       .replace(/स्टिम\s*रिच/gi, 'स्टिमरिच')
+      .replace(/stirich/gi, 'stimrich')
       .replace(/नेट\s*सर्फ/gi, 'नेट्सर्फ')
       .replace(/net\s*surf/gi, 'netsurf')
       .replace(/नेचुरा\s*मोर/gi, 'नेचुरामोर')
@@ -766,80 +777,363 @@
       .replace(/bio\s*fit/gi, 'biofit')
       .replace(/cfc\s*plus/gi, 'cfc')
       .replace(/सी\s*एफ\s*सी/gi, 'cfc')
+      .replace(/pet\s*vet/gi, 'pet vet')
+      .replace(/पेट\s*वेट/gi, 'pet vet')
+      .replace(/petvet/gi, 'pet vet')
+      .replace(/joint\s*care/gi, 'joint care')
+      .replace(/जॉइंट\s*केयर/gi, 'joint care')
+      .replace(/जोड़\s*केयर/gi, 'joint care')
+      .replace(/nutri\s*heart/gi, 'nutri heart')
+      .replace(/न्यूट्री\s*हार्ट/gi, 'nutri heart')
+      .replace(/न्यूट्रि\s*हार्ट/gi, 'nutri heart')
+      .replace(/anti\s*viral/gi, 'antiviral')
+      .replace(/एंटी\s*वायरल/gi, 'antiviral')
+      .replace(/tamatr/gi, 'टमाटर')
+      .replace(/tamatar/gi, 'टमाटर')
+      .replace(/kukda/gi, 'कुकड़ा')
+      .replace(/भाटा/gi, 'बैंगन')
+      .replace(/bhata/gi, 'बैंगन')
+      .replace(/bhate/gi, 'बैंगन')
+      .replace(/baigan/gi, 'बैंगन')
+      .replace(/baingan/gi, 'बैंगन')
+      .replace(/bhindi/gi, 'भिंडी')
+      .replace(/ful/gi, 'फूल')
+      .replace(/phul/gi, 'फूल')
+      .replace(/dudh/gi, 'दूध')
+      .replace(/doodh/gi, 'दूध')
+      .replace(/gay/gi, 'गाय')
+      .replace(/bhains/gi, 'भैंस')
+      .replace(/bhes/gi, 'भैंस')
+      .replace(/stemal/gi, 'उपयोग')
+      .replace(/istemal/gi, 'उपयोग')
+      .replace(/mousam/gi, 'मौसम')
+      .replace(/mausam/gi, 'मौसम')
+      .replace(/hystry/gi, 'history')
       .replace(/स्प्रे\s*कैलेंडर/gi, 'स्प्रे कैलेंडर')
       .replace(/spray\s*calendar/gi, 'spray calendar');
   }
 
-  // 14. EXACT PRODUCT ENTITY ROUTER (STIMRICH, BIO-99, SHET, WRAPUP, CFC, NATURAMORE)
-  function handleExactProductQuery(cleanQ) {
-    const isStimrich = cleanQ.includes('stimrich') || cleanQ.includes('स्टिमरिच') || cleanQ.includes('stirich');
-    const isBio99 = cleanQ.includes('bio-99') || cleanQ.includes('bio99') || cleanQ.includes('बायो-99') || cleanQ.includes('बायो 99');
-    const isShet = cleanQ.includes('shet') || cleanQ.includes('शेत');
-    const isWrapup = cleanQ.includes('wrapup') || cleanQ.includes('wrap-up') || cleanQ.includes('रैपअप');
-    const isCfc = cleanQ.includes('cfc') || cleanQ.includes('सीएफसी');
-    const isNaturamore = cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर');
-
-    if (isStimrich) {
-      const resp = `🌿 बायोफिट स्टिमरिच (Stimrich) - सम्पूर्ण पौध वृद्धि नियामक:\n• खुराक: 30 से 35 ml प्रति 15 लीटर पानी का पंप।\n• बीज उपचार: 10-15 ml प्रति किलो बीज (100% स्वस्थ अंकुरण)।\n• कार्य व लाभ: कल्ले (फुटाव) की संख्या में 30% वृद्धि, हरी पत्तियों में क्लोरोफिल बढ़ाना, फूलों का झड़ना रोकना और भरपूर फल-दाना भराव।\n• सर्वोत्तम समय: पहली सिंचाई के बाद, कल्ले फूटते समय व फूल आने से 10 दिन पहले। (बायो-99 के साथ मिलाकर स्प्रे करें)।`;
-      renderCrispSpecialBox('🌱 बायोफिट स्टिमरिच (Stimrich) सम्पूर्ण डोज व उपयोग विधि', resp, [
-        { text: '💧 बायो-99 की डोज क्या है?', query: 'बायो-99 की सही डोज व उपयोग' },
-        { text: '🌾 गेहूं में स्टिमरिच का स्प्रे', query: 'गेहूं में स्टिमरिच स्प्रे कब करें' },
-        { text: '🛒 स्टिमरिच ओरिजिनल ऑफर', query: 'बायोफिट स्टिमरिच ओरिजिनल ऑफर व कीमत' }
-      ]);
+  // 14. EVERYDAY CONVERSATIONS & CASUAL GREETINGS ROUTER (मानवीय व्यावहारिक बातचीत)
+  function handleEverydayConversations(cleanQ, rawQ) {
+    // 1. "kaise ho" / "kaisi ho" / "kya haal hai"
+    if (cleanQ.includes('kaise ho') || cleanQ.includes('kaisi ho') || cleanQ.includes('kya hal') || cleanQ.includes('kya haal') || cleanQ.includes('kaisa chal raha') || cleanQ.includes('how are you') || cleanQ.includes('kaise hain') || cleanQ.includes('आप कैसी हैं') || cleanQ.includes('आप कैसे हैं')) {
+      const resp = `नमस्ते! 🙏 मैं बिल्कुल स्वस्थ और आपकी सेवा में सदैव तत्पर हूँ। आप कैसे हैं? आशा है आपकी खेती व परिवार में सब कुशल-मंगल होगा।\n\nआज मैं आपकी खेती (खाद-स्प्रे), पशुपालन (दूध-फैट), सेहत या नेट्सर्फ में किस विषय पर सहायता करूँ?`;
+      renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
+        { text: '🌾 गेहूं/सरसों स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
+        { text: '🧪 स्टिमरिच व बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '🐄 गाय-भैंस का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 जोड़ों का दर्द व गठिया इलाज', query: 'नेचुरामोर जॉइंट केयर के बारे में बताओ' }
+      ], 'casual', 'greeting');
       return true;
     }
 
-    if (isBio99) {
-      const resp = `💧 बायो-99 (Bio-99) - 100% सिलिकॉन सुपर स्प्रेडर, एक्टिवेटर व स्टिकर:\n• खुराक: मात्र 5 ml प्रति 15 लीटर पानी का पंप (प्रति एकड़ 30-40 ml)।\n• कार्य व लाभ: दवा व खाद को पत्तों के आर-पार फैलाता है, बारिश में धुलने से बचाता है और किसी भी कीटनाशक, फफूंदनाशक या टॉनिक की कार्यक्षमता 35-40% तक बढ़ा देता है।\n• उपयोग नियम: किसी भी स्प्रे घोल में सबसे अंत में मिलाएं। यह जैविक व रासायनिक दोनों दवाओं के साथ 100% सुरक्षित है।`;
-      renderCrispSpecialBox('💧 बायो-99 (Bio-99) सटीक डोज व उपयोग विधि', resp, [
-        { text: '🌱 स्टिमरिच की डोज क्या है?', query: 'स्टिमरिच की खुराक व उपयोग' },
-        { text: '🌾 गेहूं में बायो-99 स्प्रे', query: 'गेहूं में बायो-99 स्प्रे' },
-        { text: '🛒 बायोफिट कॉम्बो ऑफर', query: 'बायोफिट कॉम्बो पैक ऑफर' }
-      ]);
+    // 2. "kya kar rahe ho" / "kya kar rahi ho"
+    if (cleanQ.includes('kya kar rahe') || cleanQ.includes('kya kar rahi') || cleanQ.includes('kya karti ho') || cleanQ.includes('kya kaam hai')) {
+      const resp = `मैं हमारे किसान साथियों और परिवारों के लिए खेती के वैज्ञानिक स्प्रे, पशुओं में दूध-फैट वृद्धि और आयुर्वेदिक स्वास्थ्य के 100% सटीक व प्रमाणित समाधान तैयार कर रही हूँ! 👩‍🌾✨\n\nबताइए, आज आपकी किस समस्या का समाधान करूँ?`;
+      renderCrispSpecialBox('✨ 24×7 वैज्ञानिक AI सहायता', resp, [
+        { text: '🌾 फसल में खाद व स्प्रे फॉर्मूला', query: 'फसलों में खाद व स्प्रे फॉर्मूला बताएं' },
+        { text: '🐄 पशु पोषण व दूध-फैट सप्लीमेंट', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
+        { text: '🩺 नेचुरामोर स्वास्थ्य सप्लीमेंट्स', query: 'नेचुरामोर सप्लीमेंट्स की जानकारी' }
+      ], 'casual', 'doing');
       return true;
     }
 
-    if (isShet) {
-      const resp = `🌱 बायोफिट शेत (SHET) - मृदा संवर्धक जैविक जीवाणु खाद:\n• खुराक: 1 लीटर प्रति एकड़ (ड्रिप सिंचाई, फ्लड सिंचाई या 50 किलो खाद में मिलाकर)।\n• कार्य व लाभ: मिट्टी के जैविक कार्बन को सुधारता है, जमीन को भुरभुरी बनाता है और मिट्टी में फिक्स पड़े फास्फोरस व पोटाश को पौधों की जड़ों तक पहुंचाता है।\n• उपयोग समय: बुवाई के समय या पहली व दूसरी सिंचाई के साथ।`;
-      renderCrispSpecialBox('🌱 बायोफिट शेत (SHET) मृदा सुधारक गाइड', resp, [
-        { text: '🌱 स्टिमरिच डोज', query: 'स्टिमरिच की खुराक' },
-        { text: '💧 बायो-99 डोज', query: 'बायो-99 डोज' }
-      ]);
+    // 3. "meri bat kisase ho rahi hai" / "tum kaun ho" / "apna parichay do"
+    if (cleanQ.includes('kisase ho rahi') || cleanQ.includes('kisse ho rahi') || cleanQ.includes('tum kaun') || cleanQ.includes('apna parichay') || cleanQ.includes('who are you') || cleanQ.includes('apna naam') || cleanQ.includes('naam kya hai') || cleanQ.includes('तुम कौन हो') || cleanQ.includes('मेरी बात किससे')) {
+      const resp = `आपकी बात **आरोग्यम सखी AI** से हो रही है — जो आरोग्यम इंडिया का 24×7 समर्पित डिजिटल डॉक्टर व किसान सलाहकार है।\n\nमैं आधुनिक कृषि विज्ञान (फसल रोग, कीटनाशक, जैविक स्प्रे), पशुपालन (दुग्ध वृद्धि), आयुर्वेदिक स्वास्थ्य और नेट्सर्फ के सभी प्रमाणित उत्पादों की सही डोज व समय का प्रामाणिक मार्गदर्शन देती हूँ।`;
+      renderCrispSpecialBox('👩‍🌾 आरोग्यम सखी AI — डिजिटल डॉक्टर व किसान सखी', resp, [
+        { text: '🌾 खेती व फसल रोग समाधान', query: 'फसल सुरक्षा व स्प्रे कैलेंडर' },
+        { text: '🩺 प्राकृतिक स्वास्थ्य समाधान', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
+        { text: '💬 अवनीश सर से सीधा संपर्क', query: 'फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क' }
+      ], 'casual', 'identity');
       return true;
     }
 
-    if (isWrapup) {
-      const resp = `🛡️ बायोफिट रैप-अप (Wrap-up) - प्राकृतिक जैविक फसल सुरक्षा कवच:\n• खुराक: 30 से 40 ml प्रति 15 लीटर पानी का पंप।\n• कार्य व लाभ: पौधों की पत्तियों पर प्राकृतिक नैनो-फिल्म (सुरक्षा परत) बना देता है, जिससे फंगस, बैक्टीरिया व वायरस के जीवाणु पत्तों में प्रवेश नहीं कर पाते।`;
-      renderCrispSpecialBox('🛡️ बायोफिट रैप-अप (Wrap-up) सुरक्षा कवच गाइड', resp, [
-        { text: '💧 बायो-99 डोज', query: 'बायो-99 डोज' },
-        { text: '🌱 स्टिमरिच डोज', query: 'स्टिमरिच डोज' }
-      ]);
+    // 4. "tumne galat jankari di hai" / "galat bataya" / "ye galat hai"
+    if (cleanQ.includes('galat jankari') || cleanQ.includes('galat bataya') || cleanQ.includes('galat bata') || cleanQ.includes('ye galat hai') || cleanQ.includes('kuch bhi bata') || cleanQ.includes('kuch ka kuch') || cleanQ.includes('गलत जानकारी') || cleanQ.includes('गलत बता रहे')) {
+      const resp = `माफ़ी चाहती हूँ! 🙏 यदि मेरे पिछले उत्तर में कोई भ्रम या गलत संदर्भ आया हो, तो मैं उसे तुरंत सुधारना चाहती हूँ।\n\nकृपया अपनी फसल का नाम, बीमारी का लक्षण या उत्पाद का नाम लिखकर बताएं, ताकि मैं आपको 100% सही व सटीक वैज्ञानिक जानकारी प्रस्तुत कर सकूँ।`;
+      renderCrispSpecialBox('🙏 क्षमा याचना व सुधार का अवसर', resp, [
+        { text: '🦴 नेचुरामोर जॉइंट केयर (घटक व खुराक)', query: 'नेचुरामोर जॉइंट केयर के अंदर क्या है' },
+        { text: '🌱 बायोफिट स्टिमरिच (डोज व स्प्रे)', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '💬 सीधे अवनीश सर से बात करें', query: 'फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क' }
+      ], 'casual', 'apology');
       return true;
     }
 
-    if (isCfc) {
-      const resp = `🐄 बायोफिट सीएफसी प्लस (CFC Plus) - उन्नत पशु आहार सप्लीमेंट:\n• खुराक: 10 से 15 ग्राम प्रतिदिन प्रति दुधारू गाय/भैंस (दाने या चारे में मिलाकर)।\n• बछड़े/बछड़ी: 5 ग्राम प्रतिदिन। बकरी/भेड़: 5 ग्राम प्रतिदिन।\n• कार्य व लाभ: पाचन शक्ति सुधारना, दूध उत्पादन में 10 से 20% की प्राकृतिक वृद्धि, फैट (FAT) व SNF में 0.5 से 1.2 डिग्री तक सुधार और बांझपन दूर करना।`;
-      renderCrispSpecialBox('🐄 सीएफसी प्लस (CFC Plus) खुराक व दूध-फैट फॉर्मूला', resp, [
-        { text: '🐄 गाय-भैंस का दूध कैसे बढ़ाएं?', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
-        { text: '🛒 सीएफसी ऑफर व कीमत', query: 'सीएफसी पशु आहार सप्लीमेंट ऑफर' }
-      ]);
+    // 5. "tumhara malik kya hai" / "founder kaun hai" / "company kiski hai"
+    if (cleanQ.includes('malik') || cleanQ.includes('मालिक') || cleanQ.includes('founder') || cleanQ.includes('फाउंडर') || cleanQ.includes('company kiski') || cleanQ.includes('owner')) {
+      const resp = `आरोग्यम इंडिया के संस्थापक व विज़नरी लीडर **श्री अवनीश जी** हैं।\n\nउनका मुख्य मिशन भारत के प्रत्येक किसान भाई को वैज्ञानिक ज्ञान और जैविक तकनीक द्वारा समृद्ध बनाना तथा प्रत्येक परिवार को रोगमुक्त व आत्मनिर्भर जीवन देना है। यदि आप उनसे सीधे मार्गदर्शन या WhatsApp परामर्श चाहते हैं, तो नीचे क्लिक कर सकते हैं।`;
+      const waUrl = buildAvneeshWhatsAppHandoffUrl('अवनीश जी से सीधा मार्गदर्शन');
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          🇮🇳 आरोग्यम इंडिया के संस्थापक — श्री अवनीश जी
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
+          ${escapeHtml(resp)}
+        </div>
+        <div style="margin-top:10px;">
+          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;font-weight:800;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa-brands fa-whatsapp"></i> अवनीश सर से सीधा WhatsApp पर जुड़ें →
+          </a>
+        </div>
+      `;
+      streamBotMessage(html, 'आरोग्यम इंडिया के संस्थापक श्री अवनीश जी हैं।');
       return true;
     }
 
-    if (isNaturamore) {
-      const resp = `🌿 नेचुरामोर (Naturamore) - 100% हर्बल न्यूट्रिशनल हेल्थ सप्लीमेंट:\n• सेवन विधि: 1 चम्मच (10 ग्राम) सुबह गुनगुने दूध या पानी के साथ।\n• घटक: 5 तरह के प्राकृतिक प्रोटीन, 13 जरूरी विटामिन्स, 10 मिनरल्स, एलोवेरा, अश्वगंधा व ओमेगा-3 DHA।\n• लाभ: पूरे दिन ऊर्जा, रोग प्रतिरोधक क्षमता (Immunity) बढ़ाना, हड्डियों व मांसपेशियों की मजबूती और पुरानी कमजोरी को जड़ से खत्म करना।`;
-      renderCrispSpecialBox('🌿 नेचुरामोर (Naturamore) संपूर्ण स्वास्थ्य पोषण गाइड', resp, [
-        { text: '🩺 शुगर/डायबिटीज में उपयोग', query: 'शुगर में नेचुरामोर कैसे लें' },
-        { text: '💪 पुरुषों के लिए नेचुरामोर', query: 'नेचुरामोर प्लस फॉर मेन' },
-        { text: '🌸 महिलाओं के लिए नेचुरामोर', query: 'नेचुरामोर फॉर विमेन' }
-      ]);
+    // 6. "mausam kaisa hai" / "aaj ka mausam"
+    if (cleanQ.includes('mausam') || cleanQ.includes('mousam') || cleanQ.includes('मौसम') || cleanQ.includes('barish') || cleanQ.includes('weather')) {
+      const resp = `हमारे 'मौसम रिपोर्ट' पेज पर आप अपने क्षेत्र का 7-दिवसीय सटीक तापमान, वर्षा की संभावना व हवा की गति देख सकते हैं।\n\n👉 **सुझाव:** छिड़काव हमेशा शांत मौसम और खिली धूप या शाम के समय करें। बारिश की संभावना होने पर बायो-99 (5ml/15L) अवश्य मिलाएं ताकि दवा 30 मिनट में चिपक जाए।`;
+      renderCrispSpecialBox('⛅ मौसम रिपोर्ट व स्प्रे सावधानी', resp, [
+        { text: '⛅ 7-दिवसीय मौसम रिपोर्ट खोलें', query: 'मौसम पूर्वानुमान कैसे देखें' },
+        { text: '💧 बायो-99 बारिश में सुरक्षा फॉर्मूला', query: 'बायो-99 की सही डोज व उपयोग' }
+      ], 'agri', 'weather');
+      return true;
+    }
+
+    // 7. Polite Pleasantries ("dhanyawad", "thank you", "theek hai")
+    if (cleanQ === 'dhanyawad' || cleanQ === 'thank you' || cleanQ === 'thanks' || cleanQ === 'shukriya' || cleanQ === 'theek hai' || cleanQ === 'thik hai' || cleanQ === 'धन्यवाद') {
+      const resp = `आपका बहुत-बहुत धन्यवाद! 🙏 आरोग्यम सखी AI हमेशा आपकी सेवा में 24×7 तत्पर है। जब भी कोई नया सवाल हो, बेझिझक पूछें। स्वस्थ रहें, समृद्ध रहें! 🌾🇮🇳`;
+      renderCrispSpecialBox('🌸 आपका स्वागत है!', resp, [
+        { text: '🌾 नया सवाल पूछें', query: 'फसलों का स्प्रे कैलेंडर' },
+        { text: '🛒 नेट्सर्फ उत्पाद सूची', query: 'बायोफिट उत्पाद गाइड' }
+      ], 'casual', 'thanks');
       return true;
     }
 
     return false;
   }
 
-  // 15. DEDICATED SPRAY CALENDAR ROUTER (CROPS & GENERAL MENU)
+  // 15. PRONOUN & MULTI-TURN CONTEXT RESOLVER (संदर्भ व फॉलो-अप डिटेक्टर)
+  function resolveFollowUpQuery(cleanQ, rawQ) {
+    const isIngredients = cleanQ.includes('iske andar') || cleanQ.includes('isme kya') || cleanQ.includes('kya kya hai') || cleanQ.includes('kya samagri') || cleanQ.includes('ingredients') || cleanQ.includes('composition') || cleanQ.includes('kisse bana') || cleanQ.includes('ghatak') || cleanQ.includes('इसके अंदर') || cleanQ.includes('क्या सामग्री');
+    const isDosage = cleanQ.includes('kaise khaye') || cleanQ.includes('kaise le') || cleanQ.includes('kab le') || cleanQ.includes('kab khaye') || cleanQ.includes('khuraak') || cleanQ.includes('खुराक') || cleanQ.includes('dose') || cleanQ.includes('डोज') || cleanQ.includes('kaise use') || cleanQ.includes('kaise spray') || cleanQ.includes('उपयोग कैसे') || cleanQ.includes('कैसे खाएं') || cleanQ.includes('कैसे लें');
+    const isPrice = cleanQ.includes('kitne ka hai') || cleanQ.includes('price') || cleanQ.includes('rate') || cleanQ.includes('cost') || cleanQ.includes('kimat') || cleanQ.includes('कीमत') || cleanQ.includes('mrp') || cleanQ.includes('discount') || cleanQ.includes('छूट');
+    const isBenefits = cleanQ.includes('fayde') || cleanQ.includes('fayda') || cleanQ.includes('labh') || cleanQ.includes('लाभ') || cleanQ.includes('फायदे') || cleanQ.includes('kya kaam') || cleanQ.includes('क्या काम') || cleanQ.includes('benefits');
+    const isMore = cleanQ.includes('aur batao') || cleanQ.includes('aur jankari') || cleanQ.includes('और बताओ') || cleanQ.includes('aage batao') || cleanQ.includes('aur kya');
+
+    const activeEntity = sakhiConversationState.lastActiveEntity;
+    if (!activeEntity) return false;
+
+    // Entity 1: Joint Care Follow-ups
+    if (activeEntity === 'joint_care' || activeEntity.includes('joint')) {
+      if (isIngredients || isMore) {
+        const resp = `🌿 **नेचुरामोर जॉइंट केयर (Naturamore Joint Care) के 4 मुख्य प्राकृतिक सक्रिय घटक:**\n\n1. **ग्लूकोसामाइन हाइड्रोक्लोराइड (Glucosamine HCl):** घिस चुकी कार्टिलेज (हड्डियों की कुदरती गद्दी) का पुनर्निर्माण करता है और जोड़ों के बीच घर्षण को रोकता है।\n2. **सलाई गुग्गुल (Boswellia serrata - 65% Boswellic Acid):** जोड़ों की पुरानी सूजन, अकड़न व असहनीय दर्द को प्राकृतिक रूप से शांत करता है।\n3. **हड़जोड़ (Cissus quadrangularis):** हड्डियों की सघनता बढ़ाता है और लिगामेंट्स व टेंडन्स को मजबूत करता है।\n4. **रसना व गुग्गुल (Rasna & Guggal):** वात दोष का शमन कर जोड़ों की लचीलापन वापस लाता है।\n\n💊 **खुराक:** 1 कैप्सूल सुबह और 1 शाम, भोजन के 30 मिनट बाद गुनगुने पानी से लें।`;
+        renderCrispSpecialBox('🦴 नेचुरामोर जॉइंट केयर — सक्रिय प्राकृतिक घटक', resp, [
+          { text: '🥛 नेचुरामोर पाउडर के साथ कैसे लें?', query: 'नेचुरामोर पाउडर और जॉइंट केयर कैसे लें' },
+          { text: '⏳ कितने दिनों में राहत मिलेगी?', query: 'जॉइंट केयर कितने दिन में असर करता है' },
+          { text: '💰 कीमत व डिस्काउंट ऑफर', query: 'नेचुरामोर जॉइंट केयर की कीमत व ऑफर' }
+        ], 'health', 'joint_care');
+        return true;
+      }
+      if (isDosage) {
+        const resp = `💊 **नेचुरामोर जॉइंट केयर सेवन विधि व समय:**\n• **खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को, भोजन करने के 30 मिनट बाद गुनगुने पानी के साथ लें।\n• **अवधि:** स्थायी व दीर्घकालीन लाभ के लिए इसे कम से कम 3 से 6 महीने नियमित लें।\n• **सर्वोत्तम कॉम्बो:** साथ में 1 चम्मच नेचुरामोर प्लस पाउडर (दूध या पानी में) लेने से शरीर को भरपूर कैल्शियम, ओमेगा व प्रोटीन मिलता है।`;
+        renderCrispSpecialBox('💊 नेचुरामोर जॉइंट केयर — सही खुराक व सेवन नियम', resp, [
+          { text: '🌿 इसके अंदर क्या-क्या घटक हैं?', query: 'नेचुरामोर जॉइंट केयर के अंदर क्या है' },
+          { text: '💰 कीमत व ऑर्डर कैसे करें', query: 'नेचुरामोर जॉइंट केयर की कीमत व ऑफर' }
+        ], 'health', 'joint_care');
+        return true;
+      }
+      if (isPrice) {
+        const resp = `💰 **नेचुरामोर जॉइंट केयर (30 कैप्सूल पैक):**\n• एमआरपी (MRP): मात्र ₹650\n• आरोग्यम इंडिया विशेष ऑफर: नेचुरामोर प्लस पाउडर के साथ कॉम्बो लेने पर 15% से 30% तक की सीधी छूट व फ्री होम डिलीवरी उपलब्ध है।`;
+        renderCrispSpecialBox('💰 नेचुरामोर जॉइंट केयर — प्रामाणिक कीमत व छूट', resp, [
+          { text: '🌿 इसके घटक व कार्य', query: 'नेचुरामोर जॉइंट केयर के अंदर क्या है' },
+          { text: '💊 सेवन की सही विधि', query: 'जॉइंट केयर कैसे खाएं' }
+        ], 'health', 'joint_care');
+        return true;
+      }
+    }
+
+    // Entity 2: Nutri Heart Follow-ups
+    if (activeEntity === 'nutri_heart' || activeEntity.includes('heart')) {
+      if (isIngredients || isDosage || isBenefits || isMore) {
+        const resp = `❤️ **नेचुरामोर न्यूट्री हार्ट (Nutri Heart) के घटक व लाभ:**\n• **सक्रिय घटक:** अर्जुन छाल (Arjuna), अंगूर बीज अर्क (Grape Seed Extract), लहसुन अर्क (Garlic) और को-एंजाइम Q10 (CoQ10)।\n• **मुख्य लाभ:** धमनियों को लचीला रखता है, नसों में ब्लॉकेज जमने से रोकता है, खराब कोलेस्ट्रॉल (LDL) घटाता है और सामान्य ब्लड प्रेशर बनाए रखता है।\n💊 **खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम, भोजन के 30 मिनट बाद गुनगुने पानी से।`;
+        renderCrispSpecialBox('❤️ नेचुरामोर न्यूट्री हार्ट — घटक व सेवन विधि', resp, [
+          { text: '🩺 बीपी व कोलेस्ट्रॉल में असर', query: 'न्यूट्री हार्ट से बीपी कैसे कंट्रोल होता है' },
+          { text: '💰 कीमत व कॉम्बो ऑफर', query: 'न्यूट्री हार्ट की कीमत व ऑफर' }
+        ], 'health', 'nutri_heart');
+        return true;
+      }
+    }
+
+    // Entity 3: Pet Vet / CFC Plus Follow-ups
+    if (activeEntity === 'cfc_plus' || activeEntity === 'pet_vet' || activeEntity.includes('cfc')) {
+      if (isIngredients || isDosage || isBenefits || isMore) {
+        const resp = `🐄 **बायोफिट सीएफसी प्लस / पेट वेट (CFC Plus / Pet Vet) - संपूर्ण पशु पोषण:**\n• **घटक:** शतावरी, मेथी, विटामिन्स (A, D3, E), मिनरल्स (जिंक, कॉपर, कोबाल्ट, कैल्शियम), प्रीबायोटिक्स व प्रोबायोटिक्स।\n• **मुख्य लाभ:** पाचन तंत्र दुरुस्त करता है, 10 से 20% दूध बढ़ाता है, फैट 0.5 से 1.2 डिग्री सुधारता है और बांझपन दूर करता है।\n🥄 **खुराक:** 10 से 15 ग्राम प्रतिदिन प्रति दुधारू गाय/भैंस दाने या चारे में मिलाकर दें। 10-12 दिन में स्पष्ट परिणाम दिखता है।`;
+        renderCrispSpecialBox('🐄 सीएफसी प्लस / पेट वेट — घटक व दूध-फैट वृद्धि', resp, [
+          { text: '🥛 गाय-भैंस का दूध और फैट कैसे बढ़ाएं?', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '💰 सीएफसी 500g व 1kg पैक कीमत', query: 'सीएफसी पशु आहार सप्लीमेंट ऑफर' }
+        ], 'pashu', 'cfc_plus');
+        return true;
+      }
+    }
+
+    // Entity 4: Antiviral & Tomato Leaf Curl Follow-ups
+    if (activeEntity === 'antiviral' || activeEntity.includes('kukda')) {
+      if (isIngredients || isDosage || isBenefits || isMore) {
+        const resp = `🍅 **बायोफिट एंटीवायरल (Antiviral) - कुकड़ा व वायरस का वैज्ञानिक इलाज:**\n• **घटक:** सक्रिय पादप अर्क जो वायरस के मल्टीप्लिकेशन (प्रसार) को तुरंत रोकते हैं।\n• **स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):** एंटीवायरल 35ml + बायो-99 5ml + इन्काउंटर / नीम तेल 30ml (सफेद मक्खी नियंत्रण हेतु)।\n• **परिणाम:** पत्तियों का मुड़ना रुकता है और 5 से 7 दिनों में नई सीधी, चमकदार व स्वस्थ पत्तियां फूटती हैं।`;
+        renderCrispSpecialBox('🛡️ बायोफिट एंटीवायरल — कुकड़ा नाशक फॉर्मूला', resp, [
+          { text: '💧 बायो-99 की सही डोज क्या है?', query: 'बायो-99 की सही डोज व उपयोग' },
+          { text: '🌸 फूल बढ़ाने के लिए स्टिमरिच', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' }
+        ], 'agri', 'antiviral');
+        return true;
+      }
+    }
+
+    // Entity 5: Stimrich Follow-ups
+    if (activeEntity === 'stimrich' || activeEntity.includes('stimrich')) {
+      if (isIngredients || isDosage || isBenefits || isMore) {
+        const resp = `🌱 **बायोफिट स्टिमरिच (Stimrich) - 100% जैविक ग्रोथ प्रमोटर:**\n• **घटक:** पादप हार्मोन्स (Auxins, Cytokinins) और प्रोटीन हाइड्रोलाइज़ेट।\n• **खुराक:** 30 से 35 ml प्रति 15 लीटर पंप, 5 ml बायो-99 के साथ मिलाकर स्प्रे करें।\n• **कार्य:** कल्ले 30-40% बढ़ाता है, फूलों का झड़ना रोकता है और दानों को वजनदार व चमकदार बनाता है।`;
+        renderCrispSpecialBox('🌱 बायोफिट स्टिमरिच — संपूर्ण घटक व डोज', resp, [
+          { text: '💧 बायो-99 की सही डोज', query: 'बायो-99 की सही डोज व उपयोग' },
+          { text: '🌾 गेहूं में स्टिमरिच का समय', query: 'गेहूं में स्टिमरिच स्प्रे कब करें' }
+        ], 'agri', 'stimrich');
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // 16. COMPREHENSIVE NETSURF & AGRI PRODUCT CATALOG HANDLER
+  function handleComprehensiveNetsurfCatalog(cleanQ, rawQ) {
+    // A. Naturamore Joint Care
+    if (cleanQ.includes('joint care') || cleanQ.includes('जॉइंट केयर') || cleanQ.includes('जोड़ों का दर्द') || cleanQ.includes('घुटनों का दर्द') || cleanQ.includes('गठिया')) {
+      const resp = `🦴 **नेचुरामोर जॉइंट केयर (Naturamore Joint Care) - कार्टिलेज पुनर्जनन का विज्ञान:**\n• **घटक:** ग्लूकोसामाइन HCl, सलाई गुग्गुल (Boswellia 65%), हड़जोड़ (Cissus) और रसना।\n• **कार्य:** घिस चुकी कार्टिलेज (गद्दी) को दोबारा बनाता है, सूजन व दर्द को शांत करता है और जोड़ों का लचीलापन लौटाता है।\n💊 **खुराक:** 1 कैप्सूल सुबह और 1 शाम, भोजन के 30 मिनट बाद गुनगुने पानी से लें।`;
+      renderCrispSpecialBox('🦴 नेचुरामोर जॉइंट केयर — दर्द व कार्टिलेज समाधान', resp, [
+        { text: '🌿 इसके अंदर क्या-क्या घटक हैं?', query: 'नेचुरामोर जॉइंट केयर के अंदर क्या है' },
+        { text: '💊 सेवन की सही विधि व समय', query: 'जॉइंट केयर कैसे खाएं' },
+        { text: '🥛 नेचुरामोर पाउडर के साथ कॉम्बो', query: 'नेचुरामोर पाउडर और जॉइंट केयर कैसे लें' }
+      ], 'health', 'joint_care');
+      return true;
+    }
+
+    // B. Naturamore Nutri Heart
+    if (cleanQ.includes('nutri heart') || cleanQ.includes('न्यूट्री हार्ट') || cleanQ.includes('कोलेस्ट्रॉल') || cleanQ.includes('ब्लॉकेज') || cleanQ.includes('हार्ट केयर')) {
+      const resp = `❤️ **नेचुरामोर न्यूट्री हार्ट (Naturamore Nutri Heart) - स्वस्थ हृदय का प्राकृतिक सुरक्षा कवच:**\n• **घटक:** अर्जुन छाल अर्क, लहसुन, अंगूर बीज अर्क और को-एंजाइम Q10।\n• **कार्य:** नसों में लचीलापन बनाए रखता है, खराब कोलेस्ट्रॉल (LDL) कम करता है और सामान्य रक्तचाप (BP) बनाए रखता है।\n💊 **खुराक:** 1 कैप्सूल सुबह और 1 शाम भोजन के बाद गुनगुने पानी से।`;
+      renderCrispSpecialBox('❤️ नेचुरामोर न्यूट्री हार्ट — हृदय व नस सुरक्षा गाइड', resp, [
+        { text: '💊 सेवन विधि व खुराक', query: 'न्यूट्री हार्ट कैसे खाएं' },
+        { text: '🌿 घटक व सामग्री क्या है?', query: 'न्यूट्री हार्ट के घटक क्या हैं' }
+      ], 'health', 'nutri_heart');
+      return true;
+    }
+
+    // C. Pet Vet / CFC Plus & Cow Milk Boost
+    if (cleanQ.includes('pet vet') || cleanQ.includes('पेट वेट') || cleanQ.includes('cfc') || cleanQ.includes('सीएफसी') || cleanQ.includes('गाय का दूध') || cleanQ.includes('भैंस का दूध') || cleanQ.includes('दूध कम') || cleanQ.includes('dudh kam') || cleanQ.includes('दूध और फैट') || ((cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('पशु')) && (cleanQ.includes('दूध') || cleanQ.includes('फैट')))) {
+      const resp = `🐄 **बायोफिट सीएफसी प्लस / पेट वेट — दुग्ध व फैट वृद्धि फॉर्मूला:**\n• **समस्या:** पाचन विकार व पोषक तत्वों की कमी से गाय-भैंस का दूध व फैट घट जाता है।\n• **वैज्ञानिक समाधान:** सीएफसी प्लस (CFC Plus) में शतावरी, मेथी, विटामिन्स, मिनरल्स व प्री-प्रोबायोटिक्स हैं।\n🥄 **खुराक:** 10 से 15 ग्राम प्रतिदिन प्रति दुधारू पशु दाने या चारे में मिलाकर दें। 10-12 दिनों में दूध 15-20% और फैट 0.5 से 1.2 डिग्री बढ़ जाता है।`;
+      renderCrispSpecialBox('🐄 सीएफसी प्लस / पेट वेट — दूध व फैट वृद्धि फॉर्मूला', resp, [
+        { text: '🌿 इसके अंदर क्या-क्या घटक हैं?', query: 'सीएफसी प्लस के अंदर क्या है' },
+        { text: '🥄 देने की सही विधि व खुराक', query: 'सीएफसी प्लस कैसे खिलाएं' },
+        { text: '💰 सीएफसी 500g व 1kg पैक ऑफर', query: 'सीएफसी पशु आहार सप्लीमेंट ऑफर' }
+      ], 'pashu', 'cfc_plus');
+      return true;
+    }
+
+    // D. Tomato Leaf Curl Virus & Antiviral (टमाटर में कुकड़ा रोग)
+    if (cleanQ.includes('kukda') || cleanQ.includes('कुकड़ा') || cleanQ.includes('antiviral') || cleanQ.includes('एंटीवायरल') || cleanQ.includes('leaf curl') || cleanQ.includes('मरोड़िया') || cleanQ.includes('टमाटर')) {
+      const resp = `🍅 **टमाटर में कुकड़ा रोग (Leaf Curl Virus) का वैज्ञानिक समाधान:**\nकुकड़ा रोग सफेद मक्खी द्वारा फैलाया जाने वाला वायरस है।\n🧪 **स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n1. **बायोफिट एंटीवायरल (Antiviral):** 35 मिली (वायरस का फैलाव रोकने हेतु)\n2. **बायो-99 (Bio-99):** 5 मिली (दवा को नसों तक पहुंचाने हेतु)\n3. **बायोफिट इन्काउंटर / नीम तेल:** 30 मिली (सफेद मक्खी नियंत्रण हेतु)\n👉 5 से 7 दिनों में नई स्वस्थ, सीधी व हरी पत्तियां आनी शुरू हो जाती हैं।`;
+      renderCrispSpecialBox('🛡️ टमाटर कुकड़ा रोग व बायोफिट एंटीवायरल फॉर्मूला', resp, [
+        { text: '💧 बायो-99 की सही डोज क्या है?', query: 'बायो-99 की सही डोज व उपयोग' },
+        { text: '🌱 फूल बढ़ाने के लिए स्टिमरिच डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' }
+      ], 'agri', 'antiviral');
+      return true;
+    }
+
+    // E. Flower Drop & Bloom Stagnation (बैंगन, भिंडी, मिर्च में फूल न आना)
+    if ((cleanQ.includes('बैंगन') || cleanQ.includes('भिंडी') || cleanQ.includes('मिर्च') || cleanQ.includes('सब्जी')) && (cleanQ.includes('फूल') || cleanQ.includes('ful') || cleanQ.includes('फल') || cleanQ.includes('कल्ले'))) {
+      const resp = `🌸 **बैंगन, भिंडी व मिर्च में बंपर फूल व पैदावार का फॉर्मूला:**\nजब पौधे में हार्मोनल असंतुलन होता है, तो फूल नहीं आते या गिर जाते हैं।\n🧪 **स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n1. **बायोफिट स्टिमरिच (Stimrich):** 35 मिली (फूलों की संख्या 35-40% बढ़ाता है)\n2. **बायो-99 (Bio-99):** 5 मिली (दवा को पत्तियों में तुरंत सोखने हेतु)\n3. **घुलनशील बोरॉन 20%:** 20 ग्राम (फूलों का गिरना पूरी तरह रोकने हेतु)\n👉 स्प्रे के 4 से 6 दिनों में नई कलियों और फूलों की बहार आ जाती है।`;
+      renderCrispSpecialBox('🌸 सब्जी फसलों में फूल व पैदावार वृद्धि फॉर्मूला', resp, [
+        { text: '🌱 स्टिमरिच व बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '🌾 सब्जी फसलों का पूरा स्प्रे कैलेंडर', query: 'सब्जी मिर्च का स्प्रे कैलेंडर' }
+      ], 'agri', 'stimrich');
+      return true;
+    }
+
+    // F. Biofit Stimrich
+    if (cleanQ.includes('stimrich') || cleanQ.includes('स्टिमरिच')) {
+      const resp = `🌱 **बायोफिट स्टिमरिच (Stimrich) - 100% जैविक पौध वृद्धि टॉनिक:**\n• **खुराक:** 30 से 35 ml प्रति 15 लीटर पानी का पंप (5 ml बायो-99 के साथ)।\n• **बीज उपचार:** 10-15 ml प्रति किलो बीज (100% स्वस्थ फुटाव)।\n• **लाभ:** शाखाएं व कल्ले 30-40% बढ़ाता है, फूलों का झड़ना रोकता है और उपज में 25-35% की ठोस वृद्धि करता है।`;
+      renderCrispSpecialBox('🌱 बायोफिट स्टिमरिच (Stimrich) संपूर्ण डोज व उपयोग विधि', resp, [
+        { text: '🌿 इसके अंदर क्या-क्या घटक हैं?', query: 'स्टिमरिच के अंदर क्या है' },
+        { text: '💧 बायो-99 की सही डोज क्या है?', query: 'बायो-99 की सही डोज व उपयोग' },
+        { text: '🌾 गेहूं में स्टिमरिच स्प्रे कब करें?', query: 'गेहूं में स्टिमरिच स्प्रे कब करें' }
+      ], 'agri', 'stimrich');
+      return true;
+    }
+
+    // G. Biofit Bio-99
+    if (cleanQ.includes('bio-99') || cleanQ.includes('bio99') || cleanQ.includes('बायो-99') || cleanQ.includes('बायो 99')) {
+      const resp = `💧 **बायो-99 (Bio-99) - 100% सिलिकॉन सुपर स्प्रेडर, एक्टिवेटर व स्टिकर:**\n• **खुराक:** मात्र 5 ml प्रति 15 लीटर पानी का पंप (प्रति एकड़ 30-40 ml)।\n• **लाभ:** दवा को पत्तियों के आर-पार फैलाता है, 30 मिनट में बारिश से सुरक्षित करता है और किसी भी स्प्रे की कार्यक्षमता 35-40% बढ़ा देता है। घोल में सबसे अंत में मिलाएं।`;
+      renderCrispSpecialBox('💧 बायो-99 (Bio-99) सटीक डोज व उपयोग विधि', resp, [
+        { text: '🌱 स्टिमरिच की सही डोज क्या है?', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '🌾 गेहूं में बायो-99 स्प्रे', query: 'गेहूं में बायो-99 स्प्रे' }
+      ], 'agri', 'bio99');
+      return true;
+    }
+
+    // H. Biofit SHET (Soil Health Enhancement Technology)
+    if (cleanQ.includes('shet') || cleanQ.includes('शेत') || cleanQ.includes('मिट्टी सुधार')) {
+      const resp = `🌱 **बायोफिट शेत (SHET) - मृदा संवर्धक जैविक जीवाणु खाद:**\n• **खुराक:** 1 लीटर प्रति एकड़ (ड्रिप सिंचाई, फ्लड सिंचाई या 50 किलो गोबर खाद में मिलाकर)।\n• **लाभ:** जमीन को भुरभुरी बनाता है, जैविक कार्बन सुधारता है और मिट्टी में फिक्स पड़े फास्फोरस व पोटाश को पौधों की जड़ों तक पहुंचाता है।`;
+      renderCrispSpecialBox('🌱 बायोफिट शेत (SHET) मृदा सुधारक गाइड', resp, [
+        { text: '🌱 स्टिमरिच डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '💧 बायो-99 डोज', query: 'बायो-99 की सही डोज व उपयोग' }
+      ], 'agri', 'shet');
+      return true;
+    }
+
+    // I. Biofit Wrap-up
+    if (cleanQ.includes('wrapup') || cleanQ.includes('wrap-up') || cleanQ.includes('रैपअप')) {
+      const resp = `🛡️ **बायोफिट रैप-अप (Wrap-up) - प्राकृतिक जैविक फसल सुरक्षा कवच:**\n• **खुराक:** 30 से 40 ml प्रति 15 लीटर पानी का पंप।\n• **लाभ:** पत्तियों पर प्राकृतिक नैनो-फिल्म (सुरक्षा परत) बना देता है, जिससे फंगस, बैक्टीरिया व वायरस के जीवाणु पत्तों में प्रवेश नहीं कर पाते।`;
+      renderCrispSpecialBox('🛡️ बायोफिट रैप-अप (Wrap-up) सुरक्षा कवच गाइड', resp, [
+        { text: '💧 बायो-99 डोज', query: 'बायो-99 की सही डोज व उपयोग' },
+        { text: '🌱 स्टिमरिच डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' }
+      ], 'agri', 'wrapup');
+      return true;
+    }
+
+    // J. Naturamore General Nutrition
+    if (cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर')) {
+      const resp = `🌿 **नेचुरामोर (Naturamore) - 100% हर्बल न्यूट्रिशनल हेल्थ सप्लीमेंट:**\n• **सेवन विधि:** 1 चम्मच (10 ग्राम) सुबह गुनगुने दूध या पानी के साथ।\n• **घटक:** 5 तरह के प्राकृतिक प्रोटीन, 13 जरूरी विटामिन्स, 10 मिनरल्स, एलोवेरा, अश्वगंधा व ओमेगा-3 DHA।\n• **लाभ:** दिनभर ऊर्जा, रोग प्रतिरोधक क्षमता (Immunity) और मांसपेशियों व हड्डियों की संपूर्ण मजबूती।`;
+      renderCrispSpecialBox('🌿 नेचुरामोर संपूर्ण स्वास्थ्य पोषण गाइड', resp, [
+        { text: '🦴 जोड़ों के दर्द में जॉइंट केयर', query: 'नेचुरामोर जॉइंट केयर के बारे में बताओ' },
+        { text: '❤️ हृदय स्वास्थ्य में न्यूट्री हार्ट', query: 'न्यूट्री हार्ट कैसे खाएं' },
+        { text: '🩺 शुगर/डायबिटीज में उपयोग', query: 'शुगर में नेचुरामोर कैसे लें' }
+      ], 'health', 'naturamore');
+      return true;
+    }
+
+    // K. Homonym Disambiguation for "जड़" (Plant roots vs Hair roots)
+    if (cleanQ.includes('जड़') || cleanQ.includes('jad') || cleanQ.includes('jado') || cleanQ.includes('जड़ों')) {
+      const isHair = cleanQ.includes('बाल') || cleanQ.includes('hair') || cleanQ.includes('खालित्य') || sakhiConversationState.lastActiveDomain === 'beauty';
+      const isPlant = cleanQ.includes('पौधा') || cleanQ.includes('फसल') || cleanQ.includes('खेत') || cleanQ.includes('गलन') || cleanQ.includes('माहू') || sakhiConversationState.lastActiveDomain === 'agri';
+
+      if (isHair) {
+        const resp = `💇 **बालों की जड़ों की मजबूती व पोषण फॉर्मूला:**\nबालों की जड़ें जब कमजोर होती हैं, तो हेयरफॉल शुरू होता है।\n• **नेट्सर्फ हर्ब्स एंड मोर हेयर न्यूट्रिएंट्स:** स्कैल्प में रक्त संचार बढ़ाकर जड़ों को पोषण देता है।\n• **विटामिन थेरेपी शैम्पू:** जड़ों को बिना केमिकल सुखाए डैंड्रफ मुक्त करता है।`;
+        renderCrispSpecialBox('💇 बालों की जड़ों की मजबूती व पोषण', resp, [
+          { text: '✨ हेयर न्यूट्रिएंट्स उपयोग विधि', query: 'नेट्सर्फ हेयर न्यूट्रिएंट्स का उपयोग कैसे करें' },
+          { text: '🌸 रूसी व डैंड्रफ का इलाज', query: 'डैंड्रफ और बाल झड़ने का उपाय' }
+        ], 'beauty', 'hair_roots');
+        return true;
+      } else if (isPlant) {
+        const resp = `🌱 **फसल व पौधों की जड़ों की मजबूती (जड़ गलन व फुटाव):**\n• **जड़ गलन/फफूंद:** ट्राइकोडर्मा 2 किलो प्रति एकड़ या बायोफिट शेत (SHET) 1 लीटर प्रति एकड़ ड्रिप/पानी में दें।\n• **जड़ों का फुटाव:** स्टिमरिच 35ml + बायो-99 5ml का स्प्रे जड़ों के विकास और सफेद जड़ों की संख्या 40% तक बढ़ा देता है।`;
+        renderCrispSpecialBox('🌱 फसल की जड़ों का विकास व जड़ गलन रोकथाम', resp, [
+          { text: '🌱 शेत (SHET) मृदा सुधारक डोज', query: 'बायोफिट शेत की सही डोज' },
+          { text: '🧪 स्टिमरिच कल्ले व फुटाव डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' }
+        ], 'agri', 'plant_roots');
+        return true;
+      } else {
+        const resp = `किसान साथी, 'जड़' से आपका क्या तात्पर्य है? कृपया नीचे से सही विषय चुनें ताकि मैं बिल्कुल सटीक जानकारी दे सकूँ:`;
+        renderCrispSpecialBox('🔍 विषय स्पष्ट करें: जड़ों का संदर्भ', resp, [
+          { text: '🌱 फसल/पौधे की जड़ें (कृषि व जड़ गलन)', query: 'फसल की जड़ों का विकास और जड़ गलन उपाय' },
+          { text: '💇 बालों की जड़ें व मजबूती (हेयर केयर)', query: 'बालों की जड़ों को मजबूत करने का उपाय' }
+        ], 'omni', 'roots_disambiguation');
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // 17. DEDICATED SPRAY CALENDAR ROUTER (CROPS & GENERAL MENU)
   function handleDedicatedSprayQuery(cleanQ, query) {
     const isSprayQ = cleanQ.includes('स्प्रे') || cleanQ.includes('spray') || cleanQ.includes('दवा का छिड़काव') || cleanQ.includes('छिड़काव');
     if (!isSprayQ) return false;
@@ -850,39 +1144,39 @@
     const isVeg = cleanQ.includes('सब्जी') || cleanQ.includes('टमाटर') || cleanQ.includes('मिर्च') || cleanQ.includes('बैंगन') || cleanQ.includes('प्याज') || cleanQ.includes('veg');
 
     if (isWheat) {
-      const resp = `🌾 गेहूं फसल का 4-चरण वैज्ञानिक स्प्रे कैलेंडर:\n• 1. कल्ले व फुटाव (21-25 दिन, पहली सिंचाई बाद): स्टिमरिच 30ml + बायो-99 5ml + 19:19:19 घुलनशील खाद 75g प्रति 15L पंप।\n• 2. गांठ बनते समय (40-45 दिन): एनपीके 12:61:0 75g + बायो-99 5ml।\n• 3. गभोट अवस्था (60-65 दिन): एनपीके 0:52:34 75g + बोरॉन 20% 20g (लंबी बालियां व पोलिनेशन)।\n• 4. दाना भराव (दूधिया अवस्था): एनपीके 0:0:50 (पोटाश) 75g प्रति पंप (वजनदार, चमकदार व मोटा दाना)।`;
+      const resp = `🌾 **गेहूं फसल का 4-चरण वैज्ञानिक स्प्रे कैलेंडर:**\n• 1. कल्ले व फुटाव (21-25 दिन, पहली सिंचाई बाद): स्टिमरिच 35ml + बायो-99 5ml + 19:19:19 75g प्रति 15L पंप।\n• 2. गांठ बनते समय (40-45 दिन): एनपीके 12:61:0 75g + बायो-99 5ml।\n• 3. गभोट अवस्था (60-65 दिन): एनपीके 0:52:34 75g + बोरॉन 20% 20g (लंबी बालियां व परागण)।\n• 4. दाना भराव (दूधिया अवस्था): एनपीके 0:0:50 (पोटाश) 75g प्रति पंप (वजनदार व चमकदार दाना)।`;
       renderCrispSpecialBox('🌾 गेहूं फसल का वैज्ञानिक 4-चरण स्प्रे कैलेंडर', resp, [
         { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' },
         { text: '🌿 चना स्प्रे कैलेंडर', query: 'चना का स्प्रे कैलेंडर' },
-        { text: '🧪 स्टिमरिच डोज', query: 'स्टिमरिच की खुराक' }
-      ]);
+        { text: '🧪 स्टिमरिच डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' }
+      ], 'agri', 'wheat_calendar');
       return true;
     }
 
     if (isMustard) {
-      const resp = `🌱 सरसों फसल का वैज्ञानिक स्प्रे कैलेंडर:\n• 1. शाखा फुटाव (25-30 दिन): स्टिमरिच 30ml + बायो-99 5ml + घुलनशील सल्फर 40g प्रति 15L पंप।\n• 2. फूल आने से पूर्व (45-50 दिन): बोरॉन 20% 20g + 19:19:19 75g प्रति पंप।\n• 3. माहू/चेपा दिखने पर: इमिडाक्लोप्रिड 17.8% SL 6ml + बायो-99 5ml प्रति 15L पंप।\n• 4. फली दाना बनते समय: एनपीके 0:0:50 75g (तेल प्रतिशत व दाना वजन बढ़ाने हेतु)।`;
+      const resp = `🌱 **सरसों फसल का वैज्ञानिक स्प्रे कैलेंडर:**\n• 1. शाखा फुटाव (25-30 दिन): स्टिमरिच 35ml + बायो-99 5ml + घुलनशील सल्फर 40g प्रति 15L पंप।\n• 2. फूल आने से पूर्व (45-50 दिन): बोरॉन 20% 20g + 19:19:19 75g प्रति पंप।\n• 3. माहू/चेपा दिखने पर: इमिडाक्लोप्रिड 17.8% SL 6ml + बायो-99 5ml प्रति 15L पंप।\n• 4. फली दाना बनते समय: एनपीके 0:0:50 75g (तेल प्रतिशत व दाना वजन बढ़ाने हेतु)।`;
       renderCrispSpecialBox('🌱 सरसों फसल का वैज्ञानिक स्प्रे कैलेंडर', resp, [
         { text: '🌾 गेहूं स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
         { text: '🌿 चना स्प्रे कैलेंडर', query: 'चना का स्प्रे कैलेंडर' }
-      ]);
+      ], 'agri', 'mustard_calendar');
       return true;
     }
 
     if (isChana) {
-      const resp = `🌿 चना फसल का वैज्ञानिक स्प्रे कैलेंडर:\n• 1. शाखाएं व कल्ले (30-35 दिन): स्टिमरिच 30ml + बायो-99 5ml + 19:19:19 75g।\n• 2. फूल आने से पूर्व: बोरॉन 20% 20g प्रति 15L पंप (फूल झड़ने से रोकने हेतु)।\n• 3. घटी-इल्ली रोकथाम: इमामेक्टिन बेंजोएट 5% SG 8g + बायो-99 5ml प्रति 15L पंप।\n• 4. दाना भराव: 0:0:50 75g प्रति 15L पंप।`;
+      const resp = `🌿 **चना फसल का वैज्ञानिक स्प्रे कैलेंडर:**\n• 1. शाखाएं व कल्ले (30-35 दिन): स्टिमरिच 35ml + बायो-99 5ml + 19:19:19 75g।\n• 2. फूल आने से पूर्व: बोरॉन 20% 20g प्रति 15L पंप (फूल झड़ने से रोकने हेतु)।\n• 3. घटी-इल्ली रोकथाम: इमामेक्टिन बेंजोएट 5% SG 8g + बायो-99 5ml प्रति 15L पंप।\n• 4. दाना भराव: 0:0:50 75g प्रति 15L पंप।`;
       renderCrispSpecialBox('🌿 चना फसल का वैज्ञानिक स्प्रे कैलेंडर', resp, [
         { text: '🌾 गेहूं स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
         { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' }
-      ]);
+      ], 'agri', 'chana_calendar');
       return true;
     }
 
     if (isVeg) {
-      const resp = `🥦 सब्जी, मिर्च व टमाटर का वैज्ञानिक स्प्रे कैलेंडर:\n• 1. रोपाई के 15-20 दिन: स्टिमरिच 30ml + बायो-99 5ml + 19:19:19 75g।\n• 2. फूल आने के समय: बोरॉन 20% 20g + स्टिमरिच 35ml प्रति पंप।\n• 3. रसचूसक कीट (थ्रिप्स/सफेद मक्खी): एसिटामिप्रिड 20% SP 8g + बायो-99 5ml।\n• 4. फल विकास: एनपीके 13:0:45 या 0:0:50 75g प्रति 15L पंप।`;
+      const resp = `🥦 **सब्जी, मिर्च व टमाटर का वैज्ञानिक स्प्रे कैलेंडर:**\n• 1. रोपाई के 15-20 दिन: स्टिमरिच 35ml + बायो-99 5ml + 19:19:19 75g।\n• 2. फूल आने के समय: बोरॉन 20% 20g + स्टिमरिच 35ml प्रति पंप।\n• 3. रसचूसक कीट (थ्रिप्स/सफेद मक्खी): एसिटामिप्रिड 20% SP 8g + बायो-99 5ml।\n• 4. फल विकास: एनपीके 13:0:45 या 0:0:50 75g प्रति 15L पंप।`;
       renderCrispSpecialBox('🥦 सब्जी, मिर्च व टमाटर का स्प्रे कैलेंडर', resp, [
         { text: '🌾 गेहूं स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
         { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' }
-      ]);
+      ], 'agri', 'veg_calendar');
       return true;
     }
 
@@ -893,17 +1187,17 @@
       { text: '🌱 सरसों स्प्रे कैलेंडर', query: 'सरसों का स्प्रे कैलेंडर' },
       { text: '🌿 चना स्प्रे कैलेंडर', query: 'चना का स्प्रे कैलेंडर' },
       { text: '🥦 सब्जी, मिर्च व टमाटर कैलेंडर', query: 'सब्जी मिर्च का स्प्रे कैलेंडर' }
-    ]);
+    ], 'agri', 'spray_menu');
     return true;
   }
 
-  // 16. DEDICATED NETSURF DIRECT SELLING & ₹8.19L CAPPING PLAN ROUTER
+  // 18. DEDICATED NETSURF DIRECT SELLING & ₹8.19L CAPPING PLAN ROUTER
   function handleNetsurfPlanQuery(cleanQ, query) {
     const isNetsurf = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ');
     const isPlan = cleanQ.includes('plan') || cleanQ.includes('प्लान') || cleanQ.includes('कमीशन') || cleanQ.includes('commission') || cleanQ.includes('8.19') || cleanQ.includes('8,19,250') || cleanQ.includes('कैपिंग') || cleanQ.includes('बाइनरी') || cleanQ.includes('डायरेक्ट सेलिंग') || cleanQ.includes('रिटेल') || cleanQ.includes('क्लब नेट्सर्फ') || cleanQ.includes('बिजनेस प्लान') || cleanQ.includes('बिज़नेस प्लान');
 
     if (isNetsurf && isPlan || (cleanQ.includes('नेट्सर्फ प्लान') || cleanQ.includes('netsurf plan') || cleanQ.includes('8,19,250') || cleanQ.includes('8.19 लाख'))) {
-      const planAnswer = `🌿 नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व कमीशन प्लान (प्रमाणित):\n• 1. रिटेल डिस्काउंट: एमआरपी (MRP) पर 15% से 30% तक की सीधी छूट।\n• 2. रिटेल बोनस: क्लब नेट्सर्फ के माध्यम से 5% से 15% का अतिरिक्त टर्नओवर लाभ।\n• 3. जनरेशन इनकम: आपकी टीम के प्रथम जनरेशन के लीडर्स की कमाई का 3% से 8% हिस्सा।\n• 4. टर्नओवर मैचिंग बोनस: दोनों टीमों (Team A & Team B) के मैचिंग टर्नओवर पर 3% से 6% सीधा कमीशन।\n• 5. सर्वोच्च साप्ताहिक कैपिंग: प्रति सप्ताह अधिकतम ₹8,19,250 (मासिक ₹32,77,000)।\n• 6. फैमिली प्रोटेक्शन: ₹2 लाख से ₹10 लाख का एक्सीडेंटल बीमा व नॉमिनी सुरक्षा सुविधा।`;
+      const planAnswer = `🌿 **नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व कमीशन प्लान (प्रमाणित):**\n• 1. रिटेल डिस्काउंट: एमआरपी (MRP) पर 15% से 30% तक की सीधी छूट।\n• 2. रिटेल बोनस: क्लब नेट्सर्फ के माध्यम से 5% से 15% का अतिरिक्त टर्नओवर लाभ।\n• 3. जनरेशन इनकम: आपकी टीम के प्रथम जनरेशन के लीडर्स की कमाई का 3% से 8% हिस्सा।\n• 4. टर्नओवर मैचिंग बोनस: दोनों टीमों (Team A & Team B) के मैचिंग टर्नओवर पर 3% से 6% सीधा कमीशन।\n• 5. सर्वोच्च साप्ताहिक कैपिंग: प्रति सप्ताह अधिकतम ₹8,19,250 (मासिक ₹32,77,000)।\n• 6. फैमिली प्रोटेक्शन: ₹2 लाख से ₹10 लाख का एक्सीडेंटल बीमा व नॉमिनी सुरक्षा सुविधा।`;
 
       const waOfferUrl = buildAvneeshWhatsAppHandoffUrl('नेट्सर्फ बिज़नेस प्लान व आईडी एक्टिवेशन');
 
@@ -930,30 +1224,51 @@
       `;
 
       consecutiveAmbiguousCount = 0;
+      sakhiConversationState.lastActiveDomain = 'netsurf';
+      sakhiConversationState.lastActiveEntity = 'netsurf_plan';
+      sakhiConversationState.lastActiveEntityName = 'नेट्सर्फ बिज़नेस प्लान';
       streamBotMessage(html, 'नेट्सर्फ डायरेक्ट सेलिंग में 15 से 30 प्रतिशत रिटेल डिस्काउंट और अधिकतम 8 लाख 19 हजार 250 रुपये साप्ताहिक कैपिंग उपलब्ध है।');
       return true;
     }
     return false;
   }
 
-  // 17. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
+  // 19. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
   function processKnowledgeQuery(query) {
     const rawQ = query.trim();
     const cleanQ = normalizeQueryText(rawQ);
     const targetDomain = classifyQueryDomain(cleanQ);
 
-    // 1. Exact Product Entity Matching (Stimrich, Bio-99, SHET, Wrap-up, CFC, Naturamore)
-    if (handleExactProductQuery(cleanQ)) {
+    // Track user input in history
+    sakhiConversationState.history.push({
+      role: 'user',
+      query: rawQ,
+      clean: cleanQ,
+      time: Date.now()
+    });
+
+    // 1. Everyday Conversational & Casual Social Router
+    if (handleEverydayConversations(cleanQ, rawQ)) {
       return;
     }
 
-    // 2. Dedicated Spray Calendar Router (Wheat, Mustard, Chana, Veg, or Interactive Menu)
-    if (handleDedicatedSprayQuery(cleanQ, query)) {
+    // 2. Multi-Turn Pronoun & Follow-Up Context Resolver (e.g., "kya kya hai iske andar", "kaise khaye", etc.)
+    if (resolveFollowUpQuery(cleanQ, rawQ)) {
       return;
     }
 
-    // 3. Certified Netsurf Business & ₹8.19L Capping Plan Router
-    if (handleNetsurfPlanQuery(cleanQ, query)) {
+    // 3. Comprehensive Netsurf Products & Agricultural Entities Handler
+    if (handleComprehensiveNetsurfCatalog(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 4. Dedicated Spray Calendar Router (Wheat, Mustard, Chana, Veg, or Interactive Menu)
+    if (handleDedicatedSprayQuery(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 5. Certified Netsurf Business & ₹8.19L Capping Plan Router
+    if (handleNetsurfPlanQuery(cleanQ, rawQ)) {
       return;
     }
 
@@ -962,7 +1277,7 @@
       return;
     }
 
-    // 4. Strict Domain Isolation Filter (Health NEVER leaks to Agri, Agri NEVER leaks to Health!)
+    // 6. Strict Domain Isolation Filter (Health NEVER leaks to Agri, Agri NEVER leaks to Health!)
     let candidateIntents = knowledgeData.intents;
     if (targetDomain !== 'omni') {
       const filtered = candidateIntents.filter(item => {
@@ -980,7 +1295,7 @@
       if (filtered.length > 0) candidateIntents = filtered;
     }
 
-    // 5. Token-Weighted Intent Scorer
+    // 7. Token-Weighted Intent Scorer
     const STOP_WORDS = new Set(['का','की','के','में','पर','और','हैं','है','यह','से','को','ने','या','तो','बताओ','बताइए','दीजिए','दवा','इलाज','उपचार','डोज','मात्रा','बारे','क्या','कैसे','कब','mein','bare','kare','kaise','kya','batao','dawa','dose','ilaj']);
     const qTokens = cleanQ.split(/[\s,?!।]+/).filter(t => t.length >= 2 && !STOP_WORDS.has(t));
 
@@ -1025,7 +1340,12 @@
   }
 
   // 18. CRISP SPECIAL BOX RENDERER
-  function renderCrispSpecialBox(title, bodyText, chips) {
+  function renderCrispSpecialBox(title, bodyText, chips, domain, entityKey) {
+    if (domain) sakhiConversationState.lastActiveDomain = domain;
+    if (entityKey) sakhiConversationState.lastActiveEntity = entityKey;
+    if (title) sakhiConversationState.lastActiveEntityName = title;
+    sakhiConversationState.lastAnswerSnippet = (bodyText || '').slice(0, 150);
+
     let chipsHtml = '';
     (chips || []).forEach(c => {
       chipsHtml += `
@@ -1064,6 +1384,33 @@
     const mainAnatomy = intent.anatomy_physiology || '';
     const reference = intent.reference || '';
     const crispAns = intent.crisp_answer || '';
+
+    // Update conversation state and entity memory
+    sakhiConversationState.lastActiveDomain = intent.domain || domain || sakhiConversationState.lastActiveDomain;
+    sakhiConversationState.lastActiveEntity = intent.id || (title ? title.toLowerCase() : null);
+    sakhiConversationState.lastActiveEntityName = title;
+
+    // Normalize known entity keys
+    const titleLow = title.toLowerCase();
+    if (titleLow.includes('joint') || titleLow.includes('जॉइंट') || titleLow.includes('गठिया') || titleLow.includes('जोड़ों')) {
+      sakhiConversationState.lastActiveEntity = 'joint_care';
+      sakhiConversationState.lastActiveDomain = 'health';
+    } else if (titleLow.includes('हार्ट') || titleLow.includes('heart')) {
+      sakhiConversationState.lastActiveEntity = 'nutri_heart';
+      sakhiConversationState.lastActiveDomain = 'health';
+    } else if (titleLow.includes('cfc') || titleLow.includes('सीएफसी') || titleLow.includes('पशु') || titleLow.includes('दूध')) {
+      sakhiConversationState.lastActiveEntity = 'cfc_plus';
+      sakhiConversationState.lastActiveDomain = 'pashu';
+    } else if (titleLow.includes('stimrich') || titleLow.includes('स्टिमरिच')) {
+      sakhiConversationState.lastActiveEntity = 'stimrich';
+      sakhiConversationState.lastActiveDomain = 'agri';
+    } else if (titleLow.includes('bio-99') || titleLow.includes('bio99') || titleLow.includes('बायो-99')) {
+      sakhiConversationState.lastActiveEntity = 'bio99';
+      sakhiConversationState.lastActiveDomain = 'agri';
+    } else if (titleLow.includes('antiviral') || titleLow.includes('एंटीवायरल') || titleLow.includes('कुकड़ा')) {
+      sakhiConversationState.lastActiveEntity = 'antiviral';
+      sakhiConversationState.lastActiveDomain = 'agri';
+    }
 
     let directAnswer = '';
     if (crispAns) {
@@ -1128,16 +1475,16 @@
     const cleanQ = (query || '').toLowerCase();
 
     // Direct Avneesh ji connect or consecutive unclear
-    if (cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('बात करो') || cleanQ.includes('नंबर') || cleanQ.includes('हेल्प') || consecutiveAmbiguousCount >= 1) {
+    if (cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('बात करो') || cleanQ.includes('नंबर') || cleanQ.includes('हेल्प') || consecutiveAmbiguousCount >= 2) {
       consecutiveAmbiguousCount = 0;
       const waUrl = buildAvneeshWhatsAppHandoffUrl(query);
-      const speech = `नमस्ते! मैं आपको हमारे मुख्य परामर्शक अवनीश मिश्रा जी का सीधा WhatsApp लिंक देती हूँ।`;
+      const speech = `नमस्ते! मैं आपको हमारे मुख्य विशेषज्ञ अवनीश मिश्रा जी का सीधा WhatsApp लिंक देती हूँ।`;
       const html = `
         <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:6px;">
           🤝 व्यक्तिगत मार्गदर्शन: अवनीश मिश्रा जी से सीधा संपर्क
         </div>
         <div style="font-size:0.95rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
-          आपके इस प्रश्न <strong>"${escapeHtml(query)}"</strong> पर सटीक व व्यक्तिगत समाधान हेतु आप हमारे मुख्य विशेषज्ञ अवनीश मिश्रा जी से सीधे WhatsApp पर बात कर सकते हैं।
+          आपके इस प्रश्न <strong>"${escapeHtml(query)}"</strong> पर 100% सटीक व्यक्तिगत मार्गदर्शन हेतु आप हमारे मुख्य विशेषज्ञ अवनीश मिश्रा जी से सीधे WhatsApp पर जुड़ सकते हैं।
         </div>
         <div>
           <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#ffffff;border:none;padding:12px 18px;font-size:0.95rem;font-weight:800;border-radius:24px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.4);">
@@ -1151,13 +1498,46 @@
     }
 
     consecutiveAmbiguousCount++;
+
+    // Context Retention: Check if user is currently discussing an active entity
+    const prevEntity = sakhiConversationState.lastActiveEntity;
+    const prevName = sakhiConversationState.lastActiveEntityName;
+
+    if (prevEntity && prevName) {
+      const speech = `माफ़ कीजिए, क्या आप ${prevName} के बारे में कुछ और पूछना चाहते हैं?`;
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:6px;">
+          🌸 बातचीत का संदर्भ: ${escapeHtml(prevName)}
+        </div>
+        <div style="font-size:0.95rem;line-height:1.6;color:#334155;margin-bottom:10px;">
+          माफ़ कीजिए, मैं आपके पिछले वाक्य <strong>"${escapeHtml(query)}"</strong> को पूरी तरह समझ नहीं पाई। क्या आप <strong>${escapeHtml(prevName)}</strong> से जुड़ा कुछ जानना चाहते हैं?
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इसके अंदर क्या क्या सामग्री है?')">
+            🌿 इसके अंदर क्या-क्या है?
+          </button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इसे लेने या स्प्रे करने की सही खुराक और नियम क्या है?')">
+            💊 सही खुराक व सेवन विधि
+          </button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इसकी सही कीमत और डिस्काउंट ऑफर क्या है?')">
+            💰 कीमत व डिस्काउंट ऑफर
+          </button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं व फसलों का स्प्रे कैलेंडर')">
+            🌾 नया विषय शुरू करें
+          </button>
+        </div>
+      `;
+      streamBotMessage(html, speech);
+      return;
+    }
+
     const speech = `नमस्ते! आपका सवाल बहुत महत्वपूर्ण है। कृपया नीचे से अपना मुख्य विषय चुनें:`;
     const html = `
       <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:6px;">
-        🌸 आपका सवाल महत्वपूर्ण है!
+        🌸 क्षमा करें, सवाल स्पष्ट करने में सहायता करें
       </div>
       <div style="font-size:0.95rem;line-height:1.6;color:#334155;margin-bottom:10px;">
-        आपके प्रश्न <strong>"${escapeHtml(query)}"</strong> पर सटीक जानकारी के लिए आप नीचे से संबंधित विषय चुन सकते हैं:
+        आपके प्रश्न <strong>"${escapeHtml(query)}"</strong> पर बिल्कुल सटीक जानकारी देने के लिए कृपया नीचे से सही विषय चुनें:
       </div>
 
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
@@ -1170,17 +1550,17 @@
         <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
           🐄 <span>पशुपालन (दूध-फैट)</span>
         </button>
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मधुमेह और जोड़ों के दर्द का आयुर्वेदिक उपाय')">
-          🩺 <span>स्वास्थ्य व रोग</span>
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर जॉइंट केयर के बारे में बताओ')">
+          🦴 <span>जोड़ों का दर्द (जॉइंट केयर)</span>
         </button>
         <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">
           💼 <span>नेट्सर्फ प्लान</span>
         </button>
       </div>
 
-      <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
         <span style="font-size:0.82rem;color:#64748b;">या सीधे अवनीश मिश्रा जी से बात करना चाहते हैं?</span>
-        <button type="button" class="sakhi-choice-btn" style="padding:4px 10px;font-size:0.80rem;margin:0;width:auto;" onclick="window.connectToAvneeshMishra('${escapeHtml(query)}')">
+        <button type="button" class="sakhi-choice-btn" style="padding:6px 12px;font-size:0.82rem;margin:0;width:auto;" onclick="window.connectToAvneeshMishra('${escapeHtml(query)}')">
           अवनीश जी से बात 💬
         </button>
       </div>
@@ -1360,6 +1740,10 @@
     const backdrop = ensureModalBackdropExists();
     if (backdrop) {
       backdrop.classList.add('active');
+      backdrop.style.display = 'flex';
+      backdrop.style.visibility = 'visible';
+      backdrop.style.opacity = '1';
+      backdrop.style.pointerEvents = 'auto';
       updateSakhiHeaderUserBadge();
       setTimeout(() => {
         const input = document.getElementById('sakhiTextInput');
@@ -1370,7 +1754,13 @@
 
   window.closeSakhiModal = function () {
     const backdrop = document.getElementById('sakhiModalBackdrop');
-    if (backdrop) backdrop.classList.remove('active');
+    if (backdrop) {
+      backdrop.classList.remove('active');
+      backdrop.style.display = 'none';
+      backdrop.style.visibility = 'hidden';
+      backdrop.style.opacity = '0';
+      backdrop.style.pointerEvents = 'none';
+    }
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     stopRecording();
   };
