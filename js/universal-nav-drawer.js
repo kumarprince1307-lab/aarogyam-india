@@ -1185,11 +1185,15 @@
           if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
             clearInterval(checkInterval);
             window.AarogyamSakhi.open();
-          } else if (retries > 25) {
+          } else if (retries > 35) {
             clearInterval(checkInterval);
-            window.location.href = '/aarogyam-sakhi.html';
+            if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
+              window.AarogyamSakhi.open();
+            } else {
+              window.location.href = '/aarogyam-sakhi.html';
+            }
           }
-        }, 100);
+        }, 50);
       }
     };
 
@@ -1220,12 +1224,12 @@
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v88';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261014_v89';
       document.head.appendChild(link);
     }
     if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
       const script = document.createElement('script');
-      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v88';
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261014_v89';
       script.async = true;
       document.body.appendChild(script);
     }

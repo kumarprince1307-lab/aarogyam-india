@@ -309,6 +309,20 @@
     );
   }
 
+  function ensureModalBackdropExists() {
+    let backdrop = document.getElementById('sakhiModalBackdrop');
+    if (!backdrop && document.body) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'sakhiModalBackdrop';
+      backdrop.className = 'sakhi-modal-backdrop';
+      backdrop.innerHTML = buildChatWindowMarkup(false);
+      document.body.appendChild(backdrop);
+      setupEventListeners(false);
+      renderInitialGreeting();
+    }
+    return backdrop;
+  }
+
   function injectSakhiUI() {
     if (checkIsDedicatedPage()) {
       const container = document.getElementById('sakhiFullscreenContainer') || document.body;
@@ -322,51 +336,50 @@
       return;
     }
 
-    if (document.getElementById('sakhiFloatingPill')) return;
+    // 1. Pill Setup (Check if already injected by universal-nav-drawer)
+    let pill = document.getElementById('sakhiFloatingPill');
+    if (!pill && document.body) {
+      const currentDomain = detectCurrentPageDomain();
+      let pillLabel = 'आरोग्यम सखी AI';
+      if (currentDomain === 'health') pillLabel = 'स्वास्थ्य सखी AI';
+      else if (currentDomain === 'pashu') pillLabel = 'पशु सखी AI';
+      else if (currentDomain === 'beauty') pillLabel = 'सौंदर्य सखी AI';
 
-    const currentDomain = detectCurrentPageDomain();
-    let pillLabel = 'आरोग्यम सखी AI';
-    if (currentDomain === 'health') pillLabel = 'स्वास्थ्य सखी AI';
-    else if (currentDomain === 'pashu') pillLabel = 'पशु सखी AI';
-    else if (currentDomain === 'beauty') pillLabel = 'सौंदर्य सखी AI';
+      pill = document.createElement('div');
+      pill.id = 'sakhiFloatingPill';
+      pill.className = 'sakhi-floating-pill';
+      pill.innerHTML = `
+        <div class="sakhi-pill-avatar-wrap">
+          <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
+        </div>
+        <span class="sakhi-pill-label">${pillLabel}</span>
+        <span class="sakhi-pill-live-dot"></span>
+      `;
+      document.body.appendChild(pill);
 
-    const pill = document.createElement('div');
-    pill.id = 'sakhiFloatingPill';
-    pill.className = 'sakhi-floating-pill';
-    pill.innerHTML = `
-      <div class="sakhi-pill-avatar-wrap">
-        <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
-      </div>
-      <span class="sakhi-pill-label">${pillLabel}</span>
-      <span class="sakhi-pill-live-dot"></span>
-    `;
-    pill.onclick = openSakhiModal;
-    document.body.appendChild(pill);
-
-    // 5-SECOND SMART AUTO-COLLAPSE (TO COMPACT FLOATING AVATAR)
-    let collapseTimer = setTimeout(() => {
-      if (pill) pill.classList.add('collapsed');
-    }, 5000);
-
-    pill.addEventListener('mouseenter', () => {
-      clearTimeout(collapseTimer);
-      pill.classList.remove('collapsed');
-    });
-
-    pill.addEventListener('mouseleave', () => {
-      collapseTimer = setTimeout(() => {
+      // 5-SECOND SMART AUTO-COLLAPSE (TO COMPACT FLOATING AVATAR)
+      let collapseTimer = setTimeout(() => {
         if (pill) pill.classList.add('collapsed');
-      }, 3000);
-    });
+      }, 5000);
 
-    const backdrop = document.createElement('div');
-    backdrop.id = 'sakhiModalBackdrop';
-    backdrop.className = 'sakhi-modal-backdrop';
-    backdrop.innerHTML = buildChatWindowMarkup(false);
-    document.body.appendChild(backdrop);
+      pill.addEventListener('mouseenter', () => {
+        clearTimeout(collapseTimer);
+        pill.classList.remove('collapsed');
+      });
 
-    setupEventListeners(false);
-    renderInitialGreeting();
+      pill.addEventListener('mouseleave', () => {
+        collapseTimer = setTimeout(() => {
+          if (pill) pill.classList.add('collapsed');
+        }, 3000);
+      });
+    }
+
+    if (pill) {
+      pill.onclick = openSakhiModal;
+    }
+
+    // 2. ALWAYS ENSURE MODAL BACKDROP EXISTS IN DOM
+    ensureModalBackdropExists();
   }
 
   function buildChatWindowMarkup(isFullscreen) {
@@ -496,7 +509,7 @@
     if (typeof window.stopPageAudioGreeting === 'function') {
       try { window.stopPageAudioGreeting(); } catch (e) {}
     }
-    const backdrop = document.getElementById('sakhiModalBackdrop');
+    const backdrop = ensureModalBackdropExists();
     if (backdrop) {
       backdrop.classList.add('active');
       setTimeout(() => {
