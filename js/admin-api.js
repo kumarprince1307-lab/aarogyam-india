@@ -4,9 +4,52 @@
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Intelligent Admin In-Memory Cache (Manual Refresh Only - Zero Auto Egress)
-const _adminMemoryCache = new Map();
-const ADMIN_CACHE_TTL = Infinity; // Data refreshes ONLY when admin explicitly clicks Sync / Refresh!
+// Intelligent Admin Persistent Cache (SessionStorage backed - Zero Auto Egress on page refresh / tab switch)
+const ADMIN_CACHE_TTL = 30 * 60 * 1000; // 30 minutes auto-TTL or until admin clicks Sync / Refresh
+
+const _adminMemoryCache = {
+  _map: new Map(),
+  get(key) {
+    const mem = this._map.get(key);
+    if (mem && (Date.now() - (mem.ts || 0) < ADMIN_CACHE_TTL)) {
+      return mem;
+    }
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        const raw = sessionStorage.getItem('AI_ADM_' + key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && (Date.now() - (parsed.ts || 0) < ADMIN_CACHE_TTL)) {
+            this._map.set(key, parsed);
+            return parsed;
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  },
+  set(key, item) {
+    this._map.set(key, item);
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('AI_ADM_' + key, JSON.stringify(item));
+      }
+    } catch (e) {}
+  },
+  clear() {
+    this._map.clear();
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const k = sessionStorage.key(i);
+          if (k && k.startsWith('AI_ADM_')) {
+            sessionStorage.removeItem(k);
+          }
+        }
+      }
+    } catch (e) {}
+  }
+};
 
 export function clearAdminCache() {
   _adminMemoryCache.clear();
@@ -1927,9 +1970,9 @@ export async function fetchUcasDashboardSummary() {
     const [profilesRes, purchasesRes, surveysRes, phonebookRes, lpsRes, sharesRes] = await Promise.all([
       db.from('profiles').select('id, is_active, created_at'),
       db.from('purchases').select('profile_id, purchase_date, amount, payment_status, book_id'),
-      db.from('surveys').select('id, profile_id, selected_categories, category_answers, created_at'),
+      db.from('surveys').select('id, profile_id, selected_categories, created_at'),
       db.from('phonebook').select('id, profile_id, created_at'),
-      db.from('landing_pages').select('id, profile_id, category, webinar_data, created_at'),
+      db.from('landing_pages').select('id, profile_id, category, created_at'),
       db.from('share_logs').select('id, event_type')
     ]);
 
@@ -1990,8 +2033,7 @@ export async function fetchUcasDashboardSummary() {
 
     const totalWebinarAttendees = surveys.filter(s => {
       const cat = String(s.selected_categories || '');
-      const src = s.category_answers?.source || '';
-      return cat.includes('webinar') || src.includes('webinar');
+      return cat.includes('webinar');
     }).length;
 
     const totalShares = shareLogs.filter(l => l.event_type === 'share').length;

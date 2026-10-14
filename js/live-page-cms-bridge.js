@@ -933,17 +933,8 @@
       }
     } catch (e) {}
 
-    // 2. Live cloud fetch from Supabase surveys table (Real online reviews for everyone)
-    const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
-    const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
-    fetch(`${SUPABASE_REST_URL}/surveys?select=id,name,mobile,state,district,selected_categories,category_answers,created_at&selected_categories=cs.{"customer_review"}&order=created_at.desc&limit=50`, {
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    })
-    .then(res => res.ok ? res.json() : [])
-    .then(surveys => {
+    // 2. Safe Zero-Egress Cloud Fetch & Cache (Shared across entire website)
+    const renderSurveyItems = (surveys) => {
       if (!Array.isArray(surveys) || surveys.length === 0) return;
       surveys.forEach(s => {
         const ans = s.category_answers || {};
@@ -982,6 +973,44 @@
         `;
         grid.prepend(card);
       });
+    };
+
+    // Check shared cache first (6-hour zero-egress TTL)
+    const REVIEW_CACHE_KEY = 'AOI_CACHED_PUBLIC_REVIEWS';
+    const REVIEW_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+    let hasFreshCache = false;
+
+    try {
+      const cachedRaw = localStorage.getItem(REVIEW_CACHE_KEY);
+      if (cachedRaw) {
+        const parsed = JSON.parse(cachedRaw);
+        if (parsed && Array.isArray(parsed.surveys) && parsed.surveys.length > 0) {
+          renderSurveyItems(parsed.surveys);
+          if (Date.now() - (parsed._ts || 0) < REVIEW_CACHE_TTL) {
+            hasFreshCache = true; // 🛡️ Zero egress: skip network call completely
+          }
+        }
+      }
+    } catch (e) {}
+
+    if (hasFreshCache) return;
+
+    // Fetch once if cache expired or missing
+    const SUPABASE_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+    const SUPABASE_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+    fetch(`${SUPABASE_REST_URL}/surveys?select=id,name,mobile,state,district,selected_categories,category_answers,created_at&selected_categories=cs.{"customer_review"}&order=created_at.desc&limit=50`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    })
+    .then(res => res.ok ? res.json() : [])
+    .then(surveys => {
+      if (!Array.isArray(surveys) || surveys.length === 0) return;
+      try {
+        localStorage.setItem(REVIEW_CACHE_KEY, JSON.stringify({ surveys: surveys, _ts: Date.now() }));
+      } catch (e) {}
+      renderSurveyItems(surveys);
     })
     .catch(() => {});
   }
@@ -1233,6 +1262,7 @@
         },
         body: JSON.stringify(surveyPayload)
       }).catch(err => console.warn('Supabase review insert:', err));
+      try { localStorage.removeItem('AOI_CACHED_PUBLIC_REVIEWS'); } catch (e) {}
     } catch (e) {}
 
     // 4. Close modal

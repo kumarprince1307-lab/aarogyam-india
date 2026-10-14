@@ -149,7 +149,9 @@
             this.ensureDomElements();
             await this.loadUserNotifications();
             this.bindEvents();
-            this.setupPeriodicCheck();
+            if (typeof this.setupPeriodicCheck === 'function') {
+                this.setupPeriodicCheck();
+            }
             this.initWebPushPrompt();
             this.renderFestivalBanner();
         },

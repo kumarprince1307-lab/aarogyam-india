@@ -1359,8 +1359,8 @@ export async function initAllLandingPages() {
     if (db) {
       try {
         const [lpRes, surveyRes] = await Promise.all([
-          db.from('landing_pages').select('id, profile_id, share_id, title, message, category, content_type, status, mrp, offer_price, buynow_url, og_title, og_description, og_image_url, webinar_data, created_at').order('created_at', { ascending: false }),
-          db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false })
+          db.from('landing_pages').select('id, profile_id, share_id, title, message, category, content_type, status, mrp, offer_price, buynow_url, og_title, og_description, og_image_url, webinar_data, created_at').order('created_at', { ascending: false }).limit(200),
+          db.from('surveys').select('id, profile_id, name, mobile, age, sex, state, district, village, occupation, category_answers, created_at').order('created_at', { ascending: false }).limit(300)
         ]);
 
         if (lpRes && lpRes.data) lpList = lpRes.data;
