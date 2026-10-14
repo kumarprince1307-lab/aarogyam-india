@@ -912,6 +912,18 @@
     let matchedIntent = null;
     let maxScore = 0;
 
+    // Check if user clicked a specific subtopic title
+    for (const item of knowledgeData.intents) {
+      if (item.sub_topics) {
+        for (const st of item.sub_topics) {
+          if (cleanQ.includes(st.title.toLowerCase().replace(/[^a-z0-9\u0900-\u097F]/g, '')) || cleanQ === st.title.toLowerCase()) {
+            renderSubTopicDirect(st, item);
+            return;
+          }
+        }
+      }
+    }
+
     knowledgeData.intents.forEach((intent) => {
       let score = 0;
       (intent.keywords || []).forEach((kw) => {
@@ -935,6 +947,45 @@
     }
   }
 
+  function renderSubTopicDirect(subTopic, parentIntent) {
+    const matchedBook = getRelevantBookForQuery(subTopic.title);
+    const tubeUrl = parentIntent.tube_url || '/tube.html';
+
+    const html = `
+      <div style="font-weight:900;color:#15803d;font-size:1.02rem;margin-bottom:6px;">
+        ${escapeHtml(subTopic.title)}
+      </div>
+      <div style="font-size:0.95rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
+        ${escapeHtml(subTopic.content)}
+      </div>
+
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+        <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;">
+          👉 क्या आप आगे यह भी जानना चाहते हैं?
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${parentIntent.sakhi_nuskha ? `
+            <button type="button" class="sakhi-followup-chip" style="background:#fdf2f8;border-color:#f472b6;color:#be185d;" onclick="window.revealSakhiNuskha('${parentIntent.id}', this)">
+              <span>🌸 सखी का अचूक नुस्खा</span>
+              <span>→</span>
+            </button>
+          ` : ''}
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(parentIntent.title)}')">
+            <span>🌿 इस रोग/फसल का संपूर्ण नियम</span>
+            <span>→</span>
+          </button>
+          <a href="${escapeHtml(tubeUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#fef2f2;border-color:#fca5a5;color:#dc2626;text-decoration:none;">
+            <span>📺 वीडियो परिणाम देखें</span>
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+    `;
+
+    const bookCardHtml = buildBookCardMarkup(matchedBook);
+    streamBotMessage(html, subTopic.content, bookCardHtml, '', '', '');
+  }
+
   function renderDirectSummaryWithSubOptions(intent, originalQuery) {
     const summary = intent.direct_summary || {};
     const title = intent.title || summary.title || '🌿 सम्पूर्ण वैज्ञानिक मार्गदर्शन';
@@ -945,88 +996,89 @@
 
     let html = '';
 
-    // If emergency query (e.g. Chest pain), render critical alert first!
+    // Emergency warning check
     if (isEmergencyQuery(originalQuery)) {
       html += `
         <div class="sakhi-emergency-alert">
           <i class="fa-solid fa-triangle-exclamation" style="font-size:1.2rem;margin-top:2px;"></i>
           <div>
-            <strong>आपातकालीन चेतावनी (Emergency Alert):</strong> सीने में तेज दबाव, दर्द, पसीना या बाएं हाथ में दर्द हार्ट अटैक का संकेत हो सकता है। तुरंत 108 पर कॉल करें या नजदीकी अस्पताल जाएं!
+            <strong>आपातकालीन चेतावनी (Emergency Alert):</strong> सीने में तेज दर्द, पसीना या घबराहट हार्ट अटैक का लक्षण हो सकता है। तुरंत 108 एम्बुलेंस बुलाएं या नजदीकी इमरजेंसी जाएं!
           </div>
         </div>
       `;
     }
+
+    // CRISP 1-2 LINES PUNCHY REAL ANSWER
+    let crisp1 = '';
+    if (mainAnatomy) {
+      crisp1 = mainAnatomy.split('।')[0] + '।';
+    }
+    let crisp2 = '';
+    if (mainFirstAid) {
+      crisp2 = mainFirstAid.split('।').slice(0, 2).join('।') + '।';
+    }
+    let combinedCrisp = `${crisp1} ${crisp2}`.trim();
+    if (!combinedCrisp) combinedCrisp = mainFirstAid || mainAnatomy;
 
     html += `
-      <div style="margin-bottom:10px;">
-        <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(title)}</h4>
+      <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:6px;">
+        ${escapeHtml(title)}
       </div>
 
-      ${mainAnatomy ? `
-        <div class="sakhi-curiosity-box" style="margin-top:6px;background:#f8fafc;border-color:#cbd5e1;color:#1e293b;">
-          <div class="sakhi-curiosity-header" style="color:#0f172a;"><i class="fa-solid fa-microscope"></i> 🔬 1. शारीरिक/जैविक कारण व क्रिया विज्ञान (Anatomy & Cause):</div>
-          <div style="line-height:1.6;">${escapeHtml(mainAnatomy)}</div>
-        </div>
-      ` : ''}
+      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
+        ${escapeHtml(combinedCrisp)}
+      </div>
 
-      ${mainFirstAid ? `
-        <div class="sakhi-solution-box" style="margin-top:10px;">
-          <div class="sakhi-solution-header">🌿 2. तुरंत प्रभावी उपचार व आयुर्वेदिक/जैविक प्रोटोकॉल:</div>
-          <div style="line-height:1.6;">${escapeHtml(mainFirstAid)}</div>
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+        <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <span>👉</span> <strong>क्या आप इसके बारे में आगे यह जानना चाहते हैं?</strong>
         </div>
-      ` : ''}
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
     `;
 
-    // Render Sub-Topics if available (e.g. for Diabetes, Liver, Wheat, etc.)
+    // Interactive Subtopic Chips
     if (intent.sub_topics && intent.sub_topics.length > 0) {
+      intent.sub_topics.forEach((st) => {
+        html += `
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(st.title)}')">
+            <span>${escapeHtml(st.title)}</span>
+            <span>→</span>
+          </button>
+        `;
+      });
+    }
+
+    // Nuskha Chip
+    if (intent.sakhi_nuskha) {
       html += `
-        <div style="margin-top:14px;background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:14px;padding:12px;">
-          <div style="font-weight:900;color:#0369a1;font-size:0.9rem;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-            <i class="fa-solid fa-layer-group"></i> <strong>इस विषय के विस्तृत पहलू (विस्तार से पढ़ने हेतु क्लिक करें):</strong>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            ${intent.sub_topics.map((st, idx) => `
-              <div style="background:#ffffff;border:1px solid #93c5fd;border-radius:10px;padding:10px;cursor:pointer;" onclick="const c = this.querySelector('.st-content'); c.style.display = c.style.display === 'none' ? 'block' : 'none';">
-                <div style="font-weight:800;color:#1d4ed8;font-size:0.9rem;display:flex;justify-content:space-between;align-items:center;">
-                  <span>${escapeHtml(st.title)}</span>
-                  <span style="font-size:0.8rem;color:#6b7280;">▼</span>
-                </div>
-                <div class="st-content" style="display:${idx === 0 ? 'block' : 'none'};margin-top:8px;font-size:0.88rem;color:#334155;line-height:1.55;border-top:1px dashed #e2e8f0;padding-top:6px;">
-                  ${escapeHtml(st.content)}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
+        <button type="button" class="sakhi-followup-chip" style="background:#fdf2f8;border-color:#f472b6;color:#be185d;" onclick="window.revealSakhiNuskha('${intent.id}', this)">
+          <span>🌸 सखी का दादी-नानी का नुस्खा बताएं</span>
+          <span>→</span>
+        </button>
       `;
     }
+
+    // Video Chip
+    const tubeUrl = intent.tube_url || summary.tube_url || '/tube.html';
+    html += `
+        <a href="${escapeHtml(tubeUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#fef2f2;border-color:#fca5a5;color:#dc2626;text-decoration:none;">
+          <span>📺 प्रैक्टिकल वीडियो देखें</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+    `;
 
     if (reference) {
       html += `
-        <div style="margin-top:10px;font-size:0.78rem;color:#64748b;font-style:italic;">
-          📜 <strong>शास्त्रीय व वैज्ञानिक संदर्भ:</strong> ${escapeHtml(reference)}
+        <div style="margin-top:8px;font-size:0.75rem;color:#94a3b8;font-style:italic;">
+          📜 <strong>संदर्भ:</strong> ${escapeHtml(reference)}
         </div>
       `;
     }
 
-    // Sakhi's Secret Nuskha Button
-    let nuskhaBtnHtml = '';
-    if (intent.sakhi_nuskha) {
-      nuskhaBtnHtml = `
-        <div style="margin-top:12px;">
-          <button type="button" class="sakhi-nuskha-trigger-btn" onclick="window.revealSakhiNuskha('${intent.id}', this)">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>🌸 सखी का दादी-नानी का नुस्खा जानना चाहते हैं? (यहाँ क्लिक करें) →</span>
-          </button>
-        </div>
-      `;
-    }
-
-    const tubeUrl = intent.tube_url || summary.tube_url || '/tube.html';
-    const tubeCardHtml = buildTubeCardMarkup(tubeUrl, '📺 आरोग्यम ट्यूब: लाइव प्रैक्टिकल परिणाम व वीडियो देखें');
     const bookCardHtml = buildBookCardMarkup(matchedBook);
-
-    streamBotMessage(html, mainFirstAid || mainAnatomy, bookCardHtml, tubeCardHtml, '', nuskhaBtnHtml);
+    streamBotMessage(html, combinedCrisp, bookCardHtml, '', '', '');
   }
 
   // 16. DYNAMIC SYMPTOM SYNTHESIZER (WHEN NO EXACT STATIC INTENT MATCHES)
@@ -1043,73 +1095,49 @@
     } catch (e) {}
 
     const q = query.toLowerCase();
-    const domain = detectCurrentPageDomain();
     const matchedBook = getRelevantBookForQuery(query);
 
-    let synthesizedTitle = `🌿 ${query} - आयुर्वेदिक व वैज्ञानिक परामर्श`;
-    let firstAid = `इस समस्या में सबसे पहले शरीर/फसल को विषाक्त पदार्थों (Toxins) से मुक्त रखें। पर्याप्त गुनगुना पानी पिएं, ताजा सात्विक आहार लें और रात को सोते समय 1 चम्मच त्रिफला या नेट्सर्फ De-Tox का सेवन करें।`;
-    let curiosity = `समस्या की जड़ को समझने हेतु जीवनशैली और डाइट में सुधार आवश्यक है। अत्यधिक खट्टी, तली-भुनी चीजें व तनाव बंद करें। रोजाना 30 मिनट प्राणायाम व सूक्ष्म व्यायाम करें।`;
-    let speech = `आपके प्रश्न पर प्राथमिक आयुर्वेदिक उपचार और जीवनशैली सुधार आवश्यक है। संपूर्ण मार्गदर्शन यहाँ दिया गया है।`;
+    let crispAnswer = `इस समस्या में शरीर/फसल को विषाक्तता (Toxins) से मुक्त रखें। पर्याप्त पानी, सात्विक आहार और नेट्सर्फ De-Tox या Biofit जैविक पोषण का उपयोग करें।`;
 
     if (q.includes('दर्द') || q.includes('सूजन') || q.includes('चोट')) {
-      firstAid = `दर्द व सूजन वाले स्थान पर तिल या अरंडी के तेल में लहसुन व मेथी पकाकर गुनगुनी मालिश करें। रात को 1 चम्मच सोंठ चूर्ण गुनगुने पानी से लें और ठंडी चीजों से परहेज रखें।`;
-      curiosity = `लगातार दर्द वात दोष बढ़ने का संकेत है। यूरिक एसिड या एक्स-रे की जांच अवश्य कराएं। नेट्सर्फ Joint Care व नेचुरामोरे शरीर की मांसपेशियों को पोषण देते हैं।`;
+      crispAnswer = `जोड़ों व मांसपेशियों के दर्द में तिल के तेल में लहसुन-अजवाइन पकाकर गुनगुनी मालिश करें। नेचुरामोर Joints Care और रात को 1 चम्मच सोंठ चूर्ण तुरंत आराम देता है।`;
     } else if (q.includes('पेट') || q.includes('गैस') || q.includes('कब्ज') || q.includes('अपच')) {
-      firstAid = `सुबह खाली पेट 1 गिलास गुनगुने पानी में चुटकीभर हींग, काला नमक व आधा चम्मच जीरा चूर्ण मिलाकर पिएं। भोजन के 1 घंटे बाद ही पानी पिएं।`;
-      curiosity = `कब्ज 100 बीमारियों की जड़ है। मैदे और रात में देर से खाने की आदत छोड़ें। फाइबर युक्त फल पपीता और नेट्सर्फ De-Tox आंतों को साफ रखते हैं।`;
+      crispAnswer = `कब्ज व गैस में सुबह खाली पेट गुनगुने पानी में हींग, काला नमक व जीरा चूर्ण लें। आंतों की संपूर्ण सफाई हेतु नेचुरामोर De-Tox अत्यंत लाभकारी है।`;
     } else if (q.includes('पौधा') || q.includes('पत्ती') || q.includes('कीड़ा') || q.includes('फसल')) {
-      firstAid = `फसल में पत्तियों के पीलेपन व कमजोरी हेतु 15L टंकी में 25ml StimRich + 5ml Bio-99 मिलाकर छिड़काव करें। मिट्टी में नमी बनाकर रखें।`;
-      curiosity = `फसल के रोग की स्पष्ट पहचान हेतु जड़ और तने का निरीक्षण करें। रासायनिक दवाओं के अंधाधुंध उपयोग से बचें और Biofit जैविक स्प्रे कैलेंडर अपनाएं।`;
+      crispAnswer = `फसल में पत्तियों के पीलेपन व विकास हेतु 15L पंप में 25ml StimRich + 5ml Bio-99 का स्प्रे करें और जड़ में Biofit SHET चलाएं।`;
     }
 
-    const waMsg = `नमस्ते आरोग्यम सखी AI जी! 🙏\nमेरा सवाल है: "${query}"\nकृपया इस पर सटीक वैज्ञानिक सलाह और दवा बताएं।`;
+    const waMsg = `नमस्ते आरोग्यम सखी AI! 🙏\nमेरा सवाल है: "${query}"\nकृपया इस पर व्यक्तिगत सलाह और खुराक बताएं।`;
     const waUrl = `https://wa.me/91${MASTER_ADMIN_PHONE}?text=${encodeURIComponent(waMsg)}`;
 
-    let html = `
-      <div style="margin-bottom:10px;">
-        <h4 style="margin:0 0 8px 0;color:#15803d;font-size:1.1rem;font-weight:900;">${escapeHtml(synthesizedTitle)}</h4>
+    const html = `
+      <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:6px;">
+        🌿 ${escapeHtml(query)} - सटीक समाधान
+      </div>
+      <div style="font-size:0.96rem;line-height:1.6;color:#1e293b;margin-bottom:12px;">
+        ${escapeHtml(crispAnswer)}
       </div>
 
-      <div class="sakhi-solution-box">
-        <div class="sakhi-solution-header">🌿 1. तुरंत प्राकृतिक व प्राथमिक राहत:</div>
-        <div>${escapeHtml(firstAid)}</div>
-      </div>
-
-      <div class="sakhi-curiosity-box">
-        <div class="sakhi-curiosity-header">⚠️ 2. वैज्ञानिक सावधानी व स्थायी समाधान:</div>
-        <div>${escapeHtml(curiosity)}</div>
-      </div>
-
-      <div style="margin-top:14px;">
-        <a href="${escapeHtml(waUrl)}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#ffffff;padding:10px 18px;border-radius:24px;text-decoration:none;font-weight:900;font-size:0.88rem;box-shadow:0 4px 14px rgba(22,163,74,0.3);">
-          <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i>
-          <span>मुख्य विशेषज्ञ से WhatsApp पर व्यक्तिगत सलाह लें →</span>
-        </a>
-      </div>
-    `;
-
-    const bookCardHtml = buildBookCardMarkup(matchedBook);
-    const followupChipsHtml = `
-      <div class="sakhi-followup-container">
-        <div class="sakhi-followup-title">💡 आप इन प्रमुख विषयों पर भी पूछ सकते हैं:</div>
-        <div class="sakhi-followup-list">
-          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('जोड़ों में दर्द और उंगलियों में अकड़न का इलाज')">
-            <span>🦴 जोड़ों का दर्द व यूरिक एसिड नुस्खा</span>
-            <span>→</span>
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+        <div style="font-weight:900;color:#15803d;font-size:0.9rem;margin-bottom:8px;">
+          👉 क्या आप इसके बारे में व्यक्तिगत मार्गदर्शन चाहते हैं?
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#ffffff;border-color:#16a34a;text-decoration:none;">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp पर विशेषज्ञ से पूछें →
+          </a>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मधुमेह और शुगर कंट्रोल का फॉर्मूला')">
+            <span>🩺 स्वास्थ्य व डाइट सलाह</span> →
           </button>
-          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां हटाने का नुस्खा')">
-            <span>🌟 चेहरे की झाइयां व झुर्रियां (जायफल लेप)</span>
-            <span>→</span>
-          </button>
-          <button class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
-            <span>🌾 गेहूं में कल्ले 2x बढ़ाना</span>
-            <span>→</span>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं के बारे में बताओ')">
+            <span>🌾 कृषि स्प्रे कैलेंडर</span> →
           </button>
         </div>
       </div>
     `;
 
-    streamBotMessage(html, speech, bookCardHtml, '', followupChipsHtml, '');
+    const bookCardHtml = buildBookCardMarkup(matchedBook);
+    streamBotMessage(html, crispAnswer, bookCardHtml, '', '', '');
   }
 
   // 17. VIRAL SHARE
@@ -1171,9 +1199,16 @@
     detectDomain: detectCurrentPageDomain
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // AUTO-BOOT ENGINE ON DOM READY OR IMMEDIATELY IF ALREADY LOADED
+  function bootSakhiEngine() {
     loadKnowledgeBase();
     initSpeechRecognition();
     injectSakhiUI();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootSakhiEngine);
+  } else {
+    bootSakhiEngine();
+  }
 })();
