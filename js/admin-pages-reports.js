@@ -781,37 +781,192 @@ function recordOutreachActivity(name, mobile, channel = 'WhatsApp', campaign = '
     localStorage.setItem('AI_OUTREACH_HISTORY', JSON.stringify(history));
   } catch(e) {}
 }
-function getTodaySentContactsSet() {
-  try {
-    const raw = localStorage.getItem('AI_SENT_CONTACTS_' + getTodayDateStr());
-    if (raw) return new Set(JSON.parse(raw));
-  } catch(e) {}
-  const hist = getOutreachHistory();
-  const today = getTodayDateStr();
-  const set = new Set();
-  hist.forEach(h => {
-    if (h.timestamp && h.timestamp.startsWith(today) && h.mobile) {
-      set.add(h.mobile.replace(/\D/g, '').slice(-10));
+// --- PERSISTENT CAMPAIGN-SPECIFIC SENT REGISTRY (ZERO SUPABASE EGRESS) ---
+const KEY_CAMPAIGN_SENT_REGISTRY = 'AOI_CAMPAIGN_SENT_REGISTRY_V2';
+
+function getActiveCampaignKey() {
+  const tab = (typeof mktState !== 'undefined' && mktState.activeTab) ? mktState.activeTab : 'whatsapp';
+  if (tab === 'whatsapp') {
+    const ob = (typeof mktState !== 'undefined' && mktState.offerBuilder) ? mktState.offerBuilder : {};
+    const bookId = ob.primaryBook || (typeof mktState !== 'undefined' && mktState.bookFilter !== 'all' ? mktState.bookFilter : 'BK016');
+    if (ob.type === 'bogo') {
+      return `camp_bogo_${bookId}_${ob.bonusBook || 'BK002'}`;
     }
-  });
-  return set;
+    return `camp_book_${bookId}`;
+  }
+  if (tab === 'site_pages') {
+    const pg = (typeof mktState !== 'undefined' && mktState.selectedSitePage) ? mktState.selectedSitePage : '/aarogyam-sakhi.html';
+    return `camp_page_${pg.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  }
+  if (tab === 'tube_promo') {
+    const vid = (typeof mktState !== 'undefined' && mktState.selectedTubeVideo) ? mktState.selectedTubeVideo : 'tube_promo';
+    return `camp_tube_${vid.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  }
+  if (tab === 'greetings') {
+    const cat = (typeof mktState !== 'undefined' && mktState.greetingsCategory) ? mktState.greetingsCategory : 'gm';
+    const tmpl = (typeof mktState !== 'undefined' && mktState.greetingsTemplateId) ? mktState.greetingsTemplateId : 'default';
+    return `camp_greetings_${cat}_${tmpl}`;
+  }
+  if (tab === 'festival') {
+    return 'camp_festival';
+  }
+  if (tab === 'broadcast') {
+    return 'camp_broadcast';
+  }
+  return `camp_${tab}`;
 }
-function getTodaySentMap() {
-  const set = getTodaySentContactsSet();
+
+function getActiveCampaignTitle() {
+  const tab = (typeof mktState !== 'undefined' && mktState.activeTab) ? mktState.activeTab : 'whatsapp';
+  if (tab === 'whatsapp') {
+    const ob = (typeof mktState !== 'undefined' && mktState.offerBuilder) ? mktState.offerBuilder : {};
+    const bookId = ob.primaryBook || (typeof mktState !== 'undefined' && mktState.bookFilter !== 'all' ? mktState.bookFilter : 'BK016');
+    return `VIP ई-बुक ऑफर (${bookId})`;
+  }
+  if (tab === 'site_pages') return 'वेबसाइट पेज प्रचार';
+  if (tab === 'tube_promo') return 'AarogyamTube वीडियो प्रचार';
+  if (tab === 'greetings') return 'सुविचार व बधाई संदेश';
+  if (tab === 'festival') return 'त्यौहार महाबचत सेल';
+  if (tab === 'broadcast') return 'लाइव प्रसारण बुलेटिन';
+  return 'मार्केटिंग अभियान';
+}
+
+function getCampaignSentRegistry() {
+  try {
+    const raw = localStorage.getItem(KEY_CAMPAIGN_SENT_REGISTRY);
+    const reg = raw ? JSON.parse(raw) : {};
+
+    // Auto-migration: Ensure today's 61 sent messages (23 WA + 38 SMS) are preserved and never lost
+    const todayStr = getTodayDateStr();
+    const todaySentRaw = localStorage.getItem('AI_SENT_CONTACTS_' + todayStr);
+    const outreachHist = getOutreachHistory();
+    const activeKey = getActiveCampaignKey() || 'camp_book_BK016';
+
+    if (!reg[activeKey]) reg[activeKey] = {};
+
+    if (todaySentRaw) {
+      try {
+        const arr = JSON.parse(todaySentRaw);
+        arr.forEach(mob => {
+          const clean = (mob || '').replace(/\D/g, '').slice(-10);
+          if (clean && !reg[activeKey][clean]) {
+            reg[activeKey][clean] = {
+              mobile: clean,
+              name: '',
+              channel: 'WhatsApp/SMS',
+              sentAt: new Date().toISOString()
+            };
+          }
+        });
+      } catch(e) {}
+    }
+
+    // Also enrich with names & timestamps from outreach history
+    outreachHist.forEach(h => {
+      const clean = (h.mobile || '').replace(/\D/g, '').slice(-10);
+      if (clean) {
+        let tKey = activeKey;
+        if (h.campaign && h.campaign.includes('BK002')) tKey = 'camp_book_BK002';
+        else if (h.campaign && h.campaign.includes('BK016')) tKey = 'camp_book_BK016';
+        if (!reg[tKey]) reg[tKey] = {};
+        if (!reg[tKey][clean] || !reg[tKey][clean].name) {
+          reg[tKey][clean] = {
+            mobile: clean,
+            name: h.name || '',
+            channel: h.channel || 'WhatsApp/SMS',
+            sentAt: h.timestamp || new Date().toISOString()
+          };
+        }
+      }
+    });
+
+    return reg;
+  } catch(e) {
+    return {};
+  }
+}
+
+function saveCampaignSentRegistry(reg) {
+  try {
+    localStorage.setItem(KEY_CAMPAIGN_SENT_REGISTRY, JSON.stringify(reg));
+  } catch(e) {
+    console.warn('LocalStorage save failed:', e);
+  }
+}
+
+function getCampaignSentSet(campKey = null) {
+  const key = campKey || getActiveCampaignKey();
+  const reg = getCampaignSentRegistry();
+  const campMap = reg[key] || {};
+  return new Set(Object.keys(campMap));
+}
+
+function getCampaignSentMap(campKey = null) {
+  const set = getCampaignSentSet(campKey);
   const map = {};
-  set.forEach(mob => { map[mob] = true; });
+  set.forEach(m => { map[m] = true; });
   return map;
 }
+
+function getCampaignSentRecord(mobile, campKey = null) {
+  const key = campKey || getActiveCampaignKey();
+  const reg = getCampaignSentRegistry();
+  const clean = (mobile || '').replace(/\D/g, '').slice(-10);
+  return (reg[key] && reg[key][clean]) ? reg[key][clean] : null;
+}
+
 function markContactAsSent(mobile, name, campaign = 'VIP Offer', channel = 'WhatsApp') {
   const cleanMob = (mobile || '').replace(/\D/g, '').slice(-10);
   if (!cleanMob) return;
-  const set = getTodaySentContactsSet();
-  set.add(cleanMob);
-  localStorage.setItem('AI_SENT_CONTACTS_' + getTodayDateStr(), JSON.stringify(Array.from(set)));
+
+  const campKey = getActiveCampaignKey();
+  const reg = getCampaignSentRegistry();
+  if (!reg[campKey]) reg[campKey] = {};
+
+  reg[campKey][cleanMob] = {
+    mobile: cleanMob,
+    name: name || '',
+    channel: channel,
+    campaign: campaign || campKey,
+    sentAt: new Date().toISOString()
+  };
+  saveCampaignSentRegistry(reg);
+
+  // Backward compatibility: maintain legacy daily keys
+  const todayKey = 'AI_SENT_CONTACTS_' + getTodayDateStr();
+  try {
+    const raw = localStorage.getItem(todayKey);
+    const set = raw ? new Set(JSON.parse(raw)) : new Set();
+    set.add(cleanMob);
+    localStorage.setItem(todayKey, JSON.stringify(Array.from(set)));
+  } catch(e) {}
+
   recordOutreachActivity(name, cleanMob, channel, campaign);
 }
-function clearTodaySentQueue() {
+
+function clearCampaignSentData(campKey = null) {
+  const key = campKey || getActiveCampaignKey();
+  const reg = getCampaignSentRegistry();
+  if (reg[key]) {
+    delete reg[key];
+    saveCampaignSentRegistry(reg);
+  }
+  // Clear legacy today sent contacts for this session
   localStorage.removeItem('AI_SENT_CONTACTS_' + getTodayDateStr());
+  if (typeof mktState !== 'undefined') {
+    mktState.hudQueueIndex = 0;
+  }
+}
+
+// Backward compatibility bridges
+function getTodaySentContactsSet() {
+  return getCampaignSentSet();
+}
+function getTodaySentMap() {
+  return getCampaignSentMap();
+}
+function clearTodaySentQueue() {
+  clearCampaignSentData();
 }
 
 // Global window mappings for bulletproof fallback
@@ -825,9 +980,16 @@ if (typeof window !== 'undefined') {
   window.incDailyCallCount = incDailyCallCount;
   window.getOutreachHistory = getOutreachHistory;
   window.recordOutreachActivity = recordOutreachActivity;
+  window.getActiveCampaignKey = getActiveCampaignKey;
+  window.getActiveCampaignTitle = getActiveCampaignTitle;
+  window.getCampaignSentRegistry = getCampaignSentRegistry;
+  window.getCampaignSentSet = getCampaignSentSet;
+  window.getCampaignSentMap = getCampaignSentMap;
+  window.getCampaignSentRecord = getCampaignSentRecord;
   window.getTodaySentContactsSet = getTodaySentContactsSet;
   window.getTodaySentMap = getTodaySentMap;
   window.markContactAsSent = markContactAsSent;
+  window.clearCampaignSentData = clearCampaignSentData;
   window.clearTodaySentQueue = clearTodaySentQueue;
 }
 
@@ -923,14 +1085,8 @@ function updateMarketingHubView(container) {
     }
   }
 
-  // 3. Anti-Repeat Shield filter (Active by default)
-  if (mktState.antiRepeatShield !== false) {
-    const todaySent = getTodaySentContactsSet();
-    displayedAudience = displayedAudience.filter(u => {
-      const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
-      return !todaySent.has(mob);
-    });
-  }
+  // 3. Anti-Repeat Shield: Full audience is preserved here so the outreach engine
+  // can separate into '⏳ कतार में बाकी' (pending) vs '✅ भेजे जा चुके' (sent) tabs accurately.
 
   // 4. Live Search filter
   if (mktState.searchQuery) {
@@ -1998,13 +2154,10 @@ window.getPillarContacts = getPillarContacts;
 
 function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
   const activeTableTab = mktState.tableTab || 'pending';
-  const todaySentSet = getTodaySentContactsSet();
-  const sentMap = getTodaySentMap();
-  const hudQueue = (mktState.hudQueueList && mktState.hudQueueList.length > 0)
-    ? mktState.hudQueueList
-    : (audienceList || []);
-  const hudMode = mktState.hudMode || 'whatsapp';
-  const currentHudContact = hudQueue[mktState.hudQueueIndex || 0] || null;
+  const campKey = getActiveCampaignKey();
+  const campTitle = getActiveCampaignTitle();
+  const sentSet = getCampaignSentSet(campKey);
+  const sentMap = getCampaignSentMap(campKey);
 
   const pendingAudience = (audienceList || []).filter(u => {
     const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
@@ -2014,6 +2167,17 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
     const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
     return !!sentMap[mob];
   });
+
+  // HUD queue loads pending contacts so it automatically resumes from the next unsent person
+  const hudQueue = (mktState.hudQueueList && mktState.hudQueueList.length > 0)
+    ? mktState.hudQueueList
+    : pendingAudience;
+  const hudMode = mktState.hudMode || 'whatsapp';
+
+  if (mktState.hudQueueIndex >= hudQueue.length && hudQueue.length > 0) {
+    mktState.hudQueueIndex = hudQueue.length - 1;
+  }
+  const currentHudContact = hudQueue.length > 0 ? hudQueue[mktState.hudQueueIndex || 0] : null;
 
   const displayedList = (activeTableTab === 'sent') ? sentAudience : pendingAudience;
   const currentTableAudience = displayedList;
@@ -2151,10 +2315,10 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 14px;">
         <label style="display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:800; color:#38bdf8; cursor:pointer; margin:0;">
           <input type="checkbox" id="mkt-anti-repeat-shield" ${mktState.antiRepeatShield !== false ? 'checked' : ''} style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
-          <span>🛡️ एंटी-रिपीट शील्ड सक्रिय (आज भेजे जा चुके ${todaySentSet.size} संपर्क स्वतः बाहर)</span>
+          <span>🛡️ एंटी-रिपीट शील्ड सक्रिय (${escapeHtml(campTitle)} में भेजे जा चुके ${sentAudience.length} संपर्क सुरक्षित बाहर)</span>
         </label>
         <span style="font-size:0.75rem; color:#94a3b8;">
-          ${mktState.antiRepeatShield !== false ? '✅ केवल नए/पेंडिंग संपर्क दिख रहे हैं' : '⚠️ आज भेजे गए संपर्क भी शामिल हैं'}
+          ${mktState.antiRepeatShield !== false ? '✅ केवल नए/पेंडिंग संपर्क कतार में दिख रहे हैं' : '⚠️ सभी संपर्क शामिल हैं'}
         </span>
       </div>
 
@@ -2242,17 +2406,19 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
         const sendUrl = hudMode === 'sms'
           ? `sms:+91${cMobile}?body=${encodeURIComponent(msgToSend)}`
           : `https://wa.me/91${cMobile}?text=${encodeURIComponent(msgToSend)}`;
-        const totalQ = hudQueue.length;
-        const curIdx = (mktState.hudQueueIndex || 0) + 1;
-        const pct = Math.min(100, Math.round((curIdx / totalQ) * 100));
+        const totalPool = (audienceList || []).length;
+        const sentCount = sentAudience.length;
+        const pendingCount = pendingAudience.length;
+        const currentContactNum = Math.min(totalPool, sentCount + (mktState.hudQueueIndex || 0) + 1);
+        const pct = totalPool > 0 ? Math.min(100, Math.round((sentCount / totalPool) * 100)) : 0;
 
         return `
           <!-- Current Contact Card & Actions -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; align-items:center;">
             <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
                 <span style="font-size:0.76rem; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.12); padding:3px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.3);">
-                  कतार प्रगति: ${curIdx} / ${totalQ} (${pct}%)
+                  कतार प्रगति: ${currentContactNum} / ${totalPool} (${pct}%) • ✅ भेजे गए: ${sentCount} • ⏳ बाकी: ${pendingCount}
                 </span>
                 <span style="font-size:0.72rem; color:#94a3b8;">📍 ${escapeHtml(currentHudContact.State || 'भारत')}</span>
               </div>
@@ -2344,12 +2510,12 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
           📥 डेटा सिंक (Sync)
         </button>
 
-        <button type="button" id="btn_clear_today_queue" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
-          🗑️ कतार खाली करें
+        <button type="button" id="btn_clear_today_queue" style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;" title="इस अभियान के भेजे गए सभी संपर्कों का रिकॉर्ड इरेज़ करें ताकि दोबारा 1 से शुरू हो सके">
+          🗑️ भेजे गए डेटा इरेज़ करें
         </button>
 
-        <button type="button" id="btn_reset_today_queue" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;">
-          🔄 रीसेट
+        <button type="button" id="btn_reset_today_queue" style="background:#0f172a; color:#38bdf8; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer;" title="कतार का कर्सर शुरू से देखें">
+          🔄 कतार रीसेट
         </button>
       </div>
     </div>
@@ -2412,6 +2578,7 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
               const callLink = `tel:+91${uMobile}`;
               const isSentToday = todaySentSet.has(uMobile);
               const isChecked = (mktState.selectedMobiles && mktState.selectedMobiles.has(uMobile)) || (mktState.selectedContactsSet && mktState.selectedContactsSet.has(u.id));
+              const sentRec = getCampaignSentRecord(uMobile, campKey);
 
               return `
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.15s ease;" class="mkt-user-row" data-user-id="${u.id}">
@@ -2419,7 +2586,14 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
                     <input type="checkbox" class="mkt-contact-checkbox" data-id="${u.id}" data-mobile="${uMobile}" data-name="${escapeHtml(u.full_name || '')}" ${isChecked ? 'checked' : ''} style="width:16px; height:16px; accent-color:#10b981; cursor:pointer;" />
                   </td>
                   <td style="padding:12px; cursor:pointer;" onclick="window.openMktUserDetail('${u.id}')">
-                    <strong style="color:#f8fafc; font-size:0.88rem; display:block;">${escapeHtml(u.full_name || 'अज्ञात ग्राहक')}</strong>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <strong style="color:#f8fafc; font-size:0.88rem;">${escapeHtml(u.full_name || 'अज्ञात ग्राहक')}</strong>
+                      ${sentRec ? `
+                        <span style="background:rgba(16,185,129,0.18); color:#10b981; border:1px solid rgba(16,185,129,0.4); padding:1px 6px; border-radius:4px; font-size:0.66rem; font-weight:800;">
+                          ✓ ${escapeHtml(sentRec.channel || 'भेजा गया')}
+                        </span>
+                      ` : ''}
+                    </div>
                     <span style="color:#38bdf8; font-family:monospace; font-size:0.8rem;">📱 +91 ${uMobile}</span>
                     <div style="font-size:0.72rem; color:#94a3b8;">📍 ${escapeHtml(u.State || 'भारत')}</div>
                     ${u.detectedInterest ? `
@@ -6428,14 +6602,15 @@ function attachMarketingHubEvents(container) {
       const mobile = btn.getAttribute('data-mobile');
       const channel = btn.getAttribute('data-channel') || 'WhatsApp';
 
+      const campTitle = getActiveCampaignTitle();
       if (channel.toLowerCase().includes('sms')) {
         incDailySmsCount();
-        markContactAsSent(mobile, name, 'VIP Offer', 'SMS');
-        showMarketingToast(`💬 ${name} का SMS ऐप खोला गया व 'Sent' में दर्ज किया गया!`);
+        markContactAsSent(mobile, name, campTitle, 'SMS');
+        showMarketingToast(`💬 ${name} का SMS ऐप खोला गया व 'Sent' में सुरक्षित सहेजा गया!`);
       } else {
         incDailyWaCount();
-        markContactAsSent(mobile, name, 'VIP Offer', 'WhatsApp');
-        showMarketingToast(`🟢 ${name} का WhatsApp खोला गया व 'Sent' में दर्ज किया गया!`);
+        markContactAsSent(mobile, name, campTitle, 'WhatsApp');
+        showMarketingToast(`🟢 ${name} का WhatsApp खोला गया व 'Sent' में सुरक्षित सहेजा गया!`);
       }
 
       setTimeout(() => {
@@ -6470,19 +6645,27 @@ function attachMarketingHubEvents(container) {
       const mobile = btnHudSendNext.getAttribute('data-mobile');
       const channel = btnHudSendNext.getAttribute('data-channel') || 'whatsapp';
 
+      const campTitle = getActiveCampaignTitle();
       if (channel === 'sms') {
         incDailySmsCount();
-        markContactAsSent(mobile, name, 'VIP Offer', 'SMS');
-        showMarketingToast(`💬 ${name} का SMS ऐप खोला गया व 'Sent' में दर्ज किया गया!`);
+        markContactAsSent(mobile, name, campTitle, 'SMS');
+        showMarketingToast(`💬 ${name} का SMS ऐप खोला गया व 'Sent' में सुरक्षित सहेजा गया!`);
       } else {
         incDailyWaCount();
-        markContactAsSent(mobile, name, 'VIP Offer', 'WhatsApp');
-        showMarketingToast(`🟢 ${name} का WhatsApp खोला गया व 'Sent' में दर्ज किया गया!`);
+        markContactAsSent(mobile, name, campTitle, 'WhatsApp');
+        showMarketingToast(`🟢 ${name} का WhatsApp खोला गया व 'Sent' में सुरक्षित सहेजा गया!`);
       }
 
       // Automatically advance queue index and refresh view so NEXT farmer loads immediately
       setTimeout(() => {
-        mktState.hudQueueIndex = (mktState.hudQueueIndex || 0) + 1;
+        if (mktState.hudQueueList && mktState.hudQueueList.length > 0) {
+          mktState.hudQueueIndex = (mktState.hudQueueIndex || 0) + 1;
+        } else {
+          // If hudQueueIndex was greater than 0 due to skip, keep it within bounds
+          if ((mktState.hudQueueIndex || 0) > 0) {
+            mktState.hudQueueIndex = Math.max(0, (mktState.hudQueueIndex || 0) - 1);
+          }
+        }
         updateMarketingHubView(container);
       }, 300);
     });
@@ -6539,10 +6722,13 @@ function attachMarketingHubEvents(container) {
   const btnClearQueue = container.querySelector('#btn_clear_today_queue');
   if (btnClearQueue) {
     btnClearQueue.addEventListener('click', () => {
-      if (confirm("क्या आप वाकई आज की भेजी गई सूची साफ़ करके कतार खाली करना चाहते हैं?")) {
-        clearTodaySentQueue();
+      const campKey = getActiveCampaignKey();
+      const sentCount = getCampaignSentSet(campKey).size;
+      const campTitle = getActiveCampaignTitle();
+      if (confirm(`क्या आप वाकई '${campTitle}' के भेजे गए सभी ${sentCount} संपर्कों का रिकॉर्ड इरेज़ (Clear) करना चाहते हैं?\n\nइरेज़ करने के बाद यह अभियान दोबारा संपर्क 1 से शुरू होगा।`)) {
+        clearCampaignSentData(campKey);
         mktState.hudQueueIndex = 0;
-        showMarketingToast("🗑️ कतार खाली व ताज़ा कर दी गई।");
+        showMarketingToast(`🗑️ '${campTitle}' का भेजा गया डेटा इरेज़ कर दिया गया! अब यह दोबारा 1 से शुरू होगा।`);
         updateMarketingHubView(container);
       }
     });
@@ -6550,9 +6736,8 @@ function attachMarketingHubEvents(container) {
   const btnResetQueue = container.querySelector('#btn_reset_today_queue');
   if (btnResetQueue) {
     btnResetQueue.addEventListener('click', () => {
-      clearTodaySentQueue();
       mktState.hudQueueIndex = 0;
-      showMarketingToast("🔄 कतार रीसेट हो गई।");
+      showMarketingToast("🔄 कतार का कर्सर शुरू से लोड हो गया।");
       updateMarketingHubView(container);
     });
   }
