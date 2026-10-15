@@ -178,20 +178,20 @@
     const p = loadSakhiUserPersona();
     const chips = [];
     if (p.primary_domain === 'agri') {
-      chips.push({ text: "📖 'खेती डॉक्टर' ई-बुक (BK002)", query: "कृषि ई-बुक BK002 की पूरी जानकारी" });
-      chips.push({ text: "📺 आरोग्यम ट्यूब: फसल डॉक्टर", query: "आरोग्यम ट्यूब कृषि व फसल वीडियो" });
+      chips.push({ text: "📖 'खेती डॉक्टर' ई-बुक (BK002)", url: "/ebooks/book-landing.html?id=BK002", isExternal: true });
+      chips.push({ text: "📺 आरोग्यम ट्यूब: फसल डॉक्टर", url: "/tube.html?filter=agri", isExternal: true });
     } else if (p.primary_domain === 'health') {
-      chips.push({ text: "📖 संपूर्ण स्वास्थ्य ई-बुक (BK001)", query: "स्वास्थ्य ई-बुक BK001 की पूरी जानकारी" });
-      chips.push({ text: "📺 आरोग्यम ट्यूब: स्वास्थ्य व आयुर्वेद", query: "आरोग्यम ट्यूब स्वास्थ्य वीडियो" });
+      chips.push({ text: "📖 संपूर्ण स्वास्थ्य ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001", isExternal: true });
+      chips.push({ text: "📺 आरोग्यम ट्यूब: स्वास्थ्य व आयुर्वेद", url: "/tube.html?filter=health", isExternal: true });
     } else if (p.primary_domain === 'beauty' || p.primary_domain === 'nuskhe') {
-      chips.push({ text: "📖 रूप-निखार ई-बुक (BK015)", query: "सौंदर्य व नुस्खे ई-बुक BK015" });
-      chips.push({ text: "📺 आरोग्यम ट्यूब: रूप-निखार व त्वचा", query: "आरोग्यम ट्यूब सौंदर्य वीडियो" });
+      chips.push({ text: "📖 रूप-निखार ई-बुक (BK015)", url: "/ebooks/book-landing.html?id=BK015", isExternal: true });
+      chips.push({ text: "📺 आरोग्यम ट्यूब: रूप-निखार व त्वचा", url: "/tube.html?filter=beauty", isExternal: true });
     } else if (p.primary_domain === 'business') {
-      chips.push({ text: "📖 ₹8.19 लाख कैपिंग ई-बुक (BK018)", query: "बिजनेस ई-बुक BK018" });
-      chips.push({ text: "📺 आरोग्यम ट्यूब: 8.19L बिज़नेस", query: "आरोग्यम ट्यूब बिज़नेस वीडियो" });
+      chips.push({ text: "📖 ₹8.19 लाख कैपिंग ई-बुक (BK018)", url: "/ebooks/book-landing.html?id=BK018", isExternal: true });
+      chips.push({ text: "📺 आरोग्यम ट्यूब: 8.19L बिज़नेस", url: "/tube.html?filter=business", isExternal: true });
     } else if (p.primary_domain === 'pashu') {
-      chips.push({ text: "📖 वैज्ञानिक डेयरी ई-बुक (BK016)", query: "डेयरी ई-बुक BK016" });
-      chips.push({ text: "📺 आरोग्यम ट्यूब: दूध व फैट वृद्धि", query: "आरोग्यम ट्यूब पशुपालन वीडियो" });
+      chips.push({ text: "📖 वैज्ञानिक डेयरी ई-बुक (BK016)", url: "/ebooks/book-landing.html?id=BK016", isExternal: true });
+      chips.push({ text: "📺 आरोग्यम ट्यूब: दूध व फैट वृद्धि", url: "/tube.html?filter=dairy", isExternal: true });
     }
     return chips;
   }
@@ -225,6 +225,11 @@
     // B. E-Books & Digital Library (Check before agri words so "खेती डॉक्टर ई-बुक BK002" routes to business/library!)
     if (q.includes('ई-बुक') || q.includes('ebook') || q.includes('bk002') || q.includes('bk001') || q.includes('किताब की कीमत') || q.includes('डाउनलोड लिंक') || q.includes('खरीफ गाइड') || q.includes('खेती डॉक्टर पुस्तक')) {
       return 'business';
+    }
+
+    // B.1 Aarogyam Tube Video Hub Guard
+    if (q.includes('आरोग्यम ट्यूब') || q.includes('aarogyam tube') || q.includes('आरोग्यमट्यूब') || q.includes('म ट्यूब') || q.includes('ट्यूब') || q.includes('tube') || ((q.includes('वीडियो') || q.includes('video') || q.includes('रील्स') || q.includes('shorts')) && (q.includes('आरोग्यम') || q.includes('नेट्सर्फ') || q.includes('कृषि') || q.includes('खेती') || q.includes('8.19') || q.includes('बिज़नेस') || q.includes('डेयरी') || q.includes('स्वास्थ्य') || q.includes('फसल') || q.includes('दूध')))) {
+      return 'tube';
     }
 
     // C. Veterinary & Dairy (Pashu Palan) - Highest Priority Animal Guard
@@ -662,7 +667,7 @@
     if (pendingUserQuery) {
       const q = pendingUserQuery;
       pendingUserQuery = null;
-      setTimeout(() => processKnowledgeQuery(q), 500);
+      setTimeout(() => handleUserSubmit(q), 500);
     }
   };
 
@@ -1277,6 +1282,44 @@
     const input = document.getElementById('sakhiTextInput');
     if (input) input.value = '';
 
+    // Guest Mode Access Gate: User MUST be authenticated to chat with Sakhi AI!
+    if (!isUserAuthenticated()) {
+      const phoneMatch = query.match(/(?:(?:\+91|91|0)?[-\s]?)?([6-9]\d{9})/);
+      if (phoneMatch) {
+        const extractedPhone = phoneMatch[1];
+        let potentialName = query
+          .replace(phoneMatch[0], '')
+          .replace(/(?:मेरा\s*नाम|नाम|name|mobile|phone|नंबर|no|hai|he|हूँ|हू|hu|मेरा\s*नंबर|whatsapp)/gi, '')
+          .replace(/[^a-zA-Z\u0900-\u097F\s]/g, '')
+          .trim();
+
+        if (!potentialName || potentialName.length < 2) potentialName = 'किसान साथी';
+
+        syncUnifiedUserAuth(potentialName, extractedPhone);
+        updateSakhiHeaderUserBadge();
+
+        appendUserMessage(query);
+        const successSpeech = `धन्यवाद ${potentialName} जी! आपका नंबर सुरक्षित रूप से सत्यापित हो गया है।`;
+        const successHtml = `
+          <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
+            <div style="font-weight:900;color:#15803d;font-size:1rem;margin-bottom:4px;">
+              🎉 स्वागत है ${escapeHtml(potentialName)} जी!
+            </div>
+            <div style="font-size:0.88rem;color:#334155;line-height:1.5;">
+              आपका WhatsApp नंबर <strong>${escapeHtml(extractedPhone)}</strong> सत्यापित हो गया है। अब आप खेती, पशुपालन, सेहत या सौंदर्य का कोई भी सवाल पूछ सकते हैं।
+            </div>
+          </div>
+        `;
+        streamBotMessage(successHtml, successSpeech);
+        return;
+      }
+
+      // Unauthenticated guest user: Save pending query and trigger Registration/Login Modal!
+      pendingUserQuery = query;
+      window.openSakhiAuthModal();
+      return;
+    }
+
     appendUserMessage(query);
 
     try {
@@ -1286,36 +1329,6 @@
         time: new Date().toLocaleTimeString('hi-IN')
       });
     } catch (e) {}
-
-    // In-chat Phone/Name Recognition
-    const phoneMatch = query.match(/(?:(?:\+91|91|0)?[-\s]?)?([6-9]\d{9})/);
-    if (phoneMatch && !isUserAuthenticated()) {
-      const extractedPhone = phoneMatch[1];
-      let potentialName = query
-        .replace(phoneMatch[0], '')
-        .replace(/(?:मेरा\s*नाम|नाम|name|mobile|phone|नंबर|no|hai|he|हूँ|हू|hu|मेरा\s*नंबर|whatsapp)/gi, '')
-        .replace(/[^a-zA-Z\u0900-\u097F\s]/g, '')
-        .trim();
-
-      if (!potentialName || potentialName.length < 2) potentialName = 'किसान साथी';
-
-      syncUnifiedUserAuth(potentialName, extractedPhone);
-      updateSakhiHeaderUserBadge();
-
-      const successSpeech = `धन्यवाद ${potentialName} जी! आपका नंबर सुरक्षित रूप से सत्यापित हो गया है।`;
-      const successHtml = `
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
-          <div style="font-weight:900;color:#15803d;font-size:1rem;margin-bottom:4px;">
-            🎉 स्वागत है ${escapeHtml(potentialName)} जी!
-          </div>
-          <div style="font-size:0.88rem;color:#334155;line-height:1.5;">
-            आपका WhatsApp नंबर <strong>${escapeHtml(extractedPhone)}</strong> सत्यापित हो गया है। अब आप खेती, पशुपालन, सेहत या सौंदर्य का कोई भी सवाल पूछ सकते हैं।
-          </div>
-        </div>
-      `;
-      streamBotMessage(successHtml, successSpeech);
-      return;
-    }
 
     appendTypingIndicator();
 
@@ -1501,9 +1514,9 @@
     // 2. Kheti Ka Doctor (BK002)
     if (cleanQ.includes('bk002') || cleanQ.includes('bk 002') || cleanQ.includes('kheti ka doctor') || cleanQ.includes('खेती का डॉक्टर') || cleanQ.includes('fasal ka doctor') || cleanQ.includes('फसल का डॉक्टर') || cleanQ.includes('pocket doctor') || cleanQ.includes('रोग पहचान की बुक') || cleanQ.includes('रोग पहचान')) {
       const resp = `🌾 **'खेती का डॉक्टर' (Pocket Doctor) — अपनी फसल के खुद डॉक्टर बनें:**\n• **यह पुस्तक क्यों जरूरी है?** खेत में जब पत्तियां पीली होती हैं या धब्बे पड़ते हैं, तो दुकानदार के पास जाने पर बिना जरूरत ₹1,500 की दवा पकड़ा दी जाती है। इस पुस्तक में 300+ असली एचडी फोटो देखकर आप खुद पहचान सकते हैं कि समस्या फंगस की है, कीट की या पोषण कमी की।\n• **मुख्य विशेषताएं:** 120 पेज की प्रैक्टिकल गाइड, 300+ वास्तविक फोटो, फसलवार रोग-कीट निदान चार्ट व स्प्रे साइंस।\n• **व्यावहारिक लाभ:** आप न सिर्फ अपने खेत के हजारों रुपये बचा सकते हैं, बल्कि अपने पड़ोसियों व गांव के खेतों में भी सही जानकारी दे सकते हैं।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹299)।`;
-      renderCrispSpecialBox('🌾 खेती का डॉक्टर — फोटो सहित रोग पहचान ई-बुक', resp, [
-        { text: '📖 खेती का डॉक्टर अभी पढ़ें', query: 'खेती का डॉक्टर ई-बुक कैसे प्राप्त करें' },
-        { text: '🧪 कृषि दवा डायरेक्टरी देखें', query: 'कृषि दवा डायरेक्टरी के बारे में बताओ' },
+      renderCrispSpecialBox('🌾 खेती का डॉक्टर — फोटो सहित रोग पहचान ई-बुक (BK002)', resp, [
+        { text: '📖 खेती का डॉक्टर लैंडिंग पेज खोलें (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🧪 कृषि दवा डायरेक्टरी (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_kheti_dr');
       return true;
@@ -1512,9 +1525,9 @@
     // 3. Krishi Dawa Directory (BK016)
     if (cleanQ.includes('bk016') || cleanQ.includes('bk 016') || cleanQ.includes('krishi dawa directory') || cleanQ.includes('कृषि दवा डायरेक्टरी') || cleanQ.includes('dawa directory') || cleanQ.includes('दवा डायरेक्टरी') || cleanQ.includes('दवा की गाइड') || cleanQ.includes('chemical dawa')) {
       const resp = `🧪 **'कृषि दवा डायरेक्टरी' — फसल के रोग, कीट और असली दवा की संपूर्ण गाइड:**\n• **दुकानदार के झांसे से मुक्ति:** दवा की दुकान पर एक ही दवा के 50 अलग-अलग नाम होते हैं। इस डायरेक्टरी से आप असली टेक्निकल (Active Ingredient) समझेंगे ताकि कोई आपको महंगी दवा न बेच सके।\n• **मुख्य विशेषताएं:** फफूंदनाशी, कीटनाशक व खरपतवारनाशक की संपूर्ण गाइड, कम खर्च वाले जैविक व देसी नुस्खे, 4-पेज Quick Reference (रोग ➔ फसल और Chemical ➔ रोग)।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹499)।`;
-      renderCrispSpecialBox('🧪 कृषि दवा डायरेक्टरी — रोग, कीट व दवा की पूरी गाइड', resp, [
-        { text: '📖 कृषि दवा डायरेक्टरी पढ़ें', query: 'कृषि दवा डायरेक्टरी कैसे प्राप्त करें' },
-        { text: '🌾 खेती का डॉक्टर ई-बुक', query: 'खेती का डॉक्टर के बारे में बताओ' },
+      renderCrispSpecialBox('🧪 कृषि दवा डायरेक्टरी — रोग, कीट व दवा की पूरी गाइड (BK016)', resp, [
+        { text: '📖 कृषि दवा डायरेक्टरी लैंडिंग पेज (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🌾 खेती का डॉक्टर (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_dawa_dir');
       return true;
@@ -1523,9 +1536,9 @@
     // 4. Kharif Fasal Master Guide 2026 (BK001)
     if (cleanQ.includes('bk001') || cleanQ.includes('bk 001') || cleanQ.includes('kharif') || cleanQ.includes('खरीफ फसल') || cleanQ.includes('धान सोयाबीन मक्का') || cleanQ.includes('खरीफ गाइड')) {
       const resp = `🌾 **'खरीफ फसल मास्टर गाइड 2026' — धान, सोयाबीन व मक्का उत्पादन की सम्पूर्ण गाइड:**\n• **विशेषताएं:** 150+ रंगीन पेज, 300+ वास्तविक फोटो, बीज उपचार से लेकर कटाई तक का सम्पूर्ण वैज्ञानिक प्रबंधन।\n• **कवर विषय:** खरपतवार नियंत्रण, खाद व पोषण प्रबंधन, कल्ले बढ़ाने का फॉर्मूला और कीट-रोग का वैज्ञानिक स्प्रे शेड्यूल।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹299)।`;
-      renderCrispSpecialBox('🌾 खरीफ फसल मास्टर गाइड 2026 — सम्पूर्ण उत्पादन गाइड', resp, [
-        { text: '📖 खरीफ मास्टर गाइड अभी पढ़ें', query: 'खरीफ फसल मास्टर गाइड कैसे प्राप्त करें' },
-        { text: '🌾 खेती का डॉक्टर ई-बुक', query: 'खेती का डॉक्टर के बारे में बताओ' },
+      renderCrispSpecialBox('🌾 खरीफ फसल मास्टर गाइड 2026 — सम्पूर्ण उत्पादन गाइड (BK001)', resp, [
+        { text: '📖 खरीफ मास्टर गाइड लैंडिंग पेज (BK001)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🌾 खेती का डॉक्टर (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_kharif');
       return true;
@@ -1534,9 +1547,9 @@
     // 5. Sabji Kheti Master (BK015)
     if (cleanQ.includes('bk015') || cleanQ.includes('bk 015') || cleanQ.includes('sabji kheti') || cleanQ.includes('सब्जी खेती मास्टर') || cleanQ.includes('सब्जी खेती') || cleanQ.includes('सब्जी की किताब')) {
       const resp = `🥦 **'सब्जी खेती मास्टर (PART 1)' — 11 प्रमुख सब्जियों की वैज्ञानिक खेती:**\n• **कवर फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **विशेषताएं:** 154 पेज, बीज चयन से लेकर नर्सरी, पौधों की दूरी, ड्रिप-मल्चिंग, खाद-स्प्रे कैलेंडर और बाजार भाव तक सम्पूर्ण गाइड।\n💰 **ऑफर मूल्य:** मात्र ₹149 (MRP ₹1999)।`;
-      renderCrispSpecialBox('🥦 सब्जी खेती मास्टर (Part 1) — 11 प्रमुख सब्जियों की खेती', resp, [
-        { text: '📖 सब्जी खेती मास्टर पढ़ें', query: 'सब्जी खेती मास्टर कैसे प्राप्त करें' },
-        { text: '🧪 कृषि दवा डायरेक्टरी देखें', query: 'कृषि दवा डायरेक्टरी के बारे बताओ' },
+      renderCrispSpecialBox('🥦 सब्जी खेती मास्टर (Part 1) — 11 प्रमुख सब्जियों की खेती (BK015)', resp, [
+        { text: '📖 सब्जी खेती मास्टर लैंडिंग पेज (BK015)', url: '/ebooks/book-landing.html?id=BK015', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🧪 कृषि दवा डायरेक्टरी (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹149 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_sabji');
       return true;
@@ -1545,8 +1558,8 @@
     // 6. Ghar Baithe Paise Kaise Kamaye (BK018)
     if (cleanQ.includes('ghar baithe paise') || cleanQ.includes('घर बैठे पैसे') || cleanQ.includes('income guide') || cleanQ.includes('कमाई की किताब') || cleanQ.includes('कमाई कैसे करें') || cleanQ.includes('nk018') || cleanQ.includes('bk018')) {
       const resp = `💼 **'घर बैठे पैसे कैसे कमाएँ? Income Guide' — डिजिटल व ऑफलाइन कमाई की संपूर्ण गाइड:**\n• **विशेषताएं:** 60 ऑनलाइन और ऑफलाइन कमाई के वास्तविक तरीके, 150+ जांची-परखी वेबसाइट्स की लिस्ट, बिना किसी बड़े बजट के शुरुआत करने की व्यावहारिक तकनीक।\n• **सुरक्षा:** ऑनलाइन फ्रॉड और धोखाधड़ी से बचने के सुनहरे नियम।\n💰 **ऑफर मूल्य:** मात्र ₹149 (MRP ₹1001)।`;
-      renderCrispSpecialBox('💼 घर बैठे पैसे कैसे कमाएँ? — 60 कमाई के तरीके', resp, [
-        { text: '📖 इनकम गाइड अभी पढ़ें', query: 'घर बैठे पैसे कैसे कमाएं ई-बुक कैसे प्राप्त करें' },
+      renderCrispSpecialBox('💼 घर बैठे पैसे कैसे कमाएँ? — 60 कमाई के तरीके (BK018)', resp, [
+        { text: '📖 इनकम गाइड लैंडिंग पेज खोलें (BK018)', url: '/ebooks/book-landing.html?id=BK018', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
         { text: '💳 डायरेक्ट UPI से ₹149 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'business', 'book_income');
       return true;
@@ -1556,9 +1569,10 @@
     if (isWhyBuy || (isBookGeneral && (cleanQ.includes('list') || cleanQ.includes('guide') || cleanQ.includes('faq')))) {
       const resp = `📚 **आरोग्यम इंडिया की ई-बुक्स क्यों खरीदें? — ज्ञान जो हर साल हजारों रुपये बचाए:**\n• 1. **खुद डॉक्टर बनें:** 300+ असली फोटो देखकर खेत में कीट व बीमारी खुद पहचानें और सही दवा चुनें।\n• 2. **दुकानदारों के कमीशन से मुक्ति:** गैर-जरूरी और नकली रसायनों के चक्कर से छुटकारा पाएं।\n• 3. **आजीवन डिजिटल लाइब्रेरी:** फोन में कभी भी, कहीं भी ऑफलाइन पढ़ने व सुनने की सुविधा।\n• 4. **मात्र ₹99 से शुरुआत:** एक स्प्रे के खर्च से भी कम में पूरे जीवन का ज्ञान!`;
       renderCrispSpecialBox('📚 आरोग्यम डिजिटल लाइब्रेरी — सम्पूर्ण पुस्तक सूची', resp, [
-        { text: '🌾 खेती का डॉक्टर (₹99)', query: 'खेती का डॉक्टर के बारे में बताओ' },
-        { text: '🧪 कृषि दवा डायरेक्टरी (₹99)', query: 'कृषि दवा डायरेक्टरी के बारे में बताओ' },
-        { text: '🥦 सब्जी खेती मास्टर (₹149)', query: 'सब्जी खेती मास्टर के बारे में बताओ' },
+        { text: '🌾 खेती का डॉक्टर (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+        { text: '🧪 कृषि दवा डायरेक्टरी (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
+        { text: '🌾 खरीफ मास्टर गाइड (BK001)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
+        { text: '💼 घर बैठे पैसे कैसे कमाएँ (BK018)', url: '/ebooks/book-landing.html?id=BK018', isExternal: true },
         { text: '💳 डायरेक्ट UPI से भुगतान विधि', query: 'UPI से पेमेंट कैसे करें' }
       ], 'business', 'books_catalog');
       return true;
@@ -2279,6 +2293,79 @@
     return false;
   }
 
+  // 15.75 DEDICATED AAROGYAM TUBE VIDEO HUB ROUTER
+  function handleAarogyamTubeRouter(cleanQ, rawQ) {
+    const isTubeQuery = cleanQ.includes('आरोग्यम ट्यूब') || 
+      cleanQ.includes('aarogyam tube') || 
+      cleanQ.includes('आरोग्यमट्यूब') ||
+      cleanQ.includes('म ट्यूब') ||
+      cleanQ.includes('ट्यूब') || 
+      cleanQ.includes('tube') ||
+      ((cleanQ.includes('वीडियो') || cleanQ.includes('video') || cleanQ.includes('रील्स') || cleanQ.includes('shorts')) &&
+       (cleanQ.includes('आरोग्यम') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('कृषि') || cleanQ.includes('खेती') || cleanQ.includes('8.19') || cleanQ.includes('बिज़नेस') || cleanQ.includes('business') || cleanQ.includes('डेयरी') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('फसल') || cleanQ.includes('दूध')));
+
+    if (!isTubeQuery) return false;
+
+    // Detect specific playlist intent
+    let catTitle = '🎬 आरोग्यम ट्यूब (AarogyamTube) - वीडियो लाइब्रेरी';
+    let catDesc = 'आरोग्यम ट्यूब पर कृषि, पशुपालन, प्राकृतिक स्वास्थ्य व ₹8.19 लाख कैपिंग बिज़नेस के 100+ हाई-डेफिनिशन वीडियो, फील्ड ट्रायल्स और किसानों के सफलता के इंटरव्यू उपलब्ध हैं।';
+    let activeFilter = '';
+
+    if (cleanQ.includes('बिज़नेस') || cleanQ.includes('business') || cleanQ.includes('8.19') || cleanQ.includes('कमाई') || cleanQ.includes('प्लान') || cleanQ.includes('कैपिंग')) {
+      catTitle = '📺 आरोग्यम ट्यूब: नेट्सर्फ ₹8.19L बिज़नेस व कैपिंग वीडियो';
+      catDesc = 'नेट्सर्फ डायरेक्ट सेलिंग, ₹8,19,250 पाक्षिक (15-दिन) कैपिंग, 25% रिटेल डिस्काउंट और टॉप अर्नर्स की सफलता के वीडियो देखने के लिए नीचे दिए गए लिंक पर क्लिक करें।';
+      activeFilter = 'business';
+    } else if (cleanQ.includes('कृषि') || cleanQ.includes('खेती') || cleanQ.includes('फसल') || cleanQ.includes('गेहूं') || cleanQ.includes('चना') || cleanQ.includes('सरसों') || cleanQ.includes('धान') || cleanQ.includes('स्प्रे')) {
+      catTitle = '🌾 आरोग्यम ट्यूब: कृषि व फसल डॉक्टर वीडियो';
+      catDesc = 'फसलों के रोग-कीट निदान, बायोफिट स्प्रे शेड्यूल और खेतों के लाइव रिजल्ट्स के वीडियो देखने के लिए आरोग्यम ट्यूब कृषि सेक्शन में जाएं।';
+      activeFilter = 'agri';
+    } else if (cleanQ.includes('पशु') || cleanQ.includes('दूध') || cleanQ.includes('फैट') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('डेयरी')) {
+      catTitle = '🐄 आरोग्यम ट्यूब: वैज्ञानिक डेयरी व पशु पोषण वीडियो';
+      catDesc = 'दुधारू पशुओं का दूध-फैट बढ़ाने, थनैला रोकथाम और पेट-वेट (CFC Plus) के लाइव किसान ट्रायल्स वीडियो देखें।';
+      activeFilter = 'dairy';
+    } else if (cleanQ.includes('स्वास्थ्य') || cleanQ.includes('सेहत') || cleanQ.includes('बीमारी') || cleanQ.includes('आयुर्वेद')) {
+      catTitle = '🌿 आरोग्यम ट्यूब: प्राकृतिक स्वास्थ्य व आयुर्वेद वीडियो';
+      catDesc = 'डायबिटीज, जोड़ों का दर्द, लिवर डिटॉक्स और प्राकृतिक स्वास्थ्य पर विशेषज्ञों के व्याख्यान व वीडियो गाइड देखें।';
+      activeFilter = 'health';
+    }
+
+    const tubeUrl = activeFilter ? `/tube.html?filter=${activeFilter}` : '/tube.html';
+
+    const html = `
+      <div style="font-weight:900;color:#166534;font-size:1.08rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.3rem;">🎬</span>
+        <span>${escapeHtml(catTitle)}</span>
+      </div>
+      <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
+        ${escapeHtml(catDesc)}
+      </div>
+
+      <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:14px;padding:14px;margin-bottom:12px;">
+        <div style="font-weight:800;color:#1e40af;font-size:0.9rem;margin-bottom:8px;">
+          🚀 सीधे वीडियो देखें (बाहर नया पेज खुलेगा):
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="${tubeUrl}" target="_blank" rel="noopener noreferrer" style="background:#2563eb;color:#ffffff;text-decoration:none;font-weight:800;font-size:0.92rem;padding:10px 16px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+            <span>▶ ${escapeHtml(catTitle.replace(/📺|🌾|🐄|🌿|🎬/g, '').trim())} खोलें</span>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+          <a href="/tube.html" target="_blank" rel="noopener noreferrer" style="background:#ffffff;color:#1e40af;border:1.5px solid #bfdbfe;text-decoration:none;font-weight:700;font-size:0.88rem;padding:8px 14px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;">
+            <span>🎬 AarogyamTube मुख्य हब (सभी 100+ वीडियो)</span>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+    `;
+
+    sakhiConversationState.lastActiveDomain = activeFilter === 'business' ? 'business' : (activeFilter === 'agri' ? 'agri' : (activeFilter === 'dairy' ? 'pashu' : 'omni'));
+    sakhiConversationState.lastActiveEntity = 'aarogyam_tube';
+    sakhiConversationState.lastActiveEntityName = catTitle;
+
+    const speech = `${catTitle}। वीडियो देखने के लिए सीधे लिंक पर क्लिक करें।`;
+    streamBotMessage(html, speech);
+    return true;
+  }
+
   // 15.8 STRICT SAFETY GUARDRAILS & MEDICAL/OVERDOSE REFUSAL PROTOCOL
   function handleSafetyGuardrails(cleanQ, rawQ) {
     const q = cleanQ;
@@ -2842,6 +2929,11 @@
       return;
     }
 
+    // 0.05 Dedicated Aarogyam Tube Video Hub Router
+    if (handleAarogyamTubeRouter(cleanQ, rawQ)) {
+      return;
+    }
+
     // 0.1 Live Weather & Spray Guidelines Router
     if (handleWeatherAndLiveSpray(cleanQ, rawQ)) {
       return;
@@ -2995,11 +3087,19 @@
 
     let chipsHtml = '';
     (chips || []).forEach(c => {
-      chipsHtml += `
-        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(c.query)}')">
-          <span>${escapeHtml(c.text)}</span> →
-        </button>
-      `;
+      if (c.url || c.isExternal) {
+        chipsHtml += `
+          <a href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer" class="sakhi-followup-chip" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;${c.style || ''}">
+            <span>${escapeHtml(c.text)}</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+          </a>
+        `;
+      } else {
+        chipsHtml += `
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(c.query)}')">
+            <span>${escapeHtml(c.text)}</span> →
+          </button>
+        `;
+      }
     });
 
     // Dynamic E-Book & Aarogyam Tube Video Recommendations from Persona
@@ -3007,11 +3107,19 @@
     let recoHtml = '';
     if (recoChips && recoChips.length > 0) {
       recoChips.forEach(rc => {
-        recoHtml += `
-          <button type="button" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" onclick="window.askSakhiQuick('${escapeHtml(rc.query)}')">
-            ${escapeHtml(rc.text)} →
-          </button>
-        `;
+        if (rc.url || rc.isExternal) {
+          recoHtml += `
+            <a href="${escapeHtml(rc.url)}" target="_blank" rel="noopener noreferrer" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              <span>${escapeHtml(rc.text)}</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+            </a>
+          `;
+        } else {
+          recoHtml += `
+            <button type="button" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" onclick="window.askSakhiQuick('${escapeHtml(rc.query)}')">
+              ${escapeHtml(rc.text)} →
+            </button>
+          `;
+        }
       });
     }
 
@@ -3108,11 +3216,19 @@
     let recoHtml = '';
     if (recoChips && recoChips.length > 0) {
       recoChips.forEach(rc => {
-        recoHtml += `
-          <button type="button" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" onclick="window.askSakhiQuick('${escapeHtml(rc.query)}')">
-            ${escapeHtml(rc.text)} →
-          </button>
-        `;
+        if (rc.url || rc.isExternal) {
+          recoHtml += `
+            <a href="${escapeHtml(rc.url)}" target="_blank" rel="noopener noreferrer" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              <span>${escapeHtml(rc.text)}</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+            </a>
+          `;
+        } else {
+          recoHtml += `
+            <button type="button" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" onclick="window.askSakhiQuick('${escapeHtml(rc.query)}')">
+              ${escapeHtml(rc.text)} →
+            </button>
+          `;
+        }
       });
     }
 
@@ -3221,11 +3337,19 @@
     let recoHtml = '';
     if (recoChips && recoChips.length > 0) {
       recoChips.forEach(rc => {
-        recoHtml += `
-          <button type="button" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" onclick="window.askSakhiQuick('${escapeHtml(rc.query)}')">
-            ${escapeHtml(rc.text)} →
-          </button>
-        `;
+        if (rc.url || rc.isExternal) {
+          recoHtml += `
+            <a href="${escapeHtml(rc.url)}" target="_blank" rel="noopener noreferrer" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              <span>${escapeHtml(rc.text)}</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;"></i>
+            </a>
+          `;
+        } else {
+          recoHtml += `
+            <button type="button" class="sakhi-followup-chip" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;font-weight:700;" onclick="window.askSakhiQuick('${escapeHtml(rc.query)}')">
+              ${escapeHtml(rc.text)} →
+            </button>
+          `;
+        }
       });
     }
 
@@ -3527,6 +3651,9 @@
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादा अवनीश जी से सीधा WhatsApp संपर्क')">
               💬 दादा अवनीश जी से संपर्क
             </button>
+            <a href="/tube.html" target="_blank" rel="noopener noreferrer" class="sakhi-menu-item" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:space-between;color:inherit;">
+              <span>🎬 आरोग्यम ट्यूब वीडियो</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;color:#2563eb;"></i>
+            </a>
           </div>
         </div>
 
@@ -3820,6 +3947,11 @@
 
   // Quick Action Helper
   window.askSakhiQuick = function (query) {
+    if (!isUserAuthenticated()) {
+      pendingUserQuery = query;
+      window.openSakhiAuthModal();
+      return;
+    }
     handleUserSubmit(query);
   };
 
@@ -3852,6 +3984,11 @@
 
   window.selectSakhiTopic = function (query) {
     window.toggleSakhiPlusMenu(false);
+    if (!isUserAuthenticated()) {
+      pendingUserQuery = query;
+      window.openSakhiAuthModal();
+      return;
+    }
     window.askSakhiQuick(query);
   };
 
@@ -3861,6 +3998,16 @@
     if (input && input.value.trim()) {
       const q = input.value.trim();
       input.value = '';
+      if (!isUserAuthenticated()) {
+        const phoneMatch = q.match(/(?:(?:\+91|91|0)?[-\s]?)?([6-9]\d{9})/);
+        if (phoneMatch) {
+          handleUserSubmit(q);
+          return;
+        }
+        pendingUserQuery = q;
+        window.openSakhiAuthModal();
+        return;
+      }
       handleUserSubmit(q);
     }
   };

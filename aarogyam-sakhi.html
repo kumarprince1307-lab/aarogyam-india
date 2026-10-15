@@ -205,7 +205,7 @@
         </div>
 
         <!-- ChatGPT-Style Plus Menu (Opened by [+] Button) -->
-        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none;">
+        <div class="sakhi-plus-menu" id="sakhiPlusMenu">
           <div class="sakhi-plus-menu-header">
             <span>✨ मुख्य विषय व टूल्स चुनें</span>
             <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)">✕</button>
@@ -238,6 +238,9 @@
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादा अवनीश जी से सीधा WhatsApp संपर्क')">
               💬 दादा अवनीश जी से संपर्क
             </button>
+            <a href="/tube.html" target="_blank" rel="noopener noreferrer" class="sakhi-menu-item" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:space-between;color:inherit;">
+              <span>🎬 आरोग्यम ट्यूब वीडियो</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;color:#2563eb;"></i>
+            </a>
           </div>
         </div>
 
@@ -267,7 +270,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261015_v121"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261015_v122"></script>
   <script>
     (function () {
       function resolveHeroName() {
