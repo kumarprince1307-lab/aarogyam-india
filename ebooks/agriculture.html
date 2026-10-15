@@ -1050,7 +1050,7 @@
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
   <script src="/js/book-marketing-card.js?v=20260918_v1"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261014_v90"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261015_v135"></script>
   <script src="/js/universal-video-loader.js?v=20260926_v1"></script>
   <script src="/js/viral-share-engine.js?v=20260925_v2"></script>
   <script src="/js/agriculture.js?v=20260918_v1"></script>
@@ -1116,26 +1116,13 @@
       }
     };
 
-    // 3. Consult AI Expert routes straight to Aarogyam Sakhi AI
+    // 3. Consult AI Expert routes straight to unified Aarogyam Sakhi AI page
     window.consultAiExpert = function(topic, desc) {
-      if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-        window.AarogyamSakhi.open();
-        const q = `${topic || 'कृषि समस्या'}${desc ? ': ' + desc : ''}`;
-        setTimeout(() => {
-          if (typeof window.AarogyamSakhi.ask === 'function') {
-            window.AarogyamSakhi.ask(q);
-          }
-        }, 400);
-      } else {
-        window.openFasalDoctorWhatsApp();
-      }
+      const q = `${topic || 'कृषि समस्या'}${desc ? ': ' + desc : ''}`;
+      window.location.href = `/aarogyam-sakhi.html?q=${encodeURIComponent(q)}`;
     };
 
     window.openFasalDoctorWhatsApp = function() {
-      if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-        window.AarogyamSakhi.open();
-        return;
-      }
       const proceed = () => {
         let userName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('user_name') || '';
         if (userName === 'null' || userName.trim() === '') userName = '';

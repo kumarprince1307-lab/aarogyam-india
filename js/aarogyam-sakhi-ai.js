@@ -3902,19 +3902,11 @@
     `;
   }
 
-  // 22. MODAL & EVENT LISTENERS
+  // 22. MODAL & EVENT LISTENERS (ZERO-MODAL ARCHITECTURE - ONLY DEDICATED /aarogyam-sakhi.html PAGE)
   function ensureModalBackdropExists() {
-    let backdrop = document.getElementById('sakhiModalBackdrop');
-    if (!backdrop && document.body) {
-      backdrop = document.createElement('div');
-      backdrop.id = 'sakhiModalBackdrop';
-      backdrop.className = 'sakhi-modal-backdrop';
-      backdrop.innerHTML = buildChatWindowMarkup(false);
-      document.body.appendChild(backdrop);
-      setupEventListeners(false);
-      renderInitialGreeting();
-    }
-    return backdrop;
+    if (checkIsDedicatedPage()) return null;
+    // On public pages, never inject modal into DOM. Cleanly redirect to dedicated page.
+    return null;
   }
 
   function setupEventListeners(isFullscreen) {
@@ -4131,11 +4123,9 @@
     if (pill) {
       pill.onclick = function (e) {
         if (e) e.preventDefault();
-        window.openSakhiModal();
+        window.location.href = '/aarogyam-sakhi.html';
       };
     }
-
-    ensureModalBackdropExists();
   }
 
   // 24. VIRAL SHARE
