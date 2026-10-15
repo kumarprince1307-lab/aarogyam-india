@@ -311,9 +311,14 @@
         localStorage.removeItem('aim_ns_sponsor_name');
         localStorage.removeItem('aarogyam_upline_phone');
         localStorage.removeItem('aim_last_sponsor_id');
+        localStorage.removeItem('SAKHI_USER_NAME');
+        localStorage.removeItem('SAKHI_USER_PHONE');
+        localStorage.removeItem('SAKHI_PERSONA_PROFILE');
+        localStorage.removeItem('SAKHI_CURRENT_SESSION_ID');
+        localStorage.removeItem('user_mobile');
         try { sessionStorage.clear(); } catch(e) {}
         
-        console.log("100% User session cleared. Reloading...");
+        console.log("100% User session cleared across site and Sakhi AI. Reloading...");
         window.location.reload();
     }
 

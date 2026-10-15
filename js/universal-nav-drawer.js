@@ -1150,6 +1150,12 @@
   });
 
   window.logoutUniversalUser = function () {
+    localStorage.removeItem('SAKHI_USER_NAME');
+    localStorage.removeItem('SAKHI_USER_PHONE');
+    localStorage.removeItem('SAKHI_PERSONA_PROFILE');
+    localStorage.removeItem('SAKHI_CURRENT_SESSION_ID');
+    localStorage.removeItem('user_mobile');
+
     if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
       window.V1_SESSION.logout();
       return;

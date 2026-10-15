@@ -423,9 +423,37 @@
 
   // Reliable, non-blocking check: if user has logged in anywhere on the website, they are authenticated!
   function isUserAuthenticated() {
-    if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) return true;
+    // 1. If V1_SESSION exists and reports logged out, treat as logged out!
+    if (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') {
+      if (!window.V1_SESSION.isLoggedIn()) {
+        localStorage.removeItem('SAKHI_USER_NAME');
+        localStorage.removeItem('SAKHI_USER_PHONE');
+        return false;
+      }
+    }
+    // 2. If main site auth keys were cleared, treat as logged out!
+    const hasMainSession = Boolean(
+      localStorage.getItem('AI_USER') || 
+      localStorage.getItem('AI_SESSION') || 
+      localStorage.getItem('aim_user_mobile') || 
+      localStorage.getItem('aarogyam_user_phone')
+    );
+    if (!hasMainSession) {
+      localStorage.removeItem('SAKHI_USER_NAME');
+      localStorage.removeItem('SAKHI_USER_PHONE');
+      return false;
+    }
     const phone = getUserPhone();
     return Boolean(phone && phone.length === 10);
+  }
+
+  // Cross-Tab & Site-Wide Logout Listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', function() {
+      if (!isUserAuthenticated()) {
+        updateSakhiHeaderUserBadge();
+      }
+    });
   }
 
   function getDynamicUserGreetingName() {
@@ -1108,14 +1136,24 @@
     return [];
   }
 
-  window.clearSakhiChatHistory = function() {
+  window.startSakhiNewChat = function() {
     try {
       const phone = getUserPhone() || 'user';
       localStorage.removeItem(`${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`);
       sessionChatHistory.length = 0;
+      sakhiConversationState.lastActiveDomain = null;
+      sakhiConversationState.lastActiveEntity = null;
+      sakhiConversationState.lastActiveEntityName = null;
+      sakhiConversationState.history = [];
+      consecutiveAmbiguousCount = 0;
+      const wrap = document.getElementById('sakhiMessagesWrap');
+      if (wrap) wrap.innerHTML = '';
       renderInitialGreeting();
-    } catch (e) {}
+    } catch (e) {
+      console.warn('startSakhiNewChat error:', e);
+    }
   };
+  window.clearSakhiChatHistory = window.startSakhiNewChat;
 
   // 10. CHAT UI INJECTION & MESSAGE STREAMER
   function appendUserMessage(text) {
@@ -1392,14 +1430,29 @@
 
   // 14. EVERYDAY CONVERSATIONS & CASUAL GREETINGS ROUTER (मानवीय व्यावहारिक बातचीत)
   function handleEverydayConversations(cleanQ, rawQ) {
+    // 0. Primary Greetings: "hi", "hello", "hey", "namaste", "namaskar", "ram ram", "radhe radhe"
+    const isPureGreeting = cleanQ === 'hi' || cleanQ === 'hello' || cleanQ === 'hey' || cleanQ === 'नमस्ते' || cleanQ === 'नमस्कार' || cleanQ === 'राम राम' || cleanQ === 'राधे राधे' || cleanQ === 'जय श्री राम' || cleanQ === 'हाय' || cleanQ === 'हेलो' || cleanQ === 'हेल्लो' || cleanQ === 'namaste' || cleanQ === 'namaskar' || cleanQ.startsWith('hi ') || cleanQ.startsWith('hello ') || cleanQ.startsWith('hey ');
+    if (isPureGreeting) {
+      const resp = `नमस्ते! 🙏 मैं **आरोग्यम सखी AI** — आपकी समर्पित डिजिटल हमदर्द व 24×7 सलाहकार हूँ।\n\nमैं आपकी खेती, पशुपालन, प्राकृतिक स्वास्थ्य, सौंदर्य और नेट्सर्फ के सभी समाधानों में 100% सटीक मार्गदर्शन देती हूँ।\n\nआज आप किस विषय पर जानकारी या परामर्श चाहते हैं? नीचे से विकल्प चुनें:`;
+      renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
+        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
+        { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+      ], 'casual', 'greeting_hub');
+      return true;
+    }
+
     // 1. "kaise ho" / "kaisi ho" / "kya haal hai"
     if (cleanQ.includes('kaise ho') || cleanQ.includes('kaisi ho') || cleanQ.includes('kya hal') || cleanQ.includes('kya haal') || cleanQ.includes('kaisa chal raha') || cleanQ.includes('how are you') || cleanQ.includes('kaise hain') || cleanQ.includes('आप कैसी हैं') || cleanQ.includes('आप कैसे हैं')) {
       const resp = `नमस्ते! 🙏 मैं बिल्कुल स्वस्थ और आपकी सेवा में सदैव तत्पर हूँ। आप कैसे हैं? आशा है आपकी खेती व परिवार में सब कुशल-मंगल होगा।\n\nआज मैं आपकी खेती (खाद-स्प्रे), पशुपालन (दूध-फैट), सेहत या नेट्सर्फ में किस विषय पर सहायता करूँ?`;
       renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
-        { text: '🌾 गेहूं/सरसों स्प्रे कैलेंडर', query: 'गेहूं का स्प्रे कैलेंडर' },
-        { text: '📚 कृषि ई-बुक्स गाइड', query: 'खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी' },
-        { text: '🐄 गाय-भैंस का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
-        { text: '🩺 जोड़ों का दर्द व गठिया इलाज', query: 'नेचुरामोर जॉइंट केयर के बारे में बताओ' }
+        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
+        { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
       ], 'casual', 'greeting');
       return true;
     }
@@ -1408,9 +1461,10 @@
     if (cleanQ.includes('kya kar rahe') || cleanQ.includes('kya kar rahi') || cleanQ.includes('kya karti ho') || cleanQ.includes('kya kaam hai')) {
       const resp = `मैं हमारे किसान साथियों और परिवारों के लिए खेती के वैज्ञानिक स्प्रे, पशुओं में दूध-फैट वृद्धि और आयुर्वेदिक स्वास्थ्य के 100% सटीक व प्रमाणित समाधान तैयार कर रही हूँ! 👩‍🌾✨\n\nबताइए, आज आपकी किस समस्या का समाधान करूँ?`;
       renderCrispSpecialBox('✨ 24×7 वैज्ञानिक AI सहायता', resp, [
-        { text: '🌾 फसल में खाद व स्प्रे फॉर्मूला', query: 'फसलों में खाद व स्प्रे फॉर्मूला बताएं' },
-        { text: '🐄 पशु पोषण व दूध-फैट सप्लीमेंट', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
-        { text: '🩺 नेचुरामोर स्वास्थ्य सप्लीमेंट्स', query: 'नेचुरामोर सप्लीमेंट्स की जानकारी' }
+        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों में खाद व स्प्रे फॉर्मूला बताएं' },
+        { text: '🐄 2. पशु पोषण व दूध-फैट सप्लीमेंट', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
+        { text: '🩺 3. स्वास्थ्य व नेचुरामोर सप्लीमेंट्स', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
+        { text: '💼 4. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
       ], 'casual', 'doing');
       return true;
     }
@@ -1419,9 +1473,11 @@
     if (cleanQ.includes('kisase ho rahi') || cleanQ.includes('kisse ho rahi') || cleanQ.includes('tum kaun') || cleanQ.includes('apna parichay') || cleanQ.includes('who are you') || cleanQ.includes('apna naam') || cleanQ.includes('naam kya hai') || cleanQ.includes('तुम कौन हो') || cleanQ.includes('मेरी बात किससे')) {
       const resp = `आपकी बात **आरोग्यम सखी AI** से हो रही है — जो आरोग्यम इंडिया का 24×7 समर्पित डिजिटल डॉक्टर व किसान सलाहकार है।\n\nमैं आधुनिक कृषि विज्ञान (फसल रोग, कीटनाशक, जैविक स्प्रे), पशुपालन (दुग्ध वृद्धि), आयुर्वेदिक स्वास्थ्य और नेट्सर्फ के सभी प्रमाणित उत्पादों की सही डोज व समय का प्रामाणिक मार्गदर्शन देती हूँ।`;
       renderCrispSpecialBox('👩‍🌾 आरोग्यम सखी AI — डिजिटल डॉक्टर व किसान सखी', resp, [
-        { text: '🌾 खेती व फसल रोग समाधान', query: 'फसल सुरक्षा व स्प्रे कैलेंडर' },
-        { text: '🩺 प्राकृतिक स्वास्थ्य समाधान', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
-        { text: '💬 अवनीश सर से सीधा संपर्क', query: 'फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क' }
+        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसल सुरक्षा व स्प्रे कैलेंडर' },
+        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
+        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
+        { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
       ], 'casual', 'identity');
       return true;
     }
@@ -1782,8 +1838,45 @@
       );
     }
 
-    // 4. Heart & BP (हार्ट, बीपी व उच्च रक्तचाप)
-    if (cleanQ.includes('heart') || cleanQ.includes('हार्ट') || cleanQ.includes('dil') || cleanQ.includes('बीपी') || cleanQ.includes('रक्तचाप') || cleanQ.includes('blood pressure') || cleanQ.includes('hypertension') || cleanQ.includes('कोलेस्ट्रॉल') || cleanQ.includes('ब्लॉकेज')) {
+    // 4. Heart & BP (हार्ट, बीपी, दिल व रक्तचाप)
+    const isHeartGeneral = cleanQ === 'heart' || cleanQ === 'हार्ट' || cleanQ === 'dil' || cleanQ === 'दिल' || cleanQ === 'blood' || cleanQ === 'खून' || cleanQ.includes('heart ke bare') || cleanQ.includes('दिल के बारे') || cleanQ.includes('हार्ट के बारे') || cleanQ.includes('रक्त के बारे');
+    const isHeartSpecific = cleanQ.includes('heart') || cleanQ.includes('हार्ट') || cleanQ.includes('dil') || cleanQ.includes('बीपी') || cleanQ.includes('रक्तचाप') || cleanQ.includes('blood pressure') || cleanQ.includes('hypertension') || cleanQ.includes('कोलेस्ट्रॉल') || cleanQ.includes('ब्लॉकेज');
+
+    if (isHeartGeneral) {
+      const resp = `हृदय (Heart) हमारे शरीर का सबसे महत्वपूर्ण अंग है, जो 24 घंटे रक्त व ऑक्सीजन का संचार करता है।\n\nधमनियों में खराब कोलेस्ट्रॉल (LDL) जमने, मानसिक तनाव और उच्च रक्तचाप (High BP) से दिल पर अतिरिक्त दबाव पड़ता है।\n\nआप हृदय स्वास्थ्य के किस विषय पर सटीक जानकारी व समाधान चाहते हैं? नीचे से विकल्प चुनें:`;
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          ❤️ हृदय सुरक्षा व रक्त संचार (Heart & Vascular Health)
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${formatTextHtml(resp)}
+        </div>
+        ${buildMsgAudioBtnMarkup(resp)}
+
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 हृदय स्वास्थ्य के 4 प्रमुख विषय चुनें:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर न्यूट्री हार्ट कैप्सूल के फायदे और खुराक')">🩺 1. नेचुरामोर न्यूट्री हार्ट (घटक व खुराक)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('हाई बीपी और रक्तचाप संतुलन के उपाय')">🩸 2. हाई बीपी (रक्तचाप) संतुलन</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('कोलेस्ट्रॉल कम करने और ब्लॉकेज रोकने का डाइट चार्ट')">🫀 3. कोलेस्ट्रॉल व ब्लॉकेज रोकथाम डाइट</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('हृदय रोग से बचाव के घरेलू नुस्खे')">🥗 4. हृदय सुरक्षा डाइट व परहेज</button>
+          </div>
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 क्लिनिकल पेज व 25% फ्लैट छूट:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <a href="/health/heart-care.html" target="_blank" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              ❤️ हृदय स्वास्थ्य क्लिनिकल गाइड खोलें व 25% छूट पर ऑर्डर करें →
+            </a>
+          </div>
+        </div>
+      `;
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = 'nutri_heart';
+      sakhiConversationState.lastActiveEntityName = 'हार्ट सुरक्षा व कोलेस्ट्रॉल';
+      streamBotMessage(html, cleanTextForTTS('हृदय सुरक्षा और रक्तचाप संतुलन के लिए नेचुरामोर न्यूट्री हार्ट और संतुलित आहार सर्वोत्तम है। नीचे से अपना विषय चुनें।'));
+      return true;
+    }
+
+    if (isHeartSpecific) {
       return renderHealthTopicPage(
         'हार्ट सुरक्षा, बीपी व कोलेस्ट्रॉल संतुलन',
         'धमनियों (Arteries) में खराब कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स जमने से नसों का लचीलापन घटता है, जिससे ब्लड प्रेशर बढ़ता है और हार्ट अटैक का खतरा होता है।',
@@ -2787,6 +2880,97 @@
     return true;
   }
 
+  // 17.3 DEDICATED CONVERSATIONAL NETSURF OVERVIEW ROUTER (4-5 Category Options & Direct Landing Links)
+  function handleConversationalNetsurf(cleanQ, rawQ) {
+    const isNetsurfGeneral = cleanQ === 'netsurf' || cleanQ === 'नेट्सर्फ' || cleanQ === 'about netsurf' || cleanQ.includes('about netsurf') || cleanQ.includes('netsurf kya hai') || cleanQ.includes('नेट्सर्फ क्या है') || cleanQ === 'netsurf company' || cleanQ === 'नेट्सर्फ कंपनी' || cleanQ === 'netsurf ke bare me' || cleanQ.includes('नेट्सर्फ के बारे में');
+    const isAskingPlanExplicitly = cleanQ.includes('plan') || cleanQ.includes('प्लान') || cleanQ.includes('8.19') || cleanQ.includes('capping') || cleanQ.includes('कैपिंग') || cleanQ.includes('income') || cleanQ.includes('कमाई') || cleanQ.includes('कमीशन') || cleanQ.includes('commission');
+
+    if (isNetsurfGeneral && !isAskingPlanExplicitly) {
+      const resp = `नेट्सर्फ (Netsurf Communications Pvt. Ltd.) भारत की 26 वर्षों से प्रतिष्ठित 100% स्वदेशी डायरेक्ट सेलिंग कंपनी है, जिसका मुख्यालय पुणे में है।\n\nनेट्सर्फ के उत्पाद 4 प्रमुख वैज्ञानिक वर्टिकल्स (खेती, स्वास्थ्य, सौंदर्य, पशुपालन) में कार्य करते हैं और सभी उत्पादों पर **25% फ्लैट छूट** व **5+1 ऑटो-शिपिंग (6वें माह मुफ्त)** मिलती है।\n\nआप नेट्सर्फ के किस विषय के बारे में जानना चाहते हैं? नीचे से विकल्प चुनें:`;
+
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          🏢 नेट्सर्फ (Netsurf) — 26 वर्षों का स्वदेशी विश्वास
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${formatTextHtml(resp)}
+        </div>
+        ${buildMsgAudioBtnMarkup(resp)}
+
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 4 प्रमुख वर्टिकल्स व करियर विकल्प चुनें:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('बायोफिट जैविक खेती उत्पाद')">🌾 1. बायोफिट (जैविक खेती)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर स्वास्थ्य सप्लीमेंट्स')">🌿 2. नेचुरामोर (हेल्थ सप्लीमेंट्स)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('हर्ब्स एंड मोर स्किन केयर')">🌸 3. हर्ब्स एंड मोर (पर्सनल व ब्यूटी)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('पेट वेट और सीएफसी प्लस का काम बताओ')">🐄 4. पेट-वेट (पशु पोषण व दुग्ध वृद्धि)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ 25% छूट व 8.19 लाख कैपिंग बिजनेस प्लान बताओ')">💼 5. 25% छूट व बिज़नेस प्लान</button>
+          </div>
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 आधिकारिक पेज व कैटलॉग:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <a href="/categories/netsurf.html" target="_blank" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              💼 नेट्सर्फ करियर व प्लान पेज खोलें →
+            </a>
+            <a href="/categories/netsurf-products.html" target="_blank" class="sakhi-followup-chip" style="background:#0284c7;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              📥 7 भाषाओं में Netsurf-Catalog डाउनलोड करें →
+            </a>
+          </div>
+        </div>
+      `;
+      sakhiConversationState.lastActiveDomain = 'netsurf';
+      sakhiConversationState.lastActiveEntity = 'netsurf_overview';
+      sakhiConversationState.lastActiveEntityName = 'नेट्सर्फ परिचय';
+      streamBotMessage(html, cleanTextForTTS('नेट्सर्फ 26 वर्षों से प्रतिष्ठित स्वदेशी कंपनी है जिसके 4 प्रमुख वर्टिकल्स हैं। कृपया अपना विषय चुनें।'));
+      return true;
+    }
+    return false;
+  }
+
+  // 17.4 DEDICATED CONVERSATIONAL BIOFIT OVERVIEW ROUTER (4-5 Category Options & Direct Landing Links)
+  function handleConversationalBiofit(cleanQ, rawQ) {
+    const isBiofitGeneral = cleanQ === 'biofit' || cleanQ === 'बायोफिट' || cleanQ === 'about biofit' || cleanQ.includes('about biofit') || cleanQ.includes('बायोफिट क्या है') || cleanQ.includes('biofit kya hai') || cleanQ.includes('बायोफिट के बारे में');
+    const isSpecificProduct = cleanQ.includes('stimrich') || cleanQ.includes('स्टिमरिच') || cleanQ.includes('bio-99') || cleanQ.includes('बायो-99') || cleanQ.includes('wrap up') || cleanQ.includes('रैप अप') || cleanQ.includes('intact') || cleanQ.includes('इंटैक्ट') || cleanQ.includes('npk') || cleanQ.includes('कैलेंडर');
+
+    if (isBiofitGeneral && !isSpecificProduct) {
+      const resp = `बायोफिट (Biofit) नेट्सर्फ की 100% प्रमाणित व विषमुक्त जैविक कृषि तकनीक है। यह रासायनिक खादों व जहरीले कीटनाशकों का खर्च 40-50% घटाकर पैदावार 25-40% तक बढ़ाती है।\n\nआप बायोफिट के किस समाधान के बारे में जानना चाहते हैं? नीचे से विकल्प चुनें:`;
+
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          🌾 बायोफिट (Biofit) — जहरमुक्त खेती, समृद्ध किसान
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${formatTextHtml(resp)}
+        </div>
+        ${buildMsgAudioBtnMarkup(resp)}
+
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 बायोफिट मुख्य उत्पाद व स्प्रे कैलेंडर:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('स्टिमरिच और बायो-99 की सही डोज क्या है?')">🌱 1. स्टिमरिच + बायो-99 (वृद्धि व फुटाव)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('रैप अप फंगस रोधक का उपयोग')">🛡️ 2. रैप अप (फंगल व वायरस सुरक्षा)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इंटैक्ट जैविक कीटनाशक रस चूसक कीट')">🐛 3. इंटैक्ट (जैविक कीट नियंत्रण)</button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('फसलों में खाद व स्प्रे फॉर्मूला बताएं')">📅 4. 4-चरण वैज्ञानिक स्प्रे कैलेंडर</button>
+          </div>
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 आधिकारिक पेज व फसल डॉक्टर:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <a href="/crop-doctor.html" target="_blank" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              🌾 फसल डॉक्टर पेज खोलें →
+            </a>
+            <a href="/categories/netsurf-products.html" target="_blank" class="sakhi-followup-chip" style="background:#0284c7;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              📦 बायोफिट उत्पाद कैटलॉग देखें →
+            </a>
+          </div>
+        </div>
+      `;
+      sakhiConversationState.lastActiveDomain = 'agri';
+      sakhiConversationState.lastActiveEntity = 'biofit_overview';
+      sakhiConversationState.lastActiveEntityName = 'बायोफिट जैविक कृषि';
+      streamBotMessage(html, cleanTextForTTS('बायोफिट नेट्सर्फ की जैविक कृषि तकनीक है। कृपया अपना विषय या उत्पाद चुनें।'));
+      return true;
+    }
+    return false;
+  }
+
   // 17.5 DEDICATED NETSURF CORPORATE PROFILE, FOUNDERS & 4-VERTICAL PORTFOLIO ROUTER
   function handleNetsurfCompanyProfile(cleanQ, query) {
     const isProfileKeyword = cleanQ.includes('प्रोफाइल') || cleanQ.includes('profile') || cleanQ.includes('कंपनी की प्रोफाइल') || cleanQ.includes('कंपनी प्रोफाइल') || cleanQ.includes('कंपनी परिचय') || cleanQ.includes('company profile');
@@ -2867,7 +3051,7 @@
     const isNetsurf = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('बायोफिट') || cleanQ.includes('biofit');
     const isPlan = cleanQ.includes('plan') || cleanQ.includes('प्लान') || cleanQ.includes('कमीशन') || cleanQ.includes('commission') || cleanQ.includes('8.19') || cleanQ.includes('8,19,250') || cleanQ.includes('819250') || cleanQ.includes('1638500') || cleanQ.includes('16.38') || cleanQ.includes('कैपिंग') || cleanQ.includes('बाइनरी') || cleanQ.includes('डायरेक्ट सेलिंग') || cleanQ.includes('रिटेल') || cleanQ.includes('क्लब नेट्सर्फ') || cleanQ.includes('बिजनेस प्लान') || cleanQ.includes('बिज़नेस प्लान') || cleanQ.includes('ऑटो शिपिंग') || cleanQ.includes('ऑटो-शिप') || cleanQ.includes('5+1') || cleanQ.includes('डिस्काउंट') || cleanQ.includes('जॉइनिंग') || cleanQ.includes('joining') || cleanQ.includes('फीस');
 
-    if ((isNetsurf && isPlan) || cleanQ.includes('नेट्सर्फ प्लान') || cleanQ.includes('netsurf plan') || cleanQ.includes('8,19,250') || cleanQ.includes('819250') || cleanQ.includes('1638500') || cleanQ === 'netsurf' || cleanQ === 'नेट्सर्फ' || cleanQ.includes('नेट्सर्फ (25% छूट व प्लान)')) {
+    if ((isNetsurf && isPlan) || cleanQ.includes('नेट्सर्फ प्लान') || cleanQ.includes('netsurf plan') || cleanQ.includes('नेट्सर्फ बिजनेस प्लान') || cleanQ.includes('नेट्सर्फ बिज़नेस प्लान') || cleanQ.includes('8,19,250') || cleanQ.includes('819250') || cleanQ.includes('1638500') || cleanQ.includes('नेट्सर्फ (25% छूट व प्लान)')) {
       const planAnswer = `नेट्सर्फ एक डायरेक्ट सेलिंग कंपनी है जो पिछले 26 सालों से स्वास्थ्य, जैविक खेती और डायरेक्ट सेलिंग में काम कर रही है। आप इसके बारे में क्या जानना चाहते हैं?\n\nनेट्सर्फ का प्रमाणित बिज़नेस प्लान मुख्य रूप से Consumer, Retailer और Super Retailer के लिए है:\n\n1. **Consumer (उपभोक्ता) प्लान:**\n• **फ्री जॉइनिंग:** कोई रजिस्ट्रेशन शुल्क नहीं।\n• **₹100 प्रोडक्ट वाउचर:** जॉइनिंग पर तुरंत ₹100 का वाउचर।\n• **25% फ्लैट डिस्काउंट:** सभी प्रोडक्ट्स पर सीधा 25% डिस्काउंट (कोई पुराना 25-30% का आंकड़ा नहीं, बिल्कुल पक्का 25% डिस्काउंट)।\n• **5+1 ऑटो-शिपिंग:** हर महीने नियमित खरीदारी करने पर 6वें महीने उत्पाद बिल्कुल मुफ्त (5 खरीदें + 1 फ्री)!\n\n2. **Retailer (रिटेलर) प्लान — 4 बड़े आय स्रोत:**\n• 1) **Retail Commission:** 5% से 15% (यह साप्ताहिक मिलता है)।\n• 2) **Generation Income:** 3% से 8% (10,000 टर्नओवर पर 3%, 20k पर 4%, 40k पर 5%, 80k पर 6%, 1.20L पर 7%, 1.60L पर 8% — यह 15-15 दिन में मिलता है)।\n• 3) **Binary / Team Commission:** लगभग 3% से 5% (यह भी हर 15-15 दिन में मिलता है)। **15 दिन की अधिकतम सीमा ₹8,19,250 (पाक्षिक कैपिंग)** है। क्या आप महीने का ₹16,38,500 कमाना चाहते हैं? तो अभी दादा अविनाश (अवनीश) से संपर्क करें और यह पेज ओपन करें।\n• 4) **Other Benefits:** क्लब नेट्सर्फ, फैमिली प्रोटेक्शन प्लान (₹10 लाख दुर्घटना बीमा व नॉमिनी सुरक्षा), और राष्ट्रीय व अंतरराष्ट्रीय यात्राएं।`;
 
       const waOfferUrl = buildAvneeshWhatsAppHandoffUrl('नेट्सर्फ बिज़नेस प्लान व 15-दिवसीय ₹8.19L कैपिंग मार्गदर्शन');
@@ -2929,6 +3113,19 @@
       return;
     }
 
+    // 0.01 Everyday Conversational & Casual Social Router (Hi, Hello, Namaste, Kaise ho, Tum kaun ho)
+    if (handleEverydayConversations(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.02 Conversational Netsurf & Biofit General Overview (4-5 Category Options & Landing Page Links)
+    if (handleConversationalNetsurf(cleanQ, rawQ)) {
+      return;
+    }
+    if (handleConversationalBiofit(cleanQ, rawQ)) {
+      return;
+    }
+
     // 0.05 Dedicated Aarogyam Tube Video Hub Router
     if (handleAarogyamTubeRouter(cleanQ, rawQ)) {
       return;
@@ -2956,11 +3153,6 @@
 
     // 0.5 Beauty, Skincare, Haircare, Weight & Women Empowerment Engine (Cosmetics & Self-Care)
     if (handleBeautyHairWeightWomenEmpowerment(cleanQ, rawQ)) {
-      return;
-    }
-
-    // 1. Everyday Conversational & Casual Social Router
-    if (handleEverydayConversations(cleanQ, rawQ)) {
       return;
     }
 
@@ -3540,6 +3732,30 @@
       });
       if (records.length > 60) records.length = 60;
       localStorage.setItem('sakhi_learning_telemetry', JSON.stringify(records));
+
+      if (!isResolved) {
+        const uList = JSON.parse(localStorage.getItem('sakhi_unanswered_queries') || '[]');
+        const phone = getUserPhone() || '';
+        const name = getUserDisplayName() || '';
+        const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('user_share_id') || '';
+        const existingIdx = uList.findIndex(item => item.query === userQuery);
+        if (existingIdx >= 0) {
+          uList[existingIdx].count = (uList[existingIdx].count || 1) + 1;
+          uList[existingIdx].timestamp = new Date().toISOString();
+        } else {
+          uList.unshift({
+            query: userQuery,
+            domain: domain || 'omni',
+            user: name,
+            phone: phone,
+            share_id: shareId,
+            count: 1,
+            timestamp: new Date().toISOString()
+          });
+        }
+        if (uList.length > 50) uList.length = 50;
+        localStorage.setItem('sakhi_unanswered_queries', JSON.stringify(uList));
+      }
     } catch (e) {
       // Ignore storage errors
     }
@@ -3596,6 +3812,10 @@
           </div>
           <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:6px;">
             <div id="sakhiHeaderUserBadgeWrap" style="display:inline-flex;align-items:center;"></div>
+            <button type="button" class="sakhi-new-chat-btn" id="sakhiNewChatBtn" onclick="window.startSakhiNewChat()" title="नई बातचीत शुरू करें" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:18px;padding:4px 10px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">
+              <i class="fa-solid fa-plus"></i>
+              <span>नई चैट</span>
+            </button>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="पूर्ण स्क्रीन टॉगल">
               <i class="fa-solid fa-expand"></i>
             </button>

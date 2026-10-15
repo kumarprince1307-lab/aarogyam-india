@@ -527,6 +527,9 @@ function renderProfile(detail, ucasData) {
     <!-- 7. Direct Referral Summary Section -->
     ${renderReferralInformation(detail)}
 
+    <!-- 7.5 Aarogyam Sakhi AI Insights Section -->
+    ${renderSakhiAiUserSection(detail)}
+
     <!-- 7. Purchases Section -->
     <div class="admin-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
@@ -540,6 +543,55 @@ function renderProfile(detail, ucasData) {
 
     <!-- 8. Permissions Matrix Section -->
     ${renderPermissionsSection(detail.id, permissions)}
+  `;
+}
+
+function renderSakhiAiUserSection(detail) {
+  const meta = detail?.metadata || {};
+  const sakhiData = meta.sakhi_insights || meta.sakhi_profile || null;
+  const lastQuery = sakhiData?.last_query || meta.sakhi_last_query || null;
+  const primaryDomain = sakhiData?.primary_domain || meta.sakhi_domain || null;
+  const interactionCount = sakhiData?.interaction_count || meta.sakhi_interactions || 0;
+  const domainLabelMap = {
+    agri: '🌾 जैविक खेती व फसल (Agri)',
+    pashu: '🐄 पशु पोषण व डेयरी (Dairy)',
+    health: '🩺 स्वास्थ्य व आयुर्वेद (Health)',
+    beauty: '✨ सौंदर्य व स्किनकेयर (Beauty)',
+    netsurf: '🧴 नेट्सर्फ व बायोफिट (Netsurf)',
+    business: '💼 25% छूट व बिज़नेस (Business)',
+    omni: '🌐 बहु-विषयक (Omni)'
+  };
+  const domainLabel = domainLabelMap[primaryDomain] || (primaryDomain ? primaryDomain.toUpperCase() : 'सामान्य / सर्व-समाधान');
+
+  return `
+    <div class="admin-section" style="border-left: 4px solid #16a34a; background: linear-gradient(135deg, rgba(22, 163, 74, 0.03), transparent);">
+      <div class="admin-section-header">
+        <div class="admin-section-title" style="display:flex;align-items:center;gap:8px;">
+          <span>🌸</span> आरोग्यम सखी AI — उपयोगकर्ता बातचीत अंतर्दृष्टि (Zero-Egress Insights)
+        </div>
+        <span class="admin-pill ${interactionCount > 0 ? 'active' : ''}">
+          ${interactionCount > 0 ? `${interactionCount} संवाद दर्ज` : 'सुरक्षित स्थानीय सत्र'}
+        </span>
+      </div>
+
+      <div class="admin-details-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 12px;">
+        <div class="admin-detail-item">
+          <div class="admin-detail-label">प्राथमिक रुचि / डोमेन</div>
+          <div class="admin-detail-value" style="font-weight:700;color:#166534;">${domainLabel}</div>
+        </div>
+        <div class="admin-detail-item">
+          <div class="admin-detail-label">अंतिम पूछा गया सवाल / विषय</div>
+          <div class="admin-detail-value">${lastQuery ? `"${lastQuery}"` : '<span style="color:#94a3b8;">नियमित परामर्श जारी</span>'}</div>
+        </div>
+        <div class="admin-detail-item">
+          <div class="admin-detail-label">शेयर ID व क्लाइंट सुरक्षा</div>
+          <div class="admin-detail-value"><span style="font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:4px;">${detail.share_id || 'AGRI2026'}</span> (100% क्लाइंट-साइड गोपनीयता)</div>
+        </div>
+      </div>
+      <div style="font-size:0.8rem;color:#64748b;margin-top:10px;line-height:1.4;">
+        💡 <strong>जीरो-एग्रेस सुरक्षा:</strong> सखी AI का सारा डेटा उपयोगकर्ता के ब्राउज़र सत्र में शून्य क्लाउड बिल के साथ सुरक्षित रहता है।
+      </div>
+    </div>
   `;
 }
 

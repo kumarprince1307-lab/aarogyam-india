@@ -496,7 +496,10 @@ function renderUnansweredQueries() {
 
   tbody.innerHTML = list.map((item, idx) => {
     const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString('hi-IN') : 'हाल ही में';
-    const userDisplay = item.user ? `${item.user} ${item.phone ? '(' + item.phone + ')' : ''}` : (item.phone || 'अज्ञात यूजर');
+    let userDisplay = item.user ? `${item.user} ${item.phone ? '(' + item.phone + ')' : ''}` : (item.phone || 'अज्ञात यूजर');
+    if (item.share_id) {
+      userDisplay += ` [ID: ${item.share_id}]`;
+    }
     const safeQ = encodeURIComponent(item.query || '');
     const safeDom = encodeURIComponent(item.domain || 'agri');
 
