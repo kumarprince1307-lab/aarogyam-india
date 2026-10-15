@@ -1032,8 +1032,8 @@
           <i class="fa-solid fa-share-nodes"></i>
         </button>
 
-        <!-- 4. Green AI Expert Consultation Button -->
-        <a href="javascript:void(0)" onclick="if(window.consultAiExpert){window.consultAiExpert('AI एक्सपर्ट परामर्श');}else{window.location.href=window.getPersonalizedWhatsAppUrl('AI एक्सपर्ट परामर्श');}" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp AI एक्सपर्ट" aria-label="AI Expert" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+        <!-- 4. Green Official WhatsApp Helpdesk Button -->
+        <a href="javascript:void(0)" onclick="if(window.getPersonalizedWhatsAppUrl){window.open(window.getPersonalizedWhatsAppUrl('WhatsApp सहायता'), '_blank');}else{window.open('https://api.whatsapp.com/send?phone=917974422572', '_blank');}" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp पर संपर्क करें" aria-label="WhatsApp Contact" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-brands fa-whatsapp"></i>
         </a>
       </div>
@@ -1197,7 +1197,7 @@
   function injectSakhiPillDirectly() {
     if (document.getElementById('sakhiFloatingPill')) return;
     const path = (window.location.pathname || '').toLowerCase();
-    if (path.includes('aarogyam-sakhi.html')) return;
+    if (path.includes('aarogyam-sakhi.html') || path.includes('tube')) return;
 
     let pillLabel = 'आरोग्यम सखी AI';
     if (path.includes('hair') || path.includes('skin') || path.includes('beauty')) {
@@ -1275,15 +1275,18 @@
   }
 
   function ensureAarogyamSakhiLoaded() {
+    const path = (window.location.pathname || '').toLowerCase();
+    if (path.includes('aarogyam-sakhi.html') || path.includes('tube')) return;
+
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '/css/aarogyam-sakhi-ai.css?v=20261015_v121';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261015_v125';
       document.head.appendChild(link);
     }
     if (!window.AarogyamSakhi && !document.querySelector('script[src*="aarogyam-sakhi-ai.js"]')) {
       const script = document.createElement('script');
-      script.src = '/js/aarogyam-sakhi-ai.js?v=20261015_v122';
+      script.src = '/js/aarogyam-sakhi-ai.js?v=20261015_v125';
       script.async = true;
       document.body.appendChild(script);
     }
@@ -1292,8 +1295,11 @@
   function initUniversalDrawerAndSakhi() {
     injectUniversalSideDrawer();
     checkPwaInstallState();
-    ensureAarogyamSakhiLoaded();
-    injectSakhiPillDirectly();
+    const path = (window.location.pathname || '').toLowerCase();
+    if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html')) {
+      ensureAarogyamSakhiLoaded();
+      injectSakhiPillDirectly();
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -1303,6 +1309,9 @@
   }
   window.addEventListener('load', () => {
     checkPwaInstallState();
-    injectSakhiPillDirectly();
+    const path = (window.location.pathname || '').toLowerCase();
+    if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html')) {
+      injectSakhiPillDirectly();
+    }
   });
 })();

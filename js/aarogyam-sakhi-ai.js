@@ -3837,11 +3837,14 @@
           <!-- Rendered dynamically -->
         </div>
 
+        <!-- Backdrop for Plus Menu to easily dismiss on mobile tap -->
+        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
+
         <!-- ChatGPT-Style Plus Menu (Opened by [+] Button) -->
         <div class="sakhi-plus-menu" id="sakhiPlusMenu">
           <div class="sakhi-plus-menu-header">
             <span>✨ मुख्य विषय व टूल्स चुनें</span>
-            <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)">&times;</button>
+            <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false); if(event.cancelable) event.preventDefault();" aria-label="बंद करें">&times;</button>
           </div>
           <div class="sakhi-plus-grid">
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">
@@ -4095,9 +4098,12 @@
 
   // 23. FLOATING PILL & UI INJECTION ACROSS REGULAR PAGES
   function injectSakhiUI() {
-    if (checkIsDedicatedPage()) {
-      setupEventListeners(true);
-      renderInitialGreeting();
+    const isTube = (window.location.pathname || '').toLowerCase().includes('tube');
+    if (checkIsDedicatedPage() || isTube) {
+      if (checkIsDedicatedPage()) {
+        setupEventListeners(true);
+        renderInitialGreeting();
+      }
       return;
     }
 
@@ -4175,31 +4181,36 @@
     handleUserSubmit(query);
   };
 
-  // Butter-Smooth Plus Menu Toggle with Outside-Click Auto-Close
+  // Butter-Smooth Plus Menu Toggle with Touch-Safe Backdrop and Auto-Close
   window.toggleSakhiPlusMenu = function (forceState) {
     const menu = document.getElementById('sakhiPlusMenu');
+    const backdrop = document.getElementById('sakhiPlusMenuBackdrop');
     if (!menu) return;
     const isOpen = menu.classList.contains('active');
     const shouldOpen = (typeof forceState === 'boolean') ? forceState : !isOpen;
     if (shouldOpen) {
       menu.classList.add('active');
+      if (backdrop) backdrop.classList.add('active');
     } else {
       menu.classList.remove('active');
+      if (backdrop) backdrop.classList.remove('active');
     }
   };
 
-  // Global Outside-Click Listener for Butter-Smooth Experience
+  // Robust Outside-Click and Touch Dismiss Listener for Plus Menu
   if (!window._sakhiOutsideClickBound) {
     window._sakhiOutsideClickBound = true;
-    document.addEventListener('click', function (e) {
+    const handleOutsideDismiss = function (e) {
       const menu = document.getElementById('sakhiPlusMenu');
       const plusBtn = document.getElementById('sakhiPlusBtn');
       if (menu && menu.classList.contains('active')) {
         if (!menu.contains(e.target) && (!plusBtn || !plusBtn.contains(e.target))) {
-          menu.classList.remove('active');
+          window.toggleSakhiPlusMenu(false);
         }
       }
-    });
+    };
+    document.addEventListener('click', handleOutsideDismiss);
+    document.addEventListener('touchend', handleOutsideDismiss, { passive: true });
   }
 
   window.selectSakhiTopic = function (query) {
