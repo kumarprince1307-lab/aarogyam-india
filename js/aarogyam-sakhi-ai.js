@@ -1063,7 +1063,7 @@
   // 9. KNOWLEDGE BASE LOADER (WITH PERSISTENT CACHE BUSTING)
   async function loadKnowledgeBase() {
     try {
-      const res = await fetch('/data/krishi-ai-knowledge.json?v=20261015_v120');
+      const res = await fetch('/data/krishi-ai-knowledge.json?v=20261015_v121');
       if (res.ok) {
         knowledgeData = await res.json();
       }
@@ -1783,7 +1783,9 @@
     }
 
     // 5. Women Care & PCOD
-    if (cleanQ.includes('pcod') || cleanQ.includes('pcos') || cleanQ.includes('महिला') || cleanQ.includes('मासिक धर्म') || cleanQ.includes('पीरियड्स') || cleanQ.includes('कमर दर्द')) {
+    const isWomenClinical = (cleanQ.includes('pcod') || cleanQ.includes('pcos') || cleanQ.includes('मासिक धर्म') || cleanQ.includes('माहवारी') || cleanQ.includes('पीरियड्स') || cleanQ.includes('अनियमित माहवारी') || ((cleanQ.includes('महिला') || cleanQ.includes('स्त्री') || cleanQ.includes('women')) && (cleanQ.includes('हार्मोन') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('असंतुलन') || cleanQ.includes('ओवरी') || cleanQ.includes('कमर दर्द')))) &&
+      !cleanQ.includes('कमाई') && !cleanQ.includes('बिजनेस') && !cleanQ.includes('बिज़नेस') && !cleanQ.includes('ई-टेलर') && !cleanQ.includes('घर बैठे') && !cleanQ.includes('रोजगार') && !cleanQ.includes('स्वावलंबन');
+    if (isWomenClinical) {
       return renderHealthTopicPage(
         'महिला स्वास्थ्य, PCOD/PCOS व हार्मोनल संतुलन',
         'एस्ट्रोजन और प्रोजेस्टेरोन हार्मोन के असंतुलन से ओवरी में छोटे सिस्ट बनते हैं, जिससे अनियमित माहवारी, वजन बढ़ना व चेहरे पर अनचाहे बाल आते हैं।',
@@ -1797,7 +1799,9 @@
     }
 
     // 6. Weight Loss & Obesity
-    if (cleanQ.includes('weight loss') || cleanQ.includes('वजन घटाना') || cleanQ.includes('मोटापा') || cleanQ.includes('चर्बी') || cleanQ.includes('fat kam')) {
+    const isWeightLossClinical = (cleanQ.includes('weight loss') || cleanQ.includes('वजन घटाना') || cleanQ.includes('मोटापा') || cleanQ.includes('चर्बी') || cleanQ.includes('fat kam')) &&
+      !cleanQ.includes('थायराइड') && !cleanQ.includes('थायरॉयड') && !cleanQ.includes('thyroid') && !cleanQ.includes('tsh') && !cleanQ.includes('पशु') && !cleanQ.includes('गाय') && !cleanQ.includes('भैंस');
+    if (isWeightLossClinical) {
       return renderHealthTopicPage(
         'प्राकृतिक मोटापा व वजन नियंत्रण',
         'धीमा मेटाबॉलिज्म (Metabolism) और थायरॉयड की सुस्ती भोजन की कैलोरी को फैट में बदलकर पेट व कमर पर जमा करती है।',
@@ -1811,7 +1815,9 @@
     }
 
     // 7. Men Vitality & Stamina (पौरुष शक्ति)
-    if (cleanQ.includes('stamina') || cleanQ.includes('पुरुष') || cleanQ.includes('पौरुष') || cleanQ.includes('कमजोरी') || cleanQ.includes('शुक्राणु') || cleanQ.includes('मर्दाना') || cleanQ.includes('शीघ्रपतन')) {
+    const isMenVitality = (cleanQ.includes('stamina') || cleanQ.includes('पौरुष') || cleanQ.includes('शुक्राणु') || cleanQ.includes('मर्दाना') || cleanQ.includes('शीघ्रपतन') || ((cleanQ.includes('पुरुष') || cleanQ.includes('men')) && (cleanQ.includes('कमजोरी') || cleanQ.includes('स्टेमिना') || cleanQ.includes('ऊर्जा')))) &&
+      !cleanQ.includes('पशु') && !cleanQ.includes('गाय') && !cleanQ.includes('भैंस') && !cleanQ.includes('बछड़ा') && !cleanQ.includes('बकरी') && !cleanQ.includes('फसल');
+    if (isMenVitality) {
       return renderHealthTopicPage(
         'पुरुष स्वास्थ्य, ऊर्जा व पौरुष शक्ति वृद्धि',
         'टेस्टोस्टेरोन हार्मोन की कमी, अत्यधिक मानसिक तनाव व खराब रक्त संचार से दिनभर थकान और पौरुष कमजोरी महसूस होती है।',
@@ -1824,14 +1830,14 @@
       );
     }
 
-    // 8. Thyroid Care
-    if (cleanQ.includes('thyroid') || cleanQ.includes('थायराइड') || cleanQ.includes('थायरॉयड') || cleanQ.includes('tsh')) {
+    // 8. Thyroid Care (हाइपो/हाइपर थायरॉयड व अनियंत्रित वजन संतुलन)
+    if (cleanQ.includes('thyroid') || cleanQ.includes('थायराइड') || cleanQ.includes('थायरॉयड') || cleanQ.includes('tsh') || cleanQ.includes('t3') || cleanQ.includes('t4')) {
       return renderHealthTopicPage(
-        'थायरॉयड ग्रंथि संतुलन व मेटाबॉलिज्म केयर',
-        'थायरॉयड ग्रंथि जब पर्याप्त T3 और T4 हार्मोन नहीं बनाती (Hypothyroidism), तो वजन तेजी से बढ़ता है, बाल झड़ते हैं और सुस्ती छाई रहती है।',
-        'धनिया के बीज का पानी, अखरोट, बादाम, नारियल तेल, कद्दू के बीज और हरी सब्जियां।',
-        'सोयाबीन, पत्तागोभी, फूलगोभी, अत्यधिक ठंडा भोजन व डिब्बाबंद खाद्य पदार्थ।',
-        'नेचुरामोर लाइफस्टाइल कैप्सूल + नेचुरामोर प्लस पाउडर (25% फ्लैट छूट)।',
+        'थायरॉयड ग्रंथि संतुलन व मेटाबॉलिज्म केयर (Thyroid & Weight Protocol)',
+        'थायरॉयड ग्रंथि जब पर्याप्त T3 और T4 हार्मोन नहीं बनाती (Hypothyroidism), तो मेटाबॉलिज्म धीमा होकर वजन तेजी से बढ़ता है, सुस्ती आती है और बाल झड़ते हैं। वहीं Hyperthyroidism में वजन अनियंत्रित रूप से घटता है।',
+        'साबुत धनिया के बीज का उबला पानी (खाली पेट), अखरोट, बादाम, नारियल तेल, कद्दू के बीज, सेंधा नमक और हरी सब्जियां। रोज 10-15 मिनट उज्जायी प्राणायाम व सर्वांगासन करें।',
+        'सोयाबीन, कच्ची पत्तागोभी, फूलगोभी, ब्रोकोली, अत्यधिक ठंडा भोजन, रिफाइंड तेल व डिब्बाबंद खाद्य पदार्थ।',
+        'Naturamore For Women (महिलाओं हेतु) या Lifestyle Plus कैप्सूल (1 कैप्सूल सुबह-शाम भोजन से 30 मिनट पहले) + Naturamore Powder (25% फ्लैट छूट)।',
         '/health/thyroid-care.html',
         'health',
         'thyroid_care'
@@ -1849,6 +1855,62 @@
         '/health/home-care.html',
         'health',
         'respiratory_care'
+      );
+    }
+
+    // 10. Kidney Stone & Urinary Care (पथरी व गुर्दे का स्वास्थ्य)
+    if (cleanQ.includes('kidney') || cleanQ.includes('किडनी') || cleanQ.includes('पथरी') || cleanQ.includes('stone') || cleanQ.includes('गुर्दे') || cleanQ.includes('यूरिन')) {
+      return renderHealthTopicPage(
+        'किडनी स्टोन (पथरी) व गुर्दे की कार्यक्षमता सुरक्षा',
+        'कैल्शियम ऑक्सालेट और यूरिक एसिड क्रिस्टल गुर्दे में जमा होकर पथरी का रूप लेते हैं, जिससे कमर में असहनीय दर्द व पेशाब में जलन होती है।',
+        'रोजाना 3 से 4 लीटर गुनगुना पानी, कुलथी की दाल का सूप, नारियल पानी, नींबू पानी व खीरा।',
+        'टमाटर के बीज, पालक, बैंगन, अत्यधिक नमक, उड़द की दाल, रेड मीट व कोल्ड ड्रिंक्स।',
+        'Naturamore NutriHealth प्रोटीन पाउडर (किडनी को डिटॉक्स करने हेतु) + पाषाणभेद व पुनर्नवा का काढ़ा (25% फ्लैट छूट)।',
+        '/health/general-wellness.html',
+        'health',
+        'kidney_care'
+      );
+    }
+
+    // 11. Uric Acid & Gout (यूरिक एसिड व गाउट)
+    if (cleanQ.includes('यूरिक एसिड') || cleanQ.includes('uric acid') || cleanQ.includes('यूरिक')) {
+      return renderHealthTopicPage(
+        'यूरिक एसिड नियंत्रण व गाउट (जोड़ों में सूजन) उपचार',
+        'शरीर में प्यूरीन (Purine) का चयापचय न होने से खून में यूरिक एसिड बढ़ता है और क्रिस्टल बनकर पैर के अंगूठे व जोड़ों में असहनीय चुभन पैदा करता है।',
+        'खूब पानी पिएँ (3-4L), नींबू पानी, विटामिन-C युक्त फल (आंवला), लौकी का जूस व गिलोय का काढ़ा।',
+        'दालें (विशेषकर अरहर, राजमा, छोले), मशरूम, टमाटर, फूलगोभी, शराब, बीयर व मांसाहार।',
+        'Naturamore Joint Care कैप्सूल (सलाई गुग्गुल युक्त) + Easy Detox (25% फ्लैट छूट)।',
+        '/health/joint-care.html',
+        'health',
+        'uric_acid_care'
+      );
+    }
+
+    // 12. Kids Wellness & Nutrition (बच्चों का शारीरिक व मानसिक विकास)
+    if (cleanQ.includes('kids') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे') || cleanQ.includes('बच्चों') || cleanQ.includes('बाल विकास') || cleanQ.includes('शारीरिक और मानसिक विकास')) {
+      return renderHealthTopicPage(
+        'नेचुरामोर किड्स — बच्चों का शारीरिक व मानसिक विकास (27 विटामिन्स-मिनरल्स)',
+        'बढ़ते बच्चों को हड्डियों, याददाश्त, एकाग्रता और रोग प्रतिरोधक क्षमता (Immunity) के लिए संतुलित प्रोटीन और सूक्ष्म पोषक तत्वों की आवश्यकता होती है।',
+        'दूध, भीगे बादाम, अखरोट, हरी सब्जियां, फल, दालें व अंकुरित आहार।',
+        'मैगी, चिप्स, कोल्ड ड्रिंक्स, पिज्जा, अत्यधिक टॉफी व डिब्बाबंद जंक फूड।',
+        'Naturamore Kids (स्वादिष्ट चॉकलेट फ्लेवर - 27 विटामिन्स, मिनरल्स, ब्राह्मी, शंखपुष्पी व ओमेगा-3 DHA युक्त, 25% फ्लैट छूट)।',
+        '/health/general-wellness.html',
+        'health',
+        'kids_care'
+      );
+    }
+
+    // 13. Leucorrhoea & White Discharge (महिलाओं में सफेद पानी)
+    if (cleanQ.includes('ल्यूकोरिया') || cleanQ.includes('leucorrhea') || cleanQ.includes('white discharge') || cleanQ.includes('सफेद पानी') || cleanQ.includes('सफेद प्रदर')) {
+      return renderHealthTopicPage(
+        'महिलाओं में ल्यूकोरिया (सफेद पानी) व आंतरिक पोषण समाधान',
+        'हार्मोनल असंतुलन, खून की कमी (Anemia), पोषणहीनता व आंतरिक संक्रमण से कमजोरी, कमर दर्द और सफेद पानी (White Discharge) की शिकायत होती है।',
+        'भुने चने, केला, आंवला मुरब्बा, शतावरी का चूर्ण, नारियल पानी और पर्याप्त ताजे फल।',
+        'अत्यधिक मिर्च-मसालेदार भोजन, खटाई, चाय-कॉफी, मैदा व बासी खाना।',
+        'Naturamore For Women (मसाला मिल्क / फ्रेंच वैनिला - सुबह 1 चम्मच दूध से) + हर्बल पर्सनल हाइजीन (25% फ्लैट छूट)।',
+        '/health/womens-care.html',
+        'health',
+        'leucorrhoea_care'
       );
     }
 
@@ -2137,7 +2199,10 @@
     const q = cleanQ;
 
     // A. Women Empowerment & Home-Based Business (घर बैठे ₹5,000 से ₹50,000 कमाने का मौका)
-    const isWomenBiz = q.includes('महिला') || q.includes('हाउसवाइफ') || q.includes('housewife') || q.includes('5000 से 50000') || q.includes('50,000') || q.includes('घर बैठे कमाई') || q.includes('घर से काम') || q.includes('women business') || q.includes('women empowerment') || q.includes('महिलाएं कैसे कमाए');
+    const isWomenBiz = (q.includes('महिला') || q.includes('हाउसवाइफ') || q.includes('housewife') || q.includes('नारी') || q.includes('गृहणी')) && 
+      (q.includes('कमाई') || q.includes('रोजगार') || q.includes('काम') || q.includes('बिजनेस') || q.includes('बिज़नेस') || q.includes('इनकम') || q.includes('घर बैठे') || q.includes('5000') || q.includes('50,000') || q.includes('स्मार्ट ई-टेलर') || q.includes('स्वावलंबन') || q.includes('women business') || q.includes('women empowerment') || q.includes('महिलाएं कैसे कमाए')) &&
+      !q.includes('pcod') && !q.includes('pcos') && !q.includes('ल्यूकोरिया') && !q.includes('सफेद पानी') && !q.includes('माहवारी') && !q.includes('पीरियड') && !q.includes('बीमारी') && !q.includes('दर्द') && !q.includes('हार्मोन');
+
     if (isWomenBiz) {
       const resp = `🌸 **महिलाओं के लिए घर बैठे ₹5,000 से ₹50,000 कमाने का सुनहरा अवसर:**\n\nक्या आप जानती हैं कि नेट्सर्फ परिवार के साथ जुड़कर हज़ारों गृहणियां (Housewives) अपने घर की चारदीवारी में रहकर, परिवार को संभालते हुए हर महीने **₹5,000 से लेकर ₹50,000+** तक की शानदार आमदनी कमा रही हैं? आपको घर छोड़ने की कोई जरूरत नहीं है।\n\n✨ **इस अवसर की मुख्य विशेषताएं:**\n1. **जीरो इन्वेस्टमेंट / फ्री जॉइनिंग:** रजिस्ट्रेशन 100% मुफ्त है। कोई रिस्क या लागत नहीं है।\n2. **आसान व सम्मानित काम:** घर बैठे फोन के जरिए अपने जान-पहचान वालों को स्वास्थ्य, हर्बल स्किनकेयर व ऑर्गेनिक उत्पादों की सही जानकारी देना।\n3. **संपूर्ण डिजिटल ट्रेनिंग:** आरोग्यम इंडिया और नेट्सर्फ परिवार आपको मोबाइल पर फ्री ट्रेनिंग व पूरा सपोर्ट देता है।\n4. **समय की आजादी:** दिन में मात्र 1-2 घंटे देकर भी आप आत्मनिर्भर बन सकती हैं।\n\n👉 **अधिक जानकारी व शुरुआत के लिए:** आप सीधे हमारे संस्थापक **दादा अवनीश (अविनिश कुमार मिश्रा जी - 7974422572)** से WhatsApp पर संपर्क करें।`;
       const waUrl = buildAvneeshWhatsAppHandoffUrl('महिलाओं के लिए घर बैठे 5000 से 50000 की कमाई');
@@ -2167,7 +2232,9 @@
     }
 
     // B. Skincare, Glow, Pigmentation & Melasma (चेहरे की चमक, दाग-धब्बे व झाइयां)
-    const isSkin = q.includes('त्वचा') || q.includes('स्किन') || q.includes('skin') || q.includes('चेहरा') || q.includes('चेहरे') || q.includes('ग्लो') || q.includes('glow') || q.includes('झाइयां') || q.includes('झाइयाँ') || q.includes('pigmentation') || q.includes('पिगमेंटेशन') || q.includes('melasma') || q.includes('दाग') || q.includes('धब्बे') || q.includes('मुंहासे') || q.includes('कील') || q.includes('पिंपल') || q.includes('pimple') || q.includes('acne') || q.includes('फेयरनेस') || q.includes('face wash') || q.includes('फेसवाश') || q.includes('de-tan') || q.includes('डी-टैन') || q.includes('स्क्रब');
+    const isSkin = (q.includes('त्वचा') || q.includes('स्किन') || q.includes('skin') || q.includes('चेहरा') || q.includes('चेहरे') || q.includes('ग्लो') || q.includes('glow') || q.includes('झाइयां') || q.includes('झाइयाँ') || q.includes('pigmentation') || q.includes('पिगमेंटेशन') || q.includes('melasma') || q.includes('मुंहासे') || q.includes('कील') || q.includes('पिंपल') || q.includes('pimple') || q.includes('acne') || q.includes('फेयरनेस') || q.includes('face wash') || q.includes('फेसवाश') || q.includes('de-tan') || q.includes('डी-टैन') || q.includes('स्क्रब') || ((q.includes('दाग') || q.includes('धब्बे')) && (q.includes('चेहरा') || q.includes('स्किन') || q.includes('त्वचा')))) &&
+      !q.includes('पशु') && !q.includes('गाय') && !q.includes('भैंस') && !q.includes('सरसों') && !q.includes('चना') && !q.includes('गेहूं') && !q.includes('धान') && !q.includes('टमाटर') && !q.includes('फसल') && !q.includes('पत्ती') && !q.includes('पत्तियों') && !q.includes('पौधा');
+
     if (isSkin && !q.includes('बाल') && !q.includes('मोटापा')) {
       const resp = `✨ **खूबसूरत, बेदाग व चमकदार त्वचा मास्टर गाइड (Skin Care & Glow):**\nप्रदूषण, तेज धूप और पोषक तत्वों की कमी से चेहरे पर दाग-धब्बे, झाइयां (Pigmentation) और मुंहासे होने लगते हैं।\n\n1. **आसान व आजमाया हुआ घरेलू नुस्खा:**\n• **झाइयों व दाग-धब्बों के लिए:** कच्चे दूध में चुटकी भर हल्दी और जायफल घिसकर लगाएं। 15-20 मिनट बाद हल्के गुनगुने पानी से धोएं।\n• **मुंहासे व कील-मुंहासों के लिए:** मुल्तानी मिट्टी में ताजी नीम का रस या गुलाब जल मिलाकर हफ्ते में 2 बार लेप लगाएं।\n\n2. **नेट्सर्फ हर्ब्स एंड मोर (Herbs & More) हर्बल समाधान:**\n• **विटामिन थेरेपी फेस वॉश:** त्वचा की गहराई से सफाई करता है और अतिरिक्त ऑयल नियंत्रित करता है।\n• **डी-टैन स्क्रब व फेयरनेस क्रीम:** मृत त्वचा (Dead Skin) हटाकर प्राकृतिक चमक व निखार लाता है।\n• **100% सेफ:** बिना किसी हानिकारक केमिकल या पैराबिन के शुद्ध आयुर्वेदिक अर्क।\n💰 **विशेष ऑफर:** सभी उत्पादों पर **फ्लैट 25% छूट** व 5+1 ऑफर उपलब्ध है।`;
       renderCrispSpecialBox('✨ चेहरे की चमक, दाग-धब्बे व झाइयां समाधान (25% छूट)', resp, [
@@ -2180,7 +2247,9 @@
     }
 
     // C. Haircare, Hair Fall, Baldness & Dandruff (बालों का झड़ना, रूसी व मजबूती)
-    const isHair = q.includes('बाल') || q.includes('hair') || q.includes('हेयर') || q.includes('झड़ना') || q.includes('hair fall') || q.includes('रूसी') || q.includes('डैंड्रफ') || q.includes('dandruff') || q.includes('गंजेपन') || q.includes('hair thinning') || q.includes('दोमुंहे') || q.includes('split ends') || q.includes('सफेद बाल') || q.includes('शैम्पू') || q.includes('shampoo') || q.includes('hair oil');
+    const isHair = (q.includes('hair') || q.includes('हेयर') || q.includes('रूसी') || q.includes('डैंड्रफ') || q.includes('dandruff') || q.includes('गंजेपन') || q.includes('hair thinning') || q.includes('दोमुंहे') || q.includes('split ends') || q.includes('सफेद बाल') || q.includes('hair oil') || ((q.includes('बाल') || q.includes('झड़ना')) && (q.includes('सिर') || q.includes('खोपड़ी') || q.includes('कंघी') || q.includes('गंजा') || (!q.includes('पशु') && !q.includes('गाय') && !q.includes('भैंस') && !q.includes('गेहूं') && !q.includes('धान') && !q.includes('फसल') && !q.includes('बाली'))))) &&
+      !q.includes('पशु') && !q.includes('गाय') && !q.includes('भैंस') && !q.includes('बछड़ा') && !q.includes('दुधारू') && !q.includes('डेयरी') && !q.includes('गेहूं') && !q.includes('धान') && !q.includes('बाली');
+
     if (isHair && !q.includes('त्वचा') && !q.includes('मोटापा')) {
       const resp = `💇 **बालों का झड़ना, रूसी (Dandruff) व मजबूती मास्टर गाइड (Hair Care):**\nतनाव, डैंड्रफ, केमिकल युक्त शैम्पू और पोषण की कमी से बालों की जड़ें कमजोर होकर बाल झड़ने लगते हैं।\n\n1. **आसान घरेलू नुस्खा:**\n• **झड़ते बालों के लिए:** रात को 2 चम्मच मेथी दाना भिगोएं, सुबह पीसकर खट्टी दही के साथ बालों की जड़ों में लगाएं। 30 मिनट बाद धो लें।\n• **रूसी व खुजली के लिए:** शुद्ध नारियल तेल में थोड़ा सा कपूर या नींबू का रस मिलाकर सिर की हल्की मालिश करें।\n\n2. **नेट्सर्फ हर्ब्स एंड मोर (Herbs & More) हेयर केयर समाधान:**\n• **आयुर्वेदिक हेयर ऑयल:** भृंगराज, ब्राह्मी, आंवला और बादाम तेल से युक्त—जड़ों को मजबूत कर नए बाल उगाने में सहायक।\n• **प्रोटीन शैम्पू (Protein Shampoo):** बालों का टूटना रोकता है और उन्हें रेशमी, घना व चमकदार बनाता है।\n💰 **विशेष ऑफर:** फ्लैट **25% डिस्काउंट** व होम डिलीवरी उपलब्ध।`;
       renderCrispSpecialBox('💇 बालों का झड़ना, डैंड्रफ व मजबूती समाधान (25% छूट)', resp, [
@@ -2192,8 +2261,10 @@
       return true;
     }
 
-    // D. Weight Management & Obesity (मोटापा कम करना, पेट की चर्बी व वजन नियंत्रण)
-    const isWeight = q.includes('मोटापा') || q.includes('वजन') || q.includes('weight') || q.includes('पेट की चर्बी') || q.includes('belly fat') || q.includes('वजन कम') || q.includes('वजन घटा') || q.includes('पतले') || q.includes('weight loss') || q.includes('nutrimeal') || q.includes('न्यूट्रीमील');
+    // D. Weight Management & Obesity (मोटापा कम करना, पेट की चर्बी व वजन नियंत्रण - Excludes Clinical Thyroid/PCOD/Animals)
+    const isWeight = (q.includes('मोटापा') || q.includes('weight loss') || q.includes('पेट की चर्बी') || q.includes('belly fat') || q.includes('nutrimeal') || q.includes('न्यूट्रीमील') || ((q.includes('वजन') || q.includes('weight')) && (q.includes('घटा') || q.includes('कम कर') || q.includes('पतले') || q.includes('मोटा') || q.includes('चर्बी')))) &&
+      !q.includes('थायराइड') && !q.includes('थायरॉयड') && !q.includes('thyroid') && !q.includes('tsh') && !q.includes('pcod') && !q.includes('pcos') && !q.includes('पशु') && !q.includes('गाय') && !q.includes('भैंस') && !q.includes('दूध') && !q.includes('फैट');
+
     if (isWeight) {
       const resp = `🏃 **मोटापा कम करना व वजन नियंत्रण मास्टर गाइड (Weight Management):**\nबढ़ा हुआ वजन और पेट की चर्बी शरीर का आत्मविश्वास घटाने के साथ-साथ बीपी, शुगर और घुटनों के दर्द की जड़ बन जाती है। लेकिन भूखे रहकर वजन घटाना सही नहीं है।\n\n1. **प्राकृतिक जीवनशैली व आहार टिप्स:**\n• सुबह खाली पेट गुनगुने पानी में आधा नींबू और 1 चम्मच शहद लें।\n• मैदा, तली हुई चीजें, चीनी और कोल्ड ड्रिंक्स पूरी तरह बंद करें।\n• रोजाना 30 मिनट तेज गति से टहलें (Brisk Walk) या योग करें।\n\n2. **नेट्सर्फ नेचुरामोर (Naturamore) वजन नियंत्रण समाधान:**\n• **Naturamore NutriMeal (वेट मैनेजमेंट पाउडर):** बिना कमजोरी के अतिरिक्त चर्बी (Fat) घटाता है। इसमें डाइटरी फाइबर और प्रोटीन होते हैं जो मेटाबॉलिज्म तेज करते हैं।\n• **Naturamore Women Wellness:** महिलाओं में हार्मोनल असंतुलन व थायराइड जनित वजन को संतुलित करता है।\n💰 **ऑफर:** 25% फ्लैट छूट व 5+1 ऑटो शिपिंग।`;
       renderCrispSpecialBox('🏃 मोटापा कम करना व वजन नियंत्रण फॉर्मूला (25% छूट)', resp, [
@@ -2786,7 +2857,12 @@
       return;
     }
 
-    // 0.4 Beauty, Skincare, Haircare, Weight & Women Empowerment Engine (15000+ words)
+    // 0.4 Certified 13 Specialized Clinical Health Pages, Medical Science & Diet Charts (PRIORITY OVER GENERIC COSMETICS)
+    if (handle13HealthPagesAndSponsor(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.5 Beauty, Skincare, Haircare, Weight & Women Empowerment Engine (Cosmetics & Self-Care)
     if (handleBeautyHairWeightWomenEmpowerment(cleanQ, rawQ)) {
       return;
     }
@@ -2803,11 +2879,6 @@
 
     // 1.1 E-Books Intelligence, FAQs & Direct UPI Payment Assistance (BK001, BK002, BK015, BK016, BK018)
     if (handleBookInquiriesAndFaq(cleanQ, rawQ)) {
-      return;
-    }
-
-    // 1.2 13 Specialized Health Pages, Medical Science, Diet Charts & Sponsor Guidance Router
-    if (handle13HealthPagesAndSponsor(cleanQ, rawQ)) {
       return;
     }
 
