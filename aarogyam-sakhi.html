@@ -38,12 +38,13 @@
   <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261014_v97">
 
   <style>
-    /* Full Viewport App Fit */
+    /* Natural Card Layout with Expandable Full-Screen Option */
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
+      height: 100dvh;
       overflow: hidden;
       background: #0f172a;
       font-family: 'Outfit', 'Noto Sans Devanagari', -apple-system, sans-serif;
@@ -56,6 +57,93 @@
       justify-content: center;
       align-items: center;
       background: #0f172a;
+      padding: 12px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    .sakhi-fullscreen-wrapper {
+      width: 100%;
+      max-width: 520px;
+      height: 94vh;
+      max-height: 840px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      margin: auto;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sakhi-fullscreen-wrapper .sakhi-chat-window {
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      max-width: 520px !important;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* True Edge-to-Edge Full-Screen Only When Activated by User */
+    body.is-fullscreen #sakhiFullscreenContainer,
+    #sakhiFullscreenContainer.is-fullscreen {
+      padding: 0 !important;
+    }
+    body.is-fullscreen .sakhi-fullscreen-wrapper,
+    .sakhi-fullscreen-wrapper.is-fullscreen,
+    .sakhi-fullscreen-wrapper.fullscreen-expanded {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    body.is-fullscreen .sakhi-fullscreen-wrapper .sakhi-chat-window,
+    .sakhi-fullscreen-wrapper.is-fullscreen .sakhi-chat-window,
+    .sakhi-fullscreen-wrapper.fullscreen-expanded .sakhi-chat-window {
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      border: none !important;
+    }
+
+    @media (max-width: 640px) {
+      #sakhiFullscreenContainer {
+        padding: 6px;
+      }
+      .sakhi-fullscreen-wrapper {
+        max-width: 100%;
+        height: 98vh;
+        height: 98dvh;
+      }
+      .sakhi-fullscreen-wrapper .sakhi-chat-window {
+        border-radius: 20px;
+        max-width: 100% !important;
+      }
+      /* On mobile, when full-screen is clicked, make it completely borderless */
+      body.is-fullscreen #sakhiFullscreenContainer,
+      #sakhiFullscreenContainer.is-fullscreen {
+        padding: 0 !important;
+      }
+      body.is-fullscreen .sakhi-fullscreen-wrapper,
+      .sakhi-fullscreen-wrapper.is-fullscreen {
+        height: 100vh !important;
+        height: 100dvh !important;
+      }
+      body.is-fullscreen .sakhi-fullscreen-wrapper .sakhi-chat-window,
+      .sakhi-fullscreen-wrapper.is-fullscreen .sakhi-chat-window {
+        border-radius: 0 !important;
+      }
+      .sakhi-header {
+        padding-top: max(10px, env(safe-area-inset-top, 10px)) !important;
+      }
+      .sakhi-input-footer {
+        padding-bottom: max(8px, env(safe-area-inset-bottom, 8px)) !important;
+      }
     }
   </style>
 </head>
@@ -104,24 +192,13 @@
                 </div>
               </div>
 
-              <div style="color:#334155;font-size:0.88rem;line-height:1.55;margin-bottom:12px;">
-                खेती (गेहूं, सरसों, खाद), पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द), सौंदर्य या घर बैठे कमाई से जुड़ा कोई भी सवाल नीचे पूछें।
+              <div style="color:#334155;font-size:0.92rem;line-height:1.6;margin-bottom:10px;">
+                खेती (गेहूं, सरसों, खाद, स्प्रे), पशुपालन (दूध-फैट), सेहत (जोड़ों का दर्द, शुगर), सौंदर्य या नेट्सर्फ बिज़नेस से जुड़ा कोई भी सवाल नीचे पूछें।
               </div>
 
-              <!-- Quick Topic Pills (Same as Plus Menu) -->
-              <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:10px 12px;margin-bottom:8px;">
-                <div style="font-size:0.80rem;font-weight:800;color:#166534;margin-bottom:6px;">👉 मुख्य विषय चुनें:</div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">🌾 खेती व फसलें</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">🐄 पशुपालन व डेयरी</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">🩺 स्वास्थ्य व रोग</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">✨ सौंदर्य व त्वचा</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">💼 नेट्सर्फ प्रोडक्ट्स</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">📚 ई-बुक्स</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">🌸 दादी के नुस्खे</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('आरोग्यम डिजिटल ई-टेलर व एफिलिएट कमाई')">💰 कमाई व करियर</button>
-                  <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क')">💬 अवनीश जी से संपर्क</button>
-                </div>
+              <!-- Clean ChatGPT-style Prompt Guide -->
+              <div style="display:inline-flex;align-items:center;gap:8px;font-size:0.84rem;color:#15803d;font-weight:700;background:#f0fdf4;padding:8px 14px;border-radius:24px;border:1px solid #bbf7d0;">
+                <span>✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
               </div>
             </div>
           </div>
@@ -130,43 +207,43 @@
         <!-- ChatGPT-Style Plus Menu (Opened by [+] Button) -->
         <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none;">
           <div class="sakhi-plus-menu-header">
-            <span>विषय चुनें</span>
+            <span>✨ मुख्य विषय व टूल्स चुनें</span>
             <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)">✕</button>
           </div>
           <div class="sakhi-plus-grid">
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">
-              खेती व फसलें
+              🌾 खेती व फसल डॉक्टर
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-              पशुपालन व डेयरी
+              🐄 पशुपालन, दूध व फैट
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('डायबिटीज और शुगर कंट्रोल का फॉर्मूला')">
-              स्वास्थ्य व रोग
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('स्वास्थ्य व बीमारी के लक्षण')">
+              🩺 स्वास्थ्य व रोग परामर्श
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">
-              सौंदर्य व त्वचा
+              ✨ सौंदर्य व त्वचा देखभाल
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और ₹8.19L साप्ताहिक कैपिंग')">
-              नेट्सर्फ प्रोडक्ट्स
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और ₹8,19,250 कैपिंग')">
+              💼 नेट्सर्फ (25% छूट व प्लान)
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
-              📚 ई-बुक्स
+              📚 'खेती डॉक्टर' व ई-बुक्स
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">
-              दादी के नुस्खे
+              🌸 दादी के घरेलू नुस्खे
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('आरोग्यम डिजिटल ई-टेलर व एफिलिएट कमाई')">
-              कमाई व करियर
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('किसान मित्र बनकर महीने में अच्छी कमाई कैसे करें')">
+              💰 किसान मित्र कमाई व करियर
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('फाउंडर अवनीश जी का विज़न व सीधा WhatsApp संपर्क')">
-              अवनीश जी से संपर्क
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादा अवनीश जी से सीधा WhatsApp संपर्क')">
+              💬 दादा अवनीश जी से संपर्क
             </button>
           </div>
         </div>
 
         <!-- Legal Note -->
         <div class="sakhi-legal-note">
-          ⚖️ सूचनात्मक मार्गदर्शन: उपयोग से पूर्व उत्पाद लेबल निर्देश व स्थानीय विशेषज्ञ की अनुशंसा का संज्ञान अवश्य लें।
+          Arogyam Sakhi is AI and can make mistakes. <a href="javascript:void(0)" onclick="window.openSakhiTermsModal()" style="text-decoration:underline;color:inherit;font-weight:700;margin-left:4px;">Terms & Conditions</a>
         </div>
 
         <!-- Input Footer (ChatGPT Layout: [+] [Mic] [Input] [Send]) -->
@@ -231,5 +308,31 @@
       document.addEventListener('DOMContentLoaded', resolveHeroName);
     })();
   </script>
+  <!-- Terms & Conditions Modal -->
+  <div id="sakhiTermsModal" class="sakhi-terms-modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999999;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+    <div style="background:#ffffff;border-radius:24px;max-width:540px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.5);border:1px solid rgba(0,0,0,0.1);padding:24px;box-sizing:border-box;position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid #f1f5f9;padding-bottom:12px;margin-bottom:16px;">
+        <div style="font-weight:900;font-size:1.15rem;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-scale-balanced" style="color:#16a34a;"></i>
+          <span>नियम और शर्तें (Terms & Conditions)</span>
+        </div>
+        <button type="button" onclick="window.closeSakhiTermsModal()" style="background:#f1f5f9;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;font-size:1rem;transition:all 0.2s;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div style="font-size:0.95rem;line-height:1.7;color:#334155;display:flex;flex-direction:column;gap:12px;">
+        <p style="margin:0;">• यह <strong>'आरोग्यम इंडिया'</strong> का AI आधारित डिजिटल सहायक (AI Sakhi) है, जिसे किसानों, स्वास्थ्य के प्रति जागरूक लोगों और नेट्सर्फ परिवार की मदद के लिए बनाया गया है।</p>
+        <p style="margin:0;">• चूंकि यह एक कृत्रिम बुद्धिमत्ता (AI) प्रणाली है, इसलिए दी गई जानकारी या सुझावों में कभी-कभी अशुद्धि या त्रुटि (Mistake) संभव है।</p>
+        <p style="margin:0;">• किसी भी गंभीर स्वास्थ्य समस्या, आपातकालीन स्थिति, या कृषि और व्यवसाय से जुड़े बड़े वित्तीय निर्णयों से पहले किसी योग्य डॉक्टर, कृषि विशेषज्ञ या पेशेवर सलाहकार से सलाह अवश्य लें।</p>
+        <p style="margin:0;">• इस प्लेटफॉर्म का उपयोग उपयोगकर्ता अपने स्वयं के विवेक और जिम्मेदारी पर कर रहे हैं।</p>
+      </div>
+      <div style="margin-top:20px;text-align:right;">
+        <button type="button" onclick="window.closeSakhiTermsModal()" style="background:#16a34a;color:#ffffff;border:none;padding:10px 22px;border-radius:14px;font-weight:800;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+          स्वीकार करें (I Understand)
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
