@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Sakhi AI Styles -->
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261015_v125">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261015_v130">
 
   <style>
     /* Natural Card Layout with Expandable Full-Screen Option */
@@ -208,11 +208,11 @@
           </div>
         </div>
 
-        <!-- Backdrop for Plus Menu -->
-        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
+        <!-- Backdrop for Plus Menu (Closed by default) -->
+        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" style="display:none !important;" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
 
-        <!-- ChatGPT-Style Plus Menu (Opened by [+] Button) -->
-        <div class="sakhi-plus-menu" id="sakhiPlusMenu">
+        <!-- ChatGPT-Style Plus Menu (Opened only when [+] Button is tapped; strictly closed by default) -->
+        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none !important;">
           <div class="sakhi-plus-menu-header">
             <span>✨ मुख्य विषय व टूल्स चुनें</span>
             <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false); if(event.cancelable) event.preventDefault();" aria-label="बंद करें">&times;</button>
@@ -277,9 +277,19 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261015_v125"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261015_v130"></script>
   <script>
     (function () {
+      // Force ensure Plus Menu is closed on mobile boot
+      if (typeof window.toggleSakhiPlusMenu === 'function') {
+        window.toggleSakhiPlusMenu(false);
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+        if (typeof window.toggleSakhiPlusMenu === 'function') {
+          window.toggleSakhiPlusMenu(false);
+        }
+      });
+
       function resolveHeroName() {
         let phone = (
           localStorage.getItem('aarogyam_user_phone') ||

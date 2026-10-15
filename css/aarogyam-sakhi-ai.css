@@ -436,7 +436,7 @@ body.is-fullscreen .sakhi-chat-window {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   z-index: 9999;
-  display: none;
+  display: none !important;
   opacity: 0;
   transition: opacity 0.2s ease;
   touch-action: manipulation;
@@ -449,6 +449,7 @@ body.is-fullscreen .sakhi-chat-window {
 }
 
 .sakhi-plus-menu {
+  display: none !important;
   position: absolute;
   bottom: 72px;
   left: 12px;
@@ -472,6 +473,7 @@ body.is-fullscreen .sakhi-chat-window {
 }
 
 .sakhi-plus-menu.active {
+  display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
@@ -491,16 +493,16 @@ body.is-fullscreen .sakhi-chat-window {
 }
 .sakhi-plus-menu-close {
   background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
+  border: 1.5px solid #cbd5e1;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 50%;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   line-height: 1;
   cursor: pointer;
-  color: #475569;
+  color: #334155;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -513,7 +515,7 @@ body.is-fullscreen .sakhi-chat-window {
 .sakhi-plus-menu-close:active {
   background: #e2e8f0;
   color: #0f172a;
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
 .sakhi-plus-grid {

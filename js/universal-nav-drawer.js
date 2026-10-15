@@ -738,7 +738,7 @@
             </a>
 
             <!-- 1.1 AAROGYAM SAKHI AI (24x7 Digital Doctor & Kisan Sakhi) -->
-            <a href="/aarogyam-sakhi.html" onclick="if(window.openSakhiModal){window.openSakhiModal();window.closeUniversalDrawer();return false;}" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-sakhi') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important; border-color:#86efac !important; box-shadow:0 4px 14px rgba(22,163,74,0.45) !important;">
+            <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-sakhi') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important; border-color:#86efac !important; box-shadow:0 4px 14px rgba(22,163,74,0.45) !important;">
               <div class="drawer-item-left">
                 <div class="drawer-icon-box" style="background:#0f172a; border-color:#4ade80;"><i class="fa-solid fa-robot" style="color:#4ade80;"></i></div>
                 <span class="drawer-item-title">आरोग्यम सखी AI (24×7 डॉक्टर)</span>
@@ -902,7 +902,7 @@
                   <span>7-दिवसीय मौसम पूर्वानुमान (Weather)</span>
                 </div>
               </a>
-              <a href="/aarogyam-sakhi.html" onclick="if(window.openSakhiModal){window.openSakhiModal();window.closeUniversalDrawer();return false;}" class="drawer-sub-link-item">
+              <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
                   <div class="drawer-sub-icon-box" style="background:#15803d; color:#ffffff;"><i class="fa-solid fa-robot"></i></div>
                   <span>आरोग्यम सखी AI (फसल, पशु व सेहत डॉक्टर)</span>
@@ -1032,8 +1032,8 @@
           <i class="fa-solid fa-share-nodes"></i>
         </button>
 
-        <!-- 4. Green Official WhatsApp Helpdesk Button -->
-        <a href="javascript:void(0)" onclick="if(window.getPersonalizedWhatsAppUrl){window.open(window.getPersonalizedWhatsAppUrl('WhatsApp सहायता'), '_blank');}else{window.open('https://api.whatsapp.com/send?phone=917974422572', '_blank');}" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp पर संपर्क करें" aria-label="WhatsApp Contact" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+        <!-- 4. Green Official WhatsApp Contact Button (Direct WhatsApp Helpdesk) -->
+        <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20Aarogyam%20India!%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" rel="noopener noreferrer" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp सहायता" aria-label="WhatsApp Contact" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-brands fa-whatsapp"></i>
         </a>
       </div>
@@ -1223,32 +1223,7 @@
 
     pill.onclick = function(e) {
       if (e) e.preventDefault();
-      if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-        try {
-          window.AarogyamSakhi.open();
-          return;
-        } catch(err) {
-          console.warn('[Sakhi FAB] modal error, navigating to dedicated page:', err);
-          window.location.href = '/aarogyam-sakhi.html';
-          return;
-        }
-      }
-      ensureAarogyamSakhiLoaded();
-      let retries = 0;
-      const checkInterval = setInterval(() => {
-        retries++;
-        if (window.AarogyamSakhi && typeof window.AarogyamSakhi.open === 'function') {
-          clearInterval(checkInterval);
-          try {
-            window.AarogyamSakhi.open();
-          } catch(err) {
-            window.location.href = '/aarogyam-sakhi.html';
-          }
-        } else if (retries > 12) {
-          clearInterval(checkInterval);
-          window.location.href = '/aarogyam-sakhi.html';
-        }
-      }, 50);
+      window.location.href = '/aarogyam-sakhi.html';
     };
 
     if (document.body) {

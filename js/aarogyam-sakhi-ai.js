@@ -3967,22 +3967,7 @@
 
   window.openSakhiModal = function () {
     if (checkIsDedicatedPage()) return;
-    if (typeof window.stopPageAudioGreeting === 'function') {
-      try { window.stopPageAudioGreeting(); } catch (e) {}
-    }
-    const backdrop = ensureModalBackdropExists();
-    if (backdrop) {
-      backdrop.classList.add('active');
-      backdrop.style.display = 'flex';
-      backdrop.style.visibility = 'visible';
-      backdrop.style.opacity = '1';
-      backdrop.style.pointerEvents = 'auto';
-      updateSakhiHeaderUserBadge();
-      setTimeout(() => {
-        const input = document.getElementById('sakhiTextInput');
-        if (input && window.innerWidth > 640) input.focus();
-      }, 300);
-    }
+    window.location.href = '/aarogyam-sakhi.html';
   };
 
   window.closeSakhiModal = function () {
@@ -4186,14 +4171,22 @@
     const menu = document.getElementById('sakhiPlusMenu');
     const backdrop = document.getElementById('sakhiPlusMenuBackdrop');
     if (!menu) return;
-    const isOpen = menu.classList.contains('active');
-    const shouldOpen = (typeof forceState === 'boolean') ? forceState : !isOpen;
+    const isCurrentlyActive = menu.classList.contains('active') && menu.style.display !== 'none';
+    const shouldOpen = (typeof forceState === 'boolean') ? forceState : !isCurrentlyActive;
     if (shouldOpen) {
       menu.classList.add('active');
-      if (backdrop) backdrop.classList.add('active');
+      menu.style.setProperty('display', 'block', 'important');
+      if (backdrop) {
+        backdrop.classList.add('active');
+        backdrop.style.setProperty('display', 'block', 'important');
+      }
     } else {
       menu.classList.remove('active');
-      if (backdrop) backdrop.classList.remove('active');
+      menu.style.setProperty('display', 'none', 'important');
+      if (backdrop) {
+        backdrop.classList.remove('active');
+        backdrop.style.setProperty('display', 'none', 'important');
+      }
     }
   };
 
@@ -4267,16 +4260,23 @@
     return escaped;
   }
 
-  // GLOBAL API EXPOSURE
+  // GLOBAL API EXPOSURE - ALWAYS ROUTE TO SINGLE UNIFIED DEDICATED SAKHI PAGE
   window.AarogyamSakhi = {
     open: function() {
       if (checkIsDedicatedPage()) return;
-      window.openSakhiModal();
+      window.location.href = '/aarogyam-sakhi.html';
     },
     close: function() {
-      window.closeSakhiModal();
+      if (window.history.length > 1) window.history.back();
+      else window.location.href = '/index.html';
     },
-    ask: handleUserSubmit
+    ask: function(q) {
+      if (checkIsDedicatedPage()) {
+        handleUserSubmit(q);
+      } else {
+        window.location.href = '/aarogyam-sakhi.html?q=' + encodeURIComponent(q);
+      }
+    }
   };
 
   // AUTO INIT ON DOM READY
