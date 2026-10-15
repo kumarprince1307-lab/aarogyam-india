@@ -676,7 +676,7 @@
       badgeWrap.innerHTML = `
         <div class="sakhi-user-badge logged-in" title="सत्यापित खाता: ${escapeHtml(name)}" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);color:#ffffff;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
           <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
-          <span style="max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(name)}</span>
+          <span style="max-width:145px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(name)}</span>
         </div>
       `;
     } else {
@@ -1060,10 +1060,10 @@
     `;
   }
 
-  // 9. KNOWLEDGE BASE LOADER
+  // 9. KNOWLEDGE BASE LOADER (WITH PERSISTENT CACHE BUSTING)
   async function loadKnowledgeBase() {
     try {
-      const res = await fetch('/data/krishi-ai-knowledge.json?v=20261014_v88');
+      const res = await fetch('/data/krishi-ai-knowledge.json?v=20261015_v120');
       if (res.ok) {
         knowledgeData = await res.json();
       }
@@ -1072,10 +1072,52 @@
     }
   }
 
+  // 9.5 PERSISTENT CHAT HISTORY STORAGE ENGINE (FOR AAROGYAM MASTER 7974422572 & ALL USERS)
+  const SAKHI_PERSISTENT_CHAT_KEY = 'SAKHI_PERSISTENT_CHAT_LOG';
+
+  function saveChatLogItem(role, content, speech) {
+    try {
+      const phone = getUserPhone() || 'user';
+      const key = `${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`;
+      let log = [];
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) log = JSON.parse(raw) || [];
+      } catch (e) {}
+      log.push({ role, content, speech, time: Date.now() });
+      if (log.length > 50) log = log.slice(-50);
+      localStorage.setItem(key, JSON.stringify(log));
+    } catch (e) {}
+  }
+
+  function getPersistentChatLog() {
+    try {
+      const phone = getUserPhone() || 'user';
+      const key = `${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length > 0) return arr;
+      }
+    } catch (e) {}
+    return [];
+  }
+
+  window.clearSakhiChatHistory = function() {
+    try {
+      const phone = getUserPhone() || 'user';
+      localStorage.removeItem(`${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`);
+      sessionChatHistory.length = 0;
+      renderInitialGreeting();
+    } catch (e) {}
+  };
+
   // 10. CHAT UI INJECTION & MESSAGE STREAMER
   function appendUserMessage(text) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
+
+    saveChatLogItem('user', text, '');
 
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row user';
@@ -1118,6 +1160,8 @@
     removeTypingIndicator();
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
+
+    saveChatLogItem('bot', htmlContent, speechText || '');
 
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row bot';
@@ -1166,6 +1210,21 @@
       }
     }
 
+    const savedLog = getPersistentChatLog();
+    const hasHistory = savedLog && savedLog.length > 0;
+
+    let historyToolbar = '';
+    if (hasHistory) {
+      historyToolbar = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed #cbd5e1;">
+          <span style="font-size:0.76rem;color:#64748b;font-weight:700;"><i class="fa-solid fa-clock-rotate-left"></i> आपकी पिछली बातचीत सुरक्षित है</span>
+          <button type="button" onclick="window.clearSakhiChatHistory()" title="चैट हिस्ट्री साफ करें और नया सत्र शुरू करें" style="background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;padding:3px 9px;border-radius:14px;font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-trash-can"></i> <span>नई चैट</span>
+          </button>
+        </div>
+      `;
+    }
+
     wrap.innerHTML = `
       <div class="sakhi-msg-row bot">
         <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
@@ -1185,9 +1244,28 @@
           <div style="display:inline-flex;align-items:center;gap:8px;font-size:0.84rem;color:#15803d;font-weight:700;background:#f0fdf4;padding:8px 14px;border-radius:24px;border:1px solid #bbf7d0;">
             <span>✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
           </div>
+
+          ${historyToolbar}
         </div>
       </div>
     `;
+
+    // Restore saved chat history bubbles
+    if (hasHistory) {
+      savedLog.forEach(item => {
+        const row = document.createElement('div');
+        if (item.role === 'user') {
+          row.className = 'sakhi-msg-row user';
+          row.innerHTML = `<div class="sakhi-msg-bubble user-bubble">${escapeHtml(item.content)}</div>`;
+        } else {
+          row.className = 'sakhi-msg-row bot';
+          row.innerHTML = `<div class="sakhi-msg-bubble">${item.content}</div>`;
+        }
+        wrap.appendChild(row);
+      });
+      setTimeout(() => { wrap.scrollTop = wrap.scrollHeight; }, 100);
+    }
+
     updateSakhiHeaderUserBadge();
   }
 
@@ -1875,11 +1953,12 @@
     // Entity 3: Pet Vet / CFC Plus Follow-ups
     if (activeEntity === 'cfc_plus' || activeEntity === 'pet_vet' || activeEntity.includes('cfc')) {
       if (isIngredients || isDosage || isBenefits || isMore) {
-        const resp = `🐄 **बायोफिट सीएफसी प्लस / पेट वेट (CFC Plus / Pet Vet) - संपूर्ण पशु पोषण:**\n• **घटक:** शतावरी, मेथी, विटामिन्स (A, D3, E), मिनरल्स (जिंक, कॉपर, कोबाल्ट, कैल्शियम), प्रीबायोटिक्स व प्रोबायोटिक्स।\n• **मुख्य लाभ:** पाचन तंत्र दुरुस्त करता है, 10 से 20% दूध बढ़ाता है, फैट 0.5 से 1.2 डिग्री सुधारता है और बांझपन दूर करता है।\n🥄 **खुराक:** 10 से 15 ग्राम प्रतिदिन प्रति दुधारू गाय/भैंस दाने या चारे में मिलाकर दें। 10-12 दिन में स्पष्ट परिणाम दिखता है।\n💰 **ऑफर:** 25% फ्लैट डिस्काउंट उपलब्ध है।`;
-        renderCrispSpecialBox('🐄 सीएफसी प्लस / पेट वेट — घटक व दूध-फैट वृद्धि', resp, [
+        const resp = `🐄 **बायोफिट पेट-वेट (Pet-Vet — पूर्व में CFC Plus) — संपूर्ण पशु पोषण:**\n• **घटक:** शतावरी, मेथी, विटामिन्स (A, D3, E), मिनरल्स (जिंक, कॉपर, कोबाल्ट, कैल्शियम), प्रीबायोटिक्स व प्रोबायोटिक्स।\n\n📦 **3 उपलब्ध साइज एवं आधिकारिक MRP:**\n• **250 ग्राम:** MRP **₹399**\n• **500 ग्राम:** MRP **₹699**\n• **1 किलोग्राम:** MRP **₹1,275**\n\n🥄 **खुराक एवं सेवन विधि:**\n• **बड़े दुधारू पशु (गाय/भैंस):** **10 से 15 ग्राम प्रतिदिन** सुबह के दाने या चारे में मिलाकर दें।\n• **छोटे पशु (बछड़े, बकरी, भेड़):** **5 ग्राम प्रतिदिन** दें।\n\n✅ **मुख्य लाभ:** पाचन तंत्र दुरुस्त करता है, 15 से 25% दूध उत्पादन बढ़ाता है, फैट (7 से 8 डिग्री) सुधारता है और बांझपन दूर करता है।\n💰 **ऑफर:** 25% फ्लैट डिस्काउंट व ₹100 वाउचर उपलब्ध है।`;
+        renderCrispSpecialBox('🐄 बायोफिट पेट-वेट (पूर्व CFC Plus) — 250g, 500g, 1kg', resp, [
           { text: '🥛 गाय-भैंस का दूध और फैट कैसे बढ़ाएं?', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
-          { text: '💰 सीएफसी 500g व 1kg पैक 25% छूट', query: 'सीएफसी पशु आहार सप्लीमेंट ऑफर' }
-        ], 'pashu', 'cfc_plus');
+          { text: '📦 1kg, 500g, 250g पेट-वेट 25% छूट', query: 'पेट वेट 25% छूट पर ऑर्डर करें' },
+          { text: '🥄 10-15 ग्राम दैनिक खुराक नियम', query: 'पेट वेट कैसे खिलाएं' }
+        ], 'pashu', 'pet_vet');
         return true;
       }
     }
@@ -2466,14 +2545,15 @@
       return true;
     }
 
-    // I. Pet Vet / CFC Plus
-    if (cleanQ.includes('pet vet') || cleanQ.includes('पेट वेट') || cleanQ.includes('cfc') || cleanQ.includes('सीएफसी') || cleanQ.includes('गाय का दूध') || cleanQ.includes('भैंस का दूध') || ((cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('पशु')) && (cleanQ.includes('दूध') || cleanQ.includes('फैट')))) {
-      const resp = `🐄 **बायोफिट सीएफसी प्लस / पेट वेट — दुग्ध व फैट वृद्धि फॉर्मूला:**\n• **घटक:** शतावरी, मेथी, विटामिन्स, मिनरल्स व प्री-प्रोबायोटिक्स।\n• **खुराक:** 10 से 15 ग्राम प्रतिदिन प्रति दुधारू पशु चारे में मिलाकर दें। 10-12 दिनों में दूध 15-20% और फैट 0.5 से 1.2 डिग्री बढ़ जाता है।\n💰 **ऑफर:** 25% फ्लैट छूट उपलब्ध है।`;
-      renderCrispSpecialBox('🐄 सीएफसी प्लस / पेट वेट — दूध व फैट वृद्धि फॉर्मूला (25% छूट)', resp, [
-        { text: '🌿 इसके अंदर क्या-क्या घटक हैं?', query: 'सीएफसी प्लस के अंदर क्या है' },
-        { text: '🥄 देने की सही विधि व खुराक', query: 'सीएफसी प्लस कैसे खिलाएं' },
-        { text: '💰 सीएफसी 25% छूट ऑफर', query: 'सीएफसी पशु आहार सप्लीमेंट ऑफर' }
-      ], 'pashu', 'cfc_plus');
+    // I. Pet Vet (Formerly CFC Plus)
+    if (cleanQ.includes('pet vet') || cleanQ.includes('पेट वेट') || cleanQ.includes('pet-vet') || cleanQ.includes('cfc') || cleanQ.includes('सीएफसी') || cleanQ.includes('गाय का दूध') || cleanQ.includes('भैंस का दूध') || ((cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('पशु')) && (cleanQ.includes('दूध') || cleanQ.includes('फैट')))) {
+      const resp = `🐄 **बायोफिट पेट-वेट (Pet-Vet — पूर्व में CFC Plus) — दुग्ध, फैट व पशु स्वास्थ्य फॉर्मूला:**\n\n📢 **महत्वपूर्ण सूचना:** नेट्सर्फ का लोकप्रिय पशु पोषण सप्लीमेंट 'CFC Plus' अब नए उन्नत फॉर्मूलेशन में **'Pet-Vet (पेट-वेट)'** के नाम से उपलब्ध है।\n\n📦 **3 उपलब्ध साइज एवं आधिकारिक MRP:**\n• **250 ग्राम:** MRP **₹399**\n• **500 ग्राम:** MRP **₹699**\n• **1 किलोग्राम:** MRP **₹1,275**\n\n🥄 **खुराक एवं सेवन विधि:**\n• **बड़े दुधारू पशु (गाय/भैंस):** **10 से 15 ग्राम प्रतिदिन** सुबह के दाने या चारे में मिलाकर दें।\n• **छोटे पशु (बछड़े, बकरी, भेड़):** **5 ग्राम प्रतिदिन** दें।\n\n✅ **मुख्य लाभ:**\n1. दूध उत्पादन में 15% से 25% की प्राकृतिक वृद्धि।\n2. दूध का फैट (7 से 8 डिग्री) और SNF में स्पष्ट बढ़ोतरी।\n3. पशु की पाचन क्रिया दुरुस्त होती है, त्वचा व बालों में चमक आती है और बार-बार रिपीट होने (बांझपन) की समस्या समाप्त होती है।\n\n💰 **ऑफर:** नई आईडी पर ₹100 वेलकम वाउचर और 25% तक स्थायी रीपरचेज छूट।`;
+      renderCrispSpecialBox('🐄 बायोफिट पेट-वेट (Pet-Vet / पूर्व CFC Plus) — 250g, 500g, 1kg', resp, [
+        { text: '🌿 पेट-वेट के घटक व फायदे', query: 'पेट वेट के अंदर क्या क्या घटक हैं' },
+        { text: '🥄 10-15 ग्राम दैनिक खुराक नियम', query: 'पेट वेट कैसे खिलाएं' },
+        { text: '📦 1kg, 500g, 250g रेट व छूट', query: 'पेट वेट 25% छूट पर ऑर्डर करें' },
+        { text: '🥛 भैंस का दूध व 7-8 फैट', query: 'भैंस का दूध 7 से 8 फैट लाने का तरीका' }
+      ], 'pashu', 'pet_vet_cfc');
       return true;
     }
 
@@ -2547,6 +2627,81 @@
       { text: '🥦 सब्जी, मिर्च व टमाटर कैलेंडर', query: 'सब्जी मिर्च का स्प्रे कैलेंडर' }
     ], 'agri', 'spray_menu');
     return true;
+  }
+
+  // 17.5 DEDICATED NETSURF CORPORATE PROFILE, FOUNDERS & 4-VERTICAL PORTFOLIO ROUTER
+  function handleNetsurfCompanyProfile(cleanQ, query) {
+    const isProfileKeyword = cleanQ.includes('प्रोफाइल') || cleanQ.includes('profile') || cleanQ.includes('कंपनी की प्रोफाइल') || cleanQ.includes('कंपनी प्रोफाइल') || cleanQ.includes('कंपनी परिचय') || cleanQ.includes('company profile');
+    const isFounderKeyword = cleanQ.includes('फाउंडर') || cleanQ.includes('संस्थापक') || cleanQ.includes('प्रमोटर') || cleanQ.includes('promoter') || cleanQ.includes('founder') || cleanQ.includes('मालिक') || cleanQ.includes('owner') || cleanQ.includes('सुजीत जैन') || cleanQ.includes('sujit jain') || cleanQ.includes('संजीव जैन') || cleanQ.includes('sanjay jain');
+    const isCompanyOrigin = cleanQ.includes('स्थापना') || cleanQ.includes('मुख्यालय') || cleanQ.includes('headquarter') || cleanQ.includes('hq') || cleanQ.includes('पुणे') || cleanQ.includes('pune') || cleanQ.includes('कंपनी का इतिहास') || cleanQ.includes('कंपनी इतिहास');
+    const isPortfolioOverview = cleanQ.includes('कितने प्रकार के उत्पाद') || cleanQ.includes('कितने प्रकार के प्रोडक्ट') || cleanQ.includes('चार वर्टिकल') || cleanQ.includes('4 वर्टिकल') || cleanQ.includes('product portfolio') || cleanQ.includes('उत्पाद श्रेणियां') || cleanQ.includes('पोर्टफोलियो');
+    const isDirectCompanyQuestion = (cleanQ.includes('नेट्सर्फ') || cleanQ.includes('netsurf')) && (cleanQ.includes('कंपनी क्या है') || cleanQ.includes('कंपनी के बारे में') || cleanQ.includes('कंपनी कैसी है') || cleanQ.includes('company kya hai') || cleanQ.includes('about company') || cleanQ.includes('about netsurf') || cleanQ === 'netsurf company' || cleanQ === 'नेट्सर्फ कंपनी');
+
+    if (isProfileKeyword || isFounderKeyword || isCompanyOrigin || isPortfolioOverview || isDirectCompanyQuestion) {
+      const profileText = `🏢 **नेट्सर्फ कम्युनिकेशन्स प्रा. लि. (Netsurf Communications Pvt. Ltd.) — कॉर्पोरेट प्रोफाइल एवं परिचय:**
+
+1️⃣ **कंपनी की स्थापना और अनुभव (Establishment & Introduction):**
+• **स्थापना वर्ष:** साल **2000** में स्थापित।
+• **अनुभव:** डायरेक्ट सेलिंग एवं जैविक अनुसंधान के क्षेत्र में **26 वर्षों से अधिक** का गौरवशाली व सफल इतिहास।
+• **मुख्यालय (Headquarters):** **पुणे, महाराष्ट्र (भारत)**।
+
+2️⃣ **प्रमोटर्स एवं फाउंडर्स (Promoters & Founders):**
+• **संस्थापक:** नेट्सर्फ की नींव **सुजीत जैन (Sujit Jain)** और **संजीव जैन (Sanjay Jain)** द्वारा रखी गई।
+• **मैनेजिंग डायरेक्टर:** **सुजीत जैन (Managing Director & Founder)** के दूरदर्शी नेतृत्व में यह भारत की सबसे भरोसेमंद, नैतिक और 100% स्वदेशी डायरेक्ट सेलिंग कंपनी बनी है।
+
+3️⃣ **उत्पाद पोर्टफोलियो (Product Portfolio — 4 प्रमुख वर्टिकल्स, 100% R&D प्रमाणित):**
+🌾 **1. बायोफिट (Biofit — Organic Agriculture):**
+जैविक खेती के क्रांतिकारी उत्पाद जैसे स्टिमरिच (Stimrich), बायो 99 (Bio 99), रैप अप (Wrap Up), लार्विसाइड, NPK बैक्टीरिया व VEM माइकोराइजा। रासायनिक खादों पर निर्भरता घटाकर पैदावार 25-40% बढ़ाते हैं।
+🌿 **2. नेचुरमोरे (Naturamore — Health & Dietary Supplements):**
+मानव स्वास्थ्य और पोषण के लिए दैनिक आहार पूरक जैसे नेचुरमोरे फॉर वुमन, मेन्स वेलनेस, न्यूट्रीहेल्थ, जॉइंट केयर, लिवर केयर, डायबिटीज केयर और 27 विटामिन्स-मिनरल्स युक्त नेचुरमोरे किड्स।
+🌸 **3. हर्ब्स एंड मोर (Herbs & More — Personal Care & Beauty):**
+त्वचा और बालों की देखभाल के लिए पैराबीन-मुक्त (Paraben-free) प्रीमियम उत्पाद जैसे फेसवाश, शैम्पू, स्किन क्रीम, डे-टान स्क्रब और जॉइंट केयर पेन क्रीम।
+🐄 **4. पेट-वेट (Pet-Vet / पूर्व में CFC Plus — Animal Care & Nutrition):**
+दुधारू पशुओं (गाय-भैंस) का दूध उत्पादन व 7 से 8 फैट बढ़ाने, पाचन सुधारने व बांझपन दूर करने वाला संपूर्ण पशु आहार सप्लीमेंट।
+📦 **उपलब्ध साइज व आधिकारिक MRP:**
+• **250 ग्राम:** MRP **₹399**
+• **500 ग्राम:** MRP **₹699**
+• **1 किलोग्राम:** MRP **₹1,275**
+🥄 **खुराक:** गाय-भैंस हेतु **10 से 15 ग्राम प्रतिदिन** और बछड़े/बकरी हेतु **5 ग्राम प्रतिदिन**।
+
+4️⃣ **बिजनेस सुअवसर:**
+उपभोक्ताओं को फ्री जॉइनिंग पर तुरंत ₹100 का वाउचर व 25% फ्लैट डिस्काउंट, और रिटेलर्स को 15 दिन में अधिकतम **₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500)** की कानूनी आय सीमा।`;
+
+      const waUrl = buildAvneeshWhatsAppHandoffUrl('नेट्सर्फ कंपनी प्रोफाइल व 4 उत्पाद वर्टिकल्स की जानकारी');
+
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          🏢 नेट्सर्फ कम्युनिकेशन्स प्रा. लि. — कॉर्पोरेट प्रोफाइल व 4 उत्पाद वर्टिकल्स
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${formatTextHtml(profileText)}
+        </div>
+        ${buildMsgAudioBtnMarkup(profileText)}
+
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 अधिकृत लिंक्स व सेवाएं:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <a href="/categories/netsurf.html" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              💼 नेट्सर्फ बिजनेस व ₹8.19L कैपिंग प्लान →
+            </a>
+            <a href="/categories/netsurf-products.html" class="sakhi-followup-chip" style="background:#0284c7;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              📦 नेट्सर्फ 4 वर्टिकल्स के उत्पाद देखें →
+            </a>
+          </div>
+          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;font-weight:800;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa-brands fa-whatsapp"></i> दादा अवनीश जी से सीधे WhatsApp पर जुड़ें (7974422572) →
+          </a>
+        </div>
+      `;
+
+      consecutiveAmbiguousCount = 0;
+      sakhiConversationState.lastActiveDomain = 'netsurf';
+      sakhiConversationState.lastActiveEntity = 'netsurf_profile';
+      sakhiConversationState.lastActiveEntityName = 'नेट्सर्फ कंपनी प्रोफाइल';
+      streamBotMessage(html, cleanTextForTTS('नेट्सर्फ की स्थापना साल 2000 में पुणे में हुई थी। इसके संस्थापक सुजीत जैन और संजीव जैन हैं। नेट्सर्फ के 4 प्रमुख वर्टिकल्स हैं: बायोफिट, नेचुरमोरे, हर्ब्स एंड मोर, और पेट-वेट।'));
+      return true;
+    }
+    return false;
   }
 
   // 18. DEDICATED NETSURF DIRECT SELLING & 15-DAY ₹8,19,250 CAPPING PLAN ROUTER
@@ -2658,6 +2813,11 @@
 
     // 2. Multi-Turn Pronoun & Follow-Up Context Resolver (e.g., "kya kya hai iske andar", "kaise khaye", etc.)
     if (resolveFollowUpQuery(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 2.5 Dedicated Netsurf Corporate Profile, Founders & 4-Vertical Router
+    if (handleNetsurfCompanyProfile(cleanQ, rawQ)) {
       return;
     }
 
