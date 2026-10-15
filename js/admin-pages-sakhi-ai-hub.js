@@ -384,10 +384,16 @@ function setupSakhiAdminEvents() {
   }
 
   if (clearUnansweredBtn) {
-    clearUnansweredBtn.onclick = () => {
+    clearUnansweredBtn.onclick = async () => {
       if (confirm('क्या आप सच में सभी छूटे हुए सवालों का लॉग साफ करना चाहते हैं?')) {
         localStorage.removeItem('sakhi_unanswered_queries');
-        renderUnansweredQueries();
+        try {
+          const db = window.dbClient || window.supabase;
+          if (db) {
+            await db.from('sakhi_unanswered_logs').update({ is_resolved: true }).eq('is_resolved', false);
+          }
+        } catch (_) {}
+        await renderUnansweredQueries();
       }
     };
   }
@@ -474,14 +480,45 @@ function saveCustomIntentFromModal() {
   renderUnansweredQueries();
 }
 
-function renderUnansweredQueries() {
+async function renderUnansweredQueries() {
   const tbody = document.getElementById('sakhiUnansweredTableBody');
   if (!tbody) return;
 
   let list = [];
   try {
-    list = JSON.parse(localStorage.getItem('sakhi_unanswered_queries') || '[]');
-  } catch (e) {}
+    const db = window.dbClient || window.supabase;
+    if (db) {
+      const { data, error } = await db
+        .from('sakhi_unanswered_logs')
+        .select('*')
+        .eq('is_resolved', false)
+        .order('hit_count', { ascending: false })
+        .order('last_asked_at', { ascending: false })
+        .limit(50);
+
+      if (!error && data && data.length > 0) {
+        list = data.map(d => ({
+          query: d.query_text,
+          domain: d.domain,
+          user: d.user_name,
+          phone: d.user_mobile,
+          share_id: d.share_id,
+          count: d.hit_count,
+          timestamp: d.last_asked_at,
+          id: d.id
+        }));
+      }
+    }
+  } catch (err) {
+    console.debug('Supabase unanswered queries fetch notice:', err?.message);
+  }
+
+  // Fallback to local storage if DB empty or offline
+  if (list.length === 0) {
+    try {
+      list = JSON.parse(localStorage.getItem('sakhi_unanswered_queries') || '[]');
+    } catch (e) {}
+  }
 
   if (!list || list.length === 0) {
     tbody.innerHTML = `

@@ -1159,6 +1159,23 @@ export async function fetchUserDetails(userId) {
     const joinedDateFormatted = createdDateObj ? createdDateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
     const joinedTimeFormatted = createdDateObj ? createdDateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : 'N/A';
 
+    // Fetch Sakhi AI User Insights from public.sakhi_user_insights
+    let sakhiInsights = null;
+    try {
+      let insightQuery = db.from('sakhi_user_insights').select('*');
+      if (profile.mobile) {
+        insightQuery = insightQuery.or(`profile_id.eq.${userId},mobile.eq.${profile.mobile}`);
+      } else {
+        insightQuery = insightQuery.eq('profile_id', userId);
+      }
+      const { data: insightsData } = await insightQuery.order('last_active_at', { ascending: false }).limit(1);
+      if (insightsData && insightsData.length > 0) {
+        sakhiInsights = insightsData[0];
+      }
+    } catch (e) {
+      console.warn('Error fetching sakhi user insights:', e);
+    }
+
     const userDetails = {
       id: profile.id,
       name: profile.full_name,
@@ -1184,7 +1201,12 @@ export async function fetchUserDetails(userId) {
           date: new Date(p.purchase_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
           status: p.payment_status || 'success'
       })),
-      activity: activity.sort((a,b) => new Date(b.date) - new Date(a.date))
+      activity: activity.sort((a,b) => new Date(b.date) - new Date(a.date)),
+      metadata: {
+        ...(profile.metadata || {}),
+        sakhi_insights: sakhiInsights
+      },
+      sakhiInsights: sakhiInsights
     };
 
     return { success: true, data: userDetails };

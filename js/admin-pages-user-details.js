@@ -1,12 +1,12 @@
 /* Admin User Details Page — Complete UCAS Data Integration */
 
 import { initAdminLayout } from './admin-main.js';
-import { 
-  fetchUserDetails, 
-  fetchUserUcasDetail, 
-  updateUserStatus, 
-  fetchAvailableBooks, 
-  addManualPurchase, 
+import {
+  fetchUserDetails,
+  fetchUserUcasDetail,
+  updateUserStatus,
+  fetchAvailableBooks,
+  addManualPurchase,
   deletePurchase,
   updateUserPermissionAdmin,
   fetchAllUsersAdmin
@@ -63,8 +63,8 @@ function renderPhonebookSection(phonebook) {
             </thead>
             <tbody>
               ${phonebook.map((c, i) => {
-                const sMob = String(c.mobile || '').replace(/\D/g, '');
-                return `
+    const sMob = String(c.mobile || '').replace(/\D/g, '');
+    return `
                   <tr>
                     <td><strong>#${i + 1}</strong></td>
                     <td><strong>${c.name}</strong></td>
@@ -79,7 +79,7 @@ function renderPhonebookSection(phonebook) {
                     <td>${c.created_at ? new Date(c.created_at).toLocaleDateString('en-GB') : '-'}</td>
                   </tr>
                 `;
-              }).join('')}
+  }).join('')}
             </tbody>
           </table>
         </div>
@@ -112,9 +112,9 @@ function renderSurveySection(surveys) {
             </thead>
             <tbody>
               ${surveys.map((s, i) => {
-                const sMob = String(s.mobile || '').replace(/\D/g, '');
-                const cats = Array.isArray(s.selected_categories) ? s.selected_categories.join(', ') : (s.selected_categories || 'agriculture');
-                return `
+    const sMob = String(s.mobile || '').replace(/\D/g, '');
+    const cats = Array.isArray(s.selected_categories) ? s.selected_categories.join(', ') : (s.selected_categories || 'agriculture');
+    return `
                   <tr>
                     <td><strong>#${i + 1}</strong></td>
                     <td><strong>${s.name}</strong></td>
@@ -134,7 +134,7 @@ function renderSurveySection(surveys) {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+  }).join('')}
             </tbody>
           </table>
         </div>
@@ -168,8 +168,8 @@ function renderSharingSection(landingPages, detail) {
             </thead>
             <tbody>
               ${landingPages.map(lp => {
-                const publicUrl = `${origin}/ucas/landing.html?id=${lp.id}&share_id=${lp.share_id || detail.shareId || 'AI000004'}`;
-                return `
+    const publicUrl = `${origin}/ucas/landing.html?id=${lp.id}&share_id=${lp.share_id || detail.shareId || 'AI000004'}`;
+    return `
                   <tr>
                     <td><code>${lp.id}</code></td>
                     <td><strong>${lp.title}</strong></td>
@@ -184,7 +184,7 @@ function renderSharingSection(landingPages, detail) {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+  }).join('')}
             </tbody>
           </table>
         </div>
@@ -270,12 +270,12 @@ function renderUserWebinarSection(surveys, detail) {
             </thead>
             <tbody>
               ${wbAttendees.map((att, i) => {
-                const sMob = String(att.mobile || '').replace(/\D/g, '');
-                const waMob = sMob.length === 10 ? '91' + sMob : sMob;
-                const waMsg = encodeURIComponent(`नमस्ते ${att.name} जी! मैं आरोग्यम इंडिया से बात कर रहा हूँ। आपने हमारे लाइव वेबिनार में भाग लिया था...`);
-                const isJoined = att.category_answers?.event_type === 'webinar_attendance' || Boolean(att.category_answers?.joined_at);
-                const regDate = att.category_answers?.registered_at || att.created_at;
-                return `
+    const sMob = String(att.mobile || '').replace(/\D/g, '');
+    const waMob = sMob.length === 10 ? '91' + sMob : sMob;
+    const waMsg = encodeURIComponent(`नमस्ते ${att.name} जी! मैं आरोग्यम इंडिया से बात कर रहा हूँ। आपने हमारे लाइव वेबिनार में भाग लिया था...`);
+    const isJoined = att.category_answers?.event_type === 'webinar_attendance' || Boolean(att.category_answers?.joined_at);
+    const regDate = att.category_answers?.registered_at || att.created_at;
+    return `
                   <tr>
                     <td><strong>#${i + 1}</strong></td>
                     <td><strong>${att.name}</strong></td>
@@ -283,10 +283,10 @@ function renderUserWebinarSection(surveys, detail) {
                     <td>${att.district || att.village || att.state || '-'}</td>
                     <td>${regDate ? new Date(regDate).toLocaleDateString('en-GB') : '-'}</td>
                     <td>
-                      ${isJoined 
-                        ? `<span class="admin-pill active" style="font-weight:800; font-size:0.72rem;">🟢 Live Joined</span>` 
-                        : `<span class="admin-pill" style="font-weight:700; font-size:0.72rem; opacity:0.8;">⏳ Registered</span>`
-                      }
+                      ${isJoined
+        ? `<span class="admin-pill active" style="font-weight:800; font-size:0.72rem;">🟢 Live Joined</span>`
+        : `<span class="admin-pill" style="font-weight:700; font-size:0.72rem; opacity:0.8;">⏳ Registered</span>`
+      }
                     </td>
                     <td>
                       <a href="https://wa.me/${waMob}?text=${waMsg}" target="_blank" class="admin-button small-button" style="background:#25D366; color:#fff; padding:2px 8px; font-weight:700; font-size:0.75rem; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
@@ -295,7 +295,7 @@ function renderUserWebinarSection(surveys, detail) {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+  }).join('')}
             </tbody>
           </table>
         </div>
@@ -371,7 +371,7 @@ function renderPermissionsSection(userId, userPerms) {
     Object.keys(local).forEach(k => {
       if (typeof local[k] !== 'undefined') map[k] = Boolean(local[k]);
     });
-  } catch(e) {}
+  } catch (e) { }
 
   const mediaPerms = ALL_PERMISSIONS_26.filter(p => p.isMedia);
   const standardPerms = ALL_PERMISSIONS_26.filter(p => !p.isMedia);
@@ -443,21 +443,21 @@ function renderProfile(detail, ucasData) {
   if (!detail) return '<div class="admin-empty"><strong>User not found.</strong></div>';
 
   const sanitizedMobile = String(detail.mobile || '').replace(/\D/g, '');
-  const mobileLink = sanitizedMobile 
-    ? `<a href="tel:${sanitizedMobile}" class="admin-subtle-link" title="Click to Call">📞 ${detail.mobile}</a>` 
+  const mobileLink = sanitizedMobile
+    ? `<a href="tel:${sanitizedMobile}" class="admin-subtle-link" title="Click to Call">📞 ${detail.mobile}</a>`
     : (detail.mobile || 'N/A');
 
   let whatsappButtonHTML = '';
   if (sanitizedMobile) {
-      let whatsappNumber = sanitizedMobile;
-      if (whatsappNumber.length === 10) {
-          whatsappNumber = '91' + whatsappNumber;
-      }
-      const customerName = detail.name || 'Customer';
-      const message = `नमस्ते ${customerName} जी, मैं आरोग्यम इंडिया से बात कर रहा हूँ।`;
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-      whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;padding:2px 8px;margin-left:8px;" title="WhatsApp Chat">💬 WhatsApp</a>`;
+    let whatsappNumber = sanitizedMobile;
+    if (whatsappNumber.length === 10) {
+      whatsappNumber = '91' + whatsappNumber;
+    }
+    const customerName = detail.name || 'Customer';
+    const message = `नमस्ते ${customerName} जी, मैं आरोग्यम इंडिया से बात कर रहा हूँ।`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;padding:2px 8px;margin-left:8px;" title="WhatsApp Chat">💬 WhatsApp</a>`;
   }
 
   const sub = ucasData?.subscription || {};
@@ -548,48 +548,100 @@ function renderProfile(detail, ucasData) {
 
 function renderSakhiAiUserSection(detail) {
   const meta = detail?.metadata || {};
-  const sakhiData = meta.sakhi_insights || meta.sakhi_profile || null;
-  const lastQuery = sakhiData?.last_query || meta.sakhi_last_query || null;
+  const sakhiData = meta.sakhi_insights || meta.sakhi_profile || detail.sakhiInsights || null;
+  const lastQuery = sakhiData?.last_query_topic || sakhiData?.last_query || meta.sakhi_last_query || null;
   const primaryDomain = sakhiData?.primary_domain || meta.sakhi_domain || null;
   const interactionCount = sakhiData?.interaction_count || meta.sakhi_interactions || 0;
+  const subdomains = Array.isArray(sakhiData?.top_subdomains) ? sakhiData.top_subdomains : [];
+  const recoEbook = sakhiData?.recommended_ebook || meta.sakhi_ebook || 'BK002';
+  const userTone = sakhiData?.user_tone || meta.sakhi_tone || 'standard';
+  const lastActive = sakhiData?.last_active_at ? new Date(sakhiData.last_active_at).toLocaleString('hi-IN') : null;
+
   const domainLabelMap = {
-    agri: '🌾 जैविक खेती व फसल (Agri)',
+    agri: '🌾 जैविक खेती व फसल डॉक्टर (Agri)',
     pashu: '🐄 पशु पोषण व डेयरी (Dairy)',
     health: '🩺 स्वास्थ्य व आयुर्वेद (Health)',
-    beauty: '✨ सौंदर्य व स्किनकेयर (Beauty)',
+    beauty: '✨ सौंदर्य व त्वचा (Beauty)',
     netsurf: '🧴 नेट्सर्फ व बायोफिट (Netsurf)',
     business: '💼 25% छूट व बिज़नेस (Business)',
     omni: '🌐 बहु-विषयक (Omni)'
   };
+  const toneLabelMap = {
+    dehati: '🌾 आदरणीय किसान संवाद (Dehati)',
+    business: '💼 व्यावसायिक (Business/Career)',
+    homemaker: '🌸 गृहणी / पारिवारिक (Homemaker)',
+    patient: '🩺 स्वास्थ्य परामर्श (Clinical/Patient)',
+    standard: '💬 सामान्य व संतुलित (Standard)'
+  };
   const domainLabel = domainLabelMap[primaryDomain] || (primaryDomain ? primaryDomain.toUpperCase() : 'सामान्य / सर्व-समाधान');
+  const toneLabel = toneLabelMap[userTone] || userTone;
+
+  let tagsHtml = '';
+  if (subdomains.length > 0) {
+    tagsHtml = subdomains.map(tag => `
+      <span style="background:rgba(22,163,74,0.1);color:#166534;border:1px solid #86efac;padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
+        🏷️ ${tag}
+      </span>
+    `).join(' ');
+  }
 
   return `
-    <div class="admin-section" style="border-left: 4px solid #16a34a; background: linear-gradient(135deg, rgba(22, 163, 74, 0.03), transparent);">
+    <div class="admin-section" style="border-left: 4px solid #16a34a; background: linear-gradient(135deg, rgba(22, 163, 74, 0.04), transparent);">
       <div class="admin-section-header">
         <div class="admin-section-title" style="display:flex;align-items:center;gap:8px;">
-          <span>🌸</span> आरोग्यम सखी AI — उपयोगकर्ता बातचीत अंतर्दृष्टि (Zero-Egress Insights)
+          <span>🌸</span> आरोग्यम सखी AI — उपयोगकर्ता रुचि व संवाद अंतर्दृष्टि
         </div>
         <span class="admin-pill ${interactionCount > 0 ? 'active' : ''}">
-          ${interactionCount > 0 ? `${interactionCount} संवाद दर्ज` : 'सुरक्षित स्थानीय सत्र'}
+          ${interactionCount > 0 ? `✅ ${interactionCount} संवाद दर्ज` : 'सत्र सक्रिय (नया यूजर)'}
         </span>
       </div>
 
       <div class="admin-details-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 12px;">
         <div class="admin-detail-item">
-          <div class="admin-detail-label">प्राथमिक रुचि / डोमेन</div>
-          <div class="admin-detail-value" style="font-weight:700;color:#166534;">${domainLabel}</div>
+          <div class="admin-detail-label">प्राथमिक रुचि / मुख्य डोमेन</div>
+          <div class="admin-detail-value" style="font-weight:800;color:#166534;">${domainLabel}</div>
         </div>
+
         <div class="admin-detail-item">
-          <div class="admin-detail-label">अंतिम पूछा गया सवाल / विषय</div>
-          <div class="admin-detail-value">${lastQuery ? `"${lastQuery}"` : '<span style="color:#94a3b8;">नियमित परामर्श जारी</span>'}</div>
+          <div class="admin-detail-label">अंतिम पूछा गया विषय</div>
+          <div class="admin-detail-value" style="font-weight:600;">
+            ${lastQuery ? `"${lastQuery}"` : '<span style="color:#94a3b8;">नियमित परामर्श जारी</span>'}
+          </div>
         </div>
+
         <div class="admin-detail-item">
-          <div class="admin-detail-label">शेयर ID व क्लाइंट सुरक्षा</div>
-          <div class="admin-detail-value"><span style="font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:4px;">${detail.share_id || 'AGRI2026'}</span> (100% क्लाइंट-साइड गोपनीयता)</div>
+          <div class="admin-detail-label">संवाद टोन व शैली</div>
+          <div class="admin-detail-value">${toneLabel}</div>
         </div>
+
+        <div class="admin-detail-item">
+          <div class="admin-detail-label">सिफारिश की गई ई-बुक</div>
+          <div class="admin-detail-value">
+            <a href="/ebooks/book-landing.html?id=${encodeURIComponent(recoEbook)}" target="_blank" style="color:#0284c7;font-weight:700;text-decoration:underline;">
+              📖 ${recoEbook} ई-बुक देखें →
+            </a>
+          </div>
+        </div>
+
+        ${tagsHtml ? `
+        <div class="admin-detail-item" style="grid-column: 1 / -1;">
+          <div class="admin-detail-label" style="margin-bottom:6px;">सक्रिय विषय टैग्स (Subdomains)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${tagsHtml}
+          </div>
+        </div>
+        ` : ''}
+
+        ${lastActive ? `
+        <div class="admin-detail-item">
+          <div class="admin-detail-label">अंतिम सक्रियता समय</div>
+          <div class="admin-detail-value" style="font-size:0.85rem;color:#64748b;">${lastActive}</div>
+        </div>
+        ` : ''}
       </div>
-      <div style="font-size:0.8rem;color:#64748b;margin-top:10px;line-height:1.4;">
-        💡 <strong>जीरो-एग्रेस सुरक्षा:</strong> सखी AI का सारा डेटा उपयोगकर्ता के ब्राउज़र सत्र में शून्य क्लाउड बिल के साथ सुरक्षित रहता है।
+
+      <div style="font-size:0.8rem;color:#64748b;margin-top:12px;display:flex;align-items:center;gap:6px;border-top:1px dashed #cbd5e1;padding-top:8px;">
+        <span>🛡️</span> <strong>गोपनीयता व जीरो-एग्रेस सुरक्षा:</strong> चैट का कोई भी निजी या लंबा संदेश सर्वर पर स्टोर नहीं किया जाता। केवल सुपर-कॉम्पैक्ट एग्रीगेटेड टैग्स सुरक्षित रूप से सिंक होते हैं।
       </div>
     </div>
   `;
@@ -620,15 +672,15 @@ function renderReferralInformation(detail) {
             <thead><tr><th>Name</th><th>Mobile</th><th>Total Purchases</th></tr></thead>
             <tbody>
               ${referrals.map(ref => {
-                const refSanitized = String(ref.mobile || '').replace(/\D/g, '');
-                return `
+    const refSanitized = String(ref.mobile || '').replace(/\D/g, '');
+    return `
                   <tr>
                     <td><a href="#user-details?id=${ref.id}" data-route="user-details" data-id="${ref.id}" class="admin-subtle-link">${ref.name || 'Member'}</a></td>
                     <td><a href="tel:${refSanitized}" class="admin-subtle-link">📞 ${ref.mobile}</a></td>
                     <td><strong>${ref.totalPurchases || 0}</strong></td>
                   </tr>
                 `;
-              }).join('')}
+  }).join('')}
             </tbody>
           </table>
         </div>
@@ -850,7 +902,7 @@ export async function initUserDetails() {
         modalBookSelect.innerHTML = '<option value="">-- लोड हो रहा है... --</option>';
         const booksRes = await fetchAvailableBooks();
         const booksList = booksRes.success ? booksRes.data : [];
-        modalBookSelect.innerHTML = '<option value="">-- पुस्तक चुनें --</option>' + 
+        modalBookSelect.innerHTML = '<option value="">-- पुस्तक चुनें --</option>' +
           booksList.map(b => `<option value="${b.id}" data-price="${b.offerPrice || 99}">${b.title || b.name || b.id} (${b.id}) — ₹${b.offerPrice || 99}</option>`).join('');
       }
 
@@ -1060,7 +1112,7 @@ async function renderUserPicker(container) {
         renderList(users);
         return;
       }
-      const filtered = users.filter(u => 
+      const filtered = users.filter(u =>
         (u.full_name && u.full_name.toLowerCase().includes(q)) ||
         (u.mobile && String(u.mobile).includes(q)) ||
         (u.email && u.email.toLowerCase().includes(q)) ||

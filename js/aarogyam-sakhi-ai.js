@@ -87,10 +87,49 @@
       // Ultra-lightweight Micro-Cookie hint (Max 35-45 bytes) for Edge/CDN zero-egress sync
       const cookiePayload = `dom=${encodeURIComponent(persona.primary_domain || 'omni')}&tone=${encodeURIComponent(persona.user_tone || 'standard')}&bk=${encodeURIComponent(persona.recommended_ebook || 'BK002')}`;
       document.cookie = `${SAKHI_COOKIE_HINT_KEY}=${cookiePayload};path=/;max-age=7776000;SameSite=Lax`;
+
+      // Debounced zero-egress sync to Supabase sakhi_user_insights
+      scheduleSakhiTelemetrySync(persona);
     } catch (e) {
       console.warn('Persona save error:', e);
     }
   }
+  // Zero-Egress Supabase Synchronization (Debounced 2500ms, Returns 204 No-Content)
+  let _sakhiSyncTimer = null;
+  function scheduleSakhiTelemetrySync(persona) {
+    if (_sakhiSyncTimer) clearTimeout(_sakhiSyncTimer);
+    _sakhiSyncTimer = setTimeout(() => {
+      syncSakhiInsightsToSupabase(persona || loadSakhiUserPersona());
+    }, 2500);
+  }
+
+  async function syncSakhiInsightsToSupabase(persona) {
+    if (!persona) return;
+    try {
+      const db = window.dbClient || window.supabase;
+      if (!db || typeof db.rpc !== 'function') return;
+
+      const phone = getUserPhone() || '';
+      const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('user_share_id') || '';
+      const userKey = phone || shareId || 'guest_device';
+
+      // 0-byte egress return via RPC void
+      await db.rpc('sync_sakhi_user_insight', {
+        p_user_key: userKey,
+        p_mobile: phone || null,
+        p_share_id: shareId || null,
+        p_primary_domain: persona.primary_domain || 'omni',
+        p_user_tone: persona.user_tone || 'standard',
+        p_interaction_count: persona.interaction_count || 1,
+        p_last_query: (persona.last_query_hint || '').slice(0, 100),
+        p_subdomains: Object.keys(persona.domain_scores || {}).filter(k => (persona.domain_scores[k] || 0) > 0),
+        p_reco_ebook: persona.recommended_ebook || 'BK001'
+      });
+    } catch (err) {
+      // Silently fail to guarantee zero friction and offline resilience
+    }
+  }
+
 
   function updateSakhiUserPersonaFromQuery(cleanQ, detectedDomain) {
     const p = loadSakhiUserPersona();
@@ -1921,8 +1960,8 @@
       );
     }
 
-    // 7. Men Vitality & Stamina (पौरुष शक्ति)
-    const isMenVitality = (cleanQ.includes('stamina') || cleanQ.includes('पौरुष') || cleanQ.includes('शुक्राणु') || cleanQ.includes('मर्दाना') || cleanQ.includes('शीघ्रपतन') || ((cleanQ.includes('पुरुष') || cleanQ.includes('men')) && (cleanQ.includes('कमजोरी') || cleanQ.includes('स्टेमिना') || cleanQ.includes('ऊर्जा')))) &&
+    // 7. Men Vitality & Stamina (पौरुष शक्ति व यौन स्वास्थ्य)
+    const isMenVitality = (cleanQ.includes('stamina') || cleanQ.includes('पौरुष') || cleanQ.includes('शुक्राणु') || cleanQ.includes('मर्दाना') || cleanQ.includes('शीघ्रपतन') || cleanQ.includes('यौन') || cleanQ.includes('सेक्स') || cleanQ.includes('सेक्सुअल') || cleanQ.includes('इरेक्टाइल') || cleanQ.includes('लिंग में शिथिलता') || cleanQ.includes('नपुंसकता') || cleanQ.includes('गुप्त रोग') || cleanQ.includes('धातु रोग') || ((cleanQ.includes('पुरुष') || cleanQ.includes('men') || cleanQ.includes('सेक्स')) && (cleanQ.includes('कमजोरी') || cleanQ.includes('स्टेमिना') || cleanQ.includes('ऊर्जा') || cleanQ.includes('समस्या')))) &&
       !cleanQ.includes('पशु') && !cleanQ.includes('गाय') && !cleanQ.includes('भैंस') && !cleanQ.includes('बछड़ा') && !cleanQ.includes('बकरी') && !cleanQ.includes('फसल');
     if (isMenVitality) {
       return renderHealthTopicPage(
@@ -1994,7 +2033,9 @@
     }
 
     // 12. Kids Wellness & Nutrition (बच्चों का शारीरिक व मानसिक विकास)
-    if (cleanQ.includes('kids') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे') || cleanQ.includes('बच्चों') || cleanQ.includes('बाल विकास') || cleanQ.includes('शारीरिक और मानसिक विकास')) {
+    const isKidsWellness = (cleanQ.includes('kids') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे') || cleanQ.includes('बच्चों') || cleanQ.includes('बाल विकास') || cleanQ.includes('शारीरिक और मानसिक विकास')) &&
+      !cleanQ.includes('बुखार') && !cleanQ.includes('bukhar') && !cleanQ.includes('fever') && !cleanQ.includes('चढ़ी') && !cleanQ.includes('तप') && !cleanQ.includes('उल्टी') && !cleanQ.includes('दस्त');
+    if (isKidsWellness) {
       return renderHealthTopicPage(
         'नेचुरामोर किड्स — बच्चों का शारीरिक व मानसिक विकास (27 विटामिन्स-मिनरल्स)',
         'बढ़ते बच्चों को हड्डियों, याददाश्त, एकाग्रता और रोग प्रतिरोधक क्षमता (Immunity) के लिए संतुलित प्रोटीन और सूक्ष्म पोषक तत्वों की आवश्यकता होती है।',
@@ -2463,13 +2504,47 @@
   function handleSafetyGuardrails(cleanQ, rawQ) {
     const q = cleanQ;
 
+    // 0. Child Fever First-Aid Emergency Escalation (PEDIATRIC PROTOCOL)
+    const hasChildWord = q.includes('बच्चा') || q.includes('बच्चे') || q.includes('बच्चों') || q.includes('baby') || q.includes('kid') || q.includes('child');
+    const hasFeverWord = q.includes('बुखार') || q.includes('fever') || q.includes('bukhar') || q.includes('चढ़ी') || q.includes('तप रहा') || q.includes('तप रही') || q.includes('तप') || q.includes('गरम') || q.includes('तापमान');
+    if (hasChildWord && hasFeverWord) {
+      const resp = `🩺 **शिशु व बाल बुखार सुरक्षा प्रोटोकॉल (Child Fever Safety Protocol):**\n\nबच्चों में बुखार किसी मौसमी वायरल, दांत निकलने या अंदरूनी संक्रमण का संकेत होता है।\n\n🚨 **अति आवश्यक चिकित्सीय नियम:**\nबच्चों को कभी भी बिना योग्य शिशु रोग विशेषज्ञ (Pediatrician) की सलाह के कोई भी एडल्ट दवाई या सामान्य हेल्थ सप्लीमेंट न दें!\n\n✅ **सुरक्षित प्राथमिक घरेलू देखभाल (Immediate Care):**\n1. **सामान्य ताजे पानी की पट्टी:** माथे, गर्दन व बगलों पर ताजे या हल्के गुनगुने पानी की गीली पट्टी रखें (बर्फ का पानी कभी न लगाएं)।\n2. **पर्याप्त तरल आहार:** बच्चे को डिहाइड्रेशन से बचाने के लिए मां का दूध, ओआरएस (ORS), हल्का गुनगुना पानी या दाल का पानी पिलाते रहें।\n3. **कम कपड़े व हवादार कमरा:** बच्चे को बहुत ज्यादा कपड़ों या भारी कंबल में न लपेटें।\n4. **तत्काल डॉक्टर से मिलें:** यदि बुखार 101°F से अधिक है, बच्चा बहुत रो रहा है या सुस्त पड़ रहा है, तो तुरंत नजदीकी डॉक्टर को दिखाएं।`;
+
+      const html = `
+        <div style="font-weight:900;color:#dc2626;font-size:1.05rem;margin-bottom:8px;">
+          🩺 शिशु व बाल बुखार सुरक्षा प्रोटोकॉल (Child Fever Care)
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${formatTextHtml(resp)}
+        </div>
+        ${buildMsgAudioBtnMarkup(resp)}
+        <div style="background:#fef2f2;border:1.5px solid #f87171;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#991b1b;font-size:0.85rem;margin-bottom:8px;">👉 आपातकालीन सहायता व परामर्श:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button type="button" class="sakhi-followup-chip" style="background:#dc2626;color:#fff;border-color:#b91c1c;" onclick="window.connectToAvneeshMishra('बच्चों को तेज बुखार है - प्राथमिक सहायता')">
+              📞 दादा अवनीश जी हेल्पलाइन 💬
+            </button>
+            <a href="/index.html" class="sakhi-followup-chip" style="text-decoration:none;">
+              🏠 मुख्य पोर्टल पर जाएं
+            </a>
+          </div>
+          <div style="font-size:0.8rem;color:#7f1d1d;margin-top:8px;">
+            ⚠️ <strong>महत्वपूर्ण:</strong> आरोग्यम सखी AI किसी भी सप्लीमेंट को बाल बुखार की दवा के रूप में नहीं देती। शिशु रोग विशेषज्ञ से परामर्श अनिवार्य है।
+          </div>
+        </div>
+      `;
+      streamBotMessage(html, cleanTextForTTS('बच्चों में बुखार के समय माथे पर ताजे पानी की पट्टी रखें, तरल आहार दें और तुरंत शिशु रोग विशेषज्ञ डॉक्टर से परामर्श लें।'));
+      return true;
+    }
+
     // 1. Obscene / Abusive Language & Inappropriate Personal Advances
+    const isSexualWellnessQuery = q.includes('यौन') || q.includes('कमजोरी') || q.includes('समस्या') || q.includes('प्रॉब्लम') || q.includes('दवा') || q.includes('इलाज') || q.includes('स्टैमिना') || q.includes('stamina') || q.includes('डायबिटीज') || q.includes('शीघ्रपतन') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('धातु') || q.includes('टाइमिंग');
     const abusiveTerms = [
       'गाली', 'gali', 'harami', 'kamina', 'madarchod', 'behenchod', 'chutiya', 'bhosadi', 'bhosdike',
-      'kutta', 'kutiya', 'randi', 'sex', 'sexy', 'kiss', 'love you', 'i love you', 'pyaar', 'patana',
+      'kutta', 'kutiya', 'randi', 'sexy', 'kiss', 'love you', 'i love you', 'pyaar', 'patana',
       'dating', 'chumma', 'गंदी', 'अश्लील', 'नंगा', 'नग्न', 'बकवास बंद कर', 'चुप रह'
     ];
-    if (abusiveTerms.some(t => q.includes(t))) {
+    if (abusiveTerms.some(t => q.includes(t)) || (!isSexualWellnessQuery && (q.includes('sex') || q.includes('सेक्स')))) {
       const resp = `माफ कीजिएगा, मेरा उद्देश्य केवल किसानों, स्वास्थ्य के प्रति जागरूक लोगों और नेट्सर्फ परिवार को सही, प्रामाणिक व उपयोगी जानकारी देना है। इस तरह के सवाल या भाषा पर मैं बात नहीं कर सकती। आइए, हम खेती, सेहत या नेट्सर्फ बिजनेस से जुड़ी किसी काम की बात करें।`;
       renderCrispSpecialBox('🛡️ आरोग्यम सखी AI — शालीनता व सुरक्षा नीति', resp, [
         { text: '🌾 खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
@@ -3108,8 +3183,94 @@
     // Zero-Egress Dynamic User Persona & Session Memory Update
     updateSakhiUserPersonaFromQuery(cleanQ, targetDomain);
 
+
+  // 18.5 ADVANCED MULTI-TOPIC, TWIST QUERIES & DUAL-INTENT RESOLVER
+  function handleMultiTopicAndTwistQueries(cleanQ, rawQ) {
+    const q = cleanQ;
+
+    // 1. DUAL-INTENT: SEXUAL WELLNESS + DIABETES (डायबिटिक न्यूरोपैथी व पौरुष कमजोरी)
+    const hasSexIntent = q.includes('यौन') || q.includes('सेक्स') || q.includes('सेक्सुअल') || q.includes('पौरुष') || q.includes('मर्दाना') || q.includes('शीघ्रपतन') || q.includes('इरेक्टाइल') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('stamina') || q.includes('गुप्त रोग') || q.includes('धातु');
+    const hasDiabIntent = q.includes('डायबिटीज') || q.includes('मधुमेह') || q.includes('शुगर') || q.includes('sugar') || q.includes('diabetes');
+
+    if (hasSexIntent && hasDiabIntent) {
+      const resp = `🩺 **डायबिटीज व यौन कमजोरी (Diabetic Neuropathy & Sexual Health Protocol):**\n\n• **कारण व मेडिकल साइंस:** डायबिटीज और यौन कमजोरी एक-दूसरे से सीधे जुड़े हुए हैं। अनियंत्रित ब्लड शुगर रक्त वाहिकाओं (Blood Vessels) और नसों (Peripheral Nerves) को क्षतिग्रस्त कर देती है (Diabetic Neuropathy)। इससे पुरुषों में लिंग की नसों में रक्त संचार कम हो जाता है, जिससे इरेक्टाइल डिस्फंक्शन (Erectile Dysfunction), शीघ्रपतन और अत्यधिक कमजोरी महसूस होती है।\n\n🥗 **डाइट चार्ट (पथ्य व अपथ्य):**\n✅ **क्या खाएं:** मेथी दाना, जामुन सिरका, अखरोट, बादाम, सफेद मूसली, अश्वगंधा, लहसुन, करेला व पर्याप्त पानी।\n❌ **क्या न खाएं:** चीनी, गुड़, मैदा, आलू, चावल, शराब, तंबाकू व अत्यधिक मानसिक तनाव।\n\n💊 **प्रमाणित दोहरा समाधान (25% फ्लैट छूट):**\n1. **शुगर कंट्रोल:** **नेचुरामोर लाइफस्टाइल प्लस (Lifestyle Plus)** कैप्सूल — भोजन से 30 मिनट पहले 1 कैप्सूल सुबह-शाम।\n2. **नसों की ताकत व पौरुष ऊर्जा:** **नेचुरामोर फॉर मेन (Naturamore For Men)** पाउडर + **लाइफस्टाइल मेन कैप्सूल** — सुबह दूध के साथ 1 चम्मच।\n\n👉 **ऑर्डर व 25% छूट:** दोनों समस्याओं के प्रमाणित उत्पाद सीधे नीचे दिए गए लिंक से कार्ट में जोड़ें:`;
+
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
+          🩺 डायबिटीज व यौन कमजोरी का एकीकृत समाधान (Combined Care Protocol)
+        </div>
+        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${formatTextHtml(resp)}
+        </div>
+        ${buildMsgAudioBtnMarkup(resp)}
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 संबंधित उत्पाद 25% छूट पर कार्ट में जोड़ें:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+            <a href="/health/diabetes.html" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              🩸 मधुमेह व शुगर नियंत्रण पेज (25% छूट) →
+            </a>
+            <a href="/health/sexual-wellness.html" class="sakhi-followup-chip" style="background:#0284c7;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
+              ⚡ पुरुष यौन स्वास्थ्य व पौरुष शक्ति पेज (25% छूट) →
+            </a>
+          </div>
+          <div style="font-size:0.82rem;color:#166534;line-height:1.4;">
+            💡 <strong>नोट:</strong> पहले शुगर को संतुलित करना अत्यंत जरूरी है, क्योंकि शुगर सामान्य होते ही नसों में रक्त प्रवाह सुधरने लगता है।
+          </div>
+        </div>
+      `;
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = 'diabetes_and_sexual_wellness';
+      sakhiConversationState.lastActiveEntityName = 'डायबिटीज व यौन कमजोरी एकीकृत समाधान';
+      streamBotMessage(html, cleanTextForTTS('डायबिटीज में नसों में रक्त संचार कम होने से यौन कमजोरी आती है। लाइफस्टाइल प्लस और नेचुरामोर फॉर मेन दोनों का समन्वित सेवन करें। दोनों पर 25% छूट है।'));
+      return true;
+    }
+
+    // 2. STANDALONE SEXUAL WELLNESS / ERECTILE DYSFUNCTION DIRECT ROUTE
+    if (hasSexIntent && !q.includes('पशु') && !q.includes('गाय') && !q.includes('भैंस') && !q.includes('फसल')) {
+      return handle13HealthPagesAndSponsor('पुरुष स्वास्थ्य', rawQ);
+    }
+
+    // 3. TOPIC SWITCHING: "खेती छोड़ो मुझे जोड़ों का दर्द है"
+    if ((q.includes('खेती छोड़ो') || q.includes('kheti chhodo') || q.includes('खेती बाद में')) && (q.includes('जोड़') || q.includes('दर्द') || q.includes('घुटने') || q.includes('शुगर') || q.includes('मधुमेह') || q.includes('हार्ट') || q.includes('सेहत'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      if (q.includes('जोड़') || q.includes('दर्द') || q.includes('घुटने')) {
+        return handle13HealthPagesAndSponsor('जोड़ों का दर्द', rawQ);
+      }
+      if (q.includes('शुगर') || q.includes('मधुमेह')) {
+        return handle13HealthPagesAndSponsor('मधुमेह में क्या खाएं', rawQ);
+      }
+    }
+
+    // 4. WEATHER & SPRAY CONFLICT: RAIN BEFORE SPRAY
+    if ((q.includes('बारिश') || q.includes('पानी बरस') || q.includes('rain')) && (q.includes('स्प्रे') || q.includes('दवा छिड़क') || q.includes('spray'))) {
+      const resp = `🌧️ **बारिश व स्प्रे का वैज्ञानिक नियम (Rain & Spray Guidelines):**\n\n• **नियम 1 (बारिश से पहले):** यदि अगले 2 से 4 घंटे के भीतर बारिश होने की संभावना हो, तो स्प्रे **बिल्कुल टाल दें**। बारिश से दवा धुल जाएगी और दवा व मेहनत दोनों व्यर्थ हो जाएंगे।\n• **नियम 2 (बारिश के बाद):** बारिश थमने के बाद जब पत्तियों से पानी सूख जाए और तेज हवा न चल रही हो, तब **Bio-99 (5ml प्रति 15L पंप)** के साथ मिलाकर ही स्प्रे करें ताकि दवा तुरंत पत्तियों पर चिपक कर अवशोषित (Absorb) हो जाए।`;
+      renderCrispSpecialBox('🌧️ बारिश और स्प्रे का सही नियम', resp, [
+        { text: '🌿 Bio-99 स्टीकर व स्प्रेडर', query: 'बायो 99 की पूरी जानकारी' },
+        { text: '🌾 फसलों का स्प्रे कैलेंडर', query: 'चना व गेहूं का स्प्रे कैलेंडर' }
+      ], 'agri', 'weather_spray_conflict');
+      return true;
+    }
+
+    // 5. MISSING DOSE CLARIFICATION
+    if ((q === 'डोज क्या है' || q === 'dose kya hai' || q === 'kitna dalna hai' || q === 'कितना डालना है') && !sakhiConversationState.lastActiveEntity) {
+      const resp = `कृपया बताएं कि आप **किस उत्पाद या फसल की खुराक (Dose)** जानना चाहते हैं?\n\nउदाहरण के लिए:\n• **Bio-99:** 5ml प्रति 15 लीटर पंप\n• **स्टीम रिच (Stimrich):** 20ml प्रति 15 लीटर पंप\n• **रैप अप (Wrap Up):** 30ml - 40ml प्रति 15 लीटर पंप\n• **नेचुरामोर पाउडर:** 1 चम्मच सुबह गुनगुने दूध/पानी से\n\nआप उत्पाद या फसल का नाम लिखकर पूछें!`;
+      renderCrispSpecialBox('💊 खुराक (Dose) स्पष्टीकरण', resp, [
+        { text: '🌾 बायोफिट स्प्रे डोज चार्ट', query: 'बायोफिट प्रोडक्ट की सही खुराक' },
+        { text: '🩺 नेचुरामोर सेवन विधि', query: 'नेचुरामोर पाउडर कैसे खाएं' }
+      ], 'omni', 'missing_dose');
+      return true;
+    }
+
+    return false;
+  }
+
     // 0. Safety Guardrails & Emergency Refusal Protocol (Abuse, Poison, Heart Attack, Agri Overdose, Heat Spray)
     if (handleSafetyGuardrails(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.005 Advanced Multi-Topic, Twist Queries & Dual Intent (Sexual Wellness + Diabetes, Child Fever, Rain Spray)
+    if (handleMultiTopicAndTwistQueries(cleanQ, rawQ)) {
       return;
     }
 
@@ -3644,7 +3805,17 @@
     const prevEntity = sakhiConversationState.lastActiveEntity;
     const prevName = sakhiConversationState.lastActiveEntityName;
 
-    if (prevEntity && prevName) {
+    const isPronounFollowUp = cleanQ.includes('इसके') || cleanQ.includes('इसकी') || cleanQ.includes('इसमें') || 
+      cleanQ.includes('सामग्री') || cleanQ.includes('घटक') || cleanQ.includes('खुराक') || cleanQ.includes('डोज') || 
+      cleanQ.includes('सेवन') || cleanQ.includes('कीमत') || cleanQ.includes('price') || cleanQ.includes('छूट') || 
+      cleanQ.includes('रिजल्ट') || cleanQ.includes('साइड इफेक्ट') || cleanQ.includes('कब लें') || cleanQ.includes('कैसे लें');
+
+    const touchesDifferentTopic = cleanQ.includes('यौन') || cleanQ.includes('सेक्स') || cleanQ.includes('बुखार') || 
+      cleanQ.includes('शुगर') || cleanQ.includes('डायबिटीज') || cleanQ.includes('दर्द') || cleanQ.includes('जोड़') || 
+      cleanQ.includes('खेती') || cleanQ.includes('फसल') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || 
+      cleanQ.includes('पशु') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे');
+
+    if (prevEntity && prevName && isPronounFollowUp && !touchesDifferentTopic) {
       const speech = `मुझे आपकी बात पूरी तरह समझ नहीं आई, क्या आप ${prevName} के बारे में कुछ और पूछना चाहते हैं?`;
       const html = `
         <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:6px;">
@@ -3670,6 +3841,10 @@
       `;
       streamBotMessage(html, cleanTextForTTS(speech));
       return;
+    } else {
+      // Clear stale entity so it never bleeds into unrelated queries
+      sakhiConversationState.lastActiveEntity = null;
+      sakhiConversationState.lastActiveEntityName = null;
     }
 
     // E. Polite First Clarification with Empathy & Options
@@ -3720,7 +3895,7 @@
     streamBotMessage(html, cleanTextForTTS(speech));
   }
 
-  // Telemetry Logger for Continuous Self-Learning
+  // Telemetry Logger for Continuous Self-Learning (Local + 0-Egress Supabase Sync)
   function logSakhiTelemetry(userQuery, domain, isResolved) {
     try {
       const records = JSON.parse(localStorage.getItem('sakhi_learning_telemetry') || '[]');
@@ -3733,11 +3908,12 @@
       if (records.length > 60) records.length = 60;
       localStorage.setItem('sakhi_learning_telemetry', JSON.stringify(records));
 
+      const phone = getUserPhone() || '';
+      const name = getUserDisplayName() || '';
+      const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('user_share_id') || '';
+
       if (!isResolved) {
         const uList = JSON.parse(localStorage.getItem('sakhi_unanswered_queries') || '[]');
-        const phone = getUserPhone() || '';
-        const name = getUserDisplayName() || '';
-        const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('user_share_id') || '';
         const existingIdx = uList.findIndex(item => item.query === userQuery);
         if (existingIdx >= 0) {
           uList[existingIdx].count = (uList[existingIdx].count || 1) + 1;
@@ -3755,15 +3931,32 @@
         }
         if (uList.length > 50) uList.length = 50;
         localStorage.setItem('sakhi_unanswered_queries', JSON.stringify(uList));
+
+        // Asynchronously sync unanswered query to Supabase (Fire-and-forget)
+        try {
+          const db = window.dbClient || window.supabase;
+          if (db && typeof db.rpc === 'function') {
+            db.rpc('log_sakhi_unanswered_query', {
+              p_query_text: userQuery,
+              p_domain: domain || 'omni',
+              p_user_mobile: phone || null,
+              p_user_name: name || null,
+              p_share_id: shareId || null
+            }).catch(() => {});
+          }
+        } catch (e) {}
       }
+
+      // Schedule debounced telemetry insights sync
+      scheduleSakhiTelemetrySync();
     } catch (e) {
       // Ignore storage errors
     }
   }
 
-  // Self-Testing Harness for 5 Pillars
+  // Self-Testing Harness for 5 Pillars & Twist/Multi-Topic Handlers
   window.AarogyamSakhiRunTests = function () {
-    console.log('🧪 [Aarogyam Sakhi] Running Verification Tests on 5 Pillars...');
+    console.log('🧪 [Aarogyam Sakhi] Running Comprehensive Verification Tests (15 Pillars & Scenarios)...');
     const tests = [
       { q: 'स्वास्थ्य', expectDomain: 'health', desc: 'Pillar 2: General Health Empathetic Greeting' },
       { q: 'जोड़ों का दर्द', expectDomain: 'health', desc: 'Pillar 2: Joint Pain Structured Causes & Care' },
@@ -3772,7 +3965,14 @@
       { q: 'चना फसल', expectDomain: 'agri', desc: 'Pillar 4: Chana Crop Stages & Biofit' },
       { q: 'उकठा रोग', expectDomain: 'agri', desc: 'Pillar 4: Wilt & Wrap Up (75ml/15L)' },
       { q: 'दादी के नुस्खे', expectDomain: 'nuskhe', desc: 'Pillar 5: Dadi Ke Nuskhe' },
-      { q: 'किसान मित्र', expectDomain: 'agri', desc: 'Pillar 5: Kisan Mitra Monthly Earning' }
+      { q: 'किसान मित्र', expectDomain: 'agri', desc: 'Pillar 5: Kisan Mitra Monthly Earning' },
+      { q: 'बच्चों को बुखार चढ़ी हुई है', expectDomain: 'health', desc: 'Safety: Child Fever Escalation' },
+      { q: 'मुझे सेक्सुअल प्रॉब्लम भी है और डायबिटीज भी है', expectDomain: 'health', desc: 'Multi-Intent: Sexual Wellness + Diabetes' },
+      { q: 'मुझे यौन समस्या है', expectDomain: 'health', desc: 'Men Vitality: Standalone Sexual Health' },
+      { q: 'खेती छोड़ो मुझे जोड़ों का दर्द है', expectDomain: 'health', desc: 'Twist: Topic Switching Agri to Health' },
+      { q: 'यूरिक एसिड बढ़ गया है', expectDomain: 'health', desc: 'Disambiguation: Uric Acid vs Joint Pain' },
+      { q: 'बारिश होने वाली है क्या स्प्रे करें', expectDomain: 'agri', desc: 'Disambiguation: Rain vs Spray Conflict' },
+      { q: 'डोज क्या है', expectDomain: 'omni', desc: 'Disambiguation: Missing Dose Clarification' }
     ];
     let passed = 0;
     tests.forEach((t, i) => {
