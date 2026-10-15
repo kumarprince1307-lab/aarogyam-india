@@ -107,26 +107,76 @@
     if (!persona) return;
     try {
       const db = window.dbClient || window.supabase;
-      if (!db || typeof db.rpc !== 'function') return;
+      if (!db) return;
 
-      const phone = getUserPhone() || '';
+      let phone = getUserPhone() || localStorage.getItem('SAKHI_USER_PHONE') || '';
       const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('user_share_id') || '';
-      const userKey = phone || shareId || 'guest_device';
+      
+      // Fallback guest device ID
+      let deviceId = localStorage.getItem('sakhi_device_id');
+      if (!deviceId) {
+        deviceId = 'guest_' + Math.random().toString(36).substring(2, 10);
+        localStorage.setItem('sakhi_device_id', deviceId);
+      }
 
-      // 0-byte egress return via RPC void
-      await db.rpc('sync_sakhi_user_insight', {
-        p_user_key: userKey,
-        p_mobile: phone || null,
-        p_share_id: shareId || null,
-        p_primary_domain: persona.primary_domain || 'omni',
-        p_user_tone: persona.user_tone || 'standard',
-        p_interaction_count: persona.interaction_count || 1,
-        p_last_query: (persona.last_query_hint || '').slice(0, 100),
-        p_subdomains: Object.keys(persona.domain_scores || {}).filter(k => (persona.domain_scores[k] || 0) > 0),
-        p_reco_ebook: persona.recommended_ebook || 'BK001'
-      });
+      const userKey = phone || shareId || deviceId;
+      const userName = (typeof getUserDisplayName === 'function' ? getUserDisplayName() : '') ||
+                       (typeof getUserName === 'function' ? getUserName() : '') ||
+                       (phone ? 'किसान साथी' : 'अतिथि किसान');
+
+      const subdomains = Object.keys(persona.domain_scores || {}).filter(k => (persona.domain_scores[k] || 0) > 0);
+
+      const insightRecord = {
+        user_key: userKey,
+        mobile: phone || null,
+        user_name: userName,
+        primary_domain: persona.primary_domain || 'omni',
+        domain_scores: persona.domain_scores || {},
+        top_subdomains: subdomains,
+        interaction_count: persona.interaction_count || 1,
+        last_query_topic: (persona.last_query_hint || '').slice(0, 100),
+        user_tone: persona.user_tone || 'standard',
+        recommended_ebook: persona.recommended_ebook || 'BK002',
+        recommended_tube: persona.recommended_video_tag || 'krishi_khetee_doctor',
+        last_active_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      // 1. Direct Supabase Upsert (Guaranteed to write row in public.sakhi_user_insights)
+      const { data, error } = await db
+        .from('sakhi_user_insights')
+        .upsert(insightRecord, { onConflict: 'user_key' });
+
+      if (error) {
+        console.warn('⚠️ [Sakhi Sync] Upsert notice:', error.message);
+      } else {
+        console.log('🔥 [Sakhi Sync] Successfully saved chat insights to Supabase for:', userKey);
+      }
+
+      // 2. Also cache locally in SAKHI_PERSISTENT_CHAT_USERS for immediate offline Admin rendering
+      try {
+        const localList = JSON.parse(localStorage.getItem('SAKHI_PERSISTENT_CHAT_USERS') || '[]');
+        const existingIdx = localList.findIndex(item => item.user_key === userKey || (phone && item.user_mobile === phone));
+        const localObj = {
+          user_key: userKey,
+          user_mobile: phone,
+          user_name: userName,
+          primary_domain: persona.primary_domain || 'omni',
+          last_query_topic: (persona.last_query_hint || '').slice(0, 100),
+          total_interactions: persona.interaction_count || 1,
+          recommended_ebook: persona.recommended_ebook || 'BK002',
+          last_interaction_at: new Date().toISOString()
+        };
+        if (existingIdx >= 0) {
+          localList[existingIdx] = { ...localList[existingIdx], ...localObj };
+        } else {
+          localList.unshift(localObj);
+        }
+        localStorage.setItem('SAKHI_PERSISTENT_CHAT_USERS', JSON.stringify(localList.slice(0, 50)));
+      } catch (_) {}
+
     } catch (err) {
-      // Silently fail to guarantee zero friction and offline resilience
+      console.warn('Sakhi insight sync notice:', err?.message || err);
     }
   }
 
@@ -3908,7 +3958,12 @@
       if (records.length > 60) records.length = 60;
       localStorage.setItem('sakhi_learning_telemetry', JSON.stringify(records));
 
-      const phone = getUserPhone() || '';
+      let phone = getUserPhone() || localStorage.getItem('SAKHI_USER_PHONE') || '';
+      const phoneMatch = String(userQuery || '').match(/(?:(?:\+91|91|0)?[-\s]?)?([6-9]\d{9})/);
+      if (phoneMatch && phoneMatch[1]) {
+        phone = phoneMatch[1];
+        localStorage.setItem('SAKHI_USER_PHONE', phone);
+      }
       const name = getUserDisplayName() || '';
       const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('user_share_id') || '';
 
@@ -3932,25 +3987,29 @@
         if (uList.length > 50) uList.length = 50;
         localStorage.setItem('sakhi_unanswered_queries', JSON.stringify(uList));
 
-        // Asynchronously sync unanswered query to Supabase (Fire-and-forget)
+        // Asynchronously sync unanswered query to Supabase (direct insert with RPC fallback)
         try {
           const db = window.dbClient || window.supabase;
-          if (db && typeof db.rpc === 'function') {
-            db.rpc('log_sakhi_unanswered_query', {
-              p_query_text: userQuery,
-              p_domain: domain || 'omni',
-              p_user_mobile: phone || null,
-              p_user_name: name || null,
-              p_share_id: shareId || null
+          if (db) {
+            db.from('sakhi_unanswered_logs').insert([{
+              query_text: userQuery,
+              domain: domain || 'omni',
+              user_mobile: phone || null,
+              user_name: name || null,
+              share_id: shareId || null,
+              hit_count: 1
+            }]).then(() => {
+              console.log('✅ Unanswered query logged to Supabase:', userQuery);
             }).catch(() => {});
           }
         } catch (e) {}
       }
 
-      // Schedule debounced telemetry insights sync
-      scheduleSakhiTelemetrySync();
+      // Update persona and immediately trigger live sync to Supabase
+      const updatedPersona = updateSakhiUserPersonaFromQuery(userQuery, domain);
+      syncSakhiInsightsToSupabase(updatedPersona);
     } catch (e) {
-      // Ignore storage errors
+      console.warn('Telemetry error:', e);
     }
   }
 

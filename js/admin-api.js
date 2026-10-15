@@ -745,12 +745,19 @@ export async function fetchUsers(params = {}) {
     const shareIds = profiles.map(p => p.share_id || p.referral_code).filter(Boolean);
 
     // Step 2: Fetch all necessary aggregated data in parallel
-    const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes] = await Promise.all([
+    const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes, sakhiInsightsRes] = await Promise.all([
         db.from('purchases').select('profile_id, amount, download_count').or('payment_status.eq.success,payment_status.is.null'),
         db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
         db.from('profiles').select('id, referred_by'), // Fetch all referral relationships
         db.from('download_logs').select('profile_id').in('profile_id', profileIds),
-        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, category_answers, created_at')
+        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, category_answers, created_at'),
+        (async () => {
+          try {
+            return await db.from('sakhi_user_insights').select('*');
+          } catch (_) {
+            return { data: [] };
+          }
+        })()
     ]);
 
     if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
@@ -764,6 +771,16 @@ export async function fetchUsers(params = {}) {
     const allProfileRelations = allProfileRelationsRes.data || [];
     const allDownloads = downloadLogsRes.data || [];
     const allSurveys = surveysRes.data || [];
+    const allSakhiInsights = sakhiInsightsRes?.data || [];
+
+    const sakhiMap = new Map();
+    allSakhiInsights.forEach(ins => {
+      if (ins.profile_id) sakhiMap.set(String(ins.profile_id), ins);
+      if (ins.mobile) {
+        const cleanM = String(ins.mobile).replace(/\D/g, '').slice(-10);
+        if (cleanM) sakhiMap.set(cleanM, ins);
+      }
+    });
 
     // Step 3: Create lookup maps from the fetched data
     const webinarStatsMap = {};
@@ -846,6 +863,13 @@ export async function fetchUsers(params = {}) {
         const shareStats = shareStatsMap[currentShareId] || { shares: 0, clicks: 0, visitors: 0 };
         const wbStats = webinarStatsMap[user.id] || webinarStatsMap[currentShareId] || webinarStatsMap[user.mobile] || { leads: 0, joined: 0, attendees: [] };
 
+        const cleanMob = String(user.mobile || '').replace(/\D/g, '').slice(-10);
+        const sakhiIns = sakhiMap.get(String(user.id)) || (cleanMob ? sakhiMap.get(cleanMob) : null);
+        const sakhiChatCount = sakhiIns ? (sakhiIns.interaction_count || 0) : 0;
+        const sakhiPrimaryDomain = sakhiIns ? (sakhiIns.primary_domain || null) : null;
+        const sakhiLastTopic = sakhiIns ? (sakhiIns.last_query_topic || null) : null;
+        const sakhiRecoEbook = sakhiIns ? (sakhiIns.recommended_ebook || 'BK002') : 'BK002';
+
         return {
         id: user.id,
         name: user.full_name,
@@ -867,9 +891,18 @@ export async function fetchUsers(params = {}) {
         appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null,
         webinarLeads: (wbStats.leads || 0) + (wbStats.joined || 0),
         webinarJoined: wbStats.joined || 0,
-        webinarAttendees: wbStats.attendees || []
+        webinarAttendees: wbStats.attendees || [],
+        sakhiChatCount,
+        sakhiPrimaryDomain,
+        sakhiLastTopic,
+        sakhiRecoEbook,
+        sakhiInsights: sakhiIns
         };
     });
+
+    if (params.sort === 'sakhiChats') {
+      mappedData.sort((a, b) => (b.sakhiChatCount || 0) - (a.sakhiChatCount || 0));
+    }
 
     const response = { success: true, data: mappedData };
     _adminMemoryCache.set(cacheKey, { data: response, ts: Date.now() });

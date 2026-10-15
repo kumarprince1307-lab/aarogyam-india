@@ -175,7 +175,7 @@ async function loadMarketingHubData(forceSync = false) {
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
     };
 
-    const [profilesRes, purchasesRes, booksRes, downloadsRes, tubeRes, surveysRes, tubeStatsRes, pageStatsRes, readerStatsRes] = await Promise.all([
+    const [profilesRes, purchasesRes, booksRes, downloadsRes, tubeRes, surveysRes, tubeStatsRes, pageStatsRes, readerStatsRes, sakhiRes] = await Promise.all([
       fetch(`${SUPABASE_REST_URL}/profiles?select=id,full_name,mobile,email,registration_source,State,district,created_at,last_login,login_count,interest,occupation,share_id,referral_code,referred_by&order=created_at.desc&limit=600`, { headers }).catch(() => null),
       fetch(`${SUPABASE_REST_URL}/purchases?select=id,profile_id,book_id,amount,payment_status,purchase_date,created_at,invoice_number,download_count&order=created_at.desc&limit=400`, { headers }).catch(() => null),
       fetch('/data/books.json').catch(() => null),
@@ -184,7 +184,8 @@ async function loadMarketingHubData(forceSync = false) {
       fetch(`${SUPABASE_REST_URL}/surveys?select=id,profile_id,name,mobile,state,district,selected_categories,category_answers,created_at&order=created_at.desc&limit=300`, { headers }).catch(() => null),
       fetch(`${SUPABASE_REST_URL}/tube_video_stats?select=*&order=views.desc&limit=400`, { headers }).catch(() => null),
       fetch(`${SUPABASE_REST_URL}/page_visit_stats?select=*&limit=100`, { headers }).catch(() => null),
-      fetch(`${SUPABASE_REST_URL}/reader_progress_stats?select=user_key,user_name,book_id,current_page,total_pages,percent,audio_seconds,opens_count,last_read_at&order=last_read_at.desc&limit=400`, { headers }).catch(() => null)
+      fetch(`${SUPABASE_REST_URL}/reader_progress_stats?select=user_key,user_name,book_id,current_page,total_pages,percent,audio_seconds,opens_count,last_read_at&order=last_read_at.desc&limit=400`, { headers }).catch(() => null),
+      fetch(`${SUPABASE_REST_URL}/sakhi_user_insights?select=*&limit=500`, { headers }).catch(() => null)
     ]);
 
     let profiles = [];
@@ -196,6 +197,7 @@ async function loadMarketingHubData(forceSync = false) {
     let tubeStats = [];
     let pageStats = [];
     let readerProgressStats = [];
+    let sakhiInsights = [];
 
     if (profilesRes && profilesRes.ok) profiles = await profilesRes.json();
     if (purchasesRes && purchasesRes.ok) purchases = await purchasesRes.json();
@@ -208,6 +210,28 @@ async function loadMarketingHubData(forceSync = false) {
     if (tubeStatsRes && tubeStatsRes.ok) tubeStats = await tubeStatsRes.json();
     if (pageStatsRes && pageStatsRes.ok) pageStats = await pageStatsRes.json();
     if (readerStatsRes && readerStatsRes.ok) readerProgressStats = await readerStatsRes.json();
+    if (sakhiRes && sakhiRes.ok) sakhiInsights = await sakhiRes.json();
+
+    const sakhiMap = new Map();
+    sakhiInsights.forEach(ins => {
+      if (ins.profile_id) sakhiMap.set(String(ins.profile_id), ins);
+      if (ins.mobile) {
+        const cleanM = String(ins.mobile).replace(/\D/g, '').slice(-10);
+        if (cleanM) sakhiMap.set(cleanM, ins);
+      }
+    });
+
+    profiles.forEach(p => {
+      const cleanM = String(p.mobile || '').replace(/\D/g, '').slice(-10);
+      const ins = sakhiMap.get(String(p.id)) || (cleanM ? sakhiMap.get(cleanM) : null);
+      p.sakhiInsights = ins || null;
+      p.sakhiChatCount = ins ? (ins.interaction_count || 0) : 0;
+      p.sakhiPrimaryDomain = ins ? ins.primary_domain : null;
+      p.sakhiLastTopic = ins ? ins.last_query_topic : null;
+      p.sakhiRecoEbook = ins ? ins.recommended_ebook : null;
+    });
+
+    mktState.sakhiInsights = sakhiInsights;
 
     // Load real AarogyamTube recordings from JSON and merge with local uploads
     if (tubeRes && tubeRes.ok) {
@@ -1050,6 +1074,41 @@ function updateMarketingHubView(container) {
         (u.registration_source && u.registration_source.toLowerCase().includes('demo')) ||
         (u.primaryBook && u.primaryBook.includes('DEMO'))
       );
+    } else if (mktState.funnelFilter === 'sakhi_chat') {
+      displayedAudience = displayedAudience.filter(u => 
+        (u.sakhiChatCount && u.sakhiChatCount > 0) || Boolean(u.sakhiInsights) || (u.interest || '').toLowerCase().includes('sakhi')
+      );
+    } else if (mktState.funnelFilter === 'sakhi_agri') {
+      displayedAudience = displayedAudience.filter(u => {
+        const ins = u.sakhiInsights || {};
+        const dom = (u.sakhiPrimaryDomain || ins.primary_domain || u.interest || '').toLowerCase();
+        return ((u.sakhiChatCount && u.sakhiChatCount > 0) || ins) && (dom.includes('agri') || dom.includes('krishi') || dom.includes('kheti'));
+      });
+    } else if (mktState.funnelFilter === 'sakhi_health') {
+      displayedAudience = displayedAudience.filter(u => {
+        const ins = u.sakhiInsights || {};
+        const dom = (u.sakhiPrimaryDomain || ins.primary_domain || u.interest || '').toLowerCase();
+        return ((u.sakhiChatCount && u.sakhiChatCount > 0) || ins) && (dom.includes('health') || dom.includes('sugar') || dom.includes('sehat'));
+      });
+    } else if (mktState.funnelFilter === 'sakhi_wellness') {
+      displayedAudience = displayedAudience.filter(u => {
+        const ins = u.sakhiInsights || {};
+        const dom = (u.sakhiPrimaryDomain || ins.primary_domain || u.interest || '').toLowerCase();
+        const top = (ins.last_query_topic || '').toLowerCase();
+        return ((u.sakhiChatCount && u.sakhiChatCount > 0) || ins) && (dom.includes('wellness') || dom.includes('sexual') || top.includes('कमजोरी') || top.includes('सेक्स'));
+      });
+    } else if (mktState.funnelFilter === 'sakhi_dairy') {
+      displayedAudience = displayedAudience.filter(u => {
+        const ins = u.sakhiInsights || {};
+        const dom = (u.sakhiPrimaryDomain || ins.primary_domain || u.interest || '').toLowerCase();
+        return ((u.sakhiChatCount && u.sakhiChatCount > 0) || ins) && (dom.includes('dairy') || dom.includes('pashu') || dom.includes('cow'));
+      });
+    } else if (mktState.funnelFilter === 'sakhi_business') {
+      displayedAudience = displayedAudience.filter(u => {
+        const ins = u.sakhiInsights || {};
+        const dom = (u.sakhiPrimaryDomain || ins.primary_domain || u.interest || '').toLowerCase();
+        return ((u.sakhiChatCount && u.sakhiChatCount > 0) || ins) && (dom.includes('business') || dom.includes('netsurf') || dom.includes('8.19'));
+      });
     } else {
       displayedAudience = displayedAudience.filter(u => u.funnelStage === mktState.funnelFilter);
     }
@@ -2141,11 +2200,14 @@ function getPillarContacts(pillarKey) {
       return interest.includes('netsurf') || interest.includes('बायो') || src.includes('netsurf') ||
              survCats.includes('netsurf') || survAnswers.includes('biofit') ||
              uText.includes('bk018') || uText.includes('netsurf') || uText.includes('biofit') || uText.includes('jaivik');
+    } else if (pillarKey === 'sakhi') {
+      return (u.sakhiChatCount && u.sakhiChatCount > 0) || Boolean(u.sakhiInsights) || (u.interest || '').toLowerCase().includes('sakhi');
     } else if (pillarKey === 'agri') {
       const isDairy = interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') || survCats.includes('cattlecare');
       const isHealth = interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || occ.includes('स्वास्थ्य') || survCats.includes('healthcare');
       const isNetsurf = interest.includes('netsurf') || interest.includes('बायो') || src.includes('netsurf') || survCats.includes('netsurf');
-      return (!isDairy && !isHealth && !isNetsurf) || uText.includes('bk001') || uText.includes('bk002') || uText.includes('bk015') || uText.includes('bk017') || uText.includes('kheti') || uText.includes('fasal');
+      const isSakhi = (u.sakhiChatCount && u.sakhiChatCount > 0) || Boolean(u.sakhiInsights);
+      return (!isDairy && !isHealth && !isNetsurf && !isSakhi) || uText.includes('bk001') || uText.includes('bk002') || uText.includes('bk015') || uText.includes('bk017') || uText.includes('kheti') || uText.includes('fasal');
     }
     return true;
   });
@@ -2184,6 +2246,7 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
   const currentTableAudience = displayedList;
   const currentList = paginatedUsers || displayedList.slice(0, 25);
   const selectedCount = mktState.selectedMobiles ? mktState.selectedMobiles.size : 0;
+  const sakhiCount = getPillarContacts('sakhi').length;
 
   return `
     <!-- 🧠 AI मार्केटिंग डिसीजन ब्रेन: 4 प्रमुख स्तंभ (Pillars directly connected to HUD Queue) -->
@@ -2192,11 +2255,13 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
       const dairyList = getPillarContacts('dairy');
       const healthList = getPillarContacts('health');
       const netsurfList = getPillarContacts('netsurf');
+      const sakhiList = getPillarContacts('sakhi');
 
       const agriCount = agriList.length;
       const dairyCount = dairyList.length;
       const healthCount = healthList.length;
       const netsurfCount = netsurfList.length;
+      const sakhiCount = sakhiList.length;
       const activePillar = mktState.pillarFilter;
 
       return `
@@ -2206,7 +2271,7 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
               <span style="font-size:1.3rem;">🧠</span>
               <div>
                 <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:#f8fafc;">
-                  AI मार्केटिंग डिसीजन ब्रेन — 4 प्रमुख स्तंभ (1-Click Engine Selector)
+                  AI मार्केटिंग डिसीजन ब्रेन — 5 प्रमुख स्तंभ (1-Click Engine Selector)
                 </h3>
                 <p style="margin:2px 0 0 0; font-size:0.75rem; color:#94a3b8;">
                   किसी भी स्तंभ पर क्लिक करें — उस वर्ग के सभी किसान तुरंत 1-Tap कतार इंजन व तालिका में लोड हो जाएंगे!
@@ -2220,13 +2285,13 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
                 </button>
               ` : `
                 <span style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid #3b82f6; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.74rem;">
-                  ⚡ 4 Pillars Synchronized
+                  ⚡ 5 Pillars Synchronized
                 </span>
               `}
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
             <!-- Pillar 1: Agri -->
             <div class="mkt-pillar-card" data-pillar="agri" style="background:#0f172a; border:${activePillar === 'agri' ? '2.5px solid #38bdf8' : '1.5px solid #38bdf8'}; ${activePillar === 'agri' ? 'box-shadow:0 0 20px rgba(56,189,248,0.45);' : ''} border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:all 0.2s ease;">
               <div>
@@ -2286,6 +2351,21 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
                 ⚡ इस वर्ग को कतार में लोड करें (${netsurfCount})
               </button>
             </div>
+
+            <!-- Pillar 5: Sakhi AI Chat Leads -->
+            <div class="mkt-pillar-card" data-pillar="sakhi" style="background:#0f172a; border:${activePillar === 'sakhi' ? '2.5px solid #10b981' : '1.5px solid #10b981'}; ${activePillar === 'sakhi' ? 'box-shadow:0 0 20px rgba(16,185,129,0.45);' : ''} border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:all 0.2s ease;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <span style="font-size:1.2rem;">🌸</span>
+                  <span style="background:rgba(16,185,129,0.2); color:#10b981; font-weight:900; font-size:0.8rem; padding:2px 8px; border-radius:10px;">${sakhiCount} ग्राहक</span>
+                </div>
+                <strong style="color:#f8fafc; font-size:0.92rem; display:block;">सखी AI चैट व रुचि अंतर्दृष्टि</strong>
+                <p style="color:#94a3b8; font-size:0.74rem; margin:4px 0 10px 0;">शुगर, पौरुष, जोड़, फसल व पशु पर सखी AI से बातचीत करने वाले सक्रिय ग्राहक।</p>
+              </div>
+              <button type="button" class="btn-load-pillar-queue" data-pillar="sakhi" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:8px 12px; border-radius:8px; font-weight:800; font-size:0.76rem; cursor:pointer; width:100%;">
+                ⚡ इस वर्ग को कतार में लोड करें (${sakhiCount})
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -2332,6 +2412,12 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
           </label>
           <select id="mkt-filter-funnel" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #3b82f6; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
             <option value="all" ${mktState.funnelFilter === 'all' ? 'selected' : ''}>👥 सभी किसान व ग्राहक (${(mktState.profiles || []).length})</option>
+            <option value="sakhi_chat" ${mktState.funnelFilter === 'sakhi_chat' ? 'selected' : ''}>🌸 सखी AI चैट दर्शक (सभी ${sakhiCount} AI संवाद लीड्स)</option>
+            <option value="sakhi_agri" ${mktState.funnelFilter === 'sakhi_agri' ? 'selected' : ''}>🌾 सखी: कृषि व फसल संवाद (Agri Leads)</option>
+            <option value="sakhi_health" ${mktState.funnelFilter === 'sakhi_health' ? 'selected' : ''}>🩺 सखी: स्वास्थ्य व क्रॉनिक केयर (Health Leads)</option>
+            <option value="sakhi_wellness" ${mktState.funnelFilter === 'sakhi_wellness' ? 'selected' : ''}>⚡ सखी: पर्सनल व सेक्सुअल वेलनेस (Vitality Leads)</option>
+            <option value="sakhi_dairy" ${mktState.funnelFilter === 'sakhi_dairy' ? 'selected' : ''}>🐄 सखी: पशुपालन व दूध-फैट (Dairy Leads)</option>
+            <option value="sakhi_business" ${mktState.funnelFilter === 'sakhi_business' ? 'selected' : ''}>💼 सखी: नेट्सर्फ 8.19L बिज़नेस (Business Leads)</option>
             <option value="tube_viewers" ${(mktState.funnelFilter === 'tube_viewers' || mktState.funnelFilter === 'top_funnel') ? 'selected' : ''}>📺 AarogyamTube वीडियो दर्शक (शीर्ष दर्शक)</option>
             <option value="abandoned_cart" ${mktState.funnelFilter === 'abandoned_cart' ? 'selected' : ''}>🛒 अधूरी खरीदारी वाले (छोड़े गए कार्ट / Hot Leads)</option>
             <option value="wishlist" ${mktState.funnelFilter === 'wishlist' ? 'selected' : ''}>❤️ पसंदीदा व विशलिस्ट (इच्छुक पाठक)</option>
@@ -2347,7 +2433,8 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
           </label>
           <select id="mkt-filter-book" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #10b981; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
             <option value="all" ${(mktState.bookFilter === 'all' && !mktState.pillarFilter) ? 'selected' : ''}>📚 सभी पुस्तकें व विषय (All Books & Topics)</option>
-            <optgroup label="🧠 AI 4 प्रमुख स्तंभ (Pillars)" style="background:#0f172a; color:#38bdf8;">
+            <optgroup label="🧠 AI 5 प्रमुख स्तंभ (Pillars)" style="background:#0f172a; color:#38bdf8;">
+              <option value="pillar_sakhi" ${(mktState.pillarFilter === 'sakhi' || mktState.bookFilter === 'pillar_sakhi') ? 'selected' : ''}>🌸 सखी AI चैट अंतर्दृष्टि (Sakhi Chat Hub)</option>
               <option value="pillar_agri" ${(mktState.pillarFilter === 'agri' || mktState.bookFilter === 'pillar_agri') ? 'selected' : ''}>🌾 कृषि, फसल सुरक्षा व रोग कीट (Agri Hub)</option>
               <option value="pillar_dairy" ${(mktState.pillarFilter === 'dairy' || mktState.bookFilter === 'pillar_dairy') ? 'selected' : ''}>🐄 पशुपालन, दुग्ध संवर्धन व नस्ल सुधार (Dairy Hub)</option>
               <option value="pillar_health" ${(mktState.pillarFilter === 'health' || mktState.bookFilter === 'pillar_health') ? 'selected' : ''}>❤️ सम्पूर्ण स्वास्थ्य केंद्र (Health Hub)</option>

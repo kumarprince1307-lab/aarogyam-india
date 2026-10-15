@@ -59,6 +59,20 @@ function renderUserRow(user) {
           ${user.webinarJoined > 0 ? `<span style="background:#10b981; color:#fff; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${user.webinarJoined} Live</span>` : ''}
         </button>
       </td>
+      <td>
+        <a 
+          href="#user-details?id=${user.id}" 
+          data-route="user-details?id=${user.id}" 
+          data-id="${user.id}" 
+          class="admin-button small-button" 
+          style="background:rgba(22,163,74,0.12); color:#4ade80; border:1px solid rgba(34,197,94,0.35); font-weight:800; font-size:0.75rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; text-decoration:none; white-space:nowrap;"
+          title="सखी AI अंतर्दृष्टि देखें"
+        >
+          <span>🌸</span>
+          <span>${user.sakhiChatCount || 0} Chats</span>
+          ${user.sakhiPrimaryDomain ? `<span style="background:#166534; color:#bbf7d0; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${user.sakhiPrimaryDomain}</span>` : ''}
+        </a>
+      </td>
       <td>${user.directReferrals || 0}</td>
       <td>${user.totalShares || 0}</td>
       <td>${user.totalClicks || 0}</td>
@@ -126,6 +140,7 @@ function renderUsersTable(users) {
             <th>Reg. Source</th>
             <th>Share ID</th>
             <th style="background: rgba(37,99,235,0.15); color: #60a5fa; white-space: nowrap;">🎥 Webinar Report</th>
+            <th style="background: rgba(22,163,74,0.15); color: #4ade80; white-space: nowrap;">🌸 सखी चैट (Sakhi Chat)</th>
             <th>Direct Referrals</th>
             <th>Total Shares</th>
             <th>Total Clicks</th>
@@ -195,6 +210,20 @@ function renderUsersTable(users) {
                     <span>${u.webinarLeads || 0} Leads</span>
                     ${u.webinarJoined > 0 ? `<span style="background:#10b981; color:#fff; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${u.webinarJoined} Live</span>` : ''}
                   </button>
+                </td>
+                <td>
+                  <a 
+                    href="#user-details?id=${u.id}" 
+                    data-route="user-details?id=${u.id}" 
+                    data-id="${u.id}" 
+                    class="admin-button small-button" 
+                    style="background:rgba(22,163,74,0.12); color:#4ade80; border:1px solid rgba(34,197,94,0.35); font-weight:800; font-size:0.75rem; padding:4px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; text-decoration:none; white-space:nowrap;"
+                    title="सखी AI अंतर्दृष्टि देखें"
+                  >
+                    <span>🌸</span>
+                    <span>${u.sakhiChatCount || 0} Chats</span>
+                    ${u.sakhiPrimaryDomain ? `<span style="background:#166534; color:#bbf7d0; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${u.sakhiPrimaryDomain}</span>` : ''}
+                  </a>
                 </td>
                 <td>${u.directReferrals || 0}</td>
                 <td>${u.totalShares || 0}</td>
@@ -277,6 +306,7 @@ export async function initUsers() {
         </select>
         <select id="user-sort-filter" class="admin-select">
           <option value="default">Sort by Registration Date</option>
+          <option value="sakhiChats">🌸 सखी संवाद संख्या (Sakhi Chats: High-Low)</option>
           <option value="directReferrals">Direct Referrals (High-Low)</option>
           <option value="totalShares">Total Shares (High-Low)</option>
           <option value="totalClicks">Total Clicks (High-Low)</option>
@@ -326,7 +356,11 @@ export async function initUsers() {
     // Client-side sorting
     const sortValue = sortSelect?.value;
     if (sortValue && sortValue !== 'default' && users.length > 0) {
-        users.sort((a, b) => (b[sortValue] || 0) - (a[sortValue] || 0));
+        if (sortValue === 'sakhiChats') {
+            users.sort((a, b) => (b.sakhiChatCount || 0) - (a.sakhiChatCount || 0));
+        } else {
+            users.sort((a, b) => (b[sortValue] || 0) - (a[sortValue] || 0));
+        }
     }
 
     currentUsersData = users; // Store for CSV export
