@@ -20,6 +20,11 @@
 
   let knowledgeData = null;
   let isSoundEnabled = true;
+  try {
+    const savedSound = localStorage.getItem('sakhi_sound_enabled');
+    if (savedSound !== null) isSoundEnabled = (savedSound === 'true');
+  } catch (e) {}
+  let isSpeechActive = false;
   let recognitionInstance = null;
   let isRecording = false;
   let activeSpeechBtn = null;
@@ -937,17 +942,26 @@
     if (!badgeWrap) return;
 
     if (isUserAuthenticated()) {
-      const name = getUserName();
+      const name = getUserName() || 'किसान साथी';
+      const getInitials = (n) => {
+        if (!n) return 'AM';
+        const parts = n.trim().split(/\s+/);
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return n.slice(0, 2).toUpperCase();
+      };
+      const initials = getInitials(name);
+
       badgeWrap.innerHTML = `
-        <div class="sakhi-user-badge logged-in" title="सत्यापित खाता: ${escapeHtml(name)}" style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);color:#ffffff;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
-          <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
-          <span style="max-width:145px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(name)}</span>
+        <div class="sakhi-user-badge logged-in" title="सत्यापित खाता: ${escapeHtml(name)}">
+          <span class="sakhi-badge-dot"></span>
+          <span class="sakhi-badge-short">${escapeHtml(initials)}</span>
+          <span class="sakhi-badge-full">${escapeHtml(name)}</span>
         </div>
       `;
     } else {
       badgeWrap.innerHTML = `
-        <button type="button" class="sakhi-user-badge guest" onclick="window.openSakhiAuthModal()" title="लॉगिन या नया खाता बनाने के लिए क्लिक करें" style="background:#fde047;border:none;color:#0f172a;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <span>🔑</span> <span>लॉगिन</span>
+        <button type="button" class="sakhi-user-badge guest" onclick="window.openSakhiAuthModal()" title="लॉगिन या नया खाता बनाने के लिए क्लिक करें">
+          <span>🔑</span> <span class="sakhi-badge-full">लॉगिन</span>
         </button>
       `;
     }
@@ -1030,14 +1044,12 @@
   function startSpeechKeepAlive() {
     stopSpeechKeepAlive();
     speechKeepAliveTimer = setInterval(() => {
-      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+      if (window.speechSynthesis && window.speechSynthesis.paused) {
         try {
-          // Chromium 15-second pause bug workaround: pause & resume unfreezes audio thread cleanly
-          window.speechSynthesis.pause();
           window.speechSynthesis.resume();
         } catch (e) {}
       }
-    }, 4000);
+    }, 2500);
   }
 
   function stopSpeechKeepAlive() {
@@ -1120,6 +1132,7 @@
   }
 
   function stopAllSpeech() {
+    isSpeechActive = false;
     stopSpeechKeepAlive();
     if (speechChunkWatchdog) {
       clearTimeout(speechChunkWatchdog);
@@ -1131,12 +1144,24 @@
     }
     const avatar = document.getElementById('sakhiAvatarFrame');
     if (avatar) avatar.classList.remove('speaking');
+
+    // Reset any and all active speech buttons in message bubbles
+    try {
+      document.querySelectorAll('.sakhi-action-pill.speaking, .sakhi-action-pill').forEach(b => {
+        if (b.classList.contains('speaking')) {
+          b.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+          b.classList.remove('speaking');
+        }
+      });
+    } catch (_) {}
+
     if (activeSpeechBtn) {
-      activeSpeechBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>सुनें</span>';
+      activeSpeechBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
       activeSpeechBtn.classList.remove('speaking');
       activeSpeechBtn = null;
     }
   }
+  window.stopAllSpeech = stopAllSpeech;
 
   function getBestHindiVoice() {
     if (!window.speechSynthesis) return null;
@@ -1177,11 +1202,11 @@
         current = '';
       } else {
         current += ' ' + tok;
-        // Keep unbroken chunks under 95 characters (5-6 seconds of speech) to prevent browser TTS freeze
-        if (current.length > 95) {
+        // Keep unbroken chunks around natural sentence boundaries (~160-180 chars) to prevent Android TTS stuttering
+        if (current.length > 175) {
           const words = current.trim().split(/\s+/);
           let half = '';
-          while (words.length > 0 && (half + ' ' + words[0]).length <= 75) {
+          while (words.length > 0 && (half + ' ' + words[0]).length <= 150) {
             half += (half ? ' ' : '') + words.shift();
           }
           const cl = half.replace(/^[^\w\u0900-\u097F]+|[^\w\u0900-\u097F]+$/gu, '').trim();
@@ -1198,12 +1223,14 @@
   }
 
   function playChunkedSpeech(text, onStart, onFinish) {
-    if (!window.speechSynthesis || !text) {
+    if (!window.speechSynthesis || !text || !isSoundEnabled) {
       if (typeof onFinish === 'function') onFinish();
       return;
     }
 
     stopAllSpeech();
+    if (!isSoundEnabled) return;
+    isSpeechActive = true;
 
     const cleanText = cleanTextForTTS(text);
     if (!cleanText) {
@@ -1221,10 +1248,13 @@
 
     // Small delay ensures previous speech synthesizer queue is flushed
     setTimeout(() => {
+      if (!isSpeechActive || !isSoundEnabled) return;
       if (typeof onStart === 'function') onStart();
       let currentIndex = 0;
 
       function speakNextChunk() {
+        if (!isSpeechActive || !isSoundEnabled) return;
+
         if (speechChunkWatchdog) {
           clearTimeout(speechChunkWatchdog);
           speechChunkWatchdog = null;
@@ -1255,33 +1285,45 @@
 
         let advanced = false;
         function proceed() {
+          if (!isSpeechActive || !isSoundEnabled) return;
           if (advanced) return;
           advanced = true;
           if (speechChunkWatchdog) {
             clearTimeout(speechChunkWatchdog);
             speechChunkWatchdog = null;
           }
-          speakNextChunk();
+          // Smooth 40ms breather between chunks prevents audio stutter on Android
+          setTimeout(() => {
+            if (isSpeechActive && isSoundEnabled) {
+              speakNextChunk();
+            }
+          }, 40);
         }
 
-        utterance.onend = proceed;
+        utterance.onend = function () {
+          if (!isSpeechActive || !isSoundEnabled) return;
+          proceed();
+        };
         utterance.onerror = function (e) {
-          if (e && e.error === 'canceled') return;
+          if (!isSpeechActive || !isSoundEnabled || (e && e.error === 'canceled')) return;
           proceed();
         };
 
-        // Watchdog: If browser drops onend event, advance automatically
-        const maxTime = Math.max(2500, chunkText.length * 110 + 1600);
+        // Watchdog: Generous timeout (never cuts off slow natural speech prematurely)
+        const maxTime = Math.max(45000, chunkText.length * 500 + 10000);
         speechChunkWatchdog = setTimeout(() => {
+          if (!isSpeechActive || !isSoundEnabled) return;
           proceed();
         }, maxTime);
 
         try {
+          if (!isSpeechActive || !isSoundEnabled) return;
           if (window.speechSynthesis.paused) {
             window.speechSynthesis.resume();
           }
           window.speechSynthesis.speak(utterance);
         } catch (e) {
+          if (!isSpeechActive || !isSoundEnabled) return;
           proceed();
         }
       }
@@ -1314,7 +1356,7 @@
 
     const text = decodeURIComponent(encodedText);
     activeSpeechBtn = btn;
-    btn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span> <span>रोकें</span>';
+    btn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span>';
     btn.classList.add('speaking');
 
     playChunkedSpeech(text, () => {
@@ -1339,7 +1381,7 @@
 
       const onSuccess = () => {
         const origHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-check" style="color:#16a34a;"></i> <span style="color:#16a34a;font-weight:700;">कॉपी हुआ!</span>';
+        btn.innerHTML = '<i class="fa-solid fa-check" style="color:#16a34a;"></i>';
         btn.classList.add('copied');
         setTimeout(() => {
           btn.innerHTML = origHtml;
@@ -1397,7 +1439,7 @@
     try {
       if (btn.classList.contains('liked')) return;
       btn.classList.add('liked');
-      btn.innerHTML = '<i class="fa-solid fa-thumbs-up" style="color:#16a34a;"></i> <span style="color:#16a34a;font-weight:700;">पसंद आया</span>';
+      btn.innerHTML = '<i class="fa-solid fa-thumbs-up" style="color:#16a34a;"></i>';
       btn.style.background = '#dcfce7';
       btn.style.borderColor = '#86efac';
 
@@ -1539,20 +1581,20 @@
     const enc = encodeURIComponent(cleanForSpeech);
     return `
       <div class="sakhi-msg-actions-toolbar">
-        <button type="button" class="sakhi-action-pill" onclick="window.toggleMessageSpeech(this, '${enc}')" title="आवाज़ में सुनें">
-          <i class="fa-solid fa-volume-high" style="color:#16a34a;"></i> <span>सुनें</span>
+        <button type="button" class="sakhi-action-pill pill-audio" onclick="window.toggleMessageSpeech(this, '${enc}')" title="आवाज़ में सुनें" aria-label="आवाज़ में सुनें">
+          <i class="fa-solid fa-volume-high" style="color:#16a34a;"></i>
         </button>
-        <button type="button" class="sakhi-action-pill" onclick="window.likeSakhiMessage(this)" title="यह जानकारी उपयोगी लगी">
-          <i class="fa-regular fa-thumbs-up" style="color:#0284c7;"></i> <span>उपयोगी</span>
+        <button type="button" class="sakhi-action-pill pill-like" onclick="window.likeSakhiMessage(this)" title="यह जानकारी उपयोगी लगी" aria-label="उपयोगी">
+          <i class="fa-regular fa-thumbs-up" style="color:#0284c7;"></i>
         </button>
-        <button type="button" class="sakhi-action-pill" onclick="window.createPersonalizedShare(this)" title="सीधे WhatsApp पर शेयर करें" style="background:#f0fdf4;border-color:#86efac;color:#15803d;font-weight:800;">
-          <i class="fa-brands fa-whatsapp" style="color:#16a34a;font-size:0.85rem;"></i> <span>शेयर</span>
+        <button type="button" class="sakhi-action-pill pill-share" onclick="window.createPersonalizedShare(this)" title="सीधे WhatsApp पर शेयर करें" aria-label="व्हाट्सएप शेयर" style="background:#f0fdf4;border-color:#86efac;color:#15803d;">
+          <i class="fa-brands fa-whatsapp" style="color:#16a34a;font-size:1.05rem;"></i>
         </button>
-        <button type="button" class="sakhi-action-pill" onclick="window.copySakhiMessageText(this)" title="संदेश कॉपी करें">
-          <i class="fa-regular fa-copy" style="color:#64748b;"></i> <span>कॉपी</span>
+        <button type="button" class="sakhi-action-pill pill-copy" onclick="window.copySakhiMessageText(this)" title="संदेश कॉपी करें" aria-label="कॉपी">
+          <i class="fa-regular fa-copy" style="color:#64748b;"></i>
         </button>
-        <button type="button" class="sakhi-action-pill" onclick="window.reportSakhiMessage(this)" title="सुधार सुझाव हेतु दादा अवनीश को WhatsApp करें" style="background:#fffbeb;border-color:#fde68a;color:#b45309;">
-          <i class="fa-solid fa-triangle-exclamation" style="color:#d97706;"></i> <span>सुधार</span>
+        <button type="button" class="sakhi-action-pill pill-report" onclick="window.reportSakhiMessage(this)" title="सुधार सुझाव हेतु दादा अवनीश को WhatsApp करें" aria-label="सुधार सुझाव" style="background:#fffbeb;border-color:#fde68a;color:#b45309;">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#d97706;"></i>
         </button>
       </div>
     `;
@@ -1709,7 +1751,7 @@
       const audioBtn = row.querySelector('.sakhi-action-pill');
       if (audioBtn) {
         activeSpeechBtn = audioBtn;
-        audioBtn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span> <span>रोकें</span>';
+        audioBtn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span>';
         audioBtn.classList.add('speaking');
       }
       speakResponse(speechText);
@@ -1726,7 +1768,7 @@
 
     let pills = [];
 
-    if (lower.includes('सुरेश') || lower.includes('पर्ची') || lower.includes('दोस्त')) {
+    if (lower.includes('पर्ची') || lower.includes('दोस्त') || lower.includes('मित्र')) {
       pills = [
         { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
         { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
@@ -1737,7 +1779,7 @@
       pills = [
         { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
         { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '📲 सुरेश जी को पर्ची भेजें', query: 'सुरेश के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' },
+        { text: '📲 किसान साथी को पर्ची भेजें', query: 'किसान साथी के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' },
         { text: '🌱 अवस्थावार स्प्रे चार्ट', query: 'गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए' }
       ];
     } else if (domain === 'pashu' || lower.includes('भैंस') || lower.includes('गाय') || lower.includes('दूध') || lower.includes('फैट')) {
@@ -1767,7 +1809,7 @@
         { text: '🌾 4 एकड़ का खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
         { text: '💦 दूसरा स्प्रे कब करें?', query: 'दूसरा स्प्रे कब और कैसे करें' },
         { text: '🐛 माहू व कीट नियंत्रण', query: 'सरसों में माहू और चेपा का इलाज' },
-        { text: '📲 किसान साथी को पर्ची भेजें', query: 'सुरेश के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
+        { text: '📲 किसान साथी को पर्ची भेजें', query: 'किसान साथी के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
       ];
     }
 
@@ -1981,6 +2023,89 @@
 
   // 14. EVERYDAY CONVERSATIONS & CASUAL GREETINGS ROUTER (मानवीय व्यावहारिक बातचीत)
   function handleEverydayConversations(cleanQ, rawQ) {
+    // 0.05 Time-Aware Greetings & Late-Night "क्या तुम अभी सोई नहीं" Router
+    const hr = new Date().getHours();
+    const isLateNightOrSleepQuery = (
+      cleanQ.includes('soi nahi') || cleanQ.includes('soye nahi') || cleanQ.includes('soyi nahi') ||
+      cleanQ.includes('jag rahi') || cleanQ.includes('jag rahe') || cleanQ.includes('so jao') ||
+      cleanQ.includes('so ja') || cleanQ.includes('सो जाओ') || cleanQ.includes('सोई नहीं') ||
+      cleanQ.includes('सोए नहीं') || cleanQ.includes('जाग रही हो') || cleanQ.includes('नींद नहीं आती') ||
+      cleanQ.includes('abhi tak jaag') || cleanQ.includes('abhi tak jag')
+    );
+
+    if (isLateNightOrSleepQuery && !cleanQ.includes('anidra') && !cleanQ.includes('अनिद्रा') && !cleanQ.includes('ilaj') && !cleanQ.includes('dawa')) {
+      const resp = `अरे नहीं! 🌸😊 मैं तो आपकी अपनी 24×7 डिजिटल सखी AI हूँ, मुझे इंसानों की तरह सोने या आराम की बिल्कुल ज़रूरत नहीं पड़ती!\n\nजब तक हमारे किसान भाई, माताएं-बहनें और परिवारजन जाग रहे हैं या किसी सलाह व चिंता में हैं, तब तक मैं भी पूरी तत्परता से सेवा में हाजिर रहती हूँ! 🌙✨\n\nरात काफी हो गई है, अगर खेती, पशु या सेहत से जुड़ी कोई जरूरी बात पूछनी है तो अवश्य बताएं, अन्यथा आप निश्चिंत होकर विश्राम करें ताकि कल सुबह नई ऊर्जा के साथ शुरुआत कर सकें! 🙏😴`;
+      renderCrispSpecialBox('🌙 24×7 हमेशा जागृत — आरोग्यम सखी AI', resp, [
+        { text: '🌾 1. फसलों का स्प्रे व कल्ले बढ़ाना', query: 'गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला' },
+        { text: '🐄 2. पशु का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व घरेलू नुस्खे', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' }
+      ], 'casual', 'night_companion');
+      return true;
+    }
+
+    // Good Morning / सुप्रभात
+    const isMorningGreeting = (
+      cleanQ === 'gm' || cleanQ === 'good morning' || cleanQ === 'gud morning' ||
+      cleanQ === 'सुप्रभात' || cleanQ === 'शुभ प्रभात' || cleanQ === 'suprabhat' ||
+      cleanQ.startsWith('gm ') || cleanQ.startsWith('good morning ') || cleanQ.startsWith('सुप्रभात ')
+    );
+    if (isMorningGreeting) {
+      const resp = `सुप्रभात! 🌅 राम-राम! आपका आज का दिन अत्यंत मंगलमय, सुखद, ऊर्जावान और लाभकारी हो। 🌾✨\n\nसुबह-सुबह आपके खेत, फसलों की स्थिति, पशुओं की देखभाल या परिवार की सेहत के लिए आज क्या सेवा करूँ? नीचे से विषय चुनें:`;
+      renderCrispSpecialBox('🌅 सुप्रभात — आपका दिन शुभ हो', resp, [
+        { text: '🌾 1. फसलों का स्प्रे शेड्यूल', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. पशुओं का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. सुबह की डिटॉक्स डाइट', query: 'ईजी डिटॉक्स कैसे लें और क्या फायदा है' },
+        { text: '💼 4. नेट्सर्फ बिज़नेस अवसर', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+      ], 'casual', 'good_morning');
+      return true;
+    }
+
+    // Good Afternoon / शुभ दोपहर
+    const isAfternoonGreeting = (
+      cleanQ === 'good afternoon' || cleanQ === 'gud afternoon' || cleanQ === 'शुभ दोपहर' ||
+      cleanQ === 'dopahar' || cleanQ.startsWith('good afternoon ') || cleanQ.startsWith('शुभ दोपहर ')
+    );
+    if (isAfternoonGreeting) {
+      const resp = `शुभ दोपहर! ☀️ राम-राम! आशा है दोपहर का भोजन हो चुका होगा और आप स्वस्थ होंगे।\n\nदोपहर में तेज धूप में स्प्रे करने से बचें (स्प्रे हमेशा सुबह या शाम को करें)। बताइए, आज आपकी खेती, पशुपालन या स्वास्थ्य के लिए क्या मार्गदर्शन प्रस्तुत करूँ?`;
+      renderCrispSpecialBox('☀️ शुभ दोपहर — आरोग्यम सखी AI', resp, [
+        { text: '🌾 1. फसलों में स्प्रे का सही समय', query: 'फसलों में खाद व स्प्रे फॉर्मूला बताएं' },
+        { text: '🐄 2. पशु का आहार व पाचन', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
+        { text: '✨ 3. धूप से झुलसी त्वचा (De-Tan)', query: 'धूप से काली पड़ी त्वचा के घरेलू नुस्खे' }
+      ], 'casual', 'good_afternoon');
+      return true;
+    }
+
+    // Good Evening / शुभ संध्या
+    const isEveningGreeting = (
+      cleanQ === 'good evening' || cleanQ === 'gud evening' || cleanQ === 'शुभ संध्या' ||
+      cleanQ === 'shubh sandhya' || cleanQ.startsWith('good evening ') || cleanQ.startsWith('शुभ संध्या ')
+    );
+    if (isEveningGreeting) {
+      const resp = `शुभ संध्या! 🌇 राम-राम! दिनभर की कड़ी मेहनत के बाद शाम की चाय के साथ आपका स्वागत है।\n\nशाम का समय फसलों में स्प्रे और पशुओं को चारा-सप्लीमेंट देने के लिए सबसे उत्तम माना जाता है। बताइए, आज शाम आपके लिए क्या जानकारी या एस्टीमेट तैयार करूँ?`;
+      renderCrispSpecialBox('🌇 शुभ संध्या — आरोग्यम सखी AI', resp, [
+        { text: '🌾 1. शाम के स्प्रे की डोज व विधि', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. शाम का दुग्ध व फैट सप्लीमेंट', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🦴 3. शाम को जोड़ों का दर्द निवारण', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' }
+      ], 'casual', 'good_evening');
+      return true;
+    }
+
+    // Good Night / शुभ रात्रि
+    const isNightGreeting = (
+      cleanQ === 'gn' || cleanQ === 'good night' || cleanQ === 'gud night' ||
+      cleanQ === 'शुभ रात्रि' || cleanQ === 'शुभरात्रि' || cleanQ === 'shubh ratri' ||
+      cleanQ.startsWith('gn ') || cleanQ.startsWith('good night ') || cleanQ.startsWith('शुभ रात्रि ')
+    );
+    if (isNightGreeting) {
+      const resp = `शुभ रात्रि! 🌙✨ दिनभर की भागदौड़ और परिश्रम के बाद अब शरीर और मन को शांत विश्राम देने का समय है।\n\nआप निश्चिंत होकर विश्राम करें, मैं 24×7 यहीं आपकी सेवा में उपस्थित हूँ। कल सुबह एक नई उमंग और ताजगी के साथ फिर मिलेंगे। शुभ रात्रि, मीठे सपने! 😴🙏🌸`;
+      renderCrispSpecialBox('🌙 शुभ रात्रि — सुखद विश्राम', resp, [
+        { text: '🌾 कल सुबह का स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '✨ रात को चेहरे पर स्पॉट इरेज़र', query: 'स्पॉट इरेज़र क्रीम के फायदे और लगाने का तरीका' },
+        { text: '🧘 गहरी नींद के घरेलू उपाय', query: 'तनाव और चिंता दूर करने के उपाय' }
+      ], 'casual', 'good_night');
+      return true;
+    }
+
     // 0. Primary Greetings: "hi", "hello", "hey", "namaste", "namaskar", "ram ram", "radhe radhe"
     const isPureGreeting = cleanQ === 'hi' || cleanQ === 'hello' || cleanQ === 'hey' || cleanQ === 'नमस्ते' || cleanQ === 'नमस्कार' || cleanQ === 'राम राम' || cleanQ === 'राधे राधे' || cleanQ === 'जय श्री राम' || cleanQ === 'हाय' || cleanQ === 'हेलो' || cleanQ === 'हेल्लो' || cleanQ === 'namaste' || cleanQ === 'namaskar' || cleanQ.startsWith('hi ') || cleanQ.startsWith('hello ') || cleanQ.startsWith('hey ');
     if (isPureGreeting) {
@@ -6279,12 +6404,12 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       const perAcreCost = perPumpCost * perAcrePumps; // 400
       const totalAcresCost = perAcreCost * acres; // e.g. 1600 for 4 acres
 
-      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n• **स्टिमरिच (Stimrich):** 30ml (कल्ले, फुटाव व बढ़वार)\n• **शेत (Sheth):** 30ml (मिट्टी जीवाणु व जड़ विकास)\n• **Bio-99:** 5ml (पानी को पतला कर दवा को पत्तों में सोखने हेतु)\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 20-25 दिन):** कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (दाना भराव अवस्था):** दाना मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n💡 **विशेष अवसर:**\nक्या आप इस बार अपनी फसल में कम खर्च में रिकॉर्ड पैदावार लेने के लिए तैयार हैं? यदि हाँ, तो बताएं ताकि हम आपके लिए विशेष व्यवस्था करवा सकें!`;
+      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n• **स्टिमरिच (Stimrich):** 30ml (कल्ले, फुटाव व बढ़वार)\n• **शेत (Sheth):** 30ml (मिट्टी जीवाणु व जड़ विकास)\n• **Bio-99:** 5ml (पानी को पतला कर दवा को पत्तों में सोखने हेतु)\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 20-25 दिन):** कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (दाना भराव अवस्था):** दाना मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n🌾 **क्या यह एस्टीमेट आपके अपने खेत के लिए चाहिए, या किसी किसान मित्र / पड़ोसी के लिए?**\n• **यदि अपने खेत के लिए:** तो अपनी कुल जमीन या फसल बताएं, मैं आगे का स्प्रे शेड्यूल बता दूंगी।\n• **यदि किसी मित्र के लिए:** तो उनका नाम और एकड़ बताएं, मैं उनके नाम की सुंदर WhatsApp पर्ची तैयार कर दूंगी!`;
 
       renderCrispSpecialBox(`🧮 ${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} का खर्च व डोज एस्टीमेट`, resp, [
         { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
         { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '📲 किसान साथी को पर्ची भेजें', query: 'सुरेश के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
+        { text: '📲 किसान साथी को पर्ची भेजें', query: 'किसान साथी के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
       ], 'agri', 'cost_estimate');
       return true;
     }
@@ -7466,7 +7591,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
           <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="विषय व टूल्स चुनें" onclick="window.toggleSakhiPlusMenu()">
             <i class="fa-solid fa-plus"></i>
           </button>
-          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
+          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.stopAllSpeech)window.stopAllSpeech(); if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
             <i class="fa-solid fa-microphone"></i>
           </button>
           <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
@@ -7496,10 +7621,21 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     }
 
     const soundBtn = document.getElementById('sakhiSoundToggleBtn');
-    if (soundBtn) soundBtn.onclick = toggleSound;
+    if (soundBtn) {
+      soundBtn.onclick = toggleSound;
+      soundBtn.innerHTML = isSoundEnabled
+        ? '<i class="fa-solid fa-volume-high"></i>'
+        : '<i class="fa-solid fa-volume-xmark" style="color:#ef4444;"></i>';
+      soundBtn.title = isSoundEnabled ? 'सखी आवाज़ चालू है (म्यूट करने हेतु क्लिक करें)' : 'सखी आवाज़ म्यूट है (चालू करने हेतु क्लिक करें)';
+    }
 
     const micBtn = document.getElementById('sakhiMicBtn');
-    if (micBtn) micBtn.onclick = toggleRecording;
+    if (micBtn) {
+      micBtn.onclick = function() {
+        stopAllSpeech();
+        toggleRecording();
+      };
+    }
 
     const sendBtn = document.getElementById('sakhiSendBtn');
     if (sendBtn) {
@@ -7522,14 +7658,27 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
 
   function toggleSound() {
     isSoundEnabled = !isSoundEnabled;
+    try {
+      localStorage.setItem('sakhi_sound_enabled', isSoundEnabled ? 'true' : 'false');
+    } catch (e) {}
+
     const btn = document.getElementById('sakhiSoundToggleBtn');
     if (btn) {
       btn.innerHTML = isSoundEnabled
         ? '<i class="fa-solid fa-volume-high"></i>'
-        : '<i class="fa-solid fa-volume-xmark" style="color:#fca5a5;"></i>';
+        : '<i class="fa-solid fa-volume-xmark" style="color:#ef4444;"></i>';
+      btn.title = isSoundEnabled ? 'सखी आवाज़ चालू है (म्यूट करने हेतु क्लिक करें)' : 'सखी आवाज़ म्यूट है (चालू करने हेतु क्लिक करें)';
     }
-    if (!isSoundEnabled && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
+
+    if (!isSoundEnabled) {
+      stopAllSpeech();
+      if (typeof showSakhiMicroToast === 'function') {
+        showSakhiMicroToast('🔇 सखी आवाज़ म्यूट कर दी गई है');
+      }
+    } else {
+      if (typeof showSakhiMicroToast === 'function') {
+        showSakhiMicroToast('🔊 सखी आवाज़ चालू कर दी गई है');
+      }
     }
   }
 

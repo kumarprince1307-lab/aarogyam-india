@@ -34,7 +34,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261016_v310">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261017_v316">
 
   <style>
     /* Natural Card Layout with Dynamic Viewport Height (100dvh) */
@@ -344,7 +344,7 @@
           <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="विषय व टूल्स चुनें" onclick="window.toggleSakhiPlusMenu()">
             <i class="fa-solid fa-plus"></i>
           </button>
-          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
+          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.stopAllSpeech)window.stopAllSpeech(); if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
             <i class="fa-solid fa-microphone"></i>
           </button>
           <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
@@ -360,7 +360,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261016_v312"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261017_v316"></script>
   <script>
     (function () {
       // Force ensure Plus Menu is closed on mobile boot

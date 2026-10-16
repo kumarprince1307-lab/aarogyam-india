@@ -1770,6 +1770,206 @@ body.sakhi-page-body {
   border-color: #ca8a04;
 }
 
+/* ====================================================================
+   CLEAN SPACIOUS MOBILE HEADER & AM USER INITIALS BADGE
+   ==================================================================== */
+.sakhi-user-badge .sakhi-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.8);
+}
+
+@media (max-width: 640px) {
+  .sakhi-header {
+    padding: 8px 10px !important;
+  }
+  .sakhi-header-left {
+    gap: 8px !important;
+    flex: 0 0 auto !important;
+  }
+  /* On mobile: Hide text "आरोग्यम सखी AI" so only avatar shows, removing all crowding! */
+  .sakhi-header-info {
+    display: none !important;
+  }
+  .sakhi-header-actions {
+    gap: 5px !important;
+    margin-left: auto !important;
+  }
+  /* User badge: Show short initials (e.g. 'AM') instead of full name */
+  .sakhi-user-badge .sakhi-badge-full {
+    display: none !important;
+  }
+  .sakhi-user-badge .sakhi-badge-short {
+    display: inline-block !important;
+    font-size: 0.78rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px !important;
+  }
+  .sakhi-user-badge {
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
+  .sakhi-new-chat-btn .sakhi-btn-text {
+    display: none !important;
+  }
+  .sakhi-new-chat-btn {
+    padding: 0 !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .sakhi-fullscreen-btn,
+  .sakhi-share-btn,
+  .sakhi-sound-toggle-btn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.88rem !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .sakhi-user-badge .sakhi-badge-short {
+    display: none !important;
+  }
+  .sakhi-user-badge .sakhi-badge-full {
+    display: inline-block !important;
+  }
+}
+
+/* ====================================================================
+   LARGE, ULTRA-CLEAR, DEEP DARK FONT FOR MAXIMUM READABILITY
+   ==================================================================== */
+.sakhi-msg-bubble {
+  font-size: 1.18rem !important;
+  line-height: 1.82 !important;
+  color: #090d16 !important;
+  font-weight: 500 !important;
+}
+
+.sakhi-msg-bubble div,
+.sakhi-msg-bubble p,
+.sakhi-msg-bubble li,
+.sakhi-msg-bubble span {
+  color: inherit;
+}
+
+/* Force override any small 0.8rem - 0.95rem inline font sizes in bot responses */
+.sakhi-msg-bubble div[style*="font-size:0."],
+.sakhi-msg-bubble div[style*="font-size: 0."],
+.sakhi-msg-bubble p[style*="font-size:0."],
+.sakhi-msg-bubble span[style*="font-size:0."] {
+  font-size: 1.16rem !important;
+  line-height: 1.82 !important;
+  color: #090d16 !important;
+}
+
+/* Response Section Headers / Titles */
+.sakhi-msg-bubble div[style*="font-weight:900"],
+.sakhi-msg-bubble div[style*="font-weight: 900"],
+.sakhi-msg-bubble h3,
+.sakhi-msg-bubble h4 {
+  font-size: 1.35rem !important;
+  line-height: 1.5 !important;
+  color: #14532d !important;
+  font-weight: 900 !important;
+  margin-bottom: 10px !important;
+}
+
+/* Sub-headings / Section Highlights */
+.sakhi-msg-bubble div[style*="font-weight:800"],
+.sakhi-msg-bubble strong {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+/* User Bubble text size */
+.sakhi-msg-row.user .sakhi-msg-bubble {
+  font-size: 1.18rem !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+  color: #ffffff !important;
+}
+
+/* Smart Pills Bar at bottom */
+.sakhi-smart-pill {
+  font-size: 0.95rem !important;
+  padding: 8px 14px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+}
+
+/* ====================================================================
+   IN-MESSAGE ACTIONS TOOLBAR: ICON-ONLY ROUND PILLS
+   ==================================================================== */
+.sakhi-msg-actions-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+  padding-top: 10px !important;
+  border-top: 1px dashed #cbd5e1 !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+.sakhi-msg-actions-toolbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.sakhi-action-pill {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.sakhi-action-pill:hover,
+.sakhi-action-pill:active {
+  transform: scale(1.08) !important;
+  border-color: #15803d !important;
+}
+
+/* Hide any text label inside sakhi-action-pill */
+.sakhi-action-pill span:not(.sakhi-audio-wave):not(.wave-bar) {
+  display: none !important;
+}
+
+.sakhi-action-pill i {
+  font-size: 1rem !important;
+  margin: 0 !important;
+}
+
+.sakhi-action-pill.speaking {
+  width: auto !important;
+  min-width: 44px !important;
+  border-radius: 20px !important;
+  padding: 0 10px !important;
+  background: #fef08a !important;
+  border-color: #ca8a04 !important;
+  box-shadow: 0 0 12px rgba(202, 138, 4, 0.5) !important;
+}
+
 
 
 
