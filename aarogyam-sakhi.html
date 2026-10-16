@@ -34,11 +34,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Sakhi AI Styles -->
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261015_v130">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261016_v310">
 
   <style>
-    /* Natural Card Layout with Expandable Full-Screen Option */
+    /* Natural Card Layout with Dynamic Viewport Height (100dvh) */
     html, body {
       margin: 0;
       padding: 0;
@@ -64,8 +63,9 @@
     .sakhi-fullscreen-wrapper {
       width: 100%;
       max-width: 520px;
-      height: 94vh;
-      max-height: 840px;
+      height: 96%;
+      height: 96dvh;
+      max-height: 860px;
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -80,6 +80,8 @@
       border: 1px solid rgba(255, 255, 255, 0.12);
       overflow: hidden;
       max-width: 520px !important;
+      display: flex;
+      flex-direction: column;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -111,38 +113,118 @@
       border: none !important;
     }
 
+    /* Header Compact Brand & Badges */
+    .sakhi-header-brand {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .sakhi-brand-short {
+      display: none;
+    }
+    .sakhi-live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+      animation: sakhiLivePulseDot 1.4s infinite;
+    }
+    @keyframes sakhiLivePulseDot {
+      0%, 100% { transform: scale(0.9); opacity: 0.9; }
+      50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 12px #4ade80; }
+    }
+
+    .sakhi-new-chat-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 0.80rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sakhi-new-chat-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Mobile Responsive Optimizations: 100% Screen Height, Zero Bottom Cut-off, Clean Header */
     @media (max-width: 640px) {
+      html, body {
+        height: 100% !important;
+        height: 100dvh !important;
+        position: fixed !important;
+        width: 100% !important;
+        overflow: hidden !important;
+      }
       #sakhiFullscreenContainer {
-        padding: 6px;
-      }
-      .sakhi-fullscreen-wrapper {
-        max-width: 100%;
-        height: 98vh;
-        height: 98dvh;
-      }
-      .sakhi-fullscreen-wrapper .sakhi-chat-window {
-        border-radius: 20px;
-        max-width: 100% !important;
-      }
-      /* On mobile, when full-screen is clicked, make it completely borderless */
-      body.is-fullscreen #sakhiFullscreenContainer,
-      #sakhiFullscreenContainer.is-fullscreen {
         padding: 0 !important;
-      }
-      body.is-fullscreen .sakhi-fullscreen-wrapper,
-      .sakhi-fullscreen-wrapper.is-fullscreen {
-        height: 100vh !important;
+        margin: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
         height: 100dvh !important;
       }
-      body.is-fullscreen .sakhi-fullscreen-wrapper .sakhi-chat-window,
-      .sakhi-fullscreen-wrapper.is-fullscreen .sakhi-chat-window {
+      .sakhi-fullscreen-wrapper {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100% !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .sakhi-fullscreen-wrapper .sakhi-chat-window {
         border-radius: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100% !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border: none !important;
       }
       .sakhi-header {
-        padding-top: max(10px, env(safe-area-inset-top, 10px)) !important;
+        padding: max(10px, env(safe-area-inset-top, 10px)) 10px 10px 10px !important;
+      }
+      .sakhi-brand-full {
+        display: none !important;
+      }
+      .sakhi-brand-short {
+        display: inline-block !important;
+        font-size: 1.08rem !important;
+      }
+      .sakhi-new-chat-btn {
+        width: 34px !important;
+        height: 34px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+      }
+      .sakhi-new-chat-btn .sakhi-btn-text {
+        display: none !important;
+      }
+      .sakhi-share-btn {
+        width: 34px !important;
+        height: 34px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+      }
+      .sakhi-messages-wrap {
+        padding: 12px 10px !important;
       }
       .sakhi-input-footer {
-        padding-bottom: max(8px, env(safe-area-inset-bottom, 8px)) !important;
+        padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 10px)) 10px !important;
       }
     }
   </style>
@@ -162,21 +244,24 @@
               <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
             </div>
             <div class="sakhi-header-info">
-              <h3>आरोग्यम सखी AI <span style="font-size:0.7rem;background:#22c55e;color:#fff;padding:2px 8px;border-radius:10px;">ऑनलाइन 24×7</span></h3>
+              <h3 class="sakhi-header-brand">
+                <span class="sakhi-brand-full">आरोग्यम सखी AI</span>
+                <span class="sakhi-brand-short">सखी AI</span>
+                <span class="sakhi-live-dot" title="ऑनलाइन 24×7"></span>
+              </h3>
             </div>
           </div>
           <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:6px;">
             <div id="sakhiHeaderUserBadgeWrap" style="display:inline-flex;align-items:center;"></div>
-            <button type="button" class="sakhi-new-chat-btn" id="sakhiNewChatBtn" onclick="window.startSakhiNewChat()" title="नई बातचीत शुरू करें" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:18px;padding:4px 10px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">
+            <button type="button" class="sakhi-new-chat-btn" id="sakhiNewChatBtn" onclick="window.startSakhiNewChat()" title="नई बातचीत">
               <i class="fa-solid fa-plus"></i>
-              <span>नई चैट</span>
+              <span class="sakhi-btn-text">नई चैट</span>
             </button>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="फुल स्क्रीन">
               <i class="fa-solid fa-expand"></i>
             </button>
-            <button type="button" class="sakhi-share-btn" onclick="window.shareAarogyamSakhi()" title="सखी AI को शेयर करें">
+            <button type="button" class="sakhi-share-btn" onclick="window.shareAarogyamSakhi()" title="शेयर करें" aria-label="शेयर करें">
               <i class="fa-solid fa-share-nodes"></i>
-              <span>शेयर</span>
             </button>
             <button type="button" class="sakhi-sound-toggle-btn" id="sakhiSoundToggleBtn" title="आवाज़ चालू/बंद करें">
               <i class="fa-solid fa-volume-high"></i>
@@ -187,21 +272,19 @@
         <!-- Messages Area -->
         <div class="sakhi-messages-wrap" id="sakhiMessagesWrap">
           <div class="sakhi-msg-row bot">
-            <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:16px;">
+            <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;">
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #16a34a;box-shadow:0 2px 8px rgba(22,163,74,0.3);" onerror="this.src='/images/logo/fevicon.png'">
+                <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2.5px solid #16a34a;box-shadow:0 2px 10px rgba(22,163,74,0.35);" onerror="this.src='/images/logo/fevicon.png'">
                 <div>
-                  <div style="font-size:1.05rem;font-weight:800;color:#0f172a;">नमस्ते <span id="sakhiHeroDynamicName">किसान साथी</span>! 🙏</div>
-                  <div style="font-size:0.84rem;color:#166534;font-weight:600;">मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ।</div>
+                  <div style="font-size:1.30rem;font-weight:900;color:#0f172a;">नमस्ते <span id="sakhiHeroDynamicName">किसान साथी</span>! 🙏</div>
+                  <div style="font-size:1.05rem;color:#166534;font-weight:700;">मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ।</div>
                 </div>
               </div>
 
-              <div style="color:#334155;font-size:0.92rem;line-height:1.6;margin-bottom:10px;">
-                खेती (गेहूं, सरसों, खाद, स्प्रे), पशुपालन (दूध-फैट), सेहत (जोड़ों का दर्द, शुगर), सौंदर्य या नेट्सर्फ बिज़नेस से जुड़ा कोई भी सवाल नीचे पूछें।
-              </div>
+
 
               <!-- Clean ChatGPT-style Prompt Guide -->
-              <div style="display:inline-flex;align-items:center;gap:8px;font-size:0.84rem;color:#15803d;font-weight:700;background:#f0fdf4;padding:8px 14px;border-radius:24px;border:1px solid #bbf7d0;">
+              <div style="display:inline-flex;align-items:center;gap:8px;font-size:1.02rem;color:#15803d;font-weight:800;background:#f0fdf4;padding:10px 16px;border-radius:24px;border:1.5px solid #bbf7d0;">
                 <span>✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
               </div>
             </div>
@@ -219,10 +302,7 @@
           </div>
           <div class="sakhi-plus-grid">
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">
-              🌾 खेती व फसल डॉक्टर
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-              🐄 पशुपालन, दूध व फैट
+              🌾 कृषि व फसल डॉक्टर
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('स्वास्थ्य व बीमारी के लक्षण')">
               🩺 स्वास्थ्य व रोग परामर्श
@@ -230,26 +310,29 @@
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">
               ✨ सौंदर्य व त्वचा देखभाल
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और ₹8,19,250 कैपिंग')">
-              💼 नेट्सर्फ (25% छूट व प्लान)
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
+              🐄 पशुपालन, दूध व फैट
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
-              📚 'खेती डॉक्टर' व ई-बुक्स
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग')">
+              💼 नेट्सर्फ 25% छूट व प्लान
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">
-              🌸 दादी के घरेलू नुस्खे
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('किसान मित्र बनकर महीने में अच्छी कमाई कैसे करें')">
-              💰 किसान मित्र कमाई व करियर
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('उपभोक्ता आमदनी व स्मार्ट ई-टेलर प्लान')">
+              💰 उपभोक्ता आमदनी व स्मार्ट ई-टेलर
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादा अवनीश जी से सीधा WhatsApp संपर्क')">
-              💬 दादा अवनीश जी से संपर्क
+              🤝 दादा अवनीश मिश्रा जी से संपर्क
             </button>
-            <a href="/tube.html" target="_blank" rel="noopener noreferrer" class="sakhi-menu-item" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:space-between;color:inherit;">
-              <span>🎬 आरोग्यम ट्यूब वीडियो</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;color:#2563eb;"></i>
-            </a>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दवाओं का खर्च एस्टीमेट (प्रति पंप व प्रति एकड़)')">
+              🧮 दवाओं का खर्च एस्टीमेट
+            </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
+              📚 'खेती का डॉक्टर' ई-बुक्स
+            </button>
           </div>
         </div>
+
+        <!-- Smart 1-Tap Contextual Pills Container (Dynamic Follow-up Chips) -->
+        <div id="sakhiSmartPillsContainer" class="sakhi-smart-pills-container" style="display:none;"></div>
 
         <!-- Legal Note -->
         <div class="sakhi-legal-note">
@@ -277,7 +360,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261015_v130"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261016_v312"></script>
   <script>
     (function () {
       // Force ensure Plus Menu is closed on mobile boot

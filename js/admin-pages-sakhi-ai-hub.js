@@ -483,7 +483,7 @@ async function fetchAndRenderSakhiInsights() {
       const { data, error } = await db
         .from('sakhi_user_insights')
         .select('*')
-        .order('last_interaction_at', { ascending: false })
+        .order('last_active_at', { ascending: false })
         .limit(100);
 
       if (!error && data && data.length > 0) {
@@ -516,7 +516,7 @@ function renderKPIs(list) {
   let healthChats = 0;
 
   list.forEach(item => {
-    const chats = Number(item.total_interactions || item.chat_count || 1);
+    const chats = Number(item.interaction_count || item.total_interactions || item.chat_count || 1);
     totalChats += chats;
     const dom = (item.primary_domain || item.dominant_domain || '').toLowerCase();
     if (dom.includes('agri') || dom.includes('krishi') || dom.includes('kheti')) {
@@ -543,7 +543,7 @@ function renderAnalyticsBars(list, dateRange = 'all') {
   const now = Date.now();
   const filtered = list.filter(item => {
     if (dateRange === 'all') return true;
-    const t = new Date(item.last_interaction_at || item.created_at || now).getTime();
+    const t = new Date(item.last_active_at || item.last_interaction_at || item.updated_at || item.created_at || now).getTime();
     if (dateRange === 'today') return (now - t) <= (24 * 60 * 60 * 1000);
     if (dateRange === '7d') return (now - t) <= (7 * 24 * 60 * 60 * 1000);
     if (dateRange === '30d') return (now - t) <= (30 * 24 * 60 * 60 * 1000);
@@ -555,7 +555,7 @@ function renderAnalyticsBars(list, dateRange = 'all') {
 
   filtered.forEach(item => {
     const dom = (item.primary_domain || item.dominant_domain || '').toLowerCase();
-    const chats = Number(item.total_interactions || 1);
+    const chats = Number(item.interaction_count || item.total_interactions || 1);
     totalInPeriod += chats;
 
     if (dom.includes('agri') || dom.includes('krishi') || dom.includes('kheti')) {
@@ -631,7 +631,7 @@ function renderSakhiUsersTable() {
     // Search match
     if (q) {
       const matchName = (item.user_name || '').toLowerCase().includes(q);
-      const matchPhone = (item.user_mobile || '').toLowerCase().includes(q);
+      const matchPhone = (item.mobile || item.user_mobile || '').toLowerCase().includes(q);
       const matchTopic = (item.last_query_topic || '').toLowerCase().includes(q);
       const matchEbook = (item.recommended_ebook || '').toLowerCase().includes(q);
       if (!matchName && !matchPhone && !matchTopic && !matchEbook) return false;
@@ -658,13 +658,14 @@ function renderSakhiUsersTable() {
 
   tbody.innerHTML = filtered.map((item, idx) => {
     const name = item.user_name || 'उपयोगकर्ता';
-    const mobile = item.user_mobile || '';
+    const mobile = item.mobile || item.user_mobile || '';
     const cleanMobile = String(mobile).replace(/\D/g, '');
     const domainBadge = getDomainBadge(item.primary_domain || item.dominant_domain || 'agri');
     const topic = item.last_query_topic || 'सामान्य परामर्श';
-    const totalChats = item.total_interactions || 1;
+    const totalChats = item.interaction_count || item.total_interactions || 1;
     const ebook = item.recommended_ebook || 'BK001 (आरोग्यम)';
-    const dateStr = item.last_interaction_at ? new Date(item.last_interaction_at).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
+    const dateVal = item.last_active_at || item.last_interaction_at || item.updated_at;
+    const dateStr = dateVal ? new Date(dateVal).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
 
     // WhatsApp Direct Link
     const waText = encodeURIComponent(`नमस्ते ${name} जी! आरोग्यम सखी AI पर आपके सवाल "${topic}" के संबंध में मार्गदर्शन हेतु संपर्क किया गया है।`);

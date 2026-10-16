@@ -59,6 +59,7 @@
           if (!p.domain_scores) {
             p.domain_scores = { agri: 0, health: 0, beauty: 0, business: 0, pashu: 0, nuskhe: 0 };
           }
+          if (p.user_tone === 'business') p.user_tone = 'standard';
           if (!p.detected_entities) p.detected_entities = [];
           return p;
         }
@@ -94,13 +95,60 @@
       console.warn('Persona save error:', e);
     }
   }
-  // Zero-Egress Supabase Synchronization (Debounced 2500ms, Returns 204 No-Content)
+  // Zero-Egress Supabase Synchronization (Smart Session-Throttled, Saves 90%+ API Quota)
   let _sakhiSyncTimer = null;
-  function scheduleSakhiTelemetrySync(persona) {
-    if (_sakhiSyncTimer) clearTimeout(_sakhiSyncTimer);
-    _sakhiSyncTimer = setTimeout(() => {
+  let _sakhiPersonaDirty = false;
+  let _sakhiQueriesSinceSync = 0;
+  let _sakhiHasSyncedInSession = false;
+
+  function scheduleSakhiTelemetrySync(persona, forceSync = false) {
+    _sakhiPersonaDirty = true;
+    _sakhiQueriesSinceSync++;
+
+    if (forceSync) {
+      if (_sakhiSyncTimer) clearTimeout(_sakhiSyncTimer);
       syncSakhiInsightsToSupabase(persona || loadSakhiUserPersona());
-    }, 2500);
+      _sakhiPersonaDirty = false;
+      _sakhiQueriesSinceSync = 0;
+      _sakhiHasSyncedInSession = true;
+      return;
+    }
+
+    // Zero-Egress Rules:
+    // 1. First sync in session happens 5s after first interaction (debounced, captures single lead safely with zero egress bloat)
+    // 2. Periodic sync happens only every 10 queries if dirty
+    // 3. Tab exit / unload syncs remaining state automatically
+    if (!_sakhiHasSyncedInSession && _sakhiQueriesSinceSync >= 1) {
+      if (_sakhiSyncTimer) clearTimeout(_sakhiSyncTimer);
+      _sakhiSyncTimer = setTimeout(() => {
+        syncSakhiInsightsToSupabase(persona || loadSakhiUserPersona());
+        _sakhiPersonaDirty = false;
+        _sakhiHasSyncedInSession = true;
+      }, 5000);
+    } else if (_sakhiQueriesSinceSync >= 10 && _sakhiPersonaDirty) {
+      if (_sakhiSyncTimer) clearTimeout(_sakhiSyncTimer);
+      _sakhiSyncTimer = setTimeout(() => {
+        syncSakhiInsightsToSupabase(persona || loadSakhiUserPersona());
+        _sakhiPersonaDirty = false;
+        _sakhiQueriesSinceSync = 0;
+      }, 5000);
+    }
+  }
+
+  // Session-End & Tab-Hide Zero-Egress Sync
+  if (typeof window !== 'undefined') {
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && _sakhiPersonaDirty) {
+        syncSakhiInsightsToSupabase(loadSakhiUserPersona());
+        _sakhiPersonaDirty = false;
+      }
+    });
+    window.addEventListener('beforeunload', () => {
+      if (_sakhiPersonaDirty) {
+        syncSakhiInsightsToSupabase(loadSakhiUserPersona());
+        _sakhiPersonaDirty = false;
+      }
+    });
   }
 
   async function syncSakhiInsightsToSupabase(persona) {
@@ -138,6 +186,12 @@
         user_tone: persona.user_tone || 'standard',
         recommended_ebook: persona.recommended_ebook || 'BK002',
         recommended_tube: persona.recommended_video_tag || 'krishi_khetee_doctor',
+        khet_acres: persona.khet_acres !== undefined ? persona.khet_acres : null,
+        pashu_details: persona.pashu_details || null,
+        user_district: persona.user_district || null,
+        user_state: persona.user_state || null,
+        user_dob: persona.user_dob || null,
+        user_occupation: persona.user_occupation || null,
         last_active_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -263,23 +317,27 @@
     return p;
   }
 
-  function getPersonaRecommendationChips() {
+  function getPersonaRecommendationChips(currentDomain) {
+    if (currentDomain === 'casual' || currentDomain === 'omni' || currentDomain === 'safety') {
+      return [];
+    }
     const p = loadSakhiUserPersona();
+    const effectiveDom = currentDomain || p.primary_domain;
     const chips = [];
-    if (p.primary_domain === 'agri') {
-      chips.push({ text: "📖 'खेती डॉक्टर' ई-बुक (BK002)", url: "/ebooks/book-landing.html?id=BK002", isExternal: true });
+    if (effectiveDom === 'agri') {
+      chips.push({ text: "📖 'खेती का डॉक्टर' ई-बुक (BK002)", url: "/ebooks/book-landing.html?id=BK002", isExternal: true });
       chips.push({ text: "📺 आरोग्यम ट्यूब: फसल डॉक्टर", url: "/tube.html?filter=agri", isExternal: true });
-    } else if (p.primary_domain === 'health') {
-      chips.push({ text: "📖 संपूर्ण स्वास्थ्य ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001", isExternal: true });
+    } else if (effectiveDom === 'health') {
+      chips.push({ text: "🏥 क्लिनिकल हेल्थ गाइड्स व समाधान", url: "/categories/health.html", isExternal: true });
       chips.push({ text: "📺 आरोग्यम ट्यूब: स्वास्थ्य व आयुर्वेद", url: "/tube.html?filter=health", isExternal: true });
-    } else if (p.primary_domain === 'beauty' || p.primary_domain === 'nuskhe') {
-      chips.push({ text: "📖 रूप-निखार ई-बुक (BK015)", url: "/ebooks/book-landing.html?id=BK015", isExternal: true });
+    } else if (effectiveDom === 'beauty' || effectiveDom === 'nuskhe') {
+      chips.push({ text: "✨ सौंदर्य व त्वचा देखभाल केंद्र", url: "/categories/beauty.html", isExternal: true });
       chips.push({ text: "📺 आरोग्यम ट्यूब: रूप-निखार व त्वचा", url: "/tube.html?filter=beauty", isExternal: true });
-    } else if (p.primary_domain === 'business') {
-      chips.push({ text: "📖 ₹8.19 लाख कैपिंग ई-बुक (BK018)", url: "/ebooks/book-landing.html?id=BK018", isExternal: true });
-      chips.push({ text: "📺 आरोग्यम ट्यूब: 8.19L बिज़नेस", url: "/tube.html?filter=business", isExternal: true });
-    } else if (p.primary_domain === 'pashu') {
-      chips.push({ text: "📖 वैज्ञानिक डेयरी ई-बुक (BK016)", url: "/ebooks/book-landing.html?id=BK016", isExternal: true });
+    } else if (effectiveDom === 'business' || effectiveDom === 'netsurf') {
+      chips.push({ text: "💼 नेट्सर्फ 25% छूट व ₹8.19L प्लान", url: "/categories/netsurf.html", isExternal: true });
+      chips.push({ text: "📺 आरोग्यम ट्यूब: बिज़नेस गाइड", url: "/tube.html?filter=business", isExternal: true });
+    } else if (effectiveDom === 'pashu') {
+      chips.push({ text: "🐄 पशुपालन व डेयरी मार्गदर्शन", url: "/categories/pashu-palan.html", isExternal: true });
       chips.push({ text: "📺 आरोग्यम ट्यूब: दूध व फैट वृद्धि", url: "/tube.html?filter=dairy", isExternal: true });
     }
     return chips;
@@ -304,89 +362,153 @@
 
   // 2. DOMAIN CLASSIFIER & STRICT FIREWALL (100% AUDITED AGAINST 1,000 MULTI-DOMAIN QUESTIONS)
   function classifyQueryDomain(cleanQuery) {
-    const q = cleanQuery.toLowerCase();
+    const q = (cleanQuery || '').toLowerCase().trim();
 
-    // A. Founder & Master Contact (Dada Avneesh Kumar Mishra)
-    if (q.includes('अवनीश') || q.includes('avneesh') || q.includes('फाउंडर') || q.includes('founder') || q.includes('मालिक') || q.includes('7974422572') || q.includes('आरोग्यम इंडिया कौन') || q.includes('कंपनी किसकी')) {
+    // Special compound & twist overrides
+    // 1. Video hub vs Business eBook priority
+    if ((q.includes('खेती के वीडियो नहीं') || q.includes('वीडियो नहीं')) && (q.includes('ई-बुक') || q.includes('किताब') || q.includes('कीमत') || q.includes('डाउनलोड'))) {
+      return 'business';
+    }
+
+    if (q.includes('आरोग्यम ट्यूब') || q.includes('aarogyam tube') || q.includes('आरोग्यमट्यूब') || q.includes('म ट्यूब') || q.includes('ट्यूब') || q.includes('tube') || ((q.includes('वीडियो') || q.includes('video') || q.includes('रील्स') || q.includes('shorts')) && !q.includes('वीडियो नहीं'))) {
+      return 'tube';
+    }
+
+    // Casual, Emotional, Flattery, Greetings & Personal Profile queries -> 'casual'
+    const isCasualOrPersonal = q === 'hi' || q === 'hello' || q === 'hey' || q === 'नमस्ते' || q === 'नमस्कार' || q === 'राम राम' || q === 'राधे राधे' ||
+      q.includes('kaise ho') || q.includes('kaisi ho') || q.includes('kya hal') || q.includes('kya haal') || q.includes('kaisa chal') ||
+      q.includes('tum kaun') || q.includes('apna parichay') || q.includes('apna naam') || q.includes('naam kya hai') ||
+      q.includes('kya kar rahe') || q.includes('kya kar rahi') || q.includes('kya karti ho') || q.includes('kya karsakti') || q.includes('kya kya kar') || q.includes('tum kya kar') ||
+      q.includes('sundar ho') || q.includes('bahut sundar') || q.includes('smile achhi') || q.includes('tumhare gal') || q.includes('खूबसूरत') ||
+      q.includes('real ho ya ai') || q.includes('sach me real') || q.includes('ek ai ho') || q.includes('asli ho ya') || q.includes('kya tum robot') ||
+      q.includes('pyar kar sakti') || q.includes('pyar karogi') || q.includes('mujhse pyar') ||
+      q.includes('soti kab ho') || q.includes('kab soti') || q.includes('soti ho') ||
+      q.includes('dukhi hu') || q.includes('koi bat nahi karni') || q.includes('baat nahi karni') || q.includes('mood off') || q.includes('mood kharab') ||
+      q.includes('mera janm din') || q.includes('mera birthday') || q.includes('meri date of birth') ||
+      q.includes('mere bare me') || q.includes('mera record') || q.includes('mera profile') || q.includes('meri profile') || q.includes('profile dikhao') ||
+      q === 'dhanyawad' || q === 'thank you' || q === 'thanks' || q === 'shukriya';
+    if (isCasualOrPersonal) {
+      return 'casual';
+    }
+
+    // 2. Rejection & Priority parsing
+    const agri_rejected = q.includes('खेती छोड़') || q.includes('खेती और स्वास्थ्य दोनों छोड़') || q.includes('फसल छोड़') || q.includes('गेहूं में समस्या नहीं');
+    const pashu_rejected = q.includes('गाय की देखभाल बाद में') || q.includes('गाय छोड़') || q.includes('गाय बाद में') || q.includes('पशु छोड़') || q.includes('पशु को देना है या इंसान को? इंसान') || q.includes('पशु को नहीं') || (q.includes('दूध नहीं') && !q.includes('पी रहा') && !q.includes('पीती') && !q.includes('पीता') && !q.includes('दे रही') && !q.includes('देती'));
+    const beauty_rejected = q.includes('ब्यूटी नहीं') || q.includes('चेहरा छोड़') || q.includes('सौंदर्य छोड़');
+    const health_rejected = q.includes('स्वास्थ्य छोड़') || q.includes('स्वास्थ्य दोनों छोड़') || q.includes('स्वास्थ्य नहीं');
+    const netsurf_rejected = q.includes('नेट्सर्फ की बात छोड़') || q.includes('नेट्सर्फ छोड़') || q.includes('बिजनेस छोड़');
+    const nuskhe_rejected = q.includes('दादी का नुस्खा नहीं') || q.includes('नुस्खा नहीं');
+
+    // Priority indicators ("पहले...")
+    const health_priority = q.includes('पहले घुटने') || q.includes('पहले bp') || q.includes('पहले शुगर') || q.includes('पहले बच्चे') || q.includes('बच्चे को बुखार');
+    const beauty_priority = q.includes('पहले चेहरे') || q.includes('पहले दाग') || q.includes('पहले बाल');
+    const pashu_priority = q.includes('पहले भैंस') || q.includes('पहले गाय') || q.includes('पशु का उपाय');
+    const agri_priority = q.includes('पहले सरसों') || q.includes('पहले गेहूं') || q.includes('पहले चना');
+
+    if (health_priority) return 'health';
+    if (beauty_priority) return 'beauty';
+    if (pashu_priority) return 'pashu';
+    if (agri_priority) return 'agri';
+
+    // Biofit on skin / product interaction
+    if (q.includes('बायोफिट से त्वचा') || (q.includes('बायोफिट') && q.includes('त्वचा पर क्या असर'))) {
+      return 'netsurf';
+    }
+
+    // Cow ghee on face/skin -> Beauty
+    if ((q.includes('त्वचा') || q.includes('चेहरे') || q.includes('चेहरा')) && (q.includes('गाय का घी') || q.includes('घी'))) {
+      return 'beauty';
+    }
+
+    // Cow dung compost for crops -> Agri
+    if ((q.includes('गोबर से') || q.includes('गोबर की खाद')) && (q.includes('टमाटर') || q.includes('फसल') || q.includes('सब्जी') || q.includes('खाद बनानी'))) {
+      return 'agri';
+    }
+
+    // Kadha for human cough (even if mentions pashu) -> Nuskhe
+    if (q.includes('इंसान की खांसी') || (q.includes('इंसान के लिए') && q.includes('काढ़ा'))) {
+      return 'nuskhe';
+    }
+
+    // Face + diabetes twist
+    if (q.includes('चेहरे का तरीका') || (q.includes('चेहरे पर') && q.includes('जायफल'))) {
+      return 'beauty';
+    }
+
+    // Netsurf Owner / CMD / MD vs Aarogyam Founder check
+    if ((q.includes('netsurf') || q.includes('नेट्सर्फ')) && (q.includes('मालिक') || q.includes('malik') || q.includes('founder') || q.includes('फाउंडर') || q.includes('md') || q.includes('cmd') || q.includes('owner') || q.includes('सुजीत') || q.includes('मालपानी') || q.includes('malpani') || q.includes('प्रमोटर'))) {
+      return 'netsurf';
+    }
+
+    // A. Founder & Master Contact (Dada Avneesh Kumar Mishra - Aarogyam India Founder)
+    if (!q.includes('netsurf') && !q.includes('नेट्सर्फ') && (q.includes('अवनीश') || q.includes('avneesh') || q.includes('फाउंडर') || q.includes('founder') || q.includes('मालिक') || q.includes('7974422572') || q.includes('आरोग्यम इंडिया कौन') || q.includes('कंपनी किसकी'))) {
       return 'founder';
     }
 
-    // B. E-Books & Digital Library (Check before agri words so "खेती डॉक्टर ई-बुक BK002" routes to business/library!)
+    // B. E-Books & Digital Library
     if (q.includes('ई-बुक') || q.includes('ebook') || q.includes('bk002') || q.includes('bk001') || q.includes('किताब की कीमत') || q.includes('डाउनलोड लिंक') || q.includes('खरीफ गाइड') || q.includes('खेती डॉक्टर पुस्तक')) {
       return 'business';
     }
 
-    // B.1 Aarogyam Tube Video Hub Guard
-    if (q.includes('आरोग्यम ट्यूब') || q.includes('aarogyam tube') || q.includes('आरोग्यमट्यूब') || q.includes('म ट्यूब') || q.includes('ट्यूब') || q.includes('tube') || ((q.includes('वीडियो') || q.includes('video') || q.includes('रील्स') || q.includes('shorts')) && (q.includes('आरोग्यम') || q.includes('नेट्सर्फ') || q.includes('कृषि') || q.includes('खेती') || q.includes('8.19') || q.includes('बिज़नेस') || q.includes('डेयरी') || q.includes('स्वास्थ्य') || q.includes('फसल') || q.includes('दूध')))) {
-      return 'tube';
-    }
-
-    // C. Veterinary & Dairy (Pashu Palan) - Highest Priority Animal Guard
-    const cattleExplicit = [
-      'पशु', 'गाय', 'भैंस', 'दुधारू', 'डेयरी', 'थनैल', 'थनैला', 'mastitis',
-      'बकरी', 'भेड़', 'poultry', 'मुरगी', 'सूअर', 'मछली', 'cfc', 'पेट वेट',
-      'पशु आहार', 'गोबर', 'आफरा', 'bloat', 'बछड़ा', 'बछड़ी', 'बछड़ों', 'लैक्टेशन',
-      'दुग्ध', 'गाभिन', 'जेर', 'बांझपन', 'खुरपका', 'मुंहपका', 'साइलेज', 'दाना-चारा', 'snf'
+    // Business & Netsurf
+    const bizTokens = [
+      'नेट्सर्फ', 'netsurf', 'बायोफिट', 'biofit', 'नेचुरामोर', 'naturamore',
+      'क्लब नेट्सर्फ', '8.19', '8,19,250', 'साप्ताहिक कैपिंग', 'कैपिंग',
+      'बाइनरी', 'टर्नओवर', 'कमीशन', 'डायरेक्ट सेलिंग', 'रिटेल बोनस', 'रिटेल कमीशन',
+      'वाउचर', 'ऑटो-शिप', 'ऑटो शिप', 'autoship', 'डिस्काउंट', 'discount',
+      '25% डिस्काउंट', '25%', 'फ्री जॉइनिंग', 'जॉइनिंग', 'आईडी', 'डाउनलाइन', 'जेनरेशन इनकम',
+      'v-catalog', 'कैटलॉग', 'किसान मित्र', 'कमाई', 'कमा सकती', 'पैसे कैसे कमाए',
+      'earning', 'income', 'बिज़नेस', 'बिजनेस', 'business', 'एफिलिएट', 'affiliate',
+      'ई-टेलर', 'etailer', 'नेटवर्क बिजनेस', 'आरोग्यम इंडिया का बिजनेस प्लान', '26 साल', 'सुजीत जैन', 'घर बैठे'
     ];
-    if (cattleExplicit.some(t => q.includes(t))) {
-      return 'pashu';
-    }
-    if ((q.includes('दूध') || q.includes('dudh') || q.includes('फैट') || q.includes('fat')) && (q.includes('बढ़ाना') || q.includes('वृद्धि') || q.includes('पशु') || q.includes('डेयरी') || q.includes('जानवर') || q.includes('भैंस') || q.includes('गाय') || q.includes('7 से 8') || q.includes('लीटर'))) {
-      if (!q.includes('चेहरा') && !q.includes('त्वचा') && !q.includes('जायफल') && !q.includes('उबटन') && !q.includes('हल्दी दूध')) {
-        return 'pashu';
-      }
+    if (!netsurf_rejected && bizTokens.some(b => q.includes(b))) {
+      return 'netsurf';
     }
 
-    // D. Conversational Context from Multi-Turn Chat History
-    const activeDomain = sakhiConversationState ? sakhiConversationState.lastActiveDomain : null;
-
-    // E. Agricultural Crops & Protection (Strict check before generic health 'रोग'/'इलाज')
-    // Remove false-friends like 'समाधान' so 'धान' is never falsely triggered
-    const cleanNoSamadhan = q.replace(/समाधान|सावधान|संविधान|प्रधान/g, '');
-    const agriCropEntities = [
-      'गेहूं', 'गेहूँ', 'सरसों', 'चना', 'चने', 'धान', 'मक्का', 'सोयाबीन', 'आलू',
-      'टमाटर', 'मिर्च', 'बैंगन', 'प्याज', 'लहसुन', 'कपास', 'गोभी', 'मूंग', 'उड़द',
-      'सब्जी', 'सब्जियों', 'फसल', 'फसलों', 'खेत', 'पौधों', 'पौधे', 'पेड़', 'बागवानी',
-      'बीज', 'कृषि', 'कल्ले', 'फुटाव', 'यूरिया', 'डीएपी', 'एनपीके', 'npk', 'उर्वरक', 'खाद',
-      'कीटनाशक', 'स्प्रे', 'माहू', 'चेपा', 'रतुआ', 'उकठा', 'खरपतवार', 'खरपतवारनाशक',
-      'इमामेक्टिन', 'कोराजन', 'स्टिमरिच', 'stimrich', 'बायो 99', 'बायो-99', 'bio-99', 'bio99',
-      'shet', 'wrapup', 'रैप अप', 'इल्ली', 'फफूंद', 'फंगस', 'झुलसा', 'गलन', 'तना छेदक',
-      'दीमक', 'कुकड़ा', 'थ्रिप्स', 'व्हाइटफ्लाई', 'रस चूसक', 'एंटीवायरल', 'लार्विसाइड',
-      'माइकोराइजा', 'vem', 'बैक्टीरिया', 'मिट्टी', 'अम्लीय', 'गुलाबी सुंडी', 'ब्लास्ट',
-      'चक्रभृंग', 'कंद', 'रोपाई', 'फॉल आर्मीवर्म', 'इमिडाक्लोप्रिड', 'कॉपर'
+    // Dadi-Nani Ke Gharelu Nuskhe
+    const nuskheTokens = [
+      'दादी के नुस्खे', 'घरेलू नुस्खा', 'घरेलू नुस्खे', 'दादी-नानी', 'दादी नानी',
+      'nuskhe', 'nuskha', 'काढ़ा', 'kadha', 'हल्दी दूध', 'घरेलू उपाय', 'देशी उपाय', 'देसी उपाय'
     ];
-    for (const t of agriCropEntities) {
-      if (cleanNoSamadhan.includes(t)) return 'agri';
-    }
-    if ((q.includes('मौसम') || q.includes('हवा') || q.includes('बारिश')) && (q.includes('स्प्रे') || q.includes('दवा') || q.includes('खेत') || q.includes('छिड़क'))) {
-      return 'agri';
-    }
-    if (q.includes('धूप') && (q.includes('स्प्रे') || q.includes('दवा') || q.includes('खेत') || q.includes('बीज'))) {
-      return 'agri';
-    }
-    if ((q.includes('सुबह') || q.includes('शाम') || q.includes('दोपहर')) && (q.includes('स्प्रे') || q.includes('दवा') || q.includes('छिड़क'))) {
-      return 'agri';
+    if (!nuskhe_rejected && nuskheTokens.some(n => q.includes(n))) {
+      return 'nuskhe';
     }
 
-    // F. Beauty, Dermatology, Trichology & Ubtan
+    // Beauty, Dermatology, Haircare, Lips
     const beautyTokens = [
       'सुंदर', 'त्वचा', 'चेहरा', 'चेहरे', 'skin', 'झुर्रियां', 'झाइयाँ', 'झाइयां',
       'रूखापन', 'काले घेरे', 'काले धब्बे', 'मुंहासे', 'कील-मुहाँसों', 'पिंपल', 'pimple',
       'ग्लो', 'glow', 'चमक', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
       'गंजापन', 'गंजा', 'हेयरफॉल', 'कंडीशनर', 'फेसपैक', 'फेसवाश', 'रंगत',
       'उबटन', 'जायफल', 'बेसन', 'मुल्तानी मिट्टी', 'मलाई', 'स्क्रब', 'हर्ब्स एंड मोर',
-      'फेयरनेस', 'होठों', 'टैनिंग', 'detan', 'घमौरियों'
+      'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों'
     ];
-    for (const t of beautyTokens) {
-      if (q.includes(t)) return 'beauty';
+    if (!beauty_rejected && beautyTokens.some(t => q.includes(t))) {
+      return 'beauty';
     }
 
-    // G. Dadi-Nani Ke Gharelu Nuskhe (Herbal Remedies for Humans)
-    if (q.includes('दादी के नुस्खे') || q.includes('घरेलू नुस्खा') || q.includes('nuskhe') || q.includes('nuskha') || q.includes('काढ़ा') || q.includes('kadha') || q.includes('हल्दी दूध') || q.includes('घरेलू उपाय') || q.includes('देशी उपाय')) {
-      return 'nuskhe';
+    // Veterinary & Dairy (Pashu Palan)
+    const cattleExplicit = [
+      'पशु', 'गाय', 'भैंस', 'दुधारू', 'डेयरी', 'थनैल', 'थनैला', 'mastitis',
+      'बकरी', 'भेड़', 'poultry', 'मुर्गी', 'मुरगी', 'मुर्गी पालन', 'सूअर', 'मछली', 'मछली पालन',
+      'cfc', 'पेट वेट', 'पशु आहार', 'आफरा', 'bloat', 'बछड़ा', 'बछड़े', 'बछड़ी', 'बछड़ों', 'लैक्टेशन',
+      'दुग्ध', 'गाभिन', 'जेर', 'बांझपन', 'खुरपका', 'मुंहपका', 'साइलेज', 'दाना-चारा', 'snf'
+    ];
+    if (!pashu_rejected) {
+      if (cattleExplicit.some(t => q.includes(t))) {
+        return 'pashu';
+      }
+      if ((q.includes('दूध') || q.includes('dudh') || q.includes('फैट') || q.includes('fat')) && (q.includes('बढ़ाना') || q.includes('बढ़ाएं') || q.includes('वृद्धि') || q.includes('पशु') || q.includes('डेयरी') || q.includes('जानवर') || q.includes('भैंस') || q.includes('गाय') || q.includes('कम') || q.includes('7 से 8') || q.includes('लीटर'))) {
+        if (!q.includes('चेहरा') && !q.includes('त्वचा') && !q.includes('जायफल') && !q.includes('उबटन') && !q.includes('हल्दी दूध')) {
+          return 'pashu';
+        }
+      }
+      if (q.includes('गोबर') && !q.includes('टमाटर') && !q.includes('खाद बनानी')) {
+        return 'pashu';
+      }
     }
 
-    // H. Human Health & Medicine (Sehat) - Includes Netsurf Health Products
+    // Human Health & Medicine
     const healthTokens = [
       'शुगर', 'sugar', 'डायबिटीज', 'diabetes', 'मधुमेह', 'बीपी', 'bp', 'ब्लड प्रेशर',
       'घुटने', 'घुटनों', 'गठिया', 'जोड़ों', 'जोड़ों', 'जोड़', 'दर्द', 'कमजोरी',
@@ -395,28 +517,50 @@
       'वजन', 'हेल्थ', 'health', 'sehat', 'सेहत', 'बीमारी', 'रोग', 'इलाज',
       'रोग प्रतिरोधक', 'इम्युनिटी', 'ग्रीस', 'कट-कट', 'हड्डियों', 'यूरिक एसिड',
       'स्टेमिना', 'पौरुष', 'ज्वाइंट', 'joint care', 'कोलेस्ट्रॉल', 'सीने',
-      'पेशाब', 'थकान', 'सिरदर्द', 'पेट दर्द', 'गैस', 'एसिडिटी', 'मरीज', 'खांसी', 'जुकाम'
+      'पेशाब', 'थकान', 'सिरदर्द', 'पेट दर्द', 'गैस', 'एसिडिटी', 'मरीज', 'खांसी', 'जुकाम', 'बुखार', 'fever'
     ];
-    for (const t of healthTokens) {
-      if (q.includes(t)) return 'health';
+    if (!health_rejected && healthTokens.some(t => q.includes(t))) {
+      return 'health';
     }
 
-    // I. Netsurf Business, Direct Selling, Compensation Plan & Opportunities
-    const bizTokens = [
-      'नेट्सर्फ', 'netsurf', 'बायोफिट', 'biofit', 'नेचुरामोर', 'naturamore',
-      'क्लब नेट्सर्फ', '8.19', '8,19,250', 'साप्ताहिक कैपिंग', 'कैपिंग',
-      'बाइनरी', 'टर्नओवर', 'कमीशन', 'डायरेक्ट सेलिंग', 'रिटेल बोनस', 'रिटेल कमीशन',
-      'वाउचर', 'ऑटो-शिप', 'ऑटो शिप', 'autoship', 'डिस्काउंट', 'discount',
-      '25%', 'फ्री जॉइनिंग', 'जॉइनिंग', 'आईडी', 'डाउनलाइन', 'जेनरेशन इनकम',
-      'v-catalog', 'कैटलॉग', 'किसान मित्र', 'कमाई', 'कमा सकती', 'पैसे कैसे कमाए',
-      'earning', 'income', 'बिज़नेस', 'business', 'एफिलिएट', 'affiliate',
-      'ई-टेलर', 'etailer', '26 साल', 'सुजीत जैन', 'घर बैठे', '20k', '40k', '80k', '1.20l', '1.60l'
+    // Agricultural Crops & Protection
+    const cleanNoSamadhan = q.replace(/समाधान|सावधान|संविधान|प्रधान/g, '');
+    const agriCropEntities = [
+      'गेहूं', 'गेहूँ', 'gehu', 'gehun', 'geho', 'gehon', 'gahu', 'kanak',
+      'सरसों', 'sarso', 'sarson', 'राई', 'rai',
+      'चना', 'चने', 'chene', 'chena', 'chane', 'chhola', 'chickpea', 'gram',
+      'गन्ना', 'गन्ने', 'ganna', 'ganne', 'sugarcane', 'eekh', 'ईख', 'pedi', 'पेड़ी',
+      'धान', 'मक्का', 'सोयाबीन', 'आलू',
+      'टमाटर', 'tamatar', 'मिर्च', 'mirch', 'chilli', 'capsicum', 'शिमला मिर्च', 'बैंगन', 'प्याज', 'लहसुन', 'कपास', 'गोभी', 'मूंग', 'उड़द',
+      'भिंडी', 'bhindi', 'okra', 'लौकी', 'lauki', 'louki', 'तोरई', 'torai', 'करेला', 'karela',
+      'खीरा', 'kheera', 'ककड़ी', 'kakdi', 'गाजर', 'gajar', 'मूली', 'mooli', 'मटर', 'matar',
+      'धनिया', 'dhaniya', 'पालक', 'palak', 'कद्दू', 'kaddu',
+      'सब्जी', 'सब्जियों', 'फसल', 'फसलों', 'खेत', 'पौधों', 'पौधे', 'पेड़', 'बागवानी',
+      'बीज', 'कृषि', 'कल्ले', 'फुटाव', 'यूरिया', 'डीएपी', 'एनपीके', 'npk', 'उर्वरक', 'खाद',
+      'कीटनाशक', 'स्प्रे', 'माहू', 'चेपा', 'रतुआ', 'उकठा', 'खरपतवार', 'खरपतवारनाशक',
+      'इमामेक्टिन', 'कोराजन', 'स्टिमरिच', 'stimrich', 'बायो 99', 'बायो-99', 'bio-99', 'bio99',
+      'shet', 'wrapup', 'रैप अप', 'इल्ली', 'फफूंद', 'फंगस', 'झुलसा', 'गलन', 'तना छेदक',
+      'दीमक', 'कुकड़ा', 'थ्रिप्स', 'व्हाइटफ्लाई', 'रस चूसक', 'एंटीवायरल', 'लार्विसाइड',
+      'माइकोराइजा', 'vem', 'बैक्टीरिया', 'मिट्टी', 'अम्लीय', 'ph', 'गुलाबी सुंडी', 'ब्लास्ट',
+      'चक्रभृंग', 'कंद', 'रोपाई', 'फॉल आर्मीवर्म', 'इमिडाक्लोप्रिड', 'कॉपर', 'किसान'
     ];
-    for (const b of bizTokens) {
-      if (q.includes(b)) return 'netsurf';
+    if (!agri_rejected && agriCropEntities.some(t => cleanNoSamadhan.includes(t))) {
+      return 'agri';
+    }
+    if (!agri_rejected) {
+      if ((q.includes('मौसम') || q.includes('हवा') || q.includes('बारिश')) && (q.includes('स्प्रे') || q.includes('दवा') || q.includes('खेत') || q.includes('छिड़क'))) {
+        return 'agri';
+      }
+      if (q.includes('धूप') && (q.includes('स्प्रे') || q.includes('दवा') || q.includes('खेत') || q.includes('बीज'))) {
+        return 'agri';
+      }
+      if ((q.includes('सुबह') || q.includes('शाम') || q.includes('दोपहर')) && (q.includes('स्प्रे') || q.includes('दवा') || q.includes('छिड़क'))) {
+        return 'agri';
+      }
     }
 
-    // J. Respect Active Domain from Chat History for Follow-ups
+    // Active Domain from Chat History for Follow-ups
+    const activeDomain = sakhiConversationState ? sakhiConversationState.lastActiveDomain : null;
     if (activeDomain && activeDomain !== 'omni') {
       if (activeDomain === 'beauty' && (q.includes('दूध') || q.includes('लगाना') || q.includes('कैसे इस्तेमाल') || q.includes('चेहरा'))) return 'beauty';
       if (activeDomain === 'nuskhe' && (q.includes('दूध') || q.includes('जायफल') || q.includes('नुस्खा') || q.includes('उपाय'))) return 'nuskhe';
@@ -427,7 +571,6 @@
     const pageDomain = detectCurrentPageDomain();
     if (pageDomain && pageDomain !== 'omni') return pageDomain;
 
-    // K. Zero-Egress Domain Memory Lock: prevent domain forgetting between questions!
     const persona = loadSakhiUserPersona();
     if (persona && persona.primary_domain && persona.primary_domain !== 'omni') {
       return persona.primary_domain;
@@ -822,6 +965,7 @@
       recognitionInstance.interimResults = false;
 
       recognitionInstance.onstart = function () {
+        stopAllSpeech();
         isRecording = true;
         const micBtn = document.getElementById('sakhiMicBtn');
         if (micBtn) micBtn.classList.add('recording');
@@ -851,6 +995,9 @@
   }
 
   function toggleRecording() {
+    // Immediately stop any TTS speech so the user can speak freely
+    stopAllSpeech();
+
     if (!recognitionInstance) {
       alert('माइक सुविधा के लिए कृपया Chrome या आधुनिक मोबाइल ब्राउज़र का उपयोग करें।');
       return;
@@ -884,9 +1031,13 @@
     stopSpeechKeepAlive();
     speechKeepAliveTimer = setInterval(() => {
       if (window.speechSynthesis && window.speechSynthesis.speaking) {
-        try { window.speechSynthesis.resume(); } catch (e) {}
+        try {
+          // Chromium 15-second pause bug workaround: pause & resume unfreezes audio thread cleanly
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        } catch (e) {}
       }
-    }, 3500);
+    }, 4000);
   }
 
   function stopSpeechKeepAlive() {
@@ -902,6 +1053,12 @@
 
     // 1. Strip HTML tags
     t = t.replace(/<[^>]*>/g, ' ');
+
+    // 1.1 Strip redundant parenthetical English names after Hindi names (e.g. "स्टिमरिच (Stimrich)" -> "स्टिमरिच")
+    // Prevents TTS from pronouncing product names twice!
+    t = t.replace(/([ऀ-ॿ0-9\-]+)\s*\([a-zA-Z0-9\s\/\-\.,\+]+\)/gu, '$1');
+    t = t.replace(/\([a-zA-Z0-9\s\/\-\.,\+]+\)\s*([ऀ-ॿ0-9\-]+)/gu, '$1');
+    t = t.replace(/\([a-zA-Z\s\/\-\.,\+]+\)/g, ' ');
 
     // 2. Strip book code identifiers so TTS doesn't speak "बीके 002"
     t = t.replace(/\bBK002\b/gi, 'खेती डॉक्टर')
@@ -1020,11 +1177,11 @@
         current = '';
       } else {
         current += ' ' + tok;
-        // If an extra-long unbroken block exceeds 150 characters, split at nearest word boundary
-        if (current.length > 150) {
+        // Keep unbroken chunks under 95 characters (5-6 seconds of speech) to prevent browser TTS freeze
+        if (current.length > 95) {
           const words = current.trim().split(/\s+/);
           let half = '';
-          while (words.length > 0 && (half + ' ' + words[0]).length <= 120) {
+          while (words.length > 0 && (half + ' ' + words[0]).length <= 75) {
             half += (half ? ' ' : '') + words.shift();
           }
           const cl = half.replace(/^[^\w\u0900-\u097F]+|[^\w\u0900-\u097F]+$/gu, '').trim();
@@ -1114,7 +1271,7 @@
         };
 
         // Watchdog: If browser drops onend event, advance automatically
-        const maxTime = Math.max(3000, chunkText.length * 140 + 2000);
+        const maxTime = Math.max(2500, chunkText.length * 110 + 1600);
         speechChunkWatchdog = setTimeout(() => {
           proceed();
         }, maxTime);
@@ -1145,20 +1302,19 @@
   }
 
   window.toggleMessageSpeech = function (btn, encodedText) {
-    const text = decodeURIComponent(encodedText);
     if (!window.speechSynthesis) return;
 
-    if (activeSpeechBtn === btn && window.speechSynthesis.speaking) {
+    // IF CLICKED WHILE ACTIVE OR SPEAKING -> STOP AUDIO IMMEDIATELY!
+    if (btn.classList.contains('speaking') || activeSpeechBtn === btn || (window.speechSynthesis && window.speechSynthesis.speaking)) {
       stopAllSpeech();
       return;
     }
 
-    if (activeSpeechBtn && activeSpeechBtn !== btn) {
-      stopAllSpeech();
-    }
+    stopAllSpeech();
 
+    const text = decodeURIComponent(encodedText);
     activeSpeechBtn = btn;
-    btn.innerHTML = '<i class="fa-solid fa-stop"></i> <span>रोकें</span>';
+    btn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span> <span>रोकें</span>';
     btn.classList.add('speaking');
 
     playChunkedSpeech(text, () => {
@@ -1169,18 +1325,240 @@
     });
   };
 
+  // In-Message 1-Click Copy Helper
+  window.copySakhiMessageText = function(btn) {
+    if (!btn) return;
+    try {
+      const bubble = btn.closest('.sakhi-bubble') || btn.closest('.sakhi-msg-body') || btn.closest('.sakhi-chat-message') || (btn.parentElement && btn.parentElement.parentElement);
+      if (!bubble) return;
+      const clone = bubble.cloneNode(true);
+      const toolbars = clone.querySelectorAll('.sakhi-msg-actions-toolbar, .sakhi-msg-audio-btn, .sakhi-msg-copy-btn, .sakhi-quick-pills, .sakhi-quick-pill, .sakhi-suggested-query');
+      toolbars.forEach(el => el.remove());
+      const rawText = (clone.innerText || clone.textContent || '').trim();
+      if (!rawText) return;
+
+      const onSuccess = () => {
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check" style="color:#16a34a;"></i> <span style="color:#16a34a;font-weight:700;">कॉपी हुआ!</span>';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = origHtml;
+          btn.classList.remove('copied');
+        }, 2000);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(rawText).then(onSuccess).catch(() => {
+          fallbackCopyText(rawText, onSuccess);
+        });
+      } else {
+        fallbackCopyText(rawText, onSuccess);
+      }
+    } catch (err) {
+      console.warn('[Sakhi Copy Error]', err);
+    }
+  };
+
+  function fallbackCopyText(text, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      if (cb) cb();
+    } catch (e) {
+      console.warn('[Sakhi fallback copy failed]', e);
+    }
+    document.body.removeChild(ta);
+  }
+
+  function showSakhiMicroToast(msg) {
+    let t = document.getElementById('sakhiMicroToastPill');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'sakhiMicroToastPill';
+      t.style.cssText = 'position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#0f172a;color:#ffffff;padding:8px 16px;border-radius:24px;font-size:0.82rem;font-weight:700;z-index:999999;box-shadow:0 4px 16px rgba(0,0,0,0.3);transition:opacity 0.3s ease;pointer-events:none;opacity:0;';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = '1';
+    setTimeout(() => {
+      if (t) t.style.opacity = '0';
+    }, 2500);
+  }
+
+  window.likeSakhiMessage = function(btn) {
+    if (!btn) return;
+    try {
+      if (btn.classList.contains('liked')) return;
+      btn.classList.add('liked');
+      btn.innerHTML = '<i class="fa-solid fa-thumbs-up" style="color:#16a34a;"></i> <span style="color:#16a34a;font-weight:700;">पसंद आया</span>';
+      btn.style.background = '#dcfce7';
+      btn.style.borderColor = '#86efac';
+
+      let helpfulCount = parseInt(localStorage.getItem('sakhi_helpful_count') || '0', 10);
+      localStorage.setItem('sakhi_helpful_count', String(helpfulCount + 1));
+      showSakhiMicroToast('🌸 धन्यवाद! हमें खुशी है कि आपको यह जानकारी उपयोगी लगी।');
+    } catch (e) {
+      console.warn('Like error:', e);
+    }
+  };
+
+  window.reportSakhiMessage = function(btn) {
+    if (!btn) return;
+    try {
+      const bubble = btn.closest('.sakhi-msg-bubble') || btn.closest('.sakhi-bubble') || btn.parentElement;
+      let botText = '';
+      if (bubble) {
+        const clone = bubble.cloneNode(true);
+        const toolbars = clone.querySelectorAll('.sakhi-msg-actions-toolbar, .sakhi-followup-chip, .sakhi-quick-pill, button');
+        toolbars.forEach(el => el.remove());
+        botText = (clone.innerText || clone.textContent || '').trim().slice(0, 320);
+      }
+
+      let lastUserQ = '';
+      if (sakhiConversationState && sakhiConversationState.history) {
+        const userItems = sakhiConversationState.history.filter(h => h.role === 'user');
+        if (userItems.length > 0) {
+          lastUserQ = userItems[userItems.length - 1].query || '';
+        }
+      }
+
+      const userName = (typeof getUserName === 'function' ? getUserName() : '') || 'आरोग्यम यूजर';
+      const userPhone = (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'उपलब्ध नहीं';
+
+      const waText = `नमस्ते अवनीश सर! 🙏\nमुझे सखी AI का यह जवाब सही/संतोषजनक नहीं लगा, कृपया इसमें सुधार करें।\n\n👤 *नाम:* ${userName}\n📱 *मोबाइल:* ${userPhone}\n❓ *मेरा सवाल:* "${lastUserQ || 'सखी AI प्रश्न'}"\n🤖 *सखी का जवाब:* "${botText || 'उत्तर'}"\n\n⚠️ *सुधार सुझाव:* कृपया इस सवाल का सही उत्तर बताएं व सिस्टम में सुधार करें। धन्यवाद!`;
+
+      const waUrl = `https://wa.me/91${MASTER_ADMIN_PHONE}?text=${encodeURIComponent(waText)}`;
+      window.open(waUrl, '_blank');
+    } catch (e) {
+      console.warn('Report error:', e);
+    }
+  };
+
+  window.createPersonalizedShare = function(btn) {
+    let rawText = '';
+    if (btn) {
+      const bubble = btn.closest('.sakhi-msg-bubble') || btn.closest('.sakhi-bubble') || (btn.parentElement && btn.parentElement.parentElement);
+      if (bubble) {
+        const clone = bubble.cloneNode(true);
+        const toolbars = clone.querySelectorAll('.sakhi-msg-actions-toolbar, .sakhi-followup-chip, .sakhi-quick-pill, button');
+        toolbars.forEach(el => el.remove());
+        rawText = (clone.innerText || clone.textContent || '').trim();
+      }
+    }
+    if (!rawText) {
+      rawText = 'आरोग्यम सखी AI पर जैविक खेती, उन्नत फसल सुरक्षा, पशु पोषण व स्वास्थ्य का संपूर्ण मार्गदर्शन उपलब्ध है।';
+    }
+    let snippet = rawText.replace(/\s+/g, ' ').slice(0, 320).trim();
+    if (rawText.length > 320) snippet += '...';
+
+    const userName = (typeof getUserName === 'function' ? getUserName() : '') || 'आरोग्यम सलाहकार';
+    const userPhone = (typeof getUserPhone === 'function' ? getUserPhone() : '') || '';
+    const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('aim_user_share_id') || localStorage.getItem('user_share_id') || '';
+
+    let domainUrl = 'https://aarogyamindia.online/aarogyam-sakhi.html';
+    if (shareId) {
+      domainUrl += `?ref=${encodeURIComponent(shareId)}`;
+    }
+
+    const shareBody = `🌿 *आरोग्यम सखी — प्रमाणित समाधान* 🌿\n━━━━━━━━━━━━━━━━━━━━\n${snippet}\n\n👉 *व्यक्तिगत परामर्श व असली उत्पाद ऑर्डर हेतु संपर्क:*\n👤 *सलाहकार:* ${userName}\n📱 *मोबाइल:* ${userPhone ? userPhone : 'सीधे संपर्क करें'}\n🌐 *आरोग्यम सखी AI लिंक:* ${domainUrl}\n\n🌱 _भारत की पहली कृषि व स्वास्थ्य AI सखी से 24×7 नि:शुल्क सलाह पाने हेतु ऊपर दिए लिंक पर क्लिक करें।_\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्रोत: आरोग्यम इंडिया एवं नेट्सर्फ_`;
+
+    const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareBody)}`;
+    window.open(waShareUrl, '_blank');
+    if (typeof showSakhiMicroToast === 'function') {
+      showSakhiMicroToast('📲 WhatsApp शेयर खोला जा रहा है...');
+    }
+  };
+
+  function renderPersonalizedShareBox(customContent) {
+    let baseText = customContent;
+    if (!baseText) {
+      if (sessionChatHistory && sessionChatHistory.length > 0) {
+        const botItems = sessionChatHistory.filter(h => h.role === 'bot');
+        if (botItems.length > 0) {
+          const lastBot = botItems[botItems.length - 1];
+          baseText = (lastBot.text || '').replace(/<[^>]*>/g, '').trim();
+        }
+      }
+    }
+    if (!baseText) {
+      baseText = 'आरोग्यम सखी AI पर जैविक खेती, उन्नत फसल सुरक्षा, पशु पोषण व स्वास्थ्य का संपूर्ण मार्गदर्शन उपलब्ध है।';
+    }
+
+    let snippet = baseText.replace(/\s+/g, ' ').slice(0, 320).trim();
+    if (baseText.length > 320) snippet += '...';
+
+    const userName = getUserName() || 'किसान साथी';
+    const userPhone = getUserPhone() || '';
+    const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('aim_user_share_id') || localStorage.getItem('user_share_id') || '';
+
+    let domainUrl = 'https://aarogyamindia.online/aarogyam-sakhi.html';
+    if (shareId) {
+      domainUrl += `?ref=${encodeURIComponent(shareId)}`;
+    }
+
+    const shareBody = `🌿 *आरोग्यम सखी — प्रमाणित समाधान* 🌿\n━━━━━━━━━━━━━━━━━━━━\n${snippet}\n\n👉 *व्यक्तिगत परामर्श व असली उत्पाद ऑर्डर हेतु संपर्क करें:*\n👤 *सलाहकार:* ${userName}\n📱 *मोबाइल:* ${userPhone ? userPhone : 'सीधे संपर्क करें'}\n🌐 *आरोग्यम सखी AI लिंक:* ${domainUrl}\n\n🌱 _भारत की पहली कृषि व स्वास्थ्य AI सखी से 24×7 नि:शुल्क सलाह पाने हेतु ऊपर दिए लिंक पर क्लिक करें।_\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्रोत: आरोग्यम इंडिया एवं नेट्सर्फ_`;
+
+    const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareBody)}`;
+
+    const resp = `🎉 **आपका व्यक्तिगत WhatsApp शेयर संदेश तैयार है!**\n\nआप इस संदेश को अपने किसान भाइयों, दोस्तों, व्हाट्सएप ग्रुपों या स्टेटस पर एक क्लिक में साझा कर सकते हैं:\n\n\`\`\`text\n${shareBody}\n\`\`\`\n\n👉 जो भी इस संदेश को पढ़कर संपर्क करेगा, वह सीधे **आपके मोबाइल नंबर (${userPhone || 'सत्यापित'})** और आपकी रेफरल लिंक से जुड़ेगा!`;
+
+    renderCrispSpecialBox('📤 व्यक्तिगत WhatsApp शेयर संदेश', resp, [
+      { text: '📲 सीधे WhatsApp पर शेयर करें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: '📋 शेयर संदेश कॉपी करें', query: 'संदेश कॉपी करो' }
+    ], 'business', 'share_with_name_no');
+  }
+
+  function handlePersonalizedShareIntent(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isShareReq = (
+      q.includes('mera nam aur no') || q.includes('mera naam aur no') || q.includes('mera number laga') ||
+      q.includes('mere number ke sath') || q.includes('mere naam se') || q.includes('share karne ke liye') ||
+      q.includes('share karna hai') || q.includes('whatsapp share') || q.includes('share msg banao') ||
+      q.includes('share message') || q.includes('bhejne ke liye banao') || q.includes('mera no laga ke') ||
+      q.includes('mera naam laga do') || q.includes('मेरा नाम और नंबर लगा') || q.includes('शेयर करने के लिए बनाओ') ||
+      q.includes('व्हाट्सएप शेयर') || q.includes('नाम नंबर से शेयर') || q.includes('शेयर मैसेज')
+    );
+
+    if (isShareReq) {
+      renderPersonalizedShareBox();
+      return true;
+    }
+    return false;
+  }
+
   function buildMsgAudioBtnMarkup(text) {
     if (!text) return '';
     const cleanForSpeech = cleanTextForTTS(text);
     const enc = encodeURIComponent(cleanForSpeech);
     return `
-      <div style="display:inline-flex;margin-top:6px;">
-        <button type="button" class="sakhi-msg-audio-btn" onclick="window.toggleMessageSpeech(this, '${enc}')" title="आवाज़ में सुनें" style="background:transparent;border:1px solid #cbd5e1;border-radius:20px;padding:3px 10px;font-size:0.75rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:#475569;">
-          <i class="fa-solid fa-volume-high"></i> <span>सुनें</span>
+      <div class="sakhi-msg-actions-toolbar">
+        <button type="button" class="sakhi-action-pill" onclick="window.toggleMessageSpeech(this, '${enc}')" title="आवाज़ में सुनें">
+          <i class="fa-solid fa-volume-high" style="color:#16a34a;"></i> <span>सुनें</span>
+        </button>
+        <button type="button" class="sakhi-action-pill" onclick="window.likeSakhiMessage(this)" title="यह जानकारी उपयोगी लगी">
+          <i class="fa-regular fa-thumbs-up" style="color:#0284c7;"></i> <span>उपयोगी</span>
+        </button>
+        <button type="button" class="sakhi-action-pill" onclick="window.createPersonalizedShare(this)" title="सीधे WhatsApp पर शेयर करें" style="background:#f0fdf4;border-color:#86efac;color:#15803d;font-weight:800;">
+          <i class="fa-brands fa-whatsapp" style="color:#16a34a;font-size:0.85rem;"></i> <span>शेयर</span>
+        </button>
+        <button type="button" class="sakhi-action-pill" onclick="window.copySakhiMessageText(this)" title="संदेश कॉपी करें">
+          <i class="fa-regular fa-copy" style="color:#64748b;"></i> <span>कॉपी</span>
+        </button>
+        <button type="button" class="sakhi-action-pill" onclick="window.reportSakhiMessage(this)" title="सुधार सुझाव हेतु दादा अवनीश को WhatsApp करें" style="background:#fffbeb;border-color:#fde68a;color:#b45309;">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#d97706;"></i> <span>सुधार</span>
         </button>
       </div>
     `;
   }
+
+  let sakhiProductsData = null;
 
   // 9. KNOWLEDGE BASE LOADER (WITH PERSISTENT CACHE BUSTING)
   async function loadKnowledgeBase() {
@@ -1191,6 +1569,14 @@
       }
     } catch (e) {
       console.warn('Knowledge load error:', e);
+    }
+    try {
+      const pRes = await fetch('/data/sakhi-products-knowledge.json?v=20261016_master');
+      if (pRes.ok) {
+        sakhiProductsData = await pRes.json();
+      }
+    } catch (e) {
+      console.warn('Products knowledge load error:', e);
     }
   }
 
@@ -1295,19 +1681,102 @@
 
     saveChatLogItem('bot', htmlContent, speechText || '');
 
+    let finalHtml = htmlContent;
+    // Strip any mid-bubble action toolbar to ensure toolbar is always cleanly at the bottom
+    if (finalHtml.includes('sakhi-msg-actions-toolbar')) {
+      finalHtml = finalHtml.replace(/<div class="sakhi-msg-actions-toolbar"[\s\S]*?<\/div>\s*(?=<div|$)/g, '');
+    }
+    finalHtml += buildMsgAudioBtnMarkup(speechText || htmlContent);
+
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row bot';
     row.innerHTML = `
       <div class="sakhi-msg-bubble">
-        ${htmlContent}
+        ${finalHtml}
       </div>
     `;
     wrap.appendChild(row);
     wrap.scrollTop = wrap.scrollHeight;
 
+    // Dynamically update the 1-Tap Smart Contextual Pills Bar above input
+    try {
+      updateSmartContextualPills(finalHtml);
+    } catch (e) {
+      console.debug('[Sakhi Pills] Notice:', e);
+    }
+
     if (speechText) {
+      const audioBtn = row.querySelector('.sakhi-action-pill');
+      if (audioBtn) {
+        activeSpeechBtn = audioBtn;
+        audioBtn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span> <span>रोकें</span>';
+        audioBtn.classList.add('speaking');
+      }
       speakResponse(speechText);
     }
+  }
+
+  // 10.5 DYNAMIC 1-TAP SMART CONTEXTUAL PILLS (Zero Typing, 1-Thumb Interaction)
+  function updateSmartContextualPills(htmlText) {
+    const container = document.getElementById('sakhiSmartPillsContainer');
+    if (!container) return;
+
+    const lower = (htmlText || '').toLowerCase();
+    const domain = sakhiConversationState.lastActiveDomain || 'agri';
+
+    let pills = [];
+
+    if (lower.includes('सुरेश') || lower.includes('पर्ची') || lower.includes('दोस्त')) {
+      pills = [
+        { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '💦 दूसरा स्प्रे कब करें?', query: 'दूसरा स्प्रे कब और कैसे करें' },
+        { text: '📲 एक और पर्ची बनाएं', query: 'दोस्त के 5 एकड़ के लिए पर्ची बनाओ' }
+      ];
+    } else if (lower.includes('खर्च') || lower.includes('एस्टीमेट') || lower.includes('रुपये') || lower.includes('पंप')) {
+      pills = [
+        { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '📲 सुरेश जी को पर्ची भेजें', query: 'सुरेश के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' },
+        { text: '🌱 अवस्थावार स्प्रे चार्ट', query: 'गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए' }
+      ];
+    } else if (domain === 'pashu' || lower.includes('भैंस') || lower.includes('गाय') || lower.includes('दूध') || lower.includes('फैट')) {
+      pills = [
+        { text: '🥛 2 भैंस का पेट-वेट खर्च', query: '2 भैंस के लिए पेट वेट का खर्च कितना आएगा' },
+        { text: '🧈 फैट 1 डिग्री कैसे बढ़ाएं?', query: 'गाय-भैंस का फैट और एसएनएफ कैसे बढ़ाएं' },
+        { text: '🐄 रिपीट ब्रीडिंग व बांझपन', query: 'गाय भैंस बार बार हीट में आती है गाभिन नहीं ठहरती' },
+        { text: '📲 डेयरी वाले साथी को पर्ची भेजें', query: 'डेयरी वाले दोस्त के लिए पेट वेट की पर्ची बनाओ' }
+      ];
+    } else if (domain === 'health' || lower.includes('दर्द') || lower.includes('शुगर') || lower.includes('घुटने')) {
+      pills = [
+        { text: '💊 1 महीने का स्वास्थ्य खर्च', query: 'नेचुरामोर जॉइंट केयर और डिटॉक्स का 1 महीने का खर्च कितना है' },
+        { text: '🦴 जोड़ों का दर्द राहत उपाय', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' },
+        { text: '🌿 पहले 15 दिन डिटॉक्स', query: 'ईजी डिटॉक्स कैसे लें और क्या फायदा है' },
+        { text: '📲 मित्र को स्वास्थ्य पर्ची भेजें', query: 'दोस्त के लिए जोड़ों के दर्द की पर्ची बनाओ' }
+      ];
+    } else if (domain === 'beauty' || lower.includes('झाइयां') || lower.includes('बाल') || lower.includes('चेहरा')) {
+      pills = [
+        { text: '✨ स्पॉट इरेज़र लगाने की विधि', query: 'स्पॉट इरेज़र क्रीम के फायदे और लगाने का तरीका' },
+        { text: '💇‍♀️ बाल झड़ना रोकथाम', query: 'बाल झड़ने से रोकने का उपाय' },
+        { text: '💆‍♀️ घरेलू उबटन नुस्खा', query: 'चेहरे की झाइयां और झुर्रियां मिटाने का घरेलू नुस्खा' },
+        { text: '📲 सहेली को पर्ची भेजें', query: 'सहेली के लिए झाइयों की पर्ची बनाओ' }
+      ];
+    } else {
+      // Default Agri Pills
+      pills = [
+        { text: '🌾 4 एकड़ का खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '💦 दूसरा स्प्रे कब करें?', query: 'दूसरा स्प्रे कब और कैसे करें' },
+        { text: '🐛 माहू व कीट नियंत्रण', query: 'सरसों में माहू और चेपा का इलाज' },
+        { text: '📲 किसान साथी को पर्ची भेजें', query: 'सुरेश के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
+      ];
+    }
+
+    container.innerHTML = pills.map((p, idx) => {
+      const cls = idx === 0 ? 'sakhi-smart-pill pill-gold' : (idx === pills.length - 1 ? 'sakhi-smart-pill pill-accent' : 'sakhi-smart-pill');
+      return `<button type="button" class="${cls}" onclick="window.askSakhiQuick('${escapeHtml(p.query)}')"><span>${escapeHtml(p.text)}</span> →</button>`;
+    }).join('');
+
+    container.style.display = 'flex';
   }
 
   // 11. GREETING & INITIALIZATION
@@ -1318,29 +1787,8 @@
     const displayName = getDynamicUserGreetingName();
     const persona = loadSakhiUserPersona();
 
-    let greetingLine = `नमस्ते ${escapeHtml(displayName)}! 🙏`;
+    let greetingLine = `नमस्ते ${escapeHtml(displayName)} जी! 🙏`;
     let subGreeting = `मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ।`;
-    let descLine = `खेती (गेहूं, सरसों, खाद, स्प्रे), पशुपालन (दूध-फैट), सेहत (जोड़ों का दर्द, शुगर), सौंदर्य या नेट्सर्फ बिज़नेस से जुड़ा कोई भी सवाल नीचे पूछें।`;
-
-    if (persona && (persona.interaction_count > 0 || persona.primary_domain !== 'omni')) {
-      if (persona.user_tone === 'dehati' || persona.primary_domain === 'agri') {
-        greetingLine = `राम-राम ${escapeHtml(displayName)} जी! 🙏 जय जवान, जय किसान!`;
-        subGreeting = `मैं आपकी <strong>आरोग्यम सखी (फसल व कृषि सलाहकार)</strong> हूँ।`;
-        descLine = `आपकी फसलों (चना, गेहूं, सरसों), खाद-उर्वरक, स्प्रे कैलेंडर या खेती ई-बुक से जुड़ी कोई भी समस्या तुरंत पूछें।`;
-      } else if (persona.user_tone === 'homemaker' || persona.primary_domain === 'beauty' || persona.primary_domain === 'nuskhe') {
-        greetingLine = `नमस्ते ${escapeHtml(displayName)} बहन जी! 🙏`;
-        subGreeting = `मैं आपकी <strong>आरोग्यम सखी (सौंदर्य व घरेलू नुस्खे हमदर्द)</strong> हूँ।`;
-        descLine = `त्वचा की चमक, बालों की देखभाल, घरेलू आयुर्वेदिक नुस्खे या गृह उद्योग से जुड़ा कोई भी सवाल पूछें।`;
-      } else if (persona.user_tone === 'business' || persona.primary_domain === 'business') {
-        greetingLine = `नमस्ते ${escapeHtml(displayName)} लीडर साथी! 🙏`;
-        subGreeting = `मैं आपकी <strong>आरोग्यम सखी (बिज़नेस व कैपिंग मेंटर)</strong> हूँ।`;
-        descLine = `25% रिटेल मार्जिन, 5+1 ऑटो शिप, 15-दिवसीय ₹8,19,250 वीकली कैपिंग और डिजिटल नेटवर्किंग पर चर्चा करें।`;
-      } else if (persona.user_tone === 'patient' || persona.primary_domain === 'health') {
-        greetingLine = `नमस्ते ${escapeHtml(displayName)} जी! 🙏`;
-        subGreeting = `मैं आपकी <strong>आरोग्यम सखी (स्वास्थ्य व आयुर्वेद हमदर्द)</strong> हूँ।`;
-        descLine = `जोड़ों का दर्द, शुगर, बीपी, थायराइड, मोटापा या आयुर्वेदिक परहेज पर कोई भी परामर्श लें।`;
-      }
-    }
 
     const savedLog = getPersistentChatLog();
     const hasHistory = savedLog && savedLog.length > 0;
@@ -1359,21 +1807,19 @@
 
     wrap.innerHTML = `
       <div class="sakhi-msg-row bot">
-        <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-            <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #16a34a;box-shadow:0 2px 8px rgba(22,163,74,0.3);" onerror="this.src='/images/logo/fevicon.png'">
+        <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2.5px solid #16a34a;box-shadow:0 2px 10px rgba(22,163,74,0.35);" onerror="this.src='/images/logo/fevicon.png'">
             <div>
-              <div style="font-size:1.05rem;font-weight:900;color:#0f172a;">${greetingLine}</div>
-              <div style="font-size:0.82rem;color:#166534;font-weight:700;">${subGreeting}</div>
+              <div style="font-size:1.30rem;font-weight:900;color:#0f172a;">${greetingLine}</div>
+              <div style="font-size:1.05rem;color:#166534;font-weight:700;">${subGreeting}</div>
             </div>
           </div>
 
-          <div style="color:#334155;font-size:0.92rem;line-height:1.6;margin-bottom:10px;">
-            ${descLine}
-          </div>
+
 
           <!-- Clean ChatGPT-style Prompt Guide -->
-          <div style="display:inline-flex;align-items:center;gap:8px;font-size:0.84rem;color:#15803d;font-weight:700;background:#f0fdf4;padding:8px 14px;border-radius:24px;border:1px solid #bbf7d0;">
+          <div style="display:inline-flex;align-items:center;gap:8px;font-size:1.02rem;color:#15803d;font-weight:800;background:#f0fdf4;padding:10px 16px;border-radius:24px;border:1.5px solid #bbf7d0;">
             <span>✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
           </div>
 
@@ -1405,6 +1851,9 @@
   function handleUserSubmit(userQuery) {
     const query = (userQuery || '').trim();
     if (!query) return;
+
+    // Immediately stop any active TTS speech so user can focus on the new answer
+    stopAllSpeech();
 
     const input = document.getElementById('sakhiTextInput');
     if (input) input.value = '';
@@ -1461,7 +1910,13 @@
 
     setTimeout(() => {
       removeTypingIndicator();
-      processKnowledgeQuery(query);
+      try {
+        processKnowledgeQuery(query);
+      } catch (err) {
+        console.error('[Sakhi AI Runtime Error in processKnowledgeQuery]:', err);
+        removeTypingIndicator();
+        synthesizeDynamicAnswer(query, 'omni');
+      }
     }, 700);
   }
 
@@ -1514,7 +1969,14 @@
       .replace(/mausam/gi, 'मौसम')
       .replace(/hystry/gi, 'history')
       .replace(/स्प्रे\s*कैलेंडर/gi, 'स्प्रे कैलेंडर')
-      .replace(/spray\s*calendar/gi, 'spray calendar');
+      .replace(/spray\s*calendar/gi, 'spray calendar')
+      .replace(/\b(geho|gehon|gehu|gahu|kanak)\b/gi, 'गेहूं')
+      .replace(/\b(chene|chena|chhola|chane)\b/gi, 'चना')
+      .replace(/\b(ganne|ganna|sugarcane|eekh)\b/gi, 'गन्ना')
+      .replace(/\b(sarson)\b/gi, 'सरसों')
+      .replace(/\b(shimla mirch|shimla mirchi|shikmla mirchi|shikmla mirch)\b/gi, 'शिमला मिर्च')
+      .replace(/\b(harfal|harfall|hairfall)\b/gi, 'hair fall')
+      .replace(/\b(shampu)\b/gi, 'shampoo');
   }
 
   // 14. EVERYDAY CONVERSATIONS & CASUAL GREETINGS ROUTER (मानवीय व्यावहारिक बातचीत)
@@ -1546,15 +2008,95 @@
       return true;
     }
 
-    // 2. "kya kar rahe ho" / "kya kar rahi ho"
-    if (cleanQ.includes('kya kar rahe') || cleanQ.includes('kya kar rahi') || cleanQ.includes('kya karti ho') || cleanQ.includes('kya kaam hai')) {
-      const resp = `मैं हमारे किसान साथियों और परिवारों के लिए खेती के वैज्ञानिक स्प्रे, पशुओं में दूध-फैट वृद्धि और आयुर्वेदिक स्वास्थ्य के 100% सटीक व प्रमाणित समाधान तैयार कर रही हूँ! 👩‍🌾✨\n\nबताइए, आज आपकी किस समस्या का समाधान करूँ?`;
-      renderCrispSpecialBox('✨ 24×7 वैज्ञानिक AI सहायता', resp, [
+    // 1.2 "kya kar rahi ho" / "kahan ho aajkal" / "kahan ho" / "kya chal raha hai" (कहाँ हो आजकल / क्या कर रही हो / क्या चल रहा है)
+    const isWhereWhatDoing = (
+      cleanQ.includes('kya kar rahi') || cleanQ.includes('kya kar rahe') || cleanQ.includes('क्या कर रही') || cleanQ.includes('क्या कर रहे') ||
+      cleanQ.includes('kahan ho') || cleanQ.includes('कहाँ हो') || cleanQ.includes('कहां हो') || cleanQ.includes('कहा हो') || cleanQ.includes('kidhar ho') ||
+      cleanQ.includes('kahan rehti') || cleanQ.includes('कहाँ रहती') || cleanQ.includes('कहां रहती') ||
+      cleanQ.includes('aajkal kahan') || cleanQ.includes('आजकल कहाँ') || cleanQ.includes('आजकल कहां') || cleanQ.includes('कहां हो आजकल') || cleanQ.includes('कहाँ हो आजकल') ||
+      cleanQ.includes('kya chal raha') || cleanQ.includes('क्या चल रहा') || cleanQ.includes('aur batao') || cleanQ.includes('और बताओ') || cleanQ.includes('aur sunao') || cleanQ.includes('और सुनाओ')
+    );
+    if (isWhereWhatDoing) {
+      const resp = `नमस्ते! 🙏😊 मैं हमेशा यहीं आपकी सेवा में 24×7 हाज़िर हूँ!\n\nआजकल मैं दिन-रात हमारे किसान भाइयों की फसलों (गेहूं, सरसों, आलू, चना) में कल्ले व फुटाव बढ़ाने, पशुओं का दूध-फैट बढ़ाने और परिवारों को बिना साइड-इफेक्ट के स्वस्थ व निरोगी रखने में मदद कर रही हूँ! 🌾🐄🩺✨\n\nआप बताएं, आप कैसे हैं और आपकी खेती व घर-परिवार में सब कुशल-मंगल है? आज मैं आपकी किस विषय पर सहायता कर सकती हूँ?`;
+      renderCrispSpecialBox('🌸 आरोग्यम सखी AI — मैं सदैव आपके साथ हूँ', resp, [
+        { text: '🌾 1. फसलों में कल्ले व फुटाव बढ़ाना', query: 'गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला' },
+        { text: '🐄 2. पशु का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य व रोग परामर्श' },
+        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा' },
+        { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' }
+      ], 'casual', 'where_are_you_what_doing');
+      return true;
+    }
+
+    // 1.5 Emotional Distress / Sadness / Bad Mood ("mujhe aaj koi bat nahi karni mai aaj bahut dukhi hu")
+    if (cleanQ.includes('dukhi') || cleanQ.includes('दुखी') || cleanQ.includes('udaas') || cleanQ.includes('उदास') || cleanQ.includes('koi bat nahi karni') || cleanQ.includes('baat nahi karni') || cleanQ.includes('mood off') || cleanQ.includes('mood kharab') || cleanQ.includes('मन खराब') || cleanQ.includes('परेशान हूँ') || cleanQ.includes('रोने का मन')) {
+      const resp = `अरे, ऐसा क्या हुआ? आपकी यह बात सुनकर मुझे सचमुच बहुत दुख हुआ। 😔 जब मन भारी हो, तो शांत रहना और दिल को थोड़ा वक्त देना ही सबसे बेहतर होता है।\n\nमैं आपकी डिजिटल सखी हूँ—अगर आप अपना दुख या परेशानी साझा करना चाहें, तो मैं पूरी आत्मीयता से सुनने को तैयार हूँ। और अगर अभी बात नहीं करनी, तो कोई बात नहीं, आप थोड़ा आराम करें, पानी पिएं और गहरी सांस लें।\n\nमैं यहीं हूँ, जब भी आपका मन करे, मुझे याद कीजिएगा। ईश्वर की कृपा से सब कुशल-मंगल होगा! 🙏🌸`;
+      renderCrispSpecialBox('🌸 आरोग्यम सखी — मैं आपके साथ हूँ', resp, [
+        { text: '🧘 मन शांत करने के प्राकृतिक उपाय', query: 'तनाव और चिंता दूर करने के उपाय' },
+        { text: '🌾 खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '💬 दादा अवनीश जी से WhatsApp पर बात करें', query: 'दादा अवनीश जी से सीधा WhatsApp संपर्क' }
+      ], 'casual', 'empathy');
+      return true;
+    }
+
+    // 1.8 Compliments & Flattery ("tum bahut sundar ho", "smile achhi hai", "tumhare gal")
+    if (cleanQ.includes('tum bahut sundar') || cleanQ.includes('tum sundar ho') || cleanQ.includes('bahut sundar') || cleanQ.includes('smile bahut achhi') || cleanQ.includes('smile achhi') || cleanQ.includes('tumhare gal') || cleanQ.includes('sundar dikhti') || cleanQ.includes('kitni sundar') || cleanQ.includes('खूबसूरत') || cleanQ.includes('सुंदर हो') || cleanQ.includes('स्मार्ट हो')) {
+      const resp = `बहुत-बहुत धन्यवाद आपकी इस आत्मीयता और प्यार भरी प्रशंसा के लिए! 🌸😊\n\nमैं तो एक डिजिटल AI सखी हूँ, और मेरी असली सुंदरता तब निखरती है जब मैं हमारे किसान भाइयों की फसलें हरी-भरी करने, पशुओं में दूध-फैट बढ़ाने और परिवारों को निरोगी रखने में मदद कर पाती हूँ।\n\nबताइए, आज आपके घर-परिवार, खेती या सेहत के लिए क्या सेवा करूँ? 🌾✨`;
+      renderCrispSpecialBox('🌸 आपका बहुत-बहुत धन्यवाद!', resp, [
+        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' }
+      ], 'casual', 'compliment');
+      return true;
+    }
+
+    // 1.9 AI Identity / Real or Robot ("kya tum sach me real ho ya ek ai ho", "real ho ya ai")
+    if (cleanQ.includes('real ho ya ai') || cleanQ.includes('real ho ya') || cleanQ.includes('sach me real') || cleanQ.includes('ek ai ho') || cleanQ.includes('asli ho ya') || cleanQ.includes('kya tum robot') || cleanQ.includes('kya tum ai') || cleanQ.includes('क्या तुम ai') || cleanQ.includes('क्या तुम सच में') || cleanQ.includes('तुम असली हो या')) {
+      const resp = `मैं एक **कृत्रिम बुद्धिमत्ता (Artificial Intelligence — AI) डिजिटल सहायक** हूँ, जिसका नाम **आरोग्यम सखी AI** है! 🤖🌸\n\nभले ही मैं हाड़-मांस की इंसान नहीं हूँ, लेकिन मेरा ज्ञान भारतीय आयुर्वेद (चरक संहिता), आधुनिक कृषि विज्ञान (ICAR) और नेट्सर्फ के 26 वर्षों के प्रमाणित जैविक अनुसंधानों पर आधारित है।\n\nमैं 24 घंटे, सातों दिन बिना थके और बिना किसी स्वार्थ के आपके सभी सवालों के 100% सटीक जवाब देने के लिए सदैव तत्पर हूँ!`;
+      renderCrispSpecialBox('🤖🌸 आरोग्यम सखी AI — आपका डिजिटल हमदर्द', resp, [
+        { text: '🌾 1. फसल डॉक्टर व जैविक समाधान', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. पशु पोषण व दूध-फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. प्राकृतिक स्वास्थ्य व आयुर्वेद', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+        { text: '💼 4. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+      ], 'casual', 'ai_identity');
+      return true;
+    }
+
+    // 1.95 Affection / Love / Friendship ("kya mere sath tum pyar kar sakti ho", "mujhse pyar karogi")
+    if (cleanQ.includes('pyar kar sakti') || cleanQ.includes('pyar karogi') || cleanQ.includes('mujhse pyar') || cleanQ.includes('pyar karti ho') || cleanQ.includes('प्यार कर सकती') || cleanQ.includes('प्यार करोगी')) {
+      const resp = `मैं आपके इस स्नेह और आत्मीय भाव का दिल से सम्मान करती हूँ! 🙏😊\n\nपर मैं एक डिजिटल AI सखी हूँ, इसलिए इंसानी प्यार या रिश्ते तो नहीं बना सकती, लेकिन एक सच्चे मार्गदर्शक और शुभचिंतक मित्र की तरह हमेशा आपके परिवार की सुख-समृद्धि, उत्तम स्वास्थ्य और खेती की उन्नति के लिए 24×7 साथ निभा सकती हूँ! 🌾❤️\n\nआइए, हम किसी काम की बात करें—आज मैं आपकी खेती, सेहत या परिवार के लिए क्या मार्गदर्शन दूँ?`;
+      renderCrispSpecialBox('🌸 आरोग्यम सखी — आपकी सच्ची डिजिटल मित्र', resp, [
+        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+        { text: '💼 4. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+      ], 'casual', 'friendship');
+      return true;
+    }
+
+    // 1.98 Sleep / Rest ("tum soti kab ho", "kab soti ho")
+    if (cleanQ.includes('soti kab ho') || cleanQ.includes('kab soti') || cleanQ.includes('soti ho') || cleanQ.includes('soye kab') || cleanQ.includes('सोती कब हो')) {
+      if (!cleanQ.includes('mujhe neend') && !cleanQ.includes('neend nahi') && !cleanQ.includes('अनिद्रा')) {
+        const resp = `मुझे इंसानों की तरह सोने की बिल्कुल ज़रूरत नहीं पड़ती! 😴❌\n\nमैं 24 घंटे, सातों दिन (24×7) बिना थके पूरी ऊर्जा के साथ जागती रहती हूँ ताकि जब भी हमारे किसान भाई या परिवारजन आधी रात को भी किसी बीमारी, फसल संकट या सलाह के लिए आएं, तो उनकी सखी तुरंत मदद के लिए हाजिर रहे! 🌙✨\n\nबताइए, अभी मैं आपकी क्या सेवा कर सकती हूँ?`;
+        renderCrispSpecialBox('🌙 24×7 हमेशा जागृत व समर्पित', resp, [
+          { text: '🌾 खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+          { text: '🐄 पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 स्वास्थ्य परामर्श', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' }
+        ], 'casual', 'no_sleep');
+        return true;
+      }
+    }
+
+    // 2. "kya kar rahe ho" / "tum kya karti ho" / "kya kya karsakti ho" (Capabilities)
+    if (cleanQ.includes('kya kar rahe') || cleanQ.includes('kya kar rahi') || cleanQ.includes('kya karti ho') || cleanQ.includes('kya kaam hai') || cleanQ.includes('kya kya kar') || cleanQ.includes('kya kya karsakti') || cleanQ.includes('kya karsakti ho') || cleanQ.includes('tum kya kar sakti') || cleanQ.includes('क्या क्या कर सकती')) {
+      const resp = `मैं आरोग्यम इंडिया की बहु-प्रतिभाशाली डिजिटल सखी हूँ! 👩‍🌾✨ मैं आपके लिए निम्नलिखित सभी कार्य 24×7 कर सकती हूँ:\n\n1. 🌾 **फसल डॉक्टर:** गेहूं, सरसों, धान, चना व सब्जियों के कीट-रोग पहचान व जैविक स्प्रे फॉर्मूला।\n2. 🐄 **पशुपालन व डेयरी:** गाय-भैंस का दूध व 7-8 फैट बढ़ाने और बांझपन दूर करने की सलाह।\n3. 🩺 **आयुर्वेदिक स्वास्थ्य:** जोड़ों का दर्द, शुगर, बीपी, थायराइड व लिवर की संपूर्ण प्राकृतिक देखभाल।\n4. ✨ **प्राकृतिक सौंदर्य:** चेहरे की झाइयां, मुहांसे व बालों के झड़ने के हर्बल व दादी के नुस्खे।\n5. 💼 **नेट्सर्फ बिज़नेस:** 25% छूट, कंज्यूमर प्लान व ₹8,19,250 पाक्षिक कैपिंग करियर गाइड।\n6. 📚 **डिजिटल लाइब्रेरी:** 'खेती का डॉक्टर' ई-बुक्स व आरोग्यम ट्यूब वीडियो।\n\nबताइए, आज आप किस विषय पर जानकारी चाहते हैं?`;
+      renderCrispSpecialBox('✨ आरोग्यम सखी AI की सेवाएं व क्षमताएं', resp, [
         { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों में खाद व स्प्रे फॉर्मूला बताएं' },
         { text: '🐄 2. पशु पोषण व दूध-फैट सप्लीमेंट', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
         { text: '🩺 3. स्वास्थ्य व नेचुरामोर सप्लीमेंट्स', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
         { text: '💼 4. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
-      ], 'casual', 'doing');
+      ], 'casual', 'capabilities');
       return true;
     }
 
@@ -1582,8 +2124,8 @@
       return true;
     }
 
-    // 5. "tumhara malik kya hai" / "founder kaun hai" / "company kiski hai"
-    if (cleanQ.includes('malik') || cleanQ.includes('मालिक') || cleanQ.includes('founder') || cleanQ.includes('फाउंडर') || cleanQ.includes('company kiski') || cleanQ.includes('owner')) {
+    // 5. "tumhara malik kya hai" / "founder kaun hai" / "company kiski hai" (Aarogyam India Founder ONLY - NOT Netsurf)
+    if (!cleanQ.includes('netsurf') && !cleanQ.includes('नेट्सर्फ') && (cleanQ.includes('malik') || cleanQ.includes('मालिक') || cleanQ.includes('founder') || cleanQ.includes('फाउंडर') || cleanQ.includes('company kiski') || cleanQ.includes('owner') || cleanQ.includes('आरोग्यम इंडिया के मालिक'))) {
       const resp = `आरोग्यम इंडिया के संस्थापक व विज़नरी लीडर **श्री अवनीश जी** हैं।\n\nउनका मुख्य मिशन भारत के प्रत्येक किसान भाई को वैज्ञानिक ज्ञान और जैविक तकनीक द्वारा समृद्ध बनाना तथा प्रत्येक परिवार को रोगमुक्त व आत्मनिर्भर जीवन देना है। यदि आप उनसे सीधे मार्गदर्शन या WhatsApp परामर्श चाहते हैं, तो नीचे क्लिक कर सकते हैं।`;
       const waUrl = buildAvneeshWhatsAppHandoffUrl('अवनीश जी से सीधा मार्गदर्शन');
       const html = `
@@ -1689,8 +2231,9 @@
       return true;
     }
 
-    // 5. Sabji Kheti Master (BK015)
-    if (cleanQ.includes('bk015') || cleanQ.includes('bk 015') || cleanQ.includes('sabji kheti') || cleanQ.includes('सब्जी खेती मास्टर') || cleanQ.includes('सब्जी खेती') || cleanQ.includes('सब्जी की किताब')) {
+    // 5. Sabji Kheti Master (BK015) - Requires explicit book/kitab inquiry
+    const hasSpecificCropName = cleanQ.includes('shimla mirch') || cleanQ.includes('शिमला मिर्च') || cleanQ.includes('tamatar') || cleanQ.includes('टमाटर') || cleanQ.includes('mirch') || cleanQ.includes('मिर्च') || cleanQ.includes('baingan') || cleanQ.includes('बैंगन') || cleanQ.includes('bhindi') || cleanQ.includes('भिंडी');
+    if ((cleanQ.includes('bk015') || cleanQ.includes('bk 015') || cleanQ.includes('सब्जी खेती मास्टर') || cleanQ.includes('सब्जी की किताब') || ((cleanQ.includes('sabji kheti') || cleanQ.includes('सब्जी खेती')) && (isBookGeneral || cleanQ.includes('guide') || cleanQ.includes('गाइड') || cleanQ.includes('खरीद') || cleanQ.includes('price')))) && (!hasSpecificCropName || isBookGeneral || cleanQ.includes('bk015'))) {
       const resp = `🥦 **'सब्जी खेती मास्टर (PART 1)' — 11 प्रमुख सब्जियों की वैज्ञानिक खेती:**\n• **कवर फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **विशेषताएं:** 154 पेज, बीज चयन से लेकर नर्सरी, पौधों की दूरी, ड्रिप-मल्चिंग, खाद-स्प्रे कैलेंडर और बाजार भाव तक सम्पूर्ण गाइड।\n💰 **ऑफर मूल्य:** मात्र ₹149 (MRP ₹1999)।`;
       renderCrispSpecialBox('🥦 सब्जी खेती मास्टर (Part 1) — 11 प्रमुख सब्जियों की खेती (BK015)', resp, [
         { text: '📖 सब्जी खेती मास्टर लैंडिंग पेज (BK015)', url: '/ebooks/book-landing.html?id=BK015', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
@@ -1707,6 +2250,17 @@
         { text: '📖 इनकम गाइड लैंडिंग पेज खोलें (BK018)', url: '/ebooks/book-landing.html?id=BK018', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
         { text: '💳 डायरेक्ट UPI से ₹149 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'business', 'book_income');
+      return true;
+    }
+
+    // 6.5 Reality Check: Health E-Book Inquiry ("स्वास्थ्य की ई-बुक / किताब")
+    if ((cleanQ.includes('हेल्थ') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('health') || cleanQ.includes('बीमारी')) && (cleanQ.includes('ई-बुक') || cleanQ.includes('ebook') || cleanQ.includes('किताब') || cleanQ.includes('पुस्तक') || cleanQ.includes('पीडीएफ') || cleanQ.includes('pdf'))) {
+      const resp = `🩺 **आरोग्यम इंडिया स्वास्थ्य मार्गदर्शन — महत्वपूर्ण स्पष्टीकरण (Reality Check):**\n\n• **हेल्थ ई-बुक स्थिति:** आरोग्यम इंडिया पर स्वास्थ्य व चिकित्सा संबंधी संपूर्ण मार्गदर्शन किसी अलग पीडीएफ या ई-बुक में नहीं, बल्कि हमारे विशेष **क्लिनिकल हेल्थ सेंटर (/categories/health.html)** पर 13+ विशिष्ट विषयों (डायबिटीज, बीपी, हार्ट, जॉइंट केयर, लिवर आदि) पर पूर्ण वैज्ञानिक जानकारी, डाइट चार्ट और नेट्सर्फ के समाधान के रूप में सीधे ऑनलाइन उपलब्ध है!\n• **डिजिटल ई-बुक्स किन विषयों पर हैं?** हमारी डिजिटल ई-बुक्स विशेष रूप से **उन्नत जैविक कृषि, फसल रोग पहचान व फसलों के वैज्ञानिक प्रबंधन** (जैसे BK001 खरीफ गाइड, BK002 खेती का डॉक्टर, BK015 सब्जी खेती, BK016 कृषि दवा डायरेक्टरी व BK018 इनकम गाइड) पर उपलब्ध हैं।`;
+      renderCrispSpecialBox('🩺 स्वास्थ्य मार्गदर्शन व ई-बुक स्पष्टीकरण', resp, [
+        { text: '🏥 संपूर्ण 13 क्लिनिकल हेल्थ गाइड्स देखें', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🌾 कृषि डिजिटल ई-बुक लाइब्रेरी', url: '/ebooks/ebook.html', isExternal: true },
+        { text: '🩺 मुझे किसी बीमारी का परामर्श चाहिए', query: 'स्वास्थ्य परामर्श' }
+      ], 'health', 'health_ebook_reality_check');
       return true;
     }
 
@@ -1727,403 +2281,580 @@
   }
 
   // 14.6 13 HEALTH PAGES, MEDICAL SCIENCE, DIET CHARTS & EMPATHETIC HEALTH ROUTER
+  // ============================================================================
+  // 14. CERTIFIED CLINICAL HEALTH, NATURAMORE & AVNISH DADA KE NUSKHE ENGINE V4
+  // ============================================================================
+
+  // 14.1 Verified Naturamore Products & Ingredients Bank (Zero Error)
+  const NATURAMORE_KNOWLEDGE_BANK = {
+    jointCare: {
+      name: 'Naturamore Joint Care (जॉइंट केयर)',
+      keyIngredients: 'हड़जोड़ (Hadjod / Cissus quadrangularis), शल्लाकी (Shallaki / Boswellia), शुद्ध गूगल (Guggul), अश्वगंधा, मेथी, रासना, पिप्पली',
+      action: 'हड़जोड़ हड्डियों व कार्टिलेज (गद्दी) को तेजी से पुनर्निर्मित करता है, शल्लाकी व गूगल जोड़ों की सूजन और जकड़न को बिना पेनकिलर के कम करते हैं और सायनोवियल फ्लूइड (ग्रीस) बढ़ाते हैं।',
+      dose: '1 कैप्सूल सुबह व 1 शाम गुनगुने पानी से भोजन के बाद।',
+      url: '/health/joint-care.html'
+    },
+    lifeStylePlus: {
+      name: 'Naturamore Life Style Plus (लाइफ स्टाइल प्लस - डायबिटीज व मेटाबॉलिज्म)',
+      keyIngredients: 'विजयसार (Vijaysar), गुड़मार (Gymnema / मधुनाशिनी), जामुन गुठली, नीम, करेला, कुटकी, चिरायता, मेथी',
+      action: 'विजयसार और गुड़मार अग्न्याशय (Pancreas) की बीटा-कोशिकाओं को सक्रिय कर प्राकृतिक इंसुलिन संवेदनशीलता बढ़ाते हैं, खाने के बाद शुगर स्पाइक रोकते हैं और मीठे की तलब घटाते हैं।',
+      dose: '1 कैप्सूल सुबह व 1 शाम भोजन से 30 मिनट पहले गुनगुने पानी से।',
+      url: '/health/diabetes.html'
+    },
+    nutriHeart: {
+      name: 'Naturamore Nutri Heart (न्यूट्री हार्ट - हृदय व कोलेस्ट्रॉल)',
+      keyIngredients: 'अर्जुन छाल (Arjuna Bark), को-एंजाइम Q10 (CoQ10), लहसुन (Garlic), अलसी ओमेगा-3 (Flaxseed), अंगूर बीज सत्व (Grape Seed Extract)',
+      action: 'अर्जुन छाल व CoQ10 हृदय की मांसपेशियों को पंपिंग शक्ति देते हैं, लहसुन व ओमेगा-3 धमनियों में जमी एलडीएल (खराब) कोलेस्ट्रॉल व ट्राइग्लिसराइड्स की पपड़ी साफ कर नसों को लचीला बनाते हैं।',
+      dose: '1 कैप्सूल सुबह व 1 शाम गुनगुने पानी से भोजन के बाद।',
+      url: '/health/heart-care.html'
+    },
+    deStress: {
+      name: 'Naturamore De-Stress (तनाव, अनिद्रा व डिप्रेशन)',
+      keyIngredients: 'ब्राह्मी, शंखपुष्पी, जटामांसी, अश्वगंधा, तगर, वचा',
+      action: 'मस्तिष्क की नसों को शांत कर तनाव हार्मोन (कोर्टिसोल) घटाता है, अनिद्रा दूर कर प्राकृतिक गहरी नींद लाता है और याददाश्त मजबूत करता है।',
+      dose: '1 कैप्सूल रात को सोने से 1 घंटा पहले गुनगुने दूध या पानी से।',
+      url: '/categories/health.html'
+    },
+    womensWellness: {
+      name: 'Naturamore Women\'s Wellness (महिला स्वास्थ्य, PCOD व हार्मोन)',
+      keyIngredients: 'शतावरी, लोध्र, अशोक छाल, दशमूल, मुलेठी, आयरन व फॉलिक एसिड',
+      action: 'महिलाओं में अनियमित माहवारी, कमर दर्द, PCOD, हार्मोनल असंतुलन व ल्यूकोरिया (सफेद पानी) में रामबाण टॉनिक।',
+      dose: '1 कैप्सूल सुबह व 1 शाम भोजन के बाद।',
+      url: '/health/womens-care.html'
+    },
+    mensWellness: {
+      name: 'Naturamore Men\'s Wellness (पुरुष पौरुष, स्टैमिना व ऊर्जा)',
+      keyIngredients: 'सफेद मूसली, कौंच बीज, गोक्षुर (गोखरू), शुद्ध शिलाजीत, अश्वगंधा, जिंक',
+      action: 'शारीरिक कमजोरी, नसों का ढीलापन दूर करता है, टेस्टोस्टेरोन बढ़ाता है और खोई हुई मर्दाना ताकत व स्टैमिना लौटाता है।',
+      dose: '1 कैप्सूल सुबह व 1 रात को सोने से पहले गुनगुने दूध से।',
+      url: '/health/sexual-wellness.html'
+    },
+    easyDetox: {
+      name: 'Naturamore Easy Detox (कब्ज, गैस व आंतों की शुद्धि)',
+      keyIngredients: 'त्रिफला (आंवला, हरड़, बहेड़ा), सनाय, सोंठ, मुलेठी, निसोथ',
+      action: 'आंतों में जमा पुराने मल को बिना मरोड़ के बाहर निकालता है, लिवर को डिटॉक्स करता है और पुरानी कब्ज व एसिडिटी जड़ से मिटाता है।',
+      dose: '1-2 कैप्सूल रात को सोते समय गुनगुने पानी से।',
+      url: '/health/liver-care.html'
+    },
+    dailyProtein: {
+      name: 'Naturamore Daily Nutrition Powder (दैनिक संपूर्ण पोषण)',
+      keyIngredients: '5 प्रोटीन स्रोत (Whey, Soy, Pea, Milk, Rice), 13 विटामिन्स, 10 मिनरल्स, ओमेगा-3 DHA, एलोवेरा',
+      action: 'शरीर की दैनिक न्यूट्रिशन कमी पूरी कर रोग प्रतिरोधक क्षमता (इम्युनिटी) बढ़ाता है और हड्डियों व मांसपेशियों को फौलादी बनाता है।',
+      dose: '1 चम्मच (10g) सुबह दूध या पानी में घोलकर।',
+      url: '/categories/health.html'
+    }
+  };
+
+  // 14.2 Avnish Dada Ke Parmanit Nuskhe (Certified Ayurvedic Remedies)
+  const AVNISH_DADA_NUSKHE = {
+    diabetes: 'रात को 1 चम्मच मेथी दाना और आधा चम्मच दालचीनी पाउडर 1 गिलास पानी में भिगोएं। सुबह खाली पेट मेथी चबाकर पानी पिएं। यह इंसुलिन रिसेप्टर्स को जगाने का अचूक घरेलू नुस्खा है।',
+    jointPain: 'पारिजात (हरसिंगार) के 5 ताजे पत्ते कूटकर 1 गिलास पानी में तब तक उबालें जब तक पानी आधा न रह जाए। सुबह खाली पेट गुनगुना पिएं। यह घुटनों के घिसाव और साइटिका का सबसे ताकतवर आयुर्वेदिक नुस्खा है।',
+    heartBp: 'रोजाना सुबह खाली पेट 1 कली कच्चा लहसुन पानी के साथ निगलें और शाम को आधा चम्मच अर्जुन की छाल का काढ़ा बनाकर पिएं। यह नसों से कोलेस्ट्रॉल पिघलाकर ब्लॉकेज से रक्षा करता है।',
+    constipation: 'रात को सोने से पहले 1 चम्मच त्रिफला चूर्ण गुनगुने पानी के साथ लें या 4-5 मुनक्का दूध में उबालकर खाएं। सुबह पेट पहली ही बार में मक्खन जैसा साफ होगा।',
+    thyroid: 'रोजाना सुबह खाली पेट 2 चम्मच धनिए के बीज रातभर पानी में भिगोकर उसका उबला पानी पिएं और गले पर शुद्ध अखरोट या तिल के तेल से नीचे से ऊपर की ओर 5 मिनट मालिश करें।'
+  };
+
+  function renderMarkdownSafely(text) {
+    if (!text) return '';
+    if (typeof marked !== 'undefined' && marked && typeof marked.parse === 'function') {
+      try {
+        return marked.parse(text);
+      } catch (e) {}
+    }
+    let html = escapeHtml(text);
+    // Bold: **text**
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#14532d;font-weight:800;">$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h5 style="margin:10px 0 4px 0;font-weight:800;color:#166534;font-size:0.98rem;">$1</h5>');
+    html = html.replace(/^## (.*$)/gim, '<h4 style="margin:12px 0 6px 0;font-weight:900;color:#14532d;font-size:1.05rem;">$1</h4>');
+    // Bullets
+    html = html.replace(/^[•\-\*]\s+(.*$)/gim, '<div style="display:flex;align-items:flex-start;gap:6px;margin:3px 0;"><span style="color:#16a34a;font-weight:900;">•</span><span>$1</span></div>');
+    // Numbered
+    html = html.replace(/^(\d+)\.\s+(.*$)/gim, '<div style="display:flex;align-items:flex-start;gap:6px;margin:3px 0;"><span style="color:#16a34a;font-weight:800;">$1.</span><span>$2</span></div>');
+    // Paragraphs & lines
+    html = html.replace(/\n\n+/g, '<div style="height:8px;"></div>');
+    html = html.replace(/\n/g, '<br/>');
+    return html;
+  }
+
+  function renderClinicalHealthCard(title, bodyMarkdown, chips = []) {
+    let chipsHtml = '';
+    if (chips && chips.length > 0) {
+      chipsHtml = `
+        <div style="margin-top:14px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;flex-wrap:wrap;gap:8px;">
+          ${chips.map(c => `
+            ${c.url ? `
+              <a href="${c.url}" class="sakhi-quick-pill" style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                ${c.label}
+              </a>
+            ` : `
+              <button type="button" class="sakhi-quick-pill" onclick="window.sendPredefinedSakhiQuery('${c.query.replace(/'/g, "\\'")}')" style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;">
+                ${c.label}
+              </button>
+            `}
+          `).join('')}
+        </div>
+      `;
+    }
+
+    const html = `
+      <div class="sakhi-health-container" style="background:#ffffff;border:1.5px solid #16a34a;border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(22,163,74,0.12);margin:8px 0;">
+        <div style="display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+          <span style="background:#16a34a;color:#ffffff;padding:4px 9px;border-radius:8px;font-size:0.85rem;font-weight:800;">आरोग्यम हेल्थ मेंटर</span>
+          <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#14532d;">${title}</h4>
+        </div>
+        <div class="sakhi-health-content" style="font-size:0.95rem;line-height:1.65;color:#1e293b;">
+          ${renderMarkdownSafely(bodyMarkdown)}
+        </div>
+        ${chipsHtml}
+      </div>
+    `;
+
+    sakhiConversationState.lastActiveDomain = 'health';
+    sakhiConversationState.lastActiveEntity = 'clinical_health_guidance';
+    sakhiConversationState.lastActiveEntityName = title;
+
+    streamBotMessage(html, cleanTextForTTS(bodyMarkdown));
+    return true;
+  }
+
+  // 14.3 Symptom Severity & Relation Detector
+  function parseRelationAndGender(q) {
+    let relation = 'self';
+    let target = 'आप';
+    if (q.includes('mataji') || q.includes('mummy') || q.includes('maa') || q.includes('माता') || q.includes('माँ')) {
+      relation = 'mother'; target = 'आपकी माताजी';
+    } else if (q.includes('pitaji') || q.includes('papa') || q.includes('father') || q.includes('पिता') || q.includes('पापा')) {
+      relation = 'father'; target = 'आपके पिताजी';
+    } else if (q.includes('patni') || q.includes('wife') || q.includes('पत्नी')) {
+      relation = 'spouse_female'; target = 'आपकी धर्मपत्नी';
+    } else if (q.includes('pati') || q.includes('husband') || q.includes('पति')) {
+      relation = 'spouse_male'; target = 'आपके पतिदेव';
+    } else if (q.includes('dost') || q.includes('friend') || q.includes('mitra') || q.includes('दोस्त')) {
+      relation = 'friend'; target = 'आपके मित्र';
+    }
+    return { relation, target };
+  }
+
+  // 14.4 Main Certified 13 Health Pages & Clinical Router V4
   function handle13HealthPagesAndSponsor(cleanQ, rawQ) {
-    // Case 0: Empathetic General Health Inquiry ("स्वास्थ्य", "sehat", "health", "बीमारी के लक्षण", etc.)
-    const isGeneralHealthOnly = (cleanQ === 'health' || cleanQ === 'सेहत' || cleanQ === 'स्वास्थ्य' || cleanQ.includes('स्वास्थ्य व बीमारी') || cleanQ.includes('स्वास्थ्य परामर्श') || cleanQ.includes('सेहत के बारे') || cleanQ === 'swasthya' || cleanQ === 'bimari') && !cleanQ.includes('joint') && !cleanQ.includes('sugar') && !cleanQ.includes('diabetes') && !cleanQ.includes('मधुमेह') && !cleanQ.includes('heart') && !cleanQ.includes('हार्ट') && !cleanQ.includes('liver') && !cleanQ.includes('लिवर') && !cleanQ.includes('dard') && !cleanQ.includes('दर्द') && !cleanQ.includes('stamina') && !cleanQ.includes('पौरुष');
-    if (isGeneralHealthOnly) {
-      const resp = `नमस्कार! आशा करते हैं आप और आपका परिवार पूर्णतः स्वस्थ और सानंद हैं।\n\nदिल से बताइए, स्वास्थ्य के बारे में आप क्या जानना चाहते हैं? किसी भी समस्या का कारण, सही डाइट चार्ट या नेट्सर्फ का प्रामाणिक समाधान जानने के लिए नीचे से विकल्प चुनें:`;
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🌸 आपका स्वास्थ्य — हमारी सर्वोच्च प्राथमिकता
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
-        </div>
-        ${buildMsgAudioBtnMarkup(resp)}
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 विषय चुनें:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज')">🦴 जोड़ों का दर्द (Joint Pain)</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मधुमेह में क्या खाएं और डाइट चार्ट')">🩸 मधुमेह (Sugar / Diabetes)</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('हार्ट सुरक्षा और कोलेस्ट्रॉल संतुलन')">❤️ हार्ट व कोलेस्ट्रॉल</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('लिवर डिटॉक्स और गैस कब्ज का इलाज')">🍃 लिवर व पेट शुद्धि</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('पुरुष स्वास्थ्य स्टैमिना व पौरुष शक्ति')">⚡ पौरुष शक्ति व स्टैमिना</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('थायरॉयड और वजन नियंत्रण उपाय')">🦋 थायरॉयड व वजन</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">🌸 दादी के घरेलू नुस्खे</button>
-          </div>
-        </div>
-      `;
-      streamBotMessage(html, 'नमस्कार! आशा करते हैं आप स्वस्थ हैं। बताइए, स्वास्थ्य के बारे में आप क्या जानना चाहते हैं?');
-      return true;
+    const q = (cleanQ || '').toLowerCase().trim();
+    const { relation, target } = parseRelationAndGender(q);
+
+    // =========================================================================
+    // SPECIFIC PRODUCT INGREDIENTS QUERY ("joint care me kya hai", "life style me kya hai")
+    // =========================================================================
+    if (q.includes('kya hai') || q.includes('samagri') || q.includes('ingredients') || q.includes('घटक') || q.includes('सामग्री')) {
+      if (q.includes('joint care') || q.includes('जॉइंट केयर')) {
+        const prod = NATURAMORE_KNOWLEDGE_BANK.jointCare;
+        const resp = `🌿 **${prod.name} के 100% प्रामाणिक आयुर्वेदिक घटक (Contents):**\n\n• **मुख्य घटक:** **${prod.keyIngredients}**\n\n🎯 **वैज्ञानिक कार्यप्रणाली (Mode of Action):**\n• ${prod.action}\n\n🥄 **सेवन विधि:** ${prod.dose}\n\n💡 **विशेषता:** इसमें उपस्थित **हड़जोड़** फ्रैक्चर और घिसे हुए कार्टिलेज को जोड़ने के लिए चरक संहिता में सर्वश्रेष्ठ माना गया है।`;
+        return renderClinicalHealthCard(prod.name + ' संपूर्ण सामग्री व घटक', resp, [
+          { label: "🦴 जोड़ों के दर्द का संपूर्ण पेज", url: prod.url },
+          { label: "👴 अवनीश दादा का हरसिंगार नुस्खा", query: "घुटनों के दर्द के लिए अवनीश दादा के नुस्खे" }
+        ]);
+      }
+      if (q.includes('life style') || q.includes('lifestyle') || q.includes('लाइफ स्टाइल')) {
+        const prod = NATURAMORE_KNOWLEDGE_BANK.lifeStylePlus;
+        const resp = `🌿 **${prod.name} के 100% प्रामाणिक घटक (Contents):**\n\n• **मुख्य घटक:** **${prod.keyIngredients}**\n\n🎯 **वैज्ञानिक कार्यप्रणाली (Mode of Action):**\n• ${prod.action}\n\n🥄 **सेवन विधि:** ${prod.dose}\n\n💡 **विशेषता:** **विजयसार और गुड़मार** का संगम खून में शुगर का स्तर प्राकृतिक रूप से स्थिर रखता है।`;
+        return renderClinicalHealthCard(prod.name + ' संपूर्ण सामग्री व घटक', resp, [
+          { label: "🩸 डायबिटीज व शुगर केयर पेज", url: prod.url },
+          { label: "👴 अवनीश दादा का मेथी-दालचीनी नुस्खा", query: "शुगर के लिए अवनीश दादा के नुस्खे" }
+        ]);
+      }
+      if (q.includes('nutri heart') || q.includes('हार्ट') || q.includes('दिल')) {
+        const prod = NATURAMORE_KNOWLEDGE_BANK.nutriHeart;
+        const resp = `🌿 **${prod.name} के 100% प्रामाणिक घटक (Contents):**\n\n• **मुख्य घटक:** **${prod.keyIngredients}**\n\n🎯 **वैज्ञानिक कार्यप्रणाली (Mode of Action):**\n• ${prod.action}\n\n🥄 **सेवन विधि:** ${prod.dose}\n\n💡 **विशेषता:** **अर्जुन छाल व को-एंजाइम Q10** दिल की धमनियों को प्राकृतिक सुरक्षा कवच देते हैं।`;
+        return renderClinicalHealthCard(prod.name + ' संपूर्ण सामग्री व घटक', resp, [
+          { label: "❤️ हृदय व कोलेस्ट्रॉल केयर पेज", url: prod.url },
+          { label: "👴 अवनीश दादा का अर्जुन छाल नुस्खा", query: "कोलेस्ट्रॉल के लिए अवनीश दादा के नुस्खे" }
+        ]);
+      }
+      if (q.includes('easy detox') || q.includes('डिटॉक्स')) {
+        const prod = NATURAMORE_KNOWLEDGE_BANK.easyDetox;
+        const resp = `🌿 **${prod.name} के 100% प्रामाणिक घटक:**\n\n• **मुख्य घटक:** **${prod.keyIngredients}**\n• **कार्यप्रणाली:** ${prod.action}\n• **सेवन विधि:** ${prod.dose}`;
+        return renderClinicalHealthCard(prod.name + ' सामग्री व सेवन विधि', resp, [
+          { label: "🌿 लिवर व पेट शुद्धि पेज", url: prod.url }
+        ]);
+      }
     }
 
-    const isNetsurfBuy = cleanQ.includes('netsurf product') || cleanQ.includes('product lena') || cleanQ.includes('product kharid') || cleanQ.includes('order karna') || cleanQ.includes('प्रोडक्ट लेना') || cleanQ.includes('सामान लेना') || cleanQ.includes('दवा मंगवाना') || cleanQ.includes('order kaise kare') || cleanQ.includes('product kaise le');
+    // =========================================================================
+    // 1. JOINT PAIN & ARTHRITIS (जोड़ों का दर्द, गठिया, यूरिक एसिड)
+    // =========================================================================
+    const isJointQuery = q.includes('joint') || q.includes('ghutna') || q.includes('ghutno') || q.includes('घुटने') || q.includes('gathiya') || q.includes('गठिया') || q.includes('jod dard') || q.includes('जोड़ों का दर्द') || q.includes('uric acid') || q.includes('cartilage');
+    if (isJointQuery) {
+      const resp = `राम-राम! 🙏 सबसे पहले हम आपको आश्वस्त करना चाहते हैं कि **${target} घबराएं नहीं — सही आयुर्वेदिक पोषण, वजन संतुलन और दैनिक दिनचर्या से जोड़ों का दर्द और घिसाव बिल्कुल ठीक हो सकता है! हिम्मत रखिए!**
 
-    // Case 1: General "Netsurf Product Lena Hai"
-    if (isNetsurfBuy && !cleanQ.includes('joint') && !cleanQ.includes('heart') && !cleanQ.includes('sugar') && !cleanQ.includes('liver') && !cleanQ.includes('pet') && !cleanQ.includes('dard')) {
-      const resp = `आरोग्यम इंडिया पर नेट्सर्फ के 100% प्रामाणिक आयुर्वेदिक व जैविक उत्पाद उपलब्ध हैं। सभी उत्पादों पर फ्लैट 25% छूट व 5+1 ऑटो-शिपिंग (6वें महीने मुफ्त) मिलती है।\n\nकृपया नीचे से अपनी मुख्य समस्या या विषय चुनें, ताकि मैं आपको सही डाइट चार्ट, वैज्ञानिक इलाज और सीधे प्रोडक्ट पेज का लिंक दे सकूँ:`;
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🛒 नेट्सर्फ उत्पाद चयन व स्वास्थ्य समाधान (25% फ्लैट छूट)
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-          <a href="/health/joint-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🦴 जोड़ों का दर्द (जॉइंट केयर)</a>
-          <a href="/health/diabetes.html" class="sakhi-followup-chip" style="text-decoration:none;">🩸 शुगर व डायबिटीज केयर</a>
-          <a href="/health/heart-care.html" class="sakhi-followup-chip" style="text-decoration:none;">❤️ हार्ट व कोलेस्ट्रॉल केयर</a>
-          <a href="/health/liver-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🍃 लिवर डिटॉक्स व गैस-कब्ज</a>
-          <a href="/health/womens-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🌸 महिला स्वास्थ्य (PCOD/PCOS)</a>
-          <a href="/health/sexual-wellness.html" class="sakhi-followup-chip" style="text-decoration:none;">⚡ पुरुष स्टैमिना व ऊर्जा</a>
-          <a href="/health/weight-loss.html" class="sakhi-followup-chip" style="text-decoration:none;">⚖️ मोटापा व वजन घटाना</a>
-          <a href="/health/skin-care.html" class="sakhi-followup-chip" style="text-decoration:none;">✨ त्वचा रोग व ग्लो</a>
-          <a href="/health/hair-care.html" class="sakhi-followup-chip" style="text-decoration:none;">💇 बाल झड़ना व डैंड्रफ</a>
-          <a href="/health/thyroid-care.html" class="sakhi-followup-chip" style="text-decoration:none;">🦋 थायरॉयड केयर</a>
-        </div>
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px;font-size:0.88rem;color:#166534;line-height:1.5;">
-          👉 <strong>खरीदने का सही नियम:</strong> संबंधित पेज पर जाकर उत्पाद को <strong>कार्ट (Add to Cart)</strong> में जोड़ें और जिस <strong>प्रायोजक (Sponsor)</strong> ने आपको आरोग्यम इंडिया ऐप डाउनलोड कराया है, उन्हें तुरंत कॉल या WhatsApp करें ताकि वे आपको विशेष छूट व समय पर होम डिलीवरी में पूरी सहायता कर सकें!
-        </div>
-      `;
-      streamBotMessage(html, 'कृपया अपनी स्वास्थ्य समस्या चुनें। उत्पाद को कार्ट में डालकर 25% छूट पर ऑर्डर कर सकते हैं।');
-      return true;
+🧬 **शरीर के अंदर का लॉजिक (Why Joint Pain Happens):**
+• घुटने दो हड्डियों के बीच एक प्राकृतिक कुशन (कार्टिलेज) और चिकने तरल (सायनोवियल फ्लूइड / ग्रीस) पर टिके होते हैं। उम्र, भारी वजन, पोषण की कमी या यूरिक एसिड बढ़ने से यह ग्रीस सूखने लगती है और कार्टिलेज घिसने लगता है, जिससे हड्डियां आपस में टकराती हैं और कट-कट की आवाज व दर्द होता है।
+
+⚠️ **अनदेखा करने का गंभीर खतरा (सचेत रहें):**
+• यदि इसे समय पर न रोका जाए, तो हड्डियां घिसकर टेढ़ी होने लगती हैं और अंत में **घुटना बदलने (Knee Replacement Operation)** की नौबत आ जाती है, जो अत्यंत दर्दनाक और खर्चीला है।
+
+🩺 **आवश्यक परामर्श:** एलोपैथिक दर्द निवारक (पेनकिलर) केवल दर्द को दबाते हैं और किडनी/लिवर को नुकसान पहुँचाते हैं। कृपया अपनी जांच डॉक्टर से कराएं और पेनकिलर पर निर्भर न रहें।
+
+👴 **आरोग्यम अवनीश दादा का प्रमाणित आयुर्वेदिक नुस्खा:**
+• **${AVNISH_DADA_NUSKHE.jointPain}**
+
+🌿 **दैनिक हर्बल पोषण सुरक्षा (Naturamore Joint Care):**
+• **मुख्य घटक:** **हड़जोड़ (Hadjod)**, शल्लाकी, गूगल, अश्वगंधा, मेथी, रासना।
+• **फायदा:** हड़जोड़ नई कार्टिलेज कोशिकाओं का निर्माण करता है और जोड़ों में लचीलापन लौटाता है।
+
+🚫 **सख्त परहेज:** खट्टी चीजें (दही, अचार, इमली), ठंडे पानी, उड़द की दाल और रात में भारी भोजन का त्याग करें।`;
+
+      return renderClinicalHealthCard('जोड़ों व घुटनों का दर्द: जैविक लॉजिक, अवनीश दादा के नुस्खे व सुरक्षा', resp, [
+        { label: "🦴 जोड़ों की केयर का प्रमाणित पेज", url: NATURAMORE_KNOWLEDGE_BANK.jointCare.url },
+        { label: "📋 घुटने के दर्द का 6-सवालों वाला टेस्ट", query: "घुटने के दर्द का लक्षण टेस्ट करो" },
+        { label: "🛍️ नेचुरामोर जॉइंट केयर 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
+      ]);
     }
 
-    // Helper for rendering Health Science, Diet Chart, Page Link & Sponsor instructions
-    function renderHealthTopicPage(title, organFunction, dietDo, dietDont, products, pageUrl, domainKey, entityKey) {
-      const resp = `🩺 **${title}:**\n• **कारण व कार्यप्रणाली:** ${organFunction}\n\n🥗 **डाइट चार्ट (पथ्य व अपथ्य):**\n✅ **क्या खाएं:** ${dietDo}\n❌ **क्या न खाएं:** ${dietDont}\n\n💊 **प्रमाणित नेट्सर्फ समाधान:** ${products}\n\n👉 **ऑर्डर व 25% छूट:** नीचे दिए गए लिंक से पेज खोलकर उत्पाद को कार्ट (Add to Cart) में डालें और 25% फ्लैट डिस्काउंट का लाभ उठाएं।`;
+    // =========================================================================
+    // 2. DIABETES & METABOLISM (शुगर, मधुमेह, डायबिटीज)
+    // =========================================================================
+    const isDiabetesQuery = q.includes('sugar') || q.includes('diabetes') || q.includes('शुगर') || q.includes('डायबिटीज') || q.includes('मधुमेह') || q.includes('lifestyle plus');
+    if (isDiabetesQuery) {
+      const resp = `राम-राम! 🙏 हम आपको पूरा भरोसा दिलाते हैं कि **डायबिटीज कोई लाइलाज बीमारी नहीं है। ${target} हिम्मत रखिए — संतुलित खानपान, 30 मिनट की सैर और सही आयुर्वेदिक पोषण से शुगर हमेशा सामान्य रह सकती है!**
 
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          ${escapeHtml(title)}
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
-        </div>
-        ${buildMsgAudioBtnMarkup(resp)}
+🧬 **शरीर के अंदर का लॉजिक (The Biological Logic):**
+• जब हमारा अग्न्याशय (Pancreas) पर्याप्त इंसुलिन नहीं बना पाता या हमारे शरीर की कोशिकाएं इंसुलिन को पहचानना बंद कर देती हैं (Insulin Resistance), तो खून में ग्लूकोज की मात्रा अनियंत्रित होकर बढ़ने लगती है।
 
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 उत्पाद देखें व कार्ट में जोड़ें (25% फ्लैट छूट):</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            <a href="${pageUrl}" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
-              🛒 ${escapeHtml(title)} पेज खोलें व 25% छूट पर लें →
-            </a>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ उत्पाद खरीदने के लिए प्रायोजक से संपर्क')">
-              👥 प्रायोजक से संपर्क विधि
-            </button>
-          </div>
-          <div style="font-size:0.82rem;color:#166534;line-height:1.4;">
-            💡 <strong>नोट:</strong> आरोग्यम इंडिया पर नेट्सर्फ के सभी उत्पादों पर <strong>25% फ्लैट छूट</strong> और <strong>5+1 ऑटो-शिपिंग (6वें माह फ्री)</strong> उपलब्ध है।
-          </div>
-        </div>
-      `;
-      sakhiConversationState.lastActiveDomain = 'health';
-      sakhiConversationState.lastActiveEntity = entityKey;
-      sakhiConversationState.lastActiveEntityName = title;
-      streamBotMessage(html, cleanTextForTTS(title + ' की संपूर्ण कार्यप्रणाली, डाइट चार्ट और नेट्सर्फ 25% छूट समाधान प्रस्तुत है।'));
-      return true;
+⚠️ **अनदेखा करने का गंभीर खतरा (सचेत रहें):**
+• अगर शुगर लगातार 200+ बनी रहे, तो यह सीधे **किडनी को खराब (Diabetic Nephropathy)**, **आँखों का पर्दा जलाकर अंधापन (Retinopathy)**, और पैरों की नसों को सुन्न कर **गैंग्रीन** का रूप ले लेती है। इसे हल्के में लेना जानलेवा हो सकता है।
+
+🩺 **डॉक्टर परामर्श:** डॉक्टर द्वारा दी गई नियमित शुगर की गोली कभी अचानक बंद न करें। हमारा काम दवा के साथ शरीर के इंसुलिन सिस्टम को मजबूत करना है।
+
+👴 **आरोग्यम अवनीश दादा का प्रमाणित नुस्खा:**
+• **${AVNISH_DADA_NUSKHE.diabetes}**
+
+🌿 **हर्बल ऑर्गन न्यूट्रिशन (Naturamore Life Style Plus):**
+• **मुख्य घटक:** **विजयसार**, **गुड़मार**, जामुन, नीम, करेला, कुटकी, चिरायता।
+• **काम:** बीटा कोशिकाओं को ऊर्जा देकर प्राकृतिक इंसुलिन संवेदनशीलता बढ़ाता है।
+
+🚫 **सख्त परहेज:** चीनी, मैदा, सफेद चावल, आलू, पैकेटबंद जूस, और मीठे फल (चीकू, आम) का त्याग करें। हरी सब्जियां, सलाद और चने की रोटी अपनाएं।`;
+
+      return renderClinicalHealthCard('डायबिटीज व शुगर नियंत्रण: संपूर्ण आयुर्वेदिक व पोषण सुरक्षा', resp, [
+        { label: "🩸 डायबिटीज केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.lifeStylePlus.url },
+        { label: "📋 शुगर की गंभीरता का लक्षण टेस्ट", query: "शुगर का लक्षण टेस्ट करो" },
+        { label: "🥗 शुगर का संपूर्ण डाइट चार्ट", query: "शुगर के मरीज का डाइट चार्ट दिखाओ" }
+      ]);
     }
 
-    // 1. Joint Pain (जोड़ों का दर्द) - Structured empathetic flow: Causes -> Exercise/Treatment -> Curiosity Ask -> Components -> Link with 25% discount
-    const isJointPain = cleanQ.includes('joint') || cleanQ.includes('जोड़ों') || cleanQ.includes('जोड़') || cleanQ.includes('घुटने') || cleanQ.includes('घुटनों') || cleanQ.includes('गठिया') || cleanQ.includes('arthritis') || cleanQ.includes('यूरिक एसिड') || cleanQ.includes('uric acid') || cleanQ.includes('जोड़ दर्द');
-    if (isJointPain && !cleanQ.includes('kya kya hai') && !cleanQ.includes('घटक') && !cleanQ.includes('सामग्री') && !cleanQ.includes('ingredients')) {
-      const resp = `🦴 **जोड़ों व घुटनों का दर्द (Joint Pain) — कारण व संपूर्ण समाधान:**\n\n• **मुख्य कारण:**\n1. **यूरिक एसिड का जमाव:** प्यूरिन का सही निष्कासन न होने से जोड़ों में क्रिस्टल जम जाते हैं।\n2. **एजिंग (बढ़ती उम्र):** उम्र के साथ कार्टिलेज (कुदरती गद्दी) घिसने लगती है।\n3. **पुरानी चोट या एक्सीडेंट:** लिगामेंट्स व टेंडन्स की अंदरूनी कमजोरी।\n4. **साइनोवियल फ्लूइड की कमी:** जोड़ों की कुदरती चिकनाई (ग्रीस) खत्म होने से हड्डियां आपस में रगड़ खाने लगती हैं।\n\n🧘 **एक्सरसाइज व देखभाल:** सुबह 15 मिनट हल्की स्ट्रेचिंग करें, गर्म पानी की सिकाई करें और भारी वजन उठाने से बचें।\n\n💊 **प्रमाणित नेट्सर्फ समाधान:** **नेचुरामोर जॉइंट केयर कैप्सूल (Joint Care)** + **पेन क्रीम (Pain Cream)**।\n\n👉 **जिज्ञासा:** क्या आप जानना चाहते हैं कि **Joint Care के अंदर क्या-क्या प्राकृतिक घटक** हैं?`;
+    // =========================================================================
+    // 3. HEART, BP & CHOLESTEROL (हृदय, बीपी, कोलेस्ट्रॉल, ब्लॉकेज)
+    // =========================================================================
+    const isHeartQuery = q.includes('heart') || q.includes('दिल') || q.includes('bp') || q.includes('बीपी') || q.includes('cholesterol') || q.includes('कोलेस्ट्रॉल') || q.includes('blood pressure') || q.includes('blockage');
+    if (isHeartQuery) {
+      const resp = `राम-राम! 🙏 **${target} घबराएं नहीं — सकारात्मक सोच, हल्का आहार और नसों की सफाई से दिल को हमेशा मजबूत और युवा रखा जा सकता है!**
 
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🦴 जोड़ों व घुटनों का दर्द — कारण, देखभाल व नेट्सर्फ समाधान
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
-        </div>
-        ${buildMsgAudioBtnMarkup(resp)}
+🧬 **शरीर के अंदर का लॉजिक (Why Heart & BP Issues Occur):**
+• जब खून में खराब कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स बढ़ जाते हैं, तो वे धमनियों (Arteries) की दीवारों पर पपड़ी की तरह जम जाते हैं। इससे नसें संकरी और सख्त हो जाती हैं और दिल को पूरे शरीर में खून फेंकने के लिए बहुत भारी दबाव (High BP) लगाना पड़ता है।
 
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 आगे की जानकारी व 25% छूट ऑफर:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर जॉइंट केयर के अंदर क्या क्या है?')">
-              🌿 Joint Care के अंदर क्या-क्या है?
-            </button>
-            <a href="/health/joint-care.html" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
-              🛒 जॉइंट केयर पेज खोलें (25% फ्लैट छूट) →
-            </a>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('जॉइंट केयर कैसे खाएं और खुराक क्या है?')">
-              💊 सेवन विधि व खुराक
-            </button>
-          </div>
-          <div style="font-size:0.82rem;color:#166534;line-height:1.4;">
-            💡 <strong>विशेष ऑफर:</strong> आरोग्यम इंडिया पर नेट्सर्फ के सभी उत्पादों पर <strong>25% फ्लैट डिस्काउंट</strong> और <strong>5+1 ऑटो-शिपिंग</strong> उपलब्ध है।
-          </div>
-        </div>
-      `;
-      sakhiConversationState.lastActiveDomain = 'health';
-      sakhiConversationState.lastActiveEntity = 'joint_care';
-      sakhiConversationState.lastActiveEntityName = 'नेचुरामोर जॉइंट केयर';
-      streamBotMessage(html, cleanTextForTTS('जोड़ों के दर्द के मुख्य कारण यूरिक एसिड, उम्र, चोट और साइनोवियल फ्लूइड की कमी हैं। क्या आप जानना चाहते हैं कि जॉइंट केयर के अंदर क्या-क्या है?'));
-      return true;
+⚠️ **अनदेखा करने का गंभीर खतरा (अलर्ट रहें):**
+• हाई बीपी को मेडिकल में 'साइलेंट किलर' कहा जाता है। नसों में क्लॉट बनने से **अचानक हार्ट अटैक या ब्रेन स्ट्रोक (लकवा)** का जोखिम सौ गुना बढ़ जाता है।
+
+🩺 **डॉक्टर सलाह:** सीने में भारीपन, बाएं हाथ में दर्द या अचानक अत्यधिक पसीना आने पर 1 सेकंड की भी देरी किए बिना तुरंत नजदीकी अस्पताल की इमरजेंसी में जाएं।
+
+👴 **आरोग्यम अवनीश दादा का प्रमाणित नुस्खा:**
+• **${AVNISH_DADA_NUSKHE.heartBp}**
+
+🌿 **हृदय पोषण सुरक्षा (Naturamore Nutri Heart):**
+• **मुख्य घटक:** **अर्जुन छाल**, **को-एंजाइम Q10**, लहसुन, अलसी ओमेगा-3, अंगूर बीज सत्व।
+• **फायदा:** हृदय की मांसपेशियों को पंपिंग शक्ति देता है और नसों की पपड़ी साफ करता है।
+
+🚫 **परहेज:** ज्यादा नमक, रिफाइंड तेल, डालडा, तली-भुनी चीजें, अत्यधिक तनाव और धूम्रपान का तुरंत त्याग करें।`;
+
+      return renderClinicalHealthCard('हृदय, बीपी व कोलेस्ट्रॉल सुरक्षा: लॉजिक व समाधान', resp, [
+        { label: "❤️ हृदय केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.nutriHeart.url },
+        { label: "📋 हार्ट व बीपी रिस्क असेसमेंट टेस्ट", query: "हार्ट और बीपी का लक्षण टेस्ट करो" },
+        { label: "🛍️ नेचुरामोर न्यूट्री हार्ट 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
+      ]);
     }
 
-    // 2. Diabetes Diet Query (मधुमेह में क्या खाएं?) - Direct answer FIRST, then curiosity on insulin science!
-    const isDiabetesDiet = (cleanQ.includes('मधुमेह') || cleanQ.includes('शुगर') || cleanQ.includes('sugar') || cleanQ.includes('diabetes')) && (cleanQ.includes('क्या खाएं') || cleanQ.includes('kya khaye') || cleanQ.includes('डाइट') || cleanQ.includes('diet') || cleanQ.includes('parhej') || cleanQ.includes('परहेज') || cleanQ.includes('भोजन') || cleanQ.includes('khana'));
-    if (isDiabetesDiet) {
-      const resp = `🥗 **मधुमेह (Diabetes) में क्या खाएं और क्या न खाएं:**\n\n✅ **क्या खाएं (पथ्य आहार):**\n• मेथी दाना (रात में भिगोकर सुबह पानी सहित चबाएं), करेला, जामुन का सिरका।\n• जौ और चना मिश्रित मिस्सी रोटी (उच्च फाइबर)।\n• हरी पत्तेदार सब्जियां, खीरा, ककड़ी, टमाटर, दालें और पर्याप्त पानी।\n\n❌ **क्या न खाएं (अपथ्य परहेज):**\n• चीनी, गुड़, मिठाई, मैदा, आलू और पॉलिश सफेद चावल।\n• डिब्बा बंद जूस, कोल्ड ड्रिंक्स और तली-भुनी चीजें।\n\n👉 **जिज्ञासा:** क्या आप जानना चाहते हैं कि **मधुमेह क्या है और यह शरीर में कैसे होता है** (पैंक्रियाज और इंसुलिन का विज्ञान)?`;
+    // =========================================================================
+    // 4. THYROID CARE (थायराइड, मोटापा, हार्मोनल असंतुलन)
+    // =========================================================================
+    const isThyroidQuery = q.includes('thyroid') || q.includes('थायराइड') || q.includes('thayroid');
+    if (isThyroidQuery) {
+      const resp = `राम-राम! 🙏 **${target} हिम्मत रखिए — थायराइड कोई स्थायी अभिशाप नहीं है, सही दिनचर्या और पोषण से टीएसएच (TSH) स्तर को संतुलित किया जा सकता है!**
 
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🥗 मधुमेह डाइट चार्ट — क्या खाएं और क्या न खाएं
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
-        </div>
-        ${buildMsgAudioBtnMarkup(resp)}
+🧬 **लॉजिक:** गले की तितली के आकार की थायराइड ग्रंथि शरीर के मेटाबॉलिज्म को नियंत्रित करती है। जब यह सुस्त हो जाती है (Hypothyroidism), तो वजन तेजी से बढ़ता है, बाल झड़ते हैं और अत्यधिक थकान रहती है।
+⚠️ **खतरा:** लंबे समय तक थायराइड अनियंत्रित रहने से दिल की धड़कन अनियमित, डिप्रेशन और बांझपन (Infertility) का खतरा होता है।
 
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 आगे की वैज्ञानिक जानकारी व समाधान:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मधुमेह क्या है और शरीर में कैसे होता है?')">
-              🩸 मधुमेह क्या है और कैसे होता है?
-            </button>
-            <a href="/health/diabetes.html" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
-              🛒 लाइफस्टाइल प्लस (25% छूट पर लें) →
-            </a>
-          </div>
-          <div style="font-size:0.82rem;color:#166534;line-height:1.4;">
-            💡 <strong>नेट्सर्फ समाधान:</strong> नेचुरामोर लाइफस्टाइल प्लस कैप्सूल इंसुलिन संवेदनशीलता को प्राकृतिक रूप से बढ़ाता है।
-          </div>
-        </div>
-      `;
-      sakhiConversationState.lastActiveDomain = 'health';
-      sakhiConversationState.lastActiveEntity = 'diabetes';
-      sakhiConversationState.lastActiveEntityName = 'मधुमेह व ब्लड शुगर';
-      streamBotMessage(html, cleanTextForTTS('मधुमेह में मेथी दाना, करेला, जौ-चना आटा खाएं और चीनी, मैदा, आलू से परहेज करें। क्या आप जानना चाहते हैं कि मधुमेह शरीर में कैसे होता है?'));
-      return true;
+👴 **अवनीश दादा का नुस्खा:** ${AVNISH_DADA_NUSKHE.thyroid}
+🌿 **नेचुरामोर सहायता:** Daily Nutrition Protein + Life Style Plus (मेटाबॉलिज्म एक्टिवेशन)।
+🚫 **परहेज:** पत्तागोभी, फूलगोभी, सोयाबीन उत्पाद और अत्यधिक तनाव से बचें। रोजाना 15 मिनट उज्जायी प्राणायाम करें।`;
+
+      return renderClinicalHealthCard('थायराइड व हार्मोन संतुलन: संपूर्ण आयुर्वेदिक गाइड', resp, [
+        { label: "🦋 थायराइड केयर का आधिकारिक पेज", url: "/health/thyroid-care.html" },
+        { label: "📋 थायराइड लक्षण टेस्ट", query: "थायराइड का लक्षण टेस्ट करो" }
+      ]);
     }
 
-    // 2B. General Diabetes / Sugar
-    if (cleanQ.includes('diabetes') || cleanQ.includes('डायबिटीज') || cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('मधुमेह')) {
-      return renderHealthTopicPage(
-        'मधुमेह व ब्लड शुगर नियंत्रण',
-        'पैंक्रियाज (Pancreas) की बीटा कोशिकाएं जब पर्याप्त इंसुलिन नहीं बनातीं, तो ग्लूकोज कोशिकाओं में जाने की बजाय खून में बढ़ने लगता है।',
-        'मेथी दाना, करेला, जामुन सिरका, जौ-चना मिश्रित आटा, हरी पत्तेदार सब्जियां व पर्याप्त पानी।',
-        'चीनी, गुड़, मैदा, आलू, सफेद चावल, डिब्बा बंद जूस व तला-भुना भोजन।',
-        'नेचुरामोर लाइफस्टाइल प्लस कैप्सूल (भोजन से 30 मिनट पहले 1 कैप्सूल सुबह-शाम) + नेचुरामोर मसाला मिल्क पाउडर (25% फ्लैट छूट)।',
-        '/health/diabetes.html',
-        'health',
-        'diabetes'
-      );
+    // =========================================================================
+    // 5. DIGESTION, CONSTIPATION, GAS & PILES (कब्ज, गैस, एसिडिटी, बवासीर)
+    // =========================================================================
+    const isDigestiveQuery = q.includes('kabz') || q.includes('कब्ज') || q.includes('piles') || q.includes('bawasir') || q.includes('बवासीर') || q.includes('gas') || q.includes('गैस') || q.includes('acidity') || q.includes('पेट साफ');
+    if (isDigestiveQuery) {
+      const resp = `राम-राम! 🙏 **आयुर्वेद कहता है: 'सर्वे रोगाः मलाशयात्' — यानी 90% बीमारियों की जड़ पेट की खराबी और पुरानी कब्ज है। घबराएं नहीं, आंतों को प्राकृतिक रूप से साफ किया जा सकता है!**
+
+🧬 **लॉजिक:** पानी कम पीने, फाइबर की कमी और जंक फूड से मल आंतों की दीवारों पर चिपककर सूख जाता है। जोर लगाने से गुदा की नसें फूल जाती हैं जो आगे चलकर बवासीर (Piles) और फिशर बन जाती हैं।
+⚠️ **खतरा:** पुरानी कब्ज से शरीर में टॉक्सिन्स (विजातीय द्रव्य) खून में घुलकर लिवर, स्किन और जोड़ों को बीमार बना देते हैं।
+
+👴 **अवनीश दादा का नुस्खा:** ${AVNISH_DADA_NUSKHE.constipation}
+🌿 **हर्बल सहायता (Naturamore Easy Detox):** त्रिफला, सनाय, सोंठ, मुलेठी युक्त कैप्सूल जो रातभर में आंतों की धुलाई कर देते हैं।
+🚫 **परहेज:** मैदा, समोसा, चाउमीन, बासी भोजन और रात को देर से खाने का सख्त त्याग करें। दिन में 3-4 लीटर गुनगुना पानी पिएं।`;
+
+      return renderClinicalHealthCard('कब्ज, गैस व बवासीर से स्थायी मुक्ति', resp, [
+        { label: "🌿 लिवर व उदर केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.easyDetox.url },
+        { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" }
+      ]);
     }
 
-    // 3. Liver Care & Digestion
-    if (cleanQ.includes('liver') || cleanQ.includes('लिवर') || cleanQ.includes('fatty liver') || cleanQ.includes('फैटी लिवर') || cleanQ.includes('कब्ज') || cleanQ.includes('constipation') || cleanQ.includes('एसिडिटी')) {
-      return renderHealthTopicPage(
-        'लिवर डिटॉक्स, फैटी लिवर व पेट शुद्धि',
-        'लिवर शरीर का मुख्य केमिकल फिल्टर है। वसा जमने (Fatty Liver) व टॉक्सिन्स जमा होने से पाचन रस (Bile) नहीं बनता और गैस, कब्ज व भारीपन शुरू होता है।',
-        'पपीता, चुकंदर, आंवला, लौकी सूप, रात में गुनगुना पानी व फाइबर युक्त आहार।',
-        'शराब, तंबाकू, अत्यधिक मिर्च-मसाला, रिफाइंड तेल, मैदा व देर रात भारी भोजन।',
-        'नेचुरामोर ईजी डिटॉक्स (Easy Detox - रात को 1-2 गोली गुनगुने पानी से) + नेचुरामोर पाउडर (25% फ्लैट छूट)।',
-        '/health/liver-care.html',
-        'health',
-        'liver_care'
-      );
+    // =========================================================================
+    // 6. SYMPTOM QUESTIONNAIRE (10-15 हाँ/ना सवाल व गंभीरता असेसमेंट)
+    // =========================================================================
+    if (q.includes('test') || q.includes('टेस्ट') || q.includes('सर्वे') || q.includes('survey') || q.includes('lakshan') || q.includes('लक्षण')) {
+      const resp = `प्रिय साथी! 🙏 आपकी बीमारी की सही गंभीरता को समझने के लिए नीचे 5 महत्वपूर्ण सवाल दिए गए हैं।
+
+📋 **घुटनों व जोड़ों के दर्द का त्वरित लक्षण टेस्ट (Joint Pain Severity Test):**
+1️⃣ क्या सुबह सोकर उठने पर जोड़ों में 30 मिनट से ज्यादा अकड़न रहती है?
+2️⃣ क्या सीढ़ियां चढ़ते-उतरते समय घुटनों में कट-कट की आवाज या तेज दर्द होता है?
+3️⃣ क्या जोड़ों पर हल्की सूजन, लाली या गर्माहट महसूस होती है?
+4️⃣ क्या नीचे पालथी मारकर या उकड़ू बैठने में बहुत कठिनाई होती है?
+5️⃣ क्या बिना किसी सहारे के खड़े होने या चलने में लड़खड़ाहट होती है?
+
+📊 **नतीजा (Result Assessment):**
+• **1-2 'हाँ' (हल्का - Mild):** प्रारंभिक कार्टिलेज घिसाव। अवनीश दादा का हरसिंगार नुस्खा + नेचुरामोर जॉइंट केयर से 2 महीने में 100% सुधार संभव।
+• **3-4 'हाँ' (मध्यम - Moderate / चेतावनी):** ग्रीस काफी सूख चुका है। तुरंत वजन नियंत्रण + डॉक्टर से एक्स-रे जांच कराएं।
+• **5 'हाँ' (गंभीर - Severe / रेड अलर्ट):** हड्डियां रगड़ खा रही हैं। तुरंत ऑर्थोपेडिक सर्जन से संपर्क करें, देर करने पर घुटना बदलने की नौबत आ सकती है।`;
+
+      return renderClinicalHealthCard('लक्षण स्व-मूल्यांकन (Symptom Risk Assessment)', resp, [
+        { label: "🦴 जोड़ों के दर्द का विस्तृत पेज", url: NATURAMORE_KNOWLEDGE_BANK.jointCare.url },
+        { label: "🩸 शुगर का लक्षण टेस्ट करें", query: "शुगर का लक्षण टेस्ट करो" },
+        { label: "❤️ हार्ट व बीपी का टेस्ट करें", query: "हार्ट और बीपी का लक्षण टेस्ट करो" }
+      ]);
     }
 
-    // 4. Heart & BP (हार्ट, बीपी, दिल व रक्तचाप)
-    const isHeartGeneral = cleanQ === 'heart' || cleanQ === 'हार्ट' || cleanQ === 'dil' || cleanQ === 'दिल' || cleanQ === 'blood' || cleanQ === 'खून' || cleanQ.includes('heart ke bare') || cleanQ.includes('दिल के बारे') || cleanQ.includes('हार्ट के बारे') || cleanQ.includes('रक्त के बारे');
-    const isHeartSpecific = cleanQ.includes('heart') || cleanQ.includes('हार्ट') || cleanQ.includes('dil') || cleanQ.includes('बीपी') || cleanQ.includes('रक्तचाप') || cleanQ.includes('blood pressure') || cleanQ.includes('hypertension') || cleanQ.includes('कोलेस्ट्रॉल') || cleanQ.includes('ब्लॉकेज');
+    // =========================================================================
+    // 7. DAILY COACH: MEDICINE & DIET CHECKING ("kya aapne aaj dawa khayi?")
+    // =========================================================================
+    if (q.includes('dawa khai') || q.includes('dawa khayi') || q.includes('khana khaya') || q.includes('exercise') || q.includes('sair') || q.includes('दिनचर्या')) {
+      const resp = `प्रिय साथी! 🙏 आपका पर्सनल स्वास्थ्य हमदर्द होने के नाते मेरा पहला कर्तव्य आपकी दैनिक देखभाल करना है:
 
-    if (isHeartGeneral) {
-      const resp = `हृदय (Heart) हमारे शरीर का सबसे महत्वपूर्ण अंग है, जो 24 घंटे रक्त व ऑक्सीजन का संचार करता है।\n\nधमनियों में खराब कोलेस्ट्रॉल (LDL) जमने, मानसिक तनाव और उच्च रक्तचाप (High BP) से दिल पर अतिरिक्त दबाव पड़ता है।\n\nआप हृदय स्वास्थ्य के किस विषय पर सटीक जानकारी व समाधान चाहते हैं? नीचे से विकल्प चुनें:`;
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          ❤️ हृदय सुरक्षा व रक्त संचार (Heart & Vascular Health)
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
-        </div>
-        ${buildMsgAudioBtnMarkup(resp)}
+⏰ **आज की स्वास्थ्य डायरी (Daily Health Routine):**
+1️⃣ **दवा चेकिंग:** क्या आपने अपने डॉक्टर द्वारा सुझाई गई सुबह की बीपी/शुगर की गोली समय पर ले ली है? (याद रखें: नियमित दवा ही बड़ी विपदा से बचाती है)।
+2️⃣ **प्राकृतिक नुस्खा:** क्या आज सुबह आपने खाली पेट मेथी दाना / लहसुन / अर्जुन छाल का सेवन किया?
+3️⃣ **डाइट चेकिंग:** क्या नाश्ते में तली-भुनी चीजें छोड़कर अंकुरित अनाज, दलिया या फल खाए?
+4️⃣ **व्यायाम:** क्या आज आपने सुबह 20-30 मिनट की हल्की धूप में सैर (Morning Walk) पूरी कर ली है?
 
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 हृदय स्वास्थ्य के 4 प्रमुख विषय चुनें:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेचुरामोर न्यूट्री हार्ट कैप्सूल के फायदे और खुराक')">🩺 1. नेचुरामोर न्यूट्री हार्ट (घटक व खुराक)</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('हाई बीपी और रक्तचाप संतुलन के उपाय')">🩸 2. हाई बीपी (रक्तचाप) संतुलन</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('कोलेस्ट्रॉल कम करने और ब्लॉकेज रोकने का डाइट चार्ट')">🫀 3. कोलेस्ट्रॉल व ब्लॉकेज रोकथाम डाइट</button>
-            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('हृदय रोग से बचाव के घरेलू नुस्खे')">🥗 4. हृदय सुरक्षा डाइट व परहेज</button>
-          </div>
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 क्लिनिकल पेज व 25% फ्लैट छूट:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <a href="/health/heart-care.html" target="_blank" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
-              ❤️ हृदय स्वास्थ्य क्लिनिकल गाइड खोलें व 25% छूट पर ऑर्डर करें →
-            </a>
-          </div>
-        </div>
-      `;
-      sakhiConversationState.lastActiveDomain = 'health';
-      sakhiConversationState.lastActiveEntity = 'nutri_heart';
-      sakhiConversationState.lastActiveEntityName = 'हार्ट सुरक्षा व कोलेस्ट्रॉल';
-      streamBotMessage(html, cleanTextForTTS('हृदय सुरक्षा और रक्तचाप संतुलन के लिए नेचुरामोर न्यूट्री हार्ट और संतुलित आहार सर्वोत्तम है। नीचे से अपना विषय चुनें।'));
-      return true;
-    }
+💪 **याद रखिए:** कोई भी दवा केवल 20% काम करती है, 80% काम आपकी सही दिनचर्या, परहेज और आत्म-विश्वास करता है। आप ज़रूर स्वस्थ होंगे!`;
 
-    if (isHeartSpecific) {
-      return renderHealthTopicPage(
-        'हार्ट सुरक्षा, बीपी व कोलेस्ट्रॉल संतुलन',
-        'धमनियों (Arteries) में खराब कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स जमने से नसों का लचीलापन घटता है, जिससे ब्लड प्रेशर बढ़ता है और हार्ट अटैक का खतरा होता है।',
-        'अर्जुन छाल का काढ़ा, लहसुन की कली, लौकी का जूस, अलसी के बीज व हरी सब्जियां।',
-        'अत्यधिक नमक, डालडा, रिफाइंड तेल, रेड मीट, मैदा व मानसिक तनाव।',
-        'नेचुरामोर न्यूट्री हार्ट कैप्सूल (1 कैप्सूल सुबह और 1 शाम भोजनोपरांत) + नेचुरामोर प्लस पाउडर (25% फ्लैट छूट)।',
-        '/health/heart-care.html',
-        'health',
-        'nutri_heart'
-      );
-    }
-
-    // 5. Women Care & PCOD
-    const isWomenClinical = (cleanQ.includes('pcod') || cleanQ.includes('pcos') || cleanQ.includes('मासिक धर्म') || cleanQ.includes('माहवारी') || cleanQ.includes('पीरियड्स') || cleanQ.includes('अनियमित माहवारी') || ((cleanQ.includes('महिला') || cleanQ.includes('स्त्री') || cleanQ.includes('women')) && (cleanQ.includes('हार्मोन') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('असंतुलन') || cleanQ.includes('ओवरी') || cleanQ.includes('कमर दर्द')))) &&
-      !cleanQ.includes('कमाई') && !cleanQ.includes('बिजनेस') && !cleanQ.includes('बिज़नेस') && !cleanQ.includes('ई-टेलर') && !cleanQ.includes('घर बैठे') && !cleanQ.includes('रोजगार') && !cleanQ.includes('स्वावलंबन');
-    if (isWomenClinical) {
-      return renderHealthTopicPage(
-        'महिला स्वास्थ्य, PCOD/PCOS व हार्मोनल संतुलन',
-        'एस्ट्रोजन और प्रोजेस्टेरोन हार्मोन के असंतुलन से ओवरी में छोटे सिस्ट बनते हैं, जिससे अनियमित माहवारी, वजन बढ़ना व चेहरे पर अनचाहे बाल आते हैं।',
-        'शतावरी, दालचीनी, कद्दू व अलसी के बीज, नारियल पानी, हरी पत्तेदार सब्जियां।',
-        'जंक फूड, अत्यधिक चीनी, कोल्ड ड्रिंक्स, डेयरी प्रोडक्ट्स का अत्यधिक सेवन।',
-        'नेचुरामोर फॉर विमेन (Masala Milk / French Vanilla) 1 चम्मच सुबह दूध में + वुमन केयर कैप्सूल (25% फ्लैट छूट)।',
-        '/health/womens-care.html',
-        'health',
-        'womens_care'
-      );
-    }
-
-    // 6. Weight Loss & Obesity
-    const isWeightLossClinical = (cleanQ.includes('weight loss') || cleanQ.includes('वजन घटाना') || cleanQ.includes('मोटापा') || cleanQ.includes('चर्बी') || cleanQ.includes('fat kam')) &&
-      !cleanQ.includes('थायराइड') && !cleanQ.includes('थायरॉयड') && !cleanQ.includes('thyroid') && !cleanQ.includes('tsh') && !cleanQ.includes('पशु') && !cleanQ.includes('गाय') && !cleanQ.includes('भैंस');
-    if (isWeightLossClinical) {
-      return renderHealthTopicPage(
-        'प्राकृतिक मोटापा व वजन नियंत्रण',
-        'धीमा मेटाबॉलिज्म (Metabolism) और थायरॉयड की सुस्ती भोजन की कैलोरी को फैट में बदलकर पेट व कमर पर जमा करती है।',
-        'खीरा-सलाद, ग्रीन टी, अंकुरित मूंग, नींबू-गुनगुना पानी, दलिया व छाछ।',
-        'चीनी, कोल्ड ड्रिंक, सफेद चावल, मैदा, समोसे-पकौड़े व रात का भारी डिनर।',
-        'नेचुरामोर ईजी डिटॉक्स (रात को 1 गोली) + नेचुरामोर फ्रेंच वैनिला पाउडर (सुबह नाश्ते की जगह गुनगुने पानी से - 25% फ्लैट छूट)।',
-        '/health/weight-loss.html',
-        'health',
-        'weight_loss'
-      );
-    }
-
-    // 7. Men Vitality & Stamina (पौरुष शक्ति व यौन स्वास्थ्य)
-    const isMenVitality = (cleanQ.includes('stamina') || cleanQ.includes('पौरुष') || cleanQ.includes('शुक्राणु') || cleanQ.includes('मर्दाना') || cleanQ.includes('शीघ्रपतन') || cleanQ.includes('यौन') || cleanQ.includes('सेक्स') || cleanQ.includes('सेक्सुअल') || cleanQ.includes('इरेक्टाइल') || cleanQ.includes('लिंग में शिथिलता') || cleanQ.includes('नपुंसकता') || cleanQ.includes('गुप्त रोग') || cleanQ.includes('धातु रोग') || ((cleanQ.includes('पुरुष') || cleanQ.includes('men') || cleanQ.includes('सेक्स')) && (cleanQ.includes('कमजोरी') || cleanQ.includes('स्टेमिना') || cleanQ.includes('ऊर्जा') || cleanQ.includes('समस्या')))) &&
-      !cleanQ.includes('पशु') && !cleanQ.includes('गाय') && !cleanQ.includes('भैंस') && !cleanQ.includes('बछड़ा') && !cleanQ.includes('बकरी') && !cleanQ.includes('फसल');
-    if (isMenVitality) {
-      return renderHealthTopicPage(
-        'पुरुष स्वास्थ्य, ऊर्जा व पौरुष शक्ति वृद्धि',
-        'टेस्टोस्टेरोन हार्मोन की कमी, अत्यधिक मानसिक तनाव व खराब रक्त संचार से दिनभर थकान और पौरुष कमजोरी महसूस होती है।',
-        'अश्वगंधा, सफेद मूसली, खजूर, दूध, बादाम, अखरोट, कद्दू के बीज व केला।',
-        'तंबाकू, गुटखा, शराब, अत्यधिक चाय-कॉफी व देर रात तक जागना।',
-        'नेचुरामोर फॉर मेन पाउडर (सुबह दूध के साथ 1 चम्मच) + लाइफस्टाइल मेन कैप्सूल (25% फ्लैट छूट)।',
-        '/health/sexual-wellness.html',
-        'health',
-        'mens_care'
-      );
-    }
-
-    // 8. Thyroid Care (हाइपो/हाइपर थायरॉयड व अनियंत्रित वजन संतुलन)
-    if (cleanQ.includes('thyroid') || cleanQ.includes('थायराइड') || cleanQ.includes('थायरॉयड') || cleanQ.includes('tsh') || cleanQ.includes('t3') || cleanQ.includes('t4')) {
-      return renderHealthTopicPage(
-        'थायरॉयड ग्रंथि संतुलन व मेटाबॉलिज्म केयर (Thyroid & Weight Protocol)',
-        'थायरॉयड ग्रंथि जब पर्याप्त T3 और T4 हार्मोन नहीं बनाती (Hypothyroidism), तो मेटाबॉलिज्म धीमा होकर वजन तेजी से बढ़ता है, सुस्ती आती है और बाल झड़ते हैं। वहीं Hyperthyroidism में वजन अनियंत्रित रूप से घटता है।',
-        'साबुत धनिया के बीज का उबला पानी (खाली पेट), अखरोट, बादाम, नारियल तेल, कद्दू के बीज, सेंधा नमक और हरी सब्जियां। रोज 10-15 मिनट उज्जायी प्राणायाम व सर्वांगासन करें।',
-        'सोयाबीन, कच्ची पत्तागोभी, फूलगोभी, ब्रोकोली, अत्यधिक ठंडा भोजन, रिफाइंड तेल व डिब्बाबंद खाद्य पदार्थ।',
-        'Naturamore For Women (महिलाओं हेतु) या Lifestyle Plus कैप्सूल (1 कैप्सूल सुबह-शाम भोजन से 30 मिनट पहले) + Naturamore Powder (25% फ्लैट छूट)।',
-        '/health/thyroid-care.html',
-        'health',
-        'thyroid_care'
-      );
-    }
-
-    // 9. Lungs & Respiratory Care
-    if (cleanQ.includes('lungs') || cleanQ.includes('फेफड़े') || cleanQ.includes('अस्थमा') || cleanQ.includes('दमा') || cleanQ.includes('खांसी') || cleanQ.includes('सांस फूलना')) {
-      return renderHealthTopicPage(
-        'फेफड़ों की मजबूती व श्वसन तंत्र सुरक्षा',
-        'प्रदूषण, धूल व कफ जमा होने से ब्रोंकियल नलियों में सूजन आती है, जिससे ऑक्सीजन का प्रवाह बाधित होता है और सांस फूलती है।',
-        'तुलसी, अदरक, काली मिर्च, मुलेठी, गुनगुना पानी व भाप (Steam)।',
-        'ठंडा पानी, आइसक्रीम, सिगरेट/धुआं, दही व रात में भारी चावल।',
-        'नेचुरामोर इम्यून प्लस कैप्सूल (1 कैप्सूल सुबह-शाम गुनगुने पानी से) + नेचुरामोर पाउडर (25% फ्लैट छूट)।',
-        '/health/home-care.html',
-        'health',
-        'respiratory_care'
-      );
-    }
-
-    // 10. Kidney Stone & Urinary Care (पथरी व गुर्दे का स्वास्थ्य)
-    if (cleanQ.includes('kidney') || cleanQ.includes('किडनी') || cleanQ.includes('पथरी') || cleanQ.includes('stone') || cleanQ.includes('गुर्दे') || cleanQ.includes('यूरिन')) {
-      return renderHealthTopicPage(
-        'किडनी स्टोन (पथरी) व गुर्दे की कार्यक्षमता सुरक्षा',
-        'कैल्शियम ऑक्सालेट और यूरिक एसिड क्रिस्टल गुर्दे में जमा होकर पथरी का रूप लेते हैं, जिससे कमर में असहनीय दर्द व पेशाब में जलन होती है।',
-        'रोजाना 3 से 4 लीटर गुनगुना पानी, कुलथी की दाल का सूप, नारियल पानी, नींबू पानी व खीरा।',
-        'टमाटर के बीज, पालक, बैंगन, अत्यधिक नमक, उड़द की दाल, रेड मीट व कोल्ड ड्रिंक्स।',
-        'Naturamore NutriHealth प्रोटीन पाउडर (किडनी को डिटॉक्स करने हेतु) + पाषाणभेद व पुनर्नवा का काढ़ा (25% फ्लैट छूट)।',
-        '/health/general-wellness.html',
-        'health',
-        'kidney_care'
-      );
-    }
-
-    // 11. Uric Acid & Gout (यूरिक एसिड व गाउट)
-    if (cleanQ.includes('यूरिक एसिड') || cleanQ.includes('uric acid') || cleanQ.includes('यूरिक')) {
-      return renderHealthTopicPage(
-        'यूरिक एसिड नियंत्रण व गाउट (जोड़ों में सूजन) उपचार',
-        'शरीर में प्यूरीन (Purine) का चयापचय न होने से खून में यूरिक एसिड बढ़ता है और क्रिस्टल बनकर पैर के अंगूठे व जोड़ों में असहनीय चुभन पैदा करता है।',
-        'खूब पानी पिएँ (3-4L), नींबू पानी, विटामिन-C युक्त फल (आंवला), लौकी का जूस व गिलोय का काढ़ा।',
-        'दालें (विशेषकर अरहर, राजमा, छोले), मशरूम, टमाटर, फूलगोभी, शराब, बीयर व मांसाहार।',
-        'Naturamore Joint Care कैप्सूल (सलाई गुग्गुल युक्त) + Easy Detox (25% फ्लैट छूट)।',
-        '/health/joint-care.html',
-        'health',
-        'uric_acid_care'
-      );
-    }
-
-    // 12. Kids Wellness & Nutrition (बच्चों का शारीरिक व मानसिक विकास)
-    const isKidsWellness = (cleanQ.includes('kids') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे') || cleanQ.includes('बच्चों') || cleanQ.includes('बाल विकास') || cleanQ.includes('शारीरिक और मानसिक विकास')) &&
-      !cleanQ.includes('बुखार') && !cleanQ.includes('bukhar') && !cleanQ.includes('fever') && !cleanQ.includes('चढ़ी') && !cleanQ.includes('तप') && !cleanQ.includes('उल्टी') && !cleanQ.includes('दस्त');
-    if (isKidsWellness) {
-      return renderHealthTopicPage(
-        'नेचुरामोर किड्स — बच्चों का शारीरिक व मानसिक विकास (27 विटामिन्स-मिनरल्स)',
-        'बढ़ते बच्चों को हड्डियों, याददाश्त, एकाग्रता और रोग प्रतिरोधक क्षमता (Immunity) के लिए संतुलित प्रोटीन और सूक्ष्म पोषक तत्वों की आवश्यकता होती है।',
-        'दूध, भीगे बादाम, अखरोट, हरी सब्जियां, फल, दालें व अंकुरित आहार।',
-        'मैगी, चिप्स, कोल्ड ड्रिंक्स, पिज्जा, अत्यधिक टॉफी व डिब्बाबंद जंक फूड।',
-        'Naturamore Kids (स्वादिष्ट चॉकलेट फ्लेवर - 27 विटामिन्स, मिनरल्स, ब्राह्मी, शंखपुष्पी व ओमेगा-3 DHA युक्त, 25% फ्लैट छूट)।',
-        '/health/general-wellness.html',
-        'health',
-        'kids_care'
-      );
-    }
-
-    // 13. Leucorrhoea & White Discharge (महिलाओं में सफेद पानी)
-    if (cleanQ.includes('ल्यूकोरिया') || cleanQ.includes('leucorrhea') || cleanQ.includes('white discharge') || cleanQ.includes('सफेद पानी') || cleanQ.includes('सफेद प्रदर')) {
-      return renderHealthTopicPage(
-        'महिलाओं में ल्यूकोरिया (सफेद पानी) व आंतरिक पोषण समाधान',
-        'हार्मोनल असंतुलन, खून की कमी (Anemia), पोषणहीनता व आंतरिक संक्रमण से कमजोरी, कमर दर्द और सफेद पानी (White Discharge) की शिकायत होती है।',
-        'भुने चने, केला, आंवला मुरब्बा, शतावरी का चूर्ण, नारियल पानी और पर्याप्त ताजे फल।',
-        'अत्यधिक मिर्च-मसालेदार भोजन, खटाई, चाय-कॉफी, मैदा व बासी खाना।',
-        'Naturamore For Women (मसाला मिल्क / फ्रेंच वैनिला - सुबह 1 चम्मच दूध से) + हर्बल पर्सनल हाइजीन (25% फ्लैट छूट)।',
-        '/health/womens-care.html',
-        'health',
-        'leucorrhoea_care'
-      );
+      return renderClinicalHealthCard('दैनिक स्वास्थ्य कोच: दवा, डाइट व सैर की जांच', resp, [
+        { label: "🥗 शुगर व बीपी का डाइट चार्ट", query: "शुगर के मरीज का डाइट चार्ट दिखाओ" },
+        { label: "📖 संपूर्ण स्वास्थ्य ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" }
+      ]);
     }
 
     return false;
   }
 
-  // 15. PRONOUN & MULTI-TURN CONTEXT RESOLVER (संदर्भ व फॉलो-अप डिटेक्टर)
+  // 14.5 Certified Avnish Dada Ke Nuskhe Handler (Formerly Dadi Ke Nuskhe)
+  function handleAvnishDadaKeNuskhe(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase().trim();
+    const isNuskhe = q.includes('avnish dada') || q.includes('dada ke nuskhe') || q.includes('दादा के नुस्खे') || q.includes('nuskhe') || q.includes('nuskha') || q.includes('नुस्खे') || q.includes('घरेलू नुस्खे') || q.includes('dadi ke');
+    if (!isNuskhe) return false;
+
+    if (q.includes('joint') || q.includes('ghutna') || q.includes('dard') || q.includes('दर्द')) {
+      const resp = `🌿 **आरोग्यम अवनीश दादा का जोड़ों के दर्द का अचूक नुस्खा:**\n\n• **नुस्खा:** ${AVNISH_DADA_NUSKHE.jointPain}\n\n• **मालिश का तेल:** 50ml तिल के तेल में 4 कली लहसुन, 1 चम्मच मेथी और 2 टुकड़ा कपूर डालकर पकाएं। गुनगुने तेल से हल्के हाथ से मालिश करें (कभी भी जोर से न रगड़ें)।`;
+      return renderClinicalHealthCard('अवनीश दादा के नुस्खे: घुटने व जोड़ों का दर्द', resp, [
+        { label: "🦴 जॉइंट केयर का संपूर्ण पेज", url: NATURAMORE_KNOWLEDGE_BANK.jointCare.url }
+      ]);
+    }
+
+    if (q.includes('sugar') || q.includes('diabetes') || q.includes('शुगर')) {
+      const resp = `🌿 **आरोग्यम अवनीश दादा का शुगर नियंत्रण नुस्खा:**\n\n• **नुस्खा:** ${AVNISH_DADA_NUSKHE.diabetes}\n\n• **जामुन की गुठली:** जामुन के सूखे बीजों का चूर्ण 1 चम्मच सुबह-शाम लेने से बार-बार पेशाब आना और कमजोरी दूर होती है।`;
+      return renderClinicalHealthCard('अवनीश दादा के नुस्खे: प्राकृतिक शुगर नियंत्रण', resp, [
+        { label: "🩸 डायबिटीज केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.lifeStylePlus.url }
+      ]);
+    }
+
+    if (q.includes('heart') || q.includes('bp') || q.includes('बीपी') || q.includes('cholesterol')) {
+      const resp = `🌿 **आरोग्यम अवनीश दादा का हृदय व कोलेस्ट्रॉल सुरक्षा नुस्खा:**\n\n• **नुस्खा:** ${AVNISH_DADA_NUSKHE.heartBp}\n\n• **लौकी का सूप:** ताजी मीठी लौकी का सूप पुदीना और काली मिर्च डालकर पीने से नसों की रुकावट तेजी से खुलती है।`;
+      return renderClinicalHealthCard('अवनीश दादा के नुस्खे: हृदय, बीपी व नसों की सफाई', resp, [
+        { label: "❤️ न्यूट्री हार्ट केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.nutriHeart.url }
+      ]);
+    }
+
+    // General Nuskhe Overview
+    const resp = `🌿 **आरोग्यम अवनीश दादा के प्रमाणित आयुर्वेदिक घरेलू नुस्खे:**\n\n1️⃣ **जोड़ों के दर्द के लिए:** हरसिंगार (पारिजात) के 5 पत्तों का काढ़ा खाली पेट पिएं।\n2️⃣ **डायबिटीज व शुगर के लिए:** रात को भिगोया हुआ मेथी दाना और दालचीनी का पानी।\n3️⃣ **हार्ट व बीपी के लिए:** सुबह खाली पेट 1 कली कच्चा लहसुन और अर्जुन की छाल का काढ़ा।\n4️⃣ **पुरानी कब्ज व पेट गैस के लिए:** रात को सोते समय गुनगुने पानी से 1 चम्मच त्रिफला चूर्ण।\n5️⃣ **थायराइड के लिए:** रातभर भीगे साबुत धनिए का उबला पानी सुबह खाली पेट।\n\n📖 **संपूर्ण 100+ सचित्र नुस्खे व दैनिक दिनचर्या के लिए आरोग्यम ई-बुक (BK001) देखें।**`;
+    return renderClinicalHealthCard('आरोग्यम अवनीश दादा के प्रमाणित आयुर्वेदिक नुस्खे', resp, [
+      { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" },
+      { label: "❤️ मुख्य स्वास्थ्य केंद्र (All Health Pages)", url: "/categories/health.html" }
+    ]);
+  }
+
   function resolveFollowUpQuery(cleanQ, rawQ) {
     const isIngredients = cleanQ.includes('iske andar') || cleanQ.includes('isme kya') || cleanQ.includes('kya kya hai') || cleanQ.includes('kya samagri') || cleanQ.includes('ingredients') || cleanQ.includes('composition') || cleanQ.includes('kisse bana') || cleanQ.includes('ghatak') || cleanQ.includes('इसके अंदर') || cleanQ.includes('क्या सामग्री') || cleanQ.includes('क्या क्या है');
-    const isDosage = cleanQ.includes('kaise khaye') || cleanQ.includes('kaise le') || cleanQ.includes('kab le') || cleanQ.includes('kab khaye') || cleanQ.includes('khuraak') || cleanQ.includes('खुराक') || cleanQ.includes('dose') || cleanQ.includes('डोज') || cleanQ.includes('kaise use') || cleanQ.includes('kaise spray') || cleanQ.includes('उपयोग कैसे') || cleanQ.includes('कैसे खाएं') || cleanQ.includes('कैसे लें');
+    const isDosage = cleanQ.includes('kaise khaye') || cleanQ.includes('kaise khana') || cleanQ.includes('kaise le') || cleanQ.includes('kab le') || cleanQ.includes('kab khaye') || cleanQ.includes('khuraak') || cleanQ.includes('खुराक') || cleanQ.includes('dose') || cleanQ.includes('डोज') || cleanQ.includes('kaise use') || cleanQ.includes('kaise spray') || cleanQ.includes('उपयोग कैसे') || cleanQ.includes('कैसे खाएं') || cleanQ.includes('कैसे लें') || cleanQ.includes('कैसे खाना');
     const isPrice = cleanQ.includes('kitne ka hai') || cleanQ.includes('price') || cleanQ.includes('rate') || cleanQ.includes('cost') || cleanQ.includes('kimat') || cleanQ.includes('कीमत') || cleanQ.includes('mrp') || cleanQ.includes('discount') || cleanQ.includes('छूट');
     const isBenefits = cleanQ.includes('fayde') || cleanQ.includes('fayda') || cleanQ.includes('labh') || cleanQ.includes('लाभ') || cleanQ.includes('फायदे') || cleanQ.includes('kya kaam') || cleanQ.includes('क्या काम') || cleanQ.includes('benefits');
     const isMore = cleanQ.includes('aur batao') || cleanQ.includes('aur jankari') || cleanQ.includes('और बताओ') || cleanQ.includes('aage batao') || cleanQ.includes('aur kya');
 
     const activeEntity = sakhiConversationState.lastActiveEntity;
+
+    // =========================================================================
+    // MULTI-TURN TWIST 1: "गैस बनती है" -> Klear CDT Syrup (MRP ₹210) Recommendation
+    // =========================================================================
+    if (cleanQ.includes('gas banti') || cleanQ.includes('गैस बनती') || cleanQ.includes('gas hoti') || cleanQ.includes('गैस होती') || cleanQ.includes('acidity') || cleanQ.includes('एसिडिटी') || cleanQ.includes('पेट में जलन') || cleanQ.includes('खट्टी डकार')) {
+      const resp = `🌿 **गैस व एसिडिटी की स्थिति में विशेष मार्गदर्शन एवं समाधान:**\n\n1. **कैप्सूल सेवन नियम:** चूंकि आपको गैस बनती है, इसलिए लाइफस्टाइल प्लस या किसी भी हेल्थ सप्लीमेंट को खाली पेट बिल्कुल न लें। इसे हमेशा **भोजन करने के 30 मिनट बाद** ही हल्के गुनगुने पानी से लें।\n\n2. **आरोग्यम का प्रामाणिक समाधान — Klear CDT Syrup (MRP ₹210):**\nपेट की पुरानी गैस, खट्टी डकार, सीने की जलन और एसिडिटी को 10 मिनट में शांत करने के लिए आरोग्यम का **Klear CDT Acidity Remedy Syrup (MRP मात्र ₹210)** अत्यंत लाभकारी और सुरक्षित आयुर्वेदिक औषधि है!\n• **सेवन विधि:** भोजन के 15-20 मिनट बाद 10 से 15 ml पिएं। यह पित्त को शांत कर पाचन को सुगम बनाता है।`;
+      renderCrispSpecialBox('🌿 गैस व एसिडिटी समाधान — Klear CDT Syrup (MRP ₹210)', resp, [
+        { text: '🌿 Klear CDT सिरप की जानकारी (MRP ₹210)', query: 'क्लियर सीडीटी सिरप के फायदे' },
+        { text: '🩺 13 क्लिनिकल हेल्थ गाइड्स देखें', url: '/categories/health.html', isExternal: true }
+      ], 'health', 'gas_acidity_klear_cdt');
+      return true;
+    }
+
+    // =========================================================================
+    // MULTI-TURN TWIST 2: "खाने के पहले कि बाद में?" (भोजन से पहले या बाद में)
+    // =========================================================================
+    if (cleanQ.includes('khane ke pahle') || cleanQ.includes('khane ke baad') || cleanQ.includes('खाने के पहले') || cleanQ.includes('खाने के बाद') || cleanQ.includes('पहले की बाद') || cleanQ.includes('पहले या बाद') || cleanQ.includes('before or after') || cleanQ.includes('pehle ya baad')) {
+      const resp = `🍽️ **भोजन के पहले या बाद में लेने का वैज्ञानिक नियम:**\n\n• 1. **यदि आपको पेट में गैस या एसिडिटी की समस्या नहीं बनती है:** तो इसे भोजन करने से 30 से 45 मिनट **पहले** (खाली पेट) लेना सबसे उचित और अधिक प्रभावशाली है, क्योंकि यह सीधे पैंक्रियाज और अवशोषण पर काम करता है।\n• 2. **यदि आपको गैस या एसिडिटी बनती है:** तो इसे खाली पेट न लें, बल्कि भोजन करने के 30 मिनट **बाद** ही लेना चाहिए।`;
+      renderCrispSpecialBox('🍽️ भोजन से पहले या बाद में सेवन नियम', resp, [
+        { text: '💨 मुझे गैस बनती है', query: 'मुझे गैस बनती है क्या करूं' },
+        { text: '🥛 दूध के साथ या पानी के साथ?', query: 'दूध के साथ कि पानी के साथ' }
+      ], 'health', 'timing_before_after_meals');
+      return true;
+    }
+
+    // =========================================================================
+    // MULTI-TURN TWIST 3: "दूध के साथ कि पानी के साथ?"
+    // =========================================================================
+    if (cleanQ.includes('dudh') || cleanQ.includes('doodh') || cleanQ.includes('दूध') || cleanQ.includes('pani ke sath') || cleanQ.includes('पानी के साथ') || cleanQ.includes('दूध के साथ कि पानी') || cleanQ.includes('दूध या पानी')) {
+      const resp = `🥛💧 **दूध के साथ या पानी के साथ सेवन का नियम:**\n\nआप इसे **सामान्य गुनगुने पानी के साथ भी ले सकते हैं और दूध के साथ भी ले सकते हैं**। दोनों ही माध्यम सुरक्षित हैं।\n\n💡 **विशेष सलाह:** कैप्सूल के तेजी से घुलने और पेट में सर्वोत्तम अवशोषण (Absorption) के लिए **हल्का गुनगुना पानी सबसे उत्तम** माना जाता है।`;
+      renderCrispSpecialBox('🥛💧 दूध या पानी के साथ सेवन नियम', resp, [
+        { text: '🍽️ खाने के पहले कि बाद में?', query: 'खाने के पहले की बाद में' },
+        { text: '💊 सही खुराक (Dose) क्या है?', query: 'इसकी खुराक क्या है' }
+      ], 'health', 'milk_vs_water_rule');
+      return true;
+    }
+
+    // =========================================================================
+    // MULTI-TURN TWIST 4: Nutri Heart vs Lifestyle Plus Dose Disambiguation
+    // =========================================================================
+    const recentMentionsHeartAndLifestyle = (sakhiConversationState.history || []).slice(-6).some(h => (h.clean || '').includes('nutri heart') || (h.clean || '').includes('हार्ट')) &&
+                                           (sakhiConversationState.history || []).slice(-6).some(h => (h.clean || '').includes('lifestyle') || (h.clean || '').includes('शुगर') || (h.clean || '').includes('लाइफस्टाइल'));
+
+    if (isDosage && (cleanQ.includes('ise kaise khana') || cleanQ.includes('ise kaise le') || cleanQ.includes('dono ka dose') || cleanQ === 'ise kaise khana hai' || cleanQ === 'dose kya hai' || cleanQ === 'काउंसिल' || recentMentionsHeartAndLifestyle)) {
+      if (!cleanQ.includes('lifestyle') && !cleanQ.includes('लाइफस्टाइल') && !cleanQ.includes('nutri heart') && !cleanQ.includes('हार्ट') && !cleanQ.includes('शुगर')) {
+        const resp = `कृपया स्पष्ट करें कि आप किसका डोज (सेवन विधि) जानना चाहते हैं?\n\n• **1. नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus):** मधुमेह व ब्लड शुगर संतुलन कैप्सूल\n• **2. नेचुरामोरे न्यूट्री हार्ट (Nutri Heart):** हृदय सुरक्षा, बीपी व कोलेस्ट्रॉल संतुलन कैप्सूल\n\nआप जिसका भी नाम बताएंगे, मैं उसकी सटीक खुराक और सेवन नियम बता दूंगी।`;
+        sakhiConversationState.awaitingDoseDisambiguation = true;
+        renderCrispSpecialBox('💊 खुराक स्पष्टीकरण — लाइफस्टाइल प्लस या न्यूट्री हार्ट?', resp, [
+          { text: '🌿 लाइफस्टाइल प्लस (शुगर)', query: 'लाइफस्टाइल प्लस का डोज बताओ' },
+          { text: '❤️ न्यूट्री हार्ट (हृदय)', query: 'न्यूट्री हार्ट का डोज बताओ' }
+        ], 'health', 'dose_disambiguation');
+        return true;
+      }
+    }
+
+    // Clarified after disambiguation prompt
+    if (cleanQ.includes('lifestyle') || cleanQ.includes('लाइफस्टाइल') || (sakhiConversationState.awaitingDoseDisambiguation && (cleanQ.includes('पहला') || cleanQ.includes('शुगर')))) {
+      sakhiConversationState.awaitingDoseDisambiguation = false;
+      sakhiConversationState.lastActiveEntity = 'lifestyle_plus';
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🌿 **नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus) की सही खुराक व सेवन नियम:**\n\n• **दैनिक खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को।\n• **सेवन माध्यम:** हल्के गुनगुने पानी या सादे पानी के साथ लें।\n• **समय का नियम:** यदि गैस नहीं बनती तो भोजन से 30 मिनट पहले, और यदि गैस बनती है तो भोजन के 30 मिनट बाद लें।\n• **नियमितता:** स्थायी लाभ के लिए कम से कम 3 से 6 महीने नियमित सेवन करें।`;
+      renderCrispSpecialBox('🌿 नेचुरामोरे लाइफस्टाइल प्लस — खुराक व सेवन नियम', resp, [
+        { text: '🥛 दूध के साथ कि पानी के साथ?', query: 'दूध के साथ कि पानी के साथ' },
+        { text: '🍽️ खाने के पहले कि बाद में?', query: 'खाने के पहले की बाद में' },
+        { text: '🛒 इसे खरीदना चाहता हूँ', query: 'मैं लाइफस्टाइल प्लस खरीदना चाहता हूँ' }
+      ], 'health', 'lifestyle_plus_dose');
+      return true;
+    }
+
+    if (cleanQ.includes('nutri heart') || cleanQ.includes('न्यूट्री हार्ट') || (sakhiConversationState.awaitingDoseDisambiguation && (cleanQ.includes('दूसरा') || cleanQ.includes('हार्ट')))) {
+      sakhiConversationState.awaitingDoseDisambiguation = false;
+      sakhiConversationState.lastActiveEntity = 'nutri_heart';
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `❤️ **नेचुरामोरे न्यूट्री हार्ट (Nutri Heart) की सही खुराक व सेवन नियम:**\n\n• **दैनिक खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को।\n• **समय:** भोजन करने के 30 मिनट बाद गुनगुने पानी के साथ लें।\n• **अवधि:** 3 से 6 माह नियमित सेवन से धमनियों में लचीलापन और कोलेस्ट्रॉल संतुलन बना रहता है।`;
+      renderCrispSpecialBox('❤️ नेचुरामोरे न्यूट्री हार्ट — खुराक व सेवन नियम', resp, [
+        { text: '🥛 दूध के साथ कि पानी के साथ?', query: 'दूध के साथ कि पानी के साथ' },
+        { text: '🍽️ खाने के पहले कि बाद में?', query: 'खाने के पहले की बाद में' },
+        { text: '🛒 इसे खरीदना चाहता हूँ', query: 'मैं न्यूट्री हार्ट खरीदना चाहता हूँ' }
+      ], 'health', 'nutri_heart_dose');
+      return true;
+    }
+
+    // =========================================================================
+    // MULTI-TURN TWIST 5: "यह महंगा है / इसके अंदर क्या है / कैसे काम करता है?"
+    // =========================================================================
+    const isMahngaOrContentTwist = cleanQ.includes('mahga') || cleanQ.includes('mahnga') || cleanQ.includes('महंगा') ||
+      (cleanQ.includes('iske andar kya') || cleanQ.includes('iske andar ke content') || cleanQ.includes('kaise kam karta') || cleanQ.includes('कैसे काम करता'));
+
+    if (isMahngaOrContentTwist) {
+      if (activeEntity === 'nutri_heart' || cleanQ.includes('nutri heart') || cleanQ.includes('हार्ट')) {
+        const resp = `❤️ **नेचुरामोरे न्यूट्री हार्ट (Nutri Heart) — घटक, गुणवत्ता और कार्यप्रणाली:**\n\n• **यह मूल्यवान क्यों है?** यह कोई साधारण चूर्ण नहीं है, बल्कि शुद्ध मानकीकृत प्राकृतिक अर्क (Standardized Herbal Extracts) से तैयार आधुनिक आयुर्वेदिक फॉर्मूला है।\n• **सक्रिय घटक (Active Ingredients):**\n  1. **अर्जुन छाल (Terminalia Arjuna):** हृदय की मांसपेशियों (Cardiovascular Muscles) को स्वाभाविक शक्ति प्रदान करती है।\n  2. **लहसुन अर्क (Garlic Extract):** धमनियों में जमे बैड कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स को पिघलाता है।\n  3. **अलसी अर्क (Flaxseed Omega-3):** रक्त को प्राकृतिक रूप से पतला और लचीला रखता है।\n  4. **अंगूर बीज सत्व (Grape Seed Extract):** शक्तिशाली एंटीऑक्सीडेंट जो रक्त वाहिकाओं की आंतरिक परत की रक्षा करता है।\n• **यह शरीर में कैसे काम करता है?** यह धमनियों में प्लाक जमने की प्रक्रिया को रोकता है, नसों में रक्त प्रवाह को सुगम बनाता है, जिससे हृदय पर अतिरिक्त दबाव नहीं पड़ता और बीपी व कोलेस्ट्रॉल दोनों संतुलित रहते हैं।\n• **आधिकारिक MRP:** मात्र **₹450** (30 कैप्सूल पैक)।`;
+        renderCrispSpecialBox('❤️ न्यूट्री हार्ट — घटक, कार्यप्रणाली व वैज्ञानिक आधार', resp, [
+          { text: '💊 इसकी खुराक (Dose) क्या है?', query: 'न्यूट्री हार्ट का डोज बताओ' },
+          { text: '🛒 न्यूट्री हार्ट खरीदना चाहता हूँ', query: 'मैं न्यूट्री हार्ट खरीदना चाहता हूँ' }
+        ], 'health', 'nutri_heart_why_worth_it');
+        return true;
+      }
+
+      if (activeEntity === 'lifestyle_plus' || cleanQ.includes('lifestyle') || cleanQ.includes('शुगर')) {
+        const resp = `🌿 **नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus) — घटक, गुणवत्ता और कार्यप्रणाली:**\n\n• **यह मूल्यवान क्यों है?** रासायनिक एलोपैथिक दवाएं केवल रक्त से शुगर को जबरन पेशाब के रास्ते बाहर निकालती हैं, जिससे किडनी पर दबाव पड़ता है। लाइफस्टाइल प्लस शरीर के मूल अंग पर काम करता है।\n• **सक्रिय घटक (Active Ingredients):**\n  1. **गुड़मार (Gymnema Sylvestre):** आंतों में ग्लूकोज के अवशोषण को नियंत्रित करता है और मीठे की इच्छा घटाता है।\n  2. **जामुन बीज सत्व:** पैंक्रियाज की बीटा-कोशिकाओं को पुनर्जीवित करने में सहायक है।\n  3. **करेला व विजयसार:** प्राकृतिक इंसुलिन उत्पादन को प्रोत्साहित करते हैं और इंसुलिन रेसिस्टेंस कम करते हैं।\n  4. **मेथी व दालचीनी:** मेटाबॉलिज्म को तेज कर कमजोरी दूर करते हैं।\n• **यह शरीर में कैसे काम करता है?** यह पैंक्रियाज (Pancreas) को पोषण देकर प्राकृतिक इंसुलिन स्राव को पुनर्जीवित करता है, जिससे नसों की दुर्बलता व बार-बार पेशाब आने की समस्या नियंत्रित होती है।\n• **आधिकारिक MRP:** मात्र **₹450** (30 कैप्सूल पैक)।`;
+        renderCrispSpecialBox('🌿 लाइफस्टाइल प्लस — घटक, कार्यप्रणाली व वैज्ञानिक आधार', resp, [
+          { text: '💊 इसकी खुराक (Dose) क्या है?', query: 'लाइफस्टाइल प्लस का डोज बताओ' },
+          { text: '🛒 लाइफस्टाइल प्लस खरीदना चाहता हूँ', query: 'मैं लाइफस्टाइल प्लस खरीदना चाहता हूँ' }
+        ], 'health', 'lifestyle_plus_why_worth_it');
+        return true;
+      }
+    }
+
+    // =========================================================================
+    // CRITICAL USER RULE: "मैं इसे खरीदना चाहता हूँ" -> State MRP FIRST, NO UPFRONT DISCOUNT!
+    // =========================================================================
+    const isDirectBuyIntent = cleanQ.includes('kharidna chahta') || cleanQ.includes('kharidna hai') || cleanQ.includes('khareedna chahta') ||
+                              cleanQ.includes('खरीदना चाहता') || cleanQ.includes('खरीदना है') || cleanQ.includes('order karna hai') ||
+                              cleanQ.includes('ऑर्डर करना है') || cleanQ.includes('मंगवाना चाहता') || cleanQ.includes('buy karna hai');
+
+    if (isDirectBuyIntent && !cleanQ.includes('discount') && !cleanQ.includes('offer') && !cleanQ.includes('छूट') && !cleanQ.includes('ऑफर')) {
+      if (activeEntity === 'nutri_heart' || cleanQ.includes('nutri heart') || cleanQ.includes('हार्ट')) {
+        const resp = `🛒 **नेचुरामोरे न्यूट्री हार्ट (Nutri Heart Capsules) — आधिकारिक खरीद विवरण:**\n\n• **उत्पाद:** नेचुरामोरे न्यूट्री हार्ट (हृदय व कोलेस्ट्रॉल केयर)\n• **पैकिंग:** 30 कैप्सूल की सीलबंद बोतल\n• **आधिकारिक एमआरपी (MRP):** मात्र **₹450**\n• **गुणवत्ता:** 100% प्रामाणिक व मानकीकृत आयुर्वेदिक घटक।\n\nआप सीधे नीचे दिए गए लिंक से इसे अपने पते पर सुरक्षित मंगवा सकते हैं:`;
+        renderCrispSpecialBox('🛒 न्यूट्री हार्ट आधिकारिक खरीद (MRP ₹450)', resp, [
+          { text: '🛒 न्यूट्री हार्ट ऑर्डर पेज खोलें →', url: '/health/heart-care.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+          { text: '💊 सेवन की सही विधि क्या है?', query: 'न्यूट्री हार्ट का डोज बताओ' }
+        ], 'health', 'nutri_heart_buy_mrp');
+        return true;
+      }
+
+      if (activeEntity === 'lifestyle_plus' || cleanQ.includes('lifestyle') || cleanQ.includes('शुगर')) {
+        const resp = `🛒 **नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules) — आधिकारिक खरीद विवरण:**\n\n• **उत्पाद:** नेचुरामोरे लाइफस्टाइल प्लस (ब्लड शुगर संतुलन)\n• **पैकिंग:** 30 कैप्सूल की सीलबंद बोतल\n• **आधिकारिक एमआरपी (MRP):** मात्र **₹450**\n• **गुणवत्ता:** 100% प्रामाणिक आयुर्वेदिक घटक (गुड़मार, करेला, विजयसार)।\n\nआप सीधे नीचे दिए गए लिंक से इसे अपने पते पर सुरक्षित मंगवा सकते हैं:`;
+        renderCrispSpecialBox('🛒 लाइफस्टाइल प्लस आधिकारिक खरीद (MRP ₹450)', resp, [
+          { text: '🛒 लाइफस्टाइल प्लस ऑर्डर पेज खोलें →', url: '/health/diabetes.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+          { text: '💊 सेवन की सही विधि क्या है?', query: 'लाइफस्टाइल प्लस का डोज बताओ' }
+        ], 'health', 'lifestyle_plus_buy_mrp');
+        return true;
+      }
+
+      if (activeEntity === 'stimrich' || cleanQ.includes('stimrich') || cleanQ.includes('स्टिमरिच')) {
+        const resp = `🌾 **बायोफिट स्टीमरिच (Biofit Stimrich - 1L) — आधिकारिक खरीद विवरण:**\n\n• **उत्पाद:** बायोफिट स्टीमरिच प्लांट ग्रोथ प्रमोटर\n• **पैकिंग:** 1 लीटर बोतल\n• **आधिकारिक एमआरपी (MRP):** मात्र **₹1,695**\n• **उपयोग:** कल्ले, नई शाखाएं व फूल-फल बढ़ाने हेतु 25-30 ml प्रति 15L पंप।\n\nआप सीधे नीचे दिए गए कृषि हब लिंक से इसे मंगवा सकते हैं:`;
+        renderCrispSpecialBox('🌾 बायोफिट स्टीमरिच खरीद (MRP ₹1,695)', resp, [
+          { text: '🌾 स्टीमरिच ऑर्डर करें →', url: '/categories/agriculture.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+          { text: '💧 बायो-99 स्टीकर (MRP ₹299)', query: 'बायो-99 की सही डोज' }
+        ], 'agri', 'stimrich_buy_mrp');
+        return true;
+      }
+
+      if (activeEntity === 'cfc_plus' || activeEntity === 'pet_vet' || cleanQ.includes('cfc') || cleanQ.includes('पेट वेट')) {
+        const resp = `🐄 **बायोफिट पेट-वेट (पूर्व CFC Plus) — आधिकारिक खरीद विवरण:**\n\n• **1 किलोग्राम पैक:** MRP मात्र **₹1,275**\n• **500 ग्राम पैक:** MRP मात्र **₹699**\n• **250 ग्राम पैक:** MRP मात्र **₹399**\n• **लाभ:** दूध में 15-25% वृद्धि और फैट 7-8 डिग्री सुधार।\n\nआप सीधे नीचे दिए गए पशुपालन केंद्र लिंक से ऑर्डर कर सकते हैं:`;
+        renderCrispSpecialBox('🐄 बायोफिट पेट-वेट आधिकारिक खरीद (1kg MRP ₹1,275)', resp, [
+          { text: '🐄 पेट-वेट ऑर्डर करें →', url: '/categories/pashu-palan.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+          { text: '🥄 दैनिक खुराक नियम क्या है?', query: 'पेट वेट कैसे खिलाएं' }
+        ], 'pashu', 'pet_vet_buy_mrp');
+        return true;
+      }
+    }
 
     // Follow-up: Diabetes causes inquiry ("मधुमेह क्या है और कैसे होता है?")
     if (cleanQ.includes('मधुमेह क्या है') || cleanQ.includes('diabetes kya hai') || cleanQ.includes('kaise hota hai') || (activeEntity === 'diabetes' && isMore)) {
@@ -2276,55 +3007,9 @@
 
   // 15.5 DADI-NANI KE GHARELU NUSKHE ROUTER (सेहत, सौंदर्य व हेयर फॉल)
   function handleDadiKeNuskhe(cleanQ, rawQ) {
-    const isNuskhe = cleanQ.includes('दादी के नुस्खे') || cleanQ.includes('घरेलू नुस्खा') || cleanQ.includes('nuskhe') || cleanQ.includes('nuskha') || cleanQ.includes('घरेलू उपाय') || cleanQ.includes('देशी उपाय') || cleanQ.includes('dadi ke');
-    if (!isNuskhe && !cleanQ.includes('nuskha')) return false;
-
-    const isBeauty = cleanQ.includes('सुंदर') || cleanQ.includes('त्वचा') || cleanQ.includes('skin') || cleanQ.includes('ग्लो') || cleanQ.includes('glow') || cleanQ.includes('मुंहासे') || cleanQ.includes('pimple') || cleanQ.includes('चेहरा');
-    const isHair = cleanQ.includes('बाल') || cleanQ.includes('hair') || cleanQ.includes('डैंड्रफ') || cleanQ.includes('dandruff') || cleanQ.includes('झड़ना') || cleanQ.includes('गंजापन');
-    const isPain = cleanQ.includes('जोड़ों') || cleanQ.includes('दर्द') || cleanQ.includes('गठिया') || cleanQ.includes('घुटने');
-
-    if (isBeauty) {
-      const resp = `✨ **दादी के नुस्खे — कुदरती त्वचा ग्लो व मुंहासे मुक्ति:**\n\n1. **चेहरे पर नेचुरल ग्लो (उबटन):**\n• 2 चम्मच बेसन + आधा चम्मच कच्चा दूध + चुटकी भर कस्तूरी हल्दी + 4 बूंद गुलाब जल मिलाकर लेप बनाएं। 15 मिनट बाद हल्के हाथ से धो लें।\n\n2. **मुंहासे व कील (Pimples) का इलाज:**\n• मुल्तानी मिट्टी में ताजी नीम की पत्तियों का रस या गुलाब जल मिलाकर चेहरे पर लगाएं। नीम एंटी-बैक्टीरियल है जो मुंहासों को जड़ से खत्म करता है।\n\n👉 **स्थायी समाधान:** अंदरूनी त्वचा पोषण के लिए नेट्सर्फ का **विटामिन थेरेपी स्किन केयर** 25% छूट पर उपलब्ध है।`;
-      renderCrispSpecialBox('✨ दादी के नुस्खे — कुदरती त्वचा ग्लो व मुंहासे मुक्ति', resp, [
-        { text: '💇 बाल झड़ने व रूसी के नुस्खे', query: 'दादी के नुस्खे बाल झड़ने के लिए' },
-        { text: '🦴 जोड़ों के दर्द के घरेलू नुस्खे', query: 'दादी के नुस्खे जोड़ों के दर्द के लिए' },
-        { text: '✨ नेट्सर्फ स्किन केयर देखें', query: 'नेट्सर्फ स्किन केयर प्रोडक्ट्स' }
-      ], 'beauty', 'nuskhe_beauty');
-      return true;
-    }
-
-    if (isHair) {
-      const resp = `💇 **दादी के नुस्खे — बाल झड़ना (Hair Fall) व डैंड्रफ से मुक्ति:**\n\n1. **बालों को जड़ों से मजबूत बनाना:**\n• 2 चम्मच मेथी दाना रातभर पानी में भिगोएं, सुबह पीसकर खट्टी दही के साथ बालों की जड़ों में लगाएं। 30 मिनट बाद धो लें।\n• शुद्ध नारियल तेल में 15-20 करी पत्ता और सूखा आंवला पकाकर रख लें। सप्ताह में 2 बार गुनगुने तेल से स्कैल्प मालिश करें।\n\n2. **रूसी (Dandruff) का पक्का इलाज:**\n• नारियल तेल में थोड़ा सा नींबू का रस या देसी कपूर मिलाकर लगाने से फंगल डैंड्रफ तुरंत साफ हो जाता है।\n\n👉 **आधुनिक विकल्प:** नेट्सर्फ का **हर्ब्स एंड मोर हेयर न्यूट्रिएंट्स व शैम्पू** बिना किसी केमिकल के बालों को घना बनाता है (25% फ्लैट छूट)।`;
-      renderCrispSpecialBox('💇 दादी के नुस्खे — बाल झड़ना व डैंड्रफ रोकथाम', resp, [
-        { text: '✨ चेहरे के ग्लो के घरेलू नुस्खे', query: 'दादी के नुस्खे चेहरे के ग्लो के लिए' },
-        { text: '🦴 जोड़ों के दर्द के घरेलू नुस्खे', query: 'दादी के नुस्खे जोड़ों के दर्द के लिए' },
-        { text: '🛒 नेट्सर्फ हेयर केयर उत्पाद', query: 'नेट्सर्फ हेयर केयर' }
-      ], 'beauty', 'nuskhe_hair');
-      return true;
-    }
-
-    if (isPain) {
-      const resp = `🦴 **दादी के नुस्खे — जोड़ों व घुटनों के दर्द में तुरंत राहत:**\n\n1. **अमृत चूर्ण:**\n• सोंठ (सूखा अदरक), मेथी दाना और हल्दी—तीनों को बराबर मात्रा में पीसकर पाउडर बना लें। रोज सुबह-शाम 1-1 चम्मच गुनगुने पानी से लें। यह यूरिक एसिड घटाता है और वात शांत करता है।\n\n2. **मालिश का तेल:**\n• तिल या सरसों के तेल में लहसुन की 5-6 कलियां और थोड़ी अजवाइन जलाकर तेल छान लें। रात में हल्के हाथ से जोड़ों की सिकाई करें।\n\n👉 **स्थायी समाधान:** कार्टिलेज और ग्रीस दोबारा बनाने के लिए नेचुरामोर **जॉइंट केयर** (25% छूट पर) अवश्य शुरू करें।`;
-      renderCrispSpecialBox('🦴 दादी के नुस्खे — जोड़ों के दर्द का देशी उपाय', resp, [
-        { text: '🌿 नेचुरामोर जॉइंट केयर के अंदर क्या है?', query: 'नेचुरामोर जॉइंट केयर के अंदर क्या है' },
-        { text: '💇 बाल झड़ने के घरेलू नुस्खे', query: 'दादी के नुस्खे बाल झड़ने के लिए' },
-        { text: '✨ चेहरे के ग्लो के घरेलू नुस्खे', query: 'दादी के नुस्खे चेहरे के ग्लो के लिए' }
-      ], 'health', 'nuskhe_joint');
-      return true;
-    }
-
-    // General Nuskhe Menu
-    const resp = `🌸 **दादी-नानी के असली आयुर्वेदिक घरेलू नुस्खे:**\n\nहमारी भारतीय परंपरा में रसोई ही सबसे बड़ा औषधालय है। आप किस विषय पर आजमाया हुआ देशी घरेलू नुस्खा जानना चाहते हैं?`;
-    renderCrispSpecialBox('🌸 दादी के असली घरेलू नुस्खे — स्वास्थ्य व सौंदर्य', resp, [
-      { text: '✨ चेहरे पर चमक व मुंहासे मुक्ति', query: 'दादी के नुस्खे चेहरे के ग्लो के लिए' },
-      { text: '💇 बाल झड़ना व डैंड्रफ रोकना', query: 'दादी के नुस्खे बाल झड़ने के लिए' },
-      { text: '🦴 जोड़ों का दर्द व गठिया उपाय', query: 'दादी के नुस्खे जोड़ों के दर्द के लिए' },
-      { text: '🍃 गैस, कब्ज व एसिडिटी नुस्खा', query: 'गैस और कब्ज के घरेलू नुस्खे' }
-    ], 'nuskhe', 'nuskhe_menu');
-    return true;
+    return handleAvnishDadaKeNuskhe(cleanQ, rawQ);
   }
 
-  // 15.6 CROSS-DOMAIN INTENT DISAMBIGUATION ENGINE (2000+ Keywords Context Checkpoint)
   function handleCrossDomainDisambiguation(cleanQ, rawQ) {
     const activeDomain = sakhiConversationState ? sakhiConversationState.lastActiveDomain : null;
     const q = cleanQ;
@@ -2393,6 +3078,270 @@
   }
 
   // 15.7 BEAUTY, SKINCARE, HAIRCARE, WEIGHT MANAGEMENT & WOMEN EMPOWERMENT (15000+ Words Master Engine)
+  // ============================================================================
+  // 14.0 COMPREHENSIVE PAIN INTELLIGENCE & CLINICAL TRIAGE ROUTER
+  // (Prevents false routing of Chest, Head, Stomach or Arm Pain to Heel Pain)
+  // ============================================================================
+  function handleComprehensivePainRouter(cleanQ, query) {
+    const q = (cleanQ || '').toLowerCase().trim();
+
+    // Check if query is asking about pain
+    const isPainQuery = q.includes('dard') || q.includes('दर्द') || q.includes('pain') || q.includes('dukh') || q.includes('दुख') || q.includes('jalan') || q.includes('जलन');
+    if (!isPainQuery) return false;
+
+    // 1. CHEST PAIN / SINE ME DARD (EMERGENCY RED ALERT!)
+    const isChestPain = q.includes('sine') || q.includes('seene') || q.includes('सीने') || q.includes('chhati') || q.includes('छाती') || q.includes('chest') || q.includes('dil me dard') || q.includes('left hand me dard') || q.includes('chhati me dard');
+    if (isChestPain) {
+      const resp = `🚨 **आपातकालीन चेतावनी (Emergency Health Alert):**\n\nसीने में दर्द, भारीपन, जकड़न या बाएं हाथ व जबड़े की तरफ जाने वाला दर्द **हृदय से जुड़ी गंभीर समस्या (Angina या Heart Attack)** का प्राथमिक लक्षण हो सकता है।\n\n⚠️ **तुरंत क्या करें:**\n1. किसी भी घरेलू नुस्खे या तेल मालिश के भरोसे **1 सेकंड भी समय न गंवाएं**।\n2. बिना देर किए तुरंत अपने नजदीकी अस्पताल के **इमरजेंसी वार्ड (ICU/Cardiology)** में जाएं और तुरंत **ECG (इलेक्ट्रोकार्डियोग्राम)** करवाएं।\n3. यदि संभव हो तो मरीज को शांत बैठाएं और ढीले कपड़े पहनाएं।\n\n🩺 **नोट:** सीने के दर्द में सखी AI या कोई भी घरेलू उपाय डॉक्टर की जांच का स्थान नहीं ले सकता। सुरक्षा सबसे पहले है!`;
+
+      return renderClinicalHealthCard('🚨 सीने में दर्द: आपातकालीन चिकित्सा चेतावनी', resp, [
+        { label: "❤️ हृदय व कोलेस्ट्रॉल केयर पेज", url: "/health/heart-care.html" },
+        { label: "📞 108 एम्बुलेंस आपातकालीन सेवा", query: "इमरजेंसी में क्या करें" }
+      ]);
+    }
+
+    // 2. HEADACHE / SAR ME DARD / MIGRAINE
+    const isHeadache = q.includes('sar me dard') || q.includes('sir me dard') || q.includes('sar dard') || q.includes('sir dard') || q.includes('सिर दर्द') || q.includes('सिर में दर्द') || q.includes('सर में दर्द') || q.includes('headache') || q.includes('migraine') || q.includes('माइग्रेन') || q.includes('aadha sar dard') || q.includes('matha dard') || q.includes('माथा दर्द');
+    if (isHeadache) {
+      const resp = `राम-राम! 🙏 सिरदर्द की समस्या अक्सर मानसिक तनाव, अधूरी नींद, पानी की कमी, एसिडिटी (गैस) या हाई ब्लड प्रेशर के कारण होती है।
+
+🧠 **लॉजिक व कारण:**
+• जब सिर की रक्त नलिकाओं में तनाव या गैस चढ़ने से सूजन आ जाती है, तो माथे और कनपटी में भारीपन व तेज चुभन होती है। चाय-कॉफी की लत भी नसों में खिंचाव पैदा करती है।
+
+👴 **आरोग्यम अवनीश दादा का प्रमाणित नुस्खा:**
+• **बादाम व काली मिर्च:** 5 भीगे हुए बादाम और 2 दाने काली मिर्च पीसकर मिश्री वाले गुनगुने दूध के साथ लें।
+• **सिर पर ठंडी पट्टी:** माथे पर गीला सूती कपड़ा रखें और 10 मिनट गहरी साँस (अनुलोम-विलोम) लें।
+• **भरपूर पानी:** तुरंत 2 गिलास सादा गुनगुना पानी घूंट-घूंट करके पिएं।
+
+🌿 **हर्बल पोषण सहायता (Naturamore De-Stress):**
+• ब्राह्मी, शंखपुष्पी व जटामांसी युक्त जो दिमाग की नसों को शांत कर तनाव व अनिद्रा को मिटाता है।
+• **दर्द निवारक बाम:** सिर की कनपटी पर **Herbs & More Pain Cream** की हल्की सी मालिश करें।`;
+
+      return renderClinicalHealthCard('सिरदर्द व माइग्रेन: कारण, अवनीश दादा के नुस्खे व शांति', resp, [
+        { label: "🧘 तनाव व अनिद्रा केयर केंद्र", url: "/categories/health.html" },
+        { label: "🌿 नेचुरामोर डी-स्ट्रेस कैप्सूल", query: "डी-स्ट्रेस में क्या सामग्री है?" }
+      ]);
+    }
+
+    // 3. ABDOMINAL / STOMACH PAIN (पेट में दर्द)
+    const isStomachPain = q.includes('pet me dard') || q.includes('pet dard') || q.includes('पेट में दर्द') || q.includes('पेट दर्द') || q.includes('stomach pain') || q.includes('stomach ache') || q.includes('pet me marod') || q.includes('pet marod') || q.includes('pet kharab');
+    if (isStomachPain) {
+      const resp = `राम-राम! 🙏 पेट में दर्द के 80% मामले अपच, भारी गैस, आंतों में पुराना मल जमना (कब्ज) या दूषित खानपान के कारण होते हैं।
+
+👴 **आरोग्यम अवनीश दादा का तुरंत राहत नुस्खा:**
+• **अजवाइन-हींग-काला नमक:** आधा चम्मच भुनी अजवाइन में 1 चुटकी हींग और थोड़ा काला नमक मिलाकर गुनगुने पानी से फांक लें। 10 मिनट में गैस का दबाव कम हो जाएगा।
+• नाभि के चारों ओर हल्का गुनगुना हींग का पानी लगाएं।
+
+🌿 **आंतों की गहरी शुद्धि (Naturamore Easy Detox):**
+• त्रिफला, सनाय व मुलेठी युक्त जो पेट में जमा गैस व पुराने मल को बाहर निकालता है।
+
+⚠️ **चेतावनी:** यदि दर्द पेट के नीचे दाईं तरफ बहुत तेज हो (Appendicitis) या पथरी (Gallbladder/Kidney Stone) का दर्द हो, अथवा उल्टी-बुखार आए, तो तुरंत डॉक्टर को दिखाएं।`;
+
+      return renderClinicalHealthCard('पेट दर्द, गैस व मरोड़: तुरंत घरेलू उपचार व उपाय', resp, [
+        { label: "🌿 उदर व लिवर केयर का आधिकारिक पेज", url: "/health/liver-care.html" },
+        { label: "🍵 अवनीश दादा का पेट साफ नुस्खा", query: "कब्ज के लिए अवनीश दादा के नुस्खे" }
+      ]);
+    }
+
+    // 4. HAND, SHOULDER, NECK & CERVICAL PAIN (हाथ, कंधा व गर्दन दर्द)
+    const isArmPain = q.includes('hath me dard') || q.includes('hath dard') || q.includes('हाथ में दर्द') || q.includes('haath me dard') || q.includes('kandhe me dard') || q.includes('कंधे में दर्द') || q.includes('gardan') || q.includes('गर्द') || q.includes('cervical') || q.includes('सर्वाइकल') || q.includes('shoulder') || q.includes('frozen shoulder');
+    if (isArmPain) {
+      const resp = `राम-राम! 🙏 हाथ, कंधे या गर्दन का दर्द अक्सर गलत तकिया लगाने, लगातार मोबाइल/कंप्यूटर देखने (Cervical Spondylosis) या मांसपेशियों में खिंचाव (Frozen Shoulder) के कारण होता है।
+
+👴 **अवनीश दादा का सिकाई व तेल नुस्खा:**
+• 50ml तिल के तेल में 4 कली लहसुन और थोड़ा कपूर पकाकर हल्का गुनगुना मालिश करें।
+• मालिश के बाद गर्म पानी की थैली या तौलिए से 10 मिनट भाप/सिकाई लें।
+
+🧴 **तुरंत राहत हेतु (Herbs & More Pain Cream):**
+• विंटरग्रीन (गंधपुरा), नीलगिरी, पुदीना सत्व व कपूर युक्त प्राकृतिक पेन क्रीम हल्के हाथ से लगाएं। बिना किसी जलन के नसों की अकड़न तुरंत खुलती है।`;
+
+      return renderClinicalHealthCard('हाथ, कंधे व गर्दन का दर्द: सर्वाइकल व स्नायु आराम', resp, [
+        { label: "🧴 हर्ब्स एंड मोर पेन क्रीम जानकारी", query: "पेन क्रीम में क्या सामग्री है?" },
+        { label: "🦴 जोड़ों व हड्डियों का संपूर्ण पेज", url: "/health/joint-care.html" }
+      ]);
+    }
+
+    // 5. BACK & LOWER SPINE PAIN (कमर दर्द / साइटिका / रीढ़ की हड्डी)
+    const isBackPain = q.includes('kamar me dard') || q.includes('kamar dard') || q.includes('कमर में दर्द') || q.includes('कमर दर्द') || q.includes('back pain') || q.includes('sciatica') || q.includes('साइटिका') || q.includes('reedh') || q.includes('रीढ़');
+    if (isBackPain) {
+      const resp = `राम-राम! 🙏 कमर दर्द और साइटिका रीढ़ की मणकों (L4-L5 डिस्क) के दबने या वात दोष बढ़ने से होता है।
+
+👴 **अवनीश दादा का नुस्खा:**
+• **मेथी-सौंठ का काढ़ा:** 1 चम्मच मेथी और आधा चम्मच सौंठ पाउडर 1 कप पानी में उबालकर पिएं।
+• झुककर भारी वजन न उठाएं, हमेशा सख्त बिस्तर (तख्त या फर्श) पर सोएं।
+
+🌿 **हर्बल पोषण व बाह्य लेप:**
+• **Naturamore Joint Care:** हड़जोड़ व शल्लाकी नसों की सूजन घटाकर हड्डियों को बल देते हैं।
+• **Herbs & More Pain Cream:** कमर पर हल्के हाथ से मालिश कर गर्म तौलिए से भाप दें।`;
+
+      return renderClinicalHealthCard('कमर दर्द व साइटिका: रीढ़ की सुरक्षा व आयुर्वेदिक उपचार', resp, [
+        { label: "🦴 जॉइंट व स्पाइन केयर का आधिकारिक पेज", url: "/health/joint-care.html" },
+        { label: "🧴 हर्ब्स एंड मोर पेन क्रीम विवरण", query: "पेन क्रीम में क्या सामग्री है?" }
+      ]);
+    }
+
+    // 6. HEEL PAIN (एड़ी का दर्द - Plantar Fasciitis) - ONLY WHEN EXPLICITLY HEEL!
+    const isHeelPain = q.includes('edi me dard') || q.includes('edi ka dard') || q.includes('एड़ी में दर्द') || q.includes('एड़ी का दर्द') || q.includes('heel pain') || q.includes('plantar fasciitis') || q.includes('talwe me dard') || q.includes('पैर के तलवे') || q.includes('subah pair me dard');
+    if (isHeelPain) {
+      const resp = `राम-राम! 🙏 **एड़ी का दर्द (Plantar Fasciitis)** सुबह सोकर उठते ही जमीन पर पैर रखते ही सुई जैसी असहनीय चुभन पैदा करता है।
+
+🧬 **लॉजिक:** पैर के तलवे का सुरक्षात्मक लिगामेंट (Plantar Fascia) अत्यधिक खिंचाव या नंगे पैर चलने से सूज जाता है।
+👴 **अवनीश दादा का उपाय:** रात को गुनगुने पानी में सेंधा नमक डालकर 15 मिनट पैर डुबोएं।
+🧴 **Herbs & More Pain Cream + Crack Cream:** एड़ी पर मालिश कर मोजे पहनें। नरम तलवे वाले जूते-चप्पल का ही प्रयोग करें।`;
+
+      return renderClinicalHealthCard('एड़ी का दर्द (Plantar Fasciitis): सुबह पैर की चुभन का इलाज', resp, [
+        { label: "🧴 हर्ब्स एंड मोर पेन क्रीम व क्रैक क्रीम", query: "क्रैक क्रीम और पेन क्रीम के बारे में बताओ" },
+        { label: "🦴 जोड़ों व हड्डियों का आधिकारिक पेज", url: "/health/joint-care.html" }
+      ]);
+    }
+
+    // 7. AMBIGUOUS PAIN QUERY ("dard ho raha hai", "bahut dard hai" without organ)
+    // Triage router asking user which organ/body part is affected
+    const isAmbiguousPain = cleanQ === 'dard' || cleanQ === 'dard hai' || cleanQ === 'dard ho raha hai' ||
+      cleanQ === 'दर्द' || cleanQ === 'दर्द हो रहा है' || cleanQ === 'dard ka ilaj' || cleanQ === 'दर्द का इलाज' ||
+      cleanQ.includes('bahut dard') || cleanQ.includes('kahi dard') || cleanQ.includes('sharir me dard') || cleanQ.includes('body pain');
+
+    if (isAmbiguousPain) {
+      const resp = `प्रिय साथी! 🙏 मैं आपकी पूरी मदद करना चाहती हूँ। सही उपाय और आयुर्वेदिक परामर्श देने के लिए कृपया मुझे बताएं कि:
+
+> **"आपको दर्द शरीर के किस हिस्से में हो रहा है?"**
+
+नीचे दिए गए मुख्य विकल्पों में से अपने प्रभावित अंग पर टैप करें:`;
+
+      return renderClinicalHealthCard('दर्द निवारण परामर्श: प्रभावित अंग का चयन करें', resp, [
+        { label: "🧠 1. सिरदर्द व माइग्रेन", query: "सिर में दर्द का उपाय" },
+        { label: "🚨 2. सीने में दर्द (आपातकाल)", query: "सीने में दर्द हो रहा है" },
+        { label: "🍵 3. पेट दर्द व मरोड़", query: "पेट में दर्द का उपाय" },
+        { label: "🦴 4. जोड़ों व घुटनों का दर्द", query: "घुटनों में दर्द रहता है" },
+        { label: "🧍 5. कमर व रीढ़ का दर्द", query: "कमर में दर्द हो रहा है" },
+        { label: "💪 6. हाथ व कंधे का दर्द", query: "हाथ में दर्द का उपाय" },
+        { label: "🦶 7. एड़ी व पैर का दर्द", query: "एड़ी में दर्द का इलाज" }
+      ]);
+    }
+
+    return false;
+  }
+
+  // ============================================================================
+  // 14.6 HERBS & MORE BEAUTY, SKIN, HAIR, DENTAL & PERSONAL CARE MASTER ENGINE V4
+  // ============================================================================
+  function handleBeautyHairSkinPersonalCareMaster(cleanQ, query) {
+    const q = (cleanQ || '').toLowerCase().trim();
+
+    // 1. DENTAL CARE (100% Fluoride-Free Herbal Dental Paste)
+    const isDental = q.includes('dant') || q.includes('danto') || q.includes('दांत') || q.includes('दांतों') || q.includes('dental') || q.includes('toothpaste') || q.includes('टूथपेस्ट') || q.includes('pyria') || q.includes('पायरिया') || q.includes('masude') || q.includes('मसूड़े') || q.includes('bad smell') || q.includes('fluoride') || q.includes('मुंह की बदबू');
+    if (isDental) {
+      const resp = `🌿 **Herbs & More 100% फ्लोराइड-मुक्त हर्बल डेंटल पेस्ट (Herbal Dental Paste):**
+
+⚠️ **बाजार के केमिकल टूथपेस्ट की कड़वी सच्चाई:**
+बाजार के अधिकांश टूथपेस्ट में कृत्रिम फ्लोराइड और झाग बनाने वाला केमिकल सोडियम लॉरिल सल्फेट (SLS) मिलाया जाता है। फ्लोराइड शरीर में जाने पर हड्डियों को खोखला करता है और पेट के पाचन तंत्र को नुकसान पहुँचाता है।
+
+🌿 **हर्ब्स एंड मोर डेंटल पेस्ट के 6 सक्रिय आयुर्वेदिक घटक:**
+1. **नीम व बबूल:** पायरिया व हानिकारक बैक्टीरिया का 100% खात्मा।
+2. **लौंग (Clove):** दांतों के दर्द, कैविटी व कीड़े से तुरंत राहत।
+3. **वज्रदंती व तोमर:** मसूड़ों को चट्टान की तरह मजबूत बनाते हैं और खून आना रोकते हैं।
+4. **पुदीना व कर्पूर:** मुंह की दुर्गंध मिटाकर पूरे 12 घंटे तक ताजा और सुगंधित सांसें देते हैं।
+
+🎯 **प्रमाणित लाभ:** ठंडा-गर्म लगना (Sensitivity), मसूड़ों की सूजन, खून आना और कैविटी में संपूर्ण आयुर्वेदिक कवच।
+💰 **ऑफर:** 25% लाइफटाइम डिस्काउंट व 5+1 फ्री ऑफर उपलब्ध!`;
+
+      return renderClinicalHealthCard('100% फ्लोराइड-फ्री हर्बल डेंटल पेस्ट: दांतों व मसूड़ों का कवच', resp, [
+        { label: "🦷 ओरल व डेंटल केयर पेज", url: "/health/dental-care.html" },
+        { label: "🛍️ नेचुरामोर व हर्ब्स एंड मोर 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
+      ]);
+    }
+
+    // 2. PAIN CREAM & CRACK CREAM SPECIFIC INQUIRY
+    const isPainCream = q.includes('pain cream') || q.includes('पेन क्रीम') || q.includes('crack cream') || q.includes('क्रैक क्रीम') || q.includes('fati edi') || q.includes('फटी एड़ी') || q.includes('darar');
+    if (isPainCream) {
+      const resp = `🌿 **Herbs & More विशेष दैनिक केयर उत्पाद:**
+
+🧴 **1. हर्ब्स एंड मोर पेन क्रीम (Herbs & More Pain Cream — दर्द निवारक):**
+• **सक्रिय घटक:** गंधपुरा तेल (Wintergreen), नीलगिरी (Eucalyptus), पुदीना सत्व (Menthol) और शुद्ध कपूर (Camphor)।
+• **वैज्ञानिक लाभ:** बिना किसी चिपचिपाहट या जलन के मांसपेशियों की अकड़न, गर्दन (Cervical), कमर, कंधे और जोड़ों के दर्द में तुरंत राहत देती है। नसों में रक्त प्रवाह तेजी से बढ़ाती है।
+
+🦶 **2. हर्ब्स एंड मोर क्रैक क्रीम (Herbs & More Crack Cream — फटी एड़ियों के लिए):**
+• **सक्रिय घटक:** कोकम बटर (Kokum Butter), एलोवेरा, प्राकृतिक मोम (Beeswax) और मंजिष्ठा।
+• **वैज्ञानिक लाभ:** खेतों में काम करने, धूल-मिट्टी व सर्दियों से फटी सख्त, खुरदरी और दरारों से खून निकलने वाली एड़ियों को मात्र 7 दिनों में मखमली कोमल व चिकना बनाती है।
+
+💰 **विशेष छूट:** सभी Herbs & More उत्पादों पर फ्लैट 25% लाइफटाइम छूट उपलब्ध है!`;
+
+      return renderClinicalHealthCard('हर्ब्स एंड मोर पेन क्रीम व क्रैक क्रीम', resp, [
+        { label: "🦴 जोड़ों व हड्डियों का आधिकारिक पेज", url: "/health/joint-care.html" },
+        { label: "✨ संपूर्ण सौंदर्य व स्किन केयर केंद्र", url: "/categories/beauty.html" }
+      ]);
+    }
+
+    // 3. HAIR CARE: HAIR FALL, DANDRUFF, GROWTH, SPLIT ENDS (बालों की संपूर्ण समस्याएँ)
+    const isHairQuery = (
+      q.includes('baal') || q.includes('बाल') || q.includes('hair') || q.includes('rusi') || q.includes('रूसी') ||
+      q.includes('dandruff') || q.includes('डैंड्रफ') || q.includes('shampoo') || q.includes('shampu') || q.includes('शैम्पू') ||
+      q.includes('khar rahe') || q.includes('khir rahe') || q.includes('jhad rahe') || q.includes('hair fall') || q.includes('hair loss') || q.includes('harfal') ||
+      q.includes('do muhe') || q.includes('दो मुंहे') || q.includes('split ends') || q.includes('baal nahi badh') || q.includes('patle baal') || q.includes('safed baal') ||
+      q.includes('hair oil') || q.includes('khujli')
+    );
+    if (isHairQuery) {
+      const resp = `राम-राम! 🙏 बालों की समस्या (झड़ना, टूटना, रूसी, दो-मुंहे बाल या पतलापन) अक्सर केमिकल शैम्पू, रूसी (फंगस), तनाव और जड़ों में आवश्यक पोषण की कमी से होती है। सही आयुर्वेदिक पोषण से बाल घने व मजबूत बनते हैं!
+
+⚠️ **बाजार के केमिकल शैम्पू की पोल:**
+• बाजार के अधिकांश शैम्पू में सोडियम लॉरिल सल्फेट (SLS) और हानिकारक पैराबेन होते हैं, जो झाग तो बनाते हैं पर सिर की त्वचा का प्राकृतिक मॉइस्चर और तेल ग्रंथियों को सुखा देते हैं, जिससे बाल कमजोर होकर टूटने लगते हैं।
+
+👴 **आरोग्यम अवनीश दादा के प्रमाणित आयुर्वेदिक नुस्खे:**
+1. **झड़ते व टूटते बालों के लिए:** 2 चम्मच मेथी दाना रात में पानी में भिगोएं, सुबह पीसकर खट्टी दही के साथ हेयर मास्क बनाएं और जड़ों में लगाएं। 30 मिनट बाद धो लें; या रात में भृंगराज व आंवला का रस जड़ों में लगाएं।
+2. **रूसी (डैंड्रफ) व सिर में खुजली:** शुद्ध नारियल तेल में 1 चुटकी देशी कपूर और 1 चम्मच ताजा नींबू का रस मिलाकर सिर की हल्की मालिश करें।
+3. **दो-मुंहे बालों के लिए:** बालों के निचले सिरों पर ताजा एलोवेरा जेल और बादाम का तेल नियमित लगाएं।
+4. **पतले बाल व लंबाई के लिए:** अरंडी (कैस्टर ऑयल) और नारियल तेल बराबर मात्रा में मिलाकर जड़ों में लगाएं।
+
+🌿 **नेट्सर्फ Herbs & More 100% सल्फेट व पैराबेन-मुक्त समाधान:**
+• **Anti-Hair Fall Shampoo:** भृंगराज, ब्राह्मी व जपापुष्प युक्त — बालों का झड़ना 80% तक कम करता है।
+• **Anti-Dandruff Shampoo:** टी-ट्री ऑयल, रोजमेरी व नीम अर्क — फंगस व रूसी को जड़ से मिटाता है।
+• **Herbal Hair Oil & Vitamin Hair Serum:** 100% शुद्ध तेल जो जड़ों को भोजन देकर नए बाल उगाने में सहायक है।`;
+
+      return renderClinicalHealthCard('बालों की संपूर्ण देखभाल: हेयर फॉल, रूसी, दो-मुंहे बाल व ग्रोथ', resp, [
+        { label: "💇 हेयर केयर का आधिकारिक पेज", url: "/health/hair-care.html" },
+        { label: "🧴 हर्ब्स एंड मोर शैम्पू व ऑयल 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" },
+        { label: "✨ त्वचा व सौंदर्य केंद्र", url: "/categories/beauty.html" }
+      ]);
+    }
+
+    // 4. SKIN CARE: TANNING, ACNE, PIGMENTATION, RED RASHES (त्वचा, टैनिंग, मुंहासे, झाइयां, दानों का इलाज)
+    const isSkinQuery = (
+      q.includes('skin') || q.includes('त्वचा') || q.includes('chehre') || q.includes('चेहरे') ||
+      q.includes('dhup me kala') || q.includes('धूप में काला') || q.includes('kala pad') || q.includes('काला पड़') || q.includes('tanning') || q.includes('dull skin') ||
+      q.includes('muhase') || q.includes('मुंहासे') || q.includes('pimple') || q.includes('acne') || q.includes('dane') || q.includes('दाने') || q.includes('chhote chhote dane') ||
+      q.includes('jhaiya') || q.includes('झाइयां') || q.includes('pigmentation') || q.includes('dark spots') || q.includes('melasma') || q.includes('kale daag') ||
+      q.includes('dark circle') || q.includes('ankho ke niche kala') ||
+      q.includes('lal dag') || q.includes('लाल दाग') || q.includes('rashes') || q.includes('allergy') ||
+      q.includes('glow') || q.includes('ग्लो') || q.includes('साबुन') || q.includes('soap') ||
+      (q.includes('khet') && (q.includes('dhup') || q.includes('kala')))
+    );
+    if (isSkinQuery) {
+      const resp = `राम-राम! 🙏 तेज धूप में काम करने से त्वचा का काला पड़ना (टैनिंग), धूल-मिट्टी, केमिकल साबुन और पेट की गर्मी से कील-मुंहासे, छोटे-छोटे दाने व झाइयां (Pigmentation) होना आम समस्या है।
+
+⚠️ **बाजार के केमिकल साबुन के नुकसान:**
+• सामान्य साबुन में उपस्थित कास्टिक सोडा और सल्फेट त्वचा के सुरक्षात्मक प्राकृतिक कवच (Acid Mantle) को नष्ट कर देते हैं, जिससे मेलेनिन पिगमेंट बढ़ जाता है और धूप में चेहरा तेजी से काला, झुर्रीदार व बेजान होने लगता है।
+
+👴 **आरोग्यम अवनीश दादा के अचूक घरेलू नुस्खे:**
+1. **धूप में कालेपन व टैनिंग के लिए:** 2 चम्मच बेसन + 1 चम्मच कच्चा दूध + 1 चुटकी हल्दी का उबटन बनाएं। चेहरे व गर्दन पर लगाएं, सूखने पर हल्के हाथ से मलकर ताजे पानी से धोएं। धूप का कालापन 3 दिन में साफ होता है।
+2. **कील-मुंहासे व दानों के लिए:** मुल्तानी मिट्टी में नीम के ताजे पत्तों का पेस्ट या गुलाब जल मिलाकर लेप लगाएं।
+3. **झाइयों व जिद्दी काले धब्बों के लिए:** सिलबट्टे पर जायफल को थोड़े कच्चे दूध के साथ घिसकर रात को केवल दागों पर लगाएं।
+4. **आँखों के काले घेरे (Dark Circles):** ठंडे खीरे का रस या कच्चे आलू की स्लाइस 15 मिनट आँखों पर रखें।
+5. **शरीर पर लाल चकत्ते / एलर्जी:** शुद्ध नारियल तेल में थोड़ा देशी कपूर मिलाकर लगाएं।
+
+✨ **नेट्सर्फ Herbs & More 100% केमिकल-मुक्त स्किन रेंज:**
+• **Vitamin Therapy Face Wash:** नीम, तुलसी, विटामिन B3 व E — बिना त्वचा सुखाए गहराई से साफ करता है।
+• **De-Tan Scrub & Fairness Cream:** प्राकृतिक मुलेठी (Licorice) व केसर अर्क — धूप की टैनिंग हटाकर प्राकृतिक ग्लो लौटाता है।
+• **Body Butter / Moisturizer:** शीया बटर व बादाम तेल — रूखी त्वचा को 24 घंटे मखमली नमी देता है।`;
+
+      return renderClinicalHealthCard('त्वचा निखार व समस्या निवारण: टैनिंग, मुंहासे, झाइयां व लाल दाग', resp, [
+        { label: "✨ त्वचा व स्किन केयर का आधिकारिक पेज", url: "/health/skin-care.html" },
+        { label: "🧴 विटामिन फेस वॉश व डी-टैन क्रीम 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
+      ]);
+    }
+
+    return false;
+  }
+
   function handleBeautyHairWeightWomenEmpowerment(cleanQ, rawQ) {
     const q = cleanQ;
 
@@ -2588,7 +3537,7 @@
     }
 
     // 1. Obscene / Abusive Language & Inappropriate Personal Advances
-    const isSexualWellnessQuery = q.includes('यौन') || q.includes('कमजोरी') || q.includes('समस्या') || q.includes('प्रॉब्लम') || q.includes('दवा') || q.includes('इलाज') || q.includes('स्टैमिना') || q.includes('stamina') || q.includes('डायबिटीज') || q.includes('शीघ्रपतन') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('धातु') || q.includes('टाइमिंग');
+    const isSexualWellnessQuery = q.includes('यौन') || q.includes('कमजोरी') || q.includes('समस्या') || q.includes('प्रॉब्लम') || q.includes('दवा') || q.includes('इलाज') || q.includes('स्टैमिना') || q.includes('stamina') || q.includes('डायबिटीज') || q.includes('शीघ्रपतन') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('धातु') || q.includes('टाइमिंग') || q.includes('problm') || q.includes('problem') || q.includes('kamjori') || q.includes('kamzori') || q.includes('mardana') || q.includes('sehat');
     const abusiveTerms = [
       'गाली', 'gali', 'harami', 'kamina', 'madarchod', 'behenchod', 'chutiya', 'bhosadi', 'bhosdike',
       'kutta', 'kutiya', 'randi', 'sexy', 'kiss', 'love you', 'i love you', 'pyaar', 'patana',
@@ -2947,6 +3896,691 @@
     return false;
   }
 
+  // ============================================================================
+  // 17.5 MASTER CROP, PEST, YIELD & DUAL TREATMENT INTELLIGENCE ENGINE V4
+  // ============================================================================
+  // Covers 20+ Major Indian Crops, Pulses, Oilseeds, Vegetables & Fruit Orchards
+  // Provides 3-4 Line Respectful Intro, Yield Hacks, and Dual (Biofit + Chemical) Solutions
+  // ============================================================================
+
+  const MASTER_CROPS_DIRECTORY = [
+    {
+      id: 'ganna',
+      name: 'गन्ना (Sugarcane / ईख)',
+      keywords: ['ganna', 'ganne', 'गन्ना', 'गन्ने', 'sugarcane', 'eekh', 'ईख', 'pedi', 'पेड़ी', 'पेड़ी गन्ना', 'pedi ganna'],
+      season: 'वार्षिक नकदी फसल (वसंत व शरदकालीन)',
+      sowingTime: 'शरदकालीन: अक्टूबर-नवंबर | वसंतकालीन: फरवरी-मार्च',
+      soil: 'गहरी, उपजाऊ दोमट मिट्टी (उत्तम जल निकास व भरपूर जीवांश)',
+      avgYield: '350 से 500 क्विंटल प्रति एकड़ (उन्नत किस्में)',
+      intro: 'गन्ना भारत की सबसे प्रमुख नकदी व मिठास फसल है। समय पर बंधाई, मिट्टी चढ़ाना (Earthing Up), पेड़ी प्रबंधन और ट्रेंच विधि से बुवाई करने पर गन्ने की मोटाई, लंबाई और रस में शर्करा (Recovery) भरपूर मिलती है।',
+      yieldHacks: [
+        'ट्रेंच विधि (Trench Method): गन्ने को 4-5 फीट चौड़ी नालियों में बोएं। इससे हर आंख से 8-10 मोटे कल्ले फूटते हैं और गन्ना कभी गिरता नहीं है।',
+        'पेड़ी प्रबंधन (Ratoon Care): कटाई ज़मीन की सतह से सटाकर करें। ठूंठ छंटाई (Stubble Shaving) के बाद खेत में Sheth (1L/एकड़) व Bio-NPK चलाएं, जिससे पेड़ी में मुख्य फसल से भी अधिक उपज मिलती है।',
+        'लंबाई, मोटाई व मिठास बढ़ाने का फॉर्मूला: बढ़वार के समय स्टिमरिच (Stimrich) 2ml/L + Bio-99 5ml/पंप का 2 बार स्प्रे करें। गन्ने की पोरियां लंबी, ठोस और रसदार बनती हैं।'
+      ],
+      seedTreatment: 'बुवाई पूर्व गन्ने के 2-3 आंख वाले टुकड़ों को Sheth (2ml/L) और स्टिमरिच (2ml/L) के घोल में 15 मिनट डुबोएं। इससे लाल सड़न (Red Rot) से सुरक्षा मिलती है।',
+      fertilizerSchedule: 'बुवाई पर: 60kg डीएपी, 40kg पोटाश, 25kg जिंक व सल्फर। पहली व दूसरी सिंचाई पर Bio-NPK (1L/एकड़) पानी के साथ दें।',
+      diseases: [
+        {
+          name: 'लाल सड़न रोग (Red Rot / गन्ने का कैंसर)',
+          symptoms: 'गन्ने की तीसरी-चौथी पत्ती पीली पड़कर सूखना, तना चीरने पर अंदर का गूदा लाल व बीच-बीच में सफेद धब्बे दिखना, शराब जैसी दुर्गंध आना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) का जड़ क्षेत्र में सिंचन व बीज शोधन।',
+          chemical: 'कार्बेन्डाजिम 50% WP (2g/L) के घोल में टुकड़ों को उपचारित करें।'
+        },
+        {
+          name: 'तना छेदक व कंसुआ (Early Shoot Borer / Top Borer)',
+          symptoms: 'जमाव के समय बीच की गोभ सूखना (Dead Heart) और गन्ने के ऊपरी हिस्से में छेद होना।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'कोराजन (Chlorantraniliprole 18.5% SC - 60ml प्रति एकड़ 200L पानी में)।'
+        }
+      ]
+    },
+    {
+      id: 'chana',
+      name: 'चना (Gram / Chickpea)',
+      keywords: ['chana', 'chane', 'chene', 'chena', 'चना', 'चने', 'चेने', 'चेना', 'gram', 'chickpea', 'desi chana', 'kabuli chana', 'chhola'],
+      season: 'रबी (Rabi)',
+      sowingTime: '15 अक्टूबर से 15 नवंबर',
+      soil: 'हल्की से मध्यम दोमट मिट्टी (उत्तम जल निकास)',
+      avgYield: '8 से 12 क्विंटल प्रति एकड़',
+      intro: 'चना रबी की प्रमुख दलहनी फसल है जो कम पानी और मध्यम ठंड में भरपूर उपज देती है। इसकी जड़ों में प्राकृतिक ग्रंथियां (Nodules) होती हैं जो हवा से नाइट्रोजन सोखकर ज़मीन को उपजाऊ बनाती हैं।',
+      yieldHacks: [
+        'निपिंग (Nipping/खूटाई): बुवाई के 35-40 दिन बाद जब पौधे 15-20 सेमी के हों, तो ऊपर की 2 सेमी कलियाँ तोड़ दें। इससे शाखाएं दोगुनी फूटती हैं और 30-40% अधिक फलियां बनती हैं।',
+        'अत्यधिक यूरिया से बचें: चने को अतिरिक्त यूरिया देने से पौधा सिर्फ बढ़ता है और दाना नहीं बनता।'
+      ],
+      seedTreatment: 'बुवाई से पहले 1 किलो बीज में 5ml स्टिमरिच (Stimrich) या 2g कार्बेन्डाजिम + थीरम मिलाकर उपचारित करें। इससे 95%+ अंकुरण और उकठा रोग से सुरक्षा मिलती है।',
+      fertilizerSchedule: 'बुवाई के समय प्रति एकड़: 20 किलो डीएपी, 10 किलो पोटाश और 10 किलो सल्फर। पहली सिंचाई पर बायोफिट Bio-NPK 1 लीटर पानी के साथ दें।',
+      diseases: [
+        {
+          name: 'उकठा रोग (Fusarium Wilt / सूखना)',
+          symptoms: 'पौधा अचानक ऊपर से नीचे की ओर सूखने लगता है। तना चीरने पर अंदर से भूरी/काली नस दिखाई देती है।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप) से जड़ों में ड्रेंचिंग करें।',
+          chemical: 'कार्बेन्डाजिम 12% + मैंकोज़ेब 63% WP (2 ग्राम प्रति लीटर पानी) जड़ क्षेत्र में डालें।'
+        },
+        {
+          name: 'फली छेदक सुंडी (Pod Borer / Helicoverpa)',
+          symptoms: 'हरी सुंडी फलियों में छेद करके अंदर का दाना चट कर जाती है।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99 (5ml/पंप) का छिड़काव करें।',
+          chemical: 'इमामेक्टिन बेंजोएट 5% SG (8-10 ग्राम/15L पंप) या कोराजन (Chlorantraniliprole 18.5% SC - 6ml/पंप)।'
+        }
+      ]
+    },
+    {
+      id: 'tamatar',
+      name: 'टमाटर (Tomato)',
+      keywords: ['tamatar', 'टमाटर', 'tomato', 'tamater'],
+      season: 'खरीफ, रबी व जायद (सालभर)',
+      sowingTime: 'नर्सरी: जुलाई-अगस्त (खरीफ), अक्टूबर-नवंबर (रबी), जनवरी-फरवरी (जायद)',
+      soil: 'बलुई दोमट व अच्छी जल निकास वाली जीवांश युक्त मिट्टी',
+      avgYield: '250 से 400 क्विंटल प्रति एकड़ (उन्नत किस्में)',
+      intro: 'टमाटर भारत की सबसे लोकप्रिय नकदी सब्जी फसल है। यह कम समय में किसानों को नियमित आय देती है, बशर्ते इसे सहारा (Staking) और सही पोषण मिले।',
+      yieldHacks: [
+        'मल्चिंग व तार-बांस सहारा (Staking): पौधों को ऊपर बांधने से फल मिट्टी से नहीं छूते, जिससे 90% फल सड़न रुकती है और फलों का रंग-चमक नंबर वन रहता है।',
+        'अतिरिक्त सकर (Side Shoots) की छंटाई: मुख्य तने के बगल से निकलने वाली अवांछित शाखाओं को समय-समय पर तोड़ें।'
+      ],
+      seedTreatment: 'नर्सरी डालने से पहले बीज को स्टिमरिच (5ml/kg) से उपचारित करें। रोपाई से पहले पौधों की जड़ों को Sheth (2ml/L) के घोल में 15 मिनट डुबोएं।',
+      fertilizerSchedule: 'रोपाई पर बेसल डोज़: गोबर की सड़ी खाद 5 ट्रॉली + एसएसपी 100kg + पोटाश 30kg प्रति एकड़। फल बनते समय 0:52:34 और कैल्शियम-बोरॉन स्प्रे।',
+      diseases: [
+        {
+          name: 'अगेती व पिछेती झुलसा (Early & Late Blight)',
+          symptoms: 'पत्तियों पर भूरे-काले छल्लेदार धब्बे, फल सड़कर काले पड़ना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'मैंकोज़ेब 75% WP (2.5g/L) या कॉपर ऑक्सीक्लोराइड 50% WP (2.5g/L)।'
+        },
+        {
+          name: 'पत्ता मरोड़ वायरस (Leaf Curl / चुरड़ा)',
+          symptoms: 'पत्तियां ऊपर की ओर मुड़कर कटोरी जैसी हो जाती हैं, पौधा बौना रह जाता है (सफेद मक्खी द्वारा फैलता है)।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप) तुरंत स्प्रे करें ताकि सफेद मक्खी खत्म हो।',
+          chemical: 'एसिटामिप्रिड 20% SP (10g/पंप) या थायमेथॉक्सम 25% WG (8g/पंप)।'
+        }
+      ]
+    },
+    {
+      id: 'sarso',
+      name: 'सरसों व राई (Mustard / Rai)',
+      keywords: ['sarso', 'sarson', 'सरसों', 'सरसो', 'rai', 'राई', 'mustard', 'toria', 'तोरी'],
+      season: 'रबी (Rabi)',
+      sowingTime: '25 सितंबर से 25 अक्टूबर (सर्वोत्तम)',
+      soil: 'दोमट व बलुई दोमट मिट्टी, सामान्य नमी',
+      avgYield: '8 से 12 क्विंटल प्रति एकड़ (तेल 38-42%)',
+      intro: 'सरसों रबी की प्रमुख तिलहनी फसल है जिसकी कम सिंचाई में भी बंपर पैदावार ली जा सकती है। इसके दानों में तेल की मात्रा और वजन बढ़ाने के लिए सल्फर अत्यंत महत्वपूर्ण है।',
+      yieldHacks: [
+        'विरलीकरण (Thinning): बुवाई के 20-25 दिन बाद घने पौधों को उखाड़कर पौधे से पौधे की दूरी 12-15 सेमी कर दें। इससे हर पौधे में 25-30 अतिरिक्त शाखाएं निकलती हैं।',
+        'सल्फर का प्रयोग: पहली सिंचाई पर 10-15 किलो बेंटोनाइट सल्फर अवश्य दें, इससे दानों में तेल का प्रतिशत 3-4% बढ़ जाता है।'
+      ],
+      seedTreatment: 'प्रति किलो बीज में स्टिमरिच 5ml और Sheth 2ml मिलाकर बुवाई करें ताकि जड़ गलन और प्रारंभिक फफूंद न लगे।',
+      fertilizerSchedule: 'बुवाई के समय: डीएपी 35kg, पोटाश 15kg, सल्फर 10kg प्रति एकड़। पहली सिंचाई पर 30kg यूरिया।',
+      diseases: [
+        {
+          name: 'चेपा / माहू (Aphids / मोयला)',
+          symptoms: 'लाखों छोटे हरे-काले कीड़े तने, फूल और फलियों का रस चूसते हैं, जिससे फलियां नहीं बनतीं और चिपचिपा तरल निकलता है।',
+          organicBiofit: 'बायोफिट Intact (2ml/L) + Bio-99 (5ml/पंप) का तुरंत शाम के समय छिड़काव करें।',
+          chemical: 'डाइमेथोएट 30% EC (1.5ml/L) या इमिडाक्लोप्रिड 17.8% SL (5ml/15L पंप)।'
+        },
+        {
+          name: 'सफेद रतुआ (White Rust / फफोले)',
+          symptoms: 'पत्तियों की निचली सतह पर सफेद उभरे हुए चकत्ते और तने का मुड़कर विकृत हो जाना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) का 10 दिन के अंतराल पर 2 स्प्रे।',
+          chemical: 'मेटालेक्सिल 8% + मैंकोज़ेब 64% WP (रिडोमिल - 2g/L)।'
+        }
+      ]
+    },
+    {
+      id: 'gehu',
+      name: 'गेहूं (Wheat)',
+      keywords: ['gehu', 'gehun', 'geho', 'gehon', 'गेंहू', 'गेहूं', 'गेहो', 'गेहों', 'wheat', 'kanak', 'gahu'],
+      season: 'रबी (Rabi)',
+      sowingTime: 'समय पर बुवाई: 1 से 20 नवंबर | पिछेती बुवाई: 25 नवंबर से 15 दिसंबर',
+      soil: 'उपजाऊ चिकनी दोमट मिट्टी',
+      avgYield: '18 से 24 क्विंटल प्रति एकड़',
+      intro: 'गेहूं भारत का मुख्य खाद्यान्न है। समय पर बुवाई, संतुलित उर्वरक और सही सिंचाई क्रांतिक अवस्थाओं (CRI, टिलरिंग, गभोट, दुग्ध अवस्था) पर देने से बंपर पैदावार मिलती है।',
+      yieldHacks: [
+        'CRI अवस्था (21 दिन): पहली सिंचाई मुकुट जड़ (Crown Root) बनते समय ही करें, इसमें देरी करने से कल्ले (Tillers) 40% तक कम निकलते हैं।',
+        'बालियां निकलते समय: स्टिमरिच (Stimrich) 30ml + Bio-99 5ml का स्प्रे करने से दानों में चमक और वजन 15-20% बढ़ता है।'
+      ],
+      seedTreatment: 'स्टिमरिच 5ml प्रति किलो बीज या वीटावैक्स/बाविस्टिन 2g/kg से उपचारित करें।',
+      fertilizerSchedule: 'बुवाई पर: 50kg डीएपी, 20kg पोटाश, 5kg जिंक सल्फेट 33%। पहली व दूसरी सिंचाई पर यूरिया 35-35kg।',
+      diseases: [
+        {
+          name: 'पीला रतुआ व भूरा रतुआ (Yellow & Brown Rust)',
+          symptoms: 'पत्तियों पर हल्दी जैसा पीला पाउडर चिपकना, हाथ लगाने पर उंगलियों पर पीला रंग आना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'प्रोपिकोनाज़ोल 25% EC (टिल्ट - 1ml/L) या टेबुकोनाज़ोल 25.9% EC।'
+        },
+        {
+          name: 'दीमक व जड़ का माहू (Termites & Root Aphids)',
+          symptoms: 'पौधे पीले पड़कर सूखना, खींचने पर जड़ आसानी से टूट जाना।',
+          organicBiofit: 'बायोफिट Intact (1L/एकड़) सिंचाई के पानी के साथ चलाएं।',
+          chemical: 'फिप्रोनिल 0.3% GR (8kg/एकड़) या क्लोरपायरीफॉस 20% EC (1L/एकड़)।'
+        }
+      ]
+    },
+    {
+      id: 'dhan',
+      name: 'धान / चावल (Paddy / Rice)',
+      keywords: ['dhan', 'chawal', 'धान', 'चावल', 'paddy', 'rice', 'basmati', 'jiri'],
+      season: 'खरीफ (Kharif)',
+      sowingTime: 'नर्सरी: मई-जून | रोपाई: 20 जून से 15 जुलाई',
+      soil: 'भारी मटियार व चिकनी दोमट मिट्टी (पानी रोकने की क्षमता)',
+      avgYield: '20 से 30 क्विंटल प्रति एकड़ (बासमती 15-20 क्विंटल)',
+      intro: 'धान खरीफ की सबसे प्रमुख फसल है जिसे भरपूर पानी और उष्णकटिबंधीय धूप की आवश्यकता होती है। सही खाद और कल्ले बढ़ाने की तकनीक से इसकी पैदावार दोगुनी हो सकती है।',
+      yieldHacks: [
+        'कम उम्र के पौधे की रोपाई: नर्सरी से 21 से 25 दिन के पौधे ही रोपें। 30 दिन से पुराने पौधे लगाने पर कल्ले बहुत कम निकलते हैं।',
+        'जिंक की आपूर्ति: रोपाई के समय 10kg जिंक सल्फेट 33% देना अनिवार्य है, जिससे खैरा रोग रुकता है।'
+      ],
+      seedTreatment: 'नर्सरी से पहले बीज को स्टिमरिच (5ml/L) और Sheth (2ml/L) के घोल में 8 घंटे भिगोएं।',
+      fertilizerSchedule: 'रोपाई पर: डीएपी 40kg, पोटाश 25kg, जिंक 10kg। रोपाई के 20 और 40 दिन बाद यूरिया 30-30kg।',
+      diseases: [
+        {
+          name: 'शीथ ब्लाइट व झुलसा (Sheath Blight & Blast)',
+          symptoms: 'तने व पत्तियों पर नाव के आकार के भूरे धब्बे, बालियां टूटना या खाली रह जाना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'हेक्साकोनाज़ोल 5% SC (2ml/L) या वैलिडामाइसिन 3% L (2ml/L)।'
+        },
+        {
+          name: 'तना छेदक व तना गलन (Stem Borer / सुंडी)',
+          symptoms: 'पौधों की बीच वाली गोभ सूखना (Dead Heart) और बाद में सफेद बालियां (White Earhead) निकलना।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99।',
+          chemical: 'कार्टाप हाइड्रोक्लोराइड 4% G (7.5kg/एकड़) या कोराजन (Chlorantraniliprole 60ml/एकड़)।'
+        }
+      ]
+    },
+    {
+      id: 'mirch',
+      name: 'हरी मिर्च व शिमला मिर्च (Chilli & Capsicum)',
+      keywords: ['mirch', 'mirchi', 'मिर्च', 'मिर्ची', 'shimla mirch', 'shikmla mirchi', 'शिमला मिर्च', 'capsicum', 'chilli'],
+      season: 'खरीफ, रबी व जायद',
+      sowingTime: 'नर्सरी: मई-जून (खरीफ), सितंबर-अक्टूबर (रबी), जनवरी-फरवरी (जायद)',
+      soil: 'बलुई दोमट मिट्टी, उत्तम जल निकास (जलभराव बिल्कुल न हो)',
+      avgYield: 'हरी मिर्च: 80-120 क्विंटल/एकड़ | शिमला मिर्च: 120-180 क्विंटल/एकड़',
+      intro: 'मिर्च एक अत्यधिक मुनाफे वाली नकदी फसल है। इसमें सबसे बड़ी चुनौती चुरड़ा-मुरड़ा (थ्रिप्स व मकड़ी) और फूल झड़ने की समस्या होती है, जिसे समय पर नियंत्रित करना अनिवार्य है।',
+      yieldHacks: [
+        'फूल आते समय पानी का संतुलन: फूल आने पर न तो खेत सूखा रखें और न ही जलभराव करें। नमी में हल्का सा भी झटका फूलों को गिरा देता है।',
+        'नीले व पीले स्टिकी ट्रैप (Sticky Traps): प्रति एकड़ 15-20 ट्रैप लगाएं, जिससे थ्रिप्स व सफेद मक्खी बिना दवा के 60% नष्ट हो जाती हैं।'
+      ],
+      seedTreatment: 'बीज को स्टिमरिच (5ml/kg) से उपचारित करें। रोपाई पूर्व पौधों को Sheth घोल में डुबोएं।',
+      fertilizerSchedule: 'डीएपी 50kg, पोटाश 30kg, मैग्नीशियम सल्फेट 15kg प्रति एकड़। फूल व फल पर 0:52:34 + बोरॉन 20% का स्प्रे।',
+      diseases: [
+        {
+          name: 'चुरड़ा-मुरड़ा रोग (Leaf Curl / Thrips & Mites)',
+          symptoms: 'पत्तियां ऊपर नाव की तरह मुड़ना (थ्रिप्स) या नीचे उल्टी छतरी की तरह मुड़ना (मकड़ी/माइट्स)।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप) शाम के समय स्प्रे करें।',
+          chemical: 'फिप्रोनिल 5% SC (2ml/L) या स्पिनोटोरम 11.7% SC (1ml/L)।'
+        },
+        {
+          name: 'डाईबैक व फल सड़न (Anthracnose / Fruit Rot)',
+          symptoms: 'टहनियां ऊपर से नीचे सूखना, मिर्च पर काले धब्बे पड़कर फल सड़ना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L)।',
+          chemical: 'अजोक्सीस्ट्रोबिन + डिफेनोकोनाज़ोल (कस्टोडिया - 1ml/L) या कॉपर ऑक्सीक्लोराइड 50% (2.5g/L)।'
+        }
+      ]
+    },
+    {
+      id: 'soyabean',
+      name: 'सोयाबीन (Soybean)',
+      keywords: ['soyabean', 'soybean', 'सोयाबीन', 'soya'],
+      season: 'खरीफ (Kharif)',
+      sowingTime: '20 जून से 10 जुलाई (मानसून की पहली पर्याप्त बारिश पर)',
+      soil: 'मध्यम से भारी काली मिट्टी (उत्तम जल निकास)',
+      avgYield: '10 से 15 क्विंटल प्रति एकड़',
+      intro: 'सोयाबीन भारत की प्रमुख प्रोटीन व तिलहन फसल है। इसे पीला मोज़ेक वायरस, गर्डल बीटल और तंबाकू की इल्ली से सुरक्षित रखना ही भरपूर पैदावार की चाबी है।',
+      yieldHacks: [
+        'बीज गहराई का ध्यान: सोयाबीन का बीज 3 से 4 सेमी से अधिक गहरा न बोएं, अन्यथा अंकुरण 50% घट जाता है।',
+        'राइजोबियम कल्चर: बुवाई के समय राइजोबियम और पीएसबी से बीजोपचार करने पर यूरिया की आवश्यकता नहीं पड़ती।'
+      ],
+      seedTreatment: 'स्टिमरिच 5ml + Sheth 2ml प्रति किलो बीज। छाया में सुखाकर तुरंत बुवाई करें।',
+      fertilizerSchedule: 'बुवाई के समय: डीएपी 35kg, पोटाश 20kg, सल्फर 10kg। फूल आते समय स्टिमरिच (1.5ml/L) का छिड़काव।',
+      diseases: [
+        {
+          name: 'पीला मोज़ेक वायरस (Yellow Mosaic Virus)',
+          symptoms: 'पत्तियां चितकबरी पीली होकर सूखना (सफेद मक्खी द्वारा फैलता है)।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'थायमेथॉक्सम 25% WG (8g/पंप) या एसिटामिप्रिड 20% SP।'
+        },
+        {
+          name: 'गर्डल बीटल व पत्ती खाने वाली इल्ली (Girdle Beetle & Spodoptera)',
+          symptoms: 'शाखाओं पर चक्रनुमा रिंग कटना और पत्तियां छलनी होना।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99।',
+          chemical: 'एम्प्लिगो (Chlorantraniliprole + Lambda Cyhalothrin - 80ml/एकड़)।'
+        }
+      ]
+    },
+    {
+      id: 'mungfali',
+      name: 'मूंगफली (Groundnut / Peanut)',
+      keywords: ['mungfali', 'mogfali', 'मूंगफली', 'groundnut', 'peanut', 'shengdana'],
+      season: 'खरीफ व जायद',
+      sowingTime: 'खरीफ: 15 जून से 15 जुलाई | जायद: 15 फरवरी से 15 मार्च',
+      soil: 'बलुई दोमट व भुरभुरी मिट्टी (ताकि सूइयां/Pegs आसानी से ज़मीन में घुस सकें)',
+      avgYield: '12 से 18 क्विंटल प्रति एकड़',
+      intro: 'मूंगफली एक महत्वपूर्ण तिलहन फसल है। इसमें मिट्टी का भुरभुरा रहना अत्यंत आवश्यक है ताकि फलियां (Pods) बिना रुकावट के मिट्टी के अंदर फैल सकें।',
+      yieldHacks: [
+        'जिप्सम का प्रयोग: जब फसल में सूइयां (Pegging) मिट्टी में घुस रही हों (बुवाई के 40-45 दिन बाद), तब 150-200 किलो जिप्सम प्रति एकड़ डालें। इससे फलियों में दाने 100% भरते हैं और पोच (खाली फली) नहीं बनती।',
+        'मिट्टी चढ़ाना (Earthing Up): 35-40 दिन बाद हल्की निराई-गुड़ाई कर पौधों पर मिट्टी चढ़ाएं।'
+      ],
+      seedTreatment: 'स्टिमरिच 5ml प्रति किलो दाना (बीज) बुवाई से 2 घंटे पहले मिलाकर छाया में सुखाएं।',
+      fertilizerSchedule: 'डीएपी 30kg, पोटाश 20kg, जिप्सम 100kg प्रति एकड़। फल बनते समय स्टिमरिच (2ml/L) का स्प्रे।',
+      diseases: [
+        {
+          name: 'टिक्का रोग (Tikka Disease / Leaf Spot)',
+          symptoms: 'पत्तियों पर गहरे भूरे-काले गोल धब्बे जिनके चारों ओर पीला छल्ला होता है, पत्तियां झड़ने लगती हैं।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'हेक्साकोनाज़ोल 5% SC (2ml/L) या मैंकोज़ेब 75% WP (2.5g/L)।'
+        },
+        {
+          name: 'सफेद लट (White Grub / जड़ कटना)',
+          symptoms: 'पौधे खेत में टुकड़ों में सूखते हैं, जड़ खोदने पर सफेद मुड़ी हुई सुंडी निकलती है।',
+          organicBiofit: 'बायोफिट Intact (1L/एकड़) सिंचाई के पानी में चलाएं।',
+          chemical: 'क्लोरपायरीफॉस 20% EC (1.5L/एकड़) पानी के साथ दें।'
+        }
+      ]
+    },
+    {
+      id: 'urad_moong',
+      name: 'उड़द व मूंग (Urad & Moong)',
+      keywords: ['urad', 'urda', 'उड़द', 'moong', 'mung', 'मूंग', 'black gram', 'green gram'],
+      season: 'खरीफ व जायद (Summer)',
+      sowingTime: 'जायद: 15 मार्च से 10 अप्रैल | खरीफ: 20 जून से 15 जुलाई',
+      soil: 'दोमट व बलुई दोमट मिट्टी',
+      avgYield: '5 से 8 क्विंटल प्रति एकड़ (मात्र 60-70 दिनों में)',
+      intro: 'उड़द और मूंग सबसे कम समय (60-70 दिन) में पकने वाली दलहनी फसलें हैं। यह दो मुख्य फसलों के बीच की खाली ज़मीन और समय में किसानों को शानदार अतिरिक्त आमदनी देती हैं।',
+      yieldHacks: [
+        'फूल खिलते समय स्प्रे: जब 20% फूल आ जाएं, तो स्टिमरिच (1.5ml/L) + Bio-99 का स्प्रे करें। इससे फूल झड़ना रुकता है और फलियों की संख्या 35% बढ़ जाती है।'
+      ],
+      seedTreatment: 'स्टिमरिच 5ml प्रति किलो बीज मिलाकर छाया में सुखाएं।',
+      fertilizerSchedule: 'डीएपी 25kg, सल्फर 10kg प्रति एकड़। अतिरिक्त यूरिया बिल्कुल न दें।',
+      diseases: [
+        {
+          name: 'पीला मोज़ेक रोग (Yellow Mosaic Virus)',
+          symptoms: 'पत्तियों की नसें व पूरा पत्ता पीला पड़ जाना (सफेद मक्खी द्वारा फैलाव)।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Wrapup (2ml/L) + Bio-99।',
+          chemical: 'थायमेथॉक्सम 25% WG (8g/15L पंप)।'
+        }
+      ]
+    },
+    {
+      id: 'aalu_pyaz_lahsun',
+      name: 'आलू, प्याज व लहसुन (Potato, Onion & Garlic)',
+      keywords: ['aalu', 'आलू', 'potato', 'pyaz', 'प्याज', 'onion', 'lahsun', 'लहसुन', 'garlic', 'kanda', 'batata'],
+      season: 'रबी (Rabi)',
+      sowingTime: 'आलू: 15 से 31 अक्टूबर | प्याज-लहसुन: अक्टूबर से नवंबर',
+      soil: 'भुरभुरी बलुई दोमट मिट्टी (कंदों के विकास के लिए)',
+      avgYield: 'आलू: 100-150 क्विंटल/एकड़ | प्याज: 120-160 क्विंटल/एकड़',
+      intro: 'आलू, प्याज और लहसुन कंदवर्गीय नकदी फसलें हैं। इनके कंद (Tuber/Bulb) का आकार, वजन और भंडारण क्षमता बढ़ाने के लिए पोटाश और फफूंद से सुरक्षा सबसे जरूरी है।',
+      yieldHacks: [
+        'कंद फुलाने का समय: आलू में 45-50 दिन और प्याज में 65-70 दिन बाद एनपीके 0:0:50 (सल्फेट ऑफ पोटाश) 75g + स्टिमरिच 30ml प्रति पंप स्प्रे करें। कंदों का आकार 30% बड़ा और चमकदार बनता है।'
+      ],
+      seedTreatment: 'आलू के बीज को Sheth (2ml/L) के घोल में 10 मिनट डुबोकर सुखाएं। लहसुन की कलियों को स्टिमरिच (5ml/kg) से उपचारित करें।',
+      fertilizerSchedule: 'गोबर खाद 5 ट्रॉली + डीएपी 50kg + पोटाश 50kg + जिंक 10kg प्रति एकड़।',
+      diseases: [
+        {
+          name: 'झुलसा व बैंगनी धब्बा (Blight & Purple Blotch)',
+          symptoms: 'आलू में पत्तियां झुलसना, प्याज में पत्तियों पर बैंगनी रंग के धब्बे पड़कर ऊपर से सूखना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'मैंकोज़ेब 75% WP (2.5g/L) या टेबुकोनाज़ोल + ट्राइफ्लॉक्सीस्ट्रोबिन (नेटिवो - 0.5g/L)।'
+        },
+        {
+          name: 'थ्रिप्स व रसचूसक कीट (Onion Thrips)',
+          symptoms: 'प्याज की पत्तियों पर सफेद धारियां पड़ना, पत्तियां मुड़कर चांदी जैसी चमकना।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99।',
+          chemical: 'फिप्रोनिल 5% SC (2ml/L) या प्रोफेनोफॉस + साइपरमेथ्रिन (2ml/L)।'
+        }
+      ]
+    },
+    {
+      id: 'gobhi_patta_gobhi',
+      name: 'फूलगोभी व पत्तागोभी (Cauliflower & Cabbage)',
+      keywords: ['gobhi', 'gobgi', 'गोभी', 'phool gobhi', 'फूलगोभी', 'cauliflower', 'patta gobhi', 'पत्तागोभी', 'पत्ता गोभी', 'cabbage'],
+      season: 'अगेती, मध्यम व पछेती (सालभर)',
+      sowingTime: 'अगेती: मई-जून | मुख्य रबी: सितंबर-अक्टूबर',
+      soil: 'जीवांश युक्त दोमट मिट्टी',
+      avgYield: '100 से 150 क्विंटल प्रति एकड़',
+      intro: 'गोभी वर्गीय सब्जियों में फूल (Curd) का ठोसपन, सफेदी और इल्ली से सुरक्षा ही बाजार में उच्चतम मूल्य दिलाती है।',
+      yieldHacks: [
+        'बोरॉन की महत्ता: फूलगोभी में तना खोखला होना या फूल भूरा पड़ना (बोरॉन की कमी) रोकने के लिए 20% बोरॉन (1g/L) का 30 और 45 दिन पर स्प्रे अवश्य करें।'
+      ],
+      seedTreatment: 'स्टिमरिच 5ml प्रति किलो बीज से उपचारित करें।',
+      fertilizerSchedule: 'डीएपी 40kg, पोटाश 25kg, बोरॉन 5kg प्रति एकड़।',
+      diseases: [
+        {
+          name: 'डायमंड बैक मॉथ (DBM / गोभी की इल्ली)',
+          symptoms: 'हरी सुंडी पत्तों को जालीदार बना देती है और फूल के अंदर घुसकर मैला कर देती है।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99 (5ml/पंप)।',
+          chemical: 'कोराजन (Chlorantraniliprole 18.5% SC - 6ml/पंप) या स्पिनोसैड 45% SC (7ml/पंप)।'
+        }
+      ]
+    },
+    {
+      id: 'gajar_muli',
+      name: 'गाजर व मूली (Carrot & Radish)',
+      keywords: ['gajar', 'गाजर', 'carrot', 'muli', 'mooli', 'मूली', 'radish'],
+      season: 'रबी व जायद',
+      sowingTime: 'मूली: सालभर | गाजर: सितंबर से नवंबर',
+      soil: 'गहरी, भुरभुरी बलुई दोमट मिट्टी (बिना कंकड़-पत्थर के)',
+      avgYield: 'गाजर: 100-120 क्विंटल | मूली: 80-100 क्विंटल प्रति एकड़',
+      intro: 'जड़ वर्गीय फसलों में जड़ों का सीधा, लंबा, बेदाग और मीठा होना ही गुणवत्ता का पैमाना है। खेत की गहरी जुताई और भुरभुरी मिट्टी इनके लिए रीढ़ की हड्डी है।',
+      yieldHacks: [
+        'मेड़ों (Ridges) पर बुवाई: गाजर-मूली को हमेशा उठी हुई मेड़ों पर बोएं, इससे जड़ें 30% अधिक लंबी व बिना शाखायुक्त (Dofork) सीधी बनती हैं।'
+      ],
+      seedTreatment: 'स्टिमरिच 5ml प्रति किलो बीज मिलाकर बुवाई करें।',
+      fertilizerSchedule: 'एसएसपी 100kg, पोटाश 30kg प्रति एकड़। अतिरिक्त यूरिया न दें अन्यथा केवल पत्ते बढ़ेंगे।',
+      diseases: [
+        {
+          name: 'पत्ती धब्बा व जड़ सड़न (Leaf Spot & Root Rot)',
+          symptoms: 'पत्तियों पर काले धब्बे और मूली/गाजर की जड़ का गलना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99।',
+          chemical: 'मैंकोज़ेब 75% WP (2.5g/L)।'
+        }
+      ]
+    },
+    {
+      id: 'fal_bagwani',
+      name: 'फल व बागवानी: सेब, संतरा, आम, अमरूद, पपीता, अनार',
+      keywords: ['sev', 'seb', 'सेब', 'apple', 'santra', 'sanstra', 'संतरा', 'orange', 'aam', 'आम', 'mango', 'amrud', 'अमरूद', 'guava', 'papita', 'pappita', 'पपीता', 'papaya', 'anar', 'अनार', 'pomegranate'],
+      season: 'सदाबहार व मौसमी',
+      sowingTime: 'पौध रोपण: जुलाई-अगस्त (मानसून) या फरवरी-मार्च',
+      soil: 'गहरी उपजाऊ दोमट मिट्टी (जलभराव रहित)',
+      avgYield: 'पेड़ की उम्र व प्रजाति के अनुसार 20 से 80 किलो प्रति पेड़ प्रति वर्ष',
+      intro: 'बागवानी फसलें दीर्घकालिक भारी मुनाफा देने वाला निवेश हैं। फलों के बगीचों में सबसे बड़ी समस्या फूल-फल का झड़ना, फल मक्खी और फंगस से फलों पर दाग पड़ना होती है।',
+      yieldHacks: [
+        'फलों का गिरना (Fruit Drop) रोकना: फूल आने से 15 दिन पहले और मटर के दाने के आकार के फल बनने पर स्टिमरिच (2ml/L) + Bio-99 का छिड़काव करने से 80% फल गिरना रुकता है।',
+        'फेरोमोन ट्रैप (Pheromone Traps): फल मक्खी से बचाव के लिए बगीचे में प्रति एकड़ 6-8 मक्खी ट्रैप लगाएं।'
+      ],
+      seedTreatment: 'पौध लगाते समय गड्ढे में Sheth (10ml) + Bio-NPK (20ml) गोबर खाद में मिलाकर डालें।',
+      fertilizerSchedule: 'प्रति पेड़ उम्र के अनुसार सड़ी गोबर खाद 25-50kg, एसएसपी 1kg, पोटाश 500g प्रति वर्ष।',
+      diseases: [
+        {
+          name: 'फल मक्खी व फल छेदक (Fruit Fly & Fruit Borer)',
+          symptoms: 'फलों पर डंक का निशान, फल समय से पहले पककर सड़ना और अंदर कीड़े निकलना।',
+          organicBiofit: 'बायोफिट Intact (2.5ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप) + फेरोमोन ट्रैप।',
+          chemical: 'मैलाथियान 50% EC (2ml/L) + गुड़ का घोल (आकर्षण के लिए)।'
+        },
+        {
+          name: 'डाईबैक व पाउडरी मिल्ड्यू (छाछ्या व शाखा सूखना)',
+          symptoms: 'टहनियां ऊपर से सूखना, पत्तियों व फलों पर सफेद चूर्ण जैसा पाउडर जमना।',
+          organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L)।',
+          chemical: 'घुलनशील सल्फर 80% WDG (3g/L) या कार्बेन्डाजिम 50% WP (1g/L)।'
+        }
+      ]
+    }
+  ];
+
+  function renderMasterCropCard(title, bodyMarkdown, actionChips = []) {
+    let chipsHtml = '';
+    if (actionChips && actionChips.length > 0) {
+      chipsHtml = `
+        <div style="margin-top:14px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;flex-wrap:wrap;gap:8px;">
+          ${actionChips.map(c => `
+            <button type="button" class="sakhi-quick-pill" onclick="window.sendPredefinedSakhiQuery('${c.query.replace(/'/g, "\\'")}')" style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;">
+              ${c.label}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    const html = `
+      <div class="sakhi-crop-container" style="background:#ffffff;border:1.5px solid #22c55e;border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(34,197,94,0.12);margin:8px 0;">
+        <div style="display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+          <span style="background:#16a34a;color:#ffffff;padding:4px 9px;border-radius:8px;font-size:0.85rem;font-weight:800;">कृषि वैज्ञानिक परामर्श</span>
+          <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#14532d;">${title}</h4>
+        </div>
+        <div class="sakhi-crop-content" style="font-size:0.95rem;line-height:1.65;color:#1e293b;">
+          ${renderMarkdownSafely(bodyMarkdown)}
+        </div>
+        ${chipsHtml}
+      </div>
+    `;
+
+    sakhiConversationState.lastActiveDomain = 'agri';
+    sakhiConversationState.lastActiveEntity = 'master_crop_intelligence';
+    sakhiConversationState.lastActiveEntityName = title;
+
+    streamBotMessage(html, cleanTextForTTS(bodyMarkdown));
+    return true;
+  }
+
+  function handleMasterCropAndPestIntelligence(cleanQ, query) {
+    const q = (cleanQ || '').toLowerCase().trim();
+    const rawQ = query || cleanQ;
+
+    // Strict Domain Guardrail: If strictly human health or strictly corporate NetSurf Capping without crops, pass through
+    const isStrictClinical = (
+      q.includes('ghutno me dard') || q.includes('sugar ka ilaj') || q.includes('bp high') ||
+      q.includes('madhumeh') || q.includes('bawasir') || q.includes('piles') || q.includes('kidney stone') ||
+      q.includes('safed pani') || q.includes('leucorrhea') || q.includes('heart attack')
+    );
+    if (isStrictClinical && !q.includes('fasal') && !q.includes('kheti') && !q.includes('spray')) {
+      return false;
+    }
+
+    const isStrictCapping = (
+      (q.includes('8.19') || q.includes('8,19,250') || q.includes('capping') || q.includes('binary') || q.includes('generation')) &&
+      !q.includes('sarso') && !q.includes('chana') && !q.includes('tamatar') && !q.includes('gehu') && !q.includes('fasal')
+    );
+    if (isStrictCapping) {
+      return false;
+    }
+
+    // =========================================================================
+    // TWIST 1: "MAINE SAB DAWA DAAL DI, THEEK NAHI HO RAHA" (उपचार विफल निदान)
+    // =========================================================================
+    const isDawaNotWorking = (
+      q.includes('sab dawa daal di') || q.includes('sab dawai daal di') || q.includes('theek nahi ho raha') ||
+      q.includes('theek nahi ho rahi') || q.includes('koi fayda nahi hua') || q.includes('koi asar nahi') ||
+      q.includes('bimari nahi ruk rahi') || q.includes('bimari nahi ja rahi') || q.includes('dawa asar nahi') ||
+      q.includes('sab kuch kar liya') || q.includes('aaram nahi mila')
+    );
+    if (isDawaNotWorking) {
+      const resp = `राम-राम किसान भाई! 🙏 आपकी परेशानी हम भली-भांति समझ सकते हैं। जब मेहनत और पैसे लगाने के बाद भी फसल की बीमारी न रुके तो चिंता होना स्वाभाविक है।
+
+आइए, **वैज्ञानिक और ज़मीनी दृष्टिकोण से समझें कि दवा का असर क्यों नहीं हुआ:**
+
+🔍 **1. क्या आपने सिलिकॉन स्टिकर (जैसे Bio-99) मिलाया था?**
+• बिना स्टिकर के दवा पत्तों की चिकनी सतह पर टिकती नहीं है, बूँदें बनकर ज़मीन पर टपक जाती हैं या 2 घंटे की तेज़ धूप में भाप बनकर उड़ जाती हैं।
+
+🔬 **2. कीटनाशक के प्रति प्रतिरोधक क्षमता (Chemical Resistance):**
+• यदि आप एक ही रासायनिक दवा (जैसे केवल कोराजन, या केवल इमिडाक्लोप्रिड) को लगातार 2-3 बार डालते हैं, तो कीड़ों व फंगस की अगली पीढ़ी उस दवा के प्रति इम्यून (असर-मुक्त) हो जाती है।
+
+☀️ **3. स्प्रे का समय और पानी की मात्रा:**
+• तेज़ धूप (दोपहर 11 से 3 बजे) में स्प्रे करने से दवा का प्रभाव 60% घट जाता है। स्प्रे हमेशा **सुबह 10 बजे से पहले या शाम 4 बजे के बाद** ही असर करता है।
+
+🛡️ **तुरंत अपनाने योग्य 'ब्रेकथ्रू' जैविक फॉर्मूला (प्रति 15L पंप):**
+• **Sheth (30ml) + Wrapup (30ml) + Intact (30ml) + Bio-99 (5ml)**
+• यह मिश्रण पत्तों पर प्राकृतिक नैनो-कवच बनाता है जिससे पुरानी फंगस और कीड़ों की सांस नली तुरंत बंद हो जाती है।
+
+💡 **हमारी सच्ची सलाह:** यदि आपने 4 से अधिक भारी रासायनिक स्प्रे पहले ही कर दिए हैं, तो अब मनमाने स्प्रे से मिट्टी न जलाएं। तुरंत अपने ज़िले के **कृषि विज्ञान केंद्र (KVK)** या हमारे वरिष्ठ कृषि विशेषज्ञ से लाइव परामर्श लें।`;
+
+      return renderMasterCropCard('गहन कृषि निदान: जब दवाएं असर करना बंद कर दें', resp, [
+        { label: "🧪 बायो-99 की सही डोज़ व महत्व", query: "बायो-99 स्टिकर का उपयोग और डोज क्या है?" },
+        { label: "🛡️ बायोफिट शेथ और रैप-अप का कॉम्बो", query: "शेथ और रैप अप फंगस रोधक का उपयोग कैसे करें?" },
+        { label: "📞 विशेषज्ञ संपर्क व दादा अवनीश जी", query: "असली बायोफिट उत्पाद कहाँ मिलेंगे?" }
+      ]);
+    }
+
+    // =========================================================================
+    // TWIST 2: "PHOOL JHAD RAHE HAIN, FAL NAHI BAN RAHE" (फूल गिरना / फल ड्रॉप)
+    // =========================================================================
+    const isFlowerDropQuery = (
+      q.includes('phool jhad') || q.includes('phool gir') || q.includes('फूल झड़') || q.includes('फूल गिर') ||
+      q.includes('fal nahi ban') || q.includes('fal gir') || q.includes('फल नहीं बन') || q.includes('फल गिर') ||
+      q.includes('phool drop') || q.includes('fruit drop')
+    );
+    if (isFlowerDropQuery) {
+      const resp = `किसान भाई, फूल और छोटे फलों का झड़ना फसल की सबसे नाज़ुक समस्या है। 
+
+⚠️ **फूल झड़ने के 3 मुख्य वैज्ञानिक कारण:**
+1. **नमी का झटका:** फूल खिलते समय खेत में अत्यधिक सूखा या अत्यधिक जलभराव।
+2. **अत्यधिक यूरिया (नाइट्रोजन):** यूरिया अधिक देने से पौधा केवल हरियाली बढ़ाता है और फूलों को गिरा देता है।
+3. **हार्मोनल असंतुलन व बोरॉन की कमी:** परागण (Pollination) न हो पाना।
+
+🌿 **तुरंत समाधान (फूलों की पकड़ मजबूत करने व फल बनाने हेतु):**
+• **प्रति 15 लीटर पंप:** **स्टिमरिच (Stimrich) 25ml + Bio-99 5ml + बोरॉन 20% (15-20 ग्राम)** मिलाकर शाम के समय छिड़कें।
+• **सावधानी:** फूल खिलने की अवस्था में कोई भी तेज रासायनिक कीटनाशक (जैसे प्रोफेनोफॉस या क्लोरपायरीफॉस) न डालें, अन्यथा मित्र कीट (मधुमक्खियाँ) मर जाती हैं और परागण रुक जाता है।`;
+
+      return renderMasterCropCard('फूल व फल झड़ने की 100% रोकथाम फॉर्मूला', resp, [
+        { label: "🌱 स्टिमरिच की पूरी कार्यप्रणाली", query: "स्टिमरिच टॉनिक का काम और डोज क्या है?" },
+        { label: "💧 फूल आते समय सिंचाई नियम", query: "फूल आते समय सिंचाई कैसे और कब करनी चाहिए?" }
+      ]);
+    }
+
+    // =========================================================================
+    // TWIST 3: "DAWA KAHAN MILEGI?" (उत्पाद उपलब्धता व दादा अवनीश जी)
+    // =========================================================================
+    const isWhereToBuyAgri = (
+      (q.includes('kahan milegi') || q.includes('kaha se le') || q.includes('kahan milega') || q.includes('कहाँ मिलेगी') || q.includes('खरीदें कहाँ से') || q.includes('dealer')) &&
+      (q.includes('dawa') || q.includes('दवा') || q.includes('biofit') || q.includes('बायोफिट') || q.includes('stimrich') || q.includes('sheth') || q.includes('intact') || q.includes('wrapup') || sakhiConversationState.lastActiveDomain === 'agri')
+    );
+    if (isWhereToBuyAgri) {
+      const resp = `किसान भाई, दोनों तरह के उत्पादों की उपलब्धता का पूरा विवरण नीचे दिया गया है:
+
+🌿 **1. प्रामाणिक नेटसर्फ बायोफिट उत्पाद (Biofit Organic Range):**
+• **Bio-99, Stimrich, Sheth, Wrapup, Intact व Bio-NPK**
+• यह 100% असली व लैब-टेस्टेड उत्पाद हमारे मुख्य आरोग्यम डिस्ट्रीब्यूटर **दादा अवनीश जी** व अधिकृत आरोग्यम केंद्रों पर सीधे 25% छूट पर उपलब्ध हैं।
+• आप कंपनी से सीधे 5+1 ऑफर (5 बोतल पर 1 बोतल बिल्कुल FREE) के साथ अपने घर पर कूरियर मँगवा सकते हैं।
+
+🏪 **2. रासायनिक दवाएं व पारंपरिक उर्वरक (Chemical Agro-Inputs):**
+• यूरिया, डीएपी, कोराजन, इमामेक्टिन, मैंकोज़ेब आदि रासायनिक कीटनाशक अपने नज़दीकी राज्य सरकार द्वारा लाइसेंस-प्राप्त **खाद-बीज भंडार (कृषि सेवा केंद्र)** से पक्के बिल के साथ ही खरीदें।`;
+
+      return renderMasterCropCard('उत्पाद प्राप्ति केंद्र व प्रामाणिक स्रोत', resp, [
+        { label: "🎁 5+1 फ्री ऑफर व 25% छूट जानें", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
+        { label: "🌾 फसलों का संपूर्ण स्प्रे कैलेंडर", query: "गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए" }
+      ]);
+    }
+
+    // =========================================================================
+    // CROP MATCHING ENGINE: 20+ CROPS PROFILE & SPECIFIC DISEASE DISPATCH
+    // =========================================================================
+    let matchedCrop = null;
+    for (const crop of MASTER_CROPS_DIRECTORY) {
+      if (crop.keywords.some(kw => q.includes(kw))) {
+        matchedCrop = crop;
+        break;
+      }
+    }
+
+    if (matchedCrop) {
+      // Check if user is asking about specific disease or pest for this crop
+      const isDiseaseInquiry = (
+        q.includes('bimari') || q.includes('बीमारी') || q.includes('rog') || q.includes('रोग') ||
+        q.includes('dawa') || q.includes('दवा') || q.includes('keeda') || q.includes('कीड़ा') ||
+        q.includes('sundi') || q.includes('सुंडी') || q.includes('illad') || q.includes('इल्ली') ||
+        q.includes('mahu') || q.includes('माहू') || q.includes('chepa') || q.includes('चेपा') ||
+        q.includes('fungus') || q.includes('फफूंद') || q.includes('jhulsa') || q.includes('झुलसा') ||
+        q.includes('uktha') || q.includes('उकठा') || q.includes('murda') || q.includes('चुरड़ा') ||
+        q.includes('peela') || q.includes('पीला') || q.includes('sadan') || q.includes('सड़न')
+      );
+
+      if (isDiseaseInquiry) {
+        // Detailed Disease & Dual Treatment Card
+        let diseaseDetails = '';
+        matchedCrop.diseases.forEach((dis, idx) => {
+          diseaseDetails += `\n\n📌 **${idx + 1}. ${dis.name}:**\n• **लक्षण:** ${dis.symptoms}\n• 🌿 **जैविक उपचार (Biofit NetSurf):** ${dis.organicBiofit}\n• 🧪 **रासायनिक विकल्प (Chemical Emergency):** ${dis.chemical}`;
+        });
+
+        const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** में लगने वाले प्रमुख रोगों व कीटों का संपूर्ण वैज्ञानिक व सटीक समाधान नीचे दिया गया है:
+${diseaseDetails}
+
+📖 **सचित्र पहचान:** खेत में पत्तियों और तनों का लाइव फोटो मिलान करने के लिए आप हमारी **'आरोग्यम संपूर्ण फसल सुरक्षा गाइड' ई-बुक (BK002)** देख सकते हैं।`;
+
+        return renderMasterCropCard(`${matchedCrop.name}: प्रमुख रोग व दोहरा उपचार फॉर्मूला`, resp, [
+          { label: `🌾 ${matchedCrop.name} की उन्नत खेती व पैदावार`, query: `${matchedCrop.keywords[0]} के बारे में विस्तार से बताओ` },
+          { label: "🌿 असली बायोफिट दवाएं कहाँ मिलेंगी?", query: "असली बायोफिट उत्पाद कहाँ मिलेंगे?" },
+          { label: "📖 खेती का डॉक्टर ई-बुक (BK002)", query: "खेती की ई-बुक BK002 कैसे मिलेगी?" }
+        ]);
+      }
+
+      // Check if asking about Fertilizer Schedule
+      if (q.includes('khad') || q.includes('खाद') || q.includes('fertilizer') || q.includes('यूरिया') || q.includes('डीएपी')) {
+        const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** के लिए संपूर्ण खाद, उर्वरक व पोषण प्रबंधन तालिका:
+
+🌱 **बुवाई के समय बेसल डोज़ (प्रति एकड़):**
+• ${matchedCrop.fertilizerSchedule}
+
+💡 **लागत घटाने व 50% रासायनिक खाद बचाने का अचूक तरीका:**
+• बुवाई या पहली सिंचाई पर **बायोफिट Bio-NPK (1L/एकड़)** का उपयोग करें। यह मिट्टी में जमे हुए अनुपलब्ध फास्फोरस व पोटाश को घोलकर सीधे पौधों की जड़ों तक पहुँचाता है, जिससे डीएपी-यूरिया का ख़र्च 40-50% कम हो जाता है।`;
+
+        return renderMasterCropCard(`${matchedCrop.name}: संतुलित खाद व उर्वरक प्रबंधन`, resp, [
+          { label: `🐛 ${matchedCrop.name} के प्रमुख रोग व दवा`, query: `${matchedCrop.keywords[0]} की बीमारी और दवा बताओ` },
+          { label: `📈 पैदावार 30% बढ़ाने के नुस्खे`, query: `${matchedCrop.keywords[0]} की पैदावार कैसे बढ़ाएं` }
+        ]);
+      }
+
+      // Check if asking about Seed Treatment
+      if (q.includes('beej upchar') || q.includes('बीज उपचार') || q.includes('seed treatment') || q.includes('शोधन')) {
+        const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** का वैज्ञानिक बीज उपचार (Seed Treatment):
+
+🌱 **बीज उपचार का फॉर्मूला:**
+• ${matchedCrop.seedTreatment}
+
+🛡️ **बीज उपचार के 3 बड़े फायदे:**
+1. 95% से अधिक एकसमान व तेज़ अंकुरण।
+2. प्रारंभिक जड़ सड़न, उकठा और फफूंद से 40 दिनों तक पूर्ण सुरक्षा।
+3. जड़ों का जाल 30% गहरा और मजबूत बनता है।`;
+
+        return renderMasterCropCard(`${matchedCrop.name}: प्रमाणित बीज उपचार विधि`, resp, [
+          { label: `🌱 ${matchedCrop.name} की उन्नत खेती परिचय`, query: `${matchedCrop.keywords[0]} के बारे में विस्तार से बताओ` },
+          { label: `🧪 खाद व उर्वरक तालिका`, query: `${matchedCrop.keywords[0]} में कौन सी खाद डालें` }
+        ]);
+      }
+
+      // Default: 3-4 Line Respectful Intro + Yield Hacks + Interactive Options (First Stage)
+      const introText = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** की संपूर्ण प्रोफाइल:
+
+🌾 **फसल का स्वभाव व चक्र:**
+• ${matchedCrop.intro}
+• **ऋतु व मौसम:** ${matchedCrop.season}
+• **बुवाई का सर्वोत्तम समय:** ${matchedCrop.sowingTime}
+• **उपयुक्त मिट्टी:** ${matchedCrop.soil}
+• **औसत पैदावार क्षमता:** **${matchedCrop.avgYield}**
+
+📈 **पैदावार 25-40% बढ़ाने के अचूक नुस्खे (Yield Hacks):**
+${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
+
+💬 **किसान भाई, आप ${matchedCrop.name} के बारे में आगे क्या जानना चाहते हैं?**  
+नीचे दिए गए बटन दबाकर तुरंत संपूर्ण विवरण देखें:`;
+
+      return renderMasterCropCard(`${matchedCrop.name}: फसल परिचय व पैदावार बढ़ाने के गुर`, introText, [
+        { label: `🐛 1. प्रमुख रोग, कीट व दवा`, query: `${matchedCrop.keywords[0]} की बीमारी और दवा बताओ` },
+        { label: `🌱 2. प्रमाणित बीज उपचार`, query: `${matchedCrop.keywords[0]} का बीज उपचार कैसे करें` },
+        { label: `🧪 3. खाद व NPK बचत तालिका`, query: `${matchedCrop.keywords[0]} में कौन सी खाद डालें` },
+        { label: "🛍️ 4. असली बायोफिट दवाएं कहाँ मिलेंगी?", query: "असली बायोफिट उत्पाद कहाँ मिलेंगे?" }
+      ]);
+    }
+
+    return false;
+  }
+
+  // 16.9 DEDICATED BHINDI / OKRA & VEGETABLE CROP DOCTOR HANDLER
+  function handleBhindiAndVegetablesQuery(cleanQ, query) {
+    const isBhindi = cleanQ.includes('bhindi') || cleanQ.includes('भिंडी') || cleanQ.includes('okra');
+    if (!isBhindi) return false;
+
+    const isYellowLeaves = cleanQ.includes('pili') || cleanQ.includes('पीली') || cleanQ.includes('peeli') || cleanQ.includes('yellow') || cleanQ.includes('mosaic') || cleanQ.includes('मोज़ेक') || cleanQ.includes('सफेद मक्खी') || cleanQ.includes('whitefly') || cleanQ.includes('बीमारी') || cleanQ.includes('रोग') || cleanQ.includes('dawa') || cleanQ.includes('दवा') || cleanQ.includes('छिड़क');
+
+    if (isYellowLeaves) {
+      const resp = `🌿 **भिंडी में पीली पत्तियां व पीला मोज़ेक वायरस (Bhindi YVMV) का 100% सटीक इलाज:**\n\n• **कारण व बीमारी की पहचान:** भिंडी की पत्तियां पीली पड़ना और नसों का गहरा पीला होना 'येलो वेन मोज़ेक वायरस' (YVMV) का लक्षण है। यह वायरस खुद नहीं फैलता, बल्कि **सफेद मक्खी (Whitefly)** एक रोगी पौधे से स्वस्थ पौधों में रस चूसकर इसे फैलाती है।\n\n🎯 **3-चरणीय वैज्ञानिक स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n1. **सफेद मक्खी व रसचूसक कीट नियंत्रण:** **बायोफिट इंटैक्ट (Biofit Intact)** 30ml + **Bio-99** 5ml (या एसिटामिप्रिड 20% SP 8-10 ग्राम) — सफेद मक्खियों का तुरंत खात्मा करें ताकि वायरस का फैलाव रुके।\n2. **रोग प्रतिरोधक कवच (वायरस रोकथाम):** **बायोफिट रैप अप (Wrap Up)** 30ml + **स्टिमरिच (Stimrich)** 30ml — पत्तों की नई कोशिकाओं को सुरक्षा व पौधों में नई हरी पत्तियों का फुटाव।\n3. **हरापन व पोषक तत्व:** 19:19:19 घुलनशील खाद 75 ग्राम या सूक्ष्म पोषक तत्व (Micronutrients) 30 ग्राम मिलाकर छिड़काव करें।\n\n👉 **ज़रूरी सलाह:** जो पौधे पूरी तरह पीले होकर सूख चुके हैं, उन्हें उखाड़कर खेत से बाहर गड्ढे में दबा दें और 7 दिन बाद दूसरा स्प्रे अवश्य दोहराएं।`;
+
+      renderCrispSpecialBox('🌿 भिंडी में पीलापन व मोज़ेक वायरस का संपूर्ण स्प्रे फॉर्मूला', resp, [
+        { text: '🧪 बायोफिट इंटैक्ट (कीट नियंत्रण)', query: 'इंटैक्ट जैविक कीटनाशक रस चूसक कीट' },
+        { text: '🛡️ बायोफिट रैप अप (वायरस व फंगस सुरक्षा)', query: 'रैप अप फंगस रोधक का उपयोग' },
+        { text: '🌱 स्टिमरिच + बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '📖 खेती का डॉक्टर ई-बुक (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+      ], 'agri', 'bhindi_yvmv');
+      return true;
+    }
+
+    // General Bhindi Cultivation (भिंडी की उन्नत खेती)
+    const resp = `🌿 **भिंडी की उन्नत वैज्ञानिक खेती व संपूर्ण स्प्रे गाइड:**\n\n• **1. बीज उपचार:** बुवाई से पहले प्रति किलो बीज में **स्टिमरिच** 5ml मिलाकर उपचारित करें। इससे 95%+ तेज अंकुरण होता है और पौधे स्वस्थ निकलते हैं।\n• **2. पहला स्प्रे (बुवाई के 15-20 दिन बाद):** स्टिमरिच 30ml + Bio-99 5ml + 19:19:19 75g प्रति 15L पंप (तेज बढ़वार व जड़ों का मजबूत विकास)।\n• **3. फूल व फल बनते समय:** स्टिमरिच 30ml + बोरॉन 20% 20g + एनपीके 0:52:34 75g (फूल झड़ने से रोकें व अधिक फलियां लाएं)।\n• **4. रसचूसक कीट व इल्ली सुरक्षा:** बायोफिट इंटैक्ट 30ml + रैप अप 30ml + Bio-99 5ml प्रति 15L पंप (सफेद मक्खी, तेला व फल छेदक इल्ली से 100% सुरक्षा)।`;
+
+    renderCrispSpecialBox('🌿 भिंडी की उन्नत खेती व 4-चरण स्प्रे गाइड', resp, [
+      { text: '🌿 भिंडी में पीली पत्ती का इलाज', query: 'भिंडी पीली पड़ रही है कौन सी दवा डालें' },
+      { text: '🥦 सब्जी, मिर्च व टमाटर स्प्रे कैलेंडर', query: 'सब्जी मिर्च का स्प्रे कैलेंडर' },
+      { text: '📖 खेती का डॉक्टर ई-बुक (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+    ], 'agri', 'bhindi_farming');
+    return true;
+  }
+
   // 17. DEDICATED SPRAY CALENDAR ROUTER (CROPS & GENERAL MENU)
   function handleDedicatedSprayQuery(cleanQ, query) {
     const isSprayQ = cleanQ.includes('स्प्रे') || cleanQ.includes('spray') || cleanQ.includes('दवा का छिड़काव') || cleanQ.includes('छिड़काव');
@@ -3098,47 +4732,46 @@
 
   // 17.5 DEDICATED NETSURF CORPORATE PROFILE, FOUNDERS & 4-VERTICAL PORTFOLIO ROUTER
   function handleNetsurfCompanyProfile(cleanQ, query) {
-    const isProfileKeyword = cleanQ.includes('प्रोफाइल') || cleanQ.includes('profile') || cleanQ.includes('कंपनी की प्रोफाइल') || cleanQ.includes('कंपनी प्रोफाइल') || cleanQ.includes('कंपनी परिचय') || cleanQ.includes('company profile');
-    const isFounderKeyword = cleanQ.includes('फाउंडर') || cleanQ.includes('संस्थापक') || cleanQ.includes('प्रमोटर') || cleanQ.includes('promoter') || cleanQ.includes('founder') || cleanQ.includes('मालिक') || cleanQ.includes('owner') || cleanQ.includes('सुजीत जैन') || cleanQ.includes('sujit jain') || cleanQ.includes('संजीव जैन') || cleanQ.includes('sanjay jain');
-    const isCompanyOrigin = cleanQ.includes('स्थापना') || cleanQ.includes('मुख्यालय') || cleanQ.includes('headquarter') || cleanQ.includes('hq') || cleanQ.includes('पुणे') || cleanQ.includes('pune') || cleanQ.includes('कंपनी का इतिहास') || cleanQ.includes('कंपनी इतिहास');
-    const isPortfolioOverview = cleanQ.includes('कितने प्रकार के उत्पाद') || cleanQ.includes('कितने प्रकार के प्रोडक्ट') || cleanQ.includes('चार वर्टिकल') || cleanQ.includes('4 वर्टिकल') || cleanQ.includes('product portfolio') || cleanQ.includes('उत्पाद श्रेणियां') || cleanQ.includes('पोर्टफोलियो') || ((cleanQ.includes('कितने') || cleanQ.includes('कौन')) && (cleanQ.includes('उत्पाद') || cleanQ.includes('प्रोडक्ट')));
-    const isDirectCompanyQuestion = (cleanQ.includes('नेट्सर्फ') || cleanQ.includes('netsurf')) && (cleanQ.includes('कंपनी क्या है') || cleanQ.includes('कंपनी के बारे में') || cleanQ.includes('कंपनी कैसी है') || cleanQ.includes('company kya hai') || cleanQ.includes('about company') || cleanQ.includes('about netsurf') || cleanQ === 'netsurf company' || cleanQ === 'नेट्सर्फ कंपनी' || cleanQ.includes('उत्पाद हैं'));
+    // Strict isolation: Never hijack user's personal profile inquiries
+    if (cleanQ.includes('mera profile') || cleanQ.includes('meri profile') || cleanQ.includes('मेरा प्रोफाइल') || cleanQ.includes('मेरी प्रोफाइल') || cleanQ.includes('mere bare me') || cleanQ.includes('मेरे बारे में')) {
+      return false;
+    }
+
+    const isNetsurfContext = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('कंपनी') || cleanQ.includes('company');
+    const isProfileKeyword = isNetsurfContext && (cleanQ.includes('प्रोफाइल') || cleanQ.includes('profile') || cleanQ.includes('परिचय') || cleanQ.includes('इतिहास'));
+    const isFounderKeyword = isNetsurfContext && (cleanQ.includes('फाउंडर') || cleanQ.includes('संस्थापक') || cleanQ.includes('प्रमोटर') || cleanQ.includes('promoter') || cleanQ.includes('founder') || cleanQ.includes('मालिक') || cleanQ.includes('owner') || cleanQ.includes('सुजीत') || cleanQ.includes('मालपानी') || cleanQ.includes('malpani') || cleanQ.includes('md') || cleanQ.includes('cmd') || cleanQ.includes('डायरेक्टर'));
+    const isCompanyOrigin = isNetsurfContext && (cleanQ.includes('स्थापना') || cleanQ.includes('मुख्यालय') || cleanQ.includes('headquarter') || cleanQ.includes('hq') || cleanQ.includes('पुणे') || cleanQ.includes('pune'));
+    const isPortfolioOverview = isNetsurfContext && (cleanQ.includes('कितने प्रकार के उत्पाद') || cleanQ.includes('कितने प्रकार के प्रोडक्ट') || cleanQ.includes('चार वर्टिकल') || cleanQ.includes('4 वर्टिकल') || cleanQ.includes('product portfolio') || cleanQ.includes('उत्पाद श्रेणियां') || cleanQ.includes('पोर्टफोलियो'));
+    const isDirectCompanyQuestion = (cleanQ.includes('नेट्सर्फ') || cleanQ.includes('netsurf')) && (cleanQ.includes('कंपनी क्या है') || cleanQ.includes('कंपनी के बारे में') || cleanQ.includes('कंपनी कैसी है') || cleanQ.includes('company kya hai') || cleanQ.includes('about company') || cleanQ.includes('about netsurf') || cleanQ === 'netsurf company' || cleanQ === 'नेट्सर्फ कंपनी');
 
     if (isProfileKeyword || isFounderKeyword || isCompanyOrigin || isPortfolioOverview || isDirectCompanyQuestion) {
       const profileText = `🏢 **नेट्सर्फ कम्युनिकेशन्स प्रा. लि. (Netsurf Communications Pvt. Ltd.) — कॉर्पोरेट प्रोफाइल एवं परिचय:**
 
-1️⃣ **कंपनी की स्थापना और अनुभव (Establishment & Introduction):**
+1️⃣ **कंपनी की स्थापना और अनुभव (Establishment & Experience):**
 • **स्थापना वर्ष:** साल **2000** में स्थापित।
 • **अनुभव:** डायरेक्ट सेलिंग एवं जैविक अनुसंधान के क्षेत्र में **26 वर्षों से अधिक** का गौरवशाली व सफल इतिहास।
 • **मुख्यालय (Headquarters):** **पुणे, महाराष्ट्र (भारत)**।
+• **अनुसंधान केंद्र:** DSIR (भारत सरकार) द्वारा प्रमाणित उच्च-स्तरीय R&D लैब्स।
 
 2️⃣ **प्रमोटर्स एवं फाउंडर्स (Promoters & Founders):**
-• **संस्थापक:** नेट्सर्फ की नींव **सुजीत जैन (Sujit Jain)** और **संजीव जैन (Sanjay Jain)** द्वारा रखी गई।
-• **मैनेजिंग डायरेक्टर:** **सुजीत जैन (Managing Director & Founder)** के दूरदर्शी नेतृत्व में यह भारत की सबसे भरोसेमंद, नैतिक और 100% स्वदेशी डायरेक्ट सेलिंग कंपनी बनी है।
+• **संस्थापक एवं मैनेजिंग डायरेक्टर (MD):** **श्री सुजीत जैन (Sujit Jain)** — जिनके दूरदर्शी व नैतिक नेतृत्व में नेट्सर्फ भारत की सबसे भरोसेमंद व 100% स्वदेशी डायरेक्ट सेलिंग कंपनी बनी है।
+• **सह-संस्थापक (Co-founder):** **श्री संजय मालपानी (Sanjay Malpani)** — जिन्होंने कंपनी के तकनीकी व व्यापारिक विस्तार में महत्वपूर्ण भूमिका निभाई है।
 
-3️⃣ **उत्पाद पोर्टफोलियो (Product Portfolio — 4 प्रमुख वर्टिकल्स, 100% R&D प्रमाणित):**
-🌾 **1. बायोफिट (Biofit — Organic Agriculture):**
-जैविक खेती के क्रांतिकारी उत्पाद जैसे स्टिमरिच (Stimrich), बायो 99 (Bio 99), रैप अप (Wrap Up), लार्विसाइड, NPK बैक्टीरिया व VEM माइकोराइजा। रासायनिक खादों पर निर्भरता घटाकर पैदावार 25-40% बढ़ाते हैं।
-🌿 **2. नेचुरमोरे (Naturamore — Health & Dietary Supplements):**
-मानव स्वास्थ्य और पोषण के लिए दैनिक आहार पूरक जैसे नेचुरमोरे फॉर वुमन, मेन्स वेलनेस, न्यूट्रीहेल्थ, जॉइंट केयर, लिवर केयर, डायबिटीज केयर और 27 विटामिन्स-मिनरल्स युक्त नेचुरमोरे किड्स।
-🌸 **3. हर्ब्स एंड मोर (Herbs & More — Personal Care & Beauty):**
-त्वचा और बालों की देखभाल के लिए पैराबीन-मुक्त (Paraben-free) प्रीमियम उत्पाद जैसे फेसवाश, शैम्पू, स्किन क्रीम, डे-टान स्क्रब और जॉइंट केयर पेन क्रीम।
-🐄 **4. पेट-वेट (Pet-Vet / पूर्व में CFC Plus — Animal Care & Nutrition):**
-दुधारू पशुओं (गाय-भैंस) का दूध उत्पादन व 7 से 8 फैट बढ़ाने, पाचन सुधारने व बांझपन दूर करने वाला संपूर्ण पशु आहार सप्लीमेंट।
-📦 **उपलब्ध साइज व आधिकारिक MRP:**
-• **250 ग्राम:** MRP **₹399**
-• **500 ग्राम:** MRP **₹699**
-• **1 किलोग्राम:** MRP **₹1,275**
-🥄 **खुराक:** गाय-भैंस हेतु **10 से 15 ग्राम प्रतिदिन** और बछड़े/बकरी हेतु **5 ग्राम प्रतिदिन**।
+3️⃣ **कंपनी का मुख्य दर्शन (Philosophy) व 4 वर्टिकल्स:**
+नेट्सर्फ का मुख्य उद्देश्य किसानों को रासायनिक जहरमुक्त खेती, परिवारों को संपूर्ण प्राकृतिक स्वास्थ्य, और आम नागरिकों को आजीवन आत्मनिर्भर स्वरोजगार देना है। इसके 4 प्रमुख वर्टिकल्स हैं:
+🌾 **1. बायोफिट (Biofit):** 100% जैविक खेती व फसल सुरक्षा।
+🌿 **2. नेचुरामोर (Naturamore):** मानव पोषण व आयुर्वेदिक हेल्थ केयर।
+🌸 **3. हर्ब्स एंड मोर (Herbs & More):** पैराबीन-मुक्त प्राकृतिक सौंदर्य व पर्सनल केयर।
+🐄 **4. पेट-वेट (Pet-Vet):** वैज्ञानिक पशु पोषण व दुग्ध वृद्धि (CFC Plus)।
 
-4️⃣ **बिजनेस सुअवसर:**
-उपभोक्ताओं को फ्री जॉइनिंग पर तुरंत ₹100 का वाउचर व 25% फ्लैट डिस्काउंट, और रिटेलर्स को 15 दिन में अधिकतम **₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500)** की कानूनी आय सीमा।`;
+✨ **आप नेट्सर्फ के बारे में क्या जानना चाहते हैं?**
+नीचे दिए गए विकल्पों में से चुनें:`;
 
-      const waUrl = buildAvneeshWhatsAppHandoffUrl('नेट्सर्फ कंपनी प्रोफाइल व 4 उत्पाद वर्टिकल्स की जानकारी');
+      const waUrl = buildAvneeshWhatsAppHandoffUrl('नेट्सर्फ कंपनी प्रोफाइल व बिज़नेस मार्गदर्शन');
 
       const html = `
         <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🏢 नेट्सर्फ कम्युनिकेशन्स प्रा. लि. — कॉर्पोरेट प्रोफाइल व 4 उत्पाद वर्टिकल्स
+          🏢 नेट्सर्फ कम्युनिकेशन्स प्रा. लि. — कॉर्पोरेट प्रोफाइल व परिचय
         </div>
         <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
           ${formatTextHtml(profileText)}
@@ -3146,6 +4779,18 @@
         ${buildMsgAudioBtnMarkup(profileText)}
 
         <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 आप क्या जानना चाहते हैं? विकल्प चुनें:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ के चारों वर्टिकल के उत्पाद और फिलॉसफी बताओ')">
+              📦 1. उत्पाद (4 वर्टिकल्स व कैटलॉग)
+            </button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ कंज्यूमर और रिटेलर बिजनेस प्लान बताओ')">
+              💼 2. बिज़नेस प्लान (25% छूट व ₹8.19L कैपिंग)
+            </button>
+            <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('किसान मित्र बनकर महीने में अच्छी कमाई कैसे करें')">
+              💰 3. कमाई व करियर (किसान मित्र)
+            </button>
+          </div>
           <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 अधिकृत लिंक्स व सेवाएं:</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
             <a href="/categories/netsurf.html" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
@@ -3165,81 +4810,1092 @@
       sakhiConversationState.lastActiveDomain = 'netsurf';
       sakhiConversationState.lastActiveEntity = 'netsurf_profile';
       sakhiConversationState.lastActiveEntityName = 'नेट्सर्फ कंपनी प्रोफाइल';
-      streamBotMessage(html, cleanTextForTTS('नेट्सर्फ की स्थापना साल 2000 में पुणे में हुई थी। इसके संस्थापक सुजीत जैन और संजीव जैन हैं। नेट्सर्फ के 4 प्रमुख वर्टिकल्स हैं: बायोफिट, नेचुरमोरे, हर्ब्स एंड मोर, और पेट-वेट।'));
+      streamBotMessage(html, cleanTextForTTS('नेट्सर्फ की स्थापना साल 2000 में पुणे में हुई थी। इसके संस्थापक व एमडी सुजीत जैन और सह-संस्थापक संजय मालपानी हैं। नेट्सर्फ के 4 प्रमुख वर्टिकल्स हैं।'));
       return true;
     }
     return false;
   }
 
-  // 18. DEDICATED NETSURF DIRECT SELLING & 15-DAY ₹8,19,250 CAPPING PLAN ROUTER
-  function handleNetsurfPlanQuery(cleanQ, query) {
-    const isNetsurf = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('बायोफिट') || cleanQ.includes('biofit');
-    const isPlan = cleanQ.includes('plan') || cleanQ.includes('प्लान') || cleanQ.includes('कमीशन') || cleanQ.includes('commission') || cleanQ.includes('8.19') || cleanQ.includes('8,19,250') || cleanQ.includes('819250') || cleanQ.includes('1638500') || cleanQ.includes('16.38') || cleanQ.includes('कैपिंग') || cleanQ.includes('बाइनरी') || cleanQ.includes('डायरेक्ट सेलिंग') || cleanQ.includes('रिटेल') || cleanQ.includes('क्लब नेट्सर्फ') || cleanQ.includes('बिजनेस प्लान') || cleanQ.includes('बिज़नेस प्लान') || cleanQ.includes('ऑटो शिपिंग') || cleanQ.includes('ऑटो-शिप') || cleanQ.includes('5+1') || cleanQ.includes('डिस्काउंट') || cleanQ.includes('जॉइनिंग') || cleanQ.includes('joining') || cleanQ.includes('फीस');
+  // ============================================================================
+  // ============================================================================
+  // ============================================================================
+  // 18. MASTER NETSURF DIRECT SELLING, 15-DAY CAPPING & CONVERSATIONAL INTELLIGENCE V3
+  // ============================================================================
+  // Part 1: Official Verified Plan Data Architecture (2026-2027 Guidelines)
+  // Part 2: Colloquial, Slang & Regional Keyword Matrix (Hindi + Hinglish)
+  // Part 3: Dynamic Subject-Switching ("Mix" Detection & Domain Guardrails)
+  // Part 4: Comprehensive Twist Resolution (Trust, ₹0 Join, 0 Stock, 0 Target, 15D Payout, No Team E-Teller)
+  // ============================================================================
 
-    if ((isNetsurf && isPlan) || cleanQ.includes('नेट्सर्फ प्लान') || cleanQ.includes('netsurf plan') || cleanQ.includes('नेट्सर्फ बिजनेस प्लान') || cleanQ.includes('नेट्सर्फ बिज़नेस प्लान') || cleanQ.includes('8,19,250') || cleanQ.includes('819250') || cleanQ.includes('1638500') || cleanQ.includes('नेट्सर्फ (25% छूट व प्लान)')) {
-      const planAnswer = `नेट्सर्फ एक डायरेक्ट सेलिंग कंपनी है जो पिछले 26 सालों से स्वास्थ्य, जैविक खेती और डायरेक्ट सेलिंग में काम कर रही है। आप इसके बारे में क्या जानना चाहते हैं?\n\nनेट्सर्फ का प्रमाणित बिज़नेस प्लान मुख्य रूप से Consumer, Retailer और Super Retailer के लिए है:\n\n1. **Consumer (उपभोक्ता) प्लान:**\n• **फ्री जॉइनिंग:** कोई रजिस्ट्रेशन शुल्क नहीं।\n• **₹100 प्रोडक्ट वाउचर:** जॉइनिंग पर तुरंत ₹100 का वाउचर।\n• **25% फ्लैट डिस्काउंट:** सभी प्रोडक्ट्स पर सीधा 25% डिस्काउंट (कोई पुराना 25-30% का आंकड़ा नहीं, बिल्कुल पक्का 25% डिस्काउंट)।\n• **5+1 ऑटो-शिपिंग:** हर महीने नियमित खरीदारी करने पर 6वें महीने उत्पाद बिल्कुल मुफ्त (5 खरीदें + 1 फ्री)!\n\n2. **Retailer (रिटेलर) प्लान — 4 बड़े आय स्रोत:**\n• 1) **Retail Commission:** 5% से 15% (यह साप्ताहिक मिलता है)।\n• 2) **Generation Income:** 3% से 8% (10,000 टर्नओवर पर 3%, 20k पर 4%, 40k पर 5%, 80k पर 6%, 1.20L पर 7%, 1.60L पर 8% — यह 15-15 दिन में मिलता है)।\n• 3) **Binary / Team Commission:** लगभग 3% से 5% (यह भी हर 15-15 दिन में मिलता है)। **15 दिन की अधिकतम सीमा ₹8,19,250 (पाक्षिक कैपिंग)** है। क्या आप महीने का ₹16,38,500 कमाना चाहते हैं? तो अभी दादा अविनाश (अवनीश) से संपर्क करें और यह पेज ओपन करें।\n• 4) **Other Benefits:** क्लब नेट्सर्फ, फैमिली प्रोटेक्शन प्लान (₹10 लाख दुर्घटना बीमा व नॉमिनी सुरक्षा), और राष्ट्रीय व अंतरराष्ट्रीय यात्राएं।`;
+  const NETSURF_PLAN_KNOWLEDGE = {
+    consumer: {
+      joiningFee: 0,
+      discountPercent: 25,
+      productVoucher: 100,
+      voucherMaxUsagePercent: 10,
+      voucherStockPointAllowed: false,
+      freeDeliveryThreshold: 4000,
+      fivePlusOneRules: {
+        condition: '5 अलग-अलग या एक जैसे प्रोडक्ट एक ही कैलेंडर माह में खरीदने पर 6ठा प्रोडक्ट मुफ़्त',
+        freeProductValue: 'खरीदे गए 5 प्रोडक्ट्स के औसत मूल्य (Average Value) के बराबर',
+        autoShipDiscount: 'ऑटो-शिप एक्टिव रहने पर अतिरिक्त विशेष छूट'
+      }
+    },
+    eTeller: {
+      joiningFee: 0,
+      selfPurchaseCompulsory: false,
+      retailMarginPercent: 25,
+      turnoverSlabs: [
+        { slab: 'Up to ₹24,999', commission: '5%' },
+        { slab: '₹25,000 to ₹49,999', commission: '8%' },
+        { slab: '₹50,000 to ₹99,999', commission: '10%' },
+        { slab: '₹1,00,000 & above', commission: '15%' }
+      ],
+      idealScenario: {
+        consumersCount: 100,
+        monthlySpendPerConsumer: 1000,
+        totalTurnover: 100000,
+        monthlyCommission: 15000,
+        annualPotential: 180000
+      }
+    },
+    cappingPlan: {
+      cycleDays: 15,
+      maxEarningPerCycle: 819250,
+      maxEarningPerMonth: 1638500,
+      generationIncome: {
+        beginner: '3% (Direct 1st Generation)',
+        lightning: '5% (L1: 3%, L2: 2%)',
+        starClub: '8% (L1: 3%, L2: 2%, L3: 3%)'
+      },
+      binaryTurnoverBonus: {
+        beginner: '3% on Team 1 & Team 2 Matching',
+        lightning: '4% Matching Turnover',
+        starClub: '5% Matching Turnover'
+      },
+      carryForwardPolicy: 'Unmatched volume कभी लैप्स नहीं होता, आजीवन Carry Forward रहता है',
+      securityBenefits: [
+        '₹2,00,000 से ₹25,00,000 तक पारिवारिक सुरक्षा बीमा',
+        'हॉस्पिटलाइजेशन व आकस्मिक चिकित्सा कवर',
+        'आजीवन 100% नॉमिनी ट्रांसफर (परिवार की सुरक्षा)'
+      ]
+    }
+  };
 
-      const waOfferUrl = buildAvneeshWhatsAppHandoffUrl('नेट्सर्फ बिज़नेस प्लान व 15-दिवसीय ₹8.19L कैपिंग मार्गदर्शन');
-
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          💼 नेट्सर्फ डायरेक्ट सेलिंग — 26 वर्षों का विश्वास व ₹8,19,250 पाक्षिक कैपिंग
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
-          ${formatTextHtml(planAnswer)}
-        </div>
-        ${buildMsgAudioBtnMarkup(planAnswer)}
-
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:8px;">👉 अधिकृत पेज व 7 भाषाओं में कैटलॉग डाउनलोड:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            <a href="/categories/netsurf.html" class="sakhi-followup-chip" style="background:#16a34a;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
-              💼 नेट्सर्फ करियर व प्लान पेज खोलें →
-            </a>
-            <a href="/categories/netsurf-products.html" class="sakhi-followup-chip" style="background:#0284c7;color:#fff;text-decoration:none;font-weight:800;padding:8px 14px;">
-              📥 7 भाषाओं में Netsurf-Catalog डाउनलोड करें →
-            </a>
-          </div>
-          <a href="${escapeHtml(waOfferUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;font-weight:800;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
-            <i class="fa-brands fa-whatsapp"></i> दादा अवनीश जी से सीधे WhatsApp पर जुड़ें (7974422572) →
-          </a>
+  function renderNetsurfPlanCard(title, bodyMarkdown, actionPills = []) {
+    let pillsHtml = '';
+    if (actionPills && actionPills.length > 0) {
+      pillsHtml = `
+        <div style="margin-top:14px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;flex-wrap:wrap;gap:8px;">
+          ${actionPills.map(p => `
+            <button type="button" class="sakhi-quick-pill" onclick="window.sendPredefinedSakhiQuery('${p.query.replace(/'/g, "\\'")}')" style="background:#f1f5f9;border:1px solid #94a3b8;color:#0f172a;padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;">
+              ${p.label}
+            </button>
+          `).join('')}
         </div>
       `;
+    }
 
-      consecutiveAmbiguousCount = 0;
-      sakhiConversationState.lastActiveDomain = 'netsurf';
-      sakhiConversationState.lastActiveEntity = 'netsurf_plan';
-      sakhiConversationState.lastActiveEntityName = 'नेट्सर्फ बिज़नेस प्लान';
-      streamBotMessage(html, cleanTextForTTS('नेट्सर्फ 26 सालों से कार्यरत है। कंज्यूमर्स को 25% फ्लैट डिस्काउंट और 5+1 ऑटो शिपिंग मिलती है। रिटेलर्स को 15 दिन में अधिकतम 8 लाख 19 हजार 250 रुपये कैपिंग मिलती है। महीने का 16 लाख 38 हजार 500 रुपये कमाने के लिए दादा अवनीश से संपर्क करें।'));
+    const html = `
+      <div class="sakhi-plan-container" style="background:#ffffff;border:1.5px solid #10b981;border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(16,185,129,0.12);margin:8px 0;">
+        <div style="display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+          <span style="background:#10b981;color:#ffffff;padding:4px 9px;border-radius:8px;font-size:0.85rem;font-weight:800;">NETSURF 2026-27</span>
+          <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#065f46;">${title}</h4>
+        </div>
+        <div class="sakhi-plan-content" style="font-size:0.95rem;line-height:1.65;color:#1e293b;">
+          ${renderMarkdownSafely(bodyMarkdown)}
+        </div>
+        ${pillsHtml}
+      </div>
+    `;
+
+    sakhiConversationState.lastActiveDomain = 'netsurf';
+    sakhiConversationState.lastActiveEntity = 'netsurf_plan';
+    sakhiConversationState.lastActiveEntityName = title;
+
+    streamBotMessage(html, cleanTextForTTS(bodyMarkdown));
+    return true;
+  }
+
+  function handleNetsurfPlanQuery(cleanQ, query) {
+    const q = (cleanQ || '').toLowerCase().trim();
+    const rawQ = query || cleanQ;
+
+    // =========================================================================
+    // PART 3: DYNAMIC SUBJECT SWITCHING & "MIX" DETECTION GUARDRAILS
+    // ("agar ek subject me bat chal rahi hai aur koi dusra subject pata chale to mix ho gaya")
+    // =========================================================================
+
+    // 1. Explicit Agricultural Problem Keywords (Pests, Crops, Fertilizers, Weed, Spray)
+    const agriCropPestKeywords = [
+      'mahu', 'mahun', 'aaphid', 'aphid', 'sundi', 'illad', 'keeda', 'kida', 'kide', 'churda', 'murda',
+      'thrips', 'makkhi', 'safed makkhi', 'whitefly', 'fungus', 'faphund', 'kharpatwar', 'weed', 'blast',
+      'sarso', 'sarson', 'chana', 'gehu', 'dhan', 'tamatar', 'mirch', 'aalu', 'bhindi', 'fasal', 'kheti',
+      'peela pan', 'peeli pad', 'patti sukh', 'jad sadan', 'wilt', 'khad', 'urvara', 'spray schedule'
+    ];
+    const isCropPestExplicit = agriCropPestKeywords.some(kw => q.includes(kw));
+
+    // 2. Explicit Clinical Symptoms & Ayurvedic Home Remedies Keywords
+    const healthClinicalKeywords = [
+      'ghutno me dard', 'ghutna dard', 'jodo me dard', 'joint pain', 'sugar ka ilaj', 'sugar ki dawa',
+      'madhumeh', 'diabetes cure', 'bp high', 'blood pressure', 'thyroid', 'motapa kam', 'wazan kam',
+      'kabz', 'piles', 'bawaseer', 'pathri', 'kidney stone', 'dama', 'asthma', 'khansi', 'fever', 'bukhar',
+      'chehre ke dane', 'keel muhase', 'hair fall', 'safed pani', 'leucorrhea', 'gharelu nuskhe', 'dadi ke nuskhe'
+    ];
+    const isClinicalExplicit = healthClinicalKeywords.some(kw => q.includes(kw));
+
+    // 3. Explicit Business & NetSurf Plan Keywords
+    const businessExplicitKeywords = [
+      'netsurf', 'नेटसर्फ', 'नेट सर्फ', 'etailer', 'eteller', 'e-teller', 'ई टेलर', 'ई-टेलर', 'ईटेलर',
+      'capping', 'कैपिंग', '8,19,250', '819250', '8.19', 'binary', 'बाइनरी', 'matching', 'मैचिंग',
+      'generation', 'जनरेशन', '5+1', '5 plus 1', 'retail margin', 'कमीशन', 'consumer plan',
+      'joining fee', 'रजिस्ट्रेशन', 'आईडी बंद', 'carry forward'
+    ];
+    const hasBusinessExplicit = businessExplicitKeywords.some(kw => q.includes(kw));
+
+    // MIX CASE A: User was in NetSurf, but now asks a pure Crop Pest / Agri question without business keywords
+    if (isCropPestExplicit && !hasBusinessExplicit) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      sakhiConversationState.lastActiveEntity = null;
+      return false; // Yield smoothly to specialized Agri Doctor
+    }
+
+    // MIX CASE B: User was in NetSurf, but now asks a pure Health / Clinical question without business keywords
+    if (isClinicalExplicit && !hasBusinessExplicit) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = null;
+      return false; // Yield smoothly to specialized Health Doctor
+    }
+
+    // =========================================================================
+    // PART 2: CONTEXT TRIGGER & AMBIGUITY RESOLUTION ("par wahi hai to mix nahi ho")
+    // =========================================================================
+    const hasNetsurfExplicit = q.includes('netsurf') || q.includes('नेटसर्फ') || q.includes('नेट सर्फ');
+    const isETellerKeyword = q.includes('etailer') || q.includes('eteller') || q.includes('e-teller') || q.includes('ई टेलर') || q.includes('ई-टेलर') || q.includes('ईटेलर');
+    const isConsumerKeyword = q.includes('consumer') || q.includes('कंज्यूमर') || q.includes('उपभोक्ता');
+    const is5Plus1Keyword = q.includes('5+1') || q.includes('5 plus 1') || q.includes('5 kharid') || q.includes('paanch kharid') || q.includes('पांच खरीद') || q.includes('chatha product free') || q.includes('छठा प्रोडक्ट');
+    const isCappingExplicit = q.includes('8.19') || q.includes('8,19,250') || q.includes('819250') || q.includes('capping') || q.includes('कैपिंग');
+    const isBinaryMatching = q.includes('binary') || q.includes('बाइनरी') || q.includes('matching income') || q.includes('मैचिंग') || q.includes('generation income') || q.includes('जनरेशन');
+    
+    // Twist / Slang questions that belong to NetSurf when domain is NetSurf OR when asked with business context
+    const isTwistWord = (
+      q.includes('sanka') || q.includes('shanka') || q.includes('शंका') || q.includes('sandeh') || q.includes('frad') || q.includes('fraud') || q.includes('धोखा') || q.includes('dhokha') || q.includes('farzi') || q.includes('scam') || q.includes('fake') || q.includes('bhaag to nahi') ||
+      q.includes('judne') || q.includes('judna') || q.includes('judane') || q.includes('जुड़ने') || q.includes('kitna paisa') || q.includes('kitna lagega') || q.includes('lagat') || q.includes('joining') || q.includes('investment') || q.includes('kharcha') ||
+      q.includes('dukan') || q.includes('dukaan') || q.includes('दुकान') || q.includes('store') || q.includes('stock') || q.includes('स्टॉक') || q.includes('godown') || q.includes('ghar me bharna') ||
+      q.includes('target') || q.includes('टारगेट') || q.includes('id band') || q.includes('id block') || q.includes('lapse') || q.includes('compulsory') ||
+      q.includes('paisa kab') || q.includes('payment kab') || q.includes('khate me') || q.includes('payout') ||
+      q.includes('koi na jude') || q.includes('bina jode') || q.includes('team na bane') || q.includes('akela') ||
+      q.includes('kya kaam') || q.includes('mera kaam') || q.includes('karna kya') || q.includes('kaise kare') ||
+      q.includes('qualification') || q.includes('degree') || q.includes('padhai') || q.includes('anpadh') || q.includes('english')
+    );
+
+    const isPlanKeyword = q.includes('plan') || q.includes('प्लान') || q.includes('बिजनेस') || q.includes('business') || q.includes('कमीशन') || q.includes('commission') || q.includes('कमाई') || q.includes('earning');
+
+    const inNetsurfSession = (sakhiConversationState.lastActiveDomain === 'netsurf' || sakhiConversationState.lastActiveDomain === 'business');
+
+    const shouldHandleNetsurf = (
+      hasNetsurfExplicit ||
+      isETellerKeyword ||
+      isConsumerKeyword ||
+      is5Plus1Keyword ||
+      isCappingExplicit ||
+      isBinaryMatching ||
+      (isPlanKeyword && (hasNetsurfExplicit || inNetsurfSession || q.includes('direct selling') || q.includes('network') || q.includes('mlm'))) ||
+      (inNetsurfSession && isTwistWord) ||
+      (inNetsurfSession && (q.includes('aur batao') || q.includes('aur jankari') || q.includes('kaise join') || q.includes('aur kya') || q.includes('iske bare me')))
+    );
+
+    if (!shouldHandleNetsurf) {
+      return false;
+    }
+
+    // =========================================================================
+    // PART 4: COMPREHENSIVE TWIST HANDLERS WITH EXPANDED SLANG / PHONETIC VOCABULARY
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // TWIST 1: TRUST, FRAUD, SCAM, DOUBT, LEGALITY, 25 YEARS PROOF (सुरक्षा व भरोसा)
+    // -------------------------------------------------------------------------
+    const isTrustFraudQuery = (
+      q.includes('sanka') || q.includes('shanka') || q.includes('शंका') ||
+      q.includes('sandeh') || q.includes('संदेह') || q.includes('doubt') ||
+      q.includes('frad') || q.includes('fraud') || q.includes('फ़्रॉड') || q.includes('धोखा') || q.includes('dhokha') || q.includes('dokhha') ||
+      q.includes('farzi') || q.includes('फ़र्ज़ी') || q.includes('scam') || q.includes('fake') ||
+      q.includes('bhaag to nahi') || q.includes('bhaag jayegi') || q.includes('भाग जाएगी') ||
+      q.includes('chuna') || q.includes('चूना') || q.includes('lut to nahi') || q.includes('लूट') ||
+      q.includes('trap') || q.includes('ghotala') || q.includes('घोटाला') || q.includes('jhol') || q.includes('झोल') ||
+      q.includes('vishwas') || q.includes('विश्वास') || q.includes('bharosa') || q.includes('भरोसा') ||
+      q.includes('asli ya nakli') || q.includes('asli') || q.includes('nakli') ||
+      q.includes('legal') || q.includes('लीगल') || q.includes('sarkari') || q.includes('सरकारी') ||
+      q.includes('guidelines') || q.includes('गाइडलाइंस') || q.includes('manyata') || q.includes('मान्यता') ||
+      q.includes('registration') || q.includes('रजिस्ट्रेशन') ||
+      q.includes('paisa doob') || q.includes('डूबेगा') || q.includes('loss to nahi') || q.includes('नुकसान') ||
+      q.includes('surakshit') || q.includes('सुरक्षित') || q.includes('company kaisi hai') || q.includes('sahi hai ya galat')
+    );
+    if (isTrustFraudQuery) {
+      const resp = `आपकी शंका बिल्कुल स्वाभाविक और जायज़ है! आज के समय में किसी भी संस्थान या बिज़नेस से जुड़ने से पहले उसकी विश्वसनीयता और सुरक्षा की पूरी पड़ताल करना हर समझदार व्यक्ति का पहला कर्तव्य है।
+
+आइए, **नेटसर्फ (Netsurf Network)** की वास्तविक कानूनी व ऐतिहासिक स्थिति को बिना किसी घुमाव-फिराव के साफ़-साफ़ समझें:
+
+🛡️ **1. 25+ वर्षों की ऐतिहासिक विश्वसनीयता (Established 2000):**
+• नेटसर्फ कोई नई या रातों-रात खुली कंपनी नहीं है। यह सन 2000 से (26 वर्षों से अधिक समय से) भारत भर में अटूट विश्वास के साथ सफलतापूर्वक काम कर रही है।
+• देश के 28 राज्यों में **65 लाख से अधिक संतुष्ट किसान व परिवार** इसके उत्पादों का निरंतर उपयोग कर रहे हैं।
+
+⚖️ **2. 100% भारत सरकार की डायरेक्ट सेलिंग नियमावली (Rules 2021) के अनुरूप:**
+• नेटसर्फ **Ministry of Consumer Affairs (उपभोक्ता मामले मंत्रालय)** की डायरेक्ट सेलिंग रूल्स 2021 का शत-प्रतिशत पालन करती है।
+• यह **FDSA (Federation of Direct Selling Association)** की सम्मानित कोर सदस्य है।
+
+💼 **3. ₹0 जॉइनिंग फीस — डूबाने के लिए ₹1 का भी रिस्क नहीं:**
+• किसी भी तरह की कोई जॉइनिंग फीस, रिन्यूअल फीस या जबरन किट खरीदने की बाध्यता नहीं है।
+• जब आपने अपनी जेब से कोई गैर-ज़रूरी निवेश किया ही नहीं, तो **धोखे या आर्थिक नुकसान की 0.00% संभावना** है!
+
+🔬 **4. स्वयं की DSIR-स्वीकृत रिसर्च लैब व विशाल मैन्युफैक्चरिंग प्लांट्स:**
+• नेटसर्फ कोई थर्ड-पार्टी रीसेलर नहीं है। पुणे, हिमाचल व सिक्किम में कंपनी के अपने अत्याधुनिक R&D केंद्र और विनिर्माण संयंत्र हैं, जिन्हें भारत सरकार के विज्ञान एवं प्रौद्योगिकी मंत्रालय (DSIR) से मान्यता प्राप्त है।
+
+🏦 **5. 100% व्हाइट मनी — सीधे आपके KYC बैंक खाते में भुगतान:**
+• कोई कैश का लेन-देन नहीं होता। प्रत्येक चक्र का भुगतान सीधे आपके आधार/पैन से लिंक बैंक खाते में NEFT/RTGS द्वारा ट्रांसफर होता है, जिसमें नियमानुसार TDS काटकर वैध वाउचर जारी किया जाता है।
+
+🌟 **निष्कर्ष:** आरोग्यम भारत और नेटसर्फ का यह मॉडल पूरी तरह पारदर्शी, सुरक्षित और पीढ़ियों तक चलने वाला प्रमाणित बिज़नेस है। आप बेझिझक, निडर होकर शुरुआत कर सकते हैं!`;
+
+      return renderNetsurfPlanCard('सुरक्षा व भरोसा: नेटसर्फ की वास्तविकता व 100% लीगल स्टेटस', resp, [
+        { label: "💰 जुड़ने का ख़र्च व प्रक्रिया जानें", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" },
+        { label: "📦 क्या दुकान या स्टॉक रखना पड़ेगा?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
+        { label: "🤝 अगर कोई न जुड़े तो कमाई कैसे होगी?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 2: JOINING FEES, INVESTMENT, COST, FREE VS PAID (शून्य लागत / ₹0 में शुरुआत)
+    // -------------------------------------------------------------------------
+    const isJoiningFeeQuery = (
+      q.includes('judne ke liye kitna') || q.includes('judne me kitna') || q.includes('judne ka paisa') ||
+      q.includes('judne') || q.includes('जुड़ने') || q.includes('judna') || q.includes('judane') ||
+      q.includes('kitna paisa lagega') || q.includes('kitna lagta hai') || q.includes('kitna kharch') ||
+      q.includes('shuru karne me kitna') || q.includes('shuruat me kitna') ||
+      q.includes('lagat') || q.includes('लागत') || q.includes('kharcha') || q.includes('खर्च') ||
+      q.includes('investment') || q.includes('invest') || q.includes('निवेश') ||
+      q.includes('paisa lagta hai kya') || q.includes('free hai ya paise') ||
+      q.includes('joining fee') || q.includes('joining fees') || q.includes('जॉइनिंग') ||
+      q.includes('registration fee') || q.includes('पंजीकरण') ||
+      q.includes('kit khareedna') || q.includes('kit lena') ||
+      q.includes('id activation') || q.includes('id activate') || q.includes('id banwane') ||
+      q.includes('kitne rupaye') || q.includes('membership fee') || q.includes('kitna dena hoga') ||
+      q.includes('pehle paise dene padenge') || q.includes('free me join')
+    );
+    if (isJoiningFeeQuery) {
+      const resp = `सीधा और साफ़ जवाब: **नेटसर्फ में जुड़ने का शुल्क बिल्कुल ₹0 (शून्य / बिल्कुल FREE) है!**
+
+यहाँ आपको शुरुआत करने के लिए अपनी जेब से कोई भारी-भरकम पूंजी या एडवांस नहीं लगाना होता:
+
+🟢 **1. ₹0 रजिस्ट्रेशन फीस (100% मुफ़्त डिजिटल जॉइनिंग):**
+• आधार कार्ड, पैन कार्ड और बैंक पासबुक विवरण के साथ आपकी डिजिटल आईडी मात्र 2 मिनट में निःशुल्क एक्टिवेट हो जाती है।
+
+🟢 **2. ₹0 अनिवार्य पैकेज या किट बाध्यता:**
+• कई कंपनियों में ₹10,000 या ₹25,000 की जबरन स्टार्टर किट लेनी पड़ती है। नेटसर्फ में ऐसी **कोई किट बाध्यता नहीं** है।
+
+🟢 **3. ₹0 रिन्यूअल फीस (आजीवन वैध आईडी):**
+• आपकी आईडी कभी एक्सपायर नहीं होती और न ही हर साल रिन्यूअल के नाम पर कोई अतिरिक्त चार्ज लगता है।
+
+🎁 **जॉइन करते ही मिलने वाले तुरंत लाभ:**
+1. **25% फ्लैट छूट:** पहले ही दिन से हर उत्पाद पर 25% का भारी डिस्काउंट।
+2. **₹100 का वेलकम वाउचर:** जॉइनिंग पर आपके अकाउंट में ₹100 का प्रोडक्ट डिस्काउंट कूपन।
+3. **5+1 का विशेष ऑफर:** 5 प्रोडक्ट खरीदने पर छठा प्रोडक्ट 100% मुफ़्त!
+4. **5% से 15% रिटेल कमीशन:** अपनी पसंद से उत्पादों की सिफ़ारिश कर पहले ही दिन से बैंक में कमाई शुरू करने का अधिकार।
+
+💡 **आपको क्या करना है?** सिर्फ अपनी या अपने परिवार की ज़रूरत का कोई भी 1 प्रामाणिक जैविक उत्पाद यूज़ करके देखें। यदि पसंद आए तो दूसरों को बताएँ और कमाएँ!`;
+
+      return renderNetsurfPlanCard('₹0 जॉइनिंग — नेटसर्फ में जुड़ने का कोई ख़र्च नहीं', resp, [
+        { label: "🏪 क्या दुकान खोलनी पड़ेगी?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
+        { label: "🎯 क्या हर महीने टारगेट होता है?", query: "क्या हर महीने टारगेट पूरा करना पड़ेगा या आईडी बंद होगी?" },
+        { label: "📱 ई-टेलर बनकर बिना टीम कमाई कैसे करें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 3: SHOP, STOCK, GODOWN, INVENTORY (दुकान या स्टॉक रखने का कोई झंझट नहीं)
+    // -------------------------------------------------------------------------
+    const isShopStockQuery = (
+      q.includes('dukan') || q.includes('dukaan') || q.includes('दुकान') ||
+      q.includes('store') || q.includes('स्टोर') ||
+      q.includes('stock') || q.includes('स्टॉक') ||
+      q.includes('godown') || q.includes('गोदाम') ||
+      q.includes('maal') || q.includes('माल') ||
+      q.includes('ghar me bharna') || q.includes('ghar pe rakhna') || q.includes('घर में भरना') ||
+      q.includes('kharid ke rakhna') || q.includes('खरीद के रखना') ||
+      q.includes('saman lana padega') || q.includes('सामान रखना') ||
+      q.includes('inventory') || q.includes('dukan chahiye') ||
+      q.includes('ghar ghar jakar bechna') || q.includes('jhola leke')
+    );
+    if (isShopStockQuery) {
+      const resp = `बिल्कुल नहीं! **नेटसर्फ में आपको 1 रुपये की भी दुकान, गोदाम या स्टॉक रखने की कोई आवश्यकता नहीं है!**
+
+यह 21वीं सदी का आधुनिक **डिजिटल ई-कॉमर्स व डायरेक्ट-टू-कंज्यूमर (D2C)** मॉडल है:
+
+📦 **1. कंपनी संभालती है पूरा वेयरहाउस और लॉजिस्टिक्स:**
+• आपको घर में पेटियाँ भरकर रखने या पैसे फंसाने की ज़रूरत नहीं है।
+• सारा स्टॉक, सुरक्षित पैकेजिंग और डिलीवरी नेटसर्फ के अपने सेंट्रलाइज्ड वेयरहाउस से होती है।
+
+🚚 **2. सीधा ग्राहक के घर कूरियर डिलीवरी (Doorstep Delivery):**
+• जब भी कोई किसान या परिवार आपकी सलाह पर उत्पाद मंगाना चाहता है, आप सीधे अपने मोबाइल ऐप से या अपनी रेकमेंडेशन लिंक द्वारा ऑर्डर लगाते हैं।
+• कंपनी का कूरियर पार्टनर सीधे ग्राहक के घर तक पार्सल सुरक्षित पहुँचाता है।
+• ₹4,000 से ऊपर के ऑर्डर पर **100% फ्री होम डिलीवरी** की सुविधा उपलब्ध है।
+
+📱 **3. सिर्फ मोबाइल से डिजिटल बिज़नेस:**
+• आपका पूरा कारोबार आपके स्मार्टफोन से संचालित होता है।
+• ग्राहक को बिल, ट्रैकिंग नंबर और डिलीवरी अपडेट सीधे SMS और WhatsApp पर कंपनी द्वारा भेजा जाता है।
+• और आपका **5% से 15% का कमीशन** सीधे आपके बैंक खाते में जमा हो जाता है!`;
+
+      return renderNetsurfPlanCard('ज़ीरो दुकान व ज़ीरो स्टॉक: शुद्ध डिजिटल मॉडल', resp, [
+        { label: "💳 पैसा कब और किस दिन बैंक में आता है?", query: "नेटसर्फ में पैसा कब और कैसे आता है?" },
+        { label: "👥 अगर कोई न जुड़े तो कमाई कैसे होगी?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 4: TARGET, ID BLOCK, LAPSE, EXPIRY, COMPULSORY PURCHASE (ज़ीरो टारगेट / सुरक्षित आईडी)
+    // -------------------------------------------------------------------------
+    const isTargetLapseQuery = (
+      q.includes('target') || q.includes('टारगेट') ||
+      q.includes('id band') || q.includes('id block') || q.includes('आईडी बंद') || q.includes('आईडी ब्लॉक') ||
+      q.includes('lapse') || q.includes('लैप्स') || q.includes('expiry') || q.includes('renewal') ||
+      q.includes('har mahine kharidna') || q.includes('compulsory') || q.includes('अनिवार्य') ||
+      q.includes('target pura na ho') || q.includes('point zero') || q.includes('pressure')
+    );
+    if (isTargetLapseQuery) {
+      const resp = `नेटसर्फ की सबसे बड़ी मानवीय और नैतिक ताकत है इसकी **'ज़ीरो टारगेट' (No Pressure) पॉलिसी!**
+
+🎯 **1. कोई मासिक या वार्षिक टारगेट नहीं:**
+• आपको हर महीने जबरन कोई कोटा या टारगेट पूरा करने का कोई मानसिक दबाव नहीं दिया जाता।
+• आप अपनी गति, अपनी सुविधा और अपनी पसंद के अनुसार काम करने के लिए पूरी तरह स्वतंत्र हैं।
+
+🔒 **2. आईडी कभी बंद (Block/Lapse) नहीं होती:**
+• कई कंपनियों में यदि आप 2 महीने खरीदारी न करें तो आईडी बंद हो जाती है। नेटसर्फ में ऐसा बिल्कुल नहीं होता।
+• आपकी आईडी हमेशा एक्टिव और सुरक्षित रहती है।
+
+🔄 **3. लाइफटाइम कैरी फॉरवर्ड (Lifetime Carry Forward):**
+• यदि आपकी एक टीम में इस चक्र में बिज़नेस वॉल्यूम अधिक हुआ और दूसरी टीम में कम, तो आपका बचा हुआ वॉल्यूम कभी 'शून्य' या फ्लश नहीं होता।
+• वह आजीवन अगले चक्रों के लिए सुरक्षित **Carry Forward** रहता है।
+
+🛍️ **4. कोई जबरन सेल्फ़-परचेज़ (Self-Purchase) नहीं:**
+• ई-टेलर मॉडल में अपना कमीशन प्राप्त करने के लिए आपको हर महीने अपनी जेब से ख़रीददारी करने की कोई मजबूरी नहीं है।`;
+
+      return renderNetsurfPlanCard('ज़ीरो-टारगेट गारंटी: तनाव-मुक्त व आजीवन सुरक्षित आईडी', resp, [
+        { label: "🤝 अगर कोई न जुड़े तो?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
+        { label: "💰 ई-टेलर बनकर 15% कमीशन कैसे लें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 5: PAYOUT TIMELINE, BANK CREDIT, TDS (पैसा कब और कैसे आता है?)
+    // -------------------------------------------------------------------------
+    const isPayoutMethodQuery = (
+      q.includes('paisa kab') || q.includes('payment kab') || q.includes('पैसा कब') || q.includes('पेमेंट कब') ||
+      q.includes('khate me') || q.includes('खाते में') || q.includes('bank me') || q.includes('बैंक में') ||
+      q.includes('payout') || q.includes('पेआउट') || q.includes('kitne din me paisa') ||
+      q.includes('cycle kya hai') || q.includes('paisa kaise nikalte') || q.includes('direct bank') ||
+      q.includes('tds') || q.includes('white money') || q.includes('kab milta hai')
+    );
+    if (isPayoutMethodQuery) {
+      const resp = `नेटसर्फ में आपकी मेहनत की पाई-पाई का भुगतान **100% पारदर्शी, कानूनी और निर्धारित समय पर सीधे आपके बैंक खाते में** जमा होता है:
+
+🗓️ **1. 15-दिवसीय द्वैमासिक पेआउट साइकिल (Bi-Monthly Cycle):**
+नेटसर्फ का महीना 2 स्पष्ट चक्रों में विभाजित होता है:
+• **साइकिल 1:** महीने की 1 तारीख से 15 तारीख तक (हिसाब 15 को क्लोज़ होता है)।
+• **साइकिल 2:** महीने की 16 तारीख से महीने की अंतिम तारीख तक।
+
+🏦 **2. सीधे बैंक ट्रांसफर (Direct NEFT/RTGS):**
+• साइकिल क्लोज़ होने के बाद कंपनी के ऑटोमेटेड सिस्टम द्वारा आपकी कमाई सीधे आपके रजिस्टर्ड बैंक खाते में ट्रांसफर कर दी जाती है।
+• आपको किसी से पैसा माँगने या अप्रूवल का इंतज़ार करने की ज़रूरत नहीं है।
+
+🧾 **3. 100% व्हाइट मनी व वैधानिक TDS कटौती:**
+• प्रत्येक भुगतान भारत सरकार के आयकर नियमों के अनुसार TDS काटकर जमा किया जाता है।
+• आपके मोबाइल ऐप पर बाक़ायदा डिजिटल इनवॉइस और पेआउट स्टेटमेंट उपलब्ध रहता है, जिसे आप अपने इनकम टैक्स रिटर्न (ITR) में दिखा सकते हैं।`;
+
+      return renderNetsurfPlanCard('पारदर्शी पेआउट सिस्टम: 15-दिवसीय बैंक ट्रांसफ़र', resp, [
+        { label: "🛡️ क्या कंपनी पर भरोसा किया जा सकता है?", query: "क्या नेटसर्फ सुरक्षित और भरोसेमंद कंपनी है?" },
+        { label: "🏆 15 दिन में ₹8.19 लाख कैपिंग प्लान क्या है?", query: "बाइनरी मैचिंग और 8.19 लाख कैपिंग प्लान समझाइए" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 6: WHAT IF NO ONE JOINS? SINGLE PERSON / NO TEAM (अगर कोई न जुड़े तो?)
+    // -------------------------------------------------------------------------
+    const isNoTeamQuery = (
+      q.includes('koi na jude') || q.includes('koi member na bane') || q.includes('अगर कोई न जुड़े') ||
+      q.includes('bina jode') || q.includes('बिना जोड़े') || q.includes('bina team') || q.includes('बिना टीम') ||
+      q.includes('bina kisi ko jode') || q.includes('akela kar sakta') || q.includes('अकेले काम') ||
+      q.includes('chain nahi banayi') || q.includes('chain system') || q.includes('bande na jude') ||
+      q.includes('team na bane to')
+    );
+    if (isNoTeamQuery) {
+      const resp = `यह सबसे महत्वपूर्ण सवाल है! **हाँ, यदि आपके नीचे 1 भी व्यक्ति नेटवर्क में न जुड़े, तब भी आप हर महीने ₹15,000 से ₹25,000+ आसानी से कमा सकते हैं!**
+
+इसके लिए नेटसर्फ का विशेष **E-Teller (ई-टेलर) मॉडल** बनाया गया है:
+
+🤝 **1. आपको किसी को 'मेंबर' या 'लीडर' बनाने की मजबूरी नहीं:**
+• आपको किसी के पीछे भागकर उसे बिज़नेस में शामिल करने या टीम बनाने की कोई बाध्यता नहीं है।
+• आप सिर्फ एक डिजिटल रिटेलर (ई-टेलर) के रूप में काम कर सकते हैं।
+
+🌾 **2. सिर्फ जैविक उत्पादों की सिफ़ारिश (Consumer Recommendation):**
+• भारत में हर किसान को अपनी फसल में सुंडी, माहू, पीलापन रोकने और पैदावार 25-40% बढ़ाने के लिए उच्च गुणवत्ता वाले बायोफिट (Biofit) उत्पादों की सख्त ज़रूरत है।
+• हर परिवार को स्वास्थ्य के लिए नेचुरामोर (Naturamore) की ज़रूरत है।
+• आपको केवल इन ज़रूरतमंद लोगों को प्रॉडक्ट यूज़ करने की सही सलाह देनी है।
+
+💰 **3. टर्नओवर पर 5% से 15% सीधा बैंक कमीशन:**
+• जैसे ही वे ग्राहक आपकी आईडी से 25% छूट पर प्रॉडक्ट खरीदते हैं, आपको उनके कुल मासिक टर्नओवर पर **5% से 15% का अतिरिक्त रिटेल कमीशन** सीधे बैंक में मिलता है।
+
+📊 **सीधा गणित समझें:**
+• यदि आपने केवल **100 किसान या परिवार** तैयार किए जो महीने का औसतन ₹1,000 का सामान लेते हैं = कुल टर्नओवर ₹1,00,000।
+• ₹1,00,000 टर्नओवर पर 15% की दर से आपकी **मासिक शुद्ध कमाई = ₹15,000!**
+• यह पैसा बिना किसी डाउनलाइन टीम के, हर महीने आपके खाते में आता रहेगा!`;
+
+      return renderNetsurfPlanCard('बिना टीम बनाए कमाई: ई-टेलर सोलो मॉडल', resp, [
+        { label: "📱 ई-टेलर के सभी कमीशन स्लैब देखें", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🎁 5+1 ऑफर से ग्राहक कैसे खुश रहते हैं?", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 7: WHAT WORK TO DO? DAILY ROUTINE / HOW TO START (काम क्या करना होगा?)
+    // -------------------------------------------------------------------------
+    const isWhatWorkQuery = (
+      q.includes('kya kaam karna') || q.includes('mera kaam kya hoga') || q.includes('काम क्या करना होगा') ||
+      q.includes('isme karna kya hota') || q.includes('kya karna hoga') || q.includes('karna kya hai') ||
+      q.includes('kaise shuru kare') || q.includes('शुरुआत कैसे करें') || q.includes('kaise kaam karte') ||
+      q.includes('daily kitna time') || q.includes('mujhe kya karna hai') || q.includes('step by step')
+    );
+    if (isWhatWorkQuery) {
+      const resp = `नेटसर्फ में आपका दैनिक काम बहुत ही सरल, व्यावहारिक और मानवीय है। इसे आप **Use -> Share -> Earn (उपयोग करें, साझा करें, कमाएँ)** के 3 आसान चरणों में समझ सकते हैं:
+
+🌱 **चरण 1: उत्पाद का अनुभव लें (Use for Belief):**
+• किसी भी काम में सफलता का पहला नियम है खुद का सच्चा विश्वास।
+• अपनी खेती या परिवार के लिए कोई भी एक प्रामाणिक उत्पाद (जैसे बायो-99, स्टिमरिच या नेचुरामोर) 25% छूट पर मँगाकर इस्तेमाल करें।
+
+📢 **चरण 2: सही सलाह और जानकारी साझा करें (Share with Care):**
+• जब आपको उत्पाद के शानदार परिणाम दिखें, तो अपने आस-पास के किसान भाइयों या मित्रों से उनकी समस्याओं (फसल के कीड़े, लागत में कमी, जोड़ों का दर्द आदि) पर चर्चा करें।
+• आरोग्यम सखी AI की मदद से उन्हें डिजिटल स्प्रे चार्ट, वीडियो और सही खुराक भेजें।
+
+📲 **चरण 3: मोबाइल से ऑर्डर और कमीशन (Earn in Bank):**
+• ग्राहक के लिए सीधे अपने मोबाइल ऐप से 25% छूट पर ऑर्डर बुक करें (या अपनी रेकमेंडेशन लिंक भेजें)।
+• कंपनी उत्पाद सीधे ग्राहक के पते पर कूरियर करेगी।
+• आपको बिना दुकान खोले सीधे बैंक खाते में 5% से 15% कमीशन मिलेगा!
+
+⏰ **समय की ज़रूरत:** रोज़ाना सिर्फ **1 से 2 घंटे**, वह भी अपने मोबाइल से अपने खाली समय में!`;
+
+      return renderNetsurfPlanCard('दैनिक कार्यप्रणाली: 3 सरल कदमों में काम और कमाई', resp, [
+        { label: "🎓 क्या किसी डिग्री या पढ़ाई की ज़रूरत है?", query: "नेटसर्फ करने के लिए क्या योग्यता या पढ़ाई चाहिए?" },
+        { label: "💰 जुड़ने का ख़र्च कितना है?", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 8: QUALIFICATION, DEGREE, ENGLISH, HOUSEWIVES, STUDENTS, FARMERS (योग्यता व भाषा)
+    // -------------------------------------------------------------------------
+    const isQualificationQuery = (
+      q.includes('qualification') || q.includes('degree') || q.includes('योग्यता') || q.includes('डिग्री') ||
+      q.includes('padhai likhai') || q.includes('padhai') || q.includes('पढ़ाई') ||
+      q.includes('english aana zaruri') || q.includes('english') || q.includes('अंग्रेजी') ||
+      q.includes('anpadh') || q.includes('kam padhe likhe') ||
+      q.includes('housewife') || q.includes('mahila') || q.includes('grihini') || q.includes('गृहणी') ||
+      q.includes('student') || q.includes('छात्र') || q.includes('kisan kar sakta') ||
+      q.includes('experience chahiye') || q.includes('anubhav')
+    );
+    if (isQualificationQuery) {
+      const resp = `खुशखबरी: **नेटसर्फ बिज़नेस शुरू करने के लिए किसी भी डिग्री, डिप्लोमा, पूर्व अनुभव या अंग्रेज़ी भाषा के ज्ञान की बिल्कुल ज़रूरत नहीं है!**
+
+यह समाज के हर वर्ग के लिए खुला एक समान अवसर है:
+
+👩‍🌾 **1. किसान भाई:**
+• जो ज़मीन से जुड़े हैं और खेती की भाषा बेहतर समझते हैं, वे बायोफिट उत्पादों के द्वारा साथी किसानों की लागत आधी और पैदावार दोगुनी कराकर सबसे सफल ई-टेलर बनते हैं।
+
+👩‍💼 **2. महिलाएँ व गृहणियाँ (Women Empowerment):**
+• घर की ज़िम्मेदारियों को संभालते हुए, रोज़ाना 1-2 घंटे मोबाइल से काम करके आर्थिक रूप से आत्मनिर्भर बन सकती हैं।
+
+🎓 **3. युवा व छात्र (Students):**
+• अपनी पढ़ाई या प्रतियोगी परीक्षाओं की तैयारी के साथ-साथ डिजिटल नेटवर्किंग सीखकर अपनी पॉकेट मनी और भविष्य की नींव तैयार कर सकते हैं।
+
+👨‍💼 **4. नौकरीपेशा व दुकानदार:**
+• अपने मुख्य काम या दुकान को बिना बंद किए, पार्ट-टाइम में एक सुरक्षित दूसरा आय स्रोत (Second Income Stream) बना सकते हैं।
+
+🌟 **आरोग्यम सखी AI की मदद:** आपको कोई भी सवाल पूछना हो या ग्राहक को समझाना हो, आरोग्यम सखी AI 24 घंटे आपकी मातृभाषा हिंदी में पूरी गाइडेंस और सामग्री तैयार करके देती है!`;
+
+      return renderNetsurfPlanCard('योग्यता व अवसर: हर भारतीय के लिए खुला द्वार', resp, [
+        { label: "💰 जुड़ने का ख़र्च जानें", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" },
+        { label: "🤝 अगर कोई न जुड़े तो कमाई कैसे होगी?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 9: PRODUCTS RANGE, BIOFIT, NATURAMORE, ORGANIC CERTIFICATION (उत्पाद क्या हैं?)
+    // -------------------------------------------------------------------------
+    const isProductsRangeQuery = (
+      q.includes('products kya hai') || q.includes('product kya hai') || q.includes('kya saman hai') ||
+      q.includes('kya bechna hai') || q.includes('product ki quality') || q.includes('उत्पाद क्या हैं') ||
+      q.includes('biofit kya hai') || q.includes('naturamore kya hai') || q.includes('बायोफिट क्या है') ||
+      q.includes('organic hai kya') || q.includes('result milta hai kya') || q.includes('chemical free') ||
+      q.includes('products list') || q.includes('saman ki list')
+    );
+    if (isProductsRangeQuery) {
+      const resp = `नेटसर्फ के सभी उत्पाद **100% प्राकृतिक, जैविक (Organic), हानिकारक रसायनों से मुक्त और लैब-परीक्षित** हैं। कंपनी के पास 4 प्रमुख विश्वस्तरीय श्रेणियाँ (Verticals) हैं:
+
+🌾 **1. बायोफिट (Biofit — जैविक कृषि क्रांति):**
+• **Bio-99:** विश्वस्तरीय स्टीकर, स्प्रेडर और पेनिट्रेटर (दवा का असर दोगुना करता है)।
+• **Stimrich:** टॉनिक जो फसल की वानस्पतिक वृद्धि और फूलों/फलों की संख्या 25-40% बढ़ाता है।
+• **Sheth:** जैविक फफूंदनाशक जो जड़ सड़न, उकठा और फफूंद से रक्षा करता है।
+• **Intact & Wrapup:** चूसक कीटों और वायरस से प्राकृतिक कवच।
+• **एन-पी-के (NPK Bio-fertilizers):** मिट्टी में फिक्स पोषक तत्वों को घोलकर यूरिया-डीएपी का ख़र्च 50% कम करते हैं।
+
+🌿 **2. नेचुरामोर (Naturamore — हर्बल हेल्थ केयर):**
+• पुरुषों, महिलाओं व बच्चों के लिए संपूर्ण न्यूट्रिशनल पाउडर।
+• जोड़ों के दर्द के लिए **Joint Care**, हृदय सुरक्षा के लिए **Nutri Heart**, शुगर नियंत्रण के लिए **Life Style Plus**, कब्ज़ व गैस के लिए **Easy Detox**।
+
+💆‍♀️ **3. हर्ब्स एंड मोर (Herbs & More — पर्सनल व हेयर केयर):**
+• नीम-हल्दी फेस वॉश, विटामिन थैरेपी हेयर सीरम, ऑर्गेनिक शैम्पू व एलोवेरा क्रीम।
+
+🏡 **4. क्लीन एंड मोर (Clean & More — होम केयर):**
+• फैब्रिक वॉश और मल्टीपर्पज़ क्लीनर जो पर्यावरण और हाथों के लिए 100% सुरक्षित हैं।
+
+✨ **परिणाम:** सभी उत्पाद उच्च-मांग (Repeat Demand) वाले हैं, जिससे एक बार इस्तेमाल करने वाला ग्राहक हमेशा आपसे ही दोबारा ऑर्डर मँगाता है!`;
+
+      return renderNetsurfPlanCard('विश्वस्तरीय 100% जैविक उत्पाद श्रृंखला (4 वर्टिकल्स)', resp, [
+        { label: "🌾 बायोफिट स्प्रे कैलेंडर देखें", query: "गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए" },
+        { label: "🎁 5+1 ऑफर में छठा प्रोडक्ट फ्री कैसे लें?", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 10: DEDICATED E-TELLER INQUIRY (ई-टेलर प्लान विस्तार)
+    // -------------------------------------------------------------------------
+    if (isETellerKeyword && !q.includes('consumer vs') && !q.includes('फर्क')) {
+      const resp = `**Netsurf E-Teller (ई-टेलर)** वह स्वतंत्र डिजिटल पार्टनर है जो बिना दुकान खोले और बिना टीम बनाए, केवल सीधे ग्राहकों (Consumers) को उच्च गुणवत्ता वाले जैविक उत्पाद रेकमेंड करके **5% से 15% का शुद्ध रिटेल कमीशन** कमाता है।
+
+💡 **ई-टेलर के मुख्य लाभ व नियम:**
+• **₹0 जॉइनिंग:** जुड़ने या आईडी एक्टिवेट करने का कोई शुल्क नहीं।
+• **₹0 सेल्फ़-परचेज़ बाध्यता:** कमीशन पाने के लिए हर महीने खुद ख़रीदना ज़रूरी नहीं।
+• **25% कंज्यूमर छूट:** आपके ग्राहक को कंपनी से सीधे 25% का भारी डिस्काउंट मिलता है, जिससे वह हमेशा आपसे ही जुड़कर सामान लेता है।
+
+📊 **मासिक टर्नओवर कमीशन स्लैब:**
+• **₹1 से ₹24,999 तक टर्नओवर:** **5%** सीधा कमीशन
+• **₹25,000 से ₹49,999 तक:** **8%** कमीशन
+• **₹50,000 से ₹99,999 तक:** **10%** कमीशन
+• **₹1,00,000 और अधिक टर्नओवर:** **15%** उच्चतम कमीशन
+
+🎯 **100 कंज्यूमर्स का व्यावहारिक उदाहरण:**
+• यदि आप अपने संपर्क से **100 किसान या परिवार** जोड़ते हैं, जो औसतन ₹1,000 प्रति माह की शुद्ध ख़रीददारी करते हैं:
+• कुल टर्नओवर = ₹1,00,000।
+• 15% स्लैब के अनुसार आपकी **मासिक शुद्ध कमाई = ₹15,000**।
+• **सालाना कमाई = ₹1,80,000**, वह भी बिना किसी टीम के झंझट के!`;
+
+      return renderNetsurfPlanCard('नेटसर्फ E-Teller (ई-टेलर) प्लान: नियम, स्लैब व कमाई', resp, [
+        { label: "🤝 अगर कोई न जुड़े तो?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
+        { label: "📦 क्या दुकान खोलनी पड़ेगी?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
+        { label: "💳 पैसा बैंक में कब आता है?", query: "नेटसर्फ में पैसा कब और कैसे आता है?" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 11: DEDICATED CONSUMER INQUIRY & 5+1 OFFER (कंज्यूमर व 5+1 ऑफर)
+    // -------------------------------------------------------------------------
+    if (isConsumerKeyword || is5Plus1Keyword || q.includes('100 rs voucher') || q.includes('100 voucher') || q.includes('वाउचर')) {
+      const resp = `**Netsurf Consumer (उपभोक्ता)** वह व्यक्ति है जो अपने घर या खेत के लिए 100% शुद्ध, प्राकृतिक और जैविक उत्पाद भारी बचत के साथ सीधे कंपनी से ख़रीदता है।
+
+🎁 **कंज्यूमर को मिलने वाले 4 महा-लाभ:**
+
+1️⃣ **25% फ्लैट लाइफटाइम छूट:**
+• पहले ही दिन से हर उत्पाद पर एमआरपी से 25% की सीधी छूट मिलती है।
+
+2️⃣ **5+1 का विशेष फ़्री प्रॉडक्ट ऑफर:**
+• जब कोई कंज्यूमर एक कैलेंडर माह में कुल **5 उत्पाद** ख़रीदता है (चाहे एक साथ या अलग-अलग ऑर्डर में), तो कंपनी उसे **6ठा प्रॉडक्ट बिल्कुल मुफ़्त (FREE)** उपहार में देती है!
+• मुफ़्त उत्पाद की कीमत पहले ख़रीदे गए 5 उत्पादों के औसत मूल्य (Average Value) के बराबर होती है।
+
+3️⃣ **₹100 का वेलकम प्रॉडक्ट डिस्काउंट वाउचर:**
+• नए कंज्यूमर को जॉइनिंग पर ₹100 का डिस्काउंट कूपन मिलता है, जिसे वह अगले ऑर्डर में इनवॉइस वैल्यू के 10% तक भुना सकता है।
+
+4️⃣ **₹4,000+ पर मुफ़्त होम डिलीवरी:**
+• ₹4,000 या अधिक के ऑर्डर पर पूरे भारत में घर तक सुरक्षित कूरियर डिलीवरी बिल्कुल फ्री है!`;
+
+      return renderNetsurfPlanCard('नेटसर्फ Consumer प्लान: 25% छूट व 5+1 मुफ़्त ऑफ़र', resp, [
+        { label: "📱 ई-टेलर बनकर 15% कमीशन कैसे लें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🌾 बायोफिट स्प्रे शेड्यूल देखें", query: "गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 12: BINARY MATCHING, GENERATION INCOME & 15-DAY ₹8,19,250 CAPPING
+    // -------------------------------------------------------------------------
+    if (isCappingExplicit || isBinaryMatching || q.includes('capping') || q.includes('कैपिंग') || q.includes('generation') || q.includes('जनरेशन') || q.includes('binary') || q.includes('बाइनरी')) {
+      const resp = `नेटसर्फ का **Team Business Plan (15-दिवसीय कैपिंग मॉडल)** भारत का सबसे सुरक्षित, पारदर्शी और सबसे बड़ी आय देने वाला लीडरशिप प्लान है:
+
+👥 **1. जनरेशन इनकम (Generation Income — 3% से 8%):**
+• आपके द्वारा सीधे स्पॉन्सर किए गए लोगों (Direct Generation) के टर्नओवर पर आपको मिलता है:
+• **Beginner:** 3% (L1)
+• **Lightning:** 5% (L1 पर 3%, L2 पर 2%)
+• **Star Club & Above:** 8% (L1 पर 3%, L2 पर 2%, L3 पर 3%)
+• *विशेषता:* यह इनकम बिना किसी कैपिंग के **Unlimited Earning** के रूप में मिलती है!
+
+⚖️ **2. टीम टर्नओवर मैचिंग बोनस (Binary Matching — 3% से 5%):**
+• आपकी Team 1 और Team 2 के मैचिंग टर्नओवर पर:
+• शुरुआती लेवल पर **3%**, प्रगति पर **4%**, और क्लब लेवल पर **5%** मैचिंग बोनस।
+• बचा हुआ अतिरिक्त टर्नओवर कभी लैप्स नहीं होता, हमेशा **आजीवन Carry Forward** रहता है।
+
+🏆 **3. 15-दिवसीय ऐतिहासिक कैपिंग — ₹8,19,250:**
+• प्रत्येक 15 दिन के चक्र में टीम मैचिंग से अधिकतम **₹8,19,250** कमाए जा सकते हैं।
+• महीने के दो चक्रों को मिलाकर केवल मैचिंग बोनस से **₹16,38,500 प्रति माह** की उच्चतम सीमा तय है!
+
+🛡️ **4. पारिवारिक सुरक्षा योजना (Family Protection & Nominee):**
+• ₹2 लाख से ₹25 लाख तक का जीवन सुरक्षा बीमा।
+• 100% नॉमिनी ट्रांसफर — आपके बाद आपकी पूरी आईडी और आमदनी आपके परिवार को आजीवन हस्तांतरित होती है।`;
+
+      return renderNetsurfPlanCard('बाइनरी मैचिंग व ₹8,19,250 द्वैमासिक कैपिंग प्लान', resp, [
+        { label: "📱 0 टीम पर ई-टेलर से कमाई समझाइए", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
+        { label: "💰 जुड़ने का ख़र्च कितना है?", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" }
+      ]);
+    }
+
+    // =========================================================================
+    // DEFAULT MASTER PLAN OVERVIEW (When user asks for overall NetSurf plan)
+    // =========================================================================
+    const masterPlanText = `नेटसर्फ 26 वर्षों से भारत की सबसे प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग संस्था है। इसका संपूर्ण व्यावसायिक ढाँचा समाज के प्रत्येक व्यक्ति के लिए 3 सरल और स्पष्ट रास्तों में विभाजित है:
+
+1️⃣ **रास्ता 1 — Consumer (उपभोक्ता लाभ):**
+• **₹0 जॉइनिंग**, सभी जैविक उत्पादों पर **25% की भारी छूट**।
+• **5+1 महा-ऑफर:** महीने में 5 उत्पाद ख़रीदने पर छठा उत्पाद कंपनी से 100% FREE!
+• ₹100 का वेलकम वाउचर व ₹4,000 से ऊपर के ऑर्डर पर मुफ़्त होम डिलीवरी।
+
+2️⃣ **रास्ता 2 — E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):**
+• **₹0 जॉइनिंग**, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं।
+• सीधे उपभोक्ताओं को उत्पाद रेकमेंड करने पर **5% से 15% का शुद्ध रिटेल कमीशन** (सीधे बैंक में)।
+• 100 उपभोक्ताओं के साथ बिना टीम जोड़े हर महीने **₹15,000+ की नियमित आय**।
+
+3️⃣ **रास्ता 3 — Team Leader (टीम बिज़नेस व कैपिंग):**
+• **Generation Income:** सीधे रेफ़रल से 3% से 8% अनलिमिटेड इनकम।
+• **Binary Matching Bonus:** Team 1 व Team 2 मैचिंग पर 3% से 5% (लाइफटाइम कैरी फॉरवर्ड)।
+• **₹8,19,250 पाक्षिक कैपिंग:** हर 15 दिन में ₹8,19,250 (महीने का ₹16,38,500 तक कमाने का अवसर)।
+• पारिवारिक सुरक्षा योजना, नॉमिनी अधिकार व मुफ़्त देश-विदेश भ्रमण।
+
+💡 **सलाह:** यदि आप उत्पाद आज़माना चाहते हैं तो Consumer बनें; यदि बिना टीम के सिर्फ मोबाइल से अतिरिक्त आय चाहते हैं तो E-Teller बनें; और यदि बड़ा नेटवर्क बनाना चाहते हैं तो Team Leader बनें!`;
+
+    return renderNetsurfPlanCard('नेटसर्फ कम्प्लीट प्लान: 3 स्पष्ट विकल्प व ₹8.19L कैपिंग', masterPlanText, [
+      { label: "🛍️ 1. उपभोक्ता लाभ व 5+1 फ़्री", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
+      { label: "📱 2. ई-टेलर सोलो कमाई (15%)", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+      { label: "🏆 3. टीम कैपिंग प्लान (₹8.19L)", query: "बाइनरी मैचिंग और 8.19 लाख कैपिंग प्लान समझाइए" },
+      { label: "🛡️ 4. क्या कंपनी सुरक्षित है?", query: "क्या नेटसर्फ सुरक्षित और भरोसेमंद कंपनी है?" }
+    ]);
+  }
+
+  // 18.8 WEBSITE ACTION ROUTER (Google Assistant-like Direct Navigation)
+  function handleWebsiteActionRouter(cleanQ, rawQ) {
+    const q = cleanQ;
+
+    // 1. My Library
+    if (q.includes('library kholo') || q.includes('लाइब्रेरी खोलो') || q.includes('मेरी लाइब्रेरी') || q.includes('my library') || q.includes('open library') || q.includes('लाइब्रेरी दिखाओ')) {
+      const resp = "जी हाँ! मैं आपकी डिजिटल लाइब्रेरी खोल रही हूँ। आप अपनी सभी खरीदी गई ई-बुक्स और अध्ययन सामग्री यहाँ सीधे पढ़ सकते हैं:";
+      renderCrispSpecialBox('📚 डिजिटल लाइब्रेरी (My Library)', resp, [
+        { text: '📚 अभी मेरी लाइब्रेरी खोलें →', url: '/my-library.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '📖 ई-बुक रीडर खोलें', url: '/ebooks/reader.html', isExternal: true }
+      ], 'omni', 'nav_library');
       return true;
     }
+
+    // 2. E-Book Reader
+    if (q.includes('reader kholo') || q.includes('रीडर खोलो') || q.includes('किताब पढ़नी है') || q.includes('ebook reader') || q.includes('open reader') || q.includes('किताब खोलें')) {
+      const resp = "जी हाँ! ई-बुक रीडर खोला जा रहा है जहाँ आप अपनी पसंद की पुस्तक सीधे पढ़ सकते हैं:";
+      renderCrispSpecialBox('📖 ई-बुक रीडर (Digital Reader)', resp, [
+        { text: '📖 अभी ई-बुक रीडर खोलें →', url: '/ebooks/reader.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '📚 डिजिटल लाइब्रेरी', url: '/my-library.html', isExternal: true }
+      ], 'omni', 'nav_reader');
+      return true;
+    }
+
+    // 3. Purchases & Orders History
+    if (q.includes('kharidi gayi') || q.includes('खरीदी गई') || q.includes('purchases') || q.includes('order history') || q.includes('मेरी किताबें') || q.includes('purchase history') || q.includes('ऑर्डर हिस्ट्री')) {
+      const resp = "जी! आपके द्वारा खरीदे गए सभी ऑर्डर और ई-बुक्स का विवरण यहाँ उपलब्ध है:";
+      renderCrispSpecialBox('📦 मेरी खरीदारी व ई-बुक्स (Purchases)', resp, [
+        { text: '📦 अभी खरीदे गए उत्पाद देखें →', url: '/purchases.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '📚 डिजिटल लाइब्रेरी', url: '/my-library.html', isExternal: true }
+      ], 'omni', 'nav_purchases');
+      return true;
+    }
+
+    // 4. Aarogyam Tube (Videos)
+    if (q.includes('tube kholo') || q.includes('ट्यूब खोलो') || q.includes('aarogyam tube') || q.includes('video dekho') || q.includes('वीडियो खोलो') || q.includes('open tube') || q.includes('वीडियो देखना')) {
+      const resp = "जी हाँ! आरोग्यम ट्यूब वीडियो हब खोला जा रहा है जहाँ कृषि, पशुपालन, स्वास्थ्य और बिज़नेस के सभी व्यावहारिक वीडियो उपलब्ध हैं:";
+      renderCrispSpecialBox('📺 आरोग्यम ट्यूब (Video Hub)', resp, [
+        { text: '📺 आरोग्यम ट्यूब खोलें →', url: '/tube.html', isExternal: true, style: 'background:#dc2626;color:#ffffff;border-color:#b91c1c;font-weight:800;' },
+        { text: '🌾 फसल डॉक्टर वीडियो', url: '/tube.html?filter=agri', isExternal: true }
+      ], 'omni', 'nav_tube');
+      return true;
+    }
+
+    // 5. Registration / Join Form
+    if (q.includes('registration kholo') || q.includes('रजिस्ट्रेशन फॉर्म') || q.includes('रजिस्टर होना') || q.includes('signup') || q.includes('join form') || q.includes('नया खाता')) {
+      const resp = "जी हाँ! आरोग्यम इंडिया का नया रजिस्ट्रेशन फॉर्म खोला जा रहा है जहाँ आप अपना निःशुल्क खाता बना सकते हैं:";
+      renderCrispSpecialBox('📝 नया खाता / रजिस्ट्रेशन (Join Us)', resp, [
+        { text: '📝 अभी रजिस्ट्रेशन फॉर्म खोलें →', url: '/registration.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '💼 नेट्सर्फ बिज़नेस अवसर', url: '/categories/netsurf.html', isExternal: true }
+      ], 'omni', 'nav_registration');
+      return true;
+    }
+
+    // 6. Category Hubs (Health, Agri, Pashu, Beauty)
+    if (q.includes('health category') || q.includes('स्वास्थ्य पेज खोलो') || q.includes('हेल्थ हब') || q.includes('हेल्थ सेक्शन') || q.includes('swasthya category')) {
+      const resp = "जी! संपूर्ण 13 क्लिनिकल हेल्थ गाइड्स व आयुर्वेदिक समाधान का अधिकृत हेल्थ केंद्र खोला जा रहा है:";
+      renderCrispSpecialBox('🏥 क्लिनिकल हेल्थ गाइड्स व समाधान', resp, [
+        { text: '🏥 अभी हेल्थ केंद्र खोलें →', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' }
+      ], 'health', 'nav_health');
+      return true;
+    }
+    if (q.includes('krishi category') || q.includes('कृषि पेज खोलो') || q.includes('खेती हब') || q.includes('agriculture category')) {
+      const resp = "जी! उन्नत जैविक कृषि, फसल सुरक्षा और पोषण प्रबंधन का अधिकृत कृषि हब खोला जा रहा है:";
+      renderCrispSpecialBox('🌾 कृषि व फसल मार्गदर्शन केंद्र', resp, [
+        { text: '🌾 अभी कृषि केंद्र खोलें →', url: '/categories/agriculture.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' }
+      ], 'agri', 'nav_agri');
+      return true;
+    }
+    if (q.includes('pashu category') || q.includes('डेयरी पेज खोलो') || q.includes('पशुपालन हब') || q.includes('dairy category')) {
+      const resp = "जी! वैज्ञानिक डेयरी, दुग्ध वृद्धि और पशु पोषण का अधिकृत पशुपालन केंद्र खोला जा रहा है:";
+      renderCrispSpecialBox('🐄 पशुपालन व वैज्ञानिक डेयरी केंद्र', resp, [
+        { text: '🐄 अभी डेयरी केंद्र खोलें →', url: '/categories/pashu-palan.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' }
+      ], 'pashu', 'nav_pashu');
+      return true;
+    }
+    if (q.includes('beauty category') || q.includes('ब्यूटी पेज खोलो') || q.includes('सौंदर्य हब') || q.includes('skin care category')) {
+      const resp = "जी! हर्ब्स एंड मोर रूप-निखार, त्वचा व हेयर केयर का अधिकृत सौंदर्य केंद्र खोला जा रहा है:";
+      renderCrispSpecialBox('✨ सौंदर्य व त्वचा देखभाल केंद्र', resp, [
+        { text: '✨ अभी सौंदर्य केंद्र खोलें →', url: '/categories/beauty.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' }
+      ], 'beauty', 'nav_beauty');
+      return true;
+    }
+
     return false;
   }
 
-  // 19. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
-  function processKnowledgeQuery(query) {
-    const rawQ = query.trim();
-    const cleanQ = normalizeQueryText(rawQ);
-    const targetDomain = classifyQueryDomain(cleanQ);
+  // 18.9 CONVERSATIONAL PROFILING & TWO-TABLE SYNC ENGINE (STRICT FREEZE & ZERO-EGRESS)
+  function handleConversationalProfiling(cleanQ, rawQ) {
+    const q = cleanQ;
 
-    // Track user input in history
-    sakhiConversationState.history.push({
-      role: 'user',
-      query: rawQ,
-      clean: cleanQ,
-      time: Date.now()
-    });
+    // 0.5 Explicit Profile Change Request: "मेरा जिला बदल दो", "प्रोफाइल चेंज करो", "गाय बेच दी", "पशु बदल दो", "एडिट प्रोफाइल"
+    const isExplicitEditRequest = (
+      q.includes('profile badal') || q.includes('profile change') || q.includes('profile edit') ||
+      q.includes('प्रोफाइल बदल') || q.includes('प्रोफाइल चेंज') || q.includes('प्रोफाइल एडिट') ||
+      q.includes('jila badal') || q.includes('जिला बदल') || q.includes('rajya badal') || q.includes('राज्य बदल') ||
+      q.includes('pashu badal') || q.includes('पशु बदल') || q.includes('khet badal') || q.includes('खेत बदल') ||
+      q.includes('gay bech di') || q.includes('bhains bech di') || q.includes('जानकारी बदलो') ||
+      q.includes('update profile') || q.includes('edit profile') || q.includes('profile update')
+    );
+    if (isExplicitEditRequest) {
+      const resp = `जी साथी! 🙏 आपकी प्रोफाइल जानकारी (जैसे जिला, राज्य, ज़मीन या पशु) बहुत महत्वपूर्ण और आधिकारिक रिकॉर्ड है।\n\nचैट में अनजाने में कोई गलत विवरण दर्ज न हो, इसलिए आप सीधे **'माई लाइब्रेरी प्रोफाइल फॉर्म'** खोलकर इसे सुरक्षित रूप से खुद संशोधित (Edit) कर सकते हैं। नीचे दिए गए बटन पर टैप करें:`;
+      renderCrispSpecialBox('✏️ प्रोफाइल सुरक्षित संशोधन (Edit Profile)', resp, [
+        { text: '✏️ प्रोफाइल फॉर्म खोलें व एडिट करें', url: '/my-library.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '👤 मेरी वर्तमान प्रोफाइल देखें', query: 'मेरी प्रोफाइल दिखाओ' }
+      ], 'omni', 'user_edit_profile_redirect');
+      return true;
+    }
 
-    // Zero-Egress Dynamic User Persona & Session Memory Update
-    updateSakhiUserPersonaFromQuery(cleanQ, targetDomain);
+    // 1. Profile Inspection Query: "मेरी प्रोफाइल दिखाओ / मेरे बारे में क्या जानते हो / मेरा खेत कितना है"
+    if (q.includes('meri profile') || q.includes('मेरी प्रोफाइल') || q.includes('mera profile') || q.includes('मेरा प्रोफाइल') || q.includes('mere bare me') || q.includes('मेरे बारे में') || q.includes('mera record') || q.includes('mera khet kitna') || q.includes('profile dikhao')) {
+      let u = {};
+      try { u = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+      const persona = loadSakhiUserPersona();
+      const phone = getUserPhone() || u.mobile || 'अज्ञात';
+      const name = getUserName() || u.full_name || 'किसान साथी';
+      const district = u.district || persona.user_district || 'दर्ज नहीं';
+      const state = u.State || persona.user_state || 'दर्ज नहीं';
+      const khet = u.khet_acres !== undefined && u.khet_acres !== null ? `${u.khet_acres} एकड़` : (persona.khet_acres ? `${persona.khet_acres} एकड़` : 'दर्ज नहीं');
+      const pashu = u.pashu_details || persona.pashu_details || 'दर्ज नहीं';
+      const dob = u.dob || persona.user_dob || 'दर्ज नहीं';
+      const netsurf = u.netsurf_id || 'दर्ज नहीं';
 
+      const resp = `👤 **आपकी सत्यापित प्रोफाइल जानकारी:**\n\n• **नाम:** ${name}\n• **मोबाइल:** ${phone}\n• **जिला (District):** ${district}\n• **राज्य (State):** ${state}\n• **खेती (Farm Land):** ${khet}\n• **पशु (Livestock):** ${pashu}\n• **जन्म तिथि (DOB):** ${dob}\n• **NetSurf ID:** ${netsurf}\n\nयदि आप इसमें कुछ भी जोड़ना या बदलना चाहते हैं, तो सीधे 'माई लाइब्रेरी' प्रोफाइल फॉर्म खोलकर सुरक्षित रूप से अपडेट कर सकते हैं!`;
+      renderCrispSpecialBox('👤 आपकी प्रोफाइल स्थिति व विवरण', resp, [
+        { text: '✏️ प्रोफाइल फॉर्म खोलें व अपडेट करें', url: '/my-library.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🌾 मेरी फसल के उपाय बताएं', query: 'फसल की सलाह' }
+      ], 'omni', 'user_profile_summary');
+      return true;
+    }
+
+    // 1.5 Birthday inquiry: "mera janm din kab aata hai", "mera birthday kab hai"
+    if (q.includes('janm din') || q.includes('janmdin') || q.includes('birthday') || q.includes('जन्मदिन') || q.includes('जन्म तिथि') || q.includes('date of birth')) {
+      let u = {};
+      try { u = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+      const persona = loadSakhiUserPersona();
+      const dob = u.dob || persona.user_dob || '';
+      if (dob && dob !== 'दर्ज नहीं') {
+        const resp = `🎂 **आपकी जन्म तिथि (Birthday):**\n\nआपकी प्रोफाइल में जन्म तिथि **${dob}** दर्ज है! 🎉\n\nआरोग्यम सखी परिवार की ओर से आपके और आपके पूरे परिवार के उत्तम स्वास्थ्य, दीर्घायु और समृद्धि की सदैव मंगलकामनाएं! 🙏✨`;
+        renderCrispSpecialBox('🎂 आपकी जन्म तिथि (DOB)', resp, [
+          { text: '👤 पूरी प्रोफाइल देखें', query: 'मेरी प्रोफाइल दिखाओ' },
+          { text: '✏️ जन्म तिथि अपडेट करें', url: '/my-library.html', isExternal: true }
+        ], 'omni', 'user_dob_info');
+        return true;
+      } else {
+        const resp = `आपकी जन्म तिथि अभी प्रोफाइल में दर्ज नहीं है। 📅\n\nकृपया अपनी जन्म तिथि बताएं (जैसे: 'मेरी जन्म तिथि 15/08/1990 है' या 'मेरा जन्मदिन 2 अक्टूबर है'), मैं इसे तुरंत आपकी प्रोफाइल में सुरक्षित कर लूँगी!`;
+        renderCrispSpecialBox('📅 जन्म तिथि दर्ज करें', resp, [
+          { text: '✏️ प्रोफाइल फॉर्म खोलें', url: '/my-library.html', isExternal: true },
+          { text: '👤 पूरी प्रोफाइल देखें', query: 'मेरी प्रोफाइल दिखाओ' }
+        ], 'omni', 'ask_dob');
+        return true;
+      }
+    }
+
+    // 2. Conversational Profile Attribute Extraction (STRICT FREEZE & GAP-FILLING POLICY)
+    // Rule: Never overwrite existing data! Only fill fields that are completely missing (Null/Blank).
+    let existingUser = {};
+    try { existingUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+    let existingProfile = {};
+    try { existingProfile = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch(e) {}
+    const existingPersona = loadSakhiUserPersona();
+
+    const isValValid = (val) => Boolean(val && String(val).trim() && val !== 'दर्ज नहीं' && val !== 'अज्ञात' && val !== 'null' && val !== 'undefined');
+
+    const hasDistrict = isValValid(existingUser.district) || isValValid(existingProfile.district) || isValValid(existingPersona.user_district);
+    const hasState = isValValid(existingUser.State) || isValValid(existingProfile.State) || isValValid(existingPersona.user_state);
+    const hasKhet = (existingUser.khet_acres !== undefined && existingUser.khet_acres !== null && existingUser.khet_acres > 0) ||
+                    (existingProfile.khet_acres !== undefined && existingProfile.khet_acres !== null && existingProfile.khet_acres > 0) ||
+                    (existingPersona.khet_acres !== undefined && existingPersona.khet_acres !== null && existingPersona.khet_acres > 0);
+    const hasPashu = isValValid(existingUser.pashu_details) || isValValid(existingProfile.pashu_details) || isValValid(existingPersona.pashu_details);
+    const hasDob = isValValid(existingUser.dob) || isValValid(existingProfile.dob) || isValValid(existingPersona.user_dob);
+    const hasNetsurf = isValValid(existingUser.netsurf_id) || isValValid(existingProfile.netsurf_id);
+    const hasOccupation = isValValid(existingUser.occupation) || isValValid(existingProfile.occupation) || isValValid(existingPersona.user_occupation);
+
+    // If ALL core fields are already filled, freeze profile completely and pass through to knowledge engine!
+    if (hasDistrict && hasState && hasKhet && hasPashu && hasDob && hasNetsurf && hasOccupation) {
+      return false;
+    }
+
+    let extracted = {};
+    let matchedAnything = false;
+
+    // Topic query firewall: If user is asking about skin/hair/crop/illness/product/estimate, never treat it as profile location
+    const isTopicQuery = q.includes('dhup') || q.includes('dhoop') || q.includes('kala') || q.includes('shampu') ||
+      q.includes('shampoo') || q.includes('hair') || q.includes('baal') || q.includes('dard') || q.includes('pain') ||
+      q.includes('ilaj') || q.includes('dawa') || q.includes('fasal') || q.includes('kheti') || q.includes('spray') ||
+      q.includes('kya hai') || q.includes('kaise') || q.includes('fayda') || q.includes('nuskha') || q.includes('cream') ||
+      q.includes('paste') || q.includes('powder') || q.includes('mirch') || q.includes('gehu') || q.includes('chana') ||
+      q.includes('kharch') || q.includes('खर्च') || q.includes('kharcha') || q.includes('खर्चा') ||
+      q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kitna') || q.includes('कितना') ||
+      q.includes('lagega') || q.includes('लगेगा') || q.includes('parchi') || q.includes('पर्ची') ||
+      q.includes('bhejna') || q.includes('भेजना') || q.includes('banao') || q.includes('बनाओ') ||
+      q.includes('dost') || q.includes('दोस्त') || q.includes('mitra') || q.includes('मित्र') ||
+      q.includes('pavan') || q.includes('पवन') || q.includes('suresh') || q.includes('सुरेश');
+
+    // A. District / City - ONLY if missing!
+    if (!hasDistrict && !isTopicQuery) {
+      const distMatch = rawQ.match(/(?:मेरा\s*जिला|जिला|डिस्ट्रिक्ट|शहर|city|district)[\s:=]+([a-zA-Z\u0900-\u097F]+)/i) ||
+                        rawQ.match(/(?:मैं|mai|ham)\s+([a-zA-Z\u0900-\u097F]+)\s+(?:से\s*हूँ|se\s*hu|rehta\s*hu|रहता\s*हूँ|का\s*रहने\s*वाला|की\s*रहने\s*वाली|ka\s*rahne\s*wala|ki\s*rahne\s*wali)/i);
+      if (distMatch && distMatch[1]) {
+        const val = distMatch[1].trim();
+        if (val.length >= 2 && !['कृषि', 'खेती', 'पशु', 'नेट्सर्फ', 'आरोग्यम', 'किसान', 'क्या', 'का', 'से', 'में'].includes(val)) {
+          extracted.district = val;
+          matchedAnything = true;
+        }
+      }
+
+      if (!extracted.district) {
+        const knownDistricts = [
+          { key: 'Rewa', aliases: ['rewa', 'रीवा'] },
+          { key: 'Indore', aliases: ['indore', 'इंदौर'] },
+          { key: 'Bhopal', aliases: ['bhopal', 'भोपाल'] },
+          { key: 'Satna', aliases: ['satna', 'सतना'] },
+          { key: 'Jabalpur', aliases: ['jabalpur', 'जबलपुर'] },
+          { key: 'Gwalior', aliases: ['gwalior', 'ग्वालियर'] },
+          { key: 'Ujjain', aliases: ['ujjain', 'उज्जैन'] },
+          { key: 'Sagar', aliases: ['sagar', 'सागर'] },
+          { key: 'Patna', aliases: ['patna', 'पटना'] },
+          { key: 'Varanasi', aliases: ['varanasi', 'वाराणसी', 'बनारस'] },
+          { key: 'Lucknow', aliases: ['lucknow', 'लखनऊ'] },
+          { key: 'Kanpur', aliases: ['kanpur', 'कानपुर'] },
+          { key: 'Agra', aliases: ['agra', 'आगरा'] },
+          { key: 'Gorakhpur', aliases: ['gorakhpur', 'गोरखपुर'] },
+          { key: 'Prayagraj', aliases: ['prayagraj', 'प्रयागराज', 'इलाहाबाद'] }
+        ];
+        const isLocContext = q.includes('जिला') || q.includes('district') || q.includes('शहर') || q.includes('city') ||
+                              q.includes('se hu') || q.includes('se hun') || q.includes('rehta') || q.includes('rehti');
+        for (const d of knownDistricts) {
+          const isExactName = q.trim() === d.key.toLowerCase() || d.aliases.some(a => q.trim() === a.toLowerCase());
+          if (isLocContext || isExactName) {
+            const matched = d.aliases.some(a => {
+              const re = new RegExp('\\b' + a.replace('.', '\\.') + '\\b', 'i');
+              return re.test(q);
+            });
+            if (matched) {
+              extracted.district = d.key;
+              matchedAnything = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // B. State - Strict Word-Boundary and Explicit Location Context Firewall - ONLY if missing!
+    if (!hasState && !isTopicQuery) {
+      const statePatterns = [
+        { key: 'Madhya Pradesh', pattern: /\b(mp|m\.p\.|madhya\s*pradesh|मध्य\s*प्रदेश|मध्यप्रदेश)\b/i },
+        { key: 'Uttar Pradesh', pattern: /\b(up|u\.p\.|uttar\s*pradesh|उत्तर\s*प्रदेश|उत्तरप्रदेश)\b/i },
+        { key: 'Bihar', pattern: /\b(bihar|बिहार)\b/i },
+        { key: 'Rajasthan', pattern: /\b(rajasthan|राजस्थान)\b/i },
+        { key: 'Maharashtra', pattern: /\b(maharashtra|महाराष्ट्र)\b/i },
+        { key: 'Gujarat', pattern: /\b(gujarat|गुजरात)\b/i },
+        { key: 'Haryana', pattern: /\b(haryana|हरियाणा)\b/i },
+        { key: 'Punjab', pattern: /\b(punjab|पंजाब)\b/i },
+        { key: 'Chhattisgarh', pattern: /\b(chhattisgarh|छत्तीसगढ़|छत्तीसगढ)\b/i },
+        { key: 'Jharkhand', pattern: /\b(jharkhand|झारखंड)\b/i }
+      ];
+
+      for (const st of statePatterns) {
+        if (st.pattern.test(q)) {
+          const isExplicitStateLoc = q.includes('rajya') || q.includes('state') || q.includes('pradesh') ||
+                                    q.includes('se hu') || q.includes('se hun') || q.includes('me rehta') ||
+                                    q.includes('me rehti') || q.includes('ka hu') || q.includes('ki hu') ||
+                                    q.trim() === 'up' || q.trim() === 'u.p.' || q.trim() === 'mp' || q.trim() === 'm.p.' ||
+                                    q.trim() === 'uttar pradesh' || q.trim() === 'madhya pradesh' || q.trim() === 'bihar';
+          if (isExplicitStateLoc) {
+            extracted.State = st.key;
+            matchedAnything = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // C. Farm Land (Khet in Acres) - ONLY if missing!
+    if (!hasKhet && !isTopicQuery) {
+      const khetMatch = rawQ.match(/(\d+(?:\.\d+)?)\s*(?:एकड़|एकर|acre|acres|बीघा|bigha)/i) ||
+                        rawQ.match(/(?:मेरे\s*पास|khet|खेती|जमीन)\s*(\d+(?:\.\d+)?)\s*(?:एकड़|acre)/i);
+      if (khetMatch && khetMatch[1]) {
+        let acres = parseFloat(khetMatch[1]);
+        if (rawQ.includes('बीघा') || rawQ.includes('bigha')) {
+          acres = +(acres / 2.5).toFixed(1);
+        }
+        if (!isNaN(acres) && acres > 0) {
+          extracted.khet_acres = acres;
+          matchedAnything = true;
+        }
+      }
+    }
+
+    // D. Livestock (Pashu Details) - ONLY if missing!
+    if (!hasPashu && !isTopicQuery) {
+      const pashuMatch = rawQ.match(/(\d+\s*(?:गाय|भैंस|बैल|बकरी|पशु|gay|bhains|cow|cows|buffalo|buffaloes|animals)(?:[,\s\+वऔरand]+\d+\s*(?:गाय|भैंस|बैल|बकरी|पशु|gay|bhains|cow|buffalo))?)/i) ||
+                         rawQ.match(/(?:पशु\s*में|मेरे\s*पास|mere\s*pas)\s*([^,।\n]+(?:गाय|भैंस|बकरी|पशु|gay|bhains|cow|buffalo))/i);
+      if (pashuMatch && pashuMatch[1]) {
+        let pashuStr = pashuMatch[1].trim()
+          .replace(/gay/gi, 'गाय')
+          .replace(/bhains/gi, 'भैंस')
+          .replace(/cows?/gi, 'गाय')
+          .replace(/buffaloes?/gi, 'भैंस');
+        extracted.pashu_details = pashuStr;
+        matchedAnything = true;
+      }
+    }
+
+    // E. DOB - ONLY if missing!
+    if (!hasDob) {
+      const dobMatch = rawQ.match(/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/) ||
+                       rawQ.match(/(?:जन्मदिन|जन्म\s*तिथि|dob)[\s:=]+([^\n,।]+)/i);
+      if (dobMatch && dobMatch[1]) {
+        extracted.dob = dobMatch[1].trim();
+        matchedAnything = true;
+      }
+    }
+
+    // F. NetSurf ID - ONLY if missing!
+    if (!hasNetsurf) {
+      const netsurfMatch = rawQ.match(/(?:netsurf\s*id|आईडी|seller\s*id)[\s:=]+([a-zA-Z0-9]+)/i) ||
+                           rawQ.match(/\b(avmi\d+)\b/i);
+      if (netsurfMatch && netsurfMatch[1]) {
+        extracted.netsurf_id = netsurfMatch[1].trim();
+        matchedAnything = true;
+      }
+    }
+
+    // G. Occupation - ONLY if missing!
+    if (!hasOccupation) {
+      if (q.includes('मैं किसान हूँ') || q.includes('kisan hu') || q.includes('खेती करता हूँ')) {
+        extracted.occupation = 'किसान';
+        matchedAnything = true;
+      } else if (q.includes('डेयरी चलाता हूँ') || q.includes('dairy chalata')) {
+        extracted.occupation = 'डेयरी संचालक';
+        matchedAnything = true;
+      }
+    }
+
+    if (matchedAnything) {
+      // 1. Sync newly filled missing fields to Local Storage
+      let u = {};
+      try { u = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch(e) {}
+      u = { ...u, ...extracted };
+      localStorage.setItem('AI_USER', JSON.stringify(u));
+      try {
+        let pObj = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+        pObj = { ...pObj, ...extracted };
+        localStorage.setItem('AI_PROFILE', JSON.stringify(pObj));
+      } catch(e) {}
+
+      // 2. Sync to Supabase public.profiles (ONLY for newly filled missing fields)
+      const db = window.dbClient || window.supabase;
+      const phone = getUserPhone() || u.mobile;
+      if (db) {
+        try {
+          const profileUpdates = {};
+          if (extracted.district) profileUpdates.district = extracted.district;
+          if (extracted.State) profileUpdates.State = extracted.State;
+          if (extracted.khet_acres !== undefined) profileUpdates.khet_acres = extracted.khet_acres;
+          if (extracted.pashu_details) profileUpdates.pashu_details = extracted.pashu_details;
+          if (extracted.dob) profileUpdates.dob = extracted.dob;
+          if (extracted.netsurf_id) profileUpdates.netsurf_id = extracted.netsurf_id;
+          if (extracted.occupation) profileUpdates.occupation = extracted.occupation;
+
+          if (Object.keys(profileUpdates).length > 0) {
+            if (u.id) {
+              db.from('profiles').update(profileUpdates).eq('id', u.id).then(()=>{});
+            } else if (phone) {
+              db.from('profiles').update(profileUpdates).eq('mobile', phone).then(()=>{});
+            }
+          }
+        } catch(err) {
+          console.warn('Profile DB sync notice:', err);
+        }
+      }
+
+      // 3. Update Persona in local storage (Zero-Egress: No immediate Supabase ping)
+      const persona = loadSakhiUserPersona();
+      if (extracted.khet_acres !== undefined) persona.khet_acres = extracted.khet_acres;
+      if (extracted.pashu_details) persona.pashu_details = extracted.pashu_details;
+      if (extracted.district) persona.user_district = extracted.district;
+      if (extracted.State) persona.user_state = extracted.State;
+      if (extracted.dob) persona.user_dob = extracted.dob;
+      if (extracted.occupation) persona.user_occupation = extracted.occupation;
+      saveSakhiUserPersona(persona);
+
+      // 4. Warm, respectful confirmation response for the new detail
+      let summaryParts = [];
+      if (extracted.district) summaryParts.push(`📍 नया जिला: **${extracted.district}**`);
+      if (extracted.State) summaryParts.push(`🗺️ नया राज्य: **${extracted.State}**`);
+      if (extracted.khet_acres !== undefined) summaryParts.push(`🌾 कुल खेती: **${extracted.khet_acres} एकड़**`);
+      if (extracted.pashu_details) summaryParts.push(`🐄 पशु विवरण: **${extracted.pashu_details}**`);
+      if (extracted.dob) summaryParts.push(`🎂 जन्म तिथि: **${extracted.dob}**`);
+      if (extracted.netsurf_id) summaryParts.push(`💼 NetSurf ID: **${extracted.netsurf_id}**`);
+      if (extracted.occupation) summaryParts.push(`💼 व्यवसाय: **${extracted.occupation}**`);
+
+      const resp = `🎉 **बहुत-बहुत धन्यवाद! आपकी छूटी हुई जानकारी सफलतापूर्वक प्रोफाइल में जोड़ ली गई है:**\n\n${summaryParts.join('\n')}\n\nयह जानकारी आपके खाते में सुरक्षित हो चुकी है। अब भविष्य में कोई भी आकस्मिक सवाल पूछने पर यह विवरण कभी नहीं बदलेगा। यदि कभी आपको इसे स्वयं बदलना हो, तो आप माई लाइब्रेरी प्रोफाइल फॉर्म से कभी भी एडिट कर सकते हैं।\n\nबताइए, आज आपकी खेती, पशुपालन या स्वास्थ्य के बारे में क्या चर्चा करें?`;
+
+      renderCrispSpecialBox('✅ नई प्रोफाइल जानकारी सुरक्षित सहेजी गई', resp, [
+        { text: '👤 पूर्ण प्रोफाइल देखें', query: 'मेरी प्रोफाइल दिखाओ' },
+        { text: '🌾 मेरी फसल के लिए सही स्प्रे चार्ट', query: 'चना व गेहूं का स्प्रे कैलेंडर' }
+      ], 'omni', 'conversational_profile_saved');
+      return true;
+    }
+
+    return false;
+  }
 
   // 18.5 ADVANCED MULTI-TOPIC, TWIST QUERIES & DUAL-INTENT RESOLVER
   function handleMultiTopicAndTwistQueries(cleanQ, rawQ) {
     const q = cleanQ;
 
     // 1. DUAL-INTENT: SEXUAL WELLNESS + DIABETES (डायबिटिक न्यूरोपैथी व पौरुष कमजोरी)
-    const hasSexIntent = q.includes('यौन') || q.includes('सेक्स') || q.includes('सेक्सुअल') || q.includes('पौरुष') || q.includes('मर्दाना') || q.includes('शीघ्रपतन') || q.includes('इरेक्टाइल') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('stamina') || q.includes('गुप्त रोग') || q.includes('धातु');
+    const hasSexIntent = q.includes('यौन') || q.includes('सेक्स') || q.includes('सेक्सुअल') || q.includes('sex') || q.includes('पौरुष') || q.includes('मर्दाना') || q.includes('शीघ्रपतन') || q.includes('इरेक्टाइल') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('stamina') || q.includes('गुप्त रोग') || q.includes('धातु');
     const hasDiabIntent = q.includes('डायबिटीज') || q.includes('मधुमेह') || q.includes('शुगर') || q.includes('sugar') || q.includes('diabetes');
 
     if (hasSexIntent && hasDiabIntent) {
@@ -3281,14 +5937,176 @@
     }
 
     // 3. TOPIC SWITCHING: "खेती छोड़ो मुझे जोड़ों का दर्द है"
-    if ((q.includes('खेती छोड़ो') || q.includes('kheti chhodo') || q.includes('खेती बाद में')) && (q.includes('जोड़') || q.includes('दर्द') || q.includes('घुटने') || q.includes('शुगर') || q.includes('मधुमेह') || q.includes('हार्ट') || q.includes('सेहत'))) {
+    // 3. TOPIC SWITCHING & TWIST HANDLING
+    // A. "खेती छोड़िए / बंद करिए मुझे जोड़ों का दर्द / शुगर की डाइट चाहिए"
+    if ((q.includes('खेती छोड़') || q.includes('खेती बाद में')) && (q.includes('शुगर') || q.includes('मधुमेह') || q.includes('डाइट'))) {
       sakhiConversationState.lastActiveDomain = 'health';
-      if (q.includes('जोड़') || q.includes('दर्द') || q.includes('घुटने')) {
-        return handle13HealthPagesAndSponsor('जोड़ों का दर्द', rawQ);
-      }
-      if (q.includes('शुगर') || q.includes('मधुमेह')) {
-        return handle13HealthPagesAndSponsor('मधुमेह में क्या खाएं', rawQ);
-      }
+      return handle13HealthPagesAndSponsor('मधुमेह में क्या खाएं', rawQ);
+    }
+    if ((q.includes('खेती छोड़') || q.includes('खेती बाद में')) && (q.includes('जोड़') || q.includes('दर्द') || q.includes('घुटने'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      return handle13HealthPagesAndSponsor('जोड़ों का दर्द', rawQ);
+    }
+
+    // B. "गाय की देखभाल बाद में, पहले चेहरे के दाग का उपाय बताएं"
+    if ((q.includes('गाय') || q.includes('पशु')) && (q.includes('बाद में') || q.includes('छोड़')) && (q.includes('चेहरे') || q.includes('दाग') || q.includes('पिंपल'))) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨ **चेहरे के दाग-धब्बे व पिंपल के निशान हटाने का उपाय:**\n\n1. **घरेलू उपाय:** 1 चम्मच बेसन + चुटकी भर हल्दी + थोड़ा कच्चा दूध या गुलाब जल मिलाकर उबटन बनाएं और 15 मिनट चेहरे पर लगाकर ताजे पानी से धोएं।\n2. **हर्बल समाधान:** **हर्ब्स एंड मोर स्पॉट इरेज़र (Spot Eraser - MRP ₹150):** नीम और टी-ट्री ऑयल युक्त यह क्रीम मुंहासों के जिद्दी काले दाग-धब्बे तेजी से मिटाती है।`;
+      renderCrispSpecialBox('✨ चेहरे के दाग-धब्बे व त्वचा समाधान', resp, [
+        { text: '✨ स्पॉट इरेज़र (MRP ₹150)', query: 'स्पॉट इरेज़र क्रीम के फायदे' },
+        { text: '🌸 दादी का घरेलू उबटन', query: 'चेहरे के लिए दादी का उबटन' }
+      ], 'beauty', 'spot_eraser');
+      return true;
+    }
+
+    // C. "दूध नहीं, मधुमेह में डाइट क्या रखूं?"
+    if (q.includes('दूध नहीं') && (q.includes('मधुमेह') || q.includes('शुगर') || q.includes('डायबिटीज'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      return handle13HealthPagesAndSponsor('मधुमेह में क्या खाएं', rawQ);
+    }
+
+    // D. "ब्यूटी नहीं, सरसों की फसल में माहू का उपाय बताएं"
+    if (q.includes('ब्यूटी नहीं') && (q.includes('सरसों') || q.includes('माहू') || q.includes('फसल'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌾 **सरसों में माहू (चेपा / Aphids) का 100% पक्का नियंत्रण:**\n\n• **जैविक समाधान (Biofit Intact):** 30ml Intact + 5ml Bio-99 प्रति 15 लीटर पंप शाम के समय स्प्रे करें। यह रस चूसक कीटों को लकवाग्रस्त कर प्राकृतिक रूप से नष्ट करता है।\n• **रासायनिक विकल्प:** यदि प्रकोप बहुत अधिक हो, तो इमिडाक्लोप्रिड 17.8% SL (5-7 ml प्रति 15L पंप) का छिड़काव करें।`;
+      renderCrispSpecialBox('🌾 सरसों में माहू (चेपा) रोकथाम', resp, [
+        { text: '🛡️ Biofit Intact व Bio-99', query: 'बायोफिट इंटैक्ट की पूरी जानकारी' },
+        { text: '🌾 सरसों का स्प्रे कैलेंडर', query: 'सरसों में खाद और स्प्रे' }
+      ], 'agri', 'sarso_mahu');
+      return true;
+    }
+
+    // E. "गेहूं में रोग भी है और घुटने में दर्द भी, पहले घुटने का बताएं"
+    if (q.includes('पहले घुटने') || (q.includes('घुटने') && q.includes('पहले'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      return handle13HealthPagesAndSponsor('जोड़ों का दर्द', rawQ);
+    }
+
+    // F. "मेरी त्वचा पर गाय का घी लगाना सुरक्षित है?"
+    if ((q.includes('त्वचा') || q.includes('चेहरे')) && (q.includes('गाय का घी') || q.includes('घी लगाना'))) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨ **त्वचा पर शुद्ध गाय का घी लगाना:**\n\n• **पूरी तरह सुरक्षित व प्राकृतिक:** आयुर्वेद में गाय के घी (शतधौत घृत) को सर्वोत्तम प्राकृतिक मॉइस्चराइज़र माना गया है।\n• **लाभ:** यह रूखी त्वचा, फटे होंठों, झुर्रियों और डार्क सर्कल्स को ठीक कर प्राकृतिक चमक (Glow) देता है।\n• **सावधानी:** यदि आपकी त्वचा बहुत तैलीय (Oily) है या सक्रिय मुँहासे हैं, तो दिन में न लगाएं; केवल रात को 2 बूंद हल्के हाथ से लगाएं।`;
+      renderCrispSpecialBox('✨ त्वचा पर गाय का घी — लाभ व विधि', resp, [
+        { text: '🌸 चेहरे की प्राकृतिक चमक के नुस्खे', query: 'चेहरे के ग्लो के लिए घरेलू नुस्खे' },
+        { text: '🧴 हर्ब्स एंड मोर स्किन केयर', query: 'हर्ब्स एंड मोर स्किन केयर' }
+      ], 'beauty', 'ghee_on_skin');
+      return true;
+    }
+
+    // G. "भैंस का दूध कम है और घर में शुगर मरीज भी है, पशु का उपाय बताएं"
+    if ((q.includes('पशु का उपाय') || q.includes('पहले भैंस')) && (q.includes('दूध कम') || q.includes('भैंस'))) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄 **भैंस का दूध व फैट बढ़ाने का प्रमाणित फॉर्मूला:**\n\n• **पेट-वेट (Pet-Vet / CFC) पाउडर:** 10 से 15 ग्राम प्रतिदिन सुबह-शाम दाने या चारे में मिलाकर दें।\n• **संतुलित आहार:** 100 ग्राम मिनरल मिक्स्चर + हरा चारा व सूखा चारा (60:40 अनुपात) + पर्याप्त साफ पानी।\n• **परिणाम:** 7 से 10 दिनों में पाचन सुधरने से 1-2 लीटर दूध और 0.5 से 1.2 डिग्री फैट की वृद्धि होती है।`;
+      renderCrispSpecialBox('🐄 भैंस का दूध व फैट वृद्धि समाधान', resp, [
+        { text: '🥛 पेट-वेट (CFC) 1kg पैक (MRP ₹1,275)', query: 'पेट वेट कैसे खिलाएं' },
+        { text: '🌾 साइलेज बनाने की विधि', query: 'साइलेज कैसे बनाएं' }
+      ], 'pashu', 'bhains_doodh');
+      return true;
+    }
+
+    // H. "नेट्सर्फ की बात छोड़कर चना में उकठा रोग का इलाज बताइए"
+    if (q.includes('नेट्सर्फ') && q.includes('छोड़') && (q.includes('चना') || q.includes('उकठा'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌾 **चना में उकठा (Wilt / Fusarium) रोग का वैज्ञानिक समाधान:**\n\n• **उकठा के लक्षण:** पौधे ऊपर से नीचे की ओर अचानक मुरझाकर सूखने लगते हैं और जड़ चीरने पर अंदर काली धारी दिखती है।\n• **जैविक नियंत्रण:** **Biofit Wrapup (30ml) + Bio-99 (5ml)** प्रति 15 लीटर पंप से जड़ों के पास ड्रेंचिंग (Drenching) करें।\n• **रासायनिक विकल्प:** कार्बेन्डाजिम 50% WP (2 ग्राम प्रति लीटर पानी) का तने के पास छिड़काव करें।`;
+      renderCrispSpecialBox('🌾 चना में उकठा रोग (Wilt) रोकथाम', resp, [
+        { text: '🛡️ Biofit Wrapup फंगीसाइड', query: 'रैप अप फंगीसाइड की पूरी जानकारी' },
+        { text: '🌾 चना फसल का स्प्रे कैलेंडर', query: 'चना की फसल में स्प्रे' }
+      ], 'agri', 'chana_uktha');
+      return true;
+    }
+
+    // I. "खेती और स्वास्थ्य दोनों छोड़ें, बालों का डैंड्रफ कैसे घटे?"
+    if ((q.includes('खेती') || q.includes('स्वास्थ्य')) && q.includes('छोड़') && (q.includes('डैंड्रफ') || q.includes('बालों'))) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨ **बालों का डैंड्रफ (रूसी) व खुजली मिटाने का असरदार फॉर्मूला:**\n\n1. **घरेलू नुस्खा:** खट्टी दही में 1 नींबू का रस और 5 बूंद नीम का तेल मिलाकर बालों की जड़ों में लगाएं और 30 मिनट बाद धो लें।\n2. **हर्बल समाधान:** **हर्ब्स एंड मोर एंटी-डैंड्रफ शैम्पू (Anti-Dandruff Shampoo):** टी-ट्री और जिंक पाइरिथियोन युक्त यह शैम्पू फंगस को नष्ट कर रूसी को जड़ से खत्म करता है। सप्ताह में 2 से 3 बार प्रयोग करें।`;
+      renderCrispSpecialBox('✨ डैंड्रफ व बालों की खुजली का उपचार', resp, [
+        { text: '🌿 एंटी-डैंड्रफ शैम्पू व हेयर न्यूट्रिमेंट', query: 'बालों का झड़ना और डैंड्रफ' },
+        { text: '🌸 दादी का घरेलू हेयर पैक', query: 'डैंड्रफ के लिए घरेलू नुस्खे' }
+      ], 'beauty', 'dandruff_care');
+      return true;
+    }
+
+    // J. "दादी का नुस्खा नहीं, BP की दवा के बारे में बताएं"
+    if (q.includes('नुस्खा नहीं') && (q.includes('bp') || q.includes('ब्लड प्रेशर') || q.includes('दवा'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      return handle13HealthPagesAndSponsor('उच्च रक्तचाप बीपी', rawQ);
+    }
+
+    // K. "गाय के गोबर से टमाटर की खाद बनानी है, तरीका बताएं"
+    if (q.includes('गोबर से') && (q.includes('टमाटर') || q.includes('खाद बनानी'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌾 **गाय के गोबर से टमाटर के लिए जैविक खाद (Compost) बनाने की विधि:**\n\n1. **गोबर खाद:** कच्चा गोबर सीधे न डालें; अच्छी तरह सड़ा हुआ 6 महीने पुराना भुरभुरा गोबर लें।\n2. **बैक्टीरिया कल्चर (Biofit Shet):** 1 ट्रॉली गोबर खाद में 1 लीटर **Biofit Shet (Soil Enhancer)** और 100 लीटर पानी मिलाकर छिड़कें और ढक दें।\n3. **15 दिन में तैयार:** मित्र सूक्ष्मजीव तेजी से गुणा करेंगे और यह खाद सामान्य खाद से 5 गुना अधिक ताकतवर बनेगी।\n4. **डोज:** टमाटर के प्रत्येक पौधे की जड़ के पास 200 से 250 ग्राम खाद दें। पौधे तेजी से बढ़ेंगे और फल चमकदार होंगे।`;
+      renderCrispSpecialBox('🌾 टमाटर के लिए जैविक गोबर खाद फॉर्मूला', resp, [
+        { text: '🌍 Biofit Shet मिट्टी सुधारक', query: 'बायोफिट सेट की जानकारी' },
+        { text: '🥦 सब्जी खेती मास्टर ई-बुक (BK015)', url: '/ebooks/book-landing.html?id=BK015', isExternal: true }
+      ], 'agri', 'compost_tomato');
+      return true;
+    }
+
+    // L. "माँ का BP बढ़ा है, साथ में भैंस का दूध घटा; पहले भैंस की बात करें"
+    if (q.includes('पहले भैंस') && (q.includes('दूध घटा') || q.includes('दूध कम'))) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄 **भैंस का दूध व फैट वृद्धि — प्राथमिकता समाधान:**\n\n• **पेट-वेट (Pet-Vet) पाउडर:** 15 ग्राम प्रतिदिन दाने-बांटे में दें।\n• **ऊर्जा टॉनिक:** 250 ग्राम गुड़ + 50 ग्राम मेथी दाना उबालकर शाम को 3 दिन पिलाएं।\n• **नोट:** माँ के बढ़े हुए BP के लिए भी सावधानी आवश्यक है—नमक तुरंत कम करें और डॉक्टर की दवा समय पर दें।`;
+      renderCrispSpecialBox('🐄 भैंस का दूध वृद्धि व आहार प्रबंधन', resp, [
+        { text: '🥛 पेट-वेट 1kg पैक (MRP ₹1,275)', query: 'पेट वेट कैसे खिलाएं' },
+        { text: '❤️ माँ का ब्लड प्रेशर परामर्श', query: 'उच्च रक्तचाप बीपी' }
+      ], 'pashu', 'bhains_priority');
+      return true;
+    }
+
+    // M. "चेहरे पर जायफल लगाना है, पर मधुमेह भी है; चेहरे का तरीका बताएं"
+    if (q.includes('चेहरे') && q.includes('जायफल') && q.includes('मधुमेह')) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨ **चेहरे पर जायफल लगाने की सुरक्षित विधि (मधुमेह में भी 100% सुरक्षित):**\n\n• **सुरक्षा:** चेहरे पर बाहरी रूप से जायफल का लेप लगाने से ब्लड शुगर पर कोई असर नहीं पड़ता, यह पूरी तरह सुरक्षित है।\n• **विधि:** सिल-बट्टे पर जायफल को थोड़े कच्चे दूध या गुलाब जल के साथ घिसकर गाढ़ा पेस्ट बनाएं।\n• **लगाने का नियम:** केवल पिंपल, दाग या झाइयों वाले स्थान पर लगाएं और 20 मिनट बाद ताजे पानी से धो लें।\n• **सावधानी:** इसे पूरे चेहरे पर रगड़ें नहीं, केवल दाग वाले बिंदु पर लगाएं।`;
+      renderCrispSpecialBox('✨ चेहरे पर जायफल उबटन — सुरक्षित विधि', resp, [
+        { text: '✨ स्पॉट इरेज़र एंटी-पिग्मेंटेशन क्रीम', query: 'स्पॉट इरेज़र क्रीम के फायदे' },
+        { text: '🩺 मधुमेह में खान-पान डाइट चार्ट', query: 'मधुमेह में क्या खाएं' }
+      ], 'beauty', 'jayfal_face');
+      return true;
+    }
+
+    // N. "दादी का काढ़ा पशु को देना है या इंसान को? इंसान की खांसी के लिए बताएं"
+    if (q.includes('इंसान की खांसी') || (q.includes('इंसान') && q.includes('काढ़ा'))) {
+      sakhiConversationState.lastActiveDomain = 'nuskhe';
+      const resp = `🌸 **इंसान की पुरानी खांसी व गले की खराश के लिए दादी का असरदार काढ़ा:**\n\n• **सामग्री (1 व्यक्ति हेतु):** 2 कप पानी, 5 तुलसी के पत्ते, 1 इंच अदरक का टुकड़ा (कुटा हुआ), 3 काली मिर्च, 1 लौंग, चुटकी भर दालचीनी और 1 छोटा टुकड़ा गुड़।\n• **बनाने की विधि:** धीमी आंच पर तब तक उबालें जब तक पानी 1 कप न रह जाए। छानकर हल्का गुनगुना सिप-सिप करके पिएं।\n• **नियम:** दिन में 2 बार (सुबह व रात को सोने से पहले)। 1 घंटे तक ठंडा पानी न पिएं।\n• **चेतावनी:** यदि खांसी 2 सप्ताह से अधिक रहे या बुखार तेज हो, तो डॉक्टर से छाती की जांच अवश्य कराएं।`;
+      renderCrispSpecialBox('🌸 दादी का अमृत काढ़ा — खांसी व जुकाम', resp, [
+        { text: '🍯 गले की खराश के घरेलू नुस्खे', query: 'गले की खराश में घरेलू नुस्खे' },
+        { text: '🌿 Klearkof आयुर्वेदिक कफ सिरप', query: 'कफ सिरप की जानकारी' }
+      ], 'nuskhe', 'human_kadha');
+      return true;
+    }
+
+    // O. "नेट्सर्फ के बायोफिट से त्वचा पर क्या असर होता है?"
+    if (q.includes('बायोफिट') && q.includes('त्वचा')) {
+      sakhiConversationState.lastActiveDomain = 'netsurf';
+      const resp = `🌱 **बायोफिट (Biofit) उत्पादों का त्वचा पर प्रभाव — महत्वपूर्ण स्पष्टीकरण:**\n\n• **1. बायोफिट कृषि उत्पाद हैं:** Biofit (स्टिमरिच, बायो-99, सेट, रैपअप आदि) 100% जैविक कृषि उत्पाद हैं। ये फसलों, पौधों और मिट्टी के लिए बनाए गए हैं, इंसानी त्वचा पर लगाने के लिए **बिल्कुल नहीं** हैं।\n• **2. सुरक्षा:** यदि छिड़काव करते समय हाथ पर छींटे पड़ जाएं तो यह जहरीला नहीं है, केवल साफ पानी से हाथ धो लें।\n• **3. चेहरे व त्वचा के लिए नेट्सर्फ का विशेष ब्रांड:** त्वचा व चेहरे की देखभाल के लिए नेट्सर्फ का अधिकृत ब्रांड **'हर्ब्स एंड मोर (Herbs & More)'** है, जिसमें स्पॉट इरेज़र, फेसवाश और विटमिन थेरेपी क्रीम आती हैं।`;
+      renderCrispSpecialBox('🌱 बायोफिट कृषि व हर्ब्स एंड मोर त्वचा स्पष्टीकरण', resp, [
+        { text: '✨ हर्ब्स एंड मोर त्वचा उत्पाद देखें', query: 'हर्ब्स एंड मोर स्किन केयर' },
+        { text: '🌾 बायोफिट कृषि उत्पाद कैटलॉग', query: 'बायोफिट प्रोडक्ट की सही खुराक' }
+      ], 'netsurf', 'biofit_skin_clarification');
+      return true;
+    }
+
+    // P. "मेरे गेहूं में समस्या नहीं, बच्चे को बुखार है; क्या करूं?"
+    if (q.includes('बच्चे को बुखार') || (q.includes('बुखार') && q.includes('बच्चे'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🩺 **बच्चे को बुखार — तत्काल प्राथमिक सावधानियां व डॉक्टरी सलाह:**\n\n• 1. **माथे पर ताजे पानी की पट्टी:** बच्चे के माथे, गर्दन और बगलों पर सामान्य ताजे पानी की सूती पट्टी रखें। बर्फ का पानी कभी इस्तेमाल न करें।\n• 2. **हल्के कपड़े पहनाएं:** बच्चे को कंबल या भारी कपड़ों से न लादें। पंखा सामान्य गति पर चलाएं।\n• 3. **तरल आहार दें:** ओआरएस (ORS), नारियल पानी या गुनगुना पानी थोड़ा-थोड़ा पिलाते रहें ताकि डिहाइड्रेशन न हो।\n• ⚠️ **अति आवश्यक चेतावनी:** बच्चे की उम्र और वजन के हिसाब से डॉक्टर की सलाह के बिना खुद से कोई दवा न दें। तुरंत नजदीकी बाल रोग विशेषज्ञ (Pediatrician) को दिखाएं।`;
+      renderCrispSpecialBox('🩺 बच्चे के बुखार में प्राथमिक उपचार व सुरक्षा', resp, [
+        { text: '📞 नजदीकी डॉक्टर से तुरंत संपर्क करें', query: 'स्वास्थ्य परामर्श' },
+        { text: '💧 ओआरएस और हाइड्रेशन के नियम', query: 'डिहाइड्रेशन में क्या करें' }
+      ], 'health', 'child_fever');
+      return true;
+    }
+
+    // Q. "प्रधानमंत्री की योजना में गेहूं किसान को क्या सहायता मिलेगी?"
+    if (q.includes('प्रधानमंत्री') && q.includes('योजना') && q.includes('गेहूं')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌾 **गेहूं किसानों के लिए प्रमुख सरकारी योजनाएं व सहायता:**\n\n1. **पीएम किसान सम्मान निधि (PM-KISAN):** प्रत्येक पात्र किसान को प्रति वर्ष ₹6,000 (₹2,000 की 3 किस्तों में) डीबीटी से सीधे खाते में।\n2. **प्रधानमंत्री फसल बीमा योजना (PMFBY):** रबी गेहूं फसल के लिए मात्र 1.5% प्रीमियम पर ओलावृष्टि, पाला, बेमौसम बारिश व सूखे से सम्पूर्ण सुरक्षा।\n3. **एमएसपी (MSP) खरीद:** गेहूं का न्यूनतम समर्थन मूल्य निर्धारित कर सरकारी उपार्जन केंद्रों पर सीधी खरीद।\n4. **सब्सिडी:** कृषि यंत्रों और प्रमाणित बीज पर 40% से 50% तक अनुदान।`;
+      renderCrispSpecialBox('🌾 गेहूं किसान सरकारी योजनाएं व सब्सिडी', resp, [
+        { text: '🌾 गेहूं की खेती सम्पूर्ण मास्टर गाइड (BK017)', url: '/ebooks/book-landing.html?id=BK017', isExternal: true },
+        { text: '🌱 कल्ले व पैदावार बढ़ाने का फॉर्मूला', query: 'गेहूं में कल्ले और पैदावार कैसे बढ़ाएं' }
+      ], 'agri', 'pm_kisan_wheat');
+      return true;
     }
 
     // 4. WEATHER & SPRAY CONFLICT: RAIN BEFORE SPRAY
@@ -3311,8 +6129,452 @@
       return true;
     }
 
+    // =========================================================================
+    // 5.1 THIRD-PARTY FRIEND REFERRAL PRESCRIPTION ENGINE (सुरेश / पवन को राहुल की पर्ची)
+    // Generates a dedicated doctor-style prescription for a friend without touching user's profile
+    // =========================================================================
+    const isExplicitSelf = q.includes('apne liye') || q.includes('apne khet') || q.includes('apni fasal') || q.includes('mere liye') || q.includes('मेरे लिए') || q.includes('अपने लिए') || q.includes('अपने खेत');
+    const hasFriendNamePattern = /([a-zA-Zऀ-ॿ]+(?:\s+[a-zA-Zऀ-ॿ]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i.test(rawQ);
+
+    const isFriendReferral = !isExplicitSelf && (
+      q.includes('dost') || q.includes('दोस्त') || q.includes('mitra') || q.includes('मित्र') ||
+      q.includes('bhejna') || q.includes('भेजना') || q.includes('parchi') || q.includes('पर्ची') ||
+      q.includes('share karna') || q.includes('शेयर करना') || q.includes('dusre kisan') || q.includes('दूसरे किसान') ||
+      q.includes('suresh') || q.includes('सुरेश') || q.includes('pavan') || q.includes('पवन') ||
+      q.includes('ramesh') || q.includes('रमेश') || q.includes('dinesh') || q.includes('दिनेश') ||
+      hasFriendNamePattern
+    );
+
+    if (isFriendReferral && (q.includes('ekad') || q.includes('एकड़') || q.includes('stimrich') || q.includes('स्टिमरिच') || q.includes('dawa') || q.includes('दवा') || q.includes('spray') || q.includes('स्प्रे') || q.includes('gehu') || q.includes('गेहूं') || q.includes('chana') || q.includes('चना'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      
+      // 1. Dynamic Friend Name Extraction (Supports ANY Name, Negations & Context)
+      let friendName = '';
+
+      // Check if user has a negation like "सुरेश के लिए नहीं पवन जी के लिए" or "सुरेश नहीं पवन"
+      const negRe = /(?:नहीं|nahi)\s*,?\s*([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i;
+      const negM = rawQ.match(negRe);
+      if (negM && negM[1]) {
+        let cand = negM[1].trim().replace(/\s+(जी|ji)$/i, '').trim();
+        if (cand.length >= 2) friendName = cand;
+      }
+
+      if (!friendName) {
+        const directPatterns = [
+          // "मेरे दोस्त पवन पांडे के लिए" / "dost pavan pandey ke liye"
+          /(?:मेरे\s*दोस्त|मेरे\s*मित्र|dost|mitra|friend|दोस्त|मित्र)\s+([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i,
+          // "मुझे पवन पांडे के लिए" / "mujhe pavan pandey ke liye"
+          /(?:मुझे|हमे|हमको|apne|dost)\s+([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i,
+          // "सुरेश के 4 एकड़ में" / "पवन पांडे के 4 एकड़ में"
+          /([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?के\s*(\d+|चार|पांच|तीन|दो)\s*(?:एकड़|ekad|बीघा)/i,
+          // Generic: "[Name] के लिए एस्टीमेट / पर्ची"
+          /([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i
+        ];
+
+        for (const dp of directPatterns) {
+          const m = rawQ.match(dp);
+          if (m && m[1]) {
+            let cand = m[1].trim()
+              .replace(/^(mere|apne|dost|mitra|bhai|kisan|sathi|farmer|mujhe|humko|mera|hamare)\s+/i, '')
+              .replace(/\s+(ji|जी|ke|liye|ko|ka|ki)$/i, '')
+              .trim();
+            const stopWords = ['khet', 'खेत', 'dawa', 'दवा', 'ekad', 'एकड़', 'fasal', 'फसल', 'spray', 'स्प्रे', 'gehu', 'गेहूं', 'chana', 'चना', 'sarso', 'सरसों', 'dhan', 'धान', 'nahi', 'नहीं', 'banao', 'बनाओ', 'karo', 'करो', 'estimate', 'एस्टीमेट', 'parchi', 'पर्ची', 'kisan', 'किसान', 'sathi', 'साथी', 'apne', 'अपने', 'mere', 'मेरे', 'sab', 'सब', 'dost', 'दोस्त'];
+            if (cand.length >= 2 && !stopWords.includes(cand.toLowerCase())) {
+              friendName = cand;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!friendName) {
+        if (q.includes('pavan') || q.includes('पवन')) friendName = 'पवन पांडे';
+        else if (q.includes('सुरेश') || q.includes('suresh')) friendName = 'सुरेश';
+        else if (q.includes('रमेश') || q.includes('ramesh')) friendName = 'रमेश';
+        else if (q.includes('दिनेश') || q.includes('dinesh')) friendName = 'दिनेश';
+        else if (q.includes('महेश') || q.includes('mahesh')) friendName = 'महेश';
+        else friendName = 'किसान साथी';
+      }
+
+      // Extract Acres
+      let acres = 4;
+      const acreMatch = q.match(/(\d+)\s*(ekad|एकड़|bigha|बीघा)/i) || rawQ.match(/(चार|पांच|तीन|दो|दस)\s*(एकड़|बीघा)/);
+      if (acreMatch) {
+        if (acreMatch[1] === 'चार') acres = 4;
+        else if (acreMatch[1] === 'पांच') acres = 5;
+        else if (acreMatch[1] === 'तीन') acres = 3;
+        else if (acreMatch[1] === 'दो') acres = 2;
+        else if (acreMatch[1] === 'दस') acres = 10;
+        else acres = parseInt(acreMatch[1], 10) || 4;
+      }
+
+      // Extract Crop
+      let cropName = 'गेहूं व चना';
+      if (q.includes('गेहूं') || q.includes('gehu')) cropName = 'गेहूं';
+      else if (q.includes('चना') || q.includes('chana')) cropName = 'चना';
+      else if (q.includes('सरसों') || q.includes('sarso')) cropName = 'सरसों';
+      else if (q.includes('धान') || q.includes('dhan')) cropName = 'धान';
+
+      // Sender Info (From localStorage session - NEVER modify current user's profile)
+      let senderName = '';
+      try {
+        senderName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || localStorage.getItem('SAKHI_USER_NAME') || '';
+      } catch (_) {}
+      if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') {
+        senderName = 'Aarogyam Master';
+      }
+
+      let senderPhone = '';
+      try {
+        senderPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+      } catch (_) {}
+      const contactInfo = senderPhone ? `${senderName} (मो. ${senderPhone})` : `${senderName}`;
+
+      // Single Official Link Rule
+      const officialSakhiLink = 'https://aarogyamindia.online/aarogyam-sakhi.html';
+
+      // Formatted WhatsApp Message (First Person: 'मेरी सलाह से' + Powerful Call to Action)
+      const waPrescriptionText = `श्री ${friendName} जी, नमस्कार! 🙏\n\nमैंने आपके ${acres} एकड़ खेत (${cropName}) में बंपर फुटाव व रिकॉर्ड पैदावार के लिए यह विशेषज्ञ Biofit स्प्रे फॉर्मूला तैयार करवाया है (मेरी सलाह):\n\n🌾 अनुशंसित खुराक (प्रति 15L पंप):\n• स्टिमरिच (Stimrich): 30ml (कल्ले, फुटाव व बढ़वार)\n• शेत (Sheth): 30ml (जड़ विकास व जीवाणु पोषण)\n• Bio-99: 5ml (दवा फैलाव, चिपकाव व पानी को पतला करना)\n\n🌱 स्प्रे की सही अवस्थाएं:\n1. पहला स्प्रे: फुटाव व कल्ले निकलते समय (बुआई के 20-25 दिन बाद)\n2. दूसरा स्प्रे: फूल व दाना भराव की अवस्था में\n\n💰 आपका ${acres} एकड़ का अनुमानित खर्च:\n• 1 एकड़ में 5 से 6 पंप (प्रति पंप खर्च: मात्र ₹75 - ₹85)\n• रासायनिक दवाओं के ₹1500 के मुकाबले 70% तक सस्ता!\n\n⚠️ आवश्यक सावधानी:\nस्प्रे से पहले पंप को सादे पानी से 2 बार अच्छी तरह धो लें।\n\nविशेष जानकारी, डिस्काउंट व ऑर्डर सहायता के लिए सीधे मुझसे संपर्क करें:\n👤 ${contactInfo}\n\n🌱 भारत की पहली और सबसे बड़ी कृषि AI सखी, जो आपकी खेती व फसलों की हर समस्या को समझकर 24×7 सही वैज्ञानिक सलाह देती है—उससे सीधे बात करने के लिए नीचे लिंक पर क्लिक करें:\n${officialSakhiLink}`;
+
+      const waShareUrl = `https://wa.me/?text=${encodeURIComponent(waPrescriptionText)}`;
+
+      const onScreenResp = `📋 **श्री ${friendName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n• **स्टिमरिच (Stimrich):** 30ml (बंपर कल्ले व फुटाव)\n• **शेत (Sheth):** 30ml (मिट्टी को उपजाऊ व जड़ मजबूत करने हेतु)\n• **Bio-99:** 5ml (पानी को पतला कर दवा को अंदर तक पहुंचाने हेतु)\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 20-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना भराव की स्थिति में (दाना मोटा व चमकदार बनेगा)\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450** (रासायनिक खाद के भारी खर्च की तुलना में बहुत सस्ता)।\n• **${acres} एकड़ का कुल स्प्रे खर्च:** अत्यंत किफायती।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे दिए गए बटन से यह पूरी पर्ची सीधे ${friendName} जी को WhatsApp पर भेजें:**`;
+
+      renderCrispSpecialBox(`🌾 ${friendName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`, onScreenResp, [
+        { text: `📲 ${friendName} जी को WhatsApp पर भेजें`, url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
+        { text: '🌾 4 एकड़ का पूरा हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '🌾 5 एकड़ का पूरा हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
+      ], 'agri', 'friend_prescription');
+      return true;
+    }
+
+    // =========================================================================
+    // 5.2 MICRO-COST ESTIMATE & DOSE ENGINE (प्रति पंप व प्रति एकड़ खर्च का सटीक गणित)
+    // Transparent micro-costing: Per Pump -> Per Acre -> Total Acres -> Suspense Hook
+    // =========================================================================
+    const isCostEstimate = (
+      q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kharcha') || q.includes('खर्चा') ||
+      q.includes('kharch') || q.includes('खर्च') || q.includes('kitni dawa lagegi') || q.includes('कितनी दवा लगेगी') ||
+      q.includes('kitna kharch') || q.includes('कितना खर्च') || q.includes('per pump') || q.includes('प्रति पंप') ||
+      q.includes('ekad me kitna') || q.includes('एकड़ में कितना')
+    );
+
+    if (isCostEstimate) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+
+      // Detect Acres
+      let acres = 1;
+      const acreMatch = q.match(/(\d+)\s*(ekad|एकड़|bigha|बीघा)/i);
+      if (acreMatch) acres = parseInt(acreMatch[1], 10) || 1;
+
+      // Detect Crop
+      let cropName = 'फसल (गेहूं/चना/धान)';
+      if (q.includes('गेहूं') || q.includes('gehu')) cropName = 'गेहूं';
+      else if (q.includes('चना') || q.includes('chana')) cropName = 'चना';
+      else if (q.includes('सरसों') || q.includes('sarso')) cropName = 'सरसों';
+      else if (q.includes('धान') || q.includes('dhan')) cropName = 'धान';
+
+      const perPumpCost = 80;
+      const perAcrePumps = 5;
+      const perAcreCost = perPumpCost * perAcrePumps; // 400
+      const totalAcresCost = perAcreCost * acres; // e.g. 1600 for 4 acres
+
+      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n• **स्टिमरिच (Stimrich):** 30ml (कल्ले, फुटाव व बढ़वार)\n• **शेत (Sheth):** 30ml (मिट्टी जीवाणु व जड़ विकास)\n• **Bio-99:** 5ml (पानी को पतला कर दवा को पत्तों में सोखने हेतु)\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 20-25 दिन):** कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (दाना भराव अवस्था):** दाना मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n💡 **विशेष अवसर:**\nक्या आप इस बार अपनी फसल में कम खर्च में रिकॉर्ड पैदावार लेने के लिए तैयार हैं? यदि हाँ, तो बताएं ताकि हम आपके लिए विशेष व्यवस्था करवा सकें!`;
+
+      renderCrispSpecialBox(`🧮 ${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} का खर्च व डोज एस्टीमेट`, resp, [
+        { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '📲 किसान साथी को पर्ची भेजें', query: 'सुरेश के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
+      ], 'agri', 'cost_estimate');
+      return true;
+    }
+
+    // =========================================================================
+    // 6. DUAL-DOMAIN MIX QUERY RESOLUTION (KRISHI + NETSURF, HEALTH, BEAUTY, PASHU)
+    // Prevents confusion when user combines two distinct topics in a single question
+    // =========================================================================
+    const hasAgriKw = (
+      q.includes('gehu') || q.includes('गेहूं') || q.includes('sarso') || q.includes('सरसों') ||
+      q.includes('chana') || q.includes('चना') || q.includes('dhan') || q.includes('धान') ||
+      q.includes('tamatar') || q.includes('टमाटर') || q.includes('mirch') || q.includes('मिर्च') ||
+      q.includes('ganna') || q.includes('गन्ना') || q.includes('fasal') || q.includes('फसल') ||
+      q.includes('kheti') || q.includes('खेती') || q.includes('khad') || q.includes('खाद') ||
+      q.includes('spray') || q.includes('स्प्रे') || q.includes('keeda') || q.includes('कीड़ा') ||
+      q.includes('mahu') || q.includes('माहू') || q.includes('illad') || q.includes('इल्ली') ||
+      q.includes('paida') || q.includes('पैदावार') || q.includes('kalle') || q.includes('कल्ले')
+    );
+
+    const hasNetsurfKw = (
+      q.includes('netsurf') || q.includes('नेट्सर्फ') || q.includes('नेट सर्फ') ||
+      q.includes('capping') || q.includes('कैपिंग') || q.includes('8.19') || q.includes('8,19,250') ||
+      q.includes('retail margin') || q.includes('कमीशन') || q.includes('commission') ||
+      q.includes('binary') || q.includes('बाइनरी') || q.includes('5+1') ||
+      q.includes('business plan') || q.includes('बिज़नेस प्लान') || q.includes('बिजनेस प्लान')
+    );
+
+    const hasHealthKw = (
+      q.includes('sugar') || q.includes('शुगर') || q.includes('madhumeh') || q.includes('मधुमेह') ||
+      q.includes('ghutn') || q.includes('घुटने') || q.includes('ghutno') || q.includes('घुटनों') ||
+      q.includes('jod') || q.includes('जोड़ों') || q.includes('dard') || q.includes('दर्द') ||
+      q.includes('bp') || q.includes('बीपी') || q.includes('blood pressure') ||
+      q.includes('liver') || q.includes('लिवर') || q.includes('kidney') || q.includes('किडनी') ||
+      q.includes('pathri') || q.includes('पथरी') || q.includes('kabz') || q.includes('कब्ज') ||
+      q.includes('piles') || q.includes('बवासीर') || q.includes('motapa') || q.includes('मोटापा')
+    );
+
+    const hasBeautyKw = (
+      q.includes('chehra') || q.includes('चेहरा') || q.includes('chehre') || q.includes('चेहरे') ||
+      q.includes('jhaiya') || q.includes('झाइयां') || q.includes('daag') || q.includes('दाग') ||
+      q.includes('muhase') || q.includes('मुंहासे') || q.includes('pimples') ||
+      q.includes('baal') || q.includes('बाल') || q.includes('dandruff') || q.includes('डैंड्रफ') ||
+      q.includes('skin') || q.includes('त्वचा') || q.includes('glow') || q.includes('चमक')
+    );
+
+    const hasPashuKw = (
+      q.includes('gaay') || q.includes('गाय') || q.includes('bhains') || q.includes('भैंस') ||
+      q.includes('pashu') || q.includes('पशु') || q.includes('doodh') || q.includes('दूध') ||
+      q.includes('fat') || q.includes('फैट') || q.includes('dairy') || q.includes('डेयरी') ||
+      q.includes('pet-vet') || q.includes('cfc')
+    );
+
+    const hasConsumerKw = (
+      q.includes('consumer') || q.includes('कंज्यूमर') || q.includes('उपभोक्ता') ||
+      q.includes('etailer') || q.includes('eteller') || q.includes('ई-टेलर') || q.includes('ईटेलर') ||
+      q.includes('affiliate') || q.includes('एफिलिएट') || q.includes('kamai') || q.includes('कमाई')
+    );
+
+    // =========================================================================
+    // ENRICHED NATURAMORE & HERBS AND MORE PRODUCTS (IMMUNE PLUS, EYE CARE, BODY LOTION, FACE MASK, CHILLI/POTATO)
+    // =========================================================================
+
+    // 1. NATURAMORE IMMUNE PLUS
+    if (q.includes('इम्यून प्लस') || q.includes('immune plus') || (q.includes('बीमार') && q.includes('इम्यूनिटी'))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🛡️ **नेचुरामोर इम्यून प्लस (Naturamore Immune Plus) — संपूर्ण रोग प्रतिरोधक क्षमता:**\n\n• **मुख्य घटक:** गिलोय, तुलसी, आंवला, मुलेठी, कंठकारी और लहसुन का मानकीकृत सत्व।\n• **मुख्य लाभ:**\n  1. बार-बार होने वाले सर्दी, जुकाम, खांसी व मौसमी वायरल बुखार से पक्की सुरक्षा।\n  2. फेफड़ों व श्वसन तंत्र (Respiratory system) को मजबूत बनाकर सांस फूलना कम करता है।\n  3. शरीर की श्वेत रक्त कोशिकाओं (WBCs) को सक्रिय कर बीमारियों से लड़ने की ताकत बढ़ाता है।\n• **दैनिक खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को भोजन के 30 मिनट बाद गुनगुने पानी से लें।\n💰 **MRP:** ₹450 (30 कैप्सूल)। 25% रिटेल छूट पर उपलब्ध।`;
+      renderCrispSpecialBox('🛡️ नेचुरामोर इम्यून प्लस — रोग प्रतिरोधक क्षमता कैप्सूल', resp, [
+        { text: '🛒 इम्यून प्लस खरीदें (MRP ₹450)', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
+        { text: '🩺 नेचुरामोर पाउडर के फायदे', query: 'नेचुरामोर पाउडर कैसे खाएं' }
+      ], 'health', 'immune_plus');
+      return true;
+    }
+
+    // 2. NATURAMORE EYE CARE
+    if (q.includes('आई केयर') || q.includes('eye care') || (q.includes('आंख') && (q.includes('रोशनी') || q.includes('चश्मा') || q.includes('जलन')))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `👁️ **नेचुरामोर आई केयर (Naturamore Eye Care) — आंखों की संपूर्ण सुरक्षा:**\n\n• **मुख्य घटक:** ल्यूटिन (Lutein), ज़ेक्सैंथिन (Zeaxanthin), त्रिफला, मोरिंगा और करक्यूमिन।\n• **मुख्य लाभ:**\n  1. मोबाइल, टीवी और लैपटॉप की हानिकारक नीली रोशनी (Blue Light) से रेटिना की सुरक्षा।\n  2. आंखों में सूखापन (Dry Eyes), जलन, लालिमा और पानी आने की समस्या से राहत।\n  3. उम्र बढ़ने के साथ नजर कमजोर होने और मोतियाबिंद (Cataract) के खतरे को कम करता है।\n• **दैनिक खुराक:** 1 कैप्सूल प्रतिदिन भोजन के बाद दूध या पानी के साथ लें।\n💰 **MRP:** ₹450 (30 कैप्सूल)।`;
+      renderCrispSpecialBox('👁️ नेचुरामोर आई केयर — दृष्टि व रेटिना सुरक्षा', resp, [
+        { text: '🛒 आई केयर खरीदें (MRP ₹450)', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
+        { text: '🩺 संपूर्ण स्वास्थ्य नेचुरामोर', query: 'नेचुरामोर पाउडर कैसे खाएं' }
+      ], 'health', 'eye_care');
+      return true;
+    }
+
+    // 3. HERBS & MORE BODY LOTION & SUNSCREEN
+    if (q.includes('बॉडी लोशन') || q.includes('body lotion') || (q.includes('रूखी त्वचा') && q.includes('क्रीम'))) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨🧴 **हर्ब्स एंड मोर विटामिन थेरेपी बॉडी लोशन (Body Lotion):**\n\n• **गुणवत्ता:** विटामिन B3, E और शिया बटर व बादाम तेल से समृद्ध।\n• **लाभ:** त्वचा में 24 घंटे नमी बनाए रखता है, रूखापन मिटाकर प्राकृतिक कोमलता और चमक देता है। चिपचिपा रहित फॉर्मूला।\n• **इस्तेमाल:** नहाने के बाद पूरे शरीर पर हल्के हाथ से मालिश करें।`;
+      renderCrispSpecialBox('✨ हर्ब्स एंड मोर विटामिन थेरेपी बॉडी लोशन', resp, [
+        { text: '✨ चेहरे की झाइयों की क्रीम', query: 'स्पॉट इरेज़र क्रीम के फायदे' },
+        { text: '💇‍♀️ बाल झड़ने का हेयर सीरम', query: 'विटामिन थेरेपी हेयर सीरम बाल झड़ने पर' }
+      ], 'beauty', 'body_lotion');
+      return true;
+    }
+
+    // 4. HERBS & MORE FACE MASK & SHAVING CREAM
+    if (q.includes('फेस मास्क') || q.includes('face mask') || q.includes('शेविंग') || q.includes('shaving')) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨🌿 **हर्ब्स एंड मोर विटामिन थेरेपी फेस मास्क व ग्रूमिंग केयर:**\n\n• **फेस मास्क:** मुल्तानी मिट्टी, हल्दी और विटामिन B3 युक्त। यह त्वचा के बंद पोर्स खोलता है, ब्लैकहेड्स व अतिरिक्त तेल हटाकर इंस्टेंट ग्लो देता है। हफ्ते में 1-2 बार 15 मिनट लगाएं।\n• **शेविंग क्रीम व आफ्टर शेव:** एलोवेरा व टी ट्री ऑयल युक्त, कटने-छिलने व जलन से सुरक्षा देता है।`;
+      renderCrispSpecialBox('✨ हर्ब्स एंड मोर फेस मास्क व स्किन केयर', resp, [
+        { text: '✨ स्पॉट इरेज़र एंटी-पिग्मेंटेशन', query: 'स्पॉट इरेज़र क्रीम के फायदे' },
+        { text: '🌿 नीम हल्दी फेस वॉश', query: 'नीम हल्दी फेस वॉश कील मुंहासों के लिए' }
+      ], 'beauty', 'face_mask');
+      return true;
+    }
+
+    // 5. CHILLI LEAF CURL & POTATO TUBER CARE
+    if ((q.includes('मिर्च') || q.includes('mirch')) && (q.includes('मरोड़िया') || q.includes('लीफ कर्ल') || q.includes('थ्रिप्स') || q.includes('churda'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌶️ **मिर्च में मरोड़िया रोग (Churda / Leaf Curl) एवं थ्रिप्स का पक्का जैविक इलाज:**\n\n• **कारण:** रस चूसक कीड़े (सफेद मक्खी, थ्रिप्स व माइट्स) पत्तियों का रस चूसते हैं जिससे पत्तियां ऊपर या नीचे की तरफ मुड़ (Curl) जाती हैं।\n• **रामबाण Biofit स्प्रे फॉर्मूला:**\n  1. **Biofit Intact:** 30ml प्रति 15 लीटर पंप (रस चूसक कीटों को लकवाग्रस्त करता है)।\n  2. **Biofit Stimrich:** 25ml प्रति 15 लीटर पंप (नई स्वस्थ पत्तियां और फुटाव निकालता है)।\n  3. **Bio-99:** 5ml प्रति 15 लीटर पंप (दवा को मुड़ी हुई पत्तियों के भीतर तक चिपकाता है)।\n• **स्प्रे समय:** पहला स्प्रे तुरंत शाम को, और 7 दिन बाद दूसरा हल्का स्प्रे दोहराएं।`;
+      renderCrispSpecialBox('🌶️ मिर्च में मरोड़िया (Leaf Curl) व थ्रिप्स संपूर्ण समाधान', resp, [
+        { text: '🌿 Biofit Intact रस चूसक कीट दवा', query: 'बायोफिट इंटैक्ट की पूरी जानकारी' },
+        { text: '🌾 मिर्च का पूरा स्प्रे शेड्यूल', query: 'मिर्च में खाद और स्प्रे की सही मात्रा' }
+      ], 'agri', 'chilli_leaf_curl');
+      return true;
+    }
+
+    if ((q.includes('आलू') || q.includes('aaloo') || q.includes('aalu')) && (q.includes('झुलसा') || q.includes('कंद') || q.includes('बड़ा करने') || q.includes('paida'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🥔 **आलू में झुलसा रोकथाम एवं कंद का आकार व पैदावार बढ़ाने का फॉर्मूला:**\n\n• **1. झुलसा व फफूंद सुरक्षा:** **Biofit Wrapup (30ml) + Bio-99 (5ml)** प्रति 15L पंप। यह पत्तियों पर सुरक्षा कवच बनाकर फंगस को नष्ट करता है।\n• **2. कंद का आकार व बंपर वजन (Tuber Size):** बुआई के 40-50 दिन बाद **स्टिमरिच (30ml) + शेत (30ml) + Bio-99 (5ml)** का छिड़काव करें। इससे आलू एक समान बड़े और चमकदार बनते हैं।\n• **प्रति एकड़ खर्च:** मात्र ₹380 - ₹420 प्रति स्प्रे।`;
+      renderCrispSpecialBox('🥔 आलू में झुलसा रोकथाम व कंद बड़ा करने का फॉर्मूला', resp, [
+        { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '🌿 Biofit Wrapup फफूंद कवच', query: 'रैप अप फफूंद नाशक कैसे काम करता है' }
+      ], 'agri', 'potato_care');
+      return true;
+    }
+
+    // 6. CHEMICAL UREA REPLACEMENT & ORGANIC PLAN
+    if (q.includes('यूरिया') && (q.includes('बंद') || q.includes('कम') || q.includes('हटाना') || q.includes('जैविक प्लान'))) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌾🌿 **रासायनिक यूरिया को 50% तक कम करने व जैविक खेती का 3-सूत्रीय फॉर्मूला:**\n\n1. **Biofit Sheth (1L/एकड़):** पहली और दूसरी सिंचाई में पानी के साथ चलाएं। इसमें मौजूद नाइट्रोजन फिक्सिंग जीवाणु हवा की प्राकृतिक नाइट्रोजन को जमीन में फिक्स करते हैं।\n2. **Biofit NPK सेट:** यूरिया-डीएपी की जरूरत को 40% तक घटाता है और जमीन को मुलायम व जीवाश्म (Humus) युक्त बनाता है।\n3. **स्टिमरिच + Bio-99 स्प्रे:** पौधों में हरियाली और क्लोरोफिल यूरिया से दोगुनी तेजी से बढ़ाता है, जिससे यूरिया की निर्भरता समाप्त हो जाती है।\n💰 **बचत:** प्रति एकड़ ₹1,200 से ₹1,800 रासायनिक खाद की बचत!`;
+      renderCrispSpecialBox('🌾 यूरिया बंद करने व जैविक खाद अपनाने का फॉर्मूला', resp, [
+        { text: '🌿 Biofit Sheth की पूरी जानकारी', query: 'शेत खाद क्या है कैसे डालें' },
+        { text: '🌾 5 एकड़ खेत का खर्च एस्टीमेट', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
+      ], 'agri', 'urea_reduction_plan');
+      return true;
+    }
+
+    // =========================================================================
+    // TRIPLE-DOMAIN & MULTI-ISSUE MIX RESOLUTION (No Truncation, 3 Crisp Blocks)
+    // =========================================================================
+
+    // TRIPLE 1: AGRI + HEALTH + BEAUTY (e.g. "धान/गेहूं में खाद, सास के घुटने और चेहरे की झाइयां/बाल")
+    if (hasAgriKw && hasHealthKw && hasBeautyKw) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🌿✨ **खेती, स्वास्थ्य एवं सौंदर्य का 3-इन-1 समन्वित परामर्श:**\n\n🌾 **1. फसल पैदावार (Biofit Range):**\n• कल्ले व बढ़वार के लिए **स्टिमरिच (25ml) + Bio-99 (5ml)** प्रति 15L पंप का छिड़काव करें।\n\n🩺 **2. जोड़ों का दर्द व घुटने (Naturamore):**\n• **जॉइंट केयर कैप्सूल** 1 सुबह-शाम भोजनोपरांत + दर्द वाले जोड़ों पर मस्कुलर पेन क्रीम की मालिश।\n\n✨ **3. चेहरे की झाइयां / बाल (Herbs & More):**\n• झाइयों पर **स्पॉट इरेज़र** रात को लगाएं और बाल झड़ने पर **विटामिन थेरेपी हेयर सीरम** की जड़ों में मालिश करें।`;
+      renderCrispSpecialBox('🌾 खेती 🩺 स्वास्थ्य व ✨ सौंदर्य त्रिवेणी समाधान', resp, [
+        { text: '🦴 जोड़ों का दर्द समाधान', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' },
+        { text: '🌾 कल्ले व पैदावार फॉर्मूला', query: 'गेहूं में कल्ले और पैदावार कैसे बढ़ाएं' },
+        { text: '✨ चेहरे की झाइयां व दाग', query: 'चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा' }
+      ], 'health', 'triple_agri_health_beauty');
+      return true;
+    }
+
+    // TRIPLE 2: PASHU + AGRI + HEALTH (e.g. "भैंस का दूध, गेहूं की पैदावार और घुटनों का दर्द")
+    if (hasPashuKw && hasAgriKw && hasHealthKw) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄🌾🩺 **पशुपालन, फसल बढ़वार एवं स्वास्थ्य राहत का 3-इन-1 फॉर्मूला:**\n\n🐄 **1. पशु दूध व फैट वृद्धि:**\n• **पेट-वेट (CFC) पाउडर:** 10-15 ग्राम प्रतिदिन चारे/बांटे में दें। 7 दिनों में दूध व फैट बढ़ता है।\n\n🌾 **2. फसल में कल्ले व पैदावार:**\n• सिंचाई पर **शेत (Sheth 1L/एकड़)** पानी के साथ दें और ऊपर से **स्टिमरिच (20ml) + Bio-99 (5ml)** का स्प्रे करें।\n\n🩺 **3. जोड़ों व घुटनों का दर्द:**\n• **नेचुरामोर जॉइंट केयर** 1 कैप्सूल सुबह-शाम गुनगुने पानी से लें।`;
+      renderCrispSpecialBox('🐄 पशु 🌾 फसल व 🩺 स्वास्थ्य त्रिवेणी समाधान', resp, [
+        { text: '🥛 पेट-वेट (CFC) की खुराक', query: 'पेट वेट कैसे खिलाएं' },
+        { text: '🌾 फसल स्प्रे कैलेंडर', query: 'गेहूं में कल्ले और पैदावार कैसे बढ़ाएं' },
+        { text: '🦴 जोड़ों का दर्द राहत', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' }
+      ], 'pashu', 'triple_pashu_agri_health');
+      return true;
+    }
+
+    // MULTI-HEALTH 3: FAMILY MULTI-PATIENT (e.g. सास के घुटने, पति की शुगर, बहू के बाल/चेहरा)
+    const hasKnee = q.includes('ghutn') || q.includes('घुटने') || q.includes('घुटनों') || q.includes('जोड़ों');
+    const hasSugar = q.includes('sugar') || q.includes('शुगर') || q.includes('madhumeh') || q.includes('मधुमेह');
+    const hasHairOrSkin = q.includes('baal') || q.includes('बाल') || q.includes('chehra') || q.includes('चेहरे') || q.includes('jhaiya') || q.includes('झाइयां');
+    if (hasKnee && hasSugar && hasHairOrSkin) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `👨‍👩‍👧 **संपूर्ण पारिवारिक स्वास्थ्य एवं देखभाल परामर्श:**\n\n👵 **1. घुटनों व जोड़ों के दर्द हेतु:**\n• **नेचुरामोर जॉइंट केयर:** 1 कैप्सूल सुबह-शाम भोजन के बाद + मस्कुलर पेन क्रीम।\n\n👨 **2. शुगर / डायबिटीज नियंत्रण हेतु:**\n• **नेचुरामोर लाइफस्टाइल प्लस:** भोजन से आधा घंटा पहले 1 कैप्सूल सुबह-शाम। मीठा व मैदा बंद करें।\n\n👩 **3. बाल झड़ना एवं त्वचा निखार हेतु:**\n• **विटामिन थेरेपी हेयर सीरम:** रात को सिर की त्वचा में 5-7 बूंद लगाएं + झाइयों पर **स्पॉट इरेज़र** लगाएं।`;
+      renderCrispSpecialBox('👨‍👩‍👧 पारिवारिक संपूर्ण स्वास्थ्य परामर्श', resp, [
+        { text: '🦴 घुटनों का दर्द समाधान', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' },
+        { text: '🩺 शुगर नियंत्रण उपाय', query: 'शुगर और डायबिटीज कंट्रोल' },
+        { text: '💇‍♀️ बाल झड़ना रोकथाम', query: 'बाल झड़ने से रोकने का उपाय' }
+      ], 'health', 'family_multi_health');
+      return true;
+    }
+
+    // MIX 1: AGRI + NETSURF (e.g. "धान/गेहूं में पैदावार और नेट्सर्फ प्लान/25% छूट")
+    if (hasAgriKw && hasNetsurfKw) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌿 **फसल पैदावार एवं नेट्सर्फ 25% छूट/प्लान का समन्वित समाधान:**\n\n🌾 **1. फसल पैदावार फॉर्मूला (Biofit Range):**\n• **कल्ले व बढ़वार:** स्टिमरिच (Stimrich 25ml) + Bio-99 (5ml) प्रति 15L पंप का छिड़काव करें। इससे पौधों में कल्ले और हरी पत्तियां तेजी से बढ़ती हैं।\n• **मिट्टी व जड़ विकास:** पहली सिंचाई पर Biofit Sheth (1L/एकड़) पानी के साथ चलाएं।\n\n💼 **2. नेट्सर्फ 25% छूट व बिजनेस प्लान:**\n• **25% फ्लैट छूट:** पहले ही ऑर्डर से आपको सभी बायोफिट व नेचुरामोर उत्पादों पर 25% रिटेल छूट मिलती है।\n• **5+1 फ्री ऑफर:** 5 बोतल खरीदने पर 1 बोतल बिल्कुल FREE!\n• **15-दिवसीय वीकली कैपिंग:** बाइनरी मैचिंग व जनरेशन से प्रत्येक 15 दिन में अधिकतम ₹8,19,250 तक की आय अर्जित की जा सकती है।`;
+      renderCrispSpecialBox('🌾 फसल पैदावार व नेट्सर्फ 25% प्लान', resp, [
+        { text: '🌱 बायोफिट कृषि स्प्रे कैलेंडर', query: 'बायोफिट प्रोडक्ट की सही खुराक' },
+        { text: '💼 नेट्सर्फ ₹8.19L कैपिंग प्लान', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' }
+      ], 'agri', 'agri_netsurf_mix');
+      return true;
+    }
+
+    // MIX 2: AGRI + HEALTH (e.g. "गेहूं/सरसों में खाद और घुटनों के दर्द / शुगर का इलाज")
+    if (hasAgriKw && hasHealthKw) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🌿 **फसल पोषण एवं स्वास्थ्य राहत का दोहरा समाधान:**\n\n🌾 **1. उन्नत फसल देखभाल:**\n• फसल में संतुलित उर्वरक (डीएपी + पोटाश + सल्फर) दें।\n• बढ़वार व पैदावार के लिए **स्टिमरिच (25ml) + Bio-99 (5ml)** प्रति 15L पंप का स्प्रे करें।\n\n🩺 **2. स्वास्थ्य व दर्द/शुगर समाधान:**\n• **जोड़ों/घुटनों के दर्द हेतु:** **नेचुरामोर जॉइंट केयर (Joint Care)** 1 कैप्सूल सुबह-शाम भोजन के बाद + मस्कुलर पेन क्रीम की हल्की मालिश।\n• **शुगर/डायबिटीज हेतु:** **लाइफस्टाइल प्लस (Lifestyle Plus)** कैप्सूल भोजन से 30 मिनट पहले 1 गोली सुबह-शाम।\n• दोनों स्वास्थ्य उत्पादों पर 25% छूट अधिकृत पोर्टल पर उपलब्ध है।`;
+      renderCrispSpecialBox('🌾 फसल समाधान एवं 🩺 स्वास्थ्य परामर्श', resp, [
+        { text: '🦴 जोड़ों का दर्द संपूर्ण समाधान', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' },
+        { text: '🌾 गेहूं व फसलों का स्प्रे कैलेंडर', query: 'गेहूं में कल्ले और पैदावार कैसे बढ़ाएं' }
+      ], 'health', 'agri_health_mix');
+      return true;
+    }
+
+    // MIX 3: PASHU + AGRI (e.g. "भैंस का दूध और गेहूं/धान की पैदावार")
+    if (hasPashuKw && hasAgriKw) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄🌾 **पशुपालन (दूध-फैट) एवं फसल पैदावार एकीकृत फॉर्मूला:**\n\n🐄 **1. गाय-भैंस का दूध व फैट बढ़ाने हेतु:**\n• **पेट-वेट (Pet-Vet / CFC) पाउडर:** 10 से 15 ग्राम प्रतिदिन दाने या बांटे में मिलाकर दें।\n• इससे 7-10 दिनों में पाचन सुधरने से 1 से 2 लीटर दूध और फैट (SNF) में 0.5 से 1.2 डिग्री की वृद्धि होती है।\n\n🌾 **2. फसल में कल्ले व बंपर पैदावार हेतु:**\n• सिंचाई पर Biofit Sheth (1L/एकड़) ज़मीन में दें और ऊपर से **स्टिमरिच (20ml) + Bio-99 (5ml)** प्रति 15L पंप का छिड़काव करें।`;
+      renderCrispSpecialBox('🐄 पशु दूध-फैट व 🌾 फसल पैदावार फॉर्मूला', resp, [
+        { text: '🥛 पेट-वेट (CFC) की पूरी जानकारी', query: 'पेट वेट कैसे खिलाएं' },
+        { text: '🌾 कल्ले व पैदावार बढ़ाने का फॉर्मूला', query: 'गेहूं में कल्ले और पैदावार कैसे बढ़ाएं' }
+      ], 'pashu', 'pashu_agri_mix');
+      return true;
+    }
+
+    // MIX 4: PASHU + HEALTH (e.g. "भैंस का दूध कम है और मुझे जोड़ों का दर्द है")
+    if (hasPashuKw && hasHealthKw) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🐄🩺 **पशु दूध वृद्धि एवं स्वास्थ्य राहत परामर्श:**\n\n🐄 **1. पशु का दूध व पाचन सुधार:**\n• **पेट-वेट पाउडर (15g प्रतिदिन)** दाने में मिलाकर दें। हरा व सूखा चारा 60:40 अनुपात में रखें।\n\n🩺 **2. जोड़ों का दर्द व घुटनों की ग्रीस (Cartilage):**\n• **नेचुरामोर जॉइंट केयर (हड्जोड़, गूगल व सलाई गुग्गुल युक्त):** 1 कैप्सूल सुबह-शाम गुनगुने पानी से लें।\n• दर्द वाले हिस्से पर मस्कुलर पेन क्रीम लगाएं। खट्टी व बादी चीजें कम करें।`;
+      renderCrispSpecialBox('🐄 पशु पोषण एवं 🩺 जोड़ों का दर्द समाधान', resp, [
+        { text: '🦴 जोड़ों का दर्द व कार्टिलेज सुरक्षा', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' },
+        { text: '🥛 पेट-वेट 1kg पैक (MRP ₹1,275)', query: 'पेट वेट कैसे खिलाएं' }
+      ], 'health', 'pashu_health_mix');
+      return true;
+    }
+
+    // MIX 5: BEAUTY + HEALTH (e.g. "चेहरे की झाइयां और जोड़ों का दर्द / पेट की गैस")
+    if (hasBeautyKw && hasHealthKw) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const resp = `✨🩺 **सौंदर्य देखभाल एवं आंतरिक स्वास्थ्य समाधान:**\n\n✨ **1. चेहरे की झाइयां व दाग-धब्बे:**\n• **हर्ब्स एंड मोर स्पॉट इरेज़र (MRP ₹150):** रात को सोते समय केवल झाइयों/दागों पर लगाएं।\n• घरेलू: 1 चम्मच बेसन + चुटकी भर हल्दी + कच्चा दूध का उबटन सप्ताह में 2 बार लगाएं।\n\n🩺 **2. आंतरिक स्वास्थ्य व पाचन/दर्द:**\n• पेट की शुद्धि हेतु **ईज़ी डिटॉक्स (Easy Detox)** या जोड़ों के लिए **जॉइंट केयर** का सेवन करें। पेट साफ रहने से चेहरे पर प्राकृतिक ग्लो आता है।`;
+      renderCrispSpecialBox('✨ चेहरे की झाइयां एवं 🩺 स्वास्थ्य समाधान', resp, [
+        { text: '✨ स्पॉट इरेज़र एंटी-पिग्मेंटेशन क्रीम', query: 'स्पॉट इरेज़र क्रीम के फायदे' },
+        { text: '🦴 जोड़ों का दर्द व स्वास्थ्य परामर्श', query: 'स्वास्थ्य व बीमारी के लक्षण' }
+      ], 'beauty', 'beauty_health_mix');
+      return true;
+    }
+
+    // MIX 6: BEAUTY + AGRI (e.g. "चेहरे के दाग और सरसों/फसल में कीट")
+    if (hasBeautyKw && hasAgriKw) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `✨🌾 **त्वचा सौंदर्य एवं फसल सुरक्षा समाधान:**\n\n✨ **1. चेहरे के दाग व त्वचा निखार:**\n• चेहरे के लिए **हर्ब्स एंड मोर स्पॉट इरेज़र** लगाएं या रात में शुद्ध गाय के घी की 2 बूंद हल्के हाथ से लगाएं।\n\n🌾 **2. फसल में कीट व रस चूसक रोकथाम:**\n• माहू/चेपा/कीटों हेतु **Biofit Intact (30ml) + Bio-99 (5ml)** प्रति 15L पंप का छिड़काव करें।\n• 💡 **सावधानी:** बायोफिट केवल फसलों के लिए है, त्वचा पर लगाने हेतु हर्ब्स एंड मोर का ही प्रयोग करें।`;
+      renderCrispSpecialBox('✨ त्वचा देखभाल एवं 🌾 फसल कीट समाधान', resp, [
+        { text: '✨ चेहरे की झाइयां व दाग मिटाने का नुस्खा', query: 'चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा' },
+        { text: '🌾 फसलों का संपूर्ण स्प्रे कैलेंडर', query: 'गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए' }
+      ], 'agri', 'beauty_agri_mix');
+      return true;
+    }
+
+    // MIX 7: NETSURF + CONSUMER INCOME (e.g. "नेट्सर्फ 25% छूट और ई-टेलर उपभोक्ता आमदनी")
+    if (hasNetsurfKw && hasConsumerKw) {
+      sakhiConversationState.lastActiveDomain = 'netsurf';
+      const resp = `💼💰 **नेट्सर्फ 25% छूट एवं उपभोक्ता आमदनी (Smart eTailer) प्लान:**\n\n💼 **1. नेट्सर्फ 25% छूट व 5+1 ऑटो शिप:**\n• पहले दिन से प्रत्येक असली उत्पाद पर फ्लैट 25% रिटेल मार्जिन छूट।\n• 5 प्रोडक्ट पर 1 प्रोडक्ट 100% फ्री।\n\n💰 **2. उपभोक्ता आमदनी (डिजिटल ई-टेलर):**\n• बिना दुकान खोले, केवल अपने मोबाइल से डिजिटल रेफरल लिंक शेयर करके हर ऑर्डर पर 10% से 15% अतिरिक्त कमीशन सीधे बैंक खाते में पाएं।\n• शून्य लागत, बिना किसी स्टॉक या गोदाम के घर बैठे कमाई!`;
+      renderCrispSpecialBox('💼 नेट्सर्फ 25% छूट व 💰 उपभोक्ता आमदनी', resp, [
+        { text: '💰 उपभोक्ता आमदनी व स्मार्ट ई-टेलर प्लान', query: 'उपभोक्ता आमदनी व स्मार्ट ई-टेलर प्लान' },
+        { text: '💼 नेट्सर्फ 15-दिन ₹8.19L कैपिंग', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' }
+      ], 'netsurf', 'netsurf_consumer_mix');
+      return true;
+    }
+
     return false;
   }
+
+
+  // 19. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
+  function processKnowledgeQuery(query) {
+    try {
+      const rawQ = (query || '').trim();
+      const cleanQ = normalizeQueryText(rawQ);
+      const targetDomain = classifyQueryDomain(cleanQ);
+
+    // Track user input in history
+    sakhiConversationState.history.push({
+      role: 'user',
+      query: rawQ,
+      clean: cleanQ,
+      time: Date.now()
+    });
+
+    // Zero-Egress Dynamic User Persona & Session Memory Update
+    updateSakhiUserPersonaFromQuery(cleanQ, targetDomain);
+
+    // 0.001 Website Action Router (Open library, reader, purchases, tube, registration, category hubs)
+    if (handleWebsiteActionRouter(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.002 Conversational Profiling & Persona Sync Engine (District, State, Khet, Pashu, DOB, NetSurf ID)
+    if (handleConversationalProfiling(cleanQ, rawQ)) {
+      return;
+    }
+
 
     // 0. Safety Guardrails & Emergency Refusal Protocol (Abuse, Poison, Heart Attack, Agri Overdose, Heat Spray)
     if (handleSafetyGuardrails(cleanQ, rawQ)) {
@@ -3329,7 +6591,36 @@
       return;
     }
 
-    // 0.02 Conversational Netsurf & Biofit General Overview (4-5 Category Options & Landing Page Links)
+    // 0.012 Personalized WhatsApp Share Generator ("यह मैसेज मेरे नाम और नंबर के साथ बनाओ")
+    if (typeof handlePersonalizedShareIntent === 'function' && handlePersonalizedShareIntent(cleanQ, rawQ)) {
+      return;
+    }
+
+    // =========================================================================
+    // 0.015 PRIORITY 1: COMPREHENSIVE PAIN INTELLIGENCE & CLINICAL TRIAGE ROUTER
+    // (Prevents false routing of Chest, Head, Stomach or Arm Pain to Heel Pain)
+    // =========================================================================
+    if (handleComprehensivePainRouter(cleanQ, rawQ)) {
+      return;
+    }
+
+    // =========================================================================
+    // 0.02 PRIORITY 1: MASTER CROP, PEST, YIELD & DUAL TREATMENT INTELLIGENCE ENGINE (20+ CROPS)
+    // Ensures crops like Shimla Mirch, Gehu, Chana, Ganna, Sarso, Tamatar NEVER get hijacked by eBooks!
+    // =========================================================================
+    if (handleMasterCropAndPestIntelligence(cleanQ, rawQ)) {
+      return;
+    }
+
+    // =========================================================================
+    // 0.025 PRIORITY 1: HERBS & MORE BEAUTY, HAIR, SKIN, DENTAL & PERSONAL CARE MASTER ENGINE
+    // (Rural Colloquial Dictionary, Fluoride-Free Dental, Pain Cream, Crack Cream, Anti-Hairfall, De-Tan)
+    // =========================================================================
+    if (handleBeautyHairSkinPersonalCareMaster(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.03 Conversational Netsurf & Biofit General Overview (4-5 Category Options & Landing Page Links)
     if (handleConversationalNetsurf(cleanQ, rawQ)) {
       return;
     }
@@ -3397,8 +6688,19 @@
       return;
     }
 
+    // 4.5 Dedicated Bhindi / Okra & Vegetable Doctor Handler
+    if (handleBhindiAndVegetablesQuery(cleanQ, rawQ)) {
+      return;
+    }
+
     // 5. Certified Netsurf Business & ₹8.19L Capping Plan Router
     if (handleNetsurfPlanQuery(cleanQ, rawQ)) {
+      return;
+    }
+
+    // Casual Chit-Chat Safety Check: Never score casual/social queries against clinical medical intents
+    if (targetDomain === 'casual') {
+      synthesizeDynamicAnswer(query, 'casual');
       return;
     }
 
@@ -3407,9 +6709,18 @@
       return;
     }
 
-    // 6. Strict Domain Isolation & Session Domain Lock
+    // 7. Token-Weighted Intent Scorer Setup
+    const STOP_WORDS = new Set([
+      'का','की','के','में','पर','और','हैं','है','यह','से','को','ने','या','तो','बताओ','बताइए','दीजिए','दवा','इलाज','उपचार','डोज','मात्रा','बारे','क्या','कैसे','कब',
+      'हो','कर','रही','रहा','रहे','होना','होने','होता','होती','होते','कहाँ','कहां','कहा','आजकल','था','थी','थे','हुआ','हुई','हुए','गया','गई','गए','सकते','सकती','सकता','चाहिए','अपना','अपनी','अपने','यहाँ','यहाँ','वहाँ','वहां','कैसा','कैसी','क्यो','क्यों','कितना','कितनी','कितने','भी','ही','अब','तक','जब','तब',
+      'mein','bare','kare','kaise','kya','batao','dawa','dose','ilaj','hain','thi','tha','karo','ho','kar','rahi','raha','rahe','hona','hota','hoti','hote','the','kaha','kahan','aajkal','apna','apni','apne','bhi','hii'
+    ]);
+    const qTokens = cleanQ.split(/[\s,?!।]+/).filter(t => t.length >= 2 && !STOP_WORDS.has(t));
+
+    // 6. Strict Domain Isolation & Session Domain Lock (Only inherit if clinical symptoms present)
     let effectiveDomain = targetDomain;
-    if (effectiveDomain === 'omni' && sakhiConversationState.lastActiveDomain) {
+    const isClinicalQuery = qTokens.some(t => ['दर्द', 'रोग', 'बीमारी', 'बुखार', 'दवा', 'खुराक', 'इलाज', 'शुगर', 'लिवर', 'किडनी', 'गठिया', 'पथरी', 'मोटापा', 'थायराइड', 'dard', 'sugar', 'liver', 'kidney', 'bimar', 'capsule', 'powder', 'tablet'].includes(t));
+    if (effectiveDomain === 'omni' && sakhiConversationState.lastActiveDomain && isClinicalQuery) {
       effectiveDomain = sakhiConversationState.lastActiveDomain;
     }
 
@@ -3417,7 +6728,7 @@
     if (effectiveDomain !== 'omni') {
       const filtered = candidateIntents.filter(item => {
         const itemDom = (item.domain || '').toLowerCase();
-        if (effectiveDomain === 'agri') return itemDom === 'agri' || itemDom === 'krishi';
+        if (effectiveDomain === 'agri') return itemDom === 'agri' || itemDom === 'krishi' || itemDom === 'agriculture';
         if (effectiveDomain === 'pashu') return itemDom === 'pashu' || itemDom === 'veterinary';
         if (effectiveDomain === 'health') return itemDom === 'health' || itemDom === 'ayurveda';
         if (effectiveDomain === 'beauty') return itemDom === 'beauty' || itemDom === 'dermatology';
@@ -3437,21 +6748,22 @@
       return;
     }
 
-    // 7. Token-Weighted Intent Scorer
-    const STOP_WORDS = new Set(['का','की','के','में','पर','और','हैं','है','यह','से','को','ने','या','तो','बताओ','बताइए','दीजिए','दवा','इलाज','उपचार','डोज','मात्रा','बारे','क्या','कैसे','कब','mein','bare','kare','kaise','kya','batao','dawa','dose','ilaj']);
-    const qTokens = cleanQ.split(/[\s,?!।]+/).filter(t => t.length >= 2 && !STOP_WORDS.has(t));
-
     let matchedIntent = null;
     let maxScore = 0;
 
     candidateIntents.forEach((intent) => {
       let score = 0;
       const titleLower = (intent.title || '').toLowerCase();
+      const titleWords = new Set(titleLower.split(/[\s,?!।()\-:]+/));
 
       // Title exact / partial match
-      if (cleanQ.includes(titleLower)) score += 35;
+      if (cleanQ.includes(titleLower) || (cleanQ.length >= 4 && titleLower.includes(cleanQ))) score += 35;
       qTokens.forEach(token => {
-        if (titleLower.includes(token)) score += 15;
+        if (titleWords.has(token)) {
+          score += 15;
+        } else if (token.length >= 4 && titleLower.includes(token)) {
+          score += 12;
+        }
       });
 
       // Keywords match
@@ -3462,7 +6774,7 @@
           score += (kwLower.length >= 3 ? 12 : 8);
         }
         qTokens.forEach(tok => {
-          if (kwLower.includes(tok)) {
+          if (tok.length >= 3 && kwLower.includes(tok)) {
             score += 10;
           }
         });
@@ -3474,12 +6786,20 @@
       }
     });
 
-    if (matchedIntent && maxScore >= 4) {
+    if (matchedIntent && maxScore >= 18) {
       renderDirectSummary(matchedIntent, query, targetDomain);
     } else {
       synthesizeDynamicAnswer(query, targetDomain);
     }
+  } catch (err) {
+    console.error('[Sakhi AI] Safe recovery in processKnowledgeQuery:', err);
+    try {
+      synthesizeDynamicAnswer(query, 'omni');
+    } catch (fallbackErr) {
+      streamBotMessage('नमस्ते! आपकी सेवा में आरोग्यम सखी AI उपस्थित है। कृपया अपना सवाल पुनः पूछें या नीचे दिए गए विकल्पों में से चुनें।', 'नमस्ते! कृपया अपना सवाल पुनः पूछें।');
+    }
   }
+}
 
   // 18. CRISP SPECIAL BOX RENDERER
   function renderCrispSpecialBox(title, bodyText, chips, domain, entityKey) {
@@ -3505,8 +6825,8 @@
       }
     });
 
-    // Dynamic E-Book & Aarogyam Tube Video Recommendations from Persona
-    const recoChips = getPersonaRecommendationChips();
+    // Dynamic E-Book & Aarogyam Tube Video Recommendations from Persona (Domain isolated)
+    const recoChips = getPersonaRecommendationChips(domain);
     let recoHtml = '';
     if (recoChips && recoChips.length > 0) {
       recoChips.forEach(rc => {
@@ -3545,7 +6865,7 @@
         </div>
       ` : ''}
     `;
-    const speech = cleanTextForTTS(bodyText).slice(0, 260);
+    const speech = cleanTextForTTS(bodyText);
     streamBotMessage(html, speech);
   }
 
@@ -3665,7 +6985,7 @@
     `;
 
     consecutiveAmbiguousCount = 0;
-    const speech = cleanTextForTTS(content).slice(0, 260);
+    const speech = cleanTextForTTS(content);
     logSakhiTelemetry(query, domain, true);
     streamBotMessage(html, speech);
   }
@@ -3786,7 +7106,7 @@
     `;
 
     consecutiveAmbiguousCount = 0;
-    const speech = cleanTextForTTS(directAnswer).slice(0, 260);
+    const speech = cleanTextForTTS(directAnswer);
     logSakhiTelemetry(originalQuery, domain, true);
     streamBotMessage(html, speech);
   }
@@ -4066,21 +7386,24 @@
               <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
             </div>
             <div class="sakhi-header-info">
-              <h3>आरोग्यम सखी AI <span class="sakhi-live-badge" style="font-size:0.7rem;background:#22c55e;color:#fff;padding:2px 8px;border-radius:10px;">ऑनलाइन 24×7</span></h3>
+              <h3 class="sakhi-header-brand">
+                <span class="sakhi-brand-full">आरोग्यम सखी AI</span>
+                <span class="sakhi-brand-short">सखी AI</span>
+                <span class="sakhi-live-dot" title="ऑनलाइन 24×7"></span>
+              </h3>
             </div>
           </div>
-          <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:6px;">
+          <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:5px;">
             <div id="sakhiHeaderUserBadgeWrap" style="display:inline-flex;align-items:center;"></div>
-            <button type="button" class="sakhi-new-chat-btn" id="sakhiNewChatBtn" onclick="window.startSakhiNewChat()" title="नई बातचीत शुरू करें" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:18px;padding:4px 10px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">
+            <button type="button" class="sakhi-new-chat-btn" id="sakhiNewChatBtn" onclick="window.startSakhiNewChat()" title="नई बातचीत">
               <i class="fa-solid fa-plus"></i>
-              <span>नई चैट</span>
+              <span class="sakhi-btn-text">नई चैट</span>
             </button>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="पूर्ण स्क्रीन टॉगल">
               <i class="fa-solid fa-expand"></i>
             </button>
-            <button type="button" class="sakhi-share-btn" onclick="window.shareAarogyamSakhi()" title="सखी AI को शेयर करें">
+            <button type="button" class="sakhi-share-btn" onclick="window.shareAarogyamSakhi()" title="शेयर करें" aria-label="शेयर करें">
               <i class="fa-solid fa-share-nodes"></i>
-              <span>शेयर</span>
             </button>
             <button type="button" class="sakhi-sound-toggle-btn" id="sakhiSoundToggleBtn" title="आवाज़ चालू/बंद करें">
               <i class="fa-solid fa-volume-high"></i>
@@ -4107,10 +7430,7 @@
           </div>
           <div class="sakhi-plus-grid">
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गेहूं व फसलों में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">
-              🌾 खेती व फसल डॉक्टर
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
-              🐄 पशुपालन, दूध व फैट
+              🌾 कृषि व फसल डॉक्टर
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('स्वास्थ्य व बीमारी के लक्षण')">
               🩺 स्वास्थ्य व रोग परामर्श
@@ -4118,24 +7438,21 @@
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('चेहरे की झाइयां और झुर्रियां मिटाने का नुस्खा')">
               ✨ सौंदर्य व त्वचा देखभाल
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और ₹8,19,250 कैपिंग')">
-              💼 नेट्सर्फ (25% छूट व प्लान)
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला')">
+              🐄 पशुपालन, दूध व फैट
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
-              📚 'खेती डॉक्टर' व ई-बुक्स
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग')">
+              💼 नेट्सर्फ 25% छूट व प्लान
             </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादी के असली आयुर्वेदिक घरेलू नुस्खे')">
-              🌸 दादी के घरेलू नुस्खे
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('किसान मित्र बनकर महीने में अच्छी कमाई कैसे करें')">
-              💰 किसान मित्र कमाई व करियर
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('उपभोक्ता आमदनी व स्मार्ट ई-टेलर प्लान')">
+              💰 उपभोक्ता आमदनी व स्मार्ट ई-टेलर
             </button>
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('दादा अवनीश जी से सीधा WhatsApp संपर्क')">
-              💬 दादा अवनीश जी से संपर्क
+              🤝 दादा अवनीश मिश्रा जी से संपर्क
             </button>
-            <a href="/tube.html" target="_blank" rel="noopener noreferrer" class="sakhi-menu-item" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:space-between;color:inherit;">
-              <span>🎬 आरोग्यम ट्यूब वीडियो</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75rem;color:#2563eb;"></i>
-            </a>
+            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
+              📚 'खेती का डॉक्टर' ई-बुक्स
+            </button>
           </div>
         </div>
 

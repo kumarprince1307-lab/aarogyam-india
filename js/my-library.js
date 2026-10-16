@@ -250,6 +250,8 @@ function initUserData() {
     if (document.getElementById('leadAddress')) document.getElementById('leadAddress').value = userAddress;
     if (document.getElementById('leadOccupation')) document.getElementById('leadOccupation').value = userOccupation;
     if (document.getElementById('leadInterest')) document.getElementById('leadInterest').value = userInterest;
+    if (document.getElementById('leadKhet')) document.getElementById('leadKhet').value = storedUser.khet_acres || '';
+    if (document.getElementById('leadPashu')) document.getElementById('leadPashu').value = storedUser.pashu_details || '';
 
     // 🟢 Active / Inactive User Status & 365-Day Countdown Timer
     updateSubscriptionTimerAndStatus(storedUser);
@@ -378,6 +380,12 @@ async function submitLeadForm(event) {
     const interestElem = document.getElementById('leadInterest');
     const interest = interestElem && interestElem.value.trim() !== '' ? interestElem.value.trim() : null;
 
+    const khetElem = document.getElementById('leadKhet');
+    const khet = khetElem && khetElem.value.trim() !== '' ? parseFloat(khetElem.value.trim()) : null;
+
+    const pashuElem = document.getElementById('leadPashu');
+    const pashu = pashuElem && pashuElem.value.trim() !== '' ? pashuElem.value.trim() : null;
+
     if (!fullName || !mobile) {
         alert('कृपया नाम और मोबाइल नंबर दर्ज करें।');
         return;
@@ -400,6 +408,8 @@ async function submitLeadForm(event) {
         address: address,
         occupation: occupation,
         interest: interest,
+        khet_acres: khet,
+        pashu_details: pashu
     };
 
     const submitBtn = document.getElementById('leadSubmitBtn');

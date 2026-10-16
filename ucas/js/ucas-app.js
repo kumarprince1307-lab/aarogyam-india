@@ -551,6 +551,8 @@
     const occupation = document.getElementById('leadOccupation')?.value.trim() || null;
     const interest = document.getElementById('leadInterest')?.value.trim() || null;
     const address = document.getElementById('leadAddress')?.value.trim() || null;
+    const khet = document.getElementById('leadKhet')?.value.trim() ? parseFloat(document.getElementById('leadKhet').value.trim()) : null;
+    const pashu = document.getElementById('leadPashu')?.value.trim() || null;
 
     if (!fullName || !mobile) {
       alert('कृपया नाम और मोबाइल नंबर दर्ज करें।');
@@ -573,7 +575,9 @@
       district: city,
       address: address,
       occupation: occupation,
-      interest: interest
+      interest: interest,
+      khet_acres: khet,
+      pashu_details: pashu
     };
 
     const submitBtn = document.getElementById('leadSubmitBtn');
