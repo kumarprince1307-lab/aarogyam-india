@@ -275,6 +275,41 @@ const SITE_PAGES_FALLBACK_MAP = {
     og_title: '❤️ क्या आपकी धमनियां धीरे-धीरे ब्लॉक हो रही हैं? भारत में कम उम्र में हार्ट अटैक का खौफनाक सच',
     og_description: '25 से 45 साल में अचानक हार्ट अटैक क्यों? रेस्टिंग हार्ट रेट (RHR), सीने में भारीपन, सांस फूलने के लक्षण और धमनियों की प्राकृतिक सफाई की संपूर्ण आयुर्वेदिक गाइड।',
     og_image: 'https://aarogyamindia.online/images/banners/health-banner.jpeg'
+  },
+  'krishi-panchang': {
+    id: 'page_krishi_panchang',
+    destUrl: 'https://aarogyamindia.online/krishi-panchang.html',
+    og_title: '🕉️ दैनिक वैदिक सनातन पंचांग, शुभ मुहूर्त एवं चौघड़िया',
+    og_description: 'आज का पंचांग, शुभ मुहूर्त, राहुकाल, दिन-रात का चौघड़िया, आज जन्मे बालक का नामाक्षर, अंक ज्योतिष एवं चंद्र आधारित कृषि चक्र।',
+    og_image: 'https://aarogyamindia.online/images/banners/krishi-panchang-og.webp'
+  },
+  'panchang': {
+    id: 'page_krishi_panchang',
+    destUrl: 'https://aarogyamindia.online/krishi-panchang.html',
+    og_title: '🕉️ दैनिक वैदिक सनातन पंचांग, शुभ मुहूर्त एवं चौघड़िया',
+    og_description: 'आज का पंचांग, शुभ मुहूर्त, राहुकाल, दिन-रात का चौघड़िया, आज जन्मे बालक का नामाक्षर, अंक ज्योतिष एवं चंद्र आधारित कृषि चक्र।',
+    og_image: 'https://aarogyamindia.online/images/banners/krishi-panchang-og.webp'
+  },
+  'mandi': {
+    id: 'page_mandi',
+    destUrl: 'https://aarogyamindia.online/mandi.html',
+    og_title: '🌾 मंडी भाव (Mandi Rates Live) | Aarogyam India',
+    og_description: 'क्या आप अपने शहर का मंडी भाव जानते हैं? सभी प्रमुख मंडियों के ताजा दैनिक फसल भाव देखें।',
+    og_image: 'https://aarogyamindia.online/images/banners/mandi-og.webp'
+  },
+  'weather': {
+    id: 'page_weather',
+    destUrl: 'https://aarogyamindia.online/weather.html',
+    og_title: '⛅ मौसम पूर्वानुमान (Live Weather) व फसल सुरक्षा | Aarogyam India',
+    og_description: 'आज दवाओं का स्प्रे करें या नहीं? 7 दिन का मौसम पूर्वानुमान, बारिश, तापमान व कृषि मौसम सलाह।',
+    og_image: 'https://aarogyamindia.online/images/banners/mousam-og.webp'
+  },
+  'mousam': {
+    id: 'page_weather',
+    destUrl: 'https://aarogyamindia.online/weather.html',
+    og_title: '⛅ मौसम पूर्वानुमान (Live Weather) व फसल सुरक्षा | Aarogyam India',
+    og_description: 'आज दवाओं का स्प्रे करें या नहीं? 7 दिन का मौसम पूर्वानुमान, बारिश, तापमान व कृषि मौसम सलाह।',
+    og_image: 'https://aarogyamindia.online/images/banners/mousam-og.webp'
   }
 };
 

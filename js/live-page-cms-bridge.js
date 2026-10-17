@@ -332,6 +332,28 @@
     const validSlides = pageConfig.hero_slides.filter(s => s && (s.image || s.image_preview));
     if (validSlides.length === 0) return;
 
+    // 0. Dedicated handler for Vedic Panchang slider track (prevents duplicate hero sections)
+    const panchangTrack = document.getElementById('panchangSliderTrack');
+    if (panchangTrack) {
+      carouselContainer.querySelectorAll('.home-hero-slide-item').forEach(el => el.remove());
+      panchangTrack.innerHTML = '';
+      validSlides.forEach((s) => {
+        const imgSrc = resolveAssetSrc(s, 'image', '/images/banners/krishi-panchang-banner1.webp');
+        const slideDiv = document.createElement('div');
+        slideDiv.className = 'panchang-slide';
+        slideDiv.innerHTML = `<img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(s.title || 'कृषि पंचांग')}" style="width:100%;height:auto;aspect-ratio:1600/960;object-fit:contain;display:block;border-radius:14px;">`;
+        panchangTrack.appendChild(slideDiv);
+      });
+      const dotsWrap = carouselContainer.querySelector('.panchang-slider-dots');
+      if (dotsWrap) {
+        dotsWrap.innerHTML = validSlides.map((_, i) => `<span class="panchang-slider-dot ${i === 0 ? 'active' : ''}" onclick="window.goToPanchangSlide(${i})"></span>`).join('');
+      }
+      if (typeof window.initHeroSlider === 'function') {
+        window.initHeroSlider();
+      }
+      return;
+    }
+
     // Reset init lock
     delete carouselContainer.dataset.carouselInit;
     const parentSec = carouselContainer.closest('section') || carouselContainer.parentElement;
