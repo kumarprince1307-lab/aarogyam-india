@@ -396,6 +396,67 @@
       }
     },
     {
+      "id": "page_krishi_panchang",
+      "slug": "krishi-panchang",
+      "name": "🕉️ दैनिक वैदिक पंचांग (Panchang)",
+      "url": "/krishi-panchang.html",
+      "category": "Core",
+      "status": "active",
+      "theme_primary": "#d97706",
+      "theme_dark": "#78350f",
+      "ticker_text": "🚩 100% सटीक दैनिक सनातन पंचांग, शुभ मुहूर्त, राहुकाल, चौघड़िया एवं चंद्र आधारित कृषि चक्र | 100 वर्ष शुद्ध गणना",
+      "audio_title": "दैनिक वैदिक पंचांग",
+      "audio_script": "नमस्ते! आरोग्यम दैनिक वैदिक सनातन पंचांग में आपका स्वागत है। यहाँ आप आज की तिथि, नक्षत्र, शुभ मुहूर्त, राहुकाल, दिन-रात का चौघड़िया, नामाक्षर एवं चंद्र आधारित कृषि चक्र देख सकते हैं।",
+      "og_title": "🕉️ दैनिक वैदिक सनातन पंचांग, शुभ मुहूर्त एवं चौघड़िया",
+      "og_image": "/images/banners/agriculture-hero-banner-1.webp",
+      "og_description": "आज का पंचांग, शुभ मुहूर्त, राहुकाल, दिन-रात का चौघड़िया, आज जन्मे बालक का नामाक्षर, अंक ज्योतिष एवं चंद्र आधारित कृषि चक्र।",
+      "share_message": "🚩 आज का संपूर्ण वैदिक पंचांग, शुभ मुहूर्त, चौघड़िया व चंद्र कृषि सलाह देखें — Aarogyam India",
+      "whatsapp_image": "/images/banners/agriculture-hero-banner-1.webp",
+      "fb_pixel": true,
+      "ga_tag": true,
+      "hero_slides": [
+        {
+          "image": "/images/banners/agriculture-hero-banner-1.webp",
+          "tag": "🚩 सनातन कृषि विज्ञान",
+          "title": "वैदिक कृषि चक्र एवं चंद्र बुवाई",
+          "subtitle": "चंद्रमा की कलाओं के अनुसार बीज बुवाई व जैविक पोषण",
+          "cta_text": "📖 पंचांग देखें",
+          "cta_link": "#panchangAnnualCalendarWrap",
+          "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/kheti-dr-banner-1.webp",
+          "tag": "⭐ शुभ मुहूर्त गाइड",
+          "title": "शुभ चौघड़िया व कार्य सिद्धि मुहूर्त",
+          "subtitle": "अमृत व शुभ चौघड़िया में प्रारंभ करें कृषि व व्यापार",
+          "cta_text": "⏱️ चौघड़िया देखें",
+          "cta_link": "#choghadiya-grid-container",
+          "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+          "tag": "🪷 स्वास्थ्य व अध्यात्म",
+          "title": "आरोग्यम परिवार व व्रत महात्म्य",
+          "subtitle": "एकादशी व व्रत से ऑटोफैगी और हार्मोनल संतुलन",
+          "cta_text": "🪔 व्रत विधि देखें",
+          "cta_link": "#vratMahatmyaSectionWrap",
+          "banner_mode": "full"
+        }
+      ],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_faqs",
+        "sec_reviews"
+      ],
+      "hidden_sections": [],
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते आरोग्यम टीम, मुझे आज के पंचांग, शुभ मुहूर्त व चंद्र कृषि सलाह के बारे में जानकारी चाहिए।"
+      }
+    },
+    {
       "id": "page_agriculture",
       "slug": "agriculture",
       "name": "🌱 कृषि मार्गदर्शिका हब (Agriculture Hub)",

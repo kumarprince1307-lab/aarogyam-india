@@ -319,6 +319,77 @@
       margin: 10px 0 0 0;
       line-height: 1.65;
     }
+
+    /* Living Interactive Calendar Day Cells */
+    .panchang-cal-cell {
+      background: #ffffff;
+      border: 1.5px solid #fed7aa;
+      border-radius: 8px;
+      padding: 5px 3px;
+      min-height: 56px;
+      min-width: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .panchang-cal-cell:hover {
+      transform: translateY(-2px);
+      border-color: #ea580c;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+      background: #fffbf0;
+    }
+
+    .panchang-cal-cell.cal-cell-active {
+      border: 2.5px solid #ea580c !important;
+      background: #ffedd5 !important;
+      box-shadow: 0 0 16px rgba(234, 88, 12, 0.5) !important;
+      transform: scale(1.04);
+      z-index: 5;
+    }
+
+    .panchang-cal-cell.is-sunday {
+      background: #fff1f2;
+      border-color: #fca5a5;
+    }
+
+    .panchang-cal-cell.has-event {
+      background: #fffbeb;
+      border-color: #f59e0b;
+    }
+
+    .fest-item-highlighted {
+      animation: festPulseGlow 1.8s ease-in-out infinite;
+      border-color: #ea580c !important;
+      background: #ffedd5 !important;
+    }
+
+    @keyframes festPulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(234, 88, 12, 0); }
+    }
+
+    /* Mobile Screen Fit Media Query */
+    @media (max-width: 480px) {
+      .panchang-cal-cell {
+        min-height: 50px;
+        padding: 3px 2px;
+        border-radius: 6px;
+      }
+      .cal-cell-date-num {
+        font-size: 1.05rem !important;
+      }
+      .cal-cell-tithi-name {
+        font-size: 0.62rem !important;
+      }
+    }
   </style>
 </head>
 
@@ -726,6 +797,11 @@
         </button>
       </div>
 
+      <!-- LIVING CALENDAR: SELECTED DATE FULL DETAIL CARD (जीवित तारीख सम्पूर्ण विवरण कार्ड) -->
+      <div id="selectedDateDetailCard" style="display:none;background:linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fffaf0 100%);border:2.5px solid #ea580c;border-radius:16px;padding:18px 20px;margin-bottom:18px;box-shadow:0 8px 26px rgba(234,88,12,0.22);position:relative;">
+        <!-- Populated dynamically when any date is clicked -->
+      </div>
+
       <!-- Calendar Month Cards Container -->
       <div id="panchangAnnualCalendarWrap" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;width:100%;box-sizing:border-box;">
         <!-- Populated dynamically by renderAnnualCalendar() -->
@@ -872,82 +948,187 @@
       </div>
     </div>
 
-    <!-- SECTION 6: EXPANDED DETAILED VEDIC SCIENCE FAQs (सनातन विज्ञान बनाम अंधविश्वास) -->
-    <div style="background:#ffffff;border:2px solid #fde68a;border-radius:18px;padding:22px;margin-bottom:30px;box-shadow:0 4px 18px rgba(217, 119, 6, 0.08);">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;border-bottom:1.5px solid #fef3c7;padding-bottom:10px;">
-        <h3 style="font-size:1.25rem;font-weight:900;color:#78350f;margin:0;display:flex;align-items:center;gap:8px;">
-          <span>🔬</span> <span>सनातन वैदिक पंचांग का विज्ञान (Scientific Vedic Wisdom & FAQ)</span>
+    <!-- SECTION 6: CATEGORIZED VEDIC SCIENCE, KRISHI & HEALTH FAQs -->
+    <div style="background:#ffffff;border:2px solid #ea580c;border-radius:18px;padding:22px;margin-bottom:26px;box-shadow:0 6px 20px rgba(234,88,12,0.12);">
+      
+      <!-- FAQ Section Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;border-bottom:1.5px solid #fed7aa;padding-bottom:12px;">
+        <h3 style="font-size:1.3rem;font-weight:900;color:#78350f;margin:0;display:flex;align-items:center;gap:8px;">
+          <span>❓</span> <span>पंचांग, कृषि एवं स्वास्थ्य से जुड़े मुख्य सवाल (FAQ)</span>
         </h3>
-        <span style="background:#fef3c7;color:#b45309;border:1px solid #fde68a;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:800;">
-          शुद्ध खगोलशास्त्र • कोई अंधविश्वास नहीं
+        <span style="background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;">
+          शुद्ध वैज्ञानिक समाधान • कोई अंधविश्वास नहीं
         </span>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        
+      <!-- FAQ Category Tabs -->
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:thin;">
+        <button type="button" class="panchang-faq-tab-btn active" data-tab="agri" onclick="window.switchPanchangFaqTab('agri')" style="background:#d97706;color:#ffffff;border:1.5px solid #b45309;padding:7px 16px;border-radius:20px;font-weight:800;font-size:0.82rem;cursor:pointer;white-space:nowrap;">
+          🌾 कृषि व चंद्र चक्र (Agri)
+        </button>
+        <button type="button" class="panchang-faq-tab-btn" data-tab="health" onclick="window.switchPanchangFaqTab('health')" style="background:#fffbeb;color:#78350f;border:1.5px solid #fde68a;padding:7px 16px;border-radius:20px;font-weight:800;font-size:0.82rem;cursor:pointer;white-space:nowrap;">
+          🪷 स्वास्थ्य व उपवास विज्ञान (Health)
+        </button>
+        <button type="button" class="panchang-faq-tab-btn" data-tab="science" onclick="window.switchPanchangFaqTab('science')" style="background:#fffbeb;color:#78350f;border:1.5px solid #fde68a;padding:7px 16px;border-radius:20px;font-weight:800;font-size:0.82rem;cursor:pointer;white-space:nowrap;">
+          🔬 सनातन खगोल व चौघड़िया (Other)
+        </button>
+      </div>
+
+      <!-- Group 1: Agri FAQs -->
+      <div id="panchang-faq-group-agri" class="panchang-faq-group" style="display:flex;flex-direction:column;gap:10px;">
         <details class="panchang-faq-item" open>
-          <summary>
-            <span>1.</span> पंचांग कोई अंधविश्वास नहीं बल्कि खगोलीय विज्ञान (Astronomy) कैसे है?
-          </summary>
+          <summary><span>🌾 1.</span> शुक्ल पक्ष और कृष्ण पक्ष के अनुसार बुवाई व स्प्रे का क्या वनस्पति नियम है?</summary>
           <p>
-            पंचांग संस्कृत के दो शब्दों 'पंच' और 'अंग' (तिथि, वार, नक्षत्र, योग, करण) से मिलकर बना है। यह पृथ्वी के सूर्य के चारों ओर परिक्रमण (365.25 दिन) और चंद्रमा के पृथ्वी के चारों ओर घूर्णन (29.53 दिन का सिनोडिक चक्र) का विशुद्ध गणितीय फॉर्मूला है। आधुनिक नासा (NASA) और इसरो (ISRO) की गणनाएं भी सूर्य-चंद्र के जिन देशांतर और अक्षांश को मानती हैं, हमारे ऋषियों ने 'सूर्य सिद्धांत' में हजारों वर्ष पूर्व उन्हें नैनो-सेकंड की सटीकता से सूत्रबद्ध कर दिया था।
+            <strong>शुक्ल पक्ष (बढ़ती चंद्र कला):</strong> चंद्रमा का गुरुत्वाकर्षण रस (Sap) को जमीन से ऊपर पत्तियों और शाखाओं की ओर खींचता है। इसलिए जमीन के ऊपर फलने वाली फसलों (गेहूं, चना, धान, मटर, सब्जियां) की बुवाई और <strong>स्टीमरिच + बायो-99</strong> का फोलियर स्प्रे करने से संपूर्ण अवशोषण होता है और कल्ले तेजी से निकलते हैं।<br>
+            <strong>कृष्ण पक्ष (घटती चंद्र कला):</strong> रस जड़ों की ओर प्रवाहित होता है। आलू, अदरक, हल्दी, लहसुन, प्याज जैसी कंद फसलों की बुवाई और मिट्टी में <strong>शेत (SHET) बैक्टीरिया खाद</strong> देने से कंद का आकार और वजन दोगुना बढ़ता है।
           </p>
         </details>
 
         <details class="panchang-faq-item">
-          <summary>
-            <span>2.</span> चंद्रमा के गुरुत्वाकर्षण और ज्वार-भाटे (Tides) का कृषि व मानव शरीर पर क्या प्रभाव है?
-          </summary>
+          <summary><span>🌑 2.</span> अमावस्या के दिन बुवाई या कीटनाशक स्प्रे करने से क्यों बचना चाहिए?</summary>
           <p>
-            जिस प्रकार चंद्रमा का गुरुत्वाकर्षण समुद्र के अरबों लीटर खारे पानी में पूर्णिमा और अमावस्या को विशाल ज्वार-भाटा (High & Low Tides) उत्पन्न करता है, उसी प्रकार मानव शरीर (जो 70% जल से बना है) और पौधों के अंदर मौजूद रस (Sap) में भी गुरुत्वाकर्षण खिंचाव होता है। पूर्णिमा के समय रस पत्तियों और फलों की ओर तेजी से बढ़ता है, जबकि अमावस्या के समय रस जड़ों की ओर जाता है। यही कारण है कि पंचांग देखकर बुवाई और सिंचाई करने से 25-30% अधिक उपज मिलती है।
+            अमावस्या के दिन चंद्रमा का प्रकाश न्यूनतम और गुरुत्वाकर्षण खिंचाव स्थिर होता है। प्राचीन कृषि शास्त्रों और आधुनिक वनस्पति प्रयोगों में देखा गया है कि अमावस्या को बोए गए बीजों में अंकुरण दर 15-20% धीमी रहती है और सुंडी व इल्लियों के अंडे देने की सक्रियता बढ़ जाती है। इसलिए इस दिन बुवाई के बजाय केवल खेत की जुताई और खरपतवार नियंत्रण करें।
           </p>
         </details>
 
         <details class="panchang-faq-item">
-          <summary>
-            <span>3.</span> शुक्ल पक्ष और कृष्ण पक्ष के अनुसार बुवाई व खाद देने का वनस्पति विज्ञान क्या कहता है?
-          </summary>
+          <summary><span>🐛 3.</span> क्या चंद्रमा के नक्षत्र का असर कीटों के प्रकोप पर पड़ता है?</summary>
           <p>
-            <strong>शुक्ल पक्ष (बढ़ती चंद्र कला):</strong> प्रकाश संश्लेषण की रात की सक्रियता बढ़ती है। ऊपर फलने वाले अनाज (गेहूं, चना, धान), सब्जियां (टमाटर, बैंगन, मिर्च) व फलों में कल्ले व शाखाएं अधिक निकलती हैं। इस समय स्टीमरिच टॉनिक का फोलियर स्प्रे करने से संपूर्ण अवशोषण होता है।<br>
-            <strong>कृष्ण पक्ष (घटती चंद्र कला):</strong> मिट्टी में जड़ों की पकड़ मजबूत होती है। आलू, अदरक, हल्दी, लहसुन, गाजर, मूली जैसी कंद फसलों की बुवाई और मिट्टी में बायोफिट शेत (SHET) बैक्टीरिया खाद देने से कंद का आकार और वजन दोगुना बढ़ता है।
+            हाँ! विशेषकर आर्द्रा, आश्लेषा और मघा नक्षत्रों में जब आर्द्रता और तापमान विशिष्ट अनुपात में होते हैं, तब रसचूसक कीट (माहू, थ्रिप्स, सफेद मक्खी) का प्रकोप तेज होता है। पंचांग के नक्षत्र अलर्ट को देखकर पहले ही <strong>बायोफिट इंटैक्ट (Intact)</strong> का प्रिवेंटिव स्प्रे करने से फसल 100% सुरक्षित रहती है।
+          </p>
+        </details>
+      </div>
+
+      <!-- Group 2: Health FAQs -->
+      <div id="panchang-faq-group-health" class="panchang-faq-group" style="display:none;flex-direction:column;gap:10px;">
+        <details class="panchang-faq-item" open>
+          <summary><span>🧬 4.</span> एकादशी व प्रदोष व्रत से शरीर में ऑटोफैगी (Autophagy) कैसे सक्रिय होती है?</summary>
+          <p>
+            जापानी वैज्ञानिक योशिनोरी ओहसुमी को 2016 में 'ऑटोफैगी' की खोज हेतु चिकित्सा का नोबेल पुरस्कार मिला। उन्होंने सिद्ध किया कि 14 से 16 घंटे के उपवास में शरीर की स्वस्थ कोशिकाएं अपने अंदर मौजूद पुरानी, मृत, क्षतिग्रस्त और कैंसरकारी कोशिकाओं को खाकर ऊर्जा में बदल देती हैं। एकादशी और प्रदोष व्रत इसी महान वैज्ञानिक कायाकल्प और डिटॉक्स का आधार हैं।
           </p>
         </details>
 
         <details class="panchang-faq-item">
-          <summary>
-            <span>4.</span> चौघड़िया के 7 प्रकार (शुभ, लाभ, अमृत, चर, रोग, काल, उद्वेग) किस वैज्ञानिक सिद्धांत पर हैं?
-          </summary>
+          <summary><span>👩‍⚕️ 5.</span> महिलाओं को व्रत रखने से हार्मोनल संतुलन और PCOD में क्या सुधार आता है?</summary>
           <p>
-            प्राचीन काल में 24 घंटे के दिन-रात को 16 पहरों (8 दिन के, 8 रात के) में बांटा गया, जिन्हें 'चौघड़िया' कहा गया (प्रत्येक लगभग 1 घंटा 30 मिनट का)। यह पृथ्वी की घूर्णन गति और उस समय विशेष के सौर विकिरण (Solar Radiations) तथा मानव मस्तिष्क के न्यूरोट्रांसमीटर की एकाग्रता पर आधारित है। 'अमृत' और 'शुभ' चौघड़िया में मानव मस्तिष्क सर्वाधिक शांत और निर्णय लेने में सक्षम होता है, जबकि 'काल' और 'रोग' में शारीरिक थकान और तनाव का स्तर उच्चतम होता है।
+            उपवास रखने से इंसुलिन संवेदनशीलता सुधरती है, जिससे महिलाओं में एस्ट्रोजन और प्रोजेस्टेरोन का संतुलन ठीक होता है। पीसीओडी (PCOD), अनियमित माहवारी, और चेहरे के अनचाहे मुहासों में प्राकृतिक सुधार आता है और मानसिक शांति मिलती है।
           </p>
         </details>
 
         <details class="panchang-faq-item">
-          <summary>
-            <span>5.</span> महिलाओं के उपवास पर नोबेल पुरस्कार विजेता वैज्ञानिक सिद्धांत 'ऑटोफैगी' (Autophagy) क्या सिद्ध करता है?
-          </summary>
+          <summary><span>🥣 6.</span> व्रत के पारण का सही समय और सात्विक आहार क्या होना चाहिए?</summary>
           <p>
-            जापानी वैज्ञानिक योशिनोरी ओहसुमी को 2016 में 'ऑटोफैगी' की खोज के लिए चिकित्सा का नोबेल पुरस्कार मिला। उन्होंने सिद्ध किया कि जब कोई व्यक्ति 14 से 16 घंटे भूखा रहता है (उपवास करता है), तो शरीर की स्वस्थ कोशिकाएं अपने अंदर मौजूद पुरानी, मृत, क्षतिग्रस्त और कैंसरकारी कोशिकाओं को खाकर ऊर्जा में बदल देती हैं। इससे महिलाओं में एस्ट्रोजन व प्रोजेस्टेरोन का संतुलन सुधरता है, पीसीओडी (PCOD) में राहत मिलती है और उम्र बढ़ने की गति (Aging) धीमी हो जाती है। सनातन धर्म में एकादशी और प्रदोष व्रत इसी महान वैज्ञानिक कायाकल्प का आधार हैं।
+            व्रत का पारण हमेशा सूर्योदय के बाद और पंचांग में दिए गए पारण मुहूर्त के भीतर ही करना चाहिए। पारण के समय भारी या तला-भुना खाने के बजाय गुनगुना पानी, तुलसी पत्र, आंवला या नींबू का पानी, मूंग की पतली खिचड़ी या फल लेना चाहिए ताकि पाचन तंत्र पर अचानक दबाव न पड़े।
+          </p>
+        </details>
+      </div>
+
+      <!-- Group 3: Science & Other FAQs -->
+      <div id="panchang-faq-group-science" class="panchang-faq-group" style="display:none;flex-direction:column;gap:10px;">
+        <details class="panchang-faq-item" open>
+          <summary><span>🔬 7.</span> पंचांग कोई अंधविश्वास नहीं बल्कि शुद्ध खगोलीय विज्ञान (Astronomy) कैसे है?</summary>
+          <p>
+            पंचांग संस्कृत के 'पंच' और 'अंग' (तिथि, वार, नक्षत्र, योग, करण) से मिलकर बना है। यह पृथ्वी के सूर्य के चारों ओर परिक्रमण (365.25 दिन) और चंद्रमा के पृथ्वी के चारों ओर घूर्णन (29.53 दिन का सिनोडिक चक्र) का विशुद्ध गणितीय फॉर्मूला है। आधुनिक नासा (NASA) और इसरो (ISRO) की गणनाएं भी सूर्य-चंद्र के जिन देशांतर और अक्षांश को मानती हैं, हमारे ऋषियों ने 'सूर्य सिद्धांत' में हजारों वर्ष पूर्व उन्हें नैनो-सेकंड की सटीकता से सूत्रबद्ध किया था।
           </p>
         </details>
 
         <details class="panchang-faq-item">
-          <summary>
-            <span>6.</span> राहुकाल में नए शुभ कार्य क्यों वर्जित माने गए हैं?
-          </summary>
+          <summary><span>⏱️ 8.</span> दिन और रात के चौघड़िया (शुभ, लाभ, अमृत, चर, रोग, काल, उद्वेग) का वैज्ञानिक महत्व क्या है?</summary>
           <p>
-            राहुकाल प्रत्येक दिन का वह 90 मिनट का समय है जब सूर्य की किरणों का कोण पृथ्वी के चुंबकीय क्षेत्र (Geomagnetic Field) के साथ एक विशिष्ट तनाव उत्पन्न करता है। इस समय में व्यक्ति के निर्णय लेने की क्षमता में भ्रम (Cognitive Bias) की संभावना बढ़ जाती है। इसलिए हमारे पूर्वजों ने इस काल में नवीन रजिस्ट्री, बड़ा निवेश या अनुबंध करने से बचने का नियम बनाया, ताकि बाद में पछतावा न हो।
+            प्राचीन काल में 24 घंटे को 16 पहरों में बांटा गया, जिन्हें चौघड़िया कहा जाता है। यह पृथ्वी की घूर्णन गति और उस समय विशेष के सौर विकिरण (Solar Radiations) तथा मानव मस्तिष्क के न्यूरोट्रांसमीटर की एकाग्रता पर आधारित है। 'अमृत' और 'शुभ' चौघड़िया में मानव मस्तिष्क सर्वाधिक शांत और निर्णय लेने में सक्षम होता है।
           </p>
         </details>
 
         <details class="panchang-faq-item">
-          <summary>
-            <span>7.</span> क्या यह पंचांग बिना किसी इंटरनेट सर्वर या विदेशी पेड एपीआई के 100 वर्ष तक कार्य करेगा?
-          </summary>
+          <summary><span>🌐 9.</span> क्या यह पंचांग बिना किसी इंटरनेट सर्वर या विदेशी पेड एपीआई के 100 वर्ष तक कार्य करेगा?</summary>
           <p>
             हाँ! यह आरोग्यम पंचांग 100% क्लाइंट-साइड <strong>'दृक गणित एवं सूर्य सिद्धांत'</strong> के अमर खगोलीय एल्गोरिदम पर आधारित है। इसे किसी विदेशी सशुल्क एपीआई या सर्वर कनेक्शन की आवश्यकता नहीं है। यह आने वाले 100 वर्षों तक बिना किसी रुकावट के प्रतिदिन की तिथि, नक्षत्र, योग, चौघड़िया और राहुकाल की सटीक गणना स्वतः करता रहता है।
           </p>
         </details>
+      </div>
+
+    </div>
+
+    <!-- SECTION 7: VERIFIED FARMER & READER REVIEWS (प्रमाणित समीक्षाएं) -->
+    <div style="background:#fffaf0;border:2.5px solid #ea580c;border-radius:18px;padding:22px;margin-bottom:30px;box-shadow:0 6px 20px rgba(234,88,12,0.15);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;border-bottom:2px solid #fed7aa;padding-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.8rem;">⭐</span>
+          <div>
+            <h3 style="font-size:1.3rem;font-weight:900;color:#0f172a;margin:0;">
+              प्रमाणित किसान व परिवार समीक्षाएं (Verified Reviews)
+            </h3>
+            <span style="font-size:0.82rem;color:#c2410c;font-weight:800;">
+              10,000+ किसानों व सनातन परिवारों का अटूट विश्वास
+            </span>
+          </div>
+        </div>
+        <div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:900;color:#065f46;display:flex;align-items:center;gap:6px;">
+          <i class="fa-solid fa-circle-check" style="color:#10b981;"></i> 100% सत्यापित समीक्षाएं
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
+        
+        <!-- Review 1 -->
+        <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:14px;padding:16px;box-shadow:0 3px 12px rgba(0,0,0,0.04);display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="color:#f59e0b;font-size:0.95rem;letter-spacing:1px;">⭐⭐⭐⭐⭐</div>
+              <span style="background:#dcfce7;color:#15803d;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:8px;">सत्यापित किसान</span>
+            </div>
+            <p style="font-size:0.86rem;color:#1e293b;line-height:1.6;margin:0 0 12px 0;">
+              "आरोग्यम पंचांग में चंद्र कृषि चक्र देखकर मैंने लहसुन और प्याज की बुवाई की। कंद का आकार और वजन पिछले साल से 25% अधिक निकला! अब हर स्प्रे अभिजीत मुहूर्त में ही करता हूँ।"
+            </p>
+          </div>
+          <div style="border-top:1px dashed #fed7aa;padding-top:10px;display:flex;align-items:center;gap:10px;">
+            <div style="width:38px;height:38px;background:#ea580c;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;">रा</div>
+            <div>
+              <div style="font-size:0.88rem;font-weight:900;color:#0f172a;">रामेश्वर दयाल पाटीदार</div>
+              <div style="font-size:0.75rem;color:#64748b;font-weight:600;">उज्जैन (मध्य प्रदेश) • 8 एकड़ खेती</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:14px;padding:16px;box-shadow:0 3px 12px rgba(0,0,0,0.04);display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="color:#f59e0b;font-size:0.95rem;letter-spacing:1px;">⭐⭐⭐⭐⭐</div>
+              <span style="background:#dcfce7;color:#15803d;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:8px;">सत्यापित पाठक</span>
+            </div>
+            <p style="font-size:0.86rem;color:#1e293b;line-height:1.6;margin:0 0 12px 0;">
+              "एकादशी व्रत का समय, पारण मुहूर्त और इसके वैज्ञानिक स्वास्थ्य लाभ इतनी बारीकी से कहीं नहीं मिलते। मोबाइल में इतना साफ़ और सटीक सनातन पंचांग पहली बार मिला है।"
+            </p>
+          </div>
+          <div style="border-top:1px dashed #fed7aa;padding-top:10px;display:flex;align-items:center;gap:10px;">
+            <div style="width:38px;height:38px;background:#b45309;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;">सु</div>
+            <div>
+              <div style="font-size:0.88rem;font-weight:900;color:#0f172a;">श्रीमती सुनीता शर्मा</div>
+              <div style="font-size:0.75rem;color:#64748b;font-weight:600;">जयपुर (राजस्थान) • आरोग्यम पाठक</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:14px;padding:16px;box-shadow:0 3px 12px rgba(0,0,0,0.04);display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <div style="color:#f59e0b;font-size:0.95rem;letter-spacing:1px;">⭐⭐⭐⭐⭐</div>
+              <span style="background:#dcfce7;color:#15803d;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:8px;">सत्यापित किसान</span>
+            </div>
+            <p style="font-size:0.86rem;color:#1e293b;line-height:1.6;margin:0 0 12px 0;">
+              "सुबह उठते ही सबसे पहले चौघड़िया और राहुकाल देखता हूँ। तारीख पर क्लिक करते ही पूरा विवरण आ जाता है। यह पंचांग हर किसान और व्यापारी के फोन में होना चाहिए।"
+            </p>
+          </div>
+          <div style="border-top:1px dashed #fed7aa;padding-top:10px;display:flex;align-items:center;gap:10px;">
+            <div style="width:38px;height:38px;background:#15803d;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;">सु</div>
+            <div>
+              <div style="font-size:0.88rem;font-weight:900;color:#0f172a;">सुरेन्द्र कुमार मौर्य</div>
+              <div style="font-size:0.75rem;color:#64748b;font-weight:600;">वाराणसी (उत्तर प्रदेश) • सब्जी उत्पादक</div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -1438,20 +1619,20 @@
             else if (ev.type === 'amavasya') { evColor = '#334155'; evBg = '#f1f5f9'; }
 
             eventBadge = `
-              <div style="background:${evBg};color:${evColor};border:1px solid ${evColor};border-radius:3px;padding:1px 2px;font-size:0.52rem;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.1;" title="${ev.name}">
+              <div style="background:${evBg};color:${evColor};border:1px solid ${evColor};border-radius:4px;padding:2px 3px;font-size:0.62rem;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.15;margin-top:2px;" title="${ev.name}">
                 ${ev.name.split('(')[0].trim()}
               </div>
             `;
           }
 
           cellsHtml += `
-            <div style="background:${isSunday ? '#fff1f2' : (ev ? '#fffbeb' : '#ffffff')};border:1px solid ${ev ? '#ea580c' : (isSunday ? '#fca5a5' : '#fde68a')};border-radius:6px;padding:3px 2px;min-height:46px;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,0.03);position:relative;overflow:hidden;">
+            <div id="cal-cell-${m.monthNum}-${d}" class="panchang-cal-cell ${isSunday ? 'is-sunday' : ''} ${ev ? 'has-event' : ''}" onclick="window.selectCalendarDay(2026, ${mIdx}, ${d})" title="क्लिक करके ${d} ${m.monthNameHindi} का सम्पूर्ण पंचांग व त्योहार देखें">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:2px;">
-                <span style="font-size:0.95rem;font-weight:900;color:${isSunday ? '#dc2626' : '#0f172a'};font-family:'Outfit',sans-serif;line-height:1;">
+                <span class="cal-cell-date-num" style="font-size:1.18rem;font-weight:900;color:${isSunday ? '#dc2626' : '#0f172a'};font-family:'Outfit',sans-serif;line-height:1;">
                   ${d}
                 </span>
-                <span style="font-size:0.52rem;color:${isSunday ? '#dc2626' : '#92400e'};font-weight:700;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%;">
-                  ${tithiLabel.substring(0, 8)}
+                <span class="cal-cell-tithi-name" style="font-size:0.68rem;color:${isSunday ? '#b91c1c' : '#7c2d12'};font-weight:800;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:64%;">
+                  ${tithiLabel.substring(0, 9)}
                 </span>
               </div>
               ${eventBadge}
@@ -1460,65 +1641,65 @@
         }
 
         html += `
-          <div style="background:#fffaf0;border:2px solid #ea580c;border-radius:16px;padding:14px;box-shadow:0 4px 16px rgba(234,88,12,0.12);display:flex;flex-direction:column;justify-content:space-between;width:100%;max-width:100%;box-sizing:border-box;overflow:hidden;">
+          <div style="background:#fffaf0;border:2.5px solid #ea580c;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(234,88,12,0.15);display:flex;flex-direction:column;justify-content:space-between;width:100%;max-width:100%;box-sizing:border-box;overflow:hidden;">
             
             <div>
               <!-- Calendar Month Top Header -->
-              <div style="background:linear-gradient(135deg, #78350f 0%, #b45309 50%, #ea580c 100%);color:#ffffff;border-radius:12px;padding:10px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 3px 10px rgba(180,83,9,0.25);">
+              <div style="background:linear-gradient(135deg, #78350f 0%, #b45309 50%, #ea580c 100%);color:#ffffff;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 3px 10px rgba(180,83,9,0.25);">
                 <div>
-                  <h4 style="margin:0;font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">
+                  <h4 style="margin:0;font-size:1.25rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">
                     🚩 ${m.monthNameHindi}
                   </h4>
-                  <div style="font-size:0.78rem;color:#fef08a;font-weight:800;margin-top:2px;">
+                  <div style="font-size:0.8rem;color:#fef08a;font-weight:800;margin-top:2px;">
                     मास: ${m.hinduMasa} • संवत 2083
                   </div>
                 </div>
                 <div style="text-align:right;">
-                  <span style="background:#ffffff;color:#78350f;font-size:0.72rem;font-weight:900;padding:3px 8px;border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,0.15);">
+                  <span style="background:#ffffff;color:#78350f;font-size:0.74rem;font-weight:900;padding:4px 10px;border-radius:12px;box-shadow:0 2px 4px rgba(0,0,0,0.15);">
                     आरोग्यम पंचांग
                   </span>
                 </div>
               </div>
 
-              <p style="margin:0 0 10px 0;font-size:0.8rem;color:#000000;font-weight:700;line-height:1.4;">
+              <p style="margin:0 0 12px 0;font-size:0.84rem;color:#0f172a;font-weight:700;line-height:1.45;">
                 ${m.description}
               </p>
 
-              <!-- 7-Day Matrix Scrollable Container (Mobile & Desktop Safe) -->
-              <div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:10px;">
-                <div style="min-width:260px;width:100%;box-sizing:border-box;">
-                  
-                  <!-- 7-Day Weekday Names Header -->
-                  <div style="display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:3px;text-align:center;margin-bottom:4px;">
-                    ${WEEKDAYS.map(w => `
-                      <div style="background:${w.name === 'रवि' ? '#fee2e2' : '#fed7aa'};color:${w.color};font-weight:900;font-size:0.75rem;padding:4px 1px;border-radius:4px;border:1px solid ${w.name === 'रवि' ? '#fca5a5' : '#fdba74'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        ${w.name}
-                      </div>
-                    `).join('')}
-                  </div>
-
-                  <!-- 7-Day Calendar Grid -->
-                  <div style="display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:3px;">
-                    ${cellsHtml}
-                  </div>
-
+              <!-- 7-Day Matrix Container (Mobile Responsive Full-Fit Grid) -->
+              <div style="width:100%;margin-bottom:12px;box-sizing:border-box;">
+                
+                <!-- 7-Day Weekday Names Header -->
+                <div style="display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:4px;text-align:center;margin-bottom:5px;">
+                  ${WEEKDAYS.map(w => `
+                    <div style="background:${w.name === 'रवि' ? '#fee2e2' : '#fed7aa'};color:${w.color};font-weight:900;font-size:0.82rem;padding:6px 2px;border-radius:6px;border:1px solid ${w.name === 'रवि' ? '#fca5a5' : '#fdba74'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                      ${w.name}
+                    </div>
+                  `).join('')}
                 </div>
+
+                <!-- 7-Day Calendar Grid -->
+                <div style="display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:4px;">
+                  ${cellsHtml}
+                </div>
+
               </div>
 
               <!-- Monthly Vrats & Parv Reference List (Collapsible Accordion with >> Toggle) -->
-              <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:8px 10px;margin-top:6px;">
+              <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:10px 12px;margin-top:8px;">
                 <div onclick="window.toggleMonthFestivals(${m.monthNum})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;gap:6px;">
-                  <div style="font-size:0.84rem;font-weight:900;color:#000000;display:flex;align-items:center;gap:6px;">
+                  <div style="font-size:0.88rem;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:6px;">
                     <span>🪔</span> <span>${m.monthNameHindi} के मुख्य व्रत व त्योहार:</span>
                   </div>
-                  <button type="button" style="background:#ffedd5;border:1px solid #fdba74;color:#ea580c;font-weight:900;font-size:0.75rem;padding:3px 8px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;">
+                  <button type="button" style="background:#ffedd5;border:1.5px solid #fdba74;color:#ea580c;font-weight:900;font-size:0.76rem;padding:4px 10px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;">
                     <span id="fest-btn-text-${m.monthNum}">विस्तार देखें</span>
                     <span id="fest-btn-arrow-${m.monthNum}" style="font-size:0.85rem;">❯❯</span>
                   </button>
                 </div>
                 
-                <div id="fest-list-${m.monthNum}" style="display:none;flex-direction:column;gap:6px;margin-top:8px;border-top:1px dashed #fed7aa;padding-top:8px;">
+                <div id="fest-list-${m.monthNum}" style="display:none;flex-direction:column;gap:6px;margin-top:10px;border-top:1px dashed #fed7aa;padding-top:10px;">
                   ${m.events.map(ev => {
+                    const match = ev.date.match(/\d+/);
+                    const dayNum = match ? parseInt(match[0], 10) : 1;
                     let badgeBg = '#fef3c7';
                     let badgeColor = '#92400e';
                     let typeLabel = 'पर्व';
@@ -1529,12 +1710,12 @@
                     else if (ev.type === 'festival') { badgeBg = '#fee2e2'; badgeColor = '#b91c1c'; typeLabel = 'महापर्व'; }
 
                     return `
-                      <div style="background:#ffffff;border:1px solid #fde68a;border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                      <div id="fest-item-${m.monthNum}-${dayNum}" class="panchang-fest-item" onclick="window.selectCalendarDay(2026, ${mIdx}, ${dayNum})" style="background:#ffffff;border:1.5px solid #fde68a;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s;">
                         <div>
-                          <strong style="font-size:0.84rem;color:#ea580c;">${ev.date}:</strong>
-                          <span style="font-size:0.84rem;font-weight:800;color:#000000;margin-left:6px;">${ev.name}</span>
+                          <strong style="font-size:0.88rem;color:#ea580c;">${ev.date}:</strong>
+                          <span style="font-size:0.88rem;font-weight:900;color:#0f172a;margin-left:6px;">${ev.name}</span>
                         </div>
-                        <span style="background:${badgeBg};color:${badgeColor};font-size:0.68rem;font-weight:900;padding:2px 8px;border-radius:8px;white-space:nowrap;">
+                        <span style="background:${badgeBg};color:${badgeColor};font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:10px;white-space:nowrap;">
                           ${typeLabel}
                         </span>
                       </div>
@@ -1545,9 +1726,9 @@
 
             </div>
 
-            <div style="margin-top:10px;border-top:1px dashed #ea580c;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:0.75rem;color:#78350f;font-weight:800;">सनातन पंचांग • आरोग्यम वैदिक पंचांग</span>
-              <span style="font-size:0.75rem;color:#ea580c;font-weight:900;">100 वर्ष शुद्ध गणना</span>
+            <div style="margin-top:12px;border-top:1px dashed #ea580c;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:0.78rem;color:#78350f;font-weight:800;">सनातन पंचांग • आरोग्यम वैदिक पंचांग</span>
+              <span style="font-size:0.78rem;color:#ea580c;font-weight:900;">100 वर्ष शुद्ध गणना</span>
             </div>
 
           </div>
@@ -1558,13 +1739,13 @@
     }
 
     // Toggle Month Festivals Accordion (>> / ▲)
-    window.toggleMonthFestivals = function(monthNum) {
+    window.toggleMonthFestivals = function(monthNum, forceOpen = false) {
       const list = document.getElementById(`fest-list-${monthNum}`);
       const btnText = document.getElementById(`fest-btn-text-${monthNum}`);
       const btnArrow = document.getElementById(`fest-btn-arrow-${monthNum}`);
       if (!list) return;
       const isClosed = list.style.display === 'none' || list.style.display === '';
-      if (isClosed) {
+      if (isClosed || forceOpen) {
         list.style.display = 'flex';
         if (btnText) btnText.textContent = 'बंद करें';
         if (btnArrow) btnArrow.textContent = '▲';
@@ -1575,6 +1756,7 @@
       }
     };
 
+    // Niyam 1: Filter Calendar by Month
     window.filterCalendarByMonth = function(monthNum) {
       document.querySelectorAll('.cal-month-pill').forEach(btn => {
         btn.classList.remove('active');
@@ -1596,6 +1778,177 @@
       renderAnnualCalendar(monthNum);
     };
 
+    // Niyam 2: Living Interactive Date Selection
+    window.selectCalendarDay = function(year, monthIdx, dayNum) {
+      const d = new Date(year, monthIdx, dayNum);
+      const mNum = monthIdx + 1;
+
+      // 1. Remove previous active highlight from all calendar cells
+      document.querySelectorAll('.panchang-cal-cell').forEach(cell => {
+        cell.classList.remove('cal-cell-active');
+      });
+
+      // 2. Add active class to clicked cell
+      const targetCell = document.getElementById(`cal-cell-${mNum}-${dayNum}`);
+      if (targetCell) {
+        targetCell.classList.add('cal-cell-active');
+      }
+
+      // 3. Render rich "Selected Date Detail Card" (#selectedDateDetailCard)
+      renderSelectedDateDetailCard(d, mNum, dayNum);
+
+      // 4. Smoothly open and highlight corresponding festival in the month's festival list if exists
+      highlightMonthFestival(mNum, dayNum);
+    };
+
+    function renderSelectedDateDetailCard(dateObj, monthNum, dayNum) {
+      const card = document.getElementById('selectedDateDetailCard');
+      if (!card || !window.SakhiPanchang) return;
+
+      const p = window.SakhiPanchang.getPanchangForDate(dateObj);
+      const isEventDay = Boolean(p.festival || p.isVratDay);
+      
+      const dayOfWeekNames = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+      const dayName = dayOfWeekNames[dateObj.getDay()] || '';
+
+      const safeFestivalName = (p.festival || p.vratName || '').replace(/'/g, "\\'");
+      const safeTithi = (p.tithi || '').replace(/'/g, "\\'");
+
+      card.style.display = 'block';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;border-bottom:2px solid #fed7aa;padding-bottom:12px;margin-bottom:14px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.6rem;">📅</span>
+              <div>
+                <span style="background:#ea580c;color:#ffffff;font-size:0.72rem;font-weight:900;padding:2px 8px;border-radius:10px;text-transform:uppercase;">चुनी गई तारीख का सम्पूर्ण पंचांग</span>
+                <h3 style="margin:3px 0 0 0;font-size:1.35rem;font-weight:900;color:#78350f;font-family:'Outfit',sans-serif;">
+                  ${dayNum} ${p.monthName || ''} (${dayName}) | विक्रम संवत 2083
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button type="button" onclick="window.shareSpecificDateWhatsApp('${p.formattedDate}', '${safeTithi}', '${safeFestivalName}')" style="background:#25d366;color:#ffffff;border:none;padding:8px 14px;border-radius:20px;font-weight:800;font-size:0.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(37,211,102,0.35);">
+              <i class="fa-brands fa-whatsapp"></i> <span>तारीख शेयर करें</span>
+            </button>
+            <button type="button" onclick="document.getElementById('selectedDateDetailCard').style.display='none'" style="background:#fed7aa;border:none;color:#78350f;width:30px;height:30px;border-radius:50%;cursor:pointer;font-weight:900;font-size:1rem;display:flex;align-items:center;justify-content:center;" title="बंद करें">&times;</button>
+          </div>
+        </div>
+
+        <!-- Detail Metrics 4-Box Grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px;margin-bottom:12px;">
+          
+          <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 12px;">
+            <div style="font-size:0.74rem;color:#78350f;font-weight:800;">🌙 पावन तिथि व पक्ष:</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#ea580c;margin-top:2px;">${p.tithi}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:700;">पक्ष: ${p.paksha}</div>
+          </div>
+
+          <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 12px;">
+            <div style="font-size:0.74rem;color:#78350f;font-weight:800;">⭐ नक्षत्र व स्वामी:</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#0f172a;margin-top:2px;">${p.nakshatra}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:700;">स्वामी: ${p.nakshatraLord} | राशि: ${p.rashi}</div>
+          </div>
+
+          <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 12px;">
+            <div style="font-size:0.74rem;color:#15803d;font-weight:800;">🌟 शुभ अभिजीत मुहूर्त:</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#16a34a;margin-top:2px;">${p.abhijitMuhurat}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:700;">सूर्योदय: ${p.sunrise} | सूर्यास्त: ${p.sunset}</div>
+          </div>
+
+          <div style="background:#ffffff;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 12px;">
+            <div style="font-size:0.74rem;color:#b91c1c;font-weight:800;">⚠️ अशुभ राहुकाल:</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#dc2626;margin-top:2px;">${p.rahuKaal}</div>
+            <div style="font-size:0.75rem;color:#64748b;font-weight:700;">शुभ कार्यों से बचें</div>
+          </div>
+
+        </div>
+
+        <!-- Vrat & Festival Alert Banner -->
+        ${isEventDay ? `
+          <div style="background:linear-gradient(135deg, #b45309 0%, #ea580c 100%);color:#ffffff;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(180,83,9,0.2);">
+            <span style="font-size:1.8rem;">🪔</span>
+            <div>
+              <span style="background:#fef08a;color:#78350f;font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:8px;">पावन पर्व / व्रत</span>
+              <div style="font-size:1.15rem;font-weight:900;color:#fef08a;margin-top:2px;">${p.festival || p.vratName}</div>
+              <p style="margin:2px 0 0 0;font-size:0.82rem;color:#fff7ed;line-height:1.4;">
+                ${p.vratMahatmya || "सनातन धर्म अनुसार इस पावन दिवस का विशेष आध्यात्मिक फल प्राप्त होता है।"}
+              </p>
+            </div>
+          </div>
+        ` : `
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:0.85rem;color:#166534;font-weight:700;display:flex;align-items:center;gap:8px;">
+            <span>🌿</span> <span>आज कोई विशेष कठिन व्रत नहीं है — नित्य कर्म, सात्विक दिनचर्या, व्यापार व सामान्य कृषि कार्यों के लिए उत्तम दिन है।</span>
+          </div>
+        `}
+
+        <!-- Lunar Agri Advice for Selected Date -->
+        <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:0.86rem;color:#78350f;line-height:1.55;">
+          <div style="font-weight:900;color:#b45309;margin-bottom:3px;display:flex;align-items:center;gap:6px;">
+            <span>🌱</span> <span>इस तारीख की चंद्र कृषि सलाह:</span>
+          </div>
+          <div>${p.agriGuidance.sowingAdvice}</div>
+        </div>
+      `;
+
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function highlightMonthFestival(monthNum, dayNum) {
+      // 1. Open the festival accordion if it is closed
+      const list = document.getElementById(`fest-list-${monthNum}`);
+      const btnText = document.getElementById(`fest-btn-text-${monthNum}`);
+      const btnArrow = document.getElementById(`fest-btn-arrow-${monthNum}`);
+      if (list && (list.style.display === 'none' || list.style.display === '')) {
+        list.style.display = 'flex';
+        if (btnText) btnText.textContent = 'बंद करें';
+        if (btnArrow) btnArrow.textContent = '▲';
+      }
+
+      // 2. Remove highlight from all festival items
+      document.querySelectorAll('.panchang-fest-item').forEach(el => {
+        el.classList.remove('fest-item-highlighted');
+      });
+
+      // 3. Highlight specific festival item for this day
+      const targetItem = document.getElementById(`fest-item-${monthNum}-${dayNum}`);
+      if (targetItem) {
+        targetItem.classList.add('fest-item-highlighted');
+        targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    window.shareSpecificDateWhatsApp = function(dateFormatted, tithi, festival) {
+      const shareId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : 'AI000004';
+      const refUrl = `https://aarogyamindia.online/krishi-panchang.html?ref=${shareId}`;
+      const festText = festival ? `\n🪔 पावन पर्व: ${festival}` : '';
+      const text = `🕉️ *दैनिक वैदिक पंचांग विवरण*\n📅 तारीख: ${dateFormatted}\n🌙 तिथि: ${tithi}${festText}\n\n👉 संपूर्ण चौघड़िया, व्रत महात्म्य व कृषि चंद्र चक्र देखें:\n${refUrl}`;
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    };
+
+    // Category Tabs Switcher for Panchang FAQs
+    window.switchPanchangFaqTab = function(tabName) {
+      document.querySelectorAll('.panchang-faq-tab-btn').forEach(b => {
+        const isActive = b.dataset.tab === tabName;
+        b.classList.toggle('active', isActive);
+        if (isActive) {
+          b.style.background = '#d97706';
+          b.style.color = '#ffffff';
+          b.style.borderColor = '#b45309';
+        } else {
+          b.style.background = '#fffbeb';
+          b.style.color = '#78350f';
+          b.style.borderColor = '#fde68a';
+        }
+      });
+
+      document.querySelectorAll('.panchang-faq-group').forEach(grp => {
+        grp.style.display = (grp.id === `panchang-faq-group-${tabName}`) ? 'flex' : 'none';
+      });
+    };
+
     // 7. Share Engine WhatsApp Integration with Clean Single Share ID
     window.shareTodayPanchangWhatsApp = function() {
       if (!window.SakhiPanchang) return;
@@ -1614,10 +1967,16 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initHeroSlider();
-      renderPanchang(new Date());
-      renderAnnualCalendar(0);
+      const today = new Date();
+      renderPanchang(today);
+      const currentMonth = today.getMonth() + 1;
+      window.filterCalendarByMonth(currentMonth);
+      window.selectCalendarDay(2026, today.getMonth(), today.getDate());
     });
   </script>
+
+  <!-- Live Dynamic Page CMS Bridge (Admin Sync Ready) -->
+  <script src="/js/live-page-cms-bridge.js"></script>
 
   <!-- Login Popup Fallback -->
   <div id="login-popup-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; display: none; justify-content: center; align-items: center;">

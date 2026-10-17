@@ -400,7 +400,7 @@
     const pashu_rejected = q.includes('गाय की देखभाल बाद में') || q.includes('गाय छोड़') || q.includes('गाय बाद में') || q.includes('पशु छोड़') || q.includes('पशु को देना है या इंसान को? इंसान') || q.includes('पशु को नहीं') || (q.includes('दूध नहीं') && !q.includes('पी रहा') && !q.includes('पीती') && !q.includes('पीता') && !q.includes('दे रही') && !q.includes('देती'));
     const beauty_rejected = q.includes('ब्यूटी नहीं') || q.includes('चेहरा छोड़') || q.includes('सौंदर्य छोड़');
     const health_rejected = q.includes('स्वास्थ्य छोड़') || q.includes('स्वास्थ्य दोनों छोड़') || q.includes('स्वास्थ्य नहीं');
-    const netsurf_rejected = q.includes('नेट्सर्फ की बात छोड़') || q.includes('नेट्सर्फ छोड़') || q.includes('बिजनेस छोड़');
+    const netsurf_rejected = q.includes('नेट्सर्फ की बात छोड़') || q.includes('नेट्सर्फ छोड़') || q.includes('netsurf की बात छोड़') || q.includes('netsurf छोड़') || q.includes('बिजनेस छोड़');
     const nuskhe_rejected = q.includes('दादी का नुस्खा नहीं') || q.includes('नुस्खा नहीं');
 
     // Priority indicators ("पहले...")
@@ -425,7 +425,7 @@
     }
 
     // Cow dung compost for crops -> Agri
-    if ((q.includes('गोबर से') || q.includes('गोबर की खाद')) && (q.includes('टमाटर') || q.includes('फसल') || q.includes('सब्जी') || q.includes('खाद बनानी'))) {
+    if (q.includes('गोबर') && (q.includes('टमाटर') || q.includes('फसल') || q.includes('सब्जी') || q.includes('खाद') || q.includes('खेत'))) {
       return 'agri';
     }
 
@@ -457,8 +457,8 @@
     // Business & Netsurf
     const bizTokens = [
       'नेट्सर्फ', 'netsurf', 'बायोफिट', 'biofit', 'नेचुरामोर', 'naturamore',
-      'क्लब नेट्सर्फ', '8.19', '8,19,250', 'साप्ताहिक कैपिंग', 'कैपिंग',
-      'बाइनरी', 'टर्नओवर', 'कमीशन', 'डायरेक्ट सेलिंग', 'रिटेल बोनस', 'रिटेल कमीशन',
+      'क्लब नेट्सर्फ', '8.19', '8,19,250', 'साप्ताहिक कैपिंग', 'कैपिंग', 'capping',
+      'बाइनरी', 'टर्नओवर', 'कमीशन', 'commission', 'turnover', 'payout', 'डायरेक्ट सेलिंग', 'रिटेल बोनस', 'रिटेल कमीशन',
       'वाउचर', 'ऑटो-शिप', 'ऑटो शिप', 'autoship', 'डिस्काउंट', 'discount',
       '25% डिस्काउंट', '25%', 'फ्री जॉइनिंग', 'जॉइनिंग', 'आईडी', 'डाउनलाइन', 'जेनरेशन इनकम',
       'v-catalog', 'कैटलॉग', 'किसान मित्र', 'कमाई', 'कमा सकती', 'पैसे कैसे कमाए',
@@ -483,9 +483,9 @@
       'सुंदर', 'त्वचा', 'चेहरा', 'चेहरे', 'skin', 'झुर्रियां', 'झाइयाँ', 'झाइयां',
       'रूखापन', 'काले घेरे', 'काले धब्बे', 'मुंहासे', 'कील-मुहाँसों', 'पिंपल', 'pimple',
       'ग्लो', 'glow', 'चमक', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
-      'गंजापन', 'गंजा', 'हेयरफॉल', 'कंडीशनर', 'फेसपैक', 'फेसवाश', 'रंगत',
+      'गंजापन', 'गंजा', 'हेयरफॉल', 'कंडीशनर', 'फेसपैक', 'फेसवाश', 'फेस वॉश', 'रंगत',
       'उबटन', 'जायफल', 'बेसन', 'मुल्तानी मिट्टी', 'मलाई', 'स्क्रब', 'हर्ब्स एंड मोर',
-      'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों'
+      'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों', 'बॉडी लोशन', 'body lotion'
     ];
     if (!beauty_rejected && beautyTokens.some(t => q.includes(t))) {
       return 'beauty';
@@ -494,7 +494,7 @@
     // Veterinary & Dairy (Pashu Palan)
     const cattleExplicit = [
       'पशु', 'गाय', 'भैंस', 'दुधारू', 'डेयरी', 'थनैल', 'थनैला', 'mastitis',
-      'बकरी', 'भेड़', 'poultry', 'मुर्गी', 'मुरगी', 'मुर्गी पालन', 'सूअर', 'मछली', 'मछली पालन',
+      'बकरी', 'भेड़', 'poultry', 'मुर्गी', 'मुरगी', 'मुर्गियों', 'मुर्गा', 'अंडे', 'अंडा', 'मुर्गी पालन', 'कुक्कुट', 'सूअर', 'मछली', 'मछली पालन',
       'cfc', 'पेट वेट', 'पशु आहार', 'आफरा', 'bloat', 'बछड़ा', 'बछड़े', 'बछड़ी', 'बछड़ों', 'लैक्टेशन',
       'दुग्ध', 'गाभिन', 'जेर', 'बांझपन', 'खुरपका', 'मुंहपका', 'साइलेज', 'दाना-चारा', 'snf'
     ];
@@ -510,6 +510,22 @@
       if (q.includes('गोबर') && !q.includes('टमाटर') && !q.includes('खाद बनानी')) {
         return 'pashu';
       }
+    }
+
+    // 0. CROP & PLANT DISEASE/PROTECTION DISAMBIGUATION (Guarantees crop diseases go to 'agri', NEVER 'health')
+    const cropKeywordsForDisease = [
+      'चना', 'चने', 'गेहूं', 'गेहूँ', 'धान', 'आलू', 'सरसों', 'राई', 'सोयाबीन', 'कपास',
+      'टमाटर', 'मिर्च', 'मक्का', 'गन्ना', 'बैंगन', 'प्याज', 'लहसुन', 'भिंडी', 'मटर',
+      'फसल', 'सब्जी', 'सब्जियों', 'खेत', 'पौध', 'पौधे', 'पत्ती', 'पत्तियां', 'पत्ते'
+    ];
+    const cropDiseaseTokens = [
+      'रोग', 'बीमारी', 'उकठा', 'रतुआ', 'झुलसा', 'ब्लास्ट', 'माहू', 'चेपा', 'कीट', 'इल्ली',
+      'सुंडी', 'तना छेदक', 'छेदक', 'कुकड़ा', 'थ्रिप्स', 'फफूंद', 'फंगस', 'गलन', 'दीमक',
+      'इलाज', 'दवा', 'रोकथाम', 'छिड़काव', 'स्प्रे', 'लक्षण', 'सूख', 'पीले', 'पीलापन'
+    ];
+    const isCropDisease = !agri_rejected && cropKeywordsForDisease.some(c => q.includes(c)) && cropDiseaseTokens.some(d => q.includes(d));
+    if (isCropDisease && !q.includes('दादी का नुस्खा नहीं') && !q.includes('इंसान')) {
+      return 'agri';
     }
 
     // Human Health & Medicine
@@ -2192,6 +2208,183 @@
       .replace(/\b(shampu)\b/gi, 'shampoo');
   }
 
+  // =========================================================================
+  // AAROGYAM INDIA MASTER MISSION, FOUNDER, PURPOSE & E-BOOKS ENGINE
+  // Covers: Aarogyam India Intro, Founder Dada Avneesh (26+ yrs exp),
+  // Core Mission/Purpose, Current Books (BK001, BK002, BK015),
+  // Upcoming Books (BK016, BK017, BK018, BK019) & Key Features
+  // =========================================================================
+  function cleanSakhiUnresolvedLog() {
+    try {
+      const raw = localStorage.getItem('sakhi_unresolved_queries_log');
+      if (!raw) return;
+      let logs = JSON.parse(raw) || [];
+      if (!Array.isArray(logs)) return;
+      const initialLen = logs.length;
+      logs = logs.filter(l => {
+        const q = (l.clean || l.query || '').toLowerCase();
+        return !q.includes('aarogyam') && !q.includes('आरोग्यम') && !q.includes('founder') && !q.includes('फाउंडर') && !q.includes('book') && !q.includes('किताब') && !q.includes('अवनीश') && !q.includes('panchang') && !q.includes('पंचांग');
+      });
+      if (logs.length !== initialLen) {
+        localStorage.setItem('sakhi_unresolved_queries_log', JSON.stringify(logs));
+      }
+    } catch (_) {}
+  }
+
+  function handleAarogyamIndiaMissionAndEbooksInfo(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const raw = (rawQ || '').toLowerCase();
+
+    // Ignore Netsurf corporate queries (let handleNetsurfCompanyProfile take them)
+    if (q.includes('netsurf') || q.includes('नेट्सर्फ') || q.includes('sujit jain') || q.includes('सुजीत जैन') || q.includes('sanjay malpani')) {
+      return false;
+    }
+
+    // -----------------------------------------------------------------------
+    // SUB-INTENT 1: UPCOMING BOOKS IN FUTURE (भविष्य में कौन सी बुक आएंगी / Upcoming Books)
+    // -----------------------------------------------------------------------
+    const isUpcomingBooksQuery = (
+      q.includes('bhavishya me kaun si book') || q.includes('bhavishya me kaun si kitab') ||
+      q.includes('bhavishya me kitabe') || q.includes('aane wali book') || q.includes('aane wali kitab') ||
+      q.includes('upcoming book') || q.includes('upcoming ebook') || q.includes('future book') ||
+      q.includes('आने वाली बुक') || q.includes('आने वाली किताब') || q.includes('भविष्य में कौन सी बुक') ||
+      q.includes('भविष्य की किताबें') || q.includes('नई किताबें कब') || q.includes('आगे कौन सी बुक')
+    );
+
+    if (isUpcomingBooksQuery) {
+      cleanSakhiUnresolvedLog();
+      const resp = `📚 **आरोग्यम इंडिया की आगामी पुस्तकें (Upcoming E-Books Pipeline):**\n\nहमारे सम्मानित संस्थापक **दादा अवनीश (श्री अवनीश कुमार मिश्रा जी)** के 26+ वर्षों के वास्तविक जमीनी अनुभवों पर आधारित 4 क्रांतिकारी पुस्तकें बहुत जल्द प्रकाशित हो रही हैं:\n\n1️⃣ **🧪 BK016 — कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले:**\n• फफूंदनाशी, कीटनाशक, खरपतवारनाशक व टॉनिकों के असली टेक्निकल नाम, सही डोज, मिलावट पहचान व सुरक्षित कॉम्बिनेशन चार्ट।\n\n2️⃣ **🌾 BK017 — रबी फसल संपूर्ण मास्टर गाइड:**\n• गेहूं, सरसों, चना, मटर, आलू व लहसुन की बुवाई से कटाई, कल्ले बढ़ाने, रोग रोकथाम व बंपर पैदावार की वैज्ञानिक गाइड।\n\n3️⃣ **💼 BK018 — किसान व युवा इनकम मास्टर गाइड:**\n• ग्रामीण युवाओं, किसानों व माताओं-बहनों के लिए नेटसर्फ डायरेक्ट सेलिंग, डिजिटल टूल्स और बिना जोखिम घर बैठे सम्मानजनक कमाई की गाइड।\n\n4️⃣ **🐄 BK019 — पशुपालन व आधुनिक डेयरी प्रबंधन:**\n• गाय-भैंस का दूध व 7-8 फैट वृद्धि, बांझपन निवारण, संतुलित पोषण व देसी घरेलू नुस्खों का संपूर्ण संकलन।\n\n💡 *नोट: हमारी वर्तमान पुस्तकें BK001, BK002 और BK015 अभी उपलब्ध हैं जिन्हें आप तुरंत पढ़ सकते हैं।*`;
+
+      renderCrispSpecialBox('📚 आगामी पुस्तकें (Upcoming Books Pipeline)', resp, [
+        { text: '🌾 वर्तमान उपलब्ध पुस्तकें देखें (BK001, BK002, BK015)', query: 'आरोग्यम इंडिया की कौन सी बुक अभी उपलब्ध हैं?' },
+        { text: '🧪 कृषि दवा डायरेक्टरी (BK016) अग्रिम विवरण', query: 'कृषि दवा डायरेक्टरी BK016 की जानकारी' },
+        { text: '💬 दादा अवनीश जी से WhatsApp संपर्क', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी, मुझे आगामी ई-बुक्स (BK016, BK017, BK018, BK019) की रिलीज तिथि व जानकारी चाहिए।'), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' }
+      ], 'agri', 'upcoming_books_pipeline');
+      return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // SUB-INTENT 2: CURRENTLY AVAILABLE BOOKS (कौन सी बुक अभी हैं / वर्तमान किताबें)
+    // -----------------------------------------------------------------------
+    const isCurrentBooksQuery = (
+      q.includes('kaun si book abhi') || q.includes('kaun si book hai') || q.includes('kaun kaun si book') ||
+      q.includes('kitni book hai') || q.includes('kitni kitabein') || q.includes('konsi book') ||
+      q.includes('कौन सी बुक अभी') || q.includes('कौन सी किताब अभी') || q.includes('कौन-कौन सी बुक') ||
+      q.includes('कितनी किताबें हैं') || q.includes('वर्तमान में कौन सी बुक') || q.includes('उपलब्ध किताबें') ||
+      q.includes('ई-बुक की सूची') || q.includes('ebook list') || q.includes('books list') ||
+      (q.includes('aarogyam') && (q.includes('book') || q.includes('किताब')) && (q.includes('list') || q.includes('kaun') || q.includes('all')))
+    );
+
+    if (isCurrentBooksQuery) {
+      cleanSakhiUnresolvedLog();
+      const resp = `📚 **आरोग्यम इंडिया की वर्तमान में उपलब्ध ई-बुक्स (Current E-Books):**\n\nवर्तमान में हमारे डिजिटल पुस्तकालय में 3 सबसे लोकप्रिय और व्यावहारिक ई-बुक्स उपलब्ध हैं, जिन्हें आप आजीवन (Lifetime Access) अपने मोबाइल पर पढ़ सकते हैं:\n\n1️⃣ **🌾 BK001 — खरीफ फसल मास्टर गाइड 2026 (मात्र ₹99 | MRP ₹299):**\n• धान, सोयाबीन, मक्का, उड़द, मूंग का सम्पूर्ण 150+ पेज का वैज्ञानिक गाइड।\n• बीज संस्कार, खरपतवार नियंत्रण, कल्ले बढ़ाने का फॉर्मूला और संपूर्ण स्प्रे कैलेंडर।\n\n2️⃣ **🩺 BK002 — 'खेती का डॉक्टर' (Pocket Doctor) (मात्र ₹99 | MRP ₹299):**\n• 300+ असली फोटो सहित फसलों के सभी रोग, फंगस, कीट व पोषण कमियों की पहचान।\n• खेत में खड़े होकर पत्तियां देखकर खुद डॉक्टर बनें और दुकानदारों के गैर-जरूरी खर्चों से बचें।\n\n3️⃣ **🥦 BK015 — सब्जी की उन्नत वैज्ञानिक खेती (मात्र ₹149 | MRP ₹1,999):**\n• टमाटर, मिर्च, शिमला मिर्च, बैंगन, गोभी, भिंडी, खीरा, लौकी, करेला, तोरई और कद्दू की 154-पेज की ए टू जेड संपूर्ण मास्टर गाइड।\n\n🎁 **विशेष:** आप UPI (7974422572) से तुरंत भुगतान कर 2 मिनट में एक्टिवेशन पा सकते हैं।`;
+
+      renderCrispSpecialBox('📚 वर्तमान उपलब्ध ई-बुक्स (Current E-Books)', resp, [
+        { text: '🩺 खेती का डॉक्टर खोलें (BK002 - ₹99)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🥦 सब्जी खेती मास्टर खोलें (BK015 - ₹149)', url: '/ebooks/book-landing.html?id=BK015', isExternal: true, style: 'background:#ea580c;color:#fff;font-weight:800;' },
+        { text: '🌾 खरीफ मास्टर गाइड खोलें (BK001 - ₹99)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
+        { text: '🔮 भविष्य में आने वाली पुस्तकें देखें', query: 'भविष्य में कौन सी बुक आएंगी?' }
+      ], 'agri', 'current_books_catalog');
+      return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // SUB-INTENT 3: FOUNDER DADA AVNEESH (संस्थापक / दादा अवनीश मिश्रा जी)
+    // -----------------------------------------------------------------------
+    const isFounderQuery = (
+      q.includes('dada avneesh') || q.includes('दादा अवनीश') || q.includes('अवनीश कुमार') ||
+      q.includes('avneesh mishra') || q.includes('अवनीश मिश्रा') || q.includes('avneesh ji') ||
+      q.includes('founder') || q.includes('फाउंडर') || q.includes('malik') || q.includes('मालिक') ||
+      q.includes('owner') || q.includes('संस्थापक') || q.includes('kiska hai') || q.includes('किसका है') ||
+      q.includes('sansthapak')
+    );
+
+    if (isFounderQuery) {
+      cleanSakhiUnresolvedLog();
+      const resp = `🌾 **आरोग्यम इंडिया के संस्थापक — दादा अवनीश (श्री अवनीश कुमार मिश्रा जी):**\n\n👤 **परिचय व अनुभव:**\n• **मूल निवासी:** रीवा, विंध्य क्षेत्र, मध्य प्रदेश।\n• **अनुभव:** पिछले **26+ वर्षों से निरंतर** कृषि, पशुपालन, डायरेक्ट सेलिंग और ग्रामीण सशक्तिकरण में समर्पित।\n• **मिशन:** देश के किसान भाइयों को रासायनिक जहर और बिचौलियों के आर्थिक शोषण से मुक्त कराकर 'समृद्ध किसान, रोगमुक्त परिवार' का निर्माण करना।\n\n🏆 **विशेष योगदान:**\n• लाखों किसानों को जैविक खेती व बायोफिट के वैज्ञानिक उपयोग से जोड़ा।\n• 'खेती का डॉक्टर' ई-बुक्स श्रृंखला और 'आरोग्यम सखी AI' की प्रेरणा व मार्गदर्शन के मुख्य आधार।\n• ग्रामीण युवाओं और महिलाओं को स्वावलंबन और सम्मानजनक आजीविका का मार्ग दिखाया।\n\n📞 **सीधा संपर्क व मार्गदर्शन:**\n• मोबाइल / WhatsApp: **+91 79744 22572**\n• पता: आरोग्यम इंडिया मुख्यालय, रीवा (म.प्र.)`;
+
+      renderCrispSpecialBox('👤 संस्थापक — दादा अवनीश (श्री अवनीश कुमार मिश्रा जी)', resp, [
+        { text: '💬 दादा अवनीश जी से सीधे WhatsApp पर बात करें', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('प्रणाम दादा अवनीश जी! मुझे आरोग्यम इंडिया और आपके मार्गदर्शन की आवश्यकता है।'), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '📖 हमारे बारे में विस्तृत पढ़ें (/about.html)', url: '/about.html', isExternal: true },
+        { text: '🎯 आरोग्यम इंडिया का उद्देश्य व मिशन', query: 'आरोग्यम इंडिया का उद्देश्य क्या है?' }
+      ], 'omni', 'founder_dada_avneesh');
+      return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // SUB-INTENT 4: PURPOSE / MISSION / WORK (उद्देश्य क्या है / क्या काम करता है)
+    // -----------------------------------------------------------------------
+    const isPurposeOrWorkQuery = (
+      q.includes('uddesh') || q.includes('उद्देश्य') || q.includes('mission') || q.includes('मिशन') ||
+      q.includes('lakshya') || q.includes('लक्ष्य') || q.includes('kya kaam karta hai') ||
+      q.includes('kya kaam karti hai') || q.includes('kya kam karta hai') || q.includes('kya kam karti hai') ||
+      q.includes('क्या काम करता है') || q.includes('क्या काम करती है') || q.includes('काम क्या है') ||
+      q.includes('kaam kya hai') || q.includes('kam kya hai') || q.includes('vision') || q.includes('विज़न')
+    );
+
+    if (isPurposeOrWorkQuery) {
+      cleanSakhiUnresolvedLog();
+      const resp = `🎯 **आरोग्यम इंडिया का मुख्य उद्देश्य व कार्य (Mission & Core Work):**\n\nआरोग्यम इंडिया भारत का पहला ऐसा संपूर्ण ग्रामीण व कृषि ज्ञान मंच है जो 4 बड़े संकल्पों पर काम करता है:\n\n1️⃣ **💰 खेती की लागत 40% कम करना व पैदावार 20-30% बढ़ाना:**\n• किसानों को रासायनिक खादों और अनावश्यक कीटनाशकों के अत्यधिक खर्च से बचाकर 100% जैविक (Biofit) व वैज्ञानिक विधि सिखाना।\n\n2️⃣ **🛡️ बिचौलियों व नकली दवाओं से मुक्ति:**\n• 'खेती का डॉक्टर' ई-बुक्स और सखी AI के जरिए किसान को खुद अपनी फसल का डॉक्टर बनाना ताकि कोई दुकानदार ठग न सके।\n\n3️⃣ **🇮🇳 युवा व महिला आत्मनिर्भरता (रोजगार):**\n• ग्रामीण युवाओं और माताओं-बहनों को नेट्सर्फ डायरेक्ट सेलिंग व डिजिटल टूल्स से जोड़कर घर बैठे सम्मानजनक आजीविका का अवसर देना।\n\n4️⃣ **🩺 रोगमुक्त परिवार व निरोगी समाज:**\n• चरक संहिता आयुर्वेद और प्रमाणित नेचुरामोर पोषण से हर परिवार को जोड़ों के दर्द, डायबिटीज, कमजोरी व लाइफस्टाइल रोगों से मुक्त रखना।\n\n✨ *\"हमारा संकल्प: समृद्ध किसान, संपन्न युवा और निरोगी हिंदुस्तान!\"*`;
+
+      renderCrispSpecialBox('🎯 आरोग्यम इंडिया का उद्देश्य व कार्य', resp, [
+        { text: '📖 हमारे बारे में पूरा पढ़ें (/about.html)', url: '/about.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🌾 ई-बुक लाइब्रेरी देखें', url: '/ebooks/ebook.html', isExternal: true },
+        { text: '💬 दादा अवनीश जी से जुड़ें', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी! मैं आरोग्यम इंडिया के मिशन से जुड़ना चाहता हूँ।'), isExternal: true }
+      ], 'omni', 'aarogyam_mission_purpose');
+      return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // SUB-INTENT 5: WHEN ESTABLISHED / HISTORY (कब बना / कब शुरू हुआ)
+    // -----------------------------------------------------------------------
+    const isHistoryOrWhenQuery = (
+      q.includes('kab bana') || q.includes('kab shuru') || q.includes('kab sthapit') ||
+      q.includes('kab sthapna') || q.includes('कब बना') || q.includes('कब शुरू') ||
+      q.includes('कब स्थापित') || q.includes('स्थापना कब') || q.includes('itihaas') ||
+      q.includes('इतिहास') || q.includes('कितने साल') || q.includes('kitne saal')
+    );
+
+    if (isHistoryOrWhenQuery) {
+      cleanSakhiUnresolvedLog();
+      const resp = `🏛️ **आरोग्यम इंडिया की स्थापना व 26+ वर्षों की गौरवशाली यात्रा:**\n\n• **नींव और पृष्ठभूमि:**\nआरोग्यम इंडिया की यात्रा सन **2000 (पिछले 26+ वर्षों)** से शुरू हुई, जब संस्थापक **दादा अवनीश (श्री अवनीश कुमार मिश्रा जी, रीवा म.प्र.)** ने विंध्य और मध्य भारत के गांवों में किसानों को जैविक खेती और आत्मनिर्भरता का पाठ पढ़ाना शुरू किया।\n\n• **डिजिटल क्रांति (2024-2026):**\nगांव-गांव में फैली इस 26 वर्षों की जमीनी तपस्या को डिजिटल युग में पूरे भारत के प्रत्येक किसान के मोबाइल तक पहुंचाने के लिए **'आरोग्यम इंडिया' वेब मंच और 'सखी AI'** का शुभारंभ किया गया।\n\n• **आज की स्थिति:**\nआज देश के 50,000+ से अधिक किसान भाई, पशुपालक और जागरूक परिवार आरोग्यम इंडिया की ई-बुक्स, 100 वर्ष शुद्ध पंचांग, लाइव मौसम और सखी AI से सीधा लाभ उठा रहे हैं।`;
+
+      renderCrispSpecialBox('🏛️ आरोग्यम इंडिया की स्थापना व 26+ वर्ष इतिहास', resp, [
+        { text: '👤 संस्थापक दादा अवनीश जी का परिचय', query: 'दादा अवनीश जी कौन हैं?' },
+        { text: '📖 संपूर्ण About Us पेज पढ़ें', url: '/about.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🌾 हमारी ई-बुक्स लाइब्रेरी', url: '/ebooks/ebook.html', isExternal: true }
+      ], 'omni', 'aarogyam_history_timeline');
+      return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // SUB-INTENT 6: MASTER AAROGYAM INDIA INTRO & FEATURES (आरोग्यम इंडिया क्या है?)
+    // -----------------------------------------------------------------------
+    const isAarogyamIntroQuery = (
+      q.includes('aarogyam india kya hai') || q.includes('aarogyam kya hai') ||
+      q.includes('arogyam kya hai') || q.includes('aarogyam india ke bare me') ||
+      q.includes('आरोग्यम इंडिया क्या है') || q.includes('आरोग्यम क्या है') ||
+      q.includes('आरोग्यम इंडिया के बारे में') || q.includes('आरोग्यम के बारे में') ||
+      q.includes('about aarogyam') || q.includes('about us') ||
+      q === 'aarogyam' || q === 'aarogyam india' || q === 'आरोग्यम' || q === 'आरोग्यम इंडिया' ||
+      (q.includes('aarogyam') && (q.includes('parichay') || q.includes('परिचय') || q.includes('batao') || q.includes('features') || q.includes('सुविधाएं')))
+    );
+
+    if (isAarogyamIntroQuery) {
+      cleanSakhiUnresolvedLog();
+      const resp = `🇮🇳 **आरोग्यम इंडिया (Aarogyam India) — भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य व ज्ञान मंच:**\n\n🌿 **आरोग्यम इंडिया क्या है?**\nआरोग्यम इंडिया देश के करोड़ों किसान भाइयों, पशुपालकों, ग्रामीण युवाओं और परिवारों को सशक्त बनाने वाला एक आधुनिक डिजिटल मंच है। इसकी स्थापना रीवा (म.प्र.) के विज़नरी किसान मार्गदर्शक **दादा अवनीश (श्री अवनीश कुमार मिश्रा जी - 26+ वर्ष अनुभव)** के मार्गदर्शन में हुई है।\n\n🚀 **वेबसाइट के 6 प्रमुख स्तंभ व फीचर्स:**\n1. 🤖 **24×7 सखी AI (Sakhi AI):** भारत की पहली समर्पित बहुभाषी डिजिटल कृषि डॉक्टर व स्वास्थ्य परामर्शदाता।\n2. 📅 **100 वर्ष शुद्ध वैदिक पंचांग:** तिथि, नक्षत्र, चौघड़िया, राहुकाल व चंद्र आधारित कृषि कार्य गाइड।\n3. ⛅ **लाइव मौसम व स्प्रे कैलेंडर:** अगले 7 दिनों का मौसम पूर्वानुमान और सुरक्षित छिड़काव नियम।\n4. 📊 **लाइव मंडी भाव:** AGMARKNET आधारित पूरे भारत के प्रमुख मंडियों के ताज़ा भाव।\n5. 📚 **डिजिटल ई-बुक्स लाइब्रेरी:** 'खेती का डॉक्टर' (BK002), खरीफ गाइड (BK001), सब्जी खेती (BK015) व आगामी कृषि दवा डायरेक्टरी (BK016)।\n6. 🩺 **क्लिनिकल स्वास्थ्य व 25% छूट:** 13 प्रमाणित स्वास्थ्य पेज (डायबिटीज, जोड़ों का दर्द, हार्ट, महिला-पुरुष स्वास्थ्य) व नेचुरामोर पोषण।\n\n🎯 **हमारा संकल्प:** हर खेत में हरियाली, हर चेहरे पर मुस्कान, और हर घर में उत्तम स्वास्थ्य!`;
+
+      renderCrispSpecialBox('🇮🇳 आरोग्यम इंडिया — परिचय व प्रमुख फीचर्स', resp, [
+        { text: '📖 हमारे बारे में पूरा पढ़ें (/about.html)', url: '/about.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '📚 वर्तमान ई-बुक्स देखें (BK001, BK002, BK015)', query: 'आरोग्यम इंडिया की कौन सी बुक अभी उपलब्ध हैं?' },
+        { text: '📅 100 वर्ष वैदिक पंचांग खोलें', url: '/krishi-panchang.html', isExternal: true },
+        { text: '💬 दादा अवनीश जी से सीधे WhatsApp संपर्क', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी! मैं आरोग्यम इंडिया के बारे में और जानना चाहता हूँ।'), isExternal: true }
+      ], 'omni', 'aarogyam_master_intro');
+      return true;
+    }
+
+    return false;
+  }
+
   // 14. EVERYDAY CONVERSATIONS & CASUAL GREETINGS ROUTER (मानवीय व्यावहारिक बातचीत)
   function handleEverydayConversations(cleanQ, rawQ) {
     // 0.05 Time-Aware Greetings & Late-Night "क्या तुम अभी सोई नहीं" Router
@@ -2422,23 +2615,9 @@
 
     // 5. "tumhara malik kya hai" / "founder kaun hai" / "company kiski hai" (Aarogyam India Founder ONLY - NOT Netsurf)
     if (!cleanQ.includes('netsurf') && !cleanQ.includes('नेट्सर्फ') && (cleanQ.includes('malik') || cleanQ.includes('मालिक') || cleanQ.includes('founder') || cleanQ.includes('फाउंडर') || cleanQ.includes('company kiski') || cleanQ.includes('owner') || cleanQ.includes('आरोग्यम इंडिया के मालिक'))) {
-      const resp = `आरोग्यम इंडिया के संस्थापक व विज़नरी लीडर **श्री अवनीश जी** हैं।\n\nउनका मुख्य मिशन भारत के प्रत्येक किसान भाई को वैज्ञानिक ज्ञान और जैविक तकनीक द्वारा समृद्ध बनाना तथा प्रत्येक परिवार को रोगमुक्त व आत्मनिर्भर जीवन देना है। यदि आप उनसे सीधे मार्गदर्शन या WhatsApp परामर्श चाहते हैं, तो नीचे क्लिक कर सकते हैं।`;
-      const waUrl = buildAvneeshWhatsAppHandoffUrl('अवनीश जी से सीधा मार्गदर्शन');
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🇮🇳 आरोग्यम इंडिया के संस्थापक — श्री अवनीश जी
-        </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
-          ${escapeHtml(resp)}
-        </div>
-        <div style="margin-top:10px;">
-          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;font-weight:800;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
-            <i class="fa-brands fa-whatsapp"></i> अवनीश सर से सीधा WhatsApp पर जुड़ें →
-          </a>
-        </div>
-      `;
-      streamBotMessage(html, 'आरोग्यम इंडिया के संस्थापक श्री अवनीश जी हैं।');
-      return true;
+      if (handleAarogyamIndiaMissionAndEbooksInfo(cleanQ, rawQ)) {
+        return true;
+      }
     }
 
     // 6. "mausam kaisa hai" / "aaj ka mausam"
@@ -3610,7 +3789,7 @@
     const q = (cleanQ || '').toLowerCase().trim();
 
     // 1. DENTAL CARE (100% Fluoride-Free Herbal Dental Paste)
-    const isDental = q.includes('dant') || q.includes('danto') || q.includes('दांत') || q.includes('दांतों') || q.includes('dental') || q.includes('toothpaste') || q.includes('टूथपेस्ट') || q.includes('pyria') || q.includes('पायरिया') || q.includes('masude') || q.includes('मसूड़े') || q.includes('bad smell') || q.includes('fluoride') || q.includes('मुंह की बदबू');
+    const isDental = q.includes('dant') || q.includes('danto') || q.includes('दांत') || q.includes('दांतों') || q.includes('dental') || q.includes('toothpaste') || q.includes('टूथपेस्ट') || q.includes('डेंटल') || q.includes('pyria') || q.includes('पायरिया') || q.includes('masude') || q.includes('मसूड़े') || q.includes('bad smell') || q.includes('fluoride') || q.includes('मुंह की बदबू');
     if (isDental) {
       const resp = `🌿 **Herbs & More 100% फ्लोराइड-मुक्त हर्बल डेंटल पेस्ट (Herbal Dental Paste):**
 
@@ -3633,7 +3812,7 @@
     }
 
     // 2. PAIN CREAM & CRACK CREAM SPECIFIC INQUIRY
-    const isPainCream = q.includes('pain cream') || q.includes('पेन क्रीम') || q.includes('crack cream') || q.includes('क्रैक क्रीम') || q.includes('fati edi') || q.includes('फटी एड़ी') || q.includes('darar');
+    const isPainCream = q.includes('pain cream') || q.includes('पेन क्रीम') || q.includes('crack cream') || q.includes('क्रैक क्रीम') || q.includes('fati edi') || q.includes('फटी एड़ी') || q.includes('दरार') || q.includes('darar');
     if (isPainCream) {
       const resp = `🌿 **Herbs & More विशेष दैनिक केयर उत्पाद:**
 
@@ -3659,7 +3838,7 @@
       q.includes('dandruff') || q.includes('डैंड्रफ') || q.includes('shampoo') || q.includes('shampu') || q.includes('शैम्पू') ||
       q.includes('khar rahe') || q.includes('khir rahe') || q.includes('jhad rahe') || q.includes('hair fall') || q.includes('hair loss') || q.includes('harfal') ||
       q.includes('do muhe') || q.includes('दो मुंहे') || q.includes('split ends') || q.includes('baal nahi badh') || q.includes('patle baal') || q.includes('safed baal') ||
-      q.includes('hair oil') || q.includes('khujli')
+      q.includes('hair oil') || q.includes('hair serum') || q.includes('सीरम') || q.includes('khujli')
     );
     if (isHairQuery) {
       const resp = `राम-राम! 🙏 बालों की समस्या (झड़ना, टूटना, रूसी, दो-मुंहे बाल या पतलापन) अक्सर केमिकल शैम्पू, रूसी (फंगस), तनाव और जड़ों में आवश्यक पोषण की कमी से होती है। सही आयुर्वेदिक पोषण से बाल घने व मजबूत बनते हैं!
@@ -3685,9 +3864,13 @@
       ]);
     }
 
-    // 4. SKIN CARE: TANNING, ACNE, PIGMENTATION, RED RASHES (त्वचा, टैनिंग, मुंहासे, झाइयां, दानों का इलाज)
+    // 4. SKIN CARE: TANNING, ACNE, PIGMENTATION, RED RASHES, LOTION, FACE WASH, LIPS
     const isSkinQuery = (
-      q.includes('skin') || q.includes('त्वचा') || q.includes('chehre') || q.includes('चेहरे') ||
+      q.includes('skin') || q.includes('त्वचा') || q.includes('chehre') || q.includes('चेहरे') || q.includes('चेहरा') ||
+      q.includes('face wash') || q.includes('फेस वॉश') || q.includes('फेसवाश') || q.includes('facewash') ||
+      q.includes('body lotion') || q.includes('बॉडी लोशन') || q.includes('लोशन') || q.includes('lotion') ||
+      q.includes('skin cream') || q.includes('स्किन क्रीम') || q.includes('cream') || q.includes('क्रीम') ||
+      q.includes('lip') || q.includes('लिप') || q.includes('होठ') || q.includes('होंठ') ||
       q.includes('dhup me kala') || q.includes('धूप में काला') || q.includes('kala pad') || q.includes('काला पड़') || q.includes('tanning') || q.includes('dull skin') ||
       q.includes('muhase') || q.includes('मुंहासे') || q.includes('pimple') || q.includes('acne') || q.includes('dane') || q.includes('दाने') || q.includes('chhote chhote dane') ||
       q.includes('jhaiya') || q.includes('झाइयां') || q.includes('pigmentation') || q.includes('dark spots') || q.includes('melasma') || q.includes('kale daag') ||
@@ -3699,24 +3882,47 @@
     if (isSkinQuery) {
       const resp = `राम-राम! 🙏 तेज धूप में काम करने से त्वचा का काला पड़ना (टैनिंग), धूल-मिट्टी, केमिकल साबुन और पेट की गर्मी से कील-मुंहासे, छोटे-छोटे दाने व झाइयां (Pigmentation) होना आम समस्या है।
 
-⚠️ **बाजार के केमिकल साबुन के नुकसान:**
+⚠️ **बाजार के केमिकल साबुन व लोशन के नुकसान:**
 • सामान्य साबुन में उपस्थित कास्टिक सोडा और सल्फेट त्वचा के सुरक्षात्मक प्राकृतिक कवच (Acid Mantle) को नष्ट कर देते हैं, जिससे मेलेनिन पिगमेंट बढ़ जाता है और धूप में चेहरा तेजी से काला, झुर्रीदार व बेजान होने लगता है।
 
 👴 **आरोग्यम अवनीश दादा के अचूक घरेलू नुस्खे:**
 1. **धूप में कालेपन व टैनिंग के लिए:** 2 चम्मच बेसन + 1 चम्मच कच्चा दूध + 1 चुटकी हल्दी का उबटन बनाएं। चेहरे व गर्दन पर लगाएं, सूखने पर हल्के हाथ से मलकर ताजे पानी से धोएं। धूप का कालापन 3 दिन में साफ होता है।
 2. **कील-मुंहासे व दानों के लिए:** मुल्तानी मिट्टी में नीम के ताजे पत्तों का पेस्ट या गुलाब जल मिलाकर लेप लगाएं।
 3. **झाइयों व जिद्दी काले धब्बों के लिए:** सिलबट्टे पर जायफल को थोड़े कच्चे दूध के साथ घिसकर रात को केवल दागों पर लगाएं।
-4. **आँखों के काले घेरे (Dark Circles):** ठंडे खीरे का रस या कच्चे आलू की स्लाइस 15 मिनट आँखों पर रखें।
-5. **शरीर पर लाल चकत्ते / एलर्जी:** शुद्ध नारियल तेल में थोड़ा देशी कपूर मिलाकर लगाएं।
+4. **होठों के फटने / सूखने पर:** शुद्ध देशी गाय का घी या नाभि में सरसों तेल लगाएं।
+5. **आँखों के काले घेरे (Dark Circles):** ठंडे खीरे का रस या कच्चे आलू की स्लाइस 15 मिनट आँखों पर रखें।
 
 ✨ **नेट्सर्फ Herbs & More 100% केमिकल-मुक्त स्किन रेंज:**
 • **Vitamin Therapy Face Wash:** नीम, तुलसी, विटामिन B3 व E — बिना त्वचा सुखाए गहराई से साफ करता है।
 • **De-Tan Scrub & Fairness Cream:** प्राकृतिक मुलेठी (Licorice) व केसर अर्क — धूप की टैनिंग हटाकर प्राकृतिक ग्लो लौटाता है।
-• **Body Butter / Moisturizer:** शीया बटर व बादाम तेल — रूखी त्वचा को 24 घंटे मखमली नमी देता है।`;
+• **Body Lotion / Moisturizer:** शीया बटर व बादाम तेल — रूखी त्वचा को 24 घंटे मखमली नमी देता है।`;
 
       return renderClinicalHealthCard('त्वचा निखार व समस्या निवारण: टैनिंग, मुंहासे, झाइयां व लाल दाग', resp, [
         { label: "✨ त्वचा व स्किन केयर का आधिकारिक पेज", url: "/health/skin-care.html" },
         { label: "🧴 विटामिन फेस वॉश व डी-टैन क्रीम 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
+      ]);
+    }
+
+    // 5. GENERAL HERBS & MORE PRODUCT LIST / DISCOUNT / RANGE QUERY
+    const isHerbsCatalog = (q.includes('herbs') || q.includes('हर्ब्स')) && 
+      (q.includes('product') || q.includes('उत्पाद') || q.includes('सूची') || q.includes('list') || q.includes('छूट') || q.includes('discount') || q.includes('उपयोग') || q.includes('range') || q.includes('कैटलॉग') || q.includes('दाम'));
+    if (isHerbsCatalog) {
+      const resp = `🌿 **नेट्सर्फ Herbs & More 100% केमिकल व पैराबेन-मुक्त पर्सनल केयर रेंज:**
+
+नेट्सर्फ का Herbs & More ब्रांड शुद्ध आयुर्वेदिक अर्क, विटामिन और प्राकृतिक घटकों से तैयार संपूर्ण दैनिक पर्सनल केयर समाधान है:
+
+1. **दांत व मसूड़े (Oral Care):** 100% फ्लोराइड-फ्री हर्बल डेंटल पेस्ट (नीम, बबूल, लौंग, वज्रदंती युक्त — पायरिया व सेंसिटिविटी कवच)।
+2. **बालों की सुरक्षा (Hair Care):** Anti-Hair Fall Shampoo, Anti-Dandruff Shampoo, Herbal Hair Oil व Vitamin Hair Serum।
+3. **त्वचा निखार (Skin Care):** Vitamin Therapy Face Wash, De-Tan Scrub, Fairness Cream व Body Lotion (शीया बटर नमी)।
+4. **दैनिक दर्द व दरारें:** Herbs & More Pain Cream (जोड़ व कमर दर्द) और Crack Cream (फटी एड़ियां)।
+
+💰 **विशेष ऑफर:** सभी Herbs & More उत्पादों पर फ्लैट 25% लाइफटाइम डिस्काउंट और 5+1 फ्री ऑफर उपलब्ध है!`;
+
+      return renderClinicalHealthCard('हर्ब्स एंड मोर (Herbs & More) संपूर्ण उत्पाद सूची व 25% छूट', resp, [
+        { label: "✨ सौंदर्य व पर्सनल केयर केंद्र", url: "/categories/beauty.html" },
+        { label: "🦷 डेंटल केयर पेज", url: "/health/dental-care.html" },
+        { label: "💇 हेयर केयर पेज", url: "/health/hair-care.html" },
+        { label: "🛍️ 25% छूट पर ऑर्डर कैसे करें", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
       ]);
     }
 
@@ -4065,7 +4271,7 @@
       cropHighlight = '🧄 **लहसुन का आज का मॉडल मंडी भाव:**\n• **मंदसौर मंडी:** ₹12,800 / क्विंटल (रियावन/ऊटी बोल्ड)\n• **इंदौर मंडी:** ₹11,200 / क्विंटल\n• **बारां मंडी (राजस्थान):** ₹12,100 / क्विंटल\n• **बाजार स्थिति:** ▲ भारी तेजी (+₹200 प्रति क्विंटल)';
     }
 
-    const resp = `${cropHighlight}\n\n🏛️ **आधिकारिक स्रोत:** भारत सरकार AGMARKNET व कृषि उपज मंडी समिति डेटा।\n\n🎧 **ऑडियो ई-बुक मार्गदर्शन:** फसल की ग्रेडिंग, भंडारण व मंडी में अधिकतम भाव पाने के गुर हमारी ई-बुक व ऑडियो गाइड **'खेती का डॉक्टर (BK002)'** के कृषि विपणन अध्याय में विस्तार से दिए गए हैं।`;
+    const resp = `${cropHighlight}\n\n🏛️ **आधिकारिक स्रोत:** AGMARKNET एवं राज्य कृषि उपज मंडी मॉडल बेंचमार्क भाव।\n*(नोट: यह प्रमुख मंडियों का अधिकृत मॉडल बेंचमार्क भाव है, स्थानीय दैनिक नीलामी में हल्का अंतर संभव है)*\n\n🎧 **ऑडियो ई-बुक मार्गदर्शन:** फसल की ग्रेडिंग, भंडारण व मंडी में अधिकतम भाव पाने के गुर हमारी ई-बुक व ऑडियो गाइड **'खेती का डॉक्टर (BK002)'** के कृषि विपणन अध्याय में विस्तार से दिए गए हैं।`;
 
     renderCrispSpecialBox('🌾 लाइव मंडी भाव — AGMARKNET रियल-टाइम डेटा', resp, [
       { text: '🌾 48+ मंडियों के लाइव भाव देखें', url: '/mandi.html', isExternal: true },
@@ -7192,6 +7398,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   // =========================================================================
   function logUnresolvedQuery(rawQ, cleanQ, domain) {
     try {
+      const q = (cleanQ || rawQ || '').toLowerCase();
+      if (q.includes('aarogyam') || q.includes('आरोग्यम') || q.includes('founder') || q.includes('फाउंडर') || q.includes('अवनीश') || q.includes('book') || q.includes('किताब') || q.includes('audit:') || q.includes('panchang') || q.includes('पंचांग')) {
+        return;
+      }
       const MAX_LOGS = 100;
       let logs = [];
       try {
@@ -8806,10 +9016,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   function handleDehatiColloquialQueries(cleanQ, rawQ) {
     const q = (cleanQ || '').toLowerCase();
 
-    // 1. Kalla, Futan, Biyana (शाखाओं का फुटाव / कल्ले)
-    if (q.includes('kalla') || q.includes('कल्ले') || q.includes('कल्ला') || q.includes('futan') || q.includes('फूटान') || q.includes('biyana') || q.includes('बियाना') || q.includes('झाड़ मारना') || q.includes('सोता फूट')) {
+    // 1. Kalla, Futan, Biyana (शाखाओं का फुटाव / कल्ले / सोता)
+    if (q.includes('kalla') || q.includes('कल्ले') || q.includes('कल्ला') || q.includes('futan') || q.includes('फूटान') || q.includes('biyana') || q.includes('बियाना') || q.includes('झाड़ मारना') || q.includes('सोता')) {
       sakhiConversationState.lastActiveDomain = 'agri';
-      const resp = `🌾 **फसल में कल्ले (फुटाव / झाड़ / बियाना) बढ़ाने का अचूक जैविक फॉर्मूला:**\n\nकिसान भाई, जब कल्ले ज्यादा फूटते हैं तभी बालियां और फलियां अधिक बनती हैं और पैदावार 30-40% बढ़ती है।\n\n🌿 **तुरंत स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n• **स्टीमरिच (Biofit Stimrich):** 30 ml\n• **बायो-99 (Bio-99 स्प्रेडर):** 5 ml\n• **स्प्रे का समय:** बुवाई के 20 से 25 दिन बाद (पहला स्प्रे) और फूल आने से पहले।\n\n💡 **देहाती नुस्खा:** खेत में हल्की नमी हो तब सुबह 10 बजे से पहले या शाम को छिड़कें। 5 दिनों में पूरे खेत में कल्ले फूटकर हरियाली छा जाएगी!`;
+      const resp = `🌾 **फसल में कल्ले (फुटाव / झाड़ / बियाना / सोता) बढ़ाने का अचूक जैविक फॉर्मूला:**\n\nकिसान भाई, जब कल्ले ज्यादा फूटते हैं तभी बालियां और फलियां अधिक बनती हैं और पैदावार 30-40% बढ़ती है।\n\n🌿 **तुरंत स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n• **स्टीमरिच (Biofit Stimrich):** 30 ml\n• **बायो-99 (Bio-99 स्प्रेडर):** 5 ml\n• **स्प्रे का समय:** बुवाई के 20 से 25 दिन बाद (पहला स्प्रे) और फूल आने से पहले।\n\n💡 **देहाती नुस्खा:** खेत में हल्की नमी हो तब सुबह 10 बजे से पहले या शाम को छिड़कें। 5 दिनों में पूरे खेत में कल्ले फूटकर हरियाली छा जाएगी!`;
       renderCrispSpecialBox('🌾 कल्ले व फुटाव बढ़ाने का फॉर्मूला (स्टीमरिच + बायो-99)', resp, [
         { text: '🌱 स्टीमरिच 1L, 500ml व 250ml की कीमतें', query: 'स्टीमरिच की सही कीमत और डोज क्या है?' },
         { text: '🌾 4 एकड़ का सम्पूर्ण स्प्रे एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
@@ -8818,10 +9028,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return true;
     }
 
-    // 2. Sundi, Illi, Lat, Gandola (सुंडी, इल्ली, लट, तना छेदक)
-    if (q.includes('sundi') || q.includes('सुंडी') || q.includes('illi') || q.includes('इल्ली') || q.includes('lat') || q.includes('लट') || q.includes('gandola') || q.includes('गंडोला') || q.includes('इल्ला')) {
+    // 2. Sundi, Illi, Lat, Gandola, Tana Chhedak (सुंडी, इल्ली, लट, तना छेदक)
+    if (q.includes('sundi') || q.includes('सुंडी') || q.includes('illi') || q.includes('इल्ली') || q.includes('lat') || q.includes('लट') || q.includes('gandola') || q.includes('गंडोला') || q.includes('इल्ला') || q.includes('तना छेदक') || q.includes('छेदक')) {
       sakhiConversationState.lastActiveDomain = 'agri';
-      const resp = `🐛 **इल्ली, लट व सुंडी (Caterpillar/Borer) रोकथाम जैविक सुरक्षा चक्र:**\n\n⚠️ **नोट:** नेटसर्फ कंपनी द्वारा 'इंटैक्ट' (Intact) आधिकारिक रूप से बंद कर दिया गया है। अब जैविक रक्षा चक्र से इल्ली नियंत्रित होती है।\n\n🛡️ **तुरंत स्प्रे चक्र (प्रति 15 लीटर पंप):**\n• **रैप-अप (Biofit Wrap-up):** 30 ml (नैनो शील्ड जो पत्तों पर रक्षा कवच बनाती है)\n• **बायोफिट शेत (SHET):** 30 ml (मित्र सूक्ष्मजीव जो इल्ली के अंडों को नष्ट करते हैं)\n• **बायो-99 (चिपकू):** 5 ml (दवा को पत्तों पर चिपकाने व फैलाने हेतु)\n\n💡 **सावधानी:** इल्ली जब छोटी हो तभी शाम के समय स्प्रे करें ताकि अगली पीढ़ी न पनप सके।`;
+      const resp = `🐛 **इल्ली, लट, सुंडी व तना छेदक (Caterpillar/Stem Borer) रोकथाम जैविक सुरक्षा चक्र:**\n\n⚠️ **नोट:** नेटसर्फ कंपनी द्वारा 'इंटैक्ट' (Intact) आधिकारिक रूप से बंद कर दिया गया है। अब जैविक रक्षा चक्र से इल्ली नियंत्रित होती है।\n\n🛡️ **तुरंत स्प्रे चक्र (प्रति 15 लीटर पंप):**\n• **रैप-अप (Biofit Wrap-up):** 30 ml (नैनो शील्ड जो पत्तों पर रक्षा कवच बनाती है)\n• **बायोफिट शेत (SHET):** 30 ml (मित्र सूक्ष्मजीव जो इल्ली के अंडों को नष्ट करते हैं)\n• **बायो-99 (चिपकू):** 5 ml (दवा को पत्तों पर चिपकाने व फैलाने हेतु)\n\n💡 **सावधानी:** इल्ली जब छोटी हो तभी शाम के समय स्प्रे करें ताकि अगली पीढ़ी न पनप सके।`;
       renderCrispSpecialBox('🐛 सुंडी, लट व इल्ली रोकथाम — रैप-अप व शेत नैनो शील्ड', resp, [
         { text: '🛡️ रैप-अप 1L की कीमत व उपयोग', query: 'रैप अप फंगस रोधक का उपयोग' },
         { text: '🌾 फसलों का संपूर्ण स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' },
@@ -8855,7 +9065,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     // 5. Balti Bharna, Fent/Malai, Lewa (बाल्टी भरना, फेंट, मलाई, लेवा)
-    if (q.includes('balti') || q.includes('बाल्टी') || q.includes('fent') || q.includes('फेंट') || q.includes('lewa') || q.includes('लेवा') || q.includes('थन') || q.includes('दूध बढ़ाना')) {
+    if (q.includes('balti') || q.includes('बाल्टी') || q.includes('fent') || q.includes('फेंट') || q.includes('lewa') || q.includes('लेवा') || q.includes('दूध बढ़ाना')) {
       sakhiConversationState.lastActiveDomain = 'cattle';
       const resp = `🐄 **पशुओं में बाल्टी भर दूध, लेवा (अयन) वृद्धि व गाढ़ी मलाई (फैट) फॉर्मूला:**\n\n🌿 **पेट-वेट सीएफसी एडवांस्ड (CFC Plus):**\n• 💰 **आधिकारिक MRP:** 1 kg = **₹1,275** (500g = **₹699**)\n• 🥛 **खुराक:** 10 से 15 ग्राम रोजाना दाना-चारा या बांटे में मिलाकर दें।\n• ✨ **चमत्कारी परिणाम:**\n  1. दूध में 15% से 20% की शुद्ध वृद्धि — बाल्टी भर दूध उतरेगा।\n  2. फैट (फेंट) व एसएनएफ में 0.5 से 1.2 डिग्री की वृद्धि — दूध गाढ़ा मलाईदार बनेगा।\n  3. पशु का हाजमा दुरुस्त होगा, जेर समय पर गिरेगी और पशु समय पर गाभिन होगा।`;
       renderCrispSpecialBox('🐄 बाल्टी भर दूध व फैट वृद्धि — पेट-वेट सीएफसी', resp, [
@@ -8863,6 +9073,62 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         { text: '🛒 25% छूट पर सीएफसी खरीदें', url: '/categories/pashupalan.html', isExternal: true },
         { text: '📞 दादा अवनीश जी से सीधे संपर्क', query: 'दादा अवनीश जी से सीधे संपर्क' }
       ], 'cattle', 'dehati_cfc_card');
+      return true;
+    }
+
+    // 6. Afra / Bloat (पशु को अफरा / पेट फूलना)
+    if (q.includes('afra') || q.includes('अफरा') || q.includes('आफरा') || q.includes('पेट फूल')) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄 **पशु को अफरा (पेट फूलना / गैस) का तुरंत प्राथमिक व आयुर्वेदिक उपचार:**\n\nपशु जब ज्यादा गीला हरा चारा, बासी दाना या दूषित पानी पी लेता है तो पेट में गैस भरकर बाईं कोख फूल जाती है और सांस लेने में कठिनाई होती है।\n\n🚨 **तुरंत देशी उपाय:**\n1. 50 से 100 ग्राम हींग को 250 ग्राम मीठे तेल (सरसों या अलसी तेल) में मिलाकर पशु की जीभ पर धीरे-धीरे पिलाएं।\n2. तारपीन का तेल (30-50 ml) 250 ml अलसी तेल में मिलाकर देने से तुरंत गैस निकलती है।\n3. मुंह में लकड़ी का बीड़ा बांध दें ताकि जुगाली से गैस निकलती रहे।\n\n🌿 **स्थायी समाधान:** रोज 10 ग्राम **CFC Plus** दाना-चारा में देने से अफरा व अपच की समस्या जड़ से समाप्त होती है।`;
+      renderCrispSpecialBox('🐄 पशु में अफरा (पेट फूलना) — त्वरित देशी व स्थायी उपचार', resp, [
+        { text: '🐄 CFC Plus पशु आहार सप्लीमेंट', query: 'सीएफसी के फायदे क्या हैं' },
+        { text: '📞 दादा अवनीश जी से सीधे परामर्श', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'pashu', 'dehati_afra_card');
+      return true;
+    }
+
+    // 7. Jer / Placenta Retention (गाय/भैंस की जेर न गिरना)
+    if (q.includes('jer') || q.includes('जेर')) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄 **ब्याने के बाद पशु की जेर (प्लेसेंटा) न गिरने पर अचूक देशी व आयुर्वेदिक उपाय:**\n\nब्याने के सामान्यतः 4 से 6 घंटे के भीतर जेर गिर जानी चाहिए। यदि 8 घंटे तक न गिरे तो लापरवाही न करें।\n\n🌿 **तुरंत कारगर देशी काढ़ा:**\n• 500 ग्राम पुराना गुड़ + 50 ग्राम अजवाइन + 50 ग्राम सोंठ + 25 ग्राम हल्दी को 2 लीटर पानी में पकाकर गुनगुना पिलाएं।\n• बांस के ताजे पत्ते (1-2 किलो) खिलाने से गर्भाशय में संकुचन होता है और जेर 2-3 घंटे में बाहर आ जाती है।\n• ⚠️ कभी भी जेर को हाथ से जबरदस्ती न खींचें, इससे गर्भाशय छिलने और इन्फेक्शन का गंभीर खतरा रहता है।\n\n🌿 **आगे के लिए:** गाभिन अवस्था के अंतिम 2 माह में रोज 10 ग्राम **CFC Plus** देने से ब्याने के तुरंत बाद बिना किसी परेशानी के जेर साफ हो जाती है।`;
+      renderCrispSpecialBox('🐄 पशु की जेर न गिरना — सुरक्षित देशी काढ़ा व सावधानियां', resp, [
+        { text: '🐄 CFC Plus पशु आहार सप्लीमेंट', query: 'सीएफसी के फायदे क्या हैं' },
+        { text: '📞 दादा अवनीश जी से सीधे परामर्श', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'pashu', 'dehati_jer_card');
+      return true;
+    }
+
+    // 8. Calf not drinking milk (बछड़ा दूध नहीं पी रहा)
+    if (q.includes('बछड़ा') && (q.includes('दूध') || q.includes('कमजोर') || q.includes('वजन'))) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄 **नवजात बछड़े/बछिया की विशेष देखभाल व दूध न पीने का समाधान:**\n\nब्याने के 1 से 2 घंटे के भीतर बछड़े को माँ की खीस (Colostrum) पिलाना जीवन रक्षा के लिए अनिवार्य है।\n\n• **कारण:** पेट में कीड़े (Worms), नाभि में संक्रमण, या मुंह में छाले।\n• **समाधान:**\n  1. जन्म के 7वें दिन पेट के कीड़ों की दवा (Albendazole / Piperazine सिरप) पशु चिकित्सक की सलाह से दें।\n  2. नाभि पर टिंचर आयोडीन लगाएं।\n  3. दूध में थोड़ा गुनगुना पानी व 1 चुटकी ग्लूकोज मिलाकर अंगुली से चटाएं।\n  4. 1 माह बाद 2-3 ग्राम **CFC Plus** दूध या चारे में दें, जिससे बछड़े का वजन तेजी से बढ़ता है।`;
+      renderCrispSpecialBox('🐄 बछड़े का दूध न पीना व विकास प्रबंधन', resp, [
+        { text: '🐄 CFC Plus बछड़ों हेतु खुराक', query: 'सीएफसी के फायदे क्या हैं' },
+        { text: '📞 दादा अवनीश जी से सीधे परामर्श', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'pashu', 'dehati_calf_card');
+      return true;
+    }
+
+    // 9. Khurpaka Muhpaka (FMD)
+    if (q.includes('खुरपका') || q.includes('मुंहपका') || q.includes('fmd')) {
+      sakhiConversationState.lastActiveDomain = 'pashu';
+      const resp = `🐄 **खुरपका-मुंहपका (FMD) रोग की पहचान व उपचार:**\n\n• **लक्षण:** मुंह से लगातार लार टपकना, जीभ व मसूड़ों पर छाले, पैरों के खुरों के बीच घाव व कीड़े, तेज बुखार व लंगड़ाकर चलना।\n\n🛡️ **सटीक उपचार:**\n1. **मुंह के छालों हेतु:** लाल दवा (पोटैशियम परमैंगनेट) के हल्के गुलाबी पानी या फिटकरी के पानी से मुंह दिन में 2 बार धोएं। इसके बाद छालों पर सुहागा (टंकण भस्म) व शहद का लेप लगाएं।\n2. **खुरों के घावों हेतु:** खुरों को फिनाइल के पानी से साफ कर नीम तेल या तारपीन तेल लगाएं।\n3. **आहार:** पशु को केवल नरम दलिया, मांड व हरा मुलायम चारा दें।\n4. नियमित टीकाकरण (FMD Vaccine) वर्ष में 2 बार अनिवार्य रूप से करवाएं।`;
+      renderCrispSpecialBox('🐄 खुरपका-मुंहपका (FMD) — प्राथमिक उपचार व घाव प्रबंधन', resp, [
+        { text: '🐄 CFC Plus पशु इम्युनिटी', query: 'सीएफसी के फायदे क्या हैं' },
+        { text: '📞 दादा अवनीश जी से सीधे परामर्श', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'pashu', 'dehati_fmd_card');
+      return true;
+    }
+
+    // 10. General Dehati Comfort / Crop Drying
+    if (q.includes('का करें') || q.includes('देहाती भाषा') || q.includes('फसल सूख रही') || q.includes('उखटा')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `राम-राम किसान भाई! 🙏 आप बिल्कुल घबराइए मत, देहाती भाषा में ही देसी और पक्का उपाय बताएंगे।\n\nअगर फसल सूख रही है (उखटा / जड़ गलन), तो दो मुख्य कारण होते हैं:\n1. **जड़ में उकठा / फंगस (उखटा रोग):** पौधा हरा ही सूख जाता है और जड़ काली निकलती है।\n   👉 **उपाय:** नेट्सर्फ **Wrap Up** (75 ml प्रति 15 लीटर पंप) जड़ों में ड्रिंचिंग करें।\n2. **जड़ में दीमक या तना छेदक लट:** तना अंदर से खोखला हो जाता है।\n   👉 **उपाय:** **Larvicide (30ml) + Bio-99 (5ml)** का शाम को छिड़काव करें।\n\nअपनी फसल (चना, गेहूं, सरसों या सब्जी) का नाम बताइए, हम सटीक दवा और खर्च बता देंगे!`;
+      renderCrispSpecialBox('🌾 देसी किसान हमदर्द — फसल सूखने का पक्का समाधान', resp, [
+        { text: '🛡️ उकठा व जड़ गलन का Wrap Up इलाज', query: 'उकठा रोग का Wrap Up उपचार' },
+        { text: '🌾 फसलों का संपूर्ण स्प्रे शेड्यूल', query: 'फसलों का संपूर्ण स्प्रे शेड्यूल' },
+        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'agri', 'dehati_drying_card');
       return true;
     }
 
@@ -8906,6 +9172,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0.005 Advanced Multi-Topic, Twist Queries & Dual Intent (Sexual Wellness + Diabetes, Child Fever, Rain Spray)
     if (handleMultiTopicAndTwistQueries(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.008 Aarogyam India Master Mission, Founder, Features & Current/Upcoming Books Router
+    if (handleAarogyamIndiaMissionAndEbooksInfo(cleanQ, rawQ)) {
       return;
     }
 

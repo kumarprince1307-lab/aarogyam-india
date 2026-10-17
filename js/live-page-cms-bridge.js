@@ -323,9 +323,10 @@
   function renderDynamicHeroSlides(pageConfig) {
     if (!Array.isArray(pageConfig.hero_slides) || pageConfig.hero_slides.length === 0) return;
     const carouselContainer = document.getElementById('ns-hero-carousel') ||
+                              document.getElementById('sec-hero-slider') ||
+                              document.getElementById('panchang-admin-hero-slider') ||
                               document.querySelector('.bighaat-carousel-container') || 
-                              document.querySelector('.home-hero-section') || 
-                              document.getElementById('sec-hero-slider');
+                              document.querySelector('.home-hero-section');
     if (!carouselContainer) return;
 
     const validSlides = pageConfig.hero_slides.filter(s => s && (s.image || s.image_preview));
