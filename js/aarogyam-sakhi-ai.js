@@ -1660,7 +1660,17 @@
   let sakhiProductsData = null;
 
   // 9. KNOWLEDGE BASE LOADER (WITH PERSISTENT CACHE BUSTING)
+  let sakhiMasterKnowledge = null;
+
   async function loadKnowledgeBase() {
+    try {
+      const mRes = await fetch('/data/sakhi-master-knowledge.json?v=20261017_master');
+      if (mRes.ok) {
+        sakhiMasterKnowledge = await mRes.json();
+      }
+    } catch (e) {
+      console.warn('Master knowledge load error:', e);
+    }
     try {
       const res = await fetch('/data/krishi-ai-knowledge.json?v=20261015_v121');
       if (res.ok) {
@@ -1730,10 +1740,58 @@
   window.clearSakhiChatHistory = window.startSakhiNewChat;
 
   // 10. CHAT UI INJECTION & MESSAGE STREAMER
+  // =========================================================================
+  // WHATSAPP-STYLE MESSAGE TIMESTAMPS & DATE DIVIDERS ENGINE
+  // =========================================================================
+  function formatMsgTime(ts) {
+    const d = ts ? new Date(ts) : new Date();
+    let hours = d.getHours();
+    const minutes = d.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minStr = minutes < 10 ? '0' + minutes : minutes;
+    return `${hours}:${minStr} ${ampm}`;
+  }
+
+  function getDateSeparatorLabel(ts) {
+    const d = ts ? new Date(ts) : new Date();
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (d.toDateString() === today.toDateString()) {
+      return '— आज (Today) —';
+    } else if (d.toDateString() === yesterday.toDateString()) {
+      return '— कल (Yesterday) —';
+    } else {
+      const options = { day: 'numeric', month: 'short', year: 'numeric' };
+      return `— ${d.toLocaleDateString('hi-IN', options)} —`;
+    }
+  }
+
+  let lastRenderedDateString = '';
+
+  function ensureDateSeparator(wrap, ts) {
+    if (!wrap) return;
+    const d = ts ? new Date(ts) : new Date();
+    const dateStr = d.toDateString();
+    if (lastRenderedDateString !== dateStr) {
+      lastRenderedDateString = dateStr;
+      const sep = document.createElement('div');
+      sep.className = 'sakhi-date-separator';
+      sep.style.cssText = 'text-align:center;margin:12px 0 8px;font-size:0.75rem;font-weight:700;color:#64748b;';
+      sep.innerHTML = `<span style="background:#f1f5f9;color:#475569;padding:4px 14px;border-radius:12px;border:1px solid #e2e8f0;display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,0.04);">${getDateSeparatorLabel(ts)}</span>`;
+      wrap.appendChild(sep);
+    }
+  }
+
   function appendUserMessage(text) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
+    const now = Date.now();
+    ensureDateSeparator(wrap, now);
     saveChatLogItem('user', text, '');
 
     const row = document.createElement('div');
@@ -1741,6 +1799,7 @@
     row.innerHTML = `
       <div class="sakhi-msg-bubble user-bubble">
         ${escapeHtml(text)}
+        <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(now)}</div>
       </div>
     `;
     wrap.appendChild(row);
@@ -1778,6 +1837,8 @@
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
+    const now = Date.now();
+    ensureDateSeparator(wrap, now);
     saveChatLogItem('bot', htmlContent, speechText || '');
 
     let finalHtml = htmlContent;
@@ -1792,6 +1853,10 @@
     row.innerHTML = `
       <div class="sakhi-msg-bubble">
         ${finalHtml}
+        <div class="sakhi-msg-time" style="font-size:0.68rem;color:#94a3b8;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:600;">
+          <span>${formatMsgTime(now)}</span>
+          <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
+        </div>
       </div>
     `;
     wrap.appendChild(row);
@@ -1930,13 +1995,26 @@
     // Restore saved chat history bubbles
     if (hasHistory) {
       savedLog.forEach(item => {
+        const itemTime = item.time || Date.now();
+        ensureDateSeparator(wrap, itemTime);
         const row = document.createElement('div');
         if (item.role === 'user') {
           row.className = 'sakhi-msg-row user';
-          row.innerHTML = `<div class="sakhi-msg-bubble user-bubble">${escapeHtml(item.content)}</div>`;
+          row.innerHTML = `
+            <div class="sakhi-msg-bubble user-bubble">
+              ${escapeHtml(item.content)}
+              <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(itemTime)}</div>
+            </div>`;
         } else {
           row.className = 'sakhi-msg-row bot';
-          row.innerHTML = `<div class="sakhi-msg-bubble">${item.content}</div>`;
+          row.innerHTML = `
+            <div class="sakhi-msg-bubble">
+              ${item.content}
+              <div class="sakhi-msg-time" style="font-size:0.68rem;color:#94a3b8;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:600;">
+                <span>${formatMsgTime(itemTime)}</span>
+                <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
+              </div>
+            </div>`;
         }
         wrap.appendChild(row);
       });
@@ -6640,8 +6718,219 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
+  // =========================================================================
+  // REVERSE & MYTH-BUSTER CROSS-QUERY ENGINE (10 CORE REVERSE INTENTS)
+  // Counters misconceptions e.g. "नेचुरामोर किस बीमारी की दवा है?", "सैलरी मिलती है क्या?", etc.
+  // =========================================================================
+  const EMBEDDED_REVERSE_QUESTIONS = [
+    {
+      id: "rv_naturamore_disease",
+      keywords: ["नेचुरामोर किस बीमारी", "नेचुरमोर किस बीमारी", "naturamore kis bimari", "नेचुरामोर कौन सी बीमारी", "naturamore dava hai kya", "नेचुरामोर दवा है क्या", "नेचुरामोर किस रोग", "naturamore bimari dawa"],
+      title: "🌿 नेचुरामोर: दवा नहीं, 100% प्राकृतिक पोषण सप्लीमेंट",
+      reality: "नेचुरामोर किसी बीमारी की रासायनिक दवा नहीं है, बल्कि यह शरीर का **100% प्राकृतिक पोषण (Nutritional Dietary Supplement)** है।\n\n💡 **यह कैसे काम करता है?**\n• यह शरीर में विटामिन, प्रोटीन, मिनरल्स व एंटीऑक्सीडेंट्स की कमी पूरी करता है।\n• रोग प्रतिरोधक क्षमता (Immunity) को इतना मजबूत बना देता है कि शरीर बीमारियों (जैसे कमजोरी, शुगर, जोड़ों का दर्द, थकान) से खुद लड़कर तेजी से रिकवर होने लगता है।\n• एलोपैथिक दवाओं की तरह इसका कोई साइड-इफेक्ट नहीं होता।",
+      chips: [
+        { text: "💊 नेचुरामोर फॉर मेन पाउडर", query: "नेचुरामोर फॉर मेन पाउडर के फायदे बताओ" },
+        { text: "🦴 जॉइंट केयर का 1 दिन का खर्च", query: "ज्वाइंट केयर का 1 दिन का खर्चा बताओ" },
+        { text: "🩸 डायबिटीज में 1 माह का खर्च", query: "डायबिटीज में 1 महीने का खर्च कितना आएगा" }
+      ],
+      domain: "health"
+    },
+    {
+      id: "rv_netsurf_fixed_salary",
+      keywords: ["100 लोग जोड़ने पर सैलरी", "फिक्स सैलरी मिलती है", "100 logon par salary", "fix salary milti hai", "sir ginne ke paise", "लोग जोड़ने के पैसे मिलते हैं", "mahine ki fix salary", "फिक्स इनकम"],
+      title: "💼 नेटसर्फ में सैलरी नहीं, टर्नओवर आधारित शुद्ध कमीशन",
+      reality: "नेटसर्फ में कोई फिक्स सैलरी या लोगों के सिर गिनने (Head Count) के पैसे नहीं मिलते। यह शुद्ध जैविक उत्पादों के टर्नओवर का व्यवसाय है।\n\n📊 **कमाई का वास्तविक गणित:**\n• यदि आपके 100 कंज्यूमर्स NetSurf World App से अपनी जरूरत के जैविक उत्पाद खरीदते हैं (मान लीजिए ₹1,20,000 नेट बिज़नेस हुआ):\n• तो 15% रिटेल स्लैब के अनुसार आपको **लगभग ₹15,000+ का साप्ताहिक/मासिक रिटेल कमीशन** मिलता है।\n• अगर कोई खरीदारी नहीं होती, तो कमीशन नहीं बनता। जितनी पात्र बिक्री, उतनी वास्तविक कमाई!",
+      chips: [
+        { text: "📱 ई-टेलर 15% कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { text: "🛍️ कंज्यूमर 25% छूट व 5 माह फ्री", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
+        { text: "👥 जनरेशन इनकम कैसे मिलती है?", query: "जनरेशन इनकम क्या होती है" }
+      ],
+      domain: "netsurf"
+    },
+    {
+      id: "rv_bio99_fertilizer_or_pest",
+      keywords: ["बायो 99 खाद है", "बायो 99 कीटनाशक है", "bio 99 khad hai", "bio 99 kitnashak hai", "बायो 99 क्या है खाद या दवा", "bio-99 dawa hai ya khad"],
+      title: "💧 Bio-99: खाद या कीटनाशक नहीं, 100% सिलिकॉन सुपर-स्प्रेडर व एक्टिवेटर",
+      reality: "Bio-99 न तो कोई खाद (उर्वरक) है और न ही कोई रासायनिक कीटनाशक।\n\n🔬 **Bio-99 की असली भूमिका:**\n• यह 100% सिलिकॉन आधारित **सुपर-स्प्रेडर, एक्टिवेटर और स्टिकर** है।\n• यह पानी के पृष्ठ तनाव (Surface Tension) को खत्म कर उसे पत्तों पर तुरंत फैला देता है।\n• जब आप इसे किसी भी कीटनाशक, फफूंदनाशी या टॉनिक में मिलाते हैं (मात्र 5ml प्रति 15L पंप):\n• तो दवा पत्तों में 30 मिनट में सोख ली जाती है, बारिश से धुलने से बचती है और दवा का असर 35% से 40% बढ़ जाता है!",
+      chips: [
+        { text: "🌱 स्टिमरिच ग्रोथ टॉनिक", query: "स्टिमरिच और बायो-99 की सही डोज क्या है?" },
+        { text: "🌾 गेहूं व चना स्प्रे कैलेंडर", query: "फसलों का स्प्रे कैलेंडर" },
+        { text: "🛒 Bio-99 ₹299 पैक ऑर्डर करें", query: "बायो-99 की सही डोज व उपयोग" }
+      ],
+      domain: "agri"
+    },
+    {
+      id: "rv_eteller_self_purchase",
+      keywords: ["ई-टेलर बनने के लिए सामान खरीदना जरूरी", "खुद सामान खरीदना पड़ेगा क्या", "eteller self purchase zaruri", "bina kharide eteller", "बिना सामान खरीदे जुड़ सकते हैं", "खुद खरीदारी अनिवार्य"],
+      title: "📱 ई-टेलर: ₹0 जॉइनिंग, खुद सामान खरीदने की कोई बाध्यता नहीं",
+      reality: "नेटसर्फ में ई-टेलर बनने और कमीशन प्राप्त करने के लिए **खुद सामान खरीदना बिल्कुल अनिवार्य नहीं है।**\n\n✨ **नियम एकदम स्पष्ट हैं:**\n• **₹0 जॉइनिंग:** केवल KYC (आधार/पैन व बैंक डिटेल) से आईडी चालू होती है।\n• **₹0 सेल्फ़-परचेज़:** आपको अपने घर में जबरदस्ती स्टॉक रखने या हर महीने खुद ऑर्डर लगाने की कोई शर्त नहीं है।\n• आप सीधे जरूरतमंद किसानों, परिवारों को ऐप से जोड़ते हैं और उनके ऑर्डर पर आपको **5% से 15% का साप्ताहिक रिटेल कमीशन** सीधे आपके बैंक खाते में मिलता है।\n• यदि आप अपनी जरूरत के लिए सामान लेना चाहें तो 25% छूट पर ले सकते हैं, लेकिन यह कमीशन की शर्त नहीं है।",
+      chips: [
+        { text: "📱 साप्ताहिक रिटेल कमीशन स्लैब्स", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { text: "👥 100 ग्राहक होने पर कमाई", query: "100 ग्राहक हों तो कितनी कमाई होगी" },
+        { text: "🤝 कोई न जुड़े तो क्या होगा?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
+      ],
+      domain: "netsurf"
+    },
+    {
+      id: "rv_petvet_sick_animal",
+      keywords: ["पेट वेट से बीमार पशु ठीक होगा", "पेट वेट बीमारी की दवा है", "pet vet bimari ki dawa", "cfc plus injection", "पशु की बीमारी में पेट वेट", "pet vet se rog theek hoga"],
+      title: "🐄 पेट-वेट (पूर्व CFC Plus): बीमारी की दवा नहीं, दैनिक पशु आहार पोषण",
+      reality: "पेट-वेट (Pet-Vet) पशुओं के गंभीर रोगों या बुखार की एलोपैथिक दवा नहीं है, बल्कि यह **दैनिक संपूर्ण जैविक पोषण सप्लीमेंट (Animal Feed Supplement)** है।\n\n🥛 **यह क्या लाभ देता है?**\n• यह पशु के रूमेन (पाचन तंत्र) में मित्र जीवाणुओं को बढ़ाता है जिससे पशु चारा पूरा पचाता है।\n• दूध उत्पादन में 15% से 25% की प्राकृतिक वृद्धि होती है और फैट 7 से 8 डिग्री तक बढ़ता है।\n• बांझपन (Repeat Breeding) की समस्या दूर होती है और पशु की त्वचा चमकदार बनती है।\n\n⚠️ **सावधानी:** यदि पशु को गंभीर बुखार या संक्रमण है, तो पशु चिकित्सक (Veterinary Doctor) से प्राथमिक उपचार कराएं। स्वास्थ्य सुधार के लिए पेट-वेट रोजाना 10-15 ग्राम चारे में दें।",
+      chips: [
+        { text: "🐄 2 भैंसों का दैनिक खर्च (₹20-25)", query: "मेरे दोस्त के पास दो भैंस है पेट वेट कितना दूं" },
+        { text: "📦 1kg, 500g, 250g रेट व छूट", query: "पेट वेट रेट और छूट" },
+        { text: "🥛 दूध व 7-8 फैट बढ़ाने के गुर", query: "पेट-वेट के घटक व फायदे" }
+      ],
+      domain: "pashu"
+    },
+    {
+      id: "rv_stimrich_chemical_fertilizer",
+      keywords: ["स्टिमरिच रासायनिक खाद है", "स्टिमरिच यूरिया है", "stimrich chemical hai", "स्टिमरिच केमिकल टॉनिक", "stimrich urea dap"],
+      title: "🌱 स्टिमरिच: रासायनिक खाद नहीं, 100% जैविक पादप ग्रोथ प्रमोटर",
+      reality: "स्टिमरिच कोई रासायनिक खाद (यूरिया/डीएपी) नहीं है, बल्कि यह **100% जैविक व प्राकृतिक पादप हार्मोन व ग्रोथ प्रमोटर** है।\n\n🌿 **इसके मुख्य काम:**\n• बीज का 95% से अधिक एकसमान फुटाव कराता है।\n• शाखाओं व कल्लों की संख्या दोगुनी करता है और फूलों को गिरने से रोकता है।\n• फलों व दानों का साइज, वजन व चमक 25-30% बढ़ाता है।\n• इससे मिट्टी की उर्वरता कभी खराब नहीं होती और यह मधुमक्खियों व मित्र कीटों के लिए पूरी तरह सुरक्षित है।",
+      chips: [
+        { text: "💧 स्टिमरिच + Bio-99 सही डोज", query: "स्टिमरिच और बायो-99 की सही डोज क्या है?" },
+        { text: "🌾 गेहूं व धान 4-चरण स्प्रे चार्ट", query: "गेहूं का स्प्रे कैलेंडर" },
+        { text: "🍅 सब्जी व टमाटर में उपयोग", query: "टमाटर कुकड़ा रोग व सब्जियां" }
+      ],
+      domain: "agri"
+    },
+    {
+      id: "rv_wrapup_insecticide",
+      keywords: ["रैप अप कीटनाशक है", "wrap up kitnashak hai", "रैप अप से कीड़े मरेंगे", "wrap up insect killer"],
+      title: "🛡️ Wrap Up: कीटनाशक नहीं, जैविक फंगस रोधक व पत्तियों का नैनो-कवच",
+      reality: "Wrap Up कीड़ों को मारने वाला कीटनाशक (Insecticide) नहीं है, बल्कि यह **पत्तियों और जड़ों पर सुरक्षा कवच बनाने वाला जैविक फफूंद रोधक (Bio-Fungicide)** है।\n\n🔬 **यह कैसे काम करता है?**\n• स्प्रे करने पर यह पत्तों पर एक पारदर्शी नैनो-लेयर (कवच) बना देता है, जिससे फंगस (उकठा, झुलसा, पाउडरी मिल्ड्यू) के बीजाणु पत्तों के अंदर प्रवेश नहीं कर पाते।\n• जड़ों में ड्रिंचिंग करने पर यह उकठा (Wilt / Fusarium) से 90% तक सुरक्षा देता है।\n• कीड़ों की रोकथाम हेतु इसके साथ **Intact (इंटैक्ट)** या **Larvicide** मिलाया जाता है।",
+      chips: [
+        { text: "🛡️ उकठा व जड़ गलन का पक्का इलाज", query: "उकठा रोग का Wrap Up उपचार" },
+        { text: "🐛 रसचूसक कीटों के लिए इंटैक्ट", query: "एंटीवायरल और लार्विसाइड कैसे काम करता है" },
+        { text: "🌾 फसलों का स्प्रे एस्टीमेट", query: "फसल का खर्च एस्टीमेट" }
+      ],
+      domain: "agri"
+    },
+    {
+      id: "rv_consumer_5plus1_single_month",
+      keywords: ["5+1 एक ही महीने में खरीदना है", "एक महीने में 5 सामान खरीदना जरूरी", "5 plus 1 ek mahine me", "ek hi bill me 5 kharid", "5 mahine kharid 6th month free"],
+      title: "🎁 5 महीने की लगातार खरीद = 6ठे महीने Lowest Bill का सामान 100% FREE",
+      reality: "छठा मुफ़्त उत्पाद पाने के लिए एक ही महीने में 5 उत्पाद खरीदना ज़रूरी नहीं है।\n\n📅 **कंपनी का नवीनतम 5-माह का नियम:**\n• जब आप लगातार 5 महीने तक अपनी जरूरत के अनुसार उत्पाद खरीदते हैं (हर महीने अलग-अलग उत्पाद व अलग-अलग MRP हो सकता है):\n• तो **6ठे महीने आपको पिछले 5 महीनों में से सबसे कम MRP वाली खरीद के बराबर का सामान बिल्कुल मुफ़्त (FREE)** मिलता है!\n• **उदाहरण:** यदि 5 महीनों में आपकी सबसे कम खरीद ₹1,500 की थी, तो छठे महीने ₹1,500 MRP तक का अपनी पसंद का उत्पाद मुफ़्त मिलेगा।",
+      chips: [
+        { text: "🛍️ कंज्यूमर 25% छूट व वाउचर लाभ", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
+        { text: "📱 ई-टेलर बनकर 15% कमीशन लें", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { text: "🚚 ₹4,000 पर मुफ़्त डिलीवरी", query: "कंज्यूमर को डिलीवरी फ्री कैसे मिलती है" }
+      ],
+      domain: "netsurf"
+    },
+    {
+      id: "rv_binary_total_sum_income",
+      keywords: ["बाइनरी में दोनों टीमों का जोड़ मिलता है", "team 1 team 2 jodkar commission", "binary me dono team ka sum", "matching aur kul turnover ek hai"],
+      title: "⚖️ बाइनरी इनकम: दोनों टीमों का जोड़ नहीं, बल्कि Matching पर मिलता है",
+      reality: "बाइनरी/टीम इनकम में Team 1 और Team 2 का टर्नओवर जोड़कर नहीं दिया जाता, बल्कि दोनों पक्षों के पात्र टर्नओवर की **Matching (जोड़ा)** की जाती है।\n\n📐 **सरल उदाहरण:**\n• Team 1 का टर्नओवर: ₹2,00,000\n• Team 2 का टर्नओवर: ₹1,00,000\n• **मैचिंग टर्नओवर:** **₹1,00,000** (इस ₹1 लाख पर लागू दर से कमीशन बनेगा)।\n• **अतिरिक्त टर्नओवर:** Team 1 का बचा हुआ ₹1,00,000 कभी लैप्स नहीं होता, बल्कि अगले चक्र के लिए **Carry Forward** हो जाता है।",
+      chips: [
+        { text: "⚖️ 2 लाख बाइनरी मैचिंग कमीशन", query: "अगर मेरे टीम 1 टीम 2 में 2 लाख की मैचिंग होती है तो मुझे कितना कमीशन मिलेगा" },
+        { text: "🏆 ₹8,19,250 पाक्षिक कैपिंग प्लान", query: "बाइनरी मैचिंग और ₹8,19,250 द्वैमासिक कैपिंग प्लान समझाइए" },
+        { text: "👥 जनरेशन इनकम (नो मैचिंग)", query: "जनरेशन इनकम क्या होती है" }
+      ],
+      domain: "netsurf"
+    },
+    {
+      id: "rv_capping_unlimited_overflow",
+      keywords: ["करोड़ों का बिजनेस होने पर अनलिमिटेड पैसा", "819250 se jyada binary payout", "capping ke upar commission", "capping limit cross hone par"],
+      title: "🏆 ₹8,19,250 पाक्षिक कैपिंग: संस्थागत सुरक्षा व कानूनी स्थिरता की गारंटी",
+      reality: "बाइनरी टीम मैचिंग में कंपनी की स्थिरता और कानूनी सुरक्षा हेतु **15-दिवसीय अधिकतम कैपिंग ₹8,19,250** तय है।\n\n🛡️ **कैपिंग का महत्व:**\n• चाहे आपकी दोनों टीमों में 15 दिन में ₹1 करोड़ या ₹5 करोड़ का भी टर्नओवर मैच हो जाए, उस 15-दिवसीय चक्र में बाइनरी मैचिंग से अधिकतम **₹8,19,250** ही मिलेगा (महीने का अधिकतम ₹16,38,500)।\n• यह सीमा कंपनी को कभी वित्तीय संकट (Financial Overload) में नहीं जाने देती।\n• **असीमित आय कहाँ है?** **Generation Income में कोई कैपिंग नहीं है!** वहाँ आप असीमित टर्नओवर पर 3% से 8% अनलिमिटेड कमा सकते हैं।",
+      chips: [
+        { text: "🏆 ₹8.19L कैपिंग प्लान देखें", query: "क्या सच में 819250 कैपिंग मिलती है?" },
+        { text: "👥 अनलिमिटेड जनरेशन इनकम", query: "जनरेशन इनकम क्या होती है" },
+        { text: "🛡️ क्या कंपनी 100% सुरक्षित है?", query: "नेटसर्फ की वास्तविकता और लीगल स्टेटस क्या है?" }
+      ],
+      domain: "netsurf"
+    }
+  ];
+
+  function handleReverseMythBusterQueries(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const mythList = (sakhiMasterKnowledge && sakhiMasterKnowledge.reverse_cross_questions) || EMBEDDED_REVERSE_QUESTIONS;
+
+    for (const item of mythList) {
+      if (item.keywords && item.keywords.some(kw => q.includes(kw.toLowerCase()))) {
+        const resp = `${item.reality}\n\n*नोट: यह स्पष्टीकरण ग्राहक की गलतफहमी दूर करने हेतु आधिकारिक नियमों के आधार पर दिया गया है।*`;
+        const chips = (item.chips || []).map(c => ({ text: c.text || c.label, query: c.query }));
+        renderCrispSpecialBox(item.title, resp, chips, item.domain || 'omni', item.id);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // =========================================================================
+  // UNRESOLVED QUERY LOGGER (SELF-LEARNING READINESS)
+  // =========================================================================
+  function logUnresolvedQuery(rawQ, cleanQ, domain) {
+    try {
+      const MAX_LOGS = 100;
+      let logs = [];
+      try {
+        const raw = localStorage.getItem('sakhi_unresolved_queries_log');
+        if (raw) logs = JSON.parse(raw) || [];
+      } catch (_) {}
+      logs.unshift({
+        query: rawQ,
+        clean: cleanQ,
+        domain: domain || 'unclassified',
+        time: Date.now(),
+        date: new Date().toLocaleString('hi-IN')
+      });
+      if (logs.length > MAX_LOGS) logs = logs.slice(0, MAX_LOGS);
+      localStorage.setItem('sakhi_unresolved_queries_log', JSON.stringify(logs));
+    } catch (_) {}
+  }
+
+  function handleDeveloperLogsQuery(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    if (q === 'aarogyam:logs' || q === 'sakhi:logs' || q === 'अनसुलझे सवाल' || q === 'अनसुलझे सवाल दिखाओ' || q === 'missing queries') {
+      let logs = [];
+      try {
+        const raw = localStorage.getItem('sakhi_unresolved_queries_log');
+        if (raw) logs = JSON.parse(raw) || [];
+      } catch (_) {}
+
+      if (logs.length === 0) {
+        renderCrispSpecialBox('📋 अनसुलझे सवालों की डायरी', 'अभी तक कोई अनसुलझा सवाल दर्ज नहीं हुआ है। सभी सवालों के सटीक उत्तर दिए गए हैं!', [
+          { text: '🌿 मुख्य मेन्यू खोलें', query: 'आरोग्यम सखी क्या-क्या कर सकती है?' }
+        ], 'omni', 'no_unresolved_logs');
+        return true;
+      }
+
+      const listText = logs.slice(0, 10).map((l, i) => `${i+1}. "${l.query}" (${l.date})`).join('\n');
+      const resp = `📋 **सखी AI अनसुलझे सवालों की डायरी (हालिया ${logs.length} सवाल):**\n\n${listText}\n\n💡 इन सवालों का विश्लेषण करके हम ज्ञानकोष को और समृद्ध बना सकते हैं।`;
+      renderCrispSpecialBox(`📋 हालिया अनसुलझे सवाल (${logs.length})`, resp, [
+        { text: '🗑️ लॉग्स खाली करें', query: 'aarogyam:clear_logs' },
+        { text: '🌿 मुख्य मेन्यू खोलें', query: 'आरोग्यम सखी क्या-क्या कर सकती है?' }
+      ], 'omni', 'unresolved_logs_list');
+      return true;
+    }
+
+    if (q === 'aarogyam:clear_logs') {
+      localStorage.removeItem('sakhi_unresolved_queries_log');
+      renderCrispSpecialBox('🗑️ लॉग्स खाली कर दिए गए', 'अनसुलझे सवालों की डायरी सफलतापूर्वक साफ़ कर दी गई है।', [
+        { text: '🌿 मुख्य मेन्यू खोलें', query: 'आरोग्यम सखी क्या-क्या कर सकती है?' }
+      ], 'omni', 'logs_cleared');
+      return true;
+    }
+
+    return false;
+  }
+
   function handleMultiTopicAndTwistQueries(cleanQ, rawQ) {
     const q = cleanQ;
+
+    // 0. DEVELOPER / ADMIN INSPECTION ROUTER (aarogyam:logs)
+    if (handleDeveloperLogsQuery(cleanQ, rawQ)) {
+      return true;
+    }
+
+    // 0.1 REVERSE & MYTH-BUSTER ENGINE (Counters misconceptions before keyword collision)
+    if (handleReverseMythBusterQueries(cleanQ, rawQ)) {
+      return true;
+    }
 
     // 0. HEALTH, DIABETES & ANIMAL CARE PRODUCT COST ESTIMATE ENGINE
     if (handleHealthProductCostEstimate(cleanQ, rawQ)) {
@@ -7441,6 +7730,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       synthesizeDynamicAnswer(query, 'casual');
       return;
     }
+
+    logUnresolvedQuery(rawQ, cleanQ, targetDomain);
 
     if (!knowledgeData || !knowledgeData.intents) {
       synthesizeDynamicAnswer(query, targetDomain);
