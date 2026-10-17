@@ -10203,7 +10203,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
           <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.stopAllSpeech)window.stopAllSpeech(); if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <input type="text" class="sakhi-text-input" id="sakhiTextInput" placeholder="सवाल बोलें या लिखें..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
+          <input type="search" name="sakhi_chat_query" class="sakhi-text-input" id="sakhiTextInput" placeholder="सवाल बोलें या लिखें..." autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" role="searchbox" data-form-type="other" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" enterkeyhint="send" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitSakhiFromInput();}" />
           <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें" onclick="window.submitSakhiFromInput();">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -10314,6 +10314,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   };
 
   window.toggleSakhiFullscreen = function () {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+      try { activeEl.blur(); } catch (e) {}
+    }
+
     const body = document.body;
     const container = document.getElementById('sakhiFullscreenContainer');
     const wrapper = document.querySelector('.sakhi-fullscreen-wrapper');
@@ -10363,6 +10368,12 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         try { elemToFull.requestFullscreen(); } catch (e) {}
       }
     }
+
+    setTimeout(function () {
+      if (typeof window.setSakhiViewportHeight === 'function') {
+        window.setSakhiViewportHeight();
+      }
+    }, 150);
   };
 
   window.openSakhiTermsModal = function () {

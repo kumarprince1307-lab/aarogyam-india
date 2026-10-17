@@ -964,6 +964,17 @@ body.is-fullscreen .sakhi-chat-window {
   font-family: inherit;
   transition: all 0.2s;
   box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.sakhi-text-input::-webkit-search-decoration,
+.sakhi-text-input::-webkit-search-cancel-button,
+.sakhi-text-input::-webkit-search-results-button,
+.sakhi-text-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none !important;
 }
 
 .sakhi-text-input:focus {
