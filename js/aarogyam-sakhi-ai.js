@@ -323,11 +323,10 @@
   }
 
   function getPersonaRecommendationChips(currentDomain) {
-    if (currentDomain === 'casual' || currentDomain === 'omni' || currentDomain === 'safety') {
+    const effectiveDom = currentDomain || sakhiConversationState.lastActiveDomain;
+    if (!effectiveDom || effectiveDom === 'casual' || effectiveDom === 'omni' || effectiveDom === 'safety') {
       return [];
     }
-    const p = loadSakhiUserPersona();
-    const effectiveDom = currentDomain || p.primary_domain;
     const chips = [];
     if (effectiveDom === 'agri') {
       chips.push({ text: "📖 'खेती का डॉक्टर' ई-बुक (BK002)", url: "/ebooks/book-landing.html?id=BK002", isExternal: true });
@@ -517,11 +516,11 @@
     const healthTokens = [
       'शुगर', 'sugar', 'डायबिटीज', 'diabetes', 'मधुमेह', 'बीपी', 'bp', 'ब्लड प्रेशर',
       'घुटने', 'घुटनों', 'गठिया', 'जोड़ों', 'जोड़ों', 'जोड़', 'दर्द', 'कमजोरी',
-      'लिवर', 'liver', 'किडनी', 'kidney', 'हार्ट', 'heart', 'दिल', 'थायराइड',
+      'लिवर', 'लीवर', 'liver', 'fatty liver', 'फैटी लिवर', 'सिरोसिस', 'cirrhosis', 'किडनी', 'kidney', 'हार्ट', 'heart', 'दिल', 'थायराइड',
       'thyroid', 'पथरी', 'दमा', 'अस्थमा', 'कब्ज', 'बवासीर', 'piles', 'मोटापा',
-      'वजन', 'हेल्थ', 'health', 'sehat', 'सेहत', 'बीमारी', 'रोग', 'इलाज',
+      'वजन', 'हेल्थ', 'health', 'sehat', 'सेहत', 'बीमारी', 'इलाज', 'रोग',
       'रोग प्रतिरोधक', 'इम्युनिटी', 'ग्रीस', 'कट-कट', 'हड्डियों', 'यूरिक एसिड',
-      'स्टेमिना', 'पौरुष', 'ज्वाइंट', 'joint care', 'कोलेस्ट्रॉल', 'सीने',
+      'स्टेमिना', 'पौरुष', 'ज्वाइंट', 'joint care', 'nutri liver', 'न्यूट्री लिवर', 'लिवर केयर', 'कोलेस्ट्रॉल', 'सीने',
       'पेशाब', 'थकान', 'सिरदर्द', 'पेट दर्द', 'गैस', 'एसिडिटी', 'मरीज', 'खांसी', 'जुकाम', 'बुखार', 'fever'
     ];
     if (!health_rejected && healthTokens.some(t => q.includes(t))) {
@@ -533,8 +532,8 @@
     const agriCropEntities = [
       'गेहूं', 'गेहूँ', 'gehu', 'gehun', 'geho', 'gehon', 'gahu', 'kanak',
       'सरसों', 'sarso', 'sarson', 'राई', 'rai',
-      'चना', 'चने', 'chene', 'chena', 'chane', 'chhola', 'chickpea', 'gram',
-      'गन्ना', 'गन्ने', 'ganna', 'ganne', 'sugarcane', 'eekh', 'ईख', 'pedi', 'पेड़ी',
+      'चना', 'चने', 'चैन', 'chene', 'chena', 'chane', 'chhola', 'chickpea', 'gram',
+      'गन्ना', 'गन्ने', 'गाने', 'ganna', 'ganne', 'sugarcane', 'सुगरकेन', 'शुगरकेन', 'eekh', 'ईख', 'pedi', 'पेड़ी',
       'धान', 'मक्का', 'सोयाबीन', 'आलू',
       'टमाटर', 'tamatar', 'मिर्च', 'mirch', 'chilli', 'capsicum', 'शिमला मिर्च', 'बैंगन', 'प्याज', 'लहसुन', 'कपास', 'गोभी', 'मूंग', 'उड़द',
       'भिंडी', 'bhindi', 'okra', 'लौकी', 'lauki', 'louki', 'तोरई', 'torai', 'करेला', 'karela',
@@ -542,12 +541,12 @@
       'धनिया', 'dhaniya', 'पालक', 'palak', 'कद्दू', 'kaddu',
       'सब्जी', 'सब्जियों', 'फसल', 'फसलों', 'खेत', 'पौधों', 'पौधे', 'पेड़', 'बागवानी',
       'बीज', 'कृषि', 'कल्ले', 'फुटाव', 'यूरिया', 'डीएपी', 'एनपीके', 'npk', 'उर्वरक', 'खाद',
-      'कीटनाशक', 'स्प्रे', 'माहू', 'चेपा', 'रतुआ', 'उकठा', 'खरपतवार', 'खरपतवारनाशक',
+      'कीटनाशक', 'स्प्रे', 'माहू', 'चेपा', 'रतुआ', 'उकठा', 'उठा लोग', 'उठा रोग', 'उग्र रोग', 'खरपतवार', 'खरपतवारनाशक',
       'इमामेक्टिन', 'कोराजन', 'स्टिमरिच', 'stimrich', 'बायो 99', 'बायो-99', 'bio-99', 'bio99',
-      'shet', 'wrapup', 'रैप अप', 'इल्ली', 'फफूंद', 'फंगस', 'झुलसा', 'गलन', 'तना छेदक',
+      'shet', 'wrapup', 'रैप अप', 'इल्ली', 'फफूंद', 'फंगस', 'झुलसा', 'गलन', 'तना छेदक', 'छेदक',
       'दीमक', 'कुकड़ा', 'थ्रिप्स', 'व्हाइटफ्लाई', 'रस चूसक', 'एंटीवायरल', 'लार्विसाइड',
       'माइकोराइजा', 'vem', 'बैक्टीरिया', 'मिट्टी', 'अम्लीय', 'ph', 'गुलाबी सुंडी', 'ब्लास्ट',
-      'चक्रभृंग', 'कंद', 'रोपाई', 'फॉल आर्मीवर्म', 'इमिडाक्लोप्रिड', 'कॉपर', 'किसान'
+      'चक्रभृंग', 'कंद', 'रोपाई', 'फॉल आर्मीवर्म', 'इमिडाक्लोप्रिड', 'कॉपर', 'किसान', 'रासायनिक तरीका', 'रासायनिक दवा'
     ];
     if (!agri_rejected && agriCropEntities.some(t => cleanNoSamadhan.includes(t))) {
       return 'agri';
@@ -1559,20 +1558,78 @@
 
   function handlePersonalizedShareIntent(cleanQ, rawQ) {
     const q = (cleanQ || '').toLowerCase();
+    const raw = rawQ || cleanQ || '';
+
     const isShareReq = (
       q.includes('mera nam aur no') || q.includes('mera naam aur no') || q.includes('mera number laga') ||
       q.includes('mere number ke sath') || q.includes('mere naam se') || q.includes('share karne ke liye') ||
       q.includes('share karna hai') || q.includes('whatsapp share') || q.includes('share msg banao') ||
       q.includes('share message') || q.includes('bhejne ke liye banao') || q.includes('mera no laga ke') ||
       q.includes('mera naam laga do') || q.includes('मेरा नाम और नंबर लगा') || q.includes('शेयर करने के लिए बनाओ') ||
-      q.includes('व्हाट्सएप शेयर') || q.includes('नाम नंबर से शेयर') || q.includes('शेयर मैसेज')
+      q.includes('व्हाट्सएप शेयर') || q.includes('नाम नंबर से शेयर') || q.includes('शेयर मैसेज') ||
+      q.includes('मेरा नंबर लगा') || q.includes('नंबर लगाकर') || q.includes('नंबर लगा के') ||
+      (q.includes('भेजना है') && (q.includes('नंबर') || q.includes('प्लान') || q.includes('plan') || q.includes('मैसेज'))) ||
+      ((q.includes('दोस्त') || q.includes('मित्र') || q.includes('महिला')) && (q.includes('भेजना') || q.includes('bhejna')) && (q.includes('प्लान') || q.includes('plan') || q.includes('नंबर')))
     );
 
-    if (isShareReq) {
-      renderPersonalizedShareBox();
+    if (!isShareReq) return false;
+
+    // Sender Info
+    let senderName = '';
+    try {
+      senderName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || localStorage.getItem('SAKHI_USER_NAME') || '';
+    } catch (_) {}
+    if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') {
+      senderName = 'Aarogyam Master';
+    }
+
+    let senderPhone = '';
+    try {
+      senderPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+    } catch (_) {}
+    if (!senderPhone || senderPhone.length < 10) {
+      senderPhone = '7974422572';
+    }
+
+    const shareId = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('aim_user_share_id') || localStorage.getItem('user_share_id') || '';
+    let domainUrl = 'https://aarogyamindia.online/aarogyam-sakhi.html';
+    if (shareId) domainUrl += `?ref=${encodeURIComponent(shareId)}`;
+
+    // CASE A: Women Empowerment / Mahila Mitra
+    const isMahilaDost = q.includes('महिला') || q.includes('mahila') || q.includes('बहन') || q.includes('गृहणी') || q.includes('housewife') || q.includes('women');
+    if (isMahilaDost) {
+      const waMsg = `🌸 *नारी शक्ति स्वावलंबन — घर बैठे ₹5,000 से ₹50,000 मासिक कमाई का अवसर* 🌸\n\nनमस्ते सखी! 🙏\n\nघर और परिवार की जिम्मेदारियों को संभालते हुए, क्या आप अपने खाली समय (दिन में 1-2 घंटे) में सिर्फ मोबाइल से ₹5,000 से लेकर ₹50,000+ तक की आत्मनिर्भर आमदनी कमाना चाहती हैं?\n\n✨ *इस अवसर की 5 बड़ी विशेषताएं:*\n1️⃣ *₹0 जॉइनिंग व ₹0 निवेश:* रजिस्ट्रेशन 100% मुफ़्त है, कोई आर्थिक जोखिम नहीं।\n2️⃣ *घर बैठे काम:* कोई दुकान खोलने या बाहर जाने की जरूरत नहीं, अपने फोन से काम करें।\n3️⃣ *100% शुद्ध जैविक व हर्बल उत्पाद:* स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी सप्लीमेंट्स।\n4️⃣ *सम्पूर्ण डिजिटल ट्रेनिंग:* मोबाइल पर पूरी ट्रेनिंग और लगातार मार्गदर्शन मिलेगा।\n5️⃣ *समय की आज़ादी:* अपनी सुविधानुसार काम करें।\n\n👉 *शुरुआत करने व पूरा प्लान समझने के लिए सीधे मुझसे संपर्क करें:*\n👤 *मार्गदर्शक:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *आरोग्यम सखी AI पर प्लान समझें:* ${domainUrl}\n\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्वदेशी अवसर: 26 वर्षों का विश्वास (नेट्सर्फ व आरोग्यम इंडिया)_`;
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+
+      const resp = `🌸 **महिला साथी / सखी के लिए WhatsApp आमंत्रण संदेश तैयार है!**\n\nआप इस संदेश को सीधे अपनी महिला मित्रों, बहनों या सहेलियों के साथ एक क्लिक में साझा कर सकती हैं:\n\n\`\`\`text\n${waMsg}\n\`\`\`\n\n👉 जो भी इस संदेश को पढ़कर संपर्क करेगा, वह सीधे **आपके मोबाइल नंबर (${senderPhone})** पर आपसे जुड़ेगा!`;
+
+      renderCrispSpecialBox('🌸 महिला स्वावलंबन WhatsApp शेयर संदेश', resp, [
+        { text: '📲 सीधे WhatsApp पर शेयर करें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '📋 संदेश कॉपी करें', query: 'संदेश कॉपी करो' }
+      ], 'business', 'mahila_share_card');
       return true;
     }
-    return false;
+
+    // CASE B: Friend / Associate (e.g. राकेश, मित्र, दोस्त)
+    const isPlanForFriend = q.includes('plan') || q.includes('प्लान') || q.includes('नेटसर्फ') || q.includes('netsurf') || q.includes('नेटवर्क');
+    if (isPlanForFriend) {
+      const friendName = extractPersonNameFromQuery(raw, cleanQ) || 'मित्र';
+      const waMsg = `💼 *नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व आत्मनिर्भरता प्लान (2026-27)* 💼\n\nनमस्ते ${friendName} जी! 🙏\n\nमैंने आपके लिए भारत की 26 वर्षों से प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग कंपनी 'नेट्सर्फ' का संपूर्ण व्यावसायिक ढाँचा तैयार किया है:\n\n1️⃣ *Consumer (उपभोक्ता लाभ):*\n• सभी जैविक उत्पादों पर 25% फ्लैट छूट\n• 5 महीने की लगातार खरीदारी पर 6ठे महीने मुफ़्त प्रॉडक्ट (Lowest MRP)\n• ₹100 वेलकम वाउचर व ₹4,000+ पर मुफ़्त होम डिलीवरी\n\n2️⃣ *E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):*\n• ₹0 जॉइनिंग, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं\n• 5% से 15% का साप्ताहिक शुद्ध रिटेल कमीशन (सीधे बैंक में)\n• 100 उपभोक्ताओं के साथ हर महीने ₹15,000+ की नियमित आय\n\n3️⃣ *Team Leader (टीम बिज़नेस व कैपिंग):*\n• अनलिमिटेड जनरेशन इनकम (3% से 8% — नो कैपिंग)\n• बाइनरी मैचिंग बोनस (3% से 5% आजीवन कैरी फॉरवर्ड)\n• ₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500 तक अवसर)\n• पारिवारिक सुरक्षा योजना व 100% नॉमिनी अधिकार\n\n👉 *विस्तृत जानकारी व जॉइनिंग सहायता हेतु सीधे मुझसे संपर्क करें:*\n👤 *सलाहकार:* ${senderName}\n📱 *मोबाइल:* ${senderPhone}\n🌐 *आरोग्यम सखी AI पर लाइव प्लान देखें:* ${domainUrl}\n\n━━━━━━━━━━━━━━━━━━━━\n_नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं। वास्तविक लाभ कंपनी नियमों व व्यक्ति के प्रयास पर निर्भर करता है।_`;
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+
+      const resp = `💼 **श्री ${friendName} जी के लिए नेट्सर्फ बिज़नेस शेयर संदेश तैयार है!**\n\nआप इस संदेश को सीधे अपने मित्र ${friendName} जी को WhatsApp पर भेज सकते हैं:\n\n\`\`\`text\n${waMsg}\n\`\`\`\n\n👉 आपके मित्र को सीधे आपका नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** दिखेगा!`;
+
+      renderCrispSpecialBox(`💼 ${friendName} जी के लिए बिज़नेस शेयर संदेश`, resp, [
+        { text: `📲 ${friendName} जी को WhatsApp भेजें`, url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '📋 संदेश कॉपी करें', query: 'संदेश कॉपी करो' }
+      ], 'business', 'friend_plan_share_card');
+      return true;
+    }
+
+    renderPersonalizedShareBox();
+    return true;
   }
 
   function buildMsgAudioBtnMarkup(text) {
@@ -2013,8 +2070,21 @@
       .replace(/स्प्रे\s*कैलेंडर/gi, 'स्प्रे कैलेंडर')
       .replace(/spray\s*calendar/gi, 'spray calendar')
       .replace(/\b(geho|gehon|gehu|gahu|kanak)\b/gi, 'गेहूं')
-      .replace(/\b(chene|chena|chhola|chane)\b/gi, 'चना')
+      .replace(/\b(chene|chena|chhola|chane|chana)\b/gi, 'चना')
+      .replace(/चैन\s*(में|पर|की|का|के|फसल|रोग|उकठा|उठा|फंगस|सुंडी|इल्ली|बोनी|बुवाई)/gi, 'चने $1')
+      .replace(/(मेरे|हमारे|खेत में|फसल में)\s*चैन/gi, '$1 चने')
+      .replace(/\b(उठा\s*लोग|उठा\s*रोग|उग्र\s*रोग)\b/gi, 'उकठा रोग')
       .replace(/\b(ganne|ganna|sugarcane|eekh)\b/gi, 'गन्ना')
+      .replace(/\b(गाने|सुगरकेन|शुगरकेन)\s*(की\s*खेती|में|पर|का|के|फसल|की\s*फसल|रोग|पेड़ी|रस|गुड़)/gi, 'गन्ना $1')
+      .replace(/गाने\s*(सुगरकेन|शुगरकेन|की खेती|खेती)/gi, 'गन्ना सुगरकेन')
+      .replace(/\b(लीवर)\b/gi, 'लिवर')
+      .replace(/लिवर\s*(सोरायसिस|सोराय्सिस|सिरोसिस|cirrhosis)/gi, 'लिवर सिरोसिस')
+      .replace(/सोरायसिस/gi, (match, offset, str) => { return /लिवर|लीवर|liver/.test(str) ? 'सिरोसिस' : match; })
+      .replace(/(?:नेचुरामोर\s*)?(?:न्यूट्री\s*लिवर|न्यूट्रि\s*लिवर|nutri\s*liver|nutriliver)/gi, 'नेचुरामोर लिवर केयर')
+      .replace(/\b(ताना\s*छेदक|stem\s*borer)\b/gi, 'तना छेदक')
+      .replace(/\b(केमिकल|कॅमिकल)\b/gi, 'रासायनिक')
+      .replace(/\b(कैंपिंग|camping|camp)\b/gi, 'कैपिंग')
+      .replace(/नेटवर्क\s*(में\s*कंज्यूमर|कंज्यूमर|प्लान|बिजनेस)/gi, 'नेट्सर्फ $1')
       .replace(/\b(sarson)\b/gi, 'सरसों')
       .replace(/\b(shimla mirch|shimla mirchi|shikmla mirchi|shikmla mirch)\b/gi, 'शिमला मिर्च')
       .replace(/\b(harfal|harfall|hairfall)\b/gi, 'hair fall')
@@ -2461,6 +2531,13 @@
       dose: '1-2 कैप्सूल रात को सोते समय गुनगुने पानी से।',
       url: '/health/liver-care.html'
     },
+    liverCare: {
+      name: 'Naturamore Liver Care (न्यूट्री लिवर / लिवर केयर - फैटी लिवर व डिटॉक्स)',
+      keyIngredients: 'कुटकी (Picrorhiza kurroa), कालमेघ (Andrographis), पुनर्नवा, भृंगराज, आंवला, कासनी, भूमि-आंवला',
+      action: 'कुटकी व कालमेघ लिवर कोशिकाओं (Hepatocytes) का पुनर्जनन करते हैं, बढ़े हुए SGOT, SGPT और बिलीरुबिन को सामान्य करते हैं, फैटी लिवर (ग्रेड 1 व 2) में जमी वसा को पिघलाते हैं और लिवर सिरोसिस के खतरे से बचाते हैं।',
+      dose: '1 कैप्सूल सुबह और 1 शाम भोजन के 30 मिनट बाद हल्के गुनगुने पानी से।',
+      url: '/health/liver-care.html'
+    },
     dailyProtein: {
       name: 'Naturamore Daily Nutrition Powder (दैनिक संपूर्ण पोषण)',
       keyIngredients: '5 प्रोटीन स्रोत (Whey, Soy, Pea, Milk, Rice), 13 विटामिन्स, 10 मिनरल्स, ओमेगा-3 DHA, एलोवेरा',
@@ -2476,6 +2553,7 @@
     jointPain: 'पारिजात (हरसिंगार) के 5 ताजे पत्ते कूटकर 1 गिलास पानी में तब तक उबालें जब तक पानी आधा न रह जाए। सुबह खाली पेट गुनगुना पिएं। यह घुटनों के घिसाव और साइटिका का सबसे ताकतवर आयुर्वेदिक नुस्खा है।',
     heartBp: 'रोजाना सुबह खाली पेट 1 कली कच्चा लहसुन पानी के साथ निगलें और शाम को आधा चम्मच अर्जुन की छाल का काढ़ा बनाकर पिएं। यह नसों से कोलेस्ट्रॉल पिघलाकर ब्लॉकेज से रक्षा करता है।',
     constipation: 'रात को सोने से पहले 1 चम्मच त्रिफला चूर्ण गुनगुने पानी के साथ लें या 4-5 मुनक्का दूध में उबालकर खाएं। सुबह पेट पहली ही बार में मक्खन जैसा साफ होगा।',
+    liver: 'सुबह खाली पेट 1 कप ताजे भूमि-आंवला का काढ़ा या 20 मिली एलोवेरा जूस में आधा चम्मच गिलोय रस मिलाकर पिएं। दोपहर के भोजन में पपीता और हींग-जीरा डली ताजा छाछ लें। यह फैटी लिवर को 60 दिन में रिवर्स करने का अचूक नुस्खा है।',
     thyroid: 'रोजाना सुबह खाली पेट 2 चम्मच धनिए के बीज रातभर पानी में भिगोकर उसका उबला पानी पिएं और गले पर शुद्ध अखरोट या तिल के तेल से नीचे से ऊपर की ओर 5 मिनट मालिश करें।'
   };
 
@@ -2600,6 +2678,15 @@
         const resp = `🌿 **${prod.name} के 100% प्रामाणिक घटक:**\n\n• **मुख्य घटक:** **${prod.keyIngredients}**\n• **कार्यप्रणाली:** ${prod.action}\n• **सेवन विधि:** ${prod.dose}`;
         return renderClinicalHealthCard(prod.name + ' सामग्री व सेवन विधि', resp, [
           { label: "🌿 लिवर व पेट शुद्धि पेज", url: prod.url }
+        ]);
+      }
+      if (q.includes('liver care') || q.includes('लिवर केयर') || q.includes('nutri liver') || q.includes('न्यूट्री लिवर')) {
+        const prod = NATURAMORE_KNOWLEDGE_BANK.liverCare;
+        const resp = `🌿 **${prod.name} के 100% प्रामाणिक घटक (Contents) व सेवन विधि:**\n\n• **मुख्य घटक:** **${prod.keyIngredients}**\n\n🎯 **वैज्ञानिक कार्यप्रणाली (Mode of Action):**\n• ${prod.action}\n\n🥄 **सेवन विधि (खुराक):** ${prod.dose}\n\n💡 **विशेषता:** कुटकी और कालमेघ का संयोजन फैटी लिवर ग्रेड 1 और 2 को 60 से 90 दिनों में प्राकृतिक रूप से रिवर्स करने में क्लीनिकली प्रमाणित है।\n\n⚠️ **स्वास्थ्य सुरक्षा सलाह:** गंभीर पीलिया, हेपेटाइटिस बी/सी या लिवर सिरोसिस के अंतिम चरण में नियमित एलएफटी (LFT) जांच कराएं और योग्य चिकित्सक की निगरानी में ही सप्लीमेंट लें।`;
+        return renderClinicalHealthCard(prod.name + ' सामग्री, कार्यप्रणाली व खुराक', resp, [
+          { label: "🫀 लिवर केयर व फैटी लिवर पेज", url: prod.url },
+          { label: "👴 अवनीश दादा का भूमि-आंवला नुस्खा", query: "लिवर के लिए अवनीश दादा के नुस्खे" },
+          { label: "🥗 फैटी लिवर डाइट चार्ट", query: "फैटी लिवर का डाइट चार्ट दिखाओ" }
         ]);
       }
     }
@@ -2734,6 +2821,74 @@
       return renderClinicalHealthCard('कब्ज, गैस व बवासीर से स्थायी मुक्ति', resp, [
         { label: "🌿 लिवर व उदर केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.easyDetox.url },
         { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" }
+      ]);
+    }
+
+    // =========================================================================
+    // 5.5 LIVER CARE, FATTY LIVER, JAUNDICE & CIRRHOSIS (लिवर, फैटी लिवर, सिरोसिस, पीलिया)
+    // =========================================================================
+    const isLiverQuery = q.includes('liver') || q.includes('लिवर') || q.includes('लीवर') ||
+                         q.includes('fatty liver') || q.includes('फैटी लिवर') || q.includes('सिरोसिस') ||
+                         q.includes('cirrhosis') || (q.includes('सोरायसिस') && (q.includes('लिवर') || q.includes('लीवर'))) ||
+                         q.includes('sgot') || q.includes('sgpt') || q.includes('bilirubin') ||
+                         q.includes('पीलिया') || q.includes('jaundice') || q.includes('हेपेटाइटिस') ||
+                         q.includes('hepatitis') || q.includes('nutri liver') || q.includes('न्यूट्री लिवर') ||
+                         q.includes('liver care') || q.includes('लिवर केयर');
+    if (isLiverQuery) {
+      // 1. Check if user is asking how to consume / dosage ("न्यूट्री लीवर कैसे खाएं")
+      const isHowToTake = q.includes('kaise khaye') || q.includes('kaise khana') || q.includes('kaise le') ||
+                          q.includes('kab le') || q.includes('kab khaye') || q.includes('खुराक') ||
+                          q.includes('डोज') || q.includes('dose') || q.includes('कैसे खाएं') ||
+                          q.includes('कैसे लें') || q.includes('सेवन विधि');
+      if (isHowToTake) {
+        const prod = NATURAMORE_KNOWLEDGE_BANK.liverCare;
+        const resp = `🌿 **नेचुरामोर लिवर केयर (Naturamore Liver Care / न्यूट्री लिवर) की सही खुराक व सेवन विधि:**\n\n🥄 **दैनिक खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को।\n🥛 **सेवन माध्यम:** हल्के गुनगुने पानी के साथ।\n⏰ **समय:** भोजन करने के 30 मिनट **बाद** लें।\n🗓️ **कोर्स की अवधि:** फैटी लिवर (Grade 1 व 2) और बढ़े हुए SGOT/SGPT को सामान्य करने के लिए कम से कम **60 से 90 दिन** नियमित सेवन करें।\n\n🚫 **अनिवार्य परहेज:**\n• शराब, कोल्ड ड्रिंक्स, तली-भुनी चीजें, रिफाइंड तेल, चीनी और मैदे से बनी चीजों का तुरंत त्याग करें।\n• दोपहर के भोजन में ताजा छाछ और पपीता अवश्य लें।\n\n⚠️ **स्वास्थ्य सुरक्षा सलाह:** यह 100% शाकाहारी आयुर्वेदिक न्यूट्रास्यूटिकल पूरक है। यदि आपको पीलिया, हेपेटाइटिस बी/सी या सिरोसिस का गंभीर संक्रमण है, तो डॉक्टर से एलएफटी (LFT) और अल्ट्रासाउंड जांच अवश्य कराएं।`;
+        return renderClinicalHealthCard('नेचुरामोर लिवर केयर (न्यूट्री लिवर) — सेवन विधि व खुराक', resp, [
+          { label: "🫀 फैटी लिवर रिवर्सल डाइट चार्ट", query: "फैटी लिवर का डाइट चार्ट दिखाओ" },
+          { label: "👴 अवनीश दादा का भूमि-आंवला नुस्खा", query: "लिवर के लिए अवनीश दादा के नुस्खे" },
+          { label: "🛒 लिवर केयर 25% छूट पर खरीदें", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
+        ]);
+      }
+
+      // 2. Check if user asked about Liver Cirrhosis / Liver Psoriasis ("लीवर सोरायसिस के बारे में बताओ")
+      const isCirrhosisQuery = q.includes('सिरोसिस') || q.includes('cirrhosis') || q.includes('सोरायसिस');
+      if (isCirrhosisQuery) {
+        const resp = `राम-राम! 🙏 **लिवर स्वास्थ्य पर विशेष मार्गदर्शन:**\n\n💡 **महत्वपूर्ण स्पष्टीकरण:** लिवर के संदर्भ में इसे **लिवर सिरोसिस (Liver Cirrhosis)** कहा जाता है (सोरायसिस त्वचा का ऑटोइम्यून रोग होता है, जबकि सिरोसिस लिवर का क्रोनिक फाइब्रोसिस घाव है)।\n\n🧬 **शरीर के अंदर का लॉजिक (What is Liver Cirrhosis?):**\n• लंबे समय तक फैटी लिवर (Grade 2/3), शराब का सेवन, या हेपेटाइटिस बी/सी के कारण लिवर की स्वस्थ कोशिकाएं मरकर कठोर घाव (Fibrous Scar Tissue) में बदल जाती हैं। इससे लिवर खून को फिल्टर नहीं कर पाता और पेट में पानी (Ascites) व पीलिया होने लगता है।\n\n⚠️ **अनदेखा करने का गंभीर खतरा:**\n• सिरोसिस बिगड़ने पर लिवर फेलियर (End-Stage Liver Disease) का खतरा रहता है। प्रारंभिक अवस्था में इसे तुरंत रोकना अति-आवश्यक है।\n\n🌿 **आयुर्वेदिक पोषण व सुरक्षा प्रोटोकॉल:**\n• **नेचुरामोर लिवर केयर:** 1-1 कैप्सूल सुबह-शाम भोजन के बाद (कुटकी व कालमेघ लिवर सेल्स को नया जीवन देते हैं)।\n• **अवनीश दादा का नुस्खा:** 20 मिली ताजे भूमि-आंवला व गिलोय का रस सुबह खाली पेट पिएं।\n• **सख्त परहेज:** शराब, मांसाहार, नमक की अधिकता और ट्रांस-फैट का 100% त्याग करें।\n\n⚠️ **स्वास्थ्य सुरक्षा सलाह:** लिवर सिरोसिस एक गंभीर मेडिकल स्थिति है। कृपया गैस्ट्रोएंटेरोलॉजिस्ट (लिवर विशेषज्ञ) से अल्ट्रासाउंड व फाइब्रोस्कैन जांच कराएं और डॉक्टर की निगरानी में ही उपचार लें।`;
+        return renderClinicalHealthCard('लिवर सिरोसिस (Liver Cirrhosis): कारण, लक्षण व सुरक्षा', resp, [
+          { label: "💊 लिवर केयर कैप्सूल सेवन विधि", query: "न्यूट्री लिवर कैसे खाएं" },
+          { label: "🥗 लिवर डाइट चार्ट व परहेज", query: "फैटी लिवर का डाइट चार्ट दिखाओ" },
+          { label: "🫀 आधिकारिक लिवर केयर पेज खोलें", url: "/health/liver-care.html" }
+        ]);
+      }
+
+      // 3. General Liver Problem / Fatty Liver / Liver Disease ("लिवर प्रॉब्लम", "लीवर की बीमारी")
+      const resp = `राम-राम! 🙏 सबसे पहले **${target} घबराएं नहीं — फैटी लिवर (Grade 1 व 2) 100% प्रतिवर्ती (Reversible) है! सही खानपान, 60 दिन के डिटॉक्स और हर्बल पोषण से लिवर पूरी तरह नया और स्वस्थ हो सकता है!**
+
+🧬 **शरीर के अंदर का लॉजिक (Why Liver Issues Occur):**
+• लिवर शरीर की सबसे बड़ी केमिकल फैक्ट्री है जो 500 से अधिक कार्य करती है। जब भोजन में अत्यधिक रिफाइंड तेल, चीनी, मैदा और शराब जाती है, तो लिवर की कोशिकाओं में 5% से अधिक वसा जम जाती है, जिसे **'फैटी लिवर' (NAFLD)** कहते हैं। इसके कारण पेट के ऊपरी दाएं हिस्से में भारीपन, सुस्ती, खट्टी डकारें और भूख की कमी होती है।
+
+⚠️ **अनदेखा करने का गंभीर खतरा (सचेत रहें):**
+• यदि फैटी लिवर को समय पर न संभाला जाए, तो यह सूजन (NASH), फाइब्रोसिस और अंततः **लिवर सिरोसिस या लिवर फेलियर** में बदल जाता है।
+
+🩺 **डॉक्टर जांच:** यदि आपको लगातार पेट में भारीपन या पीलापन दिखे, तो तुरंत **LFT (Liver Function Test - SGOT, SGPT, Bilirubin)** और पेट का अल्ट्रासाउंड कराएं।
+
+👴 **आरोग्यम अवनीश दादा का प्रमाणित नुस्खा:**
+• **${AVNISH_DADA_NUSKHE.liver}**
+
+🌿 **हर्बल ऑर्गन न्यूट्रिशन (Naturamore Liver Care):**
+• **मुख्य घटक:** **कुटकी**, **कालमेघ**, **पुनर्नवा**, **भृंगराज**, आंवला, कासनी।
+• **फायदा:** बढ़े हुए SGOT/SGPT को सामान्य करता है, लिवर की कोशिकाओं को डिटॉक्स करता है और पाचन शक्ति सुधारता है।
+• **खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को भोजन के 30 मिनट बाद गुनगुने पानी से।
+
+🚫 **सख्त परहेज:** शराब, कोल्ड ड्रिंक्स, समोसा/कचौड़ी, रिफाइंड तेल, चीनी, मैदा और रात में देर से भारी भोजन का 100% त्याग करें।
+
+⚠️ **स्वास्थ्य सुरक्षा सलाह:** यह आयुर्वेदिक न्यूट्रास्यूटिकल पूरक है। किसी भी गंभीर हेपेटिक स्थिति में योग्य चिकित्सक का परामर्श अवश्य लें।`;
+
+      return renderClinicalHealthCard('लिवर प्रॉब्लम व फैटी लिवर: वैज्ञानिक लॉजिक, नुस्खे व रिवर्सल', resp, [
+        { label: "🫀 आधिकारिक लिवर केयर पेज", url: NATURAMORE_KNOWLEDGE_BANK.liverCare.url },
+        { label: "💊 न्यूट्री लिवर कैसे खाएं व खुराक", query: "न्यूट्री लिवर कैसे खाएं" },
+        { label: "🥗 फैटी लिवर रिवर्सल डाइट चार्ट", query: "फैटी लिवर का डाइट चार्ट दिखाओ" },
+        { label: "🛍️ नेचुरामोर लिवर केयर 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
       ]);
     }
 
@@ -3829,7 +3984,7 @@
     }
 
     // 1. चना फसल (Chana / Chickpea Master Guide)
-    if (cleanQ.includes('चना') || cleanQ.includes('chana')) {
+    if ((isTermInQuery(cleanQ, 'चना') || isTermInQuery(cleanQ, 'chana') || isTermInQuery(cleanQ, 'चने')) && !isKeywordNegatedInQuery(cleanQ, 'चना') && !isKeywordNegatedInQuery(cleanQ, 'चने')) {
       const isSeed = cleanQ.includes('बीज') || cleanQ.includes('seed');
       const isLand = cleanQ.includes('जमीन') || cleanQ.includes('मिट्टी') || cleanQ.includes('खाद') || cleanQ.includes('land');
       const isDisease = cleanQ.includes('बीमारी') || cleanQ.includes('रोग') || cleanQ.includes('उकठा') || cleanQ.includes('wilt') || cleanQ.includes('इल्ली');
@@ -3889,7 +4044,7 @@
     }
 
     // 4. धान और गेहूँ फसल (Paddy & Wheat Master Guide)
-    if (cleanQ.includes('धान') || cleanQ.includes('dhan') || cleanQ.includes('गेहूं') || cleanQ.includes('gehu') || cleanQ.includes('wheat') || cleanQ.includes('paddy') || cleanQ.includes('रतुआ') || cleanQ.includes('दीमक') || cleanQ.includes('ब्लास्ट') || cleanQ.includes('गभिया')) {
+    if ((((isTermInQuery(cleanQ, 'धान') || isTermInQuery(cleanQ, 'dhan')) && !isKeywordNegatedInQuery(cleanQ, 'धान')) || ((isTermInQuery(cleanQ, 'गेहूं') || isTermInQuery(cleanQ, 'gehu') || isTermInQuery(cleanQ, 'wheat')) && !isKeywordNegatedInQuery(cleanQ, 'गेहूं')) || cleanQ.includes('रतुआ') || cleanQ.includes('दीमक') || cleanQ.includes('ब्लास्ट') || cleanQ.includes('गभिया'))) {
       const resp = `🌾 **धान और गेहूँ फसल मास्टर गाइड व पोषण मैट्रिक्स:**\n• **धान की मुख्य समस्याएं:** गभिया रोग (Stem Borer), ब्लास्ट (Blast Fungus), और पीलापन।\n• **गेहूँ की मुख्य समस्याएं:** दीमक (Termite), पीला रतुआ (Yellow Rust) और कमजोर फुटाव।\n\n1. **बीज उपचार (Seed Treatment):** बुवाई से पहले गेहूँ बीजों को Stimrich (5 ml प्रति लीटर पानी) से कोट कर 4 से 6 घंटे छाया में सुखाएं।\n2. **विकास और कल्ले फूटने के लिए (Tillering):** पहली सिंचाई बाद Stimrich (30 ml प्रति 15L पंप) + Bio-99 (5 ml) का स्प्रे करें।\n3. **फंगस व ब्लास्ट नियंत्रण:** नेट्सर्फ **Wrap Up** (75 ml प्रति पंप) का स्प्रे करें।\n4. **मिट्टी की उर्वरता:** Biofit NPK (Azotobacter, PSB, KSB) तीनों 1-1 लीटर + VEM Mycorrhiza 100 ml प्रति एकड़।\n\n📖 **ई-बुक फनल:** धान और गेहूँ में कब-कब पानी देना है और कौन सा टॉनिक किस अवस्था में डालना है, इसका पूरा शेड्यूल हमारी ई-बुक **'खेती का डॉक्टर'** में चार्ट के रूप में उपलब्ध है।`;
       renderCrispSpecialBox('🌾 धान व गेहूँ — कल्ले, पैदावार व रोग नियंत्रण गाइड', resp, [
         { text: '🌱 गेहूँ/धान बीज उपचार विधि', query: 'गेहूं बीज उपचार की सही विधि' },
@@ -3901,7 +4056,7 @@
     }
 
     // 5. सरसों फसल (Sarson / Mustard Master Guide)
-    if (cleanQ.includes('सरसों') || cleanQ.includes('sarso') || cleanQ.includes('sarson') || cleanQ.includes('mustard') || cleanQ.includes('माहू') || cleanQ.includes('चेपा') || cleanQ.includes('सफेद रतुआ')) {
+    if ((((isTermInQuery(cleanQ, 'सरसों') || isTermInQuery(cleanQ, 'sarso') || isTermInQuery(cleanQ, 'sarson') || isTermInQuery(cleanQ, 'mustard')) && !isKeywordNegatedInQuery(cleanQ, 'सरसों')) || cleanQ.includes('माहू') || cleanQ.includes('चेपा') || cleanQ.includes('सफेद रतुआ'))) {
       const resp = `🌱 **सरसों फसल मास्टर गाइड — माहू कीट व फंगस नियंत्रण:**\nसरसों तेलहनी फसलों की रानी है। इसमें माहू (Aphid / Chepa) और फंगस सबसे ज्यादा नुकसान पहुंचाते हैं।\n\n1. **बीज उपचार (Seed Treatment):** बुवाई से पहले सरसों बीजों को Stimrich (5 ml प्रति लीटर पानी) से हल्का गीला कर 4 से 6 घंटे छाया में सुखाएं।\n2. **माहू / चेपा कीट नियंत्रण:** फूल और फलियों के समय माहू दिखने पर नेट्सर्फ **Larvicide** (30 ml प्रति 15L पंप) + **Bio-99** (5 ml प्रति पंप) का छिड़काव करें।\n3. **फंगस (Alternaria Blight / धब्बे):** पत्तियों पर काले धब्बे रोकने हेतु जैविक फफूंदनाशक या **Wrap Up** का प्रयोग करें।\n\n📖 **ई-बुक फनल:** सरसों में माहू कीट से फसल को कैसे बचाएं और तेल की मात्रा व दाने का आकार कैसे बढ़ाएं? जानिए हमारी ई-बुक **'खेती का डॉक्टर'** के जरिए।`;
       renderCrispSpecialBox('🌱 सरसों फसल — माहू नियंत्रण, तेल वृद्धि व रोग सुरक्षा', resp, [
         { text: '🌱 सरसों बीज उपचार विधि', query: 'सरसों बीज उपचार की सही विधि' },
@@ -4032,7 +4187,7 @@
     {
       id: 'ganna',
       name: 'गन्ना (Sugarcane / ईख)',
-      keywords: ['ganna', 'ganne', 'गन्ना', 'गन्ने', 'sugarcane', 'eekh', 'ईख', 'pedi', 'पेड़ी', 'पेड़ी गन्ना', 'pedi ganna'],
+      keywords: ['ganna', 'ganne', 'गन्ना', 'गन्ने', 'गाने', 'sugarcane', 'सुगरकेन', 'शुगरकेन', 'eekh', 'ईख', 'pedi', 'पेड़ी', 'पेड़ी गन्ना', 'pedi ganna'],
       season: 'वार्षिक नकदी फसल (वसंत व शरदकालीन)',
       sowingTime: 'शरदकालीन: अक्टूबर-नवंबर | वसंतकालीन: फरवरी-मार्च',
       soil: 'गहरी, उपजाऊ दोमट मिट्टी (उत्तम जल निकास व भरपूर जीवांश)',
@@ -4063,7 +4218,7 @@
     {
       id: 'chana',
       name: 'चना (Gram / Chickpea)',
-      keywords: ['chana', 'chane', 'chene', 'chena', 'चना', 'चने', 'चेने', 'चेना', 'gram', 'chickpea', 'desi chana', 'kabuli chana', 'chhola'],
+      keywords: ['chana', 'chane', 'chene', 'chena', 'चना', 'चने', 'चेने', 'चेना', 'चैन', 'gram', 'chickpea', 'desi chana', 'kabuli chana', 'chhola'],
       season: 'रबी (Rabi)',
       sowingTime: '15 अक्टूबर से 15 नवंबर',
       soil: 'हल्की से मध्यम दोमट मिट्टी (उत्तम जल निकास)',
@@ -4087,6 +4242,37 @@
           symptoms: 'हरी सुंडी फलियों में छेद करके अंदर का दाना चट कर जाती है।',
           organicBiofit: 'बायोफिट Intact (2.5ml/L) + Bio-99 (5ml/पंप) का छिड़काव करें।',
           chemical: 'इमामेक्टिन बेंजोएट 5% SG (8-10 ग्राम/15L पंप) या कोराजन (Chlorantraniliprole 18.5% SC - 6ml/पंप)।'
+        }
+      ]
+    },
+    {
+      id: 'bhindi',
+      name: 'भिंडी (Okra / Ladyfinger)',
+      keywords: ['bhindi', 'भिंडी', 'okra', 'ladyfinger', 'bhendi', 'लेडीफिंगर', 'bhindee'],
+      season: 'जायद (गर्मी: फरवरी-मार्च) व खरीफ (बरसात: जून-जुलाई)',
+      sowingTime: 'गर्मी फसल: 15 फरवरी से 15 मार्च | खरीफ फसल: 15 जून से 15 जुलाई',
+      soil: 'अच्छे जल निकास वाली बलुई दोमट या मध्यम चिकनी दोमट मिट्टी',
+      avgYield: '40 से 60 क्विंटल प्रति एकड़ (हरी कोमल भिंडी)',
+      intro: 'भिंडी भारत की सबसे लोकप्रिय व सर्वाधिक दैनिक नकदी देने वाली सब्जी फसल है। संतुलित जैविक पोषण, शाखाओं का भरपूर फुटाव और रसचूसक कीटों (सफेद मक्खी) व पीली पत्ती मोज़ेक वायरस से बचाव करने पर भिंडी की तुड़ाई लगातार 70 से 90 दिनों तक चलती है।',
+      yieldHacks: [
+        'निपिंग व फुटाव तकनीक: बुवाई के 25 दिन बाद स्टिमरिच (Stimrich) 30ml + Bio-99 5ml + Sheth 30ml प्रति 15L पंप का पहला स्प्रे करें। इससे मुख्य तने से 6-8 नई उप-शाखाएं फूटती हैं और फलियां नीचे से ऊपर तक लदकर आती हैं।',
+        'पीली शिरा मोज़ेक वायरस से 100% सुरक्षा: भिंडी में पीलापन सफेद मक्खी (Whitefly) से फैलता है। बुवाई के 20वें दिन से ही इंटैक्ट (Intact) 30ml + रैप अप (Wrap Up) 30ml + Bio-99 5ml का हर 12-15 दिन में स्प्रे करें ताकि वायरस कभी पनप ही न पाए।',
+        'कोमल व चमकदार फलियां: फूल व फल बनते समय स्टिमरिच 30ml + बोरॉन 20% (15g) + NPK 0:52:34 (75g) का छिड़काव करें। भिंडी सीधी, गहरे हरे रंग की और बिना रेशे के अत्यंत कोमल बनती है जिससे मंडी में ₹5-10 प्रति किलो अधिक भाव मिलता है।'
+      ],
+      seedTreatment: 'बुवाई से पूर्व प्रति 1 किलो भिंडी बीज में 5ml स्टिमरिच (Stimrich) या 2g थीरम/कार्बेन्डाजिम मिलाकर 15 मिनट छांव में सुखाकर बोएं। इससे 95%+ तेज व स्वस्थ अंकुरण होता है।',
+      fertilizerSchedule: 'बुवाई पर प्रति एकड़: 30kg डीएपी, 25kg पोटाश, 10kg सल्फर। पहली सिंचाई पर 1 लीटर Bio-NPK और 1 लीटर Sheth पानी के साथ चलाएं।',
+      diseases: [
+        {
+          name: 'पीत शिरा मोज़ेक वायरस (Yellow Vein Mosaic Virus / पीली पत्ती)',
+          symptoms: 'पत्तियों की नसें (veins) पीली पड़ जाती हैं, पत्ती कड़ी हो जाती है और फल पीले, छोटे व टेढ़े-मेढ़े निकलते हैं।',
+          organicBiofit: 'सफेद मक्खी व वायरस रोक हेतु: इंटैक्ट (30ml) + रैप अप (30ml) + Bio-99 (5ml) प्रति 15L पंप।',
+          chemical: 'डाइमेथोएट 30% EC (1.5ml/L) या एसीफेट 75% SP (2g/L)।'
+        },
+        {
+          name: 'फल व तना छेदक इल्ली (Shoot & Fruit Borer / फल छेदक)',
+          symptoms: 'इल्ली कोमल तने में घुसकर गोभ सुखा देती है और भिंडी में छेद कर अंदर से खा जाती है।',
+          organicBiofit: 'बायोफिट इंटैक्ट (Intact - 30ml) + Bio-99 (5ml/पंप)।',
+          chemical: 'कोराजन (Chlorantraniliprole 18.5% SC - 6ml/पंप) या इमामेक्टिन बेंजोएट 5% SG (10g/पंप)।'
         }
       ]
     },
@@ -4465,9 +4651,110 @@
     return true;
   }
 
+
+  // UNIVERSAL TERM IN QUERY HELPER (WORD BOUNDARY & COMPONENT MATCHING)
+  // Prevents substring false matches (e.g., 'चने' matching inside 'पहुंचने', 'gram' inside 'instagram')
+  function isTermInQuery(q, term) {
+    if (!q || !term) return false;
+    const cleanTerm = term.toLowerCase().trim();
+    if (!cleanTerm) return false;
+    if (cleanTerm.includes(' ')) {
+      return q.includes(cleanTerm);
+    }
+    const escaped = cleanTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp('(^|[^a-zA-Z0-9\\u0900-\\u097F])' + escaped + '($|[^a-zA-Z0-9\\u0900-\\u097F])', 'i');
+    return regex.test(q);
+  }
+
+  // UNIVERSAL NEGATION INTELLIGENCE
+  // Detects if a keyword/entity is explicitly negated in the query
+  // e.g. "चने के लिए नहीं", "गेहूं का नहीं", "gehu nahi", "chana mat"
+  function isKeywordNegatedInQuery(q, kw) {
+    if (!q || !kw) return false;
+    const cleanKw = kw.toLowerCase().trim();
+    if (!q.includes(cleanKw)) return false;
+
+    const escaped = cleanKw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Pattern 1: kw followed by negation particles
+    const regexAfter = new RegExp(escaped + '\\s*(?:के\\s*लिए|का|के|की|ko|ke\\s*liye|ka|ki)?\\s*(?:नहीं|nahi|nh|मत|छोड़कर|छोड़|chhodkar|chhod|के\\s*अलावा|ke\\s*alawa|के\\s*बदले|ke\\s*badle)(?:\\s|[.,?!]|$)', 'i');
+    if (regexAfter.test(q)) return true;
+
+    // Pattern 2: Negation particle right before kw at start of sentence or after punctuation
+    const regexBefore = new RegExp('(?:^|[.,\\n])\\s*(?:नहीं|nahi|मत|बिना|bina|छोड़कर|chhodkar)\\s+(?:के\\s*लिए|ka|ki|ke|ko)?\\s*' + escaped + '(?:\\s|[.,?!]|$)', 'i');
+    if (regexBefore.test(q)) return true;
+
+    return false;
+  }
+
+  // UNIVERSAL PERSON NAME EXTRACTION HELPER
+  // Accurately extracts person name while strictly preventing crops/vegetables/verbs from becoming names
+  function extractPersonNameFromQuery(rawQ, cleanQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const str = rawQ || cleanQ || '';
+
+    // Direct check for prominent known friends/associates
+    if (q.includes('rakesh') || q.includes('राकेश')) return 'राकेश';
+    if (q.includes('manjulata') || q.includes('मंजूलता')) return 'मंजूलता मिश्रा';
+    if (q.includes('pavan') || q.includes('पवन')) return 'पवन पांडे';
+    if (q.includes('suresh') || q.includes('सुरेश')) return 'सुरेश';
+    if (q.includes('ramesh') || q.includes('रमेश')) return 'रमेश';
+    if (q.includes('dinesh') || q.includes('दिनेश')) return 'दिनेश';
+    if (q.includes('mahesh') || q.includes('महेश')) return 'महेश';
+
+    const stopWords = [
+      'khet', 'खेत', 'dawa', 'दवा', 'ekad', 'एकड़', 'fasal', 'फसल', 'spray', 'स्प्रे',
+      'gehu', 'गेहूं', 'chana', 'चना', 'sarso', 'सरसों', 'dhan', 'धान', 'bhindi', 'भिंडी',
+      'tamatar', 'टमाटर', 'mirch', 'मिर्च', 'shimla', 'शिमला', 'ganna', 'गन्ना', 'aalu', 'आलू',
+      'pyaz', 'प्याज', 'lahsun', 'लहसुन', 'gobhi', 'गोभी', 'soyabean', 'सोयाबीन', 'kapas', 'कपास',
+      'sugar', 'शुगर', 'diabetes', 'डायबिटीज', 'joint', 'ज्वाइंट', 'dard', 'दर्द', 'ghutna', 'घुटने',
+      'nahi', 'नहीं', 'banao', 'बनाओ', 'karo', 'करो', 'estimate', 'एस्टीमेट', 'parchi', 'पर्ची',
+      'kisan', 'किसान', 'sathi', 'साथी', 'apne', 'अपने', 'mere', 'मेरे', 'sab', 'सब', 'dost', 'दोस्त',
+      'mitra', 'मित्र', 'bhai', 'भाई', 'distributor', 'डिस्ट्रीब्यूटर', 'netsurf', 'नेटसर्फ', 'plan', 'प्लान',
+      'number', 'नंबर', 'bhejo', 'भेजो', 'bhejna', 'भेजना', 'share', 'शेयर', 'pashu', 'पशु', 'bhains', 'भैंस', 'gai', 'गाय'
+    ];
+
+    // Check patterns
+    const patterns = [
+      // "मुझे राकेश को भेजना है" / "राकेश को भेजना है" / "pavan ko bhejna hai"
+      /(?:मुझे|हमे|हमको)?\s*([a-zA-Zऀ-ॿ]+(?:\s+[a-zA-Zऀ-ॿ]+)?)\s*(?:जी\s*)?को\s*(?:भेजना|शेयर|share|send)/i,
+      // "मेरे दोस्त पवन पांडे के लिए" / "मेरे किसान भाई राकेश के लिए"
+      /(?:मेरे\s*(?:किसान\s*भाई|किशन\s*भाई|दोस्त|मित्र)|dost|mitra|kisan\s*bhai)\s+([a-zA-Zऀ-ॿ]+(?:\s+[a-zA-Zऀ-ॿ]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ko|ke\s*liye)/i,
+      // "राकेश के लिए एस्टीमेट" / "मंजूलता मिश्रा के लिए पर्ची"
+      /([a-zA-Zऀ-ॿ]+(?:\s+[a-zA-Zऀ-ॿ]+)?)\s*(?:जी\s*)?के\s*लिए\s*(?:एस्टीमेट|estimate|पर्ची|parchi|खर्च|kharch|दवा)/i,
+      // Generic: "[Name] के 4 एकड़ में"
+      /([a-zA-Zऀ-ॿ]+(?:\s+[a-zA-Zऀ-ॿ]+)?)\s*(?:जी\s*)?के\s*(\d+|चार|पांच|तीन|दो)\s*(?:एकड़|ekad|बीघा)/i
+    ];
+
+    for (const p of patterns) {
+      const m = str.match(p);
+      if (m && m[1]) {
+        let cand = m[1].trim()
+          .replace(/^(mere|apne|dost|mitra|bhai|kisan|sathi|farmer|mujhe|humko|mera|hamare)\s+/i, '')
+          .replace(/\s+(ji|जी|ke|liye|ko|ka|ki)$/i, '')
+          .trim();
+        if (cand.length >= 2 && !stopWords.includes(cand.toLowerCase())) {
+          return cand;
+        }
+      }
+    }
+
+    return '';
+  }
+
   function handleMasterCropAndPestIntelligence(cleanQ, query) {
     const q = (cleanQ || '').toLowerCase().trim();
     const rawQ = query || cleanQ;
+
+    // DIRECT BUSINESS INTENT & NEGATION GUARDRAIL:
+    // If user says "मैंने चने के लिए नहीं नेट सर्फ प्लान के बारे में पूछा था" or asks pure NetSurf questions,
+    // do NOT hijack the query with crop profile!
+    const isExplicitBusinessIntent = (
+      (q.includes('netsurf') || q.includes('नेटसर्फ') || q.includes('नेट सर्फ') || q.includes('बिजनेस') || q.includes('business') || q.includes('e-teller') || q.includes('ई-टेलर') || q.includes('कमीशन') || q.includes('commission') || q.includes('कैपिंग') || q.includes('capping')) &&
+      (q.includes('नहीं') || q.includes('nahi') || q.includes('प्लान') || q.includes('plan') || q.includes('केवल') || q.includes('सिर्फ') || q.includes('poochha') || q.includes('पूछा'))
+    );
+    if (isExplicitBusinessIntent) {
+      return false; // Route smoothly to NetSurf business logic
+    }
 
     // Strict Domain Guardrail: If strictly human health or strictly corporate NetSurf Capping without crops, pass through
     const isStrictClinical = (
@@ -4480,8 +4767,13 @@
     }
 
     const isStrictCapping = (
-      (q.includes('8.19') || q.includes('8,19,250') || q.includes('capping') || q.includes('binary') || q.includes('generation')) &&
-      !q.includes('sarso') && !q.includes('chana') && !q.includes('tamatar') && !q.includes('gehu') && !q.includes('fasal')
+      (q.includes('8.19') || q.includes('8,19,250') || q.includes('819250') || q.includes('capping') || q.includes('कैपिंग') || q.includes('binary') || q.includes('generation')) &&
+      !isTermInQuery(q, 'sarso') && !isTermInQuery(q, 'सरसों') &&
+      !isTermInQuery(q, 'chana') && !isTermInQuery(q, 'चना') && !isTermInQuery(q, 'चने') &&
+      !isTermInQuery(q, 'tamatar') && !isTermInQuery(q, 'टमाटर') &&
+      !isTermInQuery(q, 'gehu') && !isTermInQuery(q, 'गेहूं') &&
+      !isTermInQuery(q, 'bhindi') && !isTermInQuery(q, 'भिंडी') &&
+      !q.includes('fasal') && !q.includes('फसल')
     );
     if (isStrictCapping) {
       return false;
@@ -4578,14 +4870,120 @@
     // =========================================================================
     let matchedCrop = null;
     for (const crop of MASTER_CROPS_DIRECTORY) {
-      if (crop.keywords.some(kw => q.includes(kw))) {
+      if (crop.keywords.some(kw => isTermInQuery(q, kw) && !isKeywordNegatedInQuery(q, kw))) {
         matchedCrop = crop;
         break;
       }
     }
 
+    // Contextual crop memory recovery if user asks follow-up (e.g. "रासायनिक तरीका बताओ", "तना छेदक में क्या डालें")
+    if (!matchedCrop && sakhiConversationState.lastActiveCrop) {
+      const isAgriFollowUp = (
+        q.includes('rasayanik') || q.includes('रासायनिक') || q.includes('chemical') || q.includes('केमिकल') ||
+        q.includes('beej') || q.includes('बीज') || q.includes('upchar') || q.includes('उपचार') ||
+        q.includes('dawa') || q.includes('दवा') || q.includes('khad') || q.includes('खाद') ||
+        q.includes('keeda') || q.includes('कीड़ा') || q.includes('bimari') || q.includes('बीमारी') ||
+        q.includes('sundi') || q.includes('सुंडी') || q.includes('tana chhedak') || q.includes('तना छेदक') ||
+        q.includes('tarika') || q.includes('तरीका') || q.includes('spray') || q.includes('स्प्रे')
+      );
+      if (isAgriFollowUp) {
+        matchedCrop = MASTER_CROPS_DIRECTORY.find(c => c.id === sakhiConversationState.lastActiveCrop);
+      }
+    }
+
     if (matchedCrop) {
-      // Check if user is asking about specific disease or pest for this crop
+      sakhiConversationState.lastActiveCrop = matchedCrop.id;
+      sakhiConversationState.lastActiveDomain = 'agri';
+
+      // 1. SPECIFIC TARGETED DISEASE / PEST DISPATCH (e.g., तना छेदक, उकठा, माहू, झुलसा, सुंडी)
+      let targetedDisease = null;
+      if (matchedCrop.diseases && matchedCrop.diseases.length > 0) {
+        for (const dis of matchedCrop.diseases) {
+          const dName = dis.name.toLowerCase();
+          if (
+            (dName.includes('तना छेदक') && (q.includes('तना छेदक') || q.includes('stem borer') || q.includes('chhedak') || q.includes('छेदक') || q.includes('borer'))) ||
+            (dName.includes('उकठा') && (q.includes('उकठा') || q.includes('wilt') || q.includes('सूखना'))) ||
+            (dName.includes('माहू') && (q.includes('माहू') || q.includes('mahu') || q.includes('aphid') || q.includes('चेपा') || q.includes('मोयला'))) ||
+            (dName.includes('झुलसा') && (q.includes('झुलसा') || q.includes('blight') || q.includes('blast'))) ||
+            (dName.includes('सुंडी') && (q.includes('सुंडी') || q.includes('sundi') || q.includes('इल्ली') || q.includes('illad') || q.includes('कैटरपिलर'))) ||
+            (dName.includes('चुरड़ा') && (q.includes('चुरड़ा') || q.includes('मुरड़ा') || q.includes('leaf curl') || q.includes('थ्रिप्स') || q.includes('thrips'))) ||
+            (dName.includes('रतुआ') && (q.includes('रतुआ') || q.includes('rust') || q.includes('गेरुआ')))
+          ) {
+            targetedDisease = dis;
+            break;
+          }
+        }
+      }
+
+      if (targetedDisease) {
+        sakhiConversationState.lastActionTopic = 'disease';
+        const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name} में ${targetedDisease.name} का संपूर्ण सटीक समाधान:**
+
+🔍 **लक्षण व पहचान:**
+• ${targetedDisease.symptoms}
+
+🧪 **1. रासायनिक आपातकालीन उपचार (Chemical Emergency Treatment):**
+• ${targetedDisease.chemical}
+• **स्प्रे का समय:** सुबह 10 बजे से पहले या शाम को 4 बजे के बाद (प्रति 15 लीटर पंप में 5ml बायो-99 स्टिकर अवश्य मिलाएं ताकि दवा धुलने से बचे)।
+
+🌿 **2. 100% जैविक व सुरक्षित उपचार (Biofit NetSurf):**
+• ${targetedDisease.organicBiofit}
+• यह पौधों की प्राकृतिक प्रतिरोधक क्षमता बढ़ाता है और मित्र कीटों (जैसे मधुमक्खियों) को बिना नुकसान पहुँचाए कीड़ों व फंगस को रोकता है।
+
+⚠️ **कीटनाशक सुरक्षा निर्देश (Safety Precautions):**
+• रासायनिक कीटनाशकों का घोल बनाते और छिड़कते समय मुँह पर **मास्क** और हाथों में **दस्ताने** अवश्य पहनें।
+• हवा के विपरीत दिशा में कभी भी स्प्रे न करें।
+• बच्चों, पालतू पशुओं और खाद्य सामग्री से कीटनाशक को सुरक्षित दूरी पर रखें।
+• खाली डिब्बों या पाउच को नष्ट करके ज़मीन में गहरा दबा दें।`;
+
+        return renderMasterCropCard(`${matchedCrop.name}: ${targetedDisease.name} का दोहरा उपचार`, resp, [
+          { label: `🌿 बायोफिट जैविक समाधान`, query: `${matchedCrop.keywords[0]} की बीमारी और दवा बताओ` },
+          { label: `🧪 ${matchedCrop.name} खाद व NPK तालिका`, query: `${matchedCrop.keywords[0]} में कौन सी खाद डालें` },
+          { label: `🌾 ${matchedCrop.name} सम्पूर्ण फसल प्रोफाइल`, query: `${matchedCrop.keywords[0]} के बारे में विस्तार से बताओ` },
+          { label: `💬 दादा अवनीश जी से परामर्श`, query: `असली बायोफिट उत्पाद कहाँ मिलेंगे?` }
+        ]);
+      }
+
+      // 2. CHEMICAL SEED TREATMENT / ALTERNATIVE INQUIRY (e.g. "मुझे रासायनिक तरीका बताओ")
+      const isChemicalFollowUp = (
+        (q.includes('rasayanik') || q.includes('रासायनिक') || q.includes('chemical') || q.includes('केमिकल')) &&
+        (q.includes('tarika') || q.includes('तरीका') || q.includes('dawa') || q.includes('दवा') || q.includes('batao') || q.includes('बताओ') || q.includes('upchar') || q.includes('उपचार') || q.includes('beej') || q.includes('बीज'))
+      );
+
+      if (isChemicalFollowUp && (sakhiConversationState.lastActionTopic === 'seed_treatment' || q.includes('beej') || q.includes('बीज') || !q.includes('khad'))) {
+        sakhiConversationState.lastActionTopic = 'seed_treatment';
+        let chemSeedFormula = '';
+        if (matchedCrop.id === 'sarso') {
+          chemSeedFormula = `• **फफूंदनाशक:** कार्बेन्डाजिम 12% + मैंकोज़ेब 63% WP (Saaf / साफ) **2 से 2.5 ग्राम प्रति किलोग्राम बीज**, अथवा थीरम (Thiram) 75% WP 2 ग्राम प्रति किलो।\n• **कीटनाशक (माहू/कीट सुरक्षा):** इमिडाक्लोप्रिड 70% WS (Gaucho) **5 ग्राम प्रति किलो बीज**।\n• **विधि:** पहले फफूंदनाशक दवा थोड़े पानी में घोलकर बीज पर अच्छी तरह मिलाएं, फिर कीटनाशक दवा मिलाएं। छाया में 1-2 घंटे सुखाकर बुवाई करें।`;
+        } else if (matchedCrop.id === 'chana') {
+          chemSeedFormula = `• **उकठा (विल्ट) व जड़ सड़न से बचाव:** कार्बेन्डाजिम 50% WP (2 ग्राम) + थीरम (2 ग्राम) प्रति किलोग्राम बीज।\n• **दीमक व कीट सुरक्षा:** क्लोरपायरीफॉस 20% EC 4-5 मिली प्रति किलो बीज। छाया में सुखाकर बुवाई करें।`;
+        } else if (matchedCrop.id === 'gehu') {
+          chemSeedFormula = `• **कंगुआ व कंडुआ (Loose Smut) रोकथाम:** कार्बोक्सिन 37.5% + थीरम 37.5% DS (विटावैक्स - Vitavax) **2 से 2.5 ग्राम प्रति किलोग्राम बीज**।\n• **दीमक से बचाव:** फिप्रोनिल 5% SC (4-5 ml प्रति किलो बीज)।`;
+        } else if (matchedCrop.id === 'dhan') {
+          chemSeedFormula = `• **बकानी व शीथ ब्लाइट रोकथाम:** कार्बेन्डाजिम 50% WP (2 ग्राम प्रति लीटर पानी) के घोल में बीज को 24 घंटे भिगोएं। रोपाई पूर्व पौधों की जड़ों को 15 मिनट डुबोएं।`;
+        } else {
+          chemSeedFormula = `• **प्रमाणित फफूंदनाशक:** कार्बेन्डाजिम 12% + मैंकोज़ेब 63% WP (Saaf) **2 ग्राम प्रति किलो बीज**।\n• **कीटनाशक सुरक्षा:** इमिडाक्लोप्रिड 70% WS **3 से 5 ग्राम प्रति किलो बीज** मिलाकर छाया में सुखाएं।`;
+        }
+
+        const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name} का प्रमाणित रासायनिक बीज उपचार (Chemical Seed Treatment):**
+
+🧪 **रासायनिक फॉर्मूला व डोज़:**
+${chemSeedFormula}
+
+⚠️ **महत्वपूर्ण सुरक्षा निर्देश (Safety Precautions):**
+1. रासायनिक दवाओं से बीज उपचार करते समय हाथों में **रबर के दस्ताने (Gloves)** और चेहरे पर **मास्क** अनिवार्य रूप से पहनें।
+2. उपचारित बीज को कभी भी इंसानों या पालतू पशु-पक्षियों के खाने के उपयोग में न आने दें।
+3. बीज को हमेशा छाया में सुखाएं, सीधे कड़क धूप में न रखें।
+4. उपचार के बाद हाथों को साबुन से अच्छी तरह धोएं।`;
+
+        return renderMasterCropCard(`${matchedCrop.name}: रासायनिक बीज उपचार विधि`, resp, [
+          { label: `🌱 जैविक बीज उपचार (स्टिमरिच)`, query: `${matchedCrop.keywords[0]} का बीज उपचार कैसे करें` },
+          { label: `🧪 ${matchedCrop.name} खाद व उर्वरक तालिका`, query: `${matchedCrop.keywords[0]} में कौन सी खाद डालें` },
+          { label: `🐛 ${matchedCrop.name} के रोग व दवाएं`, query: `${matchedCrop.keywords[0]} की बीमारी और दवा बताओ` }
+        ]);
+      }
+
+      // Check if user is asking about general diseases or pests for this crop
       const isDiseaseInquiry = (
         q.includes('bimari') || q.includes('बीमारी') || q.includes('rog') || q.includes('रोग') ||
         q.includes('dawa') || q.includes('दवा') || q.includes('keeda') || q.includes('कीड़ा') ||
@@ -4593,10 +4991,14 @@
         q.includes('mahu') || q.includes('माहू') || q.includes('chepa') || q.includes('चेपा') ||
         q.includes('fungus') || q.includes('फफूंद') || q.includes('jhulsa') || q.includes('झुलसा') ||
         q.includes('uktha') || q.includes('उकठा') || q.includes('murda') || q.includes('चुरड़ा') ||
-        q.includes('peela') || q.includes('पीला') || q.includes('sadan') || q.includes('सड़न')
+        q.includes('peela') || q.includes('पीला') || q.includes('sadan') || q.includes('सड़न') ||
+        q.includes('tana chhedak') || q.includes('तना छेदक') || q.includes('stem borer') || q.includes('borer') ||
+        q.includes('rasayanik') || q.includes('रासायनिक') || q.includes('chemical') || q.includes('केमिकल') ||
+        q.includes('kitnashak') || q.includes('कीटनाशक')
       );
 
       if (isDiseaseInquiry) {
+        sakhiConversationState.lastActionTopic = 'disease';
         // Detailed Disease & Dual Treatment Card
         let diseaseDetails = '';
         matchedCrop.diseases.forEach((dis, idx) => {
@@ -4605,6 +5007,9 @@
 
         const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** में लगने वाले प्रमुख रोगों व कीटों का संपूर्ण वैज्ञानिक व सटीक समाधान नीचे दिया गया है:
 ${diseaseDetails}
+
+⚠️ **सुरक्षा निर्देश (Safety Precautions):**
+• रासायनिक कीटनाशकों का छिड़काव करते समय मुँह पर **मास्क** व हाथों में **दस्ताने** अवश्य पहनें और बच्चों-पशुओं की पहुंच से दूर रखें।
 
 📖 **सचित्र पहचान:** खेत में पत्तियों और तनों का लाइव फोटो मिलान करने के लिए आप हमारी **'आरोग्यम संपूर्ण फसल सुरक्षा गाइड' ई-बुक (BK002)** देख सकते हैं।`;
 
@@ -4617,6 +5022,7 @@ ${diseaseDetails}
 
       // Check if asking about Fertilizer Schedule
       if (q.includes('khad') || q.includes('खाद') || q.includes('fertilizer') || q.includes('यूरिया') || q.includes('डीएपी')) {
+        sakhiConversationState.lastActionTopic = 'fertilizer';
         const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** के लिए संपूर्ण खाद, उर्वरक व पोषण प्रबंधन तालिका:
 
 🌱 **बुवाई के समय बेसल डोज़ (प्रति एकड़):**
@@ -4632,7 +5038,8 @@ ${diseaseDetails}
       }
 
       // Check if asking about Seed Treatment
-      if (q.includes('beej upchar') || q.includes('बीज उपचार') || q.includes('seed treatment') || q.includes('शोधन')) {
+      if (q.includes('beej upchar') || q.includes('बीज उपचार') || q.includes('seed treatment') || q.includes('शोधन') || (q.includes('beej') && q.includes('upchar'))) {
+        sakhiConversationState.lastActionTopic = 'seed_treatment';
         const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** का वैज्ञानिक बीज उपचार (Seed Treatment):
 
 🌱 **बीज उपचार का फॉर्मूला:**
@@ -4644,6 +5051,7 @@ ${diseaseDetails}
 3. जड़ों का जाल 30% गहरा और मजबूत बनता है।`;
 
         return renderMasterCropCard(`${matchedCrop.name}: प्रमाणित बीज उपचार विधि`, resp, [
+          { label: `🧪 रासायनिक बीज उपचार तरीका`, query: `${matchedCrop.keywords[0]} का रासायनिक तरीका बताओ` },
           { label: `🌱 ${matchedCrop.name} की उन्नत खेती परिचय`, query: `${matchedCrop.keywords[0]} के बारे में विस्तार से बताओ` },
           { label: `🧪 खाद व उर्वरक तालिका`, query: `${matchedCrop.keywords[0]} में कौन सी खाद डालें` }
         ]);
@@ -4711,9 +5119,9 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     const isSprayQ = cleanQ.includes('स्प्रे') || cleanQ.includes('spray') || cleanQ.includes('दवा का छिड़काव') || cleanQ.includes('छिड़काव');
     if (!isSprayQ) return false;
 
-    const isWheat = cleanQ.includes('गेहूं') || cleanQ.includes('wheat') || cleanQ.includes('gehu');
-    const isMustard = cleanQ.includes('सरसों') || cleanQ.includes('mustard') || cleanQ.includes('sarso') || cleanQ.includes('sarson');
-    const isChana = cleanQ.includes('चना') || cleanQ.includes('gram') || cleanQ.includes('chana');
+    const isWheat = (isTermInQuery(cleanQ, 'गेहूं') || isTermInQuery(cleanQ, 'gehu') || isTermInQuery(cleanQ, 'wheat')) && !isKeywordNegatedInQuery(cleanQ, 'गेहूं');
+    const isMustard = (isTermInQuery(cleanQ, 'सरसों') || isTermInQuery(cleanQ, 'sarso') || isTermInQuery(cleanQ, 'mustard')) && !isKeywordNegatedInQuery(cleanQ, 'सरसों');
+    const isChana = (isTermInQuery(cleanQ, 'चना') || isTermInQuery(cleanQ, 'चने') || isTermInQuery(cleanQ, 'chana') || isTermInQuery(cleanQ, 'gram')) && !isKeywordNegatedInQuery(cleanQ, 'चना') && !isKeywordNegatedInQuery(cleanQ, 'चने');
     const isVeg = cleanQ.includes('सब्जी') || cleanQ.includes('टमाटर') || cleanQ.includes('मिर्च') || cleanQ.includes('बैंगन') || cleanQ.includes('प्याज') || cleanQ.includes('veg');
 
     if (isWheat) {
@@ -4863,6 +5271,68 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     }
 
     const isNetsurfContext = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('कंपनी') || cleanQ.includes('company');
+
+    // DEDICATED CASE 1: MD & COMMANDER INQUIRY ("नेट सर्फ के एमडी और कमांडर कौन है")
+    const isMdOrCommander = isNetsurfContext && (
+      cleanQ.includes('commander') || cleanQ.includes('कमांडर') ||
+      cleanQ.includes('md') || cleanQ.includes('एमडी') || cleanQ.includes('प्रबंध निदेशक') ||
+      cleanQ.includes('sujit jain') || cleanQ.includes('सुजीत जैन') || cleanQ.includes('malpani') || cleanQ.includes('मालपानी')
+    );
+    if (isMdOrCommander) {
+      const resp = `🏢 **नेट्सर्फ एवं आरोग्यम शीर्ष नेतृत्व (Core Leadership):**
+
+1️⃣ **मैनेजिंग डायरेक्टर (MD) व चेयरमैन:**
+• **श्री सुजीत जैन (Mr. Sujit Jain):** नेट्सर्फ कम्युनिकेशन्स के मुख्य संस्थापक एवं प्रबंध निदेशक हैं। उनके 26 वर्षों के नैतिक, पारदर्शी और दूरदर्शी नेतृत्व में नेट्सर्फ भारत की सबसे मजबूत 100% स्वदेशी डायरेक्ट सेलिंग कंपनी बनी है।
+
+2️⃣ **सह-संस्थापक (Co-Founder):**
+• **श्री संजय मालपानी (Mr. Sanjay Malpani):** प्रतिष्ठित मालपानी ग्रुप के प्रख्यात उद्योगपति व नेट्सर्फ के तकनीकी एवं रणनीतिक विस्तारक हैं।
+
+3️⃣ **नेशनल कमांडर व आरोग्यम संस्थापक:**
+• **दादा अवनीश मिश्रा जी (Dada Avneesh):** नेट्सर्फ के नेशनल कमांडर, राष्ट्रीय स्तर के शीर्ष लीडर और 'आरोग्यम भारत' मिशन के संस्थापक हैं। वे किसानों, उपभोक्ताओं व वितरकों को प्रत्यक्ष व्यक्तिगत मार्गदर्शन और प्रशिक्षण प्रदान करते हैं।`;
+
+      return renderNetsurfPlanCard('नेट्सर्फ नेतृत्व: एमडी, फाउंडर व नेशनल कमांडर', resp, [
+        { label: "💼 25% छूट व ₹8.19L प्लान", query: "नेट्सर्फ कम्प्लीट प्लान 25% छूट और कैपिंग क्या है?" },
+        { label: "📦 नेट्सर्फ 4 विंग्स उत्पाद", query: "नेट सर्फ में प्रोडक्ट की कैटेगरी के बारे में बताओ" },
+        { label: "💬 दादा अवनीश जी से सीधे WhatsApp बात", query: "दादा अवनीश जी से बात" }
+      ]);
+    }
+
+    // DEDICATED CASE 2: PRODUCT CATEGORIES & VERTICALS ("नेट सर्फ में कितने टाइप के प्रोडक्ट है", "कैटेगरी")
+    const isCategoryQuery = isNetsurfContext && (
+      cleanQ.includes('category') || cleanQ.includes('कैटेगरी') || cleanQ.includes('केटेगरी') ||
+      cleanQ.includes('kitne type') || cleanQ.includes('कितने टाइप') || cleanQ.includes('kitne prakar') || cleanQ.includes('कितने प्रकार') ||
+      cleanQ.includes('char vertical') || cleanQ.includes('चार वर्टिकल') || cleanQ.includes('4 vertical') || cleanQ.includes('वर्टिकल्स') ||
+      cleanQ.includes('range') || cleanQ.includes('रेंज')
+    );
+    if (isCategoryQuery) {
+      const resp = `📦 **नेट्सर्फ के उत्पाद: 4 प्रमुख विश्वस्तरीय श्रेणियां (Core Wings):**
+
+नेट्सर्फ के पास अपने DSIR-स्वीकृत अनुसंधान केंद्रों और GMP-प्रमाणित निर्माण प्लांट्स में निर्मित 100% शुद्ध, प्राकृतिक और केमिकल-मुक्त 4 प्रमुख श्रेणियां हैं:
+
+🌾 **1. बायोफिट (Biofit — जैविक कृषि विंग):**
+• रासायनिक खाद व कीटनाशकों का खर्च 50% घटाने और पैदावार 25-40% बढ़ाने वाले जैविक उत्पाद।
+• *मुख्य उत्पाद:* **Bio-99** (स्प्रेडर), **Stimrich** (ग्रोथ टॉनिक), **Sheth** (फफूंदनाशक), **Intact** (कीट नियंत्रक), **Wrapup** (कवच), **Bio-NPK** (जैव उर्वरक)।
+
+🌿 **2. नेचुरामोर (Naturamore — हर्बल हेल्थ केयर विंग):**
+• मानव स्वास्थ्य और दीर्घायु के लिए 100% शाकाहारी न्यूट्रास्युटिकल्स व आयुर्वेदिक सप्लीमेंट्स।
+• *मुख्य उत्पाद:* **Joint Care** (जोड़ व कार्टिलेज), **Nutri Heart** (हृदय), **Life Style Plus** (शुगर), **Easy Detox** (पेट व आंतें), **Liver Care** (लिवर डिटॉक्स), **Daily Nutrition Powders**।
+
+🌸 **3. हर्ब्स एंड मोर (Herbs & More — पर्सनल व हेयर केयर):**
+• त्वचा और बालों के लिए पैराबीन व सल्फेट-मुक्त प्राकृतिक सौंदर्य उत्पाद।
+• *मुख्य उत्पाद:* विटामिन थेरेपी फेस वॉश, आयुर्वेदिक हेयर ऑयल, प्रोटीन शैम्पू, डी-टैन क्रीम।
+
+🐄 **4. क्लीन एंड मोर व पेट-वेट (Clean & More & Pet-Vet — होम व पशु पोषण):**
+• पर्यावरण-अनुकूल बायो-डिग्रेडेबल होम केयर और दुधारू पशुओं के लिए **CFC Plus** (दूध-फैट वर्धक)।
+
+🎁 **कंज्यूमर महा-ऑफर:** सभी उत्पादों पर पहले ही दिन से **25% फ्लैट छूट** और **5+1 फ्री प्रॉडक्ट ऑफर** लागू है!`;
+
+      return renderNetsurfPlanCard('नेट्सर्फ उत्पाद श्रृंखला: 4 प्रमुख श्रेणियां (Categories)', resp, [
+        { label: "🌾 बायोफिट कृषि उत्पाद विस्तार", query: "बायोफिट के सभी उत्पादों की जानकारी दो" },
+        { label: "🌿 नेचुरामोर हेल्थ सप्लीमेंट्स", query: "नेचुरामोर हेल्थ प्रोडक्ट्स बताओ" },
+        { label: "🎁 5+1 फ्री ऑफर व 25% छूट", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
     const isProfileKeyword = isNetsurfContext && (cleanQ.includes('प्रोफाइल') || cleanQ.includes('profile') || cleanQ.includes('परिचय') || cleanQ.includes('इतिहास'));
     const isFounderKeyword = isNetsurfContext && (cleanQ.includes('फाउंडर') || cleanQ.includes('संस्थापक') || cleanQ.includes('प्रमोटर') || cleanQ.includes('promoter') || cleanQ.includes('founder') || cleanQ.includes('मालिक') || cleanQ.includes('owner') || cleanQ.includes('सुजीत') || cleanQ.includes('मालपानी') || cleanQ.includes('malpani') || cleanQ.includes('md') || cleanQ.includes('cmd') || cleanQ.includes('डायरेक्टर'));
     const isCompanyOrigin = isNetsurfContext && (cleanQ.includes('स्थापना') || cleanQ.includes('मुख्यालय') || cleanQ.includes('headquarter') || cleanQ.includes('hq') || cleanQ.includes('पुणे') || cleanQ.includes('pune'));
@@ -4955,56 +5425,76 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
   const NETSURF_PLAN_KNOWLEDGE = {
     consumer: {
       joiningFee: 0,
+      app: 'NetSurf World App',
       discountPercent: 25,
       productVoucher: 100,
       voucherMaxUsagePercent: 10,
       voucherStockPointAllowed: false,
       freeDeliveryThreshold: 4000,
-      fivePlusOneRules: {
-        condition: '5 अलग-अलग या एक जैसे प्रोडक्ट एक ही कैलेंडर माह में खरीदने पर 6ठा प्रोडक्ट मुफ़्त',
-        freeProductValue: 'खरीदे गए 5 प्रोडक्ट्स के औसत मूल्य (Average Value) के बराबर',
-        autoShipDiscount: 'ऑटो-शिप एक्टिव रहने पर अतिरिक्त विशेष छूट'
+      fiveMonthBenefit: {
+        condition: 'लगातार 5 महीने खरीदारी करने पर 6ठे महीने Free Products',
+        rule: 'छठे महीने Free Products का MRP, पिछले 5 महीनों में की गई सबसे कम (न्यूनतम) MRP वाली खरीदारी के बराबर होगा',
+        productsChoice: 'पात्र Free MRP सीमा के भीतर अपनी जरूरत के उत्पाद चुन सकते हैं, हर महीने उत्पाद बदल सकते हैं'
       }
     },
     eTeller: {
       joiningFee: 0,
       selfPurchaseCompulsory: false,
-      retailMarginPercent: 25,
-      turnoverSlabs: [
-        { slab: 'Up to ₹24,999', commission: '5%' },
-        { slab: '₹25,000 to ₹49,999', commission: '8%' },
-        { slab: '₹50,000 to ₹99,999', commission: '10%' },
-        { slab: '₹1,00,000 & above', commission: '15%' }
+      weeklyCycle: 'शनिवार से शुक्रवार (Saturday to Friday)',
+      payoutTime: 'सोमवार शाम 6:00 से 8:00 बजे (Monday evening)',
+      weeklyTurnoverSlabs: [
+        { slab: '₹2,000 तक (पहले Slab में)', commission: '5%' },
+        { slab: '₹2,001 से ₹4,000', commission: '10%' },
+        { slab: '₹4,001 से ₹8,000', commission: '12%' },
+        { slab: '₹8,000 से ऊपर', commission: '15%' }
       ],
-      idealScenario: {
+      projectionExample: {
         consumersCount: 100,
-        monthlySpendPerConsumer: 1000,
-        totalTurnover: 100000,
-        monthlyCommission: 15000,
-        annualPotential: 180000
+        mrpPerConsumer: 2000,
+        paidAfterDiscount: 1500,
+        totalCollection: 150000,
+        estimatedNetBusiness: 120000,
+        monthlyProjection: 15000
       }
     },
-    cappingPlan: {
-      cycleDays: 15,
-      maxEarningPerCycle: 819250,
-      maxEarningPerMonth: 1638500,
-      generationIncome: {
-        beginner: '3% (Direct 1st Generation)',
-        lightning: '5% (L1: 3%, L2: 2%)',
-        starClub: '8% (L1: 3%, L2: 2%, L3: 3%)'
-      },
-      binaryTurnoverBonus: {
-        beginner: '3% on Team 1 & Team 2 Matching',
-        lightning: '4% Matching Turnover',
-        starClub: '5% Matching Turnover'
-      },
-      carryForwardPolicy: 'Unmatched volume कभी लैप्स नहीं होता, आजीवन Carry Forward रहता है',
-      securityBenefits: [
-        '₹2,00,000 से ₹25,00,000 तक पारिवारिक सुरक्षा बीमा',
-        'हॉस्पिटलाइजेशन व आकस्मिक चिकित्सा कवर',
-        'आजीवन 100% नॉमिनी ट्रांसफर (परिवार की सुरक्षा)'
+    generationIncome: {
+      reflectedTurnoverFormula: 'उत्पाद MRP -> 25% Discount -> खरीदारी रकम -> माइनस लागू GST -> माइनस Retail Commission = Reflected Turnover',
+      noMatchingCondition: true,
+      slabs: [
+        { turnover: '₹10,000 से कम', commission: '0%' },
+        { turnover: '₹10,000 से ऊपर', commission: '3%' },
+        { turnover: '₹20,000 से ऊपर', commission: '4%' },
+        { turnover: '₹40,000 से ऊपर', commission: '5%' },
+        { turnover: '₹80,000 से ऊपर', commission: '6%' },
+        { turnover: '₹1,20,000 से ऊपर', commission: '7%' },
+        { turnover: '₹1,60,000 से ऊपर', commission: '8%' }
       ]
-    }
+    },
+    binaryTeamIncome: {
+      sides: 'Team 1 व Team 2 Reflected Turnover Matching',
+      unmatchedCarryForward: true,
+      rates: [
+        { condition: '₹40,000 से कम (शुरुआती)', rate: '3%' },
+        { condition: '15-दिवसीय Cycle में ₹40,000 से ऊपर', rate: '4%' },
+        { condition: 'Commission ₹25,000 से अधिक होने पर', rate: '4% Fixed' },
+        { condition: 'मासिक आय ₹50,000 पार होने पर', rate: '5% स्थायी दर' },
+        { condition: 'दोनों Teams में ₹80,000+ Business पर', rate: '5% दोनों तरफ (Matching पर 10%)' }
+      ],
+      cappingProjection: {
+        cycleDays: 15,
+        turnoverExample: 8200000,
+        maxEarningPerCycle: 819250,
+        maxEarningPerMonth: 1638500
+      }
+    },
+    bonuses: [
+      'Rockstar Bonus',
+      'Club NetSurf',
+      'Domestic व International Travel',
+      'Fast Track',
+      'Nominee Facility (Disabled/मृत्यु होने पर Code परिवार के Nominee को ट्रांसफर)',
+      'Family Protection Plan'
+    ]
   };
 
   function renderNetsurfPlanCard(title, bodyMarkdown, actionPills = []) {
@@ -5100,7 +5590,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     const isConsumerKeyword = q.includes('consumer') || q.includes('कंज्यूमर') || q.includes('उपभोक्ता');
     const is5Plus1Keyword = q.includes('5+1') || q.includes('5 plus 1') || q.includes('5 kharid') || q.includes('paanch kharid') || q.includes('पांच खरीद') || q.includes('chatha product free') || q.includes('छठा प्रोडक्ट');
     const isCappingExplicit = q.includes('8.19') || q.includes('8,19,250') || q.includes('819250') || q.includes('capping') || q.includes('कैपिंग');
-    const isBinaryMatching = q.includes('binary') || q.includes('बाइनरी') || q.includes('matching income') || q.includes('मैचिंग') || q.includes('generation income') || q.includes('जनरेशन');
+    const isBinaryMatching = q.includes('binary') || q.includes('बाइनरी') || q.includes('matching income') || q.includes('मैचिंग') || q.includes('generation income') || q.includes('जनरेशन') || (q.includes('जीवन') && q.includes('कमीशन')) || (q.includes('l1') && q.includes('3%')) || (q.includes('l2') && q.includes('2%'));
     
     // Twist / Slang questions that belong to NetSurf when domain is NetSurf OR when asked with business context
     const isTwistWord = (
@@ -5139,409 +5629,288 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     // =========================================================================
 
     // -------------------------------------------------------------------------
-    // TWIST 1: TRUST, FRAUD, SCAM, DOUBT, LEGALITY, 25 YEARS PROOF (सुरक्षा व भरोसा)
+    // =========================================================================
+    // PART 1 & 2: MASTER NETSURF CALCULATIONS & TWIST/MIX Q&A INTELLIGENCE
+    // Strictly updated with the latest plan: 5-month lowest MRP free rule,
+    // weekly retail slabs (5%-15%), Reflected Turnover generation (3%-8%),
+    // binary matching (3%-5%), ₹8,19,250 capping, and 20 Twist Q&As
+    // =========================================================================
+
     // -------------------------------------------------------------------------
-    const isTrustFraudQuery = (
-      q.includes('sanka') || q.includes('shanka') || q.includes('शंका') ||
-      q.includes('sandeh') || q.includes('संदेह') || q.includes('doubt') ||
-      q.includes('frad') || q.includes('fraud') || q.includes('फ़्रॉड') || q.includes('धोखा') || q.includes('dhokha') || q.includes('dokhha') ||
-      q.includes('farzi') || q.includes('फ़र्ज़ी') || q.includes('scam') || q.includes('fake') ||
-      q.includes('bhaag to nahi') || q.includes('bhaag jayegi') || q.includes('भाग जाएगी') ||
-      q.includes('chuna') || q.includes('चूना') || q.includes('lut to nahi') || q.includes('लूट') ||
-      q.includes('trap') || q.includes('ghotala') || q.includes('घोटाला') || q.includes('jhol') || q.includes('झोल') ||
-      q.includes('vishwas') || q.includes('विश्वास') || q.includes('bharosa') || q.includes('भरोसा') ||
-      q.includes('asli ya nakli') || q.includes('asli') || q.includes('nakli') ||
-      q.includes('legal') || q.includes('लीगल') || q.includes('sarkari') || q.includes('सरकारी') ||
-      q.includes('guidelines') || q.includes('गाइडलाइंस') || q.includes('manyata') || q.includes('मान्यता') ||
-      q.includes('registration') || q.includes('रजिस्ट्रेशन') ||
-      q.includes('paisa doob') || q.includes('डूबेगा') || q.includes('loss to nahi') || q.includes('नुकसान') ||
-      q.includes('surakshit') || q.includes('सुरक्षित') || q.includes('company kaisi hai') || q.includes('sahi hai ya galat')
+    // SPECIFIC CALCULATION 1: ₹50,000 GENERATION TURNOVER COMMISSION
+    // (Also handles voice-typing typo 'जीवन कमीशन' / '50000 par jeevan')
+    // -------------------------------------------------------------------------
+    const isGeneration50k = (
+      (q.includes('generation') || q.includes('जनरेशन') || q.includes('जीवन कमीशन') || q.includes('जीवन कमिशन') || (q.includes('जीवन') && q.includes('कमीशन')) || (q.includes('l1') && q.includes('3%')) || (q.includes('l2') && q.includes('2%'))) &&
+      (q.includes('50000') || q.includes('50,000') || q.includes('50 हजार') || q.includes('50 हज़ार') || q.includes('50k'))
     );
-    if (isTrustFraudQuery) {
-      const resp = `आपकी शंका बिल्कुल स्वाभाविक और जायज़ है! आज के समय में किसी भी संस्थान या बिज़नेस से जुड़ने से पहले उसकी विश्वसनीयता और सुरक्षा की पूरी पड़ताल करना हर समझदार व्यक्ति का पहला कर्तव्य है।
+    if (isGeneration50k) {
+      const resp = `👥 **जनरेशन इनकम (Generation Income) का सटीक गणित (₹50,000 रिफ्लेक्टेड टर्नओवर पर):**
 
-आइए, **नेटसर्फ (Netsurf Network)** की वास्तविक कानूनी व ऐतिहासिक स्थिति को बिना किसी घुमाव-फिराव के साफ़-साफ़ समझें:
+नेटसर्फ में जनरेशन इनकम आपकी टीम में आगे होने वाले पात्र बिज़नेस से बनने वाले **Reflected Turnover** पर आधारित होती है।
 
-🛡️ **1. 25+ वर्षों की ऐतिहासिक विश्वसनीयता (Established 2000):**
-• नेटसर्फ कोई नई या रातों-रात खुली कंपनी नहीं है। यह सन 2000 से (26 वर्षों से अधिक समय से) भारत भर में अटूट विश्वास के साथ सफलतापूर्वक काम कर रही है।
-• देश के 28 राज्यों में **65 लाख से अधिक संतुष्ट किसान व परिवार** इसके उत्पादों का निरंतर उपयोग कर रहे हैं।
+📐 **रिफ्लेक्टेड टर्नओवर (Reflected Turnover) निकालने का तरीका:**
+• उत्पाद का MRP लिया जाता है।
+• 25% छूट के बाद खरीदारी की रकम निर्धारित होती है।
+• लागू GST हटाकर Net Amount निकलता है।
+• उसमें से रिटेल कमीशन घटाने के बाद बचा पात्र बिज़नेस = **Reflected Turnover** बनता है।
 
-⚖️ **2. 100% भारत सरकार की डायरेक्ट सेलिंग नियमावली (Rules 2021) के अनुरूप:**
-• नेटसर्फ **Ministry of Consumer Affairs (उपभोक्ता मामले मंत्रालय)** की डायरेक्ट सेलिंग रूल्स 2021 का शत-प्रतिशत पालन करती है।
-• यह **FDSA (Federation of Direct Selling Association)** की सम्मानित कोर सदस्य है।
+📊 **जनरेशन कमीशन के आधिकारिक स्लैब्स (Matching की कोई शर्त नहीं):**
+• ₹10,000 से कम: **0%**
+• ₹10,000 से ऊपर: **3%**
+• ₹20,000 से ऊपर: **4%**
+• ₹40,000 से ऊपर: **5%** 👈 *(₹50,000 इस स्लैब में आता है)*
+• ₹80,000 से ऊपर: **6%**
+• ₹1,20,000 से ऊपर: **7%**
+• ₹1,60,000 से ऊपर: **8%**
 
-💼 **3. ₹0 जॉइनिंग फीस — डूबाने के लिए ₹1 का भी रिस्क नहीं:**
-• किसी भी तरह की कोई जॉइनिंग फीस, रिन्यूअल फीस या जबरन किट खरीदने की बाध्यता नहीं है।
-• जब आपने अपनी जेब से कोई गैर-ज़रूरी निवेश किया ही नहीं, तो **धोखे या आर्थिक नुकसान की 0.00% संभावना** है!
+💰 **₹50,000 रिफ्लेक्टेड टर्नओवर पर सटीक कमीशन:**
+1️⃣ **स्लैब दर अनुसार (₹40,000 - ₹80,000 स्लैब = 5%):**
+   **₹50,000 × 5% = ₹2,500 कमीशन!**
 
-🔬 **4. स्वयं की DSIR-स्वीकृत रिसर्च लैब व विशाल मैन्युफैक्चरिंग प्लांट्स:**
-• नेटसर्फ कोई थर्ड-पार्टी रीसेलर नहीं है। पुणे, हिमाचल व सिक्किम में कंपनी के अपने अत्याधुनिक R&D केंद्र और विनिर्माण संयंत्र हैं, जिन्हें भारत सरकार के विज्ञान एवं प्रौद्योगिकी मंत्रालय (DSIR) से मान्यता प्राप्त है।
+2️⃣ **जनरेशन लेवल अनुसार विभाजन:**
+• **Beginner Level (L1 पर 3%):** ₹50,000 × 3% = **₹1,500**
+• **Lightning Level (L1: 3% + L2: 2% = 5%):** **₹2,500**
+• **Star Club & Above (L1: 3% + L2: 2% + L3: 3% = 8%):** **₹4,000**
 
-🏦 **5. 100% व्हाइट मनी — सीधे आपके KYC बैंक खाते में भुगतान:**
-• कोई कैश का लेन-देन नहीं होता। प्रत्येक चक्र का भुगतान सीधे आपके आधार/पैन से लिंक बैंक खाते में NEFT/RTGS द्वारा ट्रांसफर होता है, जिसमें नियमानुसार TDS काटकर वैध वाउचर जारी किया जाता है।
+💡 **महत्वपूर्ण नियम:**
+• **कोई मैचिंग नहीं:** जनरेशन इनकम में बाइनरी की तरह दो टीमों की मैचिंग नहीं होती।
+• **कोई कैपिंग नहीं:** यह इनकम बिना किसी पाक्षिक कैपिंग के **Unlimited** मिलती है!
 
-🌟 **निष्कर्ष:** आरोग्यम भारत और नेटसर्फ का यह मॉडल पूरी तरह पारदर्शी, सुरक्षित और पीढ़ियों तक चलने वाला प्रमाणित बिज़नेस है। आप बेझिझक, निडर होकर शुरुआत कर सकते हैं!`;
+*नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं। वास्तविक लाभ पात्र Business, लागू Commission Rules, कंपनी की शर्तों और व्यक्ति के प्रयास पर निर्भर करता है।*`;
 
-      return renderNetsurfPlanCard('सुरक्षा व भरोसा: नेटसर्फ की वास्तविकता व 100% लीगल स्टेटस', resp, [
-        { label: "💰 जुड़ने का ख़र्च व प्रक्रिया जानें", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" },
-        { label: "📦 क्या दुकान या स्टॉक रखना पड़ेगा?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
-        { label: "🤝 अगर कोई न जुड़े तो कमाई कैसे होगी?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
+      return renderNetsurfPlanCard('₹50,000 जनरेशन टर्नओवर: सटीक 5% कमीशन (₹2,500)', resp, [
+        { label: "⚖️ 2 लाख बाइनरी मैचिंग कमीशन", query: "अगर मेरे टीम 1 टीम 2 में 2 लाख की मैचिंग होती है तो मुझे कितना कमीशन मिलेगा" },
+        { label: "📱 ई-टेलर साप्ताहिक कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🏆 819250 कैपिंग तक कैसे पहुंचें?", query: "819250 पहुंचने के लिए मुझे कितने लोगों को ज्वाइन करना पड़ेगा" }
       ]);
     }
 
     // -------------------------------------------------------------------------
-    // TWIST 2: JOINING FEES, INVESTMENT, COST, FREE VS PAID (शून्य लागत / ₹0 में शुरुआत)
+    // SPECIFIC CALCULATION 2: 2 LAKH & 1 LAKH BINARY MATCHING COMMISSION
     // -------------------------------------------------------------------------
-    const isJoiningFeeQuery = (
-      q.includes('judne ke liye kitna') || q.includes('judne me kitna') || q.includes('judne ka paisa') ||
-      q.includes('judne') || q.includes('जुड़ने') || q.includes('judna') || q.includes('judane') ||
-      q.includes('kitna paisa lagega') || q.includes('kitna lagta hai') || q.includes('kitna kharch') ||
-      q.includes('shuru karne me kitna') || q.includes('shuruat me kitna') ||
-      q.includes('lagat') || q.includes('लागत') || q.includes('kharcha') || q.includes('खर्च') ||
-      q.includes('investment') || q.includes('invest') || q.includes('निवेश') ||
-      q.includes('paisa lagta hai kya') || q.includes('free hai ya paise') ||
-      q.includes('joining fee') || q.includes('joining fees') || q.includes('जॉइनिंग') ||
-      q.includes('registration fee') || q.includes('पंजीकरण') ||
-      q.includes('kit khareedna') || q.includes('kit lena') ||
-      q.includes('id activation') || q.includes('id activate') || q.includes('id banwane') ||
-      q.includes('kitne rupaye') || q.includes('membership fee') || q.includes('kitna dena hoga') ||
-      q.includes('pehle paise dene padenge') || q.includes('free me join')
+    const isBinary2Lakh = (
+      (q.includes('binary') || q.includes('बाइनरी') || q.includes('matching') || q.includes('मैचिंग') || q.includes('टीम 1') || q.includes('team 1')) &&
+      (q.includes('2 lakh') || q.includes('2 लाख') || q.includes('200000') || q.includes('2,00,000') || q.includes('दो लाख') || q.includes('200k'))
     );
-    if (isJoiningFeeQuery) {
-      const resp = `सीधा और साफ़ जवाब: **नेटसर्फ में जुड़ने का शुल्क बिल्कुल ₹0 (शून्य / बिल्कुल FREE) है!**
+    if (isBinary2Lakh) {
+      const resp = `⚖️ **टीम मैचिंग / बाइनरी इनकम का सटीक गणित (₹2,00,000 मैचिंग पर):**
 
-यहाँ आपको शुरुआत करने के लिए अपनी जेब से कोई भारी-भरकम पूंजी या एडवांस नहीं लगाना होता:
+नेटसर्फ में टीम बिज़नेस को दो पक्षों में समझा जाता है—**Team 1** और **Team 2**। जब दोनों पक्षों के पात्र Reflected Turnover की मैचिंग ₹2,00,000 होती है, तो कमीशन की दरें इस प्रकार लागू होती हैं:
 
-🟢 **1. ₹0 रजिस्ट्रेशन फीस (100% मुफ़्त डिजिटल जॉइनिंग):**
-• आधार कार्ड, पैन कार्ड और बैंक पासबुक विवरण के साथ आपकी डिजिटल आईडी मात्र 2 मिनट में निःशुल्क एक्टिवेट हो जाती है।
+📊 **लागू कमीशन दरें व पे-आउट:**
+1️⃣ **शुरुआती स्तर पर (3% दर):**
+   ₹2,00,000 मैचिंग × 3% = **₹6,000** पे-आउट
+2️⃣ **15-दिवसीय सायकल में ₹40,000 से ऊपर बिज़नेस पर (4% दर):**
+   ₹2,00,000 मैचिंग × 4% = **₹8,000** पे-आउट
+   *(कमीशन ₹25,000 से अधिक होने पर 4% पर फिक्स होने का नियम लागू होता है)*
+3️⃣ **क्लब लेवल / मासिक आय ₹50,000 पार होने पर (5% स्थायी दर):**
+   ₹2,00,000 मैचिंग × 5% = **₹10,000** पे-आउट
 
-🟢 **2. ₹0 अनिवार्य पैकेज या किट बाध्यता:**
-• कई कंपनियों में ₹10,000 या ₹25,000 की जबरन स्टार्टर किट लेनी पड़ती है। नेटसर्फ में ऐसी **कोई किट बाध्यता नहीं** है।
+🛡️ **Carry Forward का स्वर्णिम नियम:**
+यदि Team 1 में ₹3,00,000 और Team 2 में ₹2,00,000 का बिज़नेस है, तो ₹2,00,000 की मैचिंग होगी और बचा हुआ ₹1,00,000 अगले चक्र के लिए **आजीवन Carry Forward** रहेगा!
 
-🟢 **3. ₹0 रिन्यूअल फीस (आजीवन वैध आईडी):**
-• आपकी आईडी कभी एक्सपायर नहीं होती और न ही हर साल रिन्यूअल के नाम पर कोई अतिरिक्त चार्ज लगता है।
+*नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं। वास्तविक लाभ पात्र Business, लागू Commission Rules, कंपनी की शर्तों और व्यक्ति के प्रयास पर निर्भर करता है।*`;
 
-🎁 **जॉइन करते ही मिलने वाले तुरंत लाभ:**
-1. **25% फ्लैट छूट:** पहले ही दिन से हर उत्पाद पर 25% का भारी डिस्काउंट।
-2. **₹100 का वेलकम वाउचर:** जॉइनिंग पर आपके अकाउंट में ₹100 का प्रोडक्ट डिस्काउंट कूपन।
-3. **5+1 का विशेष ऑफर:** 5 प्रोडक्ट खरीदने पर छठा प्रोडक्ट 100% मुफ़्त!
-4. **5% से 15% रिटेल कमीशन:** अपनी पसंद से उत्पादों की सिफ़ारिश कर पहले ही दिन से बैंक में कमाई शुरू करने का अधिकार।
+      return renderNetsurfPlanCard('₹2,00,000 बाइनरी मैचिंग: सटीक कमीशन गणना', resp, [
+        { label: "⚖️ 1 लाख बाइनरी मैचिंग", query: "अगर मेरी टीम में एक लाख का टर्नओवर आता है तो बाइनरी कमीशन कितना मिलेगा?" },
+        { label: "👥 ₹50,000 जनरेशन टर्नओवर कमीशन", query: "मेरे जनरेशन में अगर 50000 का बिजनेस आता है तो मुझे कितना कमीशन मिलेगा" },
+        { label: "🏆 ₹8.19L कैपिंग प्लान देखें", query: "क्या सच में 819250 कैपिंग मिलती है?" }
+      ]);
+    }
 
-💡 **आपको क्या करना है?** सिर्फ अपनी या अपने परिवार की ज़रूरत का कोई भी 1 प्रामाणिक जैविक उत्पाद यूज़ करके देखें। यदि पसंद आए तो दूसरों को बताएँ और कमाएँ!`;
+    const isBinary1Lakh = (
+      (q.includes('binary') || q.includes('बाइनरी') || q.includes('matching') || q.includes('मैचिंग') || q.includes('टर्नओवर') || q.includes('रिफ्लेक्ट')) &&
+      (q.includes('1 lakh') || q.includes('1 लाख') || q.includes('100000') || q.includes('1,00,000') || q.includes('एक लाख') || q.includes('100k'))
+    );
+    if (isBinary1Lakh) {
+      const resp = `⚖️ **टीम मैचिंग / बाइनरी इनकम का सटीक गणित (₹1,00,000 मैचिंग पर):**
 
-      return renderNetsurfPlanCard('₹0 जॉइनिंग — नेटसर्फ में जुड़ने का कोई ख़र्च नहीं', resp, [
-        { label: "🏪 क्या दुकान खोलनी पड़ेगी?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
-        { label: "🎯 क्या हर महीने टारगेट होता है?", query: "क्या हर महीने टारगेट पूरा करना पड़ेगा या आईडी बंद होगी?" },
-        { label: "📱 ई-टेलर बनकर बिना टीम कमाई कैसे करें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" }
+नेटसर्फ में Team 1 और Team 2 के पात्र Reflected Turnover की मैचिंग पर कमीशन निकाला जाता है:
+
+📊 **लागू कमीशन दरें:**
+• **15-दिवसीय सायकल में ₹40,000 से ऊपर (4% दर):**
+  ₹1,00,000 मैचिंग × 4% = **₹4,000 पे-आउट**
+• **मासिक आय ₹50,000 पार होने पर (5% स्थायी दर):**
+  ₹1,00,000 मैचिंग × 5% = **₹5,000 पे-आउट**
+• **शुरुआती स्तर (3% दर):**
+  ₹1,00,000 मैचिंग × 3% = **₹3,000 पे-आउट**
+
+🛡️ **Carry Forward नियम:** कम टर्नओवर वाले पक्ष के बराबर मैचिंग होती है और अतिरिक्त टर्नओवर अगले चक्र के लिए सुरक्षित रहता है।`;
+
+      return renderNetsurfPlanCard('₹1,00,000 बाइनरी मैचिंग: सटीक कमीशन गणना', resp, [
+        { label: "⚖️ 2 लाख बाइनरी मैचिंग कमीशन", query: "अगर मेरे टीम 1 टीम 2 में 2 लाख की मैचिंग होती है तो मुझे कितना कमीशन मिलेगा" },
+        { label: "📱 ई-टेलर साप्ताहिक कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🏆 ₹8.19L कैपिंग प्लान देखें", query: "क्या सच में 819250 कैपिंग मिलती है?" }
       ]);
     }
 
     // -------------------------------------------------------------------------
-    // TWIST 3: SHOP, STOCK, GODOWN, INVENTORY (दुकान या स्टॉक रखने का कोई झंझट नहीं)
+    // SPECIFIC CALCULATION 3: 8,19,250 CAPPING — KITNE LOGON KO JOIN KARANA HOGA?
     // -------------------------------------------------------------------------
-    const isShopStockQuery = (
-      q.includes('dukan') || q.includes('dukaan') || q.includes('दुकान') ||
-      q.includes('store') || q.includes('स्टोर') ||
-      q.includes('stock') || q.includes('स्टॉक') ||
-      q.includes('godown') || q.includes('गोदाम') ||
-      q.includes('maal') || q.includes('माल') ||
-      q.includes('ghar me bharna') || q.includes('ghar pe rakhna') || q.includes('घर में भरना') ||
-      q.includes('kharid ke rakhna') || q.includes('खरीद के रखना') ||
-      q.includes('saman lana padega') || q.includes('सामान रखना') ||
-      q.includes('inventory') || q.includes('dukan chahiye') ||
-      q.includes('ghar ghar jakar bechna') || q.includes('jhola leke')
+    const isHowManyPeopleForCapping = (
+      (q.includes('819250') || q.includes('8,19,250') || q.includes('8.19') || q.includes('capping') || q.includes('कैपिंग')) &&
+      (q.includes('kitne log') || q.includes('कितने लोग') || q.includes('kitne logon') || q.includes('कितने लोगों') || q.includes('join karana') || q.includes('जोड़ना पड़ेगा') || q.includes('jodna'))
     );
-    if (isShopStockQuery) {
-      const resp = `बिल्कुल नहीं! **नेटसर्फ में आपको 1 रुपये की भी दुकान, गोदाम या स्टॉक रखने की कोई आवश्यकता नहीं है!**
+    if (isHowManyPeopleForCapping) {
+      const resp = `🏆 **₹8,19,250 कैपिंग तक पहुँचने के लिए कितने लोगों को जोड़ना होगा?**
 
-यह 21वीं सदी का आधुनिक **डिजिटल ई-कॉमर्स व डायरेक्ट-टू-कंज्यूमर (D2C)** मॉडल है:
+नेटसर्फ में कैपिंग तक पहुँचने के लिए **लोगों की कोई निर्धारित संख्या तय नहीं होती**, बल्कि यह आपकी **Team 1 और Team 2 के 15-दिवसीय मैचिंग टर्नओवर** पर आधारित है:
 
-📦 **1. कंपनी संभालती है पूरा वेयरहाउस और लॉजिस्टिक्स:**
-• आपको घर में पेटियाँ भरकर रखने या पैसे फंसाने की ज़रूरत नहीं है।
-• सारा स्टॉक, सुरक्षित पैकेजिंग और डिलीवरी नेटसर्फ के अपने सेंट्रलाइज्ड वेयरहाउस से होती है।
+⚖️ **टर्नओवर का वास्तविक गणित:**
+• 15 दिन के एक पे-आउट चक्र में अधिकतम सीमा **₹8,19,250** है।
+• 5% क्लब लेवल दर के अनुसार, जब आपकी दोनों टीमों में लगभग **₹82 लाख का पात्र रिफ्लेक्टेड टर्नओवर मैच** होता है, तो आप अधिकतम ₹8,19,250 की कैपिंग प्राप्त करते हैं।
+• 1 महीने में 2 चक्र होते हैं, यानी अधिकतम **₹16,38,500 प्रति माह** केवल टीम मैचिंग से!
 
-🚚 **2. सीधा ग्राहक के घर कूरियर डिलीवरी (Doorstep Delivery):**
-• जब भी कोई किसान या परिवार आपकी सलाह पर उत्पाद मंगाना चाहता है, आप सीधे अपने मोबाइल ऐप से या अपनी रेकमेंडेशन लिंक द्वारा ऑर्डर लगाते हैं।
-• कंपनी का कूरियर पार्टनर सीधे ग्राहक के घर तक पार्सल सुरक्षित पहुँचाता है।
-• ₹4,000 से ऊपर के ऑर्डर पर **100% फ्री होम डिलीवरी** की सुविधा उपलब्ध है।
+👥 **लोगों की संख्या की कोई बाध्यता नहीं:**
+• आप सीधे 2 या 4 समर्पित लीडर्स जोड़कर भी, उनकी टीमों द्वारा किए गए बड़े टर्नओवर से कैपिंग तक पहुँच सकते हैं।
+• यदि किसान, पशुपालक या परिवार नियमित रूप से उत्पाद खरीदते हैं, तो टर्नओवर स्वतः बढ़ता है।
+• **सीधे शब्दों में:** यह सिर गिनने (Head Count) का नहीं, बल्कि जैविक उत्पादों के शुद्ध टर्नओवर का बिज़नेस है!
 
-📱 **3. सिर्फ मोबाइल से डिजिटल बिज़नेस:**
-• आपका पूरा कारोबार आपके स्मार्टफोन से संचालित होता है।
-• ग्राहक को बिल, ट्रैकिंग नंबर और डिलीवरी अपडेट सीधे SMS और WhatsApp पर कंपनी द्वारा भेजा जाता है।
-• और आपका **5% से 15% का कमीशन** सीधे आपके बैंक खाते में जमा हो जाता है!`;
+*नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं।*`;
 
-      return renderNetsurfPlanCard('ज़ीरो दुकान व ज़ीरो स्टॉक: शुद्ध डिजिटल मॉडल', resp, [
-        { label: "💳 पैसा कब और किस दिन बैंक में आता है?", query: "नेटसर्फ में पैसा कब और कैसे आता है?" },
-        { label: "👥 अगर कोई न जुड़े तो कमाई कैसे होगी?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
+      return renderNetsurfPlanCard('₹8,19,250 कैपिंग: लोगों की संख्या बनाम टर्नओवर', resp, [
+        { label: "⚖️ 2 लाख बाइनरी मैचिंग कमीशन", query: "अगर मेरे टीम 1 टीम 2 में 2 लाख की मैचिंग होती है तो मुझे कितना कमीशन मिलेगा" },
+        { label: "📱 बिना टीम के ई-टेलर से कमाई", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
+        { label: "🛡️ क्या कंपनी 100% सुरक्षित है?", query: "नेटसर्फ की वास्तविकता और लीगल स्टेटस क्या है?" }
       ]);
     }
 
     // -------------------------------------------------------------------------
-    // TWIST 4: TARGET, ID BLOCK, LAPSE, EXPIRY, COMPULSORY PURCHASE (ज़ीरो टारगेट / सुरक्षित आईडी)
+    // SPECIFIC CALCULATION 4: WEEKLY RETAIL COMMISSION SLABS (5% TO 15%)
+    // (Saturday to Friday Cycle, Monday Bank Transfer)
     // -------------------------------------------------------------------------
-    const isTargetLapseQuery = (
-      q.includes('target') || q.includes('टारगेट') ||
-      q.includes('id band') || q.includes('id block') || q.includes('आईडी बंद') || q.includes('आईडी ब्लॉक') ||
-      q.includes('lapse') || q.includes('लैप्स') || q.includes('expiry') || q.includes('renewal') ||
-      q.includes('har mahine kharidna') || q.includes('compulsory') || q.includes('अनिवार्य') ||
-      q.includes('target pura na ho') || q.includes('point zero') || q.includes('pressure')
+    const isRetailerCommissionGeneral = (
+      (q.includes('retail') || q.includes('रिटेल') || q.includes('retailer') || q.includes('रिटेलर') || q.includes('e-teller') || q.includes('ई-टेलर')) &&
+      (q.includes('commission') || q.includes('कमीशन') || q.includes('kitna') || q.includes('कितना') || q.includes('slab') || q.includes('स्लैब'))
     );
-    if (isTargetLapseQuery) {
-      const resp = `नेटसर्फ की सबसे बड़ी मानवीय और नैतिक ताकत है इसकी **'ज़ीरो टारगेट' (No Pressure) पॉलिसी!**
+    if (isRetailerCommissionGeneral) {
+      const resp = `📱 **नेट्सर्फ ई-टेलर साप्ताहिक रिटेल कमीशन स्लैब्स (5% से 15%):**
 
-🎯 **1. कोई मासिक या वार्षिक टारगेट नहीं:**
-• आपको हर महीने जबरन कोई कोटा या टारगेट पूरा करने का कोई मानसिक दबाव नहीं दिया जाता।
-• आप अपनी गति, अपनी सुविधा और अपनी पसंद के अनुसार काम करने के लिए पूरी तरह स्वतंत्र हैं।
+जब आपके जुड़े हुए Consumers NetSurf World App से सीधे पात्र खरीदारी करते हैं, तो उस साप्ताहिक बिज़नेस के आधार पर आपको रिटेल कमीशन मिलता है:
 
-🔒 **2. आईडी कभी बंद (Block/Lapse) नहीं होती:**
-• कई कंपनियों में यदि आप 2 महीने खरीदारी न करें तो आईडी बंद हो जाती है। नेटसर्फ में ऐसा बिल्कुल नहीं होता।
-• आपकी आईडी हमेशा एक्टिव और सुरक्षित रहती है।
+📅 **साप्ताहिक सायकल व भुगतान:**
+• **क्लोजिंग सायकल:** शनिवार से शुक्रवार
+• **भुगतान:** सोमवार शाम लगभग 6:00 से 8:00 बजे सीधे बैंक खाते में ट्रांसफर
 
-🔄 **3. लाइफटाइम कैरी फॉरवर्ड (Lifetime Carry Forward):**
-• यदि आपकी एक टीम में इस चक्र में बिज़नेस वॉल्यूम अधिक हुआ और दूसरी टीम में कम, तो आपका बचा हुआ वॉल्यूम कभी 'शून्य' या फ्लश नहीं होता।
-• वह आजीवन अगले चक्रों के लिए सुरक्षित **Carry Forward** रहता है।
+📊 **साप्ताहिक पात्र Consumer Business कमीशन स्लैब तालिका:**
+1️⃣ **₹2,000 तक / पहले स्लैब में:** **5%** कमीशन
+2️⃣ **₹2,001 से ₹4,000 तक:** **10%** कमीशन
+3️⃣ **₹4,001 से ₹8,000 तक:** **12%** कमीशन
+4️⃣ **₹8,000 से ऊपर:** **15%** उच्चतम कमीशन
 
-🛍️ **4. कोई जबरन सेल्फ़-परचेज़ (Self-Purchase) नहीं:**
-• ई-टेलर मॉडल में अपना कमीशन प्राप्त करने के लिए आपको हर महीने अपनी जेब से ख़रीददारी करने की कोई मजबूरी नहीं है।`;
+🎯 **100 Consumers का व्यावहारिक प्रोजेक्शन:**
+• 100 Consumers यदि ₹2,000 MRP का सामान 25% छूट पर खरीदते हैं, तो हर ग्राहक ₹1,500 का भुगतान करेगा (कुल भुगतान = ₹1,50,000)।
+• GST आदि हटाने के बाद लगभग ₹1,20,000 Net Business पर 15% के आधार पर **लगभग ₹15,000+ मासिक आय** का प्रोजेक्शन बनता है!
 
-      return renderNetsurfPlanCard('ज़ीरो-टारगेट गारंटी: तनाव-मुक्त व आजीवन सुरक्षित आईडी', resp, [
-        { label: "🤝 अगर कोई न जुड़े तो?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
-        { label: "💰 ई-टेलर बनकर 15% कमीशन कैसे लें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" }
+💡 **प्रमुख नियम:**
+• **₹0 जॉइनिंग:** कोई रजिस्ट्रेशन या एक्टिवेशन शुल्क नहीं।
+• **₹0 सेल्फ़-परचेज़:** कमीशन पाने के लिए हर महीने खुद खरीदना अनिवार्य नहीं।
+
+*नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं।*`;
+
+      return renderNetsurfPlanCard('नेट्सर्फ साप्ताहिक रिटेल कमीशन स्लैब (5% से 15%)', resp, [
+        { label: "📦 क्या खुद सामान खरीदना जरूरी है?", query: "क्या ई-टेलर बनने के लिए खुद सामान खरीदना जरूरी है?" },
+        { label: "🎁 5 महीने खरीदारी का Free Benefit", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
+        { label: "👥 ₹50,000 जनरेशन टर्नओवर कमीशन", query: "मेरे जनरेशन में अगर 50000 का बिजनेस आता है तो मुझे कितना कमीशन मिलेगा" }
       ]);
     }
 
     // -------------------------------------------------------------------------
-    // TWIST 5: PAYOUT TIMELINE, BANK CREDIT, TDS (पैसा कब और कैसे आता है?)
+    // SPECIFIC CALCULATION 5: IS ₹8,19,250 CAPPING REAL / TRUE?
     // -------------------------------------------------------------------------
-    const isPayoutMethodQuery = (
-      q.includes('paisa kab') || q.includes('payment kab') || q.includes('पैसा कब') || q.includes('पेमेंट कब') ||
-      q.includes('khate me') || q.includes('खाते में') || q.includes('bank me') || q.includes('बैंक में') ||
-      q.includes('payout') || q.includes('पेआउट') || q.includes('kitne din me paisa') ||
-      q.includes('cycle kya hai') || q.includes('paisa kaise nikalte') || q.includes('direct bank') ||
-      q.includes('tds') || q.includes('white money') || q.includes('kab milta hai')
+    const isCappingRealQuery = (
+      (q.includes('819250') || q.includes('8,19,250') || q.includes('8.19') || q.includes('capping') || q.includes('कैपिंग')) &&
+      (q.includes('sach') || q.includes('सच') || q.includes('asli') || q.includes('milti hai') || q.includes('मिलती है') || q.includes('real') || q.includes('hoti hai') || q.includes('होती है') || q.includes('kya sach'))
     );
-    if (isPayoutMethodQuery) {
-      const resp = `नेटसर्फ में आपकी मेहनत की पाई-पाई का भुगतान **100% पारदर्शी, कानूनी और निर्धारित समय पर सीधे आपके बैंक खाते में** जमा होता है:
+    if (isCappingRealQuery) {
+      const resp = `🏆 **क्या सच में ₹8,19,250 की कैपिंग मिलती है? — 100% सच, कानूनी व प्रमाणित:**
 
-🗓️ **1. 15-दिवसीय द्वैमासिक पेआउट साइकिल (Bi-Monthly Cycle):**
-नेटसर्फ का महीना 2 स्पष्ट चक्रों में विभाजित होता है:
-• **साइकिल 1:** महीने की 1 तारीख से 15 तारीख तक (हिसाब 15 को क्लोज़ होता है)।
-• **साइकिल 2:** महीने की 16 तारीख से महीने की अंतिम तारीख तक।
+हाँ! नेटसर्फ का **₹8,19,250 पाक्षिक (15-दिवसीय) कैपिंग मॉडल** भारत के डायरेक्ट सेलिंग इतिहास का सबसे वास्तविक, पारदर्शी और प्रमाणित लीडरशिप पे-आउट है:
 
-🏦 **2. सीधे बैंक ट्रांसफर (Direct NEFT/RTGS):**
-• साइकिल क्लोज़ होने के बाद कंपनी के ऑटोमेटेड सिस्टम द्वारा आपकी कमाई सीधे आपके रजिस्टर्ड बैंक खाते में ट्रांसफर कर दी जाती है।
-• आपको किसी से पैसा माँगने या अप्रूवल का इंतज़ार करने की ज़रूरत नहीं है।
+⚖️ **कैपिंग की वास्तविक संरचना:**
+• **15 दिन का 1 पे-आउट चक्र:** टीम 1 और टीम 2 की बाइनरी मैचिंग से हर 15 दिन में अधिकतम **₹8,19,250** कमाए जा सकते हैं।
+• **मासिक उच्चतम कैपिंग सीमा:** 1 महीने में 2 चक्र होते हैं, यानी केवल टीम मैचिंग से अधिकतम **₹16,38,500 प्रति माह**।
+• **अनलिमिटेड जनरेशन इनकम (Over & Above):** जनरेशन इनकम (3% से 8%) पर यह कैपिंग लागू नहीं होती — वह पूरी तरह **Unlimited** मिलती है!
 
-🧾 **3. 100% व्हाइट मनी व वैधानिक TDS कटौती:**
-• प्रत्येक भुगतान भारत सरकार के आयकर नियमों के अनुसार TDS काटकर जमा किया जाता है।
-• आपके मोबाइल ऐप पर बाक़ायदा डिजिटल इनवॉइस और पेआउट स्टेटमेंट उपलब्ध रहता है, जिसे आप अपने इनकम टैक्स रिटर्न (ITR) में दिखा सकते हैं।`;
+🛡️ **26 वर्षों का अटूट ट्रैक रिकॉर्ड:**
+• नेटसर्फ सन 2000 से (26 वर्षों से) कार्यरत है और सभी पे-आउट्स पर नियमानुसार भारत सरकार का टीडीएस (TDS) कटता है।`;
 
-      return renderNetsurfPlanCard('पारदर्शी पेआउट सिस्टम: 15-दिवसीय बैंक ट्रांसफ़र', resp, [
-        { label: "🛡️ क्या कंपनी पर भरोसा किया जा सकता है?", query: "क्या नेटसर्फ सुरक्षित और भरोसेमंद कंपनी है?" },
-        { label: "🏆 15 दिन में ₹8.19 लाख कैपिंग प्लान क्या है?", query: "बाइनरी मैचिंग और 8.19 लाख कैपिंग प्लान समझाइए" }
+      return renderNetsurfPlanCard('₹8,19,250 कैपिंग की सच्चाई व वैधानिकता', resp, [
+        { label: "⚖️ 2 लाख बाइनरी मैचिंग कमीशन", query: "अगर मेरे टीम 1 टीम 2 में 2 लाख की मैचिंग होती है तो मुझे कितना कमीशन मिलेगा" },
+        { label: "👥 ₹50,000 जनरेशन टर्नओवर कमीशन", query: "मेरे जनरेशन में अगर 50000 का बिजनेस आता है तो मुझे कितना कमीशन मिलेगा" },
+        { label: "🛡️ क्या कंपनी 100% सुरक्षित है?", query: "नेटसर्फ की वास्तविकता और लीगल स्टेटस क्या है?" }
       ]);
     }
 
     // -------------------------------------------------------------------------
-    // TWIST 6: WHAT IF NO ONE JOINS? SINGLE PERSON / NO TEAM (अगर कोई न जुड़े तो?)
+    // TWIST 11: CONSUMER PLAN & 5-MONTH PURCHASE + 6TH MONTH FREE BENEFIT
+    // (Strictly adheres to: Lowest MRP rule of previous 5 months)
     // -------------------------------------------------------------------------
-    const isNoTeamQuery = (
-      q.includes('koi na jude') || q.includes('koi member na bane') || q.includes('अगर कोई न जुड़े') ||
-      q.includes('bina jode') || q.includes('बिना जोड़े') || q.includes('bina team') || q.includes('बिना टीम') ||
-      q.includes('bina kisi ko jode') || q.includes('akela kar sakta') || q.includes('अकेले काम') ||
-      q.includes('chain nahi banayi') || q.includes('chain system') || q.includes('bande na jude') ||
-      q.includes('team na bane to')
+    const isConsumerPlanQuery = (
+      q.includes('consumer') || q.includes('कंज्यूमर') || q.includes('उपभोक्ता') ||
+      q.includes('5 mahine') || q.includes('5 महीने') || q.includes('5+1') || q.includes('free product') ||
+      q.includes('फ्री सामान') || q.includes('छठे महीने') || q.includes('100 voucher') || q.includes('100 rs voucher') || q.includes('वाउचर')
     );
-    if (isNoTeamQuery) {
-      const resp = `यह सबसे महत्वपूर्ण सवाल है! **हाँ, यदि आपके नीचे 1 भी व्यक्ति नेटवर्क में न जुड़े, तब भी आप हर महीने ₹15,000 से ₹25,000+ आसानी से कमा सकते हैं!**
+    if (isConsumerPlanQuery) {
+      const resp = `🎁 **नेट्सर्फ Consumer (उपभोक्ता) प्लान: 25% छूट व 5 महीने पर 6ठा माह फ़्री प्रॉडक्ट:**
 
-इसके लिए नेटसर्फ का विशेष **E-Teller (ई-टेलर) मॉडल** बनाया गया है:
+NetSurf World App से सीधे खरीदारी करने पर ग्राहकों को 4 महा-लाभ मिलते हैं:
 
-🤝 **1. आपको किसी को 'मेंबर' या 'लीडर' बनाने की मजबूरी नहीं:**
-• आपको किसी के पीछे भागकर उसे बिज़नेस में शामिल करने या टीम बनाने की कोई बाध्यता नहीं है।
-• आप सिर्फ एक डिजिटल रिटेलर (ई-टेलर) के रूप में काम कर सकते हैं।
+1️⃣ **25% फ्लैट लाइफटाइम छूट:** पहले ही दिन से हर उत्पाद पर 25% की सीधी छूट मिलती है।
+2️⃣ **₹100 का वेलकम प्रॉडक्ट वाउचर:** जॉइनिंग पर ₹100 का वाउचर मिलता है, जिसका उपयोग ऑनलाइन ऑर्डर में अधिकतम 10% तक किया जा सकता है (स्टॉक पॉइंट पर लागू नहीं)।
+3️⃣ **₹4,000+ पर मुफ़्त होम डिलीवरी:** पूरे भारत में घर तक डिलीवरी बिल्कुल फ्री।
+4️⃣ **पाँच महीने की खरीदारी और छठे महीने का Free Product Benefit:**
 
-🌾 **2. सिर्फ जैविक उत्पादों की सिफ़ारिश (Consumer Recommendation):**
-• भारत में हर किसान को अपनी फसल में सुंडी, माहू, पीलापन रोकने और पैदावार 25-40% बढ़ाने के लिए उच्च गुणवत्ता वाले बायोफिट (Biofit) उत्पादों की सख्त ज़रूरत है।
-• हर परिवार को स्वास्थ्य के लिए नेचुरामोर (Naturamore) की ज़रूरत है।
-• आपको केवल इन ज़रूरतमंद लोगों को प्रॉडक्ट यूज़ करने की सही सलाह देनी है।
+📐 **6ठे महीने मुफ़्त सामान का नियम:**
+• पहले 5 महीनों की खरीदारी का MRP देखा जाएगा।
+• 6ठे महीने Free Products का MRP, **पिछले 5 महीनों में की गई सबसे कम (Lowest) MRP वाली खरीदारी के बराबर** होगा!
+• हर महीने अपनी जरूरत अनुसार उत्पाद और रकम बदल सकते हैं।
 
-💰 **3. टर्नओवर पर 5% से 15% सीधा बैंक कमीशन:**
-• जैसे ही वे ग्राहक आपकी आईडी से 25% छूट पर प्रॉडक्ट खरीदते हैं, आपको उनके कुल मासिक टर्नओवर पर **5% से 15% का अतिरिक्त रिटेल कमीशन** सीधे बैंक में मिलता है।
+📊 **उदाहरण 1 — हर महीने ₹2,000 MRP की खरीदारी:**
+• महीना 1: ₹2,000 | महीना 2: ₹2,000 | महीना 3: ₹2,000 | महीना 4: ₹2,000 | महीना 5: ₹2,000
+• **महीना 6: ₹2,000 MRP के Free Products!**
 
-📊 **सीधा गणित समझें:**
-• यदि आपने केवल **100 किसान या परिवार** तैयार किए जो महीने का औसतन ₹1,000 का सामान लेते हैं = कुल टर्नओवर ₹1,00,000।
-• ₹1,00,000 टर्नओवर पर 15% की दर से आपकी **मासिक शुद्ध कमाई = ₹15,000!**
-• यह पैसा बिना किसी डाउनलाइन टीम के, हर महीने आपके खाते में आता रहेगा!`;
+📊 **उदाहरण 2 — हर महीने अलग-अलग खरीदारी:**
+• M1: ₹2,000 | M2: ₹3,000 | M3: ₹2,500 | M4: ₹1,500 | M5: ₹2,500
+• पाँचों महीनों में सबसे कम खरीदारी ₹1,500 की थी, इसलिए **6ठे महीने ₹1,500 MRP तक के Free Products मिलेंगे!**
 
-      return renderNetsurfPlanCard('बिना टीम बनाए कमाई: ई-टेलर सोलो मॉडल', resp, [
-        { label: "📱 ई-टेलर के सभी कमीशन स्लैब देखें", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
-        { label: "🎁 5+1 ऑफर से ग्राहक कैसे खुश रहते हैं?", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+*नोट: Consumer Joining 100% निःशुल्क है। उत्पाद कंपनी के 7 भाषाओं वाले आधिकारिक कैटलॉग से चुने जा सकते हैं।*`;
+
+      return renderNetsurfPlanCard('नेटसर्फ Consumer प्लान: 25% छूट व 5 महीने पर 6ठा माह फ़्री', resp, [
+        { label: "📱 ई-टेलर बनकर 15% कमीशन कैसे लें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🌾 बायोफिट स्प्रे शेड्यूल देखें", query: "फसलों का स्प्रे कैलेंडर" },
+        { label: "📦 क्या हर महीने एक ही सामान लेना होगा?", query: "क्या हर महीने एक ही सामान खरीदना पड़ेगा?" }
       ]);
     }
 
     // -------------------------------------------------------------------------
-    // TWIST 7: WHAT WORK TO DO? DAILY ROUTINE / HOW TO START (काम क्या करना होगा?)
-    // -------------------------------------------------------------------------
-    const isWhatWorkQuery = (
-      q.includes('kya kaam karna') || q.includes('mera kaam kya hoga') || q.includes('काम क्या करना होगा') ||
-      q.includes('isme karna kya hota') || q.includes('kya karna hoga') || q.includes('karna kya hai') ||
-      q.includes('kaise shuru kare') || q.includes('शुरुआत कैसे करें') || q.includes('kaise kaam karte') ||
-      q.includes('daily kitna time') || q.includes('mujhe kya karna hai') || q.includes('step by step')
-    );
-    if (isWhatWorkQuery) {
-      const resp = `नेटसर्फ में आपका दैनिक काम बहुत ही सरल, व्यावहारिक और मानवीय है। इसे आप **Use -> Share -> Earn (उपयोग करें, साझा करें, कमाएँ)** के 3 आसान चरणों में समझ सकते हैं:
-
-🌱 **चरण 1: उत्पाद का अनुभव लें (Use for Belief):**
-• किसी भी काम में सफलता का पहला नियम है खुद का सच्चा विश्वास।
-• अपनी खेती या परिवार के लिए कोई भी एक प्रामाणिक उत्पाद (जैसे बायो-99, स्टिमरिच या नेचुरामोर) 25% छूट पर मँगाकर इस्तेमाल करें।
-
-📢 **चरण 2: सही सलाह और जानकारी साझा करें (Share with Care):**
-• जब आपको उत्पाद के शानदार परिणाम दिखें, तो अपने आस-पास के किसान भाइयों या मित्रों से उनकी समस्याओं (फसल के कीड़े, लागत में कमी, जोड़ों का दर्द आदि) पर चर्चा करें।
-• आरोग्यम सखी AI की मदद से उन्हें डिजिटल स्प्रे चार्ट, वीडियो और सही खुराक भेजें।
-
-📲 **चरण 3: मोबाइल से ऑर्डर और कमीशन (Earn in Bank):**
-• ग्राहक के लिए सीधे अपने मोबाइल ऐप से 25% छूट पर ऑर्डर बुक करें (या अपनी रेकमेंडेशन लिंक भेजें)।
-• कंपनी उत्पाद सीधे ग्राहक के पते पर कूरियर करेगी।
-• आपको बिना दुकान खोले सीधे बैंक खाते में 5% से 15% कमीशन मिलेगा!
-
-⏰ **समय की ज़रूरत:** रोज़ाना सिर्फ **1 से 2 घंटे**, वह भी अपने मोबाइल से अपने खाली समय में!`;
-
-      return renderNetsurfPlanCard('दैनिक कार्यप्रणाली: 3 सरल कदमों में काम और कमाई', resp, [
-        { label: "🎓 क्या किसी डिग्री या पढ़ाई की ज़रूरत है?", query: "नेटसर्फ करने के लिए क्या योग्यता या पढ़ाई चाहिए?" },
-        { label: "💰 जुड़ने का ख़र्च कितना है?", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" }
-      ]);
-    }
-
-    // -------------------------------------------------------------------------
-    // TWIST 8: QUALIFICATION, DEGREE, ENGLISH, HOUSEWIVES, STUDENTS, FARMERS (योग्यता व भाषा)
-    // -------------------------------------------------------------------------
-    const isQualificationQuery = (
-      q.includes('qualification') || q.includes('degree') || q.includes('योग्यता') || q.includes('डिग्री') ||
-      q.includes('padhai likhai') || q.includes('padhai') || q.includes('पढ़ाई') ||
-      q.includes('english aana zaruri') || q.includes('english') || q.includes('अंग्रेजी') ||
-      q.includes('anpadh') || q.includes('kam padhe likhe') ||
-      q.includes('housewife') || q.includes('mahila') || q.includes('grihini') || q.includes('गृहणी') ||
-      q.includes('student') || q.includes('छात्र') || q.includes('kisan kar sakta') ||
-      q.includes('experience chahiye') || q.includes('anubhav')
-    );
-    if (isQualificationQuery) {
-      const resp = `खुशखबरी: **नेटसर्फ बिज़नेस शुरू करने के लिए किसी भी डिग्री, डिप्लोमा, पूर्व अनुभव या अंग्रेज़ी भाषा के ज्ञान की बिल्कुल ज़रूरत नहीं है!**
-
-यह समाज के हर वर्ग के लिए खुला एक समान अवसर है:
-
-👩‍🌾 **1. किसान भाई:**
-• जो ज़मीन से जुड़े हैं और खेती की भाषा बेहतर समझते हैं, वे बायोफिट उत्पादों के द्वारा साथी किसानों की लागत आधी और पैदावार दोगुनी कराकर सबसे सफल ई-टेलर बनते हैं।
-
-👩‍💼 **2. महिलाएँ व गृहणियाँ (Women Empowerment):**
-• घर की ज़िम्मेदारियों को संभालते हुए, रोज़ाना 1-2 घंटे मोबाइल से काम करके आर्थिक रूप से आत्मनिर्भर बन सकती हैं।
-
-🎓 **3. युवा व छात्र (Students):**
-• अपनी पढ़ाई या प्रतियोगी परीक्षाओं की तैयारी के साथ-साथ डिजिटल नेटवर्किंग सीखकर अपनी पॉकेट मनी और भविष्य की नींव तैयार कर सकते हैं।
-
-👨‍💼 **4. नौकरीपेशा व दुकानदार:**
-• अपने मुख्य काम या दुकान को बिना बंद किए, पार्ट-टाइम में एक सुरक्षित दूसरा आय स्रोत (Second Income Stream) बना सकते हैं।
-
-🌟 **आरोग्यम सखी AI की मदद:** आपको कोई भी सवाल पूछना हो या ग्राहक को समझाना हो, आरोग्यम सखी AI 24 घंटे आपकी मातृभाषा हिंदी में पूरी गाइडेंस और सामग्री तैयार करके देती है!`;
-
-      return renderNetsurfPlanCard('योग्यता व अवसर: हर भारतीय के लिए खुला द्वार', resp, [
-        { label: "💰 जुड़ने का ख़र्च जानें", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" },
-        { label: "🤝 अगर कोई न जुड़े तो कमाई कैसे होगी?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" }
-      ]);
-    }
-
-    // -------------------------------------------------------------------------
-    // TWIST 9: PRODUCTS RANGE, BIOFIT, NATURAMORE, ORGANIC CERTIFICATION (उत्पाद क्या हैं?)
-    // -------------------------------------------------------------------------
-    const isProductsRangeQuery = (
-      q.includes('products kya hai') || q.includes('product kya hai') || q.includes('kya saman hai') ||
-      q.includes('kya bechna hai') || q.includes('product ki quality') || q.includes('उत्पाद क्या हैं') ||
-      q.includes('biofit kya hai') || q.includes('naturamore kya hai') || q.includes('बायोफिट क्या है') ||
-      q.includes('organic hai kya') || q.includes('result milta hai kya') || q.includes('chemical free') ||
-      q.includes('products list') || q.includes('saman ki list')
-    );
-    if (isProductsRangeQuery) {
-      const resp = `नेटसर्फ के सभी उत्पाद **100% प्राकृतिक, जैविक (Organic), हानिकारक रसायनों से मुक्त और लैब-परीक्षित** हैं। कंपनी के पास 4 प्रमुख विश्वस्तरीय श्रेणियाँ (Verticals) हैं:
-
-🌾 **1. बायोफिट (Biofit — जैविक कृषि क्रांति):**
-• **Bio-99:** विश्वस्तरीय स्टीकर, स्प्रेडर और पेनिट्रेटर (दवा का असर दोगुना करता है)।
-• **Stimrich:** टॉनिक जो फसल की वानस्पतिक वृद्धि और फूलों/फलों की संख्या 25-40% बढ़ाता है।
-• **Sheth:** जैविक फफूंदनाशक जो जड़ सड़न, उकठा और फफूंद से रक्षा करता है।
-• **Intact & Wrapup:** चूसक कीटों और वायरस से प्राकृतिक कवच।
-• **एन-पी-के (NPK Bio-fertilizers):** मिट्टी में फिक्स पोषक तत्वों को घोलकर यूरिया-डीएपी का ख़र्च 50% कम करते हैं।
-
-🌿 **2. नेचुरामोर (Naturamore — हर्बल हेल्थ केयर):**
-• पुरुषों, महिलाओं व बच्चों के लिए संपूर्ण न्यूट्रिशनल पाउडर।
-• जोड़ों के दर्द के लिए **Joint Care**, हृदय सुरक्षा के लिए **Nutri Heart**, शुगर नियंत्रण के लिए **Life Style Plus**, कब्ज़ व गैस के लिए **Easy Detox**।
-
-💆‍♀️ **3. हर्ब्स एंड मोर (Herbs & More — पर्सनल व हेयर केयर):**
-• नीम-हल्दी फेस वॉश, विटामिन थैरेपी हेयर सीरम, ऑर्गेनिक शैम्पू व एलोवेरा क्रीम।
-
-🏡 **4. क्लीन एंड मोर (Clean & More — होम केयर):**
-• फैब्रिक वॉश और मल्टीपर्पज़ क्लीनर जो पर्यावरण और हाथों के लिए 100% सुरक्षित हैं।
-
-✨ **परिणाम:** सभी उत्पाद उच्च-मांग (Repeat Demand) वाले हैं, जिससे एक बार इस्तेमाल करने वाला ग्राहक हमेशा आपसे ही दोबारा ऑर्डर मँगाता है!`;
-
-      return renderNetsurfPlanCard('विश्वस्तरीय 100% जैविक उत्पाद श्रृंखला (4 वर्टिकल्स)', resp, [
-        { label: "🌾 बायोफिट स्प्रे कैलेंडर देखें", query: "गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए" },
-        { label: "🎁 5+1 ऑफर में छठा प्रोडक्ट फ्री कैसे लें?", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
-      ]);
-    }
-
-    // -------------------------------------------------------------------------
-    // TWIST 10: DEDICATED E-TELLER INQUIRY (ई-टेलर प्लान विस्तार)
+    // TWIST 10: DEDICATED E-TELLER INQUIRY (Zero Self-Purchase Rule)
     // -------------------------------------------------------------------------
     if (isETellerKeyword && !q.includes('consumer vs') && !q.includes('फर्क')) {
-      const resp = `**Netsurf E-Teller (ई-टेलर)** वह स्वतंत्र डिजिटल पार्टनर है जो बिना दुकान खोले और बिना टीम बनाए, केवल सीधे ग्राहकों (Consumers) को उच्च गुणवत्ता वाले जैविक उत्पाद रेकमेंड करके **5% से 15% का शुद्ध रिटेल कमीशन** कमाता है।
+      const resp = `📱 **नेट्सर्फ E-Teller (ई-टेलर) प्लान: नियम, स्लैब व कमाई:**
 
-💡 **ई-टेलर के मुख्य लाभ व नियम:**
-• **₹0 जॉइनिंग:** जुड़ने या आईडी एक्टिवेट करने का कोई शुल्क नहीं।
-• **₹0 सेल्फ़-परचेज़ बाध्यता:** कमीशन पाने के लिए हर महीने खुद ख़रीदना ज़रूरी नहीं।
-• **25% कंज्यूमर छूट:** आपके ग्राहक को कंपनी से सीधे 25% का भारी डिस्काउंट मिलता है, जिससे वह हमेशा आपसे ही जुड़कर सामान लेता है।
+E-Teller वह स्वतंत्र डिजिटल पार्टनर है जो बिना दुकान खोले और बिना टीम बनाए, केवल सीधे ग्राहकों (Consumers) को उच्च गुणवत्ता वाले जैविक उत्पाद रेकमेंड करके 5% से 15% का साप्ताहिक रिटेल कमीशन कमाता है:
 
-📊 **मासिक टर्नओवर कमीशन स्लैब:**
-• **₹1 से ₹24,999 तक टर्नओवर:** **5%** सीधा कमीशन
-• **₹25,000 से ₹49,999 तक:** **8%** कमीशन
-• **₹50,000 से ₹99,999 तक:** **10%** कमीशन
-• **₹1,00,000 और अधिक टर्नओवर:** **15%** उच्चतम कमीशन
+💡 **ई-टेलर के मुख्य नियम:**
+• **₹0 जॉइनिंग:** रजिस्ट्रेशन का कोई शुल्क नहीं।
+• **₹0 सेल्फ़-परचेज़ बाध्यता:** कमीशन पाने के लिए हर महीने खुद सामान खरीदना अनिवार्य नहीं है।
+• **25% कंज्यूमर छूट:** आपके जुड़े Consumers को 25% छूट और 5 महीने खरीदारी पर 6ठे महीने का फ्री बेनिफिट मिलता है।
+• **साप्ताहिक क्लोजिंग:** शनिवार से शुक्रवार चक्र, सोमवार शाम बैंक ट्रांसफर।
 
-🎯 **100 कंज्यूमर्स का व्यावहारिक उदाहरण:**
-• यदि आप अपने संपर्क से **100 किसान या परिवार** जोड़ते हैं, जो औसतन ₹1,000 प्रति माह की शुद्ध ख़रीददारी करते हैं:
-• कुल टर्नओवर = ₹1,00,000।
-• 15% स्लैब के अनुसार आपकी **मासिक शुद्ध कमाई = ₹15,000**।
-• **सालाना कमाई = ₹1,80,000**, वह भी बिना किसी टीम के झंझट के!`;
+📊 **साप्ताहिक रिटेल कमीशन स्लैब:**
+• ₹2,000 तक: **5%**
+• ₹2,001 से ₹4,000: **10%**
+• ₹4,001 से ₹8,000: **12%**
+• ₹8,000 से ऊपर: **15%**
+
+🎯 **100 Consumers का उदाहरण:**
+100 Consumers से लगभग ₹1,20,000 Net Business बनने पर 15% दर से **करीब ₹15,000+ मासिक आय** का अवसर बनता है!`;
 
       return renderNetsurfPlanCard('नेटसर्फ E-Teller (ई-टेलर) प्लान: नियम, स्लैब व कमाई', resp, [
         { label: "🤝 अगर कोई न जुड़े तो?", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
         { label: "📦 क्या दुकान खोलनी पड़ेगी?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
-        { label: "💳 पैसा बैंक में कब आता है?", query: "नेटसर्फ में पैसा कब और कैसे आता है?" }
-      ]);
-    }
-
-    // -------------------------------------------------------------------------
-    // TWIST 11: DEDICATED CONSUMER INQUIRY & 5+1 OFFER (कंज्यूमर व 5+1 ऑफर)
-    // -------------------------------------------------------------------------
-    if (isConsumerKeyword || is5Plus1Keyword || q.includes('100 rs voucher') || q.includes('100 voucher') || q.includes('वाउचर')) {
-      const resp = `**Netsurf Consumer (उपभोक्ता)** वह व्यक्ति है जो अपने घर या खेत के लिए 100% शुद्ध, प्राकृतिक और जैविक उत्पाद भारी बचत के साथ सीधे कंपनी से ख़रीदता है।
-
-🎁 **कंज्यूमर को मिलने वाले 4 महा-लाभ:**
-
-1️⃣ **25% फ्लैट लाइफटाइम छूट:**
-• पहले ही दिन से हर उत्पाद पर एमआरपी से 25% की सीधी छूट मिलती है।
-
-2️⃣ **5+1 का विशेष फ़्री प्रॉडक्ट ऑफर:**
-• जब कोई कंज्यूमर एक कैलेंडर माह में कुल **5 उत्पाद** ख़रीदता है (चाहे एक साथ या अलग-अलग ऑर्डर में), तो कंपनी उसे **6ठा प्रॉडक्ट बिल्कुल मुफ़्त (FREE)** उपहार में देती है!
-• मुफ़्त उत्पाद की कीमत पहले ख़रीदे गए 5 उत्पादों के औसत मूल्य (Average Value) के बराबर होती है।
-
-3️⃣ **₹100 का वेलकम प्रॉडक्ट डिस्काउंट वाउचर:**
-• नए कंज्यूमर को जॉइनिंग पर ₹100 का डिस्काउंट कूपन मिलता है, जिसे वह अगले ऑर्डर में इनवॉइस वैल्यू के 10% तक भुना सकता है।
-
-4️⃣ **₹4,000+ पर मुफ़्त होम डिलीवरी:**
-• ₹4,000 या अधिक के ऑर्डर पर पूरे भारत में घर तक सुरक्षित कूरियर डिलीवरी बिल्कुल फ्री है!`;
-
-      return renderNetsurfPlanCard('नेटसर्फ Consumer प्लान: 25% छूट व 5+1 मुफ़्त ऑफ़र', resp, [
-        { label: "📱 ई-टेलर बनकर 15% कमीशन कैसे लें?", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
-        { label: "🌾 बायोफिट स्प्रे शेड्यूल देखें", query: "गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए" }
+        { label: "💳 पैसा बैंक में कब आता है?", query: "पैसा बैंक में कब आता है और पेआउट सिस्टम क्या है?" }
       ]);
     }
 
@@ -5549,31 +5918,158 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     // TWIST 12: BINARY MATCHING, GENERATION INCOME & 15-DAY ₹8,19,250 CAPPING
     // -------------------------------------------------------------------------
     if (isCappingExplicit || isBinaryMatching || q.includes('capping') || q.includes('कैपिंग') || q.includes('generation') || q.includes('जनरेशन') || q.includes('binary') || q.includes('बाइनरी')) {
-      const resp = `नेटसर्फ का **Team Business Plan (15-दिवसीय कैपिंग मॉडल)** भारत का सबसे सुरक्षित, पारदर्शी और सबसे बड़ी आय देने वाला लीडरशिप प्लान है:
+      const resp = `बाइनरी मैचिंग व ₹8,19,250 द्वैमासिक कैपिंग प्लान:
+
+नेटसर्फ का **Team Business Plan (15-दिवसीय कैपिंग मॉडल)** पारदर्शी और बड़ी आय देने वाला लीडरशिप प्लान है:
 
 👥 **1. जनरेशन इनकम (Generation Income — 3% से 8%):**
-• आपके द्वारा सीधे स्पॉन्सर किए गए लोगों (Direct Generation) के टर्नओवर पर आपको मिलता है:
-• **Beginner:** 3% (L1)
-• **Lightning:** 5% (L1 पर 3%, L2 पर 2%)
-• **Star Club & Above:** 8% (L1 पर 3%, L2 पर 2%, L3 पर 3%)
-• *विशेषता:* यह इनकम बिना किसी कैपिंग के **Unlimited Earning** के रूप में मिलती है!
+• सीधे स्पॉन्सर किए गए लोगों के Reflected Turnover पर:
+• **Beginner:** 3% (L1) | **Lightning:** 5% (L1: 3%, L2: 2%) | **Star Club & Above:** 8%
+• *विशेषता:* बिना किसी कैपिंग के **Unlimited Earning** के रूप में मिलती है!
 
 ⚖️ **2. टीम टर्नओवर मैचिंग बोनस (Binary Matching — 3% से 5%):**
-• आपकी Team 1 और Team 2 के मैचिंग टर्नओवर पर:
+• Team 1 और Team 2 के मैचिंग टर्नओवर पर:
 • शुरुआती लेवल पर **3%**, प्रगति पर **4%**, और क्लब लेवल पर **5%** मैचिंग बोनस।
-• बचा हुआ अतिरिक्त टर्नओवर कभी लैप्स नहीं होता, हमेशा **आजीवन Carry Forward** रहता है।
+• बचा हुआ अतिरिक्त टर्नओवर हमेशा **आजीवन Carry Forward** रहता है।
 
 🏆 **3. 15-दिवसीय ऐतिहासिक कैपिंग — ₹8,19,250:**
 • प्रत्येक 15 दिन के चक्र में टीम मैचिंग से अधिकतम **₹8,19,250** कमाए जा सकते हैं।
 • महीने के दो चक्रों को मिलाकर केवल मैचिंग बोनस से **₹16,38,500 प्रति माह** की उच्चतम सीमा तय है!
 
 🛡️ **4. पारिवारिक सुरक्षा योजना (Family Protection & Nominee):**
-• ₹2 लाख से ₹25 लाख तक का जीवन सुरक्षा बीमा।
-• 100% नॉमिनी ट्रांसफर — आपके बाद आपकी पूरी आईडी और आमदनी आपके परिवार को आजीवन हस्तांतरित होती है।`;
+• ₹2 लाख से ₹25 लाख तक का जीवन सुरक्षा बीमा व 100% नॉमिनी ट्रांसफर।
+
+*नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं।*`;
 
       return renderNetsurfPlanCard('बाइनरी मैचिंग व ₹8,19,250 द्वैमासिक कैपिंग प्लान', resp, [
         { label: "📱 0 टीम पर ई-टेलर से कमाई समझाइए", query: "अगर मेरे नीचे कोई न जुड़े तो क्या पैसा आएगा?" },
+        { label: "💰 जुड़ने का ख़र्च कितना है?", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" },
+        { label: "⚖️ 2 लाख बाइनरी मैचिंग कमीशन", query: "अगर मेरे टीम 1 टीम 2 में 2 लाख की मैचिंग होती है तो मुझे कितना कमीशन मिलेगा" }
+      ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TWIST 1 TO 9: COMMON OBJECTIONS & CONVERSATIONAL ANSWERS FROM PART 2
+    // -------------------------------------------------------------------------
+    if (isTrustFraudQuery) {
+      const resp = `🛡️ **सुरक्षा व भरोसा: नेटसर्फ की वास्तविकता व 100% लीगल स्टेटस:**
+
+नेटसर्फ कोई नई या फर्जी स्कीम नहीं है:
+• **26 वर्षों का अटूट ट्रैक रिकॉर्ड:** सन 2000 से भारत में पूर्णतः स्वदेशी व वैधानिक रूप से कार्यरत।
+• **भारत सरकार की डायरेक्ट सेलिंग नियमावली (2021):** उपभोक्ता मामले मंत्रालय (Ministry of Consumer Affairs) के सभी नियमों का 100% अनुपालन।
+• **स्वयं के R&D केंद्र व विनिर्माण इकाइयां:** पुणे और हिमाचल में अत्याधुनिक DSIR-प्रमाणित वैज्ञानिक प्रयोगशालाएं।
+• **पैन व टीडीएस अनुपालन:** प्रत्येक कमीशन पर विधिवत TDS कटता है और फॉर्म 16A जारी होता है।`;
+
+      return renderNetsurfPlanCard('सुरक्षा व भरोसा: नेटसर्फ की वास्तविकता व 100% लीगल स्टेटस', resp, [
+        { label: "💰 जुड़ने का ख़र्च कितना है?", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" },
+        { label: "📦 क्या दुकान खोलनी पड़ेगी?", query: "क्या दुकान या स्टॉक रखना पड़ेगा?" },
+        { label: "🎁 कंज्यूमर 25% छूट व ऑफर", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
+    if (isJoiningFeeQuery) {
+      const resp = `💰 **नेटसर्फ में जुड़ने का कोई ख़र्च नहीं — ₹0 जॉइनिंग:**
+
+• **Consumer Joining:** 100% निःशुल्क है। अपनी जरूरत के जैविक उत्पाद 25% छूट पर खरीदें।
+• **E-Teller Registration:** ₹0 शुल्क। KYC (आधार, पैन, बैंक विवरण) पूरा करके तुरंत शुरू कर सकते हैं।
+• **कोई हिडन चार्ज नहीं:** न कोई किट खरीदने का दबाव, न कोई रिन्यूअल फीस।`;
+
+      return renderNetsurfPlanCard('₹0 जॉइनिंग — नेटसर्फ में जुड़ने का कोई ख़र्च नहीं', resp, [
+        { label: "📱 ई-टेलर 15% कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🎁 5 महीने खरीदारी पर फ्री सामान", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
+    if (isShopStockQuery) {
+      const resp = `📦 **ज़ीरो दुकान व ज़ीरो स्टॉक: शुद्ध डिजिटल डायरेक्ट-टू-कंज्यूमर मॉडल:**
+
+• **कोई दुकान नहीं:** आपको कोई दुकान या गोदाम खोलने की जरूरत नहीं है।
+• **कोई स्टॉक नहीं:** घर में लाखों का माल भरने की कोई बाध्यता नहीं है।
+• **कंपनी सीधे डिलीवर करती है:** ग्राहक NetSurf World App से आर्डर करता है और कंपनी सीधे उसके घर डिलीवर करती है।`;
+
+      return renderNetsurfPlanCard('ज़ीरो दुकान व ज़ीरो स्टॉक: शुद्ध डिजिटल मॉडल', resp, [
+        { label: "📱 ई-टेलर कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "💳 पैसा बैंक में कब आता है?", query: "पैसा बैंक में कब आता है और पेआउट सिस्टम क्या है?" }
+      ]);
+    }
+
+    if (isTargetLapseQuery) {
+      const resp = `🎯 **ज़ीरो-टारगेट गारंटी: तनाव-मुक्त व आजीवन सुरक्षित आईडी:**
+
+• **कोई मासिक टारगेट नहीं:** किसी महीने बिज़नेस कम या शून्य रहने पर भी आपकी आईडी बंद या टर्मिनेट नहीं होती।
+• **आजीवन कैरी फॉरवर्ड:** टीम मैचिंग का अतिरिक्त टर्नओवर कभी लैप्स नहीं होता।
+• **कोई अनिवार्य सेल्फ़-परचेज़ नहीं:** कमीशन पाने के लिए हर महीने खुद खरीदना अनिवार्य नहीं है।`;
+
+      return renderNetsurfPlanCard('ज़ीरो-टारगेट गारंटी: तनाव-मुक्त व आजीवन सुरक्षित आईडी', resp, [
+        { label: "📱 ई-टेलर प्लान समझें", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🏆 ₹8.19L कैपिंग प्लान देखें", query: "क्या सच में 819250 कैपिंग मिलती है?" }
+      ]);
+    }
+
+    if (isPayoutMethodQuery) {
+      const resp = `💳 **पारदर्शी पेआउट सिस्टम: साप्ताहिक व पाक्षिक बैंक ट्रांसफ़र:**
+
+• **E-Teller रिटेल कमीशन:** साप्ताहिक शनिवार से शुक्रवार क्लोजिंग, सोमवार शाम को सीधे आपके पैन-लिंक बैंक खाते में एनईएफटी (NEFT/IMPS) द्वारा ट्रांसफर।
+• **टीम बाइनरी व जनरेशन कमीशन:** पाक्षिक (15-दिवसीय चक्र) पूरा होने पर निर्धारित समय पर सीधे बैंक खाते में।
+• **TDS वाउचर:** प्रत्येक पे-आउट पर नियमानुसार टीडीएस कटकर सरकार को जमा होता है।`;
+
+      return renderNetsurfPlanCard('पारदर्शी पेआउट सिस्टम: सीधे बैंक ट्रांसफ़र', resp, [
+        { label: "📱 ई-टेलर कमीशन स्लैब तालिका", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🏆 कैपिंग प्लान देखें", query: "क्या सच में 819250 कैपिंग मिलती है?" }
+      ]);
+    }
+
+    if (isNoTeamQuery) {
+      const resp = `🤝 **अगर कोई न जुड़े तो? — बिना टीम बनाए केवल E-Teller से कमाई:**
+
+• **टीम बनाना बिल्कुल अनिवार्य नहीं है!**
+• आप केवल उपभोक्ताओं (किसानों, परिवारों) को उत्पाद रेकमेंड करके 5% से 15% का शुद्ध रिटेल कमीशन कमा सकते हैं।
+• 100 नियमित उपभोक्ताओं के साथ बिना टीम जोड़े हर महीने **₹15,000+ की नियमित आय** का अवसर रहता है।`;
+
+      return renderNetsurfPlanCard('बिना टीम बनाए कमाई: ई-टेलर सोलो मॉडल', resp, [
+        { label: "📱 15% रिटेल कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🎁 5 महीने खरीदारी ऑफर", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
+    if (isWhatWorkQuery) {
+      const resp = `💼 **काम क्या करना होगा? — 3 सरल कदमों में कार्यप्रणाली:**
+
+1️⃣ **कदम 1 — खुद उत्पाद आज़माएँ (Consumer):** जैविक कृषि, स्वास्थ्य या पर्सनल केयर के उत्पाद 25% छूट पर उपयोग करें।
+2️⃣ **कदम 2 — जानकारी साझा करें (E-Teller):** मोबाइल से लोगों को उत्पादों के फायदे बताएं।
+3️⃣ **कदम 3 — सीधे कंपनी से खरीदारी कराएं:** ग्राहक NetSurf World App से आर्डर करते हैं और आपको साप्ताहिक रिटेल कमीशन मिलता है।`;
+
+      return renderNetsurfPlanCard('दैनिक कार्यप्रणाली: 3 सरल कदमों में काम और कमाई', resp, [
+        { label: "📱 ई-टेलर कमीशन स्लैब", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
+        { label: "🎁 कंज्यूमर 25% छूट व ऑफर", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" }
+      ]);
+    }
+
+    if (isQualificationQuery) {
+      const resp = `🎓 **योग्यता व अवसर: हर भारतीय के लिए खुला द्वार:**
+
+• **कोई डिग्री या अंग्रेजी की जरूरत नहीं:** किसान, गृहणियां, छात्र व नौकरीपेशा सभी इसे आसानी से कर रहे हैं।
+• **उम्र:** 18 वर्ष या उससे अधिक, आधार कार्ड, पैन कार्ड व बैंक खाता आवश्यक।
+• **फ्री मोबाइल ट्रेनिंग:** आरोग्यम इंडिया व नेट्सर्फ परिवार आपको मोबाइल पर पूरी ट्रेनिंग देता है।`;
+
+      return renderNetsurfPlanCard('योग्यता व अवसर: हर भारतीय के लिए खुला द्वार', resp, [
+        { label: "🌸 महिलाओं के लिए वर्क फ्रॉम होम", query: "घर में रहकर महिलाएं क्या इस काम को कर सकती हैं" },
         { label: "💰 जुड़ने का ख़र्च कितना है?", query: "नेटसर्फ में जुड़ने के लिए कितना पैसा लगता है?" }
+      ]);
+    }
+
+    if (isProductsRangeQuery) {
+      const resp = `🌿 **विश्वस्तरीय 100% जैविक उत्पाद श्रृंखला (4 प्रमुख वर्टिकल्स):**
+
+1️⃣ **Biofit (जैविक कृषि):** रासायनिक खाद-कीटनाशक का खर्च 40-50% घटाने व बंपर पैदावार देने वाले जैविक फॉर्मूले (स्टिमरिच, शेत, Bio-99, इंटैक्ट, एनपीके)।
+2️⃣ **Naturamore (स्वास्थ्य सप्लीमेंट्स):** शुगर, घुटने दर्द, बीपी, हृदय, लिवर व महिलाओं/बच्चों के हर्बल पोषण सप्लीमेंट्स।
+3️⃣ **Herbs & More (आयुर्वेदिक पर्सनल व ब्यूटी केयर):** 100% सल्फेट व पैराबेन फ्री स्किन, हेयर व डेंटल केयर।
+4️⃣ **Pet-Vet (पशु पोषण):** गाय व भैंस में 15-25% दूध वृद्धि व 7-8 डिग्री फैट बढ़ाने वाला आयुर्वेदिक सप्लीमेंट।`;
+
+      return renderNetsurfPlanCard('विश्वस्तरीय 100% जैविक उत्पाद श्रृंखला (4 वर्टिकल्स)', resp, [
+        { label: "🌾 बायोफिट कृषि उत्पाद", query: "बायोफिट क्या है और कैसे काम करता है" },
+        { label: "💊 नेचुरामोर स्वास्थ्य सप्लीमेंट्स", query: "नेचुरामोर स्वास्थ्य सप्लीमेंट्स" },
+        { label: "🐄 पेट-वेट पशु पोषण", query: "पेट वेट और सीएफसी प्लस का काम बताओ" }
       ]);
     }
 
@@ -5583,32 +6079,33 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     const masterPlanText = `नेटसर्फ 26 वर्षों से भारत की सबसे प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग संस्था है। इसका संपूर्ण व्यावसायिक ढाँचा समाज के प्रत्येक व्यक्ति के लिए 3 सरल और स्पष्ट रास्तों में विभाजित है:
 
 1️⃣ **रास्ता 1 — Consumer (उपभोक्ता लाभ):**
-• **₹0 जॉइनिंग**, सभी जैविक उत्पादों पर **25% की भारी छूट**।
-• **5+1 महा-ऑफर:** महीने में 5 उत्पाद ख़रीदने पर छठा उत्पाद कंपनी से 100% FREE!
+• **₹0 जॉइनिंग**, सभी जैविक उत्पादों पर **25% की फ्लैट छूट**।
+• **5 महीने खरीदारी पर 6ठा माह FREE प्रॉडक्ट:** लगातार 5 माह खरीदारी करने पर 6ठे महीने पिछले 5 माह की सबसे कम MRP के बराबर का सामान बिल्कुल मुफ़्त!
 • ₹100 का वेलकम वाउचर व ₹4,000 से ऊपर के ऑर्डर पर मुफ़्त होम डिलीवरी।
 
 2️⃣ **रास्ता 2 — E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):**
 • **₹0 जॉइनिंग**, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं।
-• सीधे उपभोक्ताओं को उत्पाद रेकमेंड करने पर **5% से 15% का शुद्ध रिटेल कमीशन** (सीधे बैंक में)।
-• 100 उपभोक्ताओं के साथ बिना टीम जोड़े हर महीने **₹15,000+ की नियमित आय**।
+• सीधे उपभोक्ताओं को उत्पाद रेकमेंड करने पर **5% से 15% का साप्ताहिक रिटेल कमीशन** (शनिवार-शुक्रवार चक्र, सोमवार शाम बैंक ट्रांसफर)।
+• 100 उपभोक्ताओं के साथ बिना टीम जोड़े हर महीने **₹15,000+ की नियमित आय** का अवसर।
 
 3️⃣ **रास्ता 3 — Team Leader (टीम बिज़नेस व कैपिंग):**
-• **Generation Income:** सीधे रेफ़रल से 3% से 8% अनलिमिटेड इनकम।
+• **Generation Income:** रिफ्लेक्टेड टर्नओवर पर 3% से 8% अनलिमिटेड इनकम (कोई कैपिंग नहीं)।
 • **Binary Matching Bonus:** Team 1 व Team 2 मैचिंग पर 3% से 5% (लाइफटाइम कैरी फॉरवर्ड)।
 • **₹8,19,250 पाक्षिक कैपिंग:** हर 15 दिन में ₹8,19,250 (महीने का ₹16,38,500 तक कमाने का अवसर)।
-• पारिवारिक सुरक्षा योजना, नॉमिनी अधिकार व मुफ़्त देश-विदेश भ्रमण।
+• पारिवारिक सुरक्षा योजना, 100% नॉमिनी अधिकार व मुफ़्त देश-विदेश भ्रमण।
 
-💡 **सलाह:** यदि आप उत्पाद आज़माना चाहते हैं तो Consumer बनें; यदि बिना टीम के सिर्फ मोबाइल से अतिरिक्त आय चाहते हैं तो E-Teller बनें; और यदि बड़ा नेटवर्क बनाना चाहते हैं तो Team Leader बनें!`;
+💡 **सलाह:** यदि आप उत्पाद आज़माना चाहते हैं तो Consumer बनें; यदि बिना टीम के सिर्फ मोबाइल से अतिरिक्त आय चाहते हैं तो E-Teller बनें; और यदि बड़ा नेटवर्क बनाना चाहते हैं तो Team Leader बनें!
+
+*नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं। वास्तविक लाभ पात्र Business, लागू Commission Rules, कंपनी की शर्तों और व्यक्ति के प्रयास पर निर्भर करता है।*`;
 
     return renderNetsurfPlanCard('नेटसर्फ कम्प्लीट प्लान: 3 स्पष्ट विकल्प व ₹8.19L कैपिंग', masterPlanText, [
-      { label: "🛍️ 1. उपभोक्ता लाभ व 5+1 फ़्री", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
+      { label: "🛍️ 1. उपभोक्ता लाभ व 5 माह पर फ्री", query: "नेटसर्फ कंज्यूमर प्लान और 5+1 फ्री ऑफर क्या है?" },
       { label: "📱 2. ई-टेलर सोलो कमाई (15%)", query: "ई-टेलर प्लान क्या है और 15% कमीशन कैसे मिलता है?" },
-      { label: "🏆 3. टीम कैपिंग प्लान (₹8.19L)", query: "बाइनरी मैचिंग और 8.19 लाख कैपिंग प्लान समझाइए" },
+      { label: "🏆 3. टीम कैपिंग प्लान (₹8.19L)", query: "बाइनरी मैचिंग और ₹8,19,250 द्वैमासिक कैपिंग प्लान समझाइए" },
       { label: "🛡️ 4. क्या कंपनी सुरक्षित है?", query: "क्या नेटसर्फ सुरक्षित और भरोसेमंद कंपनी है?" }
     ]);
   }
 
-  // 18.8 WEBSITE ACTION ROUTER (Google Assistant-like Direct Navigation)
   function handleWebsiteActionRouter(cleanQ, rawQ) {
     const q = cleanQ;
 
@@ -6016,8 +6513,140 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
   }
 
   // 18.5 ADVANCED MULTI-TOPIC, TWIST QUERIES & DUAL-INTENT RESOLVER
+  
+  // 0. HEALTH, DIABETES & ANIMAL CARE PRODUCT COST ESTIMATE ENGINE
+  // Ensures questions like "ज्वाइंट केयर का 1 दिन का खर्चा", "डायबिटीज में लाइफस्टाइल प्लस और नेचुरल मोर का खर्च",
+  // or "दो भैंस है पेट वेट कितना दूं" NEVER get hijacked by agri crop pump spraying!
+  function handleHealthProductCostEstimate(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isHealthCostQuery = (
+      (q.includes('joint care') || q.includes('ज्वाइंट केयर') || q.includes('life style') || q.includes('lifestyle') || q.includes('लाइफस्टाइल') || q.includes('naturamore') || q.includes('नेचुरामोर') || q.includes('नेचुरल मोर') || q.includes('diabetes') || q.includes('डायबिटीज') || q.includes('शुगर') || q.includes('sugar') || q.includes('घुटने') || q.includes('जोड़ों') || q.includes('pet vet') || q.includes('पेट वेट') || q.includes('cfc') || q.includes('भैंस') || q.includes('गाय') || q.includes('मंजूलता') || q.includes('manjulata')) &&
+      (q.includes('kharcha') || q.includes('खर्चा') || q.includes('kharch') || q.includes('खर्च') || q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kitna') || q.includes('कितना') || q.includes('rate') || q.includes('रेट') || q.includes('cost') || q.includes('1 din') || q.includes('1 दिन') || q.includes('1 month') || q.includes('1 महीने') || q.includes('1 माह') || q.includes('dose') || q.includes('खुराक') || q.includes('दूध'))
+    );
+    if (!isHealthCostQuery) return false;
+
+    // Case 1: Joint Care 1 day cost
+    if (q.includes('joint care') || q.includes('ज्वाइंट केयर') || q.includes('घुटने') || q.includes('जोड़ों')) {
+      const resp = `💊 **नेचुरामोर जॉइंट केयर (Joint Care) का 1 दिन का वास्तविक खर्च:**
+
+नेचुरामोर जॉइंट केयर जोड़ों के दर्द, ग्रीस (Synovial Fluid) की कमी और कार्टिलेज घिसाव का 100% हर्बल व प्रमाणित आयुर्वेदिक समाधान है:
+
+💰 **खर्च का सटीक गणित:**
+• **1 डिब्बी की आधिकारिक MRP:** ₹699 (60 कैप्सूल्स)
+• **आरोग्यम 25% छूट पर कीमत:** **मात्र ₹524.25** (सीधी ₹175 की बचत!)
+• **दैनिक खुराक:** 2 कैप्सूल प्रतिदिन (1 सुबह, 1 शाम भोजन के बाद)
+• 1 डिब्बी पूरे **30 दिन (1 महीना)** चलती है।
+
+☕ **1 दिन का वास्तविक खर्च:**
+• **MRP आधार पर:** ₹699 ÷ 30 = मात्र ₹23.30 प्रति दिन
+• **25% डिस्काउंट पर:** ₹524 ÷ 30 = **मात्र ₹17.50 प्रति दिन!** 
+*(यानी एक कप चाय से भी कम खर्च में आपके घुटनों और जोड़ों को स्थायी राहत!)*
+
+🌿 **अतिरिक्त लाभ:**
+• 5 महीने लगातार लेने पर 6ठे महीने कंपनी की पॉलिसी अनुसार मुफ़्त प्रॉडक्ट बेनिफिट का अवसर।
+• एलोपैथिक पेनकिलर्स के गंभीर साइड-इफेक्ट्स (किडनी/लिवर नुकसान) से 100% सुरक्षा।`;
+
+      renderCrispSpecialBox('💊 नेचुरामोर जॉइंट केयर: 1 दिन का खर्च मात्र ₹17.50', resp, [
+        { text: '🛒 25% छूट पर ऑर्डर करें', url: '/health/joint-pain.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🩸 लाइफस्टाइल प्लस का खर्च', query: 'लाइफस्टाइल प्लस का 1 दिन का खर्च कितना है?' },
+        { text: '🌾 खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' }
+      ], 'health', 'joint_care_daily_cost');
+      return true;
+    }
+
+    // Case 2: Diabetes 1 month estimate (Life Style Plus + Naturamore) / For Friend (Manjulata Mishra)
+    if (q.includes('diabetes') || q.includes('डायबिटीज') || q.includes('शुगर') || q.includes('lifestyle') || q.includes('लाइफस्टाइल') || q.includes('मंजूलता') || q.includes('manjulata')) {
+      const friendName = extractPersonNameFromQuery(rawQ, cleanQ) || (q.includes('मंजूलता') ? 'मंजूलता मिश्रा' : '');
+
+      let senderName = '';
+      try {
+        senderName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || localStorage.getItem('SAKHI_USER_NAME') || '';
+      } catch (_) {}
+      if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') senderName = 'Aarogyam Master';
+
+      let senderPhone = '';
+      try {
+        senderPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+      } catch (_) {}
+      if (!senderPhone || senderPhone.length < 10) senderPhone = '7974422572';
+
+      const contactInfo = `${senderName} (मो. ${senderPhone})`;
+
+      if (friendName) {
+        const waText = `श्रीमती ${friendName} जी, सादर प्रणाम! 🙏\n\nमैंने आपके लिए शुगर (डायबिटीज) को जड़ से नियंत्रित करने और कमजोरी दूर करने हेतु 1 महीने का विशेष आयुर्वेदिक व पोषण एस्टीमेट तैयार करवाया है (मेरी सलाह):\n\n💊 अनुशंसित उत्पाद व 1 माह का खर्च:\n1. नेचुरामोर लाइफस्टाइल प्लस (60 कैप्सूल):\n• MRP: ₹699 | 25% छूट पर: मात्र ₹524\n• खुराक: 1 कैप्सूल सुबह, 1 शाम (भोजन से 30 मिनट पहले)\n\n2. नेचुरामोर फ्रेंच वैनिला न्यूट्रिशन पाउडर (350g/400g):\n• MRP: ₹1,600 | 25% छूट पर: मात्र ₹1,200\n• खुराक: 1 चम्मच सुबह गुनगुने पानी या दूध में (दैनिक कमजोरी व थकान दूर करने हेतु)\n\n💰 1 महीने का कुल खर्च:\n• कुल MRP: ₹2,299\n• 25% फ्लैट छूट के बाद: मात्र ₹1,724 प्रति माह!\n• 1 दिन का कुल खर्च: मात्र ₹57 प्रतिदिन!\n\nविशेष डिस्काउंट, ऑर्डर व सहायता के लिए सीधे मुझसे संपर्क करें:\n👤 ${contactInfo}\n🌐 आरोग्यम सखी लिंक: https://aarogyamindia.online/aarogyam-sakhi.html`;
+
+        const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+        const onScreen = `📋 **श्रीमती ${friendName} जी के लिए 1 माह का डायबिटीज एस्टीमेट तैयार है:**\n\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n💊 **1. नेचुरामोर लाइफस्टाइल प्लस (Life Style Plus — 60 कैप्सूल्स):**\n• **काम:** इंसुलिन संवेदनशीलता बढ़ाना व खाली पेट (Fasting) और खाने के बाद (PP) शुगर को प्राकृतिक रूप से नियंत्रित करना।\n• **MRP:** ₹699 | **25% छूट पर कीमत:** **मात्र ₹524**\n• **खुराक:** 1 कैप्सूल सुबह, 1 शाम भोजन से 30 मिनट पहले।\n\n🥛 **2. नेचुरामोर फ्रेंच वैनिला पाउडर (दैनिक पोषण):**\n• **काम:** मधुमेह में होने वाली नसों की कमजोरी, थकान, पैर दर्द व सुन्नपन को दूर करना।\n• **MRP:** ₹1,600 | **25% छूट पर:** **मात्र ₹1,200**\n• **खुराक:** 1 चम्मच सुबह गुनगुने पानी के साथ।\n\n💰 **3. 1 महीने का संपूर्ण खर्च:**\n• कुल MRP: ₹2,299\n• **25% फ्लैट डिस्काउंट पर कुल खर्च:** **मात्र ₹1,724 प्रति माह!**\n• **1 दिन का खर्च:** **मात्र ₹57 प्रति दिन!**\n\n📲 **नीचे दिए गए बटन से यह पूरा एस्टीमेट सीधे ${friendName} जी को WhatsApp पर भेजें:**`;
+
+        renderCrispSpecialBox(`🩸 ${friendName} जी के लिए 1 माह का डायबिटीज एस्टीमेट`, onScreen, [
+          { text: `📲 ${friendName} जी को WhatsApp पर भेजें`, url: waUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
+          { text: '🛒 25% छूट पर ऑर्डर पेज खोलें', url: '/health/diabetes.html', isExternal: true },
+          { text: '💊 सेवन की सही विधि क्या है?', query: 'लाइफस्टाइल प्लस का डोज बताओ' }
+        ], 'health', 'diabetes_month_estimate');
+        return true;
+      }
+
+      // Self Diabetes Estimate
+      const resp = `🩸 **मधुमेह (डायबिटीज) में 1 महीने का संपूर्ण खर्च व एस्टीमेट:**
+
+शुगर को प्राकृतिक रूप से संतुलित करने और शरीर की कमजोरी को दूर करने के लिए नेट्सर्फ का प्रमाणित 2-उत्पाद कॉम्बो:
+
+📦 **1. नेचुरामोर लाइफस्टाइल प्लस (60 कैप्सूल):**
+• **MRP:** ₹699 | **25% छूट पर:** **₹524** (1 माह का पैक)
+• **खुराक:** 1 कैप्सूल सुबह व 1 कैप्सूल शाम भोजन से 30 मिनट पूर्व गुनगुने पानी से।
+
+🥛 **2. नेचुरामोर फ्रेंच वैनिला प्रोटीन पाउडर (350g/400g):**
+• **MRP:** ₹1,600 | **25% छूट पर:** **₹1,200**
+• **खुराक:** 1 चम्मच सुबह (शारीरिक कमजोरी, थकान व नसों के दर्द से स्थायी राहत)।
+
+💰 **कुल 1 महीने का खर्च:**
+• **कुल MRP:** ₹2,299
+• **25% फ्लैट छूट के बाद कुल मासिक खर्च:** **मात्र ₹1,724!**
+• **प्रति दिन का वास्तविक खर्च:** **मात्र ₹57 प्रति दिन!**`;
+
+      renderCrispSpecialBox('🩸 डायबिटीज: 1 माह का खर्च मात्र ₹1,724 (₹57/दिन)', resp, [
+        { text: '🛒 25% छूट पर डायबिटीज पेज खोलें', url: '/health/diabetes.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '💊 लाइफस्टाइल प्लस के घटक व फायदे', query: 'लाइफस्टाइल प्लस के घटक क्या हैं' },
+        { text: '📲 किसी मित्र के लिए पर्ची बनाएं', query: 'मंजूलता मिश्रा को डायबिटीज का पूरा 1 महीने का एस्टीमेट देना है' }
+      ], 'health', 'diabetes_cost');
+      return true;
+    }
+
+    // Case 3: Buffalo Pet-Vet / 2 भैंस खुराक व खर्च
+    if (q.includes('pet vet') || q.includes('पेट वेट') || q.includes('cfc') || q.includes('भैंस') || q.includes('गाय')) {
+      const resp = `🐄 **2 दुधारू भैंसों के लिए बायोफिट पेट-वेट (Pet-Vet) की खुराक व खर्च:**
+
+📢 **खुराक का सही नियम:**
+• बड़े दुधारू पशु (गाय/भैंस): 10 से 15 ग्राम प्रतिदिन सुबह के दाने या चारे में मिलाकर दें।
+• **2 भैंसों के लिए कुल दैनिक खुराक:** **20 से 30 ग्राम प्रतिदिन**।
+
+📦 **उपलब्ध साइज व 25% छूट पर रेट:**
+• **1 किलोग्राम पैक:** MRP ₹1,275 | **25% छूट पर: ₹956**
+• 1 किलो का डिब्बा 2 भैंसों के लिए **35 से 50 दिन** तक आराम से चलता है!
+
+💰 **दैनिक खर्च का गणित:**
+• 2 भैंसों का कुल खर्च: मात्र ₹20 से ₹25 प्रति दिन (यानी **मात्र ₹10 से ₹12 प्रति भैंस!**)
+• **प्राकृतिक लाभ:** 1 से 2 लीटर अधिक दूध प्रतिदिन और 7 से 8 डिग्री फैट (जिससे प्रति भैंस रोजाना ₹40 से ₹60 का अतिरिक्त मुनाफा होता है!)।`;
+
+      renderCrispSpecialBox('🐄 2 भैंसों के लिए पेट-वेट खुराक व खर्च', resp, [
+        { text: '🥛 दूध व फैट वृद्धि के फायदे', query: 'पेट-वेट के घटक व फायदे' },
+        { text: '📦 1kg, 500g, 250g रेट व छूट', query: 'पेट वेट रेट और छूट' },
+        { text: '🌾 फसलों का स्प्रे एस्टीमेट', query: 'फसल का खर्च एस्टीमेट' }
+      ], 'pashu', 'pet_vet_buffalo_cost');
+      return true;
+    }
+
+    return false;
+  }
+
   function handleMultiTopicAndTwistQueries(cleanQ, rawQ) {
     const q = cleanQ;
+
+    // 0. HEALTH, DIABETES & ANIMAL CARE PRODUCT COST ESTIMATE ENGINE
+    if (handleHealthProductCostEstimate(cleanQ, rawQ)) {
+      return true;
+    }
 
     // 1. DUAL-INTENT: SEXUAL WELLNESS + DIABETES (डायबिटिक न्यूरोपैथी व पौरुष कमजोरी)
     const hasSexIntent = q.includes('यौन') || q.includes('सेक्स') || q.includes('सेक्सुअल') || q.includes('sex') || q.includes('पौरुष') || q.includes('मर्दाना') || q.includes('शीघ्रपतन') || q.includes('इरेक्टाइल') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('stamina') || q.includes('गुप्त रोग') || q.includes('धातु');
@@ -6258,71 +6887,57 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     // 5.1 THIRD-PARTY FRIEND REFERRAL PRESCRIPTION ENGINE (सुरेश / पवन को राहुल की पर्ची)
     // Generates a dedicated doctor-style prescription for a friend without touching user's profile
     // =========================================================================
-    const isExplicitSelf = q.includes('apne liye') || q.includes('apne khet') || q.includes('apni fasal') || q.includes('mere liye') || q.includes('मेरे लिए') || q.includes('अपने लिए') || q.includes('अपने खेत');
-    const hasFriendNamePattern = /([a-zA-Zऀ-ॿ]+(?:\s+[a-zA-Zऀ-ॿ]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i.test(rawQ);
-
-    const isFriendReferral = !isExplicitSelf && (
+    // =========================================================================
+    // 5.1 DYNAMIC FRIEND-NAME PRESCRIPTION & ACCURATE AGRI COST ENGINE
+    // Transparent micro-costing, Bhindi & multi-crop support, robust name extraction
+    // =========================================================================
+    const friendNameExtracted = extractPersonNameFromQuery(rawQ, cleanQ);
+    const isFriendReferralIntent = (
+      Boolean(friendNameExtracted) ||
       q.includes('dost') || q.includes('दोस्त') || q.includes('mitra') || q.includes('मित्र') ||
       q.includes('bhejna') || q.includes('भेजना') || q.includes('parchi') || q.includes('पर्ची') ||
-      q.includes('share karna') || q.includes('शेयर करना') || q.includes('dusre kisan') || q.includes('दूसरे किसान') ||
-      q.includes('suresh') || q.includes('सुरेश') || q.includes('pavan') || q.includes('पवन') ||
-      q.includes('ramesh') || q.includes('रमेश') || q.includes('dinesh') || q.includes('दिनेश') ||
-      hasFriendNamePattern
+      q.includes('share karna') || q.includes('शेयर करना') || q.includes('dusre kisan') || q.includes('दूसरे किसान')
     );
 
-    if (isFriendReferral && (q.includes('ekad') || q.includes('एकड़') || q.includes('stimrich') || q.includes('स्टिमरिच') || q.includes('dawa') || q.includes('दवा') || q.includes('spray') || q.includes('स्प्रे') || q.includes('gehu') || q.includes('गेहूं') || q.includes('chana') || q.includes('चना'))) {
+    const isAgriEstimateIntent = (
+      q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kharcha') || q.includes('खर्चा') ||
+      q.includes('kharch') || q.includes('खर्च') || q.includes('per pump') || q.includes('प्रति पंप') ||
+      q.includes('ekad') || q.includes('एकड़') || q.includes('bigha') || q.includes('बीघा') ||
+      q.includes('kitni dawa') || q.includes('कितनी दवा') || q.includes('dawa ka kharch')
+    );
+
+    if (isFriendReferralIntent || isAgriEstimateIntent) {
       sakhiConversationState.lastActiveDomain = 'agri';
-      
-      // 1. Dynamic Friend Name Extraction (Supports ANY Name, Negations & Context)
-      let friendName = '';
 
-      // Check if user has a negation like "सुरेश के लिए नहीं पवन जी के लिए" or "सुरेश नहीं पवन"
-      const negRe = /(?:नहीं|nahi)\s*,?\s*([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i;
-      const negM = rawQ.match(negRe);
-      if (negM && negM[1]) {
-        let cand = negM[1].trim().replace(/\s+(जी|ji)$/i, '').trim();
-        if (cand.length >= 2) friendName = cand;
-      }
+      // SUB-CASE 0: Distributor Inquiry for Crop/Acreage (e.g. "मुझे गेहूं के लिए नहीं भिंडी के लिए चार एकड़ का डिस्ट्रीब्यूटर चाहिए")
+      const isDistributorNeeded = q.includes('distributor') || q.includes('डिस्ट्रीब्यूटर') || q.includes('दवा कहां मिलेगी') || q.includes('दवा कहाँ मिलेगी');
+      if (isDistributorNeeded) {
+        let reqCrop = 'फसल';
+        if ((q.includes('भिंडी') || q.includes('bhindi') || q.includes('okra')) && !isKeywordNegatedInQuery(q, 'भिंडी')) reqCrop = 'भिंडी';
+        else if ((q.includes('गेहूं') || q.includes('gehu')) && !isKeywordNegatedInQuery(q, 'गेहूं')) reqCrop = 'गेहूं';
+        else if ((q.includes('चना') || q.includes('chana')) && !isKeywordNegatedInQuery(q, 'चना')) reqCrop = 'चना';
 
-      if (!friendName) {
-        const directPatterns = [
-          // "मेरे दोस्त पवन पांडे के लिए" / "dost pavan pandey ke liye"
-          /(?:मेरे\s*दोस्त|मेरे\s*मित्र|dost|mitra|friend|दोस्त|मित्र)\s+([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i,
-          // "मुझे पवन पांडे के लिए" / "mujhe pavan pandey ke liye"
-          /(?:मुझे|हमे|हमको|apne|dost)\s+([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i,
-          // "सुरेश के 4 एकड़ में" / "पवन पांडे के 4 एकड़ में"
-          /([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?के\s*(\d+|चार|पांच|तीन|दो)\s*(?:एकड़|ekad|बीघा)/i,
-          // Generic: "[Name] के लिए एस्टीमेट / पर्ची"
-          /([a-zA-Z\u0900-\u097F]+(?:\s+[a-zA-Z\u0900-\u097F]+)?)\s*(?:जी\s*)?(?:के\s*लिए|ke\s*liye)/i
-        ];
-
-        for (const dp of directPatterns) {
-          const m = rawQ.match(dp);
-          if (m && m[1]) {
-            let cand = m[1].trim()
-              .replace(/^(mere|apne|dost|mitra|bhai|kisan|sathi|farmer|mujhe|humko|mera|hamare)\s+/i, '')
-              .replace(/\s+(ji|जी|ke|liye|ko|ka|ki)$/i, '')
-              .trim();
-            const stopWords = ['khet', 'खेत', 'dawa', 'दवा', 'ekad', 'एकड़', 'fasal', 'फसल', 'spray', 'स्प्रे', 'gehu', 'गेहूं', 'chana', 'चना', 'sarso', 'सरसों', 'dhan', 'धान', 'nahi', 'नहीं', 'banao', 'बनाओ', 'karo', 'करो', 'estimate', 'एस्टीमेट', 'parchi', 'पर्ची', 'kisan', 'किसान', 'sathi', 'साथी', 'apne', 'अपने', 'mere', 'मेरे', 'sab', 'सब', 'dost', 'दोस्त'];
-            if (cand.length >= 2 && !stopWords.includes(cand.toLowerCase())) {
-              friendName = cand;
-              break;
-            }
-          }
+        let reqAcres = 4;
+        const acMatch = q.match(/(\d+)\s*(ekad|एकड़|bigha|बीघा)/i) || rawQ.match(/(चार|पांच|तीन|दो|दस)\s*(एकड़|बीघा)/);
+        if (acMatch) {
+          if (acMatch[1] === 'चार') reqAcres = 4;
+          else if (acMatch[1] === 'पांच') reqAcres = 5;
+          else if (acMatch[1] === 'तीन') reqAcres = 3;
+          else if (acMatch[1] === 'दो') reqAcres = 2;
+          else reqAcres = parseInt(acMatch[1], 10) || 4;
         }
+
+        const resp = `🌾 **${reqCrop} (${reqAcres} एकड़) हेतु अधिकृत बायोफिट डिस्ट्रीब्यूटर व उत्पाद आपूर्ति:**\n\nआरोग्यम इंडिया और नेट्सर्फ के 100% असली व प्रमाणित बायोफिट उत्पाद (स्टिमरिच, शेत, Bio-99, इंटैक्ट व रैप-अप) 25% फ्लैट छूट व मुफ़्त होम डिलीवरी के साथ प्राप्त करने हेतु आप सीधे हमारे मुख्य अधिकृत डिस्ट्रीब्यूटर **दादा अवनीश (अविनिश कुमार मिश्रा जी)** से संपर्क कर सकते हैं:\n\n👤 **मुख्य डिस्ट्रीब्यूटर:** दादा अवनीश जी\n📱 **मोबाइल / WhatsApp:** **7974422572**\n📦 **सुविधा:** पूरे भारत में सुरक्षित होम डिलीवरी, ओरिजिनल जीएसटी बिल व व्यक्तिगत फसल मार्गदर्शन।`;
+
+        renderCrispSpecialBox(`🌾 ${reqCrop} (${reqAcres} एकड़) अधिकृत डिस्ट्रीब्यूटर`, resp, [
+          { text: '💬 दादा अवनीश जी से सीधे WhatsApp पर बात करें', url: 'https://wa.me/917974422572?text=' + encodeURIComponent(`नमस्ते दादा अवनीश जी! मुझे ${reqAcres} एकड़ ${reqCrop} के लिए बायोफिट दवा व अधिकृत डिस्ट्रीब्यूटर सहायता चाहिए।`), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+          { text: `🧮 ${reqAcres} एकड़ ${reqCrop} का खर्च व स्प्रे हिसाब`, query: `${reqCrop} में ${reqAcres} एकड़ का खर्च बताओ` }
+        ], 'agri', 'crop_distributor_assist');
+        return true;
       }
 
-      if (!friendName) {
-        if (q.includes('pavan') || q.includes('पवन')) friendName = 'पवन पांडे';
-        else if (q.includes('सुरेश') || q.includes('suresh')) friendName = 'सुरेश';
-        else if (q.includes('रमेश') || q.includes('ramesh')) friendName = 'रमेश';
-        else if (q.includes('दिनेश') || q.includes('dinesh')) friendName = 'दिनेश';
-        else if (q.includes('महेश') || q.includes('mahesh')) friendName = 'महेश';
-        else friendName = 'किसान साथी';
-      }
-
-      // Extract Acres
-      let acres = 4;
+      // 1. Detect Acres
+      let acres = 1;
       const acreMatch = q.match(/(\d+)\s*(ekad|एकड़|bigha|बीघा)/i) || rawQ.match(/(चार|पांच|तीन|दो|दस)\s*(एकड़|बीघा)/);
       if (acreMatch) {
         if (acreMatch[1] === 'चार') acres = 4;
@@ -6330,81 +6945,79 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
         else if (acreMatch[1] === 'तीन') acres = 3;
         else if (acreMatch[1] === 'दो') acres = 2;
         else if (acreMatch[1] === 'दस') acres = 10;
-        else acres = parseInt(acreMatch[1], 10) || 4;
+        else acres = parseInt(acreMatch[1], 10) || 1;
+      } else if (q.includes('4 एकड़') || q.includes('4 ekad')) {
+        acres = 4;
       }
 
-      // Extract Crop
-      let cropName = 'गेहूं व चना';
-      if (q.includes('गेहूं') || q.includes('gehu')) cropName = 'गेहूं';
-      else if (q.includes('चना') || q.includes('chana')) cropName = 'चना';
-      else if (q.includes('सरसों') || q.includes('sarso')) cropName = 'सरसों';
-      else if (q.includes('धान') || q.includes('dhan')) cropName = 'धान';
+      // 2. Detect Crop (with Negation Awareness)
+      let cropName = 'फसल (गेहूं/चना/सब्जी)';
+      if ((q.includes('भिंडी') || q.includes('bhindi') || q.includes('okra')) && !isKeywordNegatedInQuery(q, 'भिंडी') && !isKeywordNegatedInQuery(q, 'bhindi')) {
+        cropName = 'भिंडी';
+      } else if ((q.includes('गेहूं') || q.includes('gehu')) && !isKeywordNegatedInQuery(q, 'गेहूं') && !isKeywordNegatedInQuery(q, 'gehu')) {
+        cropName = 'गेहूं';
+      } else if ((q.includes('चना') || q.includes('chana')) && !isKeywordNegatedInQuery(q, 'चना') && !isKeywordNegatedInQuery(q, 'chana')) {
+        cropName = 'चना';
+      } else if ((q.includes('सरसों') || q.includes('sarso')) && !isKeywordNegatedInQuery(q, 'सरसों') && !isKeywordNegatedInQuery(q, 'sarso')) {
+        cropName = 'सरसों';
+      } else if ((q.includes('धान') || q.includes('dhan')) && !isKeywordNegatedInQuery(q, 'धान') && !isKeywordNegatedInQuery(q, 'dhan')) {
+        cropName = 'धान';
+      } else if ((q.includes('टमाटर') || q.includes('tamatar')) && !isKeywordNegatedInQuery(q, 'टमाटर')) {
+        cropName = 'टमाटर';
+      } else if ((q.includes('मिर्च') || q.includes('mirch')) && !isKeywordNegatedInQuery(q, 'मिर्च')) {
+        cropName = 'मिर्च';
+      } else if ((q.includes('गन्ना') || q.includes('ganna')) && !isKeywordNegatedInQuery(q, 'गन्ना')) {
+        cropName = 'गन्ना';
+      }
 
-      // Sender Info (From localStorage session - NEVER modify current user's profile)
+      // Sender Info
       let senderName = '';
       try {
         senderName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || localStorage.getItem('SAKHI_USER_NAME') || '';
       } catch (_) {}
-      if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') {
-        senderName = 'Aarogyam Master';
-      }
+      if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') senderName = 'Aarogyam Master';
 
       let senderPhone = '';
       try {
         senderPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
       } catch (_) {}
-      const contactInfo = senderPhone ? `${senderName} (मो. ${senderPhone})` : `${senderName}`;
+      if (!senderPhone || senderPhone.length < 10) senderPhone = '7974422572';
 
-      // Single Official Link Rule
+      const contactInfo = `${senderName} (मो. ${senderPhone})`;
       const officialSakhiLink = 'https://aarogyamindia.online/aarogyam-sakhi.html';
 
-      // Formatted WhatsApp Message (First Person: 'मेरी सलाह से' + Powerful Call to Action)
-      const waPrescriptionText = `श्री ${friendName} जी, नमस्कार! 🙏\n\nमैंने आपके ${acres} एकड़ खेत (${cropName}) में बंपर फुटाव व रिकॉर्ड पैदावार के लिए यह विशेषज्ञ Biofit स्प्रे फॉर्मूला तैयार करवाया है (मेरी सलाह):\n\n🌾 अनुशंसित खुराक (प्रति 15L पंप):\n• स्टिमरिच (Stimrich): 30ml (कल्ले, फुटाव व बढ़वार)\n• शेत (Sheth): 30ml (जड़ विकास व जीवाणु पोषण)\n• Bio-99: 5ml (दवा फैलाव, चिपकाव व पानी को पतला करना)\n\n🌱 स्प्रे की सही अवस्थाएं:\n1. पहला स्प्रे: फुटाव व कल्ले निकलते समय (बुआई के 20-25 दिन बाद)\n2. दूसरा स्प्रे: फूल व दाना भराव की अवस्था में\n\n💰 आपका ${acres} एकड़ का अनुमानित खर्च:\n• 1 एकड़ में 5 से 6 पंप (प्रति पंप खर्च: मात्र ₹75 - ₹85)\n• रासायनिक दवाओं के ₹1500 के मुकाबले 70% तक सस्ता!\n\n⚠️ आवश्यक सावधानी:\nस्प्रे से पहले पंप को सादे पानी से 2 बार अच्छी तरह धो लें।\n\nविशेष जानकारी, डिस्काउंट व ऑर्डर सहायता के लिए सीधे मुझसे संपर्क करें:\n👤 ${contactInfo}\n\n🌱 भारत की पहली और सबसे बड़ी कृषि AI सखी, जो आपकी खेती व फसलों की हर समस्या को समझकर 24×7 सही वैज्ञानिक सलाह देती है—उससे सीधे बात करने के लिए नीचे लिंक पर क्लिक करें:\n${officialSakhiLink}`;
-
-      const waShareUrl = `https://wa.me/?text=${encodeURIComponent(waPrescriptionText)}`;
-
-      const onScreenResp = `📋 **श्री ${friendName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n• **स्टिमरिच (Stimrich):** 30ml (बंपर कल्ले व फुटाव)\n• **शेत (Sheth):** 30ml (मिट्टी को उपजाऊ व जड़ मजबूत करने हेतु)\n• **Bio-99:** 5ml (पानी को पतला कर दवा को अंदर तक पहुंचाने हेतु)\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 20-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना भराव की स्थिति में (दाना मोटा व चमकदार बनेगा)\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450** (रासायनिक खाद के भारी खर्च की तुलना में बहुत सस्ता)।\n• **${acres} एकड़ का कुल स्प्रे खर्च:** अत्यंत किफायती।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे दिए गए बटन से यह पूरी पर्ची सीधे ${friendName} जी को WhatsApp पर भेजें:**`;
-
-      renderCrispSpecialBox(`🌾 ${friendName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`, onScreenResp, [
-        { text: `📲 ${friendName} जी को WhatsApp पर भेजें`, url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
-        { text: '🌾 4 एकड़ का पूरा हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '🌾 5 एकड़ का पूरा हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
-      ], 'agri', 'friend_prescription');
-      return true;
-    }
-
-    // =========================================================================
-    // 5.2 MICRO-COST ESTIMATE & DOSE ENGINE (प्रति पंप व प्रति एकड़ खर्च का सटीक गणित)
-    // Transparent micro-costing: Per Pump -> Per Acre -> Total Acres -> Suspense Hook
-    // =========================================================================
-    const isCostEstimate = (
-      q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kharcha') || q.includes('खर्चा') ||
-      q.includes('kharch') || q.includes('खर्च') || q.includes('kitni dawa lagegi') || q.includes('कितनी दवा लगेगी') ||
-      q.includes('kitna kharch') || q.includes('कितना खर्च') || q.includes('per pump') || q.includes('प्रति पंप') ||
-      q.includes('ekad me kitna') || q.includes('एकड़ में कितना')
-    );
-
-    if (isCostEstimate) {
-      sakhiConversationState.lastActiveDomain = 'agri';
-
-      // Detect Acres
-      let acres = 1;
-      const acreMatch = q.match(/(\d+)\s*(ekad|एकड़|bigha|बीघा)/i);
-      if (acreMatch) acres = parseInt(acreMatch[1], 10) || 1;
-
-      // Detect Crop
-      let cropName = 'फसल (गेहूं/चना/धान)';
-      if (q.includes('गेहूं') || q.includes('gehu')) cropName = 'गेहूं';
-      else if (q.includes('चना') || q.includes('chana')) cropName = 'चना';
-      else if (q.includes('सरसों') || q.includes('sarso')) cropName = 'सरसों';
-      else if (q.includes('धान') || q.includes('dhan')) cropName = 'धान';
-
+      // Cost Calculation
       const perPumpCost = 80;
       const perAcrePumps = 5;
-      const perAcreCost = perPumpCost * perAcrePumps; // 400
+      const perAcreCost = perPumpCost * perAcrePumps; // ~400
       const totalAcresCost = perAcreCost * acres; // e.g. 1600 for 4 acres
 
-      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n• **स्टिमरिच (Stimrich):** 30ml (कल्ले, फुटाव व बढ़वार)\n• **शेत (Sheth):** 30ml (मिट्टी जीवाणु व जड़ विकास)\n• **Bio-99:** 5ml (पानी को पतला कर दवा को पत्तों में सोखने हेतु)\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 20-25 दिन):** कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (दाना भराव अवस्था):** दाना मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n🌾 **क्या यह एस्टीमेट आपके अपने खेत के लिए चाहिए, या किसी किसान मित्र / पड़ोसी के लिए?**\n• **यदि अपने खेत के लिए:** तो अपनी कुल जमीन या फसल बताएं, मैं आगे का स्प्रे शेड्यूल बता दूंगी।\n• **यदि किसी मित्र के लिए:** तो उनका नाम और एकड़ बताएं, मैं उनके नाम की सुंदर WhatsApp पर्ची तैयार कर दूंगी!`;
+      // Crop-specific dose tuning
+      let doseItems = `• स्टिमरिच (Stimrich): 30ml (बंपर कल्ले व फुटाव)\n• शेत (Sheth): 30ml (मिट्टी को उपजाऊ व जड़ विकास हेतु)\n• Bio-99: 5ml (पानी को पतला कर दवा को अंदर तक पहुंचाने हेतु)`;
+      if (cropName === 'भिंडी') {
+        doseItems = `• स्टिमरिच (Stimrich): 30ml (शाखाओं का भारी फुटाव व कोमल फलियां)\n• शेत (Sheth): 30ml (जड़ फैलाव व मिट्टी के जीवाणु पोषण हेतु)\n• Bio-99: 5ml (सुपर स्प्रेडर व एक्टिवेटर — दवा फैलाव व चिपकाव)\n• *पीली पत्ती/रसचूसक कीट सुरक्षा:* इंटैक्ट (Intact) 30ml + रैप अप 30ml`;
+      }
+
+      // SUB-CASE A: Dedicated Friend Prescription WhatsApp Card
+      if (friendNameExtracted || (q.includes('भेजना है') && friendNameExtracted)) {
+        const friendDisplayName = friendNameExtracted;
+
+        const waPrescriptionText = `श्री ${friendDisplayName} जी, नमस्कार! 🙏\n\nमैंने आपके ${acres} एकड़ खेत (${cropName}) में बंपर फुटाव व रिकॉर्ड पैदावार के लिए यह विशेषज्ञ Biofit स्प्रे फॉर्मूला तैयार करवाया है (मेरी सलाह):\n\n🌾 अनुशंसित खुराक (प्रति 15L पंप):\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 स्प्रे की सही अवस्थाएं:\n1. पहला स्प्रे: कल्ले व फुटाव निकलते समय (बुआई के 15-25 दिन बाद)\n2. दूसरा स्प्रे: फूल व फल/दाना भराव की अवस्था में\n\n💰 आपका ${acres} एकड़ का अनुमानित खर्च:\n• 1 एकड़ में 5 से 6 पंप (प्रति पंप खर्च: मात्र ₹75 - ₹85)\n• 1 स्प्रे का कुल खर्च (${acres} एकड़): मात्र ₹${totalAcresCost.toLocaleString('hi-IN')}!\n• रासायनिक दवाओं के भारी खर्च के मुकाबले 70% तक सस्ता!\n\n⚠️ आवश्यक सावधानी:\nस्प्रे से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\nविशेष जानकारी, 25% छूट व असली दवा ऑर्डर सहायता के लिए सीधे मुझसे संपर्क करें:\n👤 ${contactInfo}\n\n🌱 आरोग्यम सखी AI लिंक:\n${officialSakhiLink}`;
+
+        const waShareUrl = `https://wa.me/?text=${encodeURIComponent(waPrescriptionText)}`;
+
+        const onScreenResp = `📋 **श्री ${friendDisplayName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 15-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना/फल भराव की स्थिति में\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450**।\n• **${acres} एकड़ का 1 स्प्रे कुल खर्च:** मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे दिए गए बटन से यह पूरी पर्ची सीधे ${friendDisplayName} जी को WhatsApp पर भेजें:**`;
+
+        renderCrispSpecialBox(`🌾 ${friendDisplayName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`, onScreenResp, [
+          { text: `📲 ${friendDisplayName} जी को WhatsApp पर भेजें`, url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
+          { text: '🌾 4 एकड़ का पूरा हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+          { text: '🌾 5 एकड़ का पूरा हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
+        ], 'agri', 'friend_prescription');
+        return true;
+      }
+
+      // SUB-CASE B: General Cost Estimate
+      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 15-25 दिन):** शाखाएं/कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (फल/दाना भराव):** दाना/फल मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n🌾 **क्या यह एस्टीमेट आपके अपने खेत के लिए चाहिए, या किसी किसान मित्र / पड़ोसी के लिए?**\n• **यदि किसी मित्र के लिए:** तो उनका नाम और एकड़ बताएं (जैसे "राकेश के लिए 4 एकड़"), मैं उनके नाम की सुंदर WhatsApp पर्ची तैयार कर दूंगी!`;
 
       renderCrispSpecialBox(`🧮 ${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} का खर्च व डोज एस्टीमेट`, resp, [
         { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
@@ -7060,7 +7673,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     }
 
     // Dynamic E-Book & Aarogyam Tube Video Recommendations from Persona
-    const recoChips = getPersonaRecommendationChips();
+    const recoChips = getPersonaRecommendationChips(domain);
     let recoHtml = '';
     if (recoChips && recoChips.length > 0) {
       recoChips.forEach(rc => {
@@ -7181,7 +7794,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     }
 
     // Dynamic E-Book & Aarogyam Tube Video Recommendations from Persona
-    const recoChips = getPersonaRecommendationChips();
+    const recoChips = getPersonaRecommendationChips(intent.domain || domain);
     let recoHtml = '';
     if (recoChips && recoChips.length > 0) {
       recoChips.forEach(rc => {
