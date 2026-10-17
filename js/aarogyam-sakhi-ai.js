@@ -379,8 +379,17 @@
     }
 
     // Casual, Emotional, Flattery, Greetings & Personal Profile queries -> 'casual'
-    const isCasualOrPersonal = q === 'hi' || q === 'hello' || q === 'hey' || q === 'नमस्ते' || q === 'नमस्कार' || q === 'राम राम' || q === 'राधे राधे' ||
-      q.includes('kaise ho') || q.includes('kaisi ho') || q.includes('kya hal') || q.includes('kya haal') || q.includes('kaisa chal') ||
+    const isCasualOrPersonal = (
+      q === 'hi' || q === 'hello' || q === 'hey' || q === 'हाय' || q === 'हेलो' || q === 'हेल्लो' ||
+      q === 'नमस्ते' || q === 'नमस्कार' || q === 'नमस्कारम' || q === 'राम राम' || q === 'राधे राधे' ||
+      q === 'namaste' || q === 'namaskar' || q === 'namskar' || q === 'namste' || q === 'namaskaar' || q === 'namasakar' ||
+      q === 'pranam' || q === 'pranaam' || q === 'charan sparsh' || q === 'चरण स्पर्श' || q === 'प्रणाम' ||
+      q === 'sakhi' || q === 'sakhi ji' || q === 'सखी' || q === 'सखी जी' ||
+      q.includes('satrikal') || q.includes('sat sri akal') || q.includes('sat shri akal') || q.includes('sasriyakal') || q.includes('सत श्री अकाल') ||
+      q.includes('adab') || q.includes('adaab') || q.includes('आदाब') || q.includes('salam') || q.includes('salaam') || q.includes('सलाम') || q.includes('assalam') ||
+      q.includes('kaise ho') || q.includes('kaisi ho') || q.includes('kaise hain') || q.includes('kaisa hai') || q.includes('kaisi hai') ||
+      q.includes('kya hal') || q.includes('kya haal') || q.includes('hal chal') || q.includes('haal chaal') || q.includes('halchal') || q.includes('haalchal') ||
+      q.includes('kaisa chal') || q.includes('kya chal raha') || q.includes('sab theek') || q.includes('sab thik') || q.includes('sab badhiya') || q.includes('sab badiya') || q.includes('kushal mangal') ||
       q.includes('tum kaun') || q.includes('apna parichay') || q.includes('apna naam') || q.includes('naam kya hai') ||
       q.includes('kya kar rahe') || q.includes('kya kar rahi') || q.includes('kya karti ho') || q.includes('kya karsakti') || q.includes('kya kya kar') || q.includes('tum kya kar') ||
       q.includes('sundar ho') || q.includes('bahut sundar') || q.includes('smile achhi') || q.includes('tumhare gal') || q.includes('खूबसूरत') ||
@@ -390,7 +399,8 @@
       q.includes('dukhi hu') || q.includes('koi bat nahi karni') || q.includes('baat nahi karni') || q.includes('mood off') || q.includes('mood kharab') ||
       q.includes('mera janm din') || q.includes('mera birthday') || q.includes('meri date of birth') ||
       q.includes('mere bare me') || q.includes('mera record') || q.includes('mera profile') || q.includes('meri profile') || q.includes('profile dikhao') ||
-      q === 'dhanyawad' || q === 'thank you' || q === 'thanks' || q === 'shukriya';
+      q === 'dhanyawad' || q === 'thank you' || q === 'thanks' || q === 'shukriya'
+    );
     if (isCasualOrPersonal) {
       return 'casual';
     }
@@ -2205,7 +2215,15 @@
       .replace(/\b(sarson)\b/gi, 'सरसों')
       .replace(/\b(shimla mirch|shimla mirchi|shikmla mirchi|shikmla mirch)\b/gi, 'शिमला मिर्च')
       .replace(/\b(harfal|harfall|hairfall)\b/gi, 'hair fall')
-      .replace(/\b(shampu)\b/gi, 'shampoo');
+      .replace(/\b(shampu)\b/gi, 'shampoo')
+      .replace(/\b(namste|namasakar|namaskaar|namasthe|namastey|namastee)\b/gi, 'namaste')
+      .replace(/\b(namskar|namaskaram|namaskara)\b/gi, 'namaskar')
+      .replace(/\b(satrikal|satshriakal|sat shri akal|sasriyakal|sasrikal|sat siri akal)\b/gi, 'sat sri akal')
+      .replace(/\b(adaab|aadaab)\b/gi, 'adab')
+      .replace(/\b(salaam)\b/gi, 'salam')
+      .replace(/\b(ramram)\b/gi, 'ram ram')
+      .replace(/\b(radhey radhey)\b/gi, 'radhe radhe')
+      .replace(/\b(halchal|haalchal|hal-chal|haal-chaal)\b/gi, 'hal chal');
   }
 
   // =========================================================================
@@ -2472,31 +2490,118 @@
       return true;
     }
 
-    // 0. Primary Greetings: "hi", "hello", "hey", "namaste", "namaskar", "ram ram", "radhe radhe"
-    const isPureGreeting = cleanQ === 'hi' || cleanQ === 'hello' || cleanQ === 'hey' || cleanQ === 'नमस्ते' || cleanQ === 'नमस्कार' || cleanQ === 'राम राम' || cleanQ === 'राधे राधे' || cleanQ === 'जय श्री राम' || cleanQ === 'हाय' || cleanQ === 'हेलो' || cleanQ === 'हेल्लो' || cleanQ === 'namaste' || cleanQ === 'namaskar' || cleanQ.startsWith('hi ') || cleanQ.startsWith('hello ') || cleanQ.startsWith('hey ');
-    if (isPureGreeting) {
-      const resp = `नमस्ते! 🙏 मैं **आरोग्यम सखी AI** — आपकी समर्पित डिजिटल हमदर्द व 24×7 सलाहकार हूँ।\n\nमैं आपकी खेती, पशुपालन, प्राकृतिक स्वास्थ्य, सौंदर्य और नेट्सर्फ के सभी समाधानों में 100% सटीक मार्गदर्शन देती हूँ।\n\nआज आप किस विषय पर जानकारी या परामर्श चाहते हैं? नीचे से विकल्प चुनें:`;
-      renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
-        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
-        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
-        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
-        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
-        { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
-      ], 'casual', 'greeting_hub');
-      return true;
-    }
+    // 0. COMPREHENSIVE MULTI-LINGUAL INDIAN GREETINGS, ABHIVADAN & HAL-CHAAL ROUTER
+    cleanSakhiUnresolvedLog();
+    const qClean = (cleanQ || '').replace(/[.,?!:;।\-–_~*'"()]+/g, ' ').replace(/\s+/g, ' ').trim();
 
-    // 1. "kaise ho" / "kaisi ho" / "kya haal hai"
-    if (cleanQ.includes('kaise ho') || cleanQ.includes('kaisi ho') || cleanQ.includes('kya hal') || cleanQ.includes('kya haal') || cleanQ.includes('kaisa chal raha') || cleanQ.includes('how are you') || cleanQ.includes('kaise hain') || cleanQ.includes('आप कैसी हैं') || cleanQ.includes('आप कैसे हैं')) {
-      const resp = `नमस्ते! 🙏 मैं बिल्कुल स्वस्थ और आपकी सेवा में सदैव तत्पर हूँ। आप कैसे हैं? आशा है आपकी खेती व परिवार में सब कुशल-मंगल होगा।\n\nआज मैं आपकी खेती (खाद-स्प्रे), पशुपालन (दूध-फैट), सेहत या नेट्सर्फ में किस विषय पर सहायता करूँ?`;
-      renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
-        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
-        { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
-        { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
-        { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
-        { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
-      ], 'casual', 'greeting');
-      return true;
+    // Check if query is substantive (contains specific topic/problem) to prevent false intercept
+    const hasTechnicalIntent = (
+      /\b(gehu|गेहूं|chana|चना|sarso|सरसों|tamatar|टमाटर|dhan|धान|ganna|गन्ना|aloo|आलू|mirch|मिर्च|spray|स्प्रे|khad|खाद|dawa|दवा|dawai|keet|कीट|fatawat|kalle|कल्ले|doodh|dudh|दूध|fat|फैट|cfc|बायोफिट|biofit|stimrich|bio-99|wrap up|intact|dard|दर्द|sugar|शुगर|diabetes|डायबिटीज|bp|बीपी|heart|हार्ट|liver|लिवर|price|ret|rate|रेट|bhav|भाव|mandi|मंडी|mausam|मौसम|weather|book|किताब|ebook|ई-बुक|panchang|पंचांग|shampoo|शैम्पू|tel|तेल|oil|hair|skin|त्वचा|चेहरा)\b/i.test(qClean)
+    );
+
+    if (!hasTechnicalIntent) {
+      // 0.1 Sat Sri Akal / Satrikal (सत श्री अकाल)
+      const isSatSriAkal = (
+        qClean.includes('sat sri akal') || qClean.includes('satrikal') || qClean.includes('sat shri akal') ||
+        qClean.includes('sasriyakal') || qClean.includes('sasrikal') || qClean.includes('सत श्री अकाल') ||
+        qClean.includes('सत् श्री अकाल') || qClean.includes('सत्स्रीअकाल') || qClean.includes('सतश्रीअकाल')
+      );
+      if (isSatSriAkal) {
+        const resp = `सत श्री अकाल जी! 🙏🌾 वाहेगुरु जी का खालसा, वाहेगुरु जी की फतेह!\n\nमैं **आरोग्यम सखी AI** — आपकी समर्पित डिजिटल हमदर्द व 24×7 सलाहकार हूँ।\n\nमैं आपकी खेती (गेहूं, सरसों, चना, स्प्रे कैलेंडर), पशुपालन (दूध व फैट वृद्धि), प्राकृतिक स्वास्थ्य (जोड़ों का दर्द, शुगर, बीपी) और नेट्सर्फ के 100% जैविक समाधानों में पूरी निष्ठा से मार्गदर्शन करती हूँ।\n\nदसो जी, आज मैं तहाडी की सेवा कर सकदी हां? नीचे से विषय चुनें:`;
+        renderCrispSpecialBox('🌾 सत श्री अकाल जी — आरोग्यम सखी AI', resp, [
+          { text: '🌾 1. फसलों का स्प्रे शेड्यूल व खाद', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+          { text: '🐄 2. पशु का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+          { text: '💼 4. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' },
+          { text: '📚 5. कृषि ई-बुक्स लाइब्रेरी', query: 'खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी' }
+        ], 'casual', 'sat_sri_akal');
+        return true;
+      }
+
+      // 0.2 Adab / Salam (आदाब / सलाम वालेकुम)
+      const isAdabOrSalam = (
+        qClean.includes('adab') || qClean.includes('adaab') || qClean.includes('aadaab') ||
+        qClean.includes('आदाब') || qClean.includes('salam') || qClean.includes('salaam') ||
+        qClean.includes('सलाम') || qClean.includes('assalam') || qClean.includes('assalamu') ||
+        qClean.includes('walekum')
+      );
+      if (isAdabOrSalam) {
+        const resp = `आदाब! सलाम वालेकुम! 🌸🙏\n\nमैं **आरोग्यम सखी AI** — आपकी समर्पित डिजिटल हमदर्द व 24×7 सलाहकार हूँ।\n\nमैं आपकी खेती, बागवानी, पशुपालन (दूध व 7-8 फैट वृद्धि), सेहत (जोड़ों का दर्द, शुगर, कमजोरी) व घरेलू नुस्खों में पूरी सच्चाई और वैज्ञानिक सटीकता के साथ रहनुमाई करती हूँ।\n\nफरमाइए, आज मैं आपकी किस तरह से खिदमत या रहनुमाई कर सकती हूँ? नीचे से विकल्प चुनें:`;
+        renderCrispSpecialBox('🌸 आदाब व सलाम — आरोग्यम सखी AI', resp, [
+          { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+          { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+          { text: '✨ 4. त्वचा व सौंदर्य देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
+          { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+        ], 'casual', 'adab_salam');
+        return true;
+      }
+
+      // 0.3 Hal-Chaal & Wellbeing (हाल चाल / कैसे हो / सब ठीक)
+      const isHalChaal = (
+        qClean.includes('kaise ho') || qClean.includes('kaisi ho') || qClean.includes('kaise hain') ||
+        qClean.includes('kaisa hai') || qClean.includes('kaisi hai') || qClean.includes('how are you') ||
+        qClean.includes('kya hal') || qClean.includes('kya haal') || qClean.includes('hal chal') ||
+        qClean.includes('haal chaal') || qClean.includes('halchal') || qClean.includes('haalchal') ||
+        qClean.includes('kaisa chal raha') || qClean.includes('kya chal raha') ||
+        qClean.includes('sab theek') || qClean.includes('sab thik') || qClean.includes('sab badiya') ||
+        qClean.includes('sab badhiya') || qClean.includes('kushal mangal') || qClean.includes('सब कुशल मंगल') ||
+        qClean.includes('आप कैसी हैं') || qClean.includes('आप कैसे हैं') || qClean.includes('आप कैसी हो') ||
+        qClean.includes('कैसे हो') || qClean.includes('कैसी हो') || qClean.includes('कैसे हैं') ||
+        qClean.includes('क्या हाल है') || qClean.includes('क्या हाल चाल') || qClean.includes('हाल चाल') ||
+        qClean.includes('सब ठीक') || qClean.includes('सब बढ़िया')
+      );
+      if (isHalChaal) {
+        const resp = `नमस्ते! 🙏 मैं बिल्कुल स्वस्थ, प्रसन्न और आपकी सेवा में सदैव तत्पर हूँ।\n\nआप कैसे हैं? आशा है आपके खेत-खलिहान में फसलें लहलहा रही होंगी और घर-परिवार में सब कुशल-मंगल व उत्तम स्वास्थ्य से होंगे। 🌾🐄🩺✨\n\nआज मैं आपकी खेती (खाद-स्प्रे), पशुपालन (दूध-फैट), सेहत या नेट्सर्फ में किस विषय पर सहायता करूँ? नीचे से विकल्प चुनें:`;
+        renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
+          { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+          { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+          { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
+          { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+        ], 'casual', 'hal_chaal');
+        return true;
+      }
+
+      // 0.4 Pure Abhivadan & Universal Greetings (नमस्ते, नमस्कार, प्रणाम, राम राम, राधे राधे, हाय, हेलो, सखी)
+      const strippedG = qClean
+        .replace(/\b(sakhi|sakhi ji|sakhi didi|sakhi ai|ai sakhi|didi|bhai|ji|batao|suno|sunoji|madam|sir|सखी|सखी जी|दीदी|जी|बताओ|सुनो)\b/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const greetingWords = [
+        'hi', 'hello', 'hey', 'hiya', 'hola', 'हाय', 'हेलो', 'हेल्लो', 'हे',
+        'namaste', 'namste', 'namasthe', 'namastey', 'namastee', 'नमस्ते', 'नमः ते', 'नमो नमः',
+        'namaskar', 'namskar', 'namaskaar', 'namasakar', 'namaskaram', 'namaskara', 'नमस्कार', 'नमस्कारम',
+        'pranam', 'pranaam', 'charan sparsh', 'charansparsh', 'चरण स्पर्श', 'चरणस्पर्श', 'प्रणाम', 'प्रनाम',
+        'ram ram', 'ramram', 'राम राम', 'जय श्री राम', 'जय सियाराम', 'jai shree ram', 'jai shri ram', 'jai siyaram', 'सीताराम', 'sita ram',
+        'radhe radhe', 'radhey radhey', 'राधे राधे', 'जय श्री कृष्ण', 'जय श्री कृष्णा', 'jai shri krishna', 'jai shree krishna',
+        'jai jinendra', 'जय जिनेन्द्र', 'जय जिनेंद्र', 'jai johar', 'जय जोहार', 'जय माता दी', 'jai mata di',
+        'har har mahadev', 'हर हर महादेव', 'om namah shivay', 'ओम नमः शिवाय',
+        'vanakkam', 'khamma ghani', 'खम्मा घणी'
+      ];
+
+      const isPureGreeting = (
+        greetingWords.includes(qClean) ||
+        greetingWords.includes(strippedG) ||
+        qClean === 'sakhi' || qClean === 'sakhi ji' || qClean === 'सखी' || qClean === 'सखी जी' ||
+        qClean.startsWith('hi ') || qClean.startsWith('hello ') || qClean.startsWith('hey ') ||
+        qClean.startsWith('namaste ') || qClean.startsWith('namaskar ') || qClean.startsWith('namskar ') ||
+        qClean.startsWith('namste ') || qClean.startsWith('नमस्ते ') || qClean.startsWith('नमस्कार ') ||
+        qClean.startsWith('राम राम ') || qClean.startsWith('radhe radhe ') || qClean.startsWith('pranam ')
+      );
+
+      if (isPureGreeting) {
+        const resp = `नमस्ते! 🙏 प्रणाम! मैं **आरोग्यम सखी AI** — आपकी समर्पित डिजिटल हमदर्द व 24×7 सलाहकार हूँ।\n\nमैं आपकी खेती (फसलों की सुरक्षा, खाद व स्प्रे कैलेंडर), पशुपालन (दूध व 7-8 फैट वृद्धि), प्राकृतिक स्वास्थ्य (जोड़ों का दर्द, शुगर, बीपी), सौंदर्य और नेट्सर्फ के सभी समाधानों में 100% सटीक व वैज्ञानिक मार्गदर्शन देती हूँ।\n\nआज आप किस विषय पर जानकारी या परामर्श चाहते हैं? नीचे से विकल्प चुनें:`;
+        renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आपका स्वागत है', resp, [
+          { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+          { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+          { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
+          { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+        ], 'casual', 'greeting_hub');
+        return true;
+      }
     }
 
     // 1.2 "kya kar rahi ho" / "kahan ho aajkal" / "kahan ho" / "kya chal raha hai" (कहाँ हो आजकल / क्या कर रही हो / क्या चल रहा है)
