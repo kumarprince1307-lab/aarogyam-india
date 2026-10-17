@@ -902,6 +902,13 @@
                   <span>7-दिवसीय मौसम पूर्वानुमान (Weather)</span>
                 </div>
               </a>
+              <a href="/krishi-panchang.html" class="drawer-sub-link-item" style="background:rgba(217,119,6,0.12); border-left:3px solid #d97706;">
+                <div class="drawer-item-left">
+                  <div class="drawer-sub-icon-box" style="background:#d97706; color:#ffffff;"><i class="fa-solid fa-om"></i></div>
+                  <span style="font-weight:800; color:#b45309;">दैनिक वैदिक पंचांग (Panchang)</span>
+                </div>
+                <span class="drawer-tag-pill" style="background:#d97706; color:#ffffff; font-weight:900;">शुभ मुहूर्त 🚩</span>
+              </a>
               <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
                   <div class="drawer-sub-icon-box" style="background:#15803d; color:#ffffff;"><i class="fa-solid fa-robot"></i></div>

@@ -177,268 +177,238 @@
     <!-- MAIN CONTENT CONTAINER (Full Width, Centered) -->
     <main class="library-main" id="mainLibraryContent">
         <div class="mandi-dashboard-wrapper">
-            
-            <!-- Upgraded 7-Day Visual Weather & Agrometeorological Advisory Box -->
-            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; border: 1.5px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 1.5rem;">⛅</span>
-                            <h2 style="font-size: 1.3rem; margin: 0; font-weight: 900; color: #f8fafc;">
-                                7-दिवसीय कृषि मौसम व स्प्रे सलाह (Live Weather Forecast)
-                            </h2>
-                        </div>
-                        <p style="font-size: 0.84rem; color: #94a3b8; margin: 3px 0 0 0;">
-                            मंडी जाने व फसल सुरक्षा से पहले मौसम, वर्षा अनुमान व वैज्ञानिक सलाह देखें
-                        </p>
+            <!-- =========================================
+                 TOP DUAL SELECTION SYSTEM (MOBILE-FIRST 2 DISTINCT BOXES)
+            ========================================== -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 20px;">
+              
+              <!-- BOX 1: CROP SELECTION WITH DROPDOWN & TOUCH PILLS -->
+              <div style="background: #090d16; border: 1.5px solid #1e293b; border-radius: 16px; padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.35); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.35rem;">🌾</span>
+                      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #ffffff;">
+                        1. फसल चुनें (Select Crop)
+                      </h3>
                     </div>
+                    <span style="font-size: 0.72rem; background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); padding: 2px 8px; border-radius: 10px; font-weight: 800;">
+                      25+ फसलें
+                    </span>
+                  </div>
 
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                        <button type="button" id="btn-gps-weather" onclick="window.useUserCurrentLocation()" style="background: #16a34a; color: #ffffff; border: 1px solid #4ade80; padding: 7px 12px; border-radius: 8px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(22,163,74,0.3);">
-                            📍 मेरा जिला खोजें
-                        </button>
-                        
-                        <select id="weather-district-select" style="background: #0f172a; color: #f8fafc; border: 1.5px solid #475569; padding: 7px 10px; border-radius: 8px; font-weight: 700; font-size: 0.84rem; outline: none; cursor: pointer;">
-                            <optgroup label="मध्य प्रदेश (MP)">
-                                <option value="rewa" selected>रीवा (Rewa)</option>
-                                <option value="indore">इंदौर (Indore)</option>
-                                <option value="bhopal">भोपाल (Bhopal)</option>
-                                <option value="ujjain">उज्जैन (Ujjain)</option>
-                                <option value="jabalpur">जबलपुर (Jabalpur)</option>
-                                <option value="satna">सतना (Satna)</option>
-                            </optgroup>
-                            <optgroup label="उत्तर प्रदेश (UP)">
-                                <option value="varanasi">वाराणसी (Varanasi)</option>
-                                <option value="lucknow">लखनऊ (Lucknow)</option>
-                                <option value="sitapur">सीतापुर (Sitapur)</option>
-                                <option value="kanpur">कानपुर (Kanpur)</option>
-                            </optgroup>
-                            <optgroup label="राजस्थान (Rajasthan)">
-                                <option value="jaipur">जयपुर (Jaipur)</option>
-                                <option value="kota">कोटा (Kota)</option>
-                            </optgroup>
-                            <optgroup label="अन्य राज्य (Other)">
-                                <option value="patna">पटना (बिहार)</option>
-                                <option value="nagpur">नागपुर (महाराष्ट्र)</option>
-                                <option value="karnal">करनाल (हरियाणा)</option>
-                                <option value="ludhiana">लुधियाना (पंजाब)</option>
-                            </optgroup>
-                        </select>
-                    </div>
+                  <!-- Prominent Crop Dropdown -->
+                  <div style="margin-bottom: 12px;">
+                    <select id="mandiCropDropdown" style="width: 100%; background: #0f172a; color: #ffffff; border: 2px solid #334155; border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; font-weight: 800; outline: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                      <option value="all">🌾 सभी फसलें (All Crops - संपूर्ण सूची)</option>
+                      <option value="wheat">🌾 गेहूं (Wheat)</option>
+                      <option value="paddy">🌾 धान / चावल (Paddy / Rice)</option>
+                      <option value="chana">🟡 चना (Gram / Chana)</option>
+                      <option value="mustard">🌻 सरसों / राई (Mustard)</option>
+                      <option value="soyabean">🌱 सोयाबीन (Soyabean)</option>
+                      <option value="maize">🌽 मक्का (Maize)</option>
+                      <option value="cotton">⚪ कपास / नरमा (Cotton)</option>
+                      <option value="arhar">🫘 अरहर / तुअर (Arhar / Tur)</option>
+                      <option value="moong">🟢 मूंग (Moong / Green Gram)</option>
+                      <option value="urad">⚫ उड़द (Urad / Black Gram)</option>
+                      <option value="masoor">🫘 मसूर (Masoor / Lentil)</option>
+                      <option value="groundnut">🥜 मूंगफली (Groundnut)</option>
+                      <option value="bajra">🌾 बाजरा (Bajra / Pearl Millet)</option>
+                      <option value="jowar">🌾 ज्वार (Jowar / Sorghum)</option>
+                      <option value="peas">🟢 हरी मटर (Green Peas)</option>
+                      <option value="potato">🥔 आलू (Potato)</option>
+                      <option value="onion">🧅 प्याज (Onion)</option>
+                      <option value="garlic">🧄 लहसुन (Garlic)</option>
+                      <option value="tomato">🍅 टमाटर (Tomato)</option>
+                      <option value="ginger">🌿 अदरक (Ginger)</option>
+                      <option value="turmeric">🟡 हल्दी (Turmeric)</option>
+                      <option value="chilli">🌶️ मिर्च (Green / Red Chilli)</option>
+                      <option value="coriander">🌿 धनिया (Coriander)</option>
+                    </select>
+                  </div>
                 </div>
 
-                <!-- LIVE TODAY WEATHER HERO CARD -->
-                <div style="background: radial-gradient(circle at 30% 20%, rgba(30, 58, 138, 0.6) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1.5px solid rgba(56, 189, 248, 0.3); border-radius: 14px; padding: 18px; backdrop-filter: blur(8px); display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <div id="weatherIconDisplay" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);">
-                            <span style="font-size: 2.8rem;">☀️</span>
-                        </div>
-                        <div>
-                            <h3 id="displayCityName" style="font-size: 1.35rem; font-weight: 900; margin: 0; color: #f8fafc;">रीवा (Rewa)</h3>
-                            <p id="displayCountry" style="font-size: 0.8rem; margin: 2px 0 0 0; color: #38bdf8; font-weight: 700;">मध्य प्रदेश</p>
-                        </div>
-                    </div>
+                <!-- 1-Tap Quick Crop Touch Scroll -->
+                <div>
+                  <div style="font-size: 0.74rem; color: #94a3b8; font-weight: 800; margin-bottom: 6px;">
+                    ⚡ 1-टैप तुरंत चयन:
+                  </div>
+                  <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin;">
+                    <button type="button" class="crop-quick-pill" data-crop="all" onclick="window.filterByCrop('all')" style="background: #10b981; color: #ffffff; border: 1.5px solid #34d399; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      🌾 सभी
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="wheat" onclick="window.filterByCrop('wheat')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      गेहूं
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="soyabean" onclick="window.filterByCrop('soyabean')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      सोयाबीन
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="paddy" onclick="window.filterByCrop('paddy')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      धान
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="chana" onclick="window.filterByCrop('chana')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      चना
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="mustard" onclick="window.filterByCrop('mustard')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      सरसों
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="garlic" onclick="window.filterByCrop('garlic')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      लहसुन
+                    </button>
+                    <button type="button" class="crop-quick-pill" data-crop="onion" onclick="window.filterByCrop('onion')" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.78rem; cursor: pointer; white-space: nowrap;">
+                      प्याज
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.74rem; color: #94a3b8; text-transform: uppercase; font-weight: 800;">वर्तमान तापमान</div>
-                        <div id="displayTemp" style="font-size: 2.3rem; font-weight: 900; margin-top: 2px; color: #fde047; line-height: 1;">28°C</div>
-                        <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 3px;">महसूस: <strong id="displayFeelsLike">29°C</strong></div>
+              <!-- BOX 2: STATE & REGION SELECTION WITH DROPDOWN & TOUCH PILLS -->
+              <div style="background: #090d16; border: 1.5px solid #1e293b; border-radius: 16px; padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.35); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 1.35rem;">📍</span>
+                      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #ffffff;">
+                        2. राज्य व मंडी चुनें (Select State)
+                      </h3>
                     </div>
+                    <button type="button" onclick="window.resetMandiFilters()" style="background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 4px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+                      🔄 रीसेट
+                    </button>
+                  </div>
 
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.74rem; color: #94a3b8; text-transform: uppercase; font-weight: 800;">मौसम की स्थिति</div>
-                        <div id="displayCondition" style="font-size: 1.05rem; font-weight: 800; margin-top: 3px; color: #4ade80;">साफ आसमान</div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.35); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.7rem; color: #94a3b8;">नमी</div>
-                            <div id="displayHumidity" style="font-size: 0.95rem; font-weight: 800; color: #60a5fa; margin-top: 2px;">65%</div>
-                        </div>
-                        <div style="border-left: 1px solid rgba(255,255,255,0.1);"></div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.7rem; color: #94a3b8;">हवा की गति</div>
-                            <div id="displayWind" style="font-size: 0.95rem; font-weight: 800; color: #34d399; margin-top: 2px;">10 km/h</div>
-                        </div>
-                    </div>
+                  <!-- Prominent State Dropdown -->
+                  <div style="margin-bottom: 12px;">
+                    <select id="mandiStateDropdown" style="width: 100%; background: #0f172a; color: #ffffff; border: 2px solid #334155; border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; font-weight: 800; outline: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+                      <option value="">🏛️ सभी राज्य (All States - संपूर्ण भारत)</option>
+                      <option value="Madhya Pradesh">📍 मध्य प्रदेश (MP - रीवा, इंदौर, उज्जैन, भोपाल, सतना...)</option>
+                      <option value="Uttar Pradesh">📍 उत्तर प्रदेश (UP - वाराणसी, लखनऊ, कानपुर, आगरा...)</option>
+                      <option value="Rajasthan">📍 राजस्थान (RJ - कोटा, जयपुर, बीकानेर, गंगानगर...)</option>
+                      <option value="Maharashtra">📍 महाराष्ट्र (MH - नागपुर, नासिक, पुणे, सांगली...)</option>
+                      <option value="Bihar">📍 बिहार (BR - पटना, खगड़िया, मुजफ्फरपुर...)</option>
+                      <option value="Haryana">📍 हरियाणा (HR - करनाल, हिसार...)</option>
+                      <option value="Punjab">📍 पंजाब (PB - लुधियाना, जालंधर...)</option>
+                    </select>
+                  </div>
                 </div>
 
-                <!-- 7-DAY VISUAL CARDS CONTAINER -->
-                <div id="weather-7day-forecast-wrap" style="margin-top: 14px;">
-                    <!-- Rendered dynamically by js/weather.js -->
+                <!-- 1-Tap Quick State Touch Scroll -->
+                <div>
+                  <div style="font-size: 0.74rem; color: #94a3b8; font-weight: 800; margin-bottom: 6px;">
+                    ⚡ 1-टैप राज्य चयन:
+                  </div>
+                  <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin;">
+                    <button type="button" class="state-quick-pill" data-state="" onclick="window.filterByState('')" style="background: #d97706; color: #fff; border: 1px solid #fbbf24; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      सभी राज्य
+                    </button>
+                    <button type="button" class="state-quick-pill" data-state="Madhya Pradesh" onclick="window.filterByState('Madhya Pradesh')" style="background: #0f172a; color: #cbd5e1; border: 1px solid #334155; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      म.प्र. (MP)
+                    </button>
+                    <button type="button" class="state-quick-pill" data-state="Uttar Pradesh" onclick="window.filterByState('Uttar Pradesh')" style="background: #0f172a; color: #cbd5e1; border: 1px solid #334155; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      उ.प्र. (UP)
+                    </button>
+                    <button type="button" class="state-quick-pill" data-state="Rajasthan" onclick="window.filterByState('Rajasthan')" style="background: #0f172a; color: #cbd5e1; border: 1px solid #334155; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      राजस्थान
+                    </button>
+                    <button type="button" class="state-quick-pill" data-state="Maharashtra" onclick="window.filterByState('Maharashtra')" style="background: #0f172a; color: #cbd5e1; border: 1px solid #334155; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      महाराष्ट्र
+                    </button>
+                    <button type="button" class="state-quick-pill" data-state="Bihar" onclick="window.filterByState('Bihar')" style="background: #0f172a; color: #cbd5e1; border: 1px solid #334155; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                      बिहार
+                    </button>
+                  </div>
                 </div>
+              </div>
 
-                <!-- AGROMETEOROLOGICAL ADVISORY BOX -->
-                <div id="weather-advisory-box-wrap" style="margin-top: 14px;">
-                    <!-- Rendered dynamically by js/weather.js -->
-                </div>
             </div>
 
-            <!-- Mandi Filters Hub -->
-            <div class="mandi-control-card">
-                <div class="mandi-card-title">
-                    <h2>🌾 कृषि मंडी भाव फिल्टर एवं खोज</h2>
-                    <p>भारत के सभी राज्यों, जिलों, फसलों और तारीख (From-To Date) के अनुसार थोक बाजार मूल्य देखें</p>
-                </div>
+            <!-- =========================================
+                 INSTANT REAL-TIME SEARCH & SORT BAR
+            ========================================== -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+              
+              <!-- Quick Search Input -->
+              <div style="flex: 1; min-width: 260px; position: relative;">
+                <input type="text" id="mandiQuickSearch" placeholder="🔍 फसल, मंडी या जिले का नाम लिखें (उदा: रीवा, गेहूं, इंदौर, सोयाबीन)..." style="width: 100%; background: #090d16; color: #ffffff; border: 1.5px solid #334155; border-radius: 25px; padding: 12px 18px; font-size: 0.9rem; outline: none; box-sizing: border-box; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+              </div>
 
-                <div class="filters-grid-form">
-                    <div class="form-group-item">
-                        <label>State *</label>
-                        <select id="stateSelect">
-                            <option value="">सभी राज्य (All States)</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                            <option value="Assam">Assam</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Goa">Goa</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Himachal Pradesh">Himachal Pradesh</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Kerala">Kerala</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Manipur">Manipur</option>
-                            <option value="Meghalaya">Meghalaya</option>
-                            <option value="Mizoram">Mizoram</option>
-                            <option value="Nagaland">Nagaland</option>
-                            <option value="Odisha">Odisha</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Sikkim">Sikkim</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Tripura">Tripura</option>
-                            <option value="Uttar Pradesh">Uttar Pradesh</option>
-                            <option value="Uttarakhand">Uttarakhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                            <option value="Chandigarh">Chandigarh</option>
-                            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra & Nagar Haveli and Daman & Diu</option>
-                            <option value="Delhi">Delhi</option>
-                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                            <option value="Ladakh">Ladakh</option>
-                            <option value="Puducherry">Puducherry</option>
-                        </select>
-                    </div>
+              <!-- Sorting Dropdown -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <select id="mandiSortSelect" style="background: #090d16; color: #f8fafc; border: 1.5px solid #334155; padding: 10px 14px; border-radius: 20px; font-size: 0.84rem; font-weight: 700; outline: none; cursor: pointer;">
+                  <option value="price_desc">💰 सबसे अधिक भाव (High Price)</option>
+                  <option value="price_asc">📉 सबसे कम भाव (Low Price)</option>
+                  <option value="crop_asc">🌾 फसल नाम (A-Z)</option>
+                  <option value="market_asc">🏛️ मंडी नाम (A-Z)</option>
+                </select>
 
-                    <div class="form-group-item">
-                        <label>District *</label>
-                        <select id="districtSelect">
-                            <option value="">पहले राज्य चुनें (Select State First)</option>
-                        </select>
-                    </div>
+                <!-- Live Results Count Badge -->
+                <span id="mandiResultsCountBadge" style="background: #14532d; color: #86efac; border: 1px solid #22c55e; padding: 8px 14px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; white-space: nowrap;">
+                  48 मंडियों के लाइव भाव
+                </span>
+              </div>
 
-                    <div class="form-group-item">
-                        <label>Commodity (फसल) *</label>
-                        <select id="commoditySelect">
-                            <option value="">सभी फसलें (All Commodities)</option>
-                            <option value="Ajwan">Ajwan (अजवाइन)</option>
-                            <option value="Almond(Badam)">Almond (बादाम)</option>
-                            <option value="Arhar (Tur/Red Gram)(Whole)">Arhar / Tur (अरहर)</option>
-                            <option value="Arhar Dal(Tur Dal)">Arhar Dal (अरहर दाल)</option>
-                            <option value="Bajra(Pearl Millet/Cumbu)">Bajra (बाजरा)</option>
-                            <option value="Banana">Banana (केला)</option>
-                            <option value="Barley(Jau)">Barley / Jau (जौ)</option>
-                            <option value="Beans">Beans (बीन्स)</option>
-                            <option value="Beetroot">Beetroot (चुकंदर)</option>
-                            <option value="Bengal Gram Dal(Chana Dal)">Chana Dal (चना दाल)</option>
-                            <option value="Bengal Gram(Gram)(Whole)">Gram / Chana (चना)</option>
-                            <option value="Black Pepper">Black Pepper (काली मिर्च)</option>
-                            <option value="Black Gram (Urd Beans)(Whole)">Urd / Black Gram (उड़द)</option>
-                            <option value="Cocoa">Cocoa (कोको)</option>
-                            <option value="Coconut">Coconut (नारियल)</option>
-                            <option value="Coriander(Leaves)">Coriander Leaves (हरा धनिया)</option>
-                            <option value="Coriander seed">Coriander Seed (धनिया बीज)</option>
-                            <option value="Cotton">Cotton (कपास)</option>
-                            <option value="Cumin Seed(Jeera)">Cumin / Jeera (जीरा)</option>
-                            <option value="French Beans (Frasbean)">French Beans (फ्रेंचबीन्स)</option>
-                            <option value="Garlic">Garlic (लहसुन)</option>
-                            <option value="Ginger(Dry)">Ginger Dry (सोंठ)</option>
-                            <option value="Ginger(Green)">Ginger Green (अदरक)</option>
-                            <option value="Green Chilli">Green Chilli (हरी मिर्च)</option>
-                            <option value="Green Gram (Moong)(Whole)">Moong Whole (मूंग)</option>
-                            <option value="Green Peas">Green Peas (हरी मटर)</option>
-                            <option value="Groundnut">Groundnut (मूंगफली)</option>
-                            <option value="Gur(Jaggery)">Gur / Jaggery (गुड़)</option>
-                            <option value="Isabgul(Psyllium)">Isabgul (इसबगोल)</option>
-                            <option value="Lemon">Lemon (नींबू)</option>
-                            <option value="Maize">Maize (मक्का)</option>
-                            <option value="Masoor Dal">Masoor Dal (मसूर दाल)</option>
-                            <option value="Masoor(Whole)">Masoor Whole (मसूर)</option>
-                            <option value="Methi Seeds">Methi Seeds (मेथी)</option>
-                            <option value="Milk">Milk (दूध)</option>
-                            <option value="Onion">Onion (प्याज)</option>
-                            <option value="Paddy(Dhan)(Common)">Paddy / Dhan (धान)</option>
-                            <option value="Papaya">Papaya (पपीता)</option>
-                            <option value="Potato">Potato (आलू)</option>
-                            <option value="Ragi(Nachani)">Ragi (रागी)</option>
-                            <option value="Rice">Rice (चावल)</option>
-                            <option value="Sesamum(Til)">Sesamum / Til (तिल)</option>
-                            <option value="Soyabeen">Soyabeen (सोयाबीन)</option>
-                            <option value="Sunflower">Sunflower (सूरजमुखी)</option>
-                            <option value="Sweet Potato">Sweet Potato (शकरकंद)</option>
-                            <option value="Tomato">Tomato (टमाटर)</option>
-                            <option value="Turmeric">Turmeric (हल्दी)</option>
-                            <option value="Water Melon">Water Melon (तरबूज)</option>
-                            <option value="Wheat">Wheat (गेहूं)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group-item">
-                        <label>From Date</label>
-                        <input type="date" id="fromDateInput">
-                    </div>
-
-                    <div class="form-group-item">
-                        <label>To Date</label>
-                        <input type="date" id="toDateInput">
-                    </div>
-
-                    <div class="form-group-item">
-                        <label>Sort By Field</label>
-                        <select id="sortFieldSelect">
-                            <option value="market">Market</option>
-                            <option value="modal_price">Modal Price</option>
-                            <option value="commodity">Commodity</option>
-                            <option value="district">District</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group-item">
-                        <label>Sort Order</label>
-                        <select id="sortOrderSelect">
-                            <option value="asc">Ascending (आरोही)</option>
-                            <option value="desc">Descending (अवरोही)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mandi-action-buttons">
-                    <button id="resetBtn" class="btn-reset"><i class="fa-solid fa-rotate-right"></i> Reset</button>
-                    <button id="previewBtn" class="btn-preview"><i class="fa-solid fa-magnifying-glass"></i> Preview & Search</button>
-                    <button id="csvDownloadBtn" class="btn-download"><i class="fa-solid fa-file-arrow-down"></i> CSV Download</button>
-                </div>
             </div>
 
-            <!-- 3. Results Data Display Container -->
-            <div class="mandi-results-wrapper">
-                <div class="table-head-row">
-                    <span>📦 Commodity</span>
-                    <span>📍 State / District</span>
-                    <span>🏛️ Market</span>
-                    <span>🌿 Variety / Grade</span>
-                    <span>📅 Arrival Date</span>
-                    <span>💰 Min / Max / Modal</span>
-                </div>
-                <div id="mandiDataGrid" class="table-body-container">
-                    <div class="mandi-placeholder-box">
-                        <i class="fa-solid fa-seedling fa-bounce" style="font-size: 2rem; color: #10B981; margin-bottom: 10px;"></i>
-                        <p>डेटा लोड हो रहा है...</p>
+            <!-- =========================================
+                 MANDI RATES DISPLAY GRID (Never Blank)
+            ========================================== -->
+            <div id="mandiDataGrid" style="margin-bottom: 25px;">
+              <!-- Populated dynamically by js/mandi.js -->
+            </div>
+
+            <!-- =========================================
+                 COMPACT TWIN KPIS: WEATHER & VEDIC PANCHANG (NOW POSITIONED AT BOTTOM)
+            ========================================== -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-bottom: 22px;">
+              
+              <!-- KPI 1: Live Weather & Spray Advisory -->
+              <div style="background: linear-gradient(135deg, #090d16 0%, #0f172a 100%); border: 1.5px solid #1e293b; border-radius: 14px; padding: 14px 18px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.88rem; color: #38bdf8;">
+                      <span>⛅</span> <span>लाइव मौसम व स्प्रे सलाह</span>
                     </div>
+                    <span style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 12px;">
+                      Live Forecast
+                    </span>
+                  </div>
+                  <div id="mandi-kpi-weather-data">
+                    <div style="font-weight: 900; font-size: 1.4rem; color: #fde047;">28°C <span style="font-size: 0.85rem; color: #cbd5e1; font-weight: 700;">(रीवा, म.प्र.)</span></div>
+                    <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">साफ आसमान • नमी 62% • हवा 10 km/h</div>
+                  </div>
                 </div>
+                <div style="margin-top: 10px; pt-2; border-top: 1px dashed #1e293b; display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.74rem; color: #4ade80; font-weight: 800;">🟢 आज स्प्रे के लिए मौसम अनुकूल</span>
+                  <a href="/weather.html" style="background: #1e293b; color: #38bdf8; text-decoration: none; font-size: 0.74rem; font-weight: 800; padding: 4px 10px; border-radius: 12px; border: 1px solid #334155;">
+                    7-दिन मौसम देखें →
+                  </a>
+                </div>
+              </div>
+
+              <!-- KPI 2: Vedic Panchang & Shubh Muhurat -->
+              <div style="background: linear-gradient(135deg, #78350f 0%, #9a3412 100%); border: 1.5px solid #fbbf24; border-radius: 14px; padding: 14px 18px; color: #fff; box-shadow: 0 4px 16px rgba(180,83,9,0.25); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.88rem; color: #fef08a;">
+                      <span>🚩</span> <span>दैनिक वैदिक सनातन पंचांग</span>
+                    </div>
+                    <span style="background: rgba(254,240,138,0.2); color: #fef08a; border: 1px solid rgba(254,240,138,0.4); font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 12px;">
+                      सूर्य सिद्धांत
+                    </span>
+                  </div>
+                  <div id="mandi-kpi-panchang-data">
+                    <div style="font-weight: 900; font-size: 1.15rem; color: #ffffff;">शुक्ल पक्ष तृतीया</div>
+                    <div style="font-size: 0.78rem; color: #fef3c7; margin-top: 2px;">⭐ नक्षत्र: रोहिणी | 🌟 अभिजीत: 11:44 AM</div>
+                  </div>
+                </div>
+                <div style="margin-top: 10px; pt-2; border-top: 1px dashed rgba(251,191,36,0.3); display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.74rem; color: #fde68a; font-weight: 700;">🌱 चंद्र कृषि चक्र व चौघड़िया</span>
+                  <a href="/krishi-panchang.html" style="background: #ffffff; color: #78350f; text-decoration: none; font-size: 0.74rem; font-weight: 900; padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                    पंचांग खोलें →
+                  </a>
+                </div>
+              </div>
+
             </div>
 
             <!-- 4. Official Govt Disclaimer -->
@@ -537,6 +507,7 @@
   <script src="/js/universal-nav-drawer.js?v=20261015_v135"></script>
   <script src="/js/global-guest-modal.js?v=20260926_v16"></script>
   <script type="module" src="/js/public-pwa.js"></script>
+  <script src="/js/sakhi-panchang-engine.js"></script>
   <script src="/js/weather.js"></script>
   <script src="/js/mandi.js"></script>
 </body>

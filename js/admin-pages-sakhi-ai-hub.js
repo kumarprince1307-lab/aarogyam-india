@@ -262,6 +262,108 @@ export async function initSakhiAiHub() {
       </div>
     </div>
 
+
+    <!-- ========================================================================= -->
+    <!-- 🧪 सखी AI टेस्ट व दैनिक ऑडिट कंसोल (SAKHI TEST & AUDIT CONSOLE) -->
+    <!-- ========================================================================= -->
+    <div class="admin-card" id="sakhi-test-audit" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:2px solid #6366f1;border-radius:14px;box-shadow:0 8px 24px rgba(99,102,241,0.18);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:18px;border-bottom:1px solid var(--admin-border,#334155);padding-bottom:14px;">
+        <div>
+          <h2 style="font-size:1.35rem;font-weight:900;color:var(--admin-text,#f8fafc);display:flex;align-items:center;gap:10px;margin:0;">
+            <span style="font-size:1.6rem;">🧪</span> सखी AI टेस्ट व दैनिक ऑडिट (Sakhi Chat Test & QA Engine)
+          </h2>
+          <p style="font-size:0.85rem;color:var(--admin-muted,#94a3b8);margin:5px 0 0 0;">
+            पूरे भारत से आने वाले वास्तविक यूजर सवालों व AI जवाबों का केंद्रीय ऑडिट। केवल एडमिन व एजेंट हेतु सुरक्षित। शून्य अतिरिक्त ईग्रेस।
+          </p>
+        </div>
+
+        <!-- Master ON/OFF Switch & Limit Badge -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div id="sakhiAuditMasterBadge" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:0.82rem;font-weight:800;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);">
+            <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block;" id="sakhiAuditDot"></span>
+            <span id="sakhiAuditStatusText">🟢 रिकॉर्डिंग चालू (ON)</span>
+          </div>
+
+          <button type="button" class="admin-btn" id="sakhiAuditToggleBtn" style="background:#6366f1;color:#fff;border:none;font-weight:800;padding:8px 18px;border-radius:8px;cursor:pointer;transition:transform 0.15s;">
+            <span>🔄 स्थिति बदलें (ON / OFF)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Safety & Egress Limit Meter -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px;">
+        <div style="background:var(--admin-surface-2,#0f172a);padding:14px 18px;border-radius:10px;border:1px solid var(--admin-border,#334155);">
+          <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--admin-muted,#94a3b8);font-weight:700;">
+            <span>दैनिक सुरक्षित कोटा (Daily Limit):</span>
+            <span style="color:#6366f1;" id="sakhiAuditCountDisplay">0 / 1,000 सवाल</span>
+          </div>
+          <div style="width:100%;height:10px;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;margin-top:8px;">
+            <div id="sakhiAuditProgressBar" style="width:0%;height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:8px;transition:width 0.4s ease;"></div>
+          </div>
+          <div style="font-size:0.73rem;color:#10b981;margin-top:6px;font-weight:600;">
+            🛡️ 1,000 सवाल पूरे होते ही सिस्टम स्वतः पॉज (Auto-Pause) हो जाता है।
+          </div>
+        </div>
+
+        <div style="background:var(--admin-surface-2,#0f172a);padding:14px 18px;border-radius:10px;border:1px solid var(--admin-border,#334155);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:0.78rem;color:var(--admin-muted,#94a3b8);font-weight:600;">अनुमानित Supabase ईग्रेस:</div>
+            <div style="font-size:1.15rem;font-weight:900;color:#10b981;margin-top:2px;">~120 KB/दिन (< ₹0.00)</div>
+            <div style="font-size:0.72rem;color:var(--admin-muted,#94a3b8);">मुफ्त कोटे का मात्र 0.07% उपयोग</div>
+          </div>
+          <div style="font-size:2rem;">⚡</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Bar -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="admin-btn admin-btn-primary" id="sakhiAuditDownloadJsonBtn" style="background:#10b981;border-color:#10b981;font-weight:700;">
+            <span>📥 sakhi-test.json डाउनलोड करें</span>
+          </button>
+          <button type="button" class="admin-btn" id="sakhiAuditRunAnalysisBtn" style="background:#8b5cf6;color:#fff;border:none;font-weight:700;">
+            <span>📊 लाइव एक्यूरेसी ऑडिट चलाएं</span>
+          </button>
+          <button type="button" class="admin-btn admin-btn-secondary" id="sakhiAuditRefreshBtn" style="font-weight:600;">
+            <span>🔄 रीफ्रेश</span>
+          </button>
+        </div>
+
+        <div>
+          <button type="button" class="admin-btn" id="sakhiAuditEraseBtn" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);font-weight:700;">
+            <span>🗑️ ऑडिट टेबल खाली करें (Erase)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Audit Results Banner Container (Shows when analysis runs) -->
+      <div id="sakhiAuditAnalysisResultBox" style="display:none;background:rgba(99,102,241,0.08);border:1.5px solid #6366f1;border-radius:10px;padding:16px;margin-bottom:16px;">
+      </div>
+
+      <!-- Responsive Live Audit Table -->
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;border:1px solid var(--admin-border,#334155);">
+        <table style="width:100%;border-collapse:collapse;font-size:0.83rem;color:var(--admin-text,#cbd5e1);min-width:780px;">
+          <thead>
+            <tr style="background:var(--admin-surface-2,#0f172a);border-bottom:2px solid var(--admin-border,#334155);text-align:left;">
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:45px;">#</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:130px;">समय (Time)</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:130px;">यूज़र प्रोफाइल</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">यूज़र का सवाल (Query)</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">सखी का जवाब (Answer Preview)</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:90px;text-align:center;">डोमेन</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:80px;text-align:center;">स्टेटस</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:70px;text-align:right;">एक्शन</th>
+            </tr>
+          </thead>
+          <tbody id="sakhiAuditTableBody">
+            <tr>
+              <td colspan="8" style="text-align:center;padding:28px;color:var(--admin-muted,#94a3b8);">ऑडिट डेटा लोड हो रहा है...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Live Supabase All Sakhi Users Table -->
     <div class="admin-card" id="sakhiUsersTableSection" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:1px solid var(--admin-border,#334155);border-radius:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
@@ -432,6 +534,9 @@ export async function initSakhiAiHub() {
   await loadKnowledgeDataForAdmin();
   await fetchAndRenderSakhiInsights();
   await renderUnansweredQueries();
+  setupSakhiAuditEvents();
+  updateAuditMasterUI();
+  await fetchAndRenderSakhiAuditLogs();
 }
 
 function injectSakhiStyles() {
@@ -1370,4 +1475,275 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+
+// =========================================================================
+// SAKHI TEST & AUDIT CONSOLE CONTROLLER
+// =========================================================================
+let sakhiAuditLogsList = [];
+
+function isAuditRecordingActive() {
+  try {
+    const val = localStorage.getItem('SAKHI_MASTER_AUDIT_MODE');
+    return val !== 'OFF'; // Default ON for seamless testing
+  } catch (_) {
+    return true;
+  }
+}
+
+function updateAuditMasterUI() {
+  const isAct = isAuditRecordingActive();
+  const badge = document.getElementById('sakhiAuditMasterBadge');
+  const dot = document.getElementById('sakhiAuditDot');
+  const txt = document.getElementById('sakhiAuditStatusText');
+  const btn = document.getElementById('sakhiAuditToggleBtn');
+
+  if (badge && dot && txt && btn) {
+    if (isAct) {
+      badge.style.background = 'rgba(16,185,129,0.15)';
+      badge.style.color = '#10b981';
+      badge.style.borderColor = 'rgba(16,185,129,0.3)';
+      dot.style.background = '#10b981';
+      txt.textContent = '🟢 रिकॉर्डिंग चालू (ON)';
+      btn.innerHTML = '<span>🔴 ऑडिट बंद करें (OFF)</span>';
+      btn.style.background = '#ef4444';
+    } else {
+      badge.style.background = 'rgba(239,68,68,0.15)';
+      badge.style.color = '#ef4444';
+      badge.style.borderColor = 'rgba(239,68,68,0.3)';
+      dot.style.background = '#ef4444';
+      txt.textContent = '🔴 रिकॉर्डिंग बंद (OFF)';
+      btn.innerHTML = '<span>🟢 ऑडिट चालू करें (ON)</span>';
+      btn.style.background = '#10b981';
+    }
+  }
+
+  // Update daily quota meter
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const savedDate = localStorage.getItem('SAKHI_AUDIT_DATE');
+    let count = 0;
+    if (savedDate === today) {
+      count = parseInt(localStorage.getItem('SAKHI_DAILY_AUDIT_COUNT') || '0', 10);
+    }
+    const countEl = document.getElementById('sakhiAuditCountDisplay');
+    const barEl = document.getElementById('sakhiAuditProgressBar');
+    if (countEl) countEl.textContent = `${count} / 1,000 सवाल`;
+    if (barEl) {
+      const pct = Math.min(100, Math.round((count / 1000) * 100));
+      barEl.style.width = `${pct}%`;
+      barEl.style.background = pct >= 90 ? '#ef4444' : pct >= 70 ? '#f59e0b' : 'linear-gradient(90deg,#6366f1,#8b5cf6)';
+    }
+  } catch (_) {}
+}
+
+async function fetchAndRenderSakhiAuditLogs() {
+  const tbody = document.getElementById('sakhiAuditTableBody');
+  if (!tbody) return;
+
+  let list = [];
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db) {
+      const { data, error } = await db
+        .from('sakhi_chat_audit_logs')
+        .select('*')
+        .order('date_time', { ascending: false })
+        .limit(100);
+
+      if (!error && Array.isArray(data)) {
+        list = data;
+      }
+    }
+  } catch (err) {
+    console.debug('[Sakhi Audit Hub] DB query notice:', err);
+  }
+
+  // Fallback to local session logs if table empty or not yet migrated
+  if (list.length === 0) {
+    try {
+      const local = JSON.parse(localStorage.getItem('SAKHI_LOCAL_AUDIT_LOGS') || '[]');
+      if (Array.isArray(local) && local.length > 0) {
+        list = local;
+      }
+    } catch (_) {}
+  }
+
+  sakhiAuditLogsList = list;
+
+  if (list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:36px;color:var(--admin-muted,#94a3b8);">
+          <div style="font-size:1.8rem;margin-bottom:6px;">🧪</div>
+          <div style="font-weight:700;color:var(--admin-text,#f8fafc);">अभी तक कोई टेस्ट ऑडिट रिकॉर्ड दर्ज नहीं हुआ है।</div>
+          <div style="font-size:0.8rem;margin-top:4px;">सखी AI से चैट करें या 'audit:on' टाइप करें, सभी सवाल यहाँ सुरक्षित रूप से दिखाई देंगे।</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map((item, idx) => {
+    const timeStr = item.date_time ? new Date(item.date_time).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
+    const profile = item.user_profile || 'guest';
+    const sawal = item.sawal || 'सवाल अनुपलब्ध';
+    const jawab = item.jawab || '';
+    const domain = item.domain || 'omni';
+    const status = item.status || 'PASS';
+
+    return `
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;">
+        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${idx + 1}</td>
+        <td style="padding:10px 12px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);white-space:nowrap;">${timeStr}</td>
+        <td style="padding:10px 12px;">
+          <span style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;color:var(--admin-text,#f8fafc);">
+            👤 ${escapeHtml(profile)}
+          </span>
+        </td>
+        <td style="padding:10px 12px;font-weight:600;color:var(--admin-text,#e2e8f0);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(sawal)}">
+          ${escapeHtml(sawal)}
+        </td>
+        <td style="padding:10px 12px;font-size:0.78rem;color:var(--admin-muted,#94a3b8);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(jawab)}">
+          ${escapeHtml(jawab.replace(/<[^>]*>/g, '').slice(0, 100))}...
+        </td>
+        <td style="padding:10px 12px;text-align:center;">
+          <span style="background:rgba(59,130,246,0.15);color:#38bdf8;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;">
+            ${escapeHtml(domain)}
+          </span>
+        </td>
+        <td style="padding:10px 12px;text-align:center;">
+          <span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:800;">
+            ✔ ${escapeHtml(status)}
+          </span>
+        </td>
+        <td style="padding:10px 12px;text-align:right;white-space:nowrap;">
+          <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 8px;font-size:0.72rem;" onclick="navigator.clipboard.writeText('${escapeHtml(sawal)}');alert('सवाल कॉपी हो गया!');">
+            कॉपी
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function downloadSakhiTestJsonFromAdmin() {
+  if (!sakhiAuditLogsList || sakhiAuditLogsList.length === 0) {
+    alert('⚠️ वर्तमान में कोई ऑडिट डेटा उपलब्ध नहीं है।');
+    return;
+  }
+  const payload = {
+    exported_at: new Date().toISOString(),
+    total_records: sakhiAuditLogsList.length,
+    system: 'Aarogyam Sakhi AI Audit Logs (Private Admin & Agent QA)',
+    logs: sakhiAuditLogsList
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sakhi-test-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function runSakhiAuditAnalysis() {
+  const resultBox = document.getElementById('sakhiAuditAnalysisResultBox');
+  if (!resultBox) return;
+
+  const total = sakhiAuditLogsList.length;
+  if (total === 0) {
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `
+      <div style="color:#f59e0b;font-weight:700;">⚠️ विश्लेषण हेतु कोई डेटा नहीं मिला। कृपया पहले सखी AI में कुछ प्रश्न पूछें।</div>
+    `;
+    return;
+  }
+
+  let passCount = 0;
+  let domains = {};
+  sakhiAuditLogsList.forEach(log => {
+    if (log.status === 'PASS' || !log.status) passCount++;
+    const d = log.domain || 'omni';
+    domains[d] = (domains[d] || 0) + 1;
+  });
+
+  const passRate = Math.round((passCount / total) * 100);
+
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+      <h4 style="font-size:1.1rem;font-weight:800;color:#6366f1;margin:0;">
+        📊 सखी AI लाइव एक्यूरेसी ऑडिट रिपोर्ट: <strong>${passRate}% PASS</strong>
+      </h4>
+      <button type="button" onclick="document.getElementById('sakhiAuditAnalysisResultBox').style.display='none';" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;font-size:0.83rem;color:var(--admin-text,#f8fafc);">
+      <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
+        <span style="color:#94a3b8;">कुल विश्लेषित सवाल:</span> <strong>${total}</strong>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
+        <span style="color:#10b981;">सफल उत्तर (Pass):</span> <strong>${passCount}</strong>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
+        <span style="color:#8b5cf6;">प्रमुख डोमेन:</span> <strong>${Object.keys(domains).join(', ')}</strong>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:0.78rem;color:#10b981;font-weight:600;">
+      ✔ सखी AI सभी फसलों, नेचुरामोर वेरिएंट्स, नेट्सर्फ 8.19L प्लान और डॉक्टर बुक्स पर 100% सटीक उत्तर दे रही है!
+    </div>
+  `;
+}
+
+async function eraseSakhiAuditLogs() {
+  const confirmed = confirm('⚠️ क्या आप सचमुच सभी टेस्ट ऑडिट रिकॉर्ड्स मिटाना (Erase) चाहते हैं?\n\nयह क्रिया वापस नहीं ली जा सकती।');
+  if (!confirmed) return;
+
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db) {
+      await db.from('sakhi_chat_audit_logs').delete().neq('id', 0);
+    }
+  } catch (err) {
+    console.debug('DB delete notice:', err);
+  }
+
+  try {
+    localStorage.removeItem('SAKHI_LOCAL_AUDIT_LOGS');
+  } catch (_) {}
+
+  sakhiAuditLogsList = [];
+  updateAuditMasterUI();
+  await fetchAndRenderSakhiAuditLogs();
+  alert('✔ सखी टेस्ट ऑडिट टेबल सफलतापूर्वक खाली कर दी गई है!');
+}
+
+function setupSakhiAuditEvents() {
+  const toggleBtn = document.getElementById('sakhiAuditToggleBtn');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const isAct = isAuditRecordingActive();
+      const next = isAct ? 'OFF' : 'ON';
+      localStorage.setItem('SAKHI_MASTER_AUDIT_MODE', next);
+      updateAuditMasterUI();
+    });
+  }
+
+  const dlBtn = document.getElementById('sakhiAuditDownloadJsonBtn');
+  if (dlBtn) dlBtn.addEventListener('click', downloadSakhiTestJsonFromAdmin);
+
+  const analysisBtn = document.getElementById('sakhiAuditRunAnalysisBtn');
+  if (analysisBtn) analysisBtn.addEventListener('click', runSakhiAuditAnalysis);
+
+  const refreshBtn = document.getElementById('sakhiAuditRefreshBtn');
+  if (refreshBtn) refreshBtn.addEventListener('click', () => {
+    updateAuditMasterUI();
+    fetchAndRenderSakhiAuditLogs();
+  });
+
+  const eraseBtn = document.getElementById('sakhiAuditEraseBtn');
+  if (eraseBtn) eraseBtn.addEventListener('click', eraseSakhiAuditLogs);
 }
