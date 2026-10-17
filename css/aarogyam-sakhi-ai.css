@@ -590,8 +590,10 @@ body.is-fullscreen .sakhi-chat-window {
 
 /* 5. CHAT MESSAGES BODY */
 .sakhi-messages-wrap {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   padding: 18px 16px;
   display: flex;
   flex-direction: column;
@@ -902,13 +904,19 @@ body.is-fullscreen .sakhi-chat-window {
   background: #ffffff;
   padding: 12px 14px;
   border-top: 1.5px solid #e2e8f0;
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
+  flex-shrink: 0 !important;
+  margin-top: auto !important;
+  position: relative !important;
+  z-index: 50 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .sakhi-mic-btn {
