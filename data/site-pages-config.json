@@ -408,37 +408,46 @@
       "audio_title": "दैनिक वैदिक पंचांग",
       "audio_script": "नमस्ते! आरोग्यम दैनिक वैदिक सनातन पंचांग में आपका स्वागत है। यहाँ आप आज की तिथि, नक्षत्र, शुभ मुहूर्त, राहुकाल, दिन-रात का चौघड़िया, नामाक्षर एवं चंद्र आधारित कृषि चक्र देख सकते हैं।",
       "og_title": "🕉️ दैनिक वैदिक सनातन पंचांग, शुभ मुहूर्त एवं चौघड़िया",
-      "og_image": "/images/banners/agriculture-hero-banner-1.webp",
+      "og_image": "/images/banners/krishi-panchang-og.webp",
       "og_description": "आज का पंचांग, शुभ मुहूर्त, राहुकाल, दिन-रात का चौघड़िया, आज जन्मे बालक का नामाक्षर, अंक ज्योतिष एवं चंद्र आधारित कृषि चक्र।",
       "share_message": "🚩 आज का संपूर्ण वैदिक पंचांग, शुभ मुहूर्त, चौघड़िया व चंद्र कृषि सलाह देखें — Aarogyam India",
-      "whatsapp_image": "/images/banners/agriculture-hero-banner-1.webp",
+      "whatsapp_image": "/images/banners/krishi-panchang-og.webp",
       "fb_pixel": true,
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/agriculture-hero-banner-1.webp",
+          "image": "/images/banners/krishi-panchang-banner1.webp",
           "tag": "🚩 सनातन कृषि विज्ञान",
-          "title": "वैदिक कृषि चक्र एवं चंद्र बुवाई",
-          "subtitle": "चंद्रमा की कलाओं के अनुसार बीज बुवाई व जैविक पोषण",
+          "title": "चंद्रमा की स्थिति देख कर कृषि पंचांग",
+          "subtitle": "चंद्रमा की कलाओं के अनुसार बीज बुवाई, कटाई व फसल पोषण",
           "cta_text": "📖 पंचांग देखें",
           "cta_link": "#panchangAnnualCalendarWrap",
           "banner_mode": "full"
         },
         {
-          "image": "/images/banners/kheti-dr-banner-1.webp",
+          "image": "/images/banners/krishi-panchang-banner2.webp",
           "tag": "⭐ शुभ मुहूर्त गाइड",
-          "title": "शुभ चौघड़िया व कार्य सिद्धि मुहूर्त",
-          "subtitle": "अमृत व शुभ चौघड़िया में प्रारंभ करें कृषि व व्यापार",
+          "title": "आज का पंचांग - शुभ मुहूर्त, राहुकाल व चौघड़िया",
+          "subtitle": "अमृत व शुभ चौघड़िया में प्रारंभ करें कृषि, व्यापार व नवीन कार्य",
           "cta_text": "⏱️ चौघड़िया देखें",
           "cta_link": "#choghadiya-grid-container",
           "banner_mode": "full"
         },
         {
-          "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
-          "tag": "🪷 स्वास्थ्य व अध्यात्म",
-          "title": "आरोग्यम परिवार व व्रत महात्म्य",
-          "subtitle": "एकादशी व व्रत से ऑटोफैगी और हार्मोनल संतुलन",
-          "cta_text": "🪔 व्रत विधि देखें",
+          "image": "/images/banners/krishi-panchang-banner3.webp",
+          "tag": "🌱 कृषि चक्र व उत्पादन",
+          "title": "चंद्रमा की स्थिति अनुसार कृषि पंचांग",
+          "subtitle": "सही समय • सही काम • अधिक उत्पादन - वैज्ञानिक सनातन कृषि",
+          "cta_text": "🌿 कृषि सलाह देखें",
+          "cta_link": "#chandraKrishiSallahWrap",
+          "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/krishi-panchang-banner4.webp",
+          "tag": "🕉️ दैनिक पंचांग दर्शन",
+          "title": "दैनिक पंचांग, तिथि, नक्षत्र व व्रत-त्योहार",
+          "subtitle": "सनातन पंचांग व ज्योतिष आधारित संपूर्ण दैनिक मार्गदर्शन",
+          "cta_text": "🪔 व्रत-त्योहार देखें",
           "cta_link": "#vratMahatmyaSectionWrap",
           "banner_mode": "full"
         }
@@ -1419,7 +1428,9 @@
       "whatsapp_support": {
         "number": "919876543210",
         "prompt": "नमस्ते, मुझे आज के मंडी भाव के बारे में जानकारी चाहिए।"
-      }
+      },
+      "og_image": "/images/banners/mandi-og.webp",
+      "whatsapp_image": "/images/banners/mandi-og.webp"
     },
     {
       "id": "page_weather",
@@ -1447,7 +1458,9 @@
       "whatsapp_support": {
         "number": "919876543210",
         "prompt": "नमस्ते, मुझे मौसम पूर्वानुमान के बारे में जानकारी चाहिए।"
-      }
+      },
+      "og_image": "/images/banners/mousam-og.webp",
+      "whatsapp_image": "/images/banners/mousam-og.webp"
     },
     {
       "id": "page_kharif_guide",
