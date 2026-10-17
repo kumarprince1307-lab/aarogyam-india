@@ -162,7 +162,28 @@
     const referralUrl = window.generateReferralShareUrl(url);
     title = title || document.title || 'Aarogyam India - Digital Agriculture & Healthcare Hub';
     
-    const fullShareText = `🌾 *${title}*\n\nExplore Agriculture Guides, Crop Protection, Healthcare, and Digital eBooks!\n👉 Visit via my referral link:\n${referralUrl}`;
+    let fullShareText = '';
+    const curPath = window.location.pathname.toLowerCase();
+
+    if (curPath.includes('weather')) {
+      fullShareText = (typeof window.getDynamicWeatherShareText === 'function') ? window.getDynamicWeatherShareText() : '';
+    } else if (curPath.includes('mandi')) {
+      fullShareText = (typeof window.getDynamicMandiShareText === 'function') ? window.getDynamicMandiShareText() : '';
+    } else if (curPath.includes('panchang')) {
+      fullShareText = (typeof window.getDynamicPanchangShareText === 'function') ? window.getDynamicPanchangShareText() : '';
+    }
+
+    if (!fullShareText) {
+      if (curPath.includes('weather')) {
+        fullShareText = `⛅ *आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी*\n\n👉 अपने क्षेत्र का 7-दिवसीय मौसम, सटीक वर्षा रडार व स्प्रे निर्णय मीटर अभी देखें:\n${referralUrl}\n\n_Aarogyam India — किसानों की सुरक्षा व आत्मनिर्भरता का डिजिटल मंच_`;
+      } else if (curPath.includes('mandi')) {
+        fullShareText = `📊 *आरोग्यम लाइव दैनिक मंडी भाव बुलेटिन*\n\n👉 अपने नजदीकी मंडी का आज का ताज़ा भाव, आवक व बाजार स्थिति अभी देखें:\n${referralUrl}\n\n_Aarogyam India — आधुनिक खेती, पारदर्शी बाजार_`;
+      } else if (text && text.length > 5 && !text.includes('Digital Agriculture & Healthcare Hub')) {
+        fullShareText = `${text}\n\n👉 मेरे रेफरल लिंक से अभी देखें:\n${referralUrl}`;
+      } else {
+        fullShareText = `🌾 *${title}*\n\nखेती की सम्पूर्ण ई-बुक्स, 50+ फसल सुरक्षा गाइड, लाइव मंडी भाव व 24×7 AI डॉक्टर समाधान!\n👉 मेरे रेफरल लिंक से अभी देखें:\n${referralUrl}`;
+      }
+    }
 
     let overlay = document.getElementById('ai-share-drawer-overlay');
     if (!overlay) {
@@ -294,7 +315,20 @@
   };
 
   window.triggerUniversalPageShare = function () {
-    window.openUniversalShareModal(document.title, '🌾 Aarogyam India - Digital Agriculture & Healthcare Hub', window.location.href);
+    const p = window.location.pathname.toLowerCase();
+    if (p.includes('weather') && typeof window.shareWeatherWhatsApp === 'function') {
+      window.shareWeatherWhatsApp();
+      return;
+    }
+    if (p.includes('mandi') && typeof window.shareMandiWhatsApp === 'function') {
+      window.shareMandiWhatsApp();
+      return;
+    }
+    if (p.includes('panchang') && typeof window.sharePanchangWhatsApp === 'function') {
+      window.sharePanchangWhatsApp();
+      return;
+    }
+    window.openUniversalShareModal(document.title, '', window.location.href);
   };
 
   // -------------------------------------------------------------

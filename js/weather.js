@@ -47,16 +47,69 @@
 
   const DAYS_HINDI = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
 
+  const STORAGE_SAVED_LOC_KEY = 'AAROGYAM_USER_WEATHER_LOCATION';
+
+  function sanitizeText(str, maxLen = 60) {
+    if (!str || typeof str !== 'string') return '';
+    return str.replace(/[<>'"]/g, '').trim().slice(0, maxLen);
+  }
+
+  function saveUserWeatherPreference(locObj) {
+    if (!locObj) return;
+    try {
+      const lat = parseFloat(locObj.lat);
+      const lon = parseFloat(locObj.lon);
+      if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        return; // Security safeguard against invalid coordinates
+      }
+      const safeCity = sanitizeText(locObj.cityName || 'स्थानीय क्षेत्र');
+      const safeState = sanitizeText(locObj.stateName || 'भारत');
+      const safeKey = sanitizeText(locObj.key || 'gps', 20);
+
+      localStorage.setItem(STORAGE_SAVED_LOC_KEY, JSON.stringify({
+        key: safeKey,
+        lat: lat,
+        lon: lon,
+        cityName: safeCity,
+        stateName: safeState,
+        source: locObj.source || 'manual',
+        savedAt: Date.now()
+      }));
+    } catch(e) {}
+  }
+
+  function getSavedUserWeatherPreference() {
+    try {
+      const s = localStorage.getItem(STORAGE_SAVED_LOC_KEY);
+      if (s) {
+        const parsed = JSON.parse(s);
+        if (parsed && typeof parsed.lat === 'number' && typeof parsed.lon === 'number' && parsed.cityName) {
+          if (parsed.lat >= -90 && parsed.lat <= 90 && parsed.lon >= -180 && parsed.lon <= 180) {
+            return {
+              key: sanitizeText(parsed.key || 'saved', 20),
+              lat: parsed.lat,
+              lon: parsed.lon,
+              cityName: sanitizeText(parsed.cityName),
+              stateName: sanitizeText(parsed.stateName || 'भारत'),
+              source: parsed.source || 'manual'
+            };
+          }
+        }
+      }
+    } catch(e) {}
+    return null;
+  }
+
   window.AIM_CURRENT_WEATHER_STATE = null;
 
-  window.load7DayWeather = async function(locationKey, userLat = null, userLon = null, customCityName = '', customStateName = '') {
+  window.load7DayWeather = async function(locationKey, userLat = null, userLon = null, customCityName = '', customStateName = '', skipSave = false) {
     let lat, lon, displayName, displayState;
 
     if (userLat && userLon) {
-      lat = userLat;
-      lon = userLon;
-      displayName = customCityName || 'मेरी लाइव लोकेशन';
-      displayState = customStateName || 'GPS ऑटो-डिटेक्ट';
+      lat = parseFloat(userLat);
+      lon = parseFloat(userLon);
+      displayName = sanitizeText(customCityName || 'मेरी लाइव लोकेशन');
+      displayState = sanitizeText(customStateName || 'GPS ऑटो-डिटेक्ट');
     } else {
       const loc = DISTRICT_COORDINATES[locationKey.toLowerCase()] || DISTRICT_COORDINATES['rewa'];
       lat = loc.lat;
@@ -64,6 +117,23 @@
       displayName = loc.name;
       displayState = loc.state;
     }
+
+    if (!skipSave) {
+      saveUserWeatherPreference({
+        key: locationKey,
+        lat,
+        lon,
+        cityName: displayName,
+        stateName: displayState,
+        source: (userLat && userLon) ? 'gps' : 'manual'
+      });
+    }
+
+    // Immediately pre-update header hero elements
+    const cEl = document.getElementById('displayCityName');
+    const sEl = document.getElementById('displayCountry');
+    if (cEl) cEl.textContent = displayName;
+    if (sEl) sEl.textContent = displayState;
 
     const cacheKey = `AIM_WEATHER_${lat.toFixed(2)}_${lon.toFixed(2)}`;
     const now = Date.now();
@@ -141,7 +211,24 @@
     if (humidityEl) humidityEl.textContent = `${humidity}%`;
     if (windEl) windEl.textContent = `${windSpeed} km/h`;
 
-    // 2. Render Dynamic Agro KPI Grid
+    // 2. Update Mandi Page KPI card if present
+    const mandiWeatherWrap = document.getElementById('mandi-kpi-weather-data');
+    if (mandiWeatherWrap) {
+      mandiWeatherWrap.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.6rem; font-weight:900; color:#fde047;">${temp}°C</span>
+          <span style="font-size:0.86rem; color:#cbd5e1; font-weight:700;">📍 ${cityName} (${wInfo.desc})</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:4px; font-size:0.76rem;">
+          <span style="background:${todayRainProb > 40 || windSpeed > 20 ? '#991b1b' : '#15803d'}; color:${todayRainProb > 40 || windSpeed > 20 ? '#fecaca' : '#86efac'}; padding:2px 8px; border-radius:12px; font-weight:800;">
+            ${todayRainProb > 40 || windSpeed > 20 ? '🛑 स्प्रे स्थगित रखें' : '🚜 स्प्रे: उत्तम समय'}
+          </span>
+          <span style="color:#94a3b8;">🌧️ वर्षा: ${todayRainProb}% | 💧 नमी: ${humidity}%</span>
+        </div>
+      `;
+    }
+
+    // 3. Render Dynamic Agro KPI Grid
     renderAgroKpiDashboard(temp, humidity, windSpeed, todayRainProb);
 
     // 3. Render 7-Day Forecast Grid
@@ -419,13 +506,122 @@
     }
   }
 
+  function getSafeShareId() {
+    let id = '';
+    // 1. window.getUserShareId()
+    if (typeof window.getUserShareId === 'function') {
+      try { id = window.getUserShareId(); } catch(e) {}
+    }
+    // 2. window.V1_SESSION
+    if (!id && window.V1_SESSION && typeof window.V1_SESSION.getUnifiedShareId === 'function') {
+      try { id = window.V1_SESSION.getUnifiedShareId(); } catch(e) {}
+    }
+    // 3. localStorage keys
+    if (!id) {
+      try {
+        const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('currentUser') || '{}');
+        if (u.share_id) id = u.share_id;
+        else if (u.referral_code) id = u.referral_code;
+        else if (u.mobile) {
+          const m = String(u.mobile).replace(/\D/g, '').slice(-6);
+          if (m.length === 6) id = 'AI' + m;
+        }
+      } catch(e) {}
+    }
+    // 4. aim_user_mobile
+    if (!id) {
+      const mob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-6);
+      if (mob.length === 6) id = 'AI' + mob;
+    }
+    // 5. URL query params
+    if (!id) {
+      try {
+        const qp = new URLSearchParams(window.location.search);
+        const qId = qp.get('share_id') || qp.get('ref');
+        if (qId) id = qId;
+      } catch(e) {}
+    }
+    // 6. Security sanitize
+    id = String(id || '').trim().replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!id || id.length < 3) {
+      id = 'AI000004';
+    }
+    return id;
+  }
+
+  window.getDynamicWeatherShareText = function() {
+    let s = window.AIM_CURRENT_WEATHER_STATE;
+    if (!s) {
+      // Build graceful fallback using saved preferences or DOM values
+      const saved = getSavedUserWeatherPreference();
+      const cityDom = document.getElementById('displayCityName')?.textContent?.trim();
+      const tempDom = document.getElementById('displayTemp')?.textContent?.trim()?.replace('°C', '');
+      const condDom = document.getElementById('displayCondition')?.textContent?.trim();
+      const humDom = document.getElementById('displayHumidity')?.textContent?.trim()?.replace('%', '');
+      const windDom = document.getElementById('displayWind')?.textContent?.trim()?.replace(' km/h', '');
+
+      s = {
+        cityName: (saved && saved.cityName) || (cityDom && !cityDom.includes('लोड') ? cityDom : 'राऊ / इंदौर'),
+        stateName: (saved && saved.stateName) || 'मध्य प्रदेश',
+        temp: parseInt(tempDom, 10) || 25,
+        feelsLike: (parseInt(tempDom, 10) || 25) + 1,
+        condition: condDom || 'साफ आसमान (Clear Sky)',
+        humidity: parseInt(humDom, 10) || 62,
+        windSpeed: parseInt(windDom, 10) || 7,
+        rainProb: 20
+      };
+    }
+
+    const shareId = getSafeShareId();
+    const referralUrl = `https://aarogyamindia.online/weather.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
+
+    const isSpraySafe = (s.rainProb < 35 && s.windSpeed < 18 && s.temp < 36);
+    let spraySection = '';
+    if (isSpraySafe) {
+      spraySection = `🚜 *दवाओं के स्प्रे की वैज्ञानिक सलाह (Spray Advisory):*\n🟢 *आज स्प्रे के लिए 100% उत्तम एवं अनुकूल मौसम!*\n• *मौसम स्थिति:* हवा शांत (${s.windSpeed} km/h) व वर्षा जोखिम केवल ${s.rainProb}% है।\n• *स्प्रे का सही समय:* सुबह 7:00 से 11:00 बजे अथवा शाम 4:00 से 6:30 बजे तक करें।\n• *असरदार फॉर्मूला टिप:* किसी भी कीटनाशक, फफूंदनाशी या टॉनिक में *बायो-99 (Bio-99)* सिलिकॉन स्टिकर अवश्य मिलाएं — इससे दवा पत्तों पर तुरंत फैलती है और बारिश में भी नहीं धुलती। कल्ले व फुटाव बढ़ाने हेतु *बायोफिट स्टीमरिच (Steamrich)* का छिड़काव करें।`;
+    } else {
+      let reasons = [];
+      if (s.rainProb >= 35) reasons.push(`बारिश की ${s.rainProb}% संभावना (दवा बहने का खतरा)`);
+      if (s.windSpeed >= 18) reasons.push(`तेज हवा ${s.windSpeed} km/h (ड्रिफ्ट/दवा उड़ने का खतरा)`);
+      if (s.temp >= 36) reasons.push(`तेज धूप (${s.temp}°C) में वाष्पीकरण का खतरा`);
+      spraySection = `🚜 *दवाओं के स्प्रे की वैज्ञानिक सलाह (Spray Advisory):*\n🔴 *आज दवाओं का छिड़काव तुरंत टालें / स्थगित रखें!*\n• *कारण:* ${reasons.join(', ')}।\n• *नुकसान से बचें:* आज स्प्रे करने पर महंगी दवा धुलने या उड़ने से पैसे व मेहनत की भारी बर्बादी होगी। मौसम साफ होने पर ही छिड़काव करें।`;
+    }
+
+    const rainAction = (s.rainProb >= 35)
+      ? `🌧️ *सिंचाई व जल निकासी:* आगामी 24-48 घंटों में बारिश की संभावना है। सिंचाई तुरंत रोकें और खेत में जलभराव रोकने हेतु जल निकासी दुरुस्त रखें!`
+      : `☀️ *सिंचाई प्रबंधन:* आगामी 7 दिन मौसम मुख्यतः शुष्क रहेगा। आवश्यकतानुसार शाम के समय हल्की सिंचाई करें ताकि मिट्टी में नमी बनी रहे।`;
+
+    const fungusAlert = (s.humidity >= 70)
+      ? `🦠 *फफूंद व रोग चेतावनी (High Alert):* हवा में अत्यधिक नमी (${s.humidity}%) के कारण धान, सोयाबीन व सब्जियों में झुलसा/ब्लाइट, पाउडरी मिल्ड्यू व सड़न रोग का खतरा अधिक है। जैविक रैप-अप (Wrap-up) का छिड़काव तैयार रखें।`
+      : `🦠 *रोग व कीट स्थिति:* वर्तमान नमी स्तर (${s.humidity}%) पर रोग का जोखिम सामान्य है। नियमित जैविक पोषण जारी रखें।`;
+
+    const fertilizerAdvice = (s.rainProb < 40)
+      ? `🧪 *खाद व उर्वरक प्रबंधन:* खेत में पर्याप्त नमी होने पर शेत (SHET) जीवाणु खाद व एनपीके/डीएपी देने का सबसे उपयुक्त समय है। पोषक तत्व पौधों की जड़ों तक 100% पहुंचेंगे।`
+      : `🧪 *खाद व उर्वरक प्रबंधन:* बारिश की संभावना को देखते हुए दानेदार यूरिया/खाद का प्रयोग टालें, खाद बहने का जोखिम है।`;
+
+    return `🚨 *किसान मौसम व फसल सुरक्षा बुलेटिन — आरोग्यम इंडिया* 🚨\n\n📍 *क्षेत्र:* ${s.cityName} (${s.stateName})\n\n🌡️ *वर्तमान तापमान:* ${s.temp}°C (महसूस: ${s.feelsLike}°C)\n🌤️ *मौसम की स्थिति:* ${s.condition}\n💧 *हवा में नमी:* ${s.humidity}% | 💨 *हवा की गति:* ${s.windSpeed} km/h\n🌧️ *बारिश संभावना:* ${s.rainProb}%\n\n━━━━━━━━━━━━━━━━━━━━━━━\n${spraySection}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n📅 *आगामी 7 दिनों के अनुसार खेत में क्या करें:*\n${rainAction}\n\n${fungusAlert}\n\n${fertilizerAdvice}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n🌾 *10,000+ प्रगतिशील किसानों का भरोसेमंद मंच!*\n👉 अपने गाँव/तहसील का लाइव मौसम, सटीक 7-दिवसीय पूर्वानुमान, लाइव मंडी भाव, दैनिक कृषि पंचांग व 24×7 AI कृषि डॉक्टर अभी देखें:\n${referralUrl}\n\n_Aarogyam India — आधुनिक खेती, समृद्ध किसान_`;
+  };
+
   window.shareWeatherWhatsApp = function() {
-    const s = window.AIM_CURRENT_WEATHER_STATE;
-    if (!s) return;
-    const text = `⛅ *आरोग्यम इंडिया लाइव मौसम व स्प्रे एडवाइजरी*\n📍 क्षेत्र: ${s.cityName} (${s.stateName})\n\n🌡️ तापमान: ${s.temp}°C (महसूस: ${s.feelsLike}°C)\n🌤️ मौसम: ${s.condition}\n💧 नमी: ${s.humidity}% | 💨 हवा: ${s.windSpeed} km/h\n🌧️ बारिश संभावना: ${s.rainProb}%\n\n🚜 *स्प्रे सलाह:* ${s.rainProb >= 35 || s.windSpeed >= 18 ? '🔴 आज स्प्रे स्थगित रखें (बारिश/हवा का खतरा)' : '🟢 आज स्प्रे के लिए मौसम अनुकूल है (स्टीमरिच + बायो-99)'}\n\n👉 अपने क्षेत्र का 7-दिवसीय मौसम व कृषि पंचांग देखें:\nhttps://aarogyamindia.online/weather.html`;
+    const text = window.getDynamicWeatherShareText();
+    if (!text) return;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
+
+  // Override universal floating share actions only on weather page
+  const isWeatherPage = window.location.pathname.toLowerCase().includes('weather') || !!document.getElementById('weatherHeroVisual');
+  if (isWeatherPage) {
+    window.triggerUniversalPageShare = function() {
+      window.shareWeatherWhatsApp();
+    };
+    window.triggerViralPageShare = function() {
+      window.shareWeatherWhatsApp();
+    };
+    window.triggerUniversalShare = function() {
+      window.shareWeatherWhatsApp();
+    };
+  }
 
   window.useUserCurrentLocation = function() {
     const btn = document.getElementById('btn-gps-weather');
@@ -468,7 +664,7 @@
         detectedState = 'मध्य प्रदेश';
       }
 
-      if (btn) btn.innerHTML = '📍 ' + detectedCity;
+      if (btn) btn.innerHTML = '📍 ' + detectedCity + ' (डिफ़ॉल्ट)';
       window.load7DayWeather('gps', lat, lon, detectedCity, detectedState);
     }
 
@@ -495,7 +691,7 @@
           }
         } catch(e) {}
 
-        if (btn) btn.innerHTML = '📍 ' + detectedCity;
+        if (btn) btn.innerHTML = '📍 ' + detectedCity + ' (डिफ़ॉल्ट)';
         window.load7DayWeather('gps', lat, lon, detectedCity, detectedState);
       },
       (err) => {
@@ -506,15 +702,43 @@
     );
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // Default load Rewa
-    window.load7DayWeather('rewa');
+  function bootWeatherApp() {
+    const isWPage = window.location.pathname.toLowerCase().includes('weather') || !!document.getElementById('weatherHeroVisual');
+
+    // 1. Check and restore saved location memory (e.g. Indore / Rau)
+    const saved = getSavedUserWeatherPreference();
+    if (saved && saved.lat && saved.lon) {
+      window.load7DayWeather(saved.key || 'saved', saved.lat, saved.lon, saved.cityName, saved.stateName, true);
+      const btn = document.getElementById('btn-gps-weather');
+      if (btn && saved.cityName) {
+        btn.innerHTML = `📍 ${saved.cityName} (डिफ़ॉल्ट)`;
+        btn.title = 'आपकी सहेजी गई डिफ़ॉल्ट लोकेशन (पुनः GPS ट्रैक करने के लिए टैप करें)';
+      }
+      const selectEl = document.getElementById('weather-district-select');
+      if (selectEl && saved.key && selectEl.querySelector(`option[value="${saved.key}"]`)) {
+        selectEl.value = saved.key;
+      }
+    } else {
+      // Default load Rewa
+      window.load7DayWeather('rewa');
+    }
+
+    if (!isWPage) {
+      return;
+    }
 
     const selectEl = document.getElementById('weather-district-select');
     if (selectEl) {
       selectEl.addEventListener('change', (e) => {
         const val = e.target.value;
-        if (val) window.load7DayWeather(val);
+        if (val) {
+          window.load7DayWeather(val);
+          const btn = document.getElementById('btn-gps-weather');
+          if (btn) {
+            const opt = selectEl.options[selectEl.selectedIndex];
+            btn.innerHTML = `📍 ${opt ? opt.text.split(' ')[0] : 'लोकेशन'} (डिफ़ॉल्ट)`;
+          }
+        }
       });
     }
 
@@ -527,6 +751,8 @@
           const match = Object.keys(DISTRICT_COORDINATES).find(k => k.includes(q) || DISTRICT_COORDINATES[k].name.toLowerCase().includes(q));
           if (match) {
             window.load7DayWeather(match);
+            const btn = document.getElementById('btn-gps-weather');
+            if (btn) btn.innerHTML = `📍 ${DISTRICT_COORDINATES[match].name.split(' ')[0]} (डिफ़ॉल्ट)`;
           } else {
             window.load7DayWeather('rewa');
           }
@@ -538,7 +764,13 @@
 
     // Initialize Weather Page Bottom Twin KPIs (Panchang & Mandi)
     initWeatherBottomTwinKpis();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootWeatherApp);
+  } else {
+    bootWeatherApp();
+  }
 
   function initWeatherBottomTwinKpis() {
     const panchangWrap = document.getElementById('weather-kpi-panchang-data');

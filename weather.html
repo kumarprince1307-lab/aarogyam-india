@@ -288,7 +288,7 @@
                     
                     <select id="weather-district-select" style="background: #0f172a; color: #f8fafc; border: 1.5px solid #475569; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.86rem; outline: none; cursor: pointer;">
                         <optgroup label="मध्य प्रदेश (MP)">
-                            <option value="rewa" selected>रीवा (Rewa)</option>
+                            <option value="rewa">रीवा (Rewa)</option>
                             <option value="indore">इंदौर (Indore)</option>
                             <option value="bhopal">भोपाल (Bhopal)</option>
                             <option value="ujjain">उज्जैन (Ujjain)</option>
@@ -327,8 +327,8 @@
                         </div>
                     </div>
                     <div>
-                        <h2 id="displayCityName" style="font-size: 1.5rem; font-weight: 900; margin: 0; color: #f8fafc;">रीवा (Rewa)</h2>
-                        <p id="displayCountry" style="font-size: 0.84rem; margin: 2px 0 0 0; color: #38bdf8; font-weight: 700;">मध्य प्रदेश</p>
+                        <h2 id="displayCityName" style="font-size: 1.5rem; font-weight: 900; margin: 0; color: #f8fafc;">मौसम लोड हो रहा है...</h2>
+                        <p id="displayCountry" style="font-size: 0.84rem; margin: 2px 0 0 0; color: #38bdf8; font-weight: 700;">लाइव क्षेत्र एवं पूर्वानुमान</p>
                     </div>
                 </div>
 
@@ -355,6 +355,33 @@
                     </div>
                 </div>
             </div>
+            <script>
+              (function() {
+                try {
+                  var raw = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION');
+                  if (raw) {
+                    var parsed = JSON.parse(raw);
+                    if (parsed && parsed.cityName) {
+                      var cn = document.getElementById('displayCityName');
+                      if (cn) cn.textContent = parsed.cityName;
+                      var co = document.getElementById('displayCountry');
+                      if (co && parsed.stateName) co.textContent = parsed.stateName;
+                      var btn = document.getElementById('btn-gps-weather');
+                      if (btn) btn.innerHTML = '📍 ' + parsed.cityName + ' (डिफ़ॉल्ट)';
+                      var sel = document.getElementById('weather-district-select');
+                      if (sel && parsed.key) {
+                        for (var i = 0; i < sel.options.length; i++) {
+                          if (sel.options[i].value === parsed.key) {
+                            sel.selectedIndex = i;
+                            break;
+                          }
+                        }
+                      }
+                    }
+                  }
+                } catch(e) {}
+              })();
+            </script>
         </div>
 
         <!-- DYNAMIC AGROMETEOROLOGICAL KPI METRIC GRID -->
@@ -568,7 +595,7 @@
                 </div>
               </div>
             </div>
-            <div style="margin-top: 12px; pt-2; border-top: 1px dashed #1e293b; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-top: 12px; border-top: 1px dashed #1e293b; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 0.74rem; color: #4ade80; font-weight: 800;">48+ मंडियों के लाइव भाव</span>
               <a href="/mandi.html" style="background: #1e293b; color: #facc15; text-decoration: none; font-size: 0.76rem; font-weight: 800; padding: 5px 12px; border-radius: 12px; border: 1px solid #334155; display: inline-flex; align-items: center; gap: 4px;">
                 मंडी भाव देखें →
@@ -593,7 +620,7 @@
                 <div style="font-size: 0.72rem; color: #fde68a; margin-top: 2px;">🌱 ऊपर फलने वाली फसलों की बुवाई व टॉनिक स्प्रे अनुकूल</div>
               </div>
             </div>
-            <div style="margin-top: 12px; pt-2; border-top: 1px dashed rgba(251,191,36,0.3); padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-top: 12px; border-top: 1px dashed rgba(251,191,36,0.3); padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 0.74rem; color: #fde68a; font-weight: 700;">चंद्र कृषि चक्र व चौघड़िया</span>
               <a href="/krishi-panchang.html" style="background: #ffffff; color: #78350f; text-decoration: none; font-size: 0.76rem; font-weight: 900; padding: 5px 14px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
                 पंचांग खोलें →
@@ -802,11 +829,10 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/recent-purchase-toast.js"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261015_v135"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261018_v402"></script>
   <script src="/js/global-guest-modal.js?v=20260926_v16"></script>
   <script type="module" src="/js/public-pwa.js"></script>
-  <script src="/js/weather.js"></script>
+  <script src="/js/weather.js?v=20261018_v402"></script>
 
     <script>
       function syncAuthStatus() {
@@ -870,10 +896,8 @@
           }
         }
       };
-
       document.addEventListener('DOMContentLoaded', syncAuthStatus);
       syncAuthStatus();
     </script>
-    <script src="/js/universal-nav-drawer.js?v=20261015_v135"></script>
 </body>
 </html>

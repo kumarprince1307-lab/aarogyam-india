@@ -96,6 +96,13 @@
     }
 
     /* 3. Unified Light Orange Vibrant Tech KPI Cards */
+    .panchang-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
     .vedic-kpi-orange-card {
       background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
       border: 1.5px solid #fed7aa;
@@ -153,6 +160,57 @@
       font-weight: 700;
       line-height: 1.4;
       text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
+    /* Mobile Responsive Optimizations for Panchang Page */
+    @media (max-width: 640px) {
+      body {
+        padding-bottom: 74px !important;
+      }
+      .panchang-kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 20px !important;
+      }
+      .vedic-kpi-orange-card {
+        padding: 12px 10px !important;
+        border-radius: 14px !important;
+        min-width: 0 !important;
+        box-shadow: 0 4px 14px rgba(234, 88, 12, 0.2) !important;
+      }
+      .vedic-kpi-tag {
+        font-size: 0.70rem !important;
+        margin-bottom: 4px !important;
+        gap: 4px !important;
+        letter-spacing: 0.2px !important;
+      }
+      .vedic-kpi-white-bold {
+        font-size: 1.15rem !important;
+        line-height: 1.25 !important;
+        word-break: break-word !important;
+      }
+      .vedic-kpi-sub-text {
+        font-size: 0.74rem !important;
+        line-height: 1.35 !important;
+      }
+      #choghadiya-grid-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .panchang-faq-item summary {
+        font-size: 1.02rem !important;
+        font-weight: 900 !important;
+        line-height: 1.5 !important;
+      }
+      .panchang-faq-item p {
+        font-size: 0.95rem !important;
+        line-height: 1.7 !important;
+        color: #1e293b !important;
+      }
+      .panchang-faq-tab-btn {
+        font-size: 0.86rem !important;
+        padding: 8px 14px !important;
+      }
     }
 
     /* 4. Hero Banner Carousel */
@@ -588,7 +646,7 @@
       </span>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;margin-bottom:26px;">
+    <div class="panchang-kpi-grid">
       
       <!-- KPI 1: Tithi -->
       <div class="vedic-kpi-orange-card">
@@ -1159,7 +1217,7 @@
             </div>
           </div>
         </div>
-        <div style="margin-top: 10px; pt-2; border-top: 1px dashed #1e293b; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="margin-top: 10px; border-top: 1px dashed #1e293b; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 0.74rem; color: #4ade80; font-weight: 800;">48+ मंडियों के लाइव भाव</span>
           <a href="/mandi.html" style="background: #1e293b; color: #facc15; text-decoration: none; font-size: 0.74rem; font-weight: 800; padding: 5px 12px; border-radius: 12px; border: 1px solid #334155; display: inline-flex; align-items: center; gap: 4px;">
             मंडी भाव देखें →
@@ -1179,11 +1237,11 @@
             </span>
           </div>
           <div>
-            <div style="font-weight: 900; font-size: 1.35rem; color: #fde047;">28°C <span style="font-size: 0.82rem; color: #cbd5e1; font-weight: 700;">(रीवा, म.प्र.)</span></div>
+            <div style="font-weight: 900; font-size: 1.35rem; color: #fde047;">28°C <span id="panchangBottomWeatherCity" style="font-size: 0.82rem; color: #cbd5e1; font-weight: 700;">(रीवा, म.प्र.)</span></div>
             <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 4px;">साफ आसमान • नमी 62% • हवा 10 km/h</div>
           </div>
         </div>
-        <div style="margin-top: 10px; pt-2; border-top: 1px dashed #1e293b; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="margin-top: 10px; border-top: 1px dashed #1e293b; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 0.74rem; color: #4ade80; font-weight: 800;">🟢 आज स्प्रे के लिए मौसम अनुकूल</span>
           <a href="/weather.html" style="background: #1e293b; color: #38bdf8; text-decoration: none; font-size: 0.74rem; font-weight: 800; padding: 5px 12px; border-radius: 12px; border: 1px solid #334155; display: inline-flex; align-items: center; gap: 4px;">
             7-दिन मौसम देखें →
@@ -1949,20 +2007,45 @@
       });
     };
 
-    // 7. Share Engine WhatsApp Integration with Clean Single Share ID
-    window.shareTodayPanchangWhatsApp = function() {
-      if (!window.SakhiPanchang) return;
-      const p = window.SakhiPanchang.getPanchangForDate(currentPanchangDate);
+    // 7. Dynamic Share Engine with Date-Specific Panchang & Farmer Sowing Guidance
+    window.getDynamicPanchangShareText = function(p) {
+      p = p || (window.SakhiPanchang ? window.SakhiPanchang.getPanchangForDate(currentPanchangDate) : null);
+      if (!p) return '';
       
       const shareId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : 'AI000004';
       const referralUrl = (typeof window.generateReferralShareUrl === 'function')
         ? window.generateReferralShareUrl('https://aarogyamindia.online/krishi-panchang.html')
-        : `https://aarogyamindia.online/krishi-panchang.html?ref=${shareId}`;
+        : `https://aarogyamindia.online/krishi-panchang.html?share_id=${shareId}&ref=${shareId}`;
 
-      const text = `🕉️ *दैनिक वैदिक सनातन पंचांग एवं शुभ मुहूर्त*\n📅 तारीख: ${p.formattedDate}\n\n🌙 तिथि: ${p.tithi}\n⭐ नक्षत्र: ${p.nakshatra}\n🌟 शुभ अभिजीत मुहूर्त: ${p.abhijitMuhurat}\n⚠️ राहुकाल: ${p.rahuKaal}\n\n🌾 *चंद्र कृषि सलाह:* ${p.agriGuidance.isShukla ? 'शुक्ल पक्ष - ऊपर फलने वाली फसलों की बुवाई व स्टीमरिच स्प्रे करें।' : 'कृष्ण पक्ष - कंद फसलों (आलू, लहसुन, हल्दी) व शेत खाद के लिए सर्वोत्तम।'}\n\n👉 संपूर्ण चौघड़िया, 12 महीने का व्रत कैलेंडर व आज का पंचांग देखें:\n${referralUrl}`;
-      
+      const festLine = p.festival ? `🚩 *आज का पावन पर्व:* ${p.festival}\n` : (p.isVratDay ? `🪷 *आज का पावन व्रत:* ${p.vratName}\n` : '');
+
+      let agriSowingDetail = '';
+      if (p.isShukla) {
+        agriSowingDetail = `🌱 *शुक्ल पक्ष बुवाई नियम:* चंद्रमा के गुरुत्वाकर्षण से पौधों में रस ऊपर चढ़ता है। जमीन के ऊपर फलने वाली फसलों (गेहूं, चना, मटर, सरसों, टमाटर, सब्जियां) की बुवाई व कल्ले/फूटान हेतु स्टीमरिच + बायो-99 टॉनिक स्प्रे का सर्वोत्तम दिन!`;
+      } else {
+        agriSowingDetail = `🥔 *कृष्ण पक्ष बुवाई नियम:* रस जमीन में जड़ों की ओर प्रवाहित होता है। कंदवर्गीय फसलों (आलू, लहसुन, प्याज, अदरक, हल्दी) की बुवाई, जड़ विकास व शेत (SHET) बैक्टीरिया जैविक खाद देने का श्रेष्ठ समय!`;
+      }
+
+      return `🕉️ *दैनिक वैदिक सनातन पंचांग एवं शुभ मुहूर्त*\n📅 तारीख: ${p.formattedDate} | विक्रम संवत 2083\n${festLine}\n🌙 *तिथि व पक्ष:* ${p.tithi}\n⭐ *नक्षत्र:* ${p.nakshatra} (स्वामी: ${p.nakshatraLord})\n🌟 *शुभ अभिजीत मुहूर्त:* ${p.abhijitMuhurat}\n⚠️ *राहुकाल (वर्जित समय):* ${p.rahuKaal}\n🔱 *योग:* ${p.yoga} योग\n\n🌾 *किसान बुवाई व फसल सुरक्षा सलाह:* \n${agriSowingDetail}\n\n👶 *आज जन्मे बालक का नामाक्षर:* ${p.childPrediction ? p.childPrediction.namakshar : 'शुभ अक्षर'}\n🎂 *आज का मूलांक/अंक फल:* मूलांक ${p.numerology ? p.numerology.moolank + ' (' + p.numerology.planet + ')' : ''}\n\n⏱️ *दिन-रात का चौघड़िया, 12 महीने का व्रत कैलेंडर व आज का संपूर्ण पंचांग अभी देखें:*\n👉 ${referralUrl}\n\n_Aarogyam India — 100% शुद्ध खगोलीय सूर्य सिद्धांत वैदिक पंचांग_`;
+    };
+
+    window.shareTodayPanchangWhatsApp = function() {
+      if (!window.SakhiPanchang) return;
+      const p = window.SakhiPanchang.getPanchangForDate(currentPanchangDate);
+      const text = window.getDynamicPanchangShareText(p);
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
+    };
+
+    // Override universal floating share actions on panchang page
+    window.triggerUniversalPageShare = function() {
+      window.shareTodayPanchangWhatsApp();
+    };
+    window.triggerViralPageShare = function() {
+      window.shareTodayPanchangWhatsApp();
+    };
+    window.triggerUniversalShare = function() {
+      window.shareTodayPanchangWhatsApp();
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1972,6 +2055,14 @@
       const currentMonth = today.getMonth() + 1;
       window.filterCalendarByMonth(currentMonth);
       window.selectCalendarDay(2026, today.getMonth(), today.getDate());
+
+      try {
+        const savedLoc = JSON.parse(localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'null');
+        if (savedLoc && savedLoc.cityName) {
+          const wCitySpan = document.getElementById('panchangBottomWeatherCity');
+          if (wCitySpan) wCitySpan.textContent = `(${savedLoc.cityName})`;
+        }
+      } catch(e) {}
     });
   </script>
 

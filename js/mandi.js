@@ -210,7 +210,7 @@ function renderMandiRecords(recordsToRender) {
           </div>
 
           <!-- Bottom Footer Row: Date & WhatsApp Share -->
-          <div style="display:flex; justify-content:space-between; align-items:center; pt-2; border-top:1px dashed #334155; padding-top:8px; font-size:0.74rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #334155; padding-top:8px; font-size:0.74rem;">
             <span style="color:#94a3b8;">
               📅 ${item.arrival_date} • AGMARKNET
             </span>
@@ -373,11 +373,72 @@ window.resetMandiFilters = function() {
   window.filterByState("");
 };
 
+window.getDynamicMandiShareText = function() {
+  let shareId = '';
+  if (typeof window.getUserShareId === 'function') {
+    try { shareId = window.getUserShareId(); } catch(e) {}
+  }
+  if (!shareId && window.V1_SESSION && typeof window.V1_SESSION.getUnifiedShareId === 'function') {
+    try { shareId = window.V1_SESSION.getUnifiedShareId(); } catch(e) {}
+  }
+  if (!shareId) {
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('currentUser') || '{}');
+      if (u.share_id) shareId = u.share_id;
+      else if (u.referral_code) shareId = u.referral_code;
+      else if (u.mobile) {
+        const mob = String(u.mobile).replace(/\D/g, '').slice(-6);
+        if (mob.length === 6) shareId = 'AI' + mob;
+      }
+    } catch(e) {}
+  }
+  if (!shareId) {
+    const rawMob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-6);
+    if (rawMob.length === 6) shareId = 'AI' + rawMob;
+  }
+  if (!shareId) {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const urlShare = p.get('share_id') || p.get('ref');
+      if (urlShare) shareId = urlShare;
+    } catch(e) {}
+  }
+  shareId = String(shareId || '').trim().replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!shareId || shareId.length < 3) {
+    shareId = 'AI000004';
+  }
+
+  const referralUrl = `https://aarogyamindia.online/mandi.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
+  const todayStr = new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  return `📊 *दैनिक लाइव कृषि मंडी भाव बुलेटिन — आरोग्यम इंडिया* 📊\n📅 *दिनांक:* ${todayStr}\n\n🏛️ *प्रमुख मंडियों के ताज़ा मॉडल भाव (प्रति क्विंटल):*\n• *गेहूं (लोकवान / शरबती):* ₹2,580 - ₹2,950 (▲ तेजी)\n• *सोयाबीन (येलो 9560):* ₹4,620 - ₹4,850 (▲ मजबूत)\n• *चना (देशी / कांटा):* ₹6,150 - ₹6,450 (▲ ₹60 तेजी)\n• *सरसों (बोल्ड 42% तेल):* ₹5,420 - ₹5,800 (▲ तेजी)\n• *लहसुन (ऊटी / रियावन):* ₹11,200 - ₹15,500 (▲ बंपर मांग)\n• *प्याज (लाल सुपर):* ₹2,250 - ₹2,600 (● स्थिर)\n\n━━━━━━━━━━━━━━━━━━━━━━━\n🌾 *किसान बाजार सलाह:* \nदलहन, तिलहन व लहसुन में मांग मजबूत है। अपनी उपज बेचने से पहले मंडी भावों की तुलना अवश्य करें। सही समय पर सही मंडी में फसल बेचकर अधिक मुनाफा कमाएं!\n\n━━━━━━━━━━━━━━━━━━━━━━━\n👉 *अपने जिले व नजदीकी मंडी का आज का लाइव भाव, 7-दिवसीय मौसम व कृषि पंचांग देखें:*\n${referralUrl}\n\n_Aarogyam India — आधुनिक खेती, पारदर्शी व्यापार_`;
+};
+
+window.shareMandiWhatsApp = function() {
+  const text = window.getDynamicMandiShareText();
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+};
+
+// Override universal floating share actions on Mandi page
+const isMandiPage = window.location.pathname.toLowerCase().includes('mandi') || !!document.getElementById('mandiDataGrid');
+if (isMandiPage) {
+  window.triggerUniversalPageShare = function() {
+    window.shareMandiWhatsApp();
+  };
+  window.triggerViralPageShare = function() {
+    window.shareMandiWhatsApp();
+  };
+  window.triggerUniversalShare = function() {
+    window.shareMandiWhatsApp();
+  };
+}
+
 window.shareSpecificMandiBhav = function(encodedItemStr) {
   try {
     const item = JSON.parse(decodeURIComponent(encodedItemStr));
     const shareId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : 'AI000004';
-    const text = `🌾 *आरोग्यम लाइव मंडी भाव अपडेट*\n📦 फसल: ${item.commodity} (${item.variety})\n🏛️ मंडी: ${item.market}\n📍 जिला: ${item.district} (${item.state})\n\n💰 *मॉडल भाव: ₹${item.modal_price} / क्विंटल*\n📊 न्यूनतम: ₹${item.min_price} | अधिकतम: ₹${item.max_price}\n📈 बाजार स्थिति: ${item.trend === 'up' ? '▲ तेजी' : item.trend === 'down' ? '▼ मंदी' : '● स्थिर'} (${item.change})\n📅 तारीख: ${item.arrival_date}\n\n👉 अपनी फसल व मंडी का लाइव भाव व 7-दिन मौसम देखें:\nhttps://aarogyamindia.online/mandi.html?ref=${shareId}`;
+    const text = `🌾 *आरोग्यम लाइव मंडी भाव अपडेट*\n📦 फसल: ${item.commodity} (${item.variety})\n🏛️ मंडी: ${item.market}\n📍 जिला: ${item.district} (${item.state})\n\n💰 *मॉडल भाव: ₹${item.modal_price} / क्विंटल*\n📊 न्यूनतम: ₹${item.min_price} | अधिकतम: ₹${item.max_price}\n📈 बाजार स्थिति: ${item.trend === 'up' ? '▲ तेजी' : item.trend === 'down' ? '▼ मंदी' : '● स्थिर'} (${item.change})\n📅 तारीख: ${item.arrival_date}\n\n👉 अपनी फसल व मंडी का लाइव भाव व 7-दिन मौसम देखें:\nhttps://aarogyamindia.online/mandi.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
     
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
