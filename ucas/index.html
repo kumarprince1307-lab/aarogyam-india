@@ -28,6 +28,235 @@
   <link rel="stylesheet" href="/css/user-notifications.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
   <link rel="stylesheet" href="/css/home-revamp.css?v=20260926_v16">
+  <link rel="stylesheet" href="/css/pathfinder-quarter.css?v=20261018_v10">
+  
+  <style>
+    /* UCAS Pathfinder Luxury Theme & Locked Gate Enhancements */
+    .ucas-kpi-grid-pf {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 1.35rem;
+    }
+    .ucas-kpi-pf-card {
+      border-radius: 18px;
+      padding: 16px 18px;
+      color: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 110px;
+    }
+    .ucas-kpi-pf-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.25);
+    }
+    .ucas-kpi-pf-card::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .ucas-kpi-pf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .ucas-kpi-pf-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      opacity: 0.95;
+    }
+    .ucas-kpi-pf-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+    .ucas-kpi-pf-val {
+      font-size: 1.85rem;
+      font-weight: 900;
+      line-height: 1.15;
+      font-family: 'Outfit', sans-serif;
+    }
+    .ucas-kpi-pf-sub {
+      font-size: 0.74rem;
+      opacity: 0.85;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Page-wise Share Analytics Table & Cards */
+    .ucas-page-analytics-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 18px 20px;
+      margin-bottom: 1.35rem;
+      box-shadow: 0 4px 18px rgba(15,23,42,0.06);
+    }
+    .ucas-pa-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .ucas-pa-item:hover {
+      background: #eff6ff;
+      border-color: #3b82f6;
+    }
+    .ucas-pa-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 220px;
+    }
+    .ucas-pa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #0f172a;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .ucas-pa-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .ucas-pa-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+    .ucas-pa-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ucas-pa-stat-pill {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      color: #475569;
+      font-weight: 700;
+    }
+    .ucas-pa-stat-pill strong {
+      color: #0f172a;
+      font-size: 0.88rem;
+    }
+
+    /* Privacy Gate (Locked Table) */
+    .ucas-locked-privacy-gate {
+      background: linear-gradient(135deg, #091322 0%, #0d1e34 100%);
+      border: 2px solid #38bdf8;
+      border-radius: 18px;
+      padding: 28px 18px;
+      text-align: center;
+      color: #ffffff;
+      box-shadow: 0 12px 35px rgba(56,189,248,0.2);
+      margin-top: 10px;
+    }
+    .ucas-lpg-icon {
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+      display: inline-block;
+      animation: floatGentleGlow 3s ease-in-out infinite;
+    }
+    .ucas-lpg-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 8px;
+    }
+    .ucas-lpg-desc {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      max-width: 620px;
+      margin: 0 auto 16px;
+      line-height: 1.6;
+    }
+    .ucas-lpg-summary-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: rgba(15,23,42,0.8);
+      border: 1.5px solid rgba(56,189,248,0.3);
+      border-radius: 14px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+    }
+    .ucas-lpg-stat {
+      font-size: 0.84rem;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+    .ucas-lpg-stat strong {
+      color: #38bdf8;
+      font-size: 1.1rem;
+      margin-left: 4px;
+    }
+    .ucas-lpg-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 25px;
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(16,185,129,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .ucas-lpg-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(16,185,129,0.6);
+    }
+  </style>
 </head>
 <body>
 
@@ -195,29 +424,58 @@
         </div>
       </div>
 
-      <!-- Netflix Luxury Subscription Upgrade KPI Card (For Inactive Users in UCAS) -->
-      <div id="ucas-inactive-subscription-banner" style="display: none; background: linear-gradient(135deg, #180909 0%, #1c1313 50%, #0d0e14 100%); border: 1.5px solid rgba(220, 38, 38, 0.5); border-left: 4px solid #dc2626; border-radius: 18px; padding: 16px 20px; margin-bottom: 1.25rem; box-shadow: 0 14px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(220, 38, 38, 0.25);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-          <div style="flex: 2; min-width: 260px;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 1rem; color: #ffffff;">
-              <span>🔥</span>
-              <span>Aarogyam VIP 365-Day Subscription Offer!</span>
-              <span style="background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 10px rgba(220,38,38,0.6);">⚡ LIMITED OFFER</span>
+      <!-- 🌟 Smart Luxury Inactive ID & Book Activation Banner -->
+      <div id="ucas-inactive-subscription-banner" style="display: none; background: linear-gradient(135deg, #1c0a00 0%, #2a0f02 50%, #111827 100%); border: 2px solid #f97316; border-left: 6px solid #ea580c; border-radius: 20px; padding: 20px 24px; margin-bottom: 1.5rem; box-shadow: 0 16px 40px rgba(234, 88, 12, 0.25); position: relative; overflow: hidden;">
+        <!-- Glowing Ambient Background Circle -->
+        <div style="position:absolute;top:-40px;right:-40px;width:150px;height:150px;background:radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%);border-radius:50%;pointer-events:none;"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; position:relative; z-index:1;">
+          <div style="flex: 2; min-width: 280px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+              <span style="background: #ef4444; color: #fff; font-size: 0.75rem; font-weight: 900; padding: 3px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 0 12px rgba(239,68,68,0.6);">
+                <i class="fa-solid fa-triangle-exclamation"></i> आपकी Share ID अभी इनएक्टिव (Inactive) है
+              </span>
+              <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 0.72rem; font-weight: 900; padding: 3px 10px; border-radius: 20px;">
+                ⚡ लाइफटाइम एक्टिवेशन ऑफर
+              </span>
             </div>
-            <p style="font-size: 0.88rem; color: #e2e8f0; margin: 6px 0 0 0; line-height: 1.5;">
-              <strong>₹999</strong> का वार्षिक सब्सक्रिप्शन अभी <strong style="color: #fde047; font-size: 1.05rem; text-shadow: 0 0 8px rgba(253,224,71,0.5);">मात्र ₹99 में!</strong> कोई भी 1 ई-बुक लेकर तुरंत VIP सब्सक्रिप्शन + UCAS मार्केटिंग टूल्स 365 दिनों के लिए एक्टिव करें।
+
+            <h3 style="font-size: 1.25rem; font-weight: 900; color: #ffffff; margin: 4px 0 8px 0; line-height: 1.35;">
+              <span style="color: #fde047; text-shadow: 0 0 10px rgba(253,224,71,0.6); font-size: 1.3rem;">कोई भी 1 ई-बुक</span> लें और अपनी ID तुरंत एक्टिव करें!
+            </h3>
+
+            <p style="font-size: 0.88rem; color: #fed7aa; margin: 0 0 12px 0; line-height: 1.55;">
+              जैसे ही आपकी ID एक्टिव होगी, आपके लिंक/शेयर द्वारा जितने भी लोग जुड़े हैं, उनके <strong>नाम, मोबाइल नंबर व खरीद रिपोर्ट</strong> आपको हमेशा लाइव मिलते रहेंगे और 10% शेयर रिवॉर्ड्स भी शुरू हो जाएगा!
             </p>
+
+            <!-- Feature Checkpoints -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; font-size: 0.82rem; color: #f8fafc;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:#22c55e;font-size:0.95rem;font-weight:900;">✓</span>
+                <span>रेफरल सदस्यों के <strong>नाम व नंबर अनलॉक</strong></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:#22c55e;font-size:0.95rem;font-weight:900;">✓</span>
+                <span>हर खरीद पर <strong>10% नकद मूल्य शेयर रिवॉर्ड्स</strong></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:#22c55e;font-size:0.95rem;font-weight:900;">✓</span>
+                <span>संपूर्ण UCAS मार्केटिंग टूल्स <strong>365 दिन फ्री</strong></span>
+              </div>
+            </div>
           </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="/ebooks/my-library.html" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 12px; font-size: 0.86rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(234,88,12,0.4); transition: transform 0.2s;">
-              <span>📚</span> My Library से ₹99 में एक्टिव करें
+
+          <div style="display: flex; flex-direction: column; gap: 10px; min-width: 220px;">
+            <a href="/ebooks/my-library.html?tab=available#available" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #ffffff; text-decoration: none; padding: 13px 22px; border-radius: 14px; font-size: 0.92rem; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 20px rgba(234,88,12,0.45); transition: transform 0.2s;">
+              <span>📚</span> My Library से ई-बुक लेकर एक्टिव करें →
             </a>
-            <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20₹99%20वाले%20VIP%20सब्सक्रिप्शन%20ऑफर%20के%20बारे%20में%20जानकारी%20चाहिए।" target="_blank" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 12px; font-size: 0.86rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(22,163,74,0.4);">
-              <i class="fa-brands fa-whatsapp"></i> पूछताछ
+            <a href="https://wa.me/917974422572?text=नमस्ते%20Aarogyam%20India,%20मुझे%20ई-बुक%20लेकर%20UCAS%20ID%20एक्टिव%20करनी%20है।" target="_blank" style="background: rgba(255,255,255,0.08); border: 1.5px solid #22c55e; color: #4ade80; text-decoration: none; padding: 10px 18px; border-radius: 14px; font-size: 0.84rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+              <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;color:#22c55e;"></i> WhatsApp सहायता
             </a>
           </div>
         </div>
       </div>
+
 
       <!-- Profile Completion Progress Bar Card (Identical to My Library) -->
       <div class="ucas-card" style="margin-bottom:1.25rem; background: #fff; padding: 14px 18px;">
@@ -346,65 +604,111 @@
         </div>
       </div>
 
-      <!-- KPI Summary Cards (Real Dynamic Data) -->
-      <div class="ucas-kpi-grid">
-        <div class="ucas-kpi-card kpi-green">
-          <div class="ucas-kpi-icon-wrap">
-            <i class="fa-solid fa-clipboard-list"></i>
+      <!-- =========================================
+           5 PATHFINDER-STYLE PERSONAL PERFORMANCE KPI CARDS
+      ========================================== -->
+      <div class="ucas-kpi-grid-pf">
+        <!-- 1. Total Shares -->
+        <div class="ucas-kpi-pf-card" style="background:linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);border:1.5px solid #3b82f6;">
+          <div class="ucas-kpi-pf-header">
+            <span class="ucas-kpi-pf-title">🚀 कुल शेयर</span>
+            <div class="ucas-kpi-pf-icon"><i class="fa-solid fa-share-nodes"></i></div>
           </div>
-          <div class="ucas-kpi-val" id="kpi_total_surveys">0</div>
-          <div class="ucas-kpi-label">Total Surveys</div>
+          <div>
+            <div class="ucas-kpi-pf-val" id="kpi_user_total_shares">0</div>
+            <div class="ucas-kpi-pf-sub">WhatsApp व सोशल लिंक्स</div>
+          </div>
         </div>
 
-        <div class="ucas-kpi-card kpi-blue">
-          <div class="ucas-kpi-icon-wrap">
-            <i class="fa-solid fa-address-book"></i>
+        <!-- 2. Total Link Clicks -->
+        <div class="ucas-kpi-pf-card" style="background:linear-gradient(135deg, #059669 0%, #064e3b 100%);border:1.5px solid #10b981;">
+          <div class="ucas-kpi-pf-header">
+            <span class="ucas-kpi-pf-title">👆 कुल लिंक क्लिक्स</span>
+            <div class="ucas-kpi-pf-icon"><i class="fa-solid fa-arrow-pointer"></i></div>
           </div>
-          <div class="ucas-kpi-val" id="kpi_total_contacts">0</div>
-          <div class="ucas-kpi-label">Total Contacts</div>
+          <div>
+            <div class="ucas-kpi-pf-val" id="kpi_user_total_clicks">0</div>
+            <div class="ucas-kpi-pf-sub">आपके लिंक्स पर विज़िटर्स</div>
+          </div>
         </div>
 
-        <div class="ucas-kpi-card kpi-orange">
-          <div class="ucas-kpi-icon-wrap">
-            <i class="fa-solid fa-users-viewfinder"></i>
+        <!-- 3. Total Leads -->
+        <div class="ucas-kpi-pf-card" style="background:linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);border:1.5px solid #8b5cf6;">
+          <div class="ucas-kpi-pf-header">
+            <span class="ucas-kpi-pf-title">🎯 कुल लीड्स</span>
+            <div class="ucas-kpi-pf-icon"><i class="fa-solid fa-users-viewfinder"></i></div>
           </div>
-          <div class="ucas-kpi-val" id="kpi_total_leads">0</div>
-          <div class="ucas-kpi-label">Total Leads</div>
+          <div>
+            <div class="ucas-kpi-pf-val" id="kpi_user_total_leads">0</div>
+            <div class="ucas-kpi-pf-sub">सर्वे व संपर्क फॉर्म्स</div>
+          </div>
         </div>
 
-        <div class="ucas-kpi-card kpi-purple">
-          <div class="ucas-kpi-icon-wrap">
-            <i class="fa-solid fa-heart-circle-check"></i>
+        <!-- 4. Direct Referrals -->
+        <div class="ucas-kpi-pf-card" style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);border:1.5px solid #38bdf8;">
+          <div class="ucas-kpi-pf-header">
+            <span class="ucas-kpi-pf-title" style="color:#38bdf8;">👥 डायरेक्ट रेफरल</span>
+            <div class="ucas-kpi-pf-icon" style="background:rgba(56,189,248,0.2);color:#38bdf8;"><i class="fa-solid fa-user-plus"></i></div>
           </div>
-          <div class="ucas-kpi-val" id="kpi_total_interested">0</div>
-          <div class="ucas-kpi-label">Interested</div>
+          <div>
+            <div class="ucas-kpi-pf-val" id="kpi_direct_referrals" style="color:#38bdf8;">0</div>
+            <div class="ucas-kpi-pf-sub" style="color:#94a3b8;">आपकी ID से जुड़े सदस्य</div>
+          </div>
         </div>
 
-        <div class="ucas-kpi-card kpi-green">
-          <div class="ucas-kpi-icon-wrap">
-            <i class="fa-solid fa-trophy"></i>
+        <!-- 5. Direct Purchases -->
+        <div class="ucas-kpi-pf-card" style="background:linear-gradient(135deg, #d97706 0%, #92400e 100%);border:1.5px solid #f59e0b;">
+          <div class="ucas-kpi-pf-header">
+            <span class="ucas-kpi-pf-title">💰 कुल परचेज</span>
+            <div class="ucas-kpi-pf-icon"><i class="fa-solid fa-bag-shopping"></i></div>
           </div>
-          <div class="ucas-kpi-val" id="kpi_total_converted">0</div>
-          <div class="ucas-kpi-label">Converted</div>
+          <div>
+            <div class="ucas-kpi-pf-val" id="kpi_direct_purchases">₹0</div>
+            <div class="ucas-kpi-pf-sub" id="kpi_direct_purchases_sub">रेफरल से कुल खरीद</div>
+          </div>
         </div>
 
-        <div class="ucas-kpi-card kpi-blue" style="cursor:pointer;" onclick="UCAS_APP.switchView('webinars')" title="वेबिनार अटेंडेंस देखें">
-          <div class="ucas-kpi-icon-wrap" style="background:#DBEAFE;color:#1D4ED8;">
-            <i class="fa-solid fa-video"></i>
+        <!-- 6. AarogyamTube Video Share & Views KPI -->
+        <div class="ucas-kpi-pf-card" style="background:linear-gradient(135deg, #991b1b 0%, #450a0a 100%);border:1.5px solid #ef4444;cursor:pointer;" onclick="window.location.href='/tube.html'" title="AarogyamTube वीडियो हब खोलें">
+          <div class="ucas-kpi-pf-header">
+            <span class="ucas-kpi-pf-title">🎥 वीडियो शेयर & व्यूज</span>
+            <div class="ucas-kpi-pf-icon" style="background:rgba(239,68,68,0.25);color:#fca5a5;"><i class="fa-brands fa-youtube"></i></div>
           </div>
-          <div class="ucas-kpi-val" id="kpi_total_webinar_attendees" style="color:#1D4ED8;">0</div>
-          <div class="ucas-kpi-label">Webinar Attendees</div>
+          <div>
+            <div class="ucas-kpi-pf-val" id="kpi_tube_shares_views">0 <span style="font-size:0.8rem;font-weight:700;color:#fca5a5;">शेयर</span> | 0 <span style="font-size:0.8rem;font-weight:700;color:#fca5a5;">व्यूज</span></div>
+            <div class="ucas-kpi-pf-sub" id="kpi_tube_shares_views_sub">AarogyamTube वीडियो प्रमोशन</div>
+          </div>
         </div>
-        
-        <div class="ucas-kpi-card kpi-pink" style="cursor:pointer;" onclick="window.location.href='/ebooks/share-rewards.html'" title="क्लिक करके आरोग्यम शेयर & अर्न पेज खोलें">
-          <div class="ucas-kpi-icon-wrap"><i class="fa-solid fa-share-nodes"></i></div>
-          <div class="ucas-kpi-val" id="ucas-kpi-marketing-sent">0</div>
-          <div class="ucas-kpi-label">Campaigns Shared (रिवॉर्ड्स)</div>
+      </div>
+
+      <!-- Midnight Refresh Notification -->
+      <div style="font-size:0.8rem; color:#64748b; font-weight:700; margin:10px 0 16px 2px; display:flex; align-items:center; gap:6px;">
+        <span style="color:#f59e0b;">⏱️</span> <span>डेटा प्रतिदिन रात के 12:00 बजे ऑटो-अपडेट होता है (या तुरंत ताजा रिपोर्ट के लिए 'अपडेट करें' दबाएं)</span>
+      </div>
+
+      <!-- =========================================
+           GRANULAR LINK & PAGE SHARE ANALYTICS
+      ========================================== -->
+      <div class="ucas-page-analytics-card" id="ucas-page-share-analytics-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
+          <div>
+            <div style="font-weight:900;font-size:1.08rem;color:#0f172a;display:flex;align-items:center;gap:8px;">
+              <span>🚀</span> <span>पेज-वाइज़ शेयर व क्लिक ट्रैकिंग (Link & Page Analytics)</span>
+            </div>
+            <div style="font-size:0.78rem;color:#64748b;margin-top:2px;">
+              देखें आपने किस पेज को शेयर किया, उस पर कितने क्लिक्स आए, कितने लोग जुड़े और कौन सी किताब बिकी
+            </div>
+          </div>
+          <button type="button" class="ucas-btn ucas-btn-sm ucas-btn-outline" onclick="UCAS_APP.refreshDashboardKPIs()" style="font-size:0.78rem;padding:5px 12px;">
+            <i class="fa-solid fa-rotate"></i> अपडेट करें
+          </button>
         </div>
-        <div class="ucas-kpi-card kpi-orange" style="border-left:4px solid #F59E0B;">
-          <div class="ucas-kpi-icon-wrap" style="background:rgba(245,158,11,0.15);color:#F59E0B;"><i class="fa-solid fa-cart-shopping"></i></div>
-          <div class="ucas-kpi-val" id="ucas-kpi-product-leads">0</div>
-          <div class="ucas-kpi-label">Product Leads</div>
+
+        <!-- Dynamic List of Shared Pages -->
+        <div id="ucas-page-share-list">
+          <div style="text-align:center;padding:1.5rem;color:#64748b;font-size:0.85rem;">
+            🔄 पेज एनालिटिक्स लोड हो रहा है...
+          </div>
         </div>
       </div>
 
@@ -473,32 +777,264 @@
         </div>
       </div>
 
-      <!-- Quick Action Shortcuts (Unified Light Blue Theme) -->
+      <!-- =========================================
+           QUICK DASHBOARD LINKS & ACTIONS (UNIFIED & BEAUTIFIED)
+      ========================================== -->
+      <style>
+        /* Responsive Quick Dashboard Grid & Cards */
+        .ucas-quick-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        @media (min-width: 560px) {
+          .ucas-quick-grid {
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 12px;
+          }
+        }
+        @media (min-width: 960px) {
+          .ucas-quick-grid {
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 12px;
+          }
+        }
+        .ucas-quick-card {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          min-height: 86px;
+          padding: 12px 12px;
+          border-radius: 14px;
+          text-decoration: none;
+          box-sizing: border-box;
+          transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+          cursor: pointer;
+          overflow: hidden;
+          position: relative;
+          border-width: 1.5px;
+          border-style: solid;
+          outline: none;
+          font-family: inherit;
+          text-align: left;
+          width: 100%;
+        }
+        .ucas-quick-card:hover, .ucas-quick-card:focus-visible {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+        .ucas-quick-card:active {
+          transform: translateY(0);
+        }
+        .ucas-quick-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 8px;
+        }
+        .ucas-quick-icon {
+          font-size: 1.25rem;
+          line-height: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+        }
+        .ucas-quick-arrow {
+          font-size: 0.85rem;
+          font-weight: 800;
+          opacity: 0.7;
+          transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .ucas-quick-card:hover .ucas-quick-arrow {
+          transform: translateX(3px);
+          opacity: 1;
+        }
+        .ucas-quick-label {
+          font-size: 0.84rem;
+          font-weight: 800;
+          line-height: 1.3;
+          letter-spacing: -0.01em;
+          word-break: break-word;
+          white-space: normal;
+        }
+        .ucas-quick-sub {
+          font-size: 0.68rem;
+          font-weight: 600;
+          opacity: 0.75;
+          margin-top: 2px;
+          line-height: 1.2;
+        }
+      </style>
+
       <div class="ucas-card" style="margin-bottom:1.25rem;">
         <div class="ucas-card-header">
           <div class="ucas-card-title">
-            <i class="fa-solid fa-bolt" style="color:#2563EB;"></i> त्वरित कार्य (Quick Actions)
+            <i class="fa-solid fa-bolt" style="color:#2563EB;"></i> 🚀 त्वरित डैशबोर्ड लिंक्स (Quick Dashboard Links)
           </div>
+          <span style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">सभी मुख्य सेवाएं एक ही जगह</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:0.75rem;">
-          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('survey')">
-            <i class="fa-solid fa-plus-circle" style="color:#2563EB;"></i> नया सर्वे भरें
+
+        <div class="ucas-quick-grid">
+          <!-- 1. My Library -->
+          <a href="/ebooks/my-library.html" class="ucas-quick-card" style="background:#f0fdf4; border-color:#86efac; color:#15803d; box-shadow:0 2px 6px rgba(21,128,61,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dcfce7;">📚</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">मेरी डिजिटल लाइब्रेरी</div>
+              <div class="ucas-quick-sub">आपकी खरीदी ई-बुक्स</div>
+            </div>
+          </a>
+
+          <!-- 2. Purchases & Invoices -->
+          <a href="/purchases.html" class="ucas-quick-card" style="background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; box-shadow:0 2px 6px rgba(29,78,216,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dbeafe;">🧾</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">खरीद व इनवॉइस</div>
+              <div class="ucas-quick-sub">बिलिंग व रसीदें</div>
+            </div>
+          </a>
+
+          <!-- 3. eBook Store -->
+          <a href="/ebooks/ebook.html" class="ucas-quick-card" style="background:#fffbeb; border-color:#fde047; color:#b45309; box-shadow:0 2px 6px rgba(180,83,9,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#fef3c7;">🛒</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">ई-बुक स्टोर</div>
+              <div class="ucas-quick-sub">20% छूट के साथ</div>
+            </div>
+          </a>
+
+          <!-- 4. AarogyamTube -->
+          <a href="/tube.html" class="ucas-quick-card" style="background:#fef2f2; border-color:#fca5a5; color:#b91c1c; box-shadow:0 2px 6px rgba(185,28,28,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#fee2e2;">📺</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">AarogyamTube</div>
+              <div class="ucas-quick-sub">वीडियो व रील्स हब</div>
+            </div>
+          </a>
+
+          <!-- 5. Live Mandi Bhav -->
+          <a href="/mandi.html" class="ucas-quick-card" style="background:#ecfdf5; border-color:#a7f3d0; color:#047857; box-shadow:0 2px 6px rgba(4,120,87,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#d1fae5;">🌾</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">दैनिक मंडी भाव</div>
+              <div class="ucas-quick-sub">लाइव बाजार दरें</div>
+            </div>
+          </a>
+
+          <!-- 6. Weather Forecast -->
+          <a href="/weather.html" class="ucas-quick-card" style="background:#f0f9ff; border-color:#7dd3fc; color:#0369a1; box-shadow:0 2px 6px rgba(3,105,161,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#e0f2fe;">⛅</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">मौसम पूर्वानुमान</div>
+              <div class="ucas-quick-sub">7 दिनों का मौसम</div>
+            </div>
+          </a>
+
+          <!-- 7. Smart E-Tailer Plan -->
+          <a href="/pages/smart-etailer.html" class="ucas-quick-card" style="background:#faf5ff; border-color:#d8b4fe; color:#6b21a8; box-shadow:0 2px 6px rgba(107,33,168,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#f3e8ff;">👑</span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">स्मार्ट ई-टेलर</div>
+              <div class="ucas-quick-sub">₹8.19 लाख आय प्लान</div>
+            </div>
+          </a>
+
+          <!-- 8. Webinars & Live -->
+          <button type="button" class="ucas-quick-card" style="background:#eff6ff; border-color:#bfdbfe; color:#1e40af; box-shadow:0 2px 6px rgba(30,64,175,0.06);" onclick="UCAS_APP.switchView('webinars')">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dbeafe;"><i class="fa-solid fa-video" style="color:#2563EB;"></i></span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">वेबिनार व मीटिंग</div>
+              <div class="ucas-quick-sub">लाइव किसान संवाद</div>
+            </div>
           </button>
-          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('phonebook')">
-            <i class="fa-solid fa-address-book" style="color:#2563EB;"></i> फोनबुक / CSV इम्पोर्ट
+
+          <!-- 9. New Survey -->
+          <button type="button" class="ucas-quick-card" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534; box-shadow:0 2px 6px rgba(22,101,52,0.06);" onclick="UCAS_APP.switchView('survey')">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dcfce7;"><i class="fa-solid fa-plus-circle" style="color:#16a34a;"></i></span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">नया किसान सर्वे</div>
+              <div class="ucas-quick-sub">डेटा संग्रह व लीड</div>
+            </div>
           </button>
-          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('product-landing')">
-            <i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i> प्रोडक्ट लैंडिंग पेज
+
+          <!-- 10. Phonebook / CSV Import -->
+          <button type="button" class="ucas-quick-card" style="background:#eff6ff; border-color:#bfdbfe; color:#1e40af; box-shadow:0 2px 6px rgba(30,64,175,0.06);" onclick="UCAS_APP.switchView('phonebook')">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dbeafe;"><i class="fa-solid fa-address-book" style="color:#2563EB;"></i></span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">फोनबुक / CSV</div>
+              <div class="ucas-quick-sub">कांटेक्ट आयात करें</div>
+            </div>
           </button>
-          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('marketing')">
-            <i class="fa-solid fa-paper-plane" style="color:#2563EB;"></i> मार्केटिंग इंजन खोलें
+
+          <!-- 11. Product Landing Page Builder -->
+          <button type="button" class="ucas-quick-card" style="background:#fffbeb; border-color:#fde68a; color:#92400e; box-shadow:0 2px 6px rgba(146,64,14,0.06);" onclick="UCAS_APP.switchView('product-landing')">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#fef3c7;"><i class="fa-solid fa-cart-shopping" style="color:#F59E0B;"></i></span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">प्रोडक्ट लैंडिंग पेज</div>
+              <div class="ucas-quick-sub">बिक्री पेज बनाएं</div>
+            </div>
           </button>
-          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="UCAS_APP.switchView('webinars')">
-            <i class="fa-solid fa-video" style="color:#2563EB;"></i> वेबिनार व लाइव (Webinar & Live)
+
+          <!-- 12. Marketing Engine -->
+          <button type="button" class="ucas-quick-card" style="background:#eff6ff; border-color:#bfdbfe; color:#1e40af; box-shadow:0 2px 6px rgba(30,64,175,0.06);" onclick="UCAS_APP.switchView('marketing')">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dbeafe;"><i class="fa-solid fa-paper-plane" style="color:#2563EB;"></i></span>
+              <span class="ucas-quick-arrow">→</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">मार्केटिंग इंजन</div>
+              <div class="ucas-quick-sub">प्रचार व ऑटोमेशन</div>
+            </div>
           </button>
-          <button class="ucas-btn" style="background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;font-weight:700;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(30,64,175,0.08);" onclick="window.location.href='/ebooks/my-library.html'">
-            <i class="fa-solid fa-book-open" style="color:#2563EB;"></i> My Library खोलें
-          </button>
+
+          <!-- 13. 24x7 WhatsApp AI Support -->
+          <a href="https://api.whatsapp.com/send?phone=917974422572&text=Namaste" target="_blank" class="ucas-quick-card" style="background:#f0fdf4; border-color:#86efac; color:#15803d; box-shadow:0 2px 6px rgba(21,128,61,0.06);">
+            <div class="ucas-quick-top">
+              <span class="ucas-quick-icon" style="background:#dcfce7;"><i class="fa-brands fa-whatsapp" style="color:#16a34a;"></i></span>
+              <span class="ucas-quick-arrow">📱</span>
+            </div>
+            <div>
+              <div class="ucas-quick-label">24×7 AI सहायता</div>
+              <div class="ucas-quick-sub">व्हाट्सएप समाधान</div>
+            </div>
+          </a>
         </div>
       </div>
 
@@ -517,56 +1053,58 @@
         </div>
       </div>
 
-      <!-- 🌤️ Aarogyam India Weather Center (Inside UCAS View Profile) -->
-      <div class="welcome-card-soft" style="background: linear-gradient(135deg, #040a09 0%, #416406 100%); color: #fff; border-radius: var(--radius-md, 14px); padding: 22px; margin: 1.25rem 0; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-          <div>
-            <h3 style="font-size: 1.25rem; margin: 0 0 4px 0; color:#fff;">🌤️ Aarogyam India मौसम केंद्र</h3>
-            <p style="font-size: 0.85rem; opacity: 0.95; margin: 0; color:#e2e8f0;">अपने शहर या खेती की लोकेशन का सटीक लाइव तापमान और मौसम हाल देखें</p>
-          </div>
-          <div style="display: flex; gap: 8px; width: 100%; max-width: 320px;">
-            <input type="text" id="citySearchInput" placeholder="शहर का नाम लिखें (जैसे - Rewa)..." style="flex: 1; padding: 9px 12px; border: none; border-radius: 8px; outline: none; font-size: 0.85rem; background:#fff; color:#0f172a;">
-            <button id="citySearchBtn" style="background: #081108; color: #fff; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">खोजें</button>
+      <!-- =========================================
+           PATHFINDER-STYLE VIRAL AUTO-SPONSOR & DIGITAL IDENTITY
+      ========================================== -->
+      <!-- 1. Glowing Floating Viral Sponsor Notice Card -->
+      <section class="pf-viral-notice-card" id="ucasProfileViralNoticeCard">
+        <div class="pf-vn-header">
+          <span class="pf-vn-badge">🚀 वायरल शेयरिंग पावर • आपकी डिजिटल पहचान</span>
+          <span class="pf-vn-live"><span class="pf-vn-dot"></span> लाइव ऑटो-स्पॉन्सर सिस्टम</span>
+        </div>
+        <div class="pf-vn-body">
+          <div class="pf-vn-icon">💡</div>
+          <div class="pf-vn-text">
+            <h4 class="pf-vn-title" id="ucasViralNoticeTitle">🎉 नमस्ते <span id="ucasViralUserName">साथी</span> जी! आपकी डिजिटल शेयरिंग पावर एक्टिव है</h4>
+            <p class="pf-vn-desc" id="ucasViralNoticeDesc">
+              आपकी पहचान <strong id="ucasViralUserIdent">प्रिय सदस्य (ID: AI000004)</strong> सुरक्षित रूप से एक्टिव है। जब आप यह पाथफाइंडर प्लान, ई-बुक्स या कोई भी पेज अपने मित्र, टीम या सहयोगी को शेयर करेंगे, तो उनके फोन में नीचे स्वतः आपका नाम, कॉलिंग नंबर और WhatsApp बटन दिखेगा!
+            </p>
           </div>
         </div>
+        <div class="pf-vn-actions">
+          <button type="button" class="pf-vn-btn-login" id="ucasViralStatusBtn" style="cursor:default;">
+            <i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> <span id="ucasViralStatusBtnText">✅ आप लॉगिन हैं</span>
+          </button>
+          <button type="button" class="pf-vn-btn-share" onclick="window.shareUcasPersonalIdentity()">
+            <i class="fa-solid fa-share-nodes"></i> <span>अपनी पहचान के साथ शेयर करें</span>
+          </button>
+        </div>
+      </section>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 16px; background: rgba(255, 255, 255, 0.18); padding: 14px; border-radius: 12px; backdrop-filter: blur(6px);">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img id="weatherIconImg" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Icon" style="width: 48px; height: 48px; background: rgba(255,255,255,0.3); border-radius: 50%;">
+      <!-- 2. Sponsor / Counselor Contact Card -->
+      <section class="pf-sponsor-counselor-card" id="ucasProfileAdvisorCard">
+        <div class="pf-sc-header">
+          <span class="pf-sc-badge">🤝 आपके मित्र / सहयोगी / सहेली</span>
+          <span class="pf-sc-verified"><i class="fa-solid fa-circle-check"></i> सत्यापित एक्टिव स्पॉन्सर</span>
+        </div>
+        <div class="pf-sc-body">
+          <div class="pf-sc-info">
+            <div class="pf-sc-avatar">👤</div>
             <div>
-              <h4 id="displayCityName" style="font-size: 1.1rem; margin: 0; color:#fff;">--</h4>
-              <p id="displayCountry" style="font-size: 0.78rem; margin: 2px 0 0 0; opacity: 0.9; color:#e2e8f0;">India</p>
+              <h4 class="pf-sc-name" id="ucasAdvisorName">श्री अवनीश कुमार मिश्रा</h4>
+              <p class="pf-sc-sub" style="margin:2px 0 0;font-size:0.85rem;color:#94a3b8;">Share ID: <strong id="ucasAdvisorId" style="color:#38bdf8;">AI000004</strong></p>
             </div>
           </div>
-          <div style="text-align: center;">
-            <div style="font-size: 0.78rem; opacity: 0.9; text-transform: uppercase; color:#e2e8f0;">तापमान (Temperature)</div>
-            <div id="displayTemp" style="font-size: 1.7rem; font-weight: bold; margin-top: 2px; color:#fff;">--°C</div>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-size: 0.78rem; opacity: 0.9; text-transform: uppercase; color:#e2e8f0;">मौसम स्थिति</div>
-            <div id="displayCondition" style="font-size: 0.95rem; font-weight: bold; margin-top: 4px; text-transform: capitalize; color:#fff;">--</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🌾 Mandi Quick Access KPI Card (Properly inside UCAS view-profile) -->
-      <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: var(--radius-md, 14px); padding: 16px 20px; color: #fff; cursor: pointer; box-shadow: 0 8px 24px rgba(6,78,59,0.2); transition: all 0.3s ease; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
-        <div style="position: absolute; right: -10px; bottom: -15px; font-size: 4.5rem; opacity: 0.1; pointer-events: none;">
-          <i class="fa-solid fa-seedling"></i>
-        </div>
-        <div style="display: flex; align-items: center; gap: 14px; z-index: 1; flex: 1; min-width: 0;">
-          <div style="width: 44px; height: 44px; min-width: 44px; background: rgba(255, 255, 255, 0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #facc15;">
-            <i class="fa-solid fa-seedling"></i>
-          </div>
-          <div style="min-width: 0;">
-            <h4 style="margin: 0 0 2px 0; font-size: 1.05rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h4>
-            <p style="margin: 0; font-size: 0.8rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
+          <div class="pf-sc-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="tel:+917974422572" class="pf-btn-sc-call" id="ucasAdvisorCallBtn" title="कॉल करें" style="background:#1e293b;border:1.5px solid #38bdf8;color:#38bdf8;padding:8px 16px;border-radius:20px;font-weight:800;font-size:0.84rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-phone"></i> <span>कॉल करें</span>
+            </a>
+            <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87!" target="_blank" rel="noopener noreferrer" class="pf-btn-sc-wa" id="ucasAdvisorWaBtn" title="व्हाट्सएप परामर्श" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;padding:8px 18px;border-radius:20px;font-weight:800;font-size:0.84rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(22,163,74,0.35);">
+              <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp संपर्क</span>
+            </a>
           </div>
         </div>
-        <div style="z-index: 1; background: #10B981; color: #fff; width: 34px; height: 34px; min-width: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
-          <i class="fa-solid fa-arrow-right"></i>
-        </div>
-      </div>
+      </section>
     </section>
 
     <!-- -----------------------------------------------------------------------
@@ -2144,6 +2682,5 @@
 <script src="/js/global-guest-modal.js?v=20260926_v16"></script>
 <script src="/js/user-notifications.js?v=20260926_v16"></script>
 <script src="/ucas/js/ucas-app.js?v=19.0"></script>
-<script src="/js/weather.js"></script> <!-- यहाँ हमने मौसम वाली जेएस फाइल जोड़ दी है -->
 </body>
 </html>

@@ -37,6 +37,15 @@
 
   // 2. Interactive Login & Registration Modal Popups
   window.openLoginPopup = function(customTitle, customSubtitle, callback) {
+    if (typeof window.openGuestLoginModal === 'function') {
+      window.openGuestLoginModal(callback, {
+        source: 'फ्री डेमो ई-बुक (Demo Reader)',
+        title: customTitle,
+        subtitle: customSubtitle,
+        force: true
+      });
+      return;
+    }
     if (typeof callback === 'function') {
       pendingAuthCallback = callback;
     }

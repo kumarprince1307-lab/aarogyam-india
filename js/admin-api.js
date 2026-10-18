@@ -140,11 +140,16 @@ export async function fetchShareEngineSummaryData() {
       .eq('event_type', 'visit');
     if (visitorsError) console.error('Error fetching total visitors:', visitorsError.message);
 
-    // 4. Total Leads
-    const { count: totalLeads, error: leadsError } = await db
-      .from('interested_users')
-      .select('id', { count: 'exact', head: true });
-    if(leadsError) console.error('Error fetching total leads:', leadsError.message);
+    // 4. Total Leads (Accurate count from surveys table)
+    let totalLeads = 0;
+    try {
+      const { count: surveysCount, error: leadsError } = await db
+        .from('surveys')
+        .select('id', { count: 'exact', head: true });
+      if (!leadsError && typeof surveysCount === 'number') {
+        totalLeads = surveysCount;
+      }
+    } catch (_) {}
 
     // 5. Total Registrations, Active & Inactive Users
     const { count: totalRegistrations, error: regsError } = await db
@@ -354,7 +359,8 @@ export async function fetchDashboardData(params = {}) {
       periodProfilesRes,
       periodSharesRes,
       periodClicksRes,
-      periodVisitorsRes
+      periodVisitorsRes,
+      sakhiInsightsRes
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
       db.from('purchases').select('amount, profile_id').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
@@ -370,7 +376,14 @@ export async function fetchDashboardData(params = {}) {
       // Period-specific share engine stats
       db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'share').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
       db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'click').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
-      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'visit').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString())
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'visit').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      (async () => {
+        try {
+          return await db.from('sakhi_user_insights').select('*');
+        } catch (_) {
+          return { data: [] };
+        }
+      })()
     ]);
 
     // --- Process Data ---
@@ -474,6 +487,23 @@ export async function fetchDashboardData(params = {}) {
       date: new Date(a.date).toLocaleDateString('en-GB')
     }));
 
+    // Process Sakhi AI Live Metrics for Dashboard
+    const allSakhi = sakhiInsightsRes?.data || [];
+    const sakhiTotalUsers = allSakhi.length;
+    const sakhiTotalInteractions = allSakhi.reduce((sum, item) => sum + (Number(item.interaction_count) || 1), 0);
+    const domainCounts = {};
+    allSakhi.forEach(item => {
+      const dom = item.primary_domain || 'कृषि (Agriculture)';
+      domainCounts[dom] = (domainCounts[dom] || 0) + 1;
+    });
+
+    const sakhiSummary = {
+      totalUsers: sakhiTotalUsers,
+      totalInteractions: sakhiTotalInteractions,
+      domainCounts: domainCounts,
+      recentUsers: allSakhi.slice(0, 5)
+    };
+
     const resultData = {
       success: true,
       data: {
@@ -484,7 +514,8 @@ export async function fetchDashboardData(params = {}) {
         bookSales,
         todaysBirthdays,
         todaysCheckoutSummary,
-        recentActivity: sortedActivity
+        recentActivity: sortedActivity,
+        sakhiSummary
       }
     };
     _adminMemoryCache.set(cacheKey, { data: resultData, ts: Date.now() });

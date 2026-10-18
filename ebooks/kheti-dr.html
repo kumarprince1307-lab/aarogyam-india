@@ -2403,11 +2403,18 @@
     }
 
     function openLoginPopup() {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(null, { source: 'खेती का डॉक्टर ई-बुक (Demo)', force: true });
+        return;
+      }
       const popup = document.getElementById('login-popup-overlay');
       if (popup) popup.style.display = 'flex';
     }
 
     function closeLoginPopup() {
+      if (typeof window.closeGuestLoginModal === 'function') {
+        window.closeGuestLoginModal();
+      }
       const popup = document.getElementById('login-popup-overlay');
       if (popup) popup.style.display = 'none';
     }
@@ -2415,7 +2422,7 @@
     function openDemoReaderWithAuth(bookId) {
       const bId = (bookId || 'BK002').toUpperCase();
       const readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
-      let isLogged = false;
+      let isLogged = (typeof window.isUserLoggedIn === 'function') ? window.isUserLoggedIn() : false;
       try {
         const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         if (u && (u.id || u.phone || u.mobile)) isLogged = true;
@@ -2426,6 +2433,12 @@
 
       if (!isLogged) {
         sessionStorage.setItem('AIM_PENDING_DEMO_URL', readerDemoUrl);
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal(() => {
+            window.location.href = readerDemoUrl;
+          }, { source: 'खेती का डॉक्टर ई-बुक (Demo)', force: true });
+          return;
+        }
         openLoginPopup();
         return;
       }

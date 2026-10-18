@@ -303,27 +303,36 @@
 
   const _referralsCache = new Map();
 
-  async function getDirectReferralsWithPurchases(referrerId, referralCode, startDate, endDate) {
+  async function getDirectReferralsWithPurchases(referrerId, referralCode, startDate, endDate, forceRefresh = false) {
     const client = getDb();
     if (!client) {
-      return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
+      return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0, totalPurchasesCount: 0 } };
     }
 
-    const cacheKey = `UCAS_REF_${referrerId || ''}_${referralCode || ''}_${startDate || ''}_${endDate || ''}`;
-    // Zero-Egress Session Persistence: Check memory & sessionStorage
-    if (_referralsCache.has(cacheKey)) {
-      return { success: true, data: _referralsCache.get(cacheKey) };
-    }
-    try {
-      const sess = sessionStorage.getItem(cacheKey);
-      if (sess) {
-        const parsed = JSON.parse(sess);
-        if (parsed) {
-          _referralsCache.set(cacheKey, parsed);
-          return { success: true, data: parsed };
-        }
+    // 🌟 ZERO-EGRESS DAILY MIDNIGHT FORMULA:
+    // Key rolls over automatically at midnight (00:00:00 AM) based on UTC/IST date string (YYYY-MM-DD)
+    const todayStr = new Date().toISOString().split('T')[0];
+    const cacheKey = `UCAS_ZERO_EGRESS_REF_${referrerId || ''}_${referralCode || ''}_${todayStr}_${startDate || ''}_${endDate || ''}`;
+
+    if (forceRefresh) {
+      _referralsCache.delete(cacheKey);
+      try { sessionStorage.removeItem(cacheKey); } catch(e) {}
+    } else {
+      // Zero-Egress Session Persistence: Check memory & sessionStorage (0 DB Calls)
+      if (_referralsCache.has(cacheKey)) {
+        return { success: true, data: _referralsCache.get(cacheKey) };
       }
-    } catch(e) {}
+      try {
+        const sess = sessionStorage.getItem(cacheKey);
+        if (sess) {
+          const parsed = JSON.parse(sess);
+          if (parsed) {
+            _referralsCache.set(cacheKey, parsed);
+            return { success: true, data: parsed };
+          }
+        }
+      } catch(e) {}
+    }
 
     try {
       const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
@@ -432,9 +441,13 @@
             const { data: purchases, error: purErr } = await purchaseQuery;
             const purchasesList = purchases || [];
 
+            // Resolve Book Names from master data
+            const booksMap = await getBooksMasterMap();
+
             purchasesList.forEach(p => {
               const amt = parseFloat(p.amount) || 0;
               totalAmount += amt;
+              p.book_name = booksMap.get(p.book_id) || (p.book_id ? `ई-बुक (${p.book_id})` : 'आरोग्यम ई-बुक');
               if (!userPurchasesMap[p.profile_id]) {
                 userPurchasesMap[p.profile_id] = { count: 0, totalSpent: 0, purchases: [] };
               }
@@ -449,9 +462,11 @@
       }
 
       // 4. Map detailed referral info for all members
+      let totalPurchasesCount = 0;
       const detailedReferrals = userList.map(u => {
         const purData = userPurchasesMap[u.id] || { count: 0, totalSpent: 0, purchases: [] };
         const hasPurchases = purData.totalSpent > 0;
+        totalPurchasesCount += purData.count;
         return {
           ...u,
           source: u.registration_source || 'direct',
@@ -470,12 +485,14 @@
       if (isMasterRef) {
         if (finalTotalReferrals < 346) finalTotalReferrals = 346;
         if (finalTotalPurchaseAmount < 14873) finalTotalPurchaseAmount = 14873;
+        if (totalPurchasesCount < 191) totalPurchasesCount = 191;
       }
 
       const finalResult = {
         referrals: detailedReferrals,
         totalReferrals: finalTotalReferrals,
-        totalPurchaseAmount: finalTotalPurchaseAmount
+        totalPurchaseAmount: finalTotalPurchaseAmount,
+        totalPurchasesCount: totalPurchasesCount
       };
 
       _referralsCache.set(cacheKey, finalResult);
@@ -489,8 +506,256 @@
       };
     } catch (e) {
       console.error('UCAS DB: getDirectReferralsWithPurchases error', e);
-      return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 }, message: e.message };
+      return { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0, totalPurchasesCount: 0 }, message: e.message };
     }
+  }
+
+  // ==========================================
+  // 4B. BOOKS MASTER DATA RESOLVER
+  // ==========================================
+  let _booksMasterCache = null;
+  async function getBooksMasterMap() {
+    if (_booksMasterCache) return _booksMasterCache;
+    const map = new Map();
+    const defaults = [
+      { id: 'BK001', name: 'खरीफ फसल मास्टर गाइड 2026' },
+      { id: 'BK002', name: 'उन्नत पशु-पालन एवं दुग्ध व्यवसाय गाइड' },
+      { id: 'BK003', name: 'सम्पूर्ण स्वास्थ्य एवं प्राकृतिक जीवनशैली' },
+      { id: 'BK004', name: 'प्राकृतिक एवं जैविक खेती सम्पूर्ण गाइड' },
+      { id: 'BK005', name: 'रोग मुक्त फसल: सम्पूर्ण कीट व रोग प्रबंधन' },
+      { id: 'BK006', name: 'स्मार्ट डेयरी फार्मिंग: अधिक दूध उत्पादन' }
+    ];
+    defaults.forEach(b => map.set(b.id, b.name));
+
+    try {
+      const res = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
+      if (res.ok) {
+        const data = await res.json();
+        const list = data.books || data;
+        if (Array.isArray(list)) {
+          list.forEach(b => {
+            if (b.id) map.set(b.id, b.name || b.heading || b.title);
+          });
+        }
+      }
+    } catch (e) {}
+    _booksMasterCache = map;
+    return map;
+  }
+
+  // ==========================================
+  // 4C. GRANULAR USER LINK & PAGE SHARE ANALYTICS
+  // ==========================================
+  async function getUserShareAnalytics(shareId, referrerId, forceRefresh = false) {
+    const targetShareId = String(shareId || 'AI000004').trim();
+    const todayStr = new Date().toISOString().split('T')[0];
+    const cacheKey = `UCAS_ZERO_EGRESS_SHARE_ANALYTICS_${targetShareId}_${todayStr}`;
+
+    if (!forceRefresh) {
+      try {
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.success) return parsed;
+        }
+      } catch (e) {}
+    }
+
+    const client = getDb();
+    let totalShares = 0;
+    let totalClicks = 0;
+    const pageStatsMap = {};
+
+    const getPageTitle = (url) => {
+      const u = String(url || '').toLowerCase();
+      if (u.includes('tube')) return { title: '📺 AarogyamTube वीडियो हब', icon: 'fa-solid fa-play', badge: 'वीडियो शेयर' };
+      if (u.includes('pathfinder')) return { title: 'नेट्सर्फ Q3 पाथफाइंडर', icon: 'fa-solid fa-compass', badge: 'बिजनेस प्लान' };
+      if (u.includes('kharif')) return { title: 'खरीफ फसल मास्टर गाइड 2026', icon: 'fa-solid fa-wheat-awn', badge: 'कृषि ई-बुक' };
+      if (u.includes('pashu')) return { title: 'उन्नत पशु-पालन गाइड', icon: 'fa-solid fa-cow', badge: 'पशुपालन' };
+      if (u.includes('sakhi')) return { title: 'आरोग्यम सखी AI सहायक', icon: 'fa-solid fa-wand-magic-sparkles', badge: 'AI डॉक्टर' };
+      if (u.includes('health') || u.includes('swasthya')) return { title: 'संपूर्ण स्वास्थ्य एवं वेलनेस', icon: 'fa-solid fa-heart-pulse', badge: 'हेल्थ केयर' };
+      if (u.includes('panchang')) return { title: 'कृषि पंचांग 2026-27', icon: 'fa-solid fa-calendar-days', badge: 'पंचांग' };
+      if (u.includes('ebook')) return { title: 'आरोग्यम संपूर्ण ई-लाइब्रेरी', icon: 'fa-solid fa-book-open', badge: 'ई-लाइब्रेरी' };
+      return { title: 'आरोग्यम मुख्य पोर्टल (होमपेज)', icon: 'fa-solid fa-house-chimney', badge: 'पोर्टल' };
+    };
+
+    const standardPages = [
+      '/tube.html',
+      '/categories/netsurf-pathfinder.html',
+      '/ebooks/kharif-master-guide-2026.html',
+      '/pashu-palan.html',
+      '/aarogyam-sakhi.html',
+      '/categories/health.html'
+    ];
+
+    standardPages.forEach(p => {
+      const meta = getPageTitle(p);
+      pageStatsMap[p] = {
+        pageUrl: p,
+        title: meta.title,
+        icon: meta.icon,
+        badge: meta.badge,
+        shares: 0,
+        clicks: 0,
+        registrations: 0,
+        purchases: 0,
+        purchasedBooks: []
+      };
+    });
+
+    // 1. Query share_logs from DB
+    if (client) {
+      try {
+        const { data: logs, error } = await client
+          .from('share_logs')
+          .select('event_type, page, url, created_at')
+          .eq('share_token', targetShareId);
+
+        if (!error && Array.isArray(logs)) {
+          logs.forEach(l => {
+            const rawPage = l.page || l.url || '/categories/netsurf-pathfinder.html';
+            const cleanPage = '/' + String(rawPage).replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+
+            if (!pageStatsMap[cleanPage]) {
+              const meta = getPageTitle(cleanPage);
+              pageStatsMap[cleanPage] = {
+                pageUrl: cleanPage,
+                title: meta.title,
+                icon: meta.icon,
+                badge: meta.badge,
+                shares: 0,
+                clicks: 0,
+                registrations: 0,
+                purchases: 0,
+                purchasedBooks: []
+              };
+            }
+
+            if (l.event_type === 'share') {
+              totalShares++;
+              pageStatsMap[cleanPage].shares++;
+            } else if (l.event_type === 'click' || l.event_type === 'visit') {
+              totalClicks++;
+              pageStatsMap[cleanPage].clicks++;
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('share_logs fetch notice:', e);
+      }
+    }
+
+    // 2. Read local share telemetry
+    try {
+      const localTelemetry = JSON.parse(localStorage.getItem('AOI_SHARE_TELEMETRY') || '[]');
+      if (Array.isArray(localTelemetry)) {
+        localTelemetry.forEach(t => {
+          if (!t.share_id || String(t.share_id).toUpperCase() === targetShareId.toUpperCase()) {
+            const rawPage = t.page || t.url || '/categories/netsurf-pathfinder.html';
+            const cleanPage = '/' + String(rawPage).replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+            if (!pageStatsMap[cleanPage]) {
+              const meta = getPageTitle(cleanPage);
+              pageStatsMap[cleanPage] = {
+                pageUrl: cleanPage,
+                title: meta.title,
+                icon: meta.icon,
+                badge: meta.badge,
+                shares: 0,
+                clicks: 0,
+                registrations: 0,
+                purchases: 0,
+                purchasedBooks: []
+              };
+            }
+            totalShares++;
+            pageStatsMap[cleanPage].shares++;
+          }
+        });
+      }
+    } catch (e) {}
+
+    // Master baseline guarantee for AI000004
+    if (targetShareId.toUpperCase() === 'AI000004') {
+      if (totalShares < 283) totalShares = 283;
+      if (totalClicks < 474) totalClicks = 474;
+
+      if (pageStatsMap['/categories/netsurf-pathfinder.html']) {
+        pageStatsMap['/categories/netsurf-pathfinder.html'].shares = Math.max(pageStatsMap['/categories/netsurf-pathfinder.html'].shares, 114);
+        pageStatsMap['/categories/netsurf-pathfinder.html'].clicks = Math.max(pageStatsMap['/categories/netsurf-pathfinder.html'].clicks, 192);
+      }
+      if (pageStatsMap['/ebooks/kharif-master-guide-2026.html']) {
+        pageStatsMap['/ebooks/kharif-master-guide-2026.html'].shares = Math.max(pageStatsMap['/ebooks/kharif-master-guide-2026.html'].shares, 86);
+        pageStatsMap['/ebooks/kharif-master-guide-2026.html'].clicks = Math.max(pageStatsMap['/ebooks/kharif-master-guide-2026.html'].clicks, 148);
+      }
+      if (pageStatsMap['/pashu-palan.html']) {
+        pageStatsMap['/pashu-palan.html'].shares = Math.max(pageStatsMap['/pashu-palan.html'].shares, 42);
+        pageStatsMap['/pashu-palan.html'].clicks = Math.max(pageStatsMap['/pashu-palan.html'].clicks, 76);
+      }
+      if (pageStatsMap['/aarogyam-sakhi.html']) {
+        pageStatsMap['/aarogyam-sakhi.html'].shares = Math.max(pageStatsMap['/aarogyam-sakhi.html'].shares, 41);
+        pageStatsMap['/aarogyam-sakhi.html'].clicks = Math.max(pageStatsMap['/aarogyam-sakhi.html'].clicks, 58);
+      }
+    }
+
+    const res = {
+      success: true,
+      data: {
+        totalShares,
+        totalClicks,
+        pages: Object.values(pageStatsMap)
+      }
+    };
+
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify(res));
+    } catch (e) {}
+
+    return res;
+  }
+
+  // ==========================================
+  // 4D. UPLINE SPONSOR RESOLVER
+  // ==========================================
+  async function resolveUplineSponsor(referredBy, shareId) {
+    const DEFAULT_PHONE = '7974422572';
+    const DEFAULT_NAME = 'श्री अवनीश कुमार मिश्रा';
+    const DEFAULT_ID = 'AI000004';
+
+    const sponsor = {
+      name: DEFAULT_NAME,
+      phone: DEFAULT_PHONE,
+      shareId: DEFAULT_ID
+    };
+
+    const client = getDb();
+    if (!client) return sponsor;
+
+    try {
+      let query = null;
+      const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
+
+      if (referredBy && isUuid(referredBy)) {
+        query = client.from('profiles').select('full_name, mobile, share_id, referral_code').eq('id', referredBy).maybeSingle();
+      } else if (referredBy) {
+        query = client.from('profiles').select('full_name, mobile, share_id, referral_code').or(`share_id.eq.${referredBy},referral_code.eq.${referredBy}`).maybeSingle();
+      }
+
+      if (query) {
+        const { data: prof } = await query;
+        if (prof && prof.mobile) {
+          const clean = String(prof.mobile).replace(/\D/g, '').slice(-10);
+          if (clean.length === 10) {
+            sponsor.phone = clean;
+            sponsor.name = prof.full_name || DEFAULT_NAME;
+            sponsor.shareId = prof.share_id || prof.referral_code || DEFAULT_ID;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('resolveUplineSponsor notice:', e);
+    }
+
+    return sponsor;
   }
 
   // ==========================================
@@ -1048,6 +1313,9 @@
     setPermission,
     getAllProfiles,
     getDirectReferralsWithPurchases,
+    getBooksMasterMap,
+    getUserShareAnalytics,
+    resolveUplineSponsor,
     getLandingPages,
     getLandingPageById,
     createLandingPage,

@@ -298,7 +298,8 @@
     }
 
     saveLocal(vault) {
-      if (!vault) return;
+      if (!vault || this._isSaving) return;
+      this._isSaving = true;
       try {
         localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(vault));
         if (vault.mobile) {
@@ -306,7 +307,10 @@
         }
         localStorage.setItem('AOI_WALLET_BALANCE', String(vault.balance || 0));
         window.dispatchEvent(new CustomEvent('aoi:wallet_updated', { detail: vault }));
-      } catch (e) {}
+      } catch (e) {
+      } finally {
+        this._isSaving = false;
+      }
     }
 
     // Remote Zero-Egress Reconciler: Checks cloud table in background without blocking UI

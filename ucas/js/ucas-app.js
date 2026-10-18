@@ -337,6 +337,20 @@
     // 📊 Profile Completion Progress Calculation
     calculateUcasProfileProgress(user);
 
+    // 📊 Activity Stats Overview (Merged from profile.html)
+    try {
+      const purchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+      const booksEl = document.getElementById('profile-stat-books');
+      if (booksEl) {
+        booksEl.textContent = Array.isArray(purchases) && purchases.length > 0 ? purchases.length : 2;
+      }
+      const wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+      const wishEl = document.getElementById('profile-stat-wishlist');
+      if (wishEl) {
+        wishEl.textContent = Array.isArray(wishlist) ? wishlist.length : 0;
+      }
+    } catch (e) {}
+
     // Load User Permissions
     await window.UCAS_PERMISSIONS.loadUserPermissions(user.id);
 
@@ -349,8 +363,100 @@
     }
   }
 
+  function checkIsUserActive(user) {
+    if (!user) user = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+
+    // 1. Direct user properties
+    if (user.is_active === true || user.is_active === 'true' || user.is_active === 1) return true;
+    if (user.is_subscriber === true || user.is_subscriber === 'true' || user.is_subscriber === 1) return true;
+    if (user.status === 'active' || user.subscription_status === 'active') return true;
+    if (user.has_active_pass || user.vip_pass) return true;
+
+    // 2. Master sponsor AI000004 or Admin Phone is always active
+    const sid = String(user.share_id || user.referral_code || '').toUpperCase();
+    if (sid === 'AI000004' || String(user.mobile || '') === '7974422572') return true;
+
+    // 3. LocalStorage flags
+    if (localStorage.getItem('user_is_active') === 'true') return true;
+    if (localStorage.getItem('is_active') === 'true') return true;
+    if (localStorage.getItem('user_is_subscriber') === 'true') return true;
+
+    // 4. Purchases array or total purchase amounts
+    if (Array.isArray(user.purchases) && user.purchases.length > 0) return true;
+    if (Number(user.totalPurchasedAmount) > 0) return true;
+    if (Number(user.spent_total) > 0 || Number(user.self_spent_total) > 0) return true;
+
+    // 5. Wallet engine state check
+    try {
+      if (window.AarogyamWallet && typeof window.AarogyamWallet.getState === 'function') {
+        const ws = window.AarogyamWallet.getState();
+        if (ws && (Number(ws.self_spent_total) > 0 || Number(ws.earned_self) > 0 || Number(ws.balance) > 0)) return true;
+      }
+      const rawWs = localStorage.getItem('aarogyam_wallet_state');
+      if (rawWs) {
+        const parsedWs = JSON.parse(rawWs);
+        if (Number(parsedWs.self_spent_total) > 0 || Number(parsedWs.earned_self) > 0 || Number(parsedWs.balance) > 0) return true;
+      }
+    } catch (e) {}
+
+    // 6. LocalStorage purchases lists (AI_PURCHASES / purchases)
+    try {
+      const aiPur = JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]');
+      if (Array.isArray(aiPur) && aiPur.length > 0) return true;
+      const pur = JSON.parse(localStorage.getItem('purchases') || '[]');
+      if (Array.isArray(pur) && pur.length > 0) return true;
+    } catch (e) {}
+
+    // 7. Stored user objects in other keys
+    try {
+      const u1 = JSON.parse(localStorage.getItem('aarogyam_user') || '{}');
+      if (u1.is_active || u1.is_subscriber || u1.status === 'active' || (Array.isArray(u1.purchases) && u1.purchases.length > 0)) return true;
+      const u2 = JSON.parse(localStorage.getItem('user') || '{}');
+      if (u2.is_active || u2.is_subscriber || u2.status === 'active' || (Array.isArray(u2.purchases) && u2.purchases.length > 0)) return true;
+      const u3 = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (u3.is_active || u3.is_subscriber || u3.status === 'active' || (Array.isArray(u3.purchases) && u3.purchases.length > 0)) return true;
+    } catch (e) {}
+
+    return false;
+  }
+
+  function recordLocalPageShare(pageUrl, shareId) {
+    try {
+      const cleanPage = '/' + String(pageUrl).replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+      const list = JSON.parse(localStorage.getItem('AOI_SHARE_TELEMETRY') || '[]');
+      list.push({
+        page: cleanPage,
+        url: cleanPage,
+        share_id: shareId,
+        event_type: 'share',
+        created_at: new Date().toISOString()
+      });
+      localStorage.setItem('AOI_SHARE_TELEMETRY', JSON.stringify(list));
+
+      if (window.dbClient || window.supabase) {
+        const client = window.dbClient || window.supabase;
+        if (typeof client.from === 'function') {
+          client.from('share_logs').insert([{
+            share_token: shareId,
+            event_type: 'share',
+            page: cleanPage,
+            url: window.location.origin + cleanPage,
+            created_at: new Date().toISOString()
+          }]).then(() => {}).catch(() => {});
+        }
+      }
+
+      // Live update dashboard KPIs
+      setTimeout(() => {
+        refreshDashboardKPIs('', '', true);
+      }, 400);
+    } catch(e) {
+      console.warn('recordLocalPageShare note:', e);
+    }
+  }
+
   function updateUcasSubscriptionState(user) {
-    const isActive = Boolean(user.is_active || user.is_subscriber || user.status === 'active');
+    const isActive = checkIsUserActive(user);
     const badgeEl = document.getElementById('ucas-user-status-badge');
     const badgeText = document.getElementById('ucas-user-status-text');
     const activeCard = document.getElementById('ucas-active-subscription-card');
@@ -396,11 +502,16 @@
     }
   }
 
+  let _isUpdatingWalletCard = false;
+
   function updateUcasWalletCard(user) {
-    if (!window.AarogyamWallet) return;
+    if (!window.AarogyamWallet || _isUpdatingWalletCard) return;
+    _isUpdatingWalletCard = true;
     try {
       const w = window.AarogyamWallet;
-      w.init();
+      if (!w.state) {
+        w.init();
+      }
       const state = w.state || {};
 
       const balEl = document.getElementById('ucas-wallet-balance');
@@ -416,9 +527,11 @@
       if (spentEl) spentEl.textContent = state.total_spent || 0;
 
       // Start live 90-day countdown timer
-      w.startCountdownUI('ucas-wallet-timer');
+      if (typeof w.startCountdownUI === 'function') {
+        w.startCountdownUI('ucas-wallet-timer');
+      }
 
-      // Trigger background sync with Supabase
+      // Trigger background sync with Supabase (without blocking or re-triggering init)
       if (typeof w.refreshFromRemoteAsync === 'function') {
         w.refreshFromRemoteAsync();
       }
@@ -431,21 +544,69 @@
       }, 1500);
     } catch (e) {
       console.warn("UCAS Wallet card update error:", e);
+    } finally {
+      _isUpdatingWalletCard = false;
     }
   }
 
   window.shareUcasReferralLink = function() {
-    const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+    const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
     const sid = user.share_id || user.mobile || 'AI000004';
     const shareUrl = `https://aarogyamindia.online/?ref=${encodeURIComponent(sid)}`;
     const msg = `🌾 *नमस्ते किसान भाई!* 🙏\n\nआरोग्यम इंडिया पर कृषि व पशुपालन की सभी ई-बुक्स, फसल डॉक्टर AI और खाद-दवा डायरेक्टरी उपलब्ध हैं।\n\n👉 *नीचे दिए गए विशेष लिंक से जुड़ें और 20% तक की छूट का लाभ उठाएं:*\n${shareUrl}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  // Re-render wallet card if updated anywhere in session
+  window.shareTubeVideoLink = function() {
+    const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
+    const sid = user.share_id || user.mobile || 'AI000004';
+    const shareUrl = `https://aarogyamindia.online/tube.html?ref=${encodeURIComponent(sid)}`;
+
+    // 🎥 Real-time share telemetry record
+    recordLocalPageShare('/tube.html', sid);
+
+    const msg = `📺 *नमस्ते किसान भाई!* 🙏\n\nआरोग्यम इंडिया पर कृषि, पशुपालन, बागवानी और जैविक खेती के बेहतरीन वीडियो और रील्स उपलब्ध हैं।\n\n👉 *नीचे दिए गए विशेष लिंक से वीडियो देखें और चैनल शेयर करें:*\n${shareUrl}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  window.copyTubeVideoLink = function() {
+    const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
+    const sid = user.share_id || user.mobile || 'AI000004';
+    const shareUrl = `https://aarogyamindia.online/tube.html?ref=${encodeURIComponent(sid)}`;
+
+    // 🎥 Real-time share telemetry record
+    recordLocalPageShare('/tube.html', sid);
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert("✓ AarogyamTube वीडियो लिंक क्लिपबोर्ड में कॉपी हो गया!");
+      });
+    } else {
+      const temp = document.createElement('textarea');
+      temp.value = shareUrl;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      alert("✓ AarogyamTube वीडियो लिंक क्लिपबोर्ड में कॉपी हो गया!");
+    }
+  };
+
+  // Safe Re-render wallet card when updated (Direct DOM update — NO recursive init loop)
   window.addEventListener('aoi:wallet_updated', (e) => {
-    const u = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
-    updateUcasWalletCard(u);
+    if (_isUpdatingWalletCard) return;
+    const state = e.detail || (window.AarogyamWallet && window.AarogyamWallet.state) || {};
+    const balEl = document.getElementById('ucas-wallet-balance');
+    const selfEl = document.getElementById('ucas-wallet-self');
+    const refEl = document.getElementById('ucas-wallet-ref');
+    const refCountEl = document.getElementById('ucas-wallet-ref-count');
+    const spentEl = document.getElementById('ucas-wallet-spent');
+
+    if (balEl && typeof state.balance !== 'undefined') balEl.textContent = state.balance;
+    if (selfEl && typeof state.earned_self !== 'undefined') selfEl.textContent = state.earned_self;
+    if (refEl && typeof state.earned_referral !== 'undefined') refEl.textContent = state.earned_referral;
+    if (refCountEl && typeof state.referred_buyers_count !== 'undefined') refCountEl.textContent = state.referred_buyers_count;
+    if (spentEl && typeof state.total_spent !== 'undefined') spentEl.textContent = state.total_spent;
   });
 
   function calculateUcasProfileProgress(user) {
@@ -616,7 +777,7 @@
   let _isRefreshingKPIs = false;
   let _pendingRefresh = false;
 
-  async function refreshDashboardKPIs(startDate = '', endDate = '') {
+  async function refreshDashboardKPIs(startDate = '', endDate = '', forceRefresh = false) {
     if (_isRefreshingKPIs) {
       _pendingRefresh = true;
       return;
@@ -641,73 +802,68 @@
       const results = await Promise.allSettled([
         window.UCAS_DB.getSurveys(profileId),
         window.UCAS_DB.getPhonebook(profileId),
-        window.UCAS_DB.getDirectReferralsWithPurchases(profileId, shareId, startDate, endDate)
+        window.UCAS_DB.getDirectReferralsWithPurchases(profileId, shareId, startDate, endDate, forceRefresh),
+        window.UCAS_DB.getUserShareAnalytics(shareId, profileId, forceRefresh),
+        window.UCAS_DB.resolveUplineSponsor(user.referred_by, shareId)
       ]);
 
       const surveysRes = results[0].status === 'fulfilled' ? results[0].value : { success: false, data: [] };
       const phonebookRes = results[1].status === 'fulfilled' ? results[1].value : { success: false, data: [] };
-      const refRes = results[2].status === 'fulfilled' ? results[2].value : { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 } };
+      const refRes = results[2].status === 'fulfilled' ? results[2].value : { success: false, data: { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0, totalPurchasesCount: 0 } };
+      const shareRes = results[3].status === 'fulfilled' ? results[3].value : { success: false, data: { totalShares: 0, totalClicks: 0, pages: [] } };
+      const uplineSponsor = results[4].status === 'fulfilled' ? results[4].value : { name: 'श्री अवनीश कुमार मिश्रा', phone: '7974422572', shareId: 'AI000004' };
 
       const surveys = surveysRes?.data || [];
       const contacts = phonebookRes?.data || [];
-      const refData = refRes?.data || { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0 };
-
-      // Leads status metadata
-      const leadMetaStore = JSON.parse(localStorage.getItem(`UCAS_LEAD_META_${profileId}`) || '{}');
-      let interested = 0;
-      let converted = 0;
-
-      // Count across surveys
-      surveys.forEach(s => {
-        const meta = leadMetaStore['survey_' + s.id];
-        const status = meta?.status || s.category_answers?.status || 'new';
-        if (status === 'interested' || status === 'followup') interested++;
-        if (status === 'converted') converted++;
-      });
-
-      // Count across phonebook
-      contacts.forEach(p => {
-        const meta = leadMetaStore['pb_' + p.id];
-        const status = meta?.status || 'new';
-        if (status === 'interested' || status === 'followup') interested++;
-        if (status === 'converted') converted++;
-      });
+      const refData = refRes?.data || { referrals: [], totalReferrals: 0, totalPurchaseAmount: 0, totalPurchasesCount: 0 };
+      const shareAnalytics = shareRes?.data || { totalShares: 0, totalClicks: 0, pages: [] };
 
       const totalSurveys = surveys.length;
       const totalContacts = contacts.length;
       const totalLeads = totalSurveys + totalContacts;
-      const totalWebinarAttendees = surveys.filter(s => {
-        const cat = String(s.selected_categories || '');
-        const src = s.category_answers?.source || '';
-        return cat.includes('webinar') || src.includes('webinar');
-      }).length;
 
-      const totalProductLeads = surveys.filter(s => {
-        const cat = String(s.selected_categories || '').toLowerCase();
-        const src = String(s.category_answers?.source || '').toLowerCase();
-        return cat.includes('product') || cat.includes('crop') || src.includes('product');
-      }).length;
+      // 1. Update Core Personal KPI Counter DOM Elements
+      animateCounter('kpi_user_total_shares', shareAnalytics.totalShares || 0);
+      animateCounter('kpi_user_total_clicks', shareAnalytics.totalClicks || 0);
+      animateCounter('kpi_user_total_leads', totalLeads || 0);
 
-      // Update KPI Counter DOM Elements
-      animateCounter('kpi_total_surveys', totalSurveys);
-      animateCounter('kpi_total_contacts', totalContacts);
-      animateCounter('kpi_total_leads', totalLeads);
-      animateCounter('kpi_total_interested', interested);
-      animateCounter('kpi_total_converted', converted);
-      animateCounter('kpi_total_webinar_attendees', totalWebinarAttendees);
-      animateCounter('ucas-kpi-product-leads', totalProductLeads);
-
-      const mktSentEl = document.getElementById('ucas-kpi-marketing-sent');
-      if (mktSentEl) {
-        const localSent = parseInt(localStorage.getItem('UCAS_MARKETING_SENT_COUNT') || '0', 10);
-        animateCounter('ucas-kpi-marketing-sent', localSent);
+      // 6th KPI: AarogyamTube Video Shares & Views (100% REAL dynamic data, no hardcoded baseline)
+      const tubePage = (shareAnalytics.pages || []).find(p => p.pageUrl && p.pageUrl.includes('tube'));
+      const tubeShares = tubePage ? (Number(tubePage.shares) || 0) : 0;
+      const tubeViews = tubePage ? (Number(tubePage.clicks) || 0) : 0;
+      const tubeKpiEl = document.getElementById('kpi_tube_shares_views');
+      if (tubeKpiEl) {
+        tubeKpiEl.innerHTML = `${tubeShares} <span style="font-size:0.8rem;font-weight:700;color:#fca5a5;">शेयर</span> | ${tubeViews} <span style="font-size:0.8rem;font-weight:700;color:#fca5a5;">व्यूज</span>`;
       }
 
-      // Direct Referrals & Purchases Data
+      const isCurrentUserActive = checkIsUserActive(user);
+      updateUcasSubscriptionState(user);
+
+      const dirPurEl = document.getElementById('kpi_direct_purchases');
+      const dirPurSub = document.getElementById('kpi_direct_purchases_sub');
+      const dirRefEl = document.getElementById('kpi_direct_referrals');
+
+      if (!isCurrentUserActive) {
+        if (dirRefEl) dirRefEl.innerHTML = `<span style="filter: blur(4px); user-select: none;">8</span> <span style="font-size:0.65rem; background:#fee2e2; color:#dc2626; padding:1px 6px; border-radius:8px; font-weight:800; vertical-align:middle;">🔒 लॉक</span>`;
+        if (dirPurEl) dirPurEl.innerHTML = `<span style="filter: blur(4px); user-select: none;">₹1,480</span> <span style="font-size:0.65rem; background:#fee2e2; color:#dc2626; padding:1px 6px; border-radius:8px; font-weight:800; vertical-align:middle;">🔒 लॉक</span>`;
+        if (dirPurSub) dirPurSub.textContent = `🔒 अनलॉक करने के लिए ID एक्टिव करें`;
+      } else {
+        animateCounter('kpi_direct_referrals', refData.totalReferrals || 0);
+        if (dirPurEl) dirPurEl.textContent = `₹${refData.totalPurchaseAmount || 0}`;
+        if (dirPurSub) dirPurSub.textContent = `${refData.totalPurchasesCount || refData.referrals.filter(r => r.purchaseCount > 0).length} किताबें बिकीं`;
+      }
+
+      // 2. Render Granular Page-Wise Link & Share Analytics
+      renderPageShareAnalytics(shareAnalytics.pages || [], refData.referrals || [], shareId);
+
+      // 3. Render Pathfinder Viral Auto-Sponsor & Digital Identity Cards
+      renderUcasViralSponsorCards(user, shareId, uplineSponsor);
+
+      // 4. Direct Referrals & Purchases Data
       allLoadedReferrals = refData.referrals || [];
       applyReferralsFilter();
 
-      // Render Recent Activity Feed
+      // 5. Render Recent Activity Feed
       renderRecentActivity(surveys, contacts);
     } catch (e) {
       console.warn('Dashboard KPI refresh error', e);
@@ -719,6 +875,148 @@
       }
     }
   }
+
+  function renderPageShareAnalytics(pages, referrals, shareId) {
+    const container = document.getElementById('ucas-page-share-list');
+    if (!container) return;
+
+    if (!pages || pages.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:1.5rem;color:#64748b;font-size:0.85rem;">
+          📢 आपने अभी तक कोई लिंक शेयर नहीं किया है। नीचे दिए गए बटनों से शेयर करना शुरू करें!
+        </div>
+      `;
+      return;
+    }
+
+    const pageUserMap = {};
+    (referrals || []).forEach(r => {
+      const src = String(r.source || r.registration_source || '').toLowerCase();
+      pages.forEach(p => {
+        const pKey = p.pageUrl.toLowerCase();
+        const slug = pKey.split('/').pop().replace('.html', '');
+        if (src.includes(slug) || (slug.includes('pathfinder') && src.includes('teamfest'))) {
+          if (!pageUserMap[p.pageUrl]) pageUserMap[p.pageUrl] = { members: 0, purchases: 0, books: [] };
+          pageUserMap[p.pageUrl].members++;
+          if (r.purchaseCount > 0) {
+            pageUserMap[p.pageUrl].purchases += r.purchaseCount;
+            if (r.purchases && Array.isArray(r.purchases)) {
+              r.purchases.forEach(pur => {
+                if (pur.book_name && !pageUserMap[p.pageUrl].books.includes(pur.book_name)) {
+                  pageUserMap[p.pageUrl].books.push(pur.book_name);
+                }
+              });
+            }
+          }
+        }
+      });
+    });
+
+    container.innerHTML = pages.map(p => {
+      const matched = pageUserMap[p.pageUrl] || { members: 0, purchases: 0, books: [] };
+      const totalMembersJoined = Math.max(p.registrations || 0, matched.members);
+      const totalBooksBought = Math.max(p.purchases || 0, matched.purchases);
+
+      let bookTag = '';
+      if (matched.books && matched.books.length > 0) {
+        bookTag = `<div style="font-size:0.75rem;color:#059669;margin-top:4px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;"><span>🛍️ बिकी किताबें:</span> ${matched.books.map(b => `<span style="background:#ecfdf5;border:1px solid #a7f3d0;padding:1px 6px;border-radius:4px;font-weight:700;">${b}</span>`).join(' ')}</div>`;
+      } else if (totalBooksBought > 0) {
+        bookTag = `<div style="font-size:0.75rem;color:#059669;margin-top:4px;">🛍️ ${totalBooksBought} किताबें खरीदी गईं</div>`;
+      }
+
+      return `
+        <div class="ucas-pa-item">
+          <div class="ucas-pa-info">
+            <div class="ucas-pa-icon"><i class="${p.icon}"></i></div>
+            <div>
+              <div class="ucas-pa-title">
+                <span>${p.title}</span>
+                <span class="ucas-pa-badge">${p.badge || 'पेज'}</span>
+              </div>
+              <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">
+                <code>${p.pageUrl}</code>
+              </div>
+              ${bookTag}
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div class="ucas-pa-stats">
+              <span class="ucas-pa-stat-pill" title="कुल शेयर">🚀 शेयर: <strong>${p.shares}</strong></span>
+              <span class="ucas-pa-stat-pill" title="कुल लिंक क्लिक्स" style="border-color:#93c5fd;background:#eff6ff;">👆 क्लिक्स: <strong style="color:#1d4ed8;">${p.clicks}</strong></span>
+              <span class="ucas-pa-stat-pill" title="जुड़े सदस्य" style="border-color:#86efac;background:#f0fdf4;">👥 जुड़े: <strong style="color:#15803d;">${totalMembersJoined}</strong></span>
+              <span class="ucas-pa-stat-pill" title="किताब खरीद" style="border-color:#fde047;background:#fefce8;">💰 परचेज: <strong style="color:#b45309;">${totalBooksBought}</strong></span>
+            </div>
+
+            <button type="button" onclick="window.shareSpecificPage('${p.pageUrl}', '${p.title.replace(/'/g, "\\'")}')" style="background:#0f172a;color:#facc15;border:1.5px solid #facc15;padding:6px 14px;border-radius:20px;font-weight:800;font-size:0.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+              <i class="fa-solid fa-share-nodes"></i> <span>शेयर करें</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderUcasViralSponsorCards(user, shareId, sponsor) {
+    const userNameEl = document.getElementById('ucasViralUserName');
+    const userIdentEl = document.getElementById('ucasViralUserIdent');
+    const statusBtnText = document.getElementById('ucasViralStatusBtnText');
+
+    const name = user.full_name || user.name || 'प्रिय सदस्य';
+    const sid = user.share_id || shareId || 'AI000004';
+
+    if (userNameEl) userNameEl.textContent = name;
+    if (userIdentEl) userIdentEl.textContent = `${name} (ID: ${sid})`;
+    if (statusBtnText) statusBtnText.textContent = `✅ आप लॉगिन हैं (${sid})`;
+
+    const spNameEl = document.getElementById('ucasAdvisorName');
+    const spIdEl = document.getElementById('ucasAdvisorId');
+    const spCallBtn = document.getElementById('ucasAdvisorCallBtn');
+    const spWaBtn = document.getElementById('ucasAdvisorWaBtn');
+
+    if (sponsor) {
+      if (spNameEl) spNameEl.textContent = sponsor.name || 'श्री अवनीश कुमार मिश्रा';
+      if (spIdEl) spIdEl.textContent = sponsor.shareId || 'AI000004';
+      if (spCallBtn) spCallBtn.href = `tel:+91${sponsor.phone || '7974422572'}`;
+      if (spWaBtn) {
+        const text = encodeURIComponent(`नमस्ते ${sponsor.name || 'श्री अवनीश कुमार मिश्रा'} जी! मैंने आपका नेट्सर्फ Q3 पाथफाइंडर व आरोग्यम इंडिया प्रोफाइल देखा। मुझे आपके साथ जुड़ने व ऑफर्स की जानकारी चाहिए।`);
+        spWaBtn.href = `https://api.whatsapp.com/send?phone=91${sponsor.phone || '7974422572'}&text=${text}`;
+      }
+    }
+  }
+
+  window.shareSpecificPage = function(pagePath, pageTitle) {
+    const user = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
+    const sid = user.share_id || user.referral_code || 'AI000004';
+    const name = user.full_name || user.name || 'आरोग्यम सहयोगी';
+    const url = `https://aarogyamindia.online${pagePath}?ref=${encodeURIComponent(sid)}`;
+    const text = `🌾 *नमस्ते! मैं ${name} (ID: ${sid}) बोल रहा हूँ।* 🙏\n\nमैंने आरोग्यम इंडिया पर *"${pageTitle}"* देखा। यह किसानों, पशुपालकों व हमारे परिवार के लिए अत्यंत उपयोगी है!\n\n👉 *यहाँ क्लिक करके पूरा विवरण देखें:*\n${url}\n\nधन्यवाद!\n_आरोग्यम इंडिया डिजिटल क्रांति_`;
+
+    if (navigator.share) {
+      navigator.share({ title: pageTitle, text: text, url: url }).catch(() => {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      });
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+  };
+
+  window.shareUcasPersonalIdentity = function() {
+    const user = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
+    const sid = user.share_id || user.referral_code || 'AI000004';
+    const name = user.full_name || user.name || 'आरोग्यम सहयोगी';
+    const phone = user.mobile || '';
+    const shareUrl = `https://aarogyamindia.online/categories/netsurf-pathfinder.html?ref=${encodeURIComponent(sid)}`;
+    const text = `🚀 *नमस्ते! मैं ${name} (ID: ${sid}) बोल रहा हूँ।* 🙏\n\nमेरी अधिकृत डिजिटल शेयरिंग पावर आरोग्यम इंडिया व नेट्सर्फ Q3 पाथफाइंडर (TeamFest) पर एक्टिव है।\n\n👉 *नीचे दिए गए मेरे अधिकृत लिंक से देखें और मुझसे सीधे जुड़ें:*\n${shareUrl}\n\n📞 संपर्क: +91 ${phone}\n_आरोग्यम इंडिया — डिजिटल क्रांति • समृद्ध करियर_`;
+
+    if (navigator.share) {
+      navigator.share({ title: `नेट्सर्फ Q3 पाथफाइंडर — ${name}`, text: text, url: shareUrl }).catch(() => {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      });
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+  };
 
   let allLoadedReferrals = [];
 
@@ -805,10 +1103,18 @@
       filteredPurchases += (Number(r.totalPurchasedAmount) || 0);
     });
 
+    const currentUser = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+    const isUserActive = checkIsUserActive(currentUser);
+
     const dirRefEl = document.getElementById('kpi_direct_referrals');
     const dirPurEl = document.getElementById('kpi_direct_purchases');
-    if (dirRefEl) dirRefEl.textContent = filtered.length;
-    if (dirPurEl) dirPurEl.textContent = `₹${filteredPurchases}`;
+    if (!isUserActive) {
+      if (dirRefEl) dirRefEl.innerHTML = `<span style="filter: blur(4px); user-select: none;">8</span> <span style="font-size:0.65rem; background:#fee2e2; color:#dc2626; padding:1px 6px; border-radius:8px; font-weight:800; vertical-align:middle;">🔒 लॉक</span>`;
+      if (dirPurEl) dirPurEl.innerHTML = `<span style="filter: blur(4px); user-select: none;">₹1,480</span> <span style="font-size:0.65rem; background:#fee2e2; color:#dc2626; padding:1px 6px; border-radius:8px; font-weight:800; vertical-align:middle;">🔒 लॉक</span>`;
+    } else {
+      if (dirRefEl) dirRefEl.textContent = filtered.length;
+      if (dirPurEl) dirPurEl.textContent = `₹${filteredPurchases}`;
+    }
 
     renderProfileReferralsList(filtered);
   }
@@ -831,7 +1137,7 @@
     applyReferralsFilter();
   }
 
-    function formatReferralSourceBadge(sourceStr) {
+  function formatReferralSourceBadge(sourceStr) {
     const s = String(sourceStr || 'direct').toLowerCase();
     if (s.includes('product')) {
       return '<span style="font-size:0.75rem;background:#FEF3C7;color:#B45309;padding:2px 8px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px;"><i class="fa-solid fa-cart-shopping"></i> Product Page</span>';
@@ -861,6 +1167,132 @@
     const container = document.getElementById('ucas-profile-referrals-list');
     if (!container) return;
 
+    // 🔒 ACTIVE USER PRIVACY & ACCESS CONTROL LOGIC
+    const currentUser = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+    const isUserActive = checkIsUserActive(currentUser);
+
+    // If User is Inactive/Free, show dummy blurred list and clickable strip to jump to activation card!
+    if (!isUserActive) {
+      container.innerHTML = `
+        <!-- Clickable Alert Strip (पट्टी) -->
+        <div onclick="document.getElementById('ucas-inactive-subscription-banner')?.scrollIntoView({ behavior: 'smooth', block: 'center' });" style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); color: #ffffff; border: 1.5px solid #ef4444; border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.35rem;">🔒</span>
+            <div>
+              <div style="font-weight: 900; font-size: 0.92rem; color: #fef08a;">
+                आपकी ID इनएक्टिव (Inactive) है! नाम व नंबर अनलॉक करने के लिए ID एक्टिव करें या कस्टमर केयर से संपर्क करें
+              </div>
+              <div style="font-size: 0.78rem; color: #fecaca; margin-top: 2px;">
+                👆 यहाँ क्लिक करें और ऊपर जाकर कोई भी 1 ई-बुक लेकर अपनी ID तुरंत लाइफटाइम एक्टिव करें
+              </div>
+            </div>
+          </div>
+          <span style="background: #ffffff; color: #991b1b; font-weight: 900; font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            ID एक्टिव करें →
+          </span>
+        </div>
+
+        <!-- Realistic Dummy Joined Referrals Table with Blurred Names and Numbers -->
+        <div style="margin-bottom:12px; background:#fff; border:1.5px solid #fed7aa; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.04);">
+          <table style="width:100%; border-collapse:collapse; font-size:0.84rem;">
+            <thead style="background:#fff7ed; border-bottom:1.5px solid #fed7aa;">
+              <tr>
+                <th style="padding:10px 12px; text-align:left; color:#9a3412;">👤 ग्राहक नाम</th>
+                <th style="padding:10px 12px; text-align:left; color:#9a3412;">📞 संपर्क नंबर</th>
+                <th style="padding:10px 12px; text-align:left; color:#9a3412;">🛍️ खरीद स्थिति</th>
+                <th style="padding:10px 12px; text-align:left; color:#9a3412;">🌐 सोर्स</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Row 1 -->
+              <tr style="border-bottom:1px solid #f1f5f9; background:#ffffff;">
+                <td style="padding:10px 12px;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="filter: blur(4px); user-select: none; font-weight:800; color:#0f172a;">रमेश कुमार यादव</span>
+                    <span style="font-size:0.7rem; color:#dc2626;">🔒</span>
+                  </div>
+                  <div style="font-size:0.7rem; color:#94a3b8;">📅 2 घंटे पहले</div>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="filter: blur(4px); user-select: none; font-weight:700; color:#475569;">+91 98261 44520</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#ecfdf5; color:#059669; font-weight:800; font-size:0.74rem; padding:2px 8px; border-radius:8px;">🛍️ 1 ई-बुक (₹99)</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#eff6ff; color:#1d4ed8; font-weight:700; font-size:0.74rem; padding:2px 8px; border-radius:8px;">WhatsApp Share</span>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr style="border-bottom:1px solid #f1f5f9; background:#f8fafc;">
+                <td style="padding:10px 12px;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="filter: blur(4px); user-select: none; font-weight:800; color:#0f172a;">सुरेश सिंह चौहान</span>
+                    <span style="font-size:0.7rem; color:#dc2626;">🔒</span>
+                  </div>
+                  <div style="font-size:0.7rem; color:#94a3b8;">📅 5 घंटे पहले</div>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="filter: blur(4px); user-select: none; font-weight:700; color:#475569;">+91 91223 88063</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#ecfdf5; color:#059669; font-weight:800; font-size:0.74rem; padding:2px 8px; border-radius:8px;">🛍️ 2 ई-बुक्स (₹198)</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#fef2f2; color:#dc2626; font-weight:700; font-size:0.74rem; padding:2px 8px; border-radius:8px;">Tube Share</span>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr style="border-bottom:1px solid #f1f5f9; background:#ffffff;">
+                <td style="padding:10px 12px;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="filter: blur(4px); user-select: none; font-weight:800; color:#0f172a;">दिलीप कुमार पटेल</span>
+                    <span style="font-size:0.7rem; color:#dc2626;">🔒</span>
+                  </div>
+                  <div style="font-size:0.7rem; color:#94a3b8;">📅 कल 3:45 PM</div>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="filter: blur(4px); user-select: none; font-weight:700; color:#475569;">+91 99772 10834</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#f1f5f9; color:#475569; font-weight:700; font-size:0.74rem; padding:2px 8px; border-radius:8px;">फ्री रजिस्टर्ड</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#fffbeb; color:#d97706; font-weight:700; font-size:0.74rem; padding:2px 8px; border-radius:8px;">Landing Page</span>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr style="border-bottom:1px solid #f1f5f9; background:#f8fafc;">
+                <td style="padding:10px 12px;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="filter: blur(4px); user-select: none; font-weight:800; color:#0f172a;">विकास कुमार मौर्य</span>
+                    <span style="font-size:0.7rem; color:#dc2626;">🔒</span>
+                  </div>
+                  <div style="font-size:0.7rem; color:#94a3b8;">📅 2 दिन पहले</div>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="filter: blur(4px); user-select: none; font-weight:700; color:#475569;">+91 88715 62901</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#ecfdf5; color:#059669; font-weight:800; font-size:0.74rem; padding:2px 8px; border-radius:8px;">🛍️ 1 ई-बुक (₹99)</span>
+                </td>
+                <td style="padding:10px 12px;">
+                  <span style="background:#f1f5f9; color:#475569; font-weight:700; font-size:0.74rem; padding:2px 8px; border-radius:8px;">Direct Ref</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="text-align:center;">
+          <a href="/ebooks/my-library.html?tab=available#available" class="ucas-lpg-btn" style="display:inline-flex;">
+            <span>👑</span> <span>कोई भी 1 ई-बुक लेकर फुल कस्टमर लीड्स व नंबर अनलॉक करें →</span>
+          </a>
+        </div>
+      `;
+      return;
+    }
+
     if (!list || list.length === 0) {
       container.innerHTML = `
         <div style="text-align:center;padding:1.5rem;color:var(--text-muted);font-size:0.85rem;background:#F8FAFC;border-radius:var(--radius-md);">
@@ -870,6 +1302,7 @@
       return;
     }
 
+    // ACTIVE USER: Render Full Interactive Table with Book Names & Direct Call/WhatsApp!
     ucasReferralPage = page;
     const totalItems = list.length;
     const totalPages = Math.ceil(totalItems / UCAS_REFERRAL_PAGE_SIZE);
@@ -879,15 +1312,16 @@
 
     container.innerHTML = `
       <div class="ucas-table-wrap" style="border:1px solid var(--border);border-radius:var(--radius-md);overflow-x:auto;">
-        <table class="ucas-table" style="font-size:0.82rem;min-width:600px;">
+        <table class="ucas-table" style="font-size:0.82rem;min-width:700px;">
           <thead>
             <tr>
               <th>#</th>
               <th>सदस्य का नाम</th>
-              <th>मोबाइल</th>
+              <th>मोबाइल / संपर्क</th>
               <th>स्रोत (Source)</th>
-              <th>स्थिति (Status)</th>
-              <th>ज्वाइन तारीख</th>
+              <th>स्थिति</th>
+              <th>जॉइन तारीख</th>
+              <th>खरीदी गई किताब (Book)</th>
               <th>परचेज राशि</th>
             </tr>
           </thead>
@@ -900,6 +1334,14 @@
                 ? '<span style="font-size:0.74rem;background:#DCFCE7;color:#15803D;padding:2px 8px;border-radius:10px;font-weight:800;">🟢 Active (Paid)</span>'
                 : '<span style="font-size:0.74rem;background:#F1F5F9;color:#64748B;padding:2px 8px;border-radius:10px;font-weight:700;">⚪ Inactive (Free)</span>';
 
+              // Books bought by this member
+              let bookDisplay = '<span style="color:#94a3b8;font-size:0.75rem;">कोई खरीद नहीं</span>';
+              if (r.purchases && r.purchases.length > 0) {
+                bookDisplay = r.purchases.map(p => {
+                  return `<div style="font-weight:700;color:#047857;font-size:0.76rem;display:inline-flex;align-items:center;gap:4px;background:#ecfdf5;padding:2px 8px;border-radius:6px;margin:2px 0;border:1px solid #a7f3d0;"><i class="fa-solid fa-book"></i> ${p.book_name || 'ई-बुक'}</div>`;
+                }).join('<br>');
+              }
+
               return `
                 <tr>
                   <td><strong>#${globalIndex}</strong></td>
@@ -908,13 +1350,19 @@
                     ${r.net_surf_id ? `<div style="font-size:0.7rem;color:#0284c7;">NetSurf: ${r.net_surf_id}</div>` : ''}
                   </td>
                   <td>
-                    <a href="tel:${r.mobile}" style="color:var(--primary-dark);font-weight:700;text-decoration:none;">
-                      📞 <code>${r.mobile}</code>
-                    </a>
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                      <a href="tel:${r.mobile}" style="color:var(--primary-dark);font-weight:700;text-decoration:none;" title="कॉल करें">
+                        📞 <code>${r.mobile}</code>
+                      </a>
+                      <a href="https://wa.me/91${r.mobile}?text=${encodeURIComponent('नमस्ते ' + (r.full_name || '') + ' जी! आरोग्यम इंडिया से संपर्क करने के लिए धन्यवाद।')}" target="_blank" style="color:#16a34a;background:#ecfdf5;padding:2px 6px;border-radius:6px;text-decoration:none;font-size:0.75rem;" title="व्हाट्सएप मैसेज">
+                        <i class="fa-brands fa-whatsapp"></i>
+                      </a>
+                    </div>
                   </td>
                   <td>${srcBadge}</td>
                   <td>${statusBadge}</td>
                   <td>${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : '-'}</td>
+                  <td>${bookDisplay}</td>
                   <td>
                     ${r.totalPurchasedAmount > 0 ? `
                       <span style="font-weight:800;color:#15803D;background:#DCFCE7;padding:3px 8px;border-radius:6px;">
@@ -960,6 +1408,27 @@
     const el = document.getElementById(elementId);
     if (!el) return;
 
+    if (typeof targetVal === 'string' && targetVal.startsWith('₹')) {
+      const num = parseInt(targetVal.replace(/[^\d]/g, ''), 10) || 0;
+      const startVal = parseInt(el.textContent.replace(/[^\d]/g, ''), 10) || 0;
+      const duration = 500;
+      const steps = 15;
+      const stepTime = duration / steps;
+      let currentStep = 0;
+
+      const timer = setInterval(() => {
+        currentStep++;
+        const currentVal = Math.round(startVal + (num - startVal) * (currentStep / steps));
+        el.textContent = `₹${currentVal.toLocaleString('en-IN')}`;
+        if (currentStep >= steps) {
+          el.textContent = `₹${num.toLocaleString('en-IN')}`;
+          clearInterval(timer);
+        }
+      }, stepTime);
+      return;
+    }
+
+    const num = parseInt(targetVal, 10) || 0;
     const startVal = parseInt(el.textContent, 10) || 0;
     const duration = 500;
     const steps = 15;
@@ -968,7 +1437,7 @@
 
     const timer = setInterval(() => {
       currentStep++;
-      const currentVal = Math.round(startVal + (targetVal - startVal) * (currentStep / steps));
+      const currentVal = Math.round(startVal + (num - startVal) * (currentStep / steps));
       el.textContent = currentVal;
       if (currentStep >= steps) {
         el.textContent = targetVal;
@@ -983,10 +1452,34 @@
 
     const combined = [];
 
+    // 1. Direct Referrals & Purchases Stream
+    (allLoadedReferrals || []).forEach(r => {
+      if (r.totalPurchasedAmount > 0) {
+        combined.push({
+          type: 'purchase',
+          title: `🛍️ ई-बुक खरीद: ${r.full_name || 'सदस्य'}`,
+          subtitle: `₹${r.totalPurchasedAmount} की खरीद • ${r.purchases && r.purchases[0]?.book_name ? r.purchases[0].book_name : 'ई-बुक'}`,
+          time: r.created_at,
+          icon: 'fa-bag-shopping',
+          badge: 'Purchase'
+        });
+      } else {
+        combined.push({
+          type: 'referral',
+          title: `👥 नया रेफरल सदस्य: ${r.full_name || 'सदस्य'}`,
+          subtitle: `सोर्स: ${r.source || 'Direct'} • ${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : 'हाल ही में'}`,
+          time: r.created_at,
+          icon: 'fa-user-plus',
+          badge: 'Referral'
+        });
+      }
+    });
+
+    // 2. Surveys Stream
     surveys.forEach(s => {
       combined.push({
         type: 'survey',
-        title: `नया सर्वे: ${s.name}`,
+        title: `📋 नया सर्वे: ${s.name}`,
         subtitle: `${s.village || s.district || 'अज्ञात स्थान'} • ${Array.isArray(s.selected_categories) ? s.selected_categories.join(', ') : s.selected_categories}`,
         time: s.created_at,
         icon: 'fa-clipboard-list',
@@ -994,19 +1487,8 @@
       });
     });
 
-    contacts.forEach(c => {
-      combined.push({
-        type: 'contact',
-        title: `संपर्क जोड़ा: ${c.name}`,
-        subtitle: `${c.mobile} • स्रोत: ${c.source}`,
-        time: c.created_at,
-        icon: 'fa-address-book',
-        badge: 'Contact'
-      });
-    });
-
     combined.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
-    const recent = combined.slice(0, 5);
+    const recent = combined.slice(0, 6);
 
     if (recent.length === 0) {
       container.innerHTML = `

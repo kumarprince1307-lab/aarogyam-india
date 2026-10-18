@@ -483,8 +483,12 @@
       if (typeof actionCallback === 'function') actionCallback();
       return;
     }
+    const pageSrc = (typeof window.getGranularPageSource === 'function')
+      ? window.getGranularPageSource()
+      : ('ऑडियो गेट: ' + (document.title ? document.title.split('-')[0].trim() : window.location.pathname));
+
     if (typeof window.openGuestLoginModal === 'function') {
-      window.openGuestLoginModal(actionCallback, { force: true, source: 'AudioShareGate' });
+      window.openGuestLoginModal(actionCallback, { force: true, source: pageSrc });
     } else {
       openSlimLeadModal(actionCallback);
     }

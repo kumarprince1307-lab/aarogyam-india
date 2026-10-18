@@ -348,7 +348,59 @@ export async function initDashboard() {
       return;
     }
 
-    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary, todaysBirthdays } = result.data;
+function renderSakhiDashboardWidget(sakhi) {
+  if (!sakhi) return '';
+  const totalUsers = sakhi.totalUsers || 0;
+  const totalQuestions = sakhi.totalInteractions || 0;
+  const domains = sakhi.domainCounts || {};
+  const topDomainList = Object.entries(domains)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([dom, cnt]) => `<span class="admin-pill" style="background:rgba(22,163,74,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);font-size:0.75rem;">${dom}: <strong>${cnt}</strong></span>`)
+    .join(' ');
+
+  return `
+    <div class="admin-section" id="sakhi-summary-widget" style="background: linear-gradient(135deg, rgba(6,78,59,0.35) 0%, rgba(15,23,42,0.6) 100%); border: 1.5px solid rgba(16,185,129,0.4); border-radius: 16px; padding: 18px 20px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: #15803d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            🌾
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #f8fafc; letter-spacing: -0.2px;">
+              आरोग्यम सखी AI — लाइव अंतर्दृष्टि (Sakhi AI Insights)
+            </h3>
+            <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: #a7f3d0;">
+              24x7 डिजिटल डॉक्टर व किसान सखी परामर्श नेटवर्क
+            </p>
+          </div>
+        </div>
+        <a href="#sakhi-ai-hub" data-route="sakhi-ai-hub" class="admin-button small-button" style="background: #059669; color: #fff; border: none; font-weight: 800; font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <span>पूर्ण सखी हब देखें &rarr;</span>
+        </a>
+      </div>
+
+      <div class="kpi-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 4px;">
+        <div class="kpi-card" style="background: rgba(15,23,42,0.7); border: 1px solid rgba(52,211,153,0.3); border-radius: 12px; padding: 12px 16px;">
+          <div class="kpi-label" style="color: #94a3b8; font-size: 0.75rem; font-weight: 700;">सखी से जुड़े कुल किसान</div>
+          <div class="kpi-value" style="color: #34d399; font-size: 1.5rem; font-weight: 900;">${totalUsers.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="kpi-card" style="background: rgba(15,23,42,0.7); border: 1px solid rgba(56,189,248,0.3); border-radius: 12px; padding: 12px 16px;">
+          <div class="kpi-label" style="color: #94a3b8; font-size: 0.75rem; font-weight: 700;">कुल संवाद / पूछे गए सवाल</div>
+          <div class="kpi-value" style="color: #38bdf8; font-size: 1.5rem; font-weight: 900;">${totalQuestions.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="kpi-card" style="background: rgba(15,23,42,0.7); border: 1px solid rgba(251,191,36,0.3); border-radius: 12px; padding: 12px 16px;">
+          <div class="kpi-label" style="color: #94a3b8; font-size: 0.75rem; font-weight: 700;">प्रमुख परामर्श विषय</div>
+          <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px;">
+            ${topDomainList || '<span style="color:#64748b;font-size:0.75rem;">कृषि, स्वास्थ्य, पशुपालन</span>'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+    const { shareSummary, businessKpis, leadSources, customerJourney, bookSales, recentActivity, todaysCheckoutSummary, todaysBirthdays, sakhiSummary } = result.data;
     
     // Use live data for Share KPIs, with fallbacks
     const shareKpis = [
@@ -368,6 +420,7 @@ export async function initDashboard() {
 
     content.innerHTML = `
       ${renderUcasDetailWidget(ucasSummary)}
+      ${renderSakhiDashboardWidget(sakhiSummary)}
       <div class="admin-section" id="share-summary">
         <div class="admin-section-title">Share Engine Summary</div>
         ${renderKpiGroup(shareKpis)}

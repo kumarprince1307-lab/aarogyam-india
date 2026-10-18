@@ -3843,6 +3843,13 @@
       let pendingGateCallback = null;
 
       window.openTubeGateModal = function(cb) {
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal((userObj) => {
+            if (typeof updateHeaderAuthStatus === 'function') updateHeaderAuthStatus();
+            if (typeof cb === 'function') cb(userObj);
+          }, { source: 'आरोग्यमट्यूब (AarogyamTube)', force: true });
+          return;
+        }
         pendingGateCallback = cb || null;
         const modal = document.getElementById('at_tube_gate_modal');
         const sharerNameEl = document.getElementById('at_gate_sharer_name');
@@ -4193,6 +4200,17 @@
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const userShare = uObj.share_id || refShareId || 'AI000004';
         const shareUrl = `https://aarogyamindia.online/tube.html?playlist=${encodeURIComponent(pl.id)}&ref=${encodeURIComponent(userShare)}`;
+
+        // 🎥 Log share event to telemetry and share_logs
+        try {
+          const list = JSON.parse(localStorage.getItem('AOI_SHARE_TELEMETRY') || '[]');
+          list.push({ page: '/tube.html', url: '/tube.html', share_id: userShare, event_type: 'share', created_at: new Date().toISOString() });
+          localStorage.setItem('AOI_SHARE_TELEMETRY', JSON.stringify(list));
+          if (db && typeof db.from === 'function') {
+            db.from('share_logs').insert([{ share_token: userShare, event_type: 'share', page: '/tube.html', url: shareUrl, created_at: new Date().toISOString() }]).then(() => {}).catch(() => {});
+          }
+        } catch(e) {}
+
         const count = pl.video_ids ? pl.video_ids.length : 0;
         const promoText = `📑 *${pl.title}* (${count} वीडियो श्रृंखला)\n${pl.description ? pl.description + '\n' : ''}AarogyamTube पर पूरी प्लेलिस्ट एक साथ देखें:\n${shareUrl}`;
 
@@ -5398,6 +5416,28 @@
           }
         } catch(e) {}
       }
+
+      // 🎥 Track Incoming Referral Link Visit/Click for AarogyamTube
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const incomingRef = urlParams.get('ref') || urlParams.get('share_id') || urlParams.get('share_token');
+        if (incomingRef) {
+          localStorage.setItem('AI_PENDING_REFERRAL', incomingRef);
+          const clickKey = `tube_clicked_${incomingRef}_${new Date().toDateString()}`;
+          if (!sessionStorage.getItem(clickKey)) {
+            sessionStorage.setItem(clickKey, '1');
+            if (db && typeof db.from === 'function') {
+              db.from('share_logs').insert([{
+                share_token: incomingRef,
+                event_type: 'click',
+                page: '/tube.html',
+                url: window.location.href,
+                created_at: new Date().toISOString()
+              }]).then(() => {}).catch(() => {});
+            }
+          }
+        }
+      } catch(e) {}
 
       // Initialize Tube Platform
       initTubePlatform();

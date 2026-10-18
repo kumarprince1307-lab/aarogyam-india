@@ -1980,11 +1980,18 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   }
 
   function openLoginPopup() {
+    if (typeof window.openGuestLoginModal === 'function') {
+      window.openGuestLoginModal(null, { source: 'खरीफ मास्टर गाइड ई-बुक (Demo)', force: true });
+      return;
+    }
     const popup = document.getElementById('login-popup-overlay');
     if (popup) popup.style.display = 'flex';
   }
 
   function closeLoginPopup() {
+    if (typeof window.closeGuestLoginModal === 'function') {
+      window.closeGuestLoginModal();
+    }
     const popup = document.getElementById('login-popup-overlay');
     if (popup) popup.style.display = 'none';
   }
@@ -1992,7 +1999,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
   function openDemoReaderWithAuth(bookId) {
     const bId = (bookId || 'BK001').toUpperCase();
     const readerDemoUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
-    let isLogged = false;
+    let isLogged = (typeof window.isUserLoggedIn === 'function') ? window.isUserLoggedIn() : false;
     try {
       const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
       if (u && (u.id || u.phone || u.mobile)) isLogged = true;
@@ -2002,8 +2009,14 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     } catch(e) {}
 
     if (!isLogged) {
+      sessionStorage.setItem('AIM_PENDING_DEMO_URL', readerDemoUrl);
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          window.location.href = readerDemoUrl;
+        }, { source: 'खरीफ मास्टर गाइड ई-बुक (Demo)', force: true });
+        return;
+      }
       if (typeof openLoginPopup === 'function') {
-        sessionStorage.setItem('AIM_PENDING_DEMO_URL', readerDemoUrl);
         openLoginPopup();
         return;
       }

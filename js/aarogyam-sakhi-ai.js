@@ -834,7 +834,44 @@
     return modal;
   }
 
-  window.openSakhiAuthModal = function() {
+  window.openSakhiAuthModal = function(callback) {
+    if (typeof window.openGuestLoginModal === 'function') {
+      window.openGuestLoginModal((userObj) => {
+        const officialName = userObj?.name || userObj?.full_name || 'किसान साथी';
+        const rawPhone = userObj?.mobile || userObj?.phone || '';
+        syncUnifiedUserAuth(officialName, rawPhone);
+        updateSakhiHeaderUserBadge();
+        speakResponse(`स्वागत है ${officialName} जी!`);
+
+        const wrap = document.getElementById('sakhiMessagesWrap');
+        if (wrap) {
+          const row = document.createElement('div');
+          row.className = 'sakhi-msg-row bot';
+          row.innerHTML = `
+            <div class="sakhi-msg-bubble" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <span style="font-size:1.4rem;">🎉</span>
+                <div style="font-weight:900;color:#15803d;font-size:1rem;">स्वागत है ${escapeHtml(officialName)} जी!</div>
+              </div>
+              <div style="font-size:0.88rem;color:#334155;line-height:1.5;">
+                आपका WhatsApp नंबर <strong>${escapeHtml(rawPhone)}</strong> सत्यापित हो गया है। अब आप कोई भी सवाल पूछ सकते हैं।
+              </div>
+            </div>
+          `;
+          wrap.appendChild(row);
+          wrap.scrollTop = wrap.scrollHeight;
+        }
+
+        if (pendingUserQuery) {
+          const q = pendingUserQuery;
+          pendingUserQuery = null;
+          setTimeout(() => handleUserSubmit(q), 500);
+        }
+        if (typeof callback === 'function') callback(userObj);
+      }, { source: 'सखी AI (Aarogyam Sakhi)', force: true });
+      return;
+    }
+
     const modal = ensureAuthModalExists();
     if (modal) {
       modal.classList.add('active');
@@ -848,6 +885,9 @@
   };
 
   window.closeSakhiAuthModal = function() {
+    if (typeof window.closeGuestLoginModal === 'function') {
+      window.closeGuestLoginModal();
+    }
     const modal = document.getElementById('sakhiAuthModalBackdrop');
     if (modal) modal.classList.remove('active');
   };
@@ -2142,6 +2182,30 @@
 
         syncUnifiedUserAuth(potentialName, extractedPhone);
         updateSakhiHeaderUserBadge();
+
+        // Ensure Supabase profiles table has this user with referral context
+        (async () => {
+          try {
+            const db = window.dbClient || window.supabase;
+            if (db) {
+              const { data: ex } = await db.from('profiles').select('id, full_name, share_id').eq('mobile', extractedPhone).limit(1).maybeSingle();
+              if (!ex) {
+                const sponsorShareId = (typeof getActiveSponsorShareId === 'function') ? getActiveSponsorShareId() : 'AI000004';
+                await db.from('profiles').insert([{
+                  full_name: potentialName,
+                  mobile: extractedPhone,
+                  share_id: 'AI' + extractedPhone.slice(-6),
+                  referral_code: sponsorShareId,
+                  registration_source: 'सखी AI (Aarogyam Sakhi)',
+                  is_active: true,
+                  profile_complete: false
+                }]);
+              } else if (!ex.full_name && potentialName !== 'किसान साथी') {
+                await db.from('profiles').update({ full_name: potentialName }).eq('id', ex.id);
+              }
+            }
+          } catch (_) {}
+        })();
 
         appendUserMessage(query);
         const successSpeech = `धन्यवाद ${potentialName} जी! आपका नंबर सुरक्षित रूप से सत्यापित हो गया है।`;

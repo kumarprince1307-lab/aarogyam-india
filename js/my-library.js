@@ -1929,4 +1929,21 @@ window.triggerAppInstallFromModal = function() {
     } else {
         alert('ऐप इंस्टॉल करने के लिए अपने ब्राउज़र मेन्यू (⋮) में जाकर "Add to Home screen" चुनें।');
     }
-};
+};
+
+// Auto tab switch on deep link from UCAS / activation card (?tab=available or #available)
+window.addEventListener('DOMContentLoaded', () => {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const hash = window.location.hash || '';
+        if (urlParams.get('tab') === 'available' || hash.includes('available')) {
+            setTimeout(() => {
+                if (typeof window.switchTabAndScroll === 'function') {
+                    window.switchTabAndScroll('available');
+                } else if (typeof switchTab === 'function') {
+                    switchTab('available');
+                }
+            }, 300);
+        }
+    } catch(e) {}
+});
