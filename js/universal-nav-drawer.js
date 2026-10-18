@@ -140,26 +140,69 @@
   // -------------------------------------------------------------
   // 5. MULTI-PLATFORM REFERRAL SHARE ENGINE MODAL (TRANSPARENT 5-BUTTON STACK)
   // -------------------------------------------------------------
-  window.openUniversalShareModal = function (title, text, url) {
-    if (typeof window.triggerViralPageShare === 'function') {
-      window.triggerViralPageShare({ title: title, text: text, url: url });
-      return;
+  window.recordModalShareEvent = function (platform, targetUrl, title) {
+    try {
+      const sId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : 'AI000004';
+      const event = {
+        id: 'sh_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        share_id: sId,
+        platform: platform || 'universal',
+        title: title || document.title || 'Aarogyam India',
+        page: window.location.pathname,
+        url: targetUrl || window.location.href,
+        timestamp: new Date().toISOString()
+      };
+      const shares = JSON.parse(localStorage.getItem('AOI_SHARE_TELEMETRY') || '[]');
+      shares.unshift(event);
+      if (shares.length > 300) shares.pop();
+      localStorage.setItem('AOI_SHARE_TELEMETRY', JSON.stringify(shares));
+
+      if (typeof fetch === 'function') {
+        fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/rpc/increment_share_count', {
+          method: 'POST',
+          headers: {
+            'apikey': 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ p_share_token: sId })
+        }).catch(() => {});
+      }
+    } catch (e) {}
+  };
+
+  window.openUniversalShareModal = function (optionsOrTitle, text, url, image) {
+    let title = '';
+    let targetUrl = '';
+    let customText = '';
+    let customImage = '';
+
+    if (typeof optionsOrTitle === 'object' && optionsOrTitle !== null) {
+      title = optionsOrTitle.title || '';
+      customText = optionsOrTitle.text || '';
+      targetUrl = optionsOrTitle.url || '';
+      customImage = optionsOrTitle.image || optionsOrTitle.thumb || '';
+    } else {
+      title = optionsOrTitle || '';
+      customText = text || '';
+      targetUrl = url || '';
+      customImage = image || '';
     }
 
-    const isLogged = (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function')
-      ? window.V1_SESSION.isLoggedIn()
-      : (typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : false);
+    // 🔒 GUEST GATE: Check if user is logged in before allowing ANY share
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
 
     if (!isLogged) {
       if (typeof window.openGuestLoginModal === 'function') {
         window.openGuestLoginModal(() => {
-          window.openUniversalShareModal(title, text, url);
+          window.openUniversalShareModal(optionsOrTitle, text, url, image);
         }, { force: false, source: 'UniversalShareGate' });
         return;
       }
     }
 
-    const referralUrl = window.generateReferralShareUrl(url);
+    const referralUrl = window.generateReferralShareUrl(targetUrl);
     title = title || document.title || 'Aarogyam India - Digital Agriculture & Healthcare Hub';
     
     let fullShareText = '';
@@ -173,13 +216,29 @@
       fullShareText = (typeof window.getDynamicPanchangShareText === 'function') ? window.getDynamicPanchangShareText() : '';
     }
 
+    // 1. Preserve specialized dynamic engines if no card-specific text was provided
+    if (!customText) {
+      if (curPath.includes('weather') && typeof window.getDynamicWeatherShareText === 'function') {
+        fullShareText = window.getDynamicWeatherShareText();
+      } else if (curPath.includes('mandi') && typeof window.getDynamicMandiShareText === 'function') {
+        fullShareText = window.getDynamicMandiShareText();
+      } else if (curPath.includes('panchang') && typeof window.getDynamicPanchangShareText === 'function') {
+        fullShareText = window.getDynamicPanchangShareText();
+      }
+    }
+
+    // 2. If card-specific, video-specific or disease-specific text was passed, use it directly!
     if (!fullShareText) {
-      if (curPath.includes('weather')) {
+      if (customText && customText.length > 5) {
+        if (customText.includes('http')) {
+          fullShareText = customText;
+        } else {
+          fullShareText = `${customText}\n\n👉 यहाँ से पूरा विवरण देखें:\n${referralUrl}`;
+        }
+      } else if (curPath.includes('weather')) {
         fullShareText = `⛅ *आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी*\n\n👉 अपने क्षेत्र का 7-दिवसीय मौसम, सटीक वर्षा रडार व स्प्रे निर्णय मीटर अभी देखें:\n${referralUrl}\n\n_Aarogyam India — किसानों की सुरक्षा व आत्मनिर्भरता का डिजिटल मंच_`;
       } else if (curPath.includes('mandi')) {
         fullShareText = `📊 *आरोग्यम लाइव दैनिक मंडी भाव बुलेटिन*\n\n👉 अपने नजदीकी मंडी का आज का ताज़ा भाव, आवक व बाजार स्थिति अभी देखें:\n${referralUrl}\n\n_Aarogyam India — आधुनिक खेती, पारदर्शी बाजार_`;
-      } else if (text && text.length > 5 && !text.includes('Digital Agriculture & Healthcare Hub')) {
-        fullShareText = `${text}\n\n👉 मेरे रेफरल लिंक से अभी देखें:\n${referralUrl}`;
       } else {
         fullShareText = `🌾 *${title}*\n\nखेती की सम्पूर्ण ई-बुक्स, 50+ फसल सुरक्षा गाइड, लाइव मंडी भाव व 24×7 AI डॉक्टर समाधान!\n👉 मेरे रेफरल लिंक से अभी देखें:\n${referralUrl}`;
       }
@@ -200,7 +259,7 @@
       <div class="ai-share-buttons-stack" id="ai-share-buttons-stack">
         
         <!-- 1. WhatsApp Button -->
-        <a href="https://api.whatsapp.com/send?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-whatsapp" onclick="window.closeUniversalShareModal()">
+        <a href="https://api.whatsapp.com/send?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-whatsapp" onclick="window.recordModalShareEvent('whatsapp', '${referralUrl}', '${title.replace(/'/g, "\\'")}'); window.closeUniversalShareModal();">
           <div class="ai-share-icon-wrap" style="background:#25D366;color:#fff;">
             <i class="fa-brands fa-whatsapp"></i>
           </div>
@@ -212,7 +271,7 @@
         </a>
 
         <!-- 2. Facebook Button -->
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" class="ai-share-btn-item ch-facebook" onclick="window.closeUniversalShareModal()">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" class="ai-share-btn-item ch-facebook" onclick="window.recordModalShareEvent('facebook', '${referralUrl}', '${title.replace(/'/g, "\\'")}'); window.closeUniversalShareModal();">
           <div class="ai-share-icon-wrap" style="background:#1877F2;color:#fff;">
             <i class="fa-brands fa-facebook-f"></i>
           </div>
@@ -224,7 +283,7 @@
         </a>
 
         <!-- 3. Twitter / X Button -->
-        <a href="https://twitter.com/intent/tweet?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-twitter" onclick="window.closeUniversalShareModal()">
+        <a href="https://twitter.com/intent/tweet?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-twitter" onclick="window.recordModalShareEvent('twitter', '${referralUrl}', '${title.replace(/'/g, "\\'")}'); window.closeUniversalShareModal();">
           <div class="ai-share-icon-wrap" style="background:#000000;color:#fff;">
             <i class="fa-brands fa-x-twitter"></i>
           </div>
@@ -236,7 +295,7 @@
         </a>
 
         <!-- 4. Telegram Button -->
-        <a href="https://t.me/share/url?url=${encodedUrl}&text=${encodedText}" target="_blank" class="ai-share-btn-item ch-telegram" onclick="window.closeUniversalShareModal()">
+        <a href="https://t.me/share/url?url=${encodedUrl}&text=${encodedText}" target="_blank" class="ai-share-btn-item ch-telegram" onclick="window.recordModalShareEvent('telegram', '${referralUrl}', '${title.replace(/'/g, "\\'")}'); window.closeUniversalShareModal();">
           <div class="ai-share-icon-wrap" style="background:#229ED9;color:#fff;">
             <i class="fa-brands fa-telegram"></i>
           </div>
@@ -281,6 +340,7 @@
 
     function performCopy(e) {
       if (e) e.stopPropagation();
+      window.recordModalShareEvent('copylink', referralUrl, title);
       navigator.clipboard.writeText(referralUrl).then(() => {
         if (copyBadge) {
           copyBadge.textContent = '✅ कॉपी हो गया!';
@@ -304,6 +364,42 @@
     copyBadge?.addEventListener('click', performCopy);
   };
 
+  // Direct WhatsApp Share (Preserving UI, enforcing Guest Gate)
+  window.triggerDirectWhatsAppShare = function (optionsOrText, customUrl) {
+    let text = '';
+    let targetUrl = '';
+
+    if (typeof optionsOrText === 'object' && optionsOrText !== null) {
+      text = optionsOrText.text || '';
+      targetUrl = optionsOrText.url || '';
+    } else {
+      text = optionsOrText || '';
+      targetUrl = customUrl || '';
+    }
+
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    if (!isLogged) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          window.triggerDirectWhatsAppShare(optionsOrText, customUrl);
+        }, { force: false, source: 'UniversalShareGate' });
+        return;
+      }
+    }
+
+    const referralUrl = window.generateReferralShareUrl(targetUrl);
+    let finalMsg = text;
+    if (!finalMsg.includes('http')) {
+      finalMsg = `${finalMsg ? finalMsg + '\n\n' : ''}👉 पूरा विवरण यहाँ देखें:\n${referralUrl}`;
+    }
+
+    window.recordModalShareEvent('whatsapp_direct', referralUrl, 'WhatsApp Direct Share');
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(finalMsg)}`, '_blank');
+  };
+
   window.closeUniversalShareModal = function () {
     const overlay = document.getElementById('ai-share-drawer-overlay');
     if (overlay) {
@@ -313,6 +409,11 @@
       }, 250);
     }
   };
+
+  // Universal Exports
+  window.triggerUniversalShare = window.openUniversalShareModal;
+  window.triggerViralPageShare = window.openUniversalShareModal;
+  window.triggerShare = window.openUniversalShareModal;
 
   window.triggerUniversalPageShare = function () {
     const p = window.location.pathname.toLowerCase();

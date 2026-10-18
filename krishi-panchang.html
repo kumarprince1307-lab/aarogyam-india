@@ -2027,24 +2027,52 @@
       return `🕉️ *दैनिक वैदिक सनातन पंचांग एवं शुभ मुहूर्त*\n📅 तारीख: ${p.formattedDate} | विक्रम संवत 2083\n${festLine}\n🌙 *तिथि व पक्ष:* ${p.tithi}\n⭐ *नक्षत्र:* ${p.nakshatra} (स्वामी: ${p.nakshatraLord})\n🌟 *शुभ अभिजीत मुहूर्त:* ${p.abhijitMuhurat}\n⚠️ *राहुकाल (वर्जित समय):* ${p.rahuKaal}\n🔱 *योग:* ${p.yoga} योग\n\n🌾 *किसान बुवाई व फसल सुरक्षा सलाह:* \n${agriSowingDetail}\n\n👶 *आज जन्मे बालक का नामाक्षर:* ${p.childPrediction ? p.childPrediction.namakshar : 'शुभ अक्षर'}\n🎂 *आज का मूलांक/अंक फल:* मूलांक ${p.numerology ? p.numerology.moolank + ' (' + p.numerology.planet + ')' : ''}\n\n⏱️ *दिन-रात का चौघड़िया, 12 महीने का व्रत कैलेंडर व आज का संपूर्ण पंचांग अभी देखें:*\n👉 ${referralUrl}\n\n_Aarogyam India — 100% शुद्ध खगोलीय सूर्य सिद्धांत वैदिक पंचांग_`;
     };
 
+    function checkPanchangAuth(callback) {
+      const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+        ? window.isUserLoggedIn()
+        : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+      if (!isLogged) {
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal(() => {
+            if (typeof callback === 'function') callback();
+          }, { force: false, source: 'PanchangShare' });
+          return false;
+        }
+      }
+      return true;
+    }
+
     window.shareTodayPanchangWhatsApp = function() {
+      if (!checkPanchangAuth(() => window.shareTodayPanchangWhatsApp())) return;
       if (!window.SakhiPanchang) return;
       const p = window.SakhiPanchang.getPanchangForDate(currentPanchangDate);
       const text = window.getDynamicPanchangShareText(p);
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      if (typeof window.recordModalShareEvent === 'function') {
+        const sId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : 'AI000004';
+        window.recordModalShareEvent('whatsapp_direct', window.location.href, 'दैनिक वैदिक सनातन पंचांग');
+      }
       window.open(url, '_blank');
     };
 
-    // Override universal floating share actions on panchang page
+    // Universal floating & header share actions on panchang page (Opens 5-Card Modal with rich dynamic panchang text)
     window.triggerUniversalPageShare = function() {
-      window.shareTodayPanchangWhatsApp();
+      if (!checkPanchangAuth(() => window.triggerUniversalPageShare())) return;
+      const p = window.SakhiPanchang ? window.SakhiPanchang.getPanchangForDate(currentPanchangDate) : null;
+      const text = p ? window.getDynamicPanchangShareText(p) : '';
+      if (typeof window.openUniversalShareModal === 'function') {
+        window.openUniversalShareModal({
+          title: 'दैनिक वैदिक सनातन पंचांग एवं शुभ मुहूर्त',
+          text: text,
+          url: window.location.href
+        });
+      } else {
+        window.shareTodayPanchangWhatsApp();
+      }
     };
-    window.triggerViralPageShare = function() {
-      window.shareTodayPanchangWhatsApp();
-    };
-    window.triggerUniversalShare = function() {
-      window.shareTodayPanchangWhatsApp();
-    };
+    window.triggerViralPageShare = window.triggerUniversalPageShare;
+    window.triggerUniversalShare = window.triggerUniversalPageShare;
 
     document.addEventListener('DOMContentLoaded', () => {
       initHeroSlider();

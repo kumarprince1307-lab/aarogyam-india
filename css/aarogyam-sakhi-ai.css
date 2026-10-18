@@ -284,7 +284,8 @@ body.is-fullscreen .sakhi-chat-window {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible !important;
+  z-index: 1000 !important;
   gap: 8px;
 }
 
@@ -1789,6 +1790,26 @@ body.sakhi-page-body {
   border-color: #ca8a04;
 }
 
+.sakhi-followup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+.sakhi-followup-chip:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* ====================================================================
    CLEAN SPACIOUS MOBILE HEADER & AM USER INITIALS BADGE
    ==================================================================== */
@@ -1891,16 +1912,16 @@ body.sakhi-page-body {
   color: #090d16 !important;
 }
 
-/* Response Section Headers / Titles */
+/* Response Section Headers / Titles - Natural, warm, bold black */
 .sakhi-msg-bubble div[style*="font-weight:900"],
 .sakhi-msg-bubble div[style*="font-weight: 900"],
 .sakhi-msg-bubble h3,
 .sakhi-msg-bubble h4 {
-  font-size: 1.35rem !important;
+  font-size: 1.25rem !important;
   line-height: 1.5 !important;
-  color: #14532d !important;
-  font-weight: 900 !important;
-  margin-bottom: 10px !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  margin-bottom: 8px !important;
 }
 
 /* Sub-headings / Section Highlights */

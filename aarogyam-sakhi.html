@@ -229,25 +229,27 @@
         z-index: 100 !important;
       }
       .sakhi-brand-full {
-        display: none !important;
+        display: inline-block !important;
+        font-size: 1.05rem !important;
       }
       .sakhi-brand-short {
-        display: inline-block !important;
-        font-size: 1.08rem !important;
-      }
-      .sakhi-new-chat-btn {
-        width: 34px !important;
-        height: 34px !important;
-        padding: 0 !important;
-        border-radius: 50% !important;
-        justify-content: center !important;
-      }
-      .sakhi-new-chat-btn .sakhi-btn-text {
         display: none !important;
       }
+      .sakhi-fullscreen-btn {
+        display: none !important;
+      }
+      .sakhi-new-chat-btn {
+        width: auto !important;
+        height: 32px !important;
+        padding: 4px 8px !important;
+        border-radius: 18px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 3px !important;
+      }
       .sakhi-share-btn {
-        width: 34px !important;
-        height: 34px !important;
+        width: 32px !important;
+        height: 32px !important;
         padding: 0 !important;
         border-radius: 50% !important;
         justify-content: center !important;
@@ -325,20 +327,34 @@
             <div class="sakhi-avatar-frame" id="sakhiAvatarFrame">
               <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" onerror="this.src='/images/logo/fevicon.png'" />
             </div>
-            <div class="sakhi-header-info">
-              <h3 class="sakhi-header-brand">
-                <span class="sakhi-brand-full">आरोग्यम सखी AI</span>
-                <span class="sakhi-brand-short">सखी AI</span>
+            <div class="sakhi-header-info" style="min-width:0;flex-shrink:0;">
+              <h3 class="sakhi-header-brand" style="margin:0;display:flex;align-items:center;gap:6px;white-space:nowrap;">
+                <span class="sakhi-brand-full" style="font-weight:900;font-size:1.05rem;color:#0f172a;">सखी AI</span>
+                <span class="sakhi-brand-short" style="font-weight:900;font-size:1.05rem;color:#0f172a;">सखी AI</span>
                 <span class="sakhi-live-dot" title="ऑनलाइन 24×7"></span>
               </h3>
             </div>
           </div>
-          <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:6px;">
-            <div id="sakhiHeaderUserBadgeWrap" style="display:inline-flex;align-items:center;"></div>
-            <button type="button" class="sakhi-new-chat-btn" id="sakhiNewChatBtn" onclick="window.startSakhiNewChat()" title="नई बातचीत">
-              <i class="fa-solid fa-plus"></i>
-              <span class="sakhi-btn-text">नई चैट</span>
-            </button>
+          <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+            <div id="sakhiHeaderUserBadgeWrap" style="display:inline-flex;align-items:center;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+            <!-- Chat Mode Dropdown (New Chat / Old Chat) -->
+            <div class="sakhi-chat-dropdown-wrap" style="position:relative;display:inline-block;flex-shrink:0;">
+              <button type="button" class="sakhi-new-chat-btn" id="sakhiChatModeBtn" onclick="window.toggleSakhiChatMenu()" title="चैट मोड चुनें" style="display:inline-flex;align-items:center;gap:4px;padding:5px 9px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:20px;color:#166534;font-weight:800;font-size:0.80rem;cursor:pointer;white-space:nowrap;">
+                <i class="fa-solid fa-plus" id="sakhiChatModeIcon" style="color:#16a34a;font-size:0.85rem;"></i>
+                <span id="sakhiChatModeLabel">चैट</span>
+                <i class="fa-solid fa-chevron-down" style="font-size:0.62rem;opacity:0.7;"></i>
+              </button>
+              <div id="sakhiChatMenuDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:14px;box-shadow:0 14px 35px rgba(0,0,0,0.25);padding:6px;min-width:185px;z-index:2147483647;">
+                <button type="button" onclick="window.switchSakhiChatView('new')" style="width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:10px;font-size:0.92rem;font-weight:700;color:#0f172a;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                  <i class="fa-solid fa-plus-circle" style="color:#16a34a;font-size:1.05rem;"></i>
+                  <span>नया चैट (डैशबोर्ड)</span>
+                </button>
+                <button type="button" onclick="window.switchSakhiChatView('old')" style="width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:10px;font-size:0.92rem;font-weight:700;color:#0f172a;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                  <i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;font-size:1.05rem;"></i>
+                  <span>पुरानी चैट (इतिहास)</span>
+                </button>
+              </div>
+            </div>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="फुल स्क्रीन">
               <i class="fa-solid fa-expand"></i>
             </button>
@@ -374,10 +390,10 @@
         </div>
 
         <!-- Backdrop for Plus Menu (Closed by default) -->
-        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" style="display:none !important;" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
+        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" style="display:none;" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
 
         <!-- ChatGPT-Style Plus Menu (Opened only when [+] Button is tapped; strictly closed by default) -->
-        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none !important;">
+        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none;">
           <div class="sakhi-plus-menu-header">
             <span>✨ मुख्य विषय व टूल्स चुनें</span>
             <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false); if(event.cancelable) event.preventDefault();" aria-label="बंद करें">&times;</button>
@@ -441,8 +457,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
-  <script src="/js/global-guest-modal.js?v=20261018_v25"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261018_v323"></script>
+  <script src="/js/global-guest-modal.js?v=20261019_v26"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261019_v325"></script>
   <script>
     (function () {
       function lockWindowScroll() {

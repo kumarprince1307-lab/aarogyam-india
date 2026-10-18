@@ -150,7 +150,7 @@
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
-      z-index: 9999999;
+      z-index: 2147483647;
       background: rgba(15, 23, 42, 0.78);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);

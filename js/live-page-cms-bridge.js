@@ -248,12 +248,27 @@
   }
 
   function setupUniversalCarouselController(carouselContainer, totalSlides) {
-    if (!carouselContainer || totalSlides <= 1) return;
+    if (!carouselContainer) return;
 
     // Reset init lock so fresh slides can be controlled cleanly
     delete carouselContainer.dataset.carouselInit;
     const parentSec = carouselContainer.closest('section') || carouselContainer.parentElement;
     if (parentSec) delete parentSec.dataset.carouselInit;
+    const innerContainer = carouselContainer.classList.contains('bighaat-carousel-container')
+      ? carouselContainer
+      : carouselContainer.querySelector('.bighaat-carousel-container');
+    if (innerContainer) delete innerContainer.dataset.carouselInit;
+
+    // Ensure slide 0 is explicitly visible and subsequent slides are hidden
+    const allSlides = carouselContainer.querySelectorAll('.home-hero-slide-item');
+    allSlides.forEach((s, idx) => {
+      s.style.display = (idx === 0) ? 'block' : 'none';
+      if (idx === 0) {
+        s.style.opacity = '1';
+      }
+    });
+
+    if (totalSlides <= 1) return;
 
     // Try global carousel engines first
     if (typeof window.initPanoramicCarousel === 'function') {
@@ -322,10 +337,10 @@
 
   function renderDynamicHeroSlides(pageConfig) {
     if (!Array.isArray(pageConfig.hero_slides) || pageConfig.hero_slides.length === 0) return;
-    const carouselContainer = document.getElementById('ns-hero-carousel') ||
+    const carouselContainer = document.querySelector('.bighaat-carousel-container') ||
+                              document.getElementById('ns-hero-carousel') ||
                               document.getElementById('sec-hero-slider') ||
                               document.getElementById('panchang-admin-hero-slider') ||
-                              document.querySelector('.bighaat-carousel-container') || 
                               document.querySelector('.home-hero-section');
     if (!carouselContainer) return;
 
@@ -354,21 +369,26 @@
       return;
     }
 
+    const slideHost = carouselContainer.classList.contains('bighaat-carousel-container')
+      ? carouselContainer
+      : (carouselContainer.querySelector('.bighaat-carousel-container') || carouselContainer);
+
     // Reset init lock
+    delete slideHost.dataset.carouselInit;
     delete carouselContainer.dataset.carouselInit;
     const parentSec = carouselContainer.closest('section') || carouselContainer.parentElement;
     if (parentSec) delete parentSec.dataset.carouselInit;
 
     // Safety Guard: if all slides only contain placeholder strings like "नया बैनर शीर्षक यहाँ लिखें"
     // and the page already has static slides in HTML, preserve static slides rather than overwriting with placeholder text!
-    const existingSlides = carouselContainer.querySelectorAll('.home-hero-slide-item');
+    const existingSlides = slideHost.querySelectorAll('.home-hero-slide-item');
     const isOnlyPlaceholders = validSlides.every(s => (s.title || '').includes('नया बैनर शीर्षक') && (s.subtitle || '').includes('बैनर का आकर्षक विवरण'));
     if (isOnlyPlaceholders && existingSlides.length > 0) {
-      setupUniversalCarouselController(carouselContainer, existingSlides.length);
+      setupUniversalCarouselController(slideHost, existingSlides.length);
       return;
     }
 
-    // Remove existing slide items
+    // Remove existing slide items cleanly from slideHost
     existingSlides.forEach(el => el.remove());
 
     const isHealthPage = window.location.pathname.includes('/health/');
@@ -420,27 +440,27 @@
         `;
       }
 
-      // Insert before dots if they exist inside container, else append
-      const dotsEl = carouselContainer.querySelector('.bighaat-carousel-dots');
-      if (dotsEl) {
-        carouselContainer.insertBefore(slideDiv, dotsEl);
+      // Safe insertion into slideHost
+      const dotsEl = slideHost.querySelector('.bighaat-carousel-dots');
+      if (dotsEl && dotsEl.parentNode === slideHost) {
+        slideHost.insertBefore(slideDiv, dotsEl);
       } else {
-        carouselContainer.appendChild(slideDiv);
+        slideHost.appendChild(slideDiv);
       }
     });
 
-    const parentScope = carouselContainer.closest('.container') || carouselContainer.parentElement || carouselContainer;
-    let dotsContainer = parentScope.querySelector('.bighaat-carousel-dots') || carouselContainer.querySelector('.bighaat-carousel-dots');
+    const parentScope = slideHost.closest('.container') || slideHost.parentElement || slideHost;
+    let dotsContainer = parentScope.querySelector('.bighaat-carousel-dots') || slideHost.querySelector('.bighaat-carousel-dots');
     if (!dotsContainer && validSlides.length > 1) {
       dotsContainer = document.createElement('div');
       dotsContainer.className = 'bighaat-carousel-dots';
-      carouselContainer.appendChild(dotsContainer);
+      parentScope.appendChild(dotsContainer);
     }
     if (dotsContainer) {
       dotsContainer.innerHTML = validSlides.map((_, i) => `<span class="bighaat-carousel-dot${i === 0 ? ' active' : ''}"></span>`).join('');
     }
 
-    setupUniversalCarouselController(carouselContainer, validSlides.length);
+    setupUniversalCarouselController(slideHost, validSlides.length);
   }
 
   function applySectionReorderingAndVisibility(pageConfig) {

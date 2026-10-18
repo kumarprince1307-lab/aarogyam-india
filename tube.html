@@ -155,6 +155,14 @@
       pointer-events: none !important;
     }
 
+    /* Ensure universal share modal & auth modal always remain visible above cinema and reels */
+    #ai-share-drawer-overlay,
+    .ai-share-drawer-overlay,
+    #ai-universal-auth-modal {
+      z-index: 2147483647 !important;
+      pointer-events: auto !important;
+    }
+
     /* Sticky Top Unit (Header on top, Ticker underneath, Never overlapping) */
     .at-top-sticky-unit {
       position: sticky !important;
@@ -3717,16 +3725,30 @@
       }
 
       function getActiveUplineShareId() {
-        // 1. Priority to URL ref param if provided
+        // 1. Priority to URL ref param if provided by an external sharer
         const urlRef = urlParams.get('ref') || urlParams.get('share_id') || urlParams.get('sponsor');
         if (urlRef && /^AI\d{4,8}$/i.test(urlRef)) {
           try { localStorage.setItem('aim_last_sponsor_id', urlRef); } catch(e) {}
           return urlRef;
         }
 
-        // 2. Persistent upline stored for this logged-in user
+        // 2. If logged in and browsing without external ref, use logged in user's own share ID
         try {
           const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+          const mob = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
+          const cleanMob = mob ? String(mob).replace(/\D/g, '').slice(-10) : '';
+          if (cleanMob.length === 10) {
+            if (aiUser.share_id && /^AI\d{4,8}$/i.test(aiUser.share_id)) {
+              return aiUser.share_id;
+            }
+            if (typeof window.getUserShareId === 'function') {
+              const uId = window.getUserShareId();
+              if (uId && uId !== 'AI000004') return uId;
+            }
+            return 'AI' + cleanMob.slice(-6);
+          }
+
+          // 3. Persistent upline stored for referred users
           if (aiUser.referral_code && /^AI\d{4,8}$/i.test(aiUser.referral_code)) {
             return aiUser.referral_code;
           }
@@ -3744,6 +3766,28 @@
       }
 
       async function fetchSharerDetails(sId) {
+        const urlRef = urlParams.get('ref') || urlParams.get('share_id') || urlParams.get('sponsor');
+
+        // ✅ If user is logged in and not following an external ref link, show logged-in user profile!
+        if (!urlRef) {
+          try {
+            const aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+            const uName = localStorage.getItem('aim_user_name') || aiUser.name || aiUser.full_name;
+            const uMobile = localStorage.getItem('aim_user_mobile') || aiUser.mobile || aiUser.phone;
+            const cleanMob = uMobile ? String(uMobile).replace(/\D/g, '').slice(-10) : '';
+            if (cleanMob.length === 10) {
+              const myData = {
+                full_name: uName || 'आरोग्यम अधिकृत सदस्य',
+                mobile: cleanMob,
+                share_id: aiUser.share_id || ('AI' + cleanMob.slice(-6))
+              };
+              currentSharerProfile = myData;
+              updateSharerUI(myData);
+              return;
+            }
+          } catch (e) {}
+        }
+
         const cleanId = String(sId || getActiveUplineShareId()).trim();
 
         // ✅ EGRESS FIX: Cache sharer profile 24 hours in localStorage (not 10min sessionStorage)
@@ -3765,7 +3809,6 @@
             if (data && (data.full_name || data.mobile)) {
               currentSharerProfile = data;
               try {
-                // Save to localStorage for 24-hour caching (not sessionStorage)
                 localStorage.setItem('aim_sharer_prof_' + cleanId, JSON.stringify({ data: data, _ts: Date.now() }));
               } catch(e) {}
               updateSharerUI(data);
@@ -4194,11 +4237,12 @@
       };
 
       window.sharePlaylist = function (plId) {
+        if (!checkTubeAuth(() => window.sharePlaylist(plId))) return;
         const pl = allPlaylists.find(p => p.id === plId);
         if (!pl) return;
 
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const shareUrl = `https://aarogyamindia.online/tube.html?playlist=${encodeURIComponent(pl.id)}&ref=${encodeURIComponent(userShare)}`;
 
         // 🎥 Log share event to telemetry and share_logs
@@ -4505,7 +4549,7 @@
                 <div class="at-short-play-overlay">
                   <div class="at-short-play-icon"><i class="fa-solid fa-play"></i></div>
                 </div>
-                <button type="button" class="at-card-share-btn" onclick="event.stopPropagation(); window.shareIndividualVideo('${r.id}', '${r.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
+                <button type="button" class="at-card-share-btn" onclick="event.stopPropagation(); window.shareIndividualVideo('${r.id}')" title="शेयर करें">
                   <i class="fa-solid fa-share-nodes"></i>
                 </button>
               </div>
@@ -4719,38 +4763,73 @@
         }, 650);
       }
 
+      function checkTubeAuth(callback) {
+        const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+          ? window.isUserLoggedIn()
+          : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+        if (!isLogged) {
+          if (typeof window.openGuestLoginModal === 'function') {
+            window.openGuestLoginModal(() => {
+              if (typeof callback === 'function') callback();
+            }, { force: false, source: 'AarogyamTube' });
+            return false;
+          }
+        }
+        return true;
+      }
+
       window.shareCurrentReelWhatsApp = function () {
+        if (!checkTubeAuth(() => window.shareCurrentReelWhatsApp())) return;
         const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
         if (!reel) return;
         logVideoActivity('share', reel);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       window.shareCurrentReelNative = function () {
+        if (!checkTubeAuth(() => window.shareCurrentReelNative())) return;
         const reel = activeReelsList[currentReelIndex] || activeReelsList[0];
         if (!reel) return;
         logVideoActivity('share', reel);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
-        if (navigator.share) {
+        if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
           navigator.share({
             title: reel.title,
             text: promoText,
             url: shareUrl
-          }).catch((err) => {
-            if (err && err.name === 'AbortError') return;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          }).catch(() => {
+            if (typeof window.openUniversalShareModal === 'function') {
+              window.openUniversalShareModal({
+                title: reel.title,
+                text: promoText,
+                url: shareUrl,
+                image: reel.thumbnail
+              });
+            }
           });
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          return;
         }
+
+        if (typeof window.openUniversalShareModal === 'function') {
+          window.openUniversalShareModal({
+            title: reel.title,
+            text: promoText,
+            url: shareUrl,
+            image: reel.thumbnail
+          });
+          return;
+        }
+
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
 
@@ -4869,7 +4948,7 @@
                 <div class="at-vcard-play-overlay">
                   <div class="at-vcard-play-icon"><i class="fa-solid fa-play"></i></div>
                 </div>
-                <button type="button" class="at-card-share-btn" onclick="event.stopPropagation(); window.shareIndividualVideo('${v.id}', '${v.title.replace(/'/g, "\\'")}')" title="WhatsApp पर शेयर करें">
+                <button type="button" class="at-card-share-btn" onclick="event.stopPropagation(); window.shareIndividualVideo('${v.id}')" title="शेयर करें">
                   <i class="fa-solid fa-share-nodes"></i>
                 </button>
               </div>
@@ -5286,45 +5365,65 @@
       };
 
       window.shareCurrentMasterclassWhatsApp = function() {
+        if (!checkTubeAuth(() => window.shareCurrentMasterclassWhatsApp())) return;
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
         if (!vid) return;
         logVideoActivity('share', vid);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${vid.title}*\n${vid.description ? vid.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       window.shareCurrentMasterclassNative = function() {
+        if (!checkTubeAuth(() => window.shareCurrentMasterclassNative())) return;
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
         if (!vid) return;
         logVideoActivity('share', vid);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${vid.title}*\n${vid.description ? vid.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
-        if (navigator.share) {
+        if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
           navigator.share({
             title: vid.title,
             text: promoText,
             url: shareUrl
-          }).catch((err) => {
-            if (err && err.name === 'AbortError') return;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          }).catch(() => {
+            if (typeof window.openUniversalShareModal === 'function') {
+              window.openUniversalShareModal({
+                title: vid.title,
+                text: promoText,
+                url: shareUrl,
+                image: vid.thumbnail
+              });
+            }
           });
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
+          return;
         }
+
+        if (typeof window.openUniversalShareModal === 'function') {
+          window.openUniversalShareModal({
+            title: vid.title,
+            text: promoText,
+            url: shareUrl,
+            image: vid.thumbnail
+          });
+          return;
+        }
+
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };
 
       window.copyMasterclassLink = function() {
+        if (!checkTubeAuth(() => window.copyMasterclassLink())) return;
         const vid = currentMasterclassVideo || (allRecordings && allRecordings.find(v => v.format !== 'short_reel' && !v.id.startsWith('VID_S'))) || allRecordings[0];
         if (!vid) return;
         logVideoActivity('share', vid);
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
         navigator.clipboard.writeText(shareUrl).then(() => {
           alert('📋 मास्टरक्लास वीडियो शेयर लिंक कॉपी हो गया!\n' + shareUrl);
@@ -5332,8 +5431,9 @@
       };
 
       window.shareIndividualVideo = function (vidId, vidTitle) {
+        if (!checkTubeAuth(() => window.shareIndividualVideo(vidId, vidTitle))) return;
         const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-        const userShare = uObj.share_id || refShareId || 'AI000004';
+        const userShare = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (uObj.share_id || refShareId || 'AI000004');
         const match = allRecordings.find(x => x.id === vidId) || allRecordings.find(x => extractYoutubeVideoId(x.video_url) === vidId);
         const title = vidTitle || match?.title || 'AarogyamTube Video';
         const desc = match?.description || '';
@@ -5346,6 +5446,34 @@
         const promoText = isShort
           ? `🎬 *${title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`
           : `🎬 *${title}*\n${desc ? desc.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
+
+        if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
+          navigator.share({
+            title: title,
+            text: promoText,
+            url: shareUrl
+          }).catch(() => {
+            if (typeof window.openUniversalShareModal === 'function') {
+              window.openUniversalShareModal({
+                title: title,
+                text: promoText,
+                url: shareUrl,
+                image: match?.thumbnail
+              });
+            }
+          });
+          return;
+        }
+
+        if (typeof window.openUniversalShareModal === 'function') {
+          window.openUniversalShareModal({
+            title: title,
+            text: promoText,
+            url: shareUrl,
+            image: match?.thumbnail
+          });
+          return;
+        }
 
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(promoText)}`, '_blank');
       };

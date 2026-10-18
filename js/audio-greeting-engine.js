@@ -96,6 +96,16 @@
       category: 'प्रमोशनल प्लान',
       text: (name) => `नमस्ते ${name} जी! नेट्सर्फ Q3 पाथफाइंडर और टीमफेस्ट 2026 में आपका स्वागत है। इस फेस्टिव सीजन में नया आई-स्टॉक मात्र ₹25,550 में खोलें, 4-वीक रॉकस्टार बनकर 15% अतिरिक्त इंसेंटिव पाएं, और क्लब सक्षम व अस्मिता द्वारा 1% एक्स्ट्रा पेआउट और 2 रात 3 दिन का लक्ज़री टूर जीतें!`
     },
+    'netsurf': {
+      title: 'नेटसर्फ डायरेक्ट सेलिंग करियर व बिज़नेस हब',
+      category: 'करियर व स्वरोजगार',
+      text: (name) => `नमस्ते ${name} जी! नेटसर्फ डायरेक्ट सेलिंग करियर हब में आपका स्वागत है। यहाँ आपको 26 वर्षों से विश्वसनीय नेटसर्फ के 100% प्राकृतिक बायो-फिट और नेचुरामोरे उत्पाद, ₹8,19,250 की 15-दिवसीय क्लोजिंग पे-आउट और आरोग्यम इंडिया का 100% डिजिटल ऑटोमेशन सिस्टम मिलेगा। करियर प्लान समझें और सीधे संपर्क करें।`
+    },
+    'ucas': {
+      title: 'आरोग्यम UCAS व पार्टनर डैशबोर्ड',
+      category: 'ग्राहक व पार्टनर डैशबोर्ड',
+      text: (name) => `नमस्ते ${name} जी! आरोग्यम इंडिया UCAS पार्टनर डैशबोर्ड में आपका स्वागत है। यहाँ आप अपने सभी शेयर किए गए लिंक्स, लाइव क्लिक्स, डायरेक्ट रेफरल सदस्य, ई-बुक बिक्री और वॉलेट बैलेंस को रियल टाइम में ट्रैक कर सकते हैं। अपनी आईडी एक्टिव रखें और निरंतर प्रगति करें।`
+    },
     'home-care': {
       title: 'नेचुरल होम केयर व टॉक्सिन-मुक्त घर',
       category: 'हर्बल होम सुरक्षा',
@@ -211,7 +221,6 @@
   function stopAudio() {
     userMutedAudio = true;
     try {
-      sessionStorage.setItem('aoi_audio_user_stopped', '1');
       sessionStorage.setItem('aoi_audio_stopped_' + getActivePageKey(), '1');
     } catch (e) {}
 
@@ -243,8 +252,8 @@
   function playAudioGreeting(isAutoPlay = false) {
     if (isAutoPlay) {
       try {
-        if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + getActivePageKey()) === '1') {
-          return; // User explicitly stopped it
+        if (sessionStorage.getItem('aoi_audio_stopped_' + getActivePageKey()) === '1') {
+          return; // User explicitly stopped it on this page
         }
       } catch (e) {}
     } else {
@@ -745,9 +754,13 @@
     }
   };
 
-  // triggerUniversalShare always delegates to triggerViralPageShare
+  // triggerUniversalShare delegates to openUniversalShareModal (5-Card Modal with Auth Gate)
   window.triggerUniversalShare = function (customData) {
-    window.triggerViralPageShare(customData);
+    if (typeof window.openUniversalShareModal === 'function') {
+      window.openUniversalShareModal(customData);
+    } else if (typeof window.triggerViralPageShare === 'function') {
+      window.triggerViralPageShare(customData);
+    }
   };
 
   // Universal KPI Card Audio Player (Hindi Speech Synthesis + Action Gated)
@@ -815,9 +828,7 @@
   // Public APIs
   window.togglePageAudioGreeting = function () {
     if (!isSpeaking) {
-      checkRegistrationGate(() => {
-        playAudioGreeting(false);
-      });
+      playAudioGreeting(false);
     } else {
       stopAudio();
     }
@@ -829,7 +840,8 @@
   function attemptPageAudioAutoPlay() {
     try {
       const pageKey = getActivePageKey();
-      if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + pageKey) === '1') {
+      // Only skip autoplay if the user already clicked stop on THIS specific page
+      if (sessionStorage.getItem('aoi_audio_stopped_' + pageKey) === '1') {
         return;
       }
 
@@ -996,7 +1008,12 @@
     // Auto-play attempt on page load after brief delay
     setTimeout(() => {
       attemptPageAudioAutoPlay();
-    }, 900);
+    }, 700);
+
+    // Stop previous audio immediately on page navigation
+    window.addEventListener('beforeunload', () => {
+      stopAudio();
+    });
   }
 
   if (document.readyState === 'loading') {

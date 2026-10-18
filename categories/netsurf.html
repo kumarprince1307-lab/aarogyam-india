@@ -52,6 +52,7 @@
   <link rel="stylesheet" href="/css/home-revamp.css?v=20260926_v16">
   <link rel="stylesheet" href="/css/netsurf-career.css?v=20260926_v1">
   <link rel="stylesheet" href="/css/premium-mobile-ui.css?v=20261001_v1">
+  <link rel="stylesheet" href="/css/mobile-bottom-nav.css">
 </head>
 <body class="ns-page-wrapper">
 
@@ -1180,15 +1181,33 @@
   <script src="/js/image-lightbox-viewer.js?v=20261001_v1"></script>
   <script>
     window.sharePathfinderFromBanner = function() {
-      const shareId = window.V1_SESSION?.getUserShareId?.() || 'AI000004';
+      const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+        ? window.isUserLoggedIn()
+        : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+      if (!isLogged) {
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal(() => window.sharePathfinderFromBanner(), { force: false, source: 'NetsurfBannerShare' });
+          return;
+        }
+      }
+
+      const shareId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (window.V1_SESSION?.getUserShareId?.() || 'AI000004');
       const shareUrl = `${window.location.origin}/categories/netsurf-pathfinder.html?share_id=${encodeURIComponent(shareId)}`;
       const text = `🎉 *NETSURF Q3 PATHFINDER 2026-27 (TEAMFEST)*\nनया iStock मात्र ₹25,550 में, 4-वीक रॉकस्टार और 2N/3D लक्ज़री टूर!\n\n👉 पूरा प्लान यहाँ देखें:\n${shareUrl}`;
-      if (navigator.share) {
-        navigator.share({ title: 'Netsurf Q3 Pathfinder', text: text, url: shareUrl }).catch(() => {});
-      } else {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+
+      if (typeof window.openUniversalShareModal === 'function') {
+        window.openUniversalShareModal({
+          title: 'Netsurf Q3 Pathfinder',
+          text: text,
+          url: shareUrl
+        });
+        return;
       }
+
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     };
   </script>
+  <script src="/js/audio-greeting-engine.js?v=20261018_v36"></script>
 </body>
 </html>

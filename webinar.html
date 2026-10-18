@@ -1517,11 +1517,27 @@
         });
       };
 
+      function checkWebinarAuth(callback) {
+        const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+          ? window.isUserLoggedIn()
+          : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+        if (!isLogged) {
+          if (typeof window.openGuestLoginModal === 'function') {
+            window.openGuestLoginModal(() => {
+              if (typeof callback === 'function') callback();
+            }, { force: false, source: 'AarogyamWebinar' });
+            return false;
+          }
+        }
+        return true;
+      }
+
       // Helper to generate referral share link
       function getWebinarShareLink() {
         let aiUser = {};
         try { aiUser = JSON.parse(localStorage.getItem('AI_USER') || '{}'); } catch (e) { }
-        const userShareId = localStorage.getItem('aim_user_share_id') || aiUser.share_id || localStorage.getItem('aim_user_mobile') || aiUser.mobile || 'AI000004';
+        const userShareId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (localStorage.getItem('aim_user_share_id') || aiUser.share_id || localStorage.getItem('aim_user_mobile') || aiUser.mobile || 'AI000004');
         return `https://aarogyamindia.online/webinar.html?ref=${encodeURIComponent(userShareId)}`;
       }
 
@@ -1537,33 +1553,32 @@
         return `🔴 *${masterData.title}*\n\n📅 *समय:* ${dateFmt}\n⏱️ *अवधि:* ${masterData.duration_minutes || 60} मिनट\n🎁 *शुल्क:* 100% फ्री लाइव ट्रेनिंग\n\n👉 *मुफ्त ज़ूम सीट बुक करने व लाइव लिंक पाने के लिए क्लिक करें:*\n${shareUrl}\n\n(ज़ूम पासवर्ड व मीटिंग ID वेबिनार समय पर लाइव अनलॉक होगा)\n\n सादर,\n${uName || 'Aarogyam India टीम'}`;
       }
 
-      // 1. WhatsApp Share Button
+      // 1. WhatsApp Share Button (Direct WhatsApp with Auth Gate)
       window.shareWbWhatsApp = function () {
+        if (!checkWebinarAuth(() => window.shareWbWhatsApp())) return;
         const msg = getFullInviteMessage();
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
-      // 2. Native Share Button (All Apps)
-      window.shareWbNative = async function () {
+      // 2. Native Share Button (Opens 5-Card Modal matching screenshot)
+      window.shareWbNative = function () {
+        if (!checkWebinarAuth(() => window.shareWbNative())) return;
         const shareUrl = getWebinarShareLink();
         const msg = getFullInviteMessage();
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: masterData.title,
-              text: msg,
-              url: shareUrl
-            });
-          } catch (e) {
-            // Fallback to whatsapp if cancelled or failed
-          }
-        } else {
-          window.shareWbWhatsApp();
+        if (typeof window.openUniversalShareModal === 'function') {
+          window.openUniversalShareModal({
+            title: masterData.title || 'Aarogyam Webinar',
+            text: msg,
+            url: shareUrl
+          });
+          return;
         }
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
       // 3. Copy Full Invite Message
       window.copyWbFullInvite = function () {
+        if (!checkWebinarAuth(() => window.copyWbFullInvite())) return;
         const msg = getFullInviteMessage();
         navigator.clipboard.writeText(msg).then(() => {
           alert('📋 पूरा वेबिनार निमंत्रण मैसेज कॉपी हो गया है! अब इसे कहीं भी पेस्ट करके शेयर करें।');
@@ -1572,6 +1587,7 @@
 
       // 4. Copy Direct Webinar Share Link
       window.copyWbLink = function () {
+        if (!checkWebinarAuth(() => window.copyWbLink())) return;
         const shareUrl = getWebinarShareLink();
         navigator.clipboard.writeText(shareUrl).then(() => {
           alert('🔗 आपका रेफरल वेबिनार लिंक कॉपी हो गया:\n' + shareUrl);

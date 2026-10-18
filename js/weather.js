@@ -602,25 +602,51 @@
     return `🚨 *किसान मौसम व फसल सुरक्षा बुलेटिन — आरोग्यम इंडिया* 🚨\n\n📍 *क्षेत्र:* ${s.cityName} (${s.stateName})\n\n🌡️ *वर्तमान तापमान:* ${s.temp}°C (महसूस: ${s.feelsLike}°C)\n🌤️ *मौसम की स्थिति:* ${s.condition}\n💧 *हवा में नमी:* ${s.humidity}% | 💨 *हवा की गति:* ${s.windSpeed} km/h\n🌧️ *बारिश संभावना:* ${s.rainProb}%\n\n━━━━━━━━━━━━━━━━━━━━━━━\n${spraySection}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n📅 *आगामी 7 दिनों के अनुसार खेत में क्या करें:*\n${rainAction}\n\n${fungusAlert}\n\n${fertilizerAdvice}\n\n━━━━━━━━━━━━━━━━━━━━━━━\n🌾 *10,000+ प्रगतिशील किसानों का भरोसेमंद मंच!*\n👉 अपने गाँव/तहसील का लाइव मौसम, सटीक 7-दिवसीय पूर्वानुमान, लाइव मंडी भाव, दैनिक कृषि पंचांग व 24×7 AI कृषि डॉक्टर अभी देखें:\n${referralUrl}\n\n_Aarogyam India — आधुनिक खेती, समृद्ध किसान_`;
   };
 
+  function checkWeatherAuth(callback) {
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    if (!isLogged) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          if (typeof callback === 'function') callback();
+        }, { force: false, source: 'WeatherShare' });
+        return false;
+      }
+    }
+    return true;
+  }
+
   window.shareWeatherWhatsApp = function() {
+    if (!checkWeatherAuth(() => window.shareWeatherWhatsApp())) return;
     const text = window.getDynamicWeatherShareText();
     if (!text) return;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    if (typeof window.recordModalShareEvent === 'function') {
+      window.recordModalShareEvent('whatsapp_direct', window.location.href, 'किसान मौसम बुलेटिन');
+    }
     window.open(url, '_blank');
   };
 
-  // Override universal floating share actions only on weather page
+  // Universal floating share actions on weather page (Opens 5-Card Modal with rich dynamic weather text)
   const isWeatherPage = window.location.pathname.toLowerCase().includes('weather') || !!document.getElementById('weatherHeroVisual');
   if (isWeatherPage) {
     window.triggerUniversalPageShare = function() {
-      window.shareWeatherWhatsApp();
+      if (!checkWeatherAuth(() => window.triggerUniversalPageShare())) return;
+      const text = window.getDynamicWeatherShareText();
+      if (typeof window.openUniversalShareModal === 'function') {
+        window.openUniversalShareModal({
+          title: 'किसान मौसम व फसल सुरक्षा बुलेटिन',
+          text: text,
+          url: window.location.href
+        });
+      } else {
+        window.shareWeatherWhatsApp();
+      }
     };
-    window.triggerViralPageShare = function() {
-      window.shareWeatherWhatsApp();
-    };
-    window.triggerUniversalShare = function() {
-      window.shareWeatherWhatsApp();
-    };
+    window.triggerViralPageShare = window.triggerUniversalPageShare;
+    window.triggerUniversalShare = window.triggerUniversalPageShare;
   }
 
   window.useUserCurrentLocation = function() {

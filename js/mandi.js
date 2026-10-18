@@ -414,32 +414,62 @@ window.getDynamicMandiShareText = function() {
   return `📊 *दैनिक लाइव कृषि मंडी भाव बुलेटिन — आरोग्यम इंडिया* 📊\n📅 *दिनांक:* ${todayStr}\n\n🏛️ *प्रमुख मंडियों के ताज़ा मॉडल भाव (प्रति क्विंटल):*\n• *गेहूं (लोकवान / शरबती):* ₹2,580 - ₹2,950 (▲ तेजी)\n• *सोयाबीन (येलो 9560):* ₹4,620 - ₹4,850 (▲ मजबूत)\n• *चना (देशी / कांटा):* ₹6,150 - ₹6,450 (▲ ₹60 तेजी)\n• *सरसों (बोल्ड 42% तेल):* ₹5,420 - ₹5,800 (▲ तेजी)\n• *लहसुन (ऊटी / रियावन):* ₹11,200 - ₹15,500 (▲ बंपर मांग)\n• *प्याज (लाल सुपर):* ₹2,250 - ₹2,600 (● स्थिर)\n\n━━━━━━━━━━━━━━━━━━━━━━━\n🌾 *किसान बाजार सलाह:* \nदलहन, तिलहन व लहसुन में मांग मजबूत है। अपनी उपज बेचने से पहले मंडी भावों की तुलना अवश्य करें। सही समय पर सही मंडी में फसल बेचकर अधिक मुनाफा कमाएं!\n\n━━━━━━━━━━━━━━━━━━━━━━━\n👉 *अपने जिले व नजदीकी मंडी का आज का लाइव भाव, 7-दिवसीय मौसम व कृषि पंचांग देखें:*\n${referralUrl}\n\n_Aarogyam India — आधुनिक खेती, पारदर्शी व्यापार_`;
 };
 
+function checkMandiAuth(callback) {
+  const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+    ? window.isUserLoggedIn()
+    : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+  if (!isLogged) {
+    if (typeof window.openGuestLoginModal === 'function') {
+      window.openGuestLoginModal(() => {
+        if (typeof callback === 'function') callback();
+      }, { force: false, source: 'MandiShare' });
+      return false;
+    }
+  }
+  return true;
+}
+
 window.shareMandiWhatsApp = function() {
+  if (!checkMandiAuth(() => window.shareMandiWhatsApp())) return;
   const text = window.getDynamicMandiShareText();
   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  if (typeof window.recordModalShareEvent === 'function') {
+    window.recordModalShareEvent('whatsapp_direct', window.location.href, 'दैनिक मंडी भाव बुलेटिन');
+  }
   window.open(url, '_blank');
 };
 
-// Override universal floating share actions on Mandi page
+// Universal floating share actions on Mandi page (Opens 5-Card Modal with rich dynamic mandi text)
 const isMandiPage = window.location.pathname.toLowerCase().includes('mandi') || !!document.getElementById('mandiDataGrid');
 if (isMandiPage) {
   window.triggerUniversalPageShare = function() {
-    window.shareMandiWhatsApp();
+    if (!checkMandiAuth(() => window.triggerUniversalPageShare())) return;
+    const text = window.getDynamicMandiShareText();
+    if (typeof window.openUniversalShareModal === 'function') {
+      window.openUniversalShareModal({
+        title: 'दैनिक मंडी भाव बुलेटिन',
+        text: text,
+        url: window.location.href
+      });
+    } else {
+      window.shareMandiWhatsApp();
+    }
   };
-  window.triggerViralPageShare = function() {
-    window.shareMandiWhatsApp();
-  };
-  window.triggerUniversalShare = function() {
-    window.shareMandiWhatsApp();
-  };
+  window.triggerViralPageShare = window.triggerUniversalPageShare;
+  window.triggerUniversalShare = window.triggerUniversalPageShare;
 }
 
 window.shareSpecificMandiBhav = function(encodedItemStr) {
+  if (!checkMandiAuth(() => window.shareSpecificMandiBhav(encodedItemStr))) return;
   try {
     const item = JSON.parse(decodeURIComponent(encodedItemStr));
     const shareId = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : 'AI000004';
     const text = `🌾 *आरोग्यम लाइव मंडी भाव अपडेट*\n📦 फसल: ${item.commodity} (${item.variety})\n🏛️ मंडी: ${item.market}\n📍 जिला: ${item.district} (${item.state})\n\n💰 *मॉडल भाव: ₹${item.modal_price} / क्विंटल*\n📊 न्यूनतम: ₹${item.min_price} | अधिकतम: ₹${item.max_price}\n📈 बाजार स्थिति: ${item.trend === 'up' ? '▲ तेजी' : item.trend === 'down' ? '▼ मंदी' : '● स्थिर'} (${item.change})\n📅 तारीख: ${item.arrival_date}\n\n👉 अपनी फसल व मंडी का लाइव भाव व 7-दिन मौसम देखें:\nhttps://aarogyamindia.online/mandi.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
     
+    if (typeof window.recordModalShareEvent === 'function') {
+      window.recordModalShareEvent('whatsapp_direct', window.location.href, `मंडी भाव: ${item.commodity}`);
+    }
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   } catch (err) {

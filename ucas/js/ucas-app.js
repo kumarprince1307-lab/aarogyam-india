@@ -549,21 +549,41 @@
     }
   }
 
+  function checkUcasShareAuth(callback) {
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    if (!isLogged) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          if (typeof callback === 'function') callback();
+        }, { force: false, source: 'UCAS_Share' });
+        return false;
+      }
+    }
+    return true;
+  }
+
   window.shareUcasReferralLink = function() {
+    if (!checkUcasShareAuth(() => window.shareUcasReferralLink())) return;
     const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
-    const sid = user.share_id || user.mobile || 'AI000004';
+    const sid = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (user.share_id || user.mobile || 'AI000004');
     const shareUrl = `https://aarogyamindia.online/?ref=${encodeURIComponent(sid)}`;
     const msg = `🌾 *नमस्ते किसान भाई!* 🙏\n\nआरोग्यम इंडिया पर कृषि व पशुपालन की सभी ई-बुक्स, फसल डॉक्टर AI और खाद-दवा डायरेक्टरी उपलब्ध हैं।\n\n👉 *नीचे दिए गए विशेष लिंक से जुड़ें और 20% तक की छूट का लाभ उठाएं:*\n${shareUrl}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
+    if (typeof window.recordModalShareEvent === 'function') window.recordModalShareEvent('whatsapp_direct', shareUrl, 'UCAS Referral Link');
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   window.shareTubeVideoLink = function() {
+    if (!checkUcasShareAuth(() => window.shareTubeVideoLink())) return;
     const user = (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
-    const sid = user.share_id || user.mobile || 'AI000004';
+    const sid = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (user.share_id || user.mobile || 'AI000004');
     const shareUrl = `https://aarogyamindia.online/tube.html?ref=${encodeURIComponent(sid)}`;
 
     // 🎥 Real-time share telemetry record
     recordLocalPageShare('/tube.html', sid);
+    if (typeof window.recordModalShareEvent === 'function') window.recordModalShareEvent('whatsapp_direct', shareUrl, 'UCAS Tube Video Link');
 
     const msg = `📺 *नमस्ते किसान भाई!* 🙏\n\nआरोग्यम इंडिया पर कृषि, पशुपालन, बागवानी और जैविक खेती के बेहतरीन वीडियो और रील्स उपलब्ध हैं।\n\n👉 *नीचे दिए गए विशेष लिंक से वीडियो देखें और चैनल शेयर करें:*\n${shareUrl}\n\nधन्यवाद!\n_आरोग्यम इंडिया_`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
@@ -986,36 +1006,44 @@
   }
 
   window.shareSpecificPage = function(pagePath, pageTitle) {
+    if (!checkUcasShareAuth(() => window.shareSpecificPage(pagePath, pageTitle))) return;
     const user = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
-    const sid = user.share_id || user.referral_code || 'AI000004';
+    const sid = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (user.share_id || user.referral_code || 'AI000004');
     const name = user.full_name || user.name || 'आरोग्यम सहयोगी';
     const url = `https://aarogyamindia.online${pagePath}?ref=${encodeURIComponent(sid)}`;
     const text = `🌾 *नमस्ते! मैं ${name} (ID: ${sid}) बोल रहा हूँ।* 🙏\n\nमैंने आरोग्यम इंडिया पर *"${pageTitle}"* देखा। यह किसानों, पशुपालकों व हमारे परिवार के लिए अत्यंत उपयोगी है!\n\n👉 *यहाँ क्लिक करके पूरा विवरण देखें:*\n${url}\n\nधन्यवाद!\n_आरोग्यम इंडिया डिजिटल क्रांति_`;
 
-    if (navigator.share) {
-      navigator.share({ title: pageTitle, text: text, url: url }).catch(() => {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    if (typeof window.openUniversalShareModal === 'function') {
+      window.openUniversalShareModal({
+        title: pageTitle,
+        text: text,
+        url: url
       });
-    } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      return;
     }
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   window.shareUcasPersonalIdentity = function() {
+    if (!checkUcasShareAuth(() => window.shareUcasPersonalIdentity())) return;
     const user = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || {};
-    const sid = user.share_id || user.referral_code || 'AI000004';
+    const sid = (typeof window.getUserShareId === 'function') ? window.getUserShareId() : (user.share_id || user.referral_code || 'AI000004');
     const name = user.full_name || user.name || 'आरोग्यम सहयोगी';
     const phone = user.mobile || '';
     const shareUrl = `https://aarogyamindia.online/categories/netsurf-pathfinder.html?ref=${encodeURIComponent(sid)}`;
     const text = `🚀 *नमस्ते! मैं ${name} (ID: ${sid}) बोल रहा हूँ।* 🙏\n\nमेरी अधिकृत डिजिटल शेयरिंग पावर आरोग्यम इंडिया व नेट्सर्फ Q3 पाथफाइंडर (TeamFest) पर एक्टिव है।\n\n👉 *नीचे दिए गए मेरे अधिकृत लिंक से देखें और मुझसे सीधे जुड़ें:*\n${shareUrl}\n\n📞 संपर्क: +91 ${phone}\n_आरोग्यम इंडिया — डिजिटल क्रांति • समृद्ध करियर_`;
 
-    if (navigator.share) {
-      navigator.share({ title: `नेट्सर्फ Q3 पाथफाइंडर — ${name}`, text: text, url: shareUrl }).catch(() => {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    if (typeof window.openUniversalShareModal === 'function') {
+      window.openUniversalShareModal({
+        title: `नेट्सर्फ Q3 पाथफाइंडर — ${name}`,
+        text: text,
+        url: shareUrl
       });
-    } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      return;
     }
+
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   let allLoadedReferrals = [];

@@ -40,8 +40,20 @@
     lastActiveEntityName: '',
     lastActiveCrop: null,
     lastAnswerSnippet: '',
-    history: []
+    history: [],
+    pendingAction: null,
+    pendingData: null
   };
+
+  function savePersistentSakhiConsultation(domain, topic) {
+    try {
+      localStorage.setItem('SAKHI_LAST_CONSULTATION', JSON.stringify({
+        domain: domain || 'omni',
+        topic: topic || 'सामान्य परामर्श',
+        time: Date.now()
+      }));
+    } catch (_) {}
+  }
 
   // ====================================================================
   // DYNAMIC USER PROFILING & PERSONA MEMORY ENGINE (ZERO EGRESS / ZERO DB)
@@ -694,6 +706,10 @@
       name = getUserPhone() ? 'किसान साथी' : '';
     }
     return name;
+  }
+
+  function getUserDisplayName() {
+    return getUserName() || (typeof getDynamicUserGreetingName === 'function' ? getDynamicUserGreetingName() : '') || 'आरोग्यम साथी';
   }
 
   // Reliable, non-blocking check: if user has logged in anywhere on the website, they are authenticated!
@@ -1668,10 +1684,139 @@
     ], 'business', 'share_with_name_no');
   }
 
+  // =========================================================================
+  // VIRAL WHATSAPP & STATUS HOOK MESSAGE GENERATOR (Category-Aware, Short & Crisp)
+  // =========================================================================
+  const SAKHI_HOOK_REPOSITORY = {
+    agri: [
+      {
+        title: '🌾 जैविक खेती व खाद बचत संदेश',
+        hook: `🌾 *यूरिया-डीएपी का खर्च आधा और पैदावार 25% ज्यादा!* 🌾\n\nक्या आपकी फसल में पीलापन आ रहा है या रासायनिक दवाओं का खर्च बढ़ गया है?\nभारत सरकार द्वारा प्रमाणित बायोफिट जैविक तकनीक से प्रति एकड़ ₹1,500 की सीधी खाद बचत करें।\n\n👉 अपनी फसल की सही डोज व 25% छूट हेतु तुरंत WhatsApp करें:`
+      },
+      {
+        title: '🚜 गेहूं व कल्ले फुटाव संदेश',
+        hook: `🚜 *फसल में 15 से 20 कल्ले (फुटाव) निकालने का वैज्ञानिक राज!* 🌿\n\nमात्र ₹80 प्रति पंप के खर्च में रिकॉर्ड पैदावार पाएं और जमीन की उर्वरक शक्ति बढ़ाएं।\n\n👉 मुफ़्त कृषि सलाह व दवा ऑर्डर सहायता हेतु WhatsApp करें:`
+      },
+      {
+        title: '🛡️ कीट व इल्ली नियंत्रण जैविक संदेश',
+        hook: `🛡️ *बिना जहरीले केमिकल के इल्ली, रसचूसक कीट व फंगस का काल!* 🐛\n\nबायोफिट इनटैक व रैप-अप से फसल की 100% सुरक्षा, बिना किसी साइड इफेक्ट के।\n\n👉 खेत की सुरक्षा सलाह हेतु मुझे WhatsApp पर संदेश भेजें:`
+      }
+    ],
+    health: [
+      {
+        title: '🩺 जोड़ों के दर्द व गठिया संदेश',
+        hook: `🩺 *बिना हानिकारक पेनकिलर के जोड़ों और घुटनों के दर्द से स्थायी राहत!* 🦴\n\nप्राकृतिक आयुर्वेदिक पोषण (नेचुरामोर) से जोड़ों में नई ताकत पाएं। सैकड़ों परिवारों ने राहत पाई है।\n\n👉 व्यक्तिगत सलाह व 25% छूट की जानकारी हेतु मुझे WhatsApp करें:`
+      },
+      {
+        title: '⚡ कमजोरी व नसों की ताकत संदेश',
+        hook: `⚡ *दिनभर की थकान, नसों की कमजोरी और सुस्ती को कहें अलविदा!* 🌿\n\n100% प्राकृतिक शाकाहारी पोषण से शरीर को ऊर्जावान और निरोगी बनाएं।\n\n👉 अपनी सेहत अनुसार सलाह हेतु WhatsApp पर संपर्क करें:`
+      },
+      {
+        title: '🩸 शुगर व बीपी संतुलन संदेश',
+        hook: `🩸 *शुगर व बीपी को प्राकृतिक तरीके से संतुलित रखने का स्वदेशी फॉर्मूला!* 🩺\n\nअस्पताल के भारी खर्च से बचें, मात्र ₹35 रोज के पोषण से परिवार को सुरक्षित रखें।\n\n👉 फ्री सलाह हेतु मुझे WhatsApp पर संदेश भेजें:`
+      }
+    ],
+    pashu: [
+      {
+        title: '🐄 पशुपालन व दूध-फैट बढ़वार संदेश',
+        hook: `🐄 *गाय-भैंस में 1 से 2 लीटर दूध और 1 से 2 फैट बढ़ाने का प्रमाणित फॉर्मूला!* 🥛\n\nबायोफिट CFC से पशु का हाजमा दुरुस्त, शरीर में चमक और हर ब्यांत में समय पर गर्भधारण।\n\n👉 25% छूट व होम डिलीवरी हेतु तुरंत WhatsApp करें:`
+      },
+      {
+        title: '🥛 बांझपन व कमजोरी मुक्ति संदेश',
+        hook: `🐂 *पशु बार-बार फिरता है या कमजोर हो रहा है?* 🌾\n\nदवाओं के महंगे खर्च से बचें, प्राकृतिक मिनरल व विटामिन युक्त CFC आहार देकर दूध व मुनाफा दोनों बढ़ाएं।\n\n👉 घर बैठे मंगाने हेतु WhatsApp करें:`
+      }
+    ],
+    income: [
+      {
+        title: '📱 घर बैठे मोबाइल से कमाई संदेश',
+        hook: `📱 *घर बैठे अपने स्मार्टफोन से रोज़ 1-2 घंटे काम करके ₹15,000 से ₹40,000 मासिक कमाई सीखें!* 💼\n\nकोई दुकान नहीं, कोई बड़ा निवेश नहीं। सीमित 5 सीटों हेतु 'START' लिखकर WhatsApp करें:`
+      },
+      {
+        title: '🌸 महिला स्वावलंबन व सम्मान संदेश',
+        hook: `🌸 *गृहणियां व बहनें घर संभालते हुए बनें आत्मनिर्भर!* 🌸\n\nबिना घर से बाहर निकले, सम्मानजनक और सुरक्षित आयुर्वेदिक ई-टेलर कार्य सीखें।\n\n👉 संपूर्ण जानकारी हेतु मुझे WhatsApp पर संदेश भेजें:`
+      }
+    ],
+    motivational: [
+      {
+        title: '🔥 स्टेटस मोटिवेशनल विचार 1',
+        hook: `🔥 *"अगर आज भी जेब में ₹3,000 की बचत नहीं है, तो हमें काम नहीं, बल्कि काम करने का तरीका बदलना होगा!"* ⏳\n\nजब तक हम शुरुआत नहीं करेंगे, मजबूरी कभी नहीं बदलेगी। आइए मिलकर आत्मनिर्भर बनें!\n\n👉 बातचीत शुरू करने हेतु WhatsApp करें:`
+      },
+      {
+        title: '✨ स्टेटस मोटिवेशनल विचार 2',
+        hook: `✨ *"अकेले काम करोगे तो सीमित आमदनी होगी, टीम के साथ काम करोगे तो समय और पैसा दोनों आपके लिए काम करेंगे!"* 🚀\n\nनेट्सर्फ 2×2 डुप्लीकेशन से 12 महीने में सफलता का अचूक रास्ता सीखें।\n\n👉 सीधे WhatsApp पर मार्गदर्शन लें:`
+      }
+    ]
+  };
+
+  window.renderSakhiHookMessage = function(category = 'agri', idx = 0) {
+    const sName = getDynamicUserGreetingName() || 'दादा अवनीश मिश्रा';
+    let sPhone = '';
+    try {
+      sPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+    } catch (_) {}
+    if (!sPhone || sPhone.length < 10) sPhone = '7974422572';
+
+    const shareId = (typeof getAuthoritativeShareId === 'function') ? getAuthoritativeShareId() : 'AI000004';
+    const domainUrl = `https://aarogyamindia.online/aarogyam-sakhi.html?ref=${encodeURIComponent(shareId)}`;
+
+    const catKey = (category && SAKHI_HOOK_REPOSITORY[category]) ? category : 'agri';
+    const pool = SAKHI_HOOK_REPOSITORY[catKey];
+    const currentIdx = Math.max(0, Math.min(idx, pool.length - 1));
+    const nextIdx = (currentIdx + 1) % pool.length;
+    const item = pool[currentIdx];
+
+    const fullMsg = `${item.hook}\n👤 *संपर्क:* ${sName}\n📱 *कॉल/WhatsApp:* ${sPhone}\n🌐 *ऑनलाइन देखें:* ${domainUrl}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(fullMsg)}`;
+
+    const onScreenResp = `📲 **${item.title}:**\n\n${fullMsg}\n\n👉 यह छोटा और असरदार संदेश आपके नाम **(${sName})** और मोबाइल **(${sPhone})** के साथ तैयार है।\n\n🤔 **क्या आप इसे समझ पाए? क्या आप अपने WhatsApp स्टेटस पर यह लगाना चाहेंगे?**`;
+
+    renderCrispSpecialBox(item.title, onScreenResp, [
+      { text: '📲 सीधे WhatsApp पर शेयर करें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: `👉 अगला हुक संदेश (${nextIdx + 1}/${pool.length})`, query: `हुक संदेश दिखाओ ${catKey} ${nextIdx}` },
+      { text: '🌾 खेती संदेश', query: 'हुक संदेश दिखाओ agri 0' },
+      { text: '🩺 स्वास्थ्य संदेश', query: 'हुक संदेश दिखाओ health 0' },
+      { text: '🐄 पशुपालन संदेश', query: 'हुक संदेश दिखाओ pashu 0' },
+      { text: '💼 पार्ट-टाइम कमाई', query: 'हुक संदेश दिखाओ income 0' },
+      { text: '🔥 स्टेटस विचार', query: 'हुक संदेश दिखाओ motivational 0' }
+    ], 'business', `hook_card_${catKey}_${currentIdx}`);
+    return true;
+  };
+
+  window.renderSakhiScriptByIndex = function(idx = 0) {
+    return window.renderSakhiHookMessage('agri', idx);
+  };
+
   function handlePersonalizedShareIntent(cleanQ, rawQ) {
     const q = (cleanQ || '').toLowerCase();
     const raw = rawQ || cleanQ || '';
 
+    // A. DOSE CHART INSTRUCTION ("तुम मुझे डोज़ चार्ट दो")
+    if (q.includes('डोज़ चार्ट') || q.includes('dose chart') || (q.includes('डोज') && q.includes('चार्ट')) || q.includes('स्प्रे चार्ट')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const doseResp = `📋 **बायोफिट संपूर्ण अवस्थावार स्प्रे व डोज़ चार्ट (प्रति 15L पंप व प्रति एकड़):**\n\n🌾 **1. पहला स्प्रे (फुटाव व विकास — 15 से 25 दिन):**\n• **स्टिमरिच (Stimrich):** 30ml (कल्ले, फुटाव व शाखाओं की संख्या दोगुनी करने हेतु)\n• **शेत (SHET):** 30ml (जड़ विकास व मित्र जीवाणुओं की वृद्धि हेतु)\n• **बायो-99 (Bio-99):** 5ml (दवा को तुरंत पत्तों के आर-पार फैलाने हेतु)\n\n🌸 **2. दूसरा स्प्रे (फूल अवस्था — प्री-फ्लावरिंग):**\n• **स्टिमरिच:** 35ml (फूलों की संख्या बढ़ाने व फूल गिरने से रोकने हेतु)\n• **बायो-99:** 5ml\n*(नोट: फूल अवस्था में शेत स्प्रे में न डालें, सीधे जमीन में दें)*\n\n🌱 **3. तीसरा स्प्रे (फल/दाना भराव अवस्था):**\n• **स्टिमरिच:** 30ml (दाना चमकदार, मोटा व वजनदार बनाने हेतु)\n• **रैप-अप (Wrap-up):** 30ml (फसल को फंगस व मौसम की मार से सुरक्षा हेतु)\n• **बायो-99:** 5ml\n\n💧 **4. मिट्टी उपचार (पहली या दूसरी सिंचाई):**\n• **बायोफिट शेत (SHET):** 1 लीटर प्रति एकड़ पानी के साथ बहाएं या गोबर खाद में मिलाकर दें। यूरिया-डीएपी की 40% तक बचत होगी!`;
+
+      renderCrispSpecialBox('📋 बायोफिट संपूर्ण डोज़ चार्ट', doseResp, [
+        { text: '🌾 4 एकड़ का स्प्रे खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '📲 किसान साथी को पर्ची भेजें', query: 'किसान साथी को भेजने के लिए पर्ची बनाओ' },
+        { text: '🎁 25% छूट पर ऑर्डर कैसे करें', query: 'बायोफिट दवा 25% छूट पर कैसे मंगाएं' }
+      ], 'agri', 'dose_chart_card');
+      return true;
+    }
+
+    // B. NETSURF PLAN DIRECT INSTRUCTION ("तुम मुझे नेट्सर्फ प्लान के बारे में बताओ")
+    if ((q.includes('netsurf') || q.includes('नेट्सर्फ')) && (q.includes('plan') || q.includes('प्लान')) && (q.includes('batao') || q.includes('बताओ') || q.includes('kya hai') || q.includes('क्या है') || q.includes('samjhao') || q.includes('समझाओ'))) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const planResp = `💼 **नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस प्लान — 4 मुख्य स्तंभ:**\n\n1. **उपभोक्ता लाभ (25% फ्लैट छूट):**\n   • किसी भी उत्पाद पर सीधे 25% रिटेल डिस्काउंट।\n   • 5 माह की नियमित खरीद पर 6ठे माह मुफ़्त प्रॉडक्ट (5+1 ऑफर)।\n\n2. **डिजिटल ई-टेलर (बिना टीम ₹15,000+ आय):**\n   • बिना दुकान खोले, मोबाइल से रिटेल बिक्री पर 5% से 15% का साप्ताहिक शुद्ध कमीशन।\n\n3. **टीम टर्नओवर बोनस (3% से 6%):**\n   • 2 टीमों (क्लब 1 व क्लब 2) के टर्नओवर मैचिंग पर बिना किसी लैप्सिंग के लाइफटाइम कैरी-फॉरवर्ड।\n\n4. **पाक्षिक कैपिंग (₹8,19,250 प्रति 15 दिन):**\n   • महीने में 2 बार पे-आउट (15 और 30 तारीख को सीधे बैंक में)। महीने की अधिकतम आय ₹16,38,500 तक!\n\n✨ **सुरक्षा व साख:** 26 वर्षों का बेदाग रिकॉर्ड, कर्ज-मुक्त कंपनी, और भारत सरकार DSIR मान्यता प्राप्त लैब्स।`;
+
+      renderCrispSpecialBox('💼 नेट्सर्फ संपूर्ण बिज़नेस प्लान', planResp, [
+        { text: '🧮 2×2 मैट्रिक्स 12 महीने का गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' },
+        { text: '📋 नए लोगों की लिस्ट कैसे बनाएं', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { text: '📲 प्रोस्पेक्ट को WhatsApp मैसेज भेजें', query: 'नए लोगों को व्हाट्सएप पर क्या मैसेज भेजें' }
+      ], 'business', 'netsurf_plan_overview_card');
+      return true;
+    }
+
+    // C. SHARE REQUEST DETECTION (Flexible Instruction Matching)
     const isShareReq = (
       q.includes('mera nam aur no') || q.includes('mera naam aur no') || q.includes('mera number laga') ||
       q.includes('mere number ke sath') || q.includes('mere naam se') || q.includes('share karne ke liye') ||
@@ -1680,8 +1825,9 @@
       q.includes('mera naam laga do') || q.includes('मेरा नाम और नंबर लगा') || q.includes('शेयर करने के लिए बनाओ') ||
       q.includes('व्हाट्सएप शेयर') || q.includes('नाम नंबर से शेयर') || q.includes('शेयर मैसेज') ||
       q.includes('मेरा नंबर लगा') || q.includes('नंबर लगाकर') || q.includes('नंबर लगा के') ||
-      (q.includes('भेजना है') && (q.includes('नंबर') || q.includes('प्लान') || q.includes('plan') || q.includes('मैसेज'))) ||
-      ((q.includes('दोस्त') || q.includes('मित्र') || q.includes('महिला')) && (q.includes('भेजना') || q.includes('bhejna')) && (q.includes('प्लान') || q.includes('plan') || q.includes('नंबर')))
+      q.includes('सहेली') || q.includes('sahili') || q.includes('saheli') ||
+      (q.includes('भेजना है') && (q.includes('नंबर') || q.includes('नाम') || q.includes('प्लान') || q.includes('plan') || q.includes('मैसेज') || q.includes('दोस्त') || q.includes('सहेली'))) ||
+      ((q.includes('दोस्त') || q.includes('मित्र') || q.includes('महिला') || q.includes('सहेली')) && q.includes('भेजना'))
     );
 
     if (!isShareReq) return false;
@@ -1692,7 +1838,7 @@
       senderName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || localStorage.getItem('SAKHI_USER_NAME') || '';
     } catch (_) {}
     if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') {
-      senderName = 'Aarogyam Master';
+      senderName = 'दादा अवनीश मिश्रा';
     }
 
     let senderPhone = '';
@@ -1703,37 +1849,37 @@
       senderPhone = '7974422572';
     }
 
-    const shareId = getAuthoritativeShareId();
+    const shareId = (typeof getAuthoritativeShareId === 'function') ? getAuthoritativeShareId() : 'AI000004';
     let domainUrl = 'https://aarogyamindia.online/aarogyam-sakhi.html';
     domainUrl += `?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
 
-    // CASE A: Women Empowerment / Mahila Mitra
-    const isMahilaDost = q.includes('महिला') || q.includes('mahila') || q.includes('बहन') || q.includes('गृहणी') || q.includes('housewife') || q.includes('women');
+    // CASE 1: Women Empowerment / Saheli Mitra
+    const isMahilaDost = q.includes('सहेली') || q.includes('sahili') || q.includes('saheli') || q.includes('महिला') || q.includes('mahila') || q.includes('बहन') || q.includes('गृहणी') || q.includes('housewife') || q.includes('women');
     if (isMahilaDost) {
-      const waMsg = `🌸 *नारी शक्ति स्वावलंबन — घर बैठे ₹5,000 से ₹50,000 मासिक कमाई का अवसर* 🌸\n\nनमस्ते सखी! 🙏\n\nघर और परिवार की जिम्मेदारियों को संभालते हुए, क्या आप अपने खाली समय (दिन में 1-2 घंटे) में सिर्फ मोबाइल से ₹5,000 से लेकर ₹50,000+ तक की आत्मनिर्भर आमदनी कमाना चाहती हैं?\n\n✨ *इस अवसर की 5 बड़ी विशेषताएं:*\n1️⃣ *₹0 जॉइनिंग व ₹0 निवेश:* रजिस्ट्रेशन 100% मुफ़्त है, कोई आर्थिक जोखिम नहीं।\n2️⃣ *घर बैठे काम:* कोई दुकान खोलने या बाहर जाने की जरूरत नहीं, अपने फोन से काम करें।\n3️⃣ *100% शुद्ध जैविक व हर्बल उत्पाद:* स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी सप्लीमेंट्स।\n4️⃣ *सम्पूर्ण डिजिटल ट्रेनिंग:* मोबाइल पर पूरी ट्रेनिंग और लगातार मार्गदर्शन मिलेगा।\n5️⃣ *समय की आज़ादी:* अपनी सुविधानुसार काम करें।\n\n👉 *शुरुआत करने व पूरा प्लान समझने के लिए सीधे मुझसे संपर्क करें:*\n👤 *मार्गदर्शक:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *आरोग्यम सखी AI पर प्लान समझें:* ${domainUrl}\n\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्वदेशी अवसर: 26 वर्षों का विश्वास (नेट्सर्फ व आरोग्यम इंडिया)_`;
+      const waMsg = `🌸 *नारी शक्ति स्वावलंबन — घर बैठे ₹5,000 से ₹40,000 मासिक कमाई का अवसर* 🌸\n\nनमस्ते सखी! 🙏\n\nघर-परिवार की जिम्मेदारियों के साथ-साथ, क्या आप अपने खाली समय (दिन में 1-2 घंटे) में सिर्फ मोबाइल से ₹15,000 से ₹40,000+ तक की आत्मनिर्भर आमदनी कमाना चाहती हैं?\n\n✨ *इस अवसर की विशेषताएं:*\n1️⃣ *₹0 जॉइनिंग व ₹0 निवेश:* रजिस्ट्रेशन 100% मुफ़्त है, कोई आर्थिक जोखिम नहीं।\n2️⃣ *घर बैठे काम:* कोई दुकान खोलने की जरूरत नहीं, अपने फोन से काम करें।\n3️⃣ *100% शुद्ध जैविक व हर्बल उत्पाद:* स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी सप्लीमेंट्स।\n4️⃣ *सम्पूर्ण डिजिटल ट्रेनिंग:* मोबाइल पर पूरी ट्रेनिंग और लगातार मार्गदर्शन मिलेगा।\n\n👉 *शुरुआत करने हेतु सीधे WhatsApp पर संपर्क करें:*\n👤 *मार्गदर्शक:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI पर लाइव समझें:* ${domainUrl}`;
 
       const waUrl = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
 
-      const resp = `🌸 **महिला साथी / सखी के लिए WhatsApp आमंत्रण संदेश तैयार है!**\n\nआप इस संदेश को सीधे अपनी महिला मित्रों, बहनों या सहेलियों के साथ एक क्लिक में साझा कर सकती हैं:\n\n\`\`\`text\n${waMsg}\n\`\`\`\n\n👉 जो भी इस संदेश को पढ़कर संपर्क करेगा, वह सीधे **आपके मोबाइल नंबर (${senderPhone})** पर आपसे जुड़ेगा!`;
+      const resp = `🌸 **आपकी सहेली / महिला साथी के लिए WhatsApp संदेश तैयार है:**\n\n${waMsg}\n\n👉 यह संदेश आपके नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** के साथ तैयार है। नीचे दिए गए बटन पर टैप करके सीधे WhatsApp पर भेजें:`;
 
-      renderCrispSpecialBox('🌸 महिला स्वावलंबन WhatsApp शेयर संदेश', resp, [
+      renderCrispSpecialBox('🌸 सहेली हेतु स्वावलंबन WhatsApp संदेश', resp, [
         { text: '📲 सीधे WhatsApp पर शेयर करें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
         { text: '📋 संदेश कॉपी करें', query: 'संदेश कॉपी करो' }
       ], 'business', 'mahila_share_card');
       return true;
     }
 
-    // CASE B: Friend / Associate (e.g. राकेश, मित्र, दोस्त)
-    const isPlanForFriend = q.includes('plan') || q.includes('प्लान') || q.includes('नेटसर्फ') || q.includes('netsurf') || q.includes('नेटवर्क');
+    // CASE 2: Friend / Associate (e.g. राकेश, किसान साथी, दोस्त)
+    const isPlanForFriend = q.includes('plan') || q.includes('प्लान') || q.includes('नेटसर्फ') || q.includes('netsurf') || q.includes('दोस्त') || q.includes('किसान') || q.includes('राकेश');
     if (isPlanForFriend) {
-      const friendName = extractPersonNameFromQuery(raw, cleanQ) || 'मित्र';
-      const waMsg = `💼 *नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व आत्मनिर्भरता प्लान (2026-27)* 💼\n\nनमस्ते ${friendName} जी! 🙏\n\nमैंने आपके लिए भारत की 26 वर्षों से प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग कंपनी 'नेट्सर्फ' का संपूर्ण व्यावसायिक ढाँचा तैयार किया है:\n\n1️⃣ *Consumer (उपभोक्ता लाभ):*\n• सभी जैविक उत्पादों पर 25% फ्लैट छूट\n• 5 महीने की लगातार खरीदारी पर 6ठे महीने मुफ़्त प्रॉडक्ट (Lowest MRP)\n• ₹100 वेलकम वाउचर व ₹4,000+ पर मुफ़्त होम डिलीवरी\n\n2️⃣ *E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):*\n• ₹0 जॉइनिंग, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं\n• 5% से 15% का साप्ताहिक शुद्ध रिटेल कमीशन (सीधे बैंक में)\n• 100 उपभोक्ताओं के साथ हर महीने ₹15,000+ की नियमित आय\n\n3️⃣ *Team Leader (टीम बिज़नेस व कैपिंग):*\n• अनलिमिटेड जनरेशन इनकम (3% से 8% — नो कैपिंग)\n• बाइनरी मैचिंग बोनस (3% से 5% आजीवन कैरी फॉरवर्ड)\n• ₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500 तक अवसर)\n• पारिवारिक सुरक्षा योजना व 100% नॉमिनी अधिकार\n\n👉 *विस्तृत जानकारी व जॉइनिंग सहायता हेतु सीधे मुझसे संपर्क करें:*\n👤 *सलाहकार:* ${senderName}\n📱 *मोबाइल:* ${senderPhone}\n🌐 *आरोग्यम सखी AI पर लाइव प्लान देखें:* ${domainUrl}\n\n━━━━━━━━━━━━━━━━━━━━\n_नोट: सभी आय और प्रोजेक्शन उदाहरण मात्र हैं, कमाई की गारंटी नहीं। वास्तविक लाभ कंपनी नियमों व व्यक्ति के प्रयास पर निर्भर करता है।_`;
+      const friendName = (typeof extractPersonNameFromQuery === 'function' ? extractPersonNameFromQuery(raw, cleanQ) : '') || 'मित्र';
+      const waMsg = `💼 *नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व आत्मनिर्भरता प्लान (2026-27)* 💼\n\nनमस्ते ${friendName} जी! 🙏\n\nमैंने आपके लिए भारत की 26 वर्षों से प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग कंपनी 'नेट्सर्फ' का संपूर्ण व्यावसायिक अवसर तैयार किया है:\n\n1️⃣ *Consumer (उपभोक्ता लाभ):*\n• सभी जैविक उत्पादों पर 25% फ्लैट छूट\n• 5 महीने की लगातार खरीदारी पर 6ठे महीने मुफ़्त प्रॉडक्ट (Lowest MRP)\n• ₹100 वेलकम वाउचर व ₹4,000+ पर मुफ़्त होम डिलीवरी\n\n2️⃣ *E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):*\n• ₹0 जॉइनिंग, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं\n• 5% से 15% का साप्ताहिक शुद्ध रिटेल कमीशन\n• 100 उपभोक्ताओं के साथ हर महीने ₹15,000+ की नियमित आय\n\n3️⃣ *Team Leader (टीम बिज़नेस व कैपिंग):*\n• बाइनरी मैचिंग बोनस आजीवन कैरी फॉरवर्ड\n• ₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500 तक अवसर)\n• पारिवारिक सुरक्षा योजना व 100% नॉमिनी अधिकार\n\n👉 *विस्तृत जानकारी हेतु सीधे मुझसे संपर्क करें:*\n👤 *सलाहकार:* ${senderName}\n📱 *मोबाइल:* ${senderPhone}\n🌐 *ऑनलाइन देखें:* ${domainUrl}`;
 
       const waUrl = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
 
-      const resp = `💼 **श्री ${friendName} जी के लिए नेट्सर्फ बिज़नेस शेयर संदेश तैयार है!**\n\nआप इस संदेश को सीधे अपने मित्र ${friendName} जी को WhatsApp पर भेज सकते हैं:\n\n\`\`\`text\n${waMsg}\n\`\`\`\n\n👉 आपके मित्र को सीधे आपका नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** दिखेगा!`;
+      const resp = `💼 **श्री ${friendName} जी के लिए बिज़नेस शेयर संदेश तैयार है:**\n\n${waMsg}\n\n👉 आपके मित्र को सीधे आपका नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** दिखेगा:`;
 
-      renderCrispSpecialBox(`💼 ${friendName} जी के लिए बिज़नेस शेयर संदेश`, resp, [
+      renderCrispSpecialBox(`💼 ${friendName} जी के लिए शेयर संदेश`, resp, [
         { text: `📲 ${friendName} जी को WhatsApp भेजें`, url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
         { text: '📋 संदेश कॉपी करें', query: 'संदेश कॉपी करो' }
       ], 'business', 'friend_plan_share_card');
@@ -2000,67 +2146,18 @@
     }
   }
 
-  // 10.5 DYNAMIC 1-TAP SMART CONTEXTUAL PILLS (Zero Typing, 1-Thumb Interaction)
+  // 10.5 DYNAMIC 1-TAP SMART CONTEXTUAL PILLS (Permanently Hidden per User Request)
   function updateSmartContextualPills(htmlText) {
     const container = document.getElementById('sakhiSmartPillsContainer');
-    if (!container) return;
-
-    const lower = (htmlText || '').toLowerCase();
-    const domain = sakhiConversationState.lastActiveDomain || 'agri';
-
-    let pills = [];
-
-    if (lower.includes('पर्ची') || lower.includes('दोस्त') || lower.includes('मित्र')) {
-      pills = [
-        { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '💦 दूसरा स्प्रे कब करें?', query: 'दूसरा स्प्रे कब और कैसे करें' },
-        { text: '📲 एक और पर्ची बनाएं', query: 'दोस्त के 5 एकड़ के लिए पर्ची बनाओ' }
-      ];
-    } else if (lower.includes('खर्च') || lower.includes('एस्टीमेट') || lower.includes('रुपये') || lower.includes('पंप')) {
-      pills = [
-        { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '🌾 5 एकड़ का हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '📲 किसान साथी को पर्ची भेजें', query: 'किसान साथी के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' },
-        { text: '🌱 अवस्थावार स्प्रे चार्ट', query: 'गेहूं, सरसों और चना का संपूर्ण स्प्रे शेड्यूल दिखाइए' }
-      ];
-    } else if (domain === 'pashu' || lower.includes('भैंस') || lower.includes('गाय') || lower.includes('दूध') || lower.includes('फैट')) {
-      pills = [
-        { text: '🥛 2 भैंस का पेट-वेट खर्च', query: '2 भैंस के लिए पेट वेट का खर्च कितना आएगा' },
-        { text: '🧈 फैट 1 डिग्री कैसे बढ़ाएं?', query: 'गाय-भैंस का फैट और एसएनएफ कैसे बढ़ाएं' },
-        { text: '🐄 रिपीट ब्रीडिंग व बांझपन', query: 'गाय भैंस बार बार हीट में आती है गाभिन नहीं ठहरती' },
-        { text: '📲 डेयरी वाले साथी को पर्ची भेजें', query: 'डेयरी वाले दोस्त के लिए पेट वेट की पर्ची बनाओ' }
-      ];
-    } else if (domain === 'health' || lower.includes('दर्द') || lower.includes('शुगर') || lower.includes('घुटने')) {
-      pills = [
-        { text: '💊 1 महीने का स्वास्थ्य खर्च', query: 'नेचुरामोर जॉइंट केयर और डिटॉक्स का 1 महीने का खर्च कितना है' },
-        { text: '🦴 जोड़ों का दर्द राहत उपाय', query: 'जोड़ों का दर्द और घुटनों के दर्द का कारण व इलाज' },
-        { text: '🌿 पहले 15 दिन डिटॉक्स', query: 'ईजी डिटॉक्स कैसे लें और क्या फायदा है' },
-        { text: '📲 मित्र को स्वास्थ्य पर्ची भेजें', query: 'दोस्त के लिए जोड़ों के दर्द की पर्ची बनाओ' }
-      ];
-    } else if (domain === 'beauty' || lower.includes('झाइयां') || lower.includes('बाल') || lower.includes('चेहरा')) {
-      pills = [
-        { text: '✨ स्पॉट इरेज़र लगाने की विधि', query: 'स्पॉट इरेज़र क्रीम के फायदे और लगाने का तरीका' },
-        { text: '💇‍♀️ बाल झड़ना रोकथाम', query: 'बाल झड़ने से रोकने का उपाय' },
-        { text: '💆‍♀️ घरेलू उबटन नुस्खा', query: 'चेहरे की झाइयां और झुर्रियां मिटाने का घरेलू नुस्खा' },
-        { text: '📲 सहेली को पर्ची भेजें', query: 'सहेली के लिए झाइयों की पर्ची बनाओ' }
-      ];
-    } else {
-      // Default Agri Pills
-      pills = [
-        { text: '🌾 4 एकड़ का खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '💦 दूसरा स्प्रे कब करें?', query: 'दूसरा स्प्रे कब और कैसे करें' },
-        { text: '🐛 माहू व कीट नियंत्रण', query: 'सरसों में माहू और चेपा का इलाज' },
-        { text: '📲 किसान साथी को पर्ची भेजें', query: 'किसान साथी के 4 एकड़ में स्टिमरिच बायो 99 और शेत का कितना लगेगा मुझे बताओ मुझे उसे भेजना है' }
-      ];
+    if (container) {
+      container.style.display = 'none';
+      container.innerHTML = '';
     }
-
-    container.innerHTML = pills.map((p, idx) => {
-      const cls = idx === 0 ? 'sakhi-smart-pill pill-gold' : (idx === pills.length - 1 ? 'sakhi-smart-pill pill-accent' : 'sakhi-smart-pill');
-      return `<button type="button" class="${cls}" onclick="window.askSakhiQuick('${escapeHtml(p.query)}')"><span>${escapeHtml(p.text)}</span> →</button>`;
-    }).join('');
-
-    container.style.display = 'flex';
+    const bar = document.getElementById('sakhiSmartPillsBar');
+    if (bar) {
+      bar.style.display = 'none';
+      bar.innerHTML = '';
+    }
   }
 
   // 11. GREETING & INITIALIZATION
@@ -2080,10 +2177,10 @@
     let historyToolbar = '';
     if (hasHistory) {
       historyToolbar = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed #cbd5e1;">
-          <span style="font-size:0.76rem;color:#64748b;font-weight:700;"><i class="fa-solid fa-clock-rotate-left"></i> आपकी पिछली बातचीत सुरक्षित है</span>
-          <button type="button" onclick="window.clearSakhiChatHistory()" title="चैट हिस्ट्री साफ करें और नया सत्र शुरू करें" style="background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c;padding:3px 9px;border-radius:14px;font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-            <i class="fa-solid fa-trash-can"></i> <span>नई चैट</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px dashed #cbd5e1;">
+          <span style="font-size:0.78rem;color:#475569;font-weight:700;"><i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;"></i> आपकी पिछली बातचीत (${savedLog.length}) सुरक्षित है</span>
+          <button type="button" onclick="window.switchSakhiChatView('old')" title="पुरानी बातचीत देखें" style="background:#eff6ff;border:1.5px solid #93c5fd;color:#1d4ed8;padding:5px 12px;border-radius:14px;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+            <i class="fa-solid fa-clock-rotate-left"></i> <span>इतिहास देखें</span>
           </button>
         </div>
       `;
@@ -2091,7 +2188,7 @@
 
     wrap.innerHTML = `
       <div class="sakhi-msg-row bot">
-        <div class="sakhi-msg-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+        <div class="sakhi-msg-bubble" style="background:#ffffff;border:1.5px solid #86efac;border-radius:20px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
             <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2.5px solid #16a34a;box-shadow:0 2px 10px rgba(22,163,74,0.35);" onerror="this.src='/images/logo/fevicon.png'">
             <div>
@@ -2099,8 +2196,6 @@
               <div style="font-size:1.05rem;color:#166534;font-weight:700;">${subGreeting}</div>
             </div>
           </div>
-
-
 
           <!-- Clean ChatGPT-style Prompt Guide -->
           <div style="display:inline-flex;align-items:center;gap:8px;font-size:1.02rem;color:#15803d;font-weight:800;background:#f0fdf4;padding:10px 16px;border-radius:24px;border:1.5px solid #bbf7d0;">
@@ -2112,36 +2207,123 @@
       </div>
     `;
 
-    // Restore saved chat history bubbles
-    if (hasHistory) {
-      savedLog.forEach(item => {
-        const itemTime = item.time || Date.now();
-        ensureDateSeparator(wrap, itemTime);
-        const row = document.createElement('div');
-        if (item.role === 'user') {
-          row.className = 'sakhi-msg-row user';
-          row.innerHTML = `
-            <div class="sakhi-msg-bubble user-bubble">
-              ${escapeHtml(item.content)}
-              <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(itemTime)}</div>
-            </div>`;
-        } else {
-          row.className = 'sakhi-msg-row bot';
-          row.innerHTML = `
-            <div class="sakhi-msg-bubble">
-              ${item.content}
-              <div class="sakhi-msg-time" style="font-size:0.68rem;color:#94a3b8;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:600;">
-                <span>${formatMsgTime(itemTime)}</span>
-                <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
-              </div>
-            </div>`;
+    // DO NOT DUMP SAVED LOG AUTOMATICALLY! Keep dashboard clean and fresh!
+    updateSakhiHeaderUserBadge();
+  }
+
+  // CHAT MODE DROPDOWN & VIEW SWITCHER (Fresh Dashboard vs Old Chat Log)
+  window.toggleSakhiChatMenu = function (forceState) {
+    const dropdown = document.getElementById('sakhiChatMenuDropdown');
+    if (!dropdown) return;
+    const isVisible = dropdown.style.display === 'block';
+    const shouldShow = (typeof forceState === 'boolean') ? forceState : !isVisible;
+    dropdown.style.display = shouldShow ? 'block' : 'none';
+  };
+
+  if (!window._sakhiChatMenuOutsideBound) {
+    window._sakhiChatMenuOutsideBound = true;
+    document.addEventListener('click', function(e) {
+      const wrap = document.querySelector('.sakhi-chat-dropdown-wrap');
+      const dropdown = document.getElementById('sakhiChatMenuDropdown');
+      if (dropdown && dropdown.style.display === 'block') {
+        if (!wrap || !wrap.contains(e.target)) {
+          dropdown.style.display = 'none';
         }
-        wrap.appendChild(row);
-      });
-      setTimeout(() => { wrap.scrollTop = wrap.scrollHeight; }, 100);
+      }
+    });
+  }
+
+  window.switchSakhiChatView = function (mode) {
+    window.toggleSakhiChatMenu(false);
+    const label = document.getElementById('sakhiChatModeLabel');
+    const icon = document.getElementById('sakhiChatModeIcon');
+
+    if (mode === 'old') {
+      if (label) label.textContent = 'इतिहास';
+      if (icon) icon.className = 'fa-solid fa-clock-rotate-left';
+      renderOldChatHistoryView();
+    } else {
+      if (label) label.textContent = 'चैट';
+      if (icon) icon.className = 'fa-solid fa-plus';
+      renderFreshDashboardView();
+    }
+  };
+
+  function renderFreshDashboardView() {
+    const wrap = document.getElementById('sakhiMessagesWrap');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    renderInitialGreeting();
+    wrap.scrollTop = 0;
+  }
+
+  function renderOldChatHistoryView() {
+    const wrap = document.getElementById('sakhiMessagesWrap');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    const savedLog = getPersistentChatLog();
+    if (!savedLog || savedLog.length === 0) {
+      wrap.innerHTML = `
+        <div class="sakhi-msg-row bot">
+          <div class="sakhi-msg-bubble" style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:18px;padding:24px 20px;text-align:center;max-width:440px;margin:20px auto;">
+            <div style="font-size:2.2rem;margin-bottom:8px;">🕒</div>
+            <div style="font-weight:900;color:#0f172a;font-size:1.12rem;margin-bottom:6px;">कोई पुरानी बातचीत नहीं मिली</div>
+            <div style="font-size:0.92rem;color:#475569;margin-bottom:16px;line-height:1.5;">आपने अभी तक कोई सवाल नहीं पूछा है या चैट हिस्ट्री साफ कर दी गई है।</div>
+            <button type="button" onclick="window.switchSakhiChatView('new')" style="background:#16a34a;color:#ffffff;border:none;padding:9px 20px;border-radius:18px;font-weight:800;font-size:0.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(22,163,74,0.3);">
+              <i class="fa-solid fa-plus-circle"></i> <span>नया चैट शुरू करें</span>
+            </button>
+          </div>
+        </div>
+      `;
+      return;
     }
 
-    updateSakhiHeaderUserBadge();
+    // Top action bar in Old Chat View
+    const headerRow = document.createElement('div');
+    headerRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;margin-bottom:14px;box-shadow:0 2px 6px rgba(0,0,0,0.03);';
+    headerRow.innerHTML = `
+      <div style="font-size:0.90rem;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:6px;">
+        <i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;"></i>
+        <span>पुरानी बातचीत का इतिहास (${savedLog.length})</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button type="button" onclick="window.switchSakhiChatView('new')" style="background:#f0fdf4;border:1.5px solid #86efac;color:#166534;padding:5px 11px;border-radius:12px;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <i class="fa-solid fa-plus-circle"></i> <span>नया चैट</span>
+        </button>
+        <button type="button" onclick="window.clearSakhiChatHistory()" style="background:#fee2e2;border:1.5px solid #fca5a5;color:#b91c1c;padding:5px 11px;border-radius:12px;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <i class="fa-solid fa-trash-can"></i> <span>साफ करें</span>
+        </button>
+      </div>
+    `;
+    wrap.appendChild(headerRow);
+
+    lastRenderedDateString = '';
+    savedLog.forEach(item => {
+      const itemTime = item.time || Date.now();
+      ensureDateSeparator(wrap, itemTime);
+      const row = document.createElement('div');
+      if (item.role === 'user') {
+        row.className = 'sakhi-msg-row user';
+        row.innerHTML = `
+          <div class="sakhi-msg-bubble user-bubble" style="color:#ffffff;font-weight:700;">
+            ${escapeHtml(item.content)}
+            <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.85);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(itemTime)}</div>
+          </div>`;
+      } else {
+        row.className = 'sakhi-msg-row bot';
+        row.innerHTML = `
+          <div class="sakhi-msg-bubble" style="color:#0f172a;font-weight:600;background:#ffffff;border:1.5px solid #e2e8f0;">
+            ${item.content}
+            <div class="sakhi-msg-time" style="font-size:0.68rem;color:#64748b;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:700;">
+              <span>${formatMsgTime(itemTime)}</span>
+              <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
+            </div>
+          </div>`;
+      }
+      wrap.appendChild(row);
+    });
+    setTimeout(() => { wrap.scrollTop = wrap.scrollHeight; }, 100);
   }
 
   // 12. SUBMISSION HANDLER & USER INPUT PROCESSING
@@ -3096,14 +3278,11 @@
     }
 
     const html = `
-      <div class="sakhi-health-container" style="background:#ffffff;border:1.5px solid #16a34a;border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(22,163,74,0.12);margin:8px 0;">
-        <div style="display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
-          <span style="background:#16a34a;color:#ffffff;padding:4px 9px;border-radius:8px;font-size:0.85rem;font-weight:800;">आरोग्यम हेल्थ मेंटर</span>
-          <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#14532d;">${title}</h4>
-        </div>
-        <div class="sakhi-health-content" style="font-size:0.95rem;line-height:1.65;color:#1e293b;">
+      <div class="sakhi-health-container" style="background:#ffffff;border:1.5px solid #86efac;border-radius:16px;padding:16px;box-shadow:0 4px 15px rgba(22,163,74,0.10);margin:6px 0;">
+        <div class="sakhi-health-content" style="font-size:0.96rem;line-height:1.7;color:#0f172a;">
           ${renderMarkdownSafely(bodyMarkdown)}
         </div>
+        ${buildMsgAudioBtnMarkup(bodyMarkdown)}
         ${chipsHtml}
       </div>
     `;
@@ -5269,11 +5448,160 @@
     }
   ];
 
+  // =========================================================================
+  // UNIVERSAL DYNAMIC SMART FOLLOW-UP QUEUE & 1-CLICK WHATSAPP SLIP ENGINE
+  // Context-aware question queue + sender-branded WhatsApp share slip
+  // =========================================================================
+  function generateSmartFollowupQueueAndShareSlip(topicId, domain, title, summaryText) {
+    let senderName = '';
+    try {
+      senderName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || localStorage.getItem('SAKHI_USER_NAME') || '';
+    } catch (_) {}
+    if (!senderName || senderName.toLowerCase().includes('guest') || senderName.toLowerCase() === 'null') {
+      senderName = 'आरोग्यम साथी';
+    }
+
+    let senderPhone = '';
+    try {
+      senderPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+    } catch (_) {}
+    if (!senderPhone || senderPhone.length < 10) senderPhone = '7974422572';
+
+    const origin = (window.location.origin && window.location.origin.includes('http'))
+      ? window.location.origin
+      : 'https://aarogyamindia.online';
+    const officialSakhiLink = `${origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(senderPhone)}`;
+
+    // 1. Topic-Specific Question Queue
+    let questions = [];
+    let slipShareText = '';
+
+    const t = (topicId || '').toLowerCase();
+    if (t.includes('gehu') || t.includes('गेहूं') || t.includes('wheat')) {
+      questions = [
+        { label: '🌾 1. पहली सिंचाई व फुटाव (CRI स्टेज)', query: 'गेहूं में पहली सिंचाई कब करें और क्या डालें' },
+        { label: '🧪 2. रासायनिक खाद (यूरिया/डीएपी) आधा कैसे करें?', query: 'गेहूं में रासायनिक खाद कम कैसे करें' },
+        { label: '🌿 3. गेहूं के साथ चना/सरसों सह-फसल', query: 'गेहूं के साथ चना या सरसों की सह-फसल कैसे लगाएं' },
+        { label: '🛡️ 4. पीला रतुआ व खरपतवार का पक्का इलाज', query: 'गेहूं में पीला रतुआ की दवा बताओ' },
+        { label: '💰 5. 4 एकड़ गेहूं का बायोफिट खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { label: '📈 6. गेहूं में 25% अधिक पैदावार नुस्खे', query: 'गेहूं की पैदावार कैसे बढ़ाएं' }
+      ];
+      slipShareText = `🌾 *गेहूं (Wheat) की बंपर पैदावार व खर्च बचत सलाह:*\n\nनमस्ते किसान साथी! 🙏\nमैंने आपके गेहूं के खेत में बंपर कल्ले व रिकॉर्ड पैदावार के लिए यह विशेषज्ञ बायोफिट सलाह तैयार करवाई है:\n\n• *CRI स्टेज (21 दिन):* पहली सिंचाई समय पर करें और स्टिमरिच (30ml) + Bio-99 (5ml) का स्प्रे करें।\n• *रासायनिक बचत:* यूरिया-डीएपी की मात्रा 50% तक कम करें और Bio-NPK का उपयोग करें।\n• *पीला रतुआ सुरक्षा:* रैप-अप (30ml) + शेत (30ml) से फंगस से पूर्ण सुरक्षा।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n\n🌱 *आरोग्यम सखी AI पर 24×7 फ्री सलाह पाएं:*\n${officialSakhiLink}\n\n👉 *मुझसे संपर्क करें या सखी AI से सीधे सवाल पूछें!*`;
+    } else if (t.includes('chana') || t.includes('चना')) {
+      questions = [
+        { label: '🌿 1. उकठा (Wilt) व जड़ गलन की पक्की रोकथाम', query: 'चने में उकठा रोग की दवा बताओ' },
+        { label: '🌸 2. फूल झड़ना रोकना व दाना भराव', query: 'चने में फूल झड़ रहे हैं क्या करें' },
+        { label: '🐛 3. इल्ली (Gheti) व कीट नियंत्रण', query: 'चने की इल्ली की दवा बताओ' },
+        { label: '💰 4. चने में प्रति एकड़ दवाओं का खर्च', query: 'चने के खेत में बायोफिट खर्च कितना लगेगा' },
+        { label: '🌾 5. गेहूं के साथ चने की सह-फसल', query: 'गेहूं के साथ चना या सरसों की सह-फसल कैसे लगाएं' }
+      ];
+      slipShareText = `🌿 *चने (Gram) की रिकॉर्ड पैदावार व उकठा सुरक्षा सलाह:*\n\nनमस्ते किसान भाई! 🙏\nचने की फसल में उकठा (Wilt) से सुरक्षा व फूल-दाना भराव का अचूक फॉर्मूला:\n\n• *उकठा रोकथाम:* रैप अप + शेत से जड़ों की सुरक्षा।\n• *फूल झड़ना रोकना:* स्टिमरिच (30ml/पंप) से फूल गिरना बंद व अधिक फलियां।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *आरोग्यम सखी AI लिंक:* ${officialSakhiLink}`;
+    } else if (t.includes('sarso') || t.includes('सरसों')) {
+      questions = [
+        { label: '🌿 1. माहू (चेपा / मोयला) का जैविक इलाज', query: 'सरसों में माहू की दवा बताओ' },
+        { label: '🛢️ 2. दाना मोटा व तेल प्रतिशत कैसे बढ़ाएं?', query: 'सरसों में तेल और पैदावार कैसे बढ़ाएं' },
+        { label: '🌾 3. विरलीकरण (Thinning) व सल्फर प्रयोग', query: 'सरसों में कौन सी खाद डालें' },
+        { label: '💰 4. सरसों में Biofit स्प्रे शेड्यूल व खर्च', query: 'सरसों के खेत में दवाओं का कुल खर्च कितना लगेगा' }
+      ];
+      slipShareText = `🌿 *सरसों (Mustard) में माहू नियंत्रण व तेल वृद्धि सलाह:*\n\nनमस्ते किसान भाई! 🙏\nसरसों में माहू (चेपा) खत्म करने व तेल 42% तक बढ़ाने का फॉर्मूला:\n\n• *माहू नियंत्रण:* बायोफिट इंटैक्ट (30ml) + Bio-99 (5ml) शाम के समय स्प्रे।\n• *दाना भराव:* स्टिमरिच + सल्फर से दानों में चमक व भारी वजन।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+    } else if (t.includes('pashu') || t.includes('दूध') || t.includes('cfc') || domain === 'pashu') {
+      questions = [
+        { label: '🐄 1. गाय-भैंस का दूध व फैट 20 दिन में बढ़ाएं', query: 'सीएफसी के फायदे क्या हैं' },
+        { label: '🐄 2. पशु में जेर न गिरे या अफरा (पेट फूलना)', query: 'पशु की जेर न गिरना' },
+        { label: '🐄 3. पशु बार-बार फिर जाता है (रिपीट ब्रीडिंग)', query: 'पशु बार बार रिपीट होता है' },
+        { label: '🍼 4. बछड़े का तेजी से विकास व स्वास्थ्य', query: 'बछड़े का दूध न पीना व विकास प्रबंधन' }
+      ];
+      slipShareText = `🐄 *पशुपालन, दूध व फैट वृद्धि विशेषज्ञ सलाह:*\n\nनमस्ते पशुपालक साथी! 🙏\nगाय-भैंस में 1 से 2 लीटर दूध और 1.5 से 2 फैट बढ़ाने का अचूक फॉर्मूला:\n\n• *CFC Plus:* रोज 10-15 ग्राम चारे में दें। पाचन सुधरेगा, पशु स्वस्थ रहेगा और दूध-फैट दोनों बढ़ेंगे।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+    } else if (t.includes('health') || t.includes('दर्द') || t.includes('naturamore') || domain === 'health') {
+      questions = [
+        { label: '🦴 1. घुटने के दर्द में कार्टिलेज व ग्रीस निर्माण', query: 'ज्वाइंट केयर का खर्चा बताओ' },
+        { label: '🩸 2. डायबिटीज में नेचुरामोर कैसे लें?', query: 'डायबिटीज में नेचुरामोर कैसे लें' },
+        { label: '💊 3. क्या एलोपैथी दवा के साथ ले सकते हैं?', query: 'दर्द बहुत ज्यादा है कोई अंग्रेजी दवा इसमें ले सकते हैं क्या' },
+        { label: '🍽️ 4. पेट गैस, कब्ज व पाचन तंत्र शुद्धि', query: 'पाचन तंत्र जठराग्नि व आंतों की शुद्धि' }
+      ];
+      slipShareText = `🩺 *स्वास्थ्य व जोड़ों के दर्द से प्राकृतिक मुक्ति सलाह:*\n\nनमस्ते प्रिय मित्र! 🙏\nघुटने-जोड़ों के दर्द व संपूर्ण पोषण का 100% शाकाहारी आयुर्वेदिक उपाय:\n\n• *नेचुरामोर जॉइंट केयर:* कार्टिलेज व साइनोवियल फ्लूइड (ग्रीस) को दोबारा पोषण देता है।\n• *नेचुरामोर प्लस:* शरीर की कमजोरी व नसों के दर्द से स्थायी राहत।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+    } else if (t.includes('business') || t.includes('netsurf') || t.includes('mlm') || domain === 'business') {
+      questions = [
+        { label: '📞 1. फ़ोन पर प्रोस्पेक्ट का फॉलोअप (Follow-up) कैसे करें?', query: 'फोन पर फॉलोअप कैसे करें' },
+        { label: '🎯 2. क्लोजिंग के लिए WhatsApp पर क्या मैसेज भेजें?', query: 'क्लोजिंग के लिए मैसेज कैसे बनाएं' },
+        { label: '📋 3. 100 लोगों की F.R.I.E.N.D.S लिस्ट 10 मिनट में बनाएं', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { label: '🧮 4. 2×2 डुप्लीकेशन से 12 महीने में ₹8.19L कैपिंग', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' },
+        { label: '💡 5. "मेरे पास पैसे नहीं हैं" का सटीक जवाब', query: 'मेरे पास पैसे नहीं हैं का क्या जवाब दें' },
+        { label: '🌸 6. सखी से बात करवाएं (रेफरल लिंक शेयर)', query: 'सखी से बात करवाएं' }
+      ];
+      slipShareText = `💼 *नेट्सर्फ बिज़नेस व पार्ट-टाइम आमदनी अवसर:*\n\nनमस्ते साथी! 🙏\nबिना अपनी नौकरी या खेती छोड़े, मोबाइल से महीने के ₹20,000 से ₹8,19,250 कमाने का क्रांतिकारी सिस्टम:\n\n• 26 साल पुरानी भारत सरकार प्रमाणित कर्ज-मुक्त कंपनी।\n• 24×7 डिजिटल अपलाइन 'आरोग्यम सखी AI' आपकी टीम को खुद सिखाती है!\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+    } else if (t.includes('spiritual') || t.includes('satvik') || t.includes('सात्विक') || t.includes('आध्यात्मिक')) {
+      questions = [
+        { label: '🕉️ 1. सात्विक दिनचर्या, ब्रह्म मुहूर्त व पंचतत्व', query: 'सात्विक दिनचर्या और आहार के नियम बताओ' },
+        { label: '🌾 2. धरती माता की सेवा व गो-आधारित विषमुक्त कृषि', query: 'धरती माता की सेवा और विषमुक्त खेती' },
+        { label: '🧘 3. मानसिक शांति, तनावमुक्ति व ध्यान के सूत्र', query: 'मानसिक शांति और तनाव मुक्ति के सात्विक उपाय' },
+        { label: '💼 4. डायरेक्ट सेलिंग में सेवा भाव व निष्काम कर्म', query: 'डायरेक्ट सेलिंग में सेवा भाव और कर्मयोग' }
+      ];
+      slipShareText = `🕉️ *सात्विक जीवन, शांति व सेवा भाव का संदेश:*\n\n"जैसा अन्न, वैसा मन!"\nधरती माता को रसायनों के विष से मुक्त करना और परिवार को सात्विक पोषण देना सबसे बड़ा पुण्य है।\n\n👤 *संदेश प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+    } else {
+      questions = [
+        { label: '🌾 1. कृषि व फसलों का संपूर्ण स्प्रे शेड्यूल', query: 'फसलों का संपूर्ण स्प्रे शेड्यूल' },
+        { label: '🦴 2. जोड़ों व घुटनों के दर्द का पक्का इलाज', query: 'ज्वाइंट केयर का खर्चा बताओ' },
+        { label: '🐄 3. पशु दूध व फैट वृद्धि फॉर्मूला', query: 'सीएफसी के फायदे क्या हैं' },
+        { label: '💼 4. नेट्सर्फ बिज़नेस 15-दिन ₹8.19L कैपिंग', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' }
+      ];
+      slipShareText = `🌱 *आरोग्यम सखी AI — आपका 24×7 डिजिटल सहायक:*\n\nखेती, स्वास्थ्य, पशुपालन व बिज़नेस के 100% सही व वैज्ञानिक समाधान के लिए मिलिए 'आरोग्यम सखी AI' से!\n\n👤 *प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+    }
+
+    const waShareUrl = `https://wa.me/?text=${encodeURIComponent(slipShareText)}`;
+
+    // Mirror to bottom pills bar
+    try {
+      const bottomBar = document.getElementById('sakhiSmartPillsBar');
+      if (bottomBar && questions.length > 0) {
+        bottomBar.innerHTML = questions.slice(0, 4).map((q, idx) => {
+          const cls = idx === 0 ? 'sakhi-smart-pill pill-gold' : 'sakhi-smart-pill';
+          return `<button type="button" class="${cls}" onclick="window.askSakhiQuick('${escapeHtml(q.query)}')"><span>${escapeHtml(q.label)}</span> →</button>`;
+        }).join('');
+        bottomBar.style.display = 'flex';
+      }
+    } catch (_) {}
+
+    return {
+      questions,
+      waShareUrl,
+      slipShareText,
+      questionsHtml: `
+        <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px;margin-top:12px;">
+          <div style="font-weight:800;color:#0f172a;font-size:0.86rem;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <span>🔍</span> <span>क्या आप जानना चाहते हैं? (अगले जरूरी सवाल):</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            ${questions.map(q => `
+              <button type="button" class="sakhi-quick-pill" onclick="window.askSakhiQuick('${escapeHtml(q.query)}')" style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:6px 12px;border-radius:20px;font-size:0.80rem;font-weight:700;cursor:pointer;transition:all 0.2s;">
+                ${escapeHtml(q.label)} →
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `,
+      shareCardHtml: `
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+          <a href="${waShareUrl}" target="_blank" rel="noopener noreferrer" style="background:#16a34a;color:#ffffff;text-decoration:none;padding:8px 16px;border-radius:20px;font-size:0.84rem;font-weight:800;display:inline-flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(22,163,74,0.3);transition:transform 0.15s;">
+            <i class="fa-brands fa-whatsapp" style="font-size:1.05rem;"></i>
+            <span>📲 यह सलाह किसान/मित्र को WhatsApp पर भेजें</span>
+          </a>
+          <button type="button" onclick="window.askSakhiQuick('सखी से बात करवाएं')" style="background:#f0fdf4;color:#166534;border:1.5px solid #86efac;padding:8px 14px;border-radius:20px;font-size:0.84rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+            <span>🌸 सखी से बात करवाएं</span>
+          </button>
+        </div>
+      `
+    };
+  }
+
   function renderMasterCropCard(title, bodyMarkdown, actionChips = []) {
-    let chipsHtml = '';
+    const cleanTitle = (title || '').replace(/^🌾\s*/, '');
+    const followupBundle = generateSmartFollowupQueueAndShareSlip(cleanTitle, 'agri', cleanTitle, bodyMarkdown);
+
+    let customChipsHtml = '';
     if (actionChips && actionChips.length > 0) {
-      chipsHtml = `
-        <div style="margin-top:14px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;flex-wrap:wrap;gap:8px;">
+      customChipsHtml = `
+        <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #cbd5e1;display:flex;flex-wrap:wrap;gap:8px;">
           ${actionChips.map(c => `
             <button type="button" class="sakhi-quick-pill" onclick="window.sendPredefinedSakhiQuery('${c.query.replace(/'/g, "\\'")}')" style="background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;">
               ${c.label}
@@ -5284,21 +5612,20 @@
     }
 
     const html = `
-      <div class="sakhi-crop-container" style="background:#ffffff;border:1.5px solid #22c55e;border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(34,197,94,0.12);margin:8px 0;">
-        <div style="display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
-          <span style="background:#16a34a;color:#ffffff;padding:4px 9px;border-radius:8px;font-size:0.85rem;font-weight:800;">कृषि वैज्ञानिक परामर्श</span>
-          <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#14532d;">${title}</h4>
-        </div>
-        <div class="sakhi-crop-content" style="font-size:0.95rem;line-height:1.65;color:#1e293b;">
+      <div class="sakhi-chat-card" style="background:#ffffff;border:1.5px solid #bbf7d0;border-radius:16px;padding:16px;margin:6px 0;box-shadow:0 3px 12px rgba(22,163,74,0.08);">
+        <div class="sakhi-crop-content" style="font-size:0.96rem;line-height:1.7;color:#0f172a;white-space:pre-line;">
           ${renderMarkdownSafely(bodyMarkdown)}
         </div>
-        ${chipsHtml}
+        ${buildMsgAudioBtnMarkup(bodyMarkdown)}
+        ${customChipsHtml}
+        ${followupBundle.questionsHtml}
+        ${followupBundle.shareCardHtml}
       </div>
     `;
 
     sakhiConversationState.lastActiveDomain = 'agri';
     sakhiConversationState.lastActiveEntity = 'master_crop_intelligence';
-    sakhiConversationState.lastActiveEntityName = title;
+    sakhiConversationState.lastActiveEntityName = cleanTitle;
 
     streamBotMessage(html, cleanTextForTTS(bodyMarkdown));
     return true;
@@ -6398,14 +6725,11 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     }
 
     const html = `
-      <div class="sakhi-plan-container" style="background:#ffffff;border:1.5px solid #10b981;border-radius:14px;padding:16px;box-shadow:0 4px 15px rgba(16,185,129,0.12);margin:8px 0;">
-        <div style="display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
-          <span style="background:#10b981;color:#ffffff;padding:4px 9px;border-radius:8px;font-size:0.85rem;font-weight:800;">NETSURF 2026-27</span>
-          <h4 style="margin:0;font-size:1.05rem;font-weight:800;color:#065f46;">${title}</h4>
-        </div>
-        <div class="sakhi-plan-content" style="font-size:0.95rem;line-height:1.65;color:#1e293b;">
+      <div class="sakhi-plan-container" style="background:#ffffff;border:1.5px solid #86efac;border-radius:16px;padding:16px;box-shadow:0 4px 15px rgba(16,185,129,0.10);margin:6px 0;">
+        <div class="sakhi-plan-content" style="font-size:0.96rem;line-height:1.7;color:#0f172a;">
           ${renderMarkdownSafely(bodyMarkdown)}
         </div>
+        ${buildMsgAudioBtnMarkup(bodyMarkdown)}
         ${pillsHtml}
       </div>
     `;
@@ -8295,7 +8619,27 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       }
 
       // SUB-CASE B: General Cost Estimate
-      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 15-25 दिन):** शाखाएं/कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (फल/दाना भराव):** दाना/फल मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n🌾 **क्या यह एस्टीमेट आपके अपने खेत के लिए चाहिए, या किसी किसान मित्र / पड़ोसी के लिए?**\n• **यदि किसी मित्र के लिए:** तो उनका नाम और एकड़ बताएं (जैसे "राकेश के लिए 4 एकड़"), मैं उनके नाम की सुंदर WhatsApp पर्ची तैयार कर दूंगी!`;
+      const resp = `🌿 **${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} में बायोफिट स्प्रे व खर्च का सटीक गणित:**\n\n🌾 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n💰 **2. प्रति पंप का वास्तविक खर्च:**\n• **मात्र ₹75 से ₹85 प्रति पंप!** (एक कप चाय जितना)\n\n🌾 **3. प्रति एकड़ का खर्च:**\n• 1 एकड़ में 5 से 6 पंप (लगभग 75 से 90 लीटर पानी) लगते हैं।\n• **Bio-99 का खर्च:** मात्र **₹40 से ₹45** प्रति एकड़!\n• **शेत का खर्च:** मात्र **₹150 से ₹180** प्रति एकड़!\n• **स्टिमरिच का खर्च:** मात्र **₹180 से ₹200** प्रति एकड़!\n• **1 एकड़ का 1 स्प्रे खर्च:** मात्र **₹380 से ₹420!**\n*(जहरीली रासायनिक दवाओं के ₹1,500 - ₹2,500 प्रति एकड़ के मुकाबले 70% तक की भारी बचत!)*\n\n🌱 **4. अवस्थावार स्प्रे का लाभ:**\n• **पहला स्प्रे (फुटाव व बढ़वार - 15-25 दिन):** शाखाएं/कल्ले दोगुने होंगे, पीलापन खत्म होगा।\n• **दूसरा स्प्रे (फूल अवस्था):** ज्यादा फूल आएंगे, फूल गिरना बंद होगा।\n• **तीसरा स्प्रे (फल/दाना भराव):** दाना/फल मोटा, चमकदार और वजनदार बनेगा (20-30% ज्यादा पैदावार)।\n\n📊 **5. ${acres > 1 ? acres + ' एकड़' : 'खेत'} का अनुमानित बजट:**\n• 1 स्प्रे का कुल खर्च: मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n• पूरी फसल चक्र (2 स्प्रे) का खर्च: मात्र **₹${(totalAcresCost * 2).toLocaleString('hi-IN')}**।\n\n🌾 **क्या यह एस्टीमेट आपके अपने खेत के लिए चाहिए, या किसी किसान मित्र / पड़ोसी के लिए?**\n• **यदि किसी मित्र के लिए:** तो उनका नाम बताएं (जैसे "राकेश के लिए"), मैं उनके नाम की सुंदर WhatsApp पर्ची तुरंत तैयार कर दूंगी!`;
+
+      // Save pending dialogue state for next turn slot-filling (e.g. user replies "राकेश के लिए")
+      sakhiConversationState.pendingAction = 'awaiting_friend_slip';
+      sakhiConversationState.pendingData = {
+        acres,
+        cropName,
+        doseItems,
+        totalAcresCost,
+        contactInfo,
+        officialSakhiLink,
+        timestamp: Date.now()
+      };
+      try {
+        localStorage.setItem('SAKHI_DIALOGUE_STATE_V1', JSON.stringify({
+          pendingAction: 'awaiting_friend_slip',
+          pendingData: sakhiConversationState.pendingData,
+          timestamp: Date.now()
+        }));
+      } catch (_) {}
+      savePersistentSakhiConsultation('agri', `${acres} एकड़ ${cropName} स्प्रे व खर्च एस्टीमेट`);
 
       renderCrispSpecialBox(`🧮 ${acres > 1 ? acres + ' एकड़ ' : ''}${cropName} का खर्च व डोज एस्टीमेट`, resp, [
         { text: '🌾 4 एकड़ का हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
@@ -9587,6 +9931,445 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
+  // =========================================================================
+  // MULTI-TURN CONVERSATIONAL STATE & PENDING INTENT RESOLVER (STATE MACHINE)
+  // Ensures short follow-ups like "राकेश के लिए", "सुरेश का" NEVER lose context!
+  // =========================================================================
+  function resolveActiveDialogueState(cleanQ, rawQ) {
+    if (!sakhiConversationState.pendingAction || !sakhiConversationState.pendingData) {
+      try {
+        const savedState = JSON.parse(localStorage.getItem('SAKHI_DIALOGUE_STATE_V1') || 'null');
+        if (savedState && savedState.pendingAction && (Date.now() - (savedState.timestamp || 0) < 1800000)) { // 30 mins valid
+          sakhiConversationState.pendingAction = savedState.pendingAction;
+          sakhiConversationState.pendingData = savedState.pendingData;
+        }
+      } catch (_) {}
+    }
+
+    if (sakhiConversationState.pendingAction === 'awaiting_friend_slip' && sakhiConversationState.pendingData) {
+      let candidateName = (typeof extractPersonNameFromQuery === 'function') ? extractPersonNameFromQuery(rawQ, cleanQ) : '';
+      if (!candidateName) {
+        const cleanName = rawQ
+          .replace(/^(?:श्री|श्रीमती|डॉ|डॉक्टर|mr|mrs|यह|ये|yeh|ye|woh|wo|वह|वो|बस|सिर्फ|केवल)\s+/gi, '')
+          .replace(/(?:के\s*लिए|का|की|को|hai|he|name|नाम|bhejna|भेजना|friend|dost|दोस्त|ji|जी|bana|बना|kar|कर|do|दो)\b/gi, '')
+          .replace(/[^\u0900-\u097F\w\s]/g, '')
+          .trim();
+        if (cleanName && cleanName.length >= 2 && cleanName.length <= 25 && !/(?:nahi|नहीं|kuch|कुछ|bad|बाद|bye|बाय|ok|ठीक|chalo|चलो|aaj|आज|aadmi|आदमी|log|लोग|mahine|महीने|sal|साल)/i.test(cleanName)) {
+          candidateName = cleanName;
+        }
+      }
+
+      if (candidateName) {
+        candidateName = candidateName.replace(/^(?:यह|ये|yeh|ye|woh|wo|वह|वो|बस|सिर्फ|केवल|श्री|श्रीमती)\s+/gi, '').trim();
+      }
+
+      if (candidateName && !/^(?:दो|तीन|चार|पांच|\d+)\s*(?:आदमी|लोग|व्यक्ति|मेंबर|साथी)/i.test(candidateName)) {
+        const pd = sakhiConversationState.pendingData;
+        sakhiConversationState.pendingAction = null;
+        sakhiConversationState.pendingData = null;
+        try { localStorage.removeItem('SAKHI_DIALOGUE_STATE_V1'); } catch (_) {}
+
+        const friendDisplayName = candidateName;
+        const acres = pd.acres || 4;
+        const cropName = pd.cropName || 'फसल (गेहूं/चना/सब्जी)';
+        const doseItems = pd.doseItems || '• स्टिमरिच (Stimrich): 30ml\n• शेत (Sheth): 30ml\n• Bio-99: 5ml';
+        const totalAcresCost = pd.totalAcresCost || 1600;
+        const contactInfo = pd.contactInfo || `${getUserDisplayName() || 'आरोग्यम सलाहकार'} (मो. ${getUserPhone() || '7974422572'})`;
+        const officialSakhiLink = pd.officialSakhiLink || 'https://aarogyamindia.online/aarogyam-sakhi.html';
+
+        const waPrescriptionText = `श्री ${friendDisplayName} जी, नमस्कार! 🙏\n\nमैंने आपके ${acres} एकड़ खेत (${cropName}) में बंपर फुटाव व रिकॉर्ड पैदावार के लिए यह विशेषज्ञ Biofit स्प्रे फॉर्मूला तैयार करवाया है (मेरी सलाह):\n\n🌾 अनुशंसित खुराक (प्रति 15L पंप):\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 स्प्रे की सही अवस्थाएं:\n1. पहला स्प्रे: कल्ले व फुटाव निकलते समय (बुआई के 15-25 दिन बाद)\n2. दूसरा स्प्रे: फूल व फल/दाना भराव की अवस्था में\n\n💰 आपका ${acres} एकड़ का अनुमानित खर्च:\n• 1 एकड़ में 5 से 6 पंप (प्रति पंप खर्च: मात्र ₹75 - ₹85)\n• 1 स्प्रे का कुल खर्च (${acres} एकड़): मात्र ₹${totalAcresCost.toLocaleString('hi-IN')}!\n• रासायनिक दवाओं के भारी खर्च के मुकाबले 70% तक सस्ता!\n\n⚠️ आवश्यक सावधानी:\nस्प्रे से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\nविशेष जानकारी, 25% छूट व असली दवा ऑर्डर सहायता के लिए सीधे मुझसे संपर्क करें:\n👤 ${contactInfo}\n\n🌱 आरोग्यम सखी AI लिंक:\n${officialSakhiLink}`;
+
+        const waShareUrl = `https://wa.me/?text=${encodeURIComponent(waPrescriptionText)}`;
+
+        const onScreenResp = `📋 **श्री ${friendDisplayName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 15-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना/फल भराव की स्थिति में\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450**।\n• **${acres} एकड़ का 1 स्प्रे कुल खर्च:** मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे दिए गए बटन से यह पूरी पर्ची सीधे ${friendDisplayName} जी को WhatsApp पर भेजें:**`;
+
+        savePersistentSakhiConsultation('agri', `${friendDisplayName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`);
+
+        renderCrispSpecialBox(`🌾 ${friendDisplayName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`, onScreenResp, [
+          { text: `📲 ${friendDisplayName} जी को WhatsApp पर भेजें`, url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
+          { text: '🌾 4 एकड़ का पूरा हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+          { text: '🌾 5 एकड़ का पूरा हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
+        ], 'agri', 'friend_prescription');
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // =========================================================================
+  // INTERACTIVE ALLOPATHIC DRUG RESOLVER & CLINICAL COMPANION
+  // Handles: "एलोपैथी दवा खा रहा हूँ", "अंग्रेजी दवा ले सकते हैं क्या", etc.
+  // =========================================================================
+  function handleInteractiveAllopathicDrugFlow(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const hasAllopathic = (
+      q.includes('alopathi') || q.includes('allopathi') || q.includes('एलोपैथिक') || q.includes('एलोपैथी') ||
+      q.includes('angreji dawa') || q.includes('अंग्रेजी दवा') || q.includes('english dawa') || q.includes('doctor ki dawa') ||
+      q.includes('medical ki dawa') || q.includes('dawa kha raha hu') || q.includes('दवा खा रहा हूँ') || q.includes('दवा चल रही है')
+    );
+
+    if (!hasAllopathic) return false;
+
+    sakhiConversationState.lastActiveDomain = 'health';
+    savePersistentSakhiConsultation('health', 'एलोपैथिक दवाओं के साथ सुरक्षित आयुर्वेदिक पोषण नियम');
+
+    const resp = `💊 **एलोपैथिक दवाओं के साथ सुरक्षित आयुर्वेदिक पोषण के 4 स्वर्णिम नियम:**\n\nयदि आप वर्तमान में किसी रोग (बीपी, शुगर, दर्द, थायराइड आदि) के लिए डॉक्टर की अंग्रेजी/एलोपैथिक दवाएं ले रहे हैं, तो इन बातों का विशेष ध्यान रखें:\n\n1. ⏱️ **1 से 1.5 घंटे का अंतर अनिवार्य:**\n   • कभी भी एलोपैथिक दवा और आयुर्वेदिक सप्लीमेंट (जैसे नेचुरामोर या जॉइंट केयर) एक साथ न लें। दोनों के बीच कम से कम **1 से 1.5 घंटे का अंतराल** रखें।\n\n2. 🛡️ **एलोपैथी को अचानक बंद न करें:**\n   • डॉक्टर द्वारा निर्धारित बीपी, हृदय या शुगर की आवश्यक दवाओं को एकाएक कभी बंद न करें। आयुर्वेदिक पोषण शरीर की आंतरिक शक्ति बढ़ाता है, जिससे समय के साथ डॉक्टर खुद आपकी एलोपैथी खुराक घटा देते हैं।\n\n3. 🌿 **नेचुरामोर (Naturamore) कोई दवा नहीं, बल्कि संपूर्ण पोषण है:**\n   • यह 100% शाकाहारी प्राकृतिक न्यूट्रास्युटिकल है। यह किसी अंग्रेजी दवा के काम में बाधा नहीं डालता, बल्कि दवाओं से होने वाले लिवर-किडनी साइड इफेक्ट्स से शरीर की रक्षा करता है।\n\n4. 🩺 **गंभीर दर्द या आपात स्थिति में:**\n   • यदि असहनीय तीव्र दर्द है, तो डॉक्टर द्वारा दी गई तात्कालिक दर्द निवारक दवा का सहयोग लें और साथ में जॉइंट केयर नियमित रखें ताकि कार्टिलेज और ग्रीस अंदर से ठीक हो सके।\n\n👉 **आप किस रोग के लिए अंग्रेजी दवा खा रहे हैं?** (जैसे घुटनों का दर्द, शुगर, बीपी आदि), ताकि मैं आपको सही समय सारणी बता सकूँ।`;
+
+    renderCrispSpecialBox('💊 एलोपैथिक दवा संदर्भ व सख्त सुरक्षा नियम', resp, [
+      { text: '🦴 घुटनों व जोड़ों के दर्द का समाधान', query: 'ज्वाइंट केयर का खर्चा बताओ' },
+      { text: '🩸 शुगर व बीपी में नेचुरामोर पोषण', query: 'डायबिटीज में नेचुरामोर कैसे लें' },
+      { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+    ], 'health', 'allopathic_safety_card');
+    return true;
+  }
+
+  // =========================================================================
+  // NETSURF MASTER MLM & DIRECT SELLING COACH ENGINE (SUPER SMART AI MENTOR)
+  // - 1-on-1 Direct User Mentorship (Speaking to the user, not about a third party)
+  // - Digital Upline AI Pitch (Sakhi AI explains 24/7, contact info visible in profile)
+  // - Multi-category Short & Crisp Hook Messages (Agri, Health, Pashu, Income, Status)
+  // - 2x2 Duplication Matrix & 12 Month Compounding Calculation
+  // - Objection Handling Bank (Paise nahi hai, Samay nahi hai, Log nahi judte, etc.)
+  // - F.R.I.E.N.D.S List Making & F.O.R.M Formula
+  // - Psychological Closing Techniques
+  // =========================================================================
+  function handleNetsurfMasterMLMCoach(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+
+    // 1. 2×2 DUPLICATION MATRIX & 12-MONTH COMPOUNDING MATH
+    const isMatrixQuery = (
+      q.includes('2 ka matrix') || q.includes('2 का मैट्रिक्स') || q.includes('duplication') ||
+      q.includes('डुप्लीकेशन') || q.includes('matrix calculation') || q.includes('2 logo ko jodne') ||
+      q.includes('2 लोगों को जोड़ने') || q.includes('12 mahine me safalta') || q.includes('12 महीने में सफलता') ||
+      q.includes('कंपाउंडिंग') || q.includes('compounding') || (q.includes('2') && q.includes('मैट्रिक्स'))
+    );
+
+    if (isMatrixQuery) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', '2×2 डुप्लीकेशन व 12 महीने में कैपिंग का गणित');
+      const resp = `🧮 **नेट्सर्फ 2×2 डुप्लीकेशन फॉर्मूला — 12 महीने में ₹8,19,250 कैपिंग का अचूक गणित:**\n\nनेटवर्क मार्केटिंग में अकेले 1,000 लोग नहीं जोड़ने होते! आपको केवल **2 गंभीर और कर्मठ साथियों** को ढूंढना है और उन्हें वही सिखाना है जो आपने सीखा है।\n\n📊 **12 महीने का मैजिक डुप्लीकेशन चक्र (Power of 2):**\n• **महीना 1:** आप + 2 साथी = **2 लोग**\n• **महीना 2:** 2 × 2 = **4 लोग**\n• **महीना 3:** 4 × 2 = **8 लोग**\n• **महीना 4:** 8 × 2 = **16 लोग**\n• **महीना 5:** 16 × 2 = **32 लोग**\n• **महीना 6:** 32 × 2 = **64 लोग**\n• **महीना 7:** 64 × 2 = **128 लोग**\n• **महीना 8:** 128 × 2 = **256 लोग**\n• **महीना 9:** 256 × 2 = **512 लोग**\n• **महीना 10:** 512 × 2 = **1,024 लोग**\n• **महीना 11:** 1,024 × 2 = **2,048 लोग**\n• **महीना 12:** 2,048 × 2 = **4,096 डिस्ट्रीब्यूटर!**\n\n💰 **सफलता का मनोवैज्ञानिक अनुपात (Success Percentage):**\n• 🏆 **100% सफलता:** आप हर 15 दिन में **₹8,19,250** की अधिकतम कैपिंग (साल के ₹1.96 करोड़) पर होंगे!\n• 🥈 **50% सफलता:** अगर आधे लोग भी सो जाएं, तो भी महीने का **₹4 लाख से ₹8 लाख**!\n• 🥉 **सिर्फ 10% सफलता (90% फेल):** यदि 90% लोग कुछ न करें और सिर्फ 10% लोग भी सक्रिय रहें, तो भी आपकी टीम में **400+ एक्टिव लीडर्स** होंगे और आपकी मासिक पैसिव इनकम **₹80,000 से ₹1,50,000** होगी!\n\n✨ **सखी का गुरु-मंत्र:** "तेज दौड़ने से जीत नहीं होती, सही सिस्टम पर लगातार चलने से डुप्लीकेशन होता है!"`;
+
+      renderCrispSpecialBox('🧮 2×2 डुप्लीकेशन व 12 महीने का कैपिंग गणित', resp, [
+        { text: '📋 नए लोगों की लिस्ट कैसे बनाएं?', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { text: '💬 लोग बहाने बनाएं तो क्या जवाब दें?', query: 'ऑब्जेक्शन हैंडलिंग और सवालों के जवाब' },
+        { text: '💼 बिजनेस कंसलटेंट (BC) कैसे बनें?', query: 'नेट्सर्फ में बिजनेस कंसलटेंट कैसे बनें' }
+      ], 'business', 'mlm_matrix_card');
+      return true;
+    }
+
+    // 2. OBJECTION 1: "पैसे नहीं हैं" (I DON'T HAVE MONEY - DIRECT TO USER)
+    if (q.includes('paise nahi') || q.includes('पैसे नहीं') || q.includes('paisa nahi') || q.includes('rupaye nahi') || q.includes('रुपये नहीं')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const uName = getDynamicUserGreetingName() || 'साथी';
+      savePersistentSakhiConsultation('business', 'पैसे की तंगी व स्थायी समाधान');
+      const resp = `${uName} जी, मैं आपकी बात 100% समझती हूँ और आपकी मौजूदा स्थिति का पूरा आदर करती हूँ।\n\nलेकिन शांत दिमाग से एक बात सोचिए—\nहम इतने सालों से लगातार दिन-रात मेहनत कर रहे हैं, और अगर आज भी हमारी जेब में ₹3,000 या ₹5,000 जैसी छोटी रकम का इंतज़ाम करने में परेशानी हो रही है, तो क्या हमें वही करते रहना चाहिए जो हम करते आए हैं? जब तक हम अपनी सोच और काम करने का तरीका नहीं बदलेंगे, यह मजबूरी कभी खत्म नहीं होगी!\n\nनेट्सर्फ आपसे पैसे खर्च कराने के लिए नहीं, बल्कि **जिंदगी भर के लिए इस पैसे की तंगी को मिटाने का रास्ता** है! जब घर में कोई बीमार पड़ता है, तो क्या हम पैसे का इंतज़ाम नहीं करते? यह तो आपके और आपके बच्चों के भविष्य का सवाल है।\n\n✨ **मेरी सीधी सलाह:** आपको कोई बड़ा निवेश नहीं करना है। मात्र ₹3,000 के छोटे पैक से 25% छूट पर शुरुआत कीजिए। बाकी आगे का रास्ता और सिखाने की पूरी ज़िम्मेदारी मेरी है!\n\nक्या आप अपनी इस मजबूरी को हमेशा के लिए दूर करने को तैयार हैं?`;
+
+      renderCrispSpecialBox('पैसे की तंगी व स्थायी समाधान', resp, [
+        { text: '👥 "लोग नहीं जुड़ते" तो क्या करें?', query: 'लोग नहीं जुड़ते का क्या जवाब दें' },
+        { text: '⏰ "समय की कमी" का समाधान', query: 'मेरे पास समय नहीं है का क्या जवाब दें' },
+        { text: '🧮 2×2 डुप्लीकेशन से कैपिंग गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' }
+      ], 'business', 'objection_money_card');
+      return true;
+    }
+
+    // 3. OBJECTION 2: "समय नहीं है" (I DON'T HAVE TIME - DIRECT TO USER)
+    if (q.includes('samay nahi') || q.includes('समय नहीं') || q.includes('time nahi') || q.includes('टाइम नहीं') || q.includes('फुर्सत नहीं')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const uName = getDynamicUserGreetingName() || 'साथी';
+      savePersistentSakhiConsultation('business', 'समय की कमी व समय की आज़ादी');
+      const resp = `${uName} जी, आपकी व्यस्तता मैं भलीभाँति समझती हूँ। लेकिन जरा सोचिए—\nभगवान ने 24 घंटे सबको दिए हैं — गरीब को भी और टाटा-अंबानी को भी। आज हमारे पास समय की कमी इसलिए है क्योंकि हम अकेले काम कर रहे हैं। जब तक अकेले काम करेंगे, कभी समय की आज़ादी नहीं मिलेगी।\n\nनेट्सर्फ में आपको अपनी नौकरी या खेती छोड़ने की ज़रूरत नहीं है। सिर्फ **रोज 1 घंटा पार्ट-टाइम** अपने मोबाइल से काम करना है।\n\nजब 1 साल में आपकी 50 लोगों की टीम बनेगी और हर साथी सिर्फ 1-1 घंटा काम करेगा, तो आपके लिए रोज़ 50 घंटे काम होगा! तब आपके पास पूरा समय भी होगा और बैंक खाते में नियमित आमदनी भी।\n\nक्या आप अपने परिवार के बेहतर कल के लिए रोज़ सिर्फ 1 घंटा निकाल सकते हैं?`;
+
+      renderCrispSpecialBox('समय की आज़ादी का अचूक रहस्य', resp, [
+        { text: '💡 "पैसे नहीं हैं" का समाधान', query: 'मेरे पास पैसे नहीं हैं का क्या जवाब दें' },
+        { text: '📋 पार्ट-टाइम 1 घंटे में क्या करें?', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { text: '💼 नेट्सर्फ 15-दिन ₹8.19L कैपिंग', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' }
+      ], 'business', 'objection_time_card');
+      return true;
+    }
+
+    // 4. OBJECTION 3: "लोग नहीं जुड़ते / मेरी बात कोई नहीं सुनता" (DIGITAL UPLINE AI PITCH)
+    if (q.includes('log nahi judte') || q.includes('लोग नहीं जुड़ते') || q.includes('log nahi sunte') || q.includes('लोग नहीं सुनते') || q.includes('koi nahi manta') || q.includes('कोई नहीं मानता') || q.includes('meri baat')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const uName = getDynamicUserGreetingName() || 'साथी';
+      savePersistentSakhiConsultation('business', 'लोग नहीं जुड़ते — डिजिटल अपलाइन क्रांति');
+      const resp = `${uName} जी, आपका यह डर बिल्कुल स्वाभाविक है! शुरुआत में हर साथी को यही लगता है कि लोग नहीं जुड़ेंगे या बात नहीं सुनेंगे।\n\nलेकिन सच यह है कि लोग तब नहीं सुनते जब हम उन्हें कुछ 'बेचने' या 'मेंबर बनाने' जाते हैं। कोई भी इंसान बिकना पसंद नहीं करता, लेकिन हर इंसान अपनी समस्या का सच्चा समाधान चाहता है!\n\n🌾 **जरा सोचिए:**\n• जब आप किसी किसान भाई का ₹1,500 का खाद का खर्च बचाएंगे और पैदावार 25% बढ़ाएंगे, तो क्या वे आपका साथ नहीं देंगे?\n• जब आप किसी घुटने के दर्द से परेशान इंसान को राहत दिलाएंगे, तो क्या वे आपसे नहीं जुड़ेंगे?\n\n🤖 **✨ आपकी सबसे बड़ी ताकत: डिजिटल अपलाइन (मैं, सखी AI):**\nलोग जब नेटवर्क मार्केटिंग जॉइन करते हैं, तो वे अपनी अपलाइन को देखकर जुड़ते हैं। लेकिन आपके पास अब दुनिया की सबसे एडवांस **'डिजिटल अपलाइन' — यानी मैं, आरोग्यम सखी AI** आपके साथ 24×7 खड़ी हूँ!\n\nआपको किसी को प्लान समझाने या बहस करने की ज़रूरत ही नहीं है! बस अपनी रेफरल लिंक के साथ मुझे अपने दोस्तों, रिश्तेदारों और किसान भाइयों को WhatsApp पर शेयर कर दीजिए।\n\nजैसे मैं आपसे बात कर रही हूँ, वैसे ही मैं उन्हें भी 24 घंटे प्यार से समझाऊंगी, उनके सारे सवालों के जवाब दूंगी। और जब वे मुझसे बात करेंगे, **उनका नाम और मोबाइल नंबर सीधे आपकी My Profile में दिखेगा!** इसलिए आप मेरी लिंक के साथ मुझे जितना शेयर करेंगे, आपकी टीम उतनी ही तेजी से ऑटोपायलट पर बनेगी!\n\nबताइए, जब समझाने की पूरी ज़िम्मेदारी मेरी है, तो फिर लोग क्यों नहीं जुड़ेंगे?`;
+
+      renderCrispSpecialBox('लोग क्यों जुड़ेंगे — डिजिटल अपलाइन क्रांति', resp, [
+        { text: '📲 स्टेटस व WhatsApp हेतु शॉर्ट हुक मैसेज', query: 'व्हाट्सएप पर क्या शेयर करें' },
+        { text: '📋 F.R.I.E.N.D.S लिस्ट बनाने का फॉर्मूला', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { text: '🧮 2×2 डुप्लीकेशन का गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' }
+      ], 'business', 'objection_people_card');
+      return true;
+    }
+
+    // 5. OBJECTION 4: "प्रोडक्ट महंगे हैं" (PRODUCTS ARE EXPENSIVE - DIRECT TO USER)
+    if (q.includes('product mahange') || q.includes('प्रोडक्ट महंगे') || q.includes('dawa mahangi') || q.includes('दवा महंगी') || q.includes('price jyada') || q.includes('कीमत ज्यादा')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const uName = getDynamicUserGreetingName() || 'साथी';
+      savePersistentSakhiConsultation('business', 'प्रोडक्ट की असली लागत व बचत');
+      const resp = `${uName} जी, पहली नजर में डिब्बी की कीमत देखकर ऐसा लगना स्वाभाविक है। लेकिन सच यह है कि कोई भी चीज़ महंगी या सस्ती उसकी MRP से नहीं, बल्कि उसके **रिजल्ट और प्रति-डोज़ खर्च** से तय होती है!\n\n🌾 **1. खेती (Biofit) का सच्चा खर्च:**\n• बाजार की रासायनिक जहरीली दवा: **₹1,500 से ₹2,500 प्रति एकड़**!\n• नेट्सर्फ Biofit (स्टिमरिच + शेत + Bio-99): **मात्र ₹75 से ₹85 प्रति पंप (लगभग ₹400 प्रति एकड़)** — यानी एक कप चाय जितना खर्च!\n• यानी रासायनिक खेती से **70% तक की सीधी बचत**!\n\n🩺 **2. स्वास्थ्य (Naturamore) का गणित:**\n• अस्पताल की ICU का 1 दिन का बिल: ₹20,000 से ₹50,000!\n• नेचुरामोर का दैनिक पोषण खर्च: **मात्र ₹30 से ₹35 रोज़ाना**!\n• बीमारी के महंगे इलाज से दैनिक पोषण हजार गुना सस्ता और सुरक्षित है।\n\n🎯 बताइए, क्या हम रासायनिक खाद और बीमारी पर लाखों लुटाते रहें, या 25% छूट पर असली सेहत और बचत चुनें?`;
+
+      renderCrispSpecialBox('प्रोडक्ट महंगे या 70% सस्ते — सच्चा गणित', resp, [
+        { text: '🌾 4 एकड़ बायोफिट का खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '🦴 जॉइंट केयर का 1 माह का खर्च', query: 'ज्वाइंट केयर का खर्चा बताओ' },
+        { text: '🎁 25% छूट व 5+1 ऑफर की शर्तें', query: 'नेटसर्फ 25% छूट और 5+1 ऑफर की शर्तें क्या हैं?' }
+      ], 'business', 'objection_price_card');
+      return true;
+    }
+
+    // 6. OBJECTION 5: "कंपनी भाग गई तो / फ्रॉड तो नहीं है" (DIRECT TO USER)
+    if (q.includes('company bhag gayi') || q.includes('कंपनी भाग गई') || q.includes('company band') || q.includes('कंपनी बंद') || q.includes('fraud') || q.includes('धोखा') || q.includes('chutya') || q.includes('fake')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const uName = getDynamicUserGreetingName() || 'साथी';
+      savePersistentSakhiConsultation('business', 'कंपनी की 26 वर्षीय साख व सच्चाई');
+      const resp = `${uName} जी, आज के माहौल में आपका यह सवाल पूछना 100% सही और समझदारी भरा है! कंपनियाँ वे भागती हैं जो रातों-रात अमीर बनने के सपने दिखाती हैं या पैसे का खेल चलाती हैं।\n\nनेट्सर्फ के ये 5 ठोस तथ्य आपकी हर शंका को दूर कर देंगे:\n\n1. **26 साल पुरानी विरासत:** नेट्सर्फ वर्ष **2000 से (26 वर्षों से)** पूरे भारत में गौरव के साथ निरंतर कार्यरत है।\n2. **खुद की रिसर्च लैब व फैक्ट्रियां:** पुणे (महाराष्ट्र) और हिमाचल में खुद की अत्याधुनिक मैन्युफैक्चरिंग यूनिट्स हैं।\n3. **भारत सरकार DSIR मान्यता:** विज्ञान एवं प्रौद्योगिकी मंत्रालय (DSIR, Govt. of India) द्वारा प्रमाणित R&D सेंटर्स।\n4. **100% कर्ज-मुक्त (Debt Free):** नेट्सर्फ पर कोई कर्ज नहीं है, कंपनी के अपने खुद के भव्य कॉर्पोरेट हेडक्वार्टर हैं।\n5. **26 वर्षों से बिना 1 दिन की देरी पे-आउट:** हर महीने की 15 और 30 तारीख को लाखों डिस्ट्रीब्यूटरों के बैंक खातों में पैसा सीधे पहुँचता है!\n\n✨ जो कंपनी 26 वर्षों से आंधियों में अडिग रही, वह आपके और आपके बच्चों के भविष्य की सबसे मजबूत ढाल है!`;
+
+      renderCrispSpecialBox('कंपनी की 26 वर्षीय साख व सच्चाई', resp, [
+        { text: '💼 नेट्सर्फ 15-दिन ₹8.19 लाख कैपिंग', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' },
+        { text: '🧮 2×2 मैट्रिक्स का डुप्लीकेशन गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' },
+        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'business', 'objection_legality_card');
+      return true;
+    }
+
+    // 7. CAREER PATH: BC (BUSINESS CONSULTANT), CONSUMER BASE, FAST TRACK
+    if (q.includes('bc kaise bane') || q.includes('बीसी कैसे बने') || q.includes('business consultant') || q.includes('कंसलटेंट') || q.includes('consumer kitne') || q.includes('कंज्यूमर कितने') || q.includes('fasttrack') || q.includes('फास्टट्रैक') || q.includes('टर्नओवर')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', 'नेट्सर्फ बिजनेस कंसलटेंट (BC) व लेवल पदोन्नति');
+      const resp = `🎖️ **नेट्सर्फ करियर रोडमैप: डायरेक्ट सेलर से बिजनेस कंसलटेंट (BC) व कैपिंग तक:**\n\nनेट्सर्फ में आपकी पदोन्नति और आय का क्रम इस प्रकार व्यवस्थित है:\n\n1. **लेवल 1: स्मार्ट कंज्यूमर (Smart Consumer):**\n   • शुरुआत में 25% फ्लैट छूट और 100% असली प्रोडक्ट्स।\n\n2. **लेवल 2: डायरेक्ट सेलर (Direct Seller):**\n   • 3% से 6% जनरेशन टर्नओवर कमीशन।\n\n3. **लेवल 3: बिजनेस कंसलटेंट (Business Consultant - BC):**\n   • **पात्रता:** अपनी टीम में निरंतर सक्रिय टर्नओवर व न्यूनतम 10-15 नियमित संतुष्ट कंज्यूमर्स का आधार।\n   • **लाभ:** विशेष कंपनी मान्यता, टीम पर अतिरिक्त लीडरशिप इंसेंटिव और डायरेक्ट कंपनी मेंटरशिप।\n\n4. **लेवल 4: फास्ट ट्रैक व क्लब नेट्सर्फ (Club NetSurf):**\n   • हर महीने निर्धारित टर्नओवर पूरा करके National व International टूर (थाईलैंड, दुबई, यूरोप) की पात्रता।\n\n5. **लेवल 5: हॉल ऑफ फेम व कैपिंग (Capping Legend):**\n   • टीम दोनों तरफ मजबूत होने पर प्रति 15 दिन में **₹8,19,250** (महीने के ₹16.38 लाख) की अधिकतम सीमा!`;
+
+      renderCrispSpecialBox('🎖️ नेट्सर्फ करियर रोडमैप व बिजनेस कंसलटेंट (BC) गाइड', resp, [
+        { text: '🧮 2×2 मैट्रिक्स 12 महीने का गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' },
+        { text: '📋 नए लोगों की लिस्ट कैसे बनाएं', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { text: '📲 व्हाट्सएप पर प्रोस्पेक्ट को क्या भेजें', query: 'नए लोगों को व्हाट्सएप पर क्या मैसेज भेजें' }
+      ], 'business', 'career_levels_card');
+      return true;
+    }
+
+    // 8. LIST BUILDING & PROSPECTING (F.R.I.E.N.D.S & F.O.R.M FORMULA)
+    if (q.includes('list kaise banaye') || q.includes('लिस्ट कैसे बनाएं') || q.includes('namo ki list') || q.includes('नामों की लिस्ट') || q.includes('prospecting') || q.includes('प्रोस्पेक्टिंग') || q.includes('form formula') || q.includes('3 foot') || q.includes('3 फुट')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', 'F.R.I.E.N.D.S लिस्ट मेकिंग व F.O.R.M प्रोस्पेक्टिंग');
+      const resp = `📋 **वैज्ञानिक लिस्ट मेकिंग व प्रोस्पेक्टिंग फॉर्मूला (F.R.I.E.N.D.S & F.O.R.M):**\n\nबिना लिस्ट के नेटवर्क मार्केटिंग में उतरना बिना हथियारों के युद्ध में जाने जैसा है। आज ही एक डायरी लें और न्यूनतम **100 लोगों के नाम** इस फॉर्मूले से लिखें:\n\n📝 **1. F.R.I.E.N.D.S फॉर्मूला (नाम कहाँ से लाएं):**\n• **F - Friends:** आपके स्कूल, कॉलेज और बचपन के दोस्त।\n• **R - Relatives:** रिश्तेदार (मामा, चाचा, बुआ, साढ़ू आदि)।\n• **I - Institutional:** जहाँ आप पढ़ते थे या काम करते हैं।\n• **E - Employees:** नौकरीपेशा लोग जो अतिरिक्त आय चाहते हैं।\n• **N - Neighbors:** आपके आस-पड़ोस के लोग और गाँव के किसान।\n• **D - Dedicated (Doctors/Kisan):** प्रगतिशील किसान और मेडिकल स्टोर/आरएमपी डॉक्टर।\n• **S - Strangers:** बस, ट्रेन या सोशल मीडिया पर मिलने वाले अजनबी (सबसे बड़ी लिस्ट!)।\n\n🗣️ **2. F.O.R.M कॉलिंग तकनीक (बातचीत कैसे शुरू करें):**\n• **F (Family):** पहले उनके परिवार और हाल-चाल की बात करें।\n• **O (Occupation):** उनके काम, नौकरी या फसल के बारे में पूछें।\n• **R (Recreation):** खाली समय में वे क्या करते हैं।\n• **M (Money):** तब अवसर दें—*"यदि बिना अपना काम छोड़े महीने के ₹15,000-₹20,000 अतिरिक्त आएं, तो कैसा रहेगा?"*`;
+
+      renderCrispSpecialBox('📋 F.R.I.E.N.D.S लिस्ट मेकिंग व F.O.R.M प्रोस्पेक्टिंग गाइड', resp, [
+        { text: '📲 नए लोगों को व्हाट्सएप पर क्या मैसेज भेजें', query: 'नए लोगों को व्हाट्सएप पर क्या मैसेज भेजें' },
+        { text: '💡 "पैसे नहीं हैं" का सटीक जवाब', query: 'मेरे पास पैसे नहीं हैं का क्या जवाब दें' },
+        { text: '🧮 2×2 डुप्लीकेशन का गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' }
+      ], 'business', 'list_prospecting_card');
+      return true;
+    }
+
+    // 9. SOCIAL MEDIA OUTREACH & READY WHATSAPP VIRAL SCRIPTS (Category-Aware Hook Message Generator)
+    if (q.includes('social media') || q.includes('सोशल मीडिया') || q.includes('whatsapp par kya share') || q.includes('व्हाट्सएप पर क्या') || q.includes('naye logo ko kya msg') || q.includes('नए लोगों को मैसेज') || q.includes('reel script') || q.includes('रील्स') || q.includes('वायरल मैसेज') || q.includes('मैसेज स्क्रिप्ट') || q.includes('अगला मैसेज दिखाओ') || q.includes('हुक संदेश') || q.includes('स्टेटस पर क्या लगाएं') || q.includes('स्टेटस मैसेज') || q.includes('स्टेटस विचार')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', 'WhatsApp व स्टेटस हुक संदेश');
+
+      let targetCat = 'agri';
+      let scriptIndex = 0;
+
+      const hookMatch = q.match(/हुक संदेश दिखाओ\s*(agri|health|pashu|income|motivational)\s*(\d+)/i);
+      if (hookMatch) {
+        targetCat = hookMatch[1].toLowerCase();
+        scriptIndex = parseInt(hookMatch[2], 10) || 0;
+        return window.renderSakhiHookMessage(targetCat, scriptIndex);
+      }
+
+      const legacyMatch = q.match(/अगला मैसेज दिखाओ\s*(\d+)/);
+      if (legacyMatch) {
+        scriptIndex = parseInt(legacyMatch[1], 10) || 0;
+        return window.renderSakhiHookMessage('agri', scriptIndex);
+      }
+
+      if (q.includes('स्वास्थ्य') || q.includes('health') || q.includes('दर्द') || q.includes('dard')) targetCat = 'health';
+      else if (q.includes('पशु') || q.includes('pashu') || q.includes('दूध') || q.includes('doodh')) targetCat = 'pashu';
+      else if (q.includes('कमाई') || q.includes('income') || q.includes('महिला') || q.includes('युवा')) targetCat = 'income';
+      else if (q.includes('मोटिवेशन') || q.includes('विचार') || q.includes('स्टेटस')) targetCat = 'motivational';
+
+      return window.renderSakhiHookMessage(targetCat, 0);
+    }
+
+    // 10. CLOSING TECHNIQUES & PAYMENT CONVERSION
+    if (q.includes('closing kaise') || q.includes('क्लोजिंग कैसे') || q.includes('closing technique') || q.includes('deal close') || q.includes('payment kaise')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', 'साइकोलॉजिकल क्लोजिंग तकनीक व पेमेंट कन्वर्शन');
+      const resp = `🎯 **मास्टर क्लोजिंग तकनीक — प्लान दिखाने के बाद तुरंत पेमेंट कैसे लें:**\n\nकभी भी प्रोस्पेक्ट से यह मत पूछिए कि *"आपको प्लान कैसा लगा?"* (इससे वे सोचने का बहाना बनाएंगे)। हमेशा इन 3 मनोवैज्ञानिक क्लोजिंग तकनीकों का उपयोग करें:\n\n1. **अल्टरनेटिव चॉइस क्लोज (Alternative Choice Close):**\n   • *"भाई साहब, आपने पूरा सिस्टम देखा। आप शुरुआत अपनी खेती के लिए Biofit पैक से करना चाहेंगे या परिवार के स्वास्थ्य के लिए नेचुरामोर कॉम्बो से?"*\n   • *"आप 25% छूट वाले ₹10,000 के पैक से शुरू करेंगे या ₹3,500 के ट्रायल पैक से?"*\n   • (दोनों ही सूरतों में वे 'हाँ' का चुनाव करते हैं!)\n\n2. **शार्प एंगल क्लोज (Sharp Angle Close):**\n   • प्रोस्पेक्ट बोले: *"क्या मुझे होम डिलीवरी फ्री मिल जाएगी?"*\n   • आपका जवाब: *"अगर मैं आपको 100% फ्री होम डिलीवरी और 25% छूट अभी दिलवा दूं, तो क्या हम अभी शुरुआत का फॉर्म भरें?"*\n\n3. **अर्जेंसी व ऑफर क्लोज (Urgency Close):**\n   • *"इस महीने कंपनी का विशेष 5+1 कॉम्बो ऑफर चल रहा है जो सिर्फ 2 दिन शेष है। आइए अभी आधार कार्ड और मोबाइल से आपका रजिस्ट्रेशन करके ऑर्डर लगा देते हैं!"*`;
+
+      renderCrispSpecialBox('🎯 मास्टर क्लोजिंग तकनीक व पेमेंट कन्वर्शन गाइड', resp, [
+        { text: '🧮 2×2 मैट्रिक्स 12 महीने का गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' },
+        { text: '💡 "पैसे नहीं हैं" का समाधान', query: 'मेरे पास पैसे नहीं हैं का क्या जवाब दें' },
+        { text: '📲 WhatsApp पर प्रोस्पेक्ट को क्या भेजें', query: 'नए लोगों को व्हाट्सएप पर क्या मैसेज भेजें' }
+      ], 'business', 'closing_techniques_card');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 1. CROP INTERCROPPING (सह-फसल व मिश्रित खेती विशेषज्ञ)
+  // =========================================================================
+  function handleCropIntercropping(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isIntercrop = (
+      q.includes('sah fasal') || q.includes('सह-फसल') || q.includes('सह फसल') ||
+      q.includes('mishrit kheti') || q.includes('मिश्रित खेती') || q.includes('intercrop') ||
+      (q.includes('gehu') && (q.includes('chana') || q.includes('sarso'))) ||
+      (q.includes('गेहूं') && (q.includes('चना') || q.includes('सरसों') || q.includes('राई')))
+    );
+
+    if (!isIntercrop) return false;
+
+    sakhiConversationState.lastActiveDomain = 'agri';
+    const resp = `🌾 **गेहूं के साथ चना व सरसों की सह-फसल (Intercropping) — एक खेत से दोहरा मुनाफा:**\n\nसह-फसल पद्धति से एक ही खेत, एक ही सिंचाई और एक ही खाद में दोहरी आय मिलती है और फसलें एक-दूसरे की रक्षा करती हैं।\n\n📐 **1. बुवाई का सही पंक्ति अनुपात (Row Ratio):**\n• **गेहूं + सरसों (9:1 अनुपात):** हर 9 कतार गेहूं की बुवाई के बाद 1 कतार सरसों की लगाएं।\n• **गेहूं + चना (4:2 अनुपात):** 4 कतार गेहूं और 2 कतार चने की बुवाई करें।\n\n🌱 **2. तीन बड़े वैज्ञानिक फायदे:**\n1. **मुफ्त नाइट्रोजन खाद (Natural Fertilizer):** चने की जड़ों में मौजूद राइजोबियम बैक्टीरिया हवा की नाइट्रोजन खींचकर गेहूं की जड़ों को मुफ्त खुराक देते हैं।\n2. **कीट-कवच (Trap Crop):** सरसों के पीले फूल और तेज गंध से कीट सरसों पर आकर्षित होते हैं, जिससे मुख्य गेहूं की फसल कीटों से 100% सुरक्षित रहती है।\n3. **जोखिम शून्य व बंपर लाभ:** मौसम की मार या भाव के उतार-चढ़ाव में भी किसान को कभी नुकसान नहीं होता।\n\n🛡️ **3. Biofit साझा पोषण व स्प्रे शेड्यूल:**\n• **बुवाई पर:** गेहूं व चने/सरसों के बीज को **स्टिमरिच (5ml/kg)** से उपचारित करें।\n• **पहली सिंचाई (21 दिन):** स्टिमरिच (30ml) + Bio-99 (5ml) प्रति पंप — दोनों फसलों में कल्ले व फुटाव 35% बढ़ जाते हैं!`;
+
+    renderMasterCropCard('गेहूं + चना/सरसों सह-फसल व दोहरा मुनाफा', resp, [
+      { label: '🧪 रासायनिक खाद 50% कम करने का फॉर्मूला', query: 'गेहूं में रासायनिक खाद कम कैसे करें' },
+      { label: '🌾 गेहूं की संपूर्ण उन्नत खेती व बीमारियां', query: 'गेहूं की संपूर्ण जानकारी बताओ' },
+      { label: '🌿 चने में उकठा रोग व कीट नियंत्रण', query: 'चने की बीमारी और दवा बताओ' }
+    ]);
+    return true;
+  }
+
+  // =========================================================================
+  // 2. CHEMICAL FERTILIZER REDUCTION (रासायनिक खाद 50% घटाने का फॉर्मूला)
+  // =========================================================================
+  function handleChemicalFertilizerReduction(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isFertRed = (
+      q.includes('rasayanik khad') || q.includes('रासायनिक खाद') || q.includes('dap kam') ||
+      q.includes('यूरिया कम') || q.includes('यूरिया आधा') || q.includes('खाद आधा') ||
+      q.includes('khad kam') || q.includes('urea spray') || q.includes('खाद की बचत')
+    );
+
+    if (!isFertRed) return false;
+
+    sakhiConversationState.lastActiveDomain = 'agri';
+    const resp = `🧪 **यूरिया व डीएपी की मात्रा 50% घटाने का अचूक वैज्ञानिक फॉर्मूला:**\n\nकिसान भाई, सच्चाई यह है कि जब आप जमीन में 1 बोरी (45kg) यूरिया फेंकते हैं, तो पौधे केवल **25 से 30%** ही ले पाते हैं; बाकी 70% यूरिया हवा में उड़कर या जमीन में बहकर बर्बाद हो जाता है!\n\n🌾 **खाद का खर्च आधा करने के 3 पक्के नियम:**\n\n1. 🧫 **Bio-NPK से डीएपी आधा करें (जमीन में):**\n   • बुवाई या पहली सिंचाई पर **बायोफिट Bio-NPK (1L/एकड़)** दें। यह जमीन में सालों से पत्थर बनकर दबे पड़े फास्फोरस और पोटाश को घोलकर सीधे जड़ों तक पहुंचा देता है। इससे आधी बोरी डीएपी में ही पूरी बोरी जितना बंपर रिजल्ट मिलता है!\n\n2. 🍃 **यूरिया का नैनो फोलियर स्प्रे (पत्तियों पर छिड़काव):**\n   • जमीन में यूरिया की बोरी फेंकने के बजाय: **15 लीटर पंप में मात्र 100 ग्राम यूरिया + 30ml स्टिमरिच + 5ml Bio-99** मिलाकर पत्तों पर छिड़कें।\n   • पत्तियों के रंध्र (Stomata) इसे 95% सोख लेते हैं। **मात्र 2 किलो यूरिया का स्प्रे पूरी 45 किलो की बोरी जितना गहरा हरापन और फुटाव देता है!**\n\n3. 🪱 **शेत (Sheth) से मिट्टी सुधार:**\n   • शेत के सूक्ष्म जीवाणु मिट्टी को पोला और भुरभुरा बनाकर केंचुओं को सक्रिय करते हैं, जिससे जमीन खुद खाद बनाने की फैक्ट्री बन जाती है।`;
+
+    renderMasterCropCard('यूरिया व रासायनिक खाद 50% घटाने का फॉर्मूला', resp, [
+      { label: '🌾 गेहूं में पहली सिंचाई व कल्ले फुटाव', query: 'गेहूं में पहली सिंचाई कब करें और क्या डालें' },
+      { label: '💰 4 एकड़ का बायोफिट खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+      { label: '🌿 गेहूं के साथ चना/सरसों सह-फसल', query: 'गेहूं के साथ चना या सरसों की सह-फसल कैसे लगाएं' }
+    ]);
+    return true;
+  }
+
+  // =========================================================================
+  // 3. DIRECT SELLING SCRIPTS & FOLLOW-UP MASTER ENGINE
+  // =========================================================================
+  function handleDirectSellingScriptsMaster(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+
+    // A. PHONE FOLLOW-UP SCRIPT
+    if (q.includes('followup') || q.includes('फॉलोअप') || q.includes('fallowup') || q.includes('फोन पर बात') || q.includes('call par')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', 'फोन पर प्रोस्पेक्ट फॉलोअप के 3 स्वर्णिम नियम');
+      const resp = `📞 **फोन पर प्रोस्पेक्ट का फॉलोअप (Follow-up) करने के 3 स्वर्णिम नियम:**\n\nनेटवर्क मार्केटिंग में 80% जॉइनिंग और सेल प्लान दिखाने के बाद **फॉलोअप** से आती है! फोन करते समय इन 3 बातों का पालन करें:\n\n1. ⏱️ **24 से 48 घंटे का नियम:**\n   • वीडियो या प्लान देखने के 48 घंटे के भीतर कॉल अवश्य करें। इसके बाद प्रोस्पेक्ट का उत्साह ठंडा हो जाता है।\n\n2. 🗣️ **सवाल पूछने का जादुई तरीका (कभी न पूछें 'कैसा लगा'):**\n   • ❌ गलत सवाल: *"भाई साहब, आपने वीडियो देखा क्या? क्या सोचा आपने?"* (वे बहाना बनाएंगे!)\n   • ✅ सही सवाल: *"नमस्ते भाई साहब! आपने जो जानकारी देखी, उसमें आपको सबसे अच्छा क्या लगा — रासायनिक खाद का 70% खर्च बचना या पार्ट-टाइम ₹20,000 कमाने का अवसर?"*\n   • (इस सवाल में दोनों ही विकल्प सकारात्मक हैं!)\n\n3. 🤖 **डिजिटल अपलाइन (सखी AI) का उपयोग:**\n   • यदि वे कोई सवाल पूछें: *"भाई साहब, आपकी शंका बहुत वाजिब है। आइए मैं आपको अपनी डिजिटल अपलाइन 'आरोग्यम सखी AI' से रूबरू कराता हूँ, वे आपको 24 घंटे हर सवाल का वैज्ञानिक जवाब देंगी!"*`;
+
+      renderCrispSpecialBox('📞 फोन पर फॉलोअप (Follow-up) मास्टर स्क्रिप्ट', resp, [
+        { text: '🎯 क्लोजिंग के लिए WhatsApp पर क्या मैसेज भेजें?', query: 'क्लोजिंग के लिए मैसेज कैसे बनाएं' },
+        { text: '📋 100 लोगों की F.R.I.E.N.D.S लिस्ट बनाएं', query: 'नए लोगों की लिस्ट कैसे बनाएं' },
+        { text: '🌸 सखी से बात करवाएं (रेफरल शेयर)', query: 'सखी से बात करवाएं' }
+      ], 'business', 'followup_script_card');
+      return true;
+    }
+
+    // B. CLOSING MESSAGE SCRIPT
+    if (q.includes('closing msg') || q.includes('क्लोजिंग मैसेज') || q.includes('closing ke liye') || q.includes('क्लोजिंग के लिए')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      savePersistentSakhiConsultation('business', 'क्लोजिंग हेतु 3 रेडी-टू-सेंड WhatsApp मैसेज');
+      const resp = `🎯 **क्लोजिंग के लिए 3 रेडी-टू-सेंड WhatsApp मैसेज (तुरंत कॉपी करें):**\n\n1. 🌾 **खेती बचत क्लोजिंग मैसेज (किसान प्रोस्पेक्ट हेतु):**\n> *"राम-राम भाई साहब! 🙏 बुवाई का सही समय आ गया है। इस बार हमें रासायनिक खाद पर हजारों रुपये बर्बाद नहीं करने हैं, बल्कि 70% खर्च बचाकर 25% ज्यादा पैदावार लेनी है। आपका 4 एकड़ का Biofit ट्रायल पैक 25% छूट पर आज ही बुक कर दूँ?"*\n\n2. 🩺 **स्वास्थ्य व दर्द मुक्ति क्लोजिंग मैसेज (मरीज हेतु):**\n> *"नमस्ते जी! 🙏 घुटने और जोड़ों के दर्द को और मत सहिए। नेचुरामोर 100% शाकाहारी आयुर्वेदिक पोषण से हजारों परिवारों को राहत मिली है। कंपनी का 5+1 ऑफर चल रहा है, क्या यह पैक आपके घर के पते पर डिलीवर करवा दूँ?"*\n\n3. 💼 **बिज़नेस व आमदनी क्लोजिंग मैसेज:**\n> *"भाई साहब, हर महीने की 15 और 30 तारीख को पे-आउट आता है। यदि हम आज शुरुआत करते हैं, तो अगले 15 दिन में आपकी पहली इनकम का रास्ता खुल जाएगा। आइए अभी आधार कार्ड और मोबाइल से आपका फ्री रजिस्ट्रेशन फॉर्म भरते हैं!"*`;
+
+      renderCrispSpecialBox('🎯 क्लोजिंग हेतु रेडी-टू-सेंड WhatsApp मैसेज', resp, [
+        { text: '📞 फोन पर फॉलोअप कैसे करें?', query: 'फोन पर फॉलोअप कैसे करें' },
+        { text: '💡 "पैसे नहीं हैं" का सटीक जवाब', query: 'मेरे पास पैसे नहीं हैं का क्या जवाब दें' },
+        { text: '🌸 सखी से बात करवाएं', query: 'सखी से बात करवाएं' }
+      ], 'business', 'closing_msg_card');
+      return true;
+    }
+
+    // C. INVITE / SHARE SAKHI AI TO TALK ("सखी से बात करवाएं")
+    if (q.includes('sakhi se baat') || q.includes('सखी से बात करवा') || q.includes('sakhi share')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      let phone = '';
+      try { phone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || '7974422572').replace(/\D/g, '').slice(-10); } catch (_) {}
+      let name = '';
+      try { name = localStorage.getItem('aarogyam_user_name') || 'आरोग्यम साथी'; } catch (_) {}
+
+      const origin = (window.location.origin && window.location.origin.includes('http')) ? window.location.origin : 'https://aarogyamindia.online';
+      const mySakhiLink = `${origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(phone)}`;
+
+      const shareText = `🌸 *नमस्ते! मिलिए 'आरोग्यम सखी AI' से — आपकी पर्सनल 24×7 सलाहकार!* 🌾\n\nखेती में खाद-दवा की सही डोज, पशुपालन (दूध-फैट वृद्धि), घुटने-जोड़ों का दर्द या घर बैठे पार्ट-टाइम आमदनी — हर सवाल का 100% सही व वैज्ञानिक समाधान!\n\n👇 नीचे दी गई लिंक पर टैप करें और सखी AI से सीधे बात करें (बिल्कुल फ्री):\n${mySakhiLink}\n\n👤 *प्रेषक:* ${name} (मो. ${phone})`;
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+      const resp = `🌸 **अपनी डिजिटल अपलाइन 'सखी AI' से लोगों की सीधी बात करवाएं:**\n\nआपको किसी को प्लान या दवा समझाने में मेहनत करने की जरूरत नहीं है! बस नीचे दिए गए हरे बटन से यह मैसेज अपने किसान भाइयों, दोस्तों और रिश्तेदारों को WhatsApp पर शेयर कर दीजिए।\n\nवे जैसे ही इस लिंक पर टैप करके सखी AI से बात करेंगे, **उनका नाम और मोबाइल नंबर सीधे आपकी 'My Profile' में दर्ज हो जाएगा!**\n\n📲 **नीचे दिए गए बटन से सीधे WhatsApp पर शेयर करें:**`;
+
+      renderCrispSpecialBox('🌸 सखी से बात करवाएं (डिजिटल अपलाइन शेयर)', resp, [
+        { text: '📲 सीधे WhatsApp पर शेयर करें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '📞 फोन पर फॉलोअप कैसे करें?', query: 'फोन पर फॉलोअप कैसे करें' },
+        { text: '🎯 क्लोजिंग के लिए मैसेज कैसे बनाएं?', query: 'क्लोजिंग के लिए मैसेज कैसे बनाएं' }
+      ], 'business', 'invite_sakhi_card');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 4. SPIRITUAL & SATTVIC WISDOM MASTER ENGINE (सात्विक व आध्यात्मिक ज्ञान)
+  // =========================================================================
+  function handleSpiritualAndSattvicWisdom(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isSpiritual = (
+      q.includes('satvik') || q.includes('सात्विक') || q.includes('adhyatmik') || q.includes('आध्यात्मिक') ||
+      q.includes('dinacharya') || q.includes('दिनचर्या') || q.includes('brahm muhurat') || q.includes('ब्रह्म मुहूर्त') ||
+      q.includes('panchtatva') || q.includes('पंचतत्व') || q.includes('dharti mata') || q.includes('धरती माता') ||
+      q.includes('seva bhav') || q.includes('सेवा भाव') || q.includes('nishkam karma') || q.includes('निष्काम कर्म') ||
+      q.includes('karmayoga') || q.includes('कर्मयोग') || q.includes('man ki shanti') || q.includes('मानसिक शांति') ||
+      q.includes('tanav') || q.includes('तनाव') || q.includes('chinta') || q.includes('चिंता') || q.includes('जैसा अन्न वैसा मन')
+    );
+
+    if (!isSpiritual) return false;
+
+    sakhiConversationState.lastActiveDomain = 'health';
+    savePersistentSakhiConsultation('health', 'सात्विक जीवन, शांति व कर्मयोग सूत्र');
+
+    // A. DHARTI MATA & SACRED ORGANIC AGRICULTURE
+    if (q.includes('dharti') || q.includes('धरती') || q.includes('govansh') || q.includes('गो आधारित') || q.includes('गौ')) {
+      const resp = `🌾 **धरती माता की सेवा व गो-आधारित विषमुक्त कृषि का पावन धर्म:**\n\nवेदों में कहा गया है — *"माता भूमिः पुत्रोऽहं पृथिव्याः"* (यह भूमि हमारी माता है और हम इसके पुत्र हैं)।\n\nआज जहरीले रासायनिक खादों और कीटनाशकों ने हमारी धरती माता की कोख को बंजर और बीमार बना दिया है। केंचुए और मित्र जीवाणु मर रहे हैं, और वही जहर अन्न के माध्यम से हमारे बच्चों के शरीर में कैंसर और असाध्य रोग बन रहा है।\n\n🙏 **जैविक बायोफिट खेती केवल खेती नहीं, बल्कि पुण्य का पावन कार्य है:**\n1. **सूक्ष्मजीवों की सेवा:** शेत (Sheth) और Bio-NPK से मिट्टी के करोड़ों केंचुए व जीवाणु पुनः जीवित होते हैं।\n2. **विषमुक्त अन्न का अमृत:** जब आप रासायनिक जहर रहित शुद्ध अन्न उगाते हैं, तो वह अन्न खाने वाले हर इंसान की अंतरात्मा से आपको आशीर्वाद मिलता है।\n3. **आने वाली पीढ़ियों की रक्षा:** अपनी आने वाली पीढ़ी को उपजाऊ और जीवनदायिनी मिट्टी सौंपना ही सबसे बड़ा धर्म है।`;
+
+      renderCrispSpecialBox('🌾 धरती माता की सेवा व विषमुक्त कृषि का संकल्प', resp, [
+        { text: '🧪 यूरिया व रासायनिक खाद 50% घटाने का फॉर्मूला', query: 'गेहूं में रासायनिक खाद कम कैसे करें' },
+        { text: '🕉️ सात्विक दिनचर्या व आहार नियम', query: 'सात्विक दिनचर्या और आहार के नियम बताओ' },
+        { text: '💼 डायरेक्ट सेलिंग में सेवा भाव व कर्मयोग', query: 'डायरेक्ट सेलिंग में सेवा भाव और कर्मयोग' }
+      ], 'agri', 'spiritual_dharti_card');
+      return true;
+    }
+
+    // B. SEVA BHAV & KARMA YOGA IN DIRECT SELLING
+    if (q.includes('seva') || q.includes('सेवा') || q.includes('karma') || q.includes('कर्म') || q.includes('ईमानदारी') || q.includes('iman')) {
+      const resp = `💼 **डायरेक्ट सेलिंग में 'सेवा भाव' व 'निष्काम कर्मयोग' का रहस्य:**\n\nश्रीमद्भगवद्गीता में भगवान श्रीकृष्ण कहते हैं — *"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन"*।\n\nजब आप किसी व्यक्ति के पास केवल अपना कमीशन कमाने या मेंबर बनाने जाते हैं, तो सामने वाला आपकी नीयत भांप लेता है और दूर भागता है। लेकिन जब आप **'सेवा भाव'** से जाते हैं, तो चमत्कार होता है!\n\n✨ **कर्मयोग के 3 पावन सूत्र:**\n1. **समस्या का सच्चा समाधान:** जब आप किसी किसान का ₹2,000 का खर्च बचाते हैं, या किसी बुजुर्ग के घुटनों का दर्द मिटाते हैं, तो यह व्यापार नहीं, ईश्वरीय सेवा है।\n2. **छल-कपट से शून्य प्रामाणिकता:** सत्य, पारदर्शिता और समर्पण से किया गया कार्य कभी व्यर्थ नहीं जाता।\n3. **'ना' से विचलित न होना:** हर 'ना' (Rejection) आपके धैर्य की परीक्षा है। जो इंसान सेवा भाव से निरंतर लगा रहता है, ईश्वर उसे 12 महीने में शीर्ष पर पहुंचा देते हैं!`;
+
+      renderCrispSpecialBox('💼 डायरेक्ट सेलिंग में सेवा भाव व निष्काम कर्मयोग', resp, [
+        { text: '🧮 2×2 डुप्लीकेशन से 12 महीने में ₹8.19L कैपिंग', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' },
+        { text: '🕉️ सात्विक दिनचर्या व आहार नियम', query: 'सात्विक दिनचर्या और आहार के नियम बताओ' },
+        { text: '📞 फोन पर फॉलोअप कैसे करें?', query: 'फोन पर फॉलोअप कैसे करें' }
+      ], 'business', 'spiritual_karma_card');
+      return true;
+    }
+
+    // C. SATTVIC DINACHARYA, MIND PEACE & NUTRITION
+    const resp = `🕉️ **सात्विक जीवन शैली, मानसिक शांति व दैनिक आरोग्य के स्वर्णिम सूत्र:**\n\n*"जैसा अन्न, वैसा मन!"* — हमारे विचार और स्वास्थ्य सीधे हमारे आहार और दिनचर्या से जुड़े हैं।\n\n🌅 **1. ब्रह्म मुहूर्त व उषापान (सुबह का नियम):**\n• सूर्योदय से पूर्व उठें और तांबे या सादे लोटे से 2 गिलास गुनगुना जल घूंट-घूंट करके पिएं।\n• 15 मिनट प्राणायाम (अनुलोम-विलोम व भ्रामरी) करें — इससे 80% मानसिक तनाव और चिंता समाप्त हो जाती है।\n\n🥗 **2. सात्विक आहार का नियम:**\n• बासी, अत्यधिक तला-भुना और रासायनिक जहर वाला भोजन तामसिक होता है जो आलस्य और क्रोध बढ़ाता है।\n• ताजा, सुपाच्य मौसमी फल, सब्जियां और **100% शाकाहारी नेचुरामोर पोषण** शरीर के सातों धातुओं (रस, रक्त, मांस, मेद, अस्थि, मज्जा, शुक्र) को पुष्ट करता है।\n\n🧘 **3. रात्रि का शांति नियम:**\n• सोने से 1 घंटा पहले मोबाइल स्क्रीन बंद करें।\n• पैरों के तलवों पर तिल या सरसों के तेल की मालिश करें — गहरी और सात्विक नींद आएगी।`;
+
+    renderCrispSpecialBox('🕉️ सात्विक दिनचर्या, मानसिक शांति व आरोग्य सूत्र', resp, [
+      { text: '🌾 धरती माता की सेवा व विषमुक्त खेती', query: 'धरती माता की सेवा और विषमुक्त खेती' },
+      { text: '💼 डायरेक्ट सेलिंग में सेवा भाव व कर्मयोग', query: 'डायरेक्ट सेलिंग में सेवा भाव और कर्मयोग' },
+      { text: '🦴 घुटने व जोड़ों के दर्द का समाधान', query: 'ज्वाइंट केयर का खर्चा बताओ' }
+    ], 'health', 'spiritual_sattvic_card');
+    return true;
+  }
 
   // 19. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
   function processKnowledgeQuery(query) {
@@ -9606,6 +10389,41 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // Zero-Egress Dynamic User Persona & Session Memory Update
     updateSakhiUserPersonaFromQuery(cleanQ, targetDomain);
 
+    // 0.0001 ACTIVE CONVERSATIONAL STATE & MULTI-TURN PENDING ACTION RESOLUTION
+    if (typeof resolveActiveDialogueState === 'function' && resolveActiveDialogueState(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0002 INTERACTIVE ALLOPATHIC DRUG RESOLVER & SAFETY ASSISTANT
+    if (typeof handleInteractiveAllopathicDrugFlow === 'function' && handleInteractiveAllopathicDrugFlow(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0003 NETSURF DIRECT SELLING & MASTER MLM BUSINESS COACH
+    if (typeof handleNetsurfMasterMLMCoach === 'function' && handleNetsurfMasterMLMCoach(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0004 MASTER CROP INTERCROPPING (सह-फसल व मिश्रित खेती)
+    if (typeof handleCropIntercropping === 'function' && handleCropIntercropping(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0005 CHEMICAL FERTILIZER REDUCTION (यूरिया व रासायनिक खाद 50% घटाने का फॉर्मूला)
+    if (typeof handleChemicalFertilizerReduction === 'function' && handleChemicalFertilizerReduction(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0006 DIRECT SELLING PHONE FOLLOW-UP & CLOSING SCRIPTS MASTER
+    if (typeof handleDirectSellingScriptsMaster === 'function' && handleDirectSellingScriptsMaster(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0007 SPIRITUAL & SATTVIC WISDOM MASTER ENGINE (सात्विक दिनचर्या, आहार व कर्मयोग)
+    if (typeof handleSpiritualAndSattvicWisdom === 'function' && handleSpiritualAndSattvicWisdom(cleanQ, rawQ)) {
+      return;
+    }
+
     // 0.001 Website Action Router (Open library, reader, purchases, tube, registration, category hubs)
     if (handleWebsiteActionRouter(cleanQ, rawQ)) {
       return;
@@ -9615,7 +10433,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (handleConversationalProfiling(cleanQ, rawQ)) {
       return;
     }
-
 
     // 0. Safety Guardrails & Emergency Refusal Protocol (Abuse, Poison, Heart Attack, Agri Overdose, Heat Spray)
     if (handleSafetyGuardrails(cleanQ, rawQ)) {
@@ -9915,10 +10732,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     const html = `
-      <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-        ${escapeHtml(title)}
-      </div>
-      <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:10px;">
+      <div style="font-size:0.96rem;line-height:1.7;color:#0f172a;white-space:pre-line;margin-bottom:10px;">
         ${formatTextHtml(bodyText)}
       </div>
       ${buildMsgAudioBtnMarkup(bodyText)}
@@ -9934,18 +10748,12 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       ` : ''}
     `;
 
-    // Dynamic Bottom Suggestion Pills Mirroring (Per User Rule: No static pills, reflect dynamic followups)
+    // Bottom suggestion pills permanently hidden per user instruction
     try {
       const bottomBar = document.getElementById('sakhiSmartPillsBar');
-      if (bottomBar && chips && chips.length > 0) {
-        const dynamicPills = chips.filter(c => !c.url && !c.isExternal).slice(0, 4);
-        if (dynamicPills.length > 0) {
-          bottomBar.innerHTML = dynamicPills.map((c, idx) => {
-            const cls = idx === 0 ? 'sakhi-smart-pill pill-gold' : 'sakhi-smart-pill';
-            return `<button type="button" class="${cls}" onclick="window.askSakhiQuick('${escapeHtml(c.query)}')"><span>${escapeHtml(c.text)}</span> →</button>`;
-          }).join('');
-          bottomBar.style.display = 'flex';
-        }
+      if (bottomBar) {
+        bottomBar.style.display = 'none';
+        bottomBar.innerHTML = '';
       }
     } catch (_) {}
 
@@ -10866,6 +11674,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
     handleUserSubmit(query);
   };
+
+  window.processKnowledgeQuery = processKnowledgeQuery;
 
   // Butter-Smooth Plus Menu Toggle with Touch-Safe Backdrop and Auto-Close
   window.toggleSakhiPlusMenu = function (forceState) {

@@ -181,26 +181,32 @@
     return { title: cleanTitle, text: text, url: url, price: cleanPrice };
   }
 
-  // 3A. Direct Native Share (Button 1: Share Now - Native OS Share)
-  window.nativeDirectShare = function (bId, title, price) {
-    const data = buildBookSharePayload(bId, title, price);
-    if (navigator.share) {
-      navigator.share({
-        title: data.title,
-        text: data.text,
-        url: data.url
-      }).catch(err => {
-        if (err.name !== 'AbortError') {
-          window.openShareDrawer(bId, title, price);
-        }
-      });
-    } else {
-      window.openShareDrawer(bId, title, price);
+  function checkBookShareAuth(callback) {
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    if (!isLogged) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          if (typeof callback === 'function') callback();
+        }, { force: false, source: 'UniversalShareGate' });
+        return false;
+      }
     }
+    return true;
+  }
+
+  // 3A. Direct Native Share (Button 1: Share Now - Routes to 5-Button Modal with Auth Gate)
+  window.nativeDirectShare = function (bId, title, price) {
+    if (!checkBookShareAuth(() => window.nativeDirectShare(bId, title, price))) return;
+    window.openShareDrawer(bId, title, price);
   };
 
   // 3B. Animated Social Channels (5 Sharp Buttons Stack with Transparent Background)
   window.openShareDrawer = function (bId, title, price) {
+    if (!checkBookShareAuth(() => window.openShareDrawer(bId, title, price))) return;
+
     const data = buildBookSharePayload(bId, title, price);
     const encodedUrl = encodeURIComponent(data.url);
     const encodedText = encodeURIComponent(data.text);
@@ -217,7 +223,7 @@
       <div class="ai-share-buttons-stack" id="ai-share-buttons-stack">
         
         <!-- 1. WhatsApp Button -->
-        <a href="https://api.whatsapp.com/send?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-whatsapp" onclick="window.closeShareDrawer()">
+        <a href="https://api.whatsapp.com/send?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-whatsapp" onclick="if(window.recordModalShareEvent)window.recordModalShareEvent('whatsapp','${data.url}','${data.title.replace(/'/g, "\\'")}'); window.closeShareDrawer();">
           <div class="ai-share-icon-wrap" style="background:#25D366;color:#fff;">
             <i class="fa-brands fa-whatsapp"></i>
           </div>

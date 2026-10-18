@@ -94,6 +94,20 @@
 
   // Universal Share Trigger (Modal or Native WebShare)
   async function triggerShare(options = {}) {
+    // 🔒 GUEST GATE: Check if user is logged in before allowing ANY share
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    if (!isLogged) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          triggerShare(options);
+        }, { force: false, source: 'UniversalShareGate' });
+        return;
+      }
+    }
+
     const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
     const ogDesc = document.querySelector('meta[property="og:description"]')?.getAttribute('content');
 
@@ -129,100 +143,111 @@
     const cleanText = (text || '').replace(/<[^>]+>/g, '').trim();
     const isAgri = window.location.pathname.includes('agriculture') || window.location.pathname.includes('crop');
     const headerPrefix = isAgri ? '🌾' : '✨';
-    const fullShareMessage = `${headerPrefix} *${cleanTitle}*\n\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व समाधान यहाँ देखें:\n${shareUrl}`;
+    const fullShareMessage = (cleanText && cleanText.includes('http'))
+      ? cleanText
+      : `${headerPrefix} *${cleanTitle}*\n\n${cleanText ? cleanText + '\n\n' : ''}👉 सम्पूर्ण विवरण व समाधान यहाँ देखें:\n${shareUrl}`;
 
-    // Render the sleek 3-option transparent floating sheet
+    // Delegate to unified 5-card modal from screenshot if universal drawer is loaded
+    if (typeof window.openUniversalShareModal === 'function') {
+      window.openUniversalShareModal({
+        title: cleanTitle,
+        text: cleanText,
+        url: shareUrl
+      });
+      return;
+    }
+
+    // Direct fallback to 5-channel modal
     renderShareModal(cleanTitle, fullShareMessage, shareUrl);
   }
 
   function renderShareModal(title, text, shareUrl) {
-    let modal = document.getElementById('aoi-viral-share-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'aoi-viral-share-modal';
-      modal.style.cssText = `
-        position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-        z-index: 999999; display: flex; align-items: center; justify-content: center;
-        padding: 20px; opacity: 0; transition: opacity 0.22s ease;
-      `;
-      document.body.appendChild(modal);
+    let overlay = document.getElementById('ai-share-drawer-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'ai-share-drawer-overlay';
+      overlay.className = 'ai-share-drawer-overlay';
+      document.body.appendChild(overlay);
     }
 
-    const waShareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedText = encodeURIComponent(text);
 
-    modal.innerHTML = `
-      <div style="background: transparent; border: none; box-shadow: none; max-width: 360px; width: 100%; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; transform: scale(0.92); transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);" id="aoi-viral-share-container">
-
-        <!-- 1. WhatsApp Share (Green Pill Button) -->
-        <a href="${waShareLink}" target="_blank" id="btnAoiWhatsAppShare" style="
-          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-          color: #ffffff; text-decoration: none; padding: 15px 24px; border-radius: 50px;
-          font-weight: 800; font-size: 1.05rem; display: flex; align-items: center;
-          justify-content: center; gap: 12px; width: 100%; box-sizing: border-box;
-          box-shadow: 0 10px 25px rgba(22, 163, 74, 0.45);
-          border: 1.5px solid rgba(255, 255, 255, 0.25);
-          cursor: pointer; transition: transform 0.15s ease;
-        ">
-          <i class="fa-brands fa-whatsapp" style="font-size: 1.45rem;"></i>
-          <span>WhatsApp पर शेयर करें</span>
+    overlay.innerHTML = `
+      <div class="ai-share-buttons-stack" id="ai-share-buttons-stack">
+        <!-- 1. WhatsApp Button -->
+        <a href="https://api.whatsapp.com/send?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-whatsapp" onclick="if(window.recordModalShareEvent)window.recordModalShareEvent('whatsapp','${shareUrl}','${title.replace(/'/g, "\\'")}'); overlay.style.display='none';">
+          <div class="ai-share-icon-wrap" style="background:#25D366;color:#fff;">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div class="ai-share-btn-text">
+            <strong>WhatsApp</strong>
+            <span>किसान ग्रुप्स व दोस्तों को तुरंत मैसेज भेजें</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ai-share-arrow"></i>
         </a>
 
-        <!-- 2. Native Mobile Share (Blue Pill Button) -->
-        <button type="button" id="btnAoiNativeShare" style="
-          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-          color: #ffffff; border: 1.5px solid rgba(255, 255, 255, 0.25); padding: 15px 24px; border-radius: 50px;
-          font-weight: 800; font-size: 1.05rem; display: flex; align-items: center;
-          justify-content: center; gap: 12px; width: 100%; box-sizing: border-box;
-          box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
-          cursor: pointer; transition: transform 0.15s ease;
-        ">
-          <i class="fa-solid fa-share-nodes" style="font-size: 1.3rem;"></i>
-          <span>सभी ऐप्स पर शेयर करें (Native)</span>
-        </button>
+        <!-- 2. Facebook Button -->
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" class="ai-share-btn-item ch-facebook" onclick="if(window.recordModalShareEvent)window.recordModalShareEvent('facebook','${shareUrl}','${title.replace(/'/g, "\\'")}'); overlay.style.display='none';">
+          <div class="ai-share-icon-wrap" style="background:#1877F2;color:#fff;">
+            <i class="fa-brands fa-facebook-f"></i>
+          </div>
+          <div class="ai-share-btn-text">
+            <strong>Facebook</strong>
+            <span>फेसबुक फीड या मैसेंजर पर पोस्ट करें</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ai-share-arrow"></i>
+        </a>
 
-        <!-- 3. Copy Link (Glass Pill Button) -->
-        <button type="button" id="btnCopyShareUrl" style="
-          background: rgba(15, 23, 42, 0.88);
-          color: #38bdf8; border: 1.5px solid rgba(56, 189, 248, 0.5); padding: 14px 24px; border-radius: 50px;
-          font-weight: 800; font-size: 1rem; display: flex; align-items: center;
-          justify-content: center; gap: 10px; width: 100%; box-sizing: border-box;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-          cursor: pointer; transition: transform 0.15s ease;
-          backdrop-filter: blur(10px);
-        ">
-          <i class="fa-solid fa-copy" style="font-size: 1.15rem;"></i>
-          <span id="btnCopyShareText">लिंक कॉपी करें (Copy Link)</span>
-        </button>
+        <!-- 3. Twitter / X Button -->
+        <a href="https://twitter.com/intent/tweet?text=${encodedText}" target="_blank" class="ai-share-btn-item ch-twitter" onclick="if(window.recordModalShareEvent)window.recordModalShareEvent('twitter','${shareUrl}','${title.replace(/'/g, "\\'")}'); overlay.style.display='none';">
+          <div class="ai-share-icon-wrap" style="background:#000000;color:#fff;">
+            <i class="fa-brands fa-x-twitter"></i>
+          </div>
+          <div class="ai-share-btn-text">
+            <strong>Twitter / X</strong>
+            <span>ट्विटर पर पोस्ट या ट्वीट करें</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ai-share-arrow"></i>
+        </a>
 
-        <!-- Cancel / Close button -->
-        <button type="button" id="closeAoiShareModal" style="
-          background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25);
-          color: #f1f5f9; padding: 8px 22px; border-radius: 30px;
-          font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 6px;
-          display: inline-flex; align-items: center; gap: 6px;
-        ">
-          <span>✕ बंद करें (Cancel)</span>
-        </button>
+        <!-- 4. Telegram Button -->
+        <a href="https://t.me/share/url?url=${encodedUrl}&text=${encodedText}" target="_blank" class="ai-share-btn-item ch-telegram" onclick="if(window.recordModalShareEvent)window.recordModalShareEvent('telegram','${shareUrl}','${title.replace(/'/g, "\\'")}'); overlay.style.display='none';">
+          <div class="ai-share-icon-wrap" style="background:#229ED9;color:#fff;">
+            <i class="fa-brands fa-telegram"></i>
+          </div>
+          <div class="ai-share-btn-text">
+            <strong>Telegram</strong>
+            <span>टेलीग्राम ग्रुप व चैनल्स में शेयर करें</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ai-share-arrow"></i>
+        </a>
+
+        <!-- 5. Copy Link Button -->
+        <div class="ai-share-btn-item ch-copylink" id="ai-share-copy-row-btn" style="cursor:pointer;" onclick="if(window.recordModalShareEvent)window.recordModalShareEvent('copylink','${shareUrl}','${title.replace(/'/g, "\\'")}'); navigator.clipboard.writeText('${shareUrl}').then(()=>{ alert('📋 लिंक कॉपी हो गया!'); overlay.style.display='none'; });">
+          <div class="ai-share-icon-wrap" style="background:#2563eb;color:#fff;">
+            <i class="fa-solid fa-link"></i>
+          </div>
+          <div class="ai-share-btn-text" style="overflow:hidden;">
+            <strong id="ai-share-copy-title">Copy Link</strong>
+            <span style="font-family:monospace;font-size:0.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">${shareUrl}</span>
+          </div>
+          <button type="button" class="ai-share-copy-badge" style="background:#2563eb;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-weight:800;font-size:0.8rem;">
+            📋 कॉपी करें
+          </button>
+        </div>
       </div>
     `;
 
-    modal.style.display = 'flex';
-    requestAnimationFrame(() => {
-      modal.style.opacity = '1';
-      const container = document.getElementById('aoi-viral-share-container');
-      if (container) container.style.transform = 'scale(1)';
-    });
-
-    const closeModal = () => {
-      modal.style.opacity = '0';
-      const container = document.getElementById('aoi-viral-share-container');
-      if (container) container.style.transform = 'scale(0.92)';
-      setTimeout(() => { modal.style.display = 'none'; }, 220);
+    overlay.style.display = 'flex';
+    setTimeout(() => { overlay.classList.add('active'); }, 10);
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => { overlay.style.display = 'none'; }, 200);
+      }
     };
-
-    document.getElementById('closeAoiShareModal').onclick = closeModal;
-    modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+  }
 
     function recordShareEvent(platform) {
       try {
