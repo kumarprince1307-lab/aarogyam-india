@@ -66,6 +66,36 @@
       category: 'किड्स न्यूट्रिशन',
       text: (name) => `नमस्ते ${name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।`
     },
+        'mandi': {
+      title: 'दैनिक मंडी भाव व फसल बाजार दरें',
+      category: 'मंडी भाव लाइव',
+      text: (name) => `राम राम ${name} जी! आरोग्यम मंडी भाव सेवा में आपका स्वागत है। यहाँ आपको देश व राज्य की प्रमुख कृषि उपज मंडियों के गेहूं, सरसों, चना, सोयाबीन, धान व सभी ताजी सब्जियों के दैनिक अधिकतम, न्यूनतम और मॉडल भाव मिलेंगे। अपनी फसल का भाव देखें और सही समय पर सही कीमत पर अपनी उपज बेचें।`
+    },
+    'weather': {
+      title: 'दैनिक मौसम पूर्वानुमान व कृषि सलाह',
+      category: 'मौसम व फसल सुरक्षा',
+      text: (name) => `नमस्ते ${name} जी! आरोग्यम मौसम सेवा में आपका स्वागत है। यहाँ आपको अपने क्षेत्र का सटीक तापमान, बारिश का पूर्वानुमान, हवा की दिशा और कृषि मौसम सलाह मिलेगी। क्या आज फसलों पर कीटनाशक या टॉनिक का स्प्रे करना सुरक्षित है या नहीं, इसका सही निर्णय लेने के लिए नीचे दी गई सलाह अवश्य देखें।`
+    },
+    'krishi-panchang': {
+      title: 'दैनिक वैदिक सनातन पंचांग व शुभ मुहूर्त',
+      category: 'वैदिक पंचांग',
+      text: (name) => `जय श्री राम ${name} जी! आरोग्यम वैदिक सनातन पंचांग में आपका स्वागत है। आज की तिथि, वार, नक्षत्र, योग, करण, राहुकाल और दिन-रात का चौघड़िया यहाँ उपलब्ध है। अपने सभी शुभ कार्यों और फसल बुवाई व कटाई के लिए आज का श्रेष्ठ मुहूर्त यहाँ देखें।`
+    },
+    'panchang': {
+      title: 'दैनिक वैदिक सनातन पंचांग व शुभ मुहूर्त',
+      category: 'वैदिक पंचांग',
+      text: (name) => `जय श्री राम ${name} जी! आरोग्यम वैदिक सनातन पंचांग में आपका स्वागत है। आज की तिथि, वार, नक्षत्र, योग, करण, राहुकाल और दिन-रात का चौघड़िया यहाँ उपलब्ध है। अपने सभी शुभ कार्यों और फसल बुवाई व कटाई के लिए आज का श्रेष्ठ मुहूर्त यहाँ देखें।`
+    },
+    'netsurf-pathfinder': {
+      title: 'नेट्सर्फ Q3 पाथफाइंडर — टीमफेस्ट 2026',
+      category: 'प्रमोशनल प्लान',
+      text: (name) => `नमस्ते ${name} जी! नेट्सर्फ Q3 पाथफाइंडर और टीमफेस्ट 2026 में आपका स्वागत है। इस फेस्टिव सीजन में नया आई-स्टॉक मात्र ₹25,550 में खोलें, 4-वीक रॉकस्टार बनकर 15% अतिरिक्त इंसेंटिव पाएं, और क्लब सक्षम व अस्मिता द्वारा 1% एक्स्ट्रा पेआउट और 2 रात 3 दिन का लक्ज़री टूर जीतें!`
+    },
+    'pathfinder': {
+      title: 'नेट्सर्फ Q3 पाथफाइंडर — टीमफेस्ट 2026',
+      category: 'प्रमोशनल प्लान',
+      text: (name) => `नमस्ते ${name} जी! नेट्सर्फ Q3 पाथफाइंडर और टीमफेस्ट 2026 में आपका स्वागत है। इस फेस्टिव सीजन में नया आई-स्टॉक मात्र ₹25,550 में खोलें, 4-वीक रॉकस्टार बनकर 15% अतिरिक्त इंसेंटिव पाएं, और क्लब सक्षम व अस्मिता द्वारा 1% एक्स्ट्रा पेआउट और 2 रात 3 दिन का लक्ज़री टूर जीतें!`
+    },
     'home-care': {
       title: 'नेचुरल होम केयर व टॉक्सिन-मुक्त घर',
       category: 'हर्बल होम सुरक्षा',
@@ -815,29 +845,34 @@
       if (sessionStorage.getItem('aoi_audio_user_stopped') === '1' || sessionStorage.getItem('aoi_audio_stopped_' + pageKey) === '1') {
         return;
       }
-      const hasPlayed = sessionStorage.getItem('aoi_audio_played_' + pageKey);
-      if (hasPlayed === '1') return;
 
-      let played = false;
+      // Resume speech synthesis engine in case browser suspended it
+      if (window.speechSynthesis && typeof window.speechSynthesis.resume === 'function') {
+        try { window.speechSynthesis.resume(); } catch (e) {}
+      }
+
       const doPlay = () => {
-        if (played || isSpeaking) return;
-        played = true;
-        sessionStorage.setItem('aoi_audio_played_' + pageKey, '1');
+        if (isSpeaking) return;
+        try {
+          if (window.speechSynthesis && window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+        } catch (e) {}
         playAudioGreeting(true);
       };
 
-      // Try playing automatically after DOM settled
+      // 1. Try playing automatically after DOM settled
       setTimeout(() => {
         try {
-          doPlay();
+          if (!isSpeaking) doPlay();
         } catch (e) {}
-      }, 1500);
+      }, 800);
 
-      // In case browser policy blocked unmuted sound without interaction, trigger on very first gesture
-      const unlockGestures = ['click', 'touchstart', 'scroll', 'keydown'];
+      // 2. Guaranteed gesture unlock on first user interaction (touch, click, scroll)
+      const unlockGestures = ['touchstart', 'pointerdown', 'click', 'scroll', 'keydown'];
       const gestureHandler = function () {
         unlockGestures.forEach(g => window.removeEventListener(g, gestureHandler, { capture: true }));
-        if (!played && !isSpeaking) {
+        if (!isSpeaking) {
           doPlay();
         }
       };

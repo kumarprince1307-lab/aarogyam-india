@@ -567,6 +567,25 @@
       }
       resolveHeroName();
       document.addEventListener('DOMContentLoaded', resolveHeroName);
+
+      // 1-Tap Auto-Query from Pathfinder Chips or External Links
+      document.addEventListener('DOMContentLoaded', function () {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const autoQuery = urlParams.get('q');
+          if (autoQuery && autoQuery.trim()) {
+            setTimeout(function () {
+              const input = document.getElementById('sakhiTextInput');
+              if (input) {
+                input.value = decodeURIComponent(autoQuery);
+                if (typeof window.submitSakhiFromInput === 'function') {
+                  window.submitSakhiFromInput();
+                }
+              }
+            }, 600);
+          }
+        } catch (_) {}
+      });
     })();
   </script>
   <!-- Terms & Conditions Modal -->

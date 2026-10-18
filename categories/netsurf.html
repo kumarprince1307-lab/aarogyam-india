@@ -198,6 +198,64 @@
   </section>
 
   <!-- =========================================
+       3.5. NETSURF Q3 PATHFINDER 2026-27 (TEAMFEST) SHOWCASE BANNER
+  ========================================== -->
+  <section class="ns-pathfinder-kpi-banner-wrap" style="padding: 10px 16px 20px;">
+    <div class="ns-container">
+      <div style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border: 2px solid #3b82f6; border-radius: 20px; padding: 22px 18px; box-shadow: 0 12px 36px rgba(37,99,235,0.35); position: relative; overflow: hidden;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div style="display:inline-flex; align-items:center; gap:8px; background:#000; color:#facc15; border:1px solid #facc15; padding:3px 12px; border-radius:20px; font-size:0.75rem; font-weight:900; letter-spacing:0.5px;">
+            <span>🎉</span> <span>QUARTER 3 LIVE • NETSURF TEAMFEST</span>
+          </div>
+          <a href="/categories/netsurf-pathfinder.html" style="background:#22c55e; color:#000; font-weight:900; font-size:0.8rem; padding:5px 14px; border-radius:20px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(34,197,94,0.4);">
+            <span>फुल प्लान देखें</span> <span>→</span>
+          </a>
+        </div>
+
+        <h3 style="margin:0 0 6px 0; font-size:1.45rem; font-weight:900; color:#ffffff; line-height:1.2;">
+          Q3 PATHFINDER 2026-27: <span style="color:#fde047;">Celebrate • Build • Rise</span>
+        </h3>
+        <p style="margin:0 0 16px 0; font-size:0.88rem; color:#cbd5e1; line-height:1.4;">
+          अक्टूबर, नवंबर एवं दिसंबर 2026 का विशेष प्रमोशनल अभियान। नया iStock मात्र ₹25,550 में, 4-वीक रॉकस्टार और 2 Nights/3 Days लक्ज़री टूर!
+        </p>
+
+        <!-- KPI Quick Grid inside Banner -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:16px;">
+          <div style="background:#000; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:10px; text-align:center;">
+            <div style="font-size:0.68rem; color:#94a3b8; font-weight:700;">नया iStock</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#fde047;">₹25,550</div>
+            <div style="font-size:0.65rem; color:#22c55e; font-weight:800;">₹73k की जगह (27% छूट)</div>
+          </div>
+          <div style="background:#000; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:10px; text-align:center;">
+            <div style="font-size:0.68rem; color:#94a3b8; font-weight:700;">न्यू E-Tailer</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#38bdf8;">30% OFF</div>
+            <div style="font-size:0.65rem; color:#cbd5e1;">₹7,500+ पहली रसीद</div>
+          </div>
+          <div style="background:#000; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:10px; text-align:center;">
+            <div style="font-size:0.68rem; color:#94a3b8; font-weight:700;">क्लब सक्षम/अस्मिता</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#fde047;">1% EXTRA</div>
+            <div style="font-size:0.65rem; color:#cbd5e1;">दिसंबर Cycle 2 तक</div>
+          </div>
+          <div style="background:#000; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:10px; text-align:center;">
+            <div style="font-size:0.68rem; color:#94a3b8; font-weight:700;">फास्टट्रैक Q3</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#38bdf8;">2N / 3D</div>
+            <div style="font-size:0.65rem; color:#cbd5e1;">सिंगल व कपल टूर</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <a href="/categories/netsurf-pathfinder.html" style="flex:1; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; text-align:center; padding:12px; border-radius:12px; font-weight:900; font-size:0.92rem; text-decoration:none; box-shadow:0 4px 14px rgba(37,99,235,0.4);">
+            🚀 पाथफाइंडर सम्पूर्ण प्लान, लेवल्स व सखी AI →
+          </a>
+          <button type="button" onclick="window.sharePathfinderFromBanner()" style="background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.25); color:#fff; padding:12px 18px; border-radius:12px; font-weight:800; font-size:0.88rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <span>📤</span> <span>शेयर</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================
        4. KEY STATS STRIP
   ========================================== -->
   <div class="ns-stats-strip" id="sec-kpi-badges">
@@ -1120,5 +1178,17 @@
   <script src="/js/viral-share-engine.js"></script>
   <script src="/js/netsurf-career.js?v=20260926_v3"></script>
   <script src="/js/image-lightbox-viewer.js?v=20261001_v1"></script>
+  <script>
+    window.sharePathfinderFromBanner = function() {
+      const shareId = window.V1_SESSION?.getUserShareId?.() || 'AI000004';
+      const shareUrl = `${window.location.origin}/categories/netsurf-pathfinder.html?share_id=${encodeURIComponent(shareId)}`;
+      const text = `🎉 *NETSURF Q3 PATHFINDER 2026-27 (TEAMFEST)*\nनया iStock मात्र ₹25,550 में, 4-वीक रॉकस्टार और 2N/3D लक्ज़री टूर!\n\n👉 पूरा प्लान यहाँ देखें:\n${shareUrl}`;
+      if (navigator.share) {
+        navigator.share({ title: 'Netsurf Q3 Pathfinder', text: text, url: shareUrl }).catch(() => {});
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      }
+    };
+  </script>
 </body>
 </html>

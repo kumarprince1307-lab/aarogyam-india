@@ -101,6 +101,20 @@ const SITE_PAGES_FALLBACK_MAP = {
     og_description: 'कृषि, पशु पोषण, स्वास्थ्य व पर्सनल केयर के सभी 39+ ऑर्गेनिक प्रोडक्ट्स। 7 भाषाओं में पर्सनलाइज्ड PDF कैटलॉग डाउनलोड करें।',
     og_image: 'https://aarogyamindia.online/images/banners/og_image-netsurf-398382-r3uq.webp'
   },
+  'netsurf-pathfinder': {
+    id: 'page_netsurf_pathfinder',
+    destUrl: 'https://aarogyamindia.online/categories/netsurf-pathfinder.html',
+    og_title: '🎉 Netsurf Q3 Pathfinder 2026-27 | TeamFest प्रमोशनल प्लान',
+    og_description: 'नेट्सर्फ अक्टूबर, नवंबर व दिसंबर 2026 महा-अभियान: नया iStock मात्र ₹25,550 में, 30% न्यू E-Tailer छूट, 15% वीकली रॉकस्टार इंसेंटिव, क्लब सक्षम व अस्मिता 1% एक्स्ट्रा पेआउट और 2N/3D लक्ज़री टूर!',
+    og_image: 'https://aarogyamindia.online/images/banners/netsurf-pathfinadr-q3.webp'
+  },
+  'pathfinder': {
+    id: 'page_netsurf_pathfinder',
+    destUrl: 'https://aarogyamindia.online/categories/netsurf-pathfinder.html',
+    og_title: '🎉 Netsurf Q3 Pathfinder 2026-27 | TeamFest प्रमोशनल प्लान',
+    og_description: 'नेट्सर्फ अक्टूबर, नवंबर व दिसंबर 2026 महा-अभियान: नया iStock मात्र ₹25,550 में, 30% न्यू E-Tailer छूट, 15% वीकली रॉकस्टार इंसेंटिव, क्लब सक्षम व अस्मिता 1% एक्स्ट्रा पेआउट और 2N/3D लक्ज़री टूर!',
+    og_image: 'https://aarogyamindia.online/images/banners/netsurf-pathfinadr-q3.webp'
+  },
   'health': {
     id: 'page_health',
     destUrl: 'https://aarogyamindia.online/categories/health.html',

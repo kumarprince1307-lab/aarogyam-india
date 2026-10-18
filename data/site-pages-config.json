@@ -1,6 +1,23 @@
 {
   "sitePages": [
     {
+      "id": "page_netsurf_pathfinder",
+      "slug": "netsurf-pathfinder",
+      "name": "🚀 नेट्सर्फ Q3 पाथफाइंडर (TeamFest)",
+      "url": "/categories/netsurf-pathfinder.html",
+      "category": "Promotional",
+      "status": "active",
+      "theme_primary": "#2563eb",
+      "theme_dark": "#0b1329",
+      "ticker_text": "⚡ Netsurf Q3 Pathfinder TeamFest लाइव • 🎁 नया iStock मात्र ₹25,550 में • ⭐ वीकली रॉकस्टार 15% अतिरिक्त इंसेंटिव",
+      "audio_title": "नेट्सर्फ Q3 पाथफाइंडर — टीमफेस्ट 2026",
+      "audio_script": "नमस्ते {name} जी! नेट्सर्फ Q3 पाथफाइंडर और टीमफेस्ट 2026 में आपका स्वागत है। इस फेस्टिव सीजन में नया आई-स्टॉक मात्र ₹25,550 में खोलें, 4-वीक रॉकस्टार बनकर 15% अतिरिक्त इंसेंटिव पाएं, और क्लब सक्षम व अस्मिता द्वारा 1% एक्स्ट्रा पेआउट और 2 रात 3 दिन का लक्ज़री टूर जीतें!",
+      "og_title": "🎉 Netsurf Q3 Pathfinder 2026-27 | TeamFest प्रमोशनल प्लान",
+      "og_image": "/images/banners/netsurf-pathfinadr-q3.webp",
+      "og_description": "नेट्सर्फ अक्टूबर, नवंबर व दिसंबर 2026 महा-अभियान: नया iStock मात्र ₹25,550 में, 30% न्यू E-Tailer छूट, 15% वीकली रॉकस्टार इंसेंटिव, क्लब सक्षम व अस्मिता 1% एक्स्ट्रा पेआउट और 2N/3D लक्ज़री टूर!",
+      "share_message": "🎉 *NETSURF Q3 PATHFINDER 2026-27 — TEAMFEST* 🏆\n━━━━━━━━━━━━━━━━━━━━\n👉 नया iStock मात्र ₹25,550 में (₹73,000 की जगह, 27% छूट)\n👉 30% न्यू E-Tailer छूट (₹7,500+ के पहले बिल पर)\n👉 वीकली रॉकस्टार (15% अतिरिक्त इंसेंटिव + ₹2,000 गिफ्ट)\n👉 क्लब सक्षम व अस्मिता (दिसंबर तक 1% एक्स्ट्रा पेआउट)\n👉 2N/3D लक्ज़री फास्टट्रैक टूर (सिंगल 2.4L व कपल 3.0L)\n👉 TeamFest हॉल ऑफ फेम सम्मान!\n\n👇 पूरा पाथफाइंडर प्लान यहाँ देखें:\n{url}"
+    },
+    {
       "id": "page_home",
       "slug": "index",
       "name": "🏠 मुख्य पृष्ठ (Home Page)",
@@ -7163,6 +7180,17 @@
         "number": "917974422572",
         "prompt": "नमस्ते, मुझे हृदय स्वास्थ्य, बीपी व ब्लॉकेज के बारे में परामर्श चाहिए।"
       }
+    },
+    {
+      "id": "page_netsurf_pathfinder",
+      "slug": "netsurf-pathfinder",
+      "name": "Q3 Pathfinder 2026-27 (TeamFest)",
+      "destUrl": "https://aarogyamindia.online/categories/netsurf-pathfinder.html",
+      "og_title": "🎉 Netsurf Q3 Pathfinder 2026-27 | TeamFest प्रमोशनल प्लान",
+      "og_description": "अक्टूबर, नवंबर, दिसंबर 2026 का सम्पूर्ण पाथफाइंडर प्लान। वीकली रॉकस्टार (R1-R4), क्लब सक्षम व अस्मिता, फास्टट्रैक टूर और ₹25,550 में नया iStock!",
+      "og_image": "https://aarogyamindia.online/images/banners/netsurf-pathfinadr-q3.webp",
+      "audio_title": "नेट्सर्फ Q3 पाथफाइंडर ऑडियो विवरण",
+      "audio_script": "नमस्ते! नेट्सर्फ Q3 पाथफाइंडर और टीमफेस्ट 2026 में आपका स्वागत है। इस फेस्टिव सीजन में नया आई-स्टॉक मात्र ₹25,550 में खोलें, 4-वीक रॉकस्टार बनकर 15% अतिरिक्त इंसेंटिव पाएं, और क्लब सक्षम व अस्मिता द्वारा 1% एक्स्ट्रा पेआउट और 2 रात 3 दिन का लक्ज़री टूर जीतें!"
     }
   ]
 }
