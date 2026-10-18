@@ -751,7 +751,8 @@
     }
 
     if (navigator.share) {
-      navigator.share({ title, text: shareMessage, url: shareUrl }).catch(() => {});
+      // Do NOT pass url: shareUrl because shareMessage already includes it; passing url duplicates the link on Android/WhatsApp
+      navigator.share({ title, text: shareMessage }).catch(() => {});
     } else {
       const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
       window.open(waUrl, '_blank');

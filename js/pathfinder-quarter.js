@@ -592,8 +592,7 @@
     if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
       navigator.share({
         title: `${title} - AarogyamTube`,
-        text: textMsg,
-        url: tubeUrl
+        text: textMsg
       }).catch(() => {
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(textMsg)}`, '_blank');
       });
@@ -779,7 +778,8 @@
           const file = new File([blob], `pathfinder_${Date.now()}.${ext}`, { type: blob.type || `image/${ext}` });
           if (navigator.canShare({ files: [file] })) {
             await navigator.share({
-              ...shareData,
+              title: shareData.title,
+              text: shareData.text,
               files: [file]
             });
             return;
@@ -789,10 +789,11 @@
         console.warn('Native image file share fallback:', err);
       }
 
+      // DO NOT pass url property: shareData.text already contains the link.
+      // Passing url causes WhatsApp / Android share sheets to append the URL a second time at the end!
       navigator.share({
         title: shareData.title,
-        text: shareData.text,
-        url: shareData.url
+        text: shareData.text
       }).catch(() => fallbackWhatsAppShare(shareData.text));
     } else {
       fallbackWhatsAppShare(shareData.text);
