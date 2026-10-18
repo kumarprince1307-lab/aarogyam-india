@@ -1247,6 +1247,8 @@
       pillLabel = 'पशु सखी AI';
     } else if (path.includes('health') || path.includes('diabetes') || path.includes('joint') || path.includes('thyroid')) {
       pillLabel = 'स्वास्थ्य सखी AI';
+    } else if (path.includes('netsurf') || path.includes('pathfinder')) {
+      pillLabel = 'बिज़नेस सखी AI';
     }
 
     const pill = document.createElement('div');

@@ -1,0 +1,380 @@
+{
+  "quarter_id": "q3_2026_27",
+  "quarter_name": "Quarter 3 (2026-27)",
+  "quarter_heading": "Q3 PATHFINDER 2026-27",
+  "campaign_title": "NETSURF TEAMFEST 2026",
+  "campaign_tagline": "One Festival. Many Teams. One Netsurf Family. (Celebrate • Build • Rise)",
+  "period": "October - November - December 2026",
+  "event_dates": "अक्टूबर, नवंबर एवं दिसंबर 2026 (अक्टूबर विशेष फेस्टिव माह)",
+  "destination": {
+    "title": "Netsurf TeamFest Lifestyle Destination",
+    "duration": "1 Night & 2 Days",
+    "description": "एक भव्य लक्ज़री रिसॉर्ट / होटल में उत्सव, सम्मान, लर्निंग और असीमित फेस्टिव वाइब्स!",
+    "image": "/images/banners/3day-2n-banner-3.webp"
+  },
+  "og": {
+    "title": "🎉 Netsurf Q3 Pathfinder 2026-27 | TeamFest प्रमोशनल प्लान",
+    "description": "नेट्सर्फ अक्टूबर, नवंबर व दिसंबर 2026 महा-अभियान: नया iStock मात्र ₹25,550 में, 30% न्यू E-Tailer छूट, 15% वीकली रॉकस्टार इंसेंटिव, क्लब सक्षम व अस्मिता 1% एक्स्ट्रा पेआउट और 2N/3D लक्ज़री टूर!",
+    "image": "https://aarogyamindia.online/images/banners/netsurf-pathfinadr-q3.webp"
+  },
+  "hero_banners": [
+    {
+      "id": "banner_1",
+      "title": "30% NEW E-TAILER OFFER",
+      "subtitle": "नए स्मार्ट E-Tailer को ₹7,500+ के पहले बिल पर फ्लैट 30% विशेष छूट!",
+      "image": "/images/banners/30 offer-banner-1.webp",
+      "badge": "OCTOBER SPECIAL"
+    },
+    {
+      "id": "banner_2",
+      "title": "WEEKLY ROCKSTAR CHAMPION",
+      "subtitle": "4-वीक कंसिस्टेंसी पर ₹2,000 का पक्का गिफ्ट व 25 लकी ड्रा शानदार प्राइज़!",
+      "image": "/images/banners/rockstar-offer-banner-2.webp",
+      "badge": "15% EXTRA INCENTIVE"
+    },
+    {
+      "id": "banner_3",
+      "title": "2 NIGHTS / 3 DAYS LUXURY TOUR",
+      "subtitle": "सिंगल (2.4L) व कपल (3.0L) लक्ज़री डेस्टिनेशन में सम्मान और लीडरशिप सेलिब्रेशन",
+      "image": "/images/banners/3day-2n-banner-3.webp",
+      "badge": "LIFESTYLE REWARD"
+    },
+    {
+      "id": "banner_4",
+      "title": "FESTIVE iStock SPECIAL OFFER",
+      "subtitle": "₹73,000 की जगह नया Netsurf iStock खोलें मात्र ₹25,550 में!",
+      "image": "/images/banners/istock-banner-4.webp",
+      "badge": "BIGGEST SAVING"
+    }
+  ],
+  "kpi_summary": [
+    {
+      "id": "kpi_istock",
+      "target": "pfIstockWrap",
+      "label": "नया iStock ऑफर",
+      "value": "₹25,550",
+      "subtext": "₹73,000 की जगह (27% छूट)",
+      "badge": "अक्टूबर स्पेशल"
+    },
+    {
+      "id": "kpi_etailer",
+      "target": "pfCelebrateWrap",
+      "label": "न्यू E-Tailer छूट",
+      "value": "30% OFF",
+      "subtext": "₹7,500+ की पहली रसीद पर",
+      "badge": "पहला ऑर्डर"
+    },
+    {
+      "id": "kpi_rockstar",
+      "target": "pfRockstarCard",
+      "label": "वीकली रॉकस्टार",
+      "value": "R1 से R4+",
+      "subtext": "₹8,000 से ₹32,000+ टर्नओवर",
+      "badge": "15% एक्स्ट्रा इंसेंटिव"
+    },
+    {
+      "id": "kpi_club",
+      "target": "pfClubSakshamAsmitaCard",
+      "label": "क्लब सक्षम / अस्मिता",
+      "value": "30k:30k / 25k:25k",
+      "subtext": "1% एक्स्ट्रा पेआउट (33%-66% बूस्ट)",
+      "badge": "TeamFest टिकट"
+    },
+    {
+      "id": "kpi_tour",
+      "target": "pfTourCard",
+      "label": "फास्टट्रैक Q3 टूर",
+      "value": "2 Nights / 3 Days",
+      "subtext": "सिंगल (2.4L) व कपल (3.0L)",
+      "badge": "E1 व E2 क्लब"
+    },
+    {
+      "id": "kpi_rise",
+      "target": "pfRiseWrap",
+      "label": "लीडरशिप पॉइंट्स",
+      "value": "50 से 500 Pts",
+      "subtext": "BC = 5 Pts | CA/CS = 7 Pts",
+      "badge": "हॉल ऑफ फेम"
+    }
+  ],
+  "segments": {
+    "celebrate": {
+      "id": "celebrate",
+      "pillar_title": "1. CELEBRATE — नए E-Tailers व वीकली रॉकस्टार",
+      "banner_image": "/images/banners/rockstar-offer-banner-2.webp",
+      "audio_script": "नमस्ते! पाथफाइंडर क्वार्टर 3 के सेलिब्रेट पिलर में अक्टूबर महीने में जुड़ने वाले नए ई-टेलर को पहली खरीद पर सीधा 30% डिस्काउंट मिलता है। साथ ही हर हफ्ते 8 हजार से 32 हजार का टर्नओवर करके आप रॉकस्टार 1 से 4 बन सकते हैं और रिटेल प्रॉफिट पर 15% तक अतिरिक्त इंसेंटिव जीत सकते हैं। चारों हफ्ते रॉकस्टार मेंटेन करने पर 2000 रुपये का पक्का गिफ्ट और 25 लकी बंपर प्राइज भी मिलेंगे!",
+      "new_etailer_offer": {
+        "title": "अक्टूबर स्पेशल ऑफर - नए E-Tailers हेतु",
+        "condition": "अक्टूबर महीने में रजिस्ट्रेशन कराएं",
+        "benefit": "MRP ₹7,500 या उससे अधिक की पहली रसीद (First Receipt) पर सीधा 30% स्पेशल डिस्काउंट!",
+        "note": "नए E-Tailer के उपभोक्ताओं को भी मजबूत शुरुआत का लाभ मिलेगा।"
+      },
+      "weekly_rockstar": {
+        "weeks": [
+          { "week_no": 1, "dates": "17 Oct - 23 Oct 2026", "name": "Week 1" },
+          { "week_no": 2, "dates": "24 Oct - 30 Oct 2026", "name": "Week 2" },
+          { "week_no": 3, "dates": "31 Oct - 06 Nov 2026", "name": "Week 3" },
+          { "week_no": 4, "dates": "07 Nov - 13 Nov 2026", "name": "Week 4" }
+        ],
+        "tiers": [
+          {
+            "level": "R1",
+            "name": "Rock Star 1",
+            "weekly_turnover": 8000,
+            "incentive_text": "वीकली सरप्राइज ऑफर (Revealed Weekly)"
+          },
+          {
+            "level": "R2",
+            "name": "Rock Star 2",
+            "weekly_turnover": 16000,
+            "incentive_text": "वीकली रिटेल प्रॉफिट का 5% स्पेशल इंसेंटिव"
+          },
+          {
+            "level": "R3",
+            "name": "Rock Star 3",
+            "weekly_turnover": 24000,
+            "incentive_text": "वीकली रिटेल प्रॉफिट का 10% स्पेशल इंसेंटिव"
+          },
+          {
+            "level": "R4",
+            "name": "Rock Star 4",
+            "weekly_turnover": 32000,
+            "incentive_text": "वीकली रिटेल प्रॉफिट का 15% स्पेशल इंसेंटिव"
+          }
+        ]
+      },
+      "rockstar_champion": {
+        "title": "रॉकस्टार चैंपियन (कंसिस्टेंसी रिवॉर्ड)",
+        "condition": "अक्टूबर महीने के सभी चारों हफ्ते (All 4 Weeks) रॉकस्टार मेंटेन करें",
+        "confirm_gift": "कन्फर्म गिफ्ट (नीचे में से कोई भी एक चुनें):",
+        "gift_options": [
+          "₹2,000 MRP के नेट्सर्फ प्रोडक्ट्स या वाउचर",
+          "एक्सक्लूसिव रॉकस्टार चैंपियन टी-शर्ट",
+          "रॉकस्टार चैंपियन किट (प्रोडक्ट मैनुअल + रिटेलर बैज + रिटेलर कैप)"
+        ],
+        "lucky_draw": {
+          "title": "फेस्टिव धमाका लकी ड्रा (25 लकी विनर्स)",
+          "prizes": [
+            "Branded 5G Mobile (1)",
+            "Smart Tab (2)",
+            "Smart Watch (3)",
+            "Bluetooth Speaker / Soundbar (4)",
+            "High-Capacity Power Bank (5)",
+            "Netsurf Premium Bag (5)",
+            "Netsurf Special T-Shirt (5)"
+          ]
+        }
+      }
+    },
+    "build": {
+      "id": "build",
+      "pillar_title": "2. BUILD — टीमफेस्ट अर्हता, क्लब्स व फास्टट्रैक",
+      "banner_image": "/images/banners/netsurf-pathfinadr-q3.webp",
+      "audio_script": "टीमफेस्ट 2026 में पहुंचने के 3 प्रमुख रास्ते हैं। पहला: बिजनेस कंसलटेंट बनकर 10 हजार अनुपात 10 हजार का टर्नओवर। दूसरा: क्लब सक्षम पुरुषों के लिए 30 हजार अनुपात 30 हजार और क्लब अस्मिता महिलाओं के लिए 25 हजार अनुपात 25 हजार करके टीमफेस्ट की प्रिविलेज एंट्री और दिसंबर तक एक प्रतिशत एक्स्ट्रा टर्नओवर कमीशन पाएं। तीसरा: फास्टट्रैक ई वन और ई टू मेंटेन करके 2 रात 3 दिन का लक्जरी टूर पाएं!",
+      "ways_to_attend": [
+        {
+          "type": "business_consultant",
+          "title": "1. Business Consultant (BC)",
+          "turnover_criteria": "Max Team: ₹10,000 | Other Team: ₹10,000 (Invoice Value)",
+          "benefits": "Netsurf TeamFest में उपस्थिति की पात्रता",
+          "note": "Repeat achievements मान्य नहीं होंगे।"
+        },
+        {
+          "type": "club_saksham_asmita_star",
+          "title": "2. Star Club — Club Saksham (Male) & Club Asmita (Female)",
+          "saksham_criteria": "Max Team: ₹30,000 | Other Team: ₹30,000 + Self Consumer: ₹1,000",
+          "asmita_criteria": "Max Team: ₹25,000 | Other Team: ₹25,000 + Self Consumer: ₹1,000",
+          "benefits": [
+            "Netsurf TeamFest प्रिविलेज एंट्री टिकट",
+            "Netsurf बिज़नेस किट (Netsurf बैग, डायरी, पेन)",
+            "सर्टिफिकेट एवं स्पेशल रिकॉग्निशन CA/CS बैज",
+            "1% अतिरिक्त टर्नओवर कमीशन (दिसंबर Cycle 2 तक, अचीवमेंट साइकिल से लागू)"
+          ],
+          "note": "काम करने वाले डायरेक्ट सेलर का जेंडर Saksham (पुरुष) या Asmita (महिला) तय करेगा।"
+        },
+        {
+          "type": "club_saksham_asmita_superstar",
+          "title": "3. Super Star Club (All Non-FastTrack Direct Sellers)",
+          "saksham_criteria": "Max Team: ₹60,000 | Other Team: ₹60,000 + Self Consumer: ₹1,000",
+          "asmita_criteria": "Max Team: ₹50,000 | Other Team: ₹50,000 + Self Consumer: ₹1,000",
+          "benefits": [
+            "TeamFest वीआईपी एंट्री + स्पेशल सम्मान",
+            "CA/CS कम्प्लीट बिज़नेस किट व बैज",
+            "1% एक्स्ट्रा कमीशन (कमीशन में 33% से 66% तक भारी वृद्धि)",
+            "Pro VC व उच्च रैंक को 7 पॉइंट्स का योगदान"
+          ]
+        },
+        {
+          "type": "fasttrack_october",
+          "title": "4. FastTrack (E1/E2) अक्टूबर स्पेशल ऑफर",
+          "criteria": "अक्टूबर महीने में अपना FastTrack Level (E1/E2) मेंटेन करें",
+          "benefits": "TeamFest में शामिल होने का स्पेशल इनवाइट टिकट!"
+        }
+      ],
+      "fasttrack_q3_tours": {
+        "title": "फास्टट्रैक Q3 (Oct-Nov-Dec) 3 माह का संचयी टूर टारगेट",
+        "condition": "अक्टूबर, नवंबर और दिसंबर तीनों माह FastTrack मेंटेन करें + संचयी टर्नओवर पूरा करें",
+        "duration": "2 Nights & 3 Days लक्ज़री टूर",
+        "tiers": [
+          {
+            "category": "Single Tour (1 व्यक्ति)",
+            "e1": "2,40,000 : 2,40,000 (₹2.4 लाख : ₹2.4 लाख)",
+            "e2": "3,60,000 : 3,60,000 (₹3.6 लाख : ₹3.6 लाख)"
+          },
+          {
+            "category": "Couple Tour (पति-पत्नी 2 व्यक्ति)",
+            "e1": "3,00,000 : 3,00,000 (₹3.0 लाख : ₹3.0 लाख)",
+            "e2": "4,50,000 : 4,50,000 (₹4.5 लाख : ₹4.5 लाख)"
+          }
+        ]
+      }
+    },
+    "rise": {
+      "id": "rise",
+      "pillar_title": "3. RISE — लीडरशिप पॉइंट्स व हॉल ऑफ फेम",
+      "banner_image": "/images/banners/3day-2n-banner-3.webp",
+      "audio_script": "लीडरशिप पिलर में आपकी टीम में बनने वाले हर बिजनेस कंसलटेंट से आपको 5 पॉइंट और हर क्लब सक्षम या अस्मिता से 7 पॉइंट मिलते हैं। प्रो वाइस कैप्टन को 50 पॉइंट पर टीमफेस्ट टिकट, 100 पॉइंट पर शर्ट और 120 पॉइंट पर स्पेशल ब्रांडिंग मिलती है। अक्टूबर साइकिल 1 में टारगेट अचीव करने पर नेट्सर्फ के पहले हॉल ऑफ फेम में आपकी तस्वीर लगेगी और स्पेशल मेडल मिलेगा!",
+      "point_rules": [
+        { "action": "प्रत्येक Business Consultant (BC) बनाने पर", "points": "5 Points" },
+        { "action": "प्रत्येक Club Saksham (Star / SuperStar) बनाने पर", "points": "7 Points" },
+        { "action": "प्रत्येक Club Asmita (Star / SuperStar) बनाने पर", "points": "7 Points" }
+      ],
+      "leadership_targets": [
+        {
+          "rank": "Pro Vice Captain (Pro VC)",
+          "teamfest_ticket": "50 Points",
+          "netsurf_shirt": "100 Points",
+          "branding": "120 Points"
+        },
+        {
+          "rank": "Vice Captain (VC)",
+          "teamfest_ticket": "150 Points",
+          "netsurf_shirt": "300 Points",
+          "branding": "360 Points"
+        },
+        {
+          "rank": "Captain",
+          "teamfest_ticket": "500 Points",
+          "netsurf_shirt": "1000 Points",
+          "branding": "1200 Points"
+        }
+      ],
+      "hall_of_fame": {
+        "title": "Netsurf 1st-Ever TeamFest “Hall of Fame”",
+        "condition": "अक्टूबर Cycle 1 में अपना टारगेट पूरा करें!",
+        "reward": "TeamFest में आपकी तस्वीर हॉल ऑफ फेम में प्रदर्शित होगी + मंच पर स्पेशल मेडल प्राप्त होगा!"
+      }
+    },
+    "istock": {
+      "id": "istock",
+      "pillar_title": "4. iStock फेस्टिव महा-धमाका ऑफर",
+      "banner_image": "/images/banners/istock-banner-4.webp",
+      "audio_script": "इस फेस्टिव सीजन में नेट्सर्फ आई-स्टॉक की सबसे बड़ी घोषणा! 73 हजार की जगह नया नेट्सर्फ आई-स्टॉक खोलें मात्र 25 हजार 550 रुपये में, जिस पर सीधा 27% एमआरपी डिस्काउंट मिलेगा। आइए हम सब मिलकर प्रतिदिन 100 आई-स्टॉक खोलने का संकल्प लें!",
+      "special_festive_offer": {
+        "title": "अक्टूबर फेस्टिव स्पेशल — नया iStock मात्र ₹25,550 में!",
+        "regular_amount": "₹73,000",
+        "festive_amount": "₹25,550",
+        "saving": "सीधी ₹47,450 की महा-बचत",
+        "discount": "27% On MRP",
+        "challenge": "प्रतिदिन 1 iStock से बढ़कर प्रतिदिन 100 iStocks का राष्ट्रीय संकल्प!"
+      },
+      "regular_packages": [
+        { "mrp": "₹1,00,000", "discount": "27%", "refill": "₹35,000", "categories": "All Products" },
+        { "mrp": "₹3,00,000", "discount": "28%", "refill": "₹35,000", "categories": "All Products" },
+        { "mrp": "₹7,00,000", "discount": "29%", "refill": "₹35,000", "categories": "All Products" }
+      ]
+    },
+    "video_system": {
+      "id": "video_system",
+      "title": "🎬 Aarogyam Tube वीडियो प्रेजेंटेशन",
+      "description": "पाथफाइंडर Q3 व नेट्सर्फ बिजनेस प्रेजेंटेशन वीडियो। (16:9 लैंडस्केप व 9:16 रील्स दोनों में उपलब्ध)",
+      "default_format": "landscape",
+      "landscape_video": {
+        "title": "Netsurf Pathfinder & Direct Selling Master Plan",
+        "youtube_id": "-SPS50UQPjA",
+        "youtube_url": "https://youtube.com/shorts/-SPS50UQPjA?si=XwJt60FL38PvYGNW",
+        "aspect_ratio": "16:9"
+      },
+      "reel_video": {
+        "title": "Netsurf TeamFest 1-Min Quick Overview",
+        "youtube_id": "-SPS50UQPjA",
+        "youtube_url": "https://youtube.com/shorts/-SPS50UQPjA?si=XwJt60FL38PvYGNW",
+        "aspect_ratio": "9:16"
+      }
+    }
+  },
+  "quick_chips": [
+    { "id": "qc1", "text": "रॉकस्टार R2 कैसे बनें और क्या लाभ है?", "query": "रॉकस्टार R2 कैसे बनें और क्या लाभ है?" },
+    { "id": "qc2", "text": "4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट क्या है?", "query": "4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट क्या है?" },
+    { "id": "qc3", "text": "Club Saksham और Club Asmita का टर्नओवर?", "query": "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
+    { "id": "qc4", "text": "CA/CS को 1% एक्स्ट्रा कमीशन कब तक मिलेगा?", "query": "CA/CS को 1% एक्स्ट्रा कमीशन कब तक मिलेगा?" },
+    { "id": "qc5", "text": "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?", "query": "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
+    { "id": "qc6", "text": "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?", "query": "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
+    { "id": "qc7", "text": "FastTrack E1 कपल टूर कैसे हासिल करें?", "query": "FastTrack E1 कपल टूर कैसे हासिल करें?" },
+    { "id": "qc8", "text": "अक्टूबर में नया iStock कितने में खुलेगा?", "query": "अक्टूबर में नया iStock कितने में खुलेगा?" },
+    { "id": "qc9", "text": "न्यू E-Tailer को 30% छूट कैसे मिलेगी?", "query": "न्यू E-Tailer को 30% छूट कैसे मिलेगी?" },
+    { "id": "qc10", "text": "हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?", "query": "हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?" }
+  ],
+  "faqs": [
+    {
+      "id": "faq_1",
+      "type": "direct",
+      "question": "रॉकस्टार R2 बनने के लिए कितना टर्नओवर चाहिए और क्या मिलेगा?",
+      "answer": "रॉकस्टार R2 बनने के लिए एक सप्ताह में ₹16,000 का वीकली टर्नओवर (TO) चाहिए। इसे पूरा करने पर आपको वीकली रिटेल प्रॉफिट का 5% अतिरिक्त स्पेशल इंसेंटिव प्राप्त होता है।"
+    },
+    {
+      "id": "faq_2",
+      "type": "reverse",
+      "question": "अगर मैं 1 हफ्ते में ₹32,000 से अधिक का टर्नओवर करूँ तो मुझे क्या मिलेगा?",
+      "answer": "यदि आप ₹32,000+ का वीकली टर्नओवर करते हैं, तो आप Rock Star 4 (R4) अचीव कर लेते हैं, जिस पर आपको वीकली रिटेल प्रॉफिट का अधिकतम 15% अतिरिक्त स्पेशल इंसेंटिव मिलता है!"
+    },
+    {
+      "id": "faq_3",
+      "type": "direct",
+      "question": "रॉकस्टार चैंपियन क्या है और इसके क्या कन्फर्म इनाम हैं?",
+      "answer": "अक्टूबर माह के चारों सप्ताह (Week 1 से Week 4) लगातार रॉकस्टार मेंटेन करने वाले 'रॉकस्टार चैंपियन' कहलाते हैं। उन्हें ₹2,000 MRP के प्रोडक्ट्स/वाउचर, रॉकस्टार चैंपियन टी-शर्ट, या रॉकस्टार किट (मैनुअल + बैज + कैप) में से कोई एक कन्फर्म गिफ्ट मिलता है। इसके अतिरिक्त 25 लकी विनर्स को 5G मोबाइल, टैब, स्मार्ट वॉच आदि का बंपर प्राइज मिलता है।"
+    },
+    {
+      "id": "faq_4",
+      "type": "direct",
+      "question": "Club Saksham और Club Asmita में क्या अंतर और टर्नओवर नियम हैं?",
+      "answer": "जेंडर के आधार पर क्लब निर्धारित होता है: पुरुष डायरेक्ट सेलर के लिए 'Club Saksham' और महिला डायरेक्ट सेलर के लिए 'Club Asmita'।\n• Star Club: Saksham के लिए 30,000 : 30,000 टर्नओवर + ₹1,000 Self Consumer। Asmita के लिए 25,000 : 25,000 टर्नओवर + ₹1,000 Self Consumer।\n• Super Star Club: Saksham के लिए 60,000 : 60,000 और Asmita के लिए 50,000 : 50,000 टर्नओवर।"
+    },
+    {
+      "id": "faq_5",
+      "type": "mixed",
+      "question": "Club Saksham या Asmita क्वालीफाई करने पर मुझे एक्स्ट्रा इनकम कैसे होगी?",
+      "answer": "क्वालिफाई करने पर आपको अचीवमेंट साइकिल से लेकर दिसंबर Cycle 2 तक 1% अतिरिक्त टर्नओवर कमीशन (Up to 5%) मिलता है, जिससे आपकी सामान्य कमीशन आय में 33% से 66% तक की अतिरिक्त बढ़ोत्तरी हो जाती है! साथ ही TeamFest प्रिविलेज एंट्री और बिजनेस किट भी मिलती है।"
+    },
+    {
+      "id": "faq_6",
+      "type": "direct",
+      "question": "FastTrack (E1/E2) direct sellers के लिए Q3 में कौन सा टूर उपलब्ध है?",
+      "answer": "FastTrack डायरेक्ट सेलर्स जो अक्टूबर, नवंबर, दिसंबर तीनों माह FastTrack मेंटेन करेंगे और संचयी टर्नओवर पूरा करेंगे:\n• Single Tour (2N/3D): E1 = 2.4L : 2.4L, E2 = 3.6L : 3.6L\n• Couple Tour (2N/3D): E1 = 3.0L : 3.0L, E2 = 4.5L : 4.5L।"
+    },
+    {
+      "id": "faq_7",
+      "type": "reverse",
+      "question": "अगर मेरी टीम में 10 Business Consultant बन जाएं तो मुझे क्या फायदा होगा?",
+      "answer": "प्रत्येक Business Consultant बनाने पर आपको 5 पॉइंट्स मिलते हैं। 10 BC बनाने पर आपको 10 × 5 = 50 पॉइंट्स मिलेंगे! यदि आप Pro VC हैं, तो 50 पॉइंट्स पर आपको सीधे Netsurf TeamFest का टिकट मिल जाएगा!"
+    },
+    {
+      "id": "faq_8",
+      "type": "mixed",
+      "question": "अगर मेरी टीम में 5 Club Saksham / Asmita बन जाएं तो कितने पॉइंट्स मिलेंगे?",
+      "answer": "प्रत्येक Club Saksham या Asmita (Star/SuperStar) बनाने पर लीडर को 7 पॉइंट्स मिलते हैं। 5 CA/CS बनाने पर आपको 5 × 7 = 35 पॉइंट्स मिलेंगे।"
+    },
+    {
+      "id": "faq_9",
+      "type": "direct",
+      "question": "अक्टूबर में नया Netsurf iStock कितने रुपये में खोला जा सकता है?",
+      "answer": "अक्टूबर फेस्टिव स्पेशल ऑफर के तहत नया Netsurf iStock सामान्य ₹73,000 की जगह मात्र ₹25,550 में खोला जा सकता है, जिस पर 27% MRP डिस्काउंट लागू होगा। यह ₹47,450 की सीधी बचत का ऐतिहासिक अवसर है!"
+    },
+    {
+      "id": "faq_10",
+      "type": "direct",
+      "question": "हॉल ऑफ फेम (Hall of Fame) और स्पेशल मेडल कैसे मिलेगा?",
+      "answer": "अक्टूबर Cycle 1 में अपना निर्धारित टारगेट अचीव करने वाले डायरेक्ट सेलर्स की तस्वीर Netsurf के पहले TeamFest 'Hall of Fame' में प्रदर्शित की जाएगी और उन्हें समारोह में एक स्पेशल मेडल से सम्मानित किया जाएगा।"
+    }
+  ]
+}
