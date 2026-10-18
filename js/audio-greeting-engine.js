@@ -274,18 +274,15 @@
       activeAudioElement.onplay = function () {
         isSpeaking = true;
         updateAudioUIState(true);
-        showAudioToast(`🔊 सुन रहे हैं: ${config.title}`);
       };
       activeAudioElement.onended = function () {
         isSpeaking = false;
         updateAudioUIState(false);
-        hideAudioToast();
         activeAudioElement = null;
       };
       activeAudioElement.onerror = function () {
         isSpeaking = false;
         updateAudioUIState(false);
-        hideAudioToast();
         activeAudioElement = null;
       };
       activeAudioElement.play().catch(err => {
@@ -319,19 +316,16 @@
     currentUtterance.onstart = function () {
       isSpeaking = true;
       updateAudioUIState(true);
-      showAudioToast(`🔊 सुन रहे हैं: ${config.title}`);
     };
 
     currentUtterance.onend = function () {
       isSpeaking = false;
       updateAudioUIState(false);
-      hideAudioToast();
     };
 
     currentUtterance.onerror = function () {
       isSpeaking = false;
       updateAudioUIState(false);
-      hideAudioToast();
     };
 
     synth.speak(currentUtterance);
@@ -362,26 +356,14 @@
   }
 
   function showAudioToast(msg) {
-    let toast = document.getElementById('audio-live-pill-toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'audio-live-pill-toast';
-      toast.className = 'audio-live-pill-toast';
-      document.body.appendChild(toast);
-    }
-    toast.innerHTML = `
-      <div class="audio-equalizer-bars"><span></span><span></span><span></span></div>
-      <span>${msg}</span>
-      <button type="button" onclick="window.stopPageAudioGreeting()" style="background:none; border:none; color:#f87171; font-weight:900; cursor:pointer; font-size:1rem; margin-left:6px;">✕</button>
-    `;
-    toast.classList.add('show');
+    // Disabled: Floating top audio tracker completely removed as per user instruction
+    const toast = document.getElementById('audio-live-pill-toast');
+    if (toast) toast.remove();
   }
 
   function hideAudioToast() {
     const toast = document.getElementById('audio-live-pill-toast');
-    if (toast) {
-      toast.classList.remove('show');
-    }
+    if (toast) toast.remove();
   }
 
   // 5. Injects the Floating Action Bar (Audio, Share, WhatsApp)
