@@ -374,6 +374,18 @@
       return 'business';
     }
 
+    // Netsurf Business, Q3 Pathfinder, TeamFest, Direct Selling
+    const netsurfKeywords = [
+      'netsurf', 'नेट्सर्फ', 'नेटसर्फ', 'pathfinder', 'पाथफाइंडर', 'teamfest', 'टीमफेस्ट',
+      'rockstar', 'रॉकस्टार', 'saksham', 'सक्षम', 'asmita', 'अस्मिता', 'fasttrack', 'फास्टट्रैक',
+      'istock', 'आई-स्टॉक', 'आई स्टॉक', 'आईस्टॉक', 'business consultant', 'बिज़नेस कंसल्टेंट',
+      '8,19,250', '8.19', 'कैपिंग', 'capping', 'डायरेक्ट सेलर', 'direct seller', 'ई-टेलर', 'e-tailer',
+      'हॉल ऑफ फेम', 'hall of fame', 'लीडरशिप पॉइंट'
+    ];
+    if (netsurfKeywords.some(t => q.includes(t))) {
+      return 'netsurf';
+    }
+
     if (q.includes('आरोग्यम ट्यूब') || q.includes('aarogyam tube') || q.includes('आरोग्यमट्यूब') || q.includes('म ट्यूब') || q.includes('ट्यूब') || q.includes('tube') || ((q.includes('वीडियो') || q.includes('video') || q.includes('रील्स') || q.includes('shorts')) && !q.includes('वीडियो नहीं'))) {
       return 'tube';
     }
@@ -612,6 +624,7 @@
   // 3. PAGE DOMAIN DETECTION
   function detectCurrentPageDomain() {
     const path = (window.location.pathname || '').toLowerCase();
+    if (path.includes('netsurf') || path.includes('pathfinder')) return 'netsurf';
     if (path.includes('hair') || path.includes('skin') || path.includes('beauty')) return 'beauty';
     if (path.includes('pashu') || path.includes('dairy') || path.includes('cattle') || path.includes('poultry')) return 'pashu';
     if (path.includes('health/') || path.includes('diabetes') || path.includes('joint') || path.includes('thyroid') || path.includes('weight') || path.includes('heart') || path.includes('liver') || path.includes('women') || path.includes('kids') || path.includes('dental') || path.includes('sexual')) return 'health';
@@ -5279,7 +5292,13 @@ function extractPersonNameFromQuery(rawQ, cleanQ) {
       'mitra', 'मित्र', 'bhai', 'भाई', 'distributor', 'डिस्ट्रीब्यूटर', 'netsurf', 'नेटसर्फ', 'plan', 'प्लान',
       'number', 'नंबर', 'bhejo', 'भेजो', 'bhejna', 'भेजना', 'share', 'शेयर', 'pashu', 'पशु', 'bhains', 'भैंस', 'gai', 'गाय',
       'kharcha', 'खर्चा', 'cost', 'daam', 'price', 'kitna', 'कितना', 'chahiye', 'चाहिए', 'batao', 'बताओ',
-      'mahila', 'महिला', 'aurat', 'औरत', 'bacche', 'बच्चे', 'kids', 'women', 'men', 'mujhe', 'humko', 'hamare', 'hume', 'mera'
+      'mahila', 'महिला', 'aurat', 'औरत', 'bacche', 'बच्चे', 'kids', 'women', 'men', 'mujhe', 'humko', 'hamare', 'hume', 'mera',
+      'teamfest', 'टीमफेस्ट', 'pathfinder', 'पाथफाइंडर', 'rockstar', 'रॉकस्टार', 'fasttrack', 'फास्टट्रैक', 'istock', 'आईस्टॉक',
+      'direct sellers', 'direct seller', 'sellers', 'seller', 'सेलर', 'सेलर्स', 'डायरेक्ट सेलर', 'डायरेक्ट सेलर्स',
+      'jane', 'जाने', 'aane', 'आने', 'banne', 'बनने', 'hona', 'होना', 'karne', 'करने', 'dekhne', 'देखने', 'samajhne', 'समझने',
+      'ticket', 'टिकट', 'point', 'points', 'पॉइंट', 'पॉइंट्स', 'commission', 'कमीशन', 'turnover', 'टर्नओवर',
+      'offer', 'ऑफर', 'gift', 'गिफ्ट', 'discount', 'छूट', 'e-tailer', 'etailer', 'ई-टेलर', 'bc', 'ca', 'cs',
+      'saksham', 'सक्षम', 'asmita', 'अस्मिता', 'hall of fame', 'हॉल ऑफ फेम', 'medal', 'मेडल'
     ]);
 
     const prefixStrip = /^(?:mujhe|humko|mera|mere|meri|apne|dost|mitra|bhai|kisan|sathi|farmer)\s+/i;
@@ -5752,136 +5771,6 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
   }
 
   // =========================================================================
-  // 17.25 DEDICATED NETSURF Q3 PATHFINDER 2026-27 (TEAMFEST) ROUTER
-  // Comprehensive, Pinpoint, 10 FAQs & Quick Chips Handler
-  // =========================================================================
-  function handleNetsurfPathfinderQ3Router(cleanQ, rawQ) {
-    const q = (cleanQ || '').toLowerCase();
-    const raw = (rawQ || '').toLowerCase();
-
-    const isPathfinderIntent = (
-      q.includes('pathfinder') || q.includes('पाथफाइंडर') ||
-      q.includes('teamfest') || q.includes('टीमफेस्ट') ||
-      q.includes('rockstar') || q.includes('रॉकस्टार') ||
-      q.includes('saksham') || q.includes('सक्षम') ||
-      q.includes('asmita') || q.includes('अस्मिता') ||
-      q.includes('fasttrack') || q.includes('फास्टट्रैक') ||
-      q.includes('istock') || q.includes('आई-स्टॉक') || q.includes('आई स्टॉक') ||
-      q.includes('25550') || q.includes('25,550') ||
-      q.includes('hall of fame') || q.includes('हॉल ऑफ फेम') ||
-      q.includes('e-tailer') || q.includes('ई-टेलर') ||
-      (q.includes('30%') && (q.includes('छूट') || q.includes('डिस्काउंट') || q.includes('offer') || q.includes('ऑफर'))) ||
-      (q.includes('bc') && (q.includes('पॉइंट') || q.includes('10,000') || q.includes('10000'))) ||
-      (q.includes('लीडरशिप') && q.includes('पॉइंट'))
-    );
-
-    if (!isPathfinderIntent) return false;
-
-    // Sub-Intent 1: Rockstar Tiers (R1, R2, R3, R4) & 32,000 Turnover
-    if (q.includes('r2') || q.includes('r1') || q.includes('r3') || q.includes('r4') || q.includes('32000') || q.includes('32,000') || (q.includes('रॉकस्टार') && (q.includes('लेवल') || q.includes('टर्नओवर') || q.includes('इंसेंटिव') || q.includes('बनें')))) {
-      const resp = `⭐ **नेट्सर्फ Q3 वीकली रॉकस्टार (Weekly Rockstar) नियम व लेवल्स:**\n\nअक्टूबर 2026 के 4 हफ़्तों (Week 1 से Week 4) में वीकली टर्नओवर (Invoice Value) पर अतिरिक्त रिटेल इंसेंटिव दिया जा रहा है:\n\n• **Rock Star 1 (R1):** वीकली टर्नओवर ₹8,000 ➔ **3% अतिरिक्त इंसेंटिव**\n• **Rock Star 2 (R2):** वीकली टर्नओवर ₹16,000 ➔ **5% अतिरिक्त इंसेंटिव**\n• **Rock Star 3 (R3):** वीकली टर्नओवर ₹24,000 ➔ **10% अतिरिक्त इंसेंटिव**\n• **Rock Star 4 (R4):** वीकली टर्नओवर ₹32,000+ ➔ **15% अधिकतम इंसेंटिव**\n\n💡 *अतिरिक्त लाभ:* यदि आप चारों सप्ताह (Week 1 से Week 4) लगातार रॉकस्टार मेंटेन करते हैं, तो आप **'Rockstar Champion'** बन जाते हैं और ₹2,000 MRP का कन्फर्म गिफ्ट + 25 लकी विनर्स के बंपर प्राइज़ के हकदार बनते हैं!`;
-
-      renderCrispSpecialBox('⭐ नेट्सर्फ वीकली रॉकस्टार (R1-R4) व इंसेंटिव', resp, [
-        { text: '🎁 4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट क्या है?', query: '4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट क्या है?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' },
-        { text: '💬 दादा अवनीश जी से WhatsApp संपर्क', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी, मुझे नेट्सर्फ रॉकस्टार ऑफर और इंसेंटिव के बारे में समझना है।'), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_rockstar');
-      return true;
-    }
-
-    // Sub-Intent 2: Rockstar Champion & 4-Week Gift / Lucky Draw
-    if (q.includes('चैंपियन') || q.includes('champion') || q.includes('4 हफ्ते') || q.includes('पक्का गिफ्ट') || q.includes('लकी ड्रॉ') || q.includes('lucky draw') || q.includes('कन्फर्म गिफ्ट')) {
-      const resp = `🏆 **नेट्सर्फ रॉकस्टार कंसिस्टेंसी चैंपियन (Rockstar Champion Rewards):**\n\nजो डायरेक्ट सेलर अक्टूबर माह के **चारों सप्ताह (Week 1 से Week 4)** लगातार किसी भी रॉकस्टार लेवल (R1/R2/R3/R4) को मेंटेन करते हैं, उन्हें निम्नलिखित विशेष रिवार्ड मिलते हैं:\n\n🎁 **1. कन्फर्म गिफ्ट (कोई 1 अनिवार्य चुनें):**\n• ₹2,000 MRP के नेट्सर्फ प्रोडक्ट्स (100% पसंदीदा वाउचर)\n• स्पेशल रॉकस्टार चैंपियन टी-शर्ट\n• कम्प्लीट रॉकस्टार किट (मैनुअल + बैज + कैप)\n\n🎰 **2. स्पेशल लकी ड्रॉ (25 बंपर प्राइजेस):**\n• 5G स्मार्टफोन (3 विजेताओं को)\n• एंड्रॉइड टैबलेट (2 विजेताओं को)\n• स्मार्ट वॉच (5 विजेताओं को)\n• हाई-कैपेसिटी पावर बैंक (5)\n• नेट्सर्फ प्रीमियम बैग (5) व स्पेशल टी-शर्ट (5)`;
-
-      renderCrispSpecialBox('🏆 रॉकस्टार चैंपियन कन्फर्म गिफ्ट व लकी ड्रॉ', resp, [
-        { text: '⭐ रॉकस्टार R2 कैसे बनें और क्या लाभ है?', query: 'रॉकस्टार R2 कैसे बनें और क्या लाभ है?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_rockstar_champion');
-      return true;
-    }
-
-    // Sub-Intent 3: Club Saksham & Club Asmita Criteria & 1% Extra Commission
-    if (q.includes('saksham') || q.includes('सक्षम') || q.includes('asmita') || q.includes('अस्मिता') || q.includes('ca/cs') || q.includes('1%') || q.includes('star club') || q.includes('super star')) {
-      const resp = `🎖️ **Club Saksham (पुरुष) व Club Asmita (महिला) — री-लॉन्च व 1% एक्स्ट्रा पेआउट:**\n\nनेट्सर्फ ने डायरेक्ट सेलर्स के सम्मान में दोनों क्लब्स को विशेष लाभ के साथ री-लॉन्च किया है:\n\n1️⃣ **Star Club पात्रता (1 माह का टर्नओवर):**\n• **👨 Club Saksham (Male):** Max Team ₹30,000 : Other Team ₹30,000 + ₹1,000 Self Consumer\n• **👩 Club Asmita (Female):** Max Team ₹25,000 : Other Team ₹25,000 + ₹1,000 Self Consumer\n\n2️⃣ **Super Star Club पात्रता:**\n• **Saksham SuperStar:** 60,000 : 60,000\n• **Asmita SuperStar:** 50,000 : 50,000\n\n🔥 **धमाकेदार रिवार्ड्स व 1% एक्स्ट्रा कमीशन:**\n• Netsurf TeamFest में प्रिविलेज एंट्री टिकट व सम्मान\n• एक्सक्लूसिव बिज़नेस किट (Netsurf बैग, डायरी, पेन, CA/CS बैज)\n• **1% अतिरिक्त टर्नओवर कमीशन:** अचीवमेंट साइकिल से लेकर **दिसंबर Cycle 2 तक** प्रत्येक क्लोजिंग में मिलेगा! इससे आपके टर्नओवर कमीशन में 33% से 66% तक की अतिरिक्त वृद्धि होती है।`;
-
-      renderCrispSpecialBox('🎖️ Club Saksham व Asmita — टर्नओवर व 1% एक्स्ट्रा लाभ', resp, [
-        { text: '✈️ FastTrack E1 कपल टूर कैसे हासिल करें?', query: 'FastTrack E1 कपल टूर कैसे हासिल करें?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' },
-        { text: '💬 दादा अवनीश जी से WhatsApp संपर्क', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी, मुझे क्लब सक्षम / अस्मिता के 1% एक्स्ट्रा कमीशन की जानकारी चाहिए।'), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_saksham_asmita');
-      return true;
-    }
-
-    // Sub-Intent 4: FastTrack Tours (2N/3D Luxury Hotel Tour)
-    if (q.includes('fasttrack') || q.includes('फास्टट्रैक') || q.includes('टूर') || q.includes('tour') || q.includes('कपल') || q.includes('सिंगल') || q.includes('2n') || q.includes('3d') || q.includes('2 रात 3 दिन')) {
-      const resp = `✈️ **FastTrack Q3 (Oct-Nov-Dec) संचयी लक्ज़री डेस्टिनेशन टूर:**\n\nअक्टूबर, नवंबर और दिसंबर 2026 तीनों माह FastTrack मेंटेन करने वाले डायरेक्ट सेलर्स के लिए शानदार **2 Nights & 3 Days** लक्ज़री होटल टूर:\n\n🌴 **1. Single Tour (1 व्यक्ति):**\n• **E1 (Execution 1):** संचयी टर्नओवर ₹2.4 लाख : ₹2.4 लाख (2,40,000 : 2,40,000)\n• **E2 (Execution 2):** संचयी टर्नओवर ₹3.6 लाख : ₹3.6 लाख (3,60,000 : 3,60,000)\n\n💑 **2. Couple Tour (पति-पत्नी 2 व्यक्ति):**\n• **E1 (Execution 1):** संचयी टर्नओवर ₹3.0 लाख : ₹3.0 लाख (3,00,000 : 3,00,000)\n• **E2 (Execution 2):** संचयी टर्नओवर ₹4.5 लाख : ₹4.5 लाख (4,50,000 : 4,50,000)\n\n💡 *अक्टूबर स्पेशल:* अक्टूबर में अपना FastTrack (E1/E2) मेंटेन करने पर आपको Netsurf TeamFest का स्पेशल इनवाइट टिकट भी तुरंत मिलता है!`;
-
-      renderCrispSpecialBox('✈️ FastTrack Q3 संचयी लक्ज़री टूर (2N/3D)', resp, [
-        { text: '🎖️ Club Saksham और Club Asmita का टर्नओवर क्या है?', query: 'Club Saksham और Club Asmita का टर्नओवर क्या है?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_fasttrack_tour');
-      return true;
-    }
-
-    // Sub-Intent 5: Leadership Points (BC=5, CA/CS=7) & TeamFest Tickets
-    if (q.includes('bc') || q.includes('लीडरशिप') || q.includes('leadership') || q.includes('पॉइंट') || q.includes('point') || q.includes('pro vc') || q.includes('captain')) {
-      const resp = `🎯 **लीडरशिप पॉइंट्स (Rise Pillar) व TeamFest टिकट्स नियम:**\n\nअपनी टीम में नए लीडर्स विकसित करने पर आपको सीधे पॉइंट्स मिलते हैं:\n\n• 👤 **1 Business Consultant (BC) बनाने पर:** ➔ **5 Points**\n• 🎖️ **1 Club Saksham (Star/SuperStar) बनाने पर:** ➔ **7 Points**\n• 🎖️ **1 Club Asmita (Star/SuperStar) बनाने पर:** ➔ **7 Points**\n\n**रैंक अनुसार मासिक टारगेट्स व रिवार्ड्स:**\n• **Pro Vice Captain (Pro VC):** 50 Points पर TeamFest टिकट | 100 Points पर स्पेशल Netsurf शर्ट | 120 Points पर स्पेशल ब्रांडिंग\n• **Vice Captain (VC):** 150 Points पर टिकट | 300 Points पर शर्ट | 360 Points पर ब्रांडिंग\n• **Captain:** 500 Points पर टिकट | 1000 Points पर शर्ट | 1200 Points पर ब्रांडिंग\n\n💡 *उदाहरण:* यदि आप 10 BC बनाते हैं, तो आपको 10 × 5 = **50 पॉइंट्स** मिलेंगे और Pro VC होने पर तुरंत TeamFest टिकट हासिल हो जाएगा!`;
-
-      renderCrispSpecialBox('🎯 लीडरशिप पॉइंट्स, BC व TeamFest टिकट', resp, [
-        { text: '🌟 हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?', query: 'हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_leadership_points');
-      return true;
-    }
-
-    // Sub-Intent 6: iStock Festive Offer (₹25,550 vs ₹73,000)
-    if (q.includes('istock') || q.includes('आई-स्टॉक') || q.includes('आई स्टॉक') || q.includes('25550') || q.includes('25,550') || q.includes('73000') || q.includes('73,000')) {
-      const resp = `🏪 **अक्टूबर फेस्टिव महा-धमाका — नया iStock मात्र ₹25,550 में!**\n\nनेट्सर्फ ने इस त्योहारी सीजन में इतिहास की सबसे बड़ी छूट घोषित की है:\n\n• **नियमित लागत:** <s>₹73,000</s>\n• **फेस्टिव स्पेशल मूल्य:** **₹25,550 मात्र**\n• **सीधी महा-बचत:** **₹47,450 की ऐतिहासिक बचत!**\n• **डिस्काउंट:** 27% Flat Discount on MRP\n• **उत्पाद श्रेणियां:** सभी 4 प्रमुख श्रेणियां (Biofit जैविक खेती, Naturamore हेल्थ, Herbs & More पर्सनल केयर, Pet-Vet पशु पोषण) मान्य हैं।\n\n🎯 *राष्ट्रीय संकल्प:* प्रतिदिन 1 iStock से बढ़कर **प्रतिदिन 100 iStocks** खोलने का राष्ट्रीय अभियान! यह ग्रामीण व शहरी क्षेत्रों में अपना खुद का नेट्सर्फ सुपरमार्ट केंद्र खोलने का स्वर्णिम मौका है।`;
-
-      renderCrispSpecialBox('🏪 नया Netsurf iStock मात्र ₹25,550 में', resp, [
-        { text: '🛍️ न्यू E-Tailer को 30% छूट कैसे मिलेगी?', query: 'न्यू E-Tailer को 30% छूट कैसे मिलेगी?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' },
-        { text: '💬 दादा अवनीश जी से iStock खोलें', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी, मुझे ₹25,550 वाले फेस्टिव ऑफर में नया नेट्सर्फ iStock खोलना है।'), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_istock_offer');
-      return true;
-    }
-
-    // Sub-Intent 7: New E-Tailer 30% Offer
-    if (q.includes('e-tailer') || q.includes('ई-टेलर') || q.includes('30%') || q.includes('न्यू ई-टेलर') || q.includes('new etailer')) {
-      const resp = `🛍️ **अक्टूबर एक्सक्लूसिव ऑफर — नए स्मार्ट E-Tailer को 30% स्पेशल डिस्काउंट:**\n\nअक्टूबर 2026 माह में नेट्सर्फ में रजिस्टर होने वाले प्रत्येक नए **Smart e-Tailer** के लिए विशेष सुविधा:\n\n• **छूट प्रतिशत:** **30% फ्लैट डिस्काउंट** (सामान्य 25% की जगह)\n• **पात्रता:** अक्टूबर महीने में नया रजिस्ट्रेशन करने वाले सभी डायरेक्ट सेलर\n• **लाभ:** पहले ही ऑर्डर से 30% की अतिरिक्त मार्जिन व बचत\n• **लागू श्रेणियां:** बायोफिट, नेचुरामोर, हर्ब्स एंड मोर व पेट-वेट के सभी प्रोडक्ट्स पर लागू।`;
-
-      renderCrispSpecialBox('🛍️ न्यू Smart e-Tailer 30% स्पेशल ऑफर', resp, [
-        { text: '🏪 अक्टूबर में नया iStock कितने में खुलेगा?', query: 'अक्टूबर में नया iStock कितने में खुलेगा?' },
-        { text: '⭐ रॉकस्टार R2 कैसे बनें और क्या लाभ है?', query: 'रॉकस्टार R2 कैसे बनें और क्या लाभ है?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_etailer_offer');
-      return true;
-    }
-
-    // Sub-Intent 8: Hall of Fame & Special Medal
-    if (q.includes('hall of fame') || q.includes('हॉल ऑफ फेम') || q.includes('मेडल') || q.includes('medal') || q.includes('फोटो लगवाने')) {
-      const resp = `🌟 **Netsurf 1st-Ever TeamFest “Hall of Fame” & Special Medal:**\n\nनेट्सर्फ के इतिहास में पहली बार 'हॉल ऑफ फेम' का भव्य सम्मान शुरू किया गया है:\n\n• **पात्रता शर्त:** **अक्टूबर Cycle 1** में अपना निर्धारित टारगेट (Rockstar / BC / CA / CS) पूरा करें!\n• **सम्मान:** TeamFest 2026 के मुख्य द्वार पर आपकी तस्वीर विशाल 'Hall of Fame' गैलरी में प्रदर्शित की जाएगी।\n• **मंच पर पुरस्कार:** कंपनी के शीर्ष प्रबंधन द्वारा भव्य मंच पर आपको स्पेशल मेडल से सम्मानित किया जाएगा।`;
-
-      renderCrispSpecialBox('🌟 नेट्सर्फ हॉल ऑफ फेम (Hall of Fame) सम्मान', resp, [
-        { text: '🎯 TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?', query: 'TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?' },
-        { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' }
-      ], 'business', 'netsurf_hall_of_fame');
-      return true;
-    }
-
-    // Default Pathfinder Overview
-    const resp = `🎉 **नेट्सर्फ Q3 पाथफाइंडर 2026-27 (TeamFest) महा-योजना:**\n\nअक्टूबर, नवंबर और दिसंबर 2026 के लिए नेट्सर्फ ने 4 प्रमुख स्तंभों पर आधारित ऐतिहासिक प्लान घोषित किया है:\n\n1️⃣ **Celebrate:** न्यू E-Tailer को 30% छूट, वीकली रॉकस्टार (R1-R4) में 15% तक इंसेंटिव, 4-हफ्ते कंसिस्टेंसी पर ₹2,000 कन्फर्म गिफ्ट + लकी ड्रॉ।\n2️⃣ **Build:** Club Saksham (Male 30k:30k) व Club Asmita (Female 25k:25k) पर **दिसंबर तक 1% एक्स्ट्रा पेआउट**, TeamFest टिकट व 2N/3D लक्ज़री फास्टट्रैक टूर।\n3️⃣ **Rise:** लीडरशिप पॉइंट्स (1 BC = 5 Pts, 1 CA/CS = 7 Pts), TeamFest टिकट्स व पहली बार 'हॉल ऑफ फेम' सम्मान।\n4️⃣ **iStock Festive:** ₹73,000 की जगह नया iStock मात्र **₹25,550 में** (27% MRP डिस्काउंट)।\n\n👇 आप किस ऑफर के बारे में विस्तार से जानना चाहते हैं? नीचे से विकल्प चुनें:`;
-
-    renderCrispSpecialBox('🎉 Netsurf Q3 Pathfinder 2026-27 सम्पूर्ण योजना', resp, [
-      { text: '⭐ रॉकस्टार R2 कैसे बनें और क्या लाभ है?', query: 'रॉकस्टार R2 कैसे बनें और क्या लाभ है?' },
-      { text: '🎖️ Club Saksham व Asmita का टर्नओवर?', query: 'Club Saksham और Club Asmita का टर्नओवर क्या है?' },
-      { text: '🏪 नया iStock मात्र ₹25,550 में', query: 'अक्टूबर में नया iStock कितने में खुलेगा?' },
-      { text: '✈️ 2N/3D लक्ज़री फास्टट्रैक टूर', query: 'FastTrack E1 कपल टूर कैसे हासिल करें?' },
-      { text: '🚀 पूरा Q3 पाथफाइंडर पेज खोलें', url: '/categories/netsurf-pathfinder.html', isExternal: true, style: 'background:#1d4ed8;color:#fff;font-weight:800;' }
-    ], 'business', 'netsurf_pathfinder_overview');
-    return true;
-  }
-
   // 17.3 DEDICATED CONVERSATIONAL NETSURF OVERVIEW ROUTER (4-5 Category Options & Direct Landing Links)
   function handleConversationalNetsurf(cleanQ, rawQ) {
     const isNetsurfGeneral = cleanQ === 'netsurf' || cleanQ === 'नेट्सर्फ' || cleanQ === 'about netsurf' || cleanQ.includes('about netsurf') || cleanQ.includes('netsurf kya hai') || cleanQ.includes('नेट्सर्फ क्या है') || cleanQ === 'netsurf company' || cleanQ === 'नेट्सर्फ कंपनी' || cleanQ === 'netsurf ke bare me' || cleanQ.includes('नेट्सर्फ के बारे में');
@@ -6130,18 +6019,38 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
   // (Weekly Rockstar, Club Saksham/Asmita, iStock Festive ₹25,550, FastTrack Tours, 10 Pinpoint FAQs)
   // =========================================================================
   function handleNetsurfPathfinderQ3Router(cleanQ, rawQ) {
-    const q = (cleanQ || '').toLowerCase();
-    const raw = (rawQ || '').toLowerCase();
+    const q = (cleanQ || '').toLowerCase().trim();
+    const raw = (rawQ || '').toLowerCase().trim();
 
     // 1. PINPOINT MATCH: 10 READY-MADE QUESTIONS & VARIATIONS
-    
-    // Q1: रॉकस्टार R2 कैसे बनें
-    if (q.includes('r2') || (q.includes('रॉकस्टार') && (q.includes('16000') || q.includes('16,000') || q.includes('r-2') || q.includes('2')) && !q.includes('4 हफ्ते') && !q.includes('champion'))) {
-      const resp = `⭐ **Rock Star 2 (R2) बनने का नियम व लाभ:**
 
-• **टर्नओवर शर्त:** एक सप्ताह (शनिवार से शुक्रवार) में **₹16,000 का वीकली रिटेल टर्नओवर (TO)** पूरा करें।
-• **इंसेंटिव:** उस सप्ताह के रिटेल प्रॉफिट का **5% अतिरिक्त स्पेशल इंसेंटिव** सीधे आपके बैंक खाते में भेजा जाएगा!
-• **विशेष:** यदि आप ₹24,000 करेंगे तो R3 (10% इंसेंटिव) और ₹32,000+ करेंगे तो R4 (15% इंसेंटिव) मिलेगा।`;
+    // Intent 1: ₹32,000 turnover / Rock Star 4 (R4)
+    if (q.includes('32000') || q.includes('32,000') || q.includes('32 हजार') || (q.includes('r4') && (q.includes('टर्नओवर') || q.includes('मिलेगा') || q.includes('लाभ') || q.includes('इंसेंटिव') || q.includes('रॉकस्टार')))) {
+      const resp = `⭐ **Rock Star 4 (R4) टर्नओवर नियम व अधिकतम 15% इंसेंटिव:**\n\n• **टर्नओवर शर्त:** 1 सप्ताह (Cycle 1 या Cycle 2) में **₹32,000 या उससे अधिक का वीकली रिटेल टर्नओवर (TO)** पूरा करें।\n• **इंसेंटिव:** उस सप्ताह के रिटेल प्रॉफिट का **15% अधिकतम स्पेशल इंसेंटिव** सीधे आपके बैंक खाते में भेजा जाएगा!\n• **कंसिस्टेंसी का बंपर लाभ:** यदि आप चारों हफ्ते (Week 1 से 4) लगातार रॉकस्टार मेंटेन करते हैं, तो आप **'रॉकस्टार चैंपियन'** बन जाते हैं और ₹2,000 MRP का कन्फर्म गिफ्ट + 25 लकी विनर्स वाले मेगा लकी ड्रॉ में भाग लेने के हकदार बनते हैं!`;
+      return renderNetsurfPlanCard('⭐ रॉकस्टार R4 (₹32,000+) योग्यता व 15% इंसेंटिव', resp, [
+        { label: "🎁 4 हफ्ते रॉकस्टार गिफ्ट क्या है?", query: "4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट क्या है?" },
+        { label: "⭐ रॉकस्टार R2 कैसे बनें?", query: "रॉकस्टार R2 कैसे बनें और क्या लाभ है?" },
+        { label: "👨👩 Club Saksham व Asmita टर्नओवर", query: "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
+        { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
+        { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
+      ]);
+    }
+
+    // Intent 2: 4 हफ्ते कंसिस्टेंसी / रॉकस्टार चैंपियन रिवॉर्ड
+    if (q.includes('4 हफ्ते') || q.includes('चार हफ्ते') || q.includes('4-हफ्ते') || q.includes('4 week') || q.includes('four week') || q.includes('चैंपियन') || q.includes('champion') || (q.includes('रॉकस्टार') && (q.includes('पक्का गिफ्ट') || q.includes('कन्फर्म') || q.includes('कंसिस्टेंसी') || q.includes('consistency') || q.includes('इनाम') || q.includes('लकी ड्रॉ') || q.includes('lucky draw') || q.includes('लकी ड्रा')))) {
+      const resp = `🏆 **रॉकस्टार चैंपियन (4 हफ़्ते कंसिस्टेंसी) रिवॉर्ड:**\n\nअक्टूबर माह के चारों हफ़्तों में लगातार रॉकस्टार (R1-R4) मेंटेन करने पर:\n\n🎁 **1. कन्फर्म पक्का गिफ्ट (कोई भी 1 चुनें):**\n• ₹2,000 MRP के नेट्सर्फ प्रोडक्ट्स या वाउचर, अथवा\n• एक्सक्लूसिव 'रॉकस्टार चैंपियन' टी-शर्ट, अथवा\n• रॉकस्टार चैंपियन किट (प्रोडक्ट मैनुअल + रिटेलर बैज + कैप)।\n\n🎰 **2. फेस्टिव धमाका लकी ड्रा (25 लकी विनर्स):**\nब्रांडेड 5G मोबाइल, स्मार्ट टैब, स्मार्ट वॉच, ब्लूटूथ साउंडबार, हाई-कैपेसिटी पावर बैंक, नेट्सर्फ प्रीमियम बैग व स्पेशल टी-शर्ट!`;
+      return renderNetsurfPlanCard('🏆 रॉकस्टार चैंपियन 4-वीक गिफ्ट्स व लकी ड्रा', resp, [
+        { label: "⭐ रॉकस्टार R2 कैसे बनें?", query: "रॉकस्टार R2 कैसे बनें और क्या लाभ है?" },
+        { label: "🎟️ TeamFest टिकट के लिए कितने पॉइंट्स?", query: "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
+        { label: "🏅 हॉल ऑफ फेम फोटो का नियम", query: "हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?" },
+        { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
+        { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
+      ]);
+    }
+
+    // Intent 3: R2 / R1-R4 सामान्य रॉकस्टार लेवल्स
+    if (q.includes('r2') || q.includes('r-2') || q.includes('16000') || q.includes('16,000') || q.includes('16 हजार') || ((q.includes('रॉकस्टार') || q.includes('rockstar')) && (q.includes('बनने') || q.includes('चाहिए') || q.includes('मिलेगा') || q.includes('लाभ') || q.includes('इंसेंटिव') || q.includes('टर्नओवर')))) {
+      const resp = `⭐ **Rock Star 2 (R2) बनने का नियम व लाभ:**\n\n• **टर्नओवर शर्त:** एक सप्ताह (शनिवार से शुक्रवार) में **₹16,000 का वीकली रिटेल टर्नओवर (TO)** पूरा करें।\n• **इंसेंटिव:** उस सप्ताह के रिटेल प्रॉफिट का **5% अतिरिक्त स्पेशल इंसेंटिव** सीधे आपके बैंक खाते में भेजा जाएगा!\n\n**नेट्सर्फ रॉकस्टार के सभी 4 लेवल्स:**\n• **R1 (₹8,000 टर्नओवर):** वीकली सरप्राइज ऑफर (3% इंसेंटिव वाउचर)\n• **R2 (₹16,000 टर्नओवर):** 5% अतिरिक्त स्पेशल इंसेंटिव\n• **R3 (₹24,000 टर्नओवर):** 10% अतिरिक्त स्पेशल इंसेंटिव\n• **R4 (₹32,000+ टर्नओवर):** 15% अधिकतम स्पेशल इंसेंटिव`;
       return renderNetsurfPlanCard('⭐ रॉकस्टार R2 योग्यता व इंसेंटिव', resp, [
         { label: "🎁 4 हफ्ते रॉकस्टार गिफ्ट क्या है?", query: "4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट क्या है?" },
         { label: "🏷️ न्यू E-Tailer 30% छूट कैसे मिलेगी?", query: "न्यू E-Tailer को 30% छूट कैसे मिलेगी?" },
@@ -6151,62 +6060,9 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       ]);
     }
 
-    // Q2: 4 हफ्ते रॉकस्टार बनने पर पक्का गिफ्ट (कंसिस्टेंसी)
-    if (q.includes('4 हफ्ते') || q.includes('चार हफ्ते') || q.includes('4 week') || q.includes('four week') || q.includes('पक्का गिफ्ट') || q.includes('कन्फर्म गिफ्ट') || q.includes('चैंपियन') || q.includes('champion')) {
-      if (q.includes('rockstar') || q.includes('रॉकस्टार') || q.includes('गिफ्ट') || q.includes('gift') || q.includes('रिवार्ड')) {
-        const resp = `🏆 **रॉकस्टार चैंपियन (4 हफ़्ते कंसिस्टेंसी) रिवॉर्ड:**
-
-अक्टूबर माह के चारों हफ़्तों में लगातार रॉकस्टार मेंटेन करने पर:
-
-🎁 **1. कन्फर्म गिफ्ट (कोई भी 1 चुनें):**
-• ₹2,000 MRP के नेट्सर्फ प्रोडक्ट्स या वाउचर, अथवा
-• एक्सक्लूसिव 'रॉकस्टार चैंपियन' टी-शर्ट, अथवा
-• रॉकस्टार चैंपियन किट (प्रोडक्ट मैनुअल + रिटेलर बैज + कैप)।
-
-🎰 **2. फेस्टिव धमाका लकी ड्रा (25 लकी विनर्स):**
-ब्रांडेड 5G मोबाइल, स्मार्ट टैब, स्मार्ट वॉच, ब्लूटूथ साउंडबार, पावर बैंक, बैग व टी-शर्ट!`;
-        return renderNetsurfPlanCard('🏆 रॉकस्टार चैंपियन 4-वीक गिफ्ट्स व लकी ड्रा', resp, [
-          { label: "⭐ रॉकस्टार R2 कैसे बनें?", query: "रॉकस्टार R2 कैसे बनें और क्या लाभ है?" },
-          { label: "🎟️ TeamFest टिकट के लिए कितने पॉइंट्स?", query: "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
-          { label: "🏅 हॉल ऑफ फेम फोटो का नियम", query: "हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?" },
-          { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
-          { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
-        ]);
-      }
-    }
-
-    // Q3: Club Saksham vs Club Asmita टर्नओवर
-    if ((q.includes('saksham') || q.includes('सक्षम')) && (q.includes('asmita') || q.includes('अस्मिता') || q.includes('अंतर') || q.includes('turnover') || q.includes('टर्नओवर'))) {
-      const resp = `👨👩 **Club Saksham व Club Asmita टर्नओवर क्राइटेरिया:**
-
-कार्यरत डायरेक्ट सेलर के जेंडर से क्लब तय होता है (पुरुष = Saksham, महिला = Asmita):
-
-🌟 **1. Star Club टर्नओवर:**
-• **Club Saksham (Male):** Max Team ₹30,000 : Other Team ₹30,000 + Self Consumer ₹1,000
-• **Club Asmita (Female):** Max Team ₹25,000 : Other Team ₹25,000 + Self Consumer ₹1,000
-
-💥 **2. Super Star Club टर्नओवर:**
-• **Club Saksham:** 60,000 : 60,000 + ₹1,000 Self Consumer
-• **Club Asmita:** 50,000 : 50,000 + ₹1,000 Self Consumer
-
-🎁 **लाभ:** TeamFest 1N/2D प्रिविलेज एंट्री टिकट, बिज़नेस किट, CA/CS बैज व **1% अतिरिक्त कमीशन दिसंबर Cycle 2 तक!**`;
-      return renderNetsurfPlanCard('👨👩 क्लब सक्षम व अस्मिता सम्पूर्ण टर्नओवर नियम', resp, [
-        { label: "💰 1% एक्स्ट्रा कमीशन कब तक मिलेगा?", query: "CA/CS को 1% एक्स्ट्रा कमीशन कब तक मिलेगा?" },
-        { label: "✈️ FastTrack E1 कपल टूर कैसे हासिल करें?", query: "FastTrack E1 कपल टूर कैसे हासिल करें?" },
-        { label: "👥 10 BC बनाने पर मुझे कितने पॉइंट्स?", query: "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
-        { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
-        { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
-      ]);
-    }
-
-    // Q4: CA/CS को 1% एक्स्ट्रा कमीशन कब तक मिलेगा
-    if ((q.includes('1%') || q.includes('1 प्रतिशत') || q.includes('एक प्रतिशत')) && (q.includes('कमीशन') || q.includes('commission') || q.includes('पेआउट') || q.includes('payout') || q.includes('ca/cs') || q.includes('saksham') || q.includes('asmita'))) {
-      const resp = `💰 **1% अतिरिक्त टर्नओवर कमीशन की अवधि व लाभ:**
-
-• **कब तक मिलेगा:** आपकी **अचीवमेंट साइकिल से लेकर दिसंबर 2026 Cycle 2 तक** लगातार मिलेगा!
-• **कमीशन दर:** आपके सामान्य टर्नओवर कमीशन (3% या 4%) में 1% जुड़ जाएगा (अधिकतम 5% तक)।
-• **आय प्रभाव:** इससे आपकी कमीशन आय में **33% से लेकर 66% तक की अतिरिक्त शुद्ध बढ़ोतरी** हो जाती है!
-• **अतिरिक्त सम्मान:** Netsurf TeamFest (1N/2D) में वीआईपी एंट्री और CA/CS रिकॉग्निशन किट व बैज।`;
+    // Intent 4: CA/CS को 1% एक्स्ट्रा कमीशन व अतिरिक्त इनकम
+    if (((q.includes('1%') || q.includes('1 प्रतिशत') || q.includes('एक प्रतिशत') || q.includes('एक्स्ट्रा') || q.includes('extra') || q.includes('अतिरिक्त') || q.includes('कब तक')) && (q.includes('कमीशन') || q.includes('commission') || q.includes('इनकम') || q.includes('income') || q.includes('कमाई') || q.includes('पेआउट') || q.includes('payout')) && (q.includes('saksham') || q.includes('सक्षम') || q.includes('asmita') || q.includes('अस्मिता') || q.includes('ca') || q.includes('cs') || q.includes('क्लब') || q.includes('qualify') || q.includes('क्वालीफाई'))) || q.includes('1% एक्स्ट्रा') || q.includes('1% extra') || (q.includes('एक्स्ट्रा इनकम') && (q.includes('सक्षम') || q.includes('अस्मिता') || q.includes('saksham') || q.includes('asmita')))) {
+      const resp = `💰 **1% अतिरिक्त टर्नओवर कमीशन की अवधि व अतिरिक्त कमाई:**\n\n• **कब तक मिलेगा:** आपकी **अचीवमेंट साइकिल से लेकर दिसंबर 2026 Cycle 2 तक** लगातार मिलेगा!\n• **कमीशन दर:** आपके सामान्य टर्नओवर कमीशन (3% या 4%) में 1% अतिरिक्त जुड़ जाता है (अधिकतम 5% तक)।\n• **आय प्रभाव:** इससे आपकी कमीशन आय में **33% से लेकर 66% तक की अतिरिक्त शुद्ध बढ़ोतरी** हो जाती है!\n• **अतिरिक्त सम्मान:** Netsurf TeamFest (1N/2D) में वीआईपी एंट्री और CA/CS रिकॉग्निशन किट व बैज।`;
       return renderNetsurfPlanCard('💰 1% एक्स्ट्रा टर्नओवर कमीशन की पूरी जानकारी', resp, [
         { label: "👨👩 क्लब सक्षम व अस्मिता नियम", query: "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
         { label: "✈️ FastTrack E1 कपल टूर कैसे हासिल करें?", query: "FastTrack E1 कपल टूर कैसे हासिल करें?" },
@@ -6216,37 +6072,45 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       ]);
     }
 
-    // Q5: TeamFest टिकट के लिए कितने पॉइंट्स चाहिए
-    if (q.includes('teamfest') || q.includes('टीमफेस्ट')) {
-      if (q.includes('टिकट') || q.includes('ticket') || q.includes('कितने पॉइंट') || q.includes('kitne point') || q.includes('points')) {
-        const resp = `🎟️ **TeamFest टिकट हेतु आवश्यक लीडरशिप पॉइंट्स:**
-
-लीडरशिप रैंक के आधार पर टिकट पॉइंट्स निम्न हैं:
-
-• **Pro Vice Captain (Pro VC):** मात्र **50 Points** पर TeamFest टिकट! (100 Pts पर शर्ट, 120 Pts पर स्पेशल ब्रांडिंग)
-• **Vice Captain (VC):** **150 Points** पर टिकट! (300 Pts पर शर्ट, 360 Pts पर ब्रांडिंग)
-• **Captain:** **500 Points** पर टिकट! (1000 Pts पर शर्ट, 1200 Pts पर ब्रांडिंग)
-
-💡 **पॉइंट्स कैसे कमाएं:** हर Business Consultant बनाने पर **5 Points** और हर Club Saksham/Asmita बनाने पर **7 Points** मिलते हैं।`;
-        return renderNetsurfPlanCard('🎟️ TeamFest टिकट व लीडरशिप पॉइंट्स तालिका', resp, [
-          { label: "👥 10 BC बनाने पर कितने पॉइंट्स?", query: "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
-          { label: "🏅 हॉल ऑफ फेम में फोटो लगवाने का नियम?", query: "हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?" },
-          { label: "👨👩 क्लब सक्षम व अस्मिता टर्नओवर?", query: "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
-          { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
-          { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
-        ]);
-      }
+    // Intent 5: Club Saksham vs Asmita टर्नओवर क्राइटेरिया
+    if ((q.includes('saksham') || q.includes('सक्षम')) && (q.includes('asmita') || q.includes('अस्मिता')) && (q.includes('अंतर') || q.includes('नियम') || q.includes('टर्नओवर') || q.includes('turnover') || q.includes('क्राइटेरिया') || q.includes('star') || q.includes('स्टार') || q.includes('क्या है'))) {
+      const resp = `👨👩 **Club Saksham व Club Asmita टर्नओवर क्राइटेरिया:**\n\nकार्यरत डायरेक्ट सेलर के जेंडर से क्लब तय होता है (पुरुष = Saksham, महिला = Asmita):\n\n🌟 **1. Star Club टर्नओवर:**\n• **Club Saksham (Male):** Max Team ₹30,000 : Other Team ₹30,000 + Self Consumer ₹1,000\n• **Club Asmita (Female):** Max Team ₹25,000 : Other Team ₹25,000 + Self Consumer ₹1,000\n\n💥 **2. Super Star Club टर्नओवर:**\n• **Club Saksham:** ₹60,000 : ₹60,000 + ₹1,000 Self Consumer\n• **Club Asmita:** ₹50,000 : ₹50,000 + ₹1,000 Self Consumer\n\n🎁 **लाभ:** TeamFest 1N/2D प्रिविलेज एंट्री टिकट, बिज़नेस किट, CA/CS बैज व **1% अतिरिक्त कमीशन दिसंबर Cycle 2 तक!**`;
+      return renderNetsurfPlanCard('👨👩 क्लब सक्षम व अस्मिता सम्पूर्ण टर्नओवर नियम', resp, [
+        { label: "💰 1% एक्स्ट्रा कमीशन कब तक मिलेगा?", query: "CA/CS को 1% एक्स्ट्रा कमीशन कब तक मिलेगा?" },
+        { label: "✈️ FastTrack E1 कपल टूर कैसे हासिल करें?", query: "FastTrack E1 कपल टूर कैसे हासिल करें?" },
+        { label: "👥 10 BC बनाने पर मुझे कितने पॉइंट्स?", query: "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
+        { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
+        { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
+      ]);
     }
 
-    // Q6: 10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे
-    if ((q.includes('10 bc') || q.includes('10 बिजनेस') || q.includes('bc बनाने') || q.includes('business consultant')) && (q.includes('point') || q.includes('पॉइंट') || q.includes('कितने') || q.includes('लाभ'))) {
-      const resp = `👥 **10 Business Consultant बनाने का गणित:**
+    // Intent 6: TeamFest में जाने के लिए पात्रता (Eligibility / 3 Ways)
+    if ((q.includes('teamfest') || q.includes('टीमफेस्ट')) && (q.includes('पात्रता') || q.includes('योग्यता') || q.includes('eligibility') || q.includes('जाने') || q.includes('पहुंचने') || q.includes('प्रवेश') || q.includes('entry') || q.includes('शर्त') || q.includes('रास्ते') || (q.includes('कैसे') && (q.includes('जाएं') || q.includes('जाना'))))) {
+      const resp = `🎉 **Netsurf TeamFest 2026 में जाने के लिए पात्रता (3 प्रमुख रास्ते):**\n\n1️⃣ **Business Consultant (BC) बनकर:**\n• Max Team: ₹10,000 | Other Team: ₹10,000 (Invoice Value) का संतुलित टर्नओवर करके TeamFest में उपस्थिति की पात्रता हासिल करें।\n\n2️⃣ **Club Saksham / Asmita क्वालीफाई करके:**\n• Club Saksham (30k:30k) या Club Asmita (25k:25k) Star/SuperStar अचीव करने पर TeamFest प्रिविलेज टिकट, बिज़नेस किट व दिसंबर तक 1% एक्स्ट्रा कमीशन।\n\n3️⃣ **FastTrack (E1/E2) व लीडरशिप पॉइंट्स:**\n• अक्टूबर माह में FastTrack मेंटेन करने पर स्पेशल इनवाइट टिकट।\n• लीडरशिप पॉइंट्स अर्जित करके: **Pro VC (50 Points)**, **VC (150 Points)**, **Captain (500 Points)** पर TeamFest का टिकट पक्का मिलता है।`;
+      return renderNetsurfPlanCard('🎉 TeamFest 2026 उपस्थिति पात्रता व 3 रास्ते', resp, [
+        { label: "🎟️ TeamFest टिकट के लिए कितने पॉइंट्स?", query: "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
+        { label: "👥 10 BC बनाने पर मुझे कितने पॉइंट्स?", query: "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
+        { label: "👨👩 Club Saksham व Asmita टर्नओवर?", query: "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
+        { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
+        { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
+      ]);
+    }
 
-• **नियम:** प्रत्येक Business Consultant (10k:10k) तैयार करने पर लीडर को **5 Points** मिलते हैं।
-• **कुल पॉइंट्स:** 10 BC × 5 Points = **50 Points**!
+    // Intent 7: TeamFest टिकट हेतु आवश्यक लीडरशिप पॉइंट्स
+    if ((q.includes('teamfest') || q.includes('टीमफेस्ट')) && (q.includes('टिकट') || q.includes('ticket') || q.includes('कितने पॉइंट') || q.includes('kitne point') || q.includes('points') || q.includes('पॉइंट'))) {
+      const resp = `🎟️ **TeamFest टिकट हेतु आवश्यक लीडरशिप पॉइंट्स:**\n\nलीडरशिप रैंक के आधार पर टिकट पॉइंट्स निम्न हैं:\n\n• **Pro Vice Captain (Pro VC):** मात्र **50 Points** पर TeamFest टिकट! (100 Pts पर शर्ट, 120 Pts पर स्पेशल ब्रांडिंग)\n• **Vice Captain (VC):** **150 Points** पर टिकट! (300 Pts पर शर्ट, 360 Pts पर ब्रांडिंग)\n• **Captain:** **500 Points** पर टिकट! (1000 Pts पर शर्ट, 1200 Pts पर ब्रांडिंग)\n\n💡 **पॉइंट्स कैसे कमाएं:** हर Business Consultant बनाने पर **5 Points** और हर Club Saksham/Asmita बनाने पर **7 Points** मिलते हैं।`;
+      return renderNetsurfPlanCard('🎟️ TeamFest टिकट व लीडरशिप पॉइंट्स तालिका', resp, [
+        { label: "👥 10 BC बनाने पर कितने पॉइंट्स?", query: "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
+        { label: "🏅 हॉल ऑफ फेम में फोटो लगवाने का नियम?", query: "हॉल ऑफ फेम में फोटो लगवाने का नियम क्या है?" },
+        { label: "👨👩 क्लब सक्षम व अस्मिता टर्नओवर?", query: "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
+        { label: "📊 पाथफाइंडर लाइव पेज देखें", query: "पाथफाइंडर लाइव पेज खोलें" },
+        { label: "💬 दादा अवनीश जी से बात", query: "दादा अवनीश जी से बात" }
+      ]);
+    }
 
-🎉 **आपको क्या मिलेगा?**
-यदि आप **Pro Vice Captain (Pro VC)** हैं, तो 50 Points होते ही आपको **Netsurf TeamFest (1 Night & 2 Days) का आधिकारिक टिकट** मुफ़्त प्राप्त हो जाएगा!`;
+    // Intent 8: 10 BC व 5 CA/CS पॉइंट्स व टीम फायदे
+    if (q.includes('10 bc') || q.includes('10 बिजनेस') || (q.includes('business consultant') && (q.includes('10') || q.includes('फायदा') || q.includes('लाभ') || q.includes('पॉइंट') || q.includes('बन जाएं') || q.includes('बनाने'))) || (q.includes('5') && (q.includes('ca') || q.includes('cs') || q.includes('saksham') || q.includes('asmita')) && (q.includes('point') || q.includes('पॉइंट'))) || (q.includes('bc') && (q.includes('point') || q.includes('पॉइंट') || q.includes('बनाने')))) {
+      const resp = `👥 **Business Consultant (BC) व Club Saksham/Asmita (CA/CS) बनाने के पॉइंट्स व लाभ:**\n\n• **1 Business Consultant (BC) बनाने पर:** ➔ **5 Points**\n• **1 Club Saksham / Asmita (CA/CS) बनाने पर:** ➔ **7 Points**\n\n🎯 **आपके सवालों के सटीक उत्तर:**\n• **10 BC बनाने पर फायदा:** 10 BC × 5 Points = **50 Points**! यदि आप Pro Vice Captain (Pro VC) हैं, तो 50 Points पर आपको सीधे **Netsurf TeamFest (1N/2D) का टिकट** मिल जाएगा!\n• **5 CA/CS बनाने पर फायदा:** 5 × 7 = **35 Points** प्राप्त होंगे।`;
       return renderNetsurfPlanCard('👥 10 BC बनाने पर 50 Points व TeamFest टिकट', resp, [
         { label: "🎟️ TeamFest टिकट के लिए कितने पॉइंट्स?", query: "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
         { label: "💰 1% एक्स्ट्रा कमीशन कब तक मिलेगा?", query: "CA/CS को 1% एक्स्ट्रा कमीशन कब तक मिलेगा?" },
@@ -6256,21 +6120,9 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       ]);
     }
 
-    // Q7: FastTrack E1 कपल टूर कैसे हासिल करें
-    if ((q.includes('fasttrack') || q.includes('फास्टट्रैक')) && (q.includes('couple') || q.includes('कपल') || q.includes('tour') || q.includes('टूर') || q.includes('e1') || q.includes('सिंगल'))) {
-      const resp = `💑 **FastTrack Q3 संचयी लक्ज़री टूर (2 Nights & 3 Days):**
-
-तीनों माह (अक्टूबर, नवंबर, दिसंबर 2026) FastTrack मेंटेन करें और 3 माह का संचयी टर्नओवर पूरा करें:
-
-🌴 **1. Single Tour (1 व्यक्ति):**
-• **E1 Level:** 2,40,000 : 2,40,000 (₹2.4 लाख : ₹2.4 लाख)
-• **E2 Level:** 3,60,000 : 3,60,000 (₹3.6 लाख : ₹3.6 लाख)
-
-💑 **2. Couple Tour (पति-पत्नी 2 व्यक्ति):**
-• **E1 Level:** 3,00,000 : 3,00,000 (₹3.0 लाख : ₹3.0 लाख)
-• **E2 Level:** 4,50,000 : 4,50,000 (₹4.5 लाख : ₹4.5 लाख)
-
-✨ **अक्टूबर स्पेशल:** सिर्फ अक्टूबर में FastTrack मेंटेन करने पर TeamFest इनवाइट टिकट अलग से प्राप्त होगा!`;
+    // Intent 9: FastTrack Q3 संचयी लक्ज़री टूर (2N/3D Single & Couple)
+    if ((q.includes('fasttrack') || q.includes('फास्टट्रैक')) && (q.includes('tour') || q.includes('टूर') || q.includes('कपल') || q.includes('couple') || q.includes('सिंगल') || q.includes('single') || q.includes('e1') || q.includes('e2') || q.includes('direct seller') || q.includes('direct sellers') || q.includes('उपलब्ध') || q.includes('2n') || q.includes('3d'))) {
+      const resp = `💑 **FastTrack Q3 संचयी लक्ज़री टूर (2 Nights & 3 Days):**\n\nतीनों माह (अक्टूबर, नवंबर, दिसंबर 2026) FastTrack मेंटेन करें और 3 माह का संचयी टर्नओवर पूरा करें:\n\n🌴 **1. Single Tour (1 व्यक्ति):**\n• **E1 Level:** 2,40,000 : 2,40,000 (₹2.4 लाख : ₹2.4 लाख)\n• **E2 Level:** 3,60,000 : 3,60,000 (₹3.6 लाख : ₹3.6 लाख)\n\n💑 **2. Couple Tour (पति-पत्नी 2 व्यक्ति):**\n• **E1 Level:** 3,00,000 : 3,00,000 (₹3.0 लाख : ₹3.0 लाख)\n• **E2 Level:** 4,50,000 : 4,50,000 (₹4.5 लाख : ₹4.5 लाख)\n\n✨ **अक्टूबर स्पेशल:** सिर्फ अक्टूबर में FastTrack मेंटेन करने पर TeamFest इनवाइट टिकट अलग से प्राप्त होगा!`;
       return renderNetsurfPlanCard('💑 FastTrack Q3 टूर नियम (Single व Couple)', resp, [
         { label: "👨👩 क्लब सक्षम व अस्मिता नियम", query: "Club Saksham और Club Asmita का टर्नओवर क्या है?" },
         { label: "🎟️ TeamFest टिकट के लिए कितने पॉइंट्स?", query: "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
@@ -6280,19 +6132,9 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       ]);
     }
 
-    // Q8: अक्टूबर में नया iStock कितने में खुलेगा
-    if ((q.includes('istock') || q.includes('आईस्टॉक') || q.includes('i-stock')) && (q.includes('25550') || q.includes('कितने') || q.includes('kitne') || q.includes('price') || q.includes('रुपये') || q.includes('खुल') || q.includes('ऑफर') || q.includes('festive'))) {
-      const resp = `🏪 **Netsurf iStock फेस्टिव महा-ऑफर (अक्टूबर 2026):**
-
-त्योहारों के इस विशेष अवसर पर कंपनी ने नया iStock खोलने के लिए सबसे बड़ी छूट की घोषणा की है:
-
-• **नियमित पैकेज:** ~~₹73,000~~
-• **अक्टूबर फेस्टिव विशेष मूल्य:** मात्र **₹25,550**
-• **सीधी बचत:** ₹47,450 की भारी बचत!
-• **MRP डिस्काउंट:** 27% फ्लैट छूट
-• **उत्पाद श्रेणियां:** सभी 4 श्रेणियां (बायोफिट, नेचुरामोर, पर्सनल केयर, पेट-वेट) मान्य हैं।
-
-🎯 **राष्ट्रीय संकल्प:** प्रतिदिन 1 iStock से बढ़कर प्रतिदिन 100 iStocks खोलने का सामूहिक संकल्प!`;
+    // Intent 10: iStock फेस्टिव महा-ऑफर (₹25,550 vs ₹73,000)
+    if ((q.includes('istock') || q.includes('आईस्टॉक') || q.includes('आई-स्टॉक') || q.includes('आई स्टॉक')) || q.includes('25550') || q.includes('25,550') || q.includes('73000') || q.includes('73,000')) {
+      const resp = `🏪 **Netsurf iStock फेस्टिव महा-ऑफर (अक्टूबर 2026):**\n\nत्योहारों के इस विशेष अवसर पर कंपनी ने नया iStock खोलने के लिए सबसे बड़ी छूट की घोषणा की है:\n\n• **नियमित पैकेज:** ~~₹73,000~~\n• **अक्टूबर फेस्टिव विशेष मूल्य:** मात्र **₹25,550**\n• **सीधी बचत:** ₹47,450 की भारी बचत!\n• **MRP डिस्काउंट:** 27% फ्लैट छूट\n• **उत्पाद श्रेणियां:** सभी 4 श्रेणियां (बायोफिट, नेचुरामोर, पर्सनल केयर, पेट-वेट) मान्य हैं।\n\n🎯 **राष्ट्रीय संकल्प:** प्रतिदिन 1 iStock से बढ़कर प्रतिदिन 100 iStocks खोलने का सामूहिक संकल्प!`;
       return renderNetsurfPlanCard('🏪 नया iStock मात्र ₹25,550 में (27% डिस्काउंट)', resp, [
         { label: "🏷️ न्यू E-Tailer 30% छूट कैसे मिलेगी?", query: "न्यू E-Tailer को 30% छूट कैसे मिलेगी?" },
         { label: "⭐ रॉकस्टार R2 कैसे बनें और क्या लाभ?", query: "रॉकस्टार R2 कैसे बनें और क्या लाभ है?" },
@@ -6302,13 +6144,9 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       ]);
     }
 
-    // Q9: न्यू E-Tailer को 30% छूट कैसे मिलेगी
-    if ((q.includes('30%') || q.includes('30 प्रतिशत') || q.includes('e-tailer') || q.includes('ई-टेलर') || q.includes('रिटेलर') || q.includes('7500') || q.includes('7,500')) && (q.includes('छूट') || q.includes('discount') || q.includes('ऑफर') || q.includes('offer') || q.includes('नया') || q.includes('new'))) {
-      const resp = `🎉 **न्यू E-Tailer 30% स्पेशल डिस्काउंट नियम:**
-
-• **पात्रता:** जो भी नया सदस्य **अक्टूबर 2026** माह में Netsurf में डायरेक्ट सेलर / E-Tailer के रूप में रजिस्टर करेगा।
-• **शर्त:** अक्टूबर माह में की गई **MRP ₹7,500 या उससे अधिक की पहली रसीद (First Receipt)** पर सीधा **30% फ्लैट डिस्काउंट** प्राप्त होगा!
-• **लाभ:** नए डायरेक्ट सेलर और उनके उपभोक्ताओं दोनों को एक बेहद मजबूत व लाभदायक शुरुआत मिलती है।`;
+    // Intent 11: न्यू E-Tailer 30% स्पेशल डिस्काउंट
+    if ((q.includes('e-tailer') || q.includes('etailer') || q.includes('ई-टेलर') || q.includes('रिटेलर')) && (q.includes('30%') || q.includes('30') || q.includes('छूट') || q.includes('discount') || q.includes('ऑफर') || q.includes('offer') || q.includes('7500') || q.includes('7,500'))) {
+      const resp = `🎉 **न्यू E-Tailer 30% स्पेशल डिस्काउंट नियम:**\n\n• **पात्रता:** जो भी नया सदस्य **अक्टूबर 2026** माह में Netsurf में डायरेक्ट सेलर / E-Tailer के रूप में रजिस्टर करेगा।\n• **शर्त:** अक्टूबर माह में की गई **MRP ₹7,500 या उससे अधिक की पहली रसीद (First Receipt)** पर सीधा **30% फ्लैट डिस्काउंट** प्राप्त होगा!\n• **लाभ:** नए डायरेक्ट सेलर और उनके उपभोक्ताओं दोनों को एक बेहद मजबूत व लाभदायक शुरुआत मिलती है।`;
       return renderNetsurfPlanCard('🎉 न्यू E-Tailer 30% स्पेशल डिस्काउंट ऑफर', resp, [
         { label: "⭐ रॉकस्टार R2 कैसे बनें और क्या लाभ?", query: "रॉकस्टार R2 कैसे बनें और क्या लाभ है?" },
         { label: "🏪 अक्टूबर में नया iStock कितने में खुलेगा?", query: "अक्टूबर में नया iStock कितने में खुलेगा?" },
@@ -6318,14 +6156,9 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
       ]);
     }
 
-    // Q10: हॉल ऑफ फेम में फोटो लगवाने का नियम
-    if (q.includes('hall of fame') || q.includes('हॉल ऑफ फेम') || q.includes('फोटो') || q.includes('मेडल') || q.includes('medal')) {
-      const resp = `🏅 **Netsurf 1st-Ever TeamFest “Hall of Fame” & Special Medal:**
-
-• **नियम:** जो भी डायरेक्ट सेलर **अक्टूबर Cycle 1** में अपना निर्धारित टारगेट (BC, CA/CS, FastTrack या लीडरशिप) पूरा कर लेगा।
-• **सम्मान 1:** Netsurf के इतिहास के पहले TeamFest “Hall of Fame” में आपकी तस्वीर गर्व के साथ प्रदर्शित होगी!
-• **सम्मान 2:** समारोह में मंच पर आपको विशेष **TeamFest स्पेशल मेडल** से सम्मानित किया जाएगा!
-• अपनी उपलब्धि को नेट्सर्फ के सुनहरे इतिहास का हिस्सा बनाएं।`;
+    // Intent 12: हॉल ऑफ फेम व स्पेशल मेडल
+    if (q.includes('hall of fame') || q.includes('हॉल ऑफ फेम') || q.includes('हॉल आफ फेम') || (q.includes('फोटो') && (q.includes('सम्मान') || q.includes('लगवाने') || q.includes('नियम') || q.includes('फेम'))) || (q.includes('मेडल') && (q.includes('स्पेशल') || q.includes('हॉल') || q.includes('medal')))) {
+      const resp = `🏅 **Netsurf 1st-Ever TeamFest “Hall of Fame” & Special Medal:**\n\n• **नियम:** जो भी डायरेक्ट सेलर **अक्टूबर Cycle 1** में अपना निर्धारित टारगेट (BC, CA/CS, FastTrack या लीडरशिप) पूरा कर लेगा।\n• **सम्मान 1:** Netsurf के इतिहास के पहले TeamFest “Hall of Fame” में आपकी तस्वीर गर्व के साथ प्रदर्शित होगी!\n• **सम्मान 2:** समारोह में मंच पर आपको विशेष **TeamFest स्पेशल मेडल** से सम्मानित किया जाएगा!\n• अपनी उपलब्धि को नेट्सर्फ के सुनहरे इतिहास का हिस्सा बनाएं।`;
       return renderNetsurfPlanCard('🏅 हॉल ऑफ फेम व स्पेशल मेडल अर्हता', resp, [
         { label: "🎟️ TeamFest टिकट के लिए कितने पॉइंट्स?", query: "TeamFest टिकट के लिए कितने पॉइंट्स चाहिए?" },
         { label: "👥 10 BC बनाने पर मुझे कितने पॉइंट्स?", query: "10 BC बनाने पर मुझे कितने पॉइंट्स मिलेंगे?" },
@@ -6356,23 +6189,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     const pfPageUrl = `/categories/netsurf-pathfinder.html?share_id=${encodeURIComponent(shareId)}`;
     const waUrl = buildAvneeshWhatsAppHandoffUrl('Netsurf Q3 Pathfinder व TeamFest मार्गदर्शन');
 
-    const generalResp = `🎉 **NETSURF Q3 PATHFINDER 2026-27 (NETSURF TEAMFEST):**
-
-नेट्सर्फ का अक्टूबर, नवंबर व दिसंबर 2026 का विशेष प्रमोशनल अभियान 3 मुख्य स्तंभों पर आधारित है:
-
-1️⃣ **CELEBRATE (नए E-Tailer व रॉकस्टार):**
-• नए E-Tailer को ₹7,500+ के पहले बिल पर **30% स्पेशल डिस्काउंट**।
-• 4 वीकली रॉकस्टार (R1: ₹8k, R2: ₹16k, R3: ₹24k, R4: ₹32k+) में **15% तक अतिरिक्त इंसेंटिव** और ₹2,000 का पक्का गिफ्ट!
-
-2️⃣ **BUILD (टीमफेस्ट एंट्री व क्लब्स):**
-• **Business Consultant (BC):** 10,000 : 10,000
-• **Club Saksham:** 30,000 : 30,000 (पुरुष) | **Club Asmita:** 25,000 : 25,000 (महिला) → **1% एक्स्ट्रा पेआउट दिसंबर तक!**
-• **FastTrack टूर:** 2N/3D सिंगल (2.4L) व कपल (3.0L) लक्ज़री टूर।
-
-3️⃣ **RISE (लीडरशिप व iStock):**
-• **लीडरशिप पॉइंट्स:** BC = 5 Pts, CA/CS = 7 Pts। Pro VC (50 Pts), VC (150 Pts), Captain (500 Pts)।
-• **iStock फेस्टिव स्पेशल:** नया iStock मात्र **₹25,550** में (₹73,000 की जगह)!
-• **हॉल ऑफ फेम:** अक्टूबर Cycle 1 अचीवर्स की फोटो TeamFest हॉल ऑफ फेम में व स्पेशल मेडल!`;
+    const generalResp = `🎉 **NETSURF Q3 PATHFINDER 2026-27 (NETSURF TEAMFEST):**\n\nनेट्सर्फ का अक्टूबर, नवंबर व दिसंबर 2026 का विशेष प्रमोशनल अभियान 3 मुख्य स्तंभों पर आधारित है:\n\n1️⃣ **CELEBRATE (नए E-Tailer व रॉकस्टार):**\n• नए E-Tailer को ₹7,500+ के पहले बिल पर **30% स्पेशल डिस्काउंट**।\n• 4 वीकली रॉकस्टार (R1: ₹8k, R2: ₹16k, R3: ₹24k, R4: ₹32k+) में **15% तक अतिरिक्त इंसेंटिव** और ₹2,000 का पक्का गिफ्ट!\n\n2️⃣ **BUILD (टीमफेस्ट एंट्री व क्लब्स):**\n• **Business Consultant (BC):** 10,000 : 10,000\n• **Club Saksham:** 30,000 : 30,000 (पुरुष) | **Club Asmita:** 25,000 : 25,000 (महिला) → **1% एक्स्ट्रा पेआउट दिसंबर तक!**\n• **FastTrack टूर:** 2N/3D सिंगल (2.4L) व कपल (3.0L) लक्ज़री टूर।\n\n3️⃣ **RISE (लीडरशिप व iStock):**\n• **लीडरशिप पॉइंट्स:** BC = 5 Pts, CA/CS = 7 Pts। Pro VC (50 Pts), VC (150 Pts), Captain (500 Pts)।\n• **iStock फेस्टिव स्पेशल:** नया iStock मात्र **₹25,550** में (₹73,000 की जगह)!\n• **हॉल ऑफ फेम:** अक्टूबर Cycle 1 अचीवर्स की फोटो TeamFest हॉल ऑफ फेम में व स्पेशल मेडल!`;
 
     const html = `
       <div style="font-weight:900;color:#1e40af;font-size:1.1rem;margin-bottom:8px;">
@@ -8281,17 +8098,25 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // Transparent micro-costing, Bhindi & multi-crop support, robust name extraction
     // =========================================================================
     const friendNameExtracted = extractPersonNameFromQuery(rawQ, cleanQ);
-    const isFriendReferralIntent = (
-      Boolean(friendNameExtracted) ||
-      q.includes('dost') || q.includes('दोस्त') || q.includes('mitra') || q.includes('मित्र') ||
-      q.includes('bhejna') || q.includes('भेजना') || q.includes('parchi') || q.includes('पर्ची') ||
-      q.includes('share karna') || q.includes('शेयर करना') || q.includes('dusre kisan') || q.includes('दूसरे किसान')
+    const isNetsurfOrBusiness = (
+      q.includes('netsurf') || q.includes('नेट्सर्फ') || q.includes('pathfinder') || q.includes('पाथफाइंडर') ||
+      q.includes('teamfest') || q.includes('टीमफेस्ट') || q.includes('rockstar') || q.includes('रॉकस्टार') ||
+      q.includes('saksham') || q.includes('सक्षम') || q.includes('asmita') || q.includes('अस्मिता') ||
+      q.includes('fasttrack') || q.includes('फास्टट्रैक') || q.includes('istock') || q.includes('आईस्टॉक') ||
+      q.includes('business consultant') || q.includes('turnover') || q.includes('टर्नओवर') || q.includes('capping') ||
+      q.includes('कैपिंग') || q.includes('e-tailer') || q.includes('ई-टेलर') || q.includes('direct seller')
     );
 
-    const isAgriEstimateIntent = (
-      q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kharcha') || q.includes('खर्चा') ||
-      q.includes('kharch') || q.includes('खर्च') || q.includes('per pump') || q.includes('प्रति पंप') ||
-      q.includes('ekad') || q.includes('एकड़') || q.includes('bigha') || q.includes('बीघा') ||
+    const isFriendReferralIntent = !isNetsurfOrBusiness && (
+      (Boolean(friendNameExtracted) && (q.includes('bhejna') || q.includes('भेजना') || q.includes('parchi') || q.includes('पर्ची') || q.includes('khet') || q.includes('खेत') || q.includes('ekad') || q.includes('एकड़') || q.includes('fasal') || q.includes('फसल') || q.includes('dawa') || q.includes('दवा') || q.includes('dost') || q.includes('दोस्त'))) ||
+      ((q.includes('dost') || q.includes('दोस्त') || q.includes('mitra') || q.includes('मित्र')) && (q.includes('bhejna') || q.includes('भेजना') || q.includes('parchi') || q.includes('पर्ची'))) ||
+      q.includes('dusre kisan') || q.includes('दूसरे किसान')
+    );
+
+    const isAgriEstimateIntent = !isNetsurfOrBusiness && (
+      ((q.includes('estimate') || q.includes('एस्टीमेट') || q.includes('kharcha') || q.includes('खर्चा') ||
+        q.includes('kharch') || q.includes('खर्च') || q.includes('per pump') || q.includes('प्रति पंप')) &&
+       (q.includes('ekad') || q.includes('एकड़') || q.includes('bigha') || q.includes('बीघा') || q.includes('khet') || q.includes('खेत') || q.includes('dawa') || q.includes('दवा') || q.includes('fasal') || q.includes('फसल'))) ||
       q.includes('kitni dawa') || q.includes('कितनी दवा') || q.includes('dawa ka kharch')
     );
 
@@ -9733,13 +9558,13 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
-    // 0.005 Advanced Multi-Topic, Twist Queries & Dual Intent (Sexual Wellness + Diabetes, Child Fever, Rain Spray)
-    if (handleMultiTopicAndTwistQueries(cleanQ, rawQ)) {
+    // 0.004 NETSURF Q3 PATHFINDER 2026-27 (TEAMFEST) PROMOTIONAL ROUTER (Top Business Priority)
+    if (typeof handleNetsurfPathfinderQ3Router === 'function' && handleNetsurfPathfinderQ3Router(cleanQ, rawQ)) {
       return;
     }
 
-    // 0.007 NETSURF Q3 PATHFINDER 2026-27 (TEAMFEST) PROMOTIONAL ROUTER
-    if (typeof handleNetsurfPathfinderQ3Router === 'function' && handleNetsurfPathfinderQ3Router(cleanQ, rawQ)) {
+    // 0.005 Advanced Multi-Topic, Twist Queries & Dual Intent (Sexual Wellness + Diabetes, Child Fever, Rain Spray)
+    if (handleMultiTopicAndTwistQueries(cleanQ, rawQ)) {
       return;
     }
 
