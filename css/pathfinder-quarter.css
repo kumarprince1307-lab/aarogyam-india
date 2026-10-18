@@ -1708,3 +1708,316 @@ body.pf-body {
   justify-content: center;
 }
 
+/* Table Swipe Hint Style (Universal) */
+.pf-table-swipe-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: #f0fdf4;
+  border: 1px dashed #22c55e;
+  color: #15803d;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin: 10px 0 8px;
+  box-shadow: 0 1px 4px rgba(34, 197, 94, 0.15);
+}
+
+.pf-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 #e2e8f0;
+}
+
+.pf-table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.pf-table-responsive::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.pf-table-responsive::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+/* =================================================================
+   BULLETPROOF MOBILE RESPONSIVE ENGINE (< 768px)
+   Guarantees: Menu Button Visible, Zero Text Truncation, Smooth Tables,
+   Clean Pillar Headers, and No Layout Breaking Across All Screen Sizes
+================================================================= */
+@media (max-width: 768px) {
+  /* 1. Global Page Width Guard */
+  html, body.pf-body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    position: relative !important;
+    max-width: 100vw !important;
+  }
+
+  .pf-main-container {
+    padding: 10px 10px 75px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 2. Universal Animated Tiranga Header Mobile Perfection */
+  .header-tiranga-animated {
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    z-index: 9999 !important;
+  }
+
+  .header-tiranga-animated > .container {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  /* Left Brand Logo Pill */
+  .header-brand-wrap {
+    display: flex !important;
+    align-items: center !important;
+    max-width: 155px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-tiranga-animated .brand-logo-pill {
+    padding: 3px 6px !important;
+    gap: 6px !important;
+    max-width: 145px !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .header-tiranga-animated .brand-logo-pill img {
+    height: 28px !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-tiranga-animated .brand-title-text {
+    font-size: 0.84rem !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .header-tiranga-animated .brand-sub-text {
+    display: none !important;
+  }
+
+  /* Hide Crowding Header Elements on Mobile to give 100% space to Right Menu Button */
+  .header-tiranga-animated .header-current-page-badge,
+  .header-current-page-badge,
+  .header-tiranga-animated .btn-pwa-install,
+  .header-tiranga-animated #header-pwa-install-btn,
+  .btn-pwa-install,
+  #header-pwa-install-btn,
+  .header-tiranga-animated .ns-share-btn,
+  #header-unified-user-badge,
+  .header-user-status-pill {
+    display: none !important;
+  }
+
+  /* Header Actions on Mobile: GUARANTEE Right Hamburger Menu Button is ALWAYS Visible! */
+  .header-tiranga-animated .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+  }
+
+  .header-tiranga-animated .user-notif-bell-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-tiranga-animated .header-actions a[href*="cart"] {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .header-tiranga-animated .menu-button {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    font-size: 1.25rem !important;
+    border-radius: 10px !important;
+    flex-shrink: 0 !important;
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+    margin-left: 2px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
+    cursor: pointer !important;
+  }
+
+  /* 3. Pillar Headers: Clean Top Row + 100% Full Width Title (Fixes 1-Word Vertical Breaking) */
+  .pf-segment-wrap {
+    padding: 16px 12px !important;
+    margin-bottom: 20px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .pf-segment-header {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .pf-seg-tag {
+    order: 1 !important;
+    margin: 0 !important;
+    font-size: 0.72rem !important;
+    padding: 3px 8px !important;
+  }
+
+  .pf-audio-btn {
+    order: 2 !important;
+    margin-left: auto !important;
+    padding: 5px 12px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .pf-seg-title {
+    order: 3 !important;
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    font-size: 1.25rem !important;
+    line-height: 1.35 !important;
+    margin: 6px 0 0 0 !important;
+    word-break: normal !important;
+    white-space: normal !important;
+  }
+
+  /* 4. Responsive Tables: Smooth Horizontal Touch Scroll + Compact Sizing */
+  .pf-table-responsive {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-top: 6px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    display: block !important;
+  }
+
+  .pf-styled-table {
+    min-width: 480px !important;
+    width: 100% !important;
+    font-size: 0.8rem !important;
+  }
+
+  .pf-styled-table th {
+    padding: 9px 8px !important;
+    font-size: 0.76rem !important;
+    white-space: nowrap !important;
+  }
+
+  .pf-styled-table td {
+    padding: 9px 8px !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* 5. FastTrack Tour Card: Column Layout (Prevents Number & Text Collisions) */
+  .pf-tour-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .pf-tour-card {
+    padding: 14px 12px !important;
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+  }
+
+  .pf-tour-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3px !important;
+    padding: 6px 0 !important;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .pf-tour-row:last-child {
+    border-bottom: none !important;
+  }
+
+  .pf-tour-row .pf-level-tag {
+    font-size: 0.78rem !important;
+    color: #94a3b8 !important;
+    font-weight: 600 !important;
+  }
+
+  .pf-tour-row .pf-tour-val {
+    font-size: 0.92rem !important;
+    color: #fde047 !important;
+    word-break: break-word !important;
+    line-height: 1.35 !important;
+    font-weight: 800 !important;
+  }
+
+  /* 6. Cards & Containers Padding on Mobile */
+  .pf-card-box {
+    padding: 14px 10px !important;
+    border-radius: 14px !important;
+  }
+
+  .pf-page-title {
+    font-size: 1.65rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .pf-page-subtitle {
+    font-size: 0.88rem !important;
+  }
+
+  /* 7. Sakhi AI Floating Pill: Fixed to Bottom-Left (Never Covers Header or Content) */
+  .sakhi-floating-pill {
+    top: auto !important;
+    bottom: 74px !important;
+    left: 10px !important;
+    right: auto !important;
+    z-index: 9999 !important;
+  }
+}
+

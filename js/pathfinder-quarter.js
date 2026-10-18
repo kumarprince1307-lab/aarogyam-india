@@ -414,6 +414,10 @@
       <!-- Leadership Targets Table -->
       <div class="pf-card-box">
         <h4 class="pf-card-head"><i class="fa-solid fa-medal" style="color:#fde047;"></i> लीडरशिप पद व मासिक पॉइंट्स रिवार्ड</h4>
+        <div class="pf-table-swipe-hint">
+          <span>👉 पूरी तालिका देखने हेतु बाएँ-दाएँ स्वाइप करें</span>
+          <i class="fa-solid fa-arrows-left-right"></i>
+        </div>
         <div class="pf-table-responsive">
           <table class="pf-styled-table">
             <thead>
@@ -499,6 +503,10 @@
       <!-- Regular Packages Table -->
       <div class="pf-card-box">
         <h4 class="pf-card-head">नियमित iStock पैकेज संरचना</h4>
+        <div class="pf-table-swipe-hint">
+          <span>👉 पूरी तालिका देखने हेतु बाएँ-दाएँ स्वाइप करें</span>
+          <i class="fa-solid fa-arrows-left-right"></i>
+        </div>
         <div class="pf-table-responsive">
           <table class="pf-styled-table">
             <thead>
