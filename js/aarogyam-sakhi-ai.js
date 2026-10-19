@@ -1476,22 +1476,53 @@
     });
   };
 
+  // Robust Clean Message Text Extractor (Strictly excludes recommendations, menus, and toolbar buttons)
+  function getCleanMessageText(btn) {
+    if (!btn) return '';
+    try {
+      const bubble = btn.closest('.sakhi-msg-bubble') || btn.closest('.sakhi-bubble') || btn.closest('.sakhi-chat-card') || btn.closest('.sakhi-msg-row') || (btn.parentElement && btn.parentElement.parentElement);
+      if (!bubble) return '';
+      const contentEl = bubble.querySelector('.sakhi-content-body') || bubble.querySelector('.sakhi-crop-content') || bubble;
+      const clone = contentEl.cloneNode(true);
+      const badSelectors = [
+        '.sakhi-recommendations-wrapper',
+        '.sakhi-msg-actions-toolbar',
+        '.sakhi-msg-time',
+        '.sakhi-followup-chip',
+        '.sakhi-quick-pill',
+        '.sakhi-smart-pill',
+        '.sakhi-msg-audio-btn',
+        '.sakhi-msg-copy-btn',
+        '.sakhi-suggested-query',
+        'button',
+        'a',
+        'iframe',
+        'audio'
+      ];
+      clone.querySelectorAll(badSelectors.join(', ')).forEach(el => el.remove());
+      let text = (clone.innerText || clone.textContent || '').trim();
+      text = text.replace(/👉\s*विकल्प व सिफारिशें[\s\S]*$/gi, '').trim();
+      return text;
+    } catch (e) {
+      console.warn('[getCleanMessageText Error]', e);
+      return '';
+    }
+  }
+
   // In-Message 1-Click Copy Helper
   window.copySakhiMessageText = function(btn) {
     if (!btn) return;
     try {
-      const bubble = btn.closest('.sakhi-bubble') || btn.closest('.sakhi-msg-body') || btn.closest('.sakhi-chat-message') || (btn.parentElement && btn.parentElement.parentElement);
-      if (!bubble) return;
-      const clone = bubble.cloneNode(true);
-      const toolbars = clone.querySelectorAll('.sakhi-msg-actions-toolbar, .sakhi-msg-audio-btn, .sakhi-msg-copy-btn, .sakhi-quick-pills, .sakhi-quick-pill, .sakhi-suggested-query');
-      toolbars.forEach(el => el.remove());
-      const rawText = (clone.innerText || clone.textContent || '').trim();
+      const rawText = getCleanMessageText(btn);
       if (!rawText) return;
 
       const onSuccess = () => {
         const origHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check" style="color:#16a34a;"></i>';
         btn.classList.add('copied');
+        if (typeof showSakhiMicroToast === 'function') {
+          showSakhiMicroToast('📋 संदेश कॉपी हो गया!');
+        }
         setTimeout(() => {
           btn.innerHTML = origHtml;
           btn.classList.remove('copied');
@@ -1617,29 +1648,18 @@
   }
 
   window.createPersonalizedShare = function(btn) {
-    let rawText = '';
-    if (btn) {
-      const bubble = btn.closest('.sakhi-msg-bubble') || btn.closest('.sakhi-bubble') || (btn.parentElement && btn.parentElement.parentElement);
-      if (bubble) {
-        const clone = bubble.cloneNode(true);
-        const toolbars = clone.querySelectorAll('.sakhi-msg-actions-toolbar, .sakhi-followup-chip, .sakhi-quick-pill, button');
-        toolbars.forEach(el => el.remove());
-        rawText = (clone.innerText || clone.textContent || '').trim();
-      }
+    let cleanText = getCleanMessageText(btn);
+    if (!cleanText) {
+      cleanText = 'आरोग्यम सखी AI पर जैविक खेती, उन्नत फसल सुरक्षा, पशु पोषण व स्वास्थ्य का संपूर्ण मार्गदर्शन उपलब्ध है।';
     }
-    if (!rawText) {
-      rawText = 'आरोग्यम सखी AI पर जैविक खेती, उन्नत फसल सुरक्षा, पशु पोषण व स्वास्थ्य का संपूर्ण मार्गदर्शन उपलब्ध है।';
-    }
-    let snippet = rawText.replace(/\s+/g, ' ').slice(0, 320).trim();
-    if (rawText.length > 320) snippet += '...';
 
     const userName = (typeof getUserName === 'function' ? getUserName() : '') || 'आरोग्यम सलाहकार';
     const userPhone = (typeof getUserPhone === 'function' ? getUserPhone() : '') || '';
-    const shareId = getAuthoritativeShareId();
+    const shareId = (typeof getAuthoritativeShareId === 'function') ? getAuthoritativeShareId() : 'AI000004';
     let domainUrl = 'https://aarogyamindia.online/aarogyam-sakhi.html';
     domainUrl += `?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
 
-    const shareBody = `🌿 *आरोग्यम सखी — प्रमाणित समाधान* 🌿\n━━━━━━━━━━━━━━━━━━━━\n${snippet}\n\n👉 *व्यक्तिगत परामर्श व असली उत्पाद ऑर्डर हेतु संपर्क:*\n👤 *सलाहकार:* ${userName}\n📱 *मोबाइल:* ${userPhone ? userPhone : 'सीधे संपर्क करें'}\n🌐 *आरोग्यम सखी AI लिंक:* ${domainUrl}\n\n🌱 _भारत की पहली कृषि व स्वास्थ्य AI सखी से 24×7 नि:शुल्क सलाह पाने हेतु ऊपर दिए लिंक पर क्लिक करें।_\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्रोत: आरोग्यम इंडिया एवं नेट्सर्फ_`;
+    const shareBody = `🌿 *आरोग्यम सखी — प्रमाणित समाधान* 🌿\n━━━━━━━━━━━━━━━━━━━━\n${cleanText}\n\n━━━━━━━━━━━━━━━━━━━━\n👉 *व्यक्तिगत परामर्श व असली उत्पाद ऑर्डर हेतु संपर्क:*\n👤 *सलाहकार:* ${userName}\n📱 *मोबाइल:* ${userPhone ? userPhone : 'सीधे संपर्क करें'}\n🌐 *आरोग्यम सखी AI लिंक:* ${domainUrl}\n\n🌱 _भारत की पहली कृषि व स्वास्थ्य AI सखी से 24×7 नि:शुल्क सलाह पाने हेतु ऊपर दिए लिंक पर क्लिक करें।_\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्रोत: आरोग्यम इंडिया एवं नेट्सर्फ_`;
 
     const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareBody)}`;
     window.open(waShareUrl, '_blank');
@@ -1922,7 +1942,7 @@
 
   async function loadKnowledgeBase() {
     try {
-      const mRes = await fetch('/data/sakhi-master-knowledge.json?v=20261017_master');
+      const mRes = await fetch('/data/sakhi-master-knowledge.json?v=20261019_qa100');
       if (mRes.ok) {
         sakhiMasterKnowledge = await mRes.json();
       }
@@ -5673,7 +5693,8 @@ function extractPersonNameFromQuery(rawQ, cleanQ) {
     const str = rawQ || cleanQ || '';
 
     const stopWords = new Set([
-      'khet', 'खेत', 'dawa', 'दवा', 'ekad', 'एकड़', 'fasal', 'फसल', 'spray', 'स्प्रे',
+      'khet', 'खेत', 'dawa', 'दवा', 'ekad', 'एकड़', 'fasal', 'फसल', 'faslon', 'फसलों', 'faslo', 'फसलो', 'spray', 'स्प्रे',
+      'calendar', 'कैलेंडर', 'schedule', 'शेड्यूल', 'chart', 'चार्ट', 'dose', 'डोज', 'khurak', 'खुराक',
       'gehu', 'गेहूं', 'chana', 'चना', 'sarso', 'सरसों', 'dhan', 'धान', 'bhindi', 'भिंडी',
       'tamatar', 'टमाटर', 'mirch', 'मिर्च', 'shimla', 'शिमला', 'ganna', 'गन्ना', 'aalu', 'alu', 'आलू',
       'pyaz', 'pyaj', 'प्याज', 'lahsun', 'लहसुन', 'gobhi', 'गोभी', 'soyabean', 'सोयाबीन', 'kapas', 'कपास',
@@ -5689,7 +5710,9 @@ function extractPersonNameFromQuery(rawQ, cleanQ) {
       'jane', 'जाने', 'aane', 'आने', 'banne', 'बनने', 'hona', 'होना', 'karne', 'करने', 'dekhne', 'देखने', 'samajhne', 'समझने',
       'ticket', 'टिकट', 'point', 'points', 'पॉइंट', 'पॉइंट्स', 'commission', 'कमीशन', 'turnover', 'टर्नओवर',
       'offer', 'ऑफर', 'gift', 'गिफ्ट', 'discount', 'छूट', 'e-tailer', 'etailer', 'ई-टेलर', 'bc', 'ca', 'cs',
-      'saksham', 'सक्षम', 'asmita', 'अस्मिता', 'hall of fame', 'हॉल ऑफ फेम', 'medal', 'मेडल'
+      'saksham', 'सक्षम', 'asmita', 'अस्मिता', 'hall of fame', 'हॉल ऑफ फेम', 'medal', 'मेडल',
+      'khad', 'खाद', 'ilaj', 'इलाज', 'upay', 'उपाय', 'rog', 'रोग', 'kit', 'कीट', 'illi', 'इल्ली', 'fungus', 'फंगस',
+      'dudh', 'दूध', 'fat', 'फैट', 'gathia', 'गठिया', 'jhaiyan', 'झाइयां', 'shampoo', 'शैम्पू', 'cream', 'क्रीम'
     ]);
 
     const prefixStrip = /^(?:mujhe|humko|mera|mere|meri|apne|dost|mitra|bhai|kisan|sathi|farmer)\s+/i;
@@ -5717,8 +5740,7 @@ function extractPersonNameFromQuery(rawQ, cleanQ) {
         cand = cand.replace(suffixStrip, '').trim();
 
         const words = cand.toLowerCase().split(/\s+/);
-        if (words.length === 1 && stopWords.has(words[0])) continue;
-        if (words.every(w => stopWords.has(w))) continue;
+        if (words.some(w => stopWords.has(w))) continue;
 
         const filteredWords = words.filter(w => !stopWords.has(w));
         if (filteredWords.length > 0 && filteredWords.join(' ').length >= 2) {
@@ -8608,10 +8630,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
         const waShareUrl = `https://wa.me/?text=${encodeURIComponent(waPrescriptionText)}`;
 
-        const onScreenResp = `📋 **श्री ${friendDisplayName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 15-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना/फल भराव की स्थिति में\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450**।\n• **${acres} एकड़ का 1 स्प्रे कुल खर्च:** मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे दिए गए बटन से यह पूरी पर्ची सीधे ${friendDisplayName} जी को WhatsApp पर भेजें:**`;
+        const onScreenResp = `📋 **श्री ${friendDisplayName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 15-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना/फल भराव की स्थिति में\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450**।\n• **${acres} एकड़ का 1 स्प्रे कुल खर्च:** मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे टूलबार में दिए गए WhatsApp बटन से यह सलाह पर्ची सीधे अपने दोस्तों को शेयर करें।**`;
 
         renderCrispSpecialBox(`🌾 ${friendDisplayName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`, onScreenResp, [
-          { text: `📲 ${friendDisplayName} जी को WhatsApp पर भेजें`, url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
           { text: '🌾 4 एकड़ का पूरा हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
           { text: '🌾 5 एकड़ का पूरा हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
         ], 'agri', 'friend_prescription');
@@ -9947,6 +9968,14 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     if (sakhiConversationState.pendingAction === 'awaiting_friend_slip' && sakhiConversationState.pendingData) {
+      const qCombined = ((cleanQ || '') + ' ' + (rawQ || '')).toLowerCase();
+      const isGeneralQuestion = /(?:फसल|कैलेंडर|स्प्रे|खाद|दवा|खर्च|डोज|इलाज|रोग|कीट|इल्ली|दूध|फैट|पशु|गाय|भैंस|नेट्सर्फ|प्लान|कैपिंग|कमीशन|ई-टेलर|शुगर|बीपी|जोड़|दर्द|घुटने|झाइयां|बाल|स्किन|चेहरे|क्या|कैसे|कितना|कहाँ|कब|क्यों|kya|kaise|kitna|schedule|calendar|spray|bank|सर्च)/i.test(qCombined);
+      if (isGeneralQuestion) {
+        sakhiConversationState.pendingAction = null;
+        sakhiConversationState.pendingData = null;
+        try { localStorage.removeItem('SAKHI_DIALOGUE_STATE_V1'); } catch (_) {}
+        return false;
+      }
       let candidateName = (typeof extractPersonNameFromQuery === 'function') ? extractPersonNameFromQuery(rawQ, cleanQ) : '';
       if (!candidateName) {
         const cleanName = rawQ
@@ -9981,12 +10010,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
         const waShareUrl = `https://wa.me/?text=${encodeURIComponent(waPrescriptionText)}`;
 
-        const onScreenResp = `📋 **श्री ${friendDisplayName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 15-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना/फल भराव की स्थिति में\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450**।\n• **${acres} एकड़ का 1 स्प्रे कुल खर्च:** मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे दिए गए बटन से यह पूरी पर्ची सीधे ${friendDisplayName} जी को WhatsApp पर भेजें:**`;
+        const onScreenResp = `📋 **श्री ${friendDisplayName} जी के लिए विशेषज्ञ सलाह पर्ची तैयार है:**\n\n🌾 **फसल व क्षेत्र:** ${acres} एकड़ ${cropName}\n👤 **सलाह प्रेषक:** ${contactInfo}\n\n🌿 **1. प्रति 15 लीटर पंप की सही खुराक:**\n${doseItems.replace(/\\n/g, '\n')}\n\n🌱 **2. स्प्रे की सही अवस्था:**\n• **पहला स्प्रे:** कल्ले व फुटाव की स्थिति में (बुआई के 15-25 दिन)\n• **दूसरा स्प्रे:** फूल व दाना/फल भराव की स्थिति में\n\n💰 **3. खर्च का सटीक गणित:**\n• 1 एकड़ में 5 से 6 पंप लगते हैं।\n• **प्रति पंप खर्च:** मात्र **₹75 से ₹85** (एक कप चाय जितना!)।\n• **1 एकड़ का 1 स्प्रे:** मात्र **₹400 से ₹450**।\n• **${acres} एकड़ का 1 स्प्रे कुल खर्च:** मात्र **₹${totalAcresCost.toLocaleString('hi-IN')}**।\n\n⚠️ **खास सावधानी:**\nस्प्रे करने से पहले पंप को सादे पानी से अच्छी तरह धो लें।\n\n📲 **नीचे टूलबार में दिए गए WhatsApp बटन से यह सलाह पर्ची सीधे अपने दोस्तों को शेयर करें।**`;
 
         savePersistentSakhiConsultation('agri', `${friendDisplayName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`);
 
         renderCrispSpecialBox(`🌾 ${friendDisplayName} जी के लिए ${acres} एकड़ स्प्रे पर्ची`, onScreenResp, [
-          { text: `📲 ${friendDisplayName} जी को WhatsApp पर भेजें`, url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;border-color:#16a34a;font-weight:800;' },
           { text: '🌾 4 एकड़ का पूरा हिसाब', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
           { text: '🌾 5 एकड़ का पूरा हिसाब', query: '5 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
         ], 'agri', 'friend_prescription');
@@ -10372,6 +10400,48 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   // 19. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
+  // =========================================================================
+  // MASTER 100-QUESTION COMBINATION ENGINE (GURU-GRADE ACCURACY & SAFETY)
+  // Guarantees immediate, verified answers for all 100 core queries across 5 domains!
+  // =========================================================================
+  function handleMaster100QABank(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase().trim();
+    const raw = (rawQ || cleanQ || '').toLowerCase().trim();
+    const qaBank = (sakhiMasterKnowledge && sakhiMasterKnowledge.master_100_qa_bank) || [];
+    if (!qaBank || qaBank.length === 0) return false;
+
+    // 1. Exact canonical question match or high-score keyword match
+    for (const item of qaBank) {
+      const qLower = item.question.toLowerCase();
+      if (q === qLower || raw === qLower || q.includes(qLower) || raw.includes(qLower)) {
+        renderMaster100QABox(item);
+        return true;
+      }
+    }
+
+    // 2. Keyword-based matching
+    for (const item of qaBank) {
+      if (item.keywords && Array.isArray(item.keywords)) {
+        for (const kw of item.keywords) {
+          const kwLower = kw.toLowerCase();
+          if (q.includes(kwLower) || raw.includes(kwLower)) {
+            renderMaster100QABox(item);
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  function renderMaster100QABox(item) {
+    const chips = (item.chips || []).map(c => ({
+      text: c.text || c.label,
+      query: c.query
+    }));
+    renderCrispSpecialBox(item.question, item.answer, chips, item.domain || 'omni', item.id);
+  }
+
   function processKnowledgeQuery(query) {
     try {
       const rawQ = (query || '').trim();
@@ -10391,6 +10461,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0.0001 ACTIVE CONVERSATIONAL STATE & MULTI-TURN PENDING ACTION RESOLUTION
     if (typeof resolveActiveDialogueState === 'function' && resolveActiveDialogueState(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00015 MASTER 100 QA BANK ENGINE (Instant Guru-Level Resolution)
+    if (typeof handleMaster100QABank === 'function' && handleMaster100QABank(cleanQ, rawQ)) {
       return;
     }
 
@@ -10732,13 +10807,13 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     const html = `
-      <div style="font-size:0.96rem;line-height:1.7;color:#0f172a;white-space:pre-line;margin-bottom:10px;">
+      <div class="sakhi-content-body" style="font-size:0.96rem;line-height:1.7;color:#0f172a;white-space:pre-line;margin-bottom:10px;">
         ${formatTextHtml(bodyText)}
       </div>
       ${buildMsgAudioBtnMarkup(bodyText)}
 
       ${(chipsHtml || recoHtml) ? `
-        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
+        <div class="sakhi-recommendations-wrapper" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
           <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:6px;">👉 विकल्प व सिफारिशें:</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
             ${chipsHtml}
