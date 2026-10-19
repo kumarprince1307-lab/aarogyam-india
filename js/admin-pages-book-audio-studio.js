@@ -2419,12 +2419,16 @@ function testCurrentPageTts() {
     let nativeHindiVoice = null;
     if ('speechSynthesis' in window) {
         const voices = window.speechSynthesis.getVoices() || [];
-        const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
-        if (hindiVoices.length > 0) {
-            nativeHindiVoice = hindiVoices.find(v => {
-                const name = v.name.toLowerCase();
-                return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
-            }) || hindiVoices[0];
+        if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.getBestSweetVoice === 'function') {
+            nativeHindiVoice = window.AarogyamAudioNormalizer.getBestSweetVoice(voices);
+        } else {
+            const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
+            if (hindiVoices.length > 0) {
+                nativeHindiVoice = hindiVoices.find(v => {
+                    const name = v.name.toLowerCase();
+                    return name.includes('swara') || name.includes('madhur') || name.includes('google') || name.includes('kalpana') || name.includes('heera') || name.includes('female');
+                }) || hindiVoices[0];
+            }
         }
     }
 
@@ -2468,32 +2472,45 @@ function testCurrentPageTts() {
                 const ut = new SpeechSynthesisUtterance(chunk);
                 if (nativeHindiVoice) ut.voice = nativeHindiVoice;
                 ut.lang = 'hi-IN';
-                ut.rate = 0.95;
-                ut.pitch = 1.0;
+                ut.rate = 0.92; // Sweet, natural unhurried reading
+                ut.pitch = 1.05; // Gentle, bright, sweet female pitch
 
                 let hasAdvanced = false;
                 let watchdog = null;
 
-                const advance = () => {
+                const advance = (reason) => {
                     if (hasAdvanced || !studioTtsIsPlaying) return;
                     hasAdvanced = true;
-                    if (watchdog) clearTimeout(watchdog);
+                    if (watchdog) {
+                        clearTimeout(watchdog);
+                        watchdog = null;
+                    }
+                    if (reason === 'watchdog' && 'speechSynthesis' in window) {
+                        try { window.speechSynthesis.cancel(); } catch(e) {}
+                    }
                     studioTtsChunkIndex++;
-                    playNext();
+                    setTimeout(() => {
+                        if (studioTtsIsPlaying) playNext();
+                    }, 75);
                 };
 
                 ut.onend = () => {
-                    advance();
+                    advance('end');
                 };
                 ut.onerror = (e) => {
+                    if (e && (e.error === 'canceled' || e.error === 'interrupted')) {
+                        return;
+                    }
                     console.warn("Studio TTS chunk error:", e?.error);
-                    advance();
+                    advance('error');
                 };
 
-                const timeoutMs = Math.max(4000, chunk.length * 160);
+                // Generous Watchdog: Never cut off natural speech!
+                const timeoutMs = Math.max(14000, chunk.length * 350);
                 watchdog = setTimeout(() => {
                     if (!hasAdvanced && studioTtsIsPlaying) {
-                        advance();
+                        console.warn("[Studio TTS] Watchdog dead-man advance for chunk:", chunk);
+                        advance('watchdog');
                     }
                 }, timeoutMs);
 
@@ -2501,16 +2518,15 @@ function testCurrentPageTts() {
                 if (!window._studioTtsKeepAliveInterval) {
                     window._studioTtsKeepAliveInterval = setInterval(() => {
                         if ('speechSynthesis' in window && window.speechSynthesis.paused) {
-                            window.speechSynthesis.resume();
+                            try { window.speechSynthesis.resume(); } catch(e) {}
                         }
-                    }, 2500);
+                    }, 2000);
                 }
 
-                setTimeout(() => {
-                    if (studioTtsIsPlaying && 'speechSynthesis' in window) {
-                        window.speechSynthesis.speak(ut);
-                    }
-                }, 30);
+                if (window.speechSynthesis.paused) {
+                    try { window.speechSynthesis.resume(); } catch(e) {}
+                }
+                window.speechSynthesis.speak(ut);
             } catch(e) {
                 studioTtsChunkIndex++;
                 playNext();
@@ -3164,20 +3180,32 @@ function playSourceAudioPreview(audioSrc, textSrc) {
         modalAudioPlayer.pause();
         modalAudioPlayer = null;
     }
+    if (window._studioModalTtsPlayer && typeof window._studioModalTtsPlayer.stop === 'function') {
+        window._studioModalTtsPlayer.stop();
+        window._studioModalTtsPlayer = null;
+    }
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+        try { window.speechSynthesis.cancel(); } catch(e) {}
     }
 
     if (audioSrc && audioSrc.trim().length > 0) {
         modalAudioPlayer = new Audio(audioSrc);
         modalAudioPlayer.play().catch(e => console.warn("Audio preview error:", e));
     } else if (textSrc && textSrc.trim().length > 0 && ('speechSynthesis' in window)) {
-        const ut = new SpeechSynthesisUtterance(textSrc);
-        ut.lang = 'hi-IN';
-        ut.rate = 0.95;
-        ut.pitch = 1.0;
-        window._studioSourceUtterance = ut;
-        window.speechSynthesis.speak(ut);
+        if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.speakChunksSafe === 'function') {
+            window._studioModalTtsPlayer = window.AarogyamAudioNormalizer.speakChunksSafe({
+                text: textSrc,
+                rate: 0.92,
+                pitch: 1.05
+            });
+        } else {
+            const ut = new SpeechSynthesisUtterance(textSrc);
+            ut.lang = 'hi-IN';
+            ut.rate = 0.92;
+            ut.pitch = 1.05;
+            window._studioSourceUtterance = ut;
+            window.speechSynthesis.speak(ut);
+        }
     } else {
         alert("इस पेज पर कोई ऑडियो या टेक्स्ट उपलब्ध नहीं है।");
     }

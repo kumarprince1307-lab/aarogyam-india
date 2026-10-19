@@ -187,16 +187,63 @@
         },
 
         /**
-         * 3. Robust Self-Healing Speech Synthesis Player
+         * 3. Intelligent Selector for the Sweetest Natural Hindi Voice
+         */
+        getBestSweetVoice: function(customVoices) {
+            if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
+            const voices = customVoices || window.speechSynthesis.getVoices() || [];
+            if (!voices.length) return null;
+
+            // 1. Ultra-natural Microsoft Swara Online (Natural) - Sweetest Indian female narration
+            let v = voices.find(x => /swara.*natural/i.test(x.name));
+            if (v) return v;
+
+            // 2. Microsoft Madhur Online (Natural) - Hindi
+            v = voices.find(x => /madhur.*natural/i.test(x.name));
+            if (v) return v;
+
+            // 3. Any Natural Hindi Voice (Azure / Edge Neural Online)
+            v = voices.find(x => /natural/i.test(x.name) && (/hi[-_]in/i.test(x.lang) || /hindi/i.test(x.name)));
+            if (v) return v;
+
+            // 4. Google हिन्दी (Google Hindi Natural on Android / Chrome)
+            v = voices.find(x => /google/i.test(x.name) && (/हिन्दी|hindi/i.test(x.name) || /hi[-_]in/i.test(x.lang)));
+            if (v) return v;
+
+            // 5. Native Android Google High-Fidelity Female
+            v = voices.find(x => /hi[-_]in/i.test(x.lang) && /female|cfh|hie/i.test(x.name));
+            if (v) return v;
+
+            // 6. Apple Lekha / Neerja (iOS / Safari / macOS)
+            v = voices.find(x => /lekha|neerja/i.test(x.name));
+            if (v) return v;
+
+            // 7. Desktop Kalpana / Swara / Heera
+            v = voices.find(x => /kalpana|swara|heera/i.test(x.name));
+            if (v) return v;
+
+            // 8. Any Hindi voice
+            v = voices.find(x => x.lang && (x.lang.toLowerCase().startsWith('hi') || x.lang.toLowerCase().includes('hi-in') || x.lang.toLowerCase().includes('hi_in')));
+            if (v) return v;
+
+            // 9. Fallback to English (India) Natural female voice
+            v = voices.find(x => /natural/i.test(x.name) && /en[-_]in/i.test(x.lang));
+            if (v) return v;
+
+            return null;
+        },
+
+        /**
+         * 4. Robust Self-Healing Speech Synthesis Player (Zero-Stutter, Zero-Repeat, Sweet Cadence)
          */
         speakChunksSafe: function(options) {
             const text = options.text || '';
             const onStatus = options.onStatus || function() {};
             const onChunkStart = options.onChunkStart || function() {};
             const onFinished = options.onFinished || function() {};
-            const rate = options.rate || 0.96;
-            const pitch = options.pitch || 1.0;
-            const voice = options.voice || null;
+            const rate = options.rate || 0.92; // Sweet, calm, unhurried pace
+            const pitch = options.pitch || 1.05; // Gentle, bright, sweet female pitch
+            let voice = options.voice || this.getBestSweetVoice();
 
             const chunks = this.splitIntoChunks(text);
             if (!chunks.length) {
@@ -212,21 +259,28 @@
 
             const stopPlayer = () => {
                 isRunning = false;
-                if (watchdogTimer) clearTimeout(watchdogTimer);
-                if (keepAliveTimer) clearInterval(keepAliveTimer);
+                if (watchdogTimer) {
+                    clearTimeout(watchdogTimer);
+                    watchdogTimer = null;
+                }
+                if (keepAliveTimer) {
+                    clearInterval(keepAliveTimer);
+                    keepAliveTimer = null;
+                }
+                window._aoiActiveUtterance = null;
                 if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
+                    try { window.speechSynthesis.cancel(); } catch(e) {}
                 }
             };
 
             // Global Keep-Alive Heartbeat (fixes Chromium 15s freeze)
             keepAliveTimer = setInterval(() => {
                 if (!isRunning) {
-                    clearInterval(keepAliveTimer);
+                    if (keepAliveTimer) clearInterval(keepAliveTimer);
                     return;
                 }
                 if ('speechSynthesis' in window && window.speechSynthesis.paused) {
-                    window.speechSynthesis.resume();
+                    try { window.speechSynthesis.resume(); } catch(e) {}
                 }
             }, 1800);
 
@@ -249,45 +303,63 @@
 
                 if ('speechSynthesis' in window) {
                     try {
+                        // Refresh voice if none was cached initially
+                        if (!voice) voice = this.getBestSweetVoice();
+
                         const ut = new SpeechSynthesisUtterance(currentChunk);
                         currentUtterance = ut;
+                        window._aoiActiveUtterance = ut; // Strong ref prevents GC interruption
+
                         if (voice) ut.voice = voice;
                         ut.lang = 'hi-IN';
                         ut.rate = rate;
                         ut.pitch = pitch;
 
                         let hasAdvanced = false;
-                        const advance = () => {
+                        const advance = (reason) => {
                             if (hasAdvanced || !isRunning) return;
                             hasAdvanced = true;
-                            if (watchdogTimer) clearTimeout(watchdogTimer);
+                            if (watchdogTimer) {
+                                clearTimeout(watchdogTimer);
+                                watchdogTimer = null;
+                            }
+                            if (reason === 'watchdog' && 'speechSynthesis' in window) {
+                                try { window.speechSynthesis.cancel(); } catch(e) {}
+                            }
                             chunkIdx++;
-                            playNext();
+                            // 75ms micro-pause allows browser hardware buffer to cleanly clear
+                            setTimeout(() => {
+                                if (isRunning) playNext();
+                            }, 75);
                         };
 
                         ut.onend = () => {
-                            advance();
+                            advance('end');
                         };
 
                         ut.onerror = (e) => {
+                            if (e && (e.error === 'canceled' || e.error === 'interrupted')) {
+                                return;
+                            }
                             console.warn("SpeechSynthesis utterance note:", e?.error);
-                            advance();
+                            advance('error');
                         };
 
-                        // Dynamic Watchdog: auto-advance if browser drops event
-                        const watchdogMs = Math.min(12000, Math.max(3000, currentChunk.length * 150));
+                        // Generous Watchdog: Never cut off human-speed reading! Only acts if completely frozen
+                        const watchdogMs = Math.max(14000, currentChunk.length * 350);
                         watchdogTimer = setTimeout(() => {
                             if (!hasAdvanced && isRunning) {
-                                console.warn("Watchdog auto-advanced chunk:", currentChunk);
-                                advance();
+                                console.warn("[Aarogyam Audio] Watchdog dead-man advance for chunk:", currentChunk);
+                                advance('watchdog');
                             }
                         }, watchdogMs);
 
-                        setTimeout(() => {
-                            if (isRunning && 'speechSynthesis' in window) {
-                                window.speechSynthesis.speak(ut);
-                            }
-                        }, 25);
+                        // Resume synthesis in case browser entered suspended state
+                        if (window.speechSynthesis.paused) {
+                            try { window.speechSynthesis.resume(); } catch(e) {}
+                        }
+
+                        window.speechSynthesis.speak(ut);
                     } catch(err) {
                         console.error("Utterance error:", err);
                         chunkIdx++;

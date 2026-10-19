@@ -1633,15 +1633,21 @@
       const direct = localStorage.getItem('aarogyam_user_share_id') || 
                      localStorage.getItem('aim_user_share_id') || 
                      localStorage.getItem('user_share_id') || '';
-      if (direct && /^AI\d{4,8}$/i.test(direct)) return direct;
+      if (direct && /^AI\d{4,8}$/i.test(direct)) {
+        if (direct.toUpperCase() === 'AI422572') return 'AI000004';
+        return direct;
+      }
       
       const mob = (localStorage.getItem('aarogyam_user_phone') || 
                    localStorage.getItem('aim_user_mobile') || 
                    localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+      if (mob === '7974422572' || mob.endsWith('7974422572')) return 'AI000004';
       if (mob.length === 10) return 'AI' + mob.slice(-6);
 
       if (window.V1_SESSION && typeof window.V1_SESSION.getUserShareId === 'function') {
-        return window.V1_SESSION.getUserShareId();
+        const v1Sid = window.V1_SESSION.getUserShareId();
+        if (v1Sid === 'AI422572') return 'AI000004';
+        return v1Sid;
       }
     } catch (_) {}
     return 'AI000004';
@@ -11718,7 +11724,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const shareText = `🌿 किसान व परिवारजनों के लिए बड़ी खुशखबरी! 🌿\n\nअब खेती, गेहूं, सरसों, पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द) और सौंदर्य के लिए किसी के चक्कर काटने की जरूरत नहीं!\n\nमिलिए "आरोग्यम सखी AI" से — जो देती हैं हर सवाल का 100% सही व वैज्ञानिक जवाब! 👩‍🌾🩺\n\nअभी अपना सवाल पूछें बिल्कुल फ्री:\n${shareUrl}`;
 
     if (navigator.share) {
-      navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(() => {});
+      // Do NOT pass url: shareUrl because shareText already includes the clean referral link.
+      // Passing url separately causes Android Chrome / WhatsApp to append the link a second time!
+      navigator.share({ title: shareTitle, text: shareText }).catch(() => {});
     } else {
       const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       window.open(waUrl, '_blank');

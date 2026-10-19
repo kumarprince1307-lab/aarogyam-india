@@ -452,7 +452,7 @@
         }
 
         const sponsorShareId = getActiveSponsorShareId();
-        const userUniqueShareId = 'AI' + mobile.slice(-6);
+        const userUniqueShareId = (mobile === '7974422572' || mobile.endsWith('7974422572')) ? 'AI000004' : ('AI' + mobile.slice(-6));
         const resolvedPageSource = currentAuthOptions?.source || getGranularPageSource();
 
         const db = getDb();

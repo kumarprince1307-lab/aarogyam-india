@@ -269,10 +269,19 @@ function testCurrentPageTts() {
 
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const ut = new SpeechSynthesisUtterance(text);
-        ut.lang = 'hi-IN';
-        ut.rate = 1.0;
-        window.speechSynthesis.speak(ut);
+        if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.speakChunksSafe === 'function') {
+            window.AarogyamAudioNormalizer.speakChunksSafe({
+                text: text,
+                rate: 0.92,
+                pitch: 1.05
+            });
+        } else {
+            const ut = new SpeechSynthesisUtterance(text);
+            ut.lang = 'hi-IN';
+            ut.rate = 0.92;
+            ut.pitch = 1.05;
+            window.speechSynthesis.speak(ut);
+        }
     } else {
         alert("ब्राउज़र में SpeechSynthesis उपलब्ध नहीं है।");
     }

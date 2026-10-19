@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v1.1';
-const PAGES_CACHE = 'aarogyam-public-pages-v1.1';
-const MEDIA_CACHE = 'aarogyam-public-media-v1.1';
+const STATIC_CACHE = 'aarogyam-public-static-v1.2';
+const PAGES_CACHE = 'aarogyam-public-pages-v1.2';
+const MEDIA_CACHE = 'aarogyam-public-media-v1.2';
 const OFFLINE_URL = '/offline.html';
 
 
@@ -39,6 +39,9 @@ const PRECACHE_SHELL = [
   '/css/premium-mobile-ui.css',
   '/js/public-pwa.js',
   '/js/universal-nav-drawer.js',
+  '/js/viral-share-engine.js',
+  '/js/global-guest-modal.js',
+  '/js/audio-greeting-engine.js',
   '/js/image-lightbox-viewer.js',
   '/js/universal-preview-gallery-lightbox.js',
   '/js/book-marketing-card.js',
@@ -76,8 +79,11 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name.startsWith('aarogyam-public-') && !allowedCaches.includes(name))
-          .map((name) => caches.delete(name))
+          .filter((name) => !allowedCaches.includes(name))
+          .map((name) => {
+            console.log('[Aarogyam PWA SW] Deleting obsolete cache:', name);
+            return caches.delete(name);
+          })
       );
     }).then(() => {
       console.log('[Aarogyam PWA SW] Claiming clients for instant control');

@@ -212,11 +212,70 @@
     return name.trim();
   }
 
-  // 4. Speech Synthesis Controller
+  // 4. Speech Synthesis Controller & Sweet Natural Voice Engine
   let isSpeaking = false;
-  let synth = window.speechSynthesis;
+  let synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
   let currentUtterance = null;
   let userMutedAudio = false;
+  let activeGreetingPlayer = null;
+
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.onvoiceschanged = function () {
+        try { window.speechSynthesis.getVoices(); } catch (e) {}
+      };
+    } catch (e) {}
+  }
+
+  function getBestGreetingVoice() {
+    if (!synth) return null;
+    const voices = synth.getVoices() || [];
+    if (!voices.length) return null;
+
+    if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.getBestSweetVoice === 'function') {
+      return window.AarogyamAudioNormalizer.getBestSweetVoice(voices);
+    }
+
+    return voices.find(x => /swara.*natural/i.test(x.name)) ||
+           voices.find(x => /madhur.*natural/i.test(x.name)) ||
+           voices.find(x => /natural/i.test(x.name) && (/hi[-_]in/i.test(x.lang) || /hindi/i.test(x.name))) ||
+           voices.find(x => /google/i.test(x.name) && (/हिन्दी|hindi/i.test(x.name) || /hi[-_]in/i.test(x.lang))) ||
+           voices.find(x => /hi[-_]in/i.test(x.lang) && /female|cfh|hie/i.test(x.name)) ||
+           voices.find(x => /lekha|neerja/i.test(x.name)) ||
+           voices.find(x => /kalpana|swara|heera/i.test(x.name)) ||
+           voices.find(x => x.lang && (x.lang.toLowerCase().startsWith('hi') || x.lang.toLowerCase().includes('hi-in') || x.lang.toLowerCase().includes('hi_in'))) ||
+           voices.find(x => /natural/i.test(x.name) && /en[-_]in/i.test(x.lang)) ||
+           null;
+  }
+
+  function splitGreetingIntoChunks(rawText) {
+    if (!rawText) return [];
+    if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.splitIntoChunks === 'function') {
+      return window.AarogyamAudioNormalizer.splitIntoChunks(rawText);
+    }
+    const clean = String(rawText)
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/[\u3002\uFF0E]/g, ' । ')
+      .replace(/[•▪★●◆✦✓✔■►▶❖➔→⇒—–_~*#@&|^<>{}[\]"`'()]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const blocks = clean.split(/\s*।\s*/);
+    const result = [];
+    for (const b of blocks) {
+      const s = b.trim();
+      if (!s) continue;
+      if (s.length <= 80) {
+        result.push(s);
+      } else {
+        const commas = s.split(/\s*,\s*/);
+        for (const c of commas) {
+          const ct = c.trim();
+          if (ct) result.push(ct);
+        }
+      }
+    }
+    return result.length ? result : [clean];
+  }
 
   function stopAudio() {
     userMutedAudio = true;
@@ -232,8 +291,13 @@
       activeAudioElement = null;
     }
 
+    if (activeGreetingPlayer && typeof activeGreetingPlayer.stop === 'function') {
+      try { activeGreetingPlayer.stop(); } catch (e) {}
+      activeGreetingPlayer = null;
+    }
+
     if (synth) {
-      synth.cancel();
+      try { synth.cancel(); } catch (e) {}
     }
 
     // Halt any other HTML5 audio tags on the page
@@ -300,44 +364,113 @@
       return;
     }
 
-    // 2. Otherwise play Hindi Voice Speech Synthesis
+    // 2. Otherwise play Sweet Natural Hindi Voice with Chunking (Zero 15s freeze, zero repeat)
     if (!synth) {
       if (!isAutoPlay) alert('आपके ब्राउज़र में ऑडियो स्पीच सपोर्ट उपलब्ध नहीं है।');
       return;
     }
 
-    synth.cancel(); // Stop any pending speech
+    try { synth.cancel(); } catch (e) {}
 
     const textToSpeak = typeof config.text === 'function' ? config.text(userName) : (config.text || '');
+    if (!textToSpeak || !textToSpeak.trim()) return;
 
-    currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
-    currentUtterance.lang = 'hi-IN';
-    currentUtterance.rate = 0.95; // Clear natural pace
-    currentUtterance.pitch = 1.0;
-
-    // Pick best Hindi Voice if available
-    const voices = synth.getVoices();
-    const hindiVoice = voices.find(v => v.lang.includes('hi') || v.name.toLowerCase().includes('hindi') || v.name.toLowerCase().includes('india'));
-    if (hindiVoice) {
-      currentUtterance.voice = hindiVoice;
-    }
-
-    currentUtterance.onstart = function () {
+    if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.speakChunksSafe === 'function') {
       isSpeaking = true;
       updateAudioUIState(true);
+      activeGreetingPlayer = window.AarogyamAudioNormalizer.speakChunksSafe({
+        text: textToSpeak,
+        rate: 0.92,
+        pitch: 1.05,
+        onFinished: function () {
+          isSpeaking = false;
+          updateAudioUIState(false);
+          activeGreetingPlayer = null;
+        }
+      });
+      return;
+    }
+
+    // Self-contained chunk player fallback
+    const chunks = splitGreetingIntoChunks(textToSpeak);
+    if (!chunks.length) return;
+
+    let chunkIdx = 0;
+    let isCancelled = false;
+    let watchdogTimer = null;
+
+    activeGreetingPlayer = {
+      stop: function () {
+        isCancelled = true;
+        if (watchdogTimer) clearTimeout(watchdogTimer);
+        try { synth.cancel(); } catch (e) {}
+      }
     };
 
-    currentUtterance.onend = function () {
-      isSpeaking = false;
-      updateAudioUIState(false);
+    isSpeaking = true;
+    updateAudioUIState(true);
+
+    const playNextGreetingChunk = () => {
+      if (isCancelled || !isSpeaking) return;
+      if (chunkIdx >= chunks.length) {
+        isSpeaking = false;
+        updateAudioUIState(false);
+        activeGreetingPlayer = null;
+        return;
+      }
+
+      const chunk = chunks[chunkIdx];
+      if (!chunk || !chunk.trim()) {
+        chunkIdx++;
+        playNextGreetingChunk();
+        return;
+      }
+
+      const ut = new SpeechSynthesisUtterance(chunk);
+      ut.lang = 'hi-IN';
+      ut.rate = 0.92; // Sweet unhurried pace
+      ut.pitch = 1.05; // Gentle, bright female tone
+      const v = getBestGreetingVoice();
+      if (v) ut.voice = v;
+
+      let hasAdvanced = false;
+      const advance = (reason) => {
+        if (hasAdvanced || isCancelled || !isSpeaking) return;
+        hasAdvanced = true;
+        if (watchdogTimer) {
+          clearTimeout(watchdogTimer);
+          watchdogTimer = null;
+        }
+        if (reason === 'watchdog') {
+          try { synth.cancel(); } catch (e) {}
+        }
+        chunkIdx++;
+        setTimeout(() => {
+          if (!isCancelled && isSpeaking) playNextGreetingChunk();
+        }, 75);
+      };
+
+      ut.onend = () => advance('end');
+      ut.onerror = (e) => {
+        if (e && (e.error === 'canceled' || e.error === 'interrupted')) return;
+        advance('error');
+      };
+
+      const watchdogMs = Math.max(14000, chunk.length * 350);
+      watchdogTimer = setTimeout(() => {
+        if (!hasAdvanced && !isCancelled && isSpeaking) {
+          advance('watchdog');
+        }
+      }, watchdogMs);
+
+      window._aoiActiveUtterance = ut;
+      if (synth.paused) {
+        try { synth.resume(); } catch (e) {}
+      }
+      synth.speak(ut);
     };
 
-    currentUtterance.onerror = function () {
-      isSpeaking = false;
-      updateAudioUIState(false);
-    };
-
-    synth.speak(currentUtterance);
+    playNextGreetingChunk();
   }
 
   function updateAudioUIState(playing) {
@@ -786,8 +919,10 @@
       const speechStr = `${cleanTitle}। ${cleanText}। सम्पूर्ण वैज्ञानिक समाधान व परामर्श के लिए आरोग्यम इंडिया पर संपर्क करें।`;
       const utterance = new SpeechSynthesisUtterance(speechStr);
       utterance.lang = 'hi-IN';
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
+      utterance.rate = 0.92;
+      utterance.pitch = 1.05;
+      const v = getBestGreetingVoice();
+      if (v) utterance.voice = v;
 
       if (targetBtn) targetBtn.classList.add('playing');
 
@@ -797,6 +932,9 @@
       utterance.onerror = function () {
         if (targetBtn) targetBtn.classList.remove('playing');
       };
+      if (window.speechSynthesis.paused) {
+        try { window.speechSynthesis.resume(); } catch (e) {}
+      }
       window.speechSynthesis.speak(utterance);
     });
   };

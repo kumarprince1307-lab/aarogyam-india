@@ -1356,12 +1356,18 @@
 
         const utter = new SpeechSynthesisUtterance(speechText);
         utter.lang = 'hi-IN';
-        utter.rate = 0.95;
+        utter.rate = 0.92;
         utter.pitch = 1.05;
 
-        // Try to pick Hindi voice if available
+        // Try to pick sweetest Hindi voice if available
         const voices = window.speechSynthesis.getVoices();
-        const hiVoice = voices.find(v => v.lang.includes('hi') || v.lang.includes('HI'));
+        const hiVoice = voices.find(x => /swara.*natural/i.test(x.name)) ||
+                        voices.find(x => /madhur.*natural/i.test(x.name)) ||
+                        voices.find(x => /natural/i.test(x.name) && (/hi[-_]in/i.test(x.lang) || /hindi/i.test(x.name))) ||
+                        voices.find(x => /google/i.test(x.name) && (/हिन्दी|hindi/i.test(x.name) || /hi[-_]in/i.test(x.lang))) ||
+                        voices.find(x => /lekha|neerja/i.test(x.name)) ||
+                        voices.find(x => /kalpana|swara|heera/i.test(x.name)) ||
+                        voices.find(v => v.lang.includes('hi') || v.lang.includes('HI'));
         if (hiVoice) utter.voice = hiVoice;
 
         utter.onstart = () => {
@@ -2105,7 +2111,7 @@
       <button onclick="localStorage.setItem('aim_user_mobile', document.getElementById('login-mobile').value); document.getElementById('login-popup-overlay').style.display='none';" style="width: 100%; padding: 10px; background: #d97706; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 800;">लॉगिन करें</button>
     </div>
   </div>
-  <script src="/js/global-guest-modal.js?v=20261018_v25"></script>
+  <script src="/js/global-guest-modal.js?v=1.2"></script>
   <script src="/js/audio-greeting-engine.js?v=1.1"></script>
 </body>
 

@@ -185,18 +185,21 @@ class ProAudioBookEngine {
         const voices = this.synth.getVoices() || [];
         if (!voices.length) return;
 
-        const hindiVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('hi') || v.lang.toLowerCase().includes('hi-in') || v.lang.toLowerCase().includes('hi_in')));
-        
-        if (hindiVoices.length > 0) {
-            this.femaleVoice = hindiVoices.find(v => {
-                const name = v.name.toLowerCase();
-                return name.includes('kalpana') || name.includes('swara') || name.includes('heera') || name.includes('female') || name.includes('google') || name.includes('zira');
-            }) || hindiVoices[0];
-            this.hasNativeHindiVoice = true;
+        if (typeof window.AarogyamAudioNormalizer !== 'undefined' && typeof window.AarogyamAudioNormalizer.getBestSweetVoice === 'function') {
+            this.femaleVoice = window.AarogyamAudioNormalizer.getBestSweetVoice(voices);
         } else {
-            this.femaleVoice = null;
-            this.hasNativeHindiVoice = false;
+            this.femaleVoice = voices.find(x => /swara.*natural/i.test(x.name)) ||
+                               voices.find(x => /madhur.*natural/i.test(x.name)) ||
+                               voices.find(x => /natural/i.test(x.name) && (/hi[-_]in/i.test(x.lang) || /hindi/i.test(x.name))) ||
+                               voices.find(x => /google/i.test(x.name) && (/हिन्दी|hindi/i.test(x.name) || /hi[-_]in/i.test(x.lang))) ||
+                               voices.find(x => /hi[-_]in/i.test(x.lang) && /female|cfh|hie/i.test(x.name)) ||
+                               voices.find(x => /lekha|neerja/i.test(x.name)) ||
+                               voices.find(x => /kalpana|swara|heera/i.test(x.name)) ||
+                               voices.find(x => x.lang && (x.lang.toLowerCase().startsWith('hi') || x.lang.toLowerCase().includes('hi-in') || x.lang.toLowerCase().includes('hi_in'))) ||
+                               voices.find(x => /natural/i.test(x.name) && /en[-_]in/i.test(x.lang)) ||
+                               null;
         }
+        this.hasNativeHindiVoice = !!this.femaleVoice;
     }
 
     setupAudioElement() {
@@ -691,21 +694,33 @@ class ProAudioBookEngine {
             this.updateProgressBar(this.currentChunkIndex + 1, chunks.length);
 
             let hasAdvanced = false;
+            let wTimer = null;
             let chunkStartTime = Date.now();
 
-            const advance = () => {
+            const advance = (reason) => {
                 if (hasAdvanced || !this.isPlaying || this.activeEpoch !== currentEpoch) return;
                 hasAdvanced = true;
+                if (wTimer) {
+                    clearTimeout(wTimer);
+                    wTimer = null;
+                }
+                if (reason === 'watchdog' && this.synth) {
+                    try { this.synth.cancel(); } catch(e) {}
+                }
                 this.currentChunkIndex++;
-                playNextChunk();
+                setTimeout(() => {
+                    if (this.isPlaying && this.activeEpoch === currentEpoch) {
+                        playNextChunk();
+                    }
+                }, 75);
             };
 
             if (this.synth) {
                 try {
                     const ut = new SpeechSynthesisUtterance(currentChunk);
                     ut.lang = 'hi-IN';
-                    ut.pitch = 1.0;
-                    ut.rate = 0.95 * (this.playbackRate || 1.0);
+                    ut.pitch = 1.05; // Gentle, bright, sweet female pitch
+                    ut.rate = 0.92 * (this.playbackRate || 1.0); // Sweet, unhurried, natural reading pace
                     ut.volume = this.isMuted ? 0 : (this.volume || 1.0);
 
                     if (this.femaleVoice) {
@@ -717,7 +732,7 @@ class ProAudioBookEngine {
                     };
 
                     ut.onend = () => {
-                        advance();
+                        advance('end');
                     };
 
                     ut.onerror = (e) => {
@@ -725,14 +740,15 @@ class ProAudioBookEngine {
                             return;
                         }
                         console.warn("Speech synthesis note:", e?.error);
-                        advance();
+                        advance('error');
                     };
 
-                    // Dynamic Watchdog to prevent Chromium speech freeze:
-                    const watchdogMs = Math.min(15000, Math.max(3500, currentChunk.length * 160));
-                    const wTimer = setTimeout(() => {
+                    // Generous Watchdog: Never cut off human-speed reading! Only acts as dead-man switch if speech completely froze
+                    const watchdogMs = Math.max(14000, currentChunk.length * 350);
+                    wTimer = setTimeout(() => {
                         if (!hasAdvanced && this.isPlaying && this.activeEpoch === currentEpoch) {
-                            advance();
+                            console.warn("[AudioBookEngine] Watchdog dead-man advance for chunk:", currentChunk);
+                            advance('watchdog');
                         }
                     }, watchdogMs);
                     if (Array.isArray(this.activeTimers)) {
@@ -748,15 +764,18 @@ class ProAudioBookEngine {
                     if (!window._aoiKeepAliveInterval) {
                         window._aoiKeepAliveInterval = setInterval(() => {
                             if (window.speechSynthesis && window.speechSynthesis.paused) {
-                                window.speechSynthesis.resume();
+                                try { window.speechSynthesis.resume(); } catch(e) {}
                             }
-                        }, 2500);
+                        }, 2000);
                     }
 
+                    if (this.synth.paused) {
+                        try { this.synth.resume(); } catch(e) {}
+                    }
                     this.synth.speak(ut);
                 } catch(err) {
                     console.warn("Synth speak error:", err);
-                    advance();
+                    advance('error');
                 }
             } else {
                 this.handleBrowserTtsRestriction();
