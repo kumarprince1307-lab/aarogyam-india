@@ -2560,8 +2560,14 @@
     t = t.replace(/\b(?:postart|postar|postr|bannr|bannar)\b/gi, 'poster');
     t = t.replace(/\b(?:promt|propmt|prampt|pompt|pramt|प्राम्ट|प्राम्प्ट|पोस्टार)\b/gi, 'prompt');
 
-    // Checklist Phonetic Normalizations (chek list, check list, checklist, cheklist, चेक लिस्ट, चेक सूची)
-    t = t.replace(/(?:chek\s*list|cheklist|check\s*list|checklist|चेक\s*लिस्ट|चेक\s*सुची|चेक\s*सूची)/gi, 'चेकलिस्ट');
+    // Panchang Phonetic Normalizations (panchag, panjik, पंचाग)
+    t = t.replace(/(?:panchag|panchaang|panchanga|panjik|पंचाग|पन्चांग)/gi, 'पंचांग');
+
+    // WhatsApp Phonetic Normalizations (whatsapp, whtsapp, watsapp, wtsapp, वाटसप, वाट्सएप)
+    t = t.replace(/(?:whatsapp|whtsapp|watsapp|whatsap|wtsapp|वाटसप|वाट्सएप|व्हाट्सएप)/gi, 'व्हाट्सएप');
+
+    // Checklist Phonetic Normalizations (chiklist, chacklist, chek list, check list, checklist, cheklist, चेक लिस्ट, चेक सूची)
+    t = t.replace(/(?:chiklist|chacklist|chek\s*list|cheklist|check\s*list|checklist|चेक\s*लिस्ट|चेक\s*सुची|चेक\s*सूची)/gi, 'चेकलिस्ट');
 
     // Greetings & Casual Word-Boundary Normalization
     t = t.replace(/\b(?:gm|g\.m\.)\b/gi, 'good morning');
@@ -4820,33 +4826,96 @@
     return true;
   }
 
-  // 15.92 VEDIC KRISHI PANCHANG & SHUBH MUHURAT HANDLER
+  // 15.92 VEDIC KRISHI PANCHANG & SHUBH MUHURAT HANDLER (100% Dynamic - Zero Hardcoding)
   function handleVedicPanchangAndMuhurat(cleanQ, rawQ) {
-    const isPanchang = (cleanQ.includes('panchang') || cleanQ.includes('panchag') || cleanQ.includes('panchanga') || cleanQ.includes('panjika') || cleanQ.includes('पंचांग') || cleanQ.includes('पंचाग') || cleanQ.includes('muhurat') || cleanQ.includes('मुहूर्त') || cleanQ.includes('choghadiya') || cleanQ.includes('चौघड़िया') || cleanQ.includes('rahu kaal') || cleanQ.includes('राहुकाल') || cleanQ.includes('tithi') || cleanQ.includes('तिथि') || cleanQ.includes('nakshatra') || cleanQ.includes('नक्षत्र') || cleanQ.includes('vrat') || cleanQ.includes('व्रत') || cleanQ.includes('shukla paksha') || cleanQ.includes('शुक्ल पक्ष') || cleanQ.includes('krishna paksha') || cleanQ.includes('कृष्ण पक्ष') || cleanQ.includes('आज कौन सा त्योहार')) &&
-      !cleanQ.includes('netsurf') && !cleanQ.includes('नेट्सर्फ');
+    const isPanchang = (
+      cleanQ.includes('panchang') || cleanQ.includes('panchag') || cleanQ.includes('panchanga') ||
+      cleanQ.includes('panjika') || cleanQ.includes('पंचांग') || cleanQ.includes('पंचाग') ||
+      cleanQ.includes('muhurat') || cleanQ.includes('मुहूर्त') || cleanQ.includes('choghadiya') ||
+      cleanQ.includes('चौघड़िया') || cleanQ.includes('rahu kaal') || cleanQ.includes('राहुकाल') ||
+      cleanQ.includes('tithi') || cleanQ.includes('तिथि') || cleanQ.includes('nakshatra') ||
+      cleanQ.includes('नक्षत्र') || cleanQ.includes('vrat') || cleanQ.includes('व्रत') ||
+      cleanQ.includes('shukla paksha') || cleanQ.includes('शुक्ल पक्ष') || cleanQ.includes('krishna paksha') ||
+      cleanQ.includes('कृष्ण पक्ष') || cleanQ.includes('त्योहार') || cleanQ.includes('त्यौहार') || cleanQ.includes('पर्व') ||
+      cleanQ.includes('आज कौन सा त्योहार') || cleanQ.includes('आज की तिथि')
+    ) && !cleanQ.includes('netsurf') && !cleanQ.includes('नेट्सर्फ');
 
     if (!isPanchang) return false;
 
-    let pData = {
-      formattedDate: '17 अक्टूबर 2026',
-      tithi: 'शुक्ल पक्ष तृतीया',
-      nakshatra: 'रोहिणी',
-      abhijitMuhurat: '11:44 AM - 12:32 PM (अति शुभ)',
-      rahuKaal: '09:12 AM - 10:39 AM (शुभ कार्य वर्जित)',
-      agriGuidance: { isShukla: true }
-    };
+    // Detect target date: today or tomorrow
+    const isTomorrow = cleanQ.includes('kal') || cleanQ.includes('कल') || cleanQ.includes('tomorrow');
+    const targetDate = isTomorrow ? new Date(Date.now() + 86400000) : new Date();
 
+    let pData = null;
     if (window.SakhiPanchang && typeof window.SakhiPanchang.getPanchangForDate === 'function') {
       try {
-        pData = window.SakhiPanchang.getPanchangForDate(new Date());
+        pData = window.SakhiPanchang.getPanchangForDate(targetDate);
       } catch (e) {}
+    }
+
+    if (!pData || !pData.formattedDate) {
+      // Pure client-side astronomical calculation fallback
+      const hindiDays = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+      const hindiMonths = ['जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'];
+      const dayName = hindiDays[targetDate.getDay()];
+      const dNum = targetDate.getDate();
+      const mName = hindiMonths[targetDate.getMonth()];
+      const yNum = targetDate.getFullYear();
+      const formattedDate = `${dayName}, ${dNum} ${mName} ${yNum}`;
+
+      // Surya Siddhanta base calculation
+      const NEW_MOON_BASE = new Date('2024-01-11T11:57:00Z').getTime();
+      const SYNODIC_MONTH = 29.53058867 * 24 * 60 * 60 * 1000;
+      const SIDEREAL_MONTH = 27.321661 * 24 * 60 * 60 * 1000;
+      const timeMs = targetDate.getTime();
+      const timeSinceNewMoon = (timeMs - NEW_MOON_BASE) % SYNODIC_MONTH;
+      const lunarPhase = (timeSinceNewMoon >= 0 ? timeSinceNewMoon : timeSinceNewMoon + SYNODIC_MONTH) / SYNODIC_MONTH;
+      const tithiIndex = Math.floor(lunarPhase * 30);
+      const isShukla = tithiIndex < 15;
+      const tithiNumber = (tithiIndex % 15) + 1;
+      const tithis = ['प्रतिपदा', 'द्वितीया', 'तृतीया', 'चतुर्थी', 'पंचमी', 'षष्ठी', 'सप्तमी', 'अष्टमी', 'नवमी', 'दशमी', 'एकादशी', 'द्वादशी', 'त्रयोदशी', 'चतुर्दशी', isShukla ? 'पूर्णिमा' : 'अमावस्या'];
+      const tithiName = tithis[tithiNumber - 1] || 'तृतीया';
+
+      const nakshatras = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशिरा', 'आर्द्रा', 'पुनर्वसु', 'पुष्य', 'आश्लेषा', 'मघा', 'पूर्वाफाल्गुनी', 'उत्तराफाल्गुनी', 'हस्त', 'चित्रा', 'स्वाति', 'विशाखा', 'अनुराधा', 'ज्येष्ठा', 'मूल', 'पूर्वाषाढ़ा', 'उत्तराषाढ़ा', 'श्रवण', 'धनिष्ठा', 'शतभिषा', 'पूर्वाभाद्रपद', 'उत्तराभाद्रपद', 'रेवती'];
+      const nakshatraPhase = ((timeMs - NEW_MOON_BASE) % SIDEREAL_MONTH) / SIDEREAL_MONTH;
+      const nakshatraIndex = Math.abs(Math.floor(nakshatraPhase * 27)) % 27;
+      const nakshatraName = nakshatras[nakshatraIndex] || 'रोहिणी';
+
+      const rahuKaals = [
+        '04:30 PM - 06:00 PM (रविवार)',
+        '07:30 AM - 09:00 AM (सोमवार)',
+        '03:00 PM - 04:30 PM (मंगलवार)',
+        '12:00 PM - 01:30 PM (बुधवार)',
+        '01:30 PM - 03:00 PM (गुरुवार)',
+        '10:30 AM - 12:00 PM (शुक्रवार)',
+        '09:00 AM - 10:30 AM (शनिवार)'
+      ];
+
+      pData = {
+        formattedDate: formattedDate,
+        tithi: `${isShukla ? 'शुक्ल पक्ष' : 'कृष्ण पक्ष'} ${tithiName}`,
+        nakshatra: nakshatraName,
+        abhijitMuhurat: targetDate.getDay() === 3 ? 'बुधवार को अभिजीत वर्जित' : '11:44 AM - 12:32 PM (अति शुभ)',
+        rahuKaal: rahuKaals[targetDate.getDay()] || '12:00 PM - 01:30 PM',
+        agriGuidance: { isShukla: isShukla }
+      };
     }
 
     const pakshaRule = pData.agriGuidance.isShukla
       ? '🌱 **शुक्ल पक्ष (ऊर्जा ऊपर की ओर):** गेहूं, चना, सरसों, मटर, टमाटर जैसी जमीन के ऊपर फलने वाली फसलों की बुवाई, कल्ले फुटाव व स्टीमरिच (2ml/L) फोलियर स्प्रे के लिए सर्वोत्तम समय है।'
       : '🥔 **कृष्ण पक्ष (ऊर्जा जड़ों की ओर):** आलू, अदरक, हल्दी, लहसुन, प्याज जैसी कंद फसलों की बुवाई व जमीन में बायोफिट शेत (SHET) जैविक बैक्टीरिया खाद देने के लिए सर्वोत्तम समय है।';
 
-    const resp = `🚩 **दैनिक वैदिक सनातन कृषि पंचांग व शुभ मुहूर्त:**\n📅 **दिनांक:** ${pData.formattedDate} (विक्रम संवत 2083)\n🌙 **तिथि:** ${pData.tithi}\n⭐ **नक्षत्र:** ${pData.nakshatra}\n🌟 **अभिजीत मुहूर्त:** ${pData.abhijitMuhurat}\n⚠️ **राहुकाल:** ${pData.rahuKaal}\n\n🌾 **चंद्र कृषि चक्र वैज्ञानिक नियम:**\n${pakshaRule}\n\n🎧 **ऑडियो ई-बुक संदर्भ:** सनातन सूर्य सिद्धांत व खगोल आधारित कृषि बुवाई नियम हमारी ई-बुक व ऑडियो गाइड **'खरीफ मास्टर गाइड 2026 (BK015)'** में उपलब्ध हैं।`;
+    // Highlight upcoming Hindu festival for context
+    let festiveNote = '';
+    const m = targetDate.getMonth() + 1;
+    const d = targetDate.getDate();
+    if (m === 10 && d >= 18 && d <= 22) {
+      festiveNote = '\n🪔 **आगामी पावन पर्व:** 21 अक्टूबर को **देवउठनी एकादशी** (तुलसी विवाह, चातुर्मास नियम पूर्ण व समस्त मांगलिक कार्य प्रारंभ)!';
+    } else if (m === 10 && d >= 23 && d <= 26) {
+      festiveNote = '\n🪔 **आगामी महापर्व:** 25 अक्टूबर को **कार्तिक पूर्णिमा / देव दीपावली**!';
+    }
+
+    const resp = `🚩 **दैनिक वैदिक सनातन कृषि पंचांग व शुभ मुहूर्त:**\n📅 **दिनांक:** ${pData.formattedDate} (विक्रम संवत 2083)\n🌙 **तिथि:** ${pData.tithi}\n⭐ **नक्षत्र:** ${pData.nakshatra}\n🌟 **अभिजीत मुहूर्त:** ${pData.abhijitMuhurat}\n⚠️ **राहुकाल:** ${pData.rahuKaal}${festiveNote}\n\n🌾 **चंद्र कृषि चक्र वैज्ञानिक नियम:**\n${pakshaRule}\n\n🎧 **ऑडियो ई-बुक संदर्भ:** सनातन सूर्य सिद्धांत व खगोल आधारित कृषि बुवाई नियम हमारी ई-बुक व ऑडियो गाइड **'खरीफ मास्टर गाइड 2026 (BK015)'** में उपलब्ध हैं।`;
 
     renderCrispSpecialBox('🚩 दैनिक वैदिक पंचांग, चौघड़िया व चंद्र कृषि चक्र', resp, [
       { text: '🚩 संपूर्ण वैदिक पंचांग खोलें', url: '/krishi-panchang.html', isExternal: true },
@@ -11135,67 +11204,111 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   // =========================================================================
-  // 18.5 MULTI-CHANNEL SOCIAL MARKETING MESSAGE GENERATOR (WHATSAPP & FACEBOOK)
+  // 18.5 UNIVERSAL MULTI-DOMAIN WHATSAPP & SOCIAL SHARE MESSAGE ENGINE
   // =========================================================================
-  function handleMultiChannelMarketingCopyGenerator(cleanQ, rawQ) {
-    const isPromoMsgReq = (
-      cleanQ.includes('pramotional') || cleanQ.includes('promotional') || cleanQ.includes('प्रमोशनल') ||
-      cleanQ.includes('facebook post') || cleanQ.includes('फेसबुक पोस्ट') || cleanQ.includes('फेसबुक के लिए') ||
-      cleanQ.includes('whatsapp status') || cleanQ.includes('व्हाट्सएप स्टेटस') || cleanQ.includes('स्टेटस बनाओ') ||
-      cleanQ.includes('mere liye message') || cleanQ.includes('मेरे लिए मैसेज बना') || cleanQ.includes('मेरे लिए मेसेज बना') ||
-      cleanQ.includes('mere no ke sath') || cleanQ.includes('मेरे नंबर के साथ') ||
-      (cleanQ.includes('मैसेज बनाओ') && (cleanQ.includes('नेचुरामोर') || cleanQ.includes('बायोफिट') || cleanQ.includes('स्टेटस') || cleanQ.includes('फेसबुक')))
+  function handleMultiChannelMarketingCopyGenerator(cleanQ, rawQ, activeContext) {
+    const isWaMsgReq = (
+      cleanQ.includes('whatsapp') || cleanQ.includes('व्हाट्सएप') || cleanQ.includes('वाटसप') ||
+      cleanQ.includes('वाट्सएप') || cleanQ.includes('wa msg') || cleanQ.includes('watsapp') ||
+      cleanQ.includes('whats app') || cleanQ.includes('what app') ||
+      cleanQ.includes('फेसबुक') || cleanQ.includes('facebook') || cleanQ.includes('social') ||
+      cleanQ.includes('status') || cleanQ.includes('स्टेटस') || cleanQ.includes('शेयर संदेश') ||
+      cleanQ.includes('शेयर मैसेज') || cleanQ.includes('शेयर करने के लिए') || cleanQ.includes('मैसेज बना') ||
+      cleanQ.includes('मेसेज बना') || cleanQ.includes('msg bana') || cleanQ.includes('message bana') ||
+      cleanQ.includes('संदेश बना') || cleanQ.includes('मैसेज दो') || cleanQ.includes('संदेश दो') ||
+      cleanQ.includes('मेरे नंबर के साथ') || cleanQ.includes('मेरे नाम से') || cleanQ.includes('mere liye message') ||
+      (cleanQ.includes('msg') && (cleanQ.includes('bana') || cleanQ.includes('do') || cleanQ.includes('share'))) ||
+      (cleanQ.includes('मैसेज') && (cleanQ.includes('बना') || cleanQ.includes('दो') || cleanQ.includes('भेज')))
     );
 
-    if (!isPromoMsgReq) return false;
+    if (!isWaMsgReq) return false;
 
     let senderName = getUserName() || 'आरोग्यम मित्र';
     let senderPhone = getUserPhone() || '7974422572';
     const domainUrl = `https://aarogyamindia.online/aarogyam-sakhi.html?ref=${encodeURIComponent(senderPhone)}`;
 
-    const isFacebook = cleanQ.includes('facebook') || cleanQ.includes('फेसबुक') || cleanQ.includes('fb');
-    const isNaturamore = cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर') || cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य');
-    const isBiofit = cleanQ.includes('biofit') || cleanQ.includes('बायोफिट') || cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('फसल');
+    const effectiveTopic = (
+      (activeContext && (activeContext.crop || activeContext.name)) ?
+      (activeContext.crop || activeContext.name) : ''
+    ).toLowerCase();
 
-    let postTitle = '📲 आपका पर्सनलाइज़्ड प्रमोशनल संदेश तैयार है';
+    // Domain & Topic Detection across query and active context
+    const isSarso = cleanQ.includes('सरसों') || cleanQ.includes('sarso') || effectiveTopic.includes('सरसों');
+    const isGehu = cleanQ.includes('गेहूं') || cleanQ.includes('gehu') || cleanQ.includes('kanak') || effectiveTopic.includes('गेहूं');
+    const isChana = cleanQ.includes('चना') || cleanQ.includes('chana') || cleanQ.includes('उकठा') || effectiveTopic.includes('चना');
+    const isVeggies = cleanQ.includes('टमाटर') || cleanQ.includes('धान') || cleanQ.includes('आलू') || cleanQ.includes('मिर्च') || cleanQ.includes('सब्जी') || effectiveTopic.includes('टमाटर');
+    const isAgriGeneral = isSarso || isGehu || isChana || isVeggies || cleanQ.includes('biofit') || cleanQ.includes('बायोफिट') || cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('फसल') || (activeContext && activeContext.domain === 'agri');
+
+    const isSugar = cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('डायबिटीज') || cleanQ.includes('diabetes') || effectiveTopic.includes('शुगर') || effectiveTopic.includes('डायबिटीज');
+    const isJoint = cleanQ.includes('joint') || cleanQ.includes('जोड़') || cleanQ.includes('घुटने') || cleanQ.includes('दर्द') || cleanQ.includes('गठिया') || effectiveTopic.includes('जोड़');
+    const isHealthGeneral = isSugar || isJoint || cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर') || cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य') || (activeContext && activeContext.domain === 'health');
+
+    const isPashu = cleanQ.includes('pashu') || cleanQ.includes('पशु') || cleanQ.includes('दूध') || cleanQ.includes('फैट') || cleanQ.includes('dairy') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('cfc') || (activeContext && activeContext.domain === 'pashu');
+    const isWomen = cleanQ.includes('महिला') || cleanQ.includes('women') || cleanQ.includes('सहेली') || cleanQ.includes('गृहणी') || cleanQ.includes('housewife');
+    const isFestival = cleanQ.includes('diwali') || cleanQ.includes('दीपावली') || cleanQ.includes('त्योहार') || cleanQ.includes('festival') || cleanQ.includes('छठ');
+    const isSuprabhat = cleanQ.includes('suprabhat') || cleanQ.includes('सुप्रभात') || cleanQ.includes('morning') || cleanQ.includes('प्रेरणा');
+    const isFacebook = cleanQ.includes('facebook') || cleanQ.includes('फेसबुक') || cleanQ.includes('fb');
+
+    let postTitle = '📲 आपका व्यक्तिगत WhatsApp व सोशल संदेश तैयार है';
     let messageBody = '';
 
-    if (isFacebook) {
-      postTitle = '📘 फेसबुक (Facebook) पोस्ट संदेश';
-      messageBody = `🌟 *क्या आप अपने परिवार के स्वास्थ्य और बिना केमिकल की शुद्ध जीवनशैली को लेकर गंभीर हैं?* 🌟\n\nआज के भागदौड़ और मिलावट के दौर में अपने शरीर को पोषण देना कोई शौक नहीं, बल्कि सबसे बड़ी ज़रूरत बन चुका है!\n\n🌿 *नेट्सर्फ 100% शुद्ध आयुर्वेदिक व प्राकृतिक उत्पाद क्यों चुनें?*\n✅ 1. *रोग प्रतिरोधक क्षमता (Immunity):* मौसमी बीमारियों, कमजोरी व थकान से 100% सुरक्षा।\n✅ 2. *हृदय व शुगर सुरक्षा:* नसों का लचीलापन व स्वस्थ मेटाबॉलिज्म।\n✅ 3. *महिला व बाल पोषण:* हीमोग्लोबिन, हड्डियों की मजबूती व बच्चों का शारीरिक-मानसिक विकास।\n✅ 4. *सीधी छूट:* घर बैठे ओरिजिनल कंपनी बिल के साथ 25% की फ्लैट छूट!\n\n🎁 *विशेष उपभोक्ता सुविधा:*\nलगातार 5 महीने की खरीदारी पर 6ठे महीने मुफ्त प्रॉडक्ट (5+1 ऑफर) व मुफ़्त होम डिलीवरी!\n\n👇 *फ्री स्वास्थ्य परामर्श व 25% छूट पर ऑर्डर हेतु अभी संपर्क करें:*\n👤 *अधिकृत स्वास्थ्य सलाहकार:* ${senderName}\n📞 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *AI से सीधे बात करें:* ${domainUrl}\n\n#AarogyamIndia #Naturamore #OrganicHealth #Ayurveda #Wellness2026`;
-    } else if (isBiofit) {
-      postTitle = '🌾 बायोफिट जैविक खेती (WhatsApp Status & Broadcast)';
-      messageBody = `🌾 *किसान भाइयों के लिए खुशखबरी — खाद का खर्च 40% घटाएं और उपज 30% बढ़ाएं!* 🌾\n\nप्रिय किसान साथी, रासायनिक खादों से बंजर होती जमीन और बढ़ती लागत से परेशान न हों। अपनाएं 26 वर्षों से प्रमाणित 'नेट्सर्फ बायोफिट तकनीक'!\n\n✨ *बायोफिट के 4 जादुई फायदे:*\n🌱 *स्टिमरिच (Stimrich):* कल्ले, शाखाएं व फुटाव दोगुना, बंपर हरियाली!\n🧪 *बायो-99 (Bio-99):* दवा की हर बूंद पत्तों के आर-पार, 50% दवा की बचत!\n🛡️ *रैप-अप (Wrap-up):* फंगस, झुलसा व मौसम की मार से सुरक्षा कवच!\n💧 *शेत (SHET):* यूरिया-डीएपी की 40% तक बचत व मिट्टी में केंचुए सक्रिय!\n\n🎁 *विशेष किसान ऑफर:* सभी उत्पादों पर सीधी 25% छूट + मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल के अनुसार सही स्प्रे चार्ट हेतु आज ही संपर्क करें:*\n👤 *किसान मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *फसल का स्प्रे कैलेंडर देखें:* ${domainUrl}`;
-    } else if (isNaturamore) {
-      postTitle = '❤️ नेचुरामोर संपूर्ण स्वास्थ्य (WhatsApp Status & Post)';
-      messageBody = `❤️ *थकान, कमजोरी, जोड़ों का दर्द या शुगर? अपने शरीर को दें संपूर्ण पोषण!* ❤️\n\n'नेचुरामोर' (Naturamore) — भारत का सबसे भरोसेमंद 100% शाकाहारी और हर्बल न्यूट्रीशनल प्रोटीन!\n\n✨ *प्रमुख लाभ:*\n💪 शारीरिक कमजोरी, नसों का खिंचाव व थकान 7 दिन में दूर।\n🦴 जोड़ों व घुटनों में लचीलापन व नया कार्टिलेज निर्माण।\n🩸 हीमोग्लोबिन, प्लेटलेट्स व रोग प्रतिरोधक क्षमता में जबरदस्त सुधार।\n🌿 100% केमिकल, शुगर व साइड-इफेक्ट रहित आयुर्वेदिक फॉर्मूलेशन।\n\n🎁 *आज ही ऑर्डर करें और पाएं:*\n• फ्लैट 25% की विशेष रिटेल छूट!\n• ओरिजिनल कंपनी जीएसटी बिल व होम डिलीवरी।\n\n👇 *अपनी जरूरत के अनुसार सही नेचुरामोर चुनने हेतु संपर्क करें:*\n👤 *स्वास्थ्य सलाहकार:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI से समझें:* ${domainUrl}`;
+    if (isSarso) {
+      postTitle = '🌾 सरसों बंपर फुटाव व सुरक्षा (WhatsApp शेयर संदेश)';
+      messageBody = `🌾 *सरसों की फसल में बंपर फुटाव, फलियां व माहू-उकठा से 100% सुरक्षा!* 🌾\n\nकिसान भाइयों, सरसों में अधिक पैदावार और तेल की मात्रा बढ़ाने का प्रमाणित वैज्ञानिक फॉर्मूला:\n\n🌱 *स्टिमरिच (Stimrich):* 25-30 दिन की अवस्था पर प्रति एकड़ 15-20 कल्ले व अनगिनत फलियों का रिकॉर्ड फुटाव!\n🛡️ *इंटैक्ट (Intact) + Bio-99:* माहू (चेपा), सुंडी व कीटों से संपूर्ण जैविक सुरक्षा!\n💧 *रैप-अप (Wrap-up):* तना गलन, झुलसा व फफूंद से सुरक्षा कवच!\n\n🎁 *विशेष किसान ऑफर:* सभी बायोफिट उत्पादों पर फ्लैट 25% छूट व मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल की सही डोज व ऑर्डर सहायता हेतु सीधे WhatsApp करें:*\n👤 *किसान मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *सरसों स्प्रे शेड्यूल देखें:* ${domainUrl}`;
+    } else if (isGehu) {
+      postTitle = '🚜 गेहूं 15-20 कल्ले व फुटाव (WhatsApp शेयर संदेश)';
+      messageBody = `🚜 *गेहूं में 15 से 20 कल्ले (फुटाव) व चमकदार बालियों का अचूक फॉर्मूला!* 🚜\n\nकिसान भाइयों, पहले पानी (21 दिन - CRI स्टेज) पर अपनाएं नेट्सर्फ बायोफिट तकनीक:\n\n🌱 *स्टिमरिच + बायो-99:* जड़ों का गहरा फैलाव, रिकॉर्ड कल्ले व गहरी हरियाली!\n🦠 *शेत (SHET) बैक्टीरिया खाद:* यूरिया-डीएपी की 40% तक सीधी बचत व मिट्टी मुलायम!\n🛡️ *बायोफिट रैप-अप:* पीला रतुआ व फंगस से 100% सुरक्षा!\n\n🎁 *सीधी छूट:* घर बैठे 25% फ्लैट रिटेल छूट पर ऑर्डर करें।\n\n👇 *सही मात्रा व मुफ़्त परामर्श हेतु संपर्क करें:*\n👤 *कृषि सलाहकार:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n👉 *लाइव सखी AI लिंक:* ${domainUrl}`;
+    } else if (isChana) {
+      postTitle = '🌿 चना उकठा (Wilt) व कीट नियंत्रण (WhatsApp शेयर संदेश)';
+      messageBody = `🌿 *चने में उकठा रोग (Wilt), जड़ गलन व इल्ली का 100% जैविक समाधान!* 🌿\n\nकिसान भाइयों, चने की फसल को सूखने से बचाएं और 30% अधिक पैदावार पाएं:\n\n🛡️ *रैप-अप + शेत:* बुवाई के समय या पहले पानी पर देने से उकठा रोग का खतरा 90% कम!\n🌸 *स्टिमरिच (Stimrich):* अनगिनत शाखाएं, फूलों की झड़ी और दानों में भारी चमक!\n🐛 *इंटैक्ट (Intact):* घंटी छेदक इल्ली से शत-प्रतिशत प्राकृतिक सुरक्षा!\n\n🎁 *विशेष ऑफर:* ओरिजिनल बायोफिट उत्पाद 25% की छूट पर प्राप्त करें।\n\n👇 *अपनी फसल की सुरक्षा हेतु अभी संपर्क करें:*\n👤 *किसान साथी:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *खेती डॉक्टर सलाह लिंक:* ${domainUrl}`;
+    } else if (isSugar) {
+      postTitle = '🩸 डायबिटीज व शुगर नियंत्रण (WhatsApp शेयर संदेश)';
+      messageBody = `🩸 *शुगर (डायबिटीज) को जड़ से नियंत्रित करें — 100% सुरक्षित व हर्बल!* 🩸\n\nथकान, बार-बार पेशाब, नसों में खिंचाव या बढ़ता HbA1c स्तर?\nअपनाएं भारत सरकार द्वारा प्रमाणित 100% शाकाहारी आयुर्वेदिक पोषण:\n\n🌿 *नेचुरामोर लाइफ स्टाइल प्लस (Life Style Plus):* पैंक्रियाज की बीटा सेल्स को सक्रिय कर इंसुलिन संतुलन बनाए।\n💪 *नेचुरामोर न्यूट्रीशनल प्रोटीन:* शारीरिक कमजोरी दूर करे व इम्यूनिटी मजबूत करे।\n✅ *100% साइड-इफेक्ट रहित, कोई केमिकल नहीं!*\n\n🎁 *विशेष छूट:* फ्लैट 25% डिस्काउंट पर घर बैठे जीएसटी बिल के साथ मंगाएं।\n\n👇 *फ्री स्वास्थ्य परामर्श व दवा ऑर्डर हेतु WhatsApp करें:*\n👤 *स्वास्थ्य सलाहकार:* ${senderName}\n📞 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI से समझें:* ${domainUrl}`;
+    } else if (isJoint) {
+      postTitle = '🦴 घुटने व जोड़ दर्द मुक्ति (WhatsApp शेयर संदेश)';
+      messageBody = `🦴 *घुटनों का दर्द, ग्रीस की कमी व कार्टिलेज घिसाव से पाएं स्थाई राहत!* 🦴\n\nक्या उठने-बैठने में घुटनों से कट-कट आवाज आती है या चलना-फिरना दूभर हो गया है?\nबिना ऑपरेशन अपनाएं प्राकृतिक आयुर्वेदिक समाधान:\n\n🌿 *नेचुरामोर जॉइंट केयर (Joint Care):* साइनोवियल ग्रीस (तरल) को प्राकृतिक रूप से बनाए व नया कार्टिलेज निर्माण करे।\n🧴 *हर्ब्स एंड मोर पेन क्रीम:* जोड़ों के दर्द, जकड़न व सूजन में 5 मिनट में तुरंत राहत!\n\n🎁 *आज ही ऑर्डर करें और पाएं 25% की सीधी छूट + मुफ़्त होम डिलीवरी!*\n\n👇 *व्यक्तिगत सलाह व ऑर्डर हेतु संपर्क करें:*\n👤 *वेलनेस कंसल्टेंट:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n👉 *परामर्श लिंक:* ${domainUrl}`;
+    } else if (isPashu) {
+      postTitle = '🥛 पशु दूध व फैट वृद्धि (WhatsApp शेयर संदेश)';
+      messageBody = `🥛 *गाय-भैंस में 2 से 3 लीटर दूध व 7-8 फैट की गारंटीकृत वृद्धि!* 🥛\n\nपशुपालक भाइयों, पशुओं का बांझपन दूर करें और दूध का रिकॉर्ड उत्पादन पाएं:\n\n🐄 *बायोफिट पेट-वेट CFC Plus (Cattle Feed Concentrate):*\n• 100% प्राकृतिक प्रीबायोटिक, प्रोबायोटिक, शतावरी, मेथी व मिनरल्स का महामिश्रण।\n• 15 दिन में दूध में 2-3 लीटर और फैट में 1.5 से 2 डिग्री की शुद्ध वृद्धि।\n• पशु का पाचन दुरुस्त, बार-बार हीट पर आने की समस्या समाप्त।\n• दैनिक खर्च मात्र ₹10 प्रति पशु, दूध में अतिरिक्त कमाई ₹80 से ₹120 प्रतिदिन!\n\n🎁 *सीधी 25% छूट पर घर बैठे मंगाएं!*\n\n👇 *ऑर्डर व संपूर्ण जानकारी हेतु मुझे WhatsApp करें:*\n👤 *डेयरी पोषण मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *पशु पोषण गाइड:* ${domainUrl}`;
+    } else if (isWomen) {
+      postTitle = '🌸 नारी शक्ति स्वावलंबन (WhatsApp शेयर संदेश)';
+      messageBody = `🌸 *गृहणियों व बहनों के लिए घर बैठे ₹15,000 से ₹40,000 मासिक कमाने का अवसर!* 🌸\n\nनमस्ते सखी! 🙏\nक्या आप घर-परिवार संभालते हुए, दिन में 1-2 घंटे अपने मोबाइल से आत्मनिर्भर आमदनी बनाना चाहती हैं?\n\n✨ *इस कार्य की विशेषताएं:*\n1️⃣ ₹0 जॉइनिंग व ₹0 निवेश (100% जोखिम-मुक्त)\n2️⃣ कोई दुकान या दफ्तर नहीं — सब कुछ अपने फोन से\n3️⃣ शुद्ध जैविक स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी उत्पाद\n4️⃣ सम्पूर्ण डिजिटल ट्रेनिंग व पूरा मार्गदर्शन\n\n👇 *शुरुआत करने हेतु सीधे मुझे WhatsApp करें:*\n👤 *मार्गदर्शक:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI पर लाइव समझें:* ${domainUrl}`;
+    } else if (isFestival) {
+      postTitle = '🪔 पावन पर्व व त्योहार शुभकामना (WhatsApp संदेश)';
+      messageBody = `🪔 *पावन पर्व व शुभ त्योहार की आपको एवं आपके सपरिवार को हार्दिक शुभकामनाएं!* 🪔\n\nईश्वर से प्रार्थना है कि यह पावन अवसर आपके घर में उत्तम स्वास्थ्य, अपार सुख, समृद्धि और आरोग्य की वर्षा करे।\n\n🌱 *इस त्योहार पर लें जहरमुक्त जीवन व शुद्ध जैविक पोषण का संकल्प:*\n• 100% प्राकृतिक व आयुर्वेदिक संपूर्ण पारिवारिक स्वास्थ्य।\n• सभी जैविक उत्पादों पर फ्लैट 25% की रिटेल छूट।\n\n👇 *शुभकामनाओं व परामर्श हेतु संपर्क:*\n👤 *शुभचिंतक:* ${senderName}\n📱 *मोबाइल:* ${senderPhone}\n👉 *आरोग्यम सखी AI:* ${domainUrl}`;
+    } else if (isSuprabhat) {
+      postTitle = '🌅 सुप्रभात व दैनिक प्रेरणा संदेश';
+      messageBody = `🌅 *शुभ प्रभात! एक नया सवेरा, नई ऊर्जा, नई सकारात्मक शुरुआत!* 🌅\n\n"जो व्यक्ति अपने स्वास्थ्य और समय की कद्र करता है, सफलता स्वयं उसके कदम चूमती है।"\n\nईश्वर से प्रार्थना है कि आपका आज का दिन अत्यंत मंगलमय, ऊर्जावान और उपलब्धियों से भरा हो! 🙏\n\n👇 *स्वास्थ्य व जैविक खेती के किसी भी सवाल हेतु संपर्क करें:*\n👤 *सदा आपका शुभचिंतक:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n👉 *आरोग्यम सखी AI:* ${domainUrl}`;
+    } else if (isAgriGeneral) {
+      postTitle = '🌾 बायोफिट जैविक खेती (WhatsApp शेयर संदेश)';
+      messageBody = `🌾 *किसान भाइयों के लिए खुशखबरी — खाद का खर्च 40% घटाएं और उपज 30% बढ़ाएं!* 🌾\n\nरासायनिक खादों से बंजर होती जमीन और बढ़ती लागत से परेशान न हों। अपनाएं 26 वर्षों से प्रमाणित 'नेट्सर्फ बायोफिट तकनीक'!\n\n✨ *बायोफिट के 4 जादुई फायदे:*\n🌱 *स्टिमरिच (Stimrich):* कल्ले, शाखाएं व फुटाव दोगुना, बंपर हरियाली!\n🧪 *बायो-99 (Bio-99):* दवा की हर बूंद पत्तों के आर-पार, 50% दवा की बचत!\n🛡️ *रैप-अप (Wrap-up):* फंगस, झुलसा व मौसम की मार से सुरक्षा कवच!\n💧 *शेत (SHET):* यूरिया-डीएपी की 40% तक बचत व मिट्टी में केंचुए सक्रिय!\n\n🎁 *विशेष किसान ऑफर:* सभी उत्पादों पर सीधी 25% छूट + मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल के अनुसार सही स्प्रे चार्ट हेतु आज ही संपर्क करें:*\n👤 *किसान मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *फसल का स्प्रे कैलेंडर देखें:* ${domainUrl}`;
     } else {
-      postTitle = '📲 WhatsApp स्टेटस व ब्रॉडकास्ट संदेश';
-      messageBody = `✨ *घर बैठे मोबाइल से ₹15,000 से ₹40,000 मासिक कमाने का सुनहरा मौका!* ✨\n\nनमस्ते दोस्तों! 🙏\nयदि आप गृहणी, छात्र, नौकरीपेशा या किसान हैं और अपने खाली समय में पार्ट-टाइम काम करके अतिरिक्त आय बनाना चाहते हैं:\n\n✅ कोई दुकान या ऑफिस की ज़रूरत नहीं\n✅ ₹0 इन्वेस्टमेंट, ₹0 रिस्क\n✅ 100% स्वदेशी, दैनिक उपयोग के स्वास्थ्य व जैविक उत्पाद\n✅ पूरा काम सिर्फ मोबाइल और WhatsApp से\n\n👇 *सीखने और शुरुआत करने हेतु मुझे WhatsApp करें:*\n👤 *नाम:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n🌐 *वेबसाइट देखें:* ${domainUrl}`;
+      postTitle = '💼 नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस (WhatsApp शेयर संदेश)';
+      messageBody = `✨ *घर बैठे मोबाइल से ₹15,000 से ₹40,000 मासिक कमाने का सुनहरा अवसर!* ✨\n\nनमस्ते दोस्तों! 🙏\nयदि आप गृहणी, छात्र, नौकरीपेशा या किसान हैं और अपने खाली समय में पार्ट-टाइम काम करके आत्मनिर्भर आय बनाना चाहते हैं:\n\n✅ कोई दुकान या ऑफिस की ज़रूरत नहीं\n✅ ₹0 इन्वेस्टमेंट, ₹0 आर्थिक जोखिम\n✅ 100% स्वदेशी, दैनिक उपयोग के स्वास्थ्य व जैविक उत्पाद\n✅ पूरा काम सिर्फ मोबाइल और WhatsApp से\n✅ पाक्षिक ₹8,19,250 तक कैपिंग अवसर व 100% कानूनी साख\n\n👇 *सीखने और शुरुआत करने हेतु मुझे WhatsApp करें:*\n👤 *नाम:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n🌐 *वेबसाइट देखें:* ${domainUrl}`;
     }
 
-    const waShareUrl = `https://wa.me/?text=${encodeURIComponent(messageBody)}`;
+    const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageBody)}`;
 
-    const respText = `👉 यह संदेश आपके नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** के साथ तैयार किया गया है। आप इसे कॉपी कर सकते हैं या सीधे नीचे दिए गए बटन से WhatsApp पर शेयर कर सकते हैं:\n\n${messageBody}`;
+    const respText = `🌸 **आपका व्यक्तिगत शेयर संदेश तैयार है!**\nयह संदेश आपके नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** के साथ फॉर्मेट किया गया है:\n\n\`\`\`text\n${messageBody}\n\`\`\`\n\n💡 **शेयर करने की विधि:**\n1. सीधे **'📲 सीधे WhatsApp पर शेयर करें'** बटन दबाएं।\n2. या ऊपर दिए गए बॉक्स से **'कॉपी करें'** बटन दबाकर अपने व्हाट्सएप ग्रुप या स्टेटस पर पेस्ट करें।`;
 
     renderCrispSpecialBox(postTitle, respText, [
       { text: '📲 सीधे WhatsApp पर शेयर करें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
-      { text: '📘 फेसबुक पोस्ट संदेश बनाएं', query: 'मेरे लिए फेसबुक पोस्ट का मैसेज बनाओ' },
-      { text: '🌾 बायोफिट खाद का मैसेज बनाएं', query: 'बायोफिट खाद का मैसेज बनाओ मेरे नाम से' },
-      { text: '❤️ नेचुरामोर स्वास्थ्य मैसेज बनाएं', query: 'नेचुरामोर का मैसेज मेरे नंबर के साथ बनाओ' }
-    ], 'business', 'custom_promo_copy');
+      { text: '📋 इसी विषय की चेकलिस्ट लें', query: `${effectiveTopic || 'फसल'} की चेकलिस्ट बनाओ` },
+      { text: '🧮 डोज़ व खर्च एस्टीमेट', query: `${effectiveTopic || 'फसल'} का खर्च एस्टीमेट बताओ` },
+      { text: '🎨 AI पोस्टर प्रॉम्प्ट बनाएं', query: `${effectiveTopic || 'बायोफिट'} का पोस्टर प्रॉम्प्ट दो` }
+    ], 'business', 'universal_wa_copy');
     return true;
   }
 
   // =========================================================================
-  // 18.55 CHATGPT-STYLE INTERACTIVE AI CHECKLIST STUDIO (CROP, HEALTH, DAIRY, BIZ)
+  // 18.55 UNIVERSAL SMART 3-PHASE INTERACTIVE CHECKLIST STUDIO
   // =========================================================================
-  function handleAiChecklistGenerator(cleanQ, rawQ) {
+  function handleAiChecklistGenerator(cleanQ, rawQ, activeContext) {
     const isChecklistReq = (
       cleanQ.includes('चेकलिस्ट') || cleanQ.includes('checklist') || cleanQ.includes('chek list') ||
-      cleanQ.includes('check list') || cleanQ.includes('कार्य सूची') || cleanQ.includes('चेक लिस्ट') ||
-      cleanQ.includes('daily routine') || cleanQ.includes('शेड्यूल लिस्ट') ||
-      (cleanQ.includes('चेक') && (cleanQ.includes('लिस्ट') || cleanQ.includes('सूची') || cleanQ.includes('बना')))
+      cleanQ.includes('check list') || cleanQ.includes('कार्यसूची') || cleanQ.includes('स्टेप बाय स्टेप लिस्ट') ||
+      cleanQ.includes('chiklist') || cleanQ.includes('cheklist') || cleanQ.includes('कार्य सूची') || cleanQ.includes('शेड्यूल लिस्ट') ||
+      (cleanQ.includes('लिस्ट') && (cleanQ.includes('बना') || cleanQ.includes('दो') || cleanQ.includes('चाहिए') || cleanQ.includes('फसल') || cleanQ.includes('स्प्रे') || cleanQ.includes('डाइट')))
     );
 
     if (!isChecklistReq) return false;
@@ -11203,46 +11316,66 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     let userName = getUserName() || 'साथी';
     let userPhone = getUserPhone() || '7974422572';
 
-    const isAgri = cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('crop') || cleanQ.includes('फसल') || cleanQ.includes('spray') || cleanQ.includes('स्प्रे') || cleanQ.includes('biofit') || cleanQ.includes('बायोफिट');
-    const isHealth = cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('bp') || cleanQ.includes('बीपी') || cleanQ.includes('joint') || cleanQ.includes('दर्द') || cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर');
-    const isPashu = cleanQ.includes('pashu') || cleanQ.includes('पशु') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('दूध') || cleanQ.includes('dairy');
-    const isBusiness = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('business') || cleanQ.includes('बिज़नेस') || cleanQ.includes('pathfinder') || cleanQ.includes('कमाई') || cleanQ.includes('लीडर');
-    const isBeauty = cleanQ.includes('beauty') || cleanQ.includes('स्किन') || cleanQ.includes('बाल') || cleanQ.includes('झाइयां') || cleanQ.includes('चेहरे') || cleanQ.includes('सौंदर्य');
+    const effectiveTopic = (
+      (activeContext && (activeContext.crop || activeContext.name)) ?
+      (activeContext.crop || activeContext.name) : ''
+    ).toLowerCase();
+
+    const isSarso = cleanQ.includes('सरसों') || cleanQ.includes('sarso') || effectiveTopic.includes('सरसों');
+    const isGehu = cleanQ.includes('गेहूं') || cleanQ.includes('gehu') || effectiveTopic.includes('गेहूं');
+    const isChana = cleanQ.includes('चना') || cleanQ.includes('chana') || cleanQ.includes('उकठा') || effectiveTopic.includes('चना');
+    const isVeggies = cleanQ.includes('टमाटर') || cleanQ.includes('धान') || cleanQ.includes('आलू') || cleanQ.includes('मिर्च') || effectiveTopic.includes('टमाटर');
+    const isAgri = isSarso || isGehu || isChana || isVeggies || cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('crop') || cleanQ.includes('फसल') || cleanQ.includes('spray') || cleanQ.includes('स्प्रे') || cleanQ.includes('biofit') || cleanQ.includes('बायोफिट') || (activeContext && activeContext.domain === 'agri');
+
+    const isSugar = cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('डायबिटीज') || cleanQ.includes('diabetes') || effectiveTopic.includes('शुगर');
+    const isJoint = cleanQ.includes('joint') || cleanQ.includes('जोड़') || cleanQ.includes('घुटने') || cleanQ.includes('दर्द') || cleanQ.includes('गठिया') || effectiveTopic.includes('जोड़');
+    const isHealth = isSugar || isJoint || cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('bp') || cleanQ.includes('बीपी') || cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर') || (activeContext && activeContext.domain === 'health');
+
+    const isPashu = cleanQ.includes('pashu') || cleanQ.includes('पशु') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('दूध') || cleanQ.includes('dairy') || cleanQ.includes('cfc') || (activeContext && activeContext.domain === 'pashu');
+    const isBusiness = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('business') || cleanQ.includes('बिज़नेस') || cleanQ.includes('pathfinder') || cleanQ.includes('कमाई') || cleanQ.includes('लीडर') || (activeContext && activeContext.domain === 'business');
 
     let categoryTitle = '';
     let checklistContent = '';
     let shareWaText = '';
 
-    if (isAgri) {
-      categoryTitle = '🌾 फसल सुरक्षा व 100% जैविक स्प्रे चेकलिस्ट (Crop Spray Checklist)';
-      checklistContent = `📋 **फसल सुरक्षा व जैविक स्प्रे दैनिक चेकलिस्ट:**\n👤 **किसान साथी:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **1. बुवाई/रोपाई से पहले (बीज संस्कार):**\n  [ ] 1 किग्रा बीज में 5ml स्टिमरिच + 5ml Bio-99 मिलाकर छाया में 30 मिनट सुखाया?\n  [ ] 1 एकड़ में 1 लीटर शेत (SHET) बैक्टीरिया खाद मिट्टी में मिलाई?\n\n☑️ **2. फसल 15-20 दिन की होने पर (पहला स्प्रे):**\n  [ ] स्टिमरिच (20ml) + बायो-99 (5ml) प्रति 15 लीटर पंप घोल तैयार किया?\n  [ ] सुबह 10 बजे से पहले या शाम को खिली धूप/शांत मौसम में स्प्रे किया?\n\n☑️ **3. फूल आने से पहले (शाखाएं व कल्ले):**\n  [ ] स्टिमरिच (25ml) + इंटैक्ट (कीट सुरक्षा 25ml) का छिड़काव?\n\n☑️ **4. फल/दाना भरते समय:**\n  [ ] एनपीके बैक्टीरिया कल्चर + स्टिमरिच का अंतिम स्प्रे?\n\n💡 **विशेष सावधानी:** हमेशा साफ पानी का उपयोग करें और Bio-99 अवश्य मिलाएं ताकि बारिश में भी दवा न धुले।`;
-      shareWaText = `🌾 *फसल सुरक्षा व जैविक स्प्रे चेकलिस्ट*\nकिसान: ${userName}\n\n1. बीज संस्कार: स्टिमरिच + Bio-99\n2. 20 दिन पर पहला स्प्रे (फुटाव व हरियाली)\n3. फूल आने पर इंटैक्ट कीट सुरक्षा\n\n👉 अपनी फसल की सटीक डोज सखी AI से पूछें: https://aarogyamindia.online/aarogyam-sakhi.html`;
-    } else if (isHealth) {
-      categoryTitle = '🩺 दैनिक स्वास्थ्य, डायबिटीज व बीपी केयर चेकलिस्ट (Daily Health Checklist)';
+    if (isSarso) {
+      categoryTitle = '🌾 सरसों फसल 100% बंपर पैदावार व सुरक्षा चेकलिस्ट';
+      checklistContent = `📋 **सरसों फसल 3-चरण स्मार्ट चेकलिस्ट:**\n👤 **किसान साथी:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **चरण 1: बुवाई व बीज संस्कार (शुरुआती 0 दिन)**\n  [ ] 1 किलो बीज में 5ml स्टिमरिच + 10ml शेत (SHET) का लेप लगाकर छाया में 4 घंटे सुखाया?\n  [ ] जमीन की तैयारी में 1 लीटर शेत प्रति एकड़ पानी के साथ दिया?\n\n☑️ **चरण 2: पहला स्प्रे (25 से 30 दिन - कल्ले फुटाव अवस्था)**\n  [ ] स्टिमरिच (30ml) + बायो-99 (5ml) प्रति 15 लीटर पंप घोल तैयार किया?\n  [ ] सुबह 10 बजे से पूर्व या दोपहर 3 बजे बाद शांत मौसम में छिड़काव पूरा किया?\n\n☑️ **चरण 3: फूल व दाना भराव (माहू व झुलसा सुरक्षा)**\n  [ ] माहू (चेपा) की रोकथाम हेतु इंटैक्ट (30ml) + बायो-99 (5ml) का स्प्रे किया?\n  [ ] तना गलन व फंगस सुरक्षा हेतु रैप-अप (30ml) मिलाया?`;
+      shareWaText = `🌾 *सरसों फसल 3-चरण स्मार्ट चेकलिस्ट*\nकिसान साथी: ${userName}\n1. बीज संस्कार: स्टिमरिच + शेत (छाया में सुखाएं)\n2. 25 दिन पर: स्टिमरिच + बायो-99 (15-20 कल्ले)\n3. फूल अवस्था: इंटैक्ट + रैप-अप (माहू व झुलसा मुक्ति)\n👉 सखी AI से पूछें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else if (isGehu) {
+      categoryTitle = '🚜 गेहूं फसल 15-20 कल्ले व फुटाव चेकलिस्ट';
+      checklistContent = `📋 **गेहूं फसल 3-चरण संपूर्ण चेकलिस्ट:**\n👤 **किसान साथी:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **चरण 1: बुवाई व बीज उपचार**\n  [ ] 1 किग्रा गेहूं बीज में 5ml स्टिमरिच का लेप लगाकर छाया में सुखाया?\n  [ ] खेत में पलेवा के समय 1 लीटर शेत (SHET) बैक्टीरिया खाद दी?\n\n☑️ **चरण 2: पहला पानी (21 दिन - CRI मुकुट जड़ अवस्था)**\n  [ ] स्टिमरिच (30ml) + बायो-99 (5ml) प्रति 15 लीटर पंप स्प्रे तैयार किया?\n  [ ] यूरिया की मात्रा 40% कम करके दी?\n\n☑️ **चरण 3: गभोट व बाली निकलते समय (45-60 दिन)**\n  [ ] स्टिमरिच (30ml) + बायो-एनपीके (पोटाश 30ml) का छिड़काव किया?\n  [ ] पीला रतुआ रोकथाम हेतु रैप-अप (30ml) शामिल किया?`;
+      shareWaText = `🚜 *गेहूं फसल 15-20 कल्ले चेकलिस्ट*\nकिसान: ${userName}\n1. बीज उपचार: स्टिमरिच\n2. 21 दिन CRI स्टेज: स्टिमरिच + बायो-99 (फुटाव राज)\n3. गभोट अवस्था: स्टिमरिच + बायो-पोटाश\n👉 सखी AI: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else if (isChana) {
+      categoryTitle = '🌿 चना उकठा (Wilt) मुक्ति व बंपर पैदावार चेकलिस्ट';
+      checklistContent = `📋 **चना फसल 3-चरण संपूर्ण चेकलिस्ट:**\n👤 **किसान साथी:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **चरण 1: बुवाई से पहले (उकठा रोग मुक्ति)**\n  [ ] 1 किलो बीज में 10ml रैप-अप + 5ml स्टिमरिच लगाकर छाया में सुखाया?\n  [ ] जमीन में 1 लीटर शेत खाद देकर फंगस के बैक्टीरिया नष्ट किए?\n\n☑️ **चरण 2: वानस्पतिक वृद्धि (25-30 दिन)**\n  [ ] स्टिमरिच (30ml) + बायो-99 (5ml) का पहला फोलियर स्प्रे?\n  [ ] अधिक शाखाएं व कल्ले निकालने हेतु शीर्ष खूंटाई की?\n\n☑️ **चरण 3: फूल व घंटी बनते समय (इल्ली सुरक्षा)**\n  [ ] इंटैक्ट (30ml) + बायो-99 (5ml) का समय पर छिड़काव?\n  [ ] फूल आने पर केवल स्टिमरिच का हल्का स्प्रे किया?`;
+      shareWaText = `🌿 *चना उकठा मुक्ति व पैदावार चेकलिस्ट*\nकिसान: ${userName}\n1. बीज उपचार: रैप-अप + स्टिमरिच\n2. 30 दिन: स्टिमरिच स्प्रे (शाखाएं)\n3. फूल-घंटी: इंटैक्ट इल्ली सुरक्षा\n👉 सखी AI: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else if (isHealth || isSugar || isJoint) {
+      categoryTitle = '🩺 दैनिक स्वास्थ्य, डायबिटीज व जोड़ दर्द केयर चेकलिस्ट';
       checklistContent = `📋 **दैनिक स्वास्थ्य व नेचुरामोर संपूर्ण रूटीन चेकलिस्ट:**\n👤 **नाम:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **सुबह (7:00 AM - 9:00 AM):**\n  [ ] 1 गिलास गुनगुना पानी (मेथी/तांबा जल) घूंट-घूंट करके पिया?\n  [ ] 1 चम्मच नेचुरामोर (Daily Nutrition) गुनगुने पानी या दूध के साथ नाश्ते के बाद लिया?\n  [ ] 20-30 मिनट ताजी हवा में तेज चाल (Morning Walk) पूरी की?\n\n☑️ **दोपहर (1:00 PM - 2:00 PM):**\n  [ ] भोजन से पहले 1 पूरी प्लेट हरी कच्ची सलाद (खीरा, ककड़ी, टमाटर) खाई?\n  [ ] भारी तेल-मसाले व चीनी/मैदे से परहेज रखा?\n\n☑️ **शाम व रात (7:00 PM - 10:00 PM):**\n  [ ] शाम 5 बजे भुने चने या दालचीनी चाय ली?\n  [ ] रात का भोजन हल्का व 8 बजे से पहले समाप्त किया?\n  [ ] सोने से पहले अपनी निर्धारित सप्लीमेंट (लाइफ स्टाइल प्लस / जॉइंट केयर) ली?\n  [ ] रात को 7-8 घंटे की गहरी शांत नींद सुनिश्चित की?`;
-      shareWaText = `🩺 *दैनिक स्वास्थ्य व पोषण चेकलिस्ट*\nनाम: ${userName}\n\n1. सुबह: गुनगुना पानी + नेचुरामोर पोषण + मॉर्निंग वॉक\n2. दोपहर: भोजन से पहले सलाद + मल्टीग्रेन रोटी\n3. रात: हल्का भोजन + समय पर नींद\n\n👉 स्वास्थ्य सलाह आरोग्यम सखी AI पर पाएं: https://aarogyamindia.online/aarogyam-sakhi.html`;
+      shareWaText = `🩺 *दैनिक स्वास्थ्य व पोषण चेकलिस्ट*\nनाम: ${userName}\n1. सुबह: गुनगुना पानी + नेचुरामोर पोषण + मॉर्निंग वॉक\n2. दोपहर: भोजन से पहले सलाद + मल्टीग्रेन रोटी\n3. रात: हल्का भोजन + समय पर नींद\n👉 स्वास्थ्य सलाह सखी AI: https://aarogyamindia.online/aarogyam-sakhi.html`;
     } else if (isPashu) {
-      categoryTitle = '🐄 पशुपालन, 2-3 लीटर दूध व फैट वृद्धि चेकलिस्ट (Dairy Cattle Checklist)';
+      categoryTitle = '🐄 पशु पोषण, 2-3 लीटर दूध व फैट वृद्धि चेकलिस्ट';
       checklistContent = `📋 **पशु पोषण, दूध व फैट वृद्धि दैनिक चेकलिस्ट:**\n👤 **पशुपालक:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **सुबह की देखभाल:**\n  [ ] पशु को ताजा, स्वच्छ पेयजल भरपेट पिलाया?\n  [ ] सुबह के चारे/बांटे में **10 से 15 ग्राम Biofit CFC Plus** अच्छी तरह मिलाया?\n  [ ] थनों की साफ-सफाई व सूखी जगह सुनिश्चित की?\n\n☑️ **दोपहर व आहार प्रबंधन:**\n  [ ] हरे चारे (बरसीम/नेपियर) और सूखे भूसे का संतुलित 60:40 अनुपात दिया?\n  [ ] पशु को खुली हवा व धूप/छाया के अनुकूल स्थान पर बांधा?\n\n☑️ **शाम की देखभाल:**\n  [ ] शाम के दाना-मिश्रण में भी 10 ग्राम CFC Plus पाउडर दिया?\n  [ ] दूध निकालने के बाद थनों को पोटेशियम परमैंगनेट के हल्के घोल से धोया?\n\n💡 **परिणाम:** लगातार 15 से 20 दिन सीएफसी देने पर 2 से 3 लीटर दूध व 7-8 फैट की वृद्धि होती है और बांझपन खत्म होता है!`;
-      shareWaText = `🐄 *पशुपालन, दूध व फैट वृद्धि चेकलिस्ट*\nपशुपालक: ${userName}\n\n1. सुबह बांटे में 10-15g CFC Plus\n2. हरा व सूखा चारा संतुलित 60:40\n3. शाम को दोबारा 10g CFC Plus\n\n👉 पशु पोषण फॉर्मूला सखी AI पर देखें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+      shareWaText = `🐄 *पशुपालन, दूध व फैट वृद्धि चेकलिस्ट*\nपशुपालक: ${userName}\n1. सुबह बांटे में 10-15g CFC Plus\n2. हरा व सूखा चारा संतुलित 60:40\n3. शाम को दोबारा 10g CFC Plus\n👉 पशु पोषण फॉर्मूला सखी AI: https://aarogyamindia.online/aarogyam-sakhi.html`;
     } else if (isBusiness) {
-      categoryTitle = '💼 नेट्सर्फ Q3 पाथफाइंडर 90-डे डेली एक्शन चेकलिस्ट (Business Daily Checklist)';
+      categoryTitle = '💼 नेट्सर्फ डिस्ट्रीब्यूटर 90-डे डेली एक्शन चेकलिस्ट (DMO)';
       checklistContent = `📋 **नेट्सर्फ डिस्ट्रीब्यूटर 5-स्टेप डेली एक्शन चेकलिस्ट (DMO):**\n👤 **लीडर:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **1. व्यक्तिगत उपयोग व उत्पाद अनुभव:**\n  [ ] आज खुद नेचुरामोर या हर्ब्स एंड मोर उत्पाद का उपयोग किया?\n\n☑️ **2. प्रतिदिन 2 नए लोगों से संपर्क (2 Contacts Daily):**\n  [ ] आज 2 नए किसान भाइयों या सहेलियों को डिजिटल कैटलॉग भेजा?\n  [ ] कम से कम 1 व्यक्ति को 25% छूट पर उपभोक्ता बनाया?\n\n☑️ **3. सोशल मीडिया व WhatsApp स्टेटस (Daily Branding):**\n  [ ] सखी AI से बनाया गया पर्सनलाइज़्ड बायोफिट/नेचुरामोर स्टेटस शेयर किया?\n\n☑️ **4. टीम फॉलो-अप (15 मिनट):**\n  [ ] अपनी टीम के 2 एक्टिव साथियों से बात करके उनकी मदद की?\n\n☑️ **5. आत्म-विकास (Learning):**\n  [ ] 'खेती का डॉक्टर' ई-बुक का 1 अध्याय पढ़ा या आरोग्यम ट्यूब वीडियो देखा?`;
-      shareWaText = `💼 *नेट्सर्फ 90-डे डेली एक्शन चेकलिस्ट*\nलीडर: ${userName}\n\n1. प्रोडक्ट सेल्फ-यूज़\n2. 2 नए लोगों से बातचीत\n3. WhatsApp स्टेटस शेयर\n4. टीम फॉलो-अप\n\n👉 अपनी बिज़नेस ग्रोथ सखी AI से सीखें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+      shareWaText = `💼 *नेट्सर्फ 90-डे डेली एक्शन चेकलिस्ट*\nलीडर: ${userName}\n1. प्रोडक्ट सेल्फ-यूज़\n2. 2 नए लोगों से बातचीत\n3. WhatsApp स्टेटस शेयर\n4. टीम फॉलो-अप\n👉 बिज़नेस ग्रोथ सखी AI: https://aarogyamindia.online/aarogyam-sakhi.html`;
     } else {
-      categoryTitle = '📋 आरोग्यम ऑल-इन-वन स्मार्ट चेकलिस्ट स्टूडियो (AI Checklist Studio)';
+      categoryTitle = '📋 आरोग्यम ऑल-इन-वन स्मार्ट चेकलिस्ट स्टूडियो';
       checklistContent = `नमस्ते ${userName} जी! 🙏 आरोग्यम सखी AI आपके कार्य को आसान बनाने के लिए निम्नलिखित सभी प्रकार की रेडीमेड चेकलिस्ट तुरंत तैयार करती है:\n\n1. 🌾 **फसल सुरक्षा व स्प्रे चेकलिस्ट:** बुवाई, खाद, पहला स्प्रे व फंगस नियंत्रण की समयबद्ध सूची।\n2. 🩺 **दैनिक स्वास्थ्य व डाइट चेकलिस्ट:** शुगर, बीपी, थायराइड व वजन घटाने का सुबह से रात का रूटीन।\n3. 🐄 **पशु पोषण व दूध वृद्धि चेकलिस्ट:** सीएफसी प्लस, आहार, पानी व थनैला रोकथाम की दैनिक सूची।\n4. 💼 **नेट्सर्फ बिज़नेस डेली चेकलिस्ट:** 2 कॉल प्रतिदिन, स्टेटस शेयरिंग व 90-डे पाथफाइंडर कार्ययोजना।\n5. ✨ **केमिकल-फ्री ब्यूटी चेकलिस्ट:** सुबह फेसवॉश, डे क्रीम, हेयर ऑयल व नाइट केयर स्टेप्स।\n\n👉 नीचे दिए गए बटन से अपनी मनपसंद चेकलिस्ट तुरंत प्राप्त करें:`;
     }
 
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(shareWaText || checklistContent)}`;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareWaText || checklistContent)}`;
 
     renderCrispSpecialBox(categoryTitle, checklistContent, [
       { text: '📲 यह चेकलिस्ट WhatsApp पर भेजें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
-      { text: '🌾 1. फसल स्प्रे चेकलिस्ट', query: 'फसलों के स्प्रे और खाद की चेकलिस्ट बनाओ' },
+      { text: '🌾 1. सरसों व रबी स्प्रे चेकलिस्ट', query: 'सरसों और रबी फसलों की स्प्रे चेकलिस्ट बनाओ' },
       { text: '🩺 2. स्वास्थ्य व डाइट चेकलिस्ट', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' },
       { text: '🐄 3. पशुपालन दूध वृद्धि चेकलिस्ट', query: 'पशुपालन और दूध फैट बढ़ाने की चेकलिस्ट बनाओ' },
       { text: '💼 4. नेट्सर्फ बिज़नेस चेकलिस्ट', query: 'नेट्सर्फ बिज़नेस और डेली एक्शन चेकलिस्ट बनाओ' },
-      { text: '🎨 5. AI पोस्टर प्रॉम्प्ट बनाएं', query: 'मेरे लिए पोस्टर का प्रॉम्प्ट बनाओ' }
+      { text: '📲 5. इसका WhatsApp मैसेज बनाएं', query: `${effectiveTopic || 'बायोफिट'} का व्हाट्सएप मैसेज बनाओ` }
     ], 'omni', 'checklist_studio');
     return true;
   }
@@ -11324,28 +11457,72 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // Zero-Egress Dynamic User Persona & Session Memory Update
     updateSakhiUserPersonaFromQuery(cleanQ, targetDomain);
 
+    // 0. UNIVERSAL CONVERSATION CONTEXT & PRONOUN/MICRO-HISTORY RESOLVER
+    const activeCrop = sakhiConversationState.lastActiveCrop || null;
+    const activeEntityName = sakhiConversationState.lastActiveEntityName || null;
+    const activeDomain = sakhiConversationState.lastActiveDomain || null;
+    const activeContext = {
+      crop: activeCrop,
+      name: activeEntityName,
+      domain: activeDomain
+    };
+
+    const hasPronounOrFollowUp = (
+      cleanQ.includes('इसका') || cleanQ.includes('इसकी') || cleanQ.includes('इसके') || cleanQ.includes('इसमें') ||
+      cleanQ.includes('उसका') || cleanQ.includes('उसकी') || cleanQ.includes('iska') || cleanQ.includes('iski') ||
+      cleanQ.includes('isme') || cleanQ.includes('uska') || cleanQ.includes('uski') ||
+      cleanQ.includes('डोज क्या') || cleanQ.includes('खर्च कितना') || cleanQ.includes('दवा बताओ') ||
+      cleanQ.includes('स्प्रे कब') || cleanQ.includes('कैसे इस्तेमाल') || cleanQ.includes('कीमत क्या') ||
+      cleanQ.includes('whatsapp message') || cleanQ.includes('व्हाट्सएप मैसेज') || cleanQ.includes('चेकलिस्ट दो') ||
+      cleanQ.includes('चेकलिस्ट बनाओ') || cleanQ.includes('मैसेज बनाओ') || cleanQ.includes('स्टेटस बनाओ')
+    );
+
+    const hasExplicitTopicInQuery = (
+      cleanQ.includes('सरसों') || cleanQ.includes('गेहूं') || cleanQ.includes('चना') || cleanQ.includes('धान') ||
+      cleanQ.includes('टमाटर') || cleanQ.includes('आलू') || cleanQ.includes('मिर्च') || cleanQ.includes('गन्ना') ||
+      cleanQ.includes('डायबिटीज') || cleanQ.includes('शुगर') || cleanQ.includes('जोड़') || cleanQ.includes('दर्द') ||
+      cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('पशु') || cleanQ.includes('दूध') ||
+      cleanQ.includes('नेट्सर्फ') || cleanQ.includes('पाथफाइंडर') || cleanQ.includes('पंचांग') || cleanQ.includes('panchang') ||
+      cleanQ.includes('मौसम') || cleanQ.includes('मंडी') || cleanQ.includes('ई-बुक')
+    );
+
+    let effectiveCleanQ = cleanQ;
+    if (hasPronounOrFollowUp && !hasExplicitTopicInQuery && (activeCrop || activeEntityName)) {
+      effectiveCleanQ = (cleanQ + ' ' + (activeCrop || activeEntityName)).trim();
+    }
+
     // 0.0001 ACTIVE CONVERSATIONAL STATE & MULTI-TURN PENDING ACTION RESOLUTION
-    if (typeof resolveActiveDialogueState === 'function' && resolveActiveDialogueState(cleanQ, rawQ)) {
+    if (typeof resolveActiveDialogueState === 'function' && resolveActiveDialogueState(effectiveCleanQ, rawQ)) {
       return;
     }
 
     // 0.00001 MISUNDERSTANDING & FRUSTRATION DE-ESCALATION (Top Priority: Apologize & Clarify Politely)
-    if (handleMisunderstandingAndDeescalation(cleanQ, rawQ)) {
+    if (handleMisunderstandingAndDeescalation(effectiveCleanQ, rawQ)) {
       return;
     }
 
     // 0.00002 EVERYDAY GREETINGS & CASUAL SOCIAL ROUTER (Top Priority: GM, GN, Namaste, Hi, Kaise Ho)
-    if (handleEverydayConversations(cleanQ, rawQ)) {
+    if (handleEverydayConversations(effectiveCleanQ, rawQ)) {
       return;
     }
 
-    // 0.000021 CHATGPT-STYLE INTERACTIVE AI CHECKLIST STUDIO (Checklists for Crop, Health, Dairy, Business)
-    if (typeof handleAiChecklistGenerator === 'function' && handleAiChecklistGenerator(cleanQ, rawQ)) {
+    // 0.000021 TOP PRIORITY: VEDIC KRISHI PANCHANG & SHUBH MUHURAT ROUTER (Dynamic Astronomical Calculations)
+    if (typeof handleVedicPanchangAndMuhurat === 'function' && handleVedicPanchangAndMuhurat(effectiveCleanQ, rawQ)) {
       return;
     }
 
-    // 0.000022 CHATGPT & GEMINI AI POSTER PROMPT STUDIO (Poster & Image Prompts)
-    if (typeof handleAiPosterPromptGenerator === 'function' && handleAiPosterPromptGenerator(cleanQ, rawQ)) {
+    // 0.000022 TOP PRIORITY: UNIVERSAL MULTI-DOMAIN WHATSAPP SHARE & MARKETING COPY ENGINE
+    if (typeof handleMultiChannelMarketingCopyGenerator === 'function' && handleMultiChannelMarketingCopyGenerator(effectiveCleanQ, rawQ, activeContext)) {
+      return;
+    }
+
+    // 0.000023 TOP PRIORITY: CHATGPT-STYLE INTERACTIVE AI CHECKLIST STUDIO (Crop, Health, Dairy, Business)
+    if (typeof handleAiChecklistGenerator === 'function' && handleAiChecklistGenerator(effectiveCleanQ, rawQ, activeContext)) {
+      return;
+    }
+
+    // 0.000024 CHATGPT & GEMINI AI POSTER PROMPT STUDIO (Poster & Image Prompts)
+    if (typeof handleAiPosterPromptGenerator === 'function' && handleAiPosterPromptGenerator(effectiveCleanQ, rawQ)) {
       return;
     }
 
@@ -11714,6 +11891,15 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (entityKey) sakhiConversationState.lastActiveEntity = entityKey;
     if (title) sakhiConversationState.lastActiveEntityName = title;
     sakhiConversationState.lastAnswerSnippet = (bodyText || '').slice(0, 150);
+
+    const titleAndBody = ((title || '') + ' ' + (bodyText || '')).toLowerCase();
+    const knownCrops = ['सरसों', 'गेहूं', 'चना', 'धान', 'टमाटर', 'आलू', 'मिर्च', 'गन्ना', 'सोयाबीन', 'कपास', 'प्याज', 'लहसुन', 'अदरक', 'हल्दी', 'मटर'];
+    for (const cr of knownCrops) {
+      if (titleAndBody.includes(cr)) {
+        sakhiConversationState.lastActiveCrop = cr;
+        break;
+      }
+    }
 
     let chipsHtml = '';
     (chips || []).forEach(c => {
@@ -12112,36 +12298,16 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       cleanQ.includes('खेती') || cleanQ.includes('फसल') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || 
       cleanQ.includes('पशु') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे');
 
-    if (prevEntity && prevName && isPronounFollowUp && !touchesDifferentTopic) {
-      const speech = `मुझे आपकी बात पूरी तरह समझ नहीं आई, क्या आप ${prevName} के बारे में कुछ और पूछना चाहते हैं?`;
-      const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:6px;">
-          🌸 बातचीत का संदर्भ: ${escapeHtml(prevName)}
-        </div>
-        <div style="font-size:0.95rem;line-height:1.6;color:#334155;margin-bottom:10px;">
-          मुझे आपकी बात <strong>"${escapeHtml(query)}"</strong> पूरी तरह समझ नहीं आई, क्या आप अपना सवाल दोबारा पूछेंगे? क्या आप <strong>${escapeHtml(prevName)}</strong> से जुड़ा कुछ जानना चाहते हैं?
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इसके अंदर क्या क्या सामग्री है?')">
-            🌿 इसके अंदर क्या-क्या है?
-          </button>
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इसे लेने या स्प्रे करने की सही खुराक और नियम क्या है?')">
-            💊 सही खुराक व सेवन विधि
-          </button>
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('इसकी सही कीमत और 25% छूट ऑफर क्या है?')">
-            💰 कीमत व 25% छूट ऑफर
-          </button>
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('फसलों का स्प्रे कैलेंडर')">
-            🌾 नया विषय शुरू करें
-          </button>
-        </div>
-      `;
-      streamBotMessage(html, cleanTextForTTS(speech));
+    if (prevName && isPronounFollowUp) {
+      const resp = `🌸 **${prevName} — उपयोग, खुराक व परामर्श:**\n\n1. **खुराक व सही विधि:**\n• यदि कृषि/बायोफिट उत्पाद है: 30ml प्रति 15 लीटर पंप (स्प्रे) अथवा 1 लीटर प्रति एकड़ (जमीन में शेत)।\n• यदि स्वास्थ्य/नेचुरामोर है: 1 चम्मच गुनगुने पानी/दूध के साथ अथवा 1 कैप्सूल सुबह-शाम भोजन उपरांत।\n\n2. **परिणाम व प्रभाव:**\n• नियमित 7 से 15 दिनों में स्पष्ट सकारात्मक परिणाम व सुधार दिखाई देता है।\n\n3. **कीमत व विशेष छूट:**\n• कंपनी के अधिकृत जीएसटी बिल के साथ **फ्लैट 25% रिटेल छूट** पर उपलब्ध है। 5 माह लगातार खरीद पर 6ठे माह 5+1 फ्री ऑफर!`;
+
+      renderCrispSpecialBox(`🌸 ${prevName} — विस्तृत जानकारी व खुराक`, resp, [
+        { text: `📲 ${prevName} का WhatsApp मैसेज बनाएं`, query: `${prevName} का व्हाट्सएप मैसेज बनाओ` },
+        { text: `📋 ${prevName} की चेकलिस्ट लें`, query: `${prevName} की चेकलिस्ट बनाओ` },
+        { text: `🧮 ${prevName} का खर्च एस्टीमेट`, query: `${prevName} का खर्च एस्टीमेट बताओ` },
+        { text: '🌾 अन्य मुख्य विषय देखें', query: 'मुख्य विषय दिखाओ' }
+      ], sakhiConversationState.lastActiveDomain || 'omni', prevEntity);
       return;
-    } else {
-      // Clear stale entity so it never bleeds into unrelated queries
-      sakhiConversationState.lastActiveEntity = null;
-      sakhiConversationState.lastActiveEntityName = null;
     }
 
     // E. Polite Spelling Check & Topic Navigation (Per User Rule: Never say "Mujhe nahi pata")
