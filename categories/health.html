@@ -36,6 +36,7 @@
   <link rel="stylesheet" href="/css/user-notifications.css">
   <link rel="stylesheet" href="/css/universal-nav-drawer.css">
   <link rel="stylesheet" href="/css/home-revamp.css?v=20260926_v16">
+  <link rel="stylesheet" href="/css/pathfinder-quarter.css?v=20261018_v10">
   <link rel="stylesheet" href="/css/mobile-bottom-nav.css">
 
   <style>
@@ -184,6 +185,11 @@
       color: #ffffff;
       transform: translateX(5px);
     }
+    .health-kpi-item:hover {
+      transform: translateY(-4px);
+      border-color: #2563eb !important;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.16) !important;
+    }
   </style>
   <link rel="stylesheet" href="/css/premium-mobile-ui.css?v=20261001_v1">
 </head>
@@ -205,26 +211,50 @@
     </div>
   </div>
 
-  <!-- 2. TIRANGA WAVING HEADER -->
-  <header class="header-tiranga-animated" id="header">
-    <div class="container header-container" style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;">
-      <a href="/index.html" class="header-brand-wrap" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-        <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:40px;width:auto;" />
-        <div style="display:flex;flex-direction:column;">
-          <span style="font-size:1.15rem;font-weight:900;color:#0f172a;letter-spacing:-0.5px;font-family:'Outfit',sans-serif;line-height:1.1;">AAROGYAM <span style="color:#dc2626;">INDIA</span></span>
-          <span style="font-size:0.7rem;font-weight:700;color:#15803d;letter-spacing:0.5px;">प्राकृतिक स्वास्थ्य एवं वेलनेस</span>
-        </div>
-        <span class="header-current-page-badge" style="background:#dc2626;color:#ffffff;font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:12px;margin-left:6px;">❤️ स्वास्थ्य केंद्र</span>
-      </a>
+  <!-- 2. UNIVERSAL ANIMATED INDIAN TIRANGA HEADER (PATHFINDER STYLE) -->
+  <header class="header header-tiranga-animated" id="header" style="position: sticky; top: 0; z-index: 9999;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:8px;max-width:1200px;margin:0 auto;box-sizing:border-box;">
+      
+      <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
+      <div class="header-brand-wrap" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <a href="/index.html" class="brand-logo-pill" style="text-decoration:none;">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+          <div style="display:flex;flex-direction:column;">
+            <span class="brand-title-text" style="font-weight:900;">
+              AAROGYAM <span style="color:#ff671f;">INDIA</span>
+            </span>
+            <span class="brand-sub-text">
+              प्राकृतिक स्वास्थ्य एवं वेलनेस
+            </span>
+          </div>
+        </a>
 
+        <!-- Current Active Page Indicator Badge -->
+        <span class="header-current-page-badge" title="Current Page" style="background:#450a0a;color:#fecaca;border:1px solid #dc2626;">
+          ❤️ स्वास्थ्य केंद्र
+        </span>
+      </div>
+
+      <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
       <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
-        <button type="button" onclick="window.triggerViralPageShare({title:'Aarogyam India स्वास्थ्य केंद्र', text:'प्राकृतिक व आयुर्वेदिक स्वास्थ्य समाधान देखें:'})" class="btn" style="background:#dc2626; color:#fff; border:none; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; cursor:pointer;">
+        <button type="button" onclick="window.triggerViralPageShare?.({title:'Aarogyam India स्वास्थ्य केंद्र', text:'प्राकृतिक व आयुर्वेदिक स्वास्थ्य समाधान देखें:'})" class="btn" style="background:#dc2626; color:#fff; border:none; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
           <span>📤</span> <span>शेयर</span>
         </button>
-        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a; border:1.5px solid rgba(255,255,255,0.4); color:#ffffff; width:38px; height:38px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+
+        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-regular fa-bell" style="font-size:1rem;"></i>
+        </button>
+
+        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+          <i class="fa-solid fa-cart-shopping" style="font-size:1rem;"></i>
+          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:10px;">0</span>
+        </a>
+
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
+
     </div>
   </header>
 
@@ -287,39 +317,103 @@
     </div>
   </section>
 
-  <!-- 3.1 QUICK ACTION HUB (PRODUCT CATALOG, PANCHANG, AGRI, PASHU, MANDI, WEATHER) -->
-  <section style="padding: 20px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;">
+  <!-- QUICK NAVIGATION MATRIX (16 AAROGYAM DOMAINS) -->
+  <section class="health-kpi-matrix-section" style="padding: 16px 0 22px 0; background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%); border-bottom: 1.5px solid #cbd5e1;">
     <div class="container">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-        <span style="font-size:0.75rem; font-weight:900; background:rgba(220,38,38,0.1); color:#dc2626; padding:3px 12px; border-radius:20px; text-transform:uppercase;">
-          ⚡ क्विक एक्शन हब (Quick Access)
-        </span>
-        <span style="font-size:0.8rem; color:#64748b; font-weight:700;">आरोग्यम इंडिया की मुख्य सेवाएं</span>
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="background:#2563eb; color:#fff; font-weight:900; font-size:0.75rem; padding:4px 12px; border-radius:20px; box-shadow:0 2px 8px rgba(37,99,235,0.3);">
+            ⚡ 1-क्लिक नेविगेशन
+          </span>
+          <h2 style="font-size:1.1rem; font-weight:900; color:#0f172a; margin:0;">
+            आरोग्यम मुख्य सेवाएं एवं स्वास्थ्य श्रेणियां (Quick Jump Matrix)
+          </h2>
+        </div>
+        <a href="#sec-categories" style="font-size:0.8rem; font-weight:800; color:#2563eb; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+          <span>सभी 16 सेवाएं</span> ↓
+        </a>
       </div>
-      <div class="quick-hub-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px;">
-        <a href="/categories/netsurf-products.html" class="quick-hub-card" style="text-decoration:none;">
-          <div class="quick-hub-icon-circle" style="font-size:1.7rem; margin-bottom:6px;">🛍️</div>
-          <span class="quick-hub-title" style="font-size:0.85rem; font-weight:800; color:#0f172a; display:block;">प्रोडक्ट कैटलॉग</span>
+
+      <div class="health-kpi-grid">
+        <a href="/health/diabetes.html" class="health-kpi-item">
+          <span class="kpi-icon">🩸</span>
+          <strong class="kpi-title">डायबिटीज</strong>
+          <span class="kpi-sub">शुगर नियंत्रण</span>
         </a>
-        <a href="/krishi-panchang.html" class="quick-hub-card" style="text-decoration:none;">
-          <div class="quick-hub-icon-circle" style="font-size:1.7rem; margin-bottom:6px;">🕉️</div>
-          <span class="quick-hub-title" style="font-size:0.85rem; font-weight:800; color:#0f172a; display:block;">कृषि पंचांग</span>
+        <a href="/health/weight-loss.html" class="health-kpi-item">
+          <span class="kpi-icon">⚖️</span>
+          <strong class="kpi-title">वजन नियंत्रण</strong>
+          <span class="kpi-sub">प्राकृतिक फैट बर्न</span>
         </a>
-        <a href="/pashu-palan.html" class="quick-hub-card" style="text-decoration:none;">
-          <div class="quick-hub-icon-circle" style="font-size:1.7rem; margin-bottom:6px;">🐄</div>
-          <span class="quick-hub-title" style="font-size:0.85rem; font-weight:800; color:#0f172a; display:block;">पशु पालन हब</span>
+        <a href="/health/joint-care.html" class="health-kpi-item">
+          <span class="kpi-icon">🦴</span>
+          <strong class="kpi-title">जोड़ों का दर्द</strong>
+          <span class="kpi-sub">गठिया व कार्टिलेज</span>
         </a>
-        <a href="/ebooks/agriculture.html" class="quick-hub-card" style="text-decoration:none;">
-          <div class="quick-hub-icon-circle" style="font-size:1.7rem; margin-bottom:6px;">🌱</div>
-          <span class="quick-hub-title" style="font-size:0.85rem; font-weight:800; color:#0f172a; display:block;">कृषि हब</span>
+        <a href="/health/hair-care.html" class="health-kpi-item">
+          <span class="kpi-icon">💇</span>
+          <strong class="kpi-title">हेयर केयर</strong>
+          <span class="kpi-sub">हेयरफॉल व डैंड्रफ</span>
         </a>
-        <a href="/mandi.html" class="quick-hub-card" style="text-decoration:none;">
-          <div class="quick-hub-icon-circle" style="font-size:1.7rem; margin-bottom:6px;">🌾</div>
-          <span class="quick-hub-title" style="font-size:0.85rem; font-weight:800; color:#0f172a; display:block;">मंडी भाव</span>
+        <a href="/health/skin-care.html" class="health-kpi-item">
+          <span class="kpi-icon">✨</span>
+          <strong class="kpi-title">स्किन ग्लो</strong>
+          <span class="kpi-sub">पिंपल्स व चमक</span>
         </a>
-        <a href="/weather.html" class="quick-hub-card" style="text-decoration:none;">
-          <div class="quick-hub-icon-circle" style="font-size:1.7rem; margin-bottom:6px;">⛅</div>
-          <span class="quick-hub-title" style="font-size:0.85rem; font-weight:800; color:#0f172a; display:block;">मौसम रिपोर्ट</span>
+        <a href="/health/womens-care.html" class="health-kpi-item">
+          <span class="kpi-icon">🌸</span>
+          <strong class="kpi-title">महिला स्वास्थ्य</strong>
+          <span class="kpi-sub">PCOD व हार्मोनल</span>
+        </a>
+        <a href="/health/kids-care.html" class="health-kpi-item">
+          <span class="kpi-icon">👶</span>
+          <strong class="kpi-title">बाल पोषण</strong>
+          <span class="kpi-sub">ग्रोथ व इम्युनिटी</span>
+        </a>
+        <a href="/health/home-care.html" class="health-kpi-item">
+          <span class="kpi-icon">🏡</span>
+          <strong class="kpi-title">होम केयर</strong>
+          <span class="kpi-sub">टॉक्सिन-मुक्त घर</span>
+        </a>
+        <a href="/health/sexual-wellness.html" class="health-kpi-item">
+          <span class="kpi-icon">⚡</span>
+          <strong class="kpi-title">पौरुष स्वास्थ्य</strong>
+          <span class="kpi-sub">यौन शक्ति व ED</span>
+        </a>
+        <a href="/health/dental-care.html" class="health-kpi-item">
+          <span class="kpi-icon">🦷</span>
+          <strong class="kpi-title">दंत सुरक्षा</strong>
+          <span class="kpi-sub">पायरिया व संवेदनशीलता</span>
+        </a>
+        <a href="/health/liver-care.html" class="health-kpi-item">
+          <span class="kpi-icon">🫀</span>
+          <strong class="kpi-title">लिवर केयर</strong>
+          <span class="kpi-sub">फैटी लिवर व डिटॉक्स</span>
+        </a>
+        <a href="/health/thyroid-care.html" class="health-kpi-item">
+          <span class="kpi-icon">🦋</span>
+          <strong class="kpi-title">थायरॉइड</strong>
+          <span class="kpi-sub">हॉर्मोन व मेटाबॉलिज्म</span>
+        </a>
+        <a href="/health/heart-care.html" class="health-kpi-item">
+          <span class="kpi-icon">❤️</span>
+          <strong class="kpi-title">हार्ट केयर</strong>
+          <span class="kpi-sub">ब्लॉकेज व धमनियां</span>
+        </a>
+        <a href="/krishi-panchang.html" class="health-kpi-item">
+          <span class="kpi-icon">🕉️</span>
+          <strong class="kpi-title">कृषि पंचांग</strong>
+          <span class="kpi-sub">शुभ मुहूर्त व पंचांग</span>
+        </a>
+        <a href="/weather.html" class="health-kpi-item">
+          <span class="kpi-icon">⛅</span>
+          <strong class="kpi-title">मौसम रिपोर्ट</strong>
+          <span class="kpi-sub">लाइव मौसम व वर्षा</span>
+        </a>
+        <a href="/mandi.html" class="health-kpi-item">
+          <span class="kpi-icon">🌾</span>
+          <strong class="kpi-title">मंडी भाव</strong>
+          <span class="kpi-sub">ताजा दैनिक भाव</span>
         </a>
       </div>
     </div>
@@ -601,7 +695,7 @@
         <span style="background:#fee2e2; color:#b91c1c; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
           ⭐ 100% संतुष्ट परिवार
         </span>
-        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">आरोग्यम स्वास्थ्य साधकों के 10 वास्तविक अनुभव</h2>
+        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">आरोग्यम स्वास्थ्य साधकों के वास्तविक अनुभव</h2>
       </div>
 
       <div id="sec-reviews-grid" class="reviews-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
@@ -666,7 +760,7 @@
         <span style="background:#fee2e2; color:#b91c1c; font-weight:900; font-size:0.75rem; padding:4px 14px; border-radius:20px; text-transform:uppercase;">
           ❓ Frequently Asked Questions
         </span>
-        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">स्वास्थ्य संबंधी 10 सामान्य प्रश्न</h2>
+        <h2 style="font-size:1.85rem; font-weight:900; margin-top:8px; color:#0f172a;">स्वास्थ्य संबंधी सामान्य प्रश्न (FAQ)</h2>
       </div>
 
       <div id="sec-faqs-accordion" class="faq-accordion" style="display:flex; flex-direction:column; gap:10px;">
@@ -714,17 +808,88 @@
     </div>
   </section>
 
-  <!-- 6. 24x7 AI EXPERT CONSULTATION BANNER -->
+  <!-- 6. 24x7 AI EXPERT CONSULTATION & SAKHI BANNER -->
   <section style="padding: 50px 0; background: #ffffff;">
     <div class="container">
-      <div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius:24px; padding:36px; color:#fff; text-align:center; border:1.5px solid #334155; box-shadow:0 12px 30px rgba(0,0,0,0.15);">
-        <h2 style="font-size:2rem; font-weight:900; margin:0 0 12px 0;">क्या आपको अपनी रिपोर्ट या बीमारी पर व्यक्तिगत सलाह चाहिए?</h2>
-        <p style="color:#94a3b8; font-size:1rem; max-width:650px; margin:0 auto 24px auto; line-height:1.6;">
+      <div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius:24px; padding:36px; color:#fff; text-align:center; border:1.5px solid #334155; box-shadow:0 12px 30px rgba(0,0,0,0.15); position:relative;">
+        <!-- Aarogyam Sakhi Image Badge -->
+        <div style="display:inline-flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:16px;">
+          <div style="width:90px; height:90px; border-radius:50%; padding:3px; background:linear-gradient(135deg, #ec4899, #38bdf8, #22c55e); box-shadow:0 0 25px rgba(236,72,153,0.45); display:flex; align-items:center; justify-content:center;">
+            <img src="/images/sakhi/aarogyam-sakhi.webp" alt="आरोग्यम सखी AI" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" onerror="this.onerror=null; this.src='/images/logo/logo.png';" />
+          </div>
+          <span style="margin-top:-10px; background:#ec4899; color:#fff; font-size:0.7rem; font-weight:900; padding:3px 10px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:2;">🌸 आरोग्यम सखी AI</span>
+        </div>
+
+        <h2 style="font-size:1.9rem; font-weight:900; margin:0 0 12px 0;">क्या आपको अपनी रिपोर्ट या बीमारी पर व्यक्तिगत सलाह चाहिए?</h2>
+        <p style="color:#94a3b8; font-size:0.98rem; max-width:680px; margin:0 auto 24px auto; line-height:1.6;">
           अपनी ब्लड टेस्ट रिपोर्ट या बीमारी की स्थिति हमारे WhatsApp AI हेल्थ असिस्टेंट को भेजें और 5 मिनट में वैज्ञानिक प्राकृतिक गाइड प्राप्त करें।
         </p>
-        <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('स्वास्थ्य रिपोर्ट परामर्श')" class="btn" style="background:#22c55e; color:#fff; font-weight:900; font-size:1rem; padding:14px 32px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; box-shadow:0 6px 25px rgba(34,197,94,0.4);">
-          <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i> WhatsApp पर रिपोर्ट भेजें व सलाह लें
-        </button>
+
+        <!-- Dual Action Buttons: WhatsApp Consultation + Aarogyam Sakhi AI -->
+        <div style="display:flex; justify-content:center; align-items:center; gap:14px; flex-wrap:wrap;">
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('स्वास्थ्य रिपोर्ट परामर्श')" class="btn" style="background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color:#fff; font-weight:900; font-size:0.96rem; padding:13px 26px; border-radius:30px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:10px; box-shadow:0 6px 20px rgba(34,197,94,0.4);">
+            <i class="fa-brands fa-whatsapp" style="font-size:1.25rem;"></i> WhatsApp पर रिपोर्ट भेजें व सलाह लें
+          </button>
+          <a href="/aarogyam-sakhi.html?q=स्वास्थ्य रिपोर्ट व प्राकृतिक परामर्श" class="btn" style="background:linear-gradient(135deg, #ec4899 0%, #db2777 100%); color:#fff; font-weight:900; font-size:0.96rem; padding:13px 26px; border-radius:30px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:10px; box-shadow:0 6px 20px rgba(236,72,153,0.4);">
+            <i class="fa-solid fa-sparkles"></i> 🌸 आरोग्यम सखी AI से पूछें
+          </a>
+        </div>
+      </div>
+
+      <!-- =========================================
+           4. GLOWING FLOATING VIRAL SPONSOR NOTICE CARD
+      ========================================== -->
+      <div style="margin-top: 32px;">
+        <section class="pf-viral-notice-card" id="pfViralNoticeCard">
+          <div class="pf-vn-header">
+            <span class="pf-vn-badge">🚀 वायरल शेयरिंग पावर • आपकी डिजिटल पहचान</span>
+            <span class="pf-vn-live"><span class="pf-vn-dot"></span> लाइव ऑटो-स्पॉन्सर सिस्टम</span>
+          </div>
+          <div class="pf-vn-body">
+            <div class="pf-vn-icon">💡</div>
+            <div class="pf-vn-text">
+              <h4 class="pf-vn-title" id="pfViralNoticeTitle">प्रिय साथी! क्या आप जानते हैं?</h4>
+              <p class="pf-vn-desc" id="pfViralNoticeDesc">
+                आप अगर यह आरोग्यम हेल्थ पोर्टल अपने <strong>मित्र, परिवार या सहयोगी</strong> को शेयर करते हैं, तो नीचे स्वतः आपका नाम, कॉलिंग नंबर और WhatsApp बटन आ जाएगा! अपनी टीम या मित्रों को शेयर करने से पहले <strong>लॉगिन / रजिस्टर</strong> करके ही शेयर पर क्लिक करें ताकि आपकी पहचान और क्रेडिट हमेशा सुरक्षित रहे।
+              </p>
+            </div>
+          </div>
+          <div class="pf-vn-actions">
+            <button type="button" class="pf-vn-btn-login" id="pfVnLoginBtn" onclick="window.promptHealthLogin()">
+              <i class="fa-solid fa-right-to-bracket"></i> <span id="pfVnLoginBtnText">लॉगिन / रजिस्टर करें</span>
+            </button>
+            <button type="button" class="pf-vn-btn-share" onclick="window.shareHealthPage()">
+              <i class="fa-solid fa-share-nodes"></i> <span>अपनी पहचान के साथ शेयर करें</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- =========================================
+             5. SPONSOR / COUNSELOR CONTACT CARD
+        ========================================== -->
+        <section class="pf-sponsor-counselor-card" id="pfAdvisorCard" style="margin-top: 18px;">
+          <div class="pf-sc-header">
+            <span class="pf-sc-badge">🤝 आपके मित्र / सहयोगी / सहेली</span>
+            <span class="pf-sc-verified"><i class="fa-solid fa-circle-check"></i> सत्यापित एक्टिव स्पॉन्सर</span>
+          </div>
+          <div class="pf-sc-body">
+            <div class="pf-sc-info">
+              <div class="pf-sc-avatar">👤</div>
+              <div>
+                <h4 class="pf-sc-name" id="pfAdvisorName">श्री अवनीश कुमार मिश्रा</h4>
+                <p class="pf-sc-sub">Share ID: <strong id="pfAdvisorId" style="color:#38bdf8;">AI000004</strong></p>
+              </div>
+            </div>
+            <div class="pf-sc-actions">
+              <a href="tel:+917974422572" class="pf-btn-sc-call" id="pfAdvisorCallBtn" title="कॉल करें">
+                <i class="fa-solid fa-phone"></i> <span>कॉल करें</span>
+              </a>
+              <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%80%20%E0%A4%85%E0%A4%B5%E0%A4%A8%E0%A5%80%E0%A4%B6%20%E0%A4%95%E0%A5%81%E0%A4%AE%E0%A4%BE%E0%A4%B0%20%E0%A4%AE%E0%A4%BF%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A4%BE%20%E0%A4%9C%E0%A5%80!%20%E0%A4%AE%E0%A5%88%E0%A4%82%E0%A4%A8%E0%A5%87%20%E0%A4%86%E0%A4%AA%E0%A4%95%E0%A4%BE%20%E0%A4%86%E0%A4%B0%E0%A5%8B%E0%A4%97%E0%A5%8D%E0%A4%AF%E0%A4%AE%20%E0%A4%B9%E0%A5%87%E0%A4%B2%E0%A5%8D%E0%A4%A5%20%E0%A4%AA%E0%A5%8B%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%B2%20%E0%A4%A6%E0%A5%87%E0%A4%96%E0%A4%BE%E0%A5%A4%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%B8%E0%A5%8D%E0%A4%B5%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%A5%E0%A5%8D%E0%A4%AF%20%E0%A4%AA%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%B0%E0%A5%8D%E0%A4%B6%20%E0%A4%B5%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A5%8B%E0%A4%A1%E0%A4%95%E0%A5%8D%E0%A4%9F%E0%A5%8D%E0%A4%B8%20%E0%A4%95%E0%A5%80%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F%E0%A5%A4" target="_blank" rel="noopener noreferrer" class="pf-btn-sc-wa" id="pfAdvisorWaBtn" title="व्हाट्सएप परामर्श">
+                <i class="fa-brands fa-whatsapp"></i> <span>WhatsApp संपर्क</span>
+              </a>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </section>
@@ -805,6 +970,139 @@
         window.initPanoramicCarousel();
       }
     });
+
+    // Live Auto-Sponsor & Personalized Viral Share for Health Page
+    (function() {
+      const DEFAULT_PHONE = '7974422572';
+      const DEFAULT_NAME = 'श्री अवनीश कुमार मिश्रा';
+      const DEFAULT_ID = 'AI000004';
+
+      let currentSponsor = {
+        name: DEFAULT_NAME,
+        phone: DEFAULT_PHONE,
+        shareId: DEFAULT_ID
+      };
+
+      function renderHealthUserSession() {
+        const isLoggedIn = window.V1_SESSION?.isLoggedIn?.() || false;
+        const user = window.V1_SESSION?.getCurrentUser?.();
+        const shareId = window.V1_SESSION?.getUserShareId?.() || 'AI000004';
+
+        const titleEl = document.getElementById('pfViralNoticeTitle');
+        const descEl = document.getElementById('pfViralNoticeDesc');
+        const loginBtnText = document.getElementById('pfVnLoginBtnText');
+
+        if (isLoggedIn && user) {
+          const name = user.full_name || user.name || 'आरोग्यम साथी';
+          if (titleEl) {
+            titleEl.innerHTML = `🎉 नमस्ते <span style="color:#38bdf8;">${name}</span> जी! आपकी डिजिटल शेयरिंग पावर एक्टिव है`;
+          }
+          if (descEl) {
+            descEl.innerHTML = `आपकी पहचान <strong>${name} (ID: ${shareId})</strong> सुरक्षित रूप से एक्टिव है। जब आप यह स्वास्थ्य पोर्टल अपने <strong>मित्र, परिवार या सहयोगी</strong> को शेयर करेंगे, तो उनके फोन में नीचे स्वतः आपका नाम, कॉलिंग नंबर और WhatsApp बटन दिखेगा!`;
+          }
+          if (loginBtnText) {
+            loginBtnText.textContent = `✅ आप लॉगिन हैं (${shareId})`;
+          }
+        } else {
+          if (titleEl) {
+            titleEl.textContent = '💡 प्रिय साथी! क्या आप जानते हैं?';
+          }
+          if (descEl) {
+            descEl.innerHTML = 'आप अगर यह स्वास्थ्य पोर्टल अपने <strong>मित्र, परिवार या सहयोगी</strong> को शेयर करते हैं, तो नीचे स्वतः आपका नाम, कॉलिंग नंबर और WhatsApp बटन आ जाएगा! अपनी टीम को शेयर करने से पहले <strong>लॉगिन / रजिस्टर</strong> करके ही शेयर पर क्लिक करें ताकि आपकी पहचान और क्रेडिट हमेशा सुरक्षित रहे।';
+          }
+          if (loginBtnText) {
+            loginBtnText.textContent = '📲 पहले लॉगिन / रजिस्टर करें';
+          }
+        }
+      }
+
+      async function resolveHealthSponsor() {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const targetShareId = urlParams.get('share_id') || urlParams.get('ref') || urlParams.get('sponsor') || '';
+
+          if (targetShareId) {
+            currentSponsor.shareId = targetShareId;
+            const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+            const res = await fetch(`https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(share_id.eq.${encodeURIComponent(targetShareId)},referral_code.eq.${encodeURIComponent(targetShareId)})&select=full_name,mobile&limit=1`, {
+              headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+            });
+            if (res.ok) {
+              const rows = await res.json();
+              if (rows && rows[0] && rows[0].mobile) {
+                const cleanMob = String(rows[0].mobile).replace(/\D/g, '').slice(-10);
+                if (cleanMob.length === 10) {
+                  currentSponsor.phone = cleanMob;
+                  currentSponsor.name = rows[0].full_name || 'आरोग्यम अधिकृत सहयोगी';
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Health sponsor resolution:', e);
+        }
+
+        const nameEl = document.getElementById('pfAdvisorName');
+        const idEl = document.getElementById('pfAdvisorId');
+        const callBtn = document.getElementById('pfAdvisorCallBtn');
+        const waBtn = document.getElementById('pfAdvisorWaBtn');
+
+        if (nameEl) nameEl.textContent = currentSponsor.name;
+        if (idEl) idEl.textContent = currentSponsor.shareId;
+        if (callBtn) callBtn.href = `tel:+91${currentSponsor.phone}`;
+        if (waBtn) {
+          const text = encodeURIComponent(`नमस्ते ${currentSponsor.name} जी! मैंने आपका आरोग्यम हेल्थ पोर्टल देखा। मुझे स्वास्थ्य परामर्श, प्रोडक्ट्स व वेलनेस संबंधी जानकारी चाहिए।`);
+          waBtn.href = `https://api.whatsapp.com/send?phone=91${currentSponsor.phone}&text=${text}`;
+        }
+      }
+
+      window.promptHealthLogin = function () {
+        if (typeof window.openGuestLoginModal === 'function') {
+          window.openGuestLoginModal(function () {
+            renderHealthUserSession();
+          }, {
+            force: true,
+            source: 'HealthPage',
+            title: 'आरोग्यम डिजिटल स्वास्थ्य पहचान',
+            subtitle: 'लॉगिन / रजिस्टर करें ताकि आपकी Share ID और WhatsApp हर जगह स्वतः जुड़ जाए'
+          });
+          return;
+        }
+        if (typeof window.openUniversalAuthModal === 'function') {
+          window.openUniversalAuthModal();
+          return;
+        }
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/registration.html?source=health&return=${returnUrl}`;
+      };
+
+      window.shareHealthPage = function() {
+        const shareId = window.V1_SESSION?.getUserShareId?.() || 'AI000004';
+        const user = window.V1_SESSION?.getCurrentUser?.();
+        const userName = user?.full_name || user?.name || 'आरोग्यम साथी';
+
+        const origin = window.location.origin;
+        const shareUrl = `${origin}/categories/health.html?share_id=${encodeURIComponent(shareId)}`;
+        const shareText = `🌿 *AAROGYAM INDIA — सम्पूर्ण स्वास्थ्य व प्राकृतिक वेलनेस गाइड* 🩺\n━━━━━━━━━━━━━━━━━━━━\n✨ 16+ प्रमुख स्वास्थ्य एवं जीवनशैली श्रेणियों में वैज्ञानिक प्राकृतिक परामर्श, आहार चार्ट व रोग मुक्ति मार्गदर्शन!\n\n👇 *स्वास्थ्य परामर्श व सम्पूर्ण गाइड यहाँ देखें:*\n${shareUrl}\n\n👤 *सत्यापित सहयोगी:* ${userName} (ID: ${shareId})`;
+
+        if (navigator.share) {
+          navigator.share({
+            title: 'Aarogyam India - सम्पूर्ण डिजिटल स्वास्थ्य गाइड',
+            text: shareText
+          }).catch(() => {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+          });
+        } else {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+        }
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        renderHealthUserSession();
+        resolveHealthSponsor();
+        window.addEventListener('sessionStateChanged', renderHealthUserSession);
+      });
+    })();
   </script>
   <script src="/js/live-page-cms-bridge.js?v=20261001_v3"></script>
   <script src="/js/image-lightbox-viewer.js?v=20261001_v1"></script>

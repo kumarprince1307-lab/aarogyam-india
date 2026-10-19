@@ -1006,3 +1006,349 @@ body {
   height: auto !important;
   object-fit: contain !important;
 }
+
+/* ========================================================
+   UNIVERSAL 16 KPI QUICK JUMP MATRIX STYLING (MOBILE 4x4)
+   ======================================================== */
+.health-kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.health-kpi-item {
+  background: #ffffff !important;
+  border: 1.5px solid #94a3b8 !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+  color: #050811 !important;
+  border-radius: 14px !important;
+  padding: 12px 10px !important;
+  text-decoration: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  transition: all 0.22s ease !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+.health-kpi-item:hover {
+  transform: translateY(-4px) !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.16) !important;
+}
+
+.health-kpi-item .kpi-icon {
+  font-size: 1.6rem !important;
+  margin-bottom: 4px !important;
+  line-height: 1 !important;
+}
+
+.health-kpi-item .kpi-title {
+  font-size: 0.86rem !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+  display: block !important;
+}
+
+.health-kpi-item .kpi-sub {
+  font-size: 0.7rem !important;
+  color: #64748b !important;
+  margin-top: 2px !important;
+  display: block !important;
+}
+
+/* Active State for Current Page */
+.health-kpi-item.active-health-kpi {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+  border: 2px solid #60a5fa !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35) !important;
+  position: relative !important;
+}
+.health-kpi-item.active-health-kpi .kpi-title {
+  color: #fde047 !important;
+}
+.health-kpi-item.active-health-kpi .kpi-sub {
+  color: #cbd5e1 !important;
+}
+.health-kpi-item .active-kpi-badge {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  background: #fde047;
+  color: #0f172a;
+  font-size: 0.55rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  line-height: 1.2;
+}
+@media (max-width: 768px) {
+  .health-kpi-item .active-kpi-badge {
+    font-size: 0.5rem;
+    padding: 1px 3px;
+    top: -4px;
+    right: -2px;
+  }
+}
+
+/* 4-4 CARDS PER LINE ON MOBILE (COMPACT, APPLIKE, ELEGANT) */
+@media (max-width: 768px) {
+  .health-kpi-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+  }
+  .health-kpi-item {
+    padding: 8px 3px !important;
+    border-radius: 10px !important;
+    min-height: 72px !important;
+    justify-content: center !important;
+  }
+  .health-kpi-item .kpi-icon {
+    font-size: 1.25rem !important;
+    margin-bottom: 2px !important;
+  }
+  .health-kpi-item .kpi-title {
+    font-size: 0.68rem !important;
+    line-height: 1.15 !important;
+    font-weight: 800 !important;
+  }
+  .health-kpi-item .kpi-sub {
+    font-size: 0.58rem !important;
+    line-height: 1.1 !important;
+    margin-top: 1px !important;
+  }
+}
+
+/* =========================================
+   4 MAIN SUPER-PILLARS (PATHFINDER LUXURY THEME)
+========================================= */
+.super-pillars-section {
+  padding: 34px 0 20px 0;
+  background: #ffffff;
+}
+
+.super-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.super-pillar-card {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%) !important;
+  border: 1.8px solid #93c5fd !important;
+  border-radius: 20px;
+  padding: 24px 20px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.08);
+}
+
+.super-pillar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--pillar-accent, #2563eb);
+  transition: height 0.25s ease;
+}
+
+.super-pillar-card:hover {
+  transform: translateY(-6px);
+  border-color: #2563eb !important;
+  box-shadow: 0 16px 36px rgba(37,99,235,0.22);
+  background: linear-gradient(135deg, #e8f3fe 0%, #dbeafe 100%) !important;
+}
+
+.super-pillar-card:hover::before {
+  height: 7px;
+}
+
+.super-pillar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.super-pillar-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+
+.super-pillar-tag {
+  font-size: 0.86rem !important;
+  font-weight: 900 !important;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #0284c7;
+  border: 1.5px solid #93c5fd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.super-pillar-title {
+  font-size: 1.42rem !important;
+  font-weight: 900 !important;
+  color: #050811 !important;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.super-pillar-desc {
+  font-size: 1.02rem !important;
+  color: #0f172a !important;
+  line-height: 1.55;
+  margin: 0 0 16px 0;
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.super-pillar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1.5px solid #bfdbfe;
+  font-size: 1rem !important;
+  font-weight: 900;
+  color: #1d4ed8 !important;
+}
+
+.super-pillar-footer .arrow {
+  font-size: 1.25rem;
+  transition: transform 0.25s ease;
+}
+
+.super-pillar-card:hover .super-pillar-footer .arrow {
+  transform: translateX(6px);
+}
+
+/* Specific Pillars accents */
+.pillar-krishi {
+  --pillar-accent: #10b981;
+}
+
+.pillar-health {
+  --pillar-accent: #dc2626;
+}
+
+.pillar-sakhi {
+  --pillar-accent: #ec4899;
+}
+
+.pillar-ebook {
+  --pillar-accent: #d97706;
+}
+
+/* Mobile Responsiveness for 4 Pillars: 2x2 Grid */
+@media (max-width: 900px) {
+  .super-pillars-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .super-pillar-card {
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+  }
+  .super-pillar-icon {
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 1.6rem !important;
+  }
+  .super-pillar-title {
+    font-size: 1.15rem !important;
+  }
+  .super-pillar-desc {
+    font-size: 0.88rem !important;
+    margin-bottom: 12px !important;
+  }
+  .super-pillar-footer {
+    font-size: 0.9rem !important;
+  }
+}
+@media (max-width: 480px) {
+  .super-pillars-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .super-pillar-card {
+    padding: 14px 10px !important;
+  }
+  .super-pillar-tag {
+    font-size: 0.68rem !important;
+    padding: 2px 6px !important;
+  }
+  .super-pillar-title {
+    font-size: 1.05rem !important;
+  }
+  .super-pillar-desc {
+    font-size: 0.8rem !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* AarogyamTube floating pill compress */
+.at-floating-pill.compressed {
+  padding: 8px !important;
+  border-radius: 50% !important;
+  width: 50px !important;
+  height: 50px !important;
+  justify-content: center !important;
+  box-shadow: 0 6px 20px rgba(220,38,38,0.4) !important;
+}
+.at-floating-pill.compressed .at-pill-text,
+.at-floating-pill.compressed .at-pill-live-dot {
+  display: none !important;
+}
+.at-floating-pill.compressed .at-pill-logo {
+  margin: 0 !important;
+}
+.at-floating-pill.compressed:hover {
+  width: auto !important;
+  border-radius: 30px !important;
+  padding: 8px 16px !important;
+}
+.at-floating-pill.compressed:hover .at-pill-text,
+.at-floating-pill.compressed:hover .at-pill-live-dot {
+  display: inline !important;
+}
+
+/* 10. Sakhi Floating Pill: Always Keep at Top-Left as Originally Configured */
+.sakhi-floating-pill {
+  top: 98px !important;
+  bottom: auto !important;
+  left: 12px !important;
+  right: auto !important;
+  z-index: 999999 !important;
+}
+@media (max-width: 768px) {
+  .sakhi-floating-pill {
+    top: 94px !important;
+    bottom: auto !important;
+    left: 8px !important;
+    right: auto !important;
+    z-index: 999999 !important;
+  }
+}

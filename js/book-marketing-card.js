@@ -406,7 +406,7 @@
     const inWishlist = window.AarogyamWishlist.isInWishlist(bId);
 
     // KPI Badges List
-    let featuresList = ['🌱 120+ रंगीन पेज', '📷 300+ फोटो', '🧪 स्प्रे साइंस', '📱 Mobile PDF'];
+    let featuresList = ['🎧 ऑडियो बुक', '📷 300+ फोटो', '🧪 स्प्रे साइंस', '📱 Mobile PDF'];
     if (book.features && Array.isArray(book.features) && book.features.length > 0) {
       featuresList = book.features.map(f => typeof f === 'object' ? (f.text || '') : f).filter(Boolean);
     }
