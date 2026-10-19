@@ -1158,6 +1158,10 @@
     if (!rawText) return '';
     let t = String(rawText);
 
+    // 0. Strip markdown code blocks / prompts completely so TTS doesn't read long English prompts or code fences
+    t = t.replace(/```[\s\S]*?```/g, ' ');
+    t = t.replace(/`[^`]*`/g, ' ');
+
     // 1. Strip HTML tags
     t = t.replace(/<[^>]*>/g, ' ');
 
@@ -2549,6 +2553,16 @@
     t = t.replace(/(?:हाई\s*बीपी|बढ़ा\s*बीपी|उच्च\s*रक्तचाप)/gi, 'high bp');
     t = t.replace(/(?:hba1c|hb\s*a1c|hba\s*1c)/gi, 'hba1c');
 
+    // Aarogyam India & Sakhi Spoken Normalizations (aurgyam, arogyam, arogya)
+    t = t.replace(/\b(?:aurgyam|arogyam|arogym|arogya|aarogya)\b/gi, 'aarogyam');
+
+    // Poster & Prompt Phonetic Normalizations (postart, postar, promt, propmt, prampt)
+    t = t.replace(/\b(?:postart|postar|postr|bannr|bannar)\b/gi, 'poster');
+    t = t.replace(/\b(?:promt|propmt|prampt|pompt|pramt|प्राम्ट|प्राम्प्ट|पोस्टार)\b/gi, 'prompt');
+
+    // Checklist Phonetic Normalizations (chek list, check list, checklist, cheklist, चेक लिस्ट, चेक सूची)
+    t = t.replace(/(?:chek\s*list|cheklist|check\s*list|checklist|चेक\s*लिस्ट|चेक\s*सुची|चेक\s*सूची)/gi, 'चेकलिस्ट');
+
     // Greetings & Casual Word-Boundary Normalization
     t = t.replace(/\b(?:gm|g\.m\.)\b/gi, 'good morning');
     t = t.replace(/\b(?:gn|g\.n\.)\b/gi, 'good night');
@@ -3091,14 +3105,27 @@
       }
     }
 
-    // 2. "kya kar rahe ho" / "tum kya karti ho" / "kya kya karsakti ho" (Capabilities)
-    if (cleanQ.includes('kya kar rahe') || cleanQ.includes('kya kar rahi') || cleanQ.includes('kya karti ho') || cleanQ.includes('kya kaam hai') || cleanQ.includes('kya kya kar') || cleanQ.includes('kya kya karsakti') || cleanQ.includes('kya karsakti ho') || cleanQ.includes('tum kya kar sakti') || cleanQ.includes('क्या क्या कर सकती')) {
-      const resp = `मैं आरोग्यम इंडिया की बहु-प्रतिभाशाली डिजिटल सखी हूँ! 👩‍🌾✨ मैं आपके लिए निम्नलिखित सभी कार्य 24×7 कर सकती हूँ:\n\n1. 🌾 **फसल डॉक्टर:** गेहूं, सरसों, धान, चना व सब्जियों के कीट-रोग पहचान व जैविक स्प्रे फॉर्मूला।\n2. 🐄 **पशुपालन व डेयरी:** गाय-भैंस का दूध व 7-8 फैट बढ़ाने और बांझपन दूर करने की सलाह।\n3. 🩺 **आयुर्वेदिक स्वास्थ्य:** जोड़ों का दर्द, शुगर, बीपी, थायराइड व लिवर की संपूर्ण प्राकृतिक देखभाल।\n4. ✨ **प्राकृतिक सौंदर्य:** चेहरे की झाइयां, मुहांसे व बालों के झड़ने के हर्बल व दादी के नुस्खे।\n5. 💼 **नेट्सर्फ बिज़नेस:** 25% छूट, कंज्यूमर प्लान व ₹8,19,250 पाक्षिक कैपिंग करियर गाइड।\n6. 📚 **डिजिटल लाइब्रेरी:** 'खेती का डॉक्टर' ई-बुक्स व आरोग्यम ट्यूब वीडियो।\n\nबताइए, आज आप किस विषय पर जानकारी चाहते हैं?`;
-      renderCrispSpecialBox('✨ आरोग्यम सखी AI की सेवाएं व क्षमताएं', resp, [
-        { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसलों में खाद व स्प्रे फॉर्मूला बताएं' },
-        { text: '🐄 2. पशु पोषण व दूध-फैट सप्लीमेंट', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
-        { text: '🩺 3. स्वास्थ्य व नेचुरामोर सप्लीमेंट्स', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
-        { text: '💼 4. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+    // 2. "kya kar rahe ho" / "tum kya karti ho" / "kya kya karsakti ho" / "sakhi kya kya kar sakti" (Capabilities & Services)
+    const isCapabilitiesQuery = (
+      cleanQ.includes('kya kar rahe') || cleanQ.includes('kya kar rahi') || cleanQ.includes('kya karti ho') ||
+      cleanQ.includes('kya kaam hai') || cleanQ.includes('kya kya kar') || cleanQ.includes('kya kya karsakti') ||
+      cleanQ.includes('kya karsakti ho') || cleanQ.includes('tum kya kar sakti') || cleanQ.includes('क्या क्या कर सकती') ||
+      cleanQ.includes('sakhi kya kya') || cleanQ.includes('sakhi kya kar') || cleanQ.includes('सखी क्या कर सकती') ||
+      cleanQ.includes('सखी क्या क्या कर सकती') || cleanQ.includes('सखी के काम') || cleanQ.includes('सखी की क्षमता') ||
+      cleanQ.includes('tumhare kaam') || cleanQ.includes('tumhare features') || cleanQ.includes('क्या काम करती हो') ||
+      cleanQ.includes('kya kaam karti') || cleanQ.includes('kya suvidha') || cleanQ.includes('kya madat kar sakti')
+    );
+
+    if (isCapabilitiesQuery) {
+      const resp = `मैं **आरोग्यम सखी AI** हूँ — देश के किसान भाइयों, पशुपालकों और परिवारों की 24×7 सच्ची डिजिटल हमदर्द व AI डॉक्टर! 👩‍🌾🤖✨\n\nमैं आपके लिए निम्नलिखित सभी कार्य तुरंत और 100% सटीकता से कर सकती हूँ:\n\n1. 🌾 **फसल डॉक्टर व स्प्रे गणित:** गेहूं, सरसों, चना, मिर्च, टमाटर व 20+ फसलों के रोग पहचान, जैविक दवा व सही स्प्रे समय।\n2. 🎨 **ChatGPT व Gemini AI पोस्टर प्रॉम्प्ट:** अपनी फोटो व नाम के साथ सुप्रभात, त्योहार, खेती व बिज़नेस के 8K एचडी पोस्टर प्रॉम्प्ट्स।\n3. 📋 **दैनिक कार्य व फसल/स्वास्थ्य चेकलिस्ट:** स्प्रे शेड्यूल, अंग्रेजी दवा सेफ्टी, सुबह-शाम की डाइट व पशु पोषण की रेडीमेड चेकलिस्ट।\n4. 🩺 **रोगी कुंडली व डिजिटल स्वास्थ्य पर्चा:** जोड़ों का दर्द, शुगर, बीपी, थायराइड, हीमोग्लोबिन व डाइट चार्ट का पूरा पर्चा।\n5. 📲 **पर्सनलाइज़्ड सोशल मीडिया कॉपी जनरेटर:** आपके नाम और मोबाइल नंबर के साथ WhatsApp स्टेटस व Facebook पोस्ट मैसेज।\n6. 🐄 **पशुपालन व दूध-फैट वृद्धि:** गाय-भैंस में 2 से 3 लीटर दूध व 7-8 फैट बढ़ाने और बांझपन दूर करने की अचूक सलाह।\n7. ✨ **केमिकल-मुक्त ब्यूटी व हेयर केयर:** चेहरे की झाइयां, मुहांसे व बालों के झड़ने के 100% प्राकृतिक 3-स्टेप रूटीन।\n8. 💼 **नेट्सर्फ 25% छूट व Q3 पाथफाइंडर:** डायरेक्ट सेलिंग, कंज्यूमर बचत, ई-टेलर मॉडल व ₹8,19,250 पाक्षिक कैपिंग करियर गाइड।\n9. 📅 **100 वर्ष शुद्ध पंचांग व ⛅ लाइव मौसम:** शुभ मुहूर्त, चंद्र स्थिति, बारिश अलर्ट व 'खेती का डॉक्टर' ई-बुक्स।\n\n👉 नीचे दिए गए बटन पर क्लिक करके किसी भी सेवा का तुरंत लाभ उठाएं:`;
+      renderCrispSpecialBox('✨ आरोग्यम सखी AI की सेवाएं व संपूर्ण क्षमताएं', resp, [
+        { text: '🎨 1. AI पोस्टर प्रॉम्प्ट बनाएं', query: 'मेरे लिए पोस्टर का प्रॉम्प्ट बनाओ' },
+        { text: '📋 2. फसल/स्वास्थ्य चेकलिस्ट बनाएं', query: 'दैनिक कार्य और स्प्रे की चेकलिस्ट बनाओ' },
+        { text: '🩺 3. स्वास्थ्य पर्चा व डाइट चार्ट', query: 'स्वास्थ्य परामर्श व आयुर्वेदिक समाधान' },
+        { text: '📲 4. मेरे नाम से WhatsApp मैसेज', query: 'मेरे नाम और नंबर से व्हाट्सएप मैसेज बनाओ' },
+        { text: '🌾 5. फसल डॉक्टर व स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 6. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '💼 7. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
       ], 'casual', 'capabilities');
       return true;
     }
@@ -11161,6 +11188,66 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   // =========================================================================
+  // 18.55 CHATGPT-STYLE INTERACTIVE AI CHECKLIST STUDIO (CROP, HEALTH, DAIRY, BIZ)
+  // =========================================================================
+  function handleAiChecklistGenerator(cleanQ, rawQ) {
+    const isChecklistReq = (
+      cleanQ.includes('चेकलिस्ट') || cleanQ.includes('checklist') || cleanQ.includes('chek list') ||
+      cleanQ.includes('check list') || cleanQ.includes('कार्य सूची') || cleanQ.includes('चेक लिस्ट') ||
+      cleanQ.includes('daily routine') || cleanQ.includes('शेड्यूल लिस्ट') ||
+      (cleanQ.includes('चेक') && (cleanQ.includes('लिस्ट') || cleanQ.includes('सूची') || cleanQ.includes('बना')))
+    );
+
+    if (!isChecklistReq) return false;
+
+    let userName = getUserName() || 'साथी';
+    let userPhone = getUserPhone() || '7974422572';
+
+    const isAgri = cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('crop') || cleanQ.includes('फसल') || cleanQ.includes('spray') || cleanQ.includes('स्प्रे') || cleanQ.includes('biofit') || cleanQ.includes('बायोफिट');
+    const isHealth = cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('bp') || cleanQ.includes('बीपी') || cleanQ.includes('joint') || cleanQ.includes('दर्द') || cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर');
+    const isPashu = cleanQ.includes('pashu') || cleanQ.includes('पशु') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('दूध') || cleanQ.includes('dairy');
+    const isBusiness = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('business') || cleanQ.includes('बिज़नेस') || cleanQ.includes('pathfinder') || cleanQ.includes('कमाई') || cleanQ.includes('लीडर');
+    const isBeauty = cleanQ.includes('beauty') || cleanQ.includes('स्किन') || cleanQ.includes('बाल') || cleanQ.includes('झाइयां') || cleanQ.includes('चेहरे') || cleanQ.includes('सौंदर्य');
+
+    let categoryTitle = '';
+    let checklistContent = '';
+    let shareWaText = '';
+
+    if (isAgri) {
+      categoryTitle = '🌾 फसल सुरक्षा व 100% जैविक स्प्रे चेकलिस्ट (Crop Spray Checklist)';
+      checklistContent = `📋 **फसल सुरक्षा व जैविक स्प्रे दैनिक चेकलिस्ट:**\n👤 **किसान साथी:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **1. बुवाई/रोपाई से पहले (बीज संस्कार):**\n  [ ] 1 किग्रा बीज में 5ml स्टिमरिच + 5ml Bio-99 मिलाकर छाया में 30 मिनट सुखाया?\n  [ ] 1 एकड़ में 1 लीटर शेत (SHET) बैक्टीरिया खाद मिट्टी में मिलाई?\n\n☑️ **2. फसल 15-20 दिन की होने पर (पहला स्प्रे):**\n  [ ] स्टिमरिच (20ml) + बायो-99 (5ml) प्रति 15 लीटर पंप घोल तैयार किया?\n  [ ] सुबह 10 बजे से पहले या शाम को खिली धूप/शांत मौसम में स्प्रे किया?\n\n☑️ **3. फूल आने से पहले (शाखाएं व कल्ले):**\n  [ ] स्टिमरिच (25ml) + इंटैक्ट (कीट सुरक्षा 25ml) का छिड़काव?\n\n☑️ **4. फल/दाना भरते समय:**\n  [ ] एनपीके बैक्टीरिया कल्चर + स्टिमरिच का अंतिम स्प्रे?\n\n💡 **विशेष सावधानी:** हमेशा साफ पानी का उपयोग करें और Bio-99 अवश्य मिलाएं ताकि बारिश में भी दवा न धुले।`;
+      shareWaText = `🌾 *फसल सुरक्षा व जैविक स्प्रे चेकलिस्ट*\nकिसान: ${userName}\n\n1. बीज संस्कार: स्टिमरिच + Bio-99\n2. 20 दिन पर पहला स्प्रे (फुटाव व हरियाली)\n3. फूल आने पर इंटैक्ट कीट सुरक्षा\n\n👉 अपनी फसल की सटीक डोज सखी AI से पूछें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else if (isHealth) {
+      categoryTitle = '🩺 दैनिक स्वास्थ्य, डायबिटीज व बीपी केयर चेकलिस्ट (Daily Health Checklist)';
+      checklistContent = `📋 **दैनिक स्वास्थ्य व नेचुरामोर संपूर्ण रूटीन चेकलिस्ट:**\n👤 **नाम:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **सुबह (7:00 AM - 9:00 AM):**\n  [ ] 1 गिलास गुनगुना पानी (मेथी/तांबा जल) घूंट-घूंट करके पिया?\n  [ ] 1 चम्मच नेचुरामोर (Daily Nutrition) गुनगुने पानी या दूध के साथ नाश्ते के बाद लिया?\n  [ ] 20-30 मिनट ताजी हवा में तेज चाल (Morning Walk) पूरी की?\n\n☑️ **दोपहर (1:00 PM - 2:00 PM):**\n  [ ] भोजन से पहले 1 पूरी प्लेट हरी कच्ची सलाद (खीरा, ककड़ी, टमाटर) खाई?\n  [ ] भारी तेल-मसाले व चीनी/मैदे से परहेज रखा?\n\n☑️ **शाम व रात (7:00 PM - 10:00 PM):**\n  [ ] शाम 5 बजे भुने चने या दालचीनी चाय ली?\n  [ ] रात का भोजन हल्का व 8 बजे से पहले समाप्त किया?\n  [ ] सोने से पहले अपनी निर्धारित सप्लीमेंट (लाइफ स्टाइल प्लस / जॉइंट केयर) ली?\n  [ ] रात को 7-8 घंटे की गहरी शांत नींद सुनिश्चित की?`;
+      shareWaText = `🩺 *दैनिक स्वास्थ्य व पोषण चेकलिस्ट*\nनाम: ${userName}\n\n1. सुबह: गुनगुना पानी + नेचुरामोर पोषण + मॉर्निंग वॉक\n2. दोपहर: भोजन से पहले सलाद + मल्टीग्रेन रोटी\n3. रात: हल्का भोजन + समय पर नींद\n\n👉 स्वास्थ्य सलाह आरोग्यम सखी AI पर पाएं: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else if (isPashu) {
+      categoryTitle = '🐄 पशुपालन, 2-3 लीटर दूध व फैट वृद्धि चेकलिस्ट (Dairy Cattle Checklist)';
+      checklistContent = `📋 **पशु पोषण, दूध व फैट वृद्धि दैनिक चेकलिस्ट:**\n👤 **पशुपालक:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **सुबह की देखभाल:**\n  [ ] पशु को ताजा, स्वच्छ पेयजल भरपेट पिलाया?\n  [ ] सुबह के चारे/बांटे में **10 से 15 ग्राम Biofit CFC Plus** अच्छी तरह मिलाया?\n  [ ] थनों की साफ-सफाई व सूखी जगह सुनिश्चित की?\n\n☑️ **दोपहर व आहार प्रबंधन:**\n  [ ] हरे चारे (बरसीम/नेपियर) और सूखे भूसे का संतुलित 60:40 अनुपात दिया?\n  [ ] पशु को खुली हवा व धूप/छाया के अनुकूल स्थान पर बांधा?\n\n☑️ **शाम की देखभाल:**\n  [ ] शाम के दाना-मिश्रण में भी 10 ग्राम CFC Plus पाउडर दिया?\n  [ ] दूध निकालने के बाद थनों को पोटेशियम परमैंगनेट के हल्के घोल से धोया?\n\n💡 **परिणाम:** लगातार 15 से 20 दिन सीएफसी देने पर 2 से 3 लीटर दूध व 7-8 फैट की वृद्धि होती है और बांझपन खत्म होता है!`;
+      shareWaText = `🐄 *पशुपालन, दूध व फैट वृद्धि चेकलिस्ट*\nपशुपालक: ${userName}\n\n1. सुबह बांटे में 10-15g CFC Plus\n2. हरा व सूखा चारा संतुलित 60:40\n3. शाम को दोबारा 10g CFC Plus\n\n👉 पशु पोषण फॉर्मूला सखी AI पर देखें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else if (isBusiness) {
+      categoryTitle = '💼 नेट्सर्फ Q3 पाथफाइंडर 90-डे डेली एक्शन चेकलिस्ट (Business Daily Checklist)';
+      checklistContent = `📋 **नेट्सर्फ डिस्ट्रीब्यूटर 5-स्टेप डेली एक्शन चेकलिस्ट (DMO):**\n👤 **लीडर:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **1. व्यक्तिगत उपयोग व उत्पाद अनुभव:**\n  [ ] आज खुद नेचुरामोर या हर्ब्स एंड मोर उत्पाद का उपयोग किया?\n\n☑️ **2. प्रतिदिन 2 नए लोगों से संपर्क (2 Contacts Daily):**\n  [ ] आज 2 नए किसान भाइयों या सहेलियों को डिजिटल कैटलॉग भेजा?\n  [ ] कम से कम 1 व्यक्ति को 25% छूट पर उपभोक्ता बनाया?\n\n☑️ **3. सोशल मीडिया व WhatsApp स्टेटस (Daily Branding):**\n  [ ] सखी AI से बनाया गया पर्सनलाइज़्ड बायोफिट/नेचुरामोर स्टेटस शेयर किया?\n\n☑️ **4. टीम फॉलो-अप (15 मिनट):**\n  [ ] अपनी टीम के 2 एक्टिव साथियों से बात करके उनकी मदद की?\n\n☑️ **5. आत्म-विकास (Learning):**\n  [ ] 'खेती का डॉक्टर' ई-बुक का 1 अध्याय पढ़ा या आरोग्यम ट्यूब वीडियो देखा?`;
+      shareWaText = `💼 *नेट्सर्फ 90-डे डेली एक्शन चेकलिस्ट*\nलीडर: ${userName}\n\n1. प्रोडक्ट सेल्फ-यूज़\n2. 2 नए लोगों से बातचीत\n3. WhatsApp स्टेटस शेयर\n4. टीम फॉलो-अप\n\n👉 अपनी बिज़नेस ग्रोथ सखी AI से सीखें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+    } else {
+      categoryTitle = '📋 आरोग्यम ऑल-इन-वन स्मार्ट चेकलिस्ट स्टूडियो (AI Checklist Studio)';
+      checklistContent = `नमस्ते ${userName} जी! 🙏 आरोग्यम सखी AI आपके कार्य को आसान बनाने के लिए निम्नलिखित सभी प्रकार की रेडीमेड चेकलिस्ट तुरंत तैयार करती है:\n\n1. 🌾 **फसल सुरक्षा व स्प्रे चेकलिस्ट:** बुवाई, खाद, पहला स्प्रे व फंगस नियंत्रण की समयबद्ध सूची।\n2. 🩺 **दैनिक स्वास्थ्य व डाइट चेकलिस्ट:** शुगर, बीपी, थायराइड व वजन घटाने का सुबह से रात का रूटीन।\n3. 🐄 **पशु पोषण व दूध वृद्धि चेकलिस्ट:** सीएफसी प्लस, आहार, पानी व थनैला रोकथाम की दैनिक सूची।\n4. 💼 **नेट्सर्फ बिज़नेस डेली चेकलिस्ट:** 2 कॉल प्रतिदिन, स्टेटस शेयरिंग व 90-डे पाथफाइंडर कार्ययोजना।\n5. ✨ **केमिकल-फ्री ब्यूटी चेकलिस्ट:** सुबह फेसवॉश, डे क्रीम, हेयर ऑयल व नाइट केयर स्टेप्स।\n\n👉 नीचे दिए गए बटन से अपनी मनपसंद चेकलिस्ट तुरंत प्राप्त करें:`;
+    }
+
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(shareWaText || checklistContent)}`;
+
+    renderCrispSpecialBox(categoryTitle, checklistContent, [
+      { text: '📲 यह चेकलिस्ट WhatsApp पर भेजें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: '🌾 1. फसल स्प्रे चेकलिस्ट', query: 'फसलों के स्प्रे और खाद की चेकलिस्ट बनाओ' },
+      { text: '🩺 2. स्वास्थ्य व डाइट चेकलिस्ट', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' },
+      { text: '🐄 3. पशुपालन दूध वृद्धि चेकलिस्ट', query: 'पशुपालन और दूध फैट बढ़ाने की चेकलिस्ट बनाओ' },
+      { text: '💼 4. नेट्सर्फ बिज़नेस चेकलिस्ट', query: 'नेट्सर्फ बिज़नेस और डेली एक्शन चेकलिस्ट बनाओ' },
+      { text: '🎨 5. AI पोस्टर प्रॉम्प्ट बनाएं', query: 'मेरे लिए पोस्टर का प्रॉम्प्ट बनाओ' }
+    ], 'omni', 'checklist_studio');
+    return true;
+  }
+
+  // =========================================================================
   // 18.6 CHATGPT & GEMINI AI POSTER PROMPT STUDIO (DALL-E 3 & GEMINI READY)
   // =========================================================================
   function handleAiPosterPromptGenerator(cleanQ, rawQ) {
@@ -11168,7 +11255,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       cleanQ.includes('poster') || cleanQ.includes('पोस्टर') || cleanQ.includes('banner') || cleanQ.includes('बैनर') ||
       cleanQ.includes('prompt') || cleanQ.includes('प्रॉम्प्ट') || cleanQ.includes('image bana') || cleanQ.includes('इमेज बना') ||
       cleanQ.includes('फोटो बना') || cleanQ.includes('image prompt') || cleanQ.includes('प्रमोशनल इमेज') ||
-      cleanQ.includes('poster prompt')
+      cleanQ.includes('poster prompt') || cleanQ.includes('postart') || cleanQ.includes('promt') ||
+      cleanQ.includes('प्राम्ट') || cleanQ.includes('ai photo') || cleanQ.includes('ai poster') ||
+      (cleanQ.includes('फोटो') && (cleanQ.includes('बना') || cleanQ.includes('प्रॉम्प्ट') || cleanQ.includes('तैयार')))
     );
 
     if (!isPosterReq) return false;
@@ -11206,7 +11295,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       generatedPrompt = `Ultra-modern 8K health and wellness promotional poster. A bright, energetic natural setting with herbs, green tea leaves, and amla fruits around a glowing jar of Naturamore Daily Nutrition and Life Style Plus capsules. An active, healthy Indian family smiling with vitality. Premium typography: "संपूर्ण पारिवारिक पोषण — कमजोरी दूर, मजबूत दिल व संतुलित शुगर! फ्लैट 25% छूट पर घर बैठे मंगाएं।". At the bottom, a stylish verified wellness advisor card featuring attached photo: "अधिकृत नेचुरामोर डिस्ट्रीब्यूटर: ${userName} | WhatsApp: ${userPhone}". Clean medical-ayurvedic aesthetic, vibrant colors, studio lighting.`;
     }
 
-    const respText = `🌸 **मैं सीधे इमेज फ़ाइल नहीं बनाती, लेकिन आपके लिए ChatGPT (DALL-E 3) और Google Gemini में 100% अल्ट्रा-एचडी पोस्टर बनवाने का सटीक मास्टर प्रॉम्प्ट तैयार है!**\n\n📌 **${categoryTitle}:**\n\`\`\`text\n${generatedPrompt}\n\`\`\`\n\n💡 **पोस्टर बनाने की 3-स्टेप आसान विधि:**\n1. ऊपर दिए गए बॉक्स से **प्रॉम्प्ट कॉपी करें**।\n2. अपने मोबाइल में **ChatGPT ऐप** या **Google Gemini ऐप** खोलें।\n3. 'Attach Photo' (+) पर क्लिक करके अपनी फोटो (या प्रोडक्ट फोटो) जोड़ें और यह प्रॉम्प्ट पेस्ट करके **Generate / Send** दबा दें। 10 सेकंड में आपका अल्ट्रा-एचडी पोस्टर तैयार हो जाएगा!\n\n👉 नीचे दिए गए बटन से अन्य श्रेणियों के प्रॉम्प्ट्स तुरंत प्राप्त करें:`;
+    const respText = `🌸 **मैं सीधे इमेज फ़ाइल नहीं बनाती, लेकिन आपके लिए ChatGPT (DALL-E 3) और Google Gemini में 100% अल्ट्रा-एचडी पोस्टर बनवाने का सटीक मास्टर प्रॉम्प्ट तैयार है!**\n\n📌 **${categoryTitle}:**\n\`\`\`text\n${generatedPrompt}\n\`\`\`\n\n💡 **पोस्टर बनाने की 3-स्टेप आसान विधि:**\n1. ऊपर दिए गए बॉक्स से **'कॉपी करें'** बटन पर क्लिक करें।\n2. अपने मोबाइल में **ChatGPT ऐप** या **Google Gemini ऐप** खोलें।\n3. 'Attach Photo' (+) पर क्लिक करके अपनी फोटो (या प्रोडक्ट फोटो) जोड़ें और यह प्रॉम्प्ट पेस्ट करके **Generate / Send** दबा दें। 10 सेकंड में आपका अल्ट्रा-एचडी पोस्टर तैयार हो जाएगा!\n\n👉 नीचे दिए गए बटन से अन्य श्रेणियों के प्रॉम्प्ट्स तुरंत प्राप्त करें:`;
 
     renderCrispSpecialBox(categoryTitle, respText, [
       { text: '🌅 सुप्रभात व प्रेरणा पोस्टर प्रॉम्प्ट', query: 'सुप्रभात और दैनिक प्रेरणा का पोस्टर प्रॉम्प्ट दो' },
@@ -11247,6 +11336,16 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0.00002 EVERYDAY GREETINGS & CASUAL SOCIAL ROUTER (Top Priority: GM, GN, Namaste, Hi, Kaise Ho)
     if (handleEverydayConversations(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000021 CHATGPT-STYLE INTERACTIVE AI CHECKLIST STUDIO (Checklists for Crop, Health, Dairy, Business)
+    if (typeof handleAiChecklistGenerator === 'function' && handleAiChecklistGenerator(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000022 CHATGPT & GEMINI AI POSTER PROMPT STUDIO (Poster & Image Prompts)
+    if (typeof handleAiPosterPromptGenerator === 'function' && handleAiPosterPromptGenerator(cleanQ, rawQ)) {
       return;
     }
 
@@ -12710,6 +12809,25 @@ ${shareUrl}`;
   function formatTextHtml(str) {
     if (!str) return '';
     let escaped = escapeHtml(str);
+
+    // Convert ```code / prompt``` blocks into sleek, interactive copy cards!
+    escaped = escaped.replace(/```(?:text|prompt|html|json|js)?\s*\n?([\s\S]*?)```/gi, function(match, codeContent) {
+      const cleanContent = codeContent.trim();
+      return `
+        <div class="sakhi-code-prompt-card" style="background:#0f172a;color:#f8fafc;border-radius:14px;padding:14px 16px;margin:12px 0;border:1.5px solid #334155;box-shadow:0 6px 18px rgba(0,0,0,0.25);position:relative;text-align:left;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;border-bottom:1px solid #334155;padding-bottom:6px;">
+            <span style="font-size:0.78rem;font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> AI मास्टर प्रॉम्प्ट (ChatGPT / Gemini Ready)
+            </span>
+            <button type="button" class="sakhi-copy-btn" onclick="const t = this.closest('.sakhi-code-prompt-card').querySelector('.sakhi-prompt-content').innerText; navigator.clipboard.writeText(t); this.innerHTML='<i class=\\\'fa-solid fa-check\\\'></i> कॉपी हो गया!'; this.style.background='#16a34a'; setTimeout(()=>{this.innerHTML='<i class=\\\'fa-solid fa-copy\\\'></i> कॉपी करें'; this.style.background='#2563eb';}, 2500);" style="background:#2563eb;color:#ffffff;border:none;padding:5px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s;">
+              <i class="fa-solid fa-copy"></i> कॉपी करें
+            </button>
+          </div>
+          <div class="sakhi-prompt-content" style="font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:0.86rem;line-height:1.6;color:#e2e8f0;white-space:pre-wrap;word-break:break-word;">${cleanContent}</div>
+        </div>
+      `;
+    });
+
     // Convert **bold** to <strong> so text is bold without ugly ** showing or breaking TTS
     escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#14532d;font-weight:800;">$1</strong>');
     escaped = escaped.replace(/\*\*/g, '');
