@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v1.2';
-const PAGES_CACHE = 'aarogyam-public-pages-v1.2';
-const MEDIA_CACHE = 'aarogyam-public-media-v1.2';
+const STATIC_CACHE = 'aarogyam-public-static-v1.3';
+const PAGES_CACHE = 'aarogyam-public-pages-v1.3';
+const MEDIA_CACHE = 'aarogyam-public-media-v1.3';
 const OFFLINE_URL = '/offline.html';
 
 
@@ -60,11 +60,18 @@ const PRECACHE_SHELL = [
   '/images/books/fasal-ka-doctor-cover.webp'
 ];
 
+// 0. MESSAGE: Instant Skip Waiting trigger from client
+self.addEventListener('message', (event) => {
+  if (event.data && (event.data.action === 'skipWaiting' || event.data.type === 'SKIP_WAITING')) {
+    self.skipWaiting();
+  }
+});
+
 // 1. INSTALL: Precache App Shell & Core Assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      console.log('[Aarogyam PWA SW] Precaching Public App Shell V7');
+      console.log('[Aarogyam PWA SW] Precaching Public App Shell V1.3');
       return cache.addAll(PRECACHE_SHELL).catch((err) => {
         console.warn('[Aarogyam PWA SW] Precache partial warning:', err);
       });
@@ -88,6 +95,12 @@ self.addEventListener('activate', (event) => {
     }).then(() => {
       console.log('[Aarogyam PWA SW] Claiming clients for instant control');
       return self.clients.claim();
+    }).then(() => {
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'SW_ACTIVATED', version: STATIC_CACHE });
+        });
+      });
     })
   );
 });
@@ -113,8 +126,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Dynamic Site Configurations & Catalog: Network First (always fresh for admin edits & live visitors)
-  if (url.pathname.includes('site-pages-config') || url.pathname.includes('universal-book-landing') || url.searchParams.has('v')) {
+  // Dynamic CSS, JS Assets & Site Configurations: Network First with Cache Fallback (Zero stale UI for live visitors)
+  if (
+    url.pathname.endsWith('.css') ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.includes('site-pages-config') ||
+    url.pathname.includes('universal-book-landing') ||
+    url.searchParams.has('v')
+  ) {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
@@ -126,7 +145,9 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(async () => {
           const cache = await caches.open(STATIC_CACHE);
-          return (await cache.match(request)) || new Response('{"sitePages":[]}', { headers: { 'Content-Type': 'application/json' } });
+          const cached = await cache.match(request);
+          if (cached) return cached;
+          return (await caches.match(request)) || new Response('', { status: 408, statusText: 'Offline' });
         })
     );
     return;

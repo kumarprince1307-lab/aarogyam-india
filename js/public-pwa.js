@@ -255,10 +255,38 @@ function ensureMobileMenuInstallButton() {
 
 function registerPublicServiceWorker() {
   if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        console.log('🔄 [Public PWA] New Service Worker active, reloading for latest updates...');
+        window.location.reload();
+      }
+    });
+
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SW_ACTIVATED') {
+        console.log('🎉 [Public PWA] Cache updated to:', event.data.version);
+      }
+    });
+
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .then((reg) => {
           console.log('✅ [Public PWA] Service Worker registered, scope:', reg.scope);
+          if (reg.waiting) {
+            reg.waiting.postMessage({ action: 'skipWaiting' });
+          }
+          reg.addEventListener('updatefound', () => {
+            const installingWorker = reg.installing;
+            if (installingWorker) {
+              installingWorker.addEventListener('statechange', () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  installingWorker.postMessage({ action: 'skipWaiting' });
+                }
+              });
+            }
+          });
           try { reg.update(); } catch(e) {}
         })
         .catch((err) => {
