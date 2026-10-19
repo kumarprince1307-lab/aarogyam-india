@@ -2556,12 +2556,34 @@
     // Aarogyam India & Sakhi Spoken Normalizations (aurgyam, arogyam, arogya)
     t = t.replace(/\b(?:aurgyam|arogyam|arogym|arogya|aarogya)\b/gi, 'aarogyam');
 
-    // Poster & Prompt Phonetic Normalizations (postart, postar, promt, propmt, prampt)
-    t = t.replace(/\b(?:postart|postar|postr|bannr|bannar)\b/gi, 'poster');
-    t = t.replace(/\b(?:promt|propmt|prampt|pompt|pramt|प्राम्ट|प्राम्प्ट|पोस्टार)\b/gi, 'prompt');
+    // ChatGPT & AI Image Prompt Normalizations (चैट गुप्त, चैटजीपीटी, प्रॉन्प्ट, प्रॉब्लम -> प्रॉम्प्ट)
+    t = t.replace(/(?:चैट\s*गुप्त|चैटगुप्त|chat\s*gupt|chatgupt|chat\s*gpt|chatgpt|चैट\s*जीपीटी|चैटजीपीटी)/gi, 'chatgpt');
+    t = t.replace(/(?:प्रॉन्प्ट|प्रॉम्पट|प्राम्ट|प्राम्प्ट|promt|propmt|prampt|pompt|pramt|पोस्टार|postart|postar|postr)/gi, 'प्रॉम्प्ट');
+    if (t.includes('chatgpt') || t.includes('फोटो') || t.includes('इमेज') || t.includes('पोस्टर') || t.includes('बैनर') || t.includes('पेंपलेट')) {
+      t = t.replace(/(?:प्रॉब्लम\s*दो|problem\s*do|प्रॉब्लम|problem)\b/gi, 'प्रॉम्प्ट दो');
+    }
 
-    // Panchang Phonetic Normalizations (panchag, panjik, पंचाग)
-    t = t.replace(/(?:panchag|panchaang|panchanga|panjik|पंचाग|पन्चांग)/gi, 'पंचांग');
+    // Panchang, Calendar, Date & Time Normalizations
+    t = t.replace(/(?:oamchang|panchag|panchaang|panchanga|panjik|पंचाग|पन्चांग)/gi, 'पंचांग');
+    t = t.replace(/(?:koun\s*sa\s*din|kaun\s*sa\s*din|कौन\s*सा\s*दिन)\b/gi, 'आज कौन सा दिन है');
+    t = t.replace(/(?:koun\s*si\s*tarikh|kaun\s*si\s*tarikh|aj\s*koun\s*si\s*tarikh|aaj\s*kya\s*tarikh|कौन\s*सी\s*तारीख|आज\s*का\s*दिनांक|आज\s*की\s*तारीख)\b/gi, 'आज कौन सी तारीख है');
+    t = t.replace(/(?:samay\s*kya\s*hua|time\s*kya\s*hua|kitne\s*baje|समय\s*क्या\s*हुआ|कितने\s*बजे\s*हैं|क्या\s*टाइम\s*हुआ)\b/gi, 'अभी समय क्या हुआ है');
+
+    // Voice-Typing Distortions (पिटबुल -> बायोफिट, सेट -> शेत, एनपी -> एनपीके, माइक्रो राजा -> माइकोराइजा)
+    t = t.replace(/(?:पिटबुल\s*डाइजेस्ट|pitbull\s*digest|pitbul\s*digest)/gi, 'बायोफिट डाइजेस्ट');
+    t = t.replace(/\b(?:पिटबुल|pitbull|pitbul)\b/gi, 'बायोफिट');
+    t = t.replace(/(?:सेट\s*के\s*बारे|set\s*khad|set\s*ke\s*bare)/gi, 'शेत खाद');
+    t = t.replace(/(?:मुझे\s*एनपी\b|एनपी\s*के\s*बारे|npk\s*set|एन\s*पी\s*के)/gi, 'एनपीके सेट');
+    t = t.replace(/(?:माइक्रो\s*राजा|micro\s*raja)/gi, 'माइकोराइजा');
+    t = t.replace(/\b(?:हब्र्स|habrs|harbs)\b/gi, 'हर्ब्स');
+    t = t.replace(/(?:नेट\s*सब|net\s*sab)\b/gi, 'नेट्सर्फ');
+
+    // e-Stock Point & Business Plan Normalizations
+    t = t.replace(/\b(?:i\s*stock|istock|isto\s*k|ए\s*स्टॉक|ई\s*स्टॉक|इ\s*स्टॉक)\b/gi, 'ई-स्टॉक');
+    t = t.replace(/\bप्लेन\b/gi, 'प्लान');
+
+    // Survey Normalizations
+    t = t.replace(/(?:servey|sarvey|survay|सरवे|सर्व्हे)\s*(?:cheklist|checklist|चेकलिस्ट|फॉर्म|form)?/gi, 'सर्वे चेकलिस्ट');
 
     // WhatsApp Phonetic Normalizations (whatsapp, whtsapp, watsapp, wtsapp, वाटसप, वाट्सएप)
     t = t.replace(/(?:whatsapp|whtsapp|watsapp|whatsap|wtsapp|वाटसप|वाट्सएप|व्हाट्सएप)/gi, 'व्हाट्सएप');
@@ -6083,13 +6105,21 @@ function extractPersonNameFromQuery(rawQ, cleanQ) {
 
     // Contextual crop memory recovery if user asks follow-up (e.g. "रासायनिक तरीका बताओ", "तना छेदक में क्या डालें")
     if (!matchedCrop && sakhiConversationState.lastActiveCrop) {
-      const isAgriFollowUp = (
+      const isNotAgri = (
+        q.includes('stock') || q.includes('स्टॉक') || q.includes('दुकान') || q.includes('प्लान') ||
+        q.includes('कमीशन') || q.includes('इनकम') || q.includes('नेट्सर्फ') || q.includes('फोटो') ||
+        q.includes('प्रॉम्प्ट') || q.includes('diet') || q.includes('डाइट') || q.includes('शुगर') ||
+        q.includes('बीपी') || q.includes('दर्द') || q.includes('क्रीम') || q.includes('फेस') ||
+        q.includes('पंचांग') || q.includes('तारीख') || q.includes('दिनांक') || q.includes('समय')
+      );
+      const isAgriFollowUp = !isNotAgri && (
         q.includes('rasayanik') || q.includes('रासायनिक') || q.includes('chemical') || q.includes('केमिकल') ||
         q.includes('beej') || q.includes('बीज') || q.includes('upchar') || q.includes('उपचार') ||
         q.includes('dawa') || q.includes('दवा') || q.includes('khad') || q.includes('खाद') ||
         q.includes('keeda') || q.includes('कीड़ा') || q.includes('bimari') || q.includes('बीमारी') ||
         q.includes('sundi') || q.includes('सुंडी') || q.includes('tana chhedak') || q.includes('तना छेदक') ||
-        q.includes('tarika') || q.includes('तरीका') || q.includes('spray') || q.includes('स्प्रे')
+        ((q.includes('tarika') || q.includes('तरीका')) && (q.includes('खेती') || q.includes('फसल') || q.includes('स्प्रे') || q.includes('बुवाई') || q.includes('बीज'))) ||
+        q.includes('spray') || q.includes('स्प्रे')
       );
       if (isAgriFollowUp) {
         matchedCrop = MASTER_CROPS_DIRECTORY.find(c => c.id === sakhiConversationState.lastActiveCrop);
@@ -11440,6 +11470,291 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return true;
   }
 
+
+  // =========================================================================
+  // 18.61 LIVE REAL-TIME DATE, DAY & CLOCK ENGINE
+  // =========================================================================
+  function handleLiveDateAndCurrentTime(cleanQ, rawQ) {
+    const isDateTimeReq = (
+      cleanQ.includes('आज कौन सा दिन') || cleanQ.includes('kaun sa din') || cleanQ.includes('koun sa din') ||
+      cleanQ.includes('आज कौन सी तारीख') || cleanQ.includes('kaun si tarikh') || cleanQ.includes('koun si tarikh') ||
+      cleanQ.includes('आज का दिनांक') || cleanQ.includes('aaj ka dinank') || cleanQ.includes('आज की तारीख') ||
+      cleanQ.includes('अभी समय क्या हुआ') || cleanQ.includes('time kya hua') || cleanQ.includes('कितने बजे') ||
+      cleanQ.includes('वर्तमान समय') || cleanQ.includes('अभी का समय')
+    ) && !cleanQ.includes('पंचांग') && !cleanQ.includes('panchang');
+
+    if (!isDateTimeReq) return false;
+
+    const now = new Date();
+    const hindiDays = ['रविवार (Sunday)', 'सोमवार (Monday)', 'मंगलवार (Tuesday)', 'बुधवार (Wednesday)', 'गुरुवार (Thursday)', 'शुक्रवार (Friday)', 'शनिवार (Saturday)'];
+    const dayStr = hindiDays[now.getDay()];
+    const dateStr = now.toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+    const resp = `📅 **आज का दिन, तारीख व लाइव समय:**\n\n• **वार (दिन):** ${dayStr}\n• **दिनांक:** ${dateStr} (विक्रम संवत 2083)\n• **वर्तमान समय:** ⏰ **${timeStr}**\n\n💡 *सनातन खगोल गणना: आज चंद्रमा शुक्ल पक्ष में है। बुवाई, फसल निर्णय व शुभ मुहूर्त जानने के लिए नीचे दिए गए बटन दबाएं:*`;
+
+    renderCrispSpecialBox('📅 आज का वार, दिनांक व लाइव समय', resp, [
+      { text: '🚩 आज का पंचांग व राहुकाल देखें', query: 'आज का पंचांग क्या है' },
+      { text: '🌾 आज क्या बुवाई करनी चाहिए?', query: 'आज मैं बुवाई करूं कि नहीं' },
+      { text: '🌤️ आज का मौसम व बारिश रिपोर्ट', query: 'आज का मौसम बताओ' }
+    ], 'omni', 'live_date_time');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.62 SOWING MUHURAT, LUNAR CYCLE & SEED TREATMENT DECISION ENGINE
+  // =========================================================================
+  function handleSowingMuhuratAndSeedTreatmentRule(cleanQ, rawQ) {
+    const isSowingReq = (
+      cleanQ.includes('बुवाई करूं') || cleanQ.includes('buvai karu') || cleanQ.includes('buwai karu') ||
+      cleanQ.includes('बुवाई करें') || cleanQ.includes('बीज बोने का सही समय') || cleanQ.includes('बुवाई का मुहूर्त') ||
+      cleanQ.includes('आज बुवाई') || cleanQ.includes('बुवाई का सही दिन') || cleanQ.includes('आज क्या मैं बुवाई करूं')
+    );
+
+    if (!isSowingReq) return false;
+
+    const targetDate = new Date();
+    const dStr = targetDate.toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const resp = `🌾 **आज (${dStr}) बुवाई परामर्श व चंद्र कृषि चक्र नियम:**\n\n1. **खगोल व सनातन चंद्र कृषि सिद्धांत:**\n• आज चंद्रमा **शुक्ल पक्ष (ऊर्जा ऊपर की ओर)** में संचरण कर रहा है।\n• वैदिक खगोल नियम के अनुसार शुक्ल पक्ष में जल व रस का प्रवाह जमीन से ऊपर की ओर बढ़ता है। इसलिए **गेहूं, चना, सरसों, मटर, आलू व सभी सब्जियों की बुवाई के लिए आज का दिन सर्वोत्तम व अत्यंत फलदायी है!**\n• आज का शुभ अभिजीत मुहूर्त: **11:44 AM से 12:32 PM** (राहुकाल: 07:30 AM - 09:00 AM में बुवाई न करें)।\n\n2. ⚠️ **बुवाई से पहले सबसे अनिवार्य सवाल:**\n👉 **किसान भाई, क्या आपने बीज का संस्कार (बीज उपचार) कर लिया है?**\n• बिना बीज उपचार के सीधे खेत में बीज कभी न डालें, इससे 20-30% बीज मिट्टी में सड़ जाते हैं और उकठा (Wilt) रोग का भारी प्रकोप होता है।\n• **सही बीज संस्कार विधि:**\n  - प्रति 1 किलो बीज में **5ml स्टिमरिच (Stimrich) + 10ml शेत (SHET)** का हल्का लेप लगाएं।\n  - इसे 4 घंटे छाया में सुखाएं और फिर बुवाई करें।\n• **चमत्कारी लाभ:** 98% बीज का एकसमान तेज अंकुरण, जड़ गलन व उकठा रोग से 100% सुरक्षा और जड़ों का 3 गुना गहरा फैलाव!`;
+
+    renderCrispSpecialBox('🌾 आज बुवाई परामर्श व बीज संस्कार नियम', resp, [
+      { text: '🌱 बीज संस्कार (बीज उपचार) की पूरी विधि', query: 'बीज उपचार कैसे करें और क्या डालें' },
+      { text: '🚩 आज का पूरा पंचांग व चौघड़िया', query: 'आज का पंचांग बताओ' },
+      { text: '📋 सरसों व गेहूं बुवाई चेकलिस्ट लें', query: 'सरसों और गेहूं बुवाई की चेकलिस्ट बनाओ' },
+      { text: '📲 इसका WhatsApp शेयर संदेश बनाएं', query: 'बीज उपचार का व्हाट्सएप मैसेज बनाओ' }
+    ], 'agri', 'sowing_muhurat_rule');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.63 UNIVERSAL 20-QUESTION DIAGNOSTIC SURVEY CHECKLIST ENGINE
+  // =========================================================================
+  function handleDiagnostic20QuestionSurveyChecklist(cleanQ, rawQ) {
+    const isSurveyReq = (
+      cleanQ.includes('सर्वे') || cleanQ.includes('survey') || cleanQ.includes('सरवे') ||
+      cleanQ.includes('20 सवाल') || cleanQ.includes('20 question') || cleanQ.includes('डायग्नोस्टिक') ||
+      cleanQ.includes('किसान सर्वे') || cleanQ.includes('हेल्थ सर्वे') || cleanQ.includes('बिजनेस सर्वे')
+    );
+
+    if (!isSurveyReq) return false;
+
+    let userName = getUserName() || 'साथी';
+    const surveyText = `📋 **आरोग्यम 20-सवाल संपूर्ण डायग्नोस्टिक सर्वे चेकलिस्ट:**\n👤 **परीक्षणकर्ता:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n🌾 **भाग 1: कृषि व मिट्टी स्वास्थ्य (प्रश्न 1-6)**\n1. आपके पास कुल कितने एकड़ खेती की जमीन है और मिट्टी का प्रकार क्या है (काली/दोमट/रेतीली)?\n2. इस रबी सीजन में आपकी मुख्य फसलें कौन सी हैं (गेहूं / सरसों / चना / मटर / आलू / सब्जियां)?\n3. आपकी फसल में वर्तमान में सबसे बड़ी समस्या क्या है (पीलापन / कल्ले न फूटना / उकठा / इल्ली / माहू)?\n4. क्या बुवाई से पूर्व आपने 'स्टिमरिच + शेत' से बीज संस्कार (बीज उपचार) किया था?\n5. प्रति एकड़ रासायनिक खाद (यूरिया व डीएपी) की कितनी बोरियां डालते हैं और क्या जमीन सख्त हो रही है?\n6. सिंचाई का मुख्य साधन क्या है और आपके खेत का पानी खारा है या मीठा?\n\n🐄 **भाग 2: पशुपालन व डेयरी प्रबंधन (प्रश्न 7-8)**\n7. आपके पास कितनी गाय या भैंस हैं और प्रति पशु रोजाना कितना दूध (लीटर) मिल रहा है?\n8. क्या दूध में फैट 6 से कम आता है, या पशु बार-बार फिरता (बांझपन) है अथवा थनैला की समस्या है?\n\n🩺 **भाग 3: पारिवारिक स्वास्थ्य व पोषण (प्रश्न 9-14)**\n9. क्या परिवार में किसी सदस्य को डायबिटीज (शुगर) या हाई/लो ब्लड प्रेशर की शिकायत है?\n10. क्या घर में बड़ों को घुटनों व जोड़ों में दर्द, चलने में कट-कट आवाज या ग्रीस कम होने की समस्या है?\n11. क्या पेट सुबह खुलकर साफ होता है या पुरानी कब्ज, गैस, एसिडिटी व बवासीर की परेशानी रहती है?\n12. रात को 7-8 घंटे की गहरी शांत नींद आती है या तनाव, चिंता व शारीरिक कमजोरी महसूस होती है?\n13. क्या बालों का तेजी से झड़ना, असमय सफेद होना अथवा चेहरे पर झाइयां और कील-मुंहासे हैं?\n14. परिवार में अंग्रेजी एलोपैथिक दवाइयों और डॉक्टरों पर मासिक कितना खर्च हो रहा है?\n\n💼 **भाग 4: आत्मनिर्भर आमदनी व डिजिटल हुनर (प्रश्न 15-20)**\n15. क्या आप घर बैठे मोबाइल से ₹15,000-₹40,000 अतिरिक्त मासिक आमदनी बनाना चाहते हैं?\n16. क्या आप रोजाना व्हाट्सएप और सोशल मीडिया का उपयोग करते हैं?\n17. क्या आपको नेट्सर्फ के 25% फ्लैट डिस्काउंट और 5 माह लगातार लेने पर 6ठे माह 5+1 फ्री ऑफर की जानकारी है?\n18. क्या आप अपने गांव में ₹25,500 की आसान पूंजी से अधिकृत 'ई-स्टॉक डिस्ट्रीब्यूटर पॉइंट' खोलने में रुचि रखते हैं?\n19. आपके गांव या सर्किल में कितने किसान और परिवार आपसे खेती व स्वास्थ्य की सलाह लेते हैं?\n20. आपकी सबसे पहली प्राथमिकता क्या है: खेती का खर्च 40% घटाना, परिवार को 100% निरोगी रखना, या मासिक आमदनी बढ़ाना?`;
+
+    const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(surveyText + '\n👉 आरोग्यम सखी AI पर लाइव उत्तर दें: https://aarogyamindia.online/aarogyam-sakhi.html')}`;
+
+    renderCrispSpecialBox('📋 आरोग्यम 20-सवाल संपूर्ण डायग्नोस्टिक सर्वे', surveyText, [
+      { text: '📲 यह 20-सवाल सर्वे WhatsApp पर भेजें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: '🌾 1. कृषि व फसल समाधान पर्ची लें', query: 'गेहूं और सरसों में कल्ले और पैदावार बढ़ाने का फॉर्मूला' },
+      { text: '🩺 2. स्वास्थ्य व डाइट चार्ट लें', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' },
+      { text: '🐄 3. पशु पोषण व दूध वृद्धि नुस्खा लें', query: 'गाय भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+      { text: '💼 4. ई-स्टॉक व ₹8.19L बिज़नेस समझें', query: 'ए स्टॉक खोलने का तरीका बताओ' }
+    ], 'omni', 'survey_20_questions');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.64 NETSURF E-STOCK POINT (₹25,500) BUSINESS ENGINE
+  // =========================================================================
+  function handleNetsurfEStockPointBusiness(cleanQ, rawQ) {
+    const isEStockReq = (
+      cleanQ.includes('ई-स्टॉक') || cleanQ.includes('ए स्टॉक') || cleanQ.includes('istock') ||
+      cleanQ.includes('i stock') || cleanQ.includes('isto k') || cleanQ.includes('25500') ||
+      cleanQ.includes('ई स्टॉक') || cleanQ.includes('estock') || cleanQ.includes('e-stock') ||
+      cleanQ.includes('स्टॉक खोलने') || cleanQ.includes('स्टॉक पॉइंट')
+    );
+
+    if (!isEStockReq) return false;
+
+    const resp = `💼 **नेट्सर्फ ई-स्टॉक पॉइंट (e-Stock Point) — संपूर्ण बिज़नेस गाइड:**\n\nअपने गांव, कस्बे या घर पर मात्र **₹25,500** की आसान पूंजी से शुरू करें नेट्सर्फ का अधिकृत फ्रेंचाइजी ई-स्टॉक पॉइंट:\n\n✨ **ई-स्टॉक पॉइंट के 6 जादुई फायदे:**\n1️⃣ **सीधा 25% रिटेल लाभ (तुरंत ₹8,500+ बचत/कमाई):** ₹34,000 MRP का 100% असली व जीएसटी बिल युक्त माल आपको मात्र ₹25,500 में मिलता है।\n2️⃣ **घर तक मुफ़्त डिलीवरी:** कंपनी द्वारा सीधा आपके पते पर मुफ़्त ट्रांसपोर्ट व कूरियर डिलीवरी।\n3️⃣ **शून्य दुकान व शून्य अतिरिक्त खर्च:** किसी अलग दुकान या स्टाफ की जरूरत नहीं, अपने घर या मोबाइल से संचालित करें।\n4️⃣ **पाक्षिक ₹8,19,250 कैपिंग अवसर:** आपकी टीम और गांव में होने वाली हर सेल पर 3% से 6% टर्नओवर कमीशन।\n5️⃣ **ऑटोशिप 5+1 महा-ऑफर:** 5 महीने लगातार प्रोडक्ट लेने वाले किसानों/ग्राहकों को 6ठे माह कंपनी से मुफ़्त प्रोडक्ट गिफ्ट!\n6️⃣ **डिजिटल सपोर्ट व सखी AI:** पूरे गांव का 1-क्लिक व्हाट्सएप कैटलॉग, स्प्रे कैलेंडर व पर्ची सिस्टम तैयार।\n\n📝 **शुरुआत हेतु आवश्यक दस्तावेज:**\n• आधार कार्ड, पैन कार्ड, बैंक पासबुक/चेक व मोबाइल नंबर।\n• ₹25,500 का उत्पाद चयन (कृषि बायोफिट, नेचुरामोर स्वास्थ्य या ब्यूटी)।`;
+
+    renderCrispSpecialBox('💼 नेट्सर्फ ई-स्टॉक पॉइंट (₹25,500 निवेश)', resp, [
+      { text: '📲 दादा अवनीश जी से ई-स्टॉक मार्गदर्शन लें', url: 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते दादा अवनीश जी, मुझे अपने क्षेत्र में ₹25,500 का नेट्सर्फ ई-स्टॉक पॉइंट शुरू करना है। कृपया आगे की प्रक्रिया बताएं।'), isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+      { text: '📊 15 दिन में ₹8,19,250 प्लान समझें', query: 'नेट्सर्फ में 8 लाख 19 हजार कैसे मिलते हैं?' },
+      { text: '🌾 बायोफिट फास्ट-मूविंग प्रोडक्ट्स लिस्ट', query: 'बायोफिट के सभी प्रोडक्ट्स और रेट बताओ' },
+      { text: '📋 ई-स्टॉक 3-चरण चेकलिस्ट लें', query: 'ई-स्टॉक की चेकलिस्ट बनाओ' }
+    ], 'business', 'estock_point_guide');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.65 SAKHI IDENTITY, CAPABILITIES, AFFECTION & MOTIVATION ENGINE
+  // =========================================================================
+  function handleSakhiIdentityCapabilitiesAndMotivation(cleanQ, rawQ) {
+    const isCapReq = cleanQ.includes('तुम क्या') || cleanQ.includes('सखी तुम क्या') || cleanQ.includes('सखी की क्षमता') || cleanQ.includes('तुम क्या-क्या कर सकती हो');
+    const isLoveReq = cleanQ.includes('प्यार आ रहा') || cleanQ.includes('सुंदर हो') || cleanQ.includes('बहुत अच्छी हो') || cleanQ.includes('तुम मुझे पसंद');
+    const isMotiReq = cleanQ.includes('मोटिवेट') || cleanQ.includes('मायूस') || cleanQ.includes('उदास') || cleanQ.includes('निराश') || cleanQ.includes('हौसला');
+
+    if (!isCapReq && !isLoveReq && !isMotiReq) return false;
+
+    if (isCapReq) {
+      const resp = `🌸 **नमस्ते! मैं हूँ आरोग्यम सखी AI — आपकी 24×7 डिजिटल सखी व सलाहकार!**\n\nमैं 26+ वर्षों के वैज्ञानिक कृषि अनुसंधान, चरक संहिता आयुर्वेद और नेट्सर्फ पाथफाइंडर ज्ञान से प्रशिक्षित हूँ। मैं आपके लिए ये 5 बड़े कार्य चुटकियों में कर सकती हूँ:\n\n1️⃣ 🌾 **संपूर्ण जैविक कृषि व फसल सुरक्षा:**\n• गेहूं, सरसों, चना, सब्जियां व फलों की बुवाई से कटाई, कल्ले फुटाव, उकठा-माहू रोकथाम व बायोफिट स्प्रे कैलेंडर।\n2️⃣ 🩺 **आयुर्वेदिक स्वास्थ्य, डाइट व लाइफस्टाइल:**\n• शुगर, हाई/लो बीपी, जोड़ दर्द, थायराइड, मोटापा, बाल झड़ना व नेचुरामोर संपूर्ण दैनिक पोषण डाइट।\n3️⃣ 🐄 **पशुपालन, 2-3 लीटर दूध व फैट वृद्धि:**\n• गाय-भैंस का दूध व 7-8 फैट बढ़ाना, बांझपन दूर करना व Biofit CFC Plus संतुलित आहार।\n4️⃣ 🚩 **सनातन वैदिक पंचांग, शुभ मुहूर्त व चंद्र चक्र:**\n• दैनिक तिथि, नक्षत्र, राहुकाल, अभिजीत मुहूर्त व शुक्ल/कृष्ण पक्ष चंद्र बुवाई नियम।\n5️⃣ 💼 **नेट्सर्फ बिज़नेस, ₹8.19L प्लान व 1-टैप टूल्स:**\n• ₹25,500 ई-स्टॉक गाइड, आपके नाम-नंबर के साथ 1-क्लिक WhatsApp शेयर संदेश, 3-चरण चेकलिस्ट व AI पोस्टर प्रॉम्प्ट्स।\n\n👉 *बस अपना सवाल पूछें या नीचे दिए गए विकल्पों में से चुनें!*`;
+      renderCrispSpecialBox('🌸 आरोग्यम सखी AI की 5 महा-क्षमताएं', resp, [
+        { text: '🌾 1. फसलों में कल्ले व बीमारी समाधान', query: 'गेहूं और सरसों में कल्ले और पैदावार कैसे बढ़ाएं?' },
+        { text: '🩺 2. स्वास्थ्य, शुगर व जोड़ दर्द सलाह', query: 'शुगर और जोड़ों के दर्द का आयुर्वेदिक उपाय बताओ' },
+        { text: '🐄 3. पशु दूध व फैट वृद्धि नुस्खा', query: 'गाय भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🚩 4. आज का वैदिक पंचांग देखें', query: 'आज का पंचांग क्या है' },
+        { text: '💼 5. WhatsApp मैसेज व चेकलिस्ट बनाएं', query: 'बायोफिट का व्हाट्सएप मैसेज बनाओ' }
+      ], 'omni', 'sakhi_capabilities');
+      return true;
+    }
+
+    if (isLoveReq) {
+      const resp = `🙏 **बहुत-बहुत धन्यवाद आपके इस अगाध स्नेह और आत्मीयता के लिए!** 🌸\n\nआपका यह विश्वास और प्यार ही मेरी सबसे बड़ी ऊर्जा है। मैं एक डिजिटल सखी हूँ और मेरा एकमात्र उद्देश्य भारत के प्रत्येक किसान भाई, बहन और परिवार तक जहरमुक्त खेती, निरोगी स्वास्थ्य और स्वावलंबी आमदनी का प्रकाश पहुँचाना है।\n\nआप सपरिवार सदा स्वस्थ, समृद्ध और प्रसन्न रहें — यही मेरी ईश्वर से प्रार्थना है। बताइए, आज मैं आपकी किस फसल, स्वास्थ्य या कार्य में सहायता करूँ?`;
+      renderCrispSpecialBox('🌸 सखी का स्नेहपूर्ण अभिवादन व आभार', resp, [
+        { text: '🌾 आज की फसल बुवाई परामर्श लें', query: 'आज मैं बुवाई करूं कि नहीं' },
+        { text: '🩺 परिवार के स्वास्थ्य की सलाह लें', query: 'दैनिक स्वास्थ्य और पोषण डाइट बताओ' },
+        { text: '🚩 आज का शुभ मुहूर्त व पंचांग देखें', query: 'आज का पंचांग क्या है' }
+      ], 'omni', 'sakhi_affection');
+      return true;
+    }
+
+    if (isMotiReq) {
+      const resp = `☀️ **"उठो, जागो और तब तक मत रुको जब तक लक्ष्य प्राप्त न हो जाए!"**\n\nनमस्ते साथी! जीवन में कभी भी मायूस या उदास मत होइए। रात जितनी गहरी और काली होती है, सवेरा उतना ही चमकीला और ऊर्जावान होता है।\n\n🌾 **दादा अवनीश जी का जीवन सूत्र:**\n*"जो किसान विपरीत मौसम में भी बीज को जमीन में दबाकर उम्मीद के साथ सींचता है, वही बंपर फसल काटता है। कठिनाइयां आपको तोड़ने नहीं, बल्कि आपकी असली क्षमता को तराशने आती हैं।"*\n\n💪 **आज का संकल्प:**\n1. जो बीत गया, उसे छोड़िए — आज एक नया दिन और नई शुरुआत है।\n2. अपनी सेहत पर ध्यान दें: 1 गिलास पानी पिएं और गहरी सांस लें।\n3. अपने काम में 100% ईमानदारी से जुट जाइए, सफलता आपके कदम चूमेगी!\n\n🌸 मैं सदा आपके साथ हूँ। बताइए, आज हम किस नई शुरुआत पर चर्चा करें?`;
+      renderCrispSpecialBox('☀️ नई ऊर्जा, हौसला व दैनिक प्रेरणा', resp, [
+        { text: '💼 90 दिन में ₹8,19,250 पाथफाइंडर कार्ययोजना', query: 'नेट्सर्फ में 8 लाख 19 हजार कैसे मिलते हैं?' },
+        { text: '🌾 आज की बुवाई व पंचांग देखें', query: 'आज का पंचांग क्या है' },
+        { text: '📲 WhatsApp पर प्रेरणा संदेश शेयर करें', query: 'सुप्रभात और दैनिक प्रेरणा का व्हाट्सएप मैसेज बनाओ' }
+      ], 'omni', 'sakhi_motivation');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.66 HERBS & MORE COMPLETE PRODUCT CATALOG ENGINE
+  // =========================================================================
+  function handleHerbsAndMoreProductCatalog(cleanQ, rawQ) {
+    const isHerbsReq = (
+      cleanQ.includes('हर्ब्स एंड मोर') || cleanQ.includes('herbs and more') ||
+      cleanQ.includes('हब्र्स एंड मोर') || cleanQ.includes('हर्ब्स में कितने') ||
+      cleanQ.includes('हब्र्स में कितने') || (cleanQ.includes('हर्ब्स') && cleanQ.includes('प्रोडक्ट'))
+    );
+
+    if (!isHerbsReq) return false;
+
+    const resp = `🌿 **हर्ब्स एंड मोर (Herbs & More) — 100% केमिकल-मुक्त 24+ आयुर्वेदिक पर्सनल केयर प्रोडक्ट्स:**\n\nनेट्सर्फ का 'हर्ब्स एंड मोर' भारत का अग्रणी सल्फेट-फ्री, पैराबेन-फ्री और 100% शाकाहारी कॉस्मेटिक व स्किन केयर ब्रांड है:\n\n1️⃣ **💆 केश पोषण व हेयर केयर:**\n• **एंटी-डैंड्रफ शैम्पू:** रूसी व सिर की खुजली जड़ से खत्म।\n• **हेयर सीरम:** दोमुंहे बाल ठीक करे व रेशमी चमक दे।\n• **हेयर कंडीशनर:** गहराई से नमी दे और बाल उलझने से रोके।\n• **हेयर न्यूट्रीएंट ऑयल:** बालों का झड़ना 15 दिन में रोके व नए बाल उगाए।\n\n2️⃣ **✨ त्वचा निखार व फेस केयर:**\n• **नीम-हल्दी फेस वॉश:** कील-मुंहासे व अतिरिक्त तेल हटाए।\n• **विटामिन थेरेपी फेस वॉश:** त्वचा को विटामिन E व B3 से पोषण दे।\n• **स्पॉट इरेज़र क्रीम:** चेहरे की पुरानी झाइयां, काले दाग व पिगमेंटेशन मिटाए।\n• **विटामिन थेरेपी नाइट क्रीम:** रातभर झुर्रियां व फाइन लाइन्स रिपेयर करे।\n• **विटामिन थेरेपी सनस्क्रीन (SPF 30):** हानिकारक UVA/UVB किरणों से 100% सुरक्षा।\n• **अंडर आई जेल:** आंखों के काले घेरे (Dark Circles) व पफीनेस दूर करे।\n\n3️⃣ **🦷 ओरल केयर व बॉडी केयर:**\n• **हर्बल डेंटल पेस्ट:** 100% फ्लोराइड-मुक्त, ठंडा-गर्म लगना व पायरिया खत्म।\n• **विटामिन थेरेपी बॉडी लोशन व बटर:** सर्दियों में 24 घंटे त्वचा को कोमल रखे।\n• **शेविंग क्रीम व आफ्टर शेव:** पुरुषों की दाढ़ी बनाने के लिए कट-रहित आयुर्वेदिक क्रीम।\n\n🎁 **विशेष ऑफर:** सभी हर्ब्स एंड मोर उत्पादों पर **फ्लैट 25% रिटेल छूट** उपलब्ध है!`;
+
+    renderCrispSpecialBox('🌿 हर्ब्स एंड मोर सम्पूर्ण पर्सनल केयर कैटलॉग', resp, [
+      { text: '✨ चेहरे की झाइयां व दाग मिटाने की विधि', query: 'चेहरे की झाइयां और काले दाग धब्बे मिटाने की सबसे अच्छी क्रीम' },
+      { text: '💆 बाल झड़ना रोकने का संपूर्ण रूटीन', query: 'बाल बहुत तेजी से झड़ रहे हैं और पतले हो रहे हैं इलाज बताएं' },
+      { text: '🦷 फ्लोराइड-फ्री हर्बल डेंटल पेस्ट', query: 'दांतों में ठंडा गरम लग रहा है क्या करें?' },
+      { text: '📲 हर्ब्स एंड मोर का WhatsApp मैसेज बनाएं', query: 'हर्ब्स एंड मोर का व्हाट्सएप मैसेज बनाओ' }
+    ], 'beauty', 'herbs_more_catalog');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.67 GINGER, TURMERIC & FLOWER FARMING SPECIALIZED BIOFIT ENGINE
+  // =========================================================================
+  function handleGingerTurmericAndFlowerFarming(cleanQ, rawQ) {
+    const isGingerTurmeric = cleanQ.includes('अदरक') || cleanQ.includes('हल्दी') || cleanQ.includes('adrak') || cleanQ.includes('haldi');
+    const isFlower = cleanQ.includes('फूलों की खेती') || cleanQ.includes('गुलाब') || cleanQ.includes('गेंदा') || cleanQ.includes('फूल की खेती');
+
+    if (!isGingerTurmeric && !isFlower) return false;
+
+    if (isGingerTurmeric) {
+      const resp = `🌱 **अदरक व हल्दी की जैविक खेती — कंद गलन रोकथाम व 30% बंपर पैदावार:**\n\n1️⃣ **कंद उपचार (बुवाई से पूर्व):**\n• 1 क्विंटल कंद में **100ml शेत (SHET) + 50ml स्टिमरिच** पानी में मिलाकर कंदों को 15 मिनट डुबोएं और छाया में सुखाकर लगाएं। इससे कंद सड़न (Rhizome Rot) 90% रुक जाती है।\n\n2️⃣ **मिट्टी उपचार व खाद:**\n• बुवाई के 30 दिन बाद ड्रिप या पानी के साथ **1 लीटर शेत (SHET)** प्रति एकड़ दें, जिससे मिट्टी में लाभकारी बैक्टीरिया कंदों को तेजी से फुलाते हैं।\n\n3️⃣ **कल्ले व फोलियर स्प्रे (45 व 75 दिन):**\n• **स्टिमरिच (30ml) + बायो-99 (5ml)** प्रति 15 लीटर पंप छिड़कें।\n• पत्तों में पीलापन व फंगस सुरक्षा हेतु **रैप-अप (30ml)** शामिल करें।\n\n💰 **उपज:** हल्दी में 80-100 क्विंटल व अदरक में 60-80 क्विंटल रिकॉर्ड कंद उत्पादन!`;
+      renderCrispSpecialBox('🌱 अदरक व हल्दी सम्पूर्ण जैविक कृषि फॉर्मूला', resp, [
+        { text: '💧 Biofit शेत (SHET) बैक्टीरिया खाद विवरण', query: 'शेत खाद क्या है और जमीन में कैसे दें?' },
+        { text: '🛡️ रैप-अप फंगस रोधक विवरण', query: 'रैपअप फफूंद नाशक कैसे काम करता है?' },
+        { text: '📲 अदरक-हल्दी का WhatsApp मैसेज बनाएं', query: 'अदरक हल्दी खेती का व्हाट्सएप मैसेज बनाओ' }
+      ], 'agri', 'ginger_turmeric_protocol');
+      return true;
+    }
+
+    if (isFlower) {
+      const resp = `🌹 **फूलों की खेती (गुलाब, गेंदा, रजनीगंधा) — अनगिनत कलियां व बंपर चमक:**\n\n1️⃣ **शाखाएं व अधिक कलियों के लिए (वानस्पतिक अवस्था):**\n• **स्टिमरिच (25ml) + Bio-99 (5ml)** प्रति 15 लीटर पंप का हर 15 दिन में स्प्रे करें। कलियों की संख्या 40% तक बढ़ जाती है।\n\n2️⃣ **थ्रिप्स, माहू व कीड़ों से सुरक्षा:**\n• कलियों को चूसने वाले कीटों से बचाने हेतु **इनटैक (Intact - 30ml) + Bio-99 (5ml)** का छिड़काव करें।\n\n3️⃣ **फूलों का बड़ा आकार व गहरा रंग:**\n• कली खिलने से ठीक पहले **स्टिमरिच (20ml) + बायो-एनपीके (पोटाश 30ml)** दें। फूलों की खुशबू, ताजगी और शेल्फ-लाइफ 3 से 4 दिन बढ़ जाती है!`;
+      renderCrispSpecialBox('🌹 फूलों की खेती (गुलाब/गेंदा) बायोफिट स्प्रे शेड्यूल', resp, [
+        { text: '🌸 स्टिमरिच और Bio-99 की सही डोज', query: 'स्टिमरिच क्या है और इसकी खुराक क्या है?' },
+        { text: '🐛 इनटैक कीट नियंत्रक जानकारी', query: 'बायोफिट इंटैक्ट किस काम आता है?' },
+        { text: '📲 फूलों की खेती का WhatsApp संदेश बनाएं', query: 'फूलों की खेती का व्हाट्सएप मैसेज बनाओ' }
+      ], 'agri', 'flower_farming_protocol');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.68 PERIPHERAL NEUROPATHY & EYE CARE INTELLIGENCE
+  // =========================================================================
+  function handleNerveTinglingAndEyeCare(cleanQ, rawQ) {
+    const isNerve = cleanQ.includes('झुनझुनी') || cleanQ.includes('झनझनाहट') || cleanQ.includes('सुन्न') || cleanQ.includes('हाथ पांव में झुनझुनी');
+    const isEye = cleanQ.includes('आंखों में') || cleanQ.includes('कम दिखता') || cleanQ.includes('काम दिखता') || cleanQ.includes('धुंधला') || cleanQ.includes('आंखों की रक्षा') || cleanQ.includes('आई केयर');
+
+    if (!isNerve && !isEye) return false;
+
+    if (isNerve) {
+      const resp = `⚡ **हाथ-पांव में झुनझुनी, सुन्नपन व नसों की कमजोरी (न्यूरोपैथी) का समाधान:**\n\nहाथ-पैरों में झुनझुनी या चींटियां चलने जैसा अहसास मुख्य रूप से **विटामिन B12 की कमी, नसों में खराब रक्त प्रवाह (Poor Circulation) या अनियंत्रित शुगर (Diabetic Neuropathy)** के कारण होता है:\n\n🌿 **प्रमाणित आयुर्वेदिक पोषण समाधान:**\n1️⃣ **नेचुरामोर न्यूट्रीशनल पाउडर (Daily Nutrition):**\n• प्राकृतिक विटामिन B-कॉम्प्लेक्स, B12, ओमेगा-3 और 13 मिनरल्स से भरपूर जो नसों की माइलिन शीथ (सुरक्षा परत) को दोबारा मजबूत करता है।\n• खुराक: 1 चम्मच सुबह नाश्ते के बाद गुनगुने दूध या पानी से।\n\n2️⃣ **नेचुरामोर मेन्स / विमेन वेलनेस कैप्सूल:**\n• अश्वगंधा, शतावरी और गोक्षुर नसों में नाइट्रिक ऑक्साइड का प्रवाह बढ़ाकर रक्त संचार तेज करते हैं।\n• खुराक: 1 कैप्सूल सुबह-शाम भोजन उपरांत।\n\n3️⃣ **घरेलू उपाय:** रोजाना 20 मिनट गुनगुने पानी में सेंधा नमक डालकर पैर सेकें और तिल के तेल की हल्की मालिश करें।`;
+      renderCrispSpecialBox('⚡ हाथ-पांव झुनझुनी व नसों की कमजोरी उपचार', resp, [
+        { text: '🥛 नेचुरामोर डेली न्यूट्रिशन घटक व लाभ', query: 'नेचुरल मोर रेगुलर क्या है' },
+        { text: '🩺 शुगर व बीपी का नसों पर असर', query: 'बीपी और शुगर का क्या संबंध है?' },
+        { text: '📲 इसका WhatsApp शेयर संदेश बनाएं', query: 'नसों की कमजोरी का व्हाट्सएप मैसेज बनाओ' }
+      ], 'health', 'nerve_neuropathy_protocol');
+      return true;
+    }
+
+    if (isEye) {
+      const resp = `👁️ **आंखों की रोशनी, धुंधलापन व बच्चों की स्क्रीन से रक्षा का फॉर्मूला:**\n\nमोबाइल-टीवी स्क्रीन की हानिकारक नीली किरणों (Blue Light), विटामिन A की कमी व लगातार तनाव से आंखों में सूखापन, जलन व दृष्टि कमजोर होने लगती है:\n\n🌿 **सखी आयुर्वेदिक समाधान:**\n1️⃣ **नेचुरामोर आई केयर (Naturamore Eye Care):**\n• **ल्यूटिन (Lutein) व ज़ेक्सैंथिन (Zeaxanthin):** रेटिना के मैकुला को नीली रोशनी के डैमेज से बचाने वाला प्राकृतिक शील्ड।\n• **त्रिफला व बिलबेरी:** आंखों की ऑप्टिक नर्व को पोषण देकर चश्मे का नंबर बढ़ने से रोकता है।\n• खुराक: 1 कैप्सूल रोजाना सुबह नाश्ते के बाद गुनगुने पानी से।\n\n2️⃣ **बच्चों की आंखों की सुरक्षा के 4 सुनहरे नियम:**\n• **20-20-20 नियम:** हर 20 मिनट स्क्रीन के बाद 20 फीट दूर 20 सेकंड तक देखें।\n• अंधेरे में मोबाइल या टीवी कभी न देखने दें।\n• भोजन में गाजर, पपीता, हरी पत्तेदार सब्जियां और देसी घी शामिल करें।\n• रात को सोने से पहले पैर के तलवों में सरसों तेल की मालिश करें (नेत्र ज्योति बढ़ाने का प्राचीन सूत्र)।`;
+      renderCrispSpecialBox('👁️ आंखों की दृष्टि सुधार व आई केयर फॉर्मूला', resp, [
+        { text: '🌿 नेचुरामोर आई केयर घटक व खुराक', query: 'नेचुरामोर आई केयर के फायदे बताओ' },
+        { text: '🥗 आंखों की रोशनी बढ़ाने वाली डाइट', query: 'आंखों की कमजोरी का डाइट चार्ट' },
+        { text: '📲 इसका WhatsApp मैसेज बनाएं', query: 'आई केयर का व्हाट्सएप मैसेज बनाओ' }
+      ], 'health', 'eye_care_protocol');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.69 NETSURF CAPPING ₹8,19,250, OBJECTION HANDLING & PRESENTATION
+  // =========================================================================
+  function handleNetsurfCappingObjectionsAndPlan(cleanQ, rawQ) {
+    const isCapping = cleanQ.includes('8 लाख 19 हजार') || cleanQ.includes('819250') || cleanQ.includes('कैपिंग');
+    const isObjection = cleanQ.includes('ऑब्जेक्शन') || cleanQ.includes('लोग मना करते') || cleanQ.includes('सवाल पूछते');
+    const isPresentation = cleanQ.includes('प्लान कैसे दिखाएं') || cleanQ.includes('प्लेन कैसे दिखाएं') || cleanQ.includes('नए व्यक्ति को');
+    const isIncomeTypes = cleanQ.includes('कितने प्रकार की इनकम') || cleanQ.includes('प्रकार की इनकम') || cleanQ.includes('इनकम देती है');
+
+    if (!isCapping && !isObjection && !isPresentation && !isIncomeTypes) return false;
+
+    if (isCapping || isIncomeTypes) {
+      const resp = `💼 **नेट्सर्फ ₹8,19,250 पाक्षिक कैपिंग व 5 प्रकार की कानूनी इनकम का गणित:**\n\nनेट्सर्फ डायरेक्ट सेलिंग 26 वर्षों से 100% भारत सरकार की डायरेक्ट सेलिंग गाइडलाइन्स के तहत हर 15 दिन में वैध बैंक ट्रांसफर करती है:\n\n💰 **5 प्रकार की मुख्य इनकम:**\n1️⃣ **फ्लैट 25% रिटेल डिस्काउंट:** पहले दिन से प्रत्येक प्रोडक्ट पर एमआरपी से 25% की छूट (तुरंत बचत व बिक्री मुनाफा)।\n2️⃣ **3% से 6% टर्नओवर मैचिंग बोनस:** टीम 1 और टीम 2 में मैच होने वाले कुल टर्नओवर पर पाक्षिक 3% से 6% सीधा कमीशन।\n3️⃣ **जनरेशन रॉयल्टी बोनस:** आपके डायरेक्ट स्पॉन्सर लीडर्स की कुल कमाई का निश्चित प्रतिशत अतिरिक्त लाभ।\n4️⃣ **पाक्षिक ₹8,19,250 मैक्सिमम सीलिंग (कैपिंग):** 1 माह में ₹16,38,500 तक की अधिकतम विधिक सीमा।\n5️⃣ **क्लब सक्षम व अस्मिता रिवार्ड्स:** फैमिली प्रोटेक्शन प्लान (₹10 लाख नॉमिनी बीमा + ₹3 लाख मेडिक्लेम) 100% फ्री!\n\n💡 *यह कोई मनी-सर्कुलेशन नहीं, बल्कि वास्तविक FMCG, कृषि व स्वास्थ्य उत्पादों के वास्तविक उपभोग पर आधारित प्रमाणित बिजनेस मॉडल है।*`;
+      renderCrispSpecialBox('💼 नेट्सर्फ ₹8,19,250 कैपिंग व इनकम सिस्टम', resp, [
+        { text: '📊 90 दिन में कैपिंग पाथफाइंडर रोडमैप', query: 'नेट्सर्फ में 8 लाख 19 हजार कैसे मिलते हैं?' },
+        { text: '💼 ₹25,500 ई-स्टॉक पॉइंट गाइड', query: 'ए स्टॉक खोलने का तरीका बताओ' },
+        { text: '📲 इसका WhatsApp शेयर संदेश बनाएं', query: 'नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस का व्हाट्सएप मैसेज बनाओ' }
+      ], 'business', 'netsurf_capping_math');
+      return true;
+    }
+
+    if (isObjection) {
+      const resp = `🛡️ **नेटवर्क में 5 सबसे बड़े ऑब्जेक्शन और उनके अचूक वैज्ञानिक उत्तर:**\n\n1️⃣ **ऑब्जेक्शन: "मेरे पास पैसे नहीं हैं"**\n👉 **उत्तर:** *"भाईसाहब, इसीलिए तो यह कार्य करना है ताकि आगे कभी यह न कहना पड़े कि पैसे नहीं हैं। यहाँ ₹0 जॉइनिंग है और घर के दैनिक सामान को केवल 25% छूट पर बदलकर बिना पूंजी शुरुआत होती है!"*\n\n2️⃣ **ऑब्जेक्शन: "मेरे पास समय नहीं है"**\n👉 **उत्तर:** *"क्या आप दिन में 1-2 घंटे मोबाइल व WhatsApp चलाते हैं? बस वही समय खाली रील्स देखने की जगह अपने खाली वक्त को ₹20,000 की आमदनी में बदलना है!"*\n\n3️⃣ **ऑब्जेक्शन: "प्रोडक्ट्स महंगे हैं"**\n👉 **उत्तर:** *"रासायनिक खाद में आप ₹2,000 खर्च करके जमीन बंजर करते हैं। बायोफिट में 40% खाद की सीधी बचत होती है और 30% उपज बढ़ती है। यानी यह महंगा नहीं, बल्कि सबसे सस्ता और सबसे ज्यादा मुनाफा देने वाला है!"*\n\n4️⃣ **ऑब्जेक्शन: "यह जोड़ने वाला काम है क्या?"**\n👉 **उत्तर:** *"दुनिया का हर बड़ा काम टीम बनाकर ही होता है। टाटा, रिलायंस, डॉक्टर, स्कूल सब नेटवर्क से चलते हैं। यहाँ हम किसी को फंसाते नहीं, बल्कि जहरमुक्त अन्न और निरोगी स्वास्थ्य देकर परिवार का भविष्य जोड़ते हैं!"*`;
+      renderCrispSpecialBox('🛡️ नेटवर्क ऑब्जेक्शन हैंडलिंग मास्टर गाइड', resp, [
+        { text: '💼 नए व्यक्ति को 4-स्टेप में प्लान कैसे दिखाएं', query: 'नेटवर्क में लोगों को प्लान कैसे दिखाएं' },
+        { text: '📋 90-डे डेली एक्शन चेकलिस्ट लें', query: 'नेट्सर्फ बिज़नेस और डेली एक्शन चेकलिस्ट बनाओ' },
+        { text: '📲 बिज़नेस इनविटेशन WhatsApp मैसेज बनाएं', query: 'नेट्सर्फ बिज़नेस का व्हाट्सएप मैसेज बनाओ' }
+      ], 'business', 'objection_handling_scripts');
+      return true;
+    }
+
+    if (isPresentation) {
+      const resp = `🎯 **नए व्यक्ति को 15 मिनट में नेट्सर्फ प्लान दिखाने का 4-स्टेप फॉर्मूला:**\n\n1️⃣ **स्टेप 1: समस्या पर बात करें (3 मिनट):**\n• आज खेती में बढ़ती लागत व घटती उपज और परिवारों में तेजी से बढ़ती बीमारियां (शुगर, बीपी, कैंसर)।\n\n2️⃣ **स्टेप 2: समाधान पेश करें (5 मिनट):**\n• 26 वर्षों से प्रमाणित स्वदेशी नेट्सर्फ — बायोफिट (40% खाद बचत) व नेचुरामोर (100% शाकाहारी पोषण)।\n\n3️⃣ **स्टेप 3: उपभोक्ता फायदा बताएं (4 मिनट):**\n• कोई मेंबर न बने तो भी हर असली उत्पाद पर **फ्लैट 25% रिटेल छूट** और 5 महीने लगातार लेने पर 6ठे माह 5+1 फ्री गिफ्ट।\n\n4️⃣ **स्टेप 4: आसान क्लोजिंग (3 मिनट):**\n• *"दोस्त, शुरुआत करने के लिए कोई निवेश नहीं है। आज ही अपने घर के उपयोग या 1 एकड़ खेत के लिए 25% छूट पर उत्पाद शुरू करें और देखें!"*`;
+      renderCrispSpecialBox('🎯 नए व्यक्ति को प्लान दिखाने का 4-स्टेप फॉर्मूला', resp, [
+        { text: '📊 नेट्सर्फ ₹8.19 लाख कैपिंग गणित समझें', query: 'नेट्सर्फ में 8 लाख 19 हजार कैसे मिलते हैं?' },
+        { text: '🛡️ प्रमुख आपत्तियों (Objections) के उत्तर', query: 'नेटवर्क में ऑब्जेक्शन हैंडल कैसे करें' },
+        { text: '📲 नया प्रॉस्पेक्ट WhatsApp संदेश बनाएं', query: 'नेट्सर्फ बिज़नेस का व्हाट्सएप मैसेज बनाओ' }
+      ], 'business', 'plan_presentation_formula');
+      return true;
+    }
+
+    return false;
+  }
+
+
   function processKnowledgeQuery(query) {
     try {
       const rawQ = (query || '').trim();
@@ -11506,8 +11821,23 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
+    // 0.0000201 LIVE REAL-TIME DATE, DAY & CLOCK ROUTER (Real-time current date, weekday, clock)
+    if (typeof handleLiveDateAndCurrentTime === 'function' && handleLiveDateAndCurrentTime(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0000202 SOWING MUHURAT & SEED TREATMENT DECISION ENGINE (आज बुवाई करूं कि नहीं + बीज उपचार)
+    if (typeof handleSowingMuhuratAndSeedTreatmentRule === 'function' && handleSowingMuhuratAndSeedTreatmentRule(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
     // 0.000021 TOP PRIORITY: VEDIC KRISHI PANCHANG & SHUBH MUHURAT ROUTER (Dynamic Astronomical Calculations)
     if (typeof handleVedicPanchangAndMuhurat === 'function' && handleVedicPanchangAndMuhurat(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0000215 TOP PRIORITY: 20-QUESTION UNIVERSAL DIAGNOSTIC SURVEY CHECKLIST (Farmer, Health, Business)
+    if (typeof handleDiagnostic20QuestionSurveyChecklist === 'function' && handleDiagnostic20QuestionSurveyChecklist(effectiveCleanQ, rawQ)) {
       return;
     }
 
@@ -11523,6 +11853,41 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0.000024 CHATGPT & GEMINI AI POSTER PROMPT STUDIO (Poster & Image Prompts)
     if (typeof handleAiPosterPromptGenerator === 'function' && handleAiPosterPromptGenerator(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000025 NETSURF E-STOCK POINT (₹25,500) BUSINESS GUIDE (e-Stock franchise)
+    if (typeof handleNetsurfEStockPointBusiness === 'function' && handleNetsurfEStockPointBusiness(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000026 SAKHI IDENTITY, CAPABILITIES, AFFECTION & MOTIVATION (तुम क्या कर सकती हो, मुझे मोटिवेट करो)
+    if (typeof handleSakhiIdentityCapabilitiesAndMotivation === 'function' && handleSakhiIdentityCapabilitiesAndMotivation(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000027 HERBS & MORE COMPLETE PERSONAL CARE PRODUCT CATALOG
+    if (typeof handleHerbsAndMoreProductCatalog === 'function' && handleHerbsAndMoreProductCatalog(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000028 GINGER, TURMERIC & FLOWER FARMING BIOFIT PROTOCOL
+    if (typeof handleGingerTurmericAndFlowerFarming === 'function' && handleGingerTurmericAndFlowerFarming(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000029 PERIPHERAL NEUROPATHY (झुनझुनी) & EYE CARE (आंखों में कम दिखना)
+    if (typeof handleNerveTinglingAndEyeCare === 'function' && handleNerveTinglingAndEyeCare(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0000295 NETSURF ₹8,19,250 CAPPING, OBJECTION HANDLING & 4-STEP PLAN PRESENTATION
+    if (typeof handleNetsurfCappingObjectionsAndPlan === 'function' && handleNetsurfCappingObjectionsAndPlan(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.0000298 MASTER 100 QA BANK (Direct Knowledge Matching)
+    if (typeof handleMaster100QABank === 'function' && handleMaster100QABank(effectiveCleanQ, rawQ)) {
       return;
     }
 
@@ -11859,6 +12224,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         }
         qTokens.forEach(tok => {
           if (tok.length >= 3 && kwLower.includes(tok)) {
+            // Safety Guard: Avoid sexual health false match on common tokens like "गुप्त" (e.g. from "चैट गुप्त")
+            if (tok === 'गुप्त' && !cleanQ.includes('रोग') && !cleanQ.includes('धातु') && !cleanQ.includes('पौरुष') && !cleanQ.includes('सेक्स') && !cleanQ.includes('शीघ्रपतन')) {
+              return;
+            }
             score += 10;
           }
         });
@@ -12976,20 +13345,30 @@ ${shareUrl}`;
     if (!str) return '';
     let escaped = escapeHtml(str);
 
-    // Convert ```code / prompt``` blocks into sleek, interactive copy cards!
-    escaped = escaped.replace(/```(?:text|prompt|html|json|js)?\s*\n?([\s\S]*?)```/gi, function(match, codeContent) {
+    // Convert ```code / prompt / whatsapp``` blocks into sleek, interactive copy cards!
+    escaped = escaped.replace(/```(?:text|prompt|whatsapp|html|json|js)?\s*\n?([\s\S]*?)```/gi, function(match, codeContent) {
       const cleanContent = codeContent.trim();
+      const isWaCopy = cleanContent.includes('WhatsApp') || cleanContent.includes('व्हाट्सएप') || cleanContent.includes('🌾') || cleanContent.includes('📱') || cleanContent.includes('👤') || cleanContent.includes('📞') || cleanContent.includes('🎁');
+      
+      const badgeTitle = isWaCopy 
+        ? '<i class="fa-brands fa-whatsapp" style="color:#22c55e;"></i> WhatsApp शेयर संदेश (1-क्लिक में कॉपी करें)'
+        : '<i class="fa-solid fa-wand-magic-sparkles"></i> AI मास्टर प्रॉम्प्ट (ChatGPT / Gemini Ready)';
+
+      const cardBorder = isWaCopy ? '#16a34a' : '#334155';
+      const badgeColor = isWaCopy ? '#4ade80' : '#38bdf8';
+      const fontFam = isWaCopy ? 'inherit' : 'ui-monospace,SFMono-Regular,Consolas,monospace';
+
       return `
-        <div class="sakhi-code-prompt-card" style="background:#0f172a;color:#f8fafc;border-radius:14px;padding:14px 16px;margin:12px 0;border:1.5px solid #334155;box-shadow:0 6px 18px rgba(0,0,0,0.25);position:relative;text-align:left;">
+        <div class="sakhi-code-prompt-card" style="background:#0f172a;color:#f8fafc;border-radius:14px;padding:14px 16px;margin:12px 0;border:1.5px solid ${cardBorder};box-shadow:0 6px 18px rgba(0,0,0,0.25);position:relative;text-align:left;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;border-bottom:1px solid #334155;padding-bottom:6px;">
-            <span style="font-size:0.78rem;font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:6px;">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> AI मास्टर प्रॉम्प्ट (ChatGPT / Gemini Ready)
+            <span style="font-size:0.78rem;font-weight:800;color:${badgeColor};display:flex;align-items:center;gap:6px;">
+              ${badgeTitle}
             </span>
             <button type="button" class="sakhi-copy-btn" onclick="const t = this.closest('.sakhi-code-prompt-card').querySelector('.sakhi-prompt-content').innerText; navigator.clipboard.writeText(t); this.innerHTML='<i class=\\\'fa-solid fa-check\\\'></i> कॉपी हो गया!'; this.style.background='#16a34a'; setTimeout(()=>{this.innerHTML='<i class=\\\'fa-solid fa-copy\\\'></i> कॉपी करें'; this.style.background='#2563eb';}, 2500);" style="background:#2563eb;color:#ffffff;border:none;padding:5px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s;">
               <i class="fa-solid fa-copy"></i> कॉपी करें
             </button>
           </div>
-          <div class="sakhi-prompt-content" style="font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:0.86rem;line-height:1.6;color:#e2e8f0;white-space:pre-wrap;word-break:break-word;">${cleanContent}</div>
+          <div class="sakhi-prompt-content" style="font-family:${fontFam};font-size:0.88rem;line-height:1.65;color:#e2e8f0;white-space:pre-wrap;word-break:break-word;">${cleanContent}</div>
         </div>
       `;
     });
