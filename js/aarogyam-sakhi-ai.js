@@ -377,6 +377,31 @@
     return path.includes('aarogyam-sakhi') || Boolean(document.getElementById('sakhiFullscreenContainer'));
   }
 
+  // CONTEXTUAL N-GRAM / 2-WORD WINDOW RESOLVER FOR AMBIGUOUS WORDS ('रोग', 'दवा', 'बीमारी', 'इलाज', 'दूध', 'स्प्रे')
+  function analyzeContextualWindow(cleanText) {
+    if (!cleanText) return null;
+    const tokens = cleanText.split(/[\s,?!।()\-:]+/).filter(Boolean);
+    const ambiguousWords = new Set(['रोग', 'बीमारी', 'दवा', 'इलाज', 'स्प्रे', 'छिड़काव', 'उपचार', 'खुराक', 'डोज', 'समस्या', 'लक्षण', 'दूध']);
+    const agriEntities = new Set(['चना', 'चने', 'गेहूं', 'गेहूँ', 'धान', 'आलू', 'सरसों', 'राई', 'सोयाबीन', 'कपास', 'टमाटर', 'मिर्च', 'मक्का', 'गन्ना', 'बैंगन', 'प्याज', 'लहसुन', 'भिंडी', 'मटर', 'फसल', 'सब्जी', 'पौधा', 'पौधे', 'पत्ती', 'पत्ते', 'खेत', 'कुकड़ा', 'उकठा', 'रतुआ', 'झुलसा', 'माहू', 'चेपा', 'सुंडी', 'इल्ली', 'तना', 'छेदक', 'फुटाव', 'कल्ले']);
+    const pashuEntities = new Set(['गाय', 'भैंस', 'बकरी', 'भेड़', 'पशु', 'दुधारू', 'डेयरी', 'बछड़ा', 'बछड़े', 'बछिया', 'थन', 'थनैला', 'आफरा', 'खुरपका', 'मुंहपका', 'जेर', 'चारा', 'दाना']);
+    const healthEntities = new Set(['इंसान', 'बच्चे', 'बच्चा', 'मां', 'पिता', 'आदमी', 'औरत', 'महिला', 'हार्ट', 'दिल', 'सीने', 'शुगर', 'बीपी', 'लिवर', 'किडनी', 'घुटने', 'जोड़ों', 'हड्डी', 'खांसी', 'जुकाम', 'बुखार', 'सिरदर्द', 'पेट']);
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (ambiguousWords.has(tokens[i])) {
+        const start = Math.max(0, i - 2);
+        const end = Math.min(tokens.length - 1, i + 2);
+        for (let j = start; j <= end; j++) {
+          if (j === i) continue;
+          const neighbor = tokens[j];
+          if (agriEntities.has(neighbor)) return 'agri';
+          if (pashuEntities.has(neighbor)) return 'pashu';
+          if (healthEntities.has(neighbor)) return 'health';
+        }
+      }
+    }
+    return null;
+  }
+
   // 2. DOMAIN CLASSIFIER & STRICT FIREWALL (100% AUDITED AGAINST 1,000 MULTI-DOMAIN QUESTIONS)
   function classifyQueryDomain(cleanQuery) {
     const q = (cleanQuery || '').toLowerCase().trim();
@@ -385,18 +410,6 @@
     // 1. Video hub vs Business eBook priority
     if ((q.includes('खेती के वीडियो नहीं') || q.includes('वीडियो नहीं')) && (q.includes('ई-बुक') || q.includes('किताब') || q.includes('कीमत') || q.includes('डाउनलोड'))) {
       return 'business';
-    }
-
-    // Netsurf Business, Q3 Pathfinder, TeamFest, Direct Selling
-    const netsurfKeywords = [
-      'netsurf', 'नेट्सर्फ', 'नेटसर्फ', 'pathfinder', 'पाथफाइंडर', 'teamfest', 'टीमफेस्ट',
-      'rockstar', 'रॉकस्टार', 'saksham', 'सक्षम', 'asmita', 'अस्मिता', 'fasttrack', 'फास्टट्रैक',
-      'istock', 'आई-स्टॉक', 'आई स्टॉक', 'आईस्टॉक', 'business consultant', 'बिज़नेस कंसल्टेंट',
-      '8,19,250', '8.19', 'कैपिंग', 'capping', 'डायरेक्ट सेलर', 'direct seller', 'ई-टेलर', 'e-tailer',
-      'हॉल ऑफ फेम', 'hall of fame', 'लीडरशिप पॉइंट'
-    ];
-    if (netsurfKeywords.some(t => q.includes(t))) {
-      return 'netsurf';
     }
 
     if (q.includes('आरोग्यम ट्यूब') || q.includes('aarogyam tube') || q.includes('आरोग्यमट्यूब') || q.includes('म ट्यूब') || q.includes('ट्यूब') || q.includes('tube') || ((q.includes('वीडियो') || q.includes('video') || q.includes('रील्स') || q.includes('shorts')) && !q.includes('वीडियो नहीं'))) {
@@ -430,9 +443,9 @@
       return 'casual';
     }
 
-    // 2. Rejection & Priority parsing
+    // 2. Rejection & Priority parsing (Parsed first so exclusions take top priority!)
     const agri_rejected = q.includes('खेती छोड़') || q.includes('खेती और स्वास्थ्य दोनों छोड़') || q.includes('फसल छोड़') || q.includes('गेहूं में समस्या नहीं');
-    const pashu_rejected = q.includes('गाय की देखभाल बाद में') || q.includes('गाय छोड़') || q.includes('गाय बाद में') || q.includes('पशु छोड़') || q.includes('पशु को देना है या इंसान को? इंसान') || q.includes('पशु को नहीं') || (q.includes('दूध नहीं') && !q.includes('पी रहा') && !q.includes('पीती') && !q.includes('पीता') && !q.includes('दे रही') && !q.includes('देती'));
+    const pashu_rejected = q.includes('गाय की देखभाल बाद में') || q.includes('गाय छोड़') || q.includes('गाय बाद में') || q.includes('पशु छोड़') || q.includes('पशु को देना है या इंसान को? इंसान') || q.includes('पशु को नहीं') || (!q.includes('बछड़ा') && !q.includes('बछड़े') && !q.includes('बछिया') && !q.includes('गाय') && !q.includes('भैंस') && !q.includes('पशु') && q.includes('दूध नहीं') && !q.includes('पी रहा') && !q.includes('पीती') && !q.includes('पीता') && !q.includes('दे रही') && !q.includes('देती'));
     const beauty_rejected = q.includes('ब्यूटी नहीं') || q.includes('चेहरा छोड़') || q.includes('सौंदर्य छोड़');
     const health_rejected = q.includes('स्वास्थ्य छोड़') || q.includes('स्वास्थ्य दोनों छोड़') || q.includes('स्वास्थ्य नहीं');
     const netsurf_rejected = q.includes('नेट्सर्फ की बात छोड़') || q.includes('नेट्सर्फ छोड़') || q.includes('netsurf की बात छोड़') || q.includes('netsurf छोड़') || q.includes('बिजनेस छोड़');
@@ -448,6 +461,26 @@
     if (beauty_priority) return 'beauty';
     if (pashu_priority) return 'pashu';
     if (agri_priority) return 'agri';
+
+    // Netsurf Business Keywords (Evaluated only if NOT rejected!)
+    const netsurfKeywords = [
+      'netsurf', 'नेट्सर्फ', 'नेटसर्फ', 'pathfinder', 'पाथफाइंडर', 'teamfest', 'टीमफेस्ट',
+      'rockstar', 'रॉकस्टार', 'saksham', 'सक्षम', 'asmita', 'अस्मिता', 'fasttrack', 'फास्टट्रैक',
+      'istock', 'आई-स्टॉक', 'आई स्टॉक', 'आईस्टॉक', 'business consultant', 'बिज़नेस कंसल्टेंट',
+      '8,19,250', '8.19', 'कैपिंग', 'capping', 'डायरेक्ट सेलर', 'direct seller', 'ई-टेलर', 'e-tailer',
+      'हॉल ऑफ फेम', 'hall of fame', 'लीडरशिप पॉइंट'
+    ];
+    if (!netsurf_rejected && netsurfKeywords.some(t => q.includes(t))) {
+      return 'netsurf';
+    }
+
+    // 2.2 Contextual ±2 Word Window Disambiguation for Ambiguous Terms ('रोग', 'दवा', 'बीमारी', 'इलाज')
+    const contextDomain = analyzeContextualWindow(q);
+    if (contextDomain) {
+      if (contextDomain === 'agri' && !agri_rejected) return 'agri';
+      if (contextDomain === 'pashu' && !pashu_rejected) return 'pashu';
+      if (contextDomain === 'health' && !health_rejected) return 'health';
+    }
 
     // Biofit on skin / product interaction
     if (q.includes('बायोफिट से त्वचा') || (q.includes('बायोफिट') && q.includes('त्वचा पर क्या असर'))) {
@@ -1084,11 +1117,17 @@
       };
 
       recognitionInstance.onresult = function (event) {
-        const transcript = event.results[0][0].transcript;
+        const transcript = (event.results && event.results[0] && event.results[0][0]) ? event.results[0][0].transcript : '';
         const input = document.getElementById('sakhiTextInput');
-        if (input) {
+        if (input && transcript) {
           input.value = transcript;
-          handleUserSubmit(transcript);
+          input.focus();
+          input.placeholder = '✏️ आवाज़ दर्ज हुई — जाँचें व भेजें...';
+          const micBtn = document.getElementById('sakhiMicBtn');
+          if (micBtn) {
+            micBtn.classList.remove('recording');
+            micBtn.title = 'आवाज़ दर्ज हुई। भेजने के लिए Enter या सेंड बटन दबाएं।';
+          }
         }
       };
 
@@ -2637,9 +2676,7 @@
       .replace(/joint\s*care/gi, 'joint care')
       .replace(/जॉइंट\s*केयर/gi, 'joint care')
       .replace(/जोड़\s*केयर/gi, 'joint care')
-      .replace(/nutri\s*heart/gi, 'nutri heart')
-      .replace(/न्यूट्री\s*हार्ट/gi, 'nutri heart')
-      .replace(/न्यूट्रि\s*हार्ट/gi, 'nutri heart')
+      .replace(/(?:nutri\s*h(?:ea|a)rt|nutriheart|nutrihart|न्यूट्री\s*हार्ट|न्यूट्रि\s*हार्ट|न्यूत्री\s*हार्ट|न्यूट्रीहार्ट|हार्ट\s*केयर\s*कैप्सूल|हार्ट\s*केयर)/gi, 'nutri heart')
       .replace(/anti\s*viral/gi, 'antiviral')
       .replace(/एंटी\s*वायरल/gi, 'antiviral')
       .replace(/tamatr/gi, 'टमाटर')
@@ -9653,7 +9690,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     // 8. CARDIOVASCULAR & HEART SYSTEM (हृदय व रक्त संचार)
-    if (q.includes('heart') || q.includes('हृदय') || q.includes('दिल') || q.includes('circulation') || q.includes('धमनी') || q.includes('artery') || q.includes('cholesterol') || q.includes('कोलेस्ट्रॉल')) {
+    if ((q.includes('heart') || q.includes('हृदय') || q.includes('दिल') || q.includes('circulation') || q.includes('धमनी') || q.includes('artery') || q.includes('cholesterol') || q.includes('कोलेस्ट्रॉल')) &&
+        !q.includes('nutri heart') && !q.includes('न्यूट्री हार्ट') && !q.includes('हार्ट केयर') && !q.includes('कैप्सूल')) {
       sakhiConversationState.lastActiveDomain = 'health';
       const resp = `❤️ **हृदय व रक्त परिसंचरण तंत्र (Cardiovascular Anatomy):**\n\n• **हृदय की कार्यप्रणाली:** हृदय 24 घंटे रक्त को धमनियों (Arteries) के माध्यम से पूरे शरीर में पंप करता है। जब रक्त में बैड कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स बढ़ते हैं, तो धमनियों में प्लाक जमने लगता है।\n• **आयुर्वेदिक निदान (चरक संहिता):** इसे 'हृद्रोग' कहा गया है जो कफ व मेद धातु के अवरोध से होता है।\n• **पोषण व समाधान:** लहसुन का अर्क, अर्जुन छाल, गुग्गुल व ओमेगा 3-6-9 (नेचुरामोर न्यूट्री हार्ट + ओमेगा)।\n• **घरेलू नुस्खा:** अर्जुन की छाल का काढ़ा सुबह खाली पेट दूध या पानी में पकाकर पिएं।`;
       renderCrispSpecialBox('❤️ हृदय व रक्त परिसंचरण तंत्र (Cardiovascular Care)', resp, [
@@ -11902,6 +11940,50 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
+    // 0.0000200 EXPLICIT WEB/WIKI SEARCH COMMAND ROUTER ("सर्च करके बताओ", "खोज के बताओ", "नेट पर खोजो", etc.)
+    const explicitSearchKeywords = [
+      'सर्च करके बताओ', 'सर्च कर के बताओ', 'सर्च करके बताइए', 'सर्च कर बताओ', 'सर्च करो', 'सर्च करें', 'सर्च करना',
+      'खोज के बताओ', 'खोज कर बताओ', 'खोज करके बताओ', 'खोज कर बताइए', 'खोजो', 'खोजें',
+      'नेट पर खोजो', 'इंटरनेट पर खोजो', 'नेट पर सर्च करो', 'इंटरनेट पर सर्च करो', 'गूगल पर खोजो', 'गूगल पर सर्च करो',
+      'search karke batao', 'khoj kar batao', 'khoj ke batao', 'search karo', 'net par khojo', 'internet par khojo'
+    ];
+    const hasExplicitSearchTrigger = explicitSearchKeywords.some(kw => cleanQ.includes(kw));
+    if (hasExplicitSearchTrigger) {
+      if (isNetsurfOrInternalBizQuery(cleanQ)) {
+        // Strict Business Firewall: Never externalize Netsurf products, plans, or capping queries!
+      } else {
+        let extractedSearchQuery = cleanQ;
+        for (const kw of explicitSearchKeywords) {
+          extractedSearchQuery = extractedSearchQuery.split(kw).join(' ');
+        }
+        extractedSearchQuery = extractedSearchQuery.replace(/[?।!,]+/g, ' ').trim();
+        if (!extractedSearchQuery && activeEntityName) {
+          extractedSearchQuery = activeEntityName;
+        }
+
+        if (!extractedSearchQuery || extractedSearchQuery === 'क्या' || extractedSearchQuery === 'kya') {
+          // Guided help when user just says "सर्च करके बताओ"
+          renderCrispSpecialBox(
+            '🔍 इंटरनेट लाइव खोज (सर्च करके बताओ)',
+            'नमस्ते! आप इंटरनेट व विकिपीडिया पर क्या खोजना चाहते हैं?\n\nआप किसी भी फसल, नई तकनीक, इतिहास या विषय का नाम बोलें या लिखें। उदाहरण:\n• *"सर्च करके बताओ राजा भोज कौन थे"*\n• *"सर्च करके बताओ मखाना की खेती कैसे करें"*\n• *"सर्च करके बताओ स्टीविया की खेती कैसे होती है"*\n• *"सर्च करके बताओ ड्रैगन फ्रूट के फायदे"*',
+            [
+              { text: '👑 राजा भोज कौन थे', query: 'सर्च करके बताओ राजा भोज कौन थे' },
+              { text: '🥣 मखाना की खेती कैसे करें', query: 'सर्च करके बताओ मखाना की खेती कैसे करें' },
+              { text: '🌿 स्टीविया की खेती की विधि', query: 'सर्च करके बताओ स्टीविया की खेती कैसे की जाती है' },
+              { text: '🐉 ड्रैगन फ्रूट के फायदे', query: 'सर्च करके बताओ ड्रैगन फ्रूट के क्या फायदे हैं' }
+            ],
+            targetDomain || 'omni',
+            'search_guidance'
+          );
+          return;
+        }
+
+        // Fire dual external search engine (Wikipedia Hindi -> DuckDuckGo -> Vault)
+        handleDualSearchEngineAndLearningFallback(rawQ, extractedSearchQuery, targetDomain);
+        return;
+      }
+    }
+
     // 0.0000201 LIVE REAL-TIME DATE, DAY & CLOCK ROUTER (Real-time current date, weekday, clock)
     if (typeof handleLiveDateAndCurrentTime === 'function' && handleLiveDateAndCurrentTime(effectiveCleanQ, rawQ)) {
       return;
@@ -11994,6 +12076,20 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0.00006 NATURAMORE 5-VARIANT OFFICIAL CATALOG ENGINE
     if (typeof handleNaturamoreVariants === 'function' && handleNaturamoreVariants(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.000061 NATURAMORE NUTRI HEART DEDICATED RESOLVER (Ensures 100% priority over human anatomy)
+    if (cleanQ.includes('nutri heart') || cleanQ.includes('न्यूट्री हार्ट') || cleanQ.includes('हार्ट केयर')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = 'nutri_heart';
+      sakhiConversationState.lastActiveEntityName = 'नेचुरामोरे न्यूट्री हार्ट';
+      const resp = `❤️ **नेचुरामोरे न्यूट्री हार्ट (Naturamore Nutri Heart Capsules) — हृदय व कोलेस्ट्रॉल केयर:**\n\n• **सक्रिय आयुर्वेदिक घटक (Active Ingredients):**\n  1. **अर्जुन छाल अर्क (Terminalia Arjuna):** हृदय की मांसपेशियों को स्वाभाविक शक्ति प्रदान करती है।\n  2. **लहसुन अर्क (Garlic Extract):** धमनियों में जमे बैड कोलेस्ट्रॉल (LDL) और ट्राइग्लिसराइड्स को पिघलाता है।\n  3. **अंगूर बीज सत्व (Grape Seed Extract):** रक्त वाहिकाओं की आंतरिक परत की रक्षा करता है।\n  4. **अलसी ओमेगा-3 (Flaxseed):** रक्त को प्राकृतिक रूप से लचीला रखता है।\n  5. **को-एंजाइम Q10 (CoQ10):** हृदय की कोशिकाओं को ऊर्जा प्रदान करता है।\n\n📋 **खुराक एवं सेवन विधि (Dosage):**\n• **मात्रा:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को।\n• **समय:** भोजन करने के 30 मिनट बाद गुनगुने पानी के साथ लें।\n• **अवधि:** 3 से 6 माह नियमित सेवन से धमनियों में लचीलापन और कोलेस्ट्रॉल संतुलन बना रहता है।\n\n📦 **पैकिंग व आधिकारिक मूल्य:**\n• **पैकिंग:** 30 शाकाहारी कैप्सूल की सीलबंद बोतल\n• **आधिकारिक MRP:** मात्र **₹450**\n• **आरोग्यम विशेष छूट:** फ्लैट **25% छूट** (मात्र ₹338 में) और 5+1 ऑटो-शिप की सुविधा।`;
+      renderCrispSpecialBox('❤️ नेचुरामोरे न्यूट्री हार्ट — हृदय व कोलेस्ट्रॉल सुरक्षा (MRP ₹450 | 25% छूट)', resp, [
+        { text: '🛒 25% छूट पर Nutri Heart ऑर्डर करें', query: 'नेट्सर्फ 25% छूट और 5+1 ऑफर की शर्तें क्या हैं?' },
+        { text: '🩸 लाइफस्टाइल प्लस (शुगर व बीपी)', query: 'लाइफस्टाइल प्लस के फायदे और खुराक' },
+        { text: '📞 दादा अवनीश जी से सीधे WhatsApp बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'health', 'nutri_heart_master');
       return;
     }
 
@@ -12329,7 +12425,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       }
     });
 
-    if (matchedIntent && maxScore >= 18) {
+    // Confidence Guard: 50% threshold rule. Weak intent matches (< 26) must 100% trigger external search fallback
+    if (matchedIntent && maxScore >= 26) {
       renderDirectSummary(matchedIntent, query, targetDomain);
     } else {
       handleDualSearchEngineAndLearningFallback(query, effectiveCleanQ, targetDomain);
@@ -12398,16 +12495,32 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       });
     }
 
+    // 1-Tap Search Tab / Chip ("क्या सर्च करके बताऊँ? / इंटरनेट पर खोजें")
+    let searchTabHtml = '';
+    const cleanSearchTopic = (title || sakhiConversationState.lastActiveEntityName || sakhiConversationState.lastActiveCrop || '')
+      .replace(/[📖🌾🩺🐄✨❓💡👉👑🥣🌿🐉📦🎯]/g, '')
+      .replace(/[?।!,]+/g, ' ')
+      .trim();
+    if (!isNetsurfOrInternalBizQuery(titleAndBody) && cleanSearchTopic && cleanSearchTopic.length >= 2 && !cleanSearchTopic.includes('इंटरनेट लाइव खोज')) {
+      searchTabHtml = `
+        <button type="button" class="sakhi-followup-chip" style="background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e;font-weight:800;display:inline-flex;align-items:center;gap:6px;" onclick="window.askSakhiQuick('सर्च करके बताओ ${escapeHtml(cleanSearchTopic)}')">
+          <i class="fa-solid fa-magnifying-glass" style="color:#d97706;font-size:0.78rem;"></i>
+          <span>सर्च करके बताओ: "${escapeHtml(cleanSearchTopic)}"</span> →
+        </button>
+      `;
+    }
+
     const html = `
       <div class="sakhi-content-body" style="font-size:0.96rem;line-height:1.7;color:#0f172a;white-space:pre-line;margin-bottom:10px;">
         ${formatTextHtml(bodyText)}
       </div>
       ${buildMsgAudioBtnMarkup(bodyText)}
 
-      ${(chipsHtml || recoHtml) ? `
+      ${(chipsHtml || recoHtml || searchTabHtml) ? `
         <div class="sakhi-recommendations-wrapper" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
           <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:6px;">👉 विकल्प व सिफारिशें:</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            ${searchTabHtml}
             ${chipsHtml}
             ${recoHtml}
           </div>
@@ -12732,7 +12845,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   function cleanQueryForSearchEngine(query) {
-    let q = (query || '').toLowerCase().replace(/[?।!,]+/g, ' ').trim();
+    let q = (query || '').toLowerCase().replace(/[?।!,\-_:;]+/g, ' ').trim();
     if (q.includes('एलोवेरा') || q.includes('aloe vera')) return 'घृत कुमारी';
     if (q.includes('ड्रैगन फ्रूट') || q.includes('dragon fruit')) return 'कमलम (ड्रैगन फ्रूट)';
     if (q.includes('स्टीविया') || q.includes('stevia')) return 'मधुपत्र';
@@ -12745,19 +12858,34 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (q.includes('हाइड्रोपोनिक्स') || q.includes('hydroponic')) return 'हाइड्रोपोनिक्स';
 
     const fillers = [
+      // Explicit search command trigger phrases (strip before Wikipedia/DDG search)
+      'सर्च करके बताओ', 'सर्च कर के बताओ', 'सर्च करके बताइए', 'सर्च कर बताओ', 'सर्च करो', 'सर्च करें', 'सर्च करना',
+      'खोज के बताओ', 'खोज कर बताओ', 'खोज करके बताओ', 'खोज कर बताइए', 'खोजो', 'खोजें',
+      'नेट पर खोजो', 'इंटरनेट पर खोजो', 'नेट पर सर्च करो', 'इंटरनेट पर सर्च करो', 'गूगल पर खोजो', 'गूगल पर सर्च करो',
+      'search karke batao', 'khoj kar batao', 'khoj ke batao', 'search karo', 'net par khojo', 'internet par khojo',
+      // Standard fillers
       'की खेती कैसे की जाती है', 'की खेती कैसे करें', 'की खेती कैसे होती है',
       'की खेती की विधि बताओ', 'की खेती की विधि', 'की खेती',
       'के क्या फायदे हैं', 'के फायदे बताओ', 'के फायदे', 'के क्या गुण हैं',
-      'किस राज्य में होती है', 'किस राज्य में होता है', 'क्या होता है', 'क्या है',
+      'किस राज्य में होती है', 'किस राज्य में होता है', 'क्या होता है', 'क्या है', 'क्या था',
+      'कौन थे', 'कौन था', 'कौन है', 'कौन हैं', 'koun the', 'kaun the', 'kaun tha', 'kaun hai',
+      'who is', 'who was', 'where is', 'what is',
+      'कहाँ है', 'कहाँ था', 'कहाँ स्थित है', 'किसने किया', 'किसने बनाया', 'किसने लिखा', 'किसने खोजा', 'कब हुआ', 'कब हुआ था',
+      'का इतिहास', 'की कहानी', 'की कथा', 'की जीवनी', 'का जीवन परिचय',
+      'के बारे में बताओ', 'के बारे में बताइए', 'के बारे में जानकारी दो', 'के बारे में जानकारी', 'के बारे में', 'के विषय में',
       'कैसे करें', 'कैसे होती है', 'कैसे खाएं', 'कैसे लें', 'का तरीका बताओ', 'का इलाज',
-      'बताओ', 'बताइए', 'जानकारी दो', 'डिटेल दो'
+      'बताओ', 'बताइए', 'जानकारी दो', 'डिटेल दो', 'सखी', 'सखी जी', 'sakhi', 'sakhi ji'
     ];
     for (const f of fillers) {
       if (q.includes(f)) {
-        q = q.replace(f, ' ').trim();
+        q = q.replace(new RegExp(f, 'gi'), ' ').trim();
       }
     }
-    return q.trim() || query;
+    q = q.replace(/^(?:बताओ|बताइए|सखी|सखी जी|sakhi|sakhi ji)\s+/gi, '')
+         .replace(/\s+(?:था|थे|थी|है|हैं|होता|होती|रहा|रही)$/gi, '')
+         .replace(/\s+/g, ' ')
+         .trim();
+    return q || query;
   }
 
   async function fetchWikipediaHindiSummary(query) {
@@ -12767,13 +12895,28 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const sRes = await fetch(sUrl, { headers: { 'Accept': 'application/json' } });
       if (!sRes.ok) return null;
       const sData = await sRes.json();
-      const hits = sData?.query?.search || [];
+      let hits = sData?.query?.search || [];
+
+      // Fallback 1: If 0 hits, try search with top meaningful noun tokens
+      if (hits.length === 0) {
+        const nounTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 2 && !['koun','kaun','kaha','kahan','kisne','kiske','bare','wala','wali','wale','the','tha','hai','hain','ka','ki','ke','ko','me','se','par'].includes(t));
+        if (nounTokens.length > 0 && nounTokens.join(' ') !== cleanSearch) {
+          const fbSearch = nounTokens.join(' ');
+          const fbUrl = `https://hi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(fbSearch)}&utf8=&format=json&origin=*`;
+          const fbRes = await fetch(fbUrl, { headers: { 'Accept': 'application/json' } });
+          if (fbRes.ok) {
+            const fbData = await fbRes.json();
+            hits = fbData?.query?.search || [];
+          }
+        }
+      }
+
       if (hits.length === 0) return null;
 
       // Smart candidate selector: choose hit with title matching keywords
       let selectedHit = hits[0];
-      const qTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 3);
-      for (const h of hits.slice(0, 4)) {
+      const qTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 2);
+      for (const h of hits.slice(0, 5)) {
         const hTitle = (h.title || '').toLowerCase();
         if (qTokens.some(tok => hTitle.includes(tok))) {
           selectedHit = h;
@@ -12789,7 +12932,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const eData = await eRes.json();
       const page = eData?.query?.pages?.[selectedHit.pageid];
       const extract = (page?.extract || '').trim();
-      if (extract && extract.length > 40) {
+      if (extract && extract.length > 30) {
         return {
           title: page.title || selectedHit.title,
           summary: extract.slice(0, 600),
@@ -13210,18 +13353,19 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     logSakhiTelemetry(query, domain, false);
     consecutiveAmbiguousCount++;
 
-    // C. If consecutive unclear or user specifically asks for contact/number -> Apologize & WhatsApp Handoff
-    if (consecutiveAmbiguousCount >= 2 || cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('बात करो') || cleanQ.includes('नंबर') || cleanQ.includes('फोन') || cleanQ.includes('phone') || cleanQ.includes('हेल्प')) {
+    // C. If user specifically asks for founder/contact/number OR clinical health emergency
+    const isExplicitFounderAsk = cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('फाउंडर') || cleanQ.includes('founder') || cleanQ.includes('संस्थापक');
+    const isContactOrHelpAsk = cleanQ.includes('बात करो') || cleanQ.includes('नंबर') || cleanQ.includes('फोन') || cleanQ.includes('phone') || cleanQ.includes('हेल्प') || cleanQ.includes('संपर्क');
+    const isClinicalUrgent = cleanQ.includes('दर्द') || cleanQ.includes('खून') || cleanQ.includes('अस्पताल') || cleanQ.includes('इमरजेंसी') || cleanQ.includes('दवा का रिएक्शन');
+
+    if (isExplicitFounderAsk || isContactOrHelpAsk || (isClinicalUrgent && consecutiveAmbiguousCount >= 2)) {
       consecutiveAmbiguousCount = 0;
       const waUrl = buildAvneeshWhatsAppHandoffUrl(query);
-      
-      // Privacy Guard: Only display Founder name if user explicitly asked for Founder/Contact
-      const isExplicitFounderAsk = cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('फाउंडर') || cleanQ.includes('founder') || cleanQ.includes('संस्थापक');
       
       const headerTitle = isExplicitFounderAsk ? '🤝 दादा अवनीश मिश्रा जी (संस्थापक) संपर्क' : '🚨 विशेषज्ञ व्यक्तिगत सहायता व चैट संदर्भ';
       const promptText = isExplicitFounderAsk 
         ? 'आप आरोग्यम संस्थापक दादा अवनीश (अवनीश मिश्रा जी) से सीधे WhatsApp पर जुड़कर मार्गदर्शन प्राप्त कर सकते हैं:'
-        : 'क्षमा करें! मुझे आपकी बात पूरी तरह समझ नहीं आई। किसी भी गलत या भ्रामक सलाह से बचने हेतु आप अपनी पूरी चैट हिस्ट्री के साथ हमारे मुख्य विशेषज्ञ से सीधे WhatsApp पर जुड़ सकते हैं:';
+        : 'किसी भी गलत या भ्रामक सलाह से बचने हेतु आप अपनी पूरी चैट हिस्ट्री के साथ हमारे मुख्य विशेषज्ञ से सीधे WhatsApp पर जुड़ सकते हैं:';
 
       const html = `
         <div style="font-weight:900;color:#dc2626;font-size:1.02rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
@@ -13241,11 +13385,32 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
           </a>
         </div>
       `;
-      // Voice Privacy: Never speak personal phone number aloud
       const spokenMsg = isExplicitFounderAsk
         ? 'आप संस्थापक दादा अवनीश जी से सीधे व्हाट्सएप बटन दबाकर जुड़ सकते हैं।'
-        : 'क्षमा करें! इस विषय पर सटीक समाधान हेतु आप नीचे दिए गए लाल सहायता बटन से सीधे विशेषज्ञ से चैट संदर्भ के साथ जुड़ सकते हैं।';
+        : 'इस विषय पर व्यक्तिगत सहायता हेतु आप नीचे दिए गए लाल बटन से विशेषज्ञ से सीधे जुड़ सकते हैं।';
       streamBotMessage(html, cleanTextForTTS(spokenMsg));
+      return;
+    }
+
+    if (consecutiveAmbiguousCount >= 2) {
+      consecutiveAmbiguousCount = 0;
+      const html = `
+        <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-seedling" style="color:#16a34a;"></i>
+          <span>🌾 आरोग्यम सखी AI — आपका प्रश्न</span>
+        </div>
+        <div style="font-size:0.93rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
+          मुझे आपके सवाल <b>"${escapeHtml(query)}"</b> का सटीक विवरण इंटरनेट संदर्भों में तुरंत नहीं मिल सका।<br><br>
+          आरोग्यम सखी AI मुख्य रूप से <b>कृषि (फसल सुरक्षा, खाद, मंडी, मौसम), पशुपालन (दुग्ध व फैट), प्राकृतिक स्वास्थ्य (घरेलू नुस्खे, पोषण) और नेट्सर्फ जैविक समाधानों</b> की समर्पित डिजिटल सलाहकार है।
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('फसलों का संपूर्ण स्प्रे कैलेंडर')">🌾 फसल सुरक्षा व स्प्रे</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय भैंस का दूध और फैट बढ़ाने का तरीका')">🐄 पशुपालन व डेयरी</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('घरेलू नुस्खे और प्राकृतिक स्वास्थ्य')">🌿 स्वास्थ्य व घरेलू नुस्खे</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ 25% छूट और प्लान समझें')">💼 नेट्सर्फ 25% छूट</button>
+        </div>
+      `;
+      streamBotMessage(html, cleanTextForTTS('यह विषय कृषि या स्वास्थ्य के मुख्य दायरे से अलग है। कृपया खेती, पशुपालन या स्वास्थ्य से जुड़ा सवाल पूछें।'));
       return;
     }
 

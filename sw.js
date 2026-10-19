@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v1.7';
-const PAGES_CACHE = 'aarogyam-public-pages-v1.7';
-const MEDIA_CACHE = 'aarogyam-public-media-v1.7';
+const STATIC_CACHE = 'aarogyam-public-static-v1.8';
+const PAGES_CACHE = 'aarogyam-public-pages-v1.8';
+const MEDIA_CACHE = 'aarogyam-public-media-v1.8';
 const OFFLINE_URL = '/offline.html';
 
 
