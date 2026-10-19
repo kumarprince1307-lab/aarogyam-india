@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v20';
-const PAGES_CACHE = 'aarogyam-public-pages-v20';
-const MEDIA_CACHE = 'aarogyam-public-media-v20';
+const STATIC_CACHE = 'aarogyam-public-static-v21';
+const PAGES_CACHE = 'aarogyam-public-pages-v21';
+const MEDIA_CACHE = 'aarogyam-public-media-v21';
 const OFFLINE_URL = '/offline.html';
 
 
@@ -30,6 +30,7 @@ const PRECACHE_SHELL = [
   '/ebooks/cart.html',
   '/ebooks/reader.html',
   '/css/style.css',
+  '/css/home-revamp.css',
   '/css/landingpage.css',
   '/css/my-library.css',
   '/css/ebook.css',

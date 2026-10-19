@@ -207,8 +207,73 @@
   ],
   "shortcuts": [
     {
+      "name": "Aarogyam Sakhi AI",
+      "short_name": "🌸 सखी AI",
+      "description": "24×7 AI डॉक्टर व कृषि सखी परामर्श",
+      "url": "/aarogyam-sakhi.html",
+      "icons": [
+        {
+          "src": "/images/icons/pwa-icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mandi Bhav",
+      "short_name": "🌾 मंडी भाव",
+      "description": "Check daily crop market rates",
+      "url": "/mandi.html",
+      "icons": [
+        {
+          "src": "/images/icons/pwa-shortcut-mandi.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mausam Live",
+      "short_name": "⛅ मौसम",
+      "description": "Live weather and rain forecast",
+      "url": "/weather.html",
+      "icons": [
+        {
+          "src": "/images/icons/pwa-icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Krishi Panchang",
+      "short_name": "🕉️ पंचांग",
+      "description": "Daily Vedic Agriculture Panchang",
+      "url": "/krishi-panchang.html",
+      "icons": [
+        {
+          "src": "/images/icons/pwa-icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Netsurf Products",
+      "short_name": "📦 नेट्सर्फ",
+      "description": "Explore all Netsurf products catalog",
+      "url": "/categories/netsurf-products.html",
+      "icons": [
+        {
+          "src": "/images/icons/pwa-icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "eBooks Store",
-      "short_name": "Store",
+      "short_name": "📚 ई-बुक्स",
       "description": "Explore Agriculture and Health eBooks",
       "url": "/ebooks/ebook.html",
       "icons": [
@@ -221,38 +286,12 @@
     },
     {
       "name": "My Library",
-      "short_name": "Library",
+      "short_name": "📖 लाइब्रेरी",
       "description": "Access your purchased books and reading rack",
       "url": "/ebooks/my-library.html",
       "icons": [
         {
           "src": "/images/icons/pwa-shortcut-library.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Mandi Bhav",
-      "short_name": "Mandi",
-      "description": "Check daily crop market rates",
-      "url": "/mandi.html",
-      "icons": [
-        {
-          "src": "/images/icons/pwa-shortcut-mandi.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Live Webinars",
-      "short_name": "Webinar",
-      "description": "Join live farmer webinars and training",
-      "url": "/webinar.html",
-      "icons": [
-        {
-          "src": "/images/icons/pwa-shortcut-webinar.png",
           "sizes": "96x96",
           "type": "image/png"
         }
