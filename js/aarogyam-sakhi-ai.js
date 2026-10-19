@@ -9805,7 +9805,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     // 3. CHILD HEALTH, SCREEN TIME & 20-20-20 RULE (बाल स्वास्थ्य व स्क्रीन टाइम)
-    if (q.includes('screen time') || q.includes('स्क्रीन टाइम') || q.includes('mobile ki lat') || q.includes('मोबाइल की लत') || q.includes('tv mobile') || q.includes('टीव') || q.includes('digital eye') || q.includes('ankhon me jalan') || q.includes('dry eyes') || q.includes('baccho ki lambai') || q.includes('बच्चों की लंबाई') || q.includes('baccho ka vajan') || q.includes('बच्चों का वजन') || q.includes('bhookh nahi lagti')) {
+    if (q.includes('screen time') || q.includes('स्क्रीन टाइम') || q.includes('mobile ki lat') || q.includes('मोबाइल की लत') || q.includes('tv mobile') || q.includes('टीवी') || q.includes('टेलीविजन') || q.includes(' tv ') || q.includes('digital eye') || q.includes('ankhon me jalan') || q.includes('dry eyes') || q.includes('baccho ki lambai') || q.includes('बच्चों की लंबाई') || q.includes('baccho ka vajan') || q.includes('बच्चों का वजन') || q.includes('bhookh nahi lagti')) {
       sakhiConversationState.lastActiveDomain = 'health';
       const resp = `🧒📱 **बाल स्वास्थ्य, मोबाइल स्क्रीन टाइम के खतरे व शारीरिक विकास गाइड:**\n\n🚨 **मोबाइल/टीवी स्क्रीन के 3 गंभीर खतरे:**\n1. **डिजिटल आई स्ट्रेन (Digital Eye Strain):** नीली रोशनी (Blue Light) से आंखों में सूखापन, बार-बार आंखें मलना, सिरदर्द व चश्मे का नंबर तेजी से बढ़ना।\n2. **नींद में रुकावट:** स्क्रीन की रोशनी मेलाटोनिन हार्मोन को रोकती है जिससे बच्चे देर रात तक जागते हैं और चिड़चिड़े होते हैं।\n3. **मानसिक एकाग्रता में कमी:** अत्यधिक रील्स व गेमिंग से बच्चों का पढ़ाई में ध्यान नहीं लगता।\n\n👁️ **विश्व स्वास्थ्य संगठन का '20-20-20' नियम:**\n• हर **20 मिनट** के स्क्रीन समय के बाद **20 फीट** दूर रखी किसी वस्तु को **20 सेकंड** तक देखें।\n• सोने से 1 घंटे पहले सभी स्क्रीन पूरी तरह बंद रखें।\n\n🥛 **बच्चों की लंबाई, वजन, भूख व तेज दिमाग का फॉर्मूला:**\n• **नेचुरामोर फॉर किड्स 400g (चॉकलेट कुकी MRP ₹1,225):** 5-सोर्स प्रोटीन + ब्राह्मी + शंखपुष्पी + ओमेगा-3 (DHA) — बच्चे दूध में मिलाकर खुशी-खुशी पीते हैं।`;
       renderCrispSpecialBox('🧒 बाल स्वास्थ्य — स्क्रीन टाइम 20-20-20 नियम व नेचुरामोर किड्स', resp, [
@@ -12689,11 +12689,25 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return internalTokens.some(tok => q.includes(tok));
   }
 
+  let cachedDiskVault = null;
+  (async function initDiskVault() {
+    try {
+      const res = await fetch('/data/sakhi-auto-learned-vault.json');
+      if (res.ok) {
+        const d = await res.json();
+        if (d && Array.isArray(d.records)) cachedDiskVault = d.records;
+      }
+    } catch (_) {}
+  })();
+
   function getLocalLearnedVault() {
     try {
-      return JSON.parse(localStorage.getItem(SAKHI_LEARNED_VAULT_KEY) || '[]');
-    } catch (_) {
+      const local = JSON.parse(localStorage.getItem(SAKHI_LEARNED_VAULT_KEY) || '[]');
+      if (local && local.length > 0) return local;
+      if (cachedDiskVault && cachedDiskVault.length > 0) return cachedDiskVault;
       return [];
+    } catch (_) {
+      return cachedDiskVault || [];
     }
   }
 
@@ -12717,25 +12731,67 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
   }
 
+  function cleanQueryForSearchEngine(query) {
+    let q = (query || '').toLowerCase().replace(/[?।!,]+/g, ' ').trim();
+    if (q.includes('एलोवेरा') || q.includes('aloe vera')) return 'घृत कुमारी';
+    if (q.includes('ड्रैगन फ्रूट') || q.includes('dragon fruit')) return 'कमलम (ड्रैगन फ्रूट)';
+    if (q.includes('स्टीविया') || q.includes('stevia')) return 'मधुपत्र';
+    if (q.includes('चिया') || q.includes('chia')) return 'चिया सीड्ज़';
+    if (q.includes('मशरूम') || q.includes('mushroom')) return 'कुकुरमुत्ता (कवक)';
+    if (q.includes('केसर') || q.includes('kesar')) return 'केसर';
+    if (q.includes('स्पिरुलिना') || q.includes('spirulina')) return 'स्पिरुलिना';
+    if (q.includes('मखाना') || q.includes('makhana')) return 'मखाना';
+    if (q.includes('जैतून') || q.includes('olive')) return 'जैतून';
+    if (q.includes('हाइड्रोपोनिक्स') || q.includes('hydroponic')) return 'हाइड्रोपोनिक्स';
+
+    const fillers = [
+      'की खेती कैसे की जाती है', 'की खेती कैसे करें', 'की खेती कैसे होती है',
+      'की खेती की विधि बताओ', 'की खेती की विधि', 'की खेती',
+      'के क्या फायदे हैं', 'के फायदे बताओ', 'के फायदे', 'के क्या गुण हैं',
+      'किस राज्य में होती है', 'किस राज्य में होता है', 'क्या होता है', 'क्या है',
+      'कैसे करें', 'कैसे होती है', 'कैसे खाएं', 'कैसे लें', 'का तरीका बताओ', 'का इलाज',
+      'बताओ', 'बताइए', 'जानकारी दो', 'डिटेल दो'
+    ];
+    for (const f of fillers) {
+      if (q.includes(f)) {
+        q = q.replace(f, ' ').trim();
+      }
+    }
+    return q.trim() || query;
+  }
+
   async function fetchWikipediaHindiSummary(query) {
     try {
-      const cleanSearch = (query || '').replace(/[?।!,]+/g, '').trim();
+      const cleanSearch = cleanQueryForSearchEngine(query);
       const sUrl = `https://hi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanSearch)}&utf8=&format=json&origin=*`;
       const sRes = await fetch(sUrl, { headers: { 'Accept': 'application/json' } });
       if (!sRes.ok) return null;
       const sData = await sRes.json();
-      const firstHit = sData?.query?.search?.[0];
-      if (!firstHit || !firstHit.pageid) return null;
+      const hits = sData?.query?.search || [];
+      if (hits.length === 0) return null;
 
-      const eUrl = `https://hi.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids=${firstHit.pageid}&format=json&origin=*`;
+      // Smart candidate selector: choose hit with title matching keywords
+      let selectedHit = hits[0];
+      const qTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 3);
+      for (const h of hits.slice(0, 4)) {
+        const hTitle = (h.title || '').toLowerCase();
+        if (qTokens.some(tok => hTitle.includes(tok))) {
+          selectedHit = h;
+          break;
+        }
+      }
+
+      if (!selectedHit || !selectedHit.pageid) return null;
+
+      const eUrl = `https://hi.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids=${selectedHit.pageid}&format=json&origin=*`;
       const eRes = await fetch(eUrl, { headers: { 'Accept': 'application/json' } });
       if (!eRes.ok) return null;
       const eData = await eRes.json();
-      const page = eData?.query?.pages?.[firstHit.pageid];
+      const page = eData?.query?.pages?.[selectedHit.pageid];
       const extract = (page?.extract || '').trim();
       if (extract && extract.length > 40) {
         return {
-          title: page.title || firstHit.title,
+          title: page.title || selectedHit.title,
           summary: extract.slice(0, 600),
           source: 'Wikipedia (हिंदी)'
         };
@@ -12748,7 +12804,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   async function fetchDuckDuckGoInstantSummary(query) {
     try {
-      const cleanSearch = (query || '').replace(/[?।!,]+/g, '').trim();
+      const cleanSearch = cleanQueryForSearchEngine(query);
       const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(cleanSearch)}&format=json&no_html=1&skip_disambig=1`;
       const res = await fetch(ddgUrl);
       if (!res.ok) return null;
@@ -12839,7 +12895,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   function renderLearnedVaultAnswerBox(item) {
     const cleanQTitle = (item.question || '').replace(/[?।!,]+/g, '').trim();
-    const formattedText = `${item.answer}\n\n<div style="font-size:0.75rem;color:#64748b;margin-top:10px;padding-top:6px;border-top:1px dashed #cbd5e1;font-style:italic;">📜 संदर्भ स्रोत: ${escapeHtml(item.source || 'इंटरनेट संदर्भ')} (लाइव संकलन)</div>`;
+    const formattedText = `${item.answer}\n\n📜 *संदर्भ स्रोत: ${item.source || 'इंटरनेट संदर्भ'} (लाइव संकलन)*`;
     
     renderCrispSpecialBox(`📖 ${cleanQTitle}`, formattedText, [
       { text: '🌾 संबंधित कृषि व फसल सलाह लें', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
@@ -13197,17 +13253,24 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const prevEntity = sakhiConversationState.lastActiveEntity;
     const prevName = sakhiConversationState.lastActiveEntityName;
 
-    const isPronounFollowUp = cleanQ.includes('इसके') || cleanQ.includes('इसकी') || cleanQ.includes('इसमें') || 
+    const hasDistinctiveNewSubject = cleanQ.includes('स्पिरुलिना') || cleanQ.includes('स्टीविया') || 
+      cleanQ.includes('एलोवेरा') || cleanQ.includes('ड्रैगन फ्रूट') || cleanQ.includes('मखाना') || 
+      cleanQ.includes('चिया') || cleanQ.includes('जैतून') || cleanQ.includes('केसर') ||
+      cleanQ.includes('मशरूम') || cleanQ.includes('हाइड्रोपोनिक्स') || cleanQ.includes('बुवाई');
+
+    const isPronounFollowUp = !hasDistinctiveNewSubject && (
+      (cleanQ.startsWith('इसके') || cleanQ.startsWith('इसकी') || cleanQ.startsWith('इसमें') || cleanQ.startsWith('यह क्या')) ||
       cleanQ.includes('सामग्री') || cleanQ.includes('घटक') || cleanQ.includes('खुराक') || cleanQ.includes('डोज') || 
       cleanQ.includes('सेवन') || cleanQ.includes('कीमत') || cleanQ.includes('price') || cleanQ.includes('छूट') || 
-      cleanQ.includes('रिजल्ट') || cleanQ.includes('साइड इफेक्ट') || cleanQ.includes('कब लें') || cleanQ.includes('कैसे लें');
+      cleanQ.includes('रिजल्ट') || cleanQ.includes('साइड इफेक्ट') || cleanQ.includes('कब लें') || cleanQ.includes('कैसे लें')
+    );
 
     const touchesDifferentTopic = cleanQ.includes('यौन') || cleanQ.includes('सेक्स') || cleanQ.includes('बुखार') || 
       cleanQ.includes('शुगर') || cleanQ.includes('डायबिटीज') || cleanQ.includes('दर्द') || cleanQ.includes('जोड़') || 
       cleanQ.includes('खेती') || cleanQ.includes('फसल') || cleanQ.includes('गाय') || cleanQ.includes('भैंस') || 
       cleanQ.includes('पशु') || cleanQ.includes('किड्स') || cleanQ.includes('बच्चे');
 
-    if (prevName && isPronounFollowUp) {
+    if (prevName && isPronounFollowUp && !touchesDifferentTopic && !hasDistinctiveNewSubject) {
       const resp = `🌸 **${prevName} — उपयोग, खुराक व परामर्श:**\n\n1. **खुराक व सही विधि:**\n• यदि कृषि/बायोफिट उत्पाद है: 30ml प्रति 15 लीटर पंप (स्प्रे) अथवा 1 लीटर प्रति एकड़ (जमीन में शेत)।\n• यदि स्वास्थ्य/नेचुरामोर है: 1 चम्मच गुनगुने पानी/दूध के साथ अथवा 1 कैप्सूल सुबह-शाम भोजन उपरांत।\n\n2. **परिणाम व प्रभाव:**\n• नियमित 7 से 15 दिनों में स्पष्ट सकारात्मक परिणाम व सुधार दिखाई देता है।\n\n3. **कीमत व विशेष छूट:**\n• कंपनी के अधिकृत जीएसटी बिल के साथ **फ्लैट 25% रिटेल छूट** पर उपलब्ध है। 5 माह लगातार खरीद पर 6ठे माह 5+1 फ्री ऑफर!`;
 
       renderCrispSpecialBox(`🌸 ${prevName} — विस्तृत जानकारी व खुराक`, resp, [
