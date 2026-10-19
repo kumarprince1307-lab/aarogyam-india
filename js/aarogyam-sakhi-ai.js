@@ -10885,6 +10885,339 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
+  // =========================================================================
+  // 18.2 CHATGPT-STYLE INTERACTIVE GUIDED HEALTH & KUNDALI TRIAGE ENGINE
+  // (Issue -> Recipient/Friend -> English Medicine Check -> Customized Slip & Diet)
+  // =========================================================================
+  function handleInteractiveHealthTriage(cleanQ, rawQ) {
+    const isBroadHealth = (
+      cleanQ === 'health_triage_step1' ||
+      cleanQ === 'स्वास्थ्य निदान' ||
+      cleanQ === 'हेल्थ चेक' ||
+      ((cleanQ.includes('स्वास्थ्य') || cleanQ.includes('बीमार') || cleanQ.includes('इलाज')) && 
+       (cleanQ.includes('सलाह') || cleanQ.includes('निदान') || cleanQ.includes('चेक') || cleanQ.includes('मदद')) &&
+       !cleanQ.includes('फसल') && !cleanQ.includes('पशु'))
+    );
+
+    // Step 1: Broad Health -> Select Condition
+    if (isBroadHealth) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const prompt = `नमस्ते! 🙏 सही आयुर्वेदिक व पोषण समाधान, संपूर्ण डाइट चार्ट और व्यक्तिगत पर्चा तैयार करने के लिए, कृपया पहले अपनी मुख्य स्वास्थ्य समस्या चुनें:`;
+
+      renderCrispSpecialBox('🩺 आरोग्यम 3-चरणीय स्वास्थ्य निदान (चरण 1: समस्या चुनें)', prompt, [
+        { text: '🩸 1. डायबिटीज / शुगर (Kundali Slip)', query: 'डायबिटीज संपूर्ण स्वास्थ्य निदान व डाइट चार्ट (health_triage_step2_diabetes)' },
+        { text: '❤️ 2. बीपी, कोलेस्ट्रॉल व दिल की धड़कन', query: 'बीपी और हृदय स्वास्थ्य निदान (health_triage_step2_bp)' },
+        { text: '🦴 3. जोड़ों, घुटनों व कमर का दर्द', query: 'जोड़ों व घुटनों का दर्द निदान (health_triage_step2_joints)' },
+        { text: '🫀 4. फैटी लिवर, गैस व पाचन समस्या', query: 'लिवर व पाचन समस्या निदान (health_triage_step2_liver)' },
+        { text: '💊 5. अंग्रेजी दवा सुरक्षा व सलाह', query: 'अंग्रेजी दवा और आयुर्वेदिक सप्लीमेंट सुरक्षा (health_triage_step2_allopathy)' }
+      ], 'health', 'health_triage_step1');
+      return true;
+    }
+
+    // Step 2: Diabetes / Condition Selected -> Ask Recipient (Self or Friend/Family)
+    if (cleanQ.includes('health_triage_step2_diabetes') || cleanQ.includes('डायबिटीज संपूर्ण स्वास्थ्य निदान')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const prompt = `🩸 **डायबिटीज (शुगर) परामर्श व पर्चा निर्माण:**\n\nकृपया बताइए कि यह परामर्श आप **अपने स्वयं के लिए** ले रहे हैं, या **परिवार के किसी सदस्य / मित्र** के लिए ताकि उनका नाम पर्चे पर दर्ज किया जा सके?`;
+
+      renderCrispSpecialBox('🩸 डायबिटीज निदान: चरण 2 — परामर्श किसके लिए है?', prompt, [
+        { text: '👤 1. मेरे स्वयं के लिए (Self)', query: 'डायबिटीज परामर्श मेरे स्वयं के लिए है (health_triage_step3_self)' },
+        { text: '👥 2. माता-पिता / परिवारजन हेतु', query: 'डायबिटीज परामर्श माता-पिता हेतु है (health_triage_step3_family)' },
+        { text: '🤝 3. किसी मित्र / परिचित के लिए', query: 'डायबिटीज परामर्श मित्र के लिए पर्ची बनाओ (health_triage_step3_friend)' }
+      ], 'health', 'health_triage_step2_diabetes');
+      return true;
+    }
+
+    // Step 3: Recipient Selected -> English Medicine Checklist (अंग्रेजी दवा स्थिति)
+    if (cleanQ.includes('health_triage_step3')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      let recipientType = 'स्वयं';
+      if (cleanQ.includes('family')) recipientType = 'परिवारजन';
+      else if (cleanQ.includes('friend')) recipientType = 'मित्र/परिचित';
+
+      const prompt = `🩸 **परामर्श संदर्भ:** ${recipientType}\n\nवर्तमान में स्वास्थ्य स्थिति क्या है? क्या मरीज की कोई **अंग्रेजी दवा (जैसे मेटफॉर्मिन/ग्लिमेपिराइड)** या इंसुलिन चल रहा है?`;
+
+      renderCrispSpecialBox('💊 चरण 3 — वर्तमान अंग्रेजी दवा व इंसुलिन स्थिति', prompt, [
+        { text: '💊 1. मेटफॉर्मिन या अन्य शुगर की गोली चल रही है', query: 'अंग्रेजी दवा चल रही है संपूर्ण पर्चा व डाइट बनाओ (health_triage_step4_allopathy)' },
+        { text: '💉 2. इंसुलिन के इंजेक्शन लग रहे हैं', query: 'इंसुलिन चल रहा है संपूर्ण पर्चा व डाइट बनाओ (health_triage_step4_insulin)' },
+        { text: '🌱 3. अभी कोई अंग्रेजी दवा नहीं, सिर्फ खानपान', query: 'बिना दवा सिर्फ डाइट व नेचुरामोर पर्चा बनाओ (health_triage_step4_dietonly)' },
+        { text: '⚠️ 4. हाल ही में पहली बार शुगर पता चला है', query: 'नई डायबिटीज हेतु संपूर्ण डाइट व पर्चा बनाओ (health_triage_step4_newly)' }
+      ], 'health', 'health_triage_step3_meds');
+      return true;
+    }
+
+    // Step 4: Final Personalized Health Consultation Slip & Diet Chart (पर्चा व डाइट चार्ट)
+    if (cleanQ.includes('health_triage_step4') || cleanQ.includes('संपूर्ण पर्चा व डाइट बनाओ')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      let patientName = getUserName() || 'साथी';
+      if (cleanQ.includes('friend') || cleanQ.includes('family')) {
+        patientName = 'आदरणीय परिजन / मित्र';
+      }
+
+      const isTakingAllopathy = cleanQ.includes('allopathy') || cleanQ.includes('अंग्रेजी दवा') || cleanQ.includes('insulin') || cleanQ.includes('इंसुलिन');
+
+      const slipText = `📋 **आरोग्यम डिजिटल स्वास्थ्य परामर्श पर्चा (Health Consultation Slip)**\n👤 **परामर्श प्राप्तकर्ता:** ${patientName}\n🩺 **विषय:** टाइप-2 डायबिटीज व संपूर्ण मेटाबॉलिक सुधार\n📅 **तारीख:** ${new Date().toLocaleDateString('hi-IN')}\n\n⚠️ **सख्त अंग्रेजी दवा सुरक्षा नियम (Allopathic Safety Protocol):**\n${isTakingAllopathy 
+        ? '• मरीज की वर्तमान अंग्रेजी दवा (मेटफॉर्मिन आदि) को कभी भी अचानक बंद न करें!\n• नेचुरामोर लाइफ स्टाइल प्लस और डाइट चार्ट पहले शुरू करें।\n• जब 30-45 दिन में फास्टिंग व पीपी शुगर सामान्य होने लगे, तब अपने डॉक्टर की सलाह से अंग्रेजी दवा की खुराक धीरे-धीरे 50% घटाई जाती है।'
+        : '• प्राकृतिक आहार और पोषण से पैंक्रियाज को दोबारा सक्रिय करके शुगर को सामान्य सीमा में बनाए रखें।'}\n\n🥗 **सुबह से रात तक का संपूर्ण डाइट चार्ट (Diet Routine):**\n• **सुबह 7:00 बजे:** 1 गिलास गुनगुने पानी में 1 चम्मच मेथी दाना (रात का भीगा) + 4 भीगे बादाम व 1 अखरोट।\n• **सुबह 8:30 बजे (नाश्ता):** बेसन का चीला / मूंग दाल स्प्राउट्स + 1 चम्मच **नेचुरामोर प्लस (Daily Nutrition)** गुनगुने पानी से।\n• **दोपहर 1:00 बजे (लंच):** 1 बड़ी प्लेट कच्ची हरी सलाद (खीरा, ककड़ी, टमाटर) खाने के बाद ही 2 मल्टीग्रेन रोटी + 1 कटोरी हरी सब्जी + पतली दाल।\n• **शाम 5:00 बजे:** 1 मुट्ठी भुने चने + दालचीनी की हर्बल चाय (बिना चीनी)।\n• **रात 8:00 बजे (डिनर):** बहुत हल्का भोजन (सब्जियों का सूप या दलिया)।\n• **सोने से 30 मिनट पहले:** 1 कैप्सूल **नेचुरामोर लाइफ स्टाइल प्लस** ताजे पानी से।\n\n🌿 **प्रमाणित पोषण सप्लीमेंट व खुराक:**\n1. **नेचुरामोर लाइफ स्टाइल प्लस (Life Style Plus):** 1 कैप्सूल सुबह और 1 कैप्सूल शाम भोजन से 30 मिनट पहले। (पैंक्रियाज में इंसुलिन निर्माण सक्रिय करता है)।\n2. **नेचुरामोर प्लस पाउडर:** 1 चम्मच सुबह नाश्ते के बाद। (शरीर की कमजोरी व नसों का दर्द दूर करता है)।\n\n👉 यह पर्चा आप नीचे दिए गए बटन से सीधे WhatsApp पर शेयर कर सकते हैं या कॉपी करके रख सकते हैं।`;
+
+      const shareWaText = `📋 *आरोग्यम स्वास्थ्य पर्चा व डायबिटीज डाइट चार्ट*\n👤 *रोगी:* ${patientName}\n\n🥗 *डाइट सारांश:*\n• सुबह मेथी पानी + नेचुरामोर पोषण\n• दोपहर पहले सलाद फिर मल्टीग्रेन रोटी\n• रात में लाइफ स्टाइल प्लस (1 कैप्सूल)\n\n⚠️ *दवा नियम:* अंग्रेजी दवा अचानक बंद न करें, धीरे-धीरे कम करें।\n\n👉 विस्तृत डाइट चार्ट व सलाह आरोग्यम सखी AI पर देखें: https://aarogyamindia.online/aarogyam-sakhi.html`;
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareWaText)}`;
+
+      renderCrispSpecialBox(`📋 ${patientName} जी का संपूर्ण डायबिटीज पर्चा व डाइट चार्ट`, slipText, [
+        { text: '📲 यह पर्चा WhatsApp पर भेजें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🌿 नेचुरामोर लाइफ स्टाइल प्लस (25% छूट)', url: '/categories/health.html', isExternal: true },
+        { text: '📊 HbA1c टेस्ट रिपोर्ट समझना', query: 'HbA1c टेस्ट क्या होता है और इसकी सामान्य रेंज कितनी है?' }
+      ], 'health', 'personalized_health_slip');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.3 CHATGPT-STYLE INTERACTIVE GUIDED BEAUTY & SKIN CARE TRIAGE ENGINE
+  // =========================================================================
+  function handleInteractiveBeautyTriage(cleanQ, rawQ) {
+    const isBeautyTriage = cleanQ.includes('beauty_triage') || cleanQ === 'ब्यूटी रूटीन बताओ' || cleanQ === 'सौंदर्य व त्वचा निदान' ||
+      ((cleanQ.includes('चेहरे') || cleanQ.includes('त्वचा') || cleanQ.includes('स्किन') || cleanQ.includes('बाल')) && 
+       (cleanQ.includes('निदान') || cleanQ.includes('सलाह') || cleanQ.includes('समस्या') || cleanQ.includes('ग्लो')) &&
+       !cleanQ.includes('खेती') && !cleanQ.includes('फसल'));
+
+    // Step 1: Broad Beauty -> Select Issue
+    if (isBeautyTriage && !cleanQ.includes('step2') && !cleanQ.includes('step3')) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const prompt = `नमस्ते सखी! 🙏 प्राकृतिक, केमिकल-मुक्त निखार और त्वचा व बालों की सुरक्षा के लिए, कृपया अपनी मुख्य चिंता चुनें:`;
+
+      renderCrispSpecialBox('🌸 हर्ब्स एंड मोर 3-चरणीय सौंदर्य निदान (चरण 1: समस्या चुनें)', prompt, [
+        { text: '✨ 1. चेहरे पर झाइयां व पुराने काले दाग (Pigmentation)', query: 'झाइयां व काले दाग का हर्बल इलाज (beauty_triage_step2_pigment)' },
+        { text: '🌸 2. कील-मुंहासे व पिंपल्स (Acne & Pimples)', query: 'कील मुंहासे व पिंपल्स का हर्बल इलाज (beauty_triage_step2_acne)' },
+        { text: '💇 3. बालों का झड़ना, डैंड्रफ व पतलापन (Hairfall)', query: 'बालों का झड़ना व डैंड्रफ का इलाज (beauty_triage_step2_hair)' },
+        { text: '🧴 4. चेहरे पर प्राकृतिक चमक व रंगत निखार (Glow)', query: 'चेहरे का प्राकृतिक ग्लो व निखार (beauty_triage_step2_glow)' }
+      ], 'beauty', 'beauty_triage_step1');
+      return true;
+    }
+
+    // Step 2: Skin / Hair Type Selection
+    if (cleanQ.includes('beauty_triage_step2')) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      let issueName = 'त्वचा निखार';
+      if (cleanQ.includes('pigment')) issueName = 'झाइयां व काले दाग';
+      else if (cleanQ.includes('acne')) issueName = 'कील-मुंहासे';
+      else if (cleanQ.includes('hair')) issueName = 'बालों का झड़ना';
+
+      const prompt = `🌸 **विषय:** ${issueName}\n\nसखी, कृपया अपनी त्वचा / बालों का स्वभाव (Type) चुनें ताकि सही हर्बल फॉर्मूला बताया जा सके:`;
+
+      renderCrispSpecialBox(`🌸 ${issueName}: चरण 2 — त्वचा/बालों का प्रकार चुनें`, prompt, [
+        { text: '💧 1. ऑयली (चिकनी / तैलीय) त्वचा', query: `${issueName} ऑयली स्किन हेतु संपूर्ण 3-स्टेप रूटीन (beauty_triage_step3_oily)` },
+        { text: '🍂 2. ड्राई (रूखी / बेजान) त्वचा', query: `${issueName} ड्राई स्किन हेतु संपूर्ण 3-स्टेप रूटीन (beauty_triage_step3_dry)` },
+        { text: '🌿 3. नॉर्मल या संवेदनशील (Sensitive) त्वचा', query: `${issueName} नॉर्मल स्किन हेतु संपूर्ण 3-स्टेप रूटीन (beauty_triage_step3_normal)` }
+      ], 'beauty', 'beauty_triage_step2');
+      return true;
+    }
+
+    // Step 3: Precision Herbal Daily Care Routine & Product Prescription
+    if (cleanQ.includes('beauty_triage_step3')) {
+      sakhiConversationState.lastActiveDomain = 'beauty';
+      const isHair = cleanQ.includes('hair') || cleanQ.includes('बाल');
+
+      let routineText = '';
+      if (isHair) {
+        routineText = `💇 **हर्ब्स एंड मोर आयुर्वेदिक हेयर केयर संपूर्ण रूटीन:**\n\n• **1. हेयर ऑयल (रात को):** **हर्ब्स एंड मोर 7-ऑयल हेयर नरिशिंग ऑयल** से उंगलियों के पोरों से 10 मिनट हल्की मालिश करें (भृंगराज व ब्राह्मी बालों की जड़ों को मजबूत करते हैं)।\n• **2. क्लींजिंग (सप्ताह में 2-3 बार):** **हर्ब्स एंड मोर नरिशिंग शैम्पू** (सल्फेट व पैराबेन रहित) से बाल धोएं। डैंड्रफ जड़ से खत्म होगा।\n• **3. आंतरिक पोषण:** प्रतिदिन 1 चम्मच **नेचुरामोर फॉर विमेन** गुनगुने दूध के साथ लें। बायोटीन, फोलिक एसिड व आयरन से बाल झड़ना 15 दिन में 80% कम हो जाता है।`;
+      } else {
+        routineText = `🌸 **हर्ब्स एंड मोर केमिकल-मुक्त 3-स्टेप स्किन केयर रूटीन:**\n\n• **स्टेप 1 (क्लींजिंग - सुबह व रात):** **हर्ब्स एंड मोर विटामिन थेरेपी फेसवॉश** (नीम व टी-ट्री) से चेहरा धोएं। अतिरिक्त तेल और धूल-गंदगी तुरंत साफ होती है।\n• **स्टेप 2 (डे-केयर - सुबह):** **विटामिन थेरेपी डे क्रीम (SPF-15)** लगाएं। यह धूप की हानिकारक किरणों से सुरक्षा देती है और टैनिंग नहीं होने देती।\n• **स्टेप 3 (नाइट-केयर - सोने से पहले):** चेहरे पर **एंटी-एजिंग व पिगमेंटेशन क्रीम** लगाकर 2 मिनट मालिश करें। सोते समय नई कोशिकाओं का निर्माण होता है और झाइयां हल्की होती हैं।\n\n✨ **विशेषता:** 100% पैराबेन, सल्फेट, ब्लीच व हानिकारक केमिकल रहित। 25% छूट पर उपलब्ध!`;
+      }
+
+      renderCrispSpecialBox('🌸 संपूर्ण आयुर्वेदिक ब्यूटी केयर रूटीन व उत्पाद', routineText, [
+        { text: '🛍️ हर्ब्स एंड मोर उत्पाद 25% छूट पर खरीदें', url: '/categories/beauty.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🌸 नेचुरामोर फॉर विमेन (आंतरिक पोषण)', query: 'नेचुरामोर फॉर विमेन के घटक और खुराक' },
+        { text: '📲 सहेली को यह ब्यूटी रूटीन भेजें', query: 'सहेली को भेजने के लिए व्हाट्सएप मैसेज बनाओ' }
+      ], 'beauty', 'beauty_triage_step3');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.4 CHATGPT-STYLE INTERACTIVE NETSURF BUSINESS & Q3 PATHFINDER TRIAGE ENGINE
+  // =========================================================================
+  function handleInteractiveNetsurfQ3Triage(cleanQ, rawQ) {
+    const isNetsurfTriage = cleanQ.includes('netsurf_triage') || cleanQ === 'नेट्सर्फ बिज़नेस निदान' || cleanQ === 'q3 पाथफाइंडर क्या है' ||
+      ((cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ')) && 
+       (cleanQ.includes('निदान') || cleanQ.includes('कमाई कैसे करें') || cleanQ.includes('शुरुआत कैसे करें')) &&
+       !cleanQ.includes('प्रोडक्ट'));
+
+    // Step 1: Goal Selection
+    if (isNetsurfTriage && !cleanQ.includes('step2') && !cleanQ.includes('step3')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const prompt = `नमस्ते! 🙏 नेट्सर्फ 2026-27 के नए बिज़नेस मॉडल में आप अपनी गति और इच्छानुसार आय प्राप्त कर सकते हैं। कृपया अपना मुख्य लक्ष्य चुनें:`;
+
+      renderCrispSpecialBox('💼 नेट्सर्फ 3-चरणीय बिज़नेस निदान (चरण 1: लक्ष्य चुनें)', prompt, [
+        { text: '🛒 1. उत्पादों पर 25% छूट व घरेलू बचत (Consumer)', query: 'नेट्सर्फ उपभोक्ता 25% छूट प्लान (netsurf_triage_step2_consumer)' },
+        { text: '📱 2. बिना टीम हर महीने ₹15,000-₹30,000 आय (E-Teller)', query: 'डिजिटल ई-टेलर रिटेल कमाई प्लान (netsurf_triage_step2_eteller)' },
+        { text: '🏆 3. Q3 पाथफाइंडर 2026-27 व रॉकस्टार अचीवमेंट', query: 'Q3 पाथफाइंडर टीमफेस्ट क्लब रॉकस्टार (netsurf_triage_step2_q3)' },
+        { text: '🚀 4. फुल-टाइम करियर व ₹8.19 लाख पाक्षिक कैपिंग', query: 'फुल टाइम करियर और 8.19 लाख कैपिंग प्लान (netsurf_triage_step2_capping)' }
+      ], 'business', 'netsurf_triage_step1');
+      return true;
+    }
+
+    // Step 2: Background / Profile Selection
+    if (cleanQ.includes('netsurf_triage_step2')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      let goalName = 'बिज़नेस ग्रोथ';
+      if (cleanQ.includes('consumer')) goalName = '25% उपभोक्ता बचत';
+      else if (cleanQ.includes('eteller')) goalName = 'डिजिटल ई-टेलर रिटेल';
+      else if (cleanQ.includes('q3')) goalName = 'Q3 पाथफाइंडर व रॉकस्टार';
+      else if (cleanQ.includes('capping')) goalName = '₹8.19L कैपिंग लीडरशिप';
+
+      const prompt = `💼 **लक्ष्य:** ${goalName}\n\nआपकी वर्तमान पृष्ठभूमि क्या है ताकि आपके अनुकूल 90 दिन की कार्ययोजना दी जा सके?`;
+
+      renderCrispSpecialBox(`💼 ${goalName}: चरण 2 — आपकी प्रोफाइल चुनें`, prompt, [
+        { text: '👩 1. गृहणी / महिला (घर बैठे 2 घंटे समय)', query: `${goalName} महिला स्वावलंबन रोडमैप (netsurf_triage_step3_women)` },
+        { text: '🌾 2. किसान / ग्रामीण युवा (खेती व पशुपालन संपर्क)', query: `${goalName} किसान मित्र रोडमैप (netsurf_triage_step3_farmer)` },
+        { text: '💼 3. नौकरीपेशा / व्यवसायी (पार्ट-टाइम काम)', query: `${goalName} पार्ट-टाइम प्रोफेशनल रोडमैप (netsurf_triage_step3_pro)` },
+        { text: '🌐 4. डायरेक्ट सेलर / अनुभवी नेटवर्क लीडर', query: `${goalName} मास्टर लीडरशिप रोडमैप (netsurf_triage_step3_leader)` }
+      ], 'business', 'netsurf_triage_step2');
+      return true;
+    }
+
+    // Step 3: Exact Action Plan & Blueprint
+    if (cleanQ.includes('netsurf_triage_step3')) {
+      sakhiConversationState.lastActiveDomain = 'business';
+      const isWomen = cleanQ.includes('women') || cleanQ.includes('महिला');
+      const isFarmer = cleanQ.includes('farmer') || cleanQ.includes('किसान');
+
+      let planText = '';
+      if (isWomen) {
+        planText = `👩 **महिलाओं हेतु 90-दिवसीय गृह स्वावलंबन फॉर्मूला:**\n\n• **माह 1 (उपभोक्ता अनुभव):** स्वयं और परिवार में नेचुरामोर फॉर विमेन व हर्बल ब्यूटी किट का उपयोग करें (25% फ्लैट बचत)।\n• **माह 2 (सहेली संपर्क):** अपनी 10 सहेलियों व रिश्तेदारों को WhatsApp पर डिजिटल कैटलॉग शेयर करें। 10 नियमित ग्राहकों से ₹10,000 की पहली रिटेल आमदनी।\n• **माह 3 (क्लब सक्षम व रॉकस्टार):** 4 सक्रिय सहेलियों को ई-टेलर बनाएं। टीम मैचिंग से ₹25,000+ की स्थायी मासिक आय!`;
+      } else if (isFarmer) {
+        planText = `🌾 **किसान साथियों हेतु 'किसान मित्र' लखपति रोडमैप:**\n\n• **माह 1 (खेत में डेमो):** अपने 1 एकड़ खेत में स्टिमरिच + Bio-99 का स्प्रे करें और पड़ोसियों को रिजल्ट दिखाएं।\n• **माह 2 (गांव के 20 किसान):** 20 किसानों को 25% छूट पर बायोफिट बीज उपचार व स्प्रे किट उपलब्ध कराएं। रिटेल लाभ ₹20,000 से ₹35,000।\n• **माह 3 (Q3 पाथफाइंडर क्लब):** 5 गांवों में किसान मित्र टीम तैयार करें और रॉकस्टार लेवल अचीव करके कंपनी का राष्ट्रीय सम्मान प्राप्त करें!`;
+      } else {
+        planText = `🚀 **नेट्सर्फ Q3 पाथफाइंडर 2026-27 मास्टर लीडरशिप एक्शन प्लान:**\n\n• **1. रॉकस्टार लेवल्स:** क्लब 1 और क्लब 2 में संतुलित टर्नओवर मैचिंग पर अतिरिक्त 2% से 5% क्लब बोनस।\n• **2. 2×2 मैट्रिक्स 12 माह का गणित:** यदि हर साथी महीने में सिर्फ 2 नए एक्टिव डिस्ट्रीब्यूटर जोड़ता है, तो 12वें महीने 4096 की टीम बनती है और ₹8,19,250 पाक्षिक कैपिंग सुरक्षित होती है।\n• **3. डिजिटल सिस्टम:** आरोग्यम इंडिया के ऑटो-व्हाट्सएप और सखी AI फनल से 100% सोशल मीडिया से लीड्स बनाएं!`;
+      }
+
+      renderCrispSpecialBox('💼 नेट्सर्फ संपूर्ण 90-दिवसीय सफलता ब्लूप्रिंट', planText, [
+        { text: '📝 निःशुल्क नेट्सर्फ रजिस्ट्रेशन करें', url: '/registration.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '📲 नए लोगों को भेजने हेतु WhatsApp मैसेज बनाएं', query: 'नए लोगों को भेजने के लिए व्हाट्सएप मैसेज बनाओ' },
+        { text: '🧮 2 का मैट्रिक्स 12 महीने का गणित', query: '2 का मैट्रिक्स 12 महीने में सफलता का गणित बताओ' }
+      ], 'business', 'netsurf_triage_step3');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.5 MULTI-CHANNEL SOCIAL MARKETING MESSAGE GENERATOR (WHATSAPP & FACEBOOK)
+  // =========================================================================
+  function handleMultiChannelMarketingCopyGenerator(cleanQ, rawQ) {
+    const isPromoMsgReq = (
+      cleanQ.includes('pramotional') || cleanQ.includes('promotional') || cleanQ.includes('प्रमोशनल') ||
+      cleanQ.includes('facebook post') || cleanQ.includes('फेसबुक पोस्ट') || cleanQ.includes('फेसबुक के लिए') ||
+      cleanQ.includes('whatsapp status') || cleanQ.includes('व्हाट्सएप स्टेटस') || cleanQ.includes('स्टेटस बनाओ') ||
+      cleanQ.includes('mere liye message') || cleanQ.includes('मेरे लिए मैसेज बना') || cleanQ.includes('मेरे लिए मेसेज बना') ||
+      cleanQ.includes('mere no ke sath') || cleanQ.includes('मेरे नंबर के साथ') ||
+      (cleanQ.includes('मैसेज बनाओ') && (cleanQ.includes('नेचुरामोर') || cleanQ.includes('बायोफिट') || cleanQ.includes('स्टेटस') || cleanQ.includes('फेसबुक')))
+    );
+
+    if (!isPromoMsgReq) return false;
+
+    let senderName = getUserName() || 'आरोग्यम मित्र';
+    let senderPhone = getUserPhone() || '7974422572';
+    const domainUrl = `https://aarogyamindia.online/aarogyam-sakhi.html?ref=${encodeURIComponent(senderPhone)}`;
+
+    const isFacebook = cleanQ.includes('facebook') || cleanQ.includes('फेसबुक') || cleanQ.includes('fb');
+    const isNaturamore = cleanQ.includes('naturamore') || cleanQ.includes('नेचुरामोर') || cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य');
+    const isBiofit = cleanQ.includes('biofit') || cleanQ.includes('बायोफिट') || cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('फसल');
+
+    let postTitle = '📲 आपका पर्सनलाइज़्ड प्रमोशनल संदेश तैयार है';
+    let messageBody = '';
+
+    if (isFacebook) {
+      postTitle = '📘 फेसबुक (Facebook) पोस्ट संदेश';
+      messageBody = `🌟 *क्या आप अपने परिवार के स्वास्थ्य और बिना केमिकल की शुद्ध जीवनशैली को लेकर गंभीर हैं?* 🌟\n\nआज के भागदौड़ और मिलावट के दौर में अपने शरीर को पोषण देना कोई शौक नहीं, बल्कि सबसे बड़ी ज़रूरत बन चुका है!\n\n🌿 *नेट्सर्फ 100% शुद्ध आयुर्वेदिक व प्राकृतिक उत्पाद क्यों चुनें?*\n✅ 1. *रोग प्रतिरोधक क्षमता (Immunity):* मौसमी बीमारियों, कमजोरी व थकान से 100% सुरक्षा।\n✅ 2. *हृदय व शुगर सुरक्षा:* नसों का लचीलापन व स्वस्थ मेटाबॉलिज्म।\n✅ 3. *महिला व बाल पोषण:* हीमोग्लोबिन, हड्डियों की मजबूती व बच्चों का शारीरिक-मानसिक विकास।\n✅ 4. *सीधी छूट:* घर बैठे ओरिजिनल कंपनी बिल के साथ 25% की फ्लैट छूट!\n\n🎁 *विशेष उपभोक्ता सुविधा:*\nलगातार 5 महीने की खरीदारी पर 6ठे महीने मुफ्त प्रॉडक्ट (5+1 ऑफर) व मुफ़्त होम डिलीवरी!\n\n👇 *फ्री स्वास्थ्य परामर्श व 25% छूट पर ऑर्डर हेतु अभी संपर्क करें:*\n👤 *अधिकृत स्वास्थ्य सलाहकार:* ${senderName}\n📞 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *AI से सीधे बात करें:* ${domainUrl}\n\n#AarogyamIndia #Naturamore #OrganicHealth #Ayurveda #Wellness2026`;
+    } else if (isBiofit) {
+      postTitle = '🌾 बायोफिट जैविक खेती (WhatsApp Status & Broadcast)';
+      messageBody = `🌾 *किसान भाइयों के लिए खुशखबरी — खाद का खर्च 40% घटाएं और उपज 30% बढ़ाएं!* 🌾\n\nप्रिय किसान साथी, रासायनिक खादों से बंजर होती जमीन और बढ़ती लागत से परेशान न हों। अपनाएं 26 वर्षों से प्रमाणित 'नेट्सर्फ बायोफिट तकनीक'!\n\n✨ *बायोफिट के 4 जादुई फायदे:*\n🌱 *स्टिमरिच (Stimrich):* कल्ले, शाखाएं व फुटाव दोगुना, बंपर हरियाली!\n🧪 *बायो-99 (Bio-99):* दवा की हर बूंद पत्तों के आर-पार, 50% दवा की बचत!\n🛡️ *रैप-अप (Wrap-up):* फंगस, झुलसा व मौसम की मार से सुरक्षा कवच!\n💧 *शेत (SHET):* यूरिया-डीएपी की 40% तक बचत व मिट्टी में केंचुए सक्रिय!\n\n🎁 *विशेष किसान ऑफर:* सभी उत्पादों पर सीधी 25% छूट + मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल के अनुसार सही स्प्रे चार्ट हेतु आज ही संपर्क करें:*\n👤 *किसान मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *फसल का स्प्रे कैलेंडर देखें:* ${domainUrl}`;
+    } else if (isNaturamore) {
+      postTitle = '❤️ नेचुरामोर संपूर्ण स्वास्थ्य (WhatsApp Status & Post)';
+      messageBody = `❤️ *थकान, कमजोरी, जोड़ों का दर्द या शुगर? अपने शरीर को दें संपूर्ण पोषण!* ❤️\n\n'नेचुरामोर' (Naturamore) — भारत का सबसे भरोसेमंद 100% शाकाहारी और हर्बल न्यूट्रीशनल प्रोटीन!\n\n✨ *प्रमुख लाभ:*\n💪 शारीरिक कमजोरी, नसों का खिंचाव व थकान 7 दिन में दूर।\n🦴 जोड़ों व घुटनों में लचीलापन व नया कार्टिलेज निर्माण।\n🩸 हीमोग्लोबिन, प्लेटलेट्स व रोग प्रतिरोधक क्षमता में जबरदस्त सुधार।\n🌿 100% केमिकल, शुगर व साइड-इफेक्ट रहित आयुर्वेदिक फॉर्मूलेशन।\n\n🎁 *आज ही ऑर्डर करें और पाएं:*\n• फ्लैट 25% की विशेष रिटेल छूट!\n• ओरिजिनल कंपनी जीएसटी बिल व होम डिलीवरी।\n\n👇 *अपनी जरूरत के अनुसार सही नेचुरामोर चुनने हेतु संपर्क करें:*\n👤 *स्वास्थ्य सलाहकार:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI से समझें:* ${domainUrl}`;
+    } else {
+      postTitle = '📲 WhatsApp स्टेटस व ब्रॉडकास्ट संदेश';
+      messageBody = `✨ *घर बैठे मोबाइल से ₹15,000 से ₹40,000 मासिक कमाने का सुनहरा मौका!* ✨\n\nनमस्ते दोस्तों! 🙏\nयदि आप गृहणी, छात्र, नौकरीपेशा या किसान हैं और अपने खाली समय में पार्ट-टाइम काम करके अतिरिक्त आय बनाना चाहते हैं:\n\n✅ कोई दुकान या ऑफिस की ज़रूरत नहीं\n✅ ₹0 इन्वेस्टमेंट, ₹0 रिस्क\n✅ 100% स्वदेशी, दैनिक उपयोग के स्वास्थ्य व जैविक उत्पाद\n✅ पूरा काम सिर्फ मोबाइल और WhatsApp से\n\n👇 *सीखने और शुरुआत करने हेतु मुझे WhatsApp करें:*\n👤 *नाम:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n🌐 *वेबसाइट देखें:* ${domainUrl}`;
+    }
+
+    const waShareUrl = `https://wa.me/?text=${encodeURIComponent(messageBody)}`;
+
+    const respText = `👉 यह संदेश आपके नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** के साथ तैयार किया गया है। आप इसे कॉपी कर सकते हैं या सीधे नीचे दिए गए बटन से WhatsApp पर शेयर कर सकते हैं:\n\n${messageBody}`;
+
+    renderCrispSpecialBox(postTitle, respText, [
+      { text: '📲 सीधे WhatsApp पर शेयर करें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: '📘 फेसबुक पोस्ट संदेश बनाएं', query: 'मेरे लिए फेसबुक पोस्ट का मैसेज बनाओ' },
+      { text: '🌾 बायोफिट खाद का मैसेज बनाएं', query: 'बायोफिट खाद का मैसेज बनाओ मेरे नाम से' },
+      { text: '❤️ नेचुरामोर स्वास्थ्य मैसेज बनाएं', query: 'नेचुरामोर का मैसेज मेरे नंबर के साथ बनाओ' }
+    ], 'business', 'custom_promo_copy');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.6 CHATGPT & GEMINI AI POSTER PROMPT STUDIO (DALL-E 3 & GEMINI READY)
+  // =========================================================================
+  function handleAiPosterPromptGenerator(cleanQ, rawQ) {
+    const isPosterReq = (
+      cleanQ.includes('poster') || cleanQ.includes('पोस्टर') || cleanQ.includes('banner') || cleanQ.includes('बैनर') ||
+      cleanQ.includes('prompt') || cleanQ.includes('प्रॉम्प्ट') || cleanQ.includes('image bana') || cleanQ.includes('इमेज बना') ||
+      cleanQ.includes('फोटो बना') || cleanQ.includes('image prompt') || cleanQ.includes('प्रमोशनल इमेज') ||
+      cleanQ.includes('poster prompt')
+    );
+
+    if (!isPosterReq) return false;
+
+    let userName = getUserName() || 'Aarogyam Leader';
+    let userPhone = getUserPhone() || '7974422572';
+
+    const isSuprabhat = cleanQ.includes('suprabhat') || cleanQ.includes('सुप्रभात') || cleanQ.includes('morning') || cleanQ.includes('motivation') || cleanQ.includes('प्रेरणा');
+    const isFestival = cleanQ.includes('diwali') || cleanQ.includes('दीपावली') || cleanQ.includes('त्योहार') || cleanQ.includes('festival') || cleanQ.includes('dashara') || cleanQ.includes('दशहरा') || cleanQ.includes('होली');
+    const isNetsurf = cleanQ.includes('netsurf') || cleanQ.includes('नेट्सर्फ') || cleanQ.includes('pathfinder') || cleanQ.includes('पाथफाइंडर') || cleanQ.includes('business');
+    const isAgri = cleanQ.includes('agri') || cleanQ.includes('खेती') || cleanQ.includes('biofit') || cleanQ.includes('बायोफिट') || cleanQ.includes('किसान');
+    const isPashu = cleanQ.includes('pashu') || cleanQ.includes('पशु') || cleanQ.includes('दूध') || cleanQ.includes('dairy');
+
+    let promptCategory = '🎨 AI पोस्टर प्रॉम्प्ट स्टूडियो (ChatGPT / Gemini)';
+    let generatedPrompt = '';
+    let categoryTitle = '';
+
+    if (isSuprabhat) {
+      categoryTitle = '🌅 सुप्रभात व दैनिक प्रेरणा पोस्टर प्रॉम्प्ट';
+      generatedPrompt = `Hyper-realistic 8K UHD festive inspirational greeting poster. A breathtaking golden sunrise over an Indian countryside with dew drops on fresh green lotus leaves and a gentle warm divine morning glow. In the center, an elegant modern typography banner with golden Hindi lettering: "शुभ प्रभात — नया सवेरा, नई ऊर्जा, नई सफलता!". At the bottom right, an elegant glassmorphism portrait badge featuring the attached user photo, with text in bold white and gold: "प्रेरणा स्रोत: ${userName} | WhatsApp: ${userPhone}". Highly detailed, cinematic lighting, photorealistic, 16:9 vertical wallpaper format.`;
+    } else if (isFestival) {
+      categoryTitle = '🪔 दीपावली / पावन त्योहार पोस्टर प्रॉम्प्ट';
+      generatedPrompt = `Ultra-luxurious 8K photorealistic Indian Diwali and festive celebration poster. Deep royal blue and maroon background adorned with glowing traditional earthen diyas (oil lamps), intricate golden rangoli patterns, and cascading marigold flower garlands. Fireworks gently sparkling in the twilight sky. Golden 3D embossed Hindi greeting: "दीपावली व पावन पर्व की हार्दिक शुभकामनाएं! आपके घर सुख, समृद्धि और आरोग्य की वर्षा हो।". Bottom banner featuring attached user portrait in traditional attire with sleek golden badge: "शुभचिंतक: ${userName} | संपर्क: ${userPhone}". Cinematic festive depth, volumetric lighting, masterpiece quality.`;
+    } else if (isNetsurf) {
+      categoryTitle = '💼 नेट्सर्फ Q3 पाथफाइंडर व बिज़नेस पोस्टर प्रॉम्प्ट';
+      generatedPrompt = `A high-end modern corporate leadership and financial freedom poster. A majestic auditorium stage with sapphire blue and golden spotlights, showing a shining champion trophy, rising stock graphs, and financial success aura. Bold typography in modern Hindi & English: "Netsurf Pathfinder 2026-27 — आत्मनिर्भर भारत, मासिक ₹8,19,250 कैपिंग का सुनहरा अवसर!". In the forefront, an attractive executive portrait layout (using the attached photo) wearing formal attire, with verified gold checkmark and contact details: "Business Leader: ${userName} | Call/WhatsApp: ${userPhone}". Sleek, premium, crisp 8K resolution, inspiring direct-selling success.`;
+    } else if (isAgri) {
+      categoryTitle = '🌾 बायोफिट जैविक कृषि क्रांति पोस्टर प्रॉम्प्ट';
+      generatedPrompt = `Vibrant high-resolution 8K photography poster of an Indian organic farm. In the background, lush golden wheat and lush green vegetable fields under clear blue sky with a glowing sun. A proud, smiling Indian farmer standing in the farm, holding Netsurf Biofit Stimrich and Bio-99 bottles with organic bumper yield results. Prominent bold banner: "जहरमुक्त जैविक खेती — 40% खाद की बचत, 30% रिकॉर्ड बंपर उत्पादन!". On the bottom left, a verified distributor card with attached user photo and text: "अधिकृत बायोफिट सलाहकार: ${userName} | WhatsApp: ${userPhone} (25% फ्लैट छूट पर उपलब्ध)". Highly realistic, vivid natural colors, hyper-detailed.`;
+    } else if (isPashu) {
+      categoryTitle = '🥛 पशुपालन व दूध-फैट वृद्धि पोस्टर प्रॉम्प्ट';
+      generatedPrompt = `Wholesome 8K rural Indian dairy farming poster. A magnificent healthy, shining Murrah buffalo and Gir cow standing in a clean, modern dairy shed with a large steel milk pail overflowing with rich, thick foaming milk. A prominent 3D jar of Biofit Pet-Vet CFC Cattle Feed Supplement highlighted with glowing green wellness rays. Bold headline: "पशुओं में 2 से 3 लीटर दूध व 7-8 फैट की गारंटीकृत वृद्धि!". At the bottom, clean banner with user contact: "डेयरी पोषण विशेषज्ञ: ${userName} | मोबाइल: ${userPhone}". Warm golden hour farm lighting, ultra-realistic, inspiring dairy prosperity.`;
+    } else {
+      categoryTitle = '❤️ नेचुरामोर संपूर्ण स्वास्थ्य पोस्टर प्रॉम्प्ट';
+      generatedPrompt = `Ultra-modern 8K health and wellness promotional poster. A bright, energetic natural setting with herbs, green tea leaves, and amla fruits around a glowing jar of Naturamore Daily Nutrition and Life Style Plus capsules. An active, healthy Indian family smiling with vitality. Premium typography: "संपूर्ण पारिवारिक पोषण — कमजोरी दूर, मजबूत दिल व संतुलित शुगर! फ्लैट 25% छूट पर घर बैठे मंगाएं।". At the bottom, a stylish verified wellness advisor card featuring attached photo: "अधिकृत नेचुरामोर डिस्ट्रीब्यूटर: ${userName} | WhatsApp: ${userPhone}". Clean medical-ayurvedic aesthetic, vibrant colors, studio lighting.`;
+    }
+
+    const respText = `🌸 **मैं सीधे इमेज फ़ाइल नहीं बनाती, लेकिन आपके लिए ChatGPT (DALL-E 3) और Google Gemini में 100% अल्ट्रा-एचडी पोस्टर बनवाने का सटीक मास्टर प्रॉम्प्ट तैयार है!**\n\n📌 **${categoryTitle}:**\n\`\`\`text\n${generatedPrompt}\n\`\`\`\n\n💡 **पोस्टर बनाने की 3-स्टेप आसान विधि:**\n1. ऊपर दिए गए बॉक्स से **प्रॉम्प्ट कॉपी करें**।\n2. अपने मोबाइल में **ChatGPT ऐप** या **Google Gemini ऐप** खोलें।\n3. 'Attach Photo' (+) पर क्लिक करके अपनी फोटो (या प्रोडक्ट फोटो) जोड़ें और यह प्रॉम्प्ट पेस्ट करके **Generate / Send** दबा दें। 10 सेकंड में आपका अल्ट्रा-एचडी पोस्टर तैयार हो जाएगा!\n\n👉 नीचे दिए गए बटन से अन्य श्रेणियों के प्रॉम्प्ट्स तुरंत प्राप्त करें:`;
+
+    renderCrispSpecialBox(categoryTitle, respText, [
+      { text: '🌅 सुप्रभात व प्रेरणा पोस्टर प्रॉम्प्ट', query: 'सुप्रभात और दैनिक प्रेरणा का पोस्टर प्रॉम्प्ट दो' },
+      { text: '🪔 दीपावली / त्योहार पोस्टर प्रॉम्प्ट', query: 'दीपावली त्योहार का पोस्टर प्रॉम्प्ट दो' },
+      { text: '🌾 बायोफिट कृषि पोस्टर प्रॉम्प्ट', query: 'बायोफिट खेती का पोस्टर प्रॉम्प्ट दो' },
+      { text: '💼 नेट्सर्फ बिज़नेस पोस्टर प्रॉम्प्ट', query: 'नेट्सर्फ बिज़नेस और पाथफाइंडर का पोस्टर प्रॉम्प्ट दो' },
+      { text: '🥛 पशुपालन दूध वृद्धि प्रॉम्प्ट', query: 'पशुपालन और दूध वृद्धि का पोस्टर प्रॉम्प्ट दो' }
+    ], 'omni', 'poster_prompt_studio');
+    return true;
+  }
+
   function processKnowledgeQuery(query) {
     try {
       const rawQ = (query || '').trim();
@@ -11034,6 +11367,31 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0.017 CHATGPT-STYLE INTERACTIVE GUIDED KRISHI TRIAGE ENGINE
     if (typeof handleInteractiveCropTriage === 'function' && handleInteractiveCropTriage(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.018 CHATGPT-STYLE INTERACTIVE HEALTH & KUNDALI TRIAGE ENGINE
+    if (typeof handleInteractiveHealthTriage === 'function' && handleInteractiveHealthTriage(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.019 CHATGPT-STYLE INTERACTIVE BEAUTY & SKIN CARE TRIAGE ENGINE
+    if (typeof handleInteractiveBeautyTriage === 'function' && handleInteractiveBeautyTriage(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.020 CHATGPT-STYLE INTERACTIVE NETSURF BUSINESS & Q3 PATHFINDER TRIAGE ENGINE
+    if (typeof handleInteractiveNetsurfQ3Triage === 'function' && handleInteractiveNetsurfQ3Triage(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.021 MULTI-CHANNEL SOCIAL MARKETING COPY GENERATOR (WhatsApp & Facebook)
+    if (typeof handleMultiChannelMarketingCopyGenerator === 'function' && handleMultiChannelMarketingCopyGenerator(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.022 CHATGPT & GEMINI AI POSTER PROMPT STUDIO
+    if (typeof handleAiPosterPromptGenerator === 'function' && handleAiPosterPromptGenerator(cleanQ, rawQ)) {
       return;
     }
 
