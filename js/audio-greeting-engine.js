@@ -436,30 +436,39 @@
           <span>होम</span>
         </a>
 
-        <a href="/ebooks/ebook.html" class="mobile-nav-item ${isEbook ? 'active' : ''}">
+        <a href="/aarogyam-sakhi.html" class="mobile-nav-item ${currentPath.includes('sakhi') ? 'active' : ''}">
+          <span class="nav-emoji">🌸</span>
+          <span style="color:#d946ef;font-weight:800;">सखी AI</span>
+        </a>
+
+        <a href="/mandi.html" class="mobile-nav-item ${currentPath.includes('mandi') ? 'active' : ''}">
+          <span class="nav-emoji">🌾</span>
+          <span>मंडी</span>
+        </a>
+
+        <a href="/weather.html" class="mobile-nav-item ${currentPath.includes('weather') ? 'active' : ''}">
+          <span class="nav-emoji">⛅</span>
+          <span>मौसम</span>
+        </a>
+
+        <a href="/krishi-panchang.html" class="mobile-nav-item ${currentPath.includes('panchang') ? 'active' : ''}">
+          <span class="nav-emoji">🕉️</span>
+          <span>पंचांग</span>
+        </a>
+
+        <a href="/categories/netsurf-products.html" class="mobile-nav-item ${currentPath.includes('netsurf') ? 'active' : ''}">
+          <span class="nav-emoji">📦</span>
+          <span>नेट्सर्फ</span>
+        </a>
+
+        <a href="/ebooks/my-library.html" class="mobile-nav-item ${currentPath.includes('library') || currentPath.includes('ebook') ? 'active' : ''}">
           <span class="nav-emoji">📚</span>
-          <span>ई-बुक्स</span>
-          <span class="nav-badge">ऑफ़र</span>
+          <span>लाइब्रेरी</span>
         </a>
 
-        <a href="/ebooks/agriculture.html" class="mobile-nav-item ${isAgri ? 'active' : ''}">
-          <span class="nav-emoji">🌱</span>
-          <span>कृषि हब</span>
-        </a>
-
-        <a href="/categories/health.html" class="mobile-nav-item ${isHealth ? 'active' : ''}">
-          <span class="nav-emoji">❤️</span>
-          <span>स्वास्थ्य</span>
-        </a>
-
-        <a href="/pashu-palan.html" class="mobile-nav-item ${isPashu ? 'active' : ''}">
-          <span class="nav-emoji">🐄</span>
-          <span>पशु पालन</span>
-        </a>
-
-        <a href="https://wa.me/917974422572?text=${encodeURIComponent('नमस्ते आरोग्यम टीम, मुझे सहायता चाहिए।')}" target="_blank" rel="noopener noreferrer" class="mobile-nav-item" style="color:#16a34a;">
-          <span class="nav-emoji">💬</span>
-          <span>WhatsApp</span>
+        <a href="/tube.html" class="mobile-nav-item ${currentPath.includes('tube') ? 'active' : ''}">
+          <span class="nav-emoji">▶️</span>
+          <span>Tube</span>
         </a>
       </div>
     `;

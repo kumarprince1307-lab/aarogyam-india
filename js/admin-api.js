@@ -364,7 +364,7 @@ export async function fetchDashboardData(params = {}) {
     ] = await Promise.all([
       fetchShareEngineSummaryData(), // Reuse the existing summary function
       db.from('purchases').select('amount, profile_id').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
-      db.from('profiles').select('id, full_name, created_at, registration_source'), // This is for profiles, not books
+      db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(500), // Bounded to prevent full table egress
       db.from('purchases').select('profile_id, book_id, amount, purchase_date, payment_status').or('payment_status.eq.success,payment_status.is.null').gte('purchase_date', startDateForFilter.toISOString()).lt('purchase_date', apiEndDate.toISOString()),
       db.from('books').select('id, title'), // FIX: Removed 'name' as it may not exist.
       fetchTodaysBirthdays(),
@@ -372,14 +372,14 @@ export async function fetchDashboardData(params = {}) {
       db.from('purchases').select('profile_id, book_id, purchase_date, payment_status').order('purchase_date', { ascending: false }).limit(5),
       db.from('profiles').select('id, full_name, created_at, registration_source').order('created_at', { ascending: false }).limit(5),
       // New query for period-specific user counts
-      db.from('profiles').select('id, is_active').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
+      db.from('profiles').select('id, is_active').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()).limit(1000),
       // Period-specific share engine stats
       db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'share').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
       db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'click').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
       db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'visit').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
       (async () => {
         try {
-          return await db.from('sakhi_user_insights').select('*');
+          return await db.from('sakhi_user_insights').select('primary_domain, interaction_count, user_name, phone_number, created_at').order('created_at', { ascending: false }).limit(200);
         } catch (_) {
           return { data: [] };
         }
