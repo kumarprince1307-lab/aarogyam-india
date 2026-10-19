@@ -260,7 +260,7 @@
     // 1. Vocabulary & Tone Analysis (Dehati, Business, Homemaker, Patient)
     const dehatiKeywords = ['राम राम', 'जय जवान', 'जय किसान', 'किसान', 'खेती', 'खेत', 'भैया', 'भाई साहब', 'हमरे', 'का करें', 'दवाई', 'कीड़ा लागल', 'सूख रहा', 'कल्ले', 'खाद', 'यूरिया', 'बीज', 'बरसात', 'सिंचाई', 'चना', 'सरसों', 'गेहूं', 'धान'];
     const businessKeywords = ['कमाई', 'इनकम', 'बिज़नेस', 'पैसा', 'कमीशन', 'कैपिंग', '8.19', '8,19,250', 'मार्केटिंग', 'प्लान', 'नेटवर्क', 'सेल', 'मार्जिन', 'प्रॉफ़िट', 'रजिस्ट्रेशन', 'आईडी', 'डाउनलाइन'];
-    const homemakerKeywords = ['नमस्ते बहन', 'बहन जी', 'घर बैठे', 'महिला', 'लेडीज', 'चेहरा', 'ग्लो', 'बाल', 'झुर्रियां', 'झाइयां', 'रसोई', 'बच्चे', 'वजन कम', 'स्किन', 'घरेलू नुस्खा'];
+    const homemakerKeywords = ['नमस्ते बहन', 'बहन जी', 'घर बैठे', 'महिला', 'लेडीज', 'चेहरा', 'चेहरे का ग्लो', 'बाल', 'झुर्रियां', 'झाइयां', 'रसोई', 'बच्चे', 'वजन कम', 'स्किन', 'घरेलू नुस्खा'];
     const patientKeywords = ['मरीज', 'दर्द', 'बीमारी', 'शुगर', 'डायबिटीज', 'बीपी', 'गठिया', 'जोड़', 'इलाज', 'दवा', 'डॉक्टर', 'रिपोर्ट', 'कमजोरी', 'हार्ट', 'किडनी', 'लिवर', 'थायराइड'];
 
     let dehatiHits = 0, bizHits = 0, homeHits = 0, patientHits = 0;
@@ -516,12 +516,13 @@
     const beautyTokens = [
       'सुंदर', 'त्वचा', 'चेहरा', 'चेहरे', 'skin', 'झुर्रियां', 'झाइयाँ', 'झाइयां',
       'रूखापन', 'काले घेरे', 'काले धब्बे', 'मुंहासे', 'कील-मुहाँसों', 'पिंपल', 'pimple',
-      'ग्लो', 'glow', 'चमक', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
+      'चेहरे का ग्लो', 'फेस ग्लो', 'glow', 'चमक', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
       'गंजापन', 'गंजा', 'हेयरफॉल', 'कंडीशनर', 'फेसपैक', 'फेसवाश', 'फेस वॉश', 'रंगत',
       'उबटन', 'जायफल', 'बेसन', 'मुल्तानी मिट्टी', 'मलाई', 'स्क्रब', 'हर्ब्स एंड मोर',
       'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों', 'बॉडी लोशन', 'body lotion'
     ];
-    if (!beauty_rejected && beautyTokens.some(t => q.includes(t))) {
+    const isHbToken = q.includes('हीमोग्लोबिन') || q.includes('hemoglobin') || q.includes('hb') || q.includes('रक्ताल्पता') || q.includes('खून की कमी');
+    if (!beauty_rejected && !isHbToken && beautyTokens.some(t => q.includes(t))) {
       return 'beauty';
     }
 
@@ -2463,7 +2464,37 @@
 
   // 13. HIGH-PRECISION QUERY NORMALIZER
   function normalizeQueryText(text) {
-    return (text || '').toLowerCase()
+    let t = (text || '').toLowerCase();
+
+    // Naturamore Spoken & Phonetic Normalizations
+    t = t.replace(/(?:नेचुरल\s*(?:मोर|मोड़|मुहूर्त|मौर|और|मार|मोल|मूर)|natura\s*more|natural\s*more|netural\s*more|naturamor)/gi, 'नेचुरामोर');
+    t = t.replace(/नेचुरामोर\s*(?:वूमेन|वुमेन|women|woman|महिला|फॉर\s*वुमेन|फॉर\s*विमेन)/gi, 'नेचुरामोर फॉर विमेन');
+    t = t.replace(/नेचुरामोर\s*(?:किड्स|बच्चे|बच्चों|kids|kid|फॉर\s*किड्स)/gi, 'नेचुरामोर फॉर किड्स');
+
+    // Hemoglobin & Blood Count
+    t = t.replace(/(?:हीमोग्लोबिन|हिमोग्लोबिन|hemoglobin|haemoglobin|\bhb\b|रक्ताल्पता|anemia|एनीमिया|खून\s*की\s*कमी)/gi, 'हीमोग्लोबिन');
+
+    // E-Books Spoken Normalizations (ए बुक, आई बुक, इबुक, किताब)
+    t = t.replace(/(?:ए\s*बुक|ऐ\s*बुक|आई\s*बुक|इ\s*बुक|\be\s*book\b|\bebook\b|\bibook\b|\babuk\b|\bay\s*book\b|ई\s*बुक)/gi, 'ई-बुक');
+
+    // Seed Treatment & Crops
+    t = t.replace(/(?:बी\s*संस्कार|बीज\s*संस्कार|\bbeej\s*sanskar\b|\bbeej\s*upchar\b)/gi, 'बीज उपचार');
+    t = t.replace(/(?:तुवर|तूवर|तुअर|\btoor\s*dal\b|\btoor\b|\btur\b|\barhar\b)/gi, 'अरहर तुवर');
+
+    // Child Health & Neurological
+    t = t.replace(/(?:मिर्गी|दौरा|\bfit\b|\bfits\b|\bseizure\b|\bmirgi\b|\bmirgee\b)/gi, 'मिर्गी दौरा');
+    t = t.replace(/(?:खाना\s*नहीं\s*खाता|भूख\s*नहीं\s*लगती|खाना\s*नहीं\s*खाती|दूध\s*नहीं\s*पीता|भूख\s*कम)/gi, 'भूख व पोषण');
+
+    // Pregnancy
+    t = t.replace(/(?:प्रेग्नेंट|प्रेगनेंट|गर्भवती|गर्भावस्था|pregnant|pregnancy)/gi, 'गर्भावस्था');
+
+    // Greetings & Casual Word-Boundary Normalization
+    t = t.replace(/\b(?:gm|g\.m\.)\b/gi, 'good morning');
+    t = t.replace(/\b(?:gn|g\.n\.)\b/gi, 'good night');
+    t = t.replace(/\b(?:ga|g\.a\.)\b/gi, 'good afternoon');
+    t = t.replace(/\b(?:ge|g\.e\.)\b/gi, 'good evening');
+
+    return t
       .replace(/bio\s*99/gi, 'bio-99')
       .replace(/बायो\s*99/gi, 'बायो-99')
       .replace(/stim\s*rich/gi, 'stimrich')
@@ -4295,7 +4326,7 @@
       q.includes('jhaiya') || q.includes('झाइयां') || q.includes('pigmentation') || q.includes('dark spots') || q.includes('melasma') || q.includes('kale daag') ||
       q.includes('dark circle') || q.includes('ankho ke niche kala') ||
       q.includes('lal dag') || q.includes('लाल दाग') || q.includes('rashes') || q.includes('allergy') ||
-      q.includes('glow') || q.includes('ग्लो') || q.includes('साबुन') || q.includes('soap') ||
+      ((q.includes('glow') || q.includes('फेस ग्लो') || q.includes('चेहरे पर ग्लो') || q.includes('चेहरे का ग्लो')) && !q.includes('हीमोग्लोबिन') && !q.includes('hemoglobin') && !q.includes('hb')) || q.includes('साबुन') || q.includes('soap') ||
       (q.includes('khet') && (q.includes('dhup') || q.includes('kala')))
     );
     if (isSkinQuery) {
@@ -4740,8 +4771,8 @@
 
   // 15.95 SEED TREATMENT MASTER PROTOCOL (बीज संस्कार - सभी फसलों के लिए)
   function handleSeedTreatmentMaster(cleanQ, rawQ) {
-    const isSeed = cleanQ.includes('बीज उपचार') || cleanQ.includes('बीज संस्कार') || cleanQ.includes('seed treatment') || cleanQ.includes('बीज में क्या मिला') || cleanQ.includes('छांव में सुखा') || cleanQ.includes('धूप में सुखा');
-    if (!isSeed || cleanQ.includes('चना') || cleanQ.includes('गेहूं') || cleanQ.includes('सरसों')) return false;
+    const isSeed = cleanQ.includes('बीज उपचार') || cleanQ.includes('बीज संस्कार') || cleanQ.includes('seed treatment') || cleanQ.includes('बीज में क्या मिला') || cleanQ.includes('छांव में सुखा') || cleanQ.includes('धूप में सुखा') || cleanQ.includes('बी संस्कार');
+    if (!isSeed) return false;
 
     const resp = `🌱 **बीज उपचार (बीज संस्कार) मास्टर प्रोटोकॉल — सभी फसलों के लिए:**\nबुवाई से पहले बीज का उपचार करने से मिट्टी में मौजूद फंगस, बीज जनित रोग और दीमक जैसी समस्याएं शुरुआती अवस्था में ही समाप्त हो जाती हैं, जिससे पौधे का जर्मिनेशन (अंकुरण) 95% से अधिक होता है।\n\n1. **स्टिमरिच बीज उपचार फॉर्मूला:**\n• **मात्रा:** 5 ml स्टिमरिच प्रति 1 लीटर पानी।\n• **तरीका:** बीज को साफ प्लास्टिक शीट पर फैलाएं। घोल से बीज को केवल हल्का गीला (Coat) करें, ज्यादा गीला न करें।\n• **सुखाने की प्रक्रिया:** उपचारित बीज को **4 से 6 घंटे केवल छाया में सुखाएं** (धूप में बिल्कुल न सुखाएं)। इसके बाद खेत में बुवाई कर दें।\n\n2. **जैविक फंगस व उकठा (Wilt) रोकथाम:**\n• 2 घंटे बाद नेट्सर्फ बायोफिट **Wrap Up** (10 ml प्रति किलो बीज) का हल्का लेप लगाने से जड़ गलन और उकठा रोग का खतरा 90% तक कम हो जाता है।\n\n📖 **विशेष ई-बुक संदर्भ:** सभी फसलों के बीज उपचार का सचित्र शेड्यूल हमारी ई-बुक **'खेती का डॉक्टर'** में चार्ट के रूप में उपलब्ध है। क्या आप इसे देखना चाहते हैं?`;
     renderCrispSpecialBox('🌱 बीज उपचार (बीज संस्कार) — 100% फुटाव व सुरक्षा', resp, [
@@ -10448,6 +10479,208 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     renderCrispSpecialBox(item.question, item.answer, chips, item.domain || 'omni', item.id);
   }
 
+  // =========================================================================
+  // 0.00001 MISUNDERSTANDING & FRUSTRATION DE-ESCALATION ROUTER
+  // Politely handles misunderstandings, wrongful responses, insults & abuse with humble AI empathy
+  // =========================================================================
+  function handleMisunderstandingAndDeescalation(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const raw = (rawQ || '').toLowerCase();
+
+    const isMisunderstanding = (
+      q.includes('स्क्रीन की बात') || q.includes('गलत बता रही') || q.includes('गलत जवाब') ||
+      q.includes('जो पूछा वो नहीं') || q.includes('जो पूछा वो') || q.includes('kuch aur bol rahi') ||
+      q.includes('galat jawab') || q.includes('galat bata') || q.includes('ye nahi pucha') ||
+      q.includes('यह नहीं पूछा') || q.includes('पागल हो गई हो क्या') || q.includes('तुम पागल हो') ||
+      q.includes('pagal ho') || q.includes('paagal') || q.includes('dimag kharab') ||
+      q.includes('bakwas band') || q.includes('chup rah') || q.includes('jhuth bol rahi') ||
+      q.includes('kuch nahi aata') || q.includes('faltu bol')
+    );
+
+    if (!isMisunderstanding) return false;
+
+    // Acknowledge user's intended subject if detected
+    let detectedHint = '';
+    let followupChips = [];
+
+    if (q.includes('नेचुरामोर') || q.includes('पाउडर') || q.includes('महिला') || q.includes('women')) {
+      detectedHint = 'नेचुरामोर (Naturamore पोषण व स्वास्थ्य)';
+      followupChips = [
+        { text: '🌸 नेचुरामोर फॉर विमेन (हीमोग्लोबिन व शक्ति)', query: 'नेचुरामोर फॉर विमेन क्या हीमोग्लोबिन बढ़ाएगा' },
+        { text: '🧒 नेचुरामोर फॉर किड्स (बच्चों की भूख व दिमाग)', query: '10 साल के बच्चे को कौन सा नेचुरामोर दें' },
+        { text: '⚡ नेचुरामोर प्लस (ऊर्जा व कमजोरी)', query: 'नेचुरामोर एक्टिव प्लस के फायदे' },
+        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ];
+    } else if (q.includes('फसल') || q.includes('गेहूं') || q.includes('चना') || q.includes('सरसों') || q.includes('स्प्रे') || q.includes('खाद')) {
+      detectedHint = 'आपकी फसल व खेती समाधान';
+      followupChips = [
+        { text: '🌾 फसलों का संपूर्ण स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🌱 बीज उपचार का सही फॉर्मूला', query: 'बीज उपचार कैसे करें' },
+        { text: '💰 4 एकड़ में दवाओं का खर्च', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ];
+    } else if (q.includes('ई-बुक') || q.includes('किताब') || q.includes('बुक')) {
+      detectedHint = 'आरोग्यम डिजिटल ई-बुक्स';
+      followupChips = [
+        { text: '📖 खेती का डॉक्टर ई-बुक (₹99)', query: 'खेती का डॉक्टर ई-बुक के बारे में बताओ' },
+        { text: '🥦 11 सब्जियों की डायरेक्टरी (₹49)', query: '11 सब्जियों की डायरेक्टरी वाली बुक के बारे में बताओ' },
+        { text: '📚 आरोग्यम के पास कितनी ई-बुक्स हैं', query: 'आरोग्यम इंडिया में कितने प्रकार की ई-बुक है' }
+      ];
+    } else {
+      detectedHint = 'खेती, पशुपालन या स्वास्थ्य परामर्श';
+      followupChips = [
+        { text: '🌾 खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+        { text: '🐄 पशु का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { text: '🩸 हीमोग्लोबिन व खून की कमी', query: 'हीमोग्लोबिन बहुत कम है क्या नेचुरामोर से बढ़ जाएगा' },
+        { text: '📞 दादा अवनीश जी से WhatsApp संपर्क', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ];
+    }
+
+    const resp = `माफ़ कीजिएगा! 🙏 मुझसे समझने में भारी भूल हो गई।\n\nकभी-कभी आवाज़, माइक्रोफ़ोन या शब्दों के उच्चारण में मुझसे चूक हो जाती है जिसके कारण मैंने अनुचित उत्तर दे दिया। आप बिल्कुल सही कह रहे हैं। मैं अपनी गलती स्वीकार करती हूँ और अब पूरी निष्ठा से आपकी बात सुन रही हूँ।\n\nकृपया मुझे बताएं कि आप **${detectedHint}** के बारे में क्या जानना चाहते हैं? मैं तुरंत 100% सटीक और प्रमाणित वैज्ञानिक समाधान प्रस्तुत करूँगी।`;
+
+    renderCrispSpecialBox('🌸 आरोग्यम सखी AI — विनम्र स्पष्टीकरण व समाधान', resp, followupChips, 'omni', 'deescalation_card');
+    return true;
+  }
+
+  // =========================================================================
+  // 0.00002 HEMOGLOBIN, ANEMIA & NATURAMORE FOR WOMEN MASTER ENGINE
+  // Solves: Hemoglobin increase, women stamina, blood deficiency, hormone balance
+  // =========================================================================
+  function handleHemoglobinAndWomenHealth(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isHb = q.includes('हीमोग्लोबिन') || q.includes('hemoglobin') || q.includes('रक्ताल्पता') || q.includes('खून की कमी') || q.includes('anemia') || q.includes('एनीमिया');
+    const isWomenNat = q.includes('नेचुरामोर फॉर विमेन') || (q.includes('नेचुरामोर') && (q.includes('वूमेन') || q.includes('महिला') || q.includes('औरत') || q.includes('लेडीज')));
+
+    if (!isHb && !isWomenNat) return false;
+
+    sakhiConversationState.lastActiveDomain = 'health';
+    const resp = `🩸 **हीमोग्लोबिन वृद्धि, खून की कमी (एनीमिया) व नेचुरामोर फॉर विमेन संपूर्ण वैज्ञानिक मार्गदर्शन:**\n\n✅ **क्या नेचुरामोर फॉर विमेन से हीमोग्लोबिन बढ़ेगा?**\n**हाँ, 100% प्रमाणित रूप से!** नेचुरामोर फॉर विमेन विशेष रूप से महिलाओं में खून की कमी, थकान, चिड़चिड़ापन और हार्मोनल असंतुलन को प्राकृतिक रूप से ठीक करने हेतु तैयार किया गया है।\n\n🌿 **प्रमुख घटक जो हीमोग्लोबिन बढ़ाते हैं:**\n1. **बायो-अवेलेबल आयरन (Iron) व फोलिक एसिड (Folic Acid):** नए लाल रक्त कणों (RBCs) का तेजी से निर्माण करते हैं और हीमोग्लोबिन का स्तर 30-45 दिनों में सामान्य (12 से 15.5 g/dL) लाते हैं।\n2. **शतावरी (Shatavari) व पुनर्नवा (Punarnava):** खून को शुद्ध करती हैं, शरीर की सूजन घटाती हैं और हॉर्मोनल संतुलन (PCOS/अनियमित माहवारी) ठीक करती हैं।\n3. **विटामिन B-Complex, C व जिंक:** आयरन को आंतों में सोखने (Absorption) की गति तीन गुना बढ़ाते हैं।\n4. **कैल्शियम व विटामिन D3:** घुटनों व कमर का दर्द दूर कर हड्डियों को फौलादी मजबूती देते हैं।\n\n🥛 **सेवन विधि:**\n• 1 चम्मच (10 ग्राम) सुबह नाश्ते के बाद गुनगुने दूध या ताजे पानी में मिलाकर पिएं।\n• **उपलब्ध फ्लेवर:** स्वादिष्ट **मसाला दूध (Masala Milk)** एवं **फ्रेंच वैनिला**।\n• **कीमत:** आधिकारिक MRP ₹1,425 | **आरोग्यम 25% छूट पर: ₹1,069** (मात्र ₹31 प्रतिदिन का खर्च)।\n\n🥗 **साथ में घरेलू आहार:**\nरोजाना गुड़-चना, चुकंदर, अनार, पालक, और ताजे आंवले का रस लें।`;
+
+    renderCrispSpecialBox('🩸 हीमोग्लोबिन वृद्धि व नेचुरामोर फॉर विमेन (400g)', resp, [
+      { text: '🛒 25% छूट पर नेचुरामोर विमेन खरीदें (₹1,069)', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: '🧪 सीबीसी व हीमोग्लोबिन रिपोर्ट गाइड', query: 'सीबीसी रिपोर्ट में प्लेटलेट और हीमोग्लोबिन' },
+      { text: '🧒 10 साल के बच्चे के लिए नेचुरामोर', query: '10 साल के बच्चे को कौन सा नेचुरामोर दें' },
+      { text: '📞 दादा अवनीश जी से निशुल्क सलाह', query: 'दादा अवनीश जी से सीधे संपर्क' }
+    ], 'health', 'hemoglobin_women_card');
+    return true;
+  }
+
+  // =========================================================================
+  // 0.00003 CHILDREN HEALTH, EPILEPSY (मिर्गी), APPETITE & PREGNANCY ENGINE
+  // Solves: Child seizures/epilepsy, loss of appetite, kids naturamore, pregnancy caution
+  // =========================================================================
+  function handleChildrenHealthAndNutrition(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+
+    // 1. Child Epilepsy / Seizures (बच्चों को मिर्गी / दौरा)
+    if (q.includes('मिर्गी दौरा') || q.includes('मिर्गी') || q.includes('दौरा') || q.includes('seizure') || q.includes('fits')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🚨 **बच्चों में मिर्गी (Epilepsy / Seizures / दौरा) — अति आवश्यक चिकित्सीय व प्राथमिक सुरक्षा प्रोटोकॉल:**\n\nबच्चों में मिर्गी या दौरा मस्तिष्क की तंत्रिकाओं में अचानक असामान्य विद्युत तरंगें (Electrical Discharges) उठने के कारण होता है।\n\n✅ **दौरे के समय तुरंत क्या करें (First-Aid Rules):**\n1. **करवट दिलाएं:** बच्चे को तुरंत एक करवट (Recovery Position) लिटाएं ताकि मुंह की लार या उल्टी सांस की नली में न जाए।\n2. **मुंह में कुछ न डालें:** चम्मच, उंगली, कपड़ा या पानी मुंह में जबरदस्ती कभी न डालें। दांत भींचने पर जबरदस्ती खोलने की कोशिश न करें।\n3. **आसपास की जगह खाली करें:** नुकीली चीजें, चश्मा या भारी कपड़े ढीले कर दें।\n4. **समय नोट करें:** दौरे की अवधि नोट करें। यदि दौरा 3 मिनट से अधिक रहे तो तुरंत 108/112 पर एम्बुलेंस बुलाएं।\n\n⚠️ **अति आवश्यक चिकित्सीय चेतावनी:**\nमिर्गी के लिए तुरंत किसी योग्य **बाल न्यूरोलॉजिस्ट (Pediatric Neurologist)** को दिखाएं। ईईजी (EEG) व एमआरआई जांच के बाद डॉक्टर की सुझाई गई दवाइयां (एंटी-एपिलेप्टिक) समय पर दें। कोई भी हर्बल सप्लीमेंट या घरेलू नुस्खा डॉक्टर की दवा का विकल्प नहीं है।`;
+
+      renderCrispSpecialBox('🚨 बच्चों में मिर्गी (दौरा) — प्राथमिक देखभाल व न्यूरोलॉजिस्ट परामर्श', resp, [
+        { text: '📞 दादा अवनीश जी इमरजेंसी सहायता', query: 'दादा अवनीश जी से सीधे संपर्क', style: 'background:#dc2626;color:#ffffff;border-color:#b91c1c;font-weight:900;' },
+        { text: '🧒 बच्चों का संपूर्ण स्वास्थ्य व पोषण', query: '10 साल के बच्चे को कौन सा नेचुरामोर दें' },
+        { text: '🏠 आरोग्यम मुख्य पोर्टल', url: '/index.html', isExternal: true }
+      ], 'health', 'child_epilepsy_card');
+      return true;
+    }
+
+    // 2. Child Loss of Appetite / Not Eating (बच्चा खाना नहीं खाता / भूख नहीं लगना)
+    if (q.includes('भूख व पोषण') || (q.includes('बच्चा') && (q.includes('खाना') || q.includes('भूख') || q.includes('दूध नहीं')))) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🧒🍽️ **बच्चा खाना नहीं खाता / भूख न लगने का वैज्ञानिक कारण व प्राकृतिक समाधान:**\n\n🔍 **मुख्य कारण:**\n1. **पेट में कीड़े (Worms):** बच्चों में भूख न लगने का 70% कारण पेट के कृमि होते हैं। हर 6 महीने में डॉक्टर से डीवॉर्मिंग (Deworming) अवश्य कराएं।\n2. **जिंक व आयरन की कमी:** पोषण कमी से जीभ का स्वाद और पाचन अग्नि मंद पड़ जाती है।\n3. **अधिक जंक फूड व मोबाइल स्क्रीन:** चिप्स, बिस्किट या स्क्रीन देखने से पाचक रस नहीं बनते।\n\n🌿 **अचूक आयुर्वेदिक व पोषण समाधान:**\n• **घरेलू नुस्खा:** 1 चुटकी भुनी अजवाइन + थोड़ा काला नमक गुनगुने पानी के साथ भोजन से आधा घंटा पहले दें।\n• **नेचुरामोर फॉर किड्स 400g (Naturamore Kids Chocolate MRP ₹1,225 | छूट पर ₹919):**\n  - 5-सोर्स प्राकृतिक प्रोटीन + 13 विटामिन्स + 10 मिनरल्स।\n  - **ब्राह्मी व शंखपुष्पी:** पाचन तंत्र और भूख को प्राकृतिक रूप से जगाती हैं।\n  - **DHA (ओमेगा-3):** दिमाग की एकाग्रता व विकास तेज करता है।\n\n🥛 **खुराक:** 1 चम्मच सुबह हल्के गुनगुने दूध में घोलकर दें। 10 दिनों में बच्चे की भूख और वजन में शानदार सुधार दिखता है।`;
+
+      renderCrispSpecialBox('🧒 बच्चों की भूख, वजन व पाचन — नेचुरामोर फॉर किड्स', resp, [
+        { text: '🛒 25% छूट पर नेचुरामोर किड्स खरीदें (₹919)', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🧠 बच्चों का दिमाग तेज करने के उपाय', query: 'बच्चों की लंबाई और दिमाग तेज करने के उपाय' },
+        { text: '📞 दादा अवनीश जी से निशुल्क सलाह', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'health', 'child_appetite_card');
+      return true;
+    }
+
+    // 3. Naturamore for 10-year-old child (10 साल के बच्चे को कौन सा नेचुरामोर दें)
+    if ((q.includes('10 साल') || q.includes('10 वर्ष') || q.includes('बच्चे') || q.includes('बच्चों')) && q.includes('नेचुरामोर')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🧒🍫 **10 साल के बच्चे के लिए सर्वोत्तम नेचुरामोर:**\n\n10 साल के बढ़ते बच्चे के लिए सबसे उत्तम और वैज्ञानिक रूप से अनुशंसित है:\n👉 **नेचुरामोर फॉर किड्स — चॉकलेट कुकी फ्लेवर (Naturamore For Kids 400g)**\n\n💰 **कीमत:** आधिकारिक MRP ₹1,225 | **आरोग्यम 25% छूट पर मात्र ₹919** (सीधी बचत: ₹306)\n\n🌿 **यह 10 साल के बच्चे के लिए क्यों जरूरी है?**\n1. **मस्तिष्क व पढ़ाई में एकाग्रता:** इसमें उपस्थित **ब्राह्मी, शंखपुष्पी और अश्वगंधा** याददाश्त और समझने की क्षमता को कई गुना बढ़ाते हैं।\n2. **आँखों व न्यूरॉन्स की सुरक्षा:** **DHA (ओमेगा-3 फैटी एसिड्स)** मोबाइल स्क्रीन के नुकसान से आँखों की रक्षा करता है।\n3. **लंबाई व हड्डियों की मजबूती:** 5 प्राकृतिक प्रोटीन्स (दूध, सोया, मटर, चावल, व्हे) व कैल्शियम बच्चों की लंबाई और मांसपेशियों का सही विकास करते हैं।\n4. **बार-बार बीमार पड़ने से सुरक्षा:** विटामिन A, C, E व जिंक रोग प्रतिरोधक क्षमता (Immunity) बढ़ाते हैं।\n\n🥛 **सेवन विधि:** 1 चम्मच (10-12 ग्राम) सुबह हल्के गुनगुने दूध में मिलाकर दें। बच्चे इसका चॉकलेट स्वाद बहुत चाव से पीते हैं!`;
+
+      renderCrispSpecialBox('🧒 10 साल के बच्चे हेतु नेचुरामोर फॉर किड्स (चॉकलेट कुकी 400g)', resp, [
+        { text: '🛒 25% छूट पर नेचुरामोर किड्स ऑर्डर करें (₹919)', url: '/categories/health.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🍽️ बच्चों में भूख व वजन बढ़ाने के उपाय', query: 'बच्चा खाना नहीं खाता है क्या करें' },
+        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'health', 'kids_10yr_card');
+      return true;
+    }
+
+    // 4. Pregnancy & Naturamore Caution (क्या प्रेग्नेंट लेडी को नेचुरामोर दे सकते हैं)
+    if (q.includes('गर्भावस्था') && q.includes('नेचुरामोर')) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `🤰🌸 **गर्भावस्था (Pregnancy) में नेचुरामोर के सेवन संबंधी आधिकारिक चिकित्सीय नियम:**\n\nयद्यपि **नेचुरामोर फॉर विमेन (Naturamore For Women)** 100% प्राकृतिक सोया प्रोटीन, फोलिक एसिड, आयरन, कैल्शियम, विटामिन्स व शतावरी से भरपूर एक शुद्ध पोषण आहार है—\n\n🚨 **परंतु हमारा सख्त चिकित्सीय नियम है:**\nगर्भावस्था प्रत्येक महिला के लिए एक अत्यंत संवेदनशील और अनूठी शारीरिक अवस्था होती है। इसलिए गर्भवती माता को अपनी नियमित **स्त्री रोग विशेषज्ञ (Gynecologist) डॉक्टर** की लिखित अनुमति व सलाह के बाद ही नेचुरामोर या कोई भी अन्य सप्लीमेंट शुरू करना चाहिए।\n\n✅ **डॉक्टर को क्या बताएं:**\nआप अपने डॉक्टर को नेचुरामोर का डब्बा या घटक (Ingredients) दिखाएं। अधिकांश डॉक्टर्स इसके फोलिक एसिड, आयरन और प्रोटीन को देखकर खुशी से अनुमति दे देते हैं, क्योंकि यह रासायनिक दवाओं से कहीं अधिक सुरक्षित और सुपाच्य है।\n\n🥛 **स्तनपान (Lactation):** डिलीवरी के बाद शिशु को दूध पिलाते समय नेचुरामोर फॉर विमेन मां के दूध की गुणवत्ता और हीमोग्लोबिन बढ़ाने में अत्यंत लाभकारी सिद्ध होता है।`;
+
+      renderCrispSpecialBox('🤰 गर्भावस्था में नेचुरामोर सेवन — डॉक्टर परामर्श नियम', resp, [
+        { text: '🌸 नेचुरामोर फॉर विमेन के घटक व लाभ', query: 'नेचुरामोर फॉर विमेन क्या हीमोग्लोबिन बढ़ाएगा' },
+        { text: '📞 दादा अवनीश जी से निशुल्क सलाह', query: 'दादा अवनीश जी से सीधे संपर्क' }
+      ], 'health', 'pregnancy_naturamore_card');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 0.00004 AAROGYAM INDIA E-BOOKS CATALOG, DIRECTORY & PRICING ENGINE
+  // Solves: Kitne prakar ki ebook hai, Kheti doctor ebook, 11 Sabji directory, pricing
+  // =========================================================================
+  function handleAarogyamIndiaEbooksAndPricing(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const isEbookQuery = q.includes('ई-बुक') || q.includes('ebook') || q.includes('किताब') || q.includes('पुस्तक');
+
+    if (!isEbookQuery && !q.includes('खेती डॉक्टर') && !q.includes('11 सब्जियों') && !q.includes('सब्जी खेती')) {
+      return false;
+    }
+
+    // A. Specific: 11 Sabjiyon Ki Directory (BK001 / BK015)
+    if (q.includes('11 सब्जियों') || q.includes('11 सब्जी') || q.includes('सब्जियों की डायरेक्टरी') || q.includes('सब्जी डायरेक्टरी')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🥦📖 **'11 सब्जियों की सम्पूर्ण डायरेक्टरी व वैज्ञानिक खेती गाइड' (BK001):**\n\n• **कवर की गई 11 प्रमुख फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **इस ई-बुक में क्या मिलेगा?**\n  1. बीज चयन, नर्सरी तैयार करने और बीज उपचार की विधि।\n  2. ड्रिप सिंचाई, मल्चिंग पेपर और सही रोपाई दूरी।\n  3. सभी सब्जियों का अवस्थावार खाद, पोषण व बायोफिट स्प्रे कैलेंडर।\n  4. कीट-रोग (कुकड़ा/लीफ कर्ल, पीली पत्ती, फल छेदक इल्ली, उकठा) का अचूक इलाज।\n  5. बाजार में सबसे ऊंचे दाम पाने का सही समय।\n\n💰 **ऑफर मूल्य:** मात्र **₹49** (MRP ₹499 — 90% की विशेष छूट)।\n📱 **पहुंच:** ऑनलाइन डिजिटल रीडर में आजीवन (Lifetime) एक्सेस + ऑफलाइन पढ़ने की सुविधा।`;
+
+      renderCrispSpecialBox('🥦 11 सब्जियों की सम्पूर्ण डायरेक्टरी ई-बुक (मात्र ₹49)', resp, [
+        { text: '📖 11 सब्जियों की ई-बुक पढ़ें (BK001)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🌾 खेती का डॉक्टर ई-बुक (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+        { text: '📚 आरोग्यम की सभी ई-बुक्स देखें', query: 'आरोग्यम इंडिया में कितने प्रकार की ई-बुक है' }
+      ], 'agri', 'ebook_11_veg_card');
+      return true;
+    }
+
+    // B. Specific: Kheti Ka Doctor (BK002)
+    if (q.includes('खेती डॉक्टर') || q.includes('खेती का डॉक्टर') || q.includes('fasal doctor') || q.includes('kheti doctor')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `🌾📖 **'खेती का डॉक्टर' (Pocket Doctor) — 20+ फसलों की सम्पूर्ण रोग-कीट गाइड (BK002):**\n\n• **यह पुस्तक क्यों हर किसान के मोबाइल में होनी चाहिए?**\n  दुकानदार अक्सर साधारण फंगस या रसचूसक कीट में भी ₹1,500 की महंगी दवाइयां थमा देते हैं। इस पुस्तक में 300+ असली एचडी फोटो देखकर आप खुद पहचान सकते हैं कि फसल में कौन सा रोग है और असली सही दवा क्या है।\n\n• **मुख्य विशेषताएं:**\n  1. 120 पेज की सचित्र प्रैक्टिकल इनसाइक्लोपीडिया।\n  2. 20+ प्रमुख फसलें: गेहूं, चना, सरसों, धान, गन्ना, आलू, कपास, लहसुन, प्याज व सब्जियां।\n  3. रासायनिक व बायोफिट जैविक दोनों प्रकार के अचूक फॉर्मूले।\n  4. खाद का खर्च 50% घटाने का सटीक गणित।\n\n💰 **ऑफर मूल्य:** मात्र **₹99** (MRP ₹299 — आजीवन मोबाइल एक्सेस)।`;
+
+      renderCrispSpecialBox('🌾 खेती का डॉक्टर ई-बुक — 300+ फोटो सहित रोग पहचान (BK002)', resp, [
+        { text: '📖 खेती का डॉक्टर ई-बुक तुरंत पढ़ें (₹99)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🥦 11 सब्जियों की डायरेक्टरी (₹49)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
+        { text: '📚 सभी ई-बुक्स की सूची व मूल्य', query: 'आरोग्यम इंडिया में कितने प्रकार की ई-बुक है' }
+      ], 'agri', 'ebook_kheti_doctor_card');
+      return true;
+    }
+
+    // C. General: Kitne Prakar Ki Ebook Hai / Total Books / Pricing (आरोग्यम इंडिया में कितने प्रकार की ई-बुक है)
+    if (q.includes('कितने प्रकार') || q.includes('कितनी') || q.includes('कितने में') || q.includes('सूची') || q.includes('list') || q.includes('प्रकार की') || q.includes('कीमत') || q.includes('दाम') || q.includes('रेट')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const resp = `📚 **आरोग्यम इंडिया डिजिटल ई-बुक्स लाइब्रेरी — सम्पूर्ण सूची व रियायती मूल्य:**\n\nआरोग्यम इंडिया देश के किसानों और परिवारों को आत्मनिर्भर बनाने हेतु 4 अत्यंत लोकप्रिय डिजिटल ई-बुक्स उपलब्ध कराता है:\n\n1. **🌾 'खेती का डॉक्टर' (BK002) — मूल्य: मात्र ₹99 (MRP ₹299)**\n   • 20+ प्रमुख फसलों के 300+ सचित्र रोग, कीट व वैज्ञानिक बायोफिट स्प्रे कैलेंडर।\n\n2. **🥦 '11 सब्जियों की सम्पूर्ण डायरेक्टरी' (BK001) — मूल्य: मात्र ₹49 (MRP ₹499)**\n   • टमाटर, मिर्च, बैंगन, गोभी, खीरा आदि 11 सब्जियों की नर्सरी से तुड़ाई तक संपूर्ण गाइड।\n\n3. **🐄 'पशुपालन व उन्नत डेयरी मास्टर गाइड' (BK015) — मूल्य: मात्र ₹49 (MRP ₹299)**\n   • गाय-भैंस में दूध व 7-8 फैट वृद्धि, बांझपन निवारण, थनैला सुरक्षा व सीएफसी प्लस गाइड।\n\n4. **🌱 'जैविक खेती मास्टरक्लास' (BK016) — मूल्य: मात्र ₹99 (MRP ₹499)**\n   • रासायनिक खाद 50% घटाने, मिट्टी सुधारने व रिकॉर्ड बंपर उत्पादन का गुप्त फॉर्मूला।\n\n📱 **ई-बुक कैसे प्राप्त करें और पढ़ें?**\nवेबसाइट पर पेमेंट करते ही ई-बुक तुरंत आपके मोबाइल में डिजिटल रीडर में खुल जाती है। आप इसे कभी भी, कहीं भी बिना इंटरनेट के भी पढ़ और सुन सकते हैं!`;
+
+      renderCrispSpecialBox('📚 आरोग्यम डिजिटल लाइब्रेरी — 4 प्रमुख ई-बुक्स व मूल्य', resp, [
+        { text: '🌾 1. खेती का डॉक्टर पढ़ें (₹99)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+        { text: '🥦 2. 11 सब्जियों की डायरेक्टरी (₹49)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
+        { text: '🐄 3. पशुपालन व डेयरी गाइड (₹49)', url: '/ebooks/book-landing.html?id=BK015', isExternal: true },
+        { text: '🌱 4. जैविक खेती मास्टरक्लास (₹99)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true }
+      ], 'agri', 'ebooks_master_catalog_card');
+      return true;
+    }
+
+    return false;
+  }
+
   function processKnowledgeQuery(query) {
     try {
       const rawQ = (query || '').trim();
@@ -10470,8 +10703,48 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
-    // 0.00015 MASTER 100 QA BANK ENGINE (Instant Guru-Level Resolution)
-    if (typeof handleMaster100QABank === 'function' && handleMaster100QABank(cleanQ, rawQ)) {
+    // 0.00001 MISUNDERSTANDING & FRUSTRATION DE-ESCALATION (Top Priority: Apologize & Clarify Politely)
+    if (handleMisunderstandingAndDeescalation(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00002 EVERYDAY GREETINGS & CASUAL SOCIAL ROUTER (Top Priority: GM, GN, Namaste, Hi, Kaise Ho)
+    if (handleEverydayConversations(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00003 CHILDREN HEALTH, EPILEPSY (मिर्गी), APPETITE & PREGNANCY
+    if (handleChildrenHealthAndNutrition(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00004 HEMOGLOBIN, ANEMIA & NATURAMORE FOR WOMEN
+    if (handleHemoglobinAndWomenHealth(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00005 AAROGYAM INDIA E-BOOKS CATALOG, DIRECTORY & PRICING
+    if (handleAarogyamIndiaEbooksAndPricing(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00006 NATURAMORE 5-VARIANT OFFICIAL CATALOG ENGINE
+    if (typeof handleNaturamoreVariants === 'function' && handleNaturamoreVariants(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00007 WELLNESS DENTAL, FLUORIDE & CLEAN BEAUTY
+    if (typeof handleWellnessDentalChildAndCleanBeauty === 'function' && handleWellnessDentalChildAndCleanBeauty(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00008 DEHATI COLLOQUIAL DICTIONARY
+    if (typeof handleDehatiColloquialQueries === 'function' && handleDehatiColloquialQueries(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00009 SPECIALIZED BIOFIT SENTIMENT & SOIL RESTORATION
+    if (typeof handleSpecializedBiofitAndSentiment === 'function' && handleSpecializedBiofitAndSentiment(cleanQ, rawQ)) {
       return;
     }
 
@@ -10535,10 +10808,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
-    // 0.01 Everyday Conversational & Casual Social Router (Hi, Hello, Namaste, Kaise ho, Tum kaun ho)
-    if (handleEverydayConversations(cleanQ, rawQ)) {
-      return;
-    }
+    // (handleEverydayConversations moved to top priority above)
 
     // 0.012 Personalized WhatsApp Share Generator ("यह मैसेज मेरे नाम और नंबर के साथ बनाओ")
     if (typeof handlePersonalizedShareIntent === 'function' && handlePersonalizedShareIntent(cleanQ, rawQ)) {
@@ -11717,18 +11987,25 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const origin = (window.location.origin && window.location.origin.includes('http'))
       ? window.location.origin
       : 'https://aarogyamindia.online';
-    const shareId = getAuthoritativeShareId();
+    const shareId = (typeof getAuthoritativeShareId === 'function') ? getAuthoritativeShareId() : 'AI000004';
     const shareUrl = `${origin}/aarogyam-sakhi.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
 
     const shareTitle = 'आरोग्यम सखी AI - खेत, सेहत, पशु, ब्यूटी व बिज़नेस का वैज्ञानिक समाधान 🌾';
-    const shareText = `🌿 किसान व परिवारजनों के लिए बड़ी खुशखबरी! 🌿\n\nअब खेती, गेहूं, सरसों, पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द) और सौंदर्य के लिए किसी के चक्कर काटने की जरूरत नहीं!\n\nमिलिए "आरोग्यम सखी AI" से — जो देती हैं हर सवाल का 100% सही व वैज्ञानिक जवाब! 👩‍🌾🩺\n\nअभी अपना सवाल पूछें बिल्कुल फ्री:\n${shareUrl}`;
+    const shareText = `🌿 किसान व परिवारजनों के लिए बड़ी खुशखबरी! 🌿
 
-    if (navigator.share) {
-      // Do NOT pass url: shareUrl because shareText already includes the clean referral link.
-      // Passing url separately causes Android Chrome / WhatsApp to append the link a second time!
-      navigator.share({ title: shareTitle, text: shareText }).catch(() => {});
+अब खेती, गेहूं, सरसों, पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द) और सौंदर्य के लिए किसी के चक्कर काटने की जरूरत नहीं!
+
+मिलिए "आरोग्यम सखी AI" से — जो देती हैं हर सवाल का 100% सही व वैज्ञानिक जवाब! 👩‍🌾🩺
+
+अभी अपना सवाल पूछें बिल्कुल फ्री:
+${shareUrl}`;
+
+    // Direct WhatsApp guarantees ZERO duplicate links across all mobile browsers & WhatsApp!
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = waUrl;
     } else {
-      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       window.open(waUrl, '_blank');
     }
   };
