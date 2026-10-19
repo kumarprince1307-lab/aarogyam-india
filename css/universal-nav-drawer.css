@@ -641,6 +641,18 @@
   box-shadow: 0 8px 22px rgba(16, 185, 129, 0.65) !important;
 }
 
+/* Universal Rule: No floating audio player cards/toasts on any page */
+#aoi-floating-audio-pill,
+.aoi-compact-audio-pill,
+#audio-live-pill-toast,
+#aoi-download-floating-audio,
+.floating-audio-pill {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Mobile Screen Floating Stack (< 768px) */
 @media (max-width: 768px) {
   .sticky-float-widget-container {

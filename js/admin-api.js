@@ -2054,20 +2054,19 @@ export async function fetchUcasDashboardSummary() {
     if (!db) throw new Error("Supabase client not available.");
 
     const [profilesRes, purchasesRes, surveysRes, phonebookRes, lpsRes, sharesRes] = await Promise.all([
-      db.from('profiles').select('id, is_active, created_at'),
-      db.from('purchases').select('profile_id, purchase_date, amount, payment_status, book_id'),
-      db.from('surveys').select('id, profile_id, selected_categories, created_at'),
-      db.from('phonebook').select('id, profile_id, created_at'),
-      db.from('landing_pages').select('id, profile_id, category, created_at'),
-      db.from('share_logs').select('id, event_type')
+      db.from('profiles').select('id, is_active, created_at').order('created_at', { ascending: false }).limit(1000),
+      db.from('purchases').select('profile_id, purchase_date, amount, payment_status, book_id').order('purchase_date', { ascending: false }).limit(1000),
+      db.from('surveys').select('id, profile_id, selected_categories, created_at').order('created_at', { ascending: false }).limit(500),
+      db.from('phonebook').select('id', { count: 'exact', head: true }),
+      db.from('landing_pages').select('id', { count: 'exact', head: true }),
+      db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'share')
     ]);
 
     const profiles = profilesRes.data || [];
     const purchases = purchasesRes.data || [];
     const surveys = surveysRes.data || [];
-    const phonebook = phonebookRes.data || [];
-    let landingPages = lpsRes.data || [];
-    const shareLogs = sharesRes.data || [];
+    const totalPhonebook = phonebookRes.count || (phonebookRes.data || []).length || 0;
+    let localLpCount = 0;
 
     // Also include any landing pages from localStorage
     for (let i = 0; i < localStorage.length; i++) {
@@ -2075,14 +2074,12 @@ export async function fetchUcasDashboardSummary() {
       if (key && key.startsWith('UCAS_LP_')) {
         try {
           const list = JSON.parse(localStorage.getItem(key) || '[]');
-          list.forEach(p => {
-            if (!landingPages.some(existing => existing.id === p.id)) {
-              landingPages.push(p);
-            }
-          });
+          localLpCount += list.length;
         } catch (e) {}
       }
     }
+    const totalLandingPages = (lpsRes.count || 0) + localLpCount;
+    const totalShares = sharesRes.count || 0;
 
     // Compute active subscriber map
     const activeSubscriberSet = new Set();
@@ -2114,15 +2111,12 @@ export async function fetchUcasDashboardSummary() {
     const inactiveUsers = Math.max(0, totalUsers - activeUsers);
     const totalSubscribers = activeSubscriberSet.size;
     const totalSurveys = surveys.length;
-    const totalPhonebook = phonebook.length;
-    const totalLandingPages = landingPages.length;
 
     const totalWebinarAttendees = surveys.filter(s => {
       const cat = String(s.selected_categories || '');
       return cat.includes('webinar');
     }).length;
 
-    const totalShares = shareLogs.filter(l => l.event_type === 'share').length;
     const surveyResponses = totalSurveys;
 
     const response = {
