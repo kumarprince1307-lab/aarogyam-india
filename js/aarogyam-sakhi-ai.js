@@ -2173,18 +2173,72 @@
     }
   }
 
-  // 10.5 DYNAMIC 1-TAP SMART CONTEXTUAL PILLS (Permanently Hidden per User Request)
+  // 10.5 DYNAMIC 1-TAP SMART CONTEXTUAL PILLS (History-Driven Follow-Up Intelligence)
   function updateSmartContextualPills(htmlText) {
-    const container = document.getElementById('sakhiSmartPillsContainer');
-    if (container) {
-      container.style.display = 'none';
-      container.innerHTML = '';
+    const container = document.getElementById('sakhiSmartPillsContainer') || document.getElementById('sakhiSmartPillsBar');
+    if (!container) return;
+
+    const domain = (sakhiConversationState && sakhiConversationState.lastActiveDomain) || 'omni';
+    const entity = (sakhiConversationState && sakhiConversationState.lastActiveEntity) || '';
+    let pills = [];
+
+    if (entity.includes('bp') || entity.includes('heart') || (htmlText && (htmlText.includes('रक्तचाप') || htmlText.includes('ब्लड प्रेशर')))) {
+      pills = [
+        { label: '🩸 शुगर व HbA1c का संबंध', query: 'बीपी और शुगर या HbA1c का आपस में क्या संबंध है?' },
+        { label: '🌀 लो बीपी में तुरंत क्या करें', query: 'लो बीपी के लक्षण और तुरंत घरेलू उपाय क्या हैं?' },
+        { label: '🥗 बीपी नियंत्रित करने वाले 3 घरेलू उपाय', query: 'हाई बीपी कम करने के 3 पक्के घरेलू नुस्खे' },
+        { label: '💓 घबराहट व चक्कर के लक्षण', query: 'बीपी में घबराहट और चक्कर आने का क्या कारण है?' }
+      ];
+    } else if (entity.includes('sugar') || entity.includes('diabetes') || (htmlText && htmlText.includes('डायबिटीज'))) {
+      pills = [
+        { label: '📊 HbA1c रिपोर्ट समझना', query: 'HbA1c टेस्ट क्या होता है और इसकी सामान्य रेंज कितनी है?' },
+        { label: '🥗 शुगर का संपूर्ण डाइट चार्ट', query: 'शुगर के मरीज का सुबह से रात तक डाइट चार्ट' },
+        { label: '🌿 नेचुरामोर लाइफ स्टाइल प्लस', query: 'नेचुरामोर लाइफ स्टाइल प्लस के घटक और खुराक' },
+        { label: '⚠️ शुगर में नसों की कमजोरी', query: 'शुगर के कारण नसों में दर्द और कमजोरी का इलाज' }
+      ];
+    } else if (entity.includes('gehu') || entity.includes('wheat') || (htmlText && htmlText.includes('गेहूं'))) {
+      pills = [
+        { label: '🌾 गेहूं में पीलापन दूर करने का स्प्रे', query: 'गेहूं में पीली पत्तियां ठीक करने की दवा' },
+        { label: '🌱 कल्ले व फुटाव बढ़ाने का फॉर्मूला', query: 'गेहूं में अधिक कल्ले और फुटाव कैसे लाएं' },
+        { label: '🧪 गेहूं खाद व NPK तालिका', query: 'गेहूं में कौन सी खाद और स्प्रे कब डालें' },
+        { label: '💧 पहला पानी और सिंचाई समय', query: 'गेहूं में पहली सिंचाई कब करें' }
+      ];
+    } else if (entity.includes('sarso') || entity.includes('mustard') || (htmlText && htmlText.includes('सरसों'))) {
+      pills = [
+        { label: '🌱 सरसों में शाखा फुटाव का स्प्रे', query: 'सरसों में शाखाएं और फुटाव कैसे बढ़ाएं' },
+        { label: '🐛 सरसों में माहू व चेपा की रोकथाम', query: 'सरसों में माहू कीट की दवा' },
+        { label: '🧪 सल्फर व बोरॉन का छिड़काव', query: 'सरसों में सल्फर और बोरॉन कब डालें' }
+      ];
+    } else if (entity.includes('chana') || entity.includes('gram') || (htmlText && htmlText.includes('चना'))) {
+      pills = [
+        { label: '🌿 चने में अधिक फूल व शाखाएं', query: 'चने में शाखाएं और फूल बढ़ाने का स्प्रे' },
+        { label: '🐛 चने की घटी-इल्ली रोकथाम', query: 'चने की इल्ली का पक्का इलाज' },
+        { label: '💧 चने में पानी कब लगाएं', query: 'चने में पहली सिंचाई कब करें' }
+      ];
+    } else if (domain === 'pashu' || entity.includes('cfc') || (htmlText && htmlText.includes('दूध'))) {
+      pills = [
+        { label: '🥛 गाय-भैंस का दूध व फैट बढ़ाने का फॉर्मूला', query: 'गाय भैंस का दूध और फैट बढ़ाने का पक्का इलाज' },
+        { label: '🐄 पशुओं में बार-बार रिपीट होना', query: 'गाय भैंस बार बार फिरती है रुकती नहीं क्या करें' },
+        { label: '🌿 पेट-वेट (CFC) पाउडर के फायदे', query: 'बायोफिट पेट-वेट पाउडर के फायदे और खुराक' }
+      ];
+    } else {
+      pills = [
+        { label: '🌾 फसलों का 3-चरणीय निदान', query: 'मेरी फसल में बीमारी है (crop_triage_step1)' },
+        { label: '🩸 बीपी, शुगर व HbA1c गाइड', query: 'बीपी और शुगर का क्या संबंध है?' },
+        { label: '🐄 पशु का दूध व फैट बढ़ाएं', query: 'गाय भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+        { label: '💼 नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ 25% छूट और बिज़नेस प्लान' }
+      ];
     }
-    const bar = document.getElementById('sakhiSmartPillsBar');
-    if (bar) {
-      bar.style.display = 'none';
-      bar.innerHTML = '';
-    }
+
+    container.style.display = 'flex';
+    container.style.overflowX = 'auto';
+    container.style.gap = '8px';
+    container.style.padding = '6px 8px';
+    container.innerHTML = pills.map(p => `
+      <button type="button" class="sakhi-smart-pill" onclick="window.askSakhiQuick('${escapeHtml(p.query)}')" style="white-space:nowrap;flex-shrink:0;padding:6px 12px;border-radius:16px;font-size:0.8rem;font-weight:700;background:#f0fdf4;border:1.5px solid #86efac;color:#15803d;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 5px rgba(0,0,0,0.04);transition:all 0.15s;">
+        ${escapeHtml(p.label)}
+      </button>
+    `).join('');
   }
 
   // 11. GREETING & INITIALIZATION
@@ -2487,6 +2541,13 @@
 
     // Pregnancy
     t = t.replace(/(?:प्रेग्नेंट|प्रेगनेंट|गर्भवती|गर्भावस्था|pregnant|pregnancy)/gi, 'गर्भावस्था');
+
+    // Blood Pressure & Low BP (lbp, low bp, high bp, hba1c)
+    t = t.replace(/\b(?:lbp|l\.b\.p\.)\b/gi, 'low bp');
+    t = t.replace(/(?:लो\s*बीपी|कम\s*बीपी|लो\s*ब्लड\s*प्रेशर)/gi, 'low bp');
+    t = t.replace(/\b(?:hbp|h\.b\.p\.)\b/gi, 'high bp');
+    t = t.replace(/(?:हाई\s*बीपी|बढ़ा\s*बीपी|उच्च\s*रक्तचाप)/gi, 'high bp');
+    t = t.replace(/(?:hba1c|hb\s*a1c|hba\s*1c)/gi, 'hba1c');
 
     // Greetings & Casual Word-Boundary Normalization
     t = t.replace(/\b(?:gm|g\.m\.)\b/gi, 'good morning');
@@ -10681,6 +10742,149 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
+  // =========================================================================
+  // 18.0 DEDICATED BP, LOW BP, HBA1C & CARDIO CLINICAL PACING ENGINE
+  // (Prevents giant text dumps; provides crisp, medically sound answers with curiosity follow-ups)
+  // =========================================================================
+  function handleBpAndCardioIntelligence(cleanQ, rawQ) {
+    const isLowBp = cleanQ.includes('low bp') || cleanQ.includes('लो बीपी') || cleanQ.includes('लो ब्लड प्रेशर') || cleanQ.includes('कम बीपी') || cleanQ.includes('बीपी लो') || cleanQ.includes('बीपी कम');
+    
+    const isHbA1c = cleanQ.includes('hba1c') || (cleanQ.includes('शुगर') && cleanQ.includes('बीपी') && (cleanQ.includes('संबंध') || cleanQ.includes('रिलेशन') || cleanQ.includes('कनैक्शन') || cleanQ.includes('आपस में')));
+
+    const isHighBp = (cleanQ.includes('high bp') || cleanQ.includes('ब्लड प्रेशर') || cleanQ === 'bp' || cleanQ === 'बीपी' || cleanQ === 'blood pressure' || cleanQ.includes('बीपी क्या है') || cleanQ.includes('बीपी की समस्या') || cleanQ.includes('बीपी के लक्षण') || cleanQ.includes('bp ke lakshan') || cleanQ.includes('बीपी का इलाज') || cleanQ.includes('bp ka ilaj')) && !isLowBp && !isHbA1c;
+
+    if (isLowBp) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = 'low_bp';
+      sakhiConversationState.lastActiveEntityName = 'लो ब्लड प्रेशर (Low BP)';
+
+      const resp = `राम-राम! 🙏 **लो ब्लड प्रेशर (Low BP / हाइपोटेंशन) — तुरंत प्राथमिक राहत व सुरक्षित उपाय:**\n\n🧬 **शरीर का लॉजिक (Why Low BP Occurs):**\n• सामान्य रक्तचाप **120/80 mmHg** होता है। जब यह **90/60 mmHg** से नीचे गिर जाता है, तो दिमाग और दिल तक रक्त और ऑक्सीजन का बहाव कम हो जाता है।\n• इसके मुख्य कारण: शरीर में पानी व इलेक्ट्रोलाइट्स की कमी (डिहाइड्रेशन), हीमोग्लोबिन की कमी (एनीमिया), लंबे समय तक भूखा रहना या अचानक बिस्तर से उठना।\n\n🚨 **तुरंत तात्कालिक प्राथमिक राहत (First-Aid):**\n1. **नींबू-नमक-शक्कर का घोल:** 1 गिलास ताजा पानी में आधा नींबू, 1 चुटकी सेंधा नमक और 1 चम्मच मिश्री/शक्कर घोलकर तुरंत घूंट-घूंट पिएं।\n2. **पैरों को ऊपर उठाएं:** मरीज को सीधा लिटाकर पैरों के नीचे 1-2 तकिए लगाएं ताकि रक्त संचार तुरंत दिमाग और हृदय की ओर बढ़े।\n3. **झटके से न उठें:** कभी भी बिस्तर या कुर्सी से झटके से न उठें, पहले 1 मिनट बैठें फिर धीरे से खड़े हों।\n\n👴 **आरोग्यम अवनीश दादा का नुस्खा:**\n• रात को 5 मुनक्का और 2 अंजीर 1 कप पानी में भिगो दें। सुबह चबाकर खाएं और पानी पिएं। इससे हीमोग्लोबिन और रक्त संचार दोनों मजबूत होते हैं।\n\n❓ **जिज्ञासा व फॉलो-अप सवाल (Curiosity Follow-up):**\n👉 क्या आपको लो बीपी के साथ चक्कर, आंखों के आगे अंधेरा या अत्यधिक कमजोरी भी महसूस होती है? या आप अपना बीपी नंबर चेक कराना चाहते हैं?`;
+
+      renderCrispSpecialBox('🌀 लो ब्लड प्रेशर (Low BP) — तात्कालिक प्राथमिक उपचार', resp, [
+        { text: '🌀 चक्कर व कमजोरी के घरेलू उपाय', query: 'चक्कर आने और कमजोरी का तुरंत घरेलू इलाज' },
+        { text: '🩸 सामान्य बीपी रेंज चार्ट', query: 'सामान्य बीपी कितना होना चाहिए चार्ट दिखाओ' },
+        { text: '☕ लो बीपी में तुरंत क्या खाएं', query: 'लो बीपी में तुरंत क्या खाना और पीना चाहिए' },
+        { text: '🛒 नेचुरामोर डेली न्यूट्रिशन', url: '/categories/health.html', isExternal: true }
+      ], 'health', 'low_bp');
+      return true;
+    }
+
+    if (isHbA1c) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = 'hba1c_sugar_bp';
+      sakhiConversationState.lastActiveEntityName = 'HbA1c व बीपी-शुगर संबंध';
+
+      const resp = `राम-राम! 🙏 **बीपी, शुगर और HbA1c का गहरा संबंध — लॉजिक व रिपोर्ट गाइड:**\n\n🧬 **HbA1c क्या होता है?**\n• HbA1c (ग्लाइकेटेड हीमोग्लोबिन) कोई 1 दिन का शुगर नहीं, बल्कि आपके खून की लाल कोशिकाओं (RBCs) से जुड़े ग्लूकोज के आधार पर **पिछले 3 महीनों (90 दिन) का औसत शुगर स्तर** बताता है।\n• **मानक रिपोर्ट पैमाना:**\n  - **5.7% से कम:** 100% सामान्य व सुरक्षित।\n  - **5.7% से 6.4%:** प्रीडायबिटीज (चेतावनी का स्तर — तुरंत सुधारें)।\n  - **6.5% या अधिक:** स्पष्ट डायबिटीज (मधुमेह)।\n\n🩸 **बीपी और शुगर का आपस में क्या संबंध है?**\n• जब रक्त में लगातार शुगर की मात्रा अधिक रहती है, तो यह रक्त वाहिकाओं (Arteries) की अंदरूनी परत को खुरदुरा और सख्त बना देती है।\n• सख्त और संकरी नसों में खून दौड़ाने के लिए दिल को बहुत भारी दबाव लगाना पड़ता है — इसी कारण **80% शुगर के मरीजों को हाई बीपी की समस्या भी हो जाती है**।\n\n❓ **जिज्ञासा व फॉलो-अप सवाल (Curiosity Follow-up):**\n👉 क्या आपने हाल ही में खाली पेट (Fasting) या HbA1c टेस्ट कराया है? अपना टेस्ट नंबर बताएं तो मैं बता सकूं कि यह किस श्रेणी में है!`;
+
+      renderCrispSpecialBox('🩸 HbA1c टेस्ट व बीपी-शुगर का वैज्ञानिक संबंध', resp, [
+        { text: '🩸 मेरा HbA1c 6.5 से ज्यादा है', query: 'मेरा HbA1c 6.5 से ज्यादा आया है क्या करूं?' },
+        { text: '🥗 शुगर का संपूर्ण डाइट चार्ट', query: 'शुगर के मरीज का सुबह से रात तक डाइट चार्ट' },
+        { text: '🌿 नेचुरामोर लाइफ स्टाइल प्लस', query: 'नेचुरामोर लाइफ स्टाइल प्लस के घटक और खुराक' },
+        { text: '🏃‍♂️ शुगर व बीपी रिवर्सल के 5 नियम', query: 'शुगर और बीपी को रिवर्स करने के घरेलू नियम' }
+      ], 'health', 'hba1c_relation');
+      return true;
+    }
+
+    if (isHighBp) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      sakhiConversationState.lastActiveEntity = 'high_bp';
+      sakhiConversationState.lastActiveEntityName = 'ब्लड प्रेशर (High BP)';
+
+      const resp = `राम-राम! 🙏 **ब्लड प्रेशर (High BP) — लॉजिक, सामान्य रेंज व संतुलित नियंत्रण:**\n\n🧬 **सामान्य बीपी रेंज:**\n• **120/80 mmHg** को सबसे आदर्श और सामान्य माना जाता है।\n• यदि आपका बीपी लगातार **140/90 mmHg** या उससे अधिक रहता है, तो इसे हाई ब्लड प्रेशर (हाइपरटेंशन) माना जाता है।\n\n🧠 **शरीर के अंदर का लॉजिक (Why BP Rises):**\n• जब रक्त वाहिकाएं (धमनियां) तनाव, खराब कोलेस्ट्रॉल (LDL) या अत्यधिक नमक (सोडियम) के कारण संकरी और सख्त हो जाती हैं, तो दिल को पूरे शरीर में खून पहुंचाने के लिए बहुत तेज दबाव लगाना पड़ता है।\n\n🌿 **3 सरल प्राकृतिक व सुरक्षित नियम:**\n1. **सफेद नमक की जगह सेंधा नमक:** खाने में ऊपर से कच्चा नमक छिड़कना तुरंत बंद करें।\n2. **अर्जुन छाल का काढ़ा:** सुबह खाली पेट 2 चुटकी अर्जुन की छाल का काढ़ा पीने से नसों का लचीलापन लौटता है और दिल मजबूत रहता है।\n3. **दैनिक 30 मिनट वॉक व अनुलोम-विलोम:** इससे नसों का तनाव घटता है और बीपी तेजी से सामान्य होता है।\n\n❓ **जिज्ञासा व फॉलो-अप सवाल (Curiosity Follow-up):**\n👉 क्या आप जानना चाहते हैं: क्या आपको बीपी के साथ शुगर (मधुमेह) या घबराहट की भी समस्या है? या आप अपना HbA1c टेस्ट रिपोर्ट समझना चाहते हैं?`;
+
+      renderCrispSpecialBox('❤️ ब्लड प्रेशर (High BP) — लॉजिक, रेंज व समाधान', resp, [
+        { text: '🩸 शुगर व HbA1c का संबंध', query: 'बीपी और शुगर या HbA1c का आपस में क्या संबंध है?' },
+        { text: '💓 घबराहट व सीने में भारीपन', query: 'बीपी में घबराहट और चक्कर आने का क्या कारण है?' },
+        { text: '🥗 बीपी नियंत्रित करने वाले 3 घरेलू उपाय', query: 'हाई बीपी कम करने के 3 पक्के घरेलू नुस्खे' },
+        { text: '❤️ नेचुरामोर न्यूट्री हार्ट (नसों की सुरक्षा)', url: '/categories/health.html', isExternal: true }
+      ], 'health', 'high_bp');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 18.1 CHATGPT-STYLE INTERACTIVE GUIDED KRISHI TRIAGE ENGINE
+  // (3-Step Guided options: Crop -> Stage/Days -> Symptoms -> Targeted Prescription)
+  // =========================================================================
+  function handleInteractiveCropTriage(cleanQ, rawQ) {
+    const isBroadFarmingQuery = (
+      (cleanQ.includes('फसल') || cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('khet') || cleanQ.includes('खेत')) &&
+      (cleanQ.includes('बीमारी') || cleanQ.includes('रोग') || cleanQ.includes('दवा') || cleanQ.includes('dawa') || cleanQ.includes('खाद') || cleanQ.includes('समस्या') || cleanQ.includes('खराब') || cleanQ.includes('सलाह') || cleanQ.includes('इलाज') || cleanQ.includes('उपाय')) &&
+      !cleanQ.includes('गेहूं') && !cleanQ.includes('सरसों') && !cleanQ.includes('चना') && !cleanQ.includes('भिंडी') && !cleanQ.includes('मिर्च') && !cleanQ.includes('टमाटर') && !cleanQ.includes('आलू') && !cleanQ.includes('लहसुन') && !cleanQ.includes('प्याज') && !cleanQ.includes('सोयाबीन') && !cleanQ.includes('धान')
+    );
+
+    // Step 1: Broad Query -> Select Crop
+    if (isBroadFarmingQuery || cleanQ === 'crop_triage_step1') {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const prompt = `राम-राम किसान साथी! 🙏 आपकी फसल की सही पहचान और 100% सटीक वैज्ञानिक दवा व खुराक बताने के लिए, कृपया पहले अपनी फसल चुनें:`;
+
+      renderCrispSpecialBox('🌾 किसान मित्र 3-चरणीय फसल निदान (चरण 1: फसल चुनें)', prompt, [
+        { text: '🌾 1. गेहूं', query: 'गेहूं फसल की समस्या का निदान (triage_step2_gehu)' },
+        { text: '🌱 2. सरसों', query: 'सरसों फसल की समस्या का निदान (triage_step2_sarso)' },
+        { text: '🌿 3. चना व दालें', query: 'चना फसल की समस्या का निदान (triage_step2_chana)' },
+        { text: '🥔 4. आलू व सब्जियां', query: 'सब्जी फसल की समस्या का निदान (triage_step2_veg)' },
+        { text: '🌶️ 5. मिर्च व टमाटर', query: 'मिर्च टमाटर फसल निदान (triage_step2_chilli)' },
+        { text: '🧅 6. प्याज व लहसुन', query: 'लहसुन प्याज फसल निदान (triage_step2_garlic)' }
+      ], 'agri', 'crop_triage_step1');
+      return true;
+    }
+
+    // Step 2: Crop Selected -> Select Days/Stage
+    if (cleanQ.includes('triage_step2') || cleanQ.includes('फसल की समस्या का निदान')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      let cropName = 'फसल';
+      let cropTag = 'gehu';
+      if (cleanQ.includes('gehu') || cleanQ.includes('गेहूं')) { cropName = 'गेहूं'; cropTag = 'gehu'; }
+      else if (cleanQ.includes('sarso') || cleanQ.includes('सरसों')) { cropName = 'सरसों'; cropTag = 'sarso'; }
+      else if (cleanQ.includes('chana') || cleanQ.includes('चना')) { cropName = 'चना'; cropTag = 'chana'; }
+      else if (cleanQ.includes('veg') || cleanQ.includes('सब्जी') || cleanQ.includes('आलू')) { cropName = 'आलू व सब्जियां'; cropTag = 'veg'; }
+      else if (cleanQ.includes('chilli') || cleanQ.includes('मिर्च') || cleanQ.includes('टमाटर')) { cropName = 'मिर्च व टमाटर'; cropTag = 'chilli'; }
+      else if (cleanQ.includes('garlic') || cleanQ.includes('लहसुन') || cleanQ.includes('प्याज')) { cropName = 'लहसुन व प्याज'; cropTag = 'garlic'; }
+
+      const prompt = `🌾 **${cropName} फसल का चयन हुआ।**\n\nकिसान भाई, कृपया बताइए कि आपकी **${cropName}** की फसल बुवाई के बाद कितने दिन की हो चुकी है या वर्तमान में किस अवस्था में है?`;
+
+      renderCrispSpecialBox(`🌾 ${cropName}: चरण 2 — फसल की उम्र व अवस्था चुनें`, prompt, [
+        { text: `🌱 1. शुरुआती अवस्था (15 से 30 दिन)`, query: `${cropName} बुवाई के 20-30 दिन की समस्या (triage_step3_${cropTag}_stage1)` },
+        { text: `🌿 2. शाखाएं व कल्ले (35 से 50 दिन)`, query: `${cropName} 35-50 दिन फुटाव की समस्या (triage_step3_${cropTag}_stage2)` },
+        { text: `🌸 3. फूल व बालियां निकलना (60 से 75 दिन)`, query: `${cropName} फूल व बालियां अवस्था (triage_step3_${cropTag}_stage3)` },
+        { text: `🌾 4. दाना व फल भराव (दूधिया अवस्था)`, query: `${cropName} दाना भराव अवस्था (triage_step3_${cropTag}_stage4)` }
+      ], 'agri', `crop_triage_step2_${cropTag}`);
+      return true;
+    }
+
+    // Step 3: Days Selected -> Select Symptom
+    if (cleanQ.includes('triage_step3')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      let cropName = 'फसल';
+      let stageName = 'वर्तमान अवस्था';
+      if (cleanQ.includes('gehu') || cleanQ.includes('गेहूं')) cropName = 'गेहूं';
+      else if (cleanQ.includes('sarso') || cleanQ.includes('सरसों')) cropName = 'सरसों';
+      else if (cleanQ.includes('chana') || cleanQ.includes('चना')) cropName = 'चना';
+      else if (cleanQ.includes('veg') || cleanQ.includes('सब्जी')) cropName = 'सब्जियां';
+      else if (cleanQ.includes('chilli') || cleanQ.includes('मिर्च')) cropName = 'मिर्च';
+      else if (cleanQ.includes('garlic') || cleanQ.includes('लहसुन')) cropName = 'लहसुन';
+
+      if (cleanQ.includes('stage1') || cleanQ.includes('20-30')) stageName = '15-30 दिन (शुरुआती बढ़वार)';
+      else if (cleanQ.includes('stage2') || cleanQ.includes('35-50')) stageName = '35-50 दिन (शाखाएं व कल्ले)';
+      else if (cleanQ.includes('stage3') || cleanQ.includes('फूल')) stageName = 'फूल व बालियां निकलना';
+      else stageName = 'दाना भराव अवस्था';
+
+      const prompt = `🌾 **${cropName} (${stageName})**\n\nआपकी फसल में वर्तमान में क्या मुख्य लक्षण या समस्या दिख रही है? नीचे से चुनें:`;
+
+      renderCrispSpecialBox(`🎯 ${cropName}: चरण 3 — मुख्य लक्षण या समस्या चुनें`, prompt, [
+        { text: '🟡 1. पत्तियां पीली पड़ रही हैं (पीलापन)', query: `${cropName} में पीलापन दूर करने का सटीक स्प्रे बताओ` },
+        { text: '🐛 2. इल्ली या रसचूसक कीट का प्रकोप', query: `${cropName} में कीट और इल्ली मारने की दवा` },
+        { text: '🍄 3. फफूंद, जड़ गलन या झुलसा रोग', query: `${cropName} में फंगस और झुलसा रोग की दवा` },
+        { text: '💪 4. कल्ले, फुटाव व पैदावार बढ़ाना चाहते हैं', query: `${cropName} में कल्ले और पैदावार बढ़ाने का फॉर्मूला` }
+      ], 'agri', 'crop_triage_step3');
+      return true;
+    }
+
+    return false;
+  }
+
   function processKnowledgeQuery(query) {
     try {
       const rawQ = (query || '').trim();
@@ -10820,6 +11024,16 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // (Prevents false routing of Chest, Head, Stomach or Arm Pain to Heel Pain)
     // =========================================================================
     if (handleComprehensivePainRouter(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.016 DEDICATED BP, LOW BP, HBA1C & CARDIO CLINICAL PACING ENGINE
+    if (typeof handleBpAndCardioIntelligence === 'function' && handleBpAndCardioIntelligence(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.017 CHATGPT-STYLE INTERACTIVE GUIDED KRISHI TRIAGE ENGINE
+    if (typeof handleInteractiveCropTriage === 'function' && handleInteractiveCropTriage(cleanQ, rawQ)) {
       return;
     }
 
@@ -11392,25 +11606,38 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (consecutiveAmbiguousCount >= 2 || cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('बात करो') || cleanQ.includes('नंबर') || cleanQ.includes('फोन') || cleanQ.includes('phone') || cleanQ.includes('हेल्प')) {
       consecutiveAmbiguousCount = 0;
       const waUrl = buildAvneeshWhatsAppHandoffUrl(query);
-      const resp = `क्षमा करें! मुझे आपकी बात पूरी तरह समझ नहीं आई और इस विषय पर मेरा डेटा यहाँ सीमित है। मैं आपको कोई अधूरा या गलत उत्तर देकर भ्रमित नहीं करना चाहती।\n\nआप 100% सटीक व्यक्तिगत मार्गदर्शन और समाधान हेतु हमारे संस्थापक **दादा अवनीश (अवनीश मिश्रा जी)** से सीधे WhatsApp पर जुड़ सकते हैं या आरोग्यम मुख्य पृष्ठ खोल सकते हैं:`;
+      
+      // Privacy Guard: Only display Founder name if user explicitly asked for Founder/Contact
+      const isExplicitFounderAsk = cleanQ.includes('अवनीश') || cleanQ.includes('avneesh') || cleanQ.includes('फाउंडर') || cleanQ.includes('founder') || cleanQ.includes('संस्थापक');
+      
+      const headerTitle = isExplicitFounderAsk ? '🤝 दादा अवनीश मिश्रा जी (संस्थापक) संपर्क' : '🚨 विशेषज्ञ व्यक्तिगत सहायता व चैट संदर्भ';
+      const promptText = isExplicitFounderAsk 
+        ? 'आप आरोग्यम संस्थापक दादा अवनीश (अवनीश मिश्रा जी) से सीधे WhatsApp पर जुड़कर मार्गदर्शन प्राप्त कर सकते हैं:'
+        : 'क्षमा करें! मुझे आपकी बात पूरी तरह समझ नहीं आई। किसी भी गलत या भ्रामक सलाह से बचने हेतु आप अपनी पूरी चैट हिस्ट्री के साथ हमारे मुख्य विशेषज्ञ से सीधे WhatsApp पर जुड़ सकते हैं:';
+
       const html = `
-        <div style="font-weight:900;color:#166534;font-size:1.05rem;margin-bottom:8px;">
-          🤝 दादा अवनीश मिश्रा जी से सीधा WhatsApp संपर्क
+        <div style="font-weight:900;color:#dc2626;font-size:1.02rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-headset" style="color:#dc2626;"></i>
+          <span>${headerTitle}</span>
         </div>
-        <div style="font-size:0.95rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
-          ${formatTextHtml(resp)}
+        <div style="font-size:0.92rem;line-height:1.65;color:#1e293b;white-space:pre-line;margin-bottom:12px;">
+          ${promptText}
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
-          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-followup-chip" style="background:#22c55e;color:#fff;border-color:#16a34a;text-decoration:none;font-weight:800;padding:12px 18px;display:inline-flex;align-items:center;gap:8px;font-size:0.95rem;box-shadow:0 4px 14px rgba(34,197,94,0.4);">
-            <i class="fa-brands fa-whatsapp" style="font-size:1.2rem;"></i>
-            <span>दादा अवनीश जी से सीधे WhatsApp पर बात करें (7974422572) →</span>
+          <a href="${escapeHtml(waUrl)}" target="_blank" class="sakhi-red-help-btn" style="background:#dc2626;color:#fff;border-radius:12px;padding:12px 18px;text-decoration:none;font-weight:900;font-size:0.95rem;display:inline-flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 6px 18px rgba(220,38,38,0.35);transition:all 0.2s;">
+            <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i>
+            <span>🔴 विशेषज्ञ सहायता प्राप्त करें (चैट हिस्ट्री के साथ) →</span>
           </a>
           <a href="/index.html" class="sakhi-followup-chip" style="background:#f1f5f9;color:#334155;text-decoration:none;font-weight:700;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
             🏠 आरोग्यम मुख्य पोर्टल पर जाएं →
           </a>
         </div>
       `;
-      streamBotMessage(html, cleanTextForTTS('क्षमा करें, मुझे आपकी बात समझ नहीं आई। सीधे दादा अवनीश जी से 7974422572 पर संपर्क करें।'));
+      // Voice Privacy: Never speak personal phone number aloud
+      const spokenMsg = isExplicitFounderAsk
+        ? 'आप संस्थापक दादा अवनीश जी से सीधे व्हाट्सएप बटन दबाकर जुड़ सकते हैं।'
+        : 'क्षमा करें! इस विषय पर सटीक समाधान हेतु आप नीचे दिए गए लाल सहायता बटन से सीधे विशेषज्ञ से चैट संदर्भ के साथ जुड़ सकते हैं।';
+      streamBotMessage(html, cleanTextForTTS(spokenMsg));
       return;
     }
 
@@ -11497,10 +11724,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         </button>
       </div>
 
-      <div style="background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <span style="font-size:0.82rem;color:#64748b;">या सीधे दादा अवनीश मिश्रा जी से बात करना चाहते हैं?</span>
-        <button type="button" class="sakhi-choice-btn" style="padding:6px 12px;font-size:0.82rem;margin:0;width:auto;" onclick="window.connectToAvneeshMishra('${escapeHtml(query)}')">
-          दादा अवनीश जी से बात 💬
+      <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;">
+        <span style="font-size:0.84rem;color:#991b1b;font-weight:700;">क्या आपको विशेषज्ञ से व्यक्तिगत मार्गदर्शन चाहिए?</span>
+        <button type="button" class="sakhi-choice-btn" style="background:#dc2626;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:0.82rem;font-weight:900;margin:0;width:auto;box-shadow:0 3px 10px rgba(220,38,38,0.25);" onclick="window.connectToAvneeshMishra('${escapeHtml(query)}')">
+          🔴 विशेषज्ञ सहायता (चैट सहित) 💬
         </button>
       </div>
     `;
