@@ -19,6 +19,7 @@
   const SAKHI_BANNER_IMG = '/images/sakhi/aarogyam-sakhi-banner.webp';
 
   let knowledgeData = null;
+  let sakhiMaster200QABank = [];
   let isSoundEnabled = true;
   try {
     const savedSound = localStorage.getItem('sakhi_sound_enabled');
@@ -1976,6 +1977,19 @@
     } catch (e) {
       console.warn('Products knowledge load error:', e);
     }
+    try {
+      const qRes = await fetch('/data/sakhi-master-200-qa.json?v=20261020_v200');
+      if (qRes.ok) {
+        const qData = await qRes.json();
+        sakhiMaster200QABank = qData.qa_bank || [];
+        window.sakhiMaster200QABank = sakhiMaster200QABank;
+        if (typeof window.renderSakhi200Tray === 'function') {
+          window.renderSakhi200Tray('agri');
+        }
+      }
+    } catch (e) {
+      console.warn('200 QA Bank load error:', e);
+    }
   }
 
   // 9.5 PERSISTENT CHAT HISTORY STORAGE ENGINE (FOR AAROGYAM MASTER 7974422572 & ALL USERS)
@@ -2113,10 +2127,16 @@
     row.id = 'sakhiTypingIndicatorRow';
     row.className = 'sakhi-msg-row bot';
     row.innerHTML = `
-      <div class="sakhi-msg-bubble typing-bubble" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:12px 18px;display:inline-flex;align-items:center;gap:8px;">
-        <span style="font-size:0.85rem;color:#166534;font-weight:700;">आरोग्यम सखी विचार कर रही हैं</span>
-        <div class="sakhi-typing-dots">
-          <span></span><span></span><span></span>
+      <div class="sakhi-msg-bubble typing-bubble" style="background:#ffffff;border:1.5px solid #86efac;border-radius:20px;padding:9px 16px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(22,163,74,0.14);">
+        <div style="position:relative;width:32px;height:32px;flex-shrink:0;">
+          <img src="/images/sakhi/aarogyam-sakhi.webp" alt="सखी AI" style="width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #16a34a;box-shadow:0 0 10px rgba(34,197,94,0.4);" onerror="this.src='/images/logo/fevicon.png'">
+          <span style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:#22c55e;border-radius:50%;border:1.5px solid #ffffff;"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:0.95rem;color:#166534;font-weight:800;letter-spacing:0.2px;">सखी सोच रही है...</span>
+          <div class="sakhi-typing-dots">
+            <span></span><span></span><span></span>
+          </div>
         </div>
       </div>
     `;
@@ -9438,6 +9458,13 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return true;
     }
 
+    if (q === 'audit:vault' || q === 'ऑटो लर्न डाटा बैंक' || q === 'ऑटो लर्न' || q === 'vault:show' || q === 'ऑडिट वॉल्ट') {
+      if (typeof window.openLearnedVaultModal === 'function') {
+        window.openLearnedVaultModal();
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -10625,31 +10652,33 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   // 19. CORE INTENT RETRIEVAL & DOMAIN FIREWALL
   // =========================================================================
-  // MASTER 100-QUESTION COMBINATION ENGINE (GURU-GRADE ACCURACY & SAFETY)
-  // Guarantees immediate, verified answers for all 100 core queries across 5 domains!
+  // MASTER 200-QUESTION COMBINATION ENGINE (GURU-GRADE ACCURACY & SAFETY)
+  // Guarantees immediate, verified answers for all 200 core queries across 5 domains!
   // =========================================================================
-  function handleMaster100QABank(cleanQ, rawQ) {
+  function handleMaster200QABank(cleanQ, rawQ) {
     const q = (cleanQ || '').toLowerCase().trim();
     const raw = (rawQ || cleanQ || '').toLowerCase().trim();
-    const qaBank = (sakhiMasterKnowledge && sakhiMasterKnowledge.master_100_qa_bank) || [];
+    const qaBank = (sakhiMaster200QABank && sakhiMaster200QABank.length > 0)
+      ? sakhiMaster200QABank
+      : (window.sakhiMaster200QABank || []);
     if (!qaBank || qaBank.length === 0) return false;
 
-    // 1. Exact canonical question match or high-score keyword match
+    // 1. Exact canonical question match or high-score inclusion
     for (const item of qaBank) {
-      const qLower = item.question.toLowerCase();
+      const qLower = item.question.toLowerCase().trim();
       if (q === qLower || raw === qLower || q.includes(qLower) || raw.includes(qLower)) {
-        renderMaster100QABox(item);
+        renderMaster200QABox(item);
         return true;
       }
     }
 
-    // 2. Keyword-based matching
+    // 2. High-precision keyword matching
     for (const item of qaBank) {
       if (item.keywords && Array.isArray(item.keywords)) {
         for (const kw of item.keywords) {
-          const kwLower = kw.toLowerCase();
-          if (q.includes(kwLower) || raw.includes(kwLower)) {
-            renderMaster100QABox(item);
+          const kwLower = kw.toLowerCase().trim();
+          if (kwLower && (q.includes(kwLower) || raw.includes(kwLower))) {
+            renderMaster200QABox(item);
             return true;
           }
         }
@@ -10658,12 +10687,12 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-  function renderMaster100QABox(item) {
+  function renderMaster200QABox(item) {
     const chips = (item.chips || []).map(c => ({
       text: c.text || c.label,
       query: c.query
     }));
-    renderCrispSpecialBox(item.question, item.answer, chips, item.domain || 'omni', item.id);
+    renderCrispSpecialBox(item.question, item.answer, chips, item.category || 'omni', item.id);
   }
 
   // =========================================================================
@@ -11516,14 +11545,66 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const targetDate = new Date();
     const dStr = targetDate.toLocaleDateString('hi-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    const resp = `🌾 **आज (${dStr}) बुवाई परामर्श व चंद्र कृषि चक्र नियम:**\n\n1. **खगोल व सनातन चंद्र कृषि सिद्धांत:**\n• आज चंद्रमा **शुक्ल पक्ष (ऊर्जा ऊपर की ओर)** में संचरण कर रहा है।\n• वैदिक खगोल नियम के अनुसार शुक्ल पक्ष में जल व रस का प्रवाह जमीन से ऊपर की ओर बढ़ता है। इसलिए **गेहूं, चना, सरसों, मटर, आलू व सभी सब्जियों की बुवाई के लिए आज का दिन सर्वोत्तम व अत्यंत फलदायी है!**\n• आज का शुभ अभिजीत मुहूर्त: **11:44 AM से 12:32 PM** (राहुकाल: 07:30 AM - 09:00 AM में बुवाई न करें)।\n\n2. ⚠️ **बुवाई से पहले सबसे अनिवार्य सवाल:**\n👉 **किसान भाई, क्या आपने बीज का संस्कार (बीज उपचार) कर लिया है?**\n• बिना बीज उपचार के सीधे खेत में बीज कभी न डालें, इससे 20-30% बीज मिट्टी में सड़ जाते हैं और उकठा (Wilt) रोग का भारी प्रकोप होता है।\n• **सही बीज संस्कार विधि:**\n  - प्रति 1 किलो बीज में **5ml स्टिमरिच (Stimrich) + 10ml शेत (SHET)** का हल्का लेप लगाएं।\n  - इसे 4 घंटे छाया में सुखाएं और फिर बुवाई करें।\n• **चमत्कारी लाभ:** 98% बीज का एकसमान तेज अंकुरण, जड़ गलन व उकठा रोग से 100% सुरक्षा और जड़ों का 3 गुना गहरा फैलाव!`;
+    const resp = `🌾 **आज (${dStr}) बुवाई परामर्श व चंद्र कृषि चक्र नियम:**\n\n1. **खगोल व सनातन चंद्र कृषि सिद्धांत:**\n• आज चंद्रमा **शुक्ल पक्ष (ऊर्जा ऊपर की ओर)** में संचरण कर रहा है।\n• वैदिक खगोल नियम के अनुसार शुक्ल पक्ष में जल व रस का प्रवाह जमीन से ऊपर की ओर बढ़ता है। इसलिए **गेहूं, चना, सरसों, मटर, आलू व सभी सब्जियों की बुवाई के लिए आज का दिन सर्वोत्तम व अत्यंत फलदायी है!**\n• आज का शुभ अभिजीत मुहूर्त: **11:44 AM से 12:32 PM** (राहुकाल: 07:30 AM - 09:00 AM में बुवाई न करें)।\n\n2. ⚠️ **बुवाई से पहले सबसे अनिवार्य सवाल:**\n👉 **किसान भाई, क्या आपने बीज का संस्कार (बीज उपचार) कर लिया है?**\n• बिना बीज उपचार के सीधे खेत में बीज कभी न डालें, इससे 20-30% बीज मिट्टी में सड़ जाते हैं और उकठा (Wilt) रोग का भारी प्रकोप होता है।\n• 🚫 **सख्त निषेध:** बीज उपचार में **बायो-99 (Bio-99)** का इस्तेमाल **कदापि न करें!** यह पत्तियों के लिए बना सिलिकॉन स्प्रेडर है जो बीज के प्राकृतिक सुरक्षा आवरण को नुकसान पहुंचा सकता है।\n• **सही बीज संस्कार विधि:**\n  - **सामान्य फसलें (गेहूं, सरसों, मक्का, धान, आलू, सब्जियां):** प्रति 1 किलो बीज में **5ml स्टिमरिच (Stimrich) + 10ml शेत (SHET)** का हल्का लेप लगाएं।\n  - **दलहन फसलें (चना, मटर, मूंग, उड़द, अरहर, सोयाबीन):** प्रति 1 किलो बीज में **5ml रैप-अप (Wrap-Up) + 10ml शेत (SHET) + 5ml स्टिमरिच (Stimrich)** का त्रि-स्तरीय लेप लगाएं (रैप-अप उकठा व जड़ गलन से 100% सुरक्षा कवच बनाता है)।\n  - इसे 4 घंटे छाया में सुखाएं और फिर बुवाई करें।\n• **चमत्कारी लाभ:** 98% बीज का एकसमान तेज अंकुरण, जड़ गलन व उकठा रोग से 100% सुरक्षा और जड़ों का 3 गुना गहरा फैलाव!`;
 
     renderCrispSpecialBox('🌾 आज बुवाई परामर्श व बीज संस्कार नियम', resp, [
       { text: '🌱 बीज संस्कार (बीज उपचार) की पूरी विधि', query: 'बीज उपचार कैसे करें और क्या डालें' },
+      { text: '🚫 क्या बीज उपचार में बायो-99 मिला सकते हैं?', query: 'क्या बीज उपचार में बायो 99 मिला सकते हैं' },
       { text: '🚩 आज का पूरा पंचांग व चौघड़िया', query: 'आज का पंचांग बताओ' },
-      { text: '📋 सरसों व गेहूं बुवाई चेकलिस्ट लें', query: 'सरसों और गेहूं बुवाई की चेकलिस्ट बनाओ' },
-      { text: '📲 इसका WhatsApp शेयर संदेश बनाएं', query: 'बीज उपचार का व्हाट्सएप मैसेज बनाओ' }
+      { text: '📋 सरसों व गेहूं बुवाई चेकलिस्ट लें', query: 'सरसों और गेहूं बुवाई की चेकलिस्ट बनाओ' }
     ], 'agri', 'sowing_muhurat_rule');
+    return true;
+  }
+
+  // =========================================================================
+  // 18.625 DEDICATED SEED TREATMENT & BIO-99 PROHIBITION PROTOCOL
+  // Strict rule: Bio-99 strictly forbidden in seed treatment!
+  // Normal crops: Stimrich (5ml) + SHET (10ml)
+  // Pulses (दलहन): Wrap-Up (5ml) + SHET (10ml) + Stimrich (5ml)
+  // =========================================================================
+  function handleDedicatedSeedTreatmentProtocol(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const raw = (rawQ || '').toLowerCase();
+
+    const isBio99Check = (
+      (q.includes('बायो 99') || q.includes('bio 99') || q.includes('बायो-99') || q.includes('bio-99')) &&
+      (q.includes('बीज') || q.includes('उपचार') || q.includes('संस्कार') || q.includes('डाल'))
+    );
+
+    const isSeedTreatment = isBio99Check || (
+      q.includes('बीज उपचार') || q.includes('beej upchar') || q.includes('seed treatment') ||
+      q.includes('बीज संस्कार') || q.includes('बीज का उपचार') || q.includes('बीज में क्या डालें') ||
+      q.includes('बीज शोधन') || q.includes('चने का बीज उपचार') || q.includes('गेहूं का बीज उपचार') ||
+      q.includes('सरसों का बीज उपचार') || q.includes('चना बीज उपचार')
+    );
+
+    if (!isSeedTreatment) return false;
+
+    const isDalhan = (
+      q.includes('चना') || q.includes('chana') || q.includes('मटर') || q.includes('मूंग') ||
+      q.includes('उड़द') || q.includes('सोयाबीन') || q.includes('अरहर') || q.includes('दलहन')
+    );
+
+    let title = '🌱 वैज्ञानिक बीज संस्कार (बीज उपचार) सम्पूर्ण नियम';
+    let resp = '';
+
+    if (isBio99Check) {
+      title = '🚫 बीज उपचार में बायो-99 पूर्णतः वर्जित';
+      resp = `🚫 **कदापि नहीं! किसी भी बीज उपचार में बायो-99 (Bio-99) का उपयोग पूर्णतः वर्जित है।**\n\n• **वैज्ञानिक कारण:**\n1. **बायो-99** एक अति-सक्रिय नॉन-आयनिक सिलिकॉन स्प्रेडर और पेनिट्रेटर (दवा को रोमछिद्रों में भेदने वाला) है। इसका कार्य पत्तियों पर दवा को फैलाना और क्यूटिकल को भेदना है।\n2. बीज के ऊपर एक प्राकृतिक सुरक्षात्मक मोमी परत (Seed Coat) होती है। यदि बीज पर बायो-99 लगा दिया जाए, तो यह उस झिल्ली के सतही तनाव को तोड़कर समय से पूर्व गला सकता है, जिससे बीज सड़ने का खतरा रहता है।\n3. इसलिए बायो-99 का प्रयोग हमेशा **पहले फोलियर स्प्रे (बुवाई के 21 दिन बाद पत्तियों पर)** से ही किया जाता है।\n\n✅ **सही व प्रमाणित जैविक बीज उपचार विधि:**\n• **सामान्य फसलें (गेहूं, सरसों, मक्का, धान, आलू, सब्जियां):** प्रति 1 किलो बीज में **5ml स्टिमरिच (Stimrich) + 10ml शेत (SHET)** का हल्का लेप लगाएं।\n• **दलहन फसलें (चना, मटर, मूंग, उड़द, सोयाबीन, अरहर):** प्रति 1 किलो बीज में **5ml रैप-अप (Wrap-Up) + 10ml शेत (SHET) + 5ml स्टिमरिच (Stimrich)** का लेप लगाएं (रैप-अप उकठा व जड़ गलन से 100% सुरक्षा कवच बनाता है)।\n• लेप लगाकर 4 घंटे छाया में सुखाएं और फिर बुवाई करें!`;
+    } else if (isDalhan) {
+      title = '🌱 दलहन फसलों (चना/मटर/सोयाबीन) का बीज उपचार फॉर्मूला';
+      resp = `🌱 **दलहन फसलों (चना, मटर, मूंग, उड़द, सोयाबीन, अरहर) में बीज संस्कार विधि:**\n\n⚠️ **सख्त नियम:** बीज उपचार में **बायो-99 (Bio-99) का प्रयोग कदापि न करें!**\n\n🛡️ **त्रि-स्तरीय जैविक सुरक्षा कवच (प्रति 1 किलो बीज):**\n1. **बायोफिट रैप-अप (Wrap-Up):** 5ml (जैविक फफूंदनाशक शील्ड - चने के उकठा/Wilt और जड़ गलन को जड़ से रोकता है)\n2. **बायोफिट शेत (SHET):** 10ml (अरबों मित्र जीवाणु - राइजोबियम व फास्फोरस घोलक)\n3. **बायोफिट स्टिमरिच (Stimrich):** 5ml (98% एकसमान अंकुरण व प्राथमिक जड़ विकास)\n\n👉 **विधि:** तीनों दवाओं को थोड़े से पानी में मिलाकर बीज पर हल्के हाथ से लेप लगाएं। 4 घंटे छाया में सुखाकर बुवाई करें।`;
+    } else {
+      title = '🌱 वैज्ञानिक बीज संस्कार (बीज उपचार) सम्पूर्ण विधि';
+      resp = `🌱 **फसलों का वैज्ञानिक बीज संस्कार (Seed Treatment) प्रोटोकॉल:**\n\n⚠️ **सख्त नियम:** बीज उपचार में **बायो-99 (Bio-99) का प्रयोग कदापि न करें!** यह सिलिकॉन स्प्रेडर है जो पत्तियों के लिए बना है, बीज पर लगाने से बीज का प्राकृतिक आवरण प्रभावित हो सकता है।\n\n1. **सामान्य फसलें (गेहूं, सरसों, मक्का, धान, आलू, सब्जियां):**\n• प्रति 1 किलो बीज में **5ml स्टिमरिच (Stimrich) + 10ml शेत (SHET)** का हल्का लेप लगाएं।\n• 4 घंटे छाया में सुखाएं और फिर बुवाई करें।\n\n2. **दलहन फसलें (चना, मटर, मूंग, उड़द, अरहर, सोयाबीन):**\n• प्रति 1 किलो बीज में **5ml रैप-अप (Wrap-Up) + 10ml शेत (SHET) + 5ml स्टिमरिच (Stimrich)** मिलाएं।\n• रैप-अप फफूंद व उकठा (Wilt) रोग से 100% सुरक्षा कवच बनाता है।\n\n👉 **चमत्कारी लाभ:**\n• 98% एकसमान तेज अंकुरण (एक भी दाना बेकार नहीं जाता)।\n• जमीन में दीमक, उकठा और जड़ गलन से 100% जैविक सुरक्षा।\n• जड़ों का 3 गुना गहरा और मजबूत फैलाव!`;
+    }
+
+    renderCrispSpecialBox(title, resp, [
+      { text: '🚫 क्या बीज उपचार में बायो-99 डाल सकते हैं?', query: 'क्या बीज उपचार में बायो 99 मिला सकते हैं' },
+      { text: '🌱 चने में उकठा रोग से कैसे बचें', query: 'चने में उकठा रोग से कैसे बचें' },
+      { text: '🚩 आज बुवाई का शुभ मुहूर्त देखें', query: 'आज बुवाई का शुभ मुहूर्त है या नहीं' },
+      { text: '📲 इसका WhatsApp संदेश बनाएं', query: 'बीज उपचार का व्हाट्सएप मैसेज बनाओ' }
+    ], 'agri', 'seed_treatment_protocol');
     return true;
   }
 
@@ -11831,6 +11912,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
+    // 0.0000203 DEDICATED SEED TREATMENT & BIO-99 PROHIBITION PROTOCOL
+    if (typeof handleDedicatedSeedTreatmentProtocol === 'function' && handleDedicatedSeedTreatmentProtocol(effectiveCleanQ, rawQ)) {
+      return;
+    }
+
     // 0.000021 TOP PRIORITY: VEDIC KRISHI PANCHANG & SHUBH MUHURAT ROUTER (Dynamic Astronomical Calculations)
     if (typeof handleVedicPanchangAndMuhurat === 'function' && handleVedicPanchangAndMuhurat(effectiveCleanQ, rawQ)) {
       return;
@@ -11886,8 +11972,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
-    // 0.0000298 MASTER 100 QA BANK (Direct Knowledge Matching)
-    if (typeof handleMaster100QABank === 'function' && handleMaster100QABank(effectiveCleanQ, rawQ)) {
+    // 0.0000298 MASTER 200 QA BANK (Direct Knowledge Matching)
+    if (typeof handleMaster200QABank === 'function' && handleMaster200QABank(effectiveCleanQ, rawQ)) {
       return;
     }
 
@@ -12242,7 +12328,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (matchedIntent && maxScore >= 18) {
       renderDirectSummary(matchedIntent, query, targetDomain);
     } else {
-      synthesizeDynamicAnswer(query, targetDomain);
+      handleDualSearchEngineAndLearningFallback(query, effectiveCleanQ, targetDomain);
     }
   } catch (err) {
     console.error('[Sakhi AI] Safe recovery in processKnowledgeQuery:', err);
@@ -12579,6 +12665,455 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     logSakhiTelemetry(originalQuery, domain, true);
     streamBotMessage(html, speech);
   }
+
+  // =========================================================================
+  // 19.9 DUAL-ENGINE SELF-LEARNING ARCHITECTURE (WIKIPEDIA HI + DUCKDUCKGO)
+  // Isolated Auto-Learned Vault: NEVER mixes with hardcoded data.
+  // Admin Audit Studio: 1-click Approve, 1-click Deny, Multi-Deny (Bulk Purge)
+  // =========================================================================
+  const SAKHI_LEARNED_VAULT_KEY = 'SAKHI_AUTO_LEARNED_VAULT';
+
+  function isNetsurfOrInternalBizQuery(cleanQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const internalTokens = [
+      'netsurf', 'नेट्सर्फ', 'बायोफिट', 'biofit', 'स्टिमरिच', 'stimrich', 'बायो 99', 'bio 99', 'बायो-99', 'bio-99',
+      'शेत', 'shet', 'नेचुरामोर', 'naturamore', 'रैप-अप', 'wrap up', 'wrap-up', 'ई-स्टॉक', 'e-stock', 'istock',
+      '25500', '819250', '8.19', 'कैपिंग', 'capping', 'दादा अवनीश', 'avneesh mishra', 'आरोग्यम', 'aarogyam',
+      'सीएफसी', 'cfc', 'इंटैक्ट', 'intact', 'लाइफ स्टाइल प्लस', 'life style plus', 'ईजी डिटॉक्स', 'easy detox',
+      'जॉइंट केयर', 'joint care', 'डायग्नोस्टिक सर्वे', 'सर्वे चेकलिस्ट', 'पोस्टर प्रॉम्प्ट'
+    ];
+    return internalTokens.some(tok => q.includes(tok));
+  }
+
+  function getLocalLearnedVault() {
+    try {
+      return JSON.parse(localStorage.getItem(SAKHI_LEARNED_VAULT_KEY) || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveLocalLearnedVault(list) {
+    try {
+      localStorage.setItem(SAKHI_LEARNED_VAULT_KEY, JSON.stringify(list || []));
+    } catch (_) {}
+  }
+
+  async function syncVaultItemToSupabase(item) {
+    try {
+      let sb = window.dbClient || window.supabase || window.supabaseClient;
+      if ((!sb || typeof sb.from !== 'function') && window.supabase && typeof window.supabase.createClient === 'function') {
+        sb = window.supabase.createClient('https://qjhjrzsnrtahmhswxyvb.supabase.co', 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU');
+      }
+      if (sb && typeof sb.from === 'function') {
+        await sb.from('sakhi_auto_learned_vault').upsert([item], { onConflict: 'id' });
+      }
+    } catch (e) {
+      console.debug('[Vault Supabase Sync Notice]:', e);
+    }
+  }
+
+  async function fetchWikipediaHindiSummary(query) {
+    try {
+      const cleanSearch = (query || '').replace(/[?।!,]+/g, '').trim();
+      const sUrl = `https://hi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanSearch)}&utf8=&format=json&origin=*`;
+      const sRes = await fetch(sUrl, { headers: { 'Accept': 'application/json' } });
+      if (!sRes.ok) return null;
+      const sData = await sRes.json();
+      const firstHit = sData?.query?.search?.[0];
+      if (!firstHit || !firstHit.pageid) return null;
+
+      const eUrl = `https://hi.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids=${firstHit.pageid}&format=json&origin=*`;
+      const eRes = await fetch(eUrl, { headers: { 'Accept': 'application/json' } });
+      if (!eRes.ok) return null;
+      const eData = await eRes.json();
+      const page = eData?.query?.pages?.[firstHit.pageid];
+      const extract = (page?.extract || '').trim();
+      if (extract && extract.length > 40) {
+        return {
+          title: page.title || firstHit.title,
+          summary: extract.slice(0, 600),
+          source: 'Wikipedia (हिंदी)'
+        };
+      }
+    } catch (err) {
+      console.debug('[Wiki API Notice]:', err);
+    }
+    return null;
+  }
+
+  async function fetchDuckDuckGoInstantSummary(query) {
+    try {
+      const cleanSearch = (query || '').replace(/[?।!,]+/g, '').trim();
+      const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(cleanSearch)}&format=json&no_html=1&skip_disambig=1`;
+      const res = await fetch(ddgUrl);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const abstract = (data.Abstract || data.AbstractText || '').trim();
+      if (abstract && abstract.length > 30) {
+        return {
+          title: data.Heading || cleanSearch,
+          summary: abstract.slice(0, 500),
+          source: 'DuckDuckGo'
+        };
+      }
+    } catch (err) {
+      console.debug('[DDG API Notice]:', err);
+    }
+    return null;
+  }
+
+  async function handleDualSearchEngineAndLearningFallback(rawQ, cleanQ, targetDomain) {
+    // 1. Strict Firewall: Never send Netsurf or internal biz queries to external search engines!
+    if (isNetsurfOrInternalBizQuery(cleanQ)) {
+      synthesizeDynamicAnswer(rawQ, targetDomain);
+      return;
+    }
+
+    const vault = getLocalLearnedVault();
+    // 2. Check if already learned in isolated vault
+    const existing = vault.find(item => {
+      const qL = (item.clean_question || item.question || '').toLowerCase();
+      return qL === cleanQ || cleanQ.includes(qL) || qL.includes(cleanQ);
+    });
+
+    if (existing) {
+      if (existing.status === 'denied') {
+        // Explicitly denied by admin: do not serve!
+        synthesizeDynamicAnswer(rawQ, targetDomain);
+        return;
+      }
+      if (existing.status === 'approved' || existing.status === 'quarantine') {
+        renderLearnedVaultAnswerBox(existing);
+        existing.hit_count = (existing.hit_count || 1) + 1;
+        saveLocalLearnedVault(vault);
+        syncVaultItemToSupabase(existing);
+        return;
+      }
+    }
+
+    // 3. Search Wikipedia Hindi first
+    appendTypingIndicator();
+    let result = await fetchWikipediaHindiSummary(cleanQ);
+
+    // 4. Fallback to DuckDuckGo if Wikipedia had no entry
+    if (!result) {
+      result = await fetchDuckDuckGoInstantSummary(cleanQ);
+    }
+
+    removeTypingIndicator();
+
+    if (result && result.summary) {
+      let cleanSummary = result.summary
+        .replace(/\[\d+\]/g, '')
+        .replace(/http[s]?:\/\/\S+/g, '')
+        .trim();
+
+      const newRecord = {
+        id: 'vault_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        question: rawQ,
+        clean_question: cleanQ,
+        answer: cleanSummary,
+        source: result.source,
+        domain: targetDomain || 'omni',
+        status: 'quarantine', // Admin review required!
+        hit_count: 1,
+        created_at: new Date().toISOString()
+      };
+
+      vault.unshift(newRecord);
+      saveLocalLearnedVault(vault);
+      syncVaultItemToSupabase(newRecord);
+
+      renderLearnedVaultAnswerBox(newRecord);
+      return;
+    }
+
+    // 5. If both search engines returned nothing, standard graceful response
+    synthesizeDynamicAnswer(rawQ, targetDomain);
+  }
+
+  function renderLearnedVaultAnswerBox(item) {
+    const formattedText = `🔍 **सखी लाइव ज्ञान शोध (${item.source}):**\n\n${item.answer}\n\n💡 *यह जानकारी सखी AI के लाइव शोध इंजन द्वारा खोजी गई है। किसी भी रासायनिक व चिकित्सकीय निर्णय से पूर्व विशेषज्ञ से परामर्श अवश्य लें।*`;
+    
+    renderCrispSpecialBox(`🔍 शोध उत्तर: ${item.question}`, formattedText, [
+      { text: '🌾 संबंधित कृषि व फसल सलाह लें', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
+      { text: '🩺 संबंधित स्वास्थ्य व घरेलू नुस्खे', query: 'दैनिक स्वास्थ्य और डाइट चार्ट बनाओ' },
+      { text: '💼 नेट्सर्फ 25% छूट व प्लान समझें', query: 'ए स्टॉक खोलने का तरीका बताओ' },
+      { text: '📲 इसका WhatsApp शेयर संदेश बनाएं', query: `${item.question} का व्हाट्सएप मैसेज बनाओ` }
+    ], item.domain || 'omni', 'learned_vault_item');
+  }
+
+  // =========================================================================
+  // 200 READY-MADE 1-TAP QUESTIONS TRAY CONTROLLER
+  // =========================================================================
+  window.switchSakhi200Category = function(category) {
+    ['agri', 'dairy', 'health', 'business', 'panchang'].forEach(cat => {
+      const btn = document.getElementById('tabBtn_' + cat);
+      if (btn) {
+        if (cat === category) {
+          btn.style.background = '#16a34a';
+          btn.style.color = '#ffffff';
+          btn.style.border = 'none';
+        } else {
+          btn.style.background = '#f1f5f9';
+          btn.style.color = '#334155';
+          btn.style.border = '1px solid #cbd5e1';
+        }
+      }
+    });
+    window.renderSakhi200Tray(category);
+  };
+
+  window.renderSakhi200Tray = function(category) {
+    const box = document.getElementById('sakhi200PillsBox');
+    if (!box) return;
+    const cat = category || 'agri';
+    const qaBank = (sakhiMaster200QABank && sakhiMaster200QABank.length > 0)
+      ? sakhiMaster200QABank
+      : (window.sakhiMaster200QABank || []);
+    
+    const filtered = qaBank.filter(item => item.category === cat);
+    if (!filtered || filtered.length === 0) {
+      box.innerHTML = `<span style="font-size:0.80rem;color:#64748b;padding:6px;">लोड हो रहा है...</span>`;
+      return;
+    }
+
+    let html = '';
+    filtered.forEach(item => {
+      html += `
+        <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('${escapeHtml(item.question)}')" style="font-size:0.80rem;padding:6px 12px;border-radius:14px;background:#ffffff;border:1px solid #cbd5e1;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.background='#f0fdf4';this.style.borderColor='#86efac';" onmouseout="this.style.background='#ffffff';this.style.borderColor='#cbd5e1';">
+          ${escapeHtml(item.question)}
+        </button>
+      `;
+    });
+    box.innerHTML = html;
+  };
+
+  // =========================================================================
+  // ADMIN AUTO-LEARNED QA VAULT CONTROLLER & PURGE STUDIO
+  // =========================================================================
+  let currentVaultFilter = 'all';
+
+  window.openLearnedVaultModal = function() {
+    const m = document.getElementById('sakhiLearnedVaultModal');
+    if (m) {
+      m.style.display = 'flex';
+      window.renderLearnedVaultTable();
+    }
+  };
+
+  window.closeLearnedVaultModal = function() {
+    const m = document.getElementById('sakhiLearnedVaultModal');
+    if (m) m.style.display = 'none';
+  };
+
+  window.filterLearnedVault = function(filter, btn) {
+    currentVaultFilter = filter;
+    document.querySelectorAll('.vault-filter-btn').forEach(b => {
+      b.style.background = '#ffffff';
+      b.style.color = '#334155';
+      b.style.border = '1px solid #cbd5e1';
+    });
+    if (btn) {
+      btn.style.background = '#0f172a';
+      btn.style.color = '#ffffff';
+      btn.style.border = 'none';
+    }
+    window.renderLearnedVaultTable();
+  };
+
+  window.renderLearnedVaultTable = function() {
+    const container = document.getElementById('vaultListContainer');
+    if (!container) return;
+
+    const vault = getLocalLearnedVault();
+    const searchVal = (document.getElementById('vaultSearchInput')?.value || '').toLowerCase().trim();
+
+    // Update Counts
+    const totalEl = document.getElementById('vaultTotalCount');
+    const quaranEl = document.getElementById('vaultQuarantineCount');
+    const appEl = document.getElementById('vaultApprovedCount');
+    const denEl = document.getElementById('vaultDeniedCount');
+    if (totalEl) totalEl.textContent = vault.length;
+    if (quaranEl) quaranEl.textContent = vault.filter(i => i.status === 'quarantine').length;
+    if (appEl) appEl.textContent = vault.filter(i => i.status === 'approved').length;
+    if (denEl) denEl.textContent = vault.filter(i => i.status === 'denied').length;
+
+    let items = vault;
+    if (currentVaultFilter !== 'all') {
+      items = items.filter(i => i.status === currentVaultFilter);
+    }
+    if (searchVal) {
+      items = items.filter(i => 
+        (i.question || '').toLowerCase().includes(searchVal) ||
+        (i.answer || '').toLowerCase().includes(searchVal)
+      );
+    }
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:30px;color:#94a3b8;font-size:0.90rem;">
+          <i class="fa-solid fa-box-open" style="font-size:2rem;margin-bottom:8px;color:#cbd5e1;"></i>
+          <div>कोई प्रश्न रिकॉर्ड उपलब्ध नहीं है।</div>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    items.forEach(item => {
+      let badgeStyle = 'background:#fefce8;color:#a16207;border:1px solid #fef08a;';
+      let statusLabel = '🟡 क्वारंटीन (रिव्यू)';
+      if (item.status === 'approved') {
+        badgeStyle = 'background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;';
+        statusLabel = '🟢 स्वीकृत (Active)';
+      } else if (item.status === 'denied') {
+        badgeStyle = 'background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;';
+        statusLabel = '🔴 अस्वीकृत (Blocked)';
+      }
+
+      html += `
+        <div style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" class="vault-item-checkbox" data-id="${item.id}" style="width:16px;height:16px;cursor:pointer;">
+              <div style="font-weight:800;font-size:0.92rem;color:#0f172a;">${escapeHtml(item.question)}</div>
+            </div>
+            <span style="font-size:0.72rem;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap;${badgeStyle}">
+              ${statusLabel}
+            </span>
+          </div>
+          <div style="font-size:0.85rem;line-height:1.55;color:#334155;background:#f8fafc;padding:8px 10px;border-radius:10px;">
+            ${escapeHtml((item.answer || '').slice(0, 250))}${item.answer && item.answer.length > 250 ? '...' : ''}
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:0.75rem;color:#64748b;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span>🌐 स्रोत: <strong>${escapeHtml(item.source || 'Search')}</strong></span>
+              <span>🔥 हिट: <strong>${item.hit_count || 1}</strong></span>
+              <span>📅 ${new Date(item.created_at || Date.now()).toLocaleDateString('hi-IN')}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              ${item.status !== 'approved' ? `
+                <button type="button" onclick="window.approveLearnedQA('${item.id}')" style="background:#16a34a;color:#fff;border:none;padding:4px 10px;border-radius:8px;font-weight:800;font-size:0.72rem;cursor:pointer;">
+                  <i class="fa-solid fa-check"></i> स्वीकारें
+                </button>
+              ` : ''}
+              ${item.status !== 'denied' ? `
+                <button type="button" onclick="window.denyLearnedQA('${item.id}')" style="background:#ef4444;color:#fff;border:none;padding:4px 10px;border-radius:8px;font-weight:800;font-size:0.72rem;cursor:pointer;">
+                  <i class="fa-solid fa-ban"></i> अस्वीकार
+                </button>
+              ` : ''}
+              <button type="button" onclick="window.deleteLearnedQA('${item.id}')" style="background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1;padding:4px 8px;border-radius:8px;font-weight:700;font-size:0.72rem;cursor:pointer;" title="हटाएं">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  };
+
+  window.approveLearnedQA = function(id) {
+    const vault = getLocalLearnedVault();
+    const item = vault.find(i => i.id === id);
+    if (item) {
+      item.status = 'approved';
+      saveLocalLearnedVault(vault);
+      syncVaultItemToSupabase(item);
+      window.renderLearnedVaultTable();
+    }
+  };
+
+  window.denyLearnedQA = function(id) {
+    const vault = getLocalLearnedVault();
+    const item = vault.find(i => i.id === id);
+    if (item) {
+      item.status = 'denied';
+      saveLocalLearnedVault(vault);
+      syncVaultItemToSupabase(item);
+      window.renderLearnedVaultTable();
+    }
+  };
+
+  window.deleteLearnedQA = function(id) {
+    let vault = getLocalLearnedVault();
+    vault = vault.filter(i => i.id !== id);
+    saveLocalLearnedVault(vault);
+    window.renderLearnedVaultTable();
+  };
+
+  window.bulkDenySelectedLearnedQA = function() {
+    const cbs = document.querySelectorAll('.vault-item-checkbox:checked');
+    if (cbs.length === 0) {
+      alert('कृपया पहले चेकबॉक्स टिक करके प्रश्न चुनें।');
+      return;
+    }
+    const ids = Array.from(cbs).map(cb => cb.dataset.id);
+    const vault = getLocalLearnedVault();
+    vault.forEach(i => {
+      if (ids.includes(i.id)) {
+        i.status = 'denied';
+        syncVaultItemToSupabase(i);
+      }
+    });
+    saveLocalLearnedVault(vault);
+    window.renderLearnedVaultTable();
+    alert(`${ids.length} प्रश्न सफलतापूर्वक अस्वीकार (Denied) कर दिए गए!`);
+  };
+
+  window.bulkApproveSelectedLearnedQA = function() {
+    const cbs = document.querySelectorAll('.vault-item-checkbox:checked');
+    if (cbs.length === 0) {
+      alert('कृपया पहले चेकबॉक्स टिक करके प्रश्न चुनें।');
+      return;
+    }
+    const ids = Array.from(cbs).map(cb => cb.dataset.id);
+    const vault = getLocalLearnedVault();
+    vault.forEach(i => {
+      if (ids.includes(i.id)) {
+        i.status = 'approved';
+        syncVaultItemToSupabase(i);
+      }
+    });
+    saveLocalLearnedVault(vault);
+    window.renderLearnedVaultTable();
+    alert(`${ids.length} प्रश्न सफलतापूर्वक स्वीकृत (Approved) कर दिए गए!`);
+  };
+
+  window.bulkDeleteSelectedLearnedQA = function() {
+    const cbs = document.querySelectorAll('.vault-item-checkbox:checked');
+    if (cbs.length === 0) {
+      alert('कृपया पहले चेकबॉक्स टिक करके प्रश्न चुनें।');
+      return;
+    }
+    if (!confirm('क्या आप सचमुच चुने हुए प्रश्नों को डाटा बैंक से हटाना चाहते हैं?')) return;
+    const ids = Array.from(cbs).map(cb => cb.dataset.id);
+    let vault = getLocalLearnedVault();
+    vault = vault.filter(i => !ids.includes(i.id));
+    saveLocalLearnedVault(vault);
+    window.renderLearnedVaultTable();
+  };
+
+  window.exportLearnedVaultJson = function() {
+    const vault = getLocalLearnedVault();
+    const payload = {
+      exported_at: new Date().toISOString(),
+      total_records: vault.length,
+      vault_type: 'Aarogyam Sakhi Auto-Learned QA Vault',
+      records: vault
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sakhi-auto-learned-vault-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   // 20. DYNAMIC HUMAN-TOUCH ANSWER SYNTHESIZER & EMPATHETIC CLARIFICATION
   function synthesizeDynamicAnswer(query, domain) {

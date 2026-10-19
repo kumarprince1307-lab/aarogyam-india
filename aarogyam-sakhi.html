@@ -353,6 +353,10 @@
                   <i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;font-size:1.05rem;"></i>
                   <span>पुरानी चैट (इतिहास)</span>
                 </button>
+                <button type="button" onclick="window.openLearnedVaultModal(); window.toggleSakhiChatMenu();" style="width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:10px;font-size:0.92rem;font-weight:700;color:#0f172a;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.2s;border-top:1px solid #f1f5f9;margin-top:2px;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='transparent'">
+                  <i class="fa-solid fa-brain" style="color:#16a34a;font-size:1.05rem;"></i>
+                  <span>ऑटो-लर्न बैंक (ऑडिट)</span>
+                </button>
               </div>
             </div>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn" onclick="window.toggleSakhiFullscreen()" title="फुल स्क्रीन">
@@ -384,6 +388,29 @@
               <!-- Clean ChatGPT-style Prompt Guide -->
               <div style="display:inline-flex;align-items:center;gap:8px;font-size:1.02rem;color:#15803d;font-weight:800;background:#f0fdf4;padding:10px 16px;border-radius:24px;border:1.5px solid #bbf7d0;">
                 <span>✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
+              </div>
+
+              <!-- 200+ 1-Tap Quick Action Questions Tray -->
+              <div class="sakhi-quick-200-tray" id="sakhiQuick200Tray" style="margin-top:14px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:18px;padding:12px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                  <div style="font-weight:900;color:#0f172a;font-size:0.95rem;display:flex;align-items:center;gap:6px;">
+                    <i class="fa-solid fa-bolt" style="color:#eab308;"></i>
+                    <span>200+ 1-टैप सवाल बैंक (बिना टाइप किए पूछें)</span>
+                  </div>
+                  <span style="font-size:0.75rem;background:#dcfce7;color:#166534;font-weight:800;padding:2px 8px;border-radius:12px;">सत्यापित</span>
+                </div>
+                <!-- Category Tabs -->
+                <div class="sakhi-200-tabs" id="sakhi200Tabs" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+                  <button type="button" class="sakhi-200-tab-btn active" id="tabBtn_agri" onclick="window.switchSakhi200Category('agri')" style="background:#16a34a;color:#ffffff;border:none;border-radius:16px;padding:5px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;white-space:nowrap;">🌾 कृषि (40)</button>
+                  <button type="button" class="sakhi-200-tab-btn" id="tabBtn_dairy" onclick="window.switchSakhi200Category('dairy')" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:16px;padding:5px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;white-space:nowrap;">🥛 पशुपालन (40)</button>
+                  <button type="button" class="sakhi-200-tab-btn" id="tabBtn_health" onclick="window.switchSakhi200Category('health')" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:16px;padding:5px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;white-space:nowrap;">🩺 स्वास्थ्य (40)</button>
+                  <button type="button" class="sakhi-200-tab-btn" id="tabBtn_business" onclick="window.switchSakhi200Category('business')" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:16px;padding:5px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;white-space:nowrap;">💼 बिजनेस (40)</button>
+                  <button type="button" class="sakhi-200-tab-btn" id="tabBtn_panchang" onclick="window.switchSakhi200Category('panchang')" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:16px;padding:5px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;white-space:nowrap;">🗓️ पंचांग (40)</button>
+                </div>
+                <!-- Scrollable Pills Grid -->
+                <div id="sakhi200PillsBox" style="display:flex;flex-wrap:wrap;gap:6px;max-height:165px;overflow-y:auto;margin-top:8px;padding-right:4px;-webkit-overflow-scrolling:touch;">
+                  <!-- Populated by JS -->
+                </div>
               </div>
             </div>
           </div>
@@ -469,7 +496,7 @@
   <script src="/js/global-guest-modal.js?v=1.2"></script>
   <script type="module" src="/js/public-pwa.js?v=1.4"></script>
   <script src="/js/sakhi-panchang-engine.js?v=20261019_v2"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261020_v342"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261020_v343"></script>
   <script>
     (function () {
       function lockWindowScroll() {
@@ -616,6 +643,80 @@
       });
     })();
   </script>
+  <!-- Auto-Learned QA Vault Admin Audit Modal -->
+  <div id="sakhiLearnedVaultModal" class="sakhi-terms-modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;background:rgba(15,23,42,0.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999999;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;">
+    <div style="background:#ffffff;border-radius:24px;max-width:680px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);overflow:hidden;position:relative;">
+      
+      <!-- Modal Header -->
+      <div style="padding:16px 20px;border-bottom:1.5px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;">
+        <div>
+          <div style="font-weight:900;font-size:1.15rem;color:#0f172a;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-brain" style="color:#16a34a;"></i>
+            <span>🏛️ सखी ऑटो-लर्न डाटा बैंक (Audit Vault)</span>
+          </div>
+          <div style="font-size:0.78rem;color:#64748b;margin-top:2px;">
+            स्वतंत्र सुरक्षित डाटा बैंक — हार्डकोडेड डाटा से पूर्णतः पृथक
+          </div>
+        </div>
+        <button type="button" onclick="window.closeLearnedVaultModal()" style="background:#e2e8f0;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;font-size:1rem;transition:all 0.2s;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;padding:12px 16px;background:#ffffff;border-bottom:1px solid #f1f5f9;">
+        <div style="background:#f1f5f9;border-radius:12px;padding:8px 10px;text-align:center;">
+          <div style="font-size:0.70rem;color:#64748b;font-weight:700;">कुल प्रश्न</div>
+          <div id="vaultTotalCount" style="font-size:1.10rem;font-weight:900;color:#0f172a;">0</div>
+        </div>
+        <div style="background:#fefce8;border:1px solid #fef08a;border-radius:12px;padding:8px 10px;text-align:center;">
+          <div style="font-size:0.70rem;color:#854d0e;font-weight:700;">🟡 क्वारंटीन</div>
+          <div id="vaultQuarantineCount" style="font-size:1.10rem;font-weight:900;color:#a16207;">0</div>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:8px 10px;text-align:center;">
+          <div style="font-size:0.70rem;color:#166534;font-weight:700;">🟢 स्वीकृत</div>
+          <div id="vaultApprovedCount" style="font-size:1.10rem;font-weight:900;color:#15803d;">0</div>
+        </div>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:8px 10px;text-align:center;">
+          <div style="font-size:0.70rem;color:#991b1b;font-weight:700;">🔴 अस्वीकृत</div>
+          <div id="vaultDeniedCount" style="font-size:1.10rem;font-weight:900;color:#b91c1c;">0</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div style="padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:6px;flex:1 1 200px;">
+          <input type="text" id="vaultSearchInput" placeholder="सर्च करें सवाल..." oninput="window.renderLearnedVaultTable()" style="width:100%;padding:6px 10px;border-radius:10px;border:1px solid #cbd5e1;font-size:0.85rem;">
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button type="button" onclick="window.bulkDenySelectedLearnedQA()" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:10px;font-weight:800;font-size:0.78rem;cursor:pointer;">
+            <i class="fa-solid fa-ban"></i> मल्टी-अस्वीकार (Bulk Deny)
+          </button>
+          <button type="button" onclick="window.bulkApproveSelectedLearnedQA()" style="background:#16a34a;color:#fff;border:none;padding:6px 12px;border-radius:10px;font-weight:800;font-size:0.78rem;cursor:pointer;">
+            <i class="fa-solid fa-check"></i> मल्टी-स्वीकार
+          </button>
+          <button type="button" onclick="window.exportLearnedVaultJson()" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:6px 10px;border-radius:10px;font-weight:800;font-size:0.78rem;cursor:pointer;" title="JSON डाउनलोड">
+            <i class="fa-solid fa-download"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Pills -->
+      <div style="padding:8px 16px;background:#ffffff;display:flex;gap:6px;border-bottom:1px solid #f1f5f9;">
+        <button type="button" class="vault-filter-btn active" onclick="window.filterLearnedVault('all', this)" style="padding:4px 10px;border-radius:12px;border:none;background:#0f172a;color:#fff;font-size:0.75rem;font-weight:800;cursor:pointer;">सभी</button>
+        <button type="button" class="vault-filter-btn" onclick="window.filterLearnedVault('quarantine', this)" style="padding:4px 10px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;color:#334155;font-size:0.75rem;font-weight:800;cursor:pointer;">क्वारंटीन</button>
+        <button type="button" class="vault-filter-btn" onclick="window.filterLearnedVault('approved', this)" style="padding:4px 10px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;color:#334155;font-size:0.75rem;font-weight:800;cursor:pointer;">स्वीकृत</button>
+        <button type="button" class="vault-filter-btn" onclick="window.filterLearnedVault('denied', this)" style="padding:4px 10px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;color:#334155;font-size:0.75rem;font-weight:800;cursor:pointer;">अस्वीकृत</button>
+      </div>
+
+      <!-- Cards / Table Container -->
+      <div id="vaultListContainer" style="flex:1 1 auto;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;max-height:50vh;">
+        <!-- Filled dynamically -->
+      </div>
+      
+    </div>
+  </div>
+
   <!-- Terms & Conditions Modal -->
   <div id="sakhiTermsModal" class="sakhi-terms-modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999999;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
     <div style="background:#ffffff;border-radius:24px;max-width:540px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.5);border:1px solid rgba(0,0,0,0.1);padding:24px;box-sizing:border-box;position:relative;">
