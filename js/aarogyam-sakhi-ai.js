@@ -12314,6 +12314,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
             if (tok === 'गुप्त' && !cleanQ.includes('रोग') && !cleanQ.includes('धातु') && !cleanQ.includes('पौरुष') && !cleanQ.includes('सेक्स') && !cleanQ.includes('शीघ्रपतन')) {
               return;
             }
+            // Safety Guard: Avoid mustard false match on generic "तेल" (e.g. from "जैतून का तेल", "नारियल का तेल")
+            if (tok === 'तेल' && !cleanQ.includes('सरसों') && !cleanQ.includes('sarson')) {
+              return;
+            }
             score += 10;
           }
         });
@@ -12834,9 +12838,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   function renderLearnedVaultAnswerBox(item) {
-    const formattedText = `🔍 **सखी लाइव ज्ञान शोध (${item.source}):**\n\n${item.answer}\n\n💡 *यह जानकारी सखी AI के लाइव शोध इंजन द्वारा खोजी गई है। किसी भी रासायनिक व चिकित्सकीय निर्णय से पूर्व विशेषज्ञ से परामर्श अवश्य लें।*`;
+    const cleanQTitle = (item.question || '').replace(/[?।!,]+/g, '').trim();
+    const formattedText = `${item.answer}\n\n<div style="font-size:0.75rem;color:#64748b;margin-top:10px;padding-top:6px;border-top:1px dashed #cbd5e1;font-style:italic;">📜 संदर्भ स्रोत: ${escapeHtml(item.source || 'इंटरनेट संदर्भ')} (लाइव संकलन)</div>`;
     
-    renderCrispSpecialBox(`🔍 शोध उत्तर: ${item.question}`, formattedText, [
+    renderCrispSpecialBox(`📖 ${cleanQTitle}`, formattedText, [
       { text: '🌾 संबंधित कृषि व फसल सलाह लें', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
       { text: '🩺 संबंधित स्वास्थ्य व घरेलू नुस्खे', query: 'दैनिक स्वास्थ्य और डाइट चार्ट बनाओ' },
       { text: '💼 नेट्सर्फ 25% छूट व प्लान समझें', query: 'ए स्टॉक खोलने का तरीका बताओ' },
@@ -13878,6 +13883,10 @@ ${shareUrl}`;
 
   function formatTextHtml(str) {
     if (!str) return '';
+    const trimmed = String(str).trim();
+    if (trimmed.startsWith('<div') || trimmed.startsWith('<table') || trimmed.startsWith('<section')) {
+      return str;
+    }
     let escaped = escapeHtml(str);
 
     // Convert ```code / prompt / whatsapp``` blocks into sleek, interactive copy cards!

@@ -475,6 +475,61 @@ export async function initSakhiAiHub() {
       </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- 🏛️ सखी ऑटो-लर्न डाटा बैंक (SAKHI AUTO-LEARNED QA VAULT) -->
+    <!-- ========================================================================= -->
+    <div class="admin-card" id="sakhi-learned-vault" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:2px solid #10b981;border-radius:14px;box-shadow:0 8px 24px rgba(16,185,129,0.18);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:18px;border-bottom:1px solid var(--admin-border,#334155);padding-bottom:14px;">
+        <div>
+          <h2 style="font-size:1.35rem;font-weight:900;color:var(--admin-text,#f8fafc);display:flex;align-items:center;gap:10px;margin:0;">
+            <span style="font-size:1.6rem;">🏛️</span> सखी ऑटो-लर्न डाटा बैंक (Auto-Learned QA Vault)
+          </h2>
+          <p style="font-size:0.85rem;color:var(--admin-muted,#94a3b8);margin:5px 0 0 0;">
+            विकिपीडिया व डकडकगो से सखी AI द्वारा स्वचालित रूप से सीखे गए सवाल। 1-क्लिक अप्रूवल, रिजेक्शन व बल्क पर्ज।
+          </p>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="admin-btn admin-btn-secondary" id="adminExportVaultBtn" style="font-weight:700;">
+            <span>📥 JSON बैकअप</span>
+          </button>
+          <button type="button" class="admin-btn admin-btn-danger" id="adminBulkDenyVaultBtn" style="background:#ef4444;border-color:#ef4444;color:#fff;font-weight:700;">
+            <span>🚫 चुने हुए अस्वीकार करें</span>
+          </button>
+          <button type="button" class="admin-btn admin-btn-primary" id="adminBulkApproveVaultBtn" style="background:#16a34a;border-color:#16a34a;color:#fff;font-weight:700;">
+            <span>✔ चुने हुए स्वीकारें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stats & Filter Tabs -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="all" style="background:#3b82f6;color:#fff;font-weight:800;">
+            सभी (<span id="adminVaultTotalCount">0</span>)
+          </button>
+          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="quarantine" style="background:var(--admin-surface-2,#0f172a);color:#facc15;border:1px solid #eab308;font-weight:800;">
+            🟡 क्वारंटीन (<span id="adminVaultQuarantineCount">0</span>)
+          </button>
+          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="approved" style="background:var(--admin-surface-2,#0f172a);color:#4ade80;border:1px solid #22c55e;font-weight:800;">
+            🟢 स्वीकृत (<span id="adminVaultApprovedCount">0</span>)
+          </button>
+          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="denied" style="background:var(--admin-surface-2,#0f172a);color:#f87171;border:1px solid #ef4444;font-weight:800;">
+            🔴 अस्वीकृत (<span id="adminVaultDeniedCount">0</span>)
+          </button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="adminVaultSearchInput" placeholder="सवाल या उत्तर खोजें..." style="background:var(--admin-surface-2,#0f172a);color:var(--admin-text,#f8fafc);border:1.5px solid var(--admin-border,#334155);padding:6px 12px;border-radius:8px;font-size:0.82rem;min-width:220px;">
+        </div>
+      </div>
+
+      <!-- Vault Items List -->
+      <div id="adminVaultContainer" style="display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto;padding-right:4px;">
+        <div style="text-align:center;padding:30px;color:var(--admin-muted,#64748b);">डेटा लोड हो रहा है...</div>
+      </div>
+    </div>
+
     <!-- No-Code Intent Creator Modal -->
     <div id="sakhiAddIntentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999999;align-items:center;justify-content:center;padding:16px;">
       <div style="background:var(--admin-surface,#1e293b);border:1.5px solid #3b82f6;border-radius:14px;max-width:550px;width:100%;padding:24px;box-shadow:0 12px 36px rgba(0,0,0,0.6);">
@@ -537,6 +592,8 @@ export async function initSakhiAiHub() {
   setupSakhiAuditEvents();
   updateAuditMasterUI();
   await fetchAndRenderSakhiAuditLogs();
+  setupSakhiVaultAdminEvents();
+  await fetchAndRenderSakhiVaultData();
 }
 
 function injectSakhiStyles() {
@@ -1746,4 +1803,257 @@ function setupSakhiAuditEvents() {
 
   const eraseBtn = document.getElementById('sakhiAuditEraseBtn');
   if (eraseBtn) eraseBtn.addEventListener('click', eraseSakhiAuditLogs);
+}
+
+// =========================================================================
+// SAKHI AUTO-LEARNED QA VAULT CONTROLLER (ADMIN HUB MODULE)
+// =========================================================================
+let sakhiVaultList = [];
+let sakhiVaultFilter = 'all';
+
+async function fetchAndRenderSakhiVaultData() {
+  const container = document.getElementById('adminVaultContainer');
+  if (!container) return;
+
+  let list = [];
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db) {
+      const { data, error } = await db
+        .from('sakhi_auto_learned_vault')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        list = data;
+      }
+    }
+  } catch (err) {
+    console.debug('Supabase vault fetch notice:', err);
+  }
+
+  if (list.length === 0) {
+    try {
+      list = JSON.parse(localStorage.getItem('SAKHI_AUTO_LEARNED_VAULT') || '[]');
+    } catch (_) {}
+  }
+
+  sakhiVaultList = list;
+  renderSakhiVaultUI();
+}
+
+function renderSakhiVaultUI() {
+  const container = document.getElementById('adminVaultContainer');
+  if (!container) return;
+
+  const totalEl = document.getElementById('adminVaultTotalCount');
+  const quaranEl = document.getElementById('adminVaultQuarantineCount');
+  const appEl = document.getElementById('adminVaultApprovedCount');
+  const denEl = document.getElementById('adminVaultDeniedCount');
+
+  if (totalEl) totalEl.textContent = sakhiVaultList.length;
+  if (quaranEl) quaranEl.textContent = sakhiVaultList.filter(i => i.status === 'quarantine').length;
+  if (appEl) appEl.textContent = sakhiVaultList.filter(i => i.status === 'approved').length;
+  if (denEl) denEl.textContent = sakhiVaultList.filter(i => i.status === 'denied').length;
+
+  const searchVal = (document.getElementById('adminVaultSearchInput')?.value || '').toLowerCase().trim();
+  let items = sakhiVaultList;
+
+  if (sakhiVaultFilter !== 'all') {
+    items = items.filter(i => i.status === sakhiVaultFilter);
+  }
+  if (searchVal) {
+    items = items.filter(i =>
+      (i.question || '').toLowerCase().includes(searchVal) ||
+      (i.answer || '').toLowerCase().includes(searchVal)
+    );
+  }
+
+  if (items.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:32px;color:var(--admin-muted,#64748b);font-size:0.90rem;">
+        <div style="font-size:2rem;margin-bottom:6px;">📦</div>
+        <div>कोई सीखे गए प्रश्न रिकॉर्ड उपलब्ध नहीं हैं।</div>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  items.forEach(item => {
+    let badgeStyle = 'background:rgba(234,179,8,0.15);color:#facc15;border:1px solid rgba(234,179,8,0.3);';
+    let statusLabel = '🟡 क्वारंटीन (समीक्षा लंबित)';
+    if (item.status === 'approved') {
+      badgeStyle = 'background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3);';
+      statusLabel = '🟢 स्वीकृत (Active)';
+    } else if (item.status === 'denied') {
+      badgeStyle = 'background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);';
+      statusLabel = '🔴 अस्वीकृत (Blocked)';
+    }
+
+    html += `
+      <div style="background:var(--admin-surface-2,#0f172a);border:1.5px solid var(--admin-border,#334155);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" class="admin-vault-checkbox" data-id="${item.id}" style="width:16px;height:16px;cursor:pointer;">
+            <div style="font-weight:800;font-size:0.95rem;color:var(--admin-text,#f8fafc);">${escapeHtml(item.question || '')}</div>
+          </div>
+          <span style="font-size:0.72rem;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap;${badgeStyle}">
+            ${statusLabel}
+          </span>
+        </div>
+        <div style="font-size:0.86rem;line-height:1.6;color:var(--admin-text,#cbd5e1);background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+          ${escapeHtml((item.answer || '').slice(0, 300))}${item.answer && item.answer.length > 300 ? '...' : ''}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span>🌐 स्रोत: <strong>${escapeHtml(item.source || 'Search Engine')}</strong></span>
+            <span>🔥 उपयोग (Hits): <strong>${item.hit_count || 1}</strong></span>
+            <span>📅 ${new Date(item.created_at || Date.now()).toLocaleDateString('hi-IN')}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            ${item.status !== 'approved' ? `
+              <button type="button" class="admin-btn admin-btn-sm" onclick="window.adminApproveVaultItem('${item.id}')" style="background:#16a34a;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-weight:800;font-size:0.72rem;cursor:pointer;">
+                ✔ स्वीकारें
+              </button>
+            ` : ''}
+            ${item.status !== 'denied' ? `
+              <button type="button" class="admin-btn admin-btn-sm" onclick="window.adminDenyVaultItem('${item.id}')" style="background:#ef4444;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-weight:800;font-size:0.72rem;cursor:pointer;">
+                🚫 अस्वीकार
+              </button>
+            ` : ''}
+            <button type="button" class="admin-btn admin-btn-sm" onclick="window.adminDeleteVaultItem('${item.id}')" style="background:var(--admin-surface,#1e293b);color:var(--admin-muted,#94a3b8);border:1px solid var(--admin-border,#334155);padding:4px 8px;border-radius:6px;font-weight:700;font-size:0.72rem;cursor:pointer;" title="हटाएं">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+window.adminApproveVaultItem = async function(id) {
+  const item = sakhiVaultList.find(i => i.id === id);
+  if (item) {
+    item.status = 'approved';
+    saveLocalAdminVault();
+    await syncVaultToDb(item);
+    renderSakhiVaultUI();
+  }
+};
+
+window.adminDenyVaultItem = async function(id) {
+  const item = sakhiVaultList.find(i => i.id === id);
+  if (item) {
+    item.status = 'denied';
+    saveLocalAdminVault();
+    await syncVaultToDb(item);
+    renderSakhiVaultUI();
+  }
+};
+
+window.adminDeleteVaultItem = async function(id) {
+  sakhiVaultList = sakhiVaultList.filter(i => i.id !== id);
+  saveLocalAdminVault();
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db) await db.from('sakhi_auto_learned_vault').delete().eq('id', id);
+  } catch (_) {}
+  renderSakhiVaultUI();
+};
+
+function saveLocalAdminVault() {
+  try {
+    localStorage.setItem('SAKHI_AUTO_LEARNED_VAULT', JSON.stringify(sakhiVaultList));
+  } catch (_) {}
+}
+
+async function syncVaultToDb(item) {
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db) await db.from('sakhi_auto_learned_vault').upsert([item], { onConflict: 'id' });
+  } catch (_) {}
+}
+
+function setupSakhiVaultAdminEvents() {
+  document.querySelectorAll('.admin-vault-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sakhiVaultFilter = btn.dataset.filter || 'all';
+      document.querySelectorAll('.admin-vault-filter-btn').forEach(b => {
+        b.style.background = 'var(--admin-surface-2,#0f172a)';
+        b.style.color = 'var(--admin-text,#cbd5e1)';
+      });
+      btn.style.background = '#3b82f6';
+      btn.style.color = '#ffffff';
+      renderSakhiVaultUI();
+    });
+  });
+
+  const searchInput = document.getElementById('adminVaultSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => renderSakhiVaultUI());
+  }
+
+  const exportBtn = document.getElementById('adminExportVaultBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const payload = {
+        exported_at: new Date().toISOString(),
+        total: sakhiVaultList.length,
+        records: sakhiVaultList
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sakhi-learned-vault-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  const bulkDenyBtn = document.getElementById('adminBulkDenyVaultBtn');
+  if (bulkDenyBtn) {
+    bulkDenyBtn.addEventListener('click', async () => {
+      const cbs = document.querySelectorAll('.admin-vault-checkbox:checked');
+      if (cbs.length === 0) {
+        alert('कृपया चेकबॉक्स से कम से कम 1 सवाल चुनें!');
+        return;
+      }
+      const ids = Array.from(cbs).map(cb => cb.dataset.id);
+      for (const item of sakhiVaultList) {
+        if (ids.includes(item.id)) {
+          item.status = 'denied';
+          await syncVaultToDb(item);
+        }
+      }
+      saveLocalAdminVault();
+      renderSakhiVaultUI();
+      alert(`${ids.length} सवाल सफलतापूर्वक अस्वीकृत (Denied) कर दिए गए!`);
+    });
+  }
+
+  const bulkApproveBtn = document.getElementById('adminBulkApproveVaultBtn');
+  if (bulkApproveBtn) {
+    bulkApproveBtn.addEventListener('click', async () => {
+      const cbs = document.querySelectorAll('.admin-vault-checkbox:checked');
+      if (cbs.length === 0) {
+        alert('कृपया चेकबॉक्स से कम से कम 1 सवाल चुनें!');
+        return;
+      }
+      const ids = Array.from(cbs).map(cb => cb.dataset.id);
+      for (const item of sakhiVaultList) {
+        if (ids.includes(item.id)) {
+          item.status = 'approved';
+          await syncVaultToDb(item);
+        }
+      }
+      saveLocalAdminVault();
+      renderSakhiVaultUI();
+      alert(`${ids.length} सवाल सफलतापूर्वक स्वीकृत (Approved) कर दिए गए!`);
+    });
+  }
 }
