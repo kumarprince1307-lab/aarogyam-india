@@ -203,11 +203,18 @@ const previewButton=document.querySelector(".preview-buy-btn");
 
 if(previewButton){
 
-previewButton.addEventListener("click",()=>{
+previewButton.addEventListener("click",(e)=>{
+
+const href = previewButton.getAttribute("href");
+if(href && !href.startsWith("#") && href !== "javascript:void(0)"){
+return;
+}
 
 const target=document.querySelector("#buy-now");
 
-if(target){
+if(target && (!href || href === "#buy-now" || href === "#")){
+
+e.preventDefault();
 
 target.scrollIntoView({
 
@@ -412,11 +419,18 @@ const stickyBuyBtn=document.querySelector(".sticky-buy-btn");
 
 if(stickyBuyBtn){
 
-stickyBuyBtn.addEventListener("click",()=>{
+stickyBuyBtn.addEventListener("click",(e)=>{
+
+const href = stickyBuyBtn.getAttribute("href");
+if(href && !href.startsWith("#") && href !== "javascript:void(0)"){
+return;
+}
 
 const buySection=document.querySelector("#buy-now");
 
-if(buySection){
+if(buySection && (!href || href === "#buy-now" || href === "#")){
+
+e.preventDefault();
 
 buySection.scrollIntoView({
 

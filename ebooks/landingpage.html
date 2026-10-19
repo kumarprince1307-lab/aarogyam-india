@@ -30,10 +30,11 @@
     <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
     <link rel="stylesheet" href="../css/landingpage.css">
     <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=1.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="manifest" href="/manifest.json?v=1.1">
     <meta name="theme-color" content="#28a745">
 </head>
-<body>
+<body class="book-landing-page" data-page-type="book-landing">
 
     <!-- ==========================================================
         HEADER SECTION START
@@ -335,20 +336,22 @@
     <!-- ==========================================================
         MASTER MOBILE STICKY BUY BAR
     ========================================================== -->
-    <div class="mobile-sticky-bar">
-        <a href="#" class="sticky-help-btn" id="mobileHelpBtn">HELP</a>
-        <div class="mobile-book-preview">
-            <img src="" alt="Book" id="stickyThumb">
-            <div class="mobile-book-info">
-                <h4 id="stickyTitle">Book Name</h4>
-                <div class="mobile-book-price">
-                    <span class="old-price" id="stickyOldPrice">₹299</span>
-                    <strong class="offer-price" id="stickyNewPrice">₹99</strong>
+    <div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar">
+        <div class="mobile-sticky-bar-inner" style="width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <!-- 1. BOOK THUMBNAIL -->
+            <img src="" alt="Book" id="stickyThumb" class="sticky-thumb-img" style="width:38px; height:50px; border-radius:4px; object-fit:cover; flex-shrink:0;">
+            <!-- 2. PRICING -->
+            <div class="mobile-book-preview" style="display:flex; align-items:center;">
+                <div class="mobile-book-price" style="display:flex; flex-direction:column; line-height:1.1;">
+                    <span class="old-price" id="stickyOldPrice" style="font-size:13px; color:#dc2626; font-weight:800; text-decoration:line-through;">₹299</span>
+                    <strong class="offer-price" id="stickyNewPrice" style="font-size:20px; font-weight:900; color:#16a34a;">₹99</strong>
                 </div>
             </div>
+            <!-- 3. LARGE BUY NOW BUTTON -->
+            <a href="checkout.html" class="sticky-buy-btn" id="stickyBuyBtn" style="flex:1 1 auto; height:44px; font-size:15px; font-weight:900; background:linear-gradient(135deg,#dc2626,#b91c1c); border-radius:8px; color:#fff; display:flex; align-items:center; justify-content:center; text-decoration:none;">🛒 Buy Now</a>
+            <!-- 4. SHARE BUTTON -->
+            <button class="sticky-share-btn" id="mobileShareButton" type="button" title="शेयर करें" style="width:44px; min-width:44px; height:44px; border-radius:8px; background:#1565c0; color:#fff; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fa-solid fa-share-nodes"></i> <span style="display:none;">Share</span></button>
         </div>
-        <button class="sticky-share-btn" id="mobileShareButton" type="button">Share</button>
-        <a href="checkout.html" class="sticky-buy-btn" id="stickyBuyBtn">Buy Now</a>
     </div>
 
     <!-- ==========================================================

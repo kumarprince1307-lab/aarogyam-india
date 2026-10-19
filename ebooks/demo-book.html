@@ -13,10 +13,11 @@ SEO + META + CSS + GOOGLE ANALYTICS
 <meta name="keywords" content="eBook, Aarogyam India, कृषि गाइड">
 <meta name="author" content="Aarogyam India">
 <link rel="icon" href="/images/logo/favicon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="../css/demo-book.css">
 </head>
 
-<body>
+<body class="book-landing-page" data-page-type="book-landing">
 
 <!-- =========================================================
 STICKY HEADER
@@ -49,7 +50,7 @@ BOOK HERO SECTION
   <a href="#" id="demoHeroDownloadBtn" style="display:none; background: #ea580c; color: #fff; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; text-decoration: none; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(234,88,12,0.3);">
     <span>📥</span> <span>Download Free PDF</span>
   </a>
-  <a href="#" id="demoHeroBuyBtn" style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(220,38,38,0.35); border: 1px solid #fca5a5;">
+  <a href="../ebooks/checkout.html?product=BK001" id="demoHeroBuyBtn" style="background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; padding: 10px 18px; border-radius: 25px; font-weight: 800; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(220,38,38,0.35); border: 1px solid #fca5a5;">
     <span>⚡</span> <span>पूरी किताब खरीदें (₹99)</span>
   </a>
 </div>
@@ -143,14 +144,31 @@ FULL SCREEN IMAGE VIEWER
 </div>
 
 <!-- =========================================================
-STICKY BUY NOW BAR
+MASTER STICKY BUY BAR
 ========================================================= -->
-<div class="sticky-buy-bar">
-    <div class="price-area">
-        <span class="old-price" id="barMrp">₹299</span>
-        <span class="offer-price" id="barOffer">₹99</span>
+<div id="ubl-mobile-sticky-bar" class="mobile-sticky-bar sticky-buy-bar">
+    <div class="mobile-sticky-bar-inner">
+        <!-- 1. BOOK THUMBNAIL -->
+        <img id="sticky-thumb-img" src="" alt="Book Cover" class="sticky-thumb-img">
+
+        <!-- 2. PRICING -->
+        <div class="mobile-book-preview">
+            <div class="mobile-book-price price-area">
+                <span class="old-price" id="barMrp">₹299</span>
+                <strong class="offer-price" id="barOffer">₹99</strong>
+            </div>
+        </div>
+
+        <!-- 3. LARGE BUY NOW BUTTON -->
+        <a href="../ebooks/checkout.html?product=BK001" class="sticky-buy-btn buy-btn" id="stickyBuyBtn">
+            🛒 Buy Now
+        </a>
+
+        <!-- 4. SHARE BUTTON -->
+        <button class="sticky-share-btn" id="mobileShareButton" type="button" onclick="window.handleDemoBookShare()" title="शेयर करें">
+            <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+        </button>
     </div>
-    <a href="#" class="buy-btn" id="stickyBuyBtn">🛒 Buy Now</a>
 </div>
 
 <!-- =========================================================

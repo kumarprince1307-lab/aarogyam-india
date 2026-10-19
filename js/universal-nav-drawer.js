@@ -821,6 +821,53 @@
     document.head.appendChild(style);
   }
 
+  // -------------------------------------------------------------
+  // IS BOOK LANDING PAGE DETECTOR (PREVENTS MOBILE BOTTOM DRAWER OVERLAY)
+  // -------------------------------------------------------------
+  function isBookLandingPage() {
+    const currentPath = (window.location.pathname || '').toLowerCase();
+    const currentSearch = (window.location.search || '').toLowerCase();
+
+    // 1. Direct path / filename matching for book landing pages
+    if (
+      currentPath.includes('book-landing') ||
+      currentPath.includes('demo-book') ||
+      currentPath.includes('demo-kharif') ||
+      currentPath.includes('kharif-master-guide') ||
+      currentPath.includes('kheti-dr') ||
+      currentPath.includes('landingpage') ||
+      currentPath.includes('sample-ai-book') ||
+      currentPath.includes('book-details') ||
+      currentPath.includes('ai-website-guide')
+    ) {
+      return true;
+    }
+
+    // 2. /ebooks/ or /ebook/ landing page context
+    if (currentPath.includes('/ebook') && (currentSearch.includes('book=') || currentSearch.includes('id=') || currentSearch.includes('preview='))) {
+      return true;
+    }
+
+    // 3. Body class or DOM element checks
+    if (document.body && (document.body.classList.contains('book-landing-page') || document.body.dataset.pageType === 'book-landing')) {
+      return true;
+    }
+
+    if (
+      document.getElementById('ubl-mobile-sticky-bar') ||
+      document.querySelector('.mobile-sticky-bar') ||
+      document.querySelector('.sticky-buy-bar') ||
+      document.getElementById('sticky-thumb-img') ||
+      document.getElementById('stickyBuyBtn') ||
+      document.getElementById('sticky-buy-btn') ||
+      document.querySelector('[data-book-landing="true"]')
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
   function injectUniversalSideDrawer() {
     ensureDrawerStylesInjected();
     updateHeaderUserBadge();
@@ -847,6 +894,14 @@
     const currentPath = (window.location.pathname || '').toLowerCase();
     const currentSearch = (window.location.search || '').toLowerCase();
     const isInstalled = isPwaInstalled();
+    const isBookLanding = isBookLandingPage();
+
+    if (isBookLanding && document.body) {
+      try {
+        document.body.classList.add('book-landing-page');
+        document.body.dataset.pageType = 'book-landing';
+      } catch (e) {}
+    }
 
     const drawerHtml = `
       <div id="universal-side-drawer-wrap">
@@ -1180,6 +1235,7 @@
         </a>
       </div>
 
+      ${isBookLanding ? '' : `
       <!-- Universal Sticky Mobile Bottom Navigation Bar (Mobile & Tablet) -->
       <nav class="universal-mobile-bottom-nav" id="universal-mobile-bottom-nav">
         <!-- 1. Home -->
@@ -1233,9 +1289,14 @@
           <span style="color:#8b5cf6;font-weight:800;">Drawer</span>
         </button>
       </nav>
+      `}
     `;
 
     document.body.insertAdjacentHTML('beforeend', drawerHtml);
+    if (isBookLanding) {
+      const bottomNav = document.getElementById('universal-mobile-bottom-nav');
+      if (bottomNav) bottomNav.remove();
+    }
     bindDrawerTriggers();
     checkPwaInstallState();
   }
@@ -1420,8 +1481,21 @@
     }
   }
 
+  function purgeBookLandingDrawerNav() {
+    if (isBookLandingPage()) {
+      if (document.body) {
+        document.body.classList.add('book-landing-page');
+        document.body.dataset.pageType = 'book-landing';
+      }
+      const bNav = document.getElementById('universal-mobile-bottom-nav');
+      if (bNav) bNav.remove();
+    }
+  }
+
   function initUniversalDrawerAndSakhi() {
+    purgeBookLandingDrawerNav();
     injectUniversalSideDrawer();
+    purgeBookLandingDrawerNav();
     checkPwaInstallState();
     const path = (window.location.pathname || '').toLowerCase();
     if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html')) {
@@ -1436,6 +1510,7 @@
     initUniversalDrawerAndSakhi();
   }
   window.addEventListener('load', () => {
+    purgeBookLandingDrawerNav();
     checkPwaInstallState();
     const path = (window.location.pathname || '').toLowerCase();
     if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html')) {

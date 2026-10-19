@@ -255,6 +255,8 @@ async function loadBookData() {
         
         const coverEl = document.getElementById("bookCover");
         if (coverEl) coverEl.src = currentBookData.cover;
+        const stickyThumb = document.getElementById("sticky-thumb-img");
+        if (stickyThumb) stickyThumb.src = currentBookData.cover;
 
         const titleEl = document.getElementById("bookTitle");
         if (titleEl) titleEl.textContent = currentBookData.heading;

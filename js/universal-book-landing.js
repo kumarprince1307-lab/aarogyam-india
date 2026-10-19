@@ -1520,10 +1520,11 @@
     const previewActionWrap = document.querySelector('#sec-sample-book .preview-action');
     if (previewActionWrap) {
       const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
-      const demoPages = (l.demo_reader_pages || b.demo_reader_pages || '').trim();
       const isDemo = (bId.startsWith('DEMO') || l.book_type === 'demo' || b.type === 'demo');
+      const targetMain = (l.targetMainBook || b.targetMainBook || bId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (bId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
+      const targetCheckout = isDemo ? `checkout.html?id=${encodeURIComponent(targetMain)}` : `checkout.html?id=${encodeURIComponent(bId)}`;
       previewActionWrap.innerHTML = `
-        <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;">
+        <a id="preview-buy-btn" href="${targetCheckout}" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;">
           <span>🛒</span> <span>${isDemo ? 'सम्पूर्ण मुख्य पुस्तक खरीदें (Buy Full Book)' : 'Buy Now'}</span>
         </a>
         <button type="button" onclick="window.openDemoReaderWithAuth('${bId}', '${demoPages}')" class="preview-buy-btn" style="background:linear-gradient(135deg,#0284c7,#0369a1);border:1.5px solid #38bdf8;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-left:8px;" title="पूरा सचित्र डेमो रीडर खोलें">

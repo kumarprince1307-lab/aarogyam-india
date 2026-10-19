@@ -432,39 +432,123 @@ IMAGE VIEWER
 }
 
 /*=========================
-STICKY BUY BAR
+STREAMLINED RESPONSIVE STICKY BUY BAR
 =========================*/
-.sticky-buy-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #fff;
-    padding: 12px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 -5px 20px rgba(0,0,0,.12);
-    z-index: 999;
+.sticky-buy-bar,
+.mobile-sticky-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    background: #fff !important;
+    padding-top: 6px !important;
+    padding-left: max(8px, env(safe-area-inset-left, 8px)) !important;
+    padding-right: max(8px, env(safe-area-inset-right, 8px)) !important;
+    padding-bottom: max(8px, calc(6px + env(safe-area-inset-bottom, 0px))) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 -4px 22px rgba(0,0,0,.15) !important;
+    z-index: 9999 !important;
+    box-sizing: border-box !important;
 }
 
+.mobile-sticky-bar-inner {
+    width: 100% !important;
+    max-width: 1200px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+}
+
+.sticky-thumb-img {
+    width: 38px !important;
+    height: 50px !important;
+    border-radius: 4px !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+
+.mobile-book-preview {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+.mobile-book-price,
 .price-area {
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
 }
 
+.mobile-book-price .old-price,
+.price-area .old-price {
+    font-size: 13px !important;
+    color: #dc2626 !important;
+    font-weight: 800 !important;
+    text-decoration: line-through !important;
+    line-height: 1 !important;
+}
+
+.mobile-book-price .offer-price,
+.price-area .offer-price {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    color: #16a34a !important;
+    line-height: 1 !important;
+}
+
+.sticky-buy-btn,
 .buy-btn {
-    background: var(--primary);
-    color: #fff;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-size: 18px;
-    font-weight: bold;
-    transition: .3s;
+    flex: 1 1 auto !important;
+    min-width: 110px !important;
+    height: 44px !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+    padding: 0 12px !important;
+    text-decoration: none !important;
 }
 
-.buy-btn:hover {
-    background: var(--primary-dark);
+.sticky-share-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    border-radius: 8px !important;
+    background: #1565c0 !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    cursor: pointer !important;
+}
+
+.sticky-share-btn span {
+    display: none !important;
+}
+
+body {
+    padding-bottom: max(78px, calc(68px + env(safe-area-inset-bottom, 0px))) !important;
 }
 
 /*=========================

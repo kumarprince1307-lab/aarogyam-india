@@ -685,6 +685,40 @@
 }
 
 /* =============================================================
+   UNIVERSAL RULE: ALL BOOK LANDING PAGES NEVER SHOW BOTTOM NAV DRAWER
+   ============================================================= */
+body.book-landing-page .universal-mobile-bottom-nav,
+body[data-page-type="book-landing"] .universal-mobile-bottom-nav,
+.mobile-sticky-bar ~ .universal-mobile-bottom-nav,
+#ubl-mobile-sticky-bar ~ .universal-mobile-bottom-nav,
+.sticky-buy-bar ~ .universal-mobile-bottom-nav,
+body:has(#ubl-mobile-sticky-bar) .universal-mobile-bottom-nav,
+body:has(.mobile-sticky-bar) .universal-mobile-bottom-nav,
+body:has(.sticky-buy-bar) .universal-mobile-bottom-nav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  opacity: 0 !important;
+}
+
+@media (max-width: 768px) {
+  body.book-landing-page .sticky-float-widget-container,
+  body[data-page-type="book-landing"] .sticky-float-widget-container,
+  .mobile-sticky-bar ~ .sticky-float-widget-container,
+  #ubl-mobile-sticky-bar ~ .sticky-float-widget-container,
+  .sticky-buy-bar ~ .sticky-float-widget-container,
+  body:has(#ubl-mobile-sticky-bar) .sticky-float-widget-container,
+  body:has(.mobile-sticky-bar) .sticky-float-widget-container,
+  body:has(.sticky-buy-bar) .sticky-float-widget-container {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+/* =============================================================
    UNIVERSAL MOBILE STICKY BOTTOM 8-TAB NAVIGATION BAR
    ============================================================= */
 .universal-mobile-bottom-nav {

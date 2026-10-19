@@ -18,7 +18,7 @@
             document.querySelectorAll('[data-share-button="true"]').forEach(function(b) {
               b.dataset.assetId = bookId;
             });
-            ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn', 'ubl-audio-buy-btn'].forEach(function(bIdKey) {
+            ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn', 'ubl-audio-buy-btn', 'preview-buy-btn'].forEach(function(bIdKey) {
               const el = document.getElementById(bIdKey);
               if (el) el.href = 'checkout.html?id=' + encodeURIComponent(bookId);
             });
@@ -509,7 +509,7 @@
   <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=1.1">
 </head>
 
-<body>
+<body class="book-landing-page" data-page-type="book-landing">
 
   <!-- =========================================
        1. LOGIN POPUP & REGISTRATION GATE
@@ -875,7 +875,7 @@
         </div>
 
         <div class="preview-action">
-          <a id="preview-buy-btn" href="#sec-final-buy" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;font-size:1.15rem;font-weight:800;padding:14px 28px;border-radius:10px;box-shadow:0 6px 18px rgba(220,38,38,0.35);">
+          <a id="preview-buy-btn" href="checkout.html" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;font-size:1.15rem;font-weight:800;padding:14px 28px;border-radius:10px;box-shadow:0 6px 18px rgba(220,38,38,0.35);">
             🛒 Buy Now
           </a>
         </div>
