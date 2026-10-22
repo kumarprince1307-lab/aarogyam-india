@@ -2132,43 +2132,11 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [
-        "/images/books/bk019-preview-1.webp",
-        "/images/books/bk019-preview-2.webp",
-        "/images/books/bk019-preview-3.webp",
-        "/images/books/bk019-preview-4.webp",
-        "/images/books/bk019-preview-5.webp",
-        "/images/books/bk019-preview-6.webp",
-        "/images/books/bk019-preview-7.webp"
-      ],
-      "demo_images": [
-        "/images/books/bk019-preview-1.webp",
-        "/images/books/bk019-preview-2.webp",
-        "/images/books/bk019-preview-3.webp",
-        "/images/books/bk019-preview-4.webp",
-        "/images/books/bk019-preview-5.webp",
-        "/images/books/bk019-preview-6.webp",
-        "/images/books/bk019-preview-7.webp"
-      ],
-      "preview_images": [
-        "/images/books/bk019-preview-1.webp",
-        "/images/books/bk019-preview-2.webp",
-        "/images/books/bk019-preview-3.webp",
-        "/images/books/bk019-preview-4.webp",
-        "/images/books/bk019-preview-5.webp",
-        "/images/books/bk019-preview-6.webp",
-        "/images/books/bk019-preview-7.webp"
-      ],
-      "previewImages": [
-        "/images/books/bk019-preview-1.webp",
-        "/images/books/bk019-preview-2.webp",
-        "/images/books/bk019-preview-3.webp",
-        "/images/books/bk019-preview-4.webp",
-        "/images/books/bk019-preview-5.webp",
-        "/images/books/bk019-preview-6.webp",
-        "/images/books/bk019-preview-7.webp"
-      ],
-      "demoAvailable": true,
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk019-og.webp",
@@ -2184,40 +2152,14 @@
         "mp3_url": "",
         "tts_text": "नमस्कार किसान भाइयों!\nक्या आप चने की खेती करते हैं? क्या आप चाहते हैं कि बुवाई से लेकर कटाई तक खेती के जरूरी फैसले सही जानकारी के आधार पर ले सकें?\nतो पेश है Aarogyam India की रबी फसल मास्टर सीरीज़ का भाग दो, चना की खेती, संपूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका।\nइस किताब में आपको मिलेंगी चने की उन्नत किस्मों के चयन, खेत की तैयारी, बीज दर, बुवाई, बीज उपचार, खाद-पोषण, सिंचाई और खरपतवार प्रबंधन से जुड़ी उपयोगी जानकारियाँ।\nआप जानेंगे चने में उकठा रोग, जड़ सड़न, कॉलर रॉट, झुलसा और अन्य प्रमुख समस्याओं के लक्षण कैसे पहचानें। साथ ही, रोग-कीट प्रबंधन, फसल की देखभाल, कटाई, भंडारण और खेती की लागत व लाभ का हिसाब समझने में भी मदद मिलेगी।\nइस मार्गदर्शिका में कुल 40 अध्याय हैं, जिन्हें खेती के अलग-अलग चरणों के अनुसार व्यवस्थित किया गया है।\nसबसे अच्छी बात, आप इस किताब को केवल 99 रुपये के ऑफर मूल्य पर प्राप्त कर सकते हैं।",
         "story_text": "नमस्कार किसान भाइयों!\nक्या आप चने की खेती करते हैं? क्या आप चाहते हैं कि बुवाई से लेकर कटाई तक खेती के जरूरी फैसले सही जानकारी के आधार पर ले सकें?\nतो पेश है Aarogyam India की रबी फसल मास्टर सीरीज़ का भाग दो, चना की खेती, संपूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका।\nइस किताब में आपको मिलेंगी चने की उन्नत किस्मों के चयन, खेत की तैयारी, बीज दर, बुवाई, बीज उपचार, खाद-पोषण, सिंचाई और खरपतवार प्रबंधन से जुड़ी उपयोगी जानकारियाँ।\nआप जानेंगे चने में उकठा रोग, जड़ सड़न, कॉलर रॉट, झुलसा और अन्य प्रमुख समस्याओं के लक्षण कैसे पहचानें। साथ ही, रोग-कीट प्रबंधन, फसल की देखभाल, कटाई, भंडारण और खेती की लागत व लाभ का हिसाब समझने में भी मदद मिलेगी।\nइस मार्गदर्शिका में कुल 40 अध्याय हैं, जिन्हें खेती के अलग-अलग चरणों के अनुसार व्यवस्थित किया गया है।\nसबसे अच्छी बात, आप इस किताब को केवल 99 रुपये के ऑफर मूल्य पर प्राप्त कर सकते हैं।",
-        "highlights": [
-          {
-            "icon": "🐛",
-            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय. AUR "
-          },
-          {
-            "icon": "🦠",
-            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
-          },
-          {
-            "icon": "🧪",
-            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
-          },
-          {
-            "icon": "💧",
-            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
-          },
-          {
-            "icon": "🌊",
-            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
-          },
-          {
-            "icon": "🌱",
-            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
-          }
-        ],
         "offer_callout": "🔥 धमाकेदार ऑफर: चने की खेती की इस मार्गदर्शिका को अभी सिर्फ ₹99 में प्राप्त करें।💥",
         "bgm_enabled": true
       },
       "features": [
-        "120 पेज की प्रीमियम",
-        "300+ फोटो AUR",
-        "Spray Science",
-        "Free aarogyam sakhi ai"
+        "संपूर्ण प्रैक्टिकल गाइड",
+        "रोग-कीट पहचान फोटो",
+        "सटीक स्प्रे साइंस चार्ट",
+        "24×7 AI कृषि डॉक्टर"
       ],
       "totalPages": 44,
       "author": "Dada Avnish Mishra",
@@ -2225,7 +2167,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK019",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-22T14:49:09.347Z",
+      "updated_at": "2026-10-22T16:17:20.747Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "pageImagesPath": "images/books/BK019"
