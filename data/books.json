@@ -1620,7 +1620,12 @@
       "banner": "/images/banners/bk017-hero-banner.webp",
       "status": "active",
       "publish_targets": [
-        "my_library"
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "home_hero",
+        "download_funnel"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -1630,39 +1635,11 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [
-        "/images/books/bk017-preview-1.webp",
-        "/images/books/bk017-preview-2.webp",
-        "/images/books/bk017-preview-3.webp",
-        "/images/books/bk017-preview-4.webp",
-        "/images/books/bk017-preview-5.webp",
-        "/images/books/bk017-preview-6.webp"
-      ],
-      "demo_images": [
-        "/images/books/bk017-preview-1.webp",
-        "/images/books/bk017-preview-2.webp",
-        "/images/books/bk017-preview-3.webp",
-        "/images/books/bk017-preview-4.webp",
-        "/images/books/bk017-preview-5.webp",
-        "/images/books/bk017-preview-6.webp"
-      ],
-      "preview_images": [
-        "/images/books/bk017-preview-1.webp",
-        "/images/books/bk017-preview-2.webp",
-        "/images/books/bk017-preview-3.webp",
-        "/images/books/bk017-preview-4.webp",
-        "/images/books/bk017-preview-5.webp",
-        "/images/books/bk017-preview-6.webp"
-      ],
-      "previewImages": [
-        "/images/books/bk017-preview-1.webp",
-        "/images/books/bk017-preview-2.webp",
-        "/images/books/bk017-preview-3.webp",
-        "/images/books/bk017-preview-4.webp",
-        "/images/books/bk017-preview-5.webp",
-        "/images/books/bk017-preview-6.webp"
-      ],
-      "demoAvailable": true,
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk017-og.webp",
@@ -1721,7 +1698,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK017",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-22T14:57:52.973Z",
+      "updated_at": "2026-10-22T16:22:02.512Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "pageImagesPath": "images/books/BK017"
