@@ -2269,6 +2269,153 @@
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-10-12T00:54:51.073Z",
       "admin_edited": true
+    },
+    {
+      "id": "BK019",
+      "slug": "bk019",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
+      "heading": "चना की खेती — संपूर्ण मार्गदर्शिका",
+      "name": "चना की खेती — संपूर्ण मार्गदर्शिका",
+      "category": "Agriculture",
+      "language": "Hindi",
+      "mrp": 299,
+      "offerPrice": 99,
+      "cover": "/images/books/bk019-cover.webp",
+      "thumbnail": "/images/books/bk019-cover.webp",
+      "banner": "/images/banners/bk019-hero-banner.webp",
+      "status": "active",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "home_hero",
+        "download_funnel",
+        "free_shelf",
+        "demo_shelf",
+        "coming_soon_shelf"
+      ],
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "isComingSoon": false,
+      "is_coming_soon": false,
+      "mainPdf": "",
+      "pdf_url": "",
+      "freePdf": "",
+      "demoPdf": "",
+      "demoImages": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp",
+        "/images/books/bk019-preview-8.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp",
+        "/images/books/bk019-preview-8.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp",
+        "/images/books/bk019-preview-8.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp",
+        "/images/books/bk019-preview-8.webp"
+      ],
+      "demoAvailable": true,
+      "demo_reader_pages": "",
+      "demoPages": "",
+      "og_image": "/images/books/bk019-cover.webp",
+      "og_image_landscape": "/images/books/bk019-cover.webp",
+      "audio_layer": {
+        "enabled": true,
+        "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
+        "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
+        "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
+        "title": "पुस्तक का लाइव ऑडियो परिचय सुनें",
+        "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
+        "mode": "tts",
+        "mp3_url": "",
+        "tts_text": "नमस्कार किसान भाइयों!\nक्या आप चने की खेती करते हैं? क्या आप चाहते हैं कि बुवाई से लेकर कटाई तक खेती के जरूरी फैसले सही जानकारी के आधार पर ले सकें?\nतो पेश है Aarogyam India की रबी फसल मास्टर सीरीज़ का भाग दो, चना की खेती, संपूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका।\nइस किताब में आपको मिलेंगी चने की उन्नत किस्मों के चयन, खेत की तैयारी, बीज दर, बुवाई, बीज उपचार, खाद-पोषण, सिंचाई और खरपतवार प्रबंधन से जुड़ी उपयोगी जानकारियाँ।\nआप जानेंगे चने में उकठा रोग, जड़ सड़न, कॉलर रॉट, झुलसा और अन्य प्रमुख समस्याओं के लक्षण कैसे पहचानें। साथ ही, रोग-कीट प्रबंधन, फसल की देखभाल, कटाई, भंडारण और खेती की लागत व लाभ का हिसाब समझने में भी मदद मिलेगी।\nइस मार्गदर्शिका में कुल 40 अध्याय हैं, जिन्हें खेती के अलग-अलग चरणों के अनुसार व्यवस्थित किया गया है।\nसबसे अच्छी बात, आप इस किताब को केवल 99 रुपये के ऑफर मूल्य पर प्राप्त कर सकते हैं।",
+        "story_text": "नमस्कार किसान भाइयों!\nक्या आप चने की खेती करते हैं? क्या आप चाहते हैं कि बुवाई से लेकर कटाई तक खेती के जरूरी फैसले सही जानकारी के आधार पर ले सकें?\nतो पेश है Aarogyam India की रबी फसल मास्टर सीरीज़ का भाग दो, चना की खेती, संपूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका।\nइस किताब में आपको मिलेंगी चने की उन्नत किस्मों के चयन, खेत की तैयारी, बीज दर, बुवाई, बीज उपचार, खाद-पोषण, सिंचाई और खरपतवार प्रबंधन से जुड़ी उपयोगी जानकारियाँ।\nआप जानेंगे चने में उकठा रोग, जड़ सड़न, कॉलर रॉट, झुलसा और अन्य प्रमुख समस्याओं के लक्षण कैसे पहचानें। साथ ही, रोग-कीट प्रबंधन, फसल की देखभाल, कटाई, भंडारण और खेती की लागत व लाभ का हिसाब समझने में भी मदद मिलेगी।\nइस मार्गदर्शिका में कुल 40 अध्याय हैं, जिन्हें खेती के अलग-अलग चरणों के अनुसार व्यवस्थित किया गया है।\nसबसे अच्छी बात, आप इस किताब को केवल 99 रुपये के ऑफर मूल्य पर प्राप्त कर सकते हैं।",
+        "highlights": [
+          {
+            "icon": "🌱",
+            "text": " चने की उन्नत खेती की पूरी जानकारी: खेत की तैयारी से सही बुवाई और कटाई तक।"
+          },
+          {
+            "icon": "🔎",
+            "text": "रोगों की पहचान और बचाव: उकठा रोग, जड़ सड़न, कॉलर रॉट और अन्य प्रमुख रोगों के लक्षण पहचानें।"
+          },
+          {
+            "icon": "🐛",
+            "text": " कीट नियंत्रण की जानकारी: फली छेदक सहित प्रमुख कीटों की पहचान और एकीकृत प्रबंधन के तरीके।"
+          },
+          {
+            "icon": "🌿",
+            "text": " खाद और पोषण प्रबंधन: चने की फसल के लिए खाद, पोषक तत्व और मिट्टी की जरूरत समझें।"
+          },
+          {
+            "icon": "💧",
+            "text": "सिंचाई और नमी प्रबंधन: फसल की अवस्था के अनुसार पानी और नमी का सही प्रबंधन जानें।"
+          },
+          {
+            "icon": "🌾",
+            "text": "किस्म, बीज और बुवाई: सही किस्म चुनने, बीज की गुणवत्ता और बुवाई की तैयारी की जानकारी।"
+          },
+          {
+            "icon": "🛡️",
+            "text": "सुरक्षित फसल सुरक्षा: दवा के लेबल, सही उपयोग और छिड़काव से पहले जरूरी सावधानियाँ जानें।"
+          },
+          {
+            "icon": "📊 ",
+            "text": "लागत और मुनाफे का हिसाब: खेती का खर्च, उपज, बिक्री और शुद्ध लाभ निकालना सीखें।"
+          },
+          {
+            "icon": "🎯 ",
+            "text": "40 अध्यायों में व्यवस्थित मार्गदर्शन: चने की खेती के जरूरी विषय एक ही किताब में।"
+          }
+        ],
+        "offer_callout": "🔥 धमाकेदार ऑफर: चने की खेती की इस मार्गदर्शिका को अभी सिर्फ ₹99 में प्राप्त करें।💥",
+        "bgm_enabled": true
+      },
+      "features": [
+        "120 पेज की प्रीमियम",
+        "300+ फोटो",
+        "Spray Science",
+        "Free aarogyam sakhi ai"
+      ],
+      "totalPages": 120,
+      "author": "",
+      "version": "2026",
+      "landingPage": "/ebooks/book-landing.html?id=BK019",
+      "checkoutPage": "/ebooks/checkout.html",
+      "readerPage": "/ebooks/reader.html",
+      "updated_at": "2026-10-22T04:08:37.522Z",
+      "admin_edited": true
     }
   ]
 }
