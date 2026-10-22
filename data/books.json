@@ -2112,11 +2112,43 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [],
-      "demo_images": [],
-      "preview_images": [],
-      "previewImages": [],
-      "demoAvailable": false,
+      "demoImages": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp"
+      ],
+      "demo_images": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp"
+      ],
+      "preview_images": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp"
+      ],
+      "previewImages": [
+        "/images/books/bk019-preview-1.webp",
+        "/images/books/bk019-preview-2.webp",
+        "/images/books/bk019-preview-3.webp",
+        "/images/books/bk019-preview-4.webp",
+        "/images/books/bk019-preview-5.webp",
+        "/images/books/bk019-preview-6.webp",
+        "/images/books/bk019-preview-7.webp"
+      ],
+      "demoAvailable": true,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk019-og.webp",
@@ -2173,7 +2205,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK019",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-22T14:42:49.884Z",
+      "updated_at": "2026-10-22T14:49:09.347Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "pageImagesPath": "images/books/BK019"
