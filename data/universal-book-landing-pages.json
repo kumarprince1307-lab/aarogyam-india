@@ -3910,7 +3910,7 @@
     },
     {
       "id": "BK017",
-      "updated_at": "2026-10-22T07:04:19.454Z",
+      "updated_at": "2026-10-22T14:57:52.970Z",
       "admin_edited": true,
       "slug": "bk017",
       "book_type": "paid",
@@ -3930,14 +3930,14 @@
       "publish_targets": [
         "my_library"
       ],
-      "facebook_pixel_id": "disabled",
-      "google_analytics_id": "disabled",
-      "facebook_pixel_enabled": false,
-      "google_analytics_enabled": false,
-      "theme_primary": "#2e7d32",
-      "theme_dark": "#003d00",
+      "facebook_pixel_id": "1671873500553134",
+      "google_analytics_id": "G-2BWPJVQWPK",
+      "facebook_pixel_enabled": true,
+      "google_analytics_enabled": true,
+      "theme_primary": "#d97706",
+      "theme_dark": "#993700",
       "cover_effect": "3d_float",
-      "sticky_button_text": "खरीदें",
+      "sticky_button_text": "BYE NOW ",
       "sections_order": [
         "sec_hero",
         "sec_timer",
@@ -3959,7 +3959,9 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_vip_stack"
+      ],
       "section_banners": {
         "sec_audio": "/images/banners/bk017-sec_audio-banner.webp",
         "sec_why_buy": "/images/banners/bk017-sec_why_buy-banner.webp",
@@ -3969,8 +3971,8 @@
       },
       "og_title": "गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
       "og_description": "सही किस्म का चुनाव, बुवाई, फुटाव बढ़ाने का प्रबंधन, सिंचाई, पोषण, खरपतवार, रोग-कीट नियंत्रण, मौसम प्रबंधन, कटाई-भंडारण और लागत/उपज ऑडिट — गेहूँ की खेती के लिए एक आसान Practical eBook Guide।\n\nPrice/Offer अलग Pricing section में रखें:\nMRP ₹299 | आज सिर्फ ₹99",
-      "og_image": "/images/books/bk017-cover.webp",
-      "og_image_landscape": "/images/books/bk017-cover.webp",
+      "og_image": "/images/books/bk017-og.webp",
+      "og_image_landscape": "/images/books/bk017-og.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -4099,12 +4101,12 @@
           {
             "icon": "🌱",
             "title": "वैज्ञानिक जानकारी",
-            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
+            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी। AUR \n"
           },
           {
             "icon": "📷",
             "title": "300+ वास्तविक फोटो",
-            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी। AUR "
           },
           {
             "icon": "📘",
@@ -4120,7 +4122,12 @@
       },
       "preview_banner": "/images/banners/bk017-sec_preview-banner.webp",
       "demo_images": [
-        "/images/books/kharif-master-guide-2026-preview-01.webp"
+        "/images/books/bk017-preview-1.webp",
+        "/images/books/bk017-preview-2.webp",
+        "/images/books/bk017-preview-3.webp",
+        "/images/books/bk017-preview-4.webp",
+        "/images/books/bk017-preview-5.webp",
+        "/images/books/bk017-preview-6.webp"
       ],
       "demo_reader_pages": "",
       "demoPages": "",
@@ -4140,7 +4147,32 @@
         "विशेषज्ञ सुझाव"
       ],
       "videos": [],
-      "testimonials": [],
+      "testimonials": [
+        {
+          "name": "महेंद्र बिश्नोई",
+          "location": "बीकानेर, राजस्थान",
+          "rating": 5,
+          "gender": "male",
+          "comment": "चने में उकठा रोग और सरसों में चेपा (माहू) से हर साल नुकसान होता था। किताब में बताए अनुसार सही बीज उपचार और नीम आधारित जैविक स्प्रे किया। फसल में 30% लागत घटी और पैदावार भी बढ़िया रही। ₹149 तो सिर्फ एक पंप दवा की कीमत से भी कम है।"
+        },
+        {
+          "name": "अमित वर्मा",
+          "location": "बांदा, उत्तर प्रदेश",
+          "rating": 5,
+          "gender": "male",
+          "comment": "कॉलेज में पेस्टीसाइड साइंस की थ्योरी तो पढ़ाई जाती है, लेकिन फील्ड पर कौन सा ट्रेड नेम किस एक्टिव इंग्रीडिएंट के साथ आता है, यह कहीं नहीं मिलता। यह डायरेक्टरी मेरे प्रैक्टिकल वाइवा और फील्ड नॉलेज के लिए सबसे बेस्ट हैंडबुक है।"
+        }
+      ],
+      "faqs": [
+        {
+          "q": "क्या इसमें बीज उपचार (Seed Treatment) और जड़ उपचार (Drenching) की विधियाँ शामिल हैं?",
+          "a": "हाँ। बुवाई से पहले बीज उपचार कैसे करें, उकठा (Fusarium Wilt) व जड़ गलन (Root/Collar Rot) से बचाव के लिए मिट्टी का उपचार और ड्रेंचिंग किन दवाओं या जैविक फफूंदनाशक से करनी चाहिए, इसके अलग समर्पित अध्याय हैं।"
+        },
+        {
+          "q": "क्या खरीदने के बाद इसे मोबाइल में बिना इंटरनेट (ऑफ़लाइन) भी पढ़ सकते हैं?",
+          "a": "हाँ, पेमेंट पूरा होते ही यह ई-बुक आपके मोबाइल की 'My Library' में लाइफटाइम के लिए सेव हो जाती है। आप इसे खेत में काम करते समय बिना किसी इंटरनेट कनेक्शन के कभी भी ऑफलाइन खोलकर पढ़ सकते हैं।"
+        }
+      ],
       "final_buy": {
         "title": "गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
         "description": "बुवाई से कटाई तक पूरी जानकारी • ज्यादा फुटाव • बेहतर फसल • रोग एवं कीट प्रबंधन",
@@ -4157,7 +4189,9 @@
         "funnel_books": [
           "BK001",
           "BK002",
-          "BK015"
+          "BK015",
+          "BK016",
+          "BK018"
         ],
         "farmer_tip": "",
         "fast_size": "~24 MB",
