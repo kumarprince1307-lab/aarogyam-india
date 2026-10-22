@@ -2292,10 +2292,7 @@
         "my_library",
         "home_page",
         "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "download_funnel"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -2348,8 +2345,8 @@
       "demoAvailable": true,
       "demo_reader_pages": "",
       "demoPages": "",
-      "og_image": "/images/books/bk019-cover.webp",
-      "og_image_landscape": "/images/books/bk019-cover.webp",
+      "og_image": "/images/books/bk019-og.webp",
+      "og_image_landscape": "/images/books/bk019-og.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -2409,12 +2406,12 @@
         "Free aarogyam sakhi ai"
       ],
       "totalPages": 120,
-      "author": "",
+      "author": "Dada Avnish Mishra",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK019",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-22T04:13:34.622Z",
+      "updated_at": "2026-10-22T06:01:37.274Z",
       "admin_edited": true
     }
   ]
