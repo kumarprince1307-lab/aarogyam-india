@@ -168,6 +168,9 @@
     {
       "id": "SUB001",
       "slug": "sub001",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
       "heading": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
       "name": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
       "category": "Agriculture",
@@ -178,19 +181,22 @@
       "thumbnail": "/images/banners/farmer-community-banner.jpeg",
       "banner": "/images/banners/sub001-hero-banner.webp",
       "status": "active",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page"
-      ],
+      "publish_targets": [],
       "store_badge": "best_seller",
       "badge": "best_seller",
       "isComingSoon": false,
+      "is_coming_soon": false,
       "mainPdf": "",
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
+      "demo_reader_pages": "",
+      "demoPages": "",
       "og_image": "/images/banners/farmer-community-banner.jpeg",
       "og_image_landscape": "/images/banners/farmer-community-banner.jpeg",
       "audio_layer": {
@@ -243,9 +249,8 @@
       "landingPage": "/ebooks/book-landing.html?id=SUB001",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-23T23:59:59.999Z",
-      "admin_edited": true,
-      "is_coming_soon": false
+      "updated_at": "2026-10-22T06:48:13.966Z",
+      "admin_edited": true
     },
     {
       "id": "BK006",
