@@ -1702,12 +1702,7 @@
       "banner": "/images/banners/bk017-hero-banner.webp",
       "status": "active",
       "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "download_funnel"
+        "my_library"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -1724,8 +1719,8 @@
       "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
-      "og_image": "/images/books/bk017-og.webp",
-      "og_image_landscape": "/images/books/bk017-og.webp",
+      "og_image": "/images/books/bk017-cover.webp",
+      "og_image_landscape": "/images/books/bk017-cover.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -1780,7 +1775,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK017",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-22T06:59:57.322Z",
+      "updated_at": "2026-10-22T07:04:19.454Z",
       "admin_edited": true
     },
     {
