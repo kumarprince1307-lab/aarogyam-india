@@ -1631,22 +1631,42 @@
       "freePdf": "",
       "demoPdf": "",
       "demoImages": [
-        "/images/books/kharif-master-guide-2026-preview-01.webp"
+        "/images/books/bk017-preview-1.webp",
+        "/images/books/bk017-preview-2.webp",
+        "/images/books/bk017-preview-3.webp",
+        "/images/books/bk017-preview-4.webp",
+        "/images/books/bk017-preview-5.webp",
+        "/images/books/bk017-preview-6.webp"
       ],
       "demo_images": [
-        "/images/books/kharif-master-guide-2026-preview-01.webp"
+        "/images/books/bk017-preview-1.webp",
+        "/images/books/bk017-preview-2.webp",
+        "/images/books/bk017-preview-3.webp",
+        "/images/books/bk017-preview-4.webp",
+        "/images/books/bk017-preview-5.webp",
+        "/images/books/bk017-preview-6.webp"
       ],
       "preview_images": [
-        "/images/books/kharif-master-guide-2026-preview-01.webp"
+        "/images/books/bk017-preview-1.webp",
+        "/images/books/bk017-preview-2.webp",
+        "/images/books/bk017-preview-3.webp",
+        "/images/books/bk017-preview-4.webp",
+        "/images/books/bk017-preview-5.webp",
+        "/images/books/bk017-preview-6.webp"
       ],
       "previewImages": [
-        "/images/books/kharif-master-guide-2026-preview-01.webp"
+        "/images/books/bk017-preview-1.webp",
+        "/images/books/bk017-preview-2.webp",
+        "/images/books/bk017-preview-3.webp",
+        "/images/books/bk017-preview-4.webp",
+        "/images/books/bk017-preview-5.webp",
+        "/images/books/bk017-preview-6.webp"
       ],
-      "demoAvailable": false,
+      "demoAvailable": true,
       "demo_reader_pages": "",
       "demoPages": "",
-      "og_image": "/images/books/bk017-cover.webp",
-      "og_image_landscape": "/images/books/bk017-cover.webp",
+      "og_image": "/images/books/bk017-og.webp",
+      "og_image_landscape": "/images/books/bk017-og.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -1701,7 +1721,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK017",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-22T07:04:19.454Z",
+      "updated_at": "2026-10-22T14:57:52.973Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "pageImagesPath": "images/books/BK017"
