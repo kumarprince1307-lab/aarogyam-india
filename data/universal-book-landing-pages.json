@@ -3919,7 +3919,7 @@
       "book_name": "गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
       "author": "",
       "language": "Hindi",
-      "totalPages": 120,
+      "totalPages": 40,
       "version": "2026",
       "category": "Agriculture",
       "status": "active",
@@ -4119,7 +4119,9 @@
         ]
       },
       "preview_banner": "/images/banners/bk017-sec_preview-banner.webp",
-      "demo_images": [],
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
       "demo_reader_pages": "",
       "demoPages": "",
       "suggested_books_list": [],
@@ -5423,7 +5425,7 @@
       "book_name": "चना की खेती — संपूर्ण मार्गदर्शिका",
       "author": "Dada Avnish Mishra",
       "language": "Hindi",
-      "totalPages": 120,
+      "totalPages": 44,
       "version": "2026",
       "category": "Agriculture",
       "status": "active",

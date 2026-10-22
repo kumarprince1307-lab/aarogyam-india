@@ -86,13 +86,23 @@ async function verifyUserAccessAndSession(targetBookId) {
         console.warn("books.json fetch note:", e);
     }
 
+    const mergeBookData = (catalogBook, storedBook) => {
+        const merged = { ...catalogBook, ...storedBook };
+        if (catalogBook?.hasWebpPages === true) {
+            merged.hasWebpPages = true;
+            merged.pageImagesPath = catalogBook.pageImagesPath;
+            merged.totalPages = catalogBook.totalPages;
+        }
+        return merged;
+    };
+
     // Merge custom books & studio free demo books
     try {
         const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
         if (Array.isArray(customBooks)) {
             customBooks.forEach(cb => {
                 const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === cb.id.toUpperCase());
-                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...cb };
+                if (idx >= 0) jsonBooks[idx] = mergeBookData(jsonBooks[idx], cb);
                 else jsonBooks.push(cb);
             });
         }
@@ -103,7 +113,7 @@ async function verifyUserAccessAndSession(targetBookId) {
         if (Array.isArray(freeDemoBooks)) {
             freeDemoBooks.forEach(fb => {
                 const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === fb.id.toUpperCase());
-                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...fb };
+                if (idx >= 0) jsonBooks[idx] = mergeBookData(jsonBooks[idx], fb);
                 else jsonBooks.push(fb);
             });
         }
@@ -131,7 +141,7 @@ async function verifyUserAccessAndSession(targetBookId) {
                     demoImages: previewImgList.length > 0 ? previewImgList : (jsonBooks[idx]?.demoImages || []),
                     targetMainBook: lp.targetMainBook || lp.id.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || 'BK001'
                 };
-                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...normalized };
+                if (idx >= 0) jsonBooks[idx] = mergeBookData(jsonBooks[idx], normalized);
                 else jsonBooks.push(normalized);
             });
         }
@@ -156,7 +166,7 @@ async function verifyUserAccessAndSession(targetBookId) {
                     demoImages: previewImgList.length > 0 ? previewImgList : (jsonBooks[idx]?.demoImages || []),
                     targetMainBook: lp.targetMainBook || lp.id.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || 'BK001'
                 };
-                if (idx >= 0) jsonBooks[idx] = { ...jsonBooks[idx], ...normalized };
+                if (idx >= 0) jsonBooks[idx] = mergeBookData(jsonBooks[idx], normalized);
                 else jsonBooks.push(normalized);
             });
         }

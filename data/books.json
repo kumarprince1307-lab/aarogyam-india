@@ -1630,10 +1630,18 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [],
-      "demo_images": [],
-      "preview_images": [],
-      "previewImages": [],
+      "demoImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
+      "demo_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
+      "previewImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
       "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
@@ -1687,14 +1695,16 @@
         "Free Bonus PDF",
         "120+ रंगीन पेज"
       ],
-      "totalPages": 120,
+      "totalPages": 40,
       "author": "",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK017",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-10-22T07:04:19.454Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "hasWebpPages": true,
+      "pageImagesPath": "images/books/BK017"
     },
     {
       "id": "DEMO-BK016",
@@ -2157,14 +2167,16 @@
         "Spray Science",
         "Free aarogyam sakhi ai"
       ],
-      "totalPages": 120,
+      "totalPages": 44,
       "author": "Dada Avnish Mishra",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK019",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
       "updated_at": "2026-10-22T06:51:10.780Z",
-      "admin_edited": true
+      "admin_edited": true,
+      "hasWebpPages": true,
+      "pageImagesPath": "images/books/BK019"
     }
   ]
 }

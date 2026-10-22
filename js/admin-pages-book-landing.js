@@ -2814,7 +2814,15 @@ Instant Download & Lifetime Access
       if (Array.isArray(customBooks)) {
         customBooks.forEach(cb => {
           const idx = allBooks.findIndex(x => x.id === cb.id);
-          if (idx >= 0) allBooks[idx] = cb;
+          if (idx >= 0) {
+            const catalogBook = allBooks[idx];
+            allBooks[idx] = { ...catalogBook, ...cb };
+            if (catalogBook.hasWebpPages === true) {
+              allBooks[idx].hasWebpPages = true;
+              allBooks[idx].pageImagesPath = catalogBook.pageImagesPath;
+              allBooks[idx].totalPages = catalogBook.totalPages;
+            }
+          }
           else allBooks.push(cb);
         });
       }
@@ -6951,11 +6959,8 @@ Instant Download & Lifetime Access
     }
 
     if (!reviews || reviews.length === 0) {
-      reviews = [
-        { name: 'रामेश्वर पटेल', location: 'इंदौर, म.प्र.', rating: 5, gender: 'male', comment: 'यह पुस्तक बहुत ही उपयोगी है। इसमें दी गई दवाइयों की मात्रा और स्प्रे का समय बिल्कुल सटीक है।' },
-        { name: 'विकास शर्मा', location: 'उज्जैन, म.प्र.', rating: 5, gender: 'male', comment: 'रंगीन तस्वीरों के साथ रोगों की पहचान इतनी आसान हो गई है कि कोई भी किसान खुद समस्या समझ सकता है।' },
-        { name: 'सुनीता देवी', location: 'जबलपुर, म.प्र.', rating: 5, gender: 'female', comment: 'घर बैठे मोबाइल में पूरी वैज्ञानिक विधि सीखने को मिली। बहुत बहुत धन्यवाद!' }
-      ];
+      showToast(`❌ '${cleanTarget}' के JSON में कोई रिव्यू नहीं मिला। कोई sample review नहीं जोड़ा गया।`, 'error');
+      return;
     }
 
     currentReviews = reviews.map(r => ({
@@ -7999,6 +8004,8 @@ Instant Download & Lifetime Access
           { icon: 'fa-globe', text: '150+ वेरिफाइड वेबसाइट्स लिस्ट' },
           { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
         ];
+      } else if (bookId === 'BK017' || bookId === 'BK019' || page.id === 'BK017' || page.id === 'BK019') {
+        currentKpis = [];
       } else {
         currentKpis = [
           { icon: 'fa-seedling', text: '120 पेज की प्रीमियम' },
@@ -8010,8 +8017,11 @@ Instant Download & Lifetime Access
       setVal('blp_why_desc', page.why_read?.subtitle || '');
 
       currentVideos = page.videos || [];
-      currentReviews = page.testimonials || [];
-      currentDemoImages = page.demo_images || [];
+      currentReviews = [page.testimonials, page.reviews, page.customer_reviews]
+        .find(reviews => Array.isArray(reviews) && reviews.length > 0) || [];
+      const bookData = allBooks.find(book => book && book.id === bId) || {};
+      currentDemoImages = [page.demo_images, page.demoImages, page.preview_images, bookData.demoImages, bookData.preview_images]
+        .find(images => Array.isArray(images) && images.length > 0) || [];
       setVal('blp_demo_reader_pages', page.demo_reader_pages || page.demoPages || '');
       currentBonuses = page.bonuses || page.bonus_books || [];
       currentBonusPoints = page.bonus_points || [
@@ -8031,7 +8041,7 @@ Instant Download & Lifetime Access
       setVal('blp_book_name', page.book_name || page.bookName || page.hero?.title || page.heading || '');
       setVal('blp_book_author', page.author || '');
       setVal('blp_book_language', page.language || 'Hindi');
-      setVal('blp_book_pages', page.totalPages || 120);
+      setVal('blp_book_pages', page.totalPages || 0);
       setVal('blp_book_version', page.version || '2026');
       currentFaqs = page.faqs || [];
       currentSectionsOrder = (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) ?
@@ -8448,6 +8458,14 @@ Instant Download & Lifetime Access
       }
     }
 
+    const existingBookData = allBooks.find(book => book && book.id === bId) || {};
+    const enteredTotalPages = parseInt(document.getElementById('blp_book_pages')?.value, 10);
+    const totalPages = existingBookData.hasWebpPages === true
+      ? (Number(existingBookData.totalPages) || 0)
+      : (Number.isInteger(enteredTotalPages) && enteredTotalPages > 0
+        ? enteredTotalPages
+        : (Number(existingBookData.totalPages) || 0));
+
     const pageData = {
       id: bId,
       updated_at: new Date().toISOString(),
@@ -8459,7 +8477,7 @@ Instant Download & Lifetime Access
       book_name: (document.getElementById('blp_book_name')?.value || '').trim(),
       author: (document.getElementById('blp_book_author')?.value || '').trim(),
       language: (document.getElementById('blp_book_language')?.value || 'Hindi').trim(),
-      totalPages: parseInt(document.getElementById('blp_book_pages')?.value, 10) || 120,
+      totalPages,
       version: (document.getElementById('blp_book_version')?.value || '2026').trim(),
       category: category,
       status: isComingSoon ? 'coming_soon' : (document.getElementById('blp_status')?.value || 'active'),
@@ -8556,7 +8574,7 @@ Instant Download & Lifetime Access
       table_of_contents: currentTocPoints,
       videos: currentVideos,
       testimonials: currentReviews,
-      faqs: currentFaqs.length > 0 ? currentFaqs : undefined,
+      faqs: currentFaqs,
       final_buy: {
         title: (document.getElementById('blp_final_buy_title')?.value || '').trim() || title,
         description: (document.getElementById('blp_final_buy_desc')?.value || '').trim() || (document.getElementById('blp_hero_subtitle')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || '').trim(),
@@ -8586,11 +8604,18 @@ Instant Download & Lifetime Access
       admin_edited: true
     };
 
+    const existingLandingData = allLandingPages.find(page => page && page.id === bId);
+    Object.keys(pageData).forEach(key => {
+      if (pageData[key] === undefined) delete pageData[key];
+    });
+    Object.assign(pageData, { ...existingLandingData, ...pageData });
+
     const existingIdx = allLandingPages.findIndex(p => p.id === bId);
     if (existingIdx >= 0) allLandingPages[existingIdx] = pageData;
     else allLandingPages.unshift(pageData);
 
     const newBookObj = {
+      ...existingBookData,
       id: bId,
       slug: bId.toLowerCase(),
       book_type: bookType,
@@ -8663,6 +8688,7 @@ Instant Download & Lifetime Access
     let syncSuccess = false;
     let syncErrorMsg = '';
     const apiUrl = getAutoSyncApiUrl();
+    const isLocalEditor = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
 
     try {
       // Step 1: Upload any media files (Cover, Banner, Demo pages, Section Banners, PDFs) directly to Git as assets
@@ -8675,7 +8701,7 @@ Instant Download & Lifetime Access
           }
           const upRes = await syncAssetToGitHub(fileItem.path, fileItem.base64);
           if (!upRes.success) {
-            console.warn(`Asset upload warning for ${fileItem.path}:`, upRes.error);
+            throw new Error(`Asset upload failed for ${fileItem.path}: ${upRes.error || 'Unknown error'}`);
           }
         }
       }
@@ -8686,7 +8712,7 @@ Instant Download & Lifetime Access
       }
 
       // 2A. Direct Local Disk Save (Port 5505) if on localhost
-      if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      if (isLocalEditor) {
         try {
           const localSyncRes = await fetch('http://127.0.0.1:5505', {
             method: 'POST',
@@ -8708,28 +8734,34 @@ Instant Download & Lifetime Access
         }
       }
 
-      // 2B. Server PHP API (Atomic JSON Write with Safety Backup)
-      try {
-        const phpRes = await fetch('/api/save_book_landing.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pageData,
-            bookData: newBookObj,
-            uploadedFiles: []
-          })
-        });
-        const phpData = await phpRes.json().catch(() => ({}));
-        if (phpRes.ok && phpData.success) {
-          syncSuccess = true;
-          console.log('[Book Landing PHP Sync] Saved to server JSON:', bId);
+      // PHP saves are local fallbacks only; production must confirm the GitHub sync.
+      if (isLocalEditor && !syncSuccess) {
+        try {
+          const phpRes = await fetch('/api/save_book_landing.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pageData,
+              bookData: newBookObj,
+              uploadedFiles: []
+            })
+          });
+          const phpData = await phpRes.json().catch(() => ({}));
+          if (phpRes.ok && phpData.success) {
+            syncSuccess = true;
+            console.log('[Book Landing PHP Sync] Saved to local server JSON:', bId);
+          }
+        } catch (phpErr) {
+          console.warn('[Book Landing PHP Sync] Local fallback failed:', phpErr);
         }
-      } catch (phpErr) {
-        // Fallback silently if PHP server not present locally
       }
 
-      // 2C. Remote / Auto-sync fallback (if local / php didn't handle it or in production)
-      if (!syncSuccess) {
+      if (isLocalEditor && !syncSuccess) {
+        throw new Error('Local disk sync failed. Your edits are still open; please retry.');
+      }
+
+      // Production publishes only after the repository API confirms the save.
+      if (!isLocalEditor) {
         const syncRes = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -8745,7 +8777,7 @@ Instant Download & Lifetime Access
         if (syncRes.ok && syncData.success) {
           syncSuccess = true;
         } else {
-          syncErrorMsg = syncData.error || `HTTP ${syncRes.status}`;
+          throw new Error(syncData.error || `GitHub sync failed: HTTP ${syncRes.status}`);
         }
       }
 
@@ -8771,15 +8803,14 @@ Instant Download & Lifetime Access
         localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
       } catch (e) {}
 
-      showToast(`🎉 बधाई! पुस्तक (${bId}) Git पर 100% लाइव हो गई! Vercel ऑटो-डिप्लॉयमेंट चालू हो गया है।`, 'success');
+      showToast(isLocalEditor
+        ? `✅ पुस्तक (${bId}) लोकल डिस्क पर सुरक्षित हो गई।`
+        : `🎉 पुस्तक (${bId}) GitHub पर सुरक्षित और deployment के लिए publish हो गई।`, 'success');
       builderCard.style.display = 'none';
       resetBookBuilder();
       await loadAllData();
     } else {
-      showToast(`⚠️ Git सिंक मैसेज: ${syncErrorMsg || 'ऑफ़लाइन'} (डेटा लोकल सुरक्षित है)`, 'warning');
-      builderCard.style.display = 'none';
-      resetBookBuilder();
-      await loadAllData();
+      showToast(`❌ Git सिंक नहीं हुआ: ${syncErrorMsg || 'ऑफ़लाइन'} आपकी एडिटिंग स्क्रीन खुली है; डेटा हटाया नहीं गया।`, 'error');
     }
   }
 

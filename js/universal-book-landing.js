@@ -16,6 +16,12 @@
 
   let pendingAuthCallback = null;
 
+  function isAdminManagedLanding(landing = currentLandingData, book = currentBookData) {
+    const bookId = String(landing?.id || book?.id || currentBookId).toUpperCase();
+    return landing?.admin_edited === true || book?.admin_edited === true ||
+      ['BK017', 'BK019'].includes(bookId);
+  }
+
   // 1. User Registration & Session Checker
   window.isUserRegistered = function() {
     try {
@@ -571,13 +577,13 @@
     Object.keys(source).forEach(key => {
       const sVal = source[key];
       const tVal = target[key];
-      if (sVal === undefined || sVal === null || sVal === '') {
+      if (sVal === undefined || sVal === null) {
         return;
       }
       if (typeof sVal === 'object' && !Array.isArray(sVal)) {
         result[key] = deepMergeSafe(tVal || {}, sVal);
       } else if (Array.isArray(sVal)) {
-        result[key] = (sVal.length > 0) ? sVal : (tVal || []);
+        result[key] = sVal;
       } else {
         result[key] = sVal;
       }
@@ -675,7 +681,7 @@
             const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
             if (!jsonPage) {
               allLandingPages.push(item);
-            } else if (item.admin_edited || !jsonPage.updated_at || (item.updated_at && (new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
+            } else if (!jsonPage.updated_at || (item.updated_at && (new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
               allLandingPages[idx] = deepMergeSafe(allLandingPages[idx], item);
             }
           });
@@ -953,6 +959,7 @@
     const b = currentBookData || {};
     const l = currentLandingData || {};
     const hero = l.hero || {};
+    const isAdminManagedBook = isAdminManagedLanding(l, b);
 
     // Dynamic Theme Color Application
     if (l.theme_primary) {
@@ -963,15 +970,16 @@
     }
 
     const title = hero.title || b.heading || b.name || 'Aarogyam India eBook';
-    const subtitle = hero.subtitle || 'सम्पूर्ण Practical Guide';
-    const desc = hero.description || b.description || 'बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।';
+    const subtitle = hero.subtitle || (isAdminManagedBook ? '' : 'सम्पूर्ण Practical Guide');
+    const desc = hero.description || b.description || (isAdminManagedBook ? '' : 'बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।');
     const mrp = hero.mrp || b.mrp || 299;
     const offer = hero.offer_price || b.offerPrice || 99;
-    const badge = hero.offer_badge || 'Launch Offer';
+    const badge = hero.offer_badge || (isAdminManagedBook ? '' : 'Launch Offer');
     const cover = hero.cover_image || b.cover || b.thumbnail || '';
     const banner = hero.banner_image || b.banner || '';
-    const ratingScore = hero.rating_score || '4.9';
-    const ratingCount = hero.rating_count || '120+ Ratings';
+    const ratingScore = hero.rating_score || (isAdminManagedBook ? '' : '4.9');
+    const ratingCount = hero.rating_count || (isAdminManagedBook ? '' : '120+ Ratings');
+    const ratingText = ratingScore && ratingCount ? `${ratingScore} (${ratingCount})` : (ratingScore || ratingCount);
 
     // 1. SEO & Document Title
     document.title = `${title} | Aarogyam India`;
@@ -981,10 +989,10 @@
     if (descEl) descEl.setAttribute('content', desc);
 
     // 2. Hero Section
-    setElemText('hero-tag', hero.tag || '🌾 Bestseller Agriculture eBook');
+    setElemText('hero-tag', hero.tag || (isAdminManagedBook ? '' : '🌾 Bestseller Agriculture eBook'));
     setElemText('hero-title', title);
     setElemText('hero-subtitle', subtitle);
-    setElemText('hero-rating-text', `${ratingScore} (${ratingCount})`);
+    setElemText('hero-rating-text', ratingText);
     setElemText('hero-desc', desc);
     setElemText('hero-old-price', `₹${mrp}`);
     setElemText('hero-new-price', `₹${offer}`);
@@ -1117,7 +1125,8 @@
         { icon: 'fa-circle-check', text: 'Scientific Guide' },
         { icon: 'fa-gift', text: 'Free Bonus PDF' }
       ];
-      const feats = (hero.features && hero.features.length > 0) ? hero.features : ((b.features && b.features.length > 0) ? b.features : defaultFeats);
+      const feats = (hero.features && hero.features.length > 0) ? hero.features :
+        ((b.features && b.features.length > 0) ? b.features : (isAdminManagedBook ? [] : defaultFeats));
       featWrap.innerHTML = feats.map(f => {
         const item = parseKpiItem(f);
         let fIconHtml = '<i class="fa-solid fa-check"></i>';
@@ -1390,8 +1399,8 @@
 
     // 5. Why Buy Section (Icon & Emoji rendering safety)
     const why = l.why_read || {};
-    setElemText('why-title', why.title || 'यह पुस्तक क्यों खरीदें?');
-    setElemText('why-desc', why.subtitle || why.desc || 'यह केवल एक eBook नहीं, बल्कि सम्पूर्ण Practical Guide है।');
+    setElemText('why-title', why.title || (isAdminManagedBook ? '' : 'यह पुस्तक क्यों खरीदें?'));
+    setElemText('why-desc', why.subtitle || why.desc || (isAdminManagedBook ? '' : 'यह केवल एक eBook नहीं, बल्कि सम्पूर्ण Practical Guide है।'));
     const whyGrid = document.getElementById('why-cards-grid');
     const defaultWhyCards = [
       { icon: '🌱', title: 'वैज्ञानिक जानकारी', desc: 'कृषि वैज्ञानिकों द्वारा तैयार 100% प्रमाणित एवं Practical जानकारी।' },
@@ -1399,7 +1408,8 @@
       { icon: '📘', title: 'Step by Step Guide', desc: 'बीज उपचार, खाद शेड्यूल और स्प्रे फॉर्मूला की सम्पूर्ण जानकारी।' },
       { icon: '🎁', title: 'Free Bonus Gift', desc: 'इस पुस्तक के साथ विशेष बोनस सामग्री और WhatsApp सपोर्ट मुफ्त।' }
     ];
-    const cards = (why.cards && Array.isArray(why.cards) && why.cards.length > 0) ? why.cards : defaultWhyCards;
+    const cards = (why.cards && Array.isArray(why.cards) && why.cards.length > 0) ? why.cards :
+      (isAdminManagedBook ? [] : defaultWhyCards);
     if (whyGrid) {
       whyGrid.innerHTML = cards.map(c => {
         let iconHtml = '🌱';
@@ -1451,7 +1461,7 @@
     }
 
     // Dynamic Guarantee: If empty, auto-resolve correct book previews
-    if (!rawDemoList || rawDemoList.length === 0) {
+    if ((!rawDemoList || rawDemoList.length === 0) && !isAdminManagedBook) {
       if (bIdUpper.includes('015') || bIdUpper.includes('SABJI')) {
         rawDemoList = [
           '/images/books/bk015-preview-1.webp',
@@ -1494,13 +1504,14 @@
     
     const demoImages = rawDemoList.map(url => window.resolveImageSrc(url)).filter(Boolean);
 
-    if (galleryGrid && demoImages.length > 0) {
+    if (galleryGrid) {
       window.activePreviewGalleryList = demoImages;
       galleryGrid.innerHTML = demoImages.map((imgUrl, i) => `
         <div class="preview-card" onclick="window.openPinchZoomLightbox('${imgUrl}')" style="cursor:zoom-in;">
           <img src="${imgUrl}" alt="Preview Page ${i + 1}" loading="lazy" onerror="window.handleImageError(this)">
         </div>
       `).join('');
+      galleryGrid.style.display = demoImages.length ? '' : 'none';
     }
 
     const prevBannerWrap = document.getElementById('preview-banner-wrap');
@@ -1519,6 +1530,7 @@
     // Dynamic Action Buttons in Preview Section
     const previewActionWrap = document.querySelector('#sec-sample-book .preview-action');
     if (previewActionWrap) {
+      const demoPages = l.demo_reader_pages || l.demoPages || b.demo_reader_pages || b.demoPages || '';
       const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
       const isDemo = (bId.startsWith('DEMO') || l.book_type === 'demo' || b.type === 'demo');
       const targetMain = (l.targetMainBook || b.targetMainBook || bId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (bId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
@@ -1534,20 +1546,20 @@
     }
 
     if (previewSection) {
-      previewSection.style.display = 'block';
+      const hasConfiguredPreview = demoImages.length > 0 || Boolean(l.preview_banner || l.demoPdf || l.demo_pdf || b.demoPdf);
+      previewSection.style.display = isAdminManagedBook && !hasConfiguredPreview ? 'none' : 'block';
     }
 
     // 7. Separate AI Support Section (Single Crisp Image, No Duplicates, No Broken Icon)
     const aiSupportSec = document.getElementById('sec-ai-support');
     if (aiSupportSec) {
-      aiSupportSec.style.display = 'block';
-      const aiTitle = l.ai_support_title || '🌾 FREE AI WHATSAPP SUPPORT & SPRAY FORMULA 🎁';
-      const aiDesc = l.ai_support_desc || 'किताब पढ़ते समय अगर कोई बात समझ न आए, पोषक तत्वों की पहचान, महत्वपूर्ण टिप्स या फसल की समस्या हो, तो परेशान होने की जरूरत नहीं। बस WhatsApp Help बटन पर क्लिक करें और अपनी समस्या बताएं।';
+      const aiTitle = l.ai_support_title || (isAdminManagedBook ? '' : '🌾 FREE AI WHATSAPP SUPPORT & SPRAY FORMULA 🎁');
+      const aiDesc = l.ai_support_desc || (isAdminManagedBook ? '' : 'किताब पढ़ते समय अगर कोई बात समझ न आए, पोषक तत्वों की पहचान, महत्वपूर्ण टिप्स या फसल की समस्या हो, तो परेशान होने की जरूरत नहीं। बस WhatsApp Help बटन पर क्लिक करें और अपनी समस्या बताएं।');
       
       // Determine the single crisp AI support artwork
       const rawBId = (b.id || currentBookId || 'BK001').toUpperCase();
       let aiArtwork = l.ai_support_cover || (l.section_banners || {}).sec_ai_support || l.ai_support_banner || '';
-      if (!aiArtwork || (rawBId.includes('015') && (aiArtwork.includes('farmer-community') || aiArtwork.includes('kharif')))) {
+      if ((!aiArtwork && !isAdminManagedBook) || (rawBId.includes('015') && (aiArtwork.includes('farmer-community') || aiArtwork.includes('kharif')))) {
         if (rawBId.includes('015')) {
           aiArtwork = '/images/banners/bk015-sec_ai_support-banner.webp';
         } else if (rawBId.includes('002')) {
@@ -1559,7 +1571,7 @@
 
       const aiCoverImg = document.getElementById('ai-support-cover-img');
       const aiCoverWrap = aiCoverImg?.closest('.bonus-image');
-      if (aiCoverImg) {
+      if (aiCoverImg && aiArtwork) {
         aiCoverImg.src = window.resolveImageSrc(aiArtwork);
         aiCoverImg.style.display = 'block';
         aiCoverImg.onerror = function() {
@@ -1570,10 +1582,14 @@
             if (aiCoverWrap) aiCoverWrap.style.display = 'none';
           }
         };
+      } else if (aiCoverImg) {
+        aiCoverImg.removeAttribute('src');
+        aiCoverImg.style.display = 'none';
       }
       if (aiCoverWrap) {
-        aiCoverWrap.style.display = 'block';
+        aiCoverWrap.style.display = aiArtwork ? 'block' : 'none';
       }
+      aiSupportSec.style.display = (aiTitle || aiDesc || aiArtwork || (l.bonus_points || []).length) ? 'block' : 'none';
 
       // Ensure any duplicate banner wrapper is removed from sec-ai-support
       const dupBanner = aiSupportSec.querySelector('.ubl-section-banner-wrap');
@@ -1584,13 +1600,13 @@
 
       const aiListEl = document.getElementById('ai-support-list-items');
       if (aiListEl) {
-        const points = (l.bonus_points && l.bonus_points.length > 0) ? l.bonus_points : [
+        const points = (l.bonus_points && l.bonus_points.length > 0) ? l.bonus_points : (isAdminManagedBook ? [] : [
           '24×7 WhatsApp Priority Support',
           '💬 आपका सवाल → हमारी मदद → आसान समाधान',
           '📖 किताब की जानकारी समझने में सहायता',
           '🌱 फसल संबंधी विशेष स्प्रे फॉर्मूला',
           '📱 Mobile Friendly PDF & Lifetime Access'
-        ];
+        ]);
         aiListEl.innerHTML = points.map(pt => `<li>✅ ${escapeHtml(pt)}</li>`).join('');
       }
     }
@@ -1637,9 +1653,9 @@
 
         bonusWrapper.style.display = 'block';
       freeBooksGrid.innerHTML = renderList.map(bn => {
-        const bImg = window.resolveImageSrc(bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp');
-        const bTitle = bn.title || 'विशेष बोनस ई-बुक';
-        const bDesc = bn.description || 'इस मुख्य पुस्तक के साथ बिल्कुल फ्री लाइफटाइम एक्सेस।';
+        const bImg = window.resolveImageSrc(bn.image || bn.cover || (isAdminManagedBook ? '' : '/images/books/kharif-master-guide-2026-cover.webp'));
+        const bTitle = bn.title || (isAdminManagedBook ? '' : 'विशेष बोनस ई-बुक');
+        const bDesc = bn.description || (isAdminManagedBook ? '' : 'इस मुख्य पुस्तक के साथ बिल्कुल फ्री लाइफटाइम एक्सेस।');
         const bMrp = bn.mrp || 199;
         
         // Parse individual KPI features for this free book
@@ -1650,7 +1666,7 @@
           kpis = bn.features.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
         } else if (Array.isArray(bn.kpis) && bn.kpis.length > 0) {
           kpis = bn.kpis;
-        } else {
+        } else if (!isAdminManagedBook) {
           kpis = ['120+ रंगीन पेज', '300+ फोटो', 'Free Lifetime Access'];
         }
 
@@ -1661,7 +1677,7 @@
             </div>
             <div>
               <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;">
-                <img src="${bImg}" alt="${escapeHtml(bTitle)}" onerror="window.handleImageError(this)" style="width:75px;height:105px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);flex-shrink:0;">
+                ${bImg ? `<img src="${bImg}" alt="${escapeHtml(bTitle)}" onerror="window.handleImageError(this)" style="width:75px;height:105px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);flex-shrink:0;">` : ''}
                 <div style="flex:1;">
                   <h4 style="margin:0 0 6px 0;font-size:1.05rem;font-weight:800;color:#065f46;line-height:1.3;">${escapeHtml(bTitle)}</h4>
                   <div style="font-size:0.82rem;margin-bottom:6px;">
@@ -1703,8 +1719,10 @@
     const details = l.book_details || l.bookDetails || {};
     setElemText('spec-name', details.name || details.title || l.book_name || l.bookName || hero.title || title);
     setElemText('spec-lang', details.language || l.language || b.language || 'Hindi');
-    setElemText('spec-pages', `${details.pages || l.totalPages || l.total_pages || b.totalPages || 120}+ Pages`);
-    setElemText('spec-images', `${details.images || l.totalImages || l.total_images || 300}+ Real Images`);
+    const pageCount = details.pages || l.totalPages || l.total_pages || b.totalPages || (isAdminManagedBook ? 0 : 120);
+    const imageCount = details.images || l.totalImages || l.total_images || (isAdminManagedBook ? 0 : 300);
+    setElemText('spec-pages', pageCount ? `${pageCount} Pages` : '');
+    setElemText('spec-images', imageCount ? `${imageCount}+ Real Images` : '');
     setElemText('spec-author', details.author || l.author || b.author || 'Aarogyam India');
     setElemText('spec-version', `${details.version || l.version || b.version || '2026'} Edition`);
 
@@ -1721,7 +1739,8 @@
       'फसल सुरक्षा व अधिक पैदावार के गुप्त उपाय',
       'कृषि विशेषज्ञों के विशेष सुझाव'
     ];
-    const tocPoints = (l.table_of_contents && l.table_of_contents.length > 0) ? l.table_of_contents : defaultToc;
+    const tocPoints = (l.table_of_contents && l.table_of_contents.length > 0) ? l.table_of_contents :
+      (isAdminManagedBook ? [] : defaultToc);
     if (tocList) {
       tocList.innerHTML = tocPoints.map(ch => `<li>✅ ${escapeHtml(ch)}</li>`).join('');
     }
@@ -1736,7 +1755,8 @@
       { q: 'क्या बिना डाउनलोड किए भी किताब पढ़ सकता हूँ?', a: '✅ हाँ। Reader खोलिए और सीधे मोबाइल में पढ़ना शुरू कीजिए।' },
       { q: 'यदि कोई समस्या हो तो संपर्क कैसे करें?', a: 'आप हमारी 24×7 WhatsApp Support टीम से सीधे संपर्क कर सकते हैं।' }
     ];
-    const faqs = (l.faqs && l.faqs.length > 0) ? l.faqs : defaultFaqs;
+    const faqs = (l.faqs && l.faqs.length > 0) ? l.faqs :
+      (isAdminManagedBook ? [] : defaultFaqs);
     if (faqWrap) {
       faqWrap.innerHTML = faqs.map(f => {
         const question = f.q || f.question || '';
@@ -1903,13 +1923,21 @@
     const book = currentBookData || {};
     const hero = landing.hero || {};
     const details = landing.book_details || landing.bookDetails || {};
+    const isAdminManagedBook = isAdminManagedLanding(landing, book);
     const name = details.name || details.title || landing.book_name || landing.bookName || hero.title || book.heading || book.name || currentBookId;
     setElemText('spec-name', name);
     setElemText('spec-lang', details.language || landing.language || book.language || 'Hindi');
-    setElemText('spec-pages', `${details.pages || landing.totalPages || landing.total_pages || book.totalPages || 120}+ Pages`);
+    const verifiedPageCount = book.hasWebpPages === true && Number(book.totalPages) > 0
+      ? Number(book.totalPages)
+      : 0;
+    const pageCount = verifiedPageCount || details.pages || landing.totalPages || landing.total_pages || book.totalPages;
+    setElemText('spec-pages', pageCount ? `${pageCount} Pages` : '');
     setElemText('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
     setElemText('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
-    setElemText('spec-bonus', (Array.isArray(landing.bonuses) && landing.bonuses.length > 0) ? `${landing.bonuses.length} Free Bonus Books + WhatsApp Support` : 'Free Bonus PDF + 24×7 AI Support');
+    const bonusCount = Array.isArray(landing.bonuses) ? landing.bonuses.length : (Array.isArray(landing.bonus_books) ? landing.bonus_books.length : 0);
+    setElemText('spec-bonus', bonusCount
+      ? `${bonusCount} Free Bonus Books + WhatsApp Support`
+      : (isAdminManagedBook ? '' : 'Free Bonus PDF + 24×7 AI Support'));
 
     const tocList = document.getElementById('toc-list');
     const tocPoints = (Array.isArray(landing.table_of_contents) && landing.table_of_contents.length > 0)
@@ -1947,7 +1975,7 @@
       badges = b.features;
     } else if (l.features && Array.isArray(l.features) && l.features.length > 0) {
       badges = l.features;
-    } else {
+    } else if (!isAdminManagedLanding(l, b)) {
       const isBusinessOrIncome = (b.category === 'Business' || b.category === 'Digital AI' || (b.id && b.id.toUpperCase() === 'BK018') || (l.category === 'Business'));
       if (isBusinessOrIncome) {
         badges = [
@@ -2002,6 +2030,10 @@
         </div>
       `;
     }).join('');
+    const kpiSection = grid.closest('#sec-kpis');
+    if (kpiSection && isAdminManagedLanding(l, b)) {
+      kpiSection.style.display = badges.length ? '' : 'none';
+    }
   }
 
   // ==========================================================
@@ -2411,6 +2443,8 @@
     if (!grid) return;
     const l = currentLandingData || {};
     const b = currentBookData || {};
+    const rawId = String(l.id || b.id || currentBookId || 'BK001').toUpperCase();
+    const isAdminManagedBook = isAdminManagedLanding(l, b);
 
     const defaultReviews = [
       { name: 'पवन पांडे', location: 'सागर, मध्य प्रदेश', rating: 5, gender: 'male', comment: 'सरल भाषा और वास्तविक फोटो के कारण रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।' },
@@ -2423,7 +2457,7 @@
     try {
       const allApproved = JSON.parse(localStorage.getItem('AOI_APPROVED_REVIEWS') || '[]');
       if (Array.isArray(allApproved)) {
-        approvedAdditions = allApproved.filter(ar => ar && (ar.book_id === rawId || !ar.book_id)).map(ar => ({
+        approvedAdditions = allApproved.filter(ar => ar && (ar.book_id === rawId || (!ar.book_id && !isAdminManagedBook))).map(ar => ({
           name: ar.user_name || ar.name,
           location: ar.location || 'भारत',
           rating: ar.rating || 5,
@@ -2433,9 +2467,12 @@
       }
     } catch(e) {}
 
-    const rawReviews = [...approvedAdditions, ...((Array.isArray(l.reviews) && l.reviews.length > 0) ? l.reviews :
-                       (Array.isArray(l.testimonials) && l.testimonials.length > 0) ? l.testimonials :
-                       (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews : defaultReviews)];
+    const configuredReviews = (Array.isArray(l.reviews) && l.reviews.length > 0) ? l.reviews :
+      (Array.isArray(l.testimonials) && l.testimonials.length > 0) ? l.testimonials :
+      (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews : [];
+    const rawReviews = [...approvedAdditions, ...(configuredReviews.length ? configuredReviews : (isAdminManagedBook ? [] : defaultReviews))];
+    const reviewSection = grid.closest('#sec-customer-reviews');
+    if (reviewSection) reviewSection.style.display = rawReviews.length ? '' : 'none';
 
     grid.innerHTML = rawReviews.map(r => {
       const avatarHtml = r.photo || r.avatar ? 
@@ -2471,6 +2508,7 @@
           if (ans.status === 'rejected') return;
           const targetBook = String(ans.book_id || ans.page_id || '').toUpperCase();
           if (targetBook && targetBook !== bId && !targetBook.includes('BOOK')) return;
+          if (!targetBook && isAdminManagedBook) return;
           const comment = ans.comment || ans.text;
           if (!comment) return;
 
@@ -2478,6 +2516,7 @@
           card.className = 'review-card';
           card.id = s.id;
           card.style.cssText = 'background:#ffffff; border:1.8px solid #22c55e; border-radius:16px; padding:18px; box-shadow:0 6px 18px rgba(34,197,94,0.12); display:flex; flex-direction:column; justify-content:space-between; animation:fadeIn 0.3s ease;';
+          if (reviewSection) reviewSection.style.display = '';
           card.innerHTML = `
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -2817,6 +2856,7 @@
     if (!wrapper) return;
     const l = currentLandingData || {};
     const b = currentBookData || {};
+    const isAdminManagedBook = isAdminManagedLanding(l, b);
 
     const defaultFaqs = [
       { q: "क्या इस पुस्तक को मोबाइल में ऑफलाइन पढ़ सकते हैं?", a: "हाँ, खरीदने के बाद आप इसे अपनी 'My Library' में सुरक्षित ऑफलाइन कभी भी पढ़ सकते हैं।" },
@@ -2826,7 +2866,8 @@
     ];
 
     const faqs = (Array.isArray(l.faqs) && l.faqs.length > 0) ? l.faqs :
-                 (Array.isArray(b.faqs) && b.faqs.length > 0) ? b.faqs : defaultFaqs;
+                 (Array.isArray(b.faqs) && b.faqs.length > 0) ? b.faqs :
+                   (isAdminManagedBook ? [] : defaultFaqs);
 
     wrapper.innerHTML = faqs.map((f, idx) => `
       <details class="faq-item" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 18px; margin-bottom:10px; box-shadow:0 4px 14px rgba(0,0,0,0.04);" ${idx === 0 ? 'open' : ''}>
@@ -2839,6 +2880,10 @@
         </p>
       </details>
     `).join('');
+    const faqSection = wrapper.closest('#sec-faq-section');
+    if (faqSection && isAdminManagedBook) {
+      faqSection.style.display = faqs.length ? '' : 'none';
+    }
   }
 
 
