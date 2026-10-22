@@ -596,13 +596,14 @@
     const isEbooksSubdir = window.location.pathname.includes('/ebooks/');
     const primaryPath = isEbooksSubdir ? `../${cleanUrl}` : `/${cleanUrl}`;
     const fallbackPath = isEbooksSubdir ? `/${cleanUrl}` : `../${cleanUrl}`;
+    const isBookConfig = cleanUrl === 'data/books.json' || cleanUrl === 'data/universal-book-landing-pages.json';
 
     const cacheKey = `AOI_CACHE_${cleanUrl.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
     // High-speed Session Storage cache (0ms immediate load)
     try {
       const cached = sessionStorage.getItem(cacheKey);
-      if (cached) {
+      if (cached && !isBookConfig) {
         const item = JSON.parse(cached);
         if (item && item.data && (Date.now() - item.time < 300000)) { // 5-minute cache
           // Background revalidation
@@ -621,14 +622,13 @@
     // High-speed CDN/Browser caching with 5-minute revalidation for ultra-fast mobile loading
     const cacheBucket = Math.floor(Date.now() / 300000);
     const candidates = [
-      `${primaryPath}?v=${cacheBucket}`,
-      primaryPath,
-      fallbackPath
+      `${primaryPath}?v=${isBookConfig ? Date.now() : cacheBucket}`,
+      ...(isBookConfig ? [`${fallbackPath}?v=${Date.now()}`] : [primaryPath, fallbackPath])
     ];
 
     for (const c of candidates) {
       try {
-        const res = await fetch(c);
+        const res = await fetch(c, isBookConfig ? { cache: 'no-store' } : undefined);
         if (res.ok) {
           const json = await res.json();
           try {
@@ -681,7 +681,7 @@
             const jsonPage = idx >= 0 ? allLandingPages[idx] : null;
             if (!jsonPage) {
               allLandingPages.push(item);
-            } else if (!jsonPage.updated_at || (item.updated_at && (new Date(item.updated_at) >= new Date(jsonPage.updated_at)))) {
+            } else if (!jsonPage.updated_at || (item.updated_at && (new Date(item.updated_at) > new Date(jsonPage.updated_at)))) {
               allLandingPages[idx] = deepMergeSafe(allLandingPages[idx], item);
             }
           });
