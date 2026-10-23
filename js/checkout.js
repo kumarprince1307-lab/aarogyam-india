@@ -890,6 +890,7 @@ async function loadBook() {
         let offerSecurityError = null;
 
         let booksArray = [];
+        let landingPagesArray = [];
         const cacheTime = Math.floor(Date.now() / 300000);
         try {
             const response = await fetch("/data/books.json?v=" + cacheTime);
@@ -905,34 +906,70 @@ async function loadBook() {
             }
         }
 
-        // Check custom books from localStorage
+        try {
+            const response = await fetch("/data/universal-book-landing-pages.json?v=" + cacheTime);
+            if (response.ok) {
+                const jsonResult = await response.json();
+                const pages = Array.isArray(jsonResult) ? jsonResult : jsonResult.bookLandingPages;
+                landingPagesArray = Array.isArray(pages) ? pages : [];
+            } else {
+                throw new Error(`Landing page catalog request failed: ${response.status}`);
+            }
+        } catch (e) {
+            console.warn("Landing page catalog unavailable for checkout merge", e);
+        }
+
+        const hasNewerLocalVersion = (localItem, serverItem) => {
+            const localTime = Date.parse(localItem.updated_at || "");
+            const serverTime = Date.parse(serverItem?.updated_at || "");
+            return Number.isFinite(localTime) && localTime > (Number.isFinite(serverTime) ? serverTime : 0);
+        };
+
+        // Merge local admin edits only when they are newer than the live catalog.
         try {
             const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
             if (Array.isArray(customBooks)) {
                 customBooks.forEach(cb => {
                     if (!cb || !cb.id) return;
                     const idx = booksArray.findIndex(x => x.id && x.id.toUpperCase() === cb.id.toUpperCase());
-                    if (idx >= 0) booksArray[idx] = cb;
-                    else booksArray.unshift(cb);
+                    if (idx < 0) {
+                        booksArray.unshift(cb);
+                    } else if (hasNewerLocalVersion(cb, booksArray[idx])) {
+                        booksArray[idx] = Object.assign({}, booksArray[idx], cb);
+                    }
                 });
             }
             const landingList = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
             if (Array.isArray(landingList)) {
                 landingList.forEach(lp => {
                     if (!lp || !lp.id) return;
-                    const idx = booksArray.findIndex(x => x.id && x.id.toUpperCase() === lp.id.toUpperCase());
-                    const synth = {
-                        id: lp.id,
-                        name: lp.hero?.title || lp.id,
-                        mrp: lp.hero?.mrp || 299,
-                        offerPrice: lp.hero?.offer_price || 99,
-                        cover: lp.hero?.cover_image || "/images/books/kharif-master-guide-2026-cover.webp"
-                    };
-                    if (idx >= 0) booksArray[idx] = Object.assign({}, booksArray[idx], synth);
-                    else booksArray.unshift(synth);
+                    const lpIdx = landingPagesArray.findIndex(x => x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                    if (lpIdx >= 0) {
+                        if (hasNewerLocalVersion(lp, landingPagesArray[lpIdx])) landingPagesArray[lpIdx] = lp;
+                    } else {
+                        const book = booksArray.find(x => x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                        if (!book || hasNewerLocalVersion(lp, book)) landingPagesArray.push(lp);
+                    }
                 });
             }
-        } catch (e) {}
+
+            landingPagesArray.forEach(lp => {
+                if (!lp || !lp.id) return;
+                const idx = booksArray.findIndex(x => x.id && x.id.toUpperCase() === lp.id.toUpperCase());
+                const existingBook = idx >= 0 ? booksArray[idx] : {};
+                const synth = {
+                    id: lp.id,
+                    name: lp.hero?.title || existingBook.name || lp.id,
+                    mrp: lp.hero?.mrp ?? existingBook.mrp ?? 299,
+                    offerPrice: lp.hero?.offer_price ?? existingBook.offerPrice ?? 99,
+                    cover: lp.hero?.cover_image || existingBook.cover || existingBook.thumbnail || "/images/books/kharif-master-guide-2026-cover.webp"
+                };
+                if (idx >= 0) booksArray[idx] = Object.assign({}, existingBook, synth);
+                else booksArray.unshift(synth);
+            });
+        } catch (e) {
+            console.warn("Local checkout catalog merge failed", e);
+        }
 
         // Combo and Multi-Book Bundle Check
         const comboParam = (params.get("combo") || "").toLowerCase().trim();
