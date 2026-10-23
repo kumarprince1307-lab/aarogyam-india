@@ -3349,7 +3349,7 @@
     },
     {
       "id": "BK016",
-      "updated_at": "2026-10-23T04:44:03.335Z",
+      "updated_at": "2026-10-23T05:10:41.366Z",
       "admin_edited": true,
       "slug": "bk016",
       "book_type": "paid",
@@ -3405,12 +3405,13 @@
       ],
       "hidden_sections": [],
       "section_banners": {
-        "sec_timer": "/images/banners/bk016-sec_timer-banner.webp",
         "sec_audio": "/images/banners/bk016-sec_audio-banner.webp",
-        "sec_why_buy": "/images/banners/bk016-sec_why_buy-banner.webp",
-        "sec_vip_stack": "/images/banners/bk016-sec_vip_stack-banner.webp",
+        "sec_timer": "/images/banners/bk016-sec_timer-banner.webp",
+        "sec_preview": "/images/banners/bk016-sec_preview-banner.webp",
         "sec_ai_support": "/images/banners/bk016-sec_ai_support-banner.webp",
-        "sec_final_buy": "/images/banners/bk016-sec_final_buy-banner.webp"
+        "sec_final_buy": "/images/banners/bk016-sec_final_buy-banner.webp",
+        "sec_why_buy": "/images/banners/bk016-sec_why_buy-banner.webp",
+        "sec_vip_stack": "/images/banners/bk016-sec_vip_stack-banner.webp"
       },
       "og_title": "कृषि दवा सलाहकार गाइड + 365 दिन AI सखी FREE",
       "og_description": "फसल में रोग या कीट की समस्या आने पर सही जानकारी खोजने के लिए तैयार की गई आसान संदर्भ पुस्तक। इसमें रासायनिक दवाओं की जानकारी के साथ जैविक विकल्प, किसान के उपयोगी नुस्खे, रोग→फसल और Chemical→रोग Quick Directory तथा सुरक्षित उपयोग की जरूरी जानकारी एक ही जगह दी गई है।\nकृषि दवा सलाहकार गाइड से फसल रोग-कीट प्रबंधन और दवाओं के उपयोग की जानकारी पाएं। किताब के साथ 365 दिन AI सखी FREE—सिर्फ ₹99 में।",
@@ -3572,6 +3573,7 @@
           }
         ]
       },
+      "preview_banner": "/images/banners/bk016-sec_preview-banner.webp",
       "demo_images": [],
       "demo_reader_pages": "",
       "demoPages": "",
@@ -3590,28 +3592,12 @@
         "अधिक उत्पादन के उपाय",
         "विशेषज्ञ सुझाव"
       ],
-      "videos": [
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "🎥 नया वीडियो डेमो",
-          "ratio": "16:9"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "🎥 नया वीडियो डेमो",
-          "ratio": "16:9"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "🎥 नया वीडियो डेमो",
-          "ratio": "16:9"
-        }
-      ],
+      "videos": [],
       "testimonials": [],
       "faqs": [],
       "final_buy": {
         "title": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
-        "description": "रासायनिक दवाएँ • जैविक विकल्प • किसान के नुस्खे • सुरक्षित उपयोग",
+        "description": "कृषि दवा सलाहकार गाइड—फसल के रोग-कीट प्रबंधन, कृषि दवाओं के उपयोग, छिड़काव की सावधानियों और जैविक विकल्पों की उपयोगी जानकारी एक जगह। किताब के साथ 365 दिन Aarogyam Sakhi AI FREE। विशेष ऑफर सिर्फ ₹99।",
         "benefits": [
           "फफूंद • बैक्टीरिया • वायरस • कीट • माइट्स • खरपतवार • Fungicide • Insecticide • Herbicide • Biological Control • Formulation • Seed/Soil Treatment • Spray • Safety • Quick Directory • किसान नुस्खे"
         ],
