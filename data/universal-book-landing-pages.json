@@ -3349,7 +3349,7 @@
     },
     {
       "id": "BK016",
-      "updated_at": "2026-10-23T06:09:50.119Z",
+      "updated_at": "2026-10-23T06:15:04.178Z",
       "admin_edited": true,
       "slug": "bk016",
       "book_type": "paid",
@@ -3405,8 +3405,8 @@
       ],
       "hidden_sections": [],
       "section_banners": {
-        "sec_timer": "/images/banners/bk016-sec_timer-banner.webp",
         "sec_audio": "/images/banners/bk016-sec_audio-banner.webp",
+        "sec_timer": "/images/banners/bk016-sec_timer-banner.webp",
         "sec_why_buy": "/images/banners/bk016-sec_why_buy-banner.webp",
         "sec_vip_stack": "/images/banners/bk016-sec_vip_stack-banner.webp",
         "sec_preview": "/images/banners/bk016-sec_preview-banner.webp",
@@ -3592,18 +3592,7 @@
         "अधिक उत्पादन के उपाय",
         "विशेषज्ञ सुझाव"
       ],
-      "videos": [
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "🎥 नया वीडियो डेमो",
-          "ratio": "16:9"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "🎥 नया वीडियो डेमो",
-          "ratio": "16:9"
-        }
-      ],
+      "videos": [],
       "testimonials": [],
       "faqs": [],
       "final_buy": {
