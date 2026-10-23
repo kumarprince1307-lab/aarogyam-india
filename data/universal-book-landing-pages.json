@@ -3349,7 +3349,7 @@
     },
     {
       "id": "BK016",
-      "updated_at": "2026-10-23T05:37:43.566Z",
+      "updated_at": "2026-10-23T06:04:45.675Z",
       "admin_edited": true,
       "slug": "bk016",
       "book_type": "paid",
@@ -3382,36 +3382,16 @@
       "theme_dark": "#993700",
       "cover_effect": "3d_float",
       "sticky_button_text": "BYE NOW ",
-      "sections_order": [
-        "sec_hero",
-        "sec_timer",
-        "sec_kpis",
-        "sec_audio",
-        "sec_trust",
-        "sec_why_buy",
-        "sec_vip_stack",
-        "sec_video",
-        "sec_preview",
-        "sec_suggested",
-        "sec_bonuses",
-        "sec_ai_support",
-        "sec_specs_toc",
-        "sec_reviews",
-        "sec_faqs",
-        "sec_final_buy",
-        "sec_help",
-        "sec_pdf_main",
-        "sec_pdf_free"
-      ],
+      "sections_order": [],
       "hidden_sections": [],
       "section_banners": {
-        "sec_audio": "/images/banners/bk016-sec_audio-banner.webp",
         "sec_timer": "/images/banners/bk016-sec_timer-banner.webp",
+        "sec_audio": "/images/banners/bk016-sec_audio-banner.webp",
+        "sec_why_buy": "/images/banners/bk016-sec_why_buy-banner.webp",
+        "sec_vip_stack": "/images/banners/bk016-sec_vip_stack-banner.webp",
         "sec_preview": "/images/banners/bk016-sec_preview-banner.webp",
         "sec_ai_support": "/images/banners/bk016-sec_ai_support-banner.webp",
-        "sec_final_buy": "/images/banners/bk016-sec_final_buy-banner.webp",
-        "sec_why_buy": "/images/banners/bk016-sec_why_buy-banner.webp",
-        "sec_vip_stack": "/images/banners/bk016-sec_vip_stack-banner.webp"
+        "sec_final_buy": "/images/banners/bk016-sec_final_buy-banner.webp"
       },
       "og_title": "कृषि दवा सलाहकार गाइड + 365 दिन AI सखी FREE",
       "og_description": "फसल में रोग या कीट की समस्या आने पर सही जानकारी खोजने के लिए तैयार की गई आसान संदर्भ पुस्तक। इसमें रासायनिक दवाओं की जानकारी के साथ जैविक विकल्प, किसान के उपयोगी नुस्खे, रोग→फसल और Chemical→रोग Quick Directory तथा सुरक्षित उपयोग की जरूरी जानकारी एक ही जगह दी गई है।\nकृषि दवा सलाहकार गाइड से फसल रोग-कीट प्रबंधन और दवाओं के उपयोग की जानकारी पाएं। किताब के साथ 365 दिन AI सखी FREE—सिर्फ ₹99 में।",
@@ -3426,34 +3406,8 @@
         "subtitle": "लाइव ऑडियो नरेशन (Female Voice - कृषि सखी)",
         "mode": "tts",
         "mp3_url": "",
-        "tts_text": "नमस्कार किसान भाई।\nखेती में रोग और कीट की समस्या आए, तो सबसे जरूरी है सही जानकारी और सही समय पर सही कदम।\nइस कृषि दवा डायरेक्टरी में आपको रासायनिक दवाओं की जानकारी के साथ, उनके उपयोग को समझने का आसान तरीका मिलेगा।\n\nसाथ ही जैविक और कम-रासायनिक विकल्प, IPM के तरीके और किसान के उपयोगी नुस्खे भी दिए गए हैं।\n\nकिताब के अंत में रोग से फसल और Chemical से रोग खोजने की Quick Directory है, ताकि जरूरत की जानकारी जल्दी मिल सके।\n\nऔर सबसे जरूरी—कृषि दवाओं के सुरक्षित उपयोग और गलती से शरीर में जाने पर जरूरी सावधानियों की जानकारी भी शामिल है।\nइस किताब को अपने खेत के लिए एक Practical Reference की तरह रखें—समस्या आए, जानकारी देखें और फिर सही निर्णय लें।\nशुभ दिवाली महा-ऑफर: केवल ₹99 में (सीमित समय ऑफर, जल्दी करें!) —",
-        "story_text": "नमस्कार किसान भाई।\nखेती में रोग और कीट की समस्या आए, तो सबसे जरूरी है सही जानकारी और सही समय पर सही कदम।\nइस कृषि दवा डायरेक्टरी में आपको रासायनिक दवाओं की जानकारी के साथ, उनके उपयोग को समझने का आसान तरीका मिलेगा।\n\nसाथ ही जैविक और कम-रासायनिक विकल्प, IPM के तरीके और किसान के उपयोगी नुस्खे भी दिए गए हैं।\n\nकिताब के अंत में रोग से फसल और Chemical से रोग खोजने की Quick Directory है, ताकि जरूरत की जानकारी जल्दी मिल सके।\n\nऔर सबसे जरूरी—कृषि दवाओं के सुरक्षित उपयोग और गलती से शरीर में जाने पर जरूरी सावधानियों की जानकारी भी शामिल है।\nइस किताब को अपने खेत के लिए एक Practical Reference की तरह रखें—समस्या आए, जानकारी देखें और फिर सही निर्णय लें।\nशुभ दिवाली महा-ऑफर: केवल ₹99 में (सीमित समय ऑफर, जल्दी करें!) —",
-        "highlights": [
-          {
-            "icon": "🐛",
-            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
-          },
-          {
-            "icon": "🦠",
-            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
-          },
-          {
-            "icon": "🧪",
-            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
-          },
-          {
-            "icon": "💧",
-            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
-          },
-          {
-            "icon": "🌊",
-            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
-          },
-          {
-            "icon": "🌱",
-            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
-          }
-        ],
+        "tts_text": "नमस्कार किसान भाई।\nखेती में रोग और कीट की समस्या आए, तो सबसे जरूरी है सही जानकारी और सही समय पर सही कदम।\nइस कृषि दवा डायरेक्टरी में आपको रासायनिक दवाओं की जानकारी के साथ, उनके उपयोग को समझने का आसान तरीका मिलेगा।\n\nसाथ ही जैविक और कम-रासायनिक विकल्प, IPM के तरीके और किसान के उपयोगी नुस्खे भी दिए गए हैं।\n\nकिताब के अंत में रोग से फसल और Chemical से रोग खोजने की Quick Directory है, ताकि जरूरत की जानकारी जल्दी मिल सके।\n\nऔर सबसे जरूरी—कृषि दवाओं के सुरक्षित उपयोग और गलती से शरीर में जाने पर जरूरी सावधानियों की जानकारी भी शामिल है।\nइस किताब को अपने खेत के लिए एक Practical Reference की तरह रखें—समस्या आए, जानकारी देखें और फिर सही निर्णय लें।\nशुभ दिवाली महा-ऑफर: केवल ₹99 में \\, सीमित समय ऑफर, जल्दी करें!",
+        "story_text": "नमस्कार किसान भाई।\nखेती में रोग और कीट की समस्या आए, तो सबसे जरूरी है सही जानकारी और सही समय पर सही कदम।\nइस कृषि दवा डायरेक्टरी में आपको रासायनिक दवाओं की जानकारी के साथ, उनके उपयोग को समझने का आसान तरीका मिलेगा।\n\nसाथ ही जैविक और कम-रासायनिक विकल्प, IPM के तरीके और किसान के उपयोगी नुस्खे भी दिए गए हैं।\n\nकिताब के अंत में रोग से फसल और Chemical से रोग खोजने की Quick Directory है, ताकि जरूरत की जानकारी जल्दी मिल सके।\n\nऔर सबसे जरूरी—कृषि दवाओं के सुरक्षित उपयोग और गलती से शरीर में जाने पर जरूरी सावधानियों की जानकारी भी शामिल है।\nइस किताब को अपने खेत के लिए एक Practical Reference की तरह रखें—समस्या आए, जानकारी देखें और फिर सही निर्णय लें।\nशुभ दिवाली महा-ऑफर: केवल ₹99 में \\, सीमित समय ऑफर, जल्दी करें!",
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹149 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true,
         "banner_image": "/images/banners/bk016-sec_audio-banner.webp"
@@ -3466,29 +3420,9 @@
       "ai_support_title": "AAROGYAM SAKHI AI",
       "ai_support_cover": "",
       "ai_support_desc": "ई-बुक पढ़ते समय कोई भी फार्मूला या तकनीकी बात समझ न आए, तो बस एक क्लिक में पूछें। 24×7 Aarogyam Sakhi AI आपकी फसल से जुड़े हर सवाल का तुरंत सही उत्तर देगी।\"",
-      "bonuses": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
-      "bonus_books": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
-      "bonus_points": [
-        "24×7 WhatsApp Support",
-        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
-        "📖 किताब की जानकारी समझने में सहायता",
-        "🌱 फसल संबंधी सवाल",
-        "📱 Mobile Friendly PDF & Lifetime Access"
-      ],
+      "bonuses": [],
+      "bonus_books": [],
+      "bonus_points": [],
       "timer": {
         "enabled": true,
         "minutes": 50,
@@ -3550,60 +3484,15 @@
         "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "👨‍🌾 किसान इसे क्यों खरीदे?  क्योंकि खेत में समस्या सिर्फ एक प्रकार की नहीं आती। कभी फफूंद, कभी कीट, कभी वायरस, कभी खरपतवार, कभी जड़/मिट्टी की समस्या—और हर बार अलग-अलग जानकारी खोजने के बजाय एक Practical Reference हाथ में रहता है।  🧑‍🔬 दवा विक्रेता इसे क्यों खरीदे?  क्योंकि ग्राहक सिर्फ “दवा का नाम” नहीं पूछता। वह पूछता है—यह किस समस्या में है, इसका Active Ingredient क्या है, Formulation क्या है और कैसे उपयोग होता है। किताब का Disease/Pest + Chemical + Formulation + Quick Directory हिस्सा ऐसे संदर्भ में काम आता है।  🎓 कृषि विद्यार्थी इसे क्यों खरीदे?  क्योंकि एक ही किताब में pesticide knowledge के कई महत्वपूर्ण हिस्से साथ मिलते हैं। Fungicide, Insecticide, Herbicide, Bacterial/Viral diseases, Biopesticide, Formulation, Seed/Soil Treatment, IPM, Spray और Safety—revision के लिए एक consolidated reference।",
         "banner_image": "/images/banners/bk016-sec_why_buy-banner.webp",
-        "cards": [
-          {
-            "icon": "🌱",
-            "title": "वैज्ञानिक जानकारी",
-            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
-          },
-          {
-            "icon": "📷",
-            "title": "300+ वास्तविक फोटो",
-            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
-          },
-          {
-            "icon": "📘",
-            "title": "Step by Step Guide",
-            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
-          },
-          {
-            "icon": "🎁",
-            "title": "Free Bonus PDF",
-            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
-          }
-        ]
+        "cards": []
       },
       "preview_banner": "/images/banners/bk016-sec_preview-banner.webp",
-      "demo_images": [
-        "/images/books/bk016-preview-1.webp",
-        "/images/books/bk016-preview-2.webp",
-        "/images/books/bk016-preview-3.webp",
-        "/images/books/bk016-preview-4.webp",
-        "/images/books/bk016-preview-5.webp",
-        "/images/books/bk016-preview-6.webp",
-        "/images/books/bk016-preview-7.webp",
-        "/images/books/bk016-preview-8.webp",
-        "/images/books/bk016-preview-9.webp",
-        "/images/books/bk016-preview-10.webp",
-        "/images/books/bk016-preview-11.webp"
-      ],
+      "demo_images": [],
       "demo_reader_pages": "",
       "demoPages": "",
       "suggested_books_list": [],
       "suggested_books": [],
-      "table_of_contents": [
-        "बीज उपचार",
-        "खेत की तैयारी",
-        "बुवाई की वैज्ञानिक विधि",
-        "उर्वरक प्रबंधन",
-        "खरपतवार नियंत्रण",
-        "रोग एवं कीट प्रबंधन",
-        "पोषक तत्वों की कमी",
-        "स्प्रे चार्ट",
-        "IPM तकनीक",
-        "अधिक उत्पादन के उपाय",
-        "विशेषज्ञ सुझाव"
-      ],
+      "table_of_contents": [],
       "videos": [],
       "testimonials": [],
       "faqs": [],
