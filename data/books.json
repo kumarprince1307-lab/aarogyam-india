@@ -1245,8 +1245,8 @@
       "book_type": "paid",
       "audience": "all",
       "target_main_books": [],
-      "heading": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
-      "name": "कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा की पूरी गाइड",
+      "heading": "कृषि दवा सलाहकार गाइड",
+      "name": "कृषि दवा सलाहकार गाइड",
       "category": "Agriculture",
       "language": "Hindi",
       "mrp": 499,
@@ -1261,10 +1261,7 @@
         "my_library",
         "home_page",
         "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "download_funnel"
       ],
       "store_badge": "best_seller",
       "badge": "best_seller",
@@ -1395,7 +1392,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK016",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-10-23T02:40:33.175Z",
+      "updated_at": "2026-10-23T04:13:23.798Z",
       "admin_edited": true,
       "faqs": [
         {
