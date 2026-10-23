@@ -3349,7 +3349,7 @@
     },
     {
       "id": "BK016",
-      "updated_at": "2026-10-23T05:10:41.366Z",
+      "updated_at": "2026-10-23T05:37:43.566Z",
       "admin_edited": true,
       "slug": "bk016",
       "book_type": "paid",
@@ -3574,7 +3574,19 @@
         ]
       },
       "preview_banner": "/images/banners/bk016-sec_preview-banner.webp",
-      "demo_images": [],
+      "demo_images": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
       "demo_reader_pages": "",
       "demoPages": "",
       "suggested_books_list": [],

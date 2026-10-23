@@ -521,7 +521,20 @@
     }
     const clean = trimmed.replace(/^(\.\.\/|\/)+/, '');
     const isEbooksSubdir = window.location.pathname.includes('/ebooks/');
-    return (isEbooksSubdir ? '../' : '/') + clean;
+    const resolved = (isEbooksSubdir ? '../' : '/') + clean;
+    const assetPath = clean.split(/[?#]/, 1)[0];
+    const assetVersion = currentLandingData?.updated_at || currentBookData?.updated_at;
+
+    // Admin uploads overwrite stable paths, so use the saved book revision as the cache key.
+    if (assetVersion && /^images\/(books|banners)\//i.test(assetPath)) {
+      const hashIndex = resolved.indexOf('#');
+      const assetUrl = hashIndex === -1 ? resolved : resolved.slice(0, hashIndex);
+      const hash = hashIndex === -1 ? '' : resolved.slice(hashIndex);
+      const separator = assetUrl.includes('?') ? '&' : '?';
+      return `${assetUrl}${separator}book_updated=${encodeURIComponent(assetVersion)}${hash}`;
+    }
+
+    return resolved;
   };
 
 
@@ -1017,6 +1030,8 @@
     const heroBannerImg = document.getElementById('hero-banner-img');
     if (heroBannerImg) {
       if (banner && typeof banner === 'string' && banner.trim().length > 0) {
+        heroBannerImg.fetchPriority = 'high';
+        heroBannerImg.decoding = 'async';
         heroBannerImg.src = window.resolveImageSrc(banner.trim());
         heroBannerImg.style.display = 'block';
         heroBannerImg.onerror = function() { window.handleImageError(this); };
@@ -2138,6 +2153,7 @@
               <iframe 
                 src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" 
                 title="${escapeHtml(v.title || 'Video')}" 
+                loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen>
               </iframe>
@@ -2164,6 +2180,7 @@
             <iframe 
               src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" 
               title="${escapeHtml(v.title || 'Video')}" 
+              loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
             </iframe>
@@ -3017,7 +3034,7 @@
     const title = l.og_title || hero.title || b.heading || 'Aarogyam India eBook';
     const desc = l.og_description || hero.description || b.description || 'सम्पूर्ण Practical Guide। अभी विशेष छूट पर उपलब्ध।';
     const rawImg = l.og_image || hero.banner_image || hero.cover_image || '/images/books/kharif-fasal-og.webp';
-    const absImg = toAbsoluteUrl(rawImg);
+    const absImg = toAbsoluteUrl(window.resolveImageSrc(rawImg));
 
     setMetaProp('og-title-meta', title);
     setMetaProp('og-desc-meta', desc);
