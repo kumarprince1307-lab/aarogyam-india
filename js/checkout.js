@@ -719,7 +719,7 @@ const DEFAULT_BOOK_CATALOG = {
     'BK002': { id: 'BK002', name: 'खेती का डॉक्टर (फसल का डॉक्टर)', mrp: 299, offerPrice: 99, cover: '/images/books/fasal-ka-doctor-cover.webp' },
     'BK006': { id: 'BK006', name: 'AI वेबसाइट निर्माण गाइड 2026', mrp: 1299, offerPrice: 199, cover: '/images/books/ai-website-guide-cover.webp' },
     'BK015': { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', mrp: 1999, offerPrice: 149, cover: '/images/books/bk015-cover.webp' },
-    'BK016': { id: 'BK016', name: 'कृषि दवा डायरेक्टरी', mrp: 499, offerPrice: 149, cover: '/images/books/bk016-cover.webp' },
+    'BK016': { id: 'BK016', name: 'कृषि दवा डायरेक्टरी', mrp: 499, offerPrice: 99, cover: '/images/books/bk016-cover.webp' },
     'BK017': { id: 'BK017', name: 'गेहूँ की खेती सम्पूर्ण मार्गदर्शिका', mrp: 299, offerPrice: 99, cover: '/images/books/bk017-cover.webp' },
     'SUB001': { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता', mrp: 2999, offerPrice: 99, cover: '/images/banners/farmer-community-banner.jpeg' }
 };

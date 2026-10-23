@@ -1065,7 +1065,7 @@
         id: 'BK016',
         title: 'कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा',
         subtitle: 'रासायनिक दवाएँ • जैविक विकल्प • किसान के नुस्खे • 4-पेज Quick Directory',
-        price: '₹149',
+        price: '₹99',
         oldPrice: '₹499',
         image: '/images/books/bk016-cover.webp',
         link: '/ebooks/book-landing.html?id=BK016',
