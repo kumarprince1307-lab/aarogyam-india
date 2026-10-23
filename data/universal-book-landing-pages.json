@@ -3349,7 +3349,7 @@
     },
     {
       "id": "BK016",
-      "updated_at": "2026-10-23T06:15:04.178Z",
+      "updated_at": "2026-10-23T06:25:43.358Z",
       "admin_edited": true,
       "slug": "bk016",
       "book_type": "paid",
@@ -3403,7 +3403,9 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_bonuses"
+      ],
       "section_banners": {
         "sec_audio": "/images/banners/bk016-sec_audio-banner.webp",
         "sec_timer": "/images/banners/bk016-sec_timer-banner.webp",
@@ -3574,7 +3576,19 @@
         ]
       },
       "preview_banner": "/images/banners/bk016-sec_preview-banner.webp",
-      "demo_images": [],
+      "demo_images": [
+        "/images/books/bk016-preview-1.webp",
+        "/images/books/bk016-preview-2.webp",
+        "/images/books/bk016-preview-3.webp",
+        "/images/books/bk016-preview-4.webp",
+        "/images/books/bk016-preview-5.webp",
+        "/images/books/bk016-preview-6.webp",
+        "/images/books/bk016-preview-7.webp",
+        "/images/books/bk016-preview-8.webp",
+        "/images/books/bk016-preview-9.webp",
+        "/images/books/bk016-preview-10.webp",
+        "/images/books/bk016-preview-11.webp"
+      ],
       "demo_reader_pages": "",
       "demoPages": "",
       "suggested_books_list": [],
@@ -3592,7 +3606,18 @@
         "अधिक उत्पादन के उपाय",
         "विशेषज्ञ सुझाव"
       ],
-      "videos": [],
+      "videos": [
+        {
+          "url": "https://youtube.com/shorts/ew5tDJgGTK8?si=xfFNgPJRCudl4uHd",
+          "title": "बुक शॉर्ट वीडियो 1",
+          "ratio": "9:16"
+        },
+        {
+          "url": "https://youtube.com/shorts/bvCuBEuyg48?si=Yw0x_RNBRmrsdPW3",
+          "title": "बुक शॉर्ट वीडियो 2",
+          "ratio": "9:16"
+        }
+      ],
       "testimonials": [],
       "faqs": [],
       "final_buy": {

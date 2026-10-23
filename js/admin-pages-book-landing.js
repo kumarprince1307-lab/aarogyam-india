@@ -120,10 +120,25 @@ export async function initBookLandingPages() {
   let currentSectionsOrder = [];
   let currentHiddenSections = [];
   let currentSectionBanners = {};
+  let currentAssetRevision = '';
   let selectedThemePrimary = '#2E7D32';
   let selectedThemeDark = '#1B5E20';
   let selectedCoverEffect = '3d_float';
   let draggedItemIndex = null;
+
+  function versionBookImagePreview(url, revision = currentAssetRevision) {
+    if (!url || typeof url !== 'string' || !revision) return url;
+    try {
+      const imageUrl = new URL(url, window.location.href);
+      if (imageUrl.origin !== window.location.origin || !/^\/images\/(books|banners)\//i.test(imageUrl.pathname)) {
+        return url;
+      }
+      imageUrl.searchParams.set('book_updated', revision);
+      return imageUrl.href;
+    } catch {
+      return url;
+    }
+  }
 
   const defaultSectionsList = [
     { key: 'sec_hero', name: '📖 1. Hero 3D Book & Main Pitch', desc: '3D कवर, शीर्षक, रेटिंग, मूल्य एवं एक्शन बटन' },
@@ -2390,7 +2405,7 @@ Instant Download & Lifetime Access
       const wrap = document.getElementById(`blp_sec_banner_preview_wrap_${secKey}`);
       const img = document.getElementById(`blp_sec_banner_preview_${secKey}`);
       if (img && wrap) {
-        img.src = url.trim();
+        img.src = versionBookImagePreview(url.trim());
         wrap.style.display = 'block';
       }
     } else {
@@ -2609,6 +2624,8 @@ Instant Download & Lifetime Access
     const bId = e.target.value;
     const b = allBooks.find(x => x.id === bId);
     if (!b) return;
+    const landingPage = allLandingPages.find(page => page.id === bId);
+    currentAssetRevision = landingPage?.updated_at || b.updated_at || '';
 
     document.getElementById('blp_input_book_id').value = b.id;
     document.getElementById('blp_category_select').value = b.category || 'Agriculture';
@@ -2617,8 +2634,8 @@ Instant Download & Lifetime Access
     document.getElementById('blp_hero_offer_price').value = b.offerPrice || 99;
     document.getElementById('blp_cover_url').value = b.cover || b.thumbnail || '';
     document.getElementById('blp_banner_url').value = b.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp';
-    document.getElementById('blp_preview_cover_img').src = b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
-    document.getElementById('blp_preview_banner_img').src = b.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp';
+    document.getElementById('blp_preview_cover_img').src = versionBookImagePreview(b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp');
+    document.getElementById('blp_preview_banner_img').src = versionBookImagePreview(b.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp');
   });
 
   document.getElementById('btn_add_kpi_badge_item')?.addEventListener('click', () => {
@@ -2768,7 +2785,7 @@ Instant Download & Lifetime Access
     const previewImg = previewImgId ? document.getElementById(previewImgId) : null;
 
     urlInput?.addEventListener('input', () => {
-      if (urlInput.value && previewImg) previewImg.src = urlInput.value;
+      if (urlInput.value && previewImg) previewImg.src = versionBookImagePreview(urlInput.value);
     });
 
     fileInput?.addEventListener('change', (e) => {
@@ -3062,7 +3079,7 @@ Instant Download & Lifetime Access
               <div style="background: var(--admin-surface, #1e293b); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: border-color 0.2s;">
                 <!-- 1. Cover & Info -->
                 <div style="display: flex; align-items: center; gap: 12px; min-width: 240px; flex: 1 1 auto;">
-                  <img src="${coverImg}" alt="Cover" style="width: 52px; height: 68px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); flex-shrink: 0;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+                  <img src="${escapeHtml(versionBookImagePreview(coverImg, p.updated_at))}" alt="Cover" style="width: 52px; height: 68px; object-fit: contain; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); flex-shrink: 0;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
                   <div style="min-width: 0;">
                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap;">
                       <span style="font-family: monospace; font-size: 0.95rem; font-weight: 900; color: ${themeCol}; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; display: inline-block;">
@@ -6236,7 +6253,7 @@ Instant Download & Lifetime Access
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;">
         ${currentDemoImages.map((img, idx) => `
           <div style="position:relative;width:68px;height:90px;border-radius:6px;overflow:hidden;border:1.5px solid var(--admin-border);box-shadow:0 2px 6px rgba(0,0,0,0.2);">
-            <img src="${img}" style="width:100%;height:100%;object-fit:cover;" />
+            <img src="${escapeHtml(versionBookImagePreview(img))}" style="width:100%;height:100%;object-fit:cover;" />
             <button type="button" onclick="window.removeDemoImage(${idx})" style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
           </div>
         `).join('')}
@@ -6663,7 +6680,7 @@ Instant Download & Lifetime Access
 
     if (pTitle) pTitle.textContent = title;
     if (pDesc) pDesc.textContent = desc;
-    if (pImg && imgUrl) pImg.src = imgUrl;
+    if (pImg && imgUrl) pImg.src = versionBookImagePreview(imgUrl);
   };
 
   window.clearImageField = function(type) {
@@ -7320,6 +7337,7 @@ Instant Download & Lifetime Access
     // CRITICAL SAFETY: Set new ID and set editingBookId to new ID so main book is NEVER mutated
     setVal('blp_input_book_id', newId);
     editingBookId = newId;
+    currentAssetRevision = page.updated_at || '';
 
     const titleEl = document.getElementById('admin-book-builder-title');
     if (titleEl) titleEl.textContent = `✨ नया ${curBookType === 'demo' ? 'डेमो' : (curBookType === 'free' ? 'फ्री बोनस' : 'बुक')} पेज: ${newId} (${sourceId} से इम्पोर्टेड)`;
@@ -7341,9 +7359,9 @@ Instant Download & Lifetime Access
     setVal('blp_cover_effect', page.cover_effect || '3d_float');
 
     const prevCover = document.getElementById('blp_preview_cover_img');
-    if (prevCover && (hero.cover_image || page.cover)) prevCover.src = hero.cover_image || page.cover;
+    if (prevCover && (hero.cover_image || page.cover)) prevCover.src = versionBookImagePreview(hero.cover_image || page.cover);
     const prevBanner = document.getElementById('blp_preview_banner_img');
-    if (prevBanner && hero.banner_image) prevBanner.src = hero.banner_image;
+    if (prevBanner && hero.banner_image) prevBanner.src = versionBookImagePreview(hero.banner_image);
 
     // 2. Dynamic KPIs
     const rawKpis = (hero.features && Array.isArray(hero.features) && hero.features.length > 0)
@@ -7420,10 +7438,9 @@ Instant Download & Lifetime Access
     if (typeof renderVideosInBuilder === 'function') renderVideosInBuilder();
 
     // 8. Demo Preview Gallery & Demo Reader Allowed Pages
-    const demoImgs = page.demo_images || page.demoImages || page.preview_images;
-    if (demoImgs && Array.isArray(demoImgs) && demoImgs.length > 0) {
-      currentDemoImages = Array.from(new Set(demoImgs.filter(Boolean)));
-    }
+    const demoImgs = [page.demo_images, page.demoImages, page.preview_images]
+      .find(images => Array.isArray(images) && images.length > 0) || [];
+    currentDemoImages = Array.from(new Set(demoImgs.filter(Boolean)));
     setVal('blp_demo_reader_pages', page.demo_reader_pages || page.demoPages || (curBookType === 'demo' ? '1, 2, 3, 4, 5' : ''));
     if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
 
@@ -7497,7 +7514,7 @@ Instant Download & Lifetime Access
         const img = document.getElementById(`blp_sec_banner_preview_${s.key}`);
         if (bannerUrl) {
           if (input) input.value = bannerUrl;
-          if (img) img.src = bannerUrl;
+          if (img) img.src = versionBookImagePreview(bannerUrl);
           if (wrap) wrap.style.display = 'block';
         } else {
           if (input) input.value = '';
@@ -7539,6 +7556,7 @@ Instant Download & Lifetime Access
 
   function resetBookBuilder() {
     editingBookId = null;
+    currentAssetRevision = '';
     currentKpis = [
       { icon: 'fa-seedling', text: '120 पेज की प्रीमियम' },
       { icon: 'fa-camera', text: '300+ फोटो' },
@@ -7717,6 +7735,7 @@ Instant Download & Lifetime Access
         if (bObj) {
           if (typeof resetBookBuilder === 'function') resetBookBuilder();
           editingBookId = bObj.id;
+          currentAssetRevision = bObj.updated_at || '';
           const titleEl = document.getElementById('admin-book-builder-title');
           if (titleEl) titleEl.textContent = `✏️ एडिट बुक: ${bObj.id}`;
           setVal('blp_input_book_id', bObj.id);
@@ -7726,7 +7745,7 @@ Instant Download & Lifetime Access
           setVal('blp_hero_offer_price', bObj.offerPrice || 99);
           setVal('blp_cover_url', bObj.cover || bObj.thumbnail || '');
           const prevImg = document.getElementById('blp_preview_cover_img');
-          if (prevImg && bObj.cover) prevImg.src = bObj.cover;
+          if (prevImg && bObj.cover) prevImg.src = versionBookImagePreview(bObj.cover);
           const bIsComing = Boolean(bObj.isComingSoon === true || bObj.is_coming_soon === true || bObj.status === 'coming_soon' || bObj.badge === 'coming_soon' || bObj.store_badge === 'coming_soon');
           setVal('blp_is_coming_soon', bIsComing ? 'true' : 'false');
           setVal('blp_store_badge', bObj.badge || bObj.store_badge || (bIsComing ? 'coming_soon' : 'best_seller'));
@@ -7770,6 +7789,7 @@ Instant Download & Lifetime Access
       }
 
       editingBookId = page.id;
+      currentAssetRevision = page.updated_at || '';
       const titleEl = document.getElementById('admin-book-builder-title');
       if (titleEl) titleEl.textContent = `✏️ एडिट बुक लैंडिंग पेज: ${page.id}`;
 
@@ -7819,9 +7839,9 @@ Instant Download & Lifetime Access
       setVal('blp_cover_effect', page.cover_effect || '3d_float');
 
       const prevCover = document.getElementById('blp_preview_cover_img');
-      if (prevCover && hero.cover_image) prevCover.src = hero.cover_image;
+      if (prevCover && hero.cover_image) prevCover.src = versionBookImagePreview(hero.cover_image);
       const prevBanner = document.getElementById('blp_preview_banner_img');
-      if (prevBanner && hero.banner_image) prevBanner.src = hero.banner_image;
+      if (prevBanner && hero.banner_image) prevBanner.src = versionBookImagePreview(hero.banner_image);
 
       // OG Tags
       setVal('blp_og_title', page.og_title || hero.title || page.book_name || '');
@@ -7933,7 +7953,7 @@ Instant Download & Lifetime Access
           const img = document.getElementById(`blp_sec_banner_preview_${s.key}`);
           if (bannerUrl) {
             if (input) input.value = bannerUrl;
-            if (img) img.src = bannerUrl;
+            if (img) img.src = versionBookImagePreview(bannerUrl);
             if (wrap) wrap.style.display = 'block';
           } else {
             if (input) input.value = '';
