@@ -20,7 +20,7 @@
     return localStorage.getItem('AOI_REFERRER_ID') || '';
   }
 
-  // Get current user's phone or ID to act as referrer
+  // Get current user's registered Share ID to act as referrer (ZERO RAW PHONE LEAK)
   function getCurrentUserRefId() {
     let ref = '';
     // 1. Authenticated user in session or localStorage (Top Priority)
@@ -28,38 +28,60 @@
       const u = (window.V1_SESSION && typeof window.V1_SESSION.getCurrentUser === 'function')
         ? window.V1_SESSION.getCurrentUser()
         : JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-      if (u && (u.share_id || u.referral_code || u.mobile)) {
-        ref = u.share_id || u.referral_code || u.mobile || '';
+      if (u) {
+        if (u.share_id && !/^\d{10}$/.test(u.share_id)) ref = u.share_id;
+        else if (u.referral_code && !/^\d{10}$/.test(u.referral_code)) ref = u.referral_code;
+        else if (u.mobile) {
+          const cleanM = String(u.mobile).replace(/\D/g, '').slice(-10);
+          if (cleanM.length === 10) ref = 'AI' + cleanM.slice(-6);
+        }
       }
     } catch (e) { }
 
     // 2. Global unified helper
+    if (!ref && typeof window.getAuthoritativeShareId === 'function') {
+      try {
+        const s = window.getAuthoritativeShareId();
+        if (s && !/^\d{10}$/.test(s)) ref = s;
+      } catch (e) { }
+    }
     if (!ref && typeof window.getUnifiedShareId === 'function') {
       try {
         const s = window.getUnifiedShareId();
-        if (s && s !== 'AI000004') ref = s;
+        if (s && !/^\d{10}$/.test(s)) ref = s;
       } catch (e) { }
     }
     if (!ref && typeof window.getUserShareId === 'function') {
       try {
         const s = window.getUserShareId();
-        if (s && s !== 'AI000004') ref = s;
+        if (s && !/^\d{10}$/.test(s)) ref = s;
       } catch (e) { }
     }
 
-    // 3. Authenticated mobile
+    // 3. Registered Share ID from localStorage
     if (!ref) {
-      const mob = (localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
-      if (mob.length === 10) ref = mob;
+      const regShare = localStorage.getItem('aarogyam_user_share_id') || localStorage.getItem('aim_user_share_id') || localStorage.getItem('user_share_id');
+      if (regShare && !/^\d{10}$/.test(regShare)) ref = regShare;
     }
 
-    // 4. Guest lead phone (only if no authenticated user)
+    // 4. Derive AI-Code from stored mobile (NEVER return raw phone number)
     if (!ref) {
-      try { ref = localStorage.getItem('aarogyam_user_phone') || ''; } catch (e) { }
+      try {
+        const mob = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+        if (mob.length === 10) {
+          ref = 'AI' + mob.slice(-6);
+        }
+      } catch (e) { }
     }
 
     if (!ref) {
-      ref = getReferrerId();
+      const rawRef = getReferrerId();
+      if (rawRef && !/^\d{10}$/.test(rawRef)) ref = rawRef;
+    }
+
+    // Strict validation: NEVER return 10-digit number
+    if (/^\d{10}$/.test(ref)) {
+      ref = 'AI' + ref.slice(-6);
     }
     return ref || 'AI000004';
   }

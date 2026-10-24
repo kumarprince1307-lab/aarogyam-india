@@ -641,19 +641,42 @@ async function fetchAndRenderSakhiInsights() {
   let list = [];
   try {
     const db = window.dbClient || window.supabase;
-    if (db) {
+    if (db && typeof db.from === 'function') {
       const { data, error } = await db
         .from('sakhi_user_insights')
         .select('*')
         .order('last_active_at', { ascending: false })
-        .limit(100);
+        .limit(200);
 
       if (!error && data && data.length > 0) {
         list = data;
       }
     }
   } catch (err) {
-    console.debug('Supabase sakhi insights fetch error, checking fallback:', err?.message);
+    console.debug('Supabase client error, checking direct REST fetch:', err?.message);
+  }
+
+  // Guaranteed Direct REST Fetch Fallback if client wasn't ready
+  if (list.length === 0) {
+    try {
+      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?select=*&order=last_active_at.desc&limit=200';
+      const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      const res = await fetch(sbUrl, {
+        headers: {
+          'apikey': sbKey,
+          'Authorization': `Bearer ${sbKey}`,
+          'Accept': 'application/json'
+        }
+      });
+      if (res.ok) {
+        const restData = await res.json();
+        if (Array.isArray(restData) && restData.length > 0) {
+          list = restData;
+        }
+      }
+    } catch(fetchErr) {
+      console.warn('[Sakhi AI Hub] Direct REST fetch error:', fetchErr);
+    }
   }
 
   // Fallback to local storage if DB empty

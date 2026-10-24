@@ -231,6 +231,28 @@ async function loadMarketingHubData(forceSync = false) {
       p.sakhiRecoEbook = ins ? ins.recommended_ebook : null;
     });
 
+    // Also include Sakhi Leads into profiles for unified reports
+    const knownM = new Set(profiles.map(p => String(p.mobile || '').replace(/\D/g, '').slice(-10)).filter(Boolean));
+    sakhiInsights.forEach(ins => {
+      const cMob = String(ins.mobile || ins.user_key || '').replace(/\D/g, '').slice(-10);
+      if (cMob && cMob.length === 10 && !knownM.has(cMob)) {
+        knownM.add(cMob);
+        profiles.push({
+          id: ins.profile_id || ('sakhi_' + cMob),
+          full_name: ins.user_name || 'सखी किसान',
+          mobile: cMob,
+          email: '',
+          registration_source: 'Sakhi AI Chat Lead',
+          created_at: ins.created_at || ins.last_active_at || new Date().toISOString(),
+          sakhiInsights: ins,
+          sakhiChatCount: ins.interaction_count || 1,
+          sakhiPrimaryDomain: ins.primary_domain || 'agri',
+          sakhiLastTopic: ins.last_query_topic || 'फसल परामर्श',
+          sakhiRecoEbook: ins.recommended_ebook || 'BK002'
+        });
+      }
+    });
+
     mktState.sakhiInsights = sakhiInsights;
 
     // Load real AarogyamTube recordings from JSON and merge with local uploads

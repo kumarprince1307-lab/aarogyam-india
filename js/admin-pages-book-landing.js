@@ -115,6 +115,66 @@ export async function initBookLandingPages() {
   let currentBonusPoints = [];
   let currentTocPoints = [];
   let currentFaqs = [];
+
+  // Global Undo History Stack for BLP Builder
+  window._blpUndoStack = window._blpUndoStack || [];
+  
+  // Modular Single Segment Save Handler for Instant Editing (e.g. Gehu, Chana, etc.)
+  window.saveBlpSpecificSegment = async function(segmentName) {
+    console.log('[Book Landing] Saving individual segment:', segmentName);
+    const saveBtn = document.getElementById('btn_save_book_lp');
+    if (typeof showToast === 'function') {
+      showToast(`💾 सेगमेंट '${segmentName}' सुरक्षित किया जा रहा है...`, 'info');
+    }
+    try {
+      if (typeof saveBookLandingPage === 'function') {
+        await saveBookLandingPage();
+        if (typeof showToast === 'function') {
+          showToast(`✅ '${segmentName}' सफलतापूर्वक सुरक्षित हो गया!`, 'success');
+        }
+      } else if (saveBtn) {
+        saveBtn.click();
+      }
+    } catch (e) {
+      console.error('Error saving segment:', e);
+      if (typeof showToast === 'function') {
+        showToast(`⚠️ त्रुटि: ${e.message}`, 'error');
+      }
+    }
+  };
+
+  window.saveBlpUndoState = function() {
+    try {
+      window._blpUndoStack.push({
+        faqs: JSON.parse(JSON.stringify(currentFaqs || [])),
+        reviews: JSON.parse(JSON.stringify(currentReviews || [])),
+        demoImages: JSON.parse(JSON.stringify(currentDemoImages || [])),
+        toc: JSON.parse(JSON.stringify(currentTocPoints || []))
+      });
+      if (window._blpUndoStack.length > 20) window._blpUndoStack.shift();
+    } catch(e) {}
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      if (['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) return;
+      if (window._blpUndoStack && window._blpUndoStack.length > 0) {
+        const last = window._blpUndoStack.pop();
+        if (last) {
+          currentFaqs = last.faqs || [];
+          currentReviews = last.reviews || [];
+          currentDemoImages = last.demoImages || [];
+          currentTocPoints = last.toc || [];
+          if (typeof renderFaqsInBuilder === 'function') renderFaqsInBuilder();
+          if (typeof renderReviewsInBuilder === 'function') renderReviewsInBuilder();
+          if (typeof renderTocPointsInBuilder === 'function') renderTocPointsInBuilder();
+          if (typeof renderDemoImagesInBuilder === 'function') renderDemoImagesInBuilder();
+          if (typeof showToast === 'function') showToast('↩️ पिछला बदलाव वापस लाया गया (Undo - Ctrl+Z)!', 'info');
+        }
+      }
+    }
+  });
+
   let currentSuggestedBooks = [];
   let currentAudioHighlights = [];
   let currentSectionsOrder = [];
@@ -280,6 +340,7 @@ export async function initBookLandingPages() {
               <button type="button" id="btn_generate_book_code" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 700; padding: 4px 12px;">
                 ⚡ नया Book Code जनरेट करें
               </button>
+              <button type="button" onclick="window.saveBlpSpecificSegment('बुनियादी विवरण व कैटेगरी')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
               <button type="button" id="btn_add_new_category" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700; padding: 4px 12px;">
                 + नया Category जोड़ें
               </button>
@@ -533,6 +594,7 @@ export async function initBookLandingPages() {
               </div>
               <small style="color: var(--admin-muted);">जैसे: 120 पेज, 300+ फोटो, स्प्रे साइंस, फ्री बोनस PDF</small>
             </div>
+            <button type="button" onclick="window.saveBlpSpecificSegment('KPI बैजेस')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
             <button type="button" id="btn_add_kpi_badge_item" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 800;">
               + नया KPI बैज जोड़ें
             </button>
@@ -813,6 +875,7 @@ export async function initBookLandingPages() {
             <div style="font-weight: 800; color: #3b82f6; font-size: 0.95rem;">
               🎥 8. मल्टी-वीडियो मैनेजर (16:9 Landscape & 9:16 Shorts/Reels)
             </div>
+            <button type="button" onclick="window.saveBlpSpecificSegment('वीडियो गैलरी')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
             <button type="button" id="btn_add_video_item" class="admin-button small-button" style="background: #2563eb; color: #fff; font-weight: 700;">
               + नया वीडियो जोड़ें
             </button>
@@ -975,6 +1038,7 @@ export async function initBookLandingPages() {
             <div style="font-weight: 800; color: #38bdf8; font-size: 0.92rem;">
               📑 13. पुस्तक विवरण तालिका व "इस पुस्तक में क्या-क्या है?" (TOC Points)
             </div>
+            <button type="button" onclick="window.saveBlpSpecificSegment('विषय सूची व इंडेक्स (Index)')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
             <button type="button" id="btn_add_toc_point_item" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
               + नया अध्याय पॉइंट जोड़ें
             </button>
@@ -1016,6 +1080,7 @@ export async function initBookLandingPages() {
               <button type="button" onclick="window.importReviewsFromSelectedBook()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
                 📥 मुख्य पुस्तक से रिव्यू इम्पोर्ट करें
               </button>
+              <button type="button" onclick="window.saveBlpSpecificSegment('कस्टमर रिव्यूज')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
               <button type="button" id="btn_add_review_item" class="admin-button small-button" style="background: #d97706; color: #fff; font-weight: 700;">
                 + नया रिव्यू जोड़ें
               </button>
@@ -1040,6 +1105,7 @@ export async function initBookLandingPages() {
               <button type="button" onclick="window.importFaqsFromSelectedBook()" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 700;">
                 📥 मुख्य पुस्तक से FAQ इम्पोर्ट करें
               </button>
+              <button type="button" onclick="window.saveBlpSpecificSegment('FAQs प्रश्नोत्तर')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
               <button type="button" id="btn_add_faq_item" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
                 + नया FAQ जोड़ें
               </button>
@@ -8593,8 +8659,8 @@ Instant Download & Lifetime Access
       bonus_points: currentBonusPoints,
       table_of_contents: currentTocPoints,
       videos: currentVideos,
-      testimonials: currentReviews,
-      faqs: currentFaqs,
+      testimonials: (currentReviews && currentReviews.length > 0) ? currentReviews : (existingPage?.testimonials || []),
+      faqs: (currentFaqs && currentFaqs.length > 0) ? currentFaqs : (existingPage?.faqs || []),
       final_buy: {
         title: (document.getElementById('blp_final_buy_title')?.value || '').trim() || title,
         description: (document.getElementById('blp_final_buy_desc')?.value || '').trim() || (document.getElementById('blp_hero_subtitle')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || '').trim(),

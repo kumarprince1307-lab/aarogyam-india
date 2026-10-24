@@ -379,7 +379,7 @@ export async function fetchDashboardData(params = {}) {
       db.from('share_logs').select('id', { count: 'exact', head: true }).eq('event_type', 'visit').gte('created_at', startDateForFilter.toISOString()).lt('created_at', apiEndDate.toISOString()),
       (async () => {
         try {
-          return await db.from('sakhi_user_insights').select('primary_domain, interaction_count, user_name, phone_number, created_at').order('created_at', { ascending: false }).limit(200);
+          return await db.from('sakhi_user_insights').select('primary_domain, interaction_count, user_name, mobile, created_at').order('created_at', { ascending: false }).limit(200);
         } catch (_) {
           return { data: [] };
         }
@@ -488,12 +488,39 @@ export async function fetchDashboardData(params = {}) {
     }));
 
     // Process Sakhi AI Live Metrics for Dashboard
-    const allSakhi = sakhiInsightsRes?.data || [];
+    let allSakhi = sakhiInsightsRes?.data || [];
+    if (!Array.isArray(allSakhi)) allSakhi = [];
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const localChatUsers = JSON.parse(localStorage.getItem('SAKHI_PERSISTENT_CHAT_USERS') || '[]');
+        if (Array.isArray(localChatUsers) && localChatUsers.length > 0) {
+          const knownMobiles = new Set(allSakhi.map(s => String(s.mobile || s.user_key || '').slice(-10)));
+          localChatUsers.forEach(lu => {
+            const mClean = String(lu.mobile || lu.phone || '').slice(-10);
+            if (mClean && !knownMobiles.has(mClean)) {
+              knownMobiles.add(mClean);
+              allSakhi.push({
+                user_name: lu.name || 'सखी किसान',
+                mobile: mClean,
+                primary_domain: lu.domain || 'कृषि (Agriculture)',
+                interaction_count: lu.chatCount || lu.chats || 1,
+                created_at: lu.date || new Date().toISOString()
+              });
+            }
+          });
+        }
+      }
+    } catch (_) {}
+
     const sakhiTotalUsers = allSakhi.length;
     const sakhiTotalInteractions = allSakhi.reduce((sum, item) => sum + (Number(item.interaction_count) || 1), 0);
     const domainCounts = {};
     allSakhi.forEach(item => {
-      const dom = item.primary_domain || 'कृषि (Agriculture)';
+      let dom = item.primary_domain || 'कृषि (Agriculture)';
+      if (dom === 'agri') dom = 'कृषि (Agriculture)';
+      else if (dom === 'health') dom = 'स्वास्थ्य (Health)';
+      else if (dom === 'pashu') dom = 'पशुपालन (Livestock)';
+      else if (dom === 'business') dom = 'बिजनेस (Business)';
       domainCounts[dom] = (domainCounts[dom] || 0) + 1;
     });
 
@@ -770,7 +797,7 @@ export async function fetchUsers(params = {}) {
 
     const { data: profiles, error: profilesError } = await queryBuilder;
     if (profilesError) console.error("fetchUsers query error:", profilesError.message);
-    if (!profiles || profiles.length === 0) return { success: true, data: [] };
+    if (!profiles) profiles = [];
 
     const profileIds = profiles.map(p => p.id).filter(Boolean);
     const shareIds = profiles.map(p => p.share_id || p.referral_code).filter(Boolean);
@@ -929,6 +956,43 @@ export async function fetchUsers(params = {}) {
         sakhiRecoEbook,
         sakhiInsights: sakhiIns
         };
+    });
+
+    // Step 4.1: Include Sakhi Chat users who do not have a profiles record yet (e.g. 8090534335)
+    const knownMobiles = new Set(profiles.map(p => String(p.mobile || '').replace(/\D/g, '').slice(-10)).filter(Boolean));
+    allSakhiInsights.forEach(ins => {
+      const mClean = String(ins.mobile || ins.user_key || '').replace(/\D/g, '').slice(-10);
+      if (mClean && mClean.length === 10 && !knownMobiles.has(mClean)) {
+        knownMobiles.add(mClean);
+        mappedData.push({
+          id: ins.profile_id || ('sakhi_' + mClean),
+          name: ins.user_name || 'सखी किसान',
+          mobile: mClean,
+          email: '',
+          source: 'Sakhi AI Chat Lead',
+          status: 'active',
+          shareId: 'N/A',
+          directReferrals: 0,
+          totalShares: 0,
+          totalClicks: 0,
+          totalVisitors: 0,
+          totalDirectPurchases: 0,
+          totalPurchases: 0,
+          totalSpent: 0,
+          totalDownloads: 0,
+          downloadLimit: 0,
+          appInstalled: false,
+          appInstalledAt: null,
+          webinarLeads: 0,
+          webinarJoined: 0,
+          webinarAttendees: [],
+          sakhiChatCount: ins.interaction_count || 1,
+          sakhiPrimaryDomain: ins.primary_domain || 'agri',
+          sakhiLastTopic: ins.last_query_topic || 'फसल परामर्श',
+          sakhiRecoEbook: ins.recommended_ebook || 'BK002',
+          sakhiInsights: ins
+        });
+      }
     });
 
     if (params.sort === 'sakhiChats') {
@@ -2690,4 +2754,4 @@ export async function fetchAllUsersAdmin() {
     console.error('Failed to fetch all users for admin:', err);
     return { success: false, data: [], error: err.message };
   }
-}
+}

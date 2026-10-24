@@ -1201,25 +1201,17 @@ async function loadBookStudio(bookId) {
         ? studioBookData.pageImagesPath 
         : `images/books/${cleanId}`;
 
-    // 3. Static WebP images in Repository (Priority for main books with WebP pages, e.g. BK001, BK002, BK015)
-    if (!studioPageImages.length && !isDemoStudio && repoTotal > 0 && (studioBookData?.hasWebpPages || cleanId.startsWith('BK') || cleanId === 'BK001' || cleanId === 'BK002' || cleanId === 'BK015')) {
-        studioPageImages = [];
-        for (let p = 1; p <= repoTotal; p++) {
-            studioPageImages.push(`../${basePath}/${p}.webp`);
-        }
-        studioTotalPages = repoTotal;
-    }
-
-    // 4. If not static WebP, try loading from IndexedDB
+    // 3. Check Saved Pages in IndexedDB FIRST (User-saved edits take highest priority)
     if (!studioPageImages.length) {
         const dbImages = await loadPagesFromDb(bookId);
-        if (dbImages && dbImages.length > 0) {
+        if (dbImages && Array.isArray(dbImages) && dbImages.length > 0) {
             studioPageImages = dbImages;
             studioTotalPages = dbImages.length;
+            console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from IndexedDB for ${cleanId}`);
         }
     }
 
-    // 5. Try loading from LocalStorage
+    // 4. Check Saved Pages in LocalStorage SECOND
     if (!studioPageImages.length) {
         try {
             const localPages = localStorage.getItem(`AOI_BOOK_PAGES_${cleanId}`);
@@ -1228,9 +1220,19 @@ async function loadBookStudio(bookId) {
                 if (Array.isArray(parsedPages) && parsedPages.length > 0) {
                     studioPageImages = parsedPages;
                     studioTotalPages = parsedPages.length;
+                    console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from LocalStorage for ${cleanId}`);
                 }
             }
         } catch (e) {}
+    }
+
+    // 5. Static WebP images Fallback (ONLY if user has never saved a custom page list)
+    if (!studioPageImages.length && !isDemoStudio && repoTotal > 0 && (studioBookData?.hasWebpPages || cleanId.startsWith('BK'))) {
+        studioPageImages = [];
+        for (let p = 1; p <= repoTotal; p++) {
+            studioPageImages.push(`../${basePath}/${p}.webp`);
+        }
+        studioTotalPages = repoTotal;
     }
 
     // 6. Check custom book pageImages in JSON / Landing Page (ONLY for main books, NEVER demo books)

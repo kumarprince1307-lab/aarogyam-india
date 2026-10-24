@@ -1,3 +1,44 @@
+
+// Unified Non-Intrusive Audio/TTS Unsupported Banner (Shows once, never spams if dismissed)
+function showAarogyamTtsUnsupportedBanner() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  try {
+    if (localStorage.getItem('aarogyam_tts_unsupported_dismissed') === '1' ||
+        sessionStorage.getItem('aarogyam_tts_unsupported_dismissed') === '1') {
+      return;
+    }
+  } catch (e) {}
+
+  if (document.getElementById('aarogyam-tts-unsupported-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'aarogyam-tts-unsupported-banner';
+  banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#f8fafc;border:1.5px solid #38bdf8;box-shadow:0 10px 25px rgba(0,0,0,0.5);border-radius:12px;padding:12px 18px;z-index:999999;display:flex;align-items:center;gap:12px;font-size:0.88rem;font-family:inherit;max-width:92vw;width:440px;';
+  banner.innerHTML = '<span style="font-size:1.3rem;">ℹ️</span>' +
+    '<span style="flex:1;line-height:1.4;">आपके ब्राउज़र में टेक्स्ट-टू-स्पीच ऑडियो सपोर्ट उपलब्ध नहीं है। आप सीधे पढ़कर आनंद ले सकते हैं।</span>' +
+    '<button type="button" id="btn-close-tts-banner" style="background:#0284c7;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;">✕ समझ गया</button>';
+  
+  if (document.body) {
+    document.body.appendChild(banner);
+  } else {
+    window.addEventListener('DOMContentLoaded', () => document.body.appendChild(banner));
+  }
+
+  const dismiss = () => {
+    try {
+      localStorage.setItem('aarogyam_tts_unsupported_dismissed', '1');
+      sessionStorage.setItem('aarogyam_tts_unsupported_dismissed', '1');
+    } catch (e) {}
+    banner.remove();
+  };
+
+  const btn = document.getElementById('btn-close-tts-banner');
+  if (btn) btn.onclick = dismiss;
+}
+if (typeof window !== 'undefined') {
+  window.showAarogyamTtsUnsupportedBanner = showAarogyamTtsUnsupportedBanner;
+}
+
 /* ==========================================================
    AAROGYAM INDIA — UNIVERSAL DYNAMIC BOOK LANDING PAGE JS (PRO V25.0)
    Full Dynamic Engine for ebooks/book-landing.html
@@ -454,7 +495,8 @@
     try { renderDynamicOpenGraph(); } catch(e) { console.warn('renderDynamicOpenGraph error:', e); }
     try { bindInteractiveEvents(); } catch(e) { console.warn('bindInteractiveEvents error:', e); }
     try { renderFaqSection(); } catch(e) { console.warn('renderFaqSection error:', e); }
-    try { renderBookDetails(); } catch(e) { console.warn('renderBookDetails error:', e); }
+    try { renderBookDetails(); } catch(e) {}
+    try { renderBookBundleCarousel(); } catch(e) { console.warn('renderBookDetails error:', e); }
     try { renderFinalBuySection(); } catch(e) { console.warn('renderFinalBuySection error:', e); }
     try { initLandingPageAutoplay(); } catch(e) { console.warn('initLandingPageAutoplay error:', e); }
     try { enforceHiddenSections(); } catch(e) { console.warn('enforceHiddenSections error:', e); }
@@ -3468,7 +3510,7 @@
 
   function playSpeechSynthesisTts(text) {
     if (!('speechSynthesis' in window)) {
-      if (typeof showToast === 'function') showToast('आपके ब्राउज़र में Speech Audio सपोर्ट नहीं है।', 'info');
+      if (typeof showAarogyamTtsUnsupportedBanner === 'function') showAarogyamTtsUnsupportedBanner();
       window.stopUblLandingAudio();
       return;
     }
@@ -3742,3 +3784,84 @@
   }
 
 })(window);
+
+
+  // =========================================================================
+  // BOOK COMBO / BOOK BUNDLE CAROUSEL ENGINE (Industry Best Practice)
+  // =========================================================================
+  function renderBookBundleCarousel() {
+    const l = currentLandingData || {};
+    const b = currentBookData || {};
+    const isBundle = l.is_bundle === true || b.is_bundle === true || Array.isArray(l.bundle_books) || Array.isArray(b.bundle_books) || String(b.id || '').toUpperCase().includes('BUNDLE') || String(b.id || '').toUpperCase().includes('COMBO');
+    
+    // Check if container already exists or create before Final Buy
+    let bundleSec = document.getElementById('sec-book-bundle-carousel');
+    if (!isBundle) {
+      if (bundleSec) bundleSec.style.display = 'none';
+      return;
+    }
+
+    const bundleList = l.bundle_books || b.bundle_books || [
+      { id: "BK001", name: "खरीफ मास्टर गाइड 2026", cover: "/images/books/kharif-master-guide-2026-cover.webp", pages: 152, price: "₹149", desc: "धान, मक्का, सोयाबीन व सभी खरीफ फसलों का सम्पूर्ण उपचार" },
+      { id: "BK002", name: "खेती का डॉक्टर", cover: "/images/books/fasal-ka-doctor-cover.webp", pages: 118, price: "₹199", desc: "फसलों के समस्त रोग, फंगस व कीटनाशक दवाओं की सटीक गाइड" },
+      { id: "BK015", name: "चना व रबी फसल क्रांति", cover: "/images/books/fasal-ka-doctor-cover.webp", pages: 154, price: "₹149", desc: "चना, मसूर व रबी फसलों में अधिक पैदावार का वैज्ञानिक फॉर्मूला" },
+      { id: "BK016", name: "कृषि दवा डायरेक्टरी व स्प्रे चार्ट", cover: "/images/books/BK016/cover.webp", pages: 96, price: "₹99", desc: "मार्केट में मिलने वाली 120+ दवाओं की सही डोज व मिलावट से बचाव" }
+    ];
+
+    if (!bundleSec) {
+      bundleSec = document.createElement('section');
+      bundleSec.id = 'sec-book-bundle-carousel';
+      bundleSec.className = 'landing-section';
+      bundleSec.style.cssText = 'padding:35px 15px;background:rgba(15,23,42,0.65);border-top:1px solid rgba(34,197,94,0.2);border-bottom:1px solid rgba(34,197,94,0.2);margin:25px 0;';
+      
+      const parent = document.getElementById('sec-final-buy') || document.querySelector('.landing-container') || document.body;
+      parent.parentNode.insertBefore(bundleSec, parent);
+    }
+
+    bundleSec.style.display = 'block';
+    bundleSec.innerHTML = `
+      <div style="max-width:1080px;margin:0 auto;">
+        <!-- Bundle Hero Header -->
+        <div style="text-align:center;margin-bottom:25px;">
+          <span style="background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:0.85rem;font-weight:800;padding:5px 15px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;display:inline-block;margin-bottom:10px;">
+            🎁 महा-बचत बुक कॉम्बो (Book Combo Bundle)
+          </span>
+          <h2 style="font-size:1.6rem;font-weight:900;color:#f8fafc;margin:5px 0 10px;">
+            इस कॉम्बो में शामिल सभी 4 संपूर्ण पुस्तकें
+          </h2>
+          <p style="color:#94a3b8;font-size:0.95rem;max-width:650px;margin:0 auto;">
+            अलग-अलग खरीदने के बजाय पूरे बंडल में पाएं 40% तक की भारी बचत, सम्पूर्ण ऑडियो एक्सेस और आजीवन वैधता!
+          </p>
+        </div>
+
+        <!-- Horizontal Scrollable Carousel -->
+        <div style="display:flex;gap:18px;overflow-x:auto;padding:10px 5px 20px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;">
+          ${bundleList.map((item, idx) => `
+            <div style="flex:0 0 260px;background:rgba(30,41,59,0.9);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 25px rgba(0,0,0,0.3);position:relative;">
+              <span style="position:absolute;top:10px;left:10px;background:#10b981;color:#fff;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:8px;">
+                पुस्तक ${idx + 1}
+              </span>
+              <div style="text-align:center;margin:15px 0 10px;">
+                <img src="${item.cover || '/images/books/kharif-master-guide-2026-cover.webp'}" alt="${item.name}" style="height:170px;max-width:100%;object-fit:cover;border-radius:8px;box-shadow:0 6px 15px rgba(0,0,0,0.4);" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+              </div>
+              <div>
+                <h3 style="font-size:1.05rem;font-weight:800;color:#f1f5f9;margin:0 0 6px;line-height:1.3;">
+                  ${item.name}
+                </h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:0.8rem;color:#cbd5e1;">
+                  <span>📄 ${item.pages || '100+'} पेज</span>
+                  <span style="color:#4ade80;font-weight:700;">मूल्य: ${item.price || 'शामिल'}</span>
+                </div>
+                <p style="font-size:0.82rem;color:#94a3b8;line-height:1.4;margin:0 0 12px;">
+                  ${item.desc || 'खेती की आधुनिक तकनीक एवं फसल सुरक्षा'}
+                </p>
+              </div>
+              <a href="/ebooks/book-landing.html?id=${item.id}" target="_blank" style="display:block;text-align:center;background:rgba(255,255,255,0.08);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);padding:7px;border-radius:8px;font-size:0.8rem;font-weight:700;text-decoration:none;transition:0.2s;">
+                📖 पुस्तक विवरण देखें >
+              </a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }

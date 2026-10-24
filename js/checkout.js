@@ -1156,8 +1156,10 @@ async function loadBook() {
         // If not found in JSON but custom params provided, build dynamic product
         if (!book) {
             const isSub = targetId === "SUB001" || (customTitle && customTitle.toLowerCase().includes("vip"));
-            const defMrp = customAmount ? (parseInt(customAmount, 10) >= 999 ? 2999 : 299) : (isSub ? 2999 : 299);
-            const defPrice = customAmount ? parseInt(customAmount, 10) : (isSub ? 999 : 99);
+            // 🛡️ STRICT SECURITY: Raw customAmount can NEVER dictate price without valid cryptographic signature
+            const safeParsedPrice = (verifiedOfferAmount !== null) ? verifiedOfferAmount : (isSub ? 999 : 99);
+            const defMrp = isSub ? 2999 : 299;
+            const defPrice = safeParsedPrice;
             const defTitle = customTitle || (isSub ? "👑 Aarogyam Pro VIP Annual Subscription" : "🌾 Aarogyam India ई-बुक मास्टरक्लास");
 
             book = {
@@ -1674,6 +1676,28 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         const bookPrice = window.currentCheckoutBook.offerPrice;
         const walletDiscount = (window.appliedWalletDiscount || 0);
         const finalPayablePrice = Math.max(0, bookPrice - walletDiscount);
+
+        // 🛡️ ANTI-TAMPERING & CARD-TESTING PROTECTION
+        const MAX_PERMITTED_PRICE = 999;
+        if (finalPayablePrice > MAX_PERMITTED_PRICE && !window.activeVerifiedOffer) {
+            console.error("CRITICAL SECURITY ALERT: Tampered amount blocked:", finalPayablePrice);
+            alert("सुरक्षा चेतावनी: अमान्य भुगतान राशि (₹" + finalPayablePrice + ")! सिस्टम द्वारा छेड़छाड़ की गई राशि ब्लॉक कर दी गई है।");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+            return;
+        }
+
+        const cardAttemptsKey = 'ai_card_attempts_' + new Date().toISOString().slice(0, 10);
+        let cardAttempts = 0;
+        try {
+            cardAttempts = parseInt(sessionStorage.getItem(cardAttemptsKey) || '0', 10);
+        } catch(e) {}
+        if (cardAttempts >= 6) {
+            alert("अत्यधिक विफल प्रयासों के कारण सुरक्षा हेतु यह सत्र अस्थायी रूप से रोक दिया गया है। कृपया 15 मिनट बाद पुनः प्रयास करें या UPI विकल्प चुनें।");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+            return;
+        }
         
         const orderData = {
             bookId: bookIdToBuy,

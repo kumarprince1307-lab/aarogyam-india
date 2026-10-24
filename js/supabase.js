@@ -807,6 +807,13 @@ function startPayment() {
     
     const currentBookId = window.currentOrder.bookId;
     const currentAmount = window.currentOrder.amount;
+
+    // 🛡️ Anti-Tampering Shield
+    if (currentAmount > 999 && !window.activeVerifiedOffer) {
+        console.error("Security alert: Tampered amount blocked in supabase.js:", currentAmount);
+        alert("सुरक्षा चेतावनी: अमान्य भुगतान राशि! सिस्टम द्वारा छेड़छाड़ की गई राशि ब्लॉक कर दी गई है।");
+        return;
+    }
     const currentInvoiceNo = "INV_" + Date.now(); 
     
     const options = {
