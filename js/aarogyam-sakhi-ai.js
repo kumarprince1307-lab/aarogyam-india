@@ -15465,6 +15465,29 @@ ${shareUrl}`;
     }
   };
 
+  // FarmChat Live Weather Forecast Trigger
+  window.openSakhiWeatherForecast = function() {
+    const city = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'रीवा';
+    const query = `आज का मौसम और कृषि सलाह बताओ (${city})`;
+    window.sendSakhiSuggestion(query);
+  };
+
+  // Add profile crop quick action (FarmChat style)
+  window.addCropToProfile = function(cropName) {
+    try {
+      const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+      prof.crops = prof.crops || [];
+      if (!prof.crops.includes(cropName)) prof.crops.push(cropName);
+      localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
+      if (typeof showToast === 'function') {
+        showToast(`✅ आपकी प्रोफाइल में '${cropName}' की फसल जोड़ दी गई है!`, 'success');
+      }
+      if (typeof appendSakhiMessage === 'function') {
+        appendSakhiMessage('bot', `✅ आपकी प्रोफाइल में **${cropName}** फसल सफलतापूर्वक जोड़ दी गई है। अब आपको समय-समय पर इस फसल की बुवाई, सिंचाई व रोग अलर्ट मिलते रहेंगे!`, false);
+      }
+    } catch(e) {}
+  };
+
   // AUTO INIT ON DOM READY
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -15485,24 +15508,3 @@ ${shareUrl}`;
   }
 })();
 
-
-  // FarmChat Live Weather Forecast Trigger
-  window.openSakhiWeatherForecast = function() {
-    const city = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'रीवा';
-    const query = `आज का मौसम और कृषि सलाह बताओ (${city})`;
-    window.sendSakhiSuggestion(query);
-  };
-
-  // Add profile crop quick action (FarmChat style)
-  window.addCropToProfile = function(cropName) {
-    try {
-      const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
-      prof.crops = prof.crops || [];
-      if (!prof.crops.includes(cropName)) prof.crops.push(cropName);
-      localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
-      if (typeof showToast === 'function') {
-        showToast(`✅ आपकी प्रोफाइल में '${cropName}' की फसल जोड़ दी गई है!`, 'success');
-      }
-      appendSakhiMessage('bot', `✅ आपकी प्रोफाइल में **${cropName}** फसल सफलतापूर्वक जोड़ दी गई है। अब आपको समय-समय पर इस फसल की बुवाई, सिंचाई व रोग अलर्ट मिलते रहेंगे!`, false);
-    } catch(e) {}
-  };
