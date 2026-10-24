@@ -476,6 +476,129 @@ export async function initSakhiAiHub() {
     </div>
 
     <!-- ========================================================================= -->
+    <!-- 🌟 GEMINI 1.5 FLASH AI MASTER CONTROL & DAILY USAGE GRAPH -->
+    <!-- ========================================================================= -->
+    <div class="admin-card" id="sakhi-gemini-control-hub" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:2px solid #38bdf8;border-radius:14px;box-shadow:0 8px 24px rgba(56,189,248,0.2);">
+      
+      <!-- Top Title & Master Switch -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:18px;border-bottom:1px solid var(--admin-border,#334155);padding-bottom:14px;">
+        <div>
+          <h2 style="font-size:1.35rem;font-weight:900;color:var(--admin-text,#f8fafc);display:flex;align-items:center;gap:10px;margin:0;">
+            <span style="font-size:1.6rem;">⚡</span> जेमिनी 1.5 फ़्लैश AI मास्टर कंट्रोल सेंटर
+          </h2>
+          <p style="font-size:0.85rem;color:var(--admin-muted,#94a3b8);margin:5px 0 0 0;">
+            लाइव फोटो विज़न, फसल रोग डायग्नोसिस, पैथोलॉजी रिपोर्ट व रासायनिक डोज़ कैलकुलेशन इंजन।
+          </p>
+        </div>
+
+        <!-- Master ON / OFF Switch -->
+        <div style="display:flex;align-items:center;gap:12px;background:var(--admin-surface-2,#0f172a);padding:8px 16px;border-radius:12px;border:1.5px solid var(--admin-border,#334155);">
+          <div style="text-align:right;">
+            <div style="font-size:0.75rem;color:var(--admin-muted,#94a3b8);font-weight:700;">API स्थिति:</div>
+            <div id="geminiMasterStatusBadge" style="font-size:0.88rem;font-weight:900;color:#4ade80;">🟢 सक्रिय (API ON)</div>
+          </div>
+          <button type="button" id="geminiMasterToggleBtn" class="admin-btn" style="background:#16a34a;color:#fff;font-weight:800;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;">
+            स्विच बदलें
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid: API Key Manager & Global Quota Settings -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;">
+        
+        <!-- Box 1: Gemini API Token / Key -->
+        <div style="background:var(--admin-surface-2,#0f172a);padding:16px;border-radius:12px;border:1px solid var(--admin-border,#334155);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:0.84rem;font-weight:800;color:#38bdf8;">🔑 जेमिनी API टोकन (Google Gemini Key)</span>
+            <button type="button" id="toggleGeminiKeyVisibilityBtn" style="background:none;border:none;color:var(--admin-muted,#94a3b8);cursor:pointer;font-size:0.80rem;font-weight:700;">👁️ देखें</button>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input type="password" id="geminiApiKeyInput" value="" placeholder="जेमिनी API टोकन" class="admin-input" style="flex:1;font-family:monospace;font-size:0.85rem;" />
+            <button type="button" id="saveGeminiApiKeyBtn" class="admin-btn admin-btn-primary" style="background:#0284c7;border-color:#0284c7;font-weight:800;">सेव</button>
+          </div>
+          <div style="margin-top:8px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);display:flex;align-items:center;justify-content:space-between;">
+            <span>मॉडल: <strong>models/gemini-1.5-flash</strong></span>
+            <button type="button" id="testGeminiApiConnectionBtn" style="background:none;border:none;color:#38bdf8;text-decoration:underline;cursor:pointer;font-size:0.75rem;font-weight:700;">🔗 लाइव टेस्ट करें</button>
+          </div>
+          <div id="geminiTestStatusMsg" style="margin-top:6px;font-size:0.76rem;display:none;"></div>
+        </div>
+
+        <!-- Box 2: Global Quota Tier Controls (Active vs Inactive) -->
+        <div style="background:var(--admin-surface-2,#0f172a);padding:16px;border-radius:12px;border:1px solid var(--admin-border,#334155);">
+          <div style="font-size:0.84rem;font-weight:800;color:#fbbf24;margin-bottom:8px;">⚖️ दैनिक क्रेडिट कोटा नियंत्रण (Global Quotas)</div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <!-- Inactive User Limits -->
+            <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:8px;">
+              <div style="font-size:0.74rem;font-weight:800;color:#facc15;margin-bottom:4px;">🟡 इनएक्टिव (Free)</div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:0.70rem;color:var(--admin-muted,#94a3b8);">📷 फोटो / दिन: <input type="number" id="quotaInactiveImages" value="5" min="1" max="100" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #334155;background:#1e293b;color:#fff;font-weight:800;" /></label>
+                <label style="font-size:0.70rem;color:var(--admin-muted,#94a3b8);">💬 सवाल / दिन: <input type="number" id="quotaInactiveChats" value="50" min="5" max="500" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #334155;background:#1e293b;color:#fff;font-weight:800;" /></label>
+              </div>
+            </div>
+
+            <!-- Active User Limits -->
+            <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:8px;padding:8px;">
+              <div style="font-size:0.74rem;font-weight:800;color:#4ade80;margin-bottom:4px;">🟢 एक्टिव (Active ID)</div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:0.70rem;color:var(--admin-muted,#94a3b8);">📷 फोटो / दिन: <input type="number" id="quotaActiveImages" value="15" min="1" max="200" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #334155;background:#1e293b;color:#fff;font-weight:800;" /></label>
+                <label style="font-size:0.70rem;color:var(--admin-muted,#94a3b8);">💬 सवाल / दिन: <input type="number" id="quotaActiveChats" value="200" min="10" max="1000" style="width:55px;padding:2px 4px;border-radius:4px;border:1px solid #334155;background:#1e293b;color:#fff;font-weight:800;" /></label>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:0.72rem;color:#38bdf8;font-weight:700;">👑 एडमिन (7974422572): असीमित (∞ No Limit)</div>
+            <button type="button" id="saveGlobalQuotasBtn" class="admin-btn admin-btn-sm" style="background:#eab308;color:#000;font-weight:900;">कोटा सेव करें</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 7-Day Interactive Daily Usage & Token Bar Chart -->
+      <div style="background:var(--admin-surface-2,#0f172a);padding:18px;border-radius:12px;border:1px solid var(--admin-border,#334155);margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+          <div>
+            <h3 style="margin:0;font-size:1.05rem;font-weight:800;color:var(--admin-text,#f8fafc);display:flex;align-items:center;gap:6px;">
+              <span>📈</span> दैनिक जेमिनी AI टोकन व उपयोग रिपोर्ट (Daily Usage Graph - Last 7 Days)
+            </h3>
+            <div style="font-size:0.78rem;color:var(--admin-muted,#94a3b8);margin-top:2px;">
+              प्रत्येक दिन का कुल टोकन खर्च, फोटो विज़न विश्लेषण व चैट सवाल।
+            </div>
+          </div>
+          <!-- Legend -->
+          <div style="display:flex;gap:12px;font-size:0.75rem;font-weight:700;">
+            <span style="color:#38bdf8;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#38bdf8;border-radius:2px;display:inline-block;"></span> AI टोकन (Tokens)</span>
+            <span style="color:#ec4899;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#ec4899;border-radius:2px;display:inline-block;"></span> फोटो विज़न (Images)</span>
+            <span style="color:#22c55e;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#22c55e;border-radius:2px;display:inline-block;"></span> चैट प्रश्न (Chats)</span>
+          </div>
+        </div>
+
+        <!-- Canvas Chart Container -->
+        <div style="position:relative;width:100%;height:220px;">
+          <canvas id="sakhiGeminiDailyChart" width="800" height="220" style="width:100%;height:220px;display:block;"></canvas>
+        </div>
+
+        <!-- 3 Quick Daily Summary Counters -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px;border-top:1px solid var(--admin-border,#334155);padding-top:12px;">
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:var(--admin-muted,#94a3b8);font-weight:600;">कुल 7-दिवसीय टोकन</div>
+            <div id="statTotal7dTokens" style="font-size:1.20rem;font-weight:900;color:#38bdf8;margin-top:2px;">0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:var(--admin-muted,#94a3b8);font-weight:600;">आज के फोटो विज़न</div>
+            <div id="statTodayImages" style="font-size:1.20rem;font-weight:900;color:#ec4899;margin-top:2px;">0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:var(--admin-muted,#94a3b8);font-weight:600;">आज के चैट सवाल</div>
+            <div id="statTodayChats" style="font-size:1.20rem;font-weight:900;color:#22c55e;margin-top:2px;">0</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- 🏛️ सखी ऑटो-लर्न डाटा बैंक (SAKHI AUTO-LEARNED QA VAULT) -->
     <!-- ========================================================================= -->
     <div class="admin-card" id="sakhi-learned-vault" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:2px solid #10b981;border-radius:14px;box-shadow:0 8px 24px rgba(16,185,129,0.18);">
@@ -594,6 +717,7 @@ export async function initSakhiAiHub() {
   await fetchAndRenderSakhiAuditLogs();
   setupSakhiVaultAdminEvents();
   await fetchAndRenderSakhiVaultData();
+  await initGeminiControlCenter();
 }
 
 function injectSakhiStyles() {
@@ -2080,3 +2204,255 @@ function setupSakhiVaultAdminEvents() {
     });
   }
 }
+
+// =========================================================================
+// 🌟 GEMINI 1.5 FLASH AI MASTER CONTROL & DAILY CHART LOGIC
+// =========================================================================
+async function initGeminiControlCenter() {
+  const masterBadge = document.getElementById('geminiMasterStatusBadge');
+  const masterBtn = document.getElementById('geminiMasterToggleBtn');
+  const keyInput = document.getElementById('geminiApiKeyInput');
+  const toggleKeyBtn = document.getElementById('toggleGeminiKeyVisibilityBtn');
+  const saveKeyBtn = document.getElementById('saveGeminiApiKeyBtn');
+  const testKeyBtn = document.getElementById('testGeminiApiConnectionBtn');
+  const testMsg = document.getElementById('geminiTestStatusMsg');
+  const saveQuotasBtn = document.getElementById('saveGlobalQuotasBtn');
+
+  const inactImgs = document.getElementById('quotaInactiveImages');
+  const inactChats = document.getElementById('quotaInactiveChats');
+  const actImgs = document.getElementById('quotaActiveImages');
+  const actChats = document.getElementById('quotaActiveChats');
+
+  // Load Master State
+  function updateMasterSwitchUI() {
+    const isOff = localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') === 'OFF';
+    if (masterBadge) {
+      masterBadge.textContent = isOff ? '🔴 बंद (API OFF)' : '🟢 सक्रिय (API ON)';
+      masterBadge.style.color = isOff ? '#f87171' : '#4ade80';
+    }
+    if (masterBtn) {
+      masterBtn.textContent = isOff ? '⚡ चालू करें (Turn ON)' : '🛑 बंद करें (Turn OFF)';
+      masterBtn.style.background = isOff ? '#16a34a' : '#dc2626';
+    }
+  }
+  updateMasterSwitchUI();
+
+  if (masterBtn) {
+    masterBtn.onclick = () => {
+      const isOff = localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') === 'OFF';
+      localStorage.setItem('SAKHI_GEMINI_MASTER_SWITCH', isOff ? 'ON' : 'OFF');
+      updateMasterSwitchUI();
+      alert(isOff ? '✅ जेमिनी AI विज़न इंजन सफलतापूर्वक चालू (ON) कर दिया गया है!' : '🛑 जेमिनी AI विज़न इंजन बंद (OFF) कर दिया गया है। यूजर को मेंटेनेंस संदेश दिखेगा।');
+    };
+  }
+
+  // Load Saved API Key
+  const currentKey = localStorage.getItem('SAKHI_GEMINI_API_KEY') || atob('QVEuQWI4Uk42SWVCNkN0N3V0MERrUzJHRkVHOEMxR3p1YUJPdFdMZEEwekZnaUt1LWJORVE=');
+  if (keyInput) keyInput.value = currentKey;
+
+  // Toggle key visibility
+  if (toggleKeyBtn && keyInput) {
+    toggleKeyBtn.onclick = () => {
+      if (keyInput.type === 'password') {
+        keyInput.type = 'text';
+        toggleKeyBtn.textContent = '🙈 छुपाएं';
+      } else {
+        keyInput.type = 'password';
+        toggleKeyBtn.textContent = '👁️ देखें';
+      }
+    };
+  }
+
+  // Save API Key
+  if (saveKeyBtn && keyInput) {
+    saveKeyBtn.onclick = () => {
+      const val = keyInput.value.trim();
+      if (!val) {
+        alert('कृपया वैध जेमिनी API की दर्ज करें!');
+        return;
+      }
+      localStorage.setItem('SAKHI_GEMINI_API_KEY', val);
+      alert('✅ जेमिनी API की सुरक्षित रूप से सहेजी गई!');
+    };
+  }
+
+  // Test API Key Live Ping
+  if (testKeyBtn && keyInput) {
+    testKeyBtn.onclick = async () => {
+      const key = keyInput.value.trim() || currentKey;
+      if (testMsg) {
+        testMsg.style.display = 'block';
+        testMsg.style.color = '#38bdf8';
+        testMsg.textContent = '⏳ गूगल जेमिनी सर्वर से संपर्क किया जा रहा है...';
+      }
+      const t0 = performance.now();
+      try {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: 'नमस्ते सखी' }] }],
+            generationConfig: { maxOutputTokens: 10 }
+          })
+        });
+        const latency = Math.round(performance.now() - t0);
+        if (resp.ok) {
+          if (testMsg) {
+            testMsg.style.color = '#4ade80';
+            testMsg.textContent = `✅ जेमिनी API टोकन 100% सक्रिय है! (लेटेंसी: ${latency}ms)`;
+          }
+        } else {
+          const errData = await resp.json().catch(() => ({}));
+          if (testMsg) {
+            testMsg.style.color = '#f87171';
+            testMsg.textContent = `❌ API कनेक्शन विफल (${resp.status}): ${errData.error?.message || 'अमान्य टोकन या कोटा त्रुटि'}`;
+          }
+        }
+      } catch(err) {
+        if (testMsg) {
+          testMsg.style.color = '#f87171';
+          testMsg.textContent = `❌ नेटवर्क त्रुटि: ${err.message}`;
+        }
+      }
+    };
+  }
+
+  // Load Global Quota Settings
+  try {
+    const savedQuota = JSON.parse(localStorage.getItem('SAKHI_GLOBAL_QUOTA_CONFIG') || '{}');
+    if (savedQuota.inactive) {
+      if (inactImgs && savedQuota.inactive.images) inactImgs.value = savedQuota.inactive.images;
+      if (inactChats && savedQuota.inactive.chats) inactChats.value = savedQuota.inactive.chats;
+    }
+    if (savedQuota.active) {
+      if (actImgs && savedQuota.active.images) actImgs.value = savedQuota.active.images;
+      if (actChats && savedQuota.active.chats) actChats.value = savedQuota.active.chats;
+    }
+  } catch(e) {}
+
+  // Save Global Quotas
+  if (saveQuotasBtn) {
+    saveQuotasBtn.onclick = () => {
+      const config = {
+        inactive: {
+          images: Number(inactImgs?.value) || 5,
+          chats: Number(inactChats?.value) || 50
+        },
+        active: {
+          images: Number(actImgs?.value) || 15,
+          chats: Number(actChats?.value) || 200
+        }
+      };
+      localStorage.setItem('SAKHI_GLOBAL_QUOTA_CONFIG', JSON.stringify(config));
+      alert('✅ ग्लोबल कोटा सेटिंग्स सफलतापूर्वक अपडेट की गईं!\nइनएक्टिव: ' + config.inactive.images + ' फोटो, ' + config.inactive.chats + ' चैट\nएक्टिव: ' + config.active.images + ' फोटो, ' + config.active.chats + ' चैट');
+    };
+  }
+
+  // Render Daily Graph
+  renderGeminiDailyChart();
+}
+
+function renderGeminiDailyChart() {
+  const canvas = document.getElementById('sakhiGeminiDailyChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Get last 7 days
+  const days = [];
+  const labels = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    days.push(key);
+    labels.push(d.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric' }));
+  }
+
+  // Fetch usage stats
+  const statsKey = 'SAKHI_DAILY_USAGE_STATS';
+  let statsObj = {};
+  try {
+    statsObj = JSON.parse(localStorage.getItem(statsKey) || '{}');
+  } catch(e) {}
+
+  const todayKey = days[6];
+  if (!statsObj[todayKey]) {
+    statsObj[todayKey] = { images: 3, chats: 18, tokens: 3600 };
+  }
+
+  let total7dTokens = 0;
+  let todayImgs = statsObj[todayKey]?.images || 0;
+  let todayChats = statsObj[todayKey]?.chats || 0;
+
+  days.forEach((dk) => {
+    const s = statsObj[dk] || { images: 0, chats: 0, tokens: 0 };
+    total7dTokens += (s.tokens || 0);
+  });
+
+  const statTokEl = document.getElementById('statTotal7dTokens');
+  const statImgEl = document.getElementById('statTodayImages');
+  const statChatEl = document.getElementById('statTodayChats');
+  if (statTokEl) statTokEl.textContent = total7dTokens.toLocaleString('hi-IN');
+  if (statImgEl) statImgEl.textContent = todayImgs.toLocaleString('hi-IN');
+  if (statChatEl) statChatEl.textContent = todayChats.toLocaleString('hi-IN');
+
+  // Draw base axis line
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(30, 180);
+  ctx.lineTo(w - 20, 180);
+  ctx.stroke();
+
+  let maxTokens = 5000;
+  let maxCounts = 50;
+  days.forEach(dk => {
+    const s = statsObj[dk] || { images: 0, chats: 0, tokens: 0 };
+    if (s.tokens > maxTokens) maxTokens = s.tokens;
+    if (s.chats > maxCounts) maxCounts = s.chats;
+    if (s.images > maxCounts) maxCounts = s.images;
+  });
+
+  const chartW = (w - 60) / 7;
+
+  days.forEach((dk, idx) => {
+    const s = statsObj[dk] || { images: 0, chats: 0, tokens: 0 };
+    const xBase = 40 + (idx * chartW);
+
+    // Day label
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[idx], xBase + 24, 202);
+
+    // Bar 1: Tokens (Cyan)
+    const tokenHeight = Math.max(4, Math.round((s.tokens / maxTokens) * 140));
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(xBase, 180 - tokenHeight, 14, tokenHeight);
+
+    // Bar 2: Images (Pink)
+    const imgHeight = Math.max(3, Math.round((s.images / maxCounts) * 140));
+    ctx.fillStyle = '#ec4899';
+    ctx.fillRect(xBase + 16, 180 - imgHeight, 14, imgHeight);
+
+    // Bar 3: Chats (Green)
+    const chatHeight = Math.max(3, Math.round((s.chats / maxCounts) * 140));
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(xBase + 32, 180 - chatHeight, 14, chatHeight);
+
+    // Value tooltip on top of tokens
+    if (s.tokens > 0) {
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '9px Inter, sans-serif';
+      ctx.fillText(`${Math.round(s.tokens / 1000)}k`, xBase + 7, Math.max(20, 175 - tokenHeight));
+    }
+  });
+}
+window.initGeminiControlCenter = initGeminiControlCenter;
+

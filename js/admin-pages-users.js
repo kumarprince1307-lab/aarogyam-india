@@ -253,6 +253,7 @@ function renderUsersTable(users) {
                   <div style="display: flex; gap: 6px; align-items: center;">
                       <a href="#user-details?id=${u.id}" data-route="user-details?id=${u.id}" data-id="${u.id}" class="admin-button small-button">View</a>
                       <a href="#user-permissions?userId=${u.id}" data-route="user-permissions" data-id="${u.id}" class="admin-button small-button" style="background:#0F172A;color:#FBBF24;border:1px solid #F59E0B;" title="Manage Granular Media & Platform Permissions">🔒 Perms</a>
+                      <button type="button" class="admin-button small-button btn-user-quota" onclick="window.openUserQuotaModal('${u.id}', '${sanitizedMobile}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.status}')" style="background:#0284c7;color:#fff;border:1px solid #38bdf8;font-weight:800;white-space:nowrap;" title="सखी AI क्रेडिट व कोटा कस्टमाइज़ करें">⚡ क्रेडिट</button>
                   </div>
                 </td>
               </tr>
@@ -677,4 +678,111 @@ function openUserWebinarReportDrawer(user) {
   await reload();
 }
 
-// TODO: support CSV export and quick actions (block/unblock)
+// =========================================================================
+// 🌟 USER-LEVEL SAKHI AI CREDIT & QUOTA MANAGEMENT MODAL
+// =========================================================================
+window.openUserQuotaModal = function(userId, mobile, name, status) {
+  const existing = document.getElementById('userCustomQuotaModal');
+  if (existing) existing.remove();
+
+  const cleanMobile = String(mobile || '').replace(/\D/g, '').slice(-10);
+  let customMap = {};
+  try {
+    customMap = JSON.parse(localStorage.getItem('SAKHI_CUSTOM_USER_QUOTAS') || '{}');
+  } catch(e) {}
+  const uQuota = customMap[cleanMobile] || {};
+
+  const bonusImg = uQuota.bonusImages || 0;
+  const bonusChat = uQuota.bonusChats || 0;
+  const customImg = typeof uQuota.customImages === 'number' ? uQuota.customImages : '';
+  const customChat = typeof uQuota.customChats === 'number' ? uQuota.customChats : '';
+  const isBlocked = Boolean(uQuota.blocked);
+
+  const modal = document.createElement('div');
+  modal.id = 'userCustomQuotaModal';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);z-index:99999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+  
+  modal.innerHTML = `
+    <div style="background:#ffffff;border-radius:20px;max-width:440px;width:100%;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,0.4);border:1.5px solid #38bdf8;box-sizing:border-box;color:#0f172a;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;">
+        <h3 style="margin:0;font-size:1.15rem;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <span>⚡</span> सखी AI यूजर क्रेडिट कस्टमाइज़ेशन
+        </h3>
+        <button type="button" onclick="document.getElementById('userCustomQuotaModal').remove()" style="background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;color:#64748b;">&times;</button>
+      </div>
+
+      <div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:0.84rem;">
+        <div>👤 <strong>यूजर नाम:</strong> ${name || 'N/A'}</div>
+        <div>📱 <strong>मोबाइल:</strong> ${cleanMobile || 'N/A'}</div>
+        <div>⚡ <strong>सिस्टम स्टेटस:</strong> <span style="font-weight:800;color:${status === 'active' ? '#15803d' : '#ca8a04'};">${(status || 'INACTIVE').toUpperCase()}</span></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+        <!-- Bonus Credits -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">🎁 बोनस फोटो (+Images):</label>
+            <input type="number" id="modalUserBonusImages" value="${bonusImg}" min="0" max="500" class="admin-input" style="width:100%;box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">🎁 बोनस चैट (+Chats):</label>
+            <input type="number" id="modalUserBonusChats" value="${bonusChat}" min="0" max="5000" class="admin-input" style="width:100%;box-sizing:border-box;" />
+          </div>
+        </div>
+
+        <!-- Custom Limit Override -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">⚙️ फिक्स फोटो सीमा:</label>
+            <input type="number" id="modalUserCustomImages" placeholder="डिफ़ॉल्ट" value="${customImg}" min="0" max="1000" class="admin-input" style="width:100%;box-sizing:border-box;" />
+          </div>
+          <div>
+            <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">⚙️ फिक्स चैट सीमा:</label>
+            <input type="number" id="modalUserCustomChats" placeholder="डिफ़ॉल्ट" value="${customChat}" min="0" max="10000" class="admin-input" style="width:100%;box-sizing:border-box;" />
+          </div>
+        </div>
+
+        <!-- Block Gemini API for this user -->
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:0.80rem;font-weight:900;color:#b91c1c;">🛑 जेमिनी AI एक्सेस ब्लॉक करें</div>
+            <div style="font-size:0.70rem;color:#7f1d1d;">इस यूजर के लिए सखी AI पूरी तरह बंद करें</div>
+          </div>
+          <input type="checkbox" id="modalUserBlockGemini" ${isBlocked ? 'checked' : ''} style="width:18px;height:18px;accent-color:#dc2626;cursor:pointer;" />
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="modalSaveUserQuotaBtn" style="flex:1;background:#0284c7;color:#fff;border:none;border-radius:10px;padding:10px;font-weight:900;font-size:0.90rem;cursor:pointer;">
+          💾 क्रेडिट सेटिंग सुरक्षित करें
+        </button>
+        <button type="button" onclick="document.getElementById('userCustomQuotaModal').remove()" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;">
+          रद्द करें
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById('modalSaveUserQuotaBtn').onclick = function() {
+    const bImg = Number(document.getElementById('modalUserBonusImages').value) || 0;
+    const bChat = Number(document.getElementById('modalUserBonusChats').value) || 0;
+    const cImgRaw = document.getElementById('modalUserCustomImages').value.trim();
+    const cChatRaw = document.getElementById('modalUserCustomChats').value.trim();
+    const blocked = Boolean(document.getElementById('modalUserBlockGemini').checked);
+
+    customMap[cleanMobile] = {
+      bonusImages: bImg,
+      bonusChats: bChat,
+      customImages: cImgRaw !== '' ? Number(cImgRaw) : undefined,
+      customChats: cChatRaw !== '' ? Number(cChatRaw) : undefined,
+      blocked: blocked,
+      updatedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('SAKHI_CUSTOM_USER_QUOTAS', JSON.stringify(customMap));
+    alert(`✅ ${name} (${cleanMobile}) के सखी AI क्रेडिट सफलतापूर्वक अपडेट किए गए!`);
+    modal.remove();
+  };
+};

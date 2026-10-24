@@ -143,6 +143,33 @@
     const file = event.target?.files?.[0];
     if (!file) return;
 
+    // Strict Auth Check (Guests are gated, "atiti ke liye to sakhi khulega hi nahi")
+    if (!isUserAuthenticated()) {
+      if (typeof window.openSakhiAuthModal === 'function') window.openSakhiAuthModal();
+      if (event.target) event.target.value = '';
+      return;
+    }
+
+    // Check Gemini Master Switch
+    if (window.SakhiVision && typeof window.SakhiVision.isGeminiActive === 'function' && !window.SakhiVision.isGeminiActive()) {
+      if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.showQuotaModal === 'function') {
+        window.SakhiQuotaEngine.showQuotaModal('offline', 'image');
+        if (event.target) event.target.value = '';
+        return;
+      }
+    }
+
+    // Check Image Quota
+    if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.checkQuota === 'function') {
+      const quotaCheck = window.SakhiQuotaEngine.checkQuota('image');
+      if (!quotaCheck.allowed) {
+        window.SakhiQuotaEngine.showQuotaModal(quotaCheck.reason || 'limit_reached', 'image', quotaCheck);
+        if (event.target) event.target.value = '';
+        return;
+      }
+      window.SakhiQuotaEngine.incrementUsage('image');
+    }
+
     const reader = new FileReader();
     reader.onload = function(e) {
       const imgDataUrl = e.target.result;
@@ -156,9 +183,12 @@
       `;
       appendSakhiMessage('user', userHtml, true);
 
-      // Analyze image
-      // Smart Multi-Modal Vision Analysis & Interactive Symptom Checklist via SakhiVision
+      // Show typing indicator
+      appendTypingIndicator();
+
+      // Analyze image via Gemini Flash Vision / SakhiVision Engine
       setTimeout(() => {
+        removeTypingIndicator();
         const fileName = (file.name || '').toLowerCase();
         if (window.SakhiVision && typeof window.SakhiVision.analyzeCropImage === 'function') {
           window.SakhiVision.analyzeCropImage(imgDataUrl, fileName, function(res) {
@@ -212,6 +242,29 @@
   }
   window.handleSakhiImageUpload = handleSakhiImageUpload;
 
+  // Camera Trigger with Auth, Quota and Master Switch Guards
+  window.triggerSakhiCamera = function() {
+    if (!isUserAuthenticated()) {
+      if (typeof window.openSakhiAuthModal === 'function') window.openSakhiAuthModal();
+      return;
+    }
+    if (window.SakhiVision && typeof window.SakhiVision.isGeminiActive === 'function' && !window.SakhiVision.isGeminiActive()) {
+      if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.showQuotaModal === 'function') {
+        window.SakhiQuotaEngine.showQuotaModal('offline', 'image');
+        return;
+      }
+    }
+    if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.checkQuota === 'function') {
+      const quotaCheck = window.SakhiQuotaEngine.checkQuota('image');
+      if (!quotaCheck.allowed) {
+        window.SakhiQuotaEngine.showQuotaModal(quotaCheck.reason || 'limit_reached', 'image', quotaCheck);
+        return;
+      }
+    }
+    const fileInput = document.getElementById('sakhiImageInput');
+    if (fileInput) fileInput.click();
+  };
+
   // Global Interactive Crop & Symptom Checklist Handlers for Sakhi AI
   let activeChecklistCrop = 'गेहूँ';
   window.selectSakhiCropChecklist = function(crop, btn) {
@@ -237,7 +290,347 @@
     }
   };
 
+  function isUserActiveTier(phone) {
+    const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+    if (p === '7974422572') return true;
 
+    try {
+      const customMap = JSON.parse(localStorage.getItem('SAKHI_CUSTOM_USER_QUOTAS') || '{}');
+      if (customMap[p] && customMap[p].status) {
+        if (customMap[p].status === 'active') return true;
+        if (customMap[p].status === 'inactive') return false;
+      }
+    } catch(e) {}
+
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (u && (u.is_subscriber || u.is_active || u.status === 'active' || u.status === 'ACTIVE' || (u.totalPurchases && u.totalPurchases > 0))) {
+        return true;
+      }
+    } catch(e) {}
+
+    try {
+      const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+      if (prof && (prof.is_subscriber || prof.is_active || prof.status === 'active' || prof.status === 'ACTIVE')) {
+        return true;
+      }
+    } catch(e) {}
+
+    if (localStorage.getItem('aarogyam_user_active') === 'true' || localStorage.getItem('aarogyam_is_subscriber') === 'true') {
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // SAKHI ZERO-EGRESS QUOTA & MULTI-TIER USAGE ENGINE
+  // =========================================================================
+  const SakhiQuotaEngine = {
+    ADMIN_PHONE: '7974422572',
+
+    getDefaultLimits: function() {
+      let inactiveLimits = { images: 5, chats: 50 };
+      let activeLimits = { images: 15, chats: 200 };
+      try {
+        const saved = JSON.parse(localStorage.getItem('SAKHI_GLOBAL_QUOTA_CONFIG') || '{}');
+        if (saved.inactive) inactiveLimits = Object.assign(inactiveLimits, saved.inactive);
+        if (saved.active) activeLimits = Object.assign(activeLimits, saved.active);
+      } catch(e) {}
+      return { inactive: inactiveLimits, active: activeLimits };
+    },
+
+    getTodayKey: function() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    },
+
+    getUserTier: function(phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+      if (p === this.ADMIN_PHONE) return 'admin';
+      return isUserActiveTier(p) ? 'active' : 'inactive';
+    },
+
+    getUserUsage: function(phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'anonymous';
+      const key = `sakhi_usage_${p}_${this.getTodayKey()}`;
+      try {
+        const data = JSON.parse(localStorage.getItem(key) || '{}');
+        return {
+          images: Number(data.images) || 0,
+          chats: Number(data.chats) || 0
+        };
+      } catch(e) {
+        return { images: 0, chats: 0 };
+      }
+    },
+
+    getUserCustomQuota: function(phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+      if (!p) return null;
+      try {
+        const customMap = JSON.parse(localStorage.getItem('SAKHI_CUSTOM_USER_QUOTAS') || '{}');
+        return customMap[p] || null;
+      } catch(e) {
+        return null;
+      }
+    },
+
+    getUserLimits: function(phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+      if (p === this.ADMIN_PHONE) {
+        return { images: Infinity, chats: Infinity, isUnlimited: true };
+      }
+      const custom = this.getUserCustomQuota(p);
+      if (custom && custom.blocked) {
+        return { images: 0, chats: 0, blocked: true };
+      }
+
+      const tier = this.getUserTier(p);
+      const defaults = this.getDefaultLimits();
+      const base = tier === 'active' ? defaults.active : defaults.inactive;
+
+      let imgLimit = Number(base.images) || (tier === 'active' ? 15 : 5);
+      let chatLimit = Number(base.chats) || (tier === 'active' ? 200 : 50);
+
+      if (custom) {
+        if (typeof custom.customImages === 'number') imgLimit = custom.customImages;
+        if (typeof custom.customChats === 'number') chatLimit = custom.customChats;
+        if (typeof custom.bonusImages === 'number') imgLimit += custom.bonusImages;
+        if (typeof custom.bonusChats === 'number') chatLimit += custom.bonusChats;
+      }
+
+      return { images: imgLimit, chats: chatLimit, isUnlimited: false };
+    },
+
+    getRemainingCredits: function(phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+      if (p === this.ADMIN_PHONE) {
+        return { imagesRemaining: 'असीमित (∞)', chatsRemaining: 'असीमित (∞)', isUnlimited: true, tier: 'admin' };
+      }
+      const limits = this.getUserLimits(p);
+      if (limits.blocked) {
+        return { imagesRemaining: 0, chatsRemaining: 0, blocked: true, tier: 'blocked' };
+      }
+      const usage = this.getUserUsage(p);
+      const imgRem = Math.max(0, limits.images - usage.images);
+      const chatRem = Math.max(0, limits.chats - usage.chats);
+      return {
+        imagesRemaining: imgRem,
+        chatsRemaining: chatRem,
+        totalImages: limits.images,
+        totalChats: limits.chats,
+        imagesUsed: usage.images,
+        chatsUsed: usage.chats,
+        isUnlimited: false,
+        tier: this.getUserTier(p)
+      };
+    },
+
+    checkQuota: function(type, phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+      if (p === this.ADMIN_PHONE) return { allowed: true, isUnlimited: true };
+
+      const limits = this.getUserLimits(p);
+      if (limits.blocked) {
+        return { allowed: false, reason: 'blocked', message: 'एडमिन द्वारा आपका सखी AI उपयोग अस्थायी रूप से रोका गया है।' };
+      }
+
+      const usage = this.getUserUsage(p);
+      if (type === 'image') {
+        if (usage.images >= limits.images) {
+          return {
+            allowed: false,
+            reason: 'limit_reached',
+            tier: this.getUserTier(p),
+            current: usage.images,
+            max: limits.images
+          };
+        }
+      } else if (type === 'chat') {
+        if (usage.chats >= limits.chats) {
+          return {
+            allowed: false,
+            reason: 'limit_reached',
+            tier: this.getUserTier(p),
+            current: usage.chats,
+            max: limits.chats
+          };
+        }
+      }
+
+      return { allowed: true };
+    },
+
+    incrementUsage: function(type, phone) {
+      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'anonymous';
+      const key = `sakhi_usage_${p}_${this.getTodayKey()}`;
+      const usage = this.getUserUsage(p);
+      if (type === 'image') usage.images += 1;
+      if (type === 'chat') usage.chats += 1;
+      try {
+        localStorage.setItem(key, JSON.stringify(usage));
+      } catch(e) {}
+
+      this.recordGlobalDailyStat(type);
+      this.updatePlusMenuCreditsUI();
+    },
+
+    recordGlobalDailyStat: function(type, tokens) {
+      const today = this.getTodayKey();
+      const statsKey = 'SAKHI_DAILY_USAGE_STATS';
+      try {
+        const allStats = JSON.parse(localStorage.getItem(statsKey) || '{}');
+        if (!allStats[today]) {
+          allStats[today] = { images: 0, chats: 0, tokens: 0 };
+        }
+        if (type === 'image') allStats[today].images += 1;
+        if (type === 'chat') allStats[today].chats += 1;
+        if (tokens && typeof tokens === 'number') allStats[today].tokens += tokens;
+        localStorage.setItem(statsKey, JSON.stringify(allStats));
+      } catch(e) {}
+    },
+
+    logQuarantineQuery: function(queryText, domain, userPhone, userName, reason) {
+      try {
+        const item = {
+          id: 'qq_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          query: queryText,
+          domain: domain || 'agri',
+          phone: userPhone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || '',
+          user: userName || (typeof getUserName === 'function' ? getUserName() : '') || 'किसान साथी',
+          timestamp: new Date().toISOString(),
+          reason: reason || 'unanswered',
+          resolved: false
+        };
+        const key = 'sakhi_quarantine_queries';
+        const list = JSON.parse(localStorage.getItem(key) || '[]');
+        list.unshift(item);
+        if (list.length > 200) list.pop();
+        localStorage.setItem(key, JSON.stringify(list));
+
+        const unkey = 'sakhi_unanswered_queries';
+        const unlist = JSON.parse(localStorage.getItem(unkey) || '[]');
+        const existing = unlist.find(u => (u.query || '').trim().toLowerCase() === (queryText || '').trim().toLowerCase());
+        if (existing) {
+          existing.count = (existing.count || 1) + 1;
+          existing.timestamp = new Date().toISOString();
+        } else {
+          unlist.unshift({
+            query: queryText,
+            domain: domain || 'agri',
+            user: userName || (typeof getUserName === 'function' ? getUserName() : '') || 'किसान साथी',
+            phone: userPhone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || '',
+            count: 1,
+            timestamp: new Date().toISOString()
+          });
+        }
+        localStorage.setItem(unkey, JSON.stringify(unlist.slice(0, 100)));
+      } catch(e) {
+        console.warn('Quarantine log error:', e);
+      }
+    },
+
+    updatePlusMenuCreditsUI: function() {
+      const phone = typeof getUserPhone === 'function' ? getUserPhone() : '';
+      const rem = this.getRemainingCredits(phone);
+      
+      const imgEl = document.getElementById('sakhiImageCreditsDisplay');
+      const txtEl = document.getElementById('sakhiTextCreditsDisplay');
+      const tierBadge = document.getElementById('sakhiUserTierBadge');
+      const upgradePrompt = document.getElementById('sakhiTierUpgradePrompt');
+
+      if (rem.isUnlimited) {
+        if (imgEl) imgEl.textContent = 'असीमित (∞)';
+        if (txtEl) txtEl.textContent = 'असीमित (∞)';
+        if (tierBadge) {
+          tierBadge.textContent = 'SUPER ADMIN';
+          tierBadge.style.background = '#2563eb';
+        }
+        if (upgradePrompt) upgradePrompt.style.display = 'none';
+        return;
+      }
+
+      if (imgEl) {
+        imgEl.textContent = `${rem.imagesRemaining} / ${rem.totalImages} शेष`;
+        imgEl.style.color = rem.imagesRemaining > 0 ? '#38bdf8' : '#f87171';
+      }
+      if (txtEl) {
+        txtEl.textContent = `${rem.chatsRemaining} / ${rem.totalChats} शेष`;
+        txtEl.style.color = rem.chatsRemaining > 0 ? '#4ade80' : '#f87171';
+      }
+      if (tierBadge) {
+        if (rem.tier === 'active') {
+          tierBadge.textContent = 'ACTIVE ID';
+          tierBadge.style.background = '#15803d';
+          tierBadge.style.color = '#dcfce7';
+          if (upgradePrompt) upgradePrompt.style.display = 'none';
+        } else {
+          tierBadge.textContent = 'FREE / INACTIVE';
+          tierBadge.style.background = '#ca8a04';
+          tierBadge.style.color = '#fef08a';
+          if (upgradePrompt) upgradePrompt.style.display = 'flex';
+        }
+      }
+    },
+
+    showQuotaModal: function(reason, type, meta) {
+      const existing = document.getElementById('sakhiQuotaModalContainer');
+      if (existing) existing.remove();
+
+      const userName = (typeof getUserDisplayName === 'function' ? getUserDisplayName() : '') || 'किसान साथी';
+      const typeLabel = type === 'image' ? 'फोटो व कैमरा विश्लेषण' : 'सखी AI चैट प्रश्न';
+
+      let contentHtml = '';
+      if (reason === 'offline') {
+        contentHtml = `
+          <div style="background:#ffffff;border-radius:24px;max-width:390px;width:92%;padding:26px 20px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.45);border:2px solid #cbd5e1;box-sizing:border-box;">
+            <div style="font-size:3rem;margin-bottom:8px;">⚙️</div>
+            <h3 style="margin:0 0 8px 0;font-size:1.25rem;font-weight:900;color:#0f172a;">सखी AI विज़न मेंटेनेंस</h3>
+            <p style="font-size:0.92rem;color:#475569;line-height:1.5;margin-bottom:20px;">
+              सखी AI विज़न इंजन एडमिन द्वारा अस्थायी रूप से बंद (Maintenance) किया गया है। कृपया थोड़ी देर बाद पुनः प्रयास करें या टेक्स्ट लिखकर पूछें।
+            </p>
+            <button type="button" onclick="document.getElementById('sakhiQuotaModalContainer').remove()" style="width:100%;background:#0f172a;color:#ffffff;border:none;border-radius:14px;padding:12px;font-size:0.95rem;font-weight:800;cursor:pointer;">
+              ठीक है, समझा
+            </button>
+          </div>
+        `;
+      } else {
+        contentHtml = `
+          <div style="background:#ffffff;border-radius:24px;max-width:400px;width:92%;padding:26px 20px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.45);border:2px solid #f59e0b;box-sizing:border-box;">
+            <div style="font-size:3rem;margin-bottom:8px;">⚠️</div>
+            <h3 style="margin:0 0 6px 0;font-size:1.22rem;font-weight:900;color:#0f172a;">आज की दैनिक सीमा समाप्त!</h3>
+            <p style="font-size:0.90rem;color:#475569;line-height:1.5;margin:0 0 14px 0;">
+              प्रिय <strong>${escapeHtml(userName)}</strong> जी, आपकी आज की <strong>${typeLabel}</strong> की दैनिक सीमा समाप्त हो चुकी है।
+            </p>
+            <div style="background:#fef3c7;border:1.5px solid #fde047;border-radius:14px;padding:12px;margin-bottom:16px;text-align:left;font-size:0.84rem;color:#92400e;line-height:1.5;">
+              <div style="font-weight:900;color:#78350f;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                <span>🌟</span> <span>अतिरिक्त क्रेडिट पाने के उपाय:</span>
+              </div>
+              <div>• अपनी आईडी <strong>सक्रिय (Active)</strong> करें और पाएं <strong>3x ज्यादा कोटा (15 फोटो + 200 चैट/दिन)</strong>!</div>
+              <div>• अथवा कल सुबह 12:00 बजे तक का इंतजार करें (दैनिक कोटा स्वतः रीसेट हो जाएगा)।</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <a href="/subscription.html" style="display:block;width:100%;box-sizing:border-box;background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);color:#ffffff;text-decoration:none;border-radius:14px;padding:12px;font-size:0.95rem;font-weight:900;box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+                ⚡ अपनी आईडी एक्टिवेट करें
+              </a>
+              <button type="button" onclick="document.getElementById('sakhiQuotaModalContainer').remove()" style="width:100%;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:14px;padding:10px;font-size:0.88rem;font-weight:800;cursor:pointer;">
+                कल का इंतजार करें
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      const modal = document.createElement('div');
+      modal.id = 'sakhiQuotaModalContainer';
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+      modal.innerHTML = contentHtml;
+      document.body.appendChild(modal);
+    }
+  };
+
+  window.SakhiQuotaEngine = SakhiQuotaEngine;
 
   const MASTER_ADMIN_PHONE = '7974422572';
   const SAKHI_AVATAR_IMG = '/images/sakhi/aarogyam-sakhi.webp';
@@ -2653,10 +3046,14 @@
         return;
       }
 
-      // Unauthenticated guest user: Save pending query and trigger Registration/Login Modal!
-      pendingUserQuery = query;
-      window.openSakhiAuthModal();
-      return;
+    // Quota Enforcement: Check daily chat question quota
+    if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.checkQuota === 'function') {
+      const quotaCheck = window.SakhiQuotaEngine.checkQuota('chat');
+      if (!quotaCheck.allowed) {
+        window.SakhiQuotaEngine.showQuotaModal(quotaCheck.reason || 'limit_reached', 'chat', quotaCheck);
+        return;
+      }
+      window.SakhiQuotaEngine.incrementUsage('chat');
     }
 
     appendUserMessage(query);
@@ -14814,6 +15211,9 @@ ${shareUrl}`;
     const isCurrentlyActive = menu.classList.contains('active') && menu.style.display !== 'none';
     const shouldOpen = (typeof forceState === 'boolean') ? forceState : !isCurrentlyActive;
     if (shouldOpen) {
+      if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
+        window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+      }
       menu.classList.add('active');
       menu.style.setProperty('display', 'block', 'important');
       if (backdrop) {
@@ -15059,11 +15459,17 @@ ${shareUrl}`;
       loadKnowledgeBase();
       initSpeechRecognition();
       injectSakhiUI();
+      if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
+        window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+      }
     });
   } else {
     loadKnowledgeBase();
     initSpeechRecognition();
     injectSakhiUI();
+    if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
+      window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+    }
   }
 })();
 
