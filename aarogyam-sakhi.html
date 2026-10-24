@@ -233,35 +233,77 @@
       }
       .sakhi-header {
         flex-shrink: 0 !important;
-        padding: max(10px, env(safe-area-inset-top, 10px)) 10px 10px 10px !important;
+        padding: max(8px, env(safe-area-inset-top, 8px)) 10px 8px 10px !important;
         position: relative !important;
         z-index: 100 !important;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    opacity 0.2s ease,
+                    max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    padding 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        max-height: 64px !important;
+        overflow: hidden !important;
       }
-      .sakhi-brand-full {
-        display: inline-block !important;
-        font-size: 1.05rem !important;
+      /* Smart Auto-Collapse Header when chatting or scrolling down on mobile */
+      .sakhi-chat-window.chat-input-focused .sakhi-header,
+      .sakhi-chat-window.header-smart-hidden .sakhi-header {
+        max-height: 0 !important;
+        min-height: 0 !important;
+        height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        border-bottom: none !important;
+        transform: translateY(-100%) !important;
       }
-      .sakhi-brand-short {
+      .sakhi-chat-window.chat-input-focused .sakhi-legal-note,
+      .sakhi-chat-window.header-smart-hidden .sakhi-legal-note {
+        display: none !important;
+        max-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      /* Clean Mobile Header: Hide bulky pills causing clutter */
+      #sakhiHeaderWeatherBtn {
+        display: none !important;
+      }
+      #sakhiHeaderUserBadgeWrap {
         display: none !important;
       }
       .sakhi-fullscreen-btn {
         display: none !important;
       }
+      .sakhi-avatar-frame {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        border-width: 2px !important;
+      }
+      .sakhi-brand-full {
+        display: inline-block !important;
+        font-size: 1.02rem !important;
+      }
+      .sakhi-brand-short {
+        display: none !important;
+      }
       .sakhi-new-chat-btn {
         width: auto !important;
-        height: 32px !important;
-        padding: 4px 8px !important;
-        border-radius: 18px !important;
+        height: 30px !important;
+        padding: 3px 8px !important;
+        border-radius: 16px !important;
         display: inline-flex !important;
         align-items: center !important;
         gap: 3px !important;
+        font-size: 0.78rem !important;
       }
       .sakhi-share-btn {
-        width: 32px !important;
-        height: 32px !important;
+        width: 30px !important;
+        height: 30px !important;
         padding: 0 !important;
         border-radius: 50% !important;
         justify-content: center !important;
+        font-size: 0.85rem !important;
       }
       .sakhi-messages-wrap {
         padding: 12px 10px !important;
@@ -275,20 +317,56 @@
         flex-shrink: 0 !important;
       }
       .sakhi-legal-note {
-        padding: 3px 10px !important;
-        font-size: 0.72rem !important;
+        padding: 2px 10px !important;
+        font-size: 0.70rem !important;
         text-align: center;
         background: #ffffff !important;
         color: #64748b !important;
         flex-shrink: 0 !important;
       }
       .sakhi-input-footer {
-        padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 10px !important;
+        padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px)) 10px !important;
         position: relative !important;
         z-index: 1000 !important;
         flex-shrink: 0 !important;
         background: #ffffff !important;
         box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+        gap: 6px !important;
+      }
+      /* Ultra-Wide Textarea on Mobile */
+      .sakhi-text-input {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        border-radius: 22px !important;
+        padding: 9px 14px !important;
+        font-size: 1.02rem !important;
+      }
+      .sakhi-cam-btn {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        font-size: 0.90rem !important;
+      }
+      .sakhi-mic-btn {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        font-size: 0.95rem !important;
+      }
+      .sakhi-send-btn {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        font-size: 0.95rem !important;
+      }
+      .sakhi-plus-btn {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        font-size: 0.95rem !important;
       }
     }
 
@@ -509,28 +587,26 @@
         <!-- Smart 1-Tap Contextual Pills Container (Dynamic Follow-up Chips) -->
         <div id="sakhiSmartPillsContainer" class="sakhi-smart-pills-container" style="display:none;"></div>
 
-        <!-- Input Footer (ChatGPT Layout: [+] [Cam] [Mic] [Lang] [Input] [Send]) -->
+        <!-- Input Footer: [+] on Left, Wide Textarea in Center, Camera/Mic/Send on Right Side -->
         <div class="sakhi-input-footer" style="position:relative;z-index:1000;pointer-events:auto;">
           <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="विषय व टूल्स चुनें" onclick="window.toggleSakhiPlusMenu(event)">
             <i class="fa-solid fa-plus"></i>
           </button>
-          <button type="button" class="sakhi-cam-btn" id="sakhiCamBtn" title="फोटो या रिपोर्ट अपलोड करें (Coming Soon)" onclick="window.showSakhiComingSoon('📷 AI कैमरा व फसल फोटो विज़न जल्द आ रहा है!')" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;background:none;border:none;">
-            <i class="fa-solid fa-camera"></i>
-          </button>
-          <input type="file" id="sakhiImageInput" accept="image/*" style="display:none;" />
-          <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.stopAllSpeech)window.stopAllSpeech(); if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
-            <i class="fa-solid fa-microphone"></i>
-          </button>
-          <div class="sakhi-footer-lang-wrap" style="position:relative;display:inline-block;flex-shrink:0;">
-            <button type="button" class="sakhi-footer-lang-pill" id="sakhiFooterLangPill" onclick="window.showSakhiComingSoon('🌐 अन्य भाषाएँ (मराठी, गुजराती, बांग्ला) जल्द आ रही हैं!')" title="भाषा (Coming Soon)" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;color:#166534;font-size:0.75rem;font-weight:800;padding:5px 9px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">
-              <i class="fa-solid fa-globe" style="color:#16a34a;font-size:0.8rem;"></i>
-              <span id="sakhiFooterLangLabel">हिंदी</span>
+          
+          <textarea name="sakhi_chat_query" class="sakhi-text-input" id="sakhiTextInput" rows="1" placeholder="अपने खेत या फसल के बारे में पूछें..." autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" data-form-type="other" enterkeyhint="send" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();window.submitSakhiFromInput();}"></textarea>
+          
+          <div class="sakhi-side-actions-group" style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0;">
+            <button type="button" class="sakhi-cam-btn" id="sakhiCamBtn" title="फोटो या रिपोर्ट अपलोड करें (Coming Soon)" onclick="window.showSakhiComingSoon('📷 AI कैमरा व फसल फोटो विज़न जल्द आ रहा है!')" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;background:none;border:none;">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+            <input type="file" id="sakhiImageInput" accept="image/*" style="display:none;" />
+            <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.stopAllSpeech)window.stopAllSpeech(); if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें" onclick="window.submitSakhiFromInput();">
+              <i class="fa-solid fa-paper-plane"></i>
             </button>
           </div>
-          <textarea name="sakhi_chat_query" class="sakhi-text-input" id="sakhiTextInput" rows="1" placeholder="अपने खेत या फसल के बारे में पूछें..." autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" data-form-type="other" enterkeyhint="send" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();window.submitSakhiFromInput();}"></textarea>
-          <button type="button" class="sakhi-send-btn" id="sakhiSendBtn" title="भेजें" onclick="window.submitSakhiFromInput();">
-            <i class="fa-solid fa-paper-plane"></i>
-          </button>
         </div>
 
         <!-- Legal Note below Footer -->
@@ -618,26 +694,48 @@
         }
 
         const input = document.getElementById('sakhiTextInput');
+        const chatWin = document.getElementById('sakhiChatWindow');
+        const wrap = document.getElementById('sakhiMessagesWrap');
+
         if (input) {
           input.addEventListener('focus', function () {
+            if (chatWin) chatWin.classList.add('chat-input-focused');
             lockWindowScroll();
             setTimeout(function () {
               lockWindowScroll();
               setSakhiViewportHeight();
-              const wrap = document.getElementById('sakhiMessagesWrap');
               if (wrap) wrap.scrollTop = wrap.scrollHeight;
             }, 60);
             setTimeout(function () {
               lockWindowScroll();
               setSakhiViewportHeight();
+              if (wrap) wrap.scrollTop = wrap.scrollHeight;
             }, 200);
           });
+
           input.addEventListener('blur', function () {
             setTimeout(function () {
+              if (document.activeElement !== input && chatWin) {
+                chatWin.classList.remove('chat-input-focused');
+              }
               lockWindowScroll();
               setSakhiViewportHeight();
-            }, 60);
+            }, 150);
           });
+        }
+
+        // Smart Header Auto-Hide on scrolling down in messages
+        if (wrap && chatWin) {
+          let lastScrollY = 0;
+          wrap.addEventListener('scroll', function () {
+            const currentY = wrap.scrollTop;
+            if (currentY > 60 && currentY > lastScrollY + 10) {
+              chatWin.classList.add('header-smart-hidden');
+            } else if (currentY < 20 || currentY < lastScrollY - 15) {
+              chatWin.classList.remove('header-smart-hidden');
+            }
+            lastScrollY = currentY;
+          }, { passive: true });
         }
       });
 

@@ -923,17 +923,68 @@ body.is-fullscreen .sakhi-chat-window {
   opacity: 1 !important;
 }
 
+/* Smart Header Collapse when typing or scrolling */
+.sakhi-chat-window.chat-input-focused .sakhi-header,
+.sakhi-chat-window.header-smart-hidden .sakhi-header {
+  max-height: 0 !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  border-bottom: none !important;
+  transform: translateY(-100%) !important;
+}
+.sakhi-chat-window.chat-input-focused .sakhi-legal-note,
+.sakhi-chat-window.header-smart-hidden .sakhi-legal-note {
+  display: none !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.sakhi-side-actions-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.sakhi-cam-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+.sakhi-cam-btn:hover, .sakhi-cam-btn:active {
+  background: #f1f5f9;
+  color: #0f172a;
+  transform: scale(1.05);
+}
+
 .sakhi-mic-btn {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: #f1f5f9;
-  border: 2px solid #cbd5e1;
+  border: 1.5px solid #cbd5e1;
   color: #0f172a;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.25s ease;
   flex-shrink: 0;
