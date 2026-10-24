@@ -1,39 +1,7 @@
 
-// Unified Non-Intrusive Audio/TTS Unsupported Banner (Shows once, never spams if dismissed)
+// Audio/TTS Unsupported Banner (Completely Disabled - Zero Intrusive Popups)
 function showAarogyamTtsUnsupportedBanner() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  try {
-    if (localStorage.getItem('aarogyam_tts_unsupported_dismissed') === '1' ||
-        sessionStorage.getItem('aarogyam_tts_unsupported_dismissed') === '1') {
-      return;
-    }
-  } catch (e) {}
-
-  if (document.getElementById('aarogyam-tts-unsupported-banner')) return;
-
-  const banner = document.createElement('div');
-  banner.id = 'aarogyam-tts-unsupported-banner';
-  banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#f8fafc;border:1.5px solid #38bdf8;box-shadow:0 10px 25px rgba(0,0,0,0.5);border-radius:12px;padding:12px 18px;z-index:999999;display:flex;align-items:center;gap:12px;font-size:0.88rem;font-family:inherit;max-width:92vw;width:440px;';
-  banner.innerHTML = '<span style="font-size:1.3rem;">ℹ️</span>' +
-    '<span style="flex:1;line-height:1.4;">आपके ब्राउज़र में टेक्स्ट-टू-स्पीच ऑडियो सपोर्ट उपलब्ध नहीं है। आप सीधे पढ़कर आनंद ले सकते हैं।</span>' +
-    '<button type="button" id="btn-close-tts-banner" style="background:#0284c7;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;">✕ समझ गया</button>';
-  
-  if (document.body) {
-    document.body.appendChild(banner);
-  } else {
-    window.addEventListener('DOMContentLoaded', () => document.body.appendChild(banner));
-  }
-
-  const dismiss = () => {
-    try {
-      localStorage.setItem('aarogyam_tts_unsupported_dismissed', '1');
-      sessionStorage.setItem('aarogyam_tts_unsupported_dismissed', '1');
-    } catch (e) {}
-    banner.remove();
-  };
-
-  const btn = document.getElementById('btn-close-tts-banner');
-  if (btn) btn.onclick = dismiss;
+  return; // Silent no-op as per user instruction
 }
 if (typeof window !== 'undefined') {
   window.showAarogyamTtsUnsupportedBanner = showAarogyamTtsUnsupportedBanner;
@@ -1724,7 +1692,7 @@ function initLibraryAudioGuide() {
     function speakGuide() {
         if (!synth) synth = window.speechSynthesis || null;
         if (!synth) {
-            alert('आपके ब्राउज़र में ऑडियो सपोर्ट उपलब्ध नहीं है।');
+            console.warn('Audio guide: SpeechSynthesis not available in this browser environment.');
             return;
         }
 

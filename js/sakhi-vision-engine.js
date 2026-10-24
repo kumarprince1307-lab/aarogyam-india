@@ -77,7 +77,7 @@
     const apiKey = SakhiVision.getGeminiApiKey();
     if (!apiKey) return false;
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`;
 
     const systemInstruction = `आप "आरोग्यम सखी AI" (Aarogyam Sakhi AI) हैं — भारतीय किसानों व परिवारों की भारत की अग्रणी डिजिटल कृषि व स्वास्थ्य सलाहकार।
 दी गई फोटो का सूक्ष्मता से विश्लेषण करें:
@@ -307,8 +307,8 @@
           return;
         }
 
-        // B. Krishi Dawa Directory / Offer Poster Detection
-        if (fn.includes('dawa') || fn.includes('directory') || fn.includes('book') || fn.includes('poster') || fn.includes('pustak') || fn.includes('offer') || fn.includes('diwali') || redCount >= 3) {
+        // B. Krishi Dawa Directory / Offer Poster Detection (Only for actual posters/books, never red crops like tomatoes)
+        if (fn.includes('dawa') || fn.includes('directory') || fn.includes('book') || fn.includes('poster') || fn.includes('pustak') || fn.includes('offer') || fn.includes('diwali')) {
           const promoMsg = `📚 **सखी AI विज़न विश्लेषण — ई-बुक पोस्टर पहचान:**\n\n` +
             `यह आरोग्यम इंडिया की बहुप्रशंसित **'कृषि दवा डायरेक्टरी' (Krishi Dawa Directory - स्पेशल ऑफर मात्र ₹99)** का आधिकारिक पोस्टर है!\n\n` +
             `• **पहचाने गए मुख्य बिंदु:**\n` +

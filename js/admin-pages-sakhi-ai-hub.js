@@ -835,13 +835,16 @@ function renderKPIs(list) {
     }
   });
 
-  const totalEl = document.getElementById('sakhiKpiTotalChats');
-  const agriEl = document.getElementById('sakhiKpiAgriChats');
-  const healthEl = document.getElementById('sakhiKpiHealthChats');
+  function formatCompactNumber(num) {
+    const n = Number(num) || 0;
+    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return String(n);
+  }
 
-  if (totalEl) totalEl.textContent = totalChats > 0 ? `${totalChats}+` : '0';
-  if (agriEl) agriEl.textContent = agriChats > 0 ? `${agriChats}+` : '0';
-  if (healthEl) healthEl.textContent = healthChats > 0 ? `${healthChats}+` : '0';
+  if (totalEl) totalEl.textContent = formatCompactNumber(totalChats);
+  if (agriEl) agriEl.textContent = formatCompactNumber(agriChats);
+  if (healthEl) healthEl.textContent = formatCompactNumber(healthChats);
 }
 
 // ----------------------------------------------------
@@ -2383,7 +2386,7 @@ function renderGeminiDailyChart() {
 
   const todayKey = days[6];
   if (!statsObj[todayKey]) {
-    statsObj[todayKey] = { images: 3, chats: 18, tokens: 3600 };
+    statsObj[todayKey] = { images: 0, chats: 0, tokens: 0 };
   }
 
   let total7dTokens = 0;

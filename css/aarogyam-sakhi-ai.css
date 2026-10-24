@@ -23,10 +23,10 @@ html, body {
 /* 1. FLOATING ACTION PILL (FAB - HIGH CONTRAST BLACK & WHITE WITH BLINKING RED DOT) */
 .sakhi-floating-pill {
   position: fixed;
-  top: 98px;
-  left: 12px;
-  bottom: auto;
-  right: auto;
+  bottom: 84px;
+  right: 18px;
+  top: auto;
+  left: auto;
   z-index: 999999;
   display: inline-flex;
   align-items: center;
@@ -51,12 +51,13 @@ html, body {
 
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    top: 94px !important;
-    left: 8px !important;
-    bottom: auto !important;
+    bottom: 78px !important;
+    right: 12px !important;
+    top: auto !important;
+    left: auto !important;
     padding: 4px 10px 4px 4px !important;
     font-size: 0.80rem !important;
-    max-width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 24px) !important;
   }
 }
 

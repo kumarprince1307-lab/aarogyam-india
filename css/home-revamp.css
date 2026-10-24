@@ -1335,20 +1335,20 @@ body {
   display: inline !important;
 }
 
-/* 10. Sakhi Floating Pill: Always Keep at Top-Left as Originally Configured */
+/* 10. Sakhi Floating Pill: Clean Bottom-Right Positioning (Never Overlaps Top Header / Audio Bar) */
 .sakhi-floating-pill {
-  top: 98px !important;
-  bottom: auto !important;
-  left: 12px !important;
-  right: auto !important;
+  bottom: 84px !important;
+  top: auto !important;
+  right: 18px !important;
+  left: auto !important;
   z-index: 999999 !important;
 }
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    top: 94px !important;
-    bottom: auto !important;
-    left: 8px !important;
-    right: auto !important;
+    bottom: 78px !important;
+    top: auto !important;
+    right: 12px !important;
+    left: auto !important;
     z-index: 999999 !important;
   }
 }

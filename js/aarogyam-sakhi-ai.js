@@ -486,7 +486,13 @@
         }
         if (type === 'image') allStats[today].images += 1;
         if (type === 'chat') allStats[today].chats += 1;
-        if (tokens && typeof tokens === 'number') allStats[today].tokens += tokens;
+        if (tokens && typeof tokens === 'number') {
+          allStats[today].tokens += tokens;
+        } else if (type === 'chat') {
+          allStats[today].tokens += 180;
+        } else if (type === 'image') {
+          allStats[today].tokens += 350;
+        }
         localStorage.setItem(statsKey, JSON.stringify(allStats));
       } catch(e) {}
     },
@@ -1668,9 +1674,14 @@
 
     // 1.1 Strip redundant parenthetical English names after Hindi names (e.g. "स्टिमरिच (Stimrich)" -> "स्टिमरिच")
     // Prevents TTS from pronouncing product names twice!
-    t = t.replace(/([ऀ-ॿ0-9\-]+)\s*\([a-zA-Z0-9\s\/\-\.,\+]+\)/gu, '$1');
-    t = t.replace(/\([a-zA-Z0-9\s\/\-\.,\+]+\)\s*([ऀ-ॿ0-9\-]+)/gu, '$1');
-    t = t.replace(/\([a-zA-Z\s\/\-\.,\+]+\)/g, ' ');
+    t = t.replace(/([\u0900-\u097F0-9-]+)\s*\([a-zA-Z0-9\s/.,+–—'":;%-]+\)/g, '$1');
+    t = t.replace(/\([a-zA-Z0-9\s/.,+–—'":;%-]+\)\s*([\u0900-\u097F0-9-]+)/g, '$1');
+    t = t.replace(/\([a-zA-Z0-9\s/.,+–—'":;%-]+\)/g, ' ');
+    t = t.replace(/\[[a-zA-Z0-9\s/.,+–—'":;%-]+\]/g, ' ');
+
+    // 1.5 Handle 24x7 / 24X7 / 24×7 correctly (Never pronounce "चौबीस गुणा सात"!)
+    t = t.replace(/\b24\s*[xX×*\/]\s*7\b/gi, ' चौबीसों घंटे सातों दिन ')
+         .replace(/24\s*[xX×*\/]\s*7/gi, ' चौबीसों घंटे सातों दिन ');
 
     // 2. Strip book code identifiers so TTS doesn't speak "बीके 002"
     t = t.replace(/\bBK002\b/gi, 'खेती डॉक्टर')
@@ -1716,14 +1727,15 @@
     t = t.replace(/(\d+)\s*%/g, ' $1 प्रतिशत ');
     t = t.replace(/\s*\+\s*/g, ' और ');
 
-    // 6. Ratios & Time-Like Colon Patterns (Prevent "19 bajke 19 minute 19 second")
-    t = t.replace(/\b19\s*:\s*19\s*:\s*19\b/gi, 'उन्नीस उन्नीस उन्नीस')
+    // 6. Time and Colon Patterns (Never pronounce "20:30 मिनट" as "बीस अनुपात तीस"!)
+    t = t.replace(/\b(\d{1,2})\s*:\s*(\d{2})\s*(?:मिनट|बजे|घंटे)?\b/gi, '$1 बजकर $2 मिनट ')
+         .replace(/\b19\s*:\s*19\s*:\s*19\b/gi, 'उन्नीस उन्नीस उन्नीस')
          .replace(/\b0\s*:\s*52\s*:\s*34\b/gi, 'जीरो बावन चौंतीस')
          .replace(/\b0\s*:\s*0\s*:\s*50\b/gi, 'जीरो जीरो पचास')
          .replace(/\b12\s*:\s*61\s*:\s*0\b/gi, 'बारह इकसठ जीरो')
          .replace(/\b13\s*:\s*0\s*:\s*45\b/gi, 'तेरह जीरो पैंतालीस')
          .replace(/\b(\d+)\s*:\s*(\d+)\s*:\s*(\d+)\b/g, '$1 $2 $3')
-         .replace(/\b(\d+)\s*:\s*(\d+)\b/g, '$1 अनुपात $2');
+         .replace(/\b(\d+)\s*:\s*(\d+)\b/g, '$1 $2');
 
     // 7. Strip URLs, links and file paths
     t = t.replace(/https?:\/\/\S+/gi, ' ')
@@ -1734,12 +1746,12 @@
          .replace(/\s+\d+[\.\)]\s+/g, ' ');
 
     // 9. Strip ALL Unicode Emojis
-    t = t.replace(/[\u{1F300}-\u{1F9FF}\u{1FA00}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{200D}\u{FE0F}]/gu, ' ');
+    t = t.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ');
 
-    // 10. CRITICAL: Remove commas, semicolons, colons, dashes, quotes, slashes, brackets, bullets, asterisks
-    // SO TTS CAN NEVER PRONOUNCE "कॉमा", "डैश", "ब्रैकेट", "स्लैश", "स्टार", आदि!
-    t = t.replace(/[*#_~`|•●★☆✔✓👉👉🏻👉🏼👉🏽👉🏾👉🏿→⇒➔↔]/gu, ' ')
-         .replace(/[,\:;\-\–\—\/\\\"\'\“\”\‘\’\(\)\[\]\{\}\<\>\^\@\&\=\$\~]/g, ' ')
+    // 10. CRITICAL: Remove all asterisks, markdown hashes, quotes, brackets
+    // Never pronounce "स्टार" or "डैश" or "ब्रैकेट"!
+    t = t.replace(/[*#_~`|•●★☆✔✓👉→⇒➔↔]/g, ' ')
+         .replace(/[,:;\-–—/\\"'"“"‘'()\[\]{}<>^@&$~]/g, ' ')
          .replace(/\s+/g, ' ')
          .trim();
 
