@@ -254,6 +254,15 @@ function ensureMobileMenuInstallButton() {
 }
 
 function registerPublicServiceWorker() {
+    // Auto-check for updates whenever user returns to tab / PWA
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then(reg => {
+          try { reg.update(); } catch(e) {}
+        });
+      }
+    });
+
   if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {

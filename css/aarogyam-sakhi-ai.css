@@ -439,6 +439,7 @@ body.is-fullscreen .sakhi-chat-window {
   z-index: 9999;
   display: none !important;
   opacity: 0;
+  pointer-events: none !important;
   transition: opacity 0.2s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -447,6 +448,7 @@ body.is-fullscreen .sakhi-chat-window {
 .sakhi-plus-menu-backdrop.active {
   display: block !important;
   opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .sakhi-plus-menu {
@@ -911,11 +913,12 @@ body.is-fullscreen .sakhi-chat-window {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
   flex-shrink: 0 !important;
   margin-top: auto !important;
   position: relative !important;
-  z-index: 50 !important;
+  z-index: 10001 !important;
+  pointer-events: auto !important;
   visibility: visible !important;
   opacity: 1 !important;
 }
@@ -1832,7 +1835,15 @@ body.sakhi-page-body {
   }
   /* On mobile: Hide text "आरोग्यम सखी AI" so only avatar shows, removing all crowding! */
   .sakhi-header-info {
-    display: none !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .sakhi-header-brand span {
+    display: inline-block !important;
+    color: #ffffff !important;
+    font-size: 0.95rem !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
   }
   .sakhi-header-actions {
     gap: 5px !important;
@@ -2014,3 +2025,272 @@ body.sakhi-page-body {
 
 
 
+
+/* Auto-expanding ChatGPT style textarea */
+.sakhi-text-input {
+  min-height: 40px !important;
+  max-height: 120px !important;
+  resize: none !important;
+  overflow-y: auto !important;
+  line-height: 1.4 !important;
+  font-size: 15px !important;
+  padding: 9px 14px !important;
+  border-radius: 20px !important;
+  box-sizing: border-box !important;
+}
+.sakhi-cam-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+}
+.sakhi-cam-btn:hover {
+  background: #22c55e;
+  color: #fff;
+}
+
+/* Live Weather Pulse Animation (FarmChat Style) */
+@keyframes sakhiWeatherPulse {
+  0% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+  70% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  100% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+.sakhi-live-weather-dot {
+  animation: sakhiWeatherPulse 1.8s infinite !important;
+}
+
+/* ====================================================================
+   HIGH CONTRAST RULES: PROMPT CARDS, 5.2K VIEWS BADGE & LANGUAGE SELECTOR
+   ==================================================================== */
+.sakhi-views-pill,
+.sakhi-views-pill *,
+.sakhi-badge-views,
+.sakhi-badge-views * {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.sakhi-code-prompt-card {
+  background: #0f172a !important;
+  border: 1.5px solid #38bdf8 !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+}
+
+.sakhi-code-prompt-card,
+.sakhi-code-prompt-card *,
+.sakhi-prompt-content,
+.sakhi-prompt-content * {
+  color: #f8fafc !important;
+}
+
+.sakhi-code-prompt-card strong,
+.sakhi-code-prompt-card b {
+  color: #38bdf8 !important;
+}
+
+.sakhi-code-prompt-card .sakhi-copy-btn {
+  color: #ffffff !important;
+  background: #2563eb !important;
+}
+
+/* Language Selector Dropdown in Header */
+.sakhi-lang-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px 9px !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 20px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+.sakhi-lang-btn:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+
+/* =========================================================================
+   HIGH-CONTRAST AI PROMPT CARD & VIEWS PILL (100% CRISP WHITE TEXT)
+   ========================================================================= */
+.sakhi-code-prompt-card {
+  background: #0b1329 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #38bdf8 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+}
+.sakhi-code-prompt-card *,
+.sakhi-code-prompt-card p,
+.sakhi-code-prompt-card div,
+.sakhi-code-prompt-card span,
+.sakhi-code-prompt-card strong,
+.sakhi-prompt-content,
+.sakhi-prompt-content * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Views Pill: 5.2k किसान जुड़े (Always Bright White) */
+.sakhi-views-pill,
+.sakhi-views-pill *,
+.sakhi-views-pill span,
+.sakhi-views-pill i {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+}
+
+/* Header Brand: सखी AI (Always Visible in Pure White) */
+.sakhi-header-info {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.sakhi-header-brand,
+.sakhi-header-brand span,
+.sakhi-header-brand .sakhi-brand-full,
+.sakhi-header-brand .sakhi-brand-short {
+  display: inline-block !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 1.05rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
+}
+
+/* Multi-Lingual Language Dropdown Styling */
+.sakhi-lang-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 5px 9px !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 20px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  backdrop-filter: blur(4px) !important;
+  transition: all 0.2s ease !important;
+}
+.sakhi-lang-btn:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: #fde047 !important;
+}
+.sakhi-lang-opt-btn {
+  width: 100% !important;
+  text-align: left !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 9px 12px !important;
+  border-radius: 10px !important;
+  font-size: 0.90rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: background 0.15s ease !important;
+}
+.sakhi-lang-opt-btn:hover {
+  background: #f0fdf4 !important;
+  color: #166534 !important;
+}
+
+/* Live Weather Pill */
+.sakhi-weather-pill-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 5px 9px !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 20px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.78rem !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+/* Clickable Quick Pills & Followup Chips */
+.sakhi-quick-pill, .sakhi-followup-chip {
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+.sakhi-quick-pill:active, .sakhi-followup-chip:active {
+  transform: scale(0.96) !important;
+}
+
+
+/* Mobile Declutter & Clean Header Optimization */
+@media (max-width: 640px) {
+  .sakhi-hide-mobile {
+    display: none !important;
+  }
+  .sakhi-header {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+  .sakhi-header-left {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+  .sakhi-avatar-frame {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .sakhi-header-brand span {
+    font-size: 0.98rem !important;
+  }
+  .sakhi-header-actions {
+    gap: 4px !important;
+  }
+  .sakhi-lang-btn, .sakhi-weather-pill-btn {
+    padding: 3px 7px !important;
+    font-size: 0.72rem !important;
+  }
+  .sakhi-new-chat-btn {
+    padding: 3px 7px !important;
+    font-size: 0.72rem !important;
+  }
+}
+
+
+/* Footer Language Pill & Dropdown */
+.sakhi-footer-lang-pill {
+  transition: all 0.2s ease !important;
+}
+.sakhi-footer-lang-pill:hover, .sakhi-footer-lang-pill:active {
+  background: #dcfce7 !important;
+  border-color: #16a34a !important;
+}
+.sakhi-fullscreen-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

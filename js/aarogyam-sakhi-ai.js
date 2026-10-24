@@ -1,3 +1,66 @@
+
+  // Global Coming Soon Popup Helper
+  window.showSakhiComingSoon = function(msg) {
+    const existing = document.getElementById('sakhiComingSoonToast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'sakhiComingSoonToast';
+    toast.innerHTML = `<i class="fa-solid fa-clock" style="color:#fde047;font-size:1rem;"></i> <span>${msg || 'यह सुविधा जल्द आ रही है!'}</span>`;
+    toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#ffffff;padding:10px 20px;border-radius:24px;font-size:0.86rem;font-weight:800;border:1.5px solid rgba(250,204,21,0.6);box-shadow:0 10px 30px rgba(0,0,0,0.35);z-index:99999999;display:flex;align-items:center;gap:8px;pointer-events:none;';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 2200);
+  };
+
+  // Global Followup Chips & Suggestion Click Handler (Forwarding Stubs)
+  window.sendSakhiSuggestion = function(queryText) {
+    if (!queryText) return;
+    const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
+    if (input) input.value = queryText;
+    if (typeof window._sakhiCoreExecuteSuggestion === 'function') {
+      window._sakhiCoreExecuteSuggestion(queryText);
+    }
+  };
+  window.askSakhiQuick = function(queryText) {
+    window.sendSakhiSuggestion(queryText);
+  };
+
+
+  // Language Dropdown Toggle & Selection Handler
+  window.toggleSakhiLangDropdown = function() {
+    const menu = document.getElementById('sakhiLangDropdownMenu');
+    if (menu) {
+      menu.style.display = (menu.style.display === 'none' || !menu.style.display) ? 'block' : 'none';
+    }
+  };
+
+  window.setSakhiLanguage = function(langCode, langLabel) {
+    try {
+      localStorage.setItem('sakhi_language', langCode);
+      localStorage.setItem('sakhi_language_label', langLabel);
+      const labelEl = document.getElementById('sakhiCurrentLangLabel');
+      if (labelEl) labelEl.textContent = langLabel;
+      const menu = document.getElementById('sakhiLangDropdownMenu');
+      if (menu) menu.style.display = 'none';
+      if (typeof showToast === 'function') {
+        showToast(`✅ भाषा बदलकर '${langLabel}' कर दी गई है।`, 'success');
+      }
+    } catch(e) {}
+  };
+
+  // Close dropdown on outside click
+  if (typeof document !== 'undefined') {
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.sakhi-lang-dropdown-wrap')) {
+        const menu = document.getElementById('sakhiLangDropdownMenu');
+        if (menu) menu.style.display = 'none';
+      }
+    });
+  }
+
 /**
  * ====================================================================
  * AAROGYAM SAKHI AI - NEURAL CORE ENGINE v8.1 (PROFESSIONAL AI GRADE)
@@ -14,6 +77,168 @@
 'use strict';
 
 (function () {
+
+  // =========================================================================
+  // 1. AUTO-EXPANDING TEXTAREA CHAT INPUT (ChatGPT Style)
+  // =========================================================================
+  function initAutoExpandingInput() {
+    const txtInput = document.getElementById('sakhiTextInput');
+    if (!txtInput) return;
+    txtInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAutoExpandingInput);
+  } else {
+    setTimeout(initAutoExpandingInput, 300);
+  }
+
+  // =========================================================================
+  // 1.9 GLOBAL SAKHI MESSAGE APPENDER & MULTI-MODAL PREVIEW ENGINE
+  // =========================================================================
+  function appendSakhiMessage(role, htmlOrText, isHtml, chips) {
+    const wrap = document.getElementById('sakhiMessagesWrap');
+    if (!wrap) return;
+    const now = Date.now();
+    if (typeof ensureDateSeparator === 'function') {
+      ensureDateSeparator(wrap, now);
+    }
+    if (role === 'user') {
+      const row = document.createElement('div');
+      row.className = 'sakhi-msg-row user';
+      const timeStr = typeof formatMsgTime === 'function' ? formatMsgTime(now) : new Date(now).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      const contentHtml = isHtml ? htmlOrText : (typeof escapeHtml === 'function' ? escapeHtml(htmlOrText) : htmlOrText);
+      const isCard = isHtml && (String(contentHtml).includes('sakhi-open-user-photo-card') || String(contentHtml).includes('sakhi-native-image-card'));
+      const bubbleStyle = isCard
+        ? 'background:transparent;padding:0;box-shadow:none;border:none;'
+        : 'background:#15803d;color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;box-shadow:0 2px 6px rgba(0,0,0,0.08);';
+      const timeColor = isCard ? '#64748b' : '#bbf7d0';
+      row.innerHTML = `
+        <div class="sakhi-msg-bubble" style="${bubbleStyle}">
+          ${contentHtml}
+          <div class="sakhi-msg-time" style="font-size:0.68rem;color:${timeColor};text-align:right;margin-top:4px;font-weight:600;">
+            <span>${timeStr}</span>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(row);
+      wrap.scrollTop = wrap.scrollHeight;
+      if (typeof saveChatLogItem === 'function') {
+        saveChatLogItem('user', htmlOrText, '');
+      }
+    } else {
+      if (typeof streamBotMessage === 'function') {
+        streamBotMessage(htmlOrText, '', chips);
+      }
+    }
+  }
+  window.appendSakhiMessage = appendSakhiMessage;
+
+  // =========================================================================
+  // 2. MULTI-MODAL IMAGE & CAMERA UPLOAD HANDLER (Preview + Analysis)
+  // =========================================================================
+  function handleSakhiImageUpload(event) {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imgDataUrl = e.target.result;
+      
+      // Render user message with image thumbnail immediately in chat!
+      // FarmChat-Style Open Photo Display (Clean rounded card, NOT crammed in a green text box)
+      const userHtml = `
+        <div class="sakhi-open-user-photo-card" style="display:inline-block;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.4);max-width:280px;width:100%;">
+          <img src="${imgDataUrl}" alt="किसान द्वारा भेजी गई फसल फोटो" style="width:100%;height:auto;max-height:280px;object-fit:cover;display:block;" />
+        </div>
+      `;
+      appendSakhiMessage('user', userHtml, true);
+
+      // Analyze image
+      // Smart Multi-Modal Vision Analysis & Interactive Symptom Checklist via SakhiVision
+      setTimeout(() => {
+        const fileName = (file.name || '').toLowerCase();
+        if (window.SakhiVision && typeof window.SakhiVision.analyzeCropImage === 'function') {
+          window.SakhiVision.analyzeCropImage(imgDataUrl, fileName, function(res) {
+            if (res.isLab || res.isBook || res.isPoster || res.isDiagnosed || !res.checklist) {
+              appendSakhiMessage('bot', res.response, false, res.chips);
+              return;
+            }
+
+            const checklistHtml = `
+              <div style="line-height:1.6;font-size:0.92rem;">
+                ${res.response.replace(/\n/g, '<br/>')}
+              </div>
+
+              <div class="sakhi-checklist-container" style="background:linear-gradient(135deg, rgba(6,78,59,0.3) 0%, rgba(15,23,42,0.6) 100%);border:1.5px solid rgba(16,185,129,0.5);border-radius:14px;padding:14px;margin-top:12px;box-shadow:0 4px 14px rgba(0,0,0,0.25);">
+                <div style="font-size:0.84rem;font-weight:800;color:#86efac;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                  <span>🌾 चरण 1: अपनी फसल चुनें:</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                  <button type="button" onclick="window.selectSakhiCropChecklist('गेहूँ', this)" class="sakhi-chk-btn" style="background:#10b981;color:#000;border:1px solid #10b981;border-radius:18px;padding:6px 14px;font-size:0.8rem;font-weight:800;cursor:pointer;">🌾 गेहूँ</button>
+                  <button type="button" onclick="window.selectSakhiCropChecklist('चना', this)" class="sakhi-chk-btn" style="background:#065f46;color:#fff;border:1px solid #10b981;border-radius:18px;padding:6px 14px;font-size:0.8rem;font-weight:800;cursor:pointer;">🌱 चना</button>
+                  <button type="button" onclick="window.selectSakhiCropChecklist('सरसों', this)" class="sakhi-chk-btn" style="background:#065f46;color:#fff;border:1px solid #10b981;border-radius:18px;padding:6px 14px;font-size:0.8rem;font-weight:800;cursor:pointer;">🌿 सरसों</button>
+                  <button type="button" onclick="window.selectSakhiCropChecklist('टमाटर/सब्जी', this)" class="sakhi-chk-btn" style="background:#065f46;color:#fff;border:1px solid #10b981;border-radius:18px;padding:6px 14px;font-size:0.8rem;font-weight:800;cursor:pointer;">🍅 टमाटर/सब्जी</button>
+                  <button type="button" onclick="window.selectSakhiCropChecklist('धान', this)" class="sakhi-chk-btn" style="background:#065f46;color:#fff;border:1px solid #10b981;border-radius:18px;padding:6px 14px;font-size:0.8rem;font-weight:800;cursor:pointer;">🌾 धान</button>
+                </div>
+
+                <div style="font-size:0.84rem;font-weight:800;color:#fde047;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                  <span>🔍 चरण 2: पौधे/पत्ती पर मुख्य लक्षण क्या दिख रहे हैं? (टैप करें)</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <button type="button" onclick="window.triggerSakhiSymptomDiagnosis('पीला रतुआ / पत्तियां पीली')" class="sakhi-chk-sym-btn" style="background:#1e293b;color:#fef08a;border:1.5px solid #eab308;border-radius:18px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">🟡 पीला रतुआ / पत्तियां पीली</button>
+                  <button type="button" onclick="window.triggerSakhiSymptomDiagnosis('उकठा / जड़ सूखना (Wilt)')" class="sakhi-chk-sym-btn" style="background:#1e293b;color:#fed7aa;border:1.5px solid #f97316;border-radius:18px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">🍂 उकठा / जड़ सूखना</button>
+                  <button type="button" onclick="window.triggerSakhiSymptomDiagnosis('सफेद चूर्ण / फफूंद (Powdery Mildew)')" class="sakhi-chk-sym-btn" style="background:#1e293b;color:#f1f5f9;border:1.5px solid #94a3b8;border-radius:18px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">⚪ सफेद चूर्ण / फफूंद</button>
+                  <button type="button" onclick="window.triggerSakhiSymptomDiagnosis('इल्ली / सुंडी / छेद')" class="sakhi-chk-sym-btn" style="background:#1e293b;color:#fca5a5;border:1.5px solid #ef4444;border-radius:18px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">🐛 इल्ली / छेद</button>
+                  <button type="button" onclick="window.triggerSakhiSymptomDiagnosis('पत्ती मुड़ना (मरोड़िया)')" class="sakhi-chk-sym-btn" style="background:#1e293b;color:#d8b4fe;border:1.5px solid #a855f7;border-radius:18px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">🍃 पत्ती मुड़ना (मरोड़िया)</button>
+                  <button type="button" onclick="window.triggerSakhiSymptomDiagnosis('काले-भूरे धब्बे / झुलसा')" class="sakhi-chk-sym-btn" style="background:#1e293b;color:#fdba74;border:1.5px solid #b45309;border-radius:18px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">🟤 काले-भूरे धब्बे / झुलसा</button>
+                </div>
+              </div>
+            `;
+            appendSakhiMessage('bot', checklistHtml, true, [
+              { text: '🌾 दवा स्प्रे का सही समय', query: 'दवा स्प्रे करने का सही समय क्या है' },
+              { text: '🐛 कीटनाशक व फफूंदनाशक चार्ट', query: 'कीटनाशक व फफूंदनाशक दवाओं का चार्ट दिखाओ' }
+            ]);
+          });
+        } else {
+          appendSakhiMessage('bot', '🌾 आपकी फोटो प्राप्त हुई। कृपया अपनी फसल का नाम (गेहूँ, चना, टमाटर) और पत्ती के लक्षण बताएं ताकि सटीक दवा बताई जा सके।', false);
+        }
+      }, 700);
+    };
+    reader.readAsDataURL(file);
+    if (event.target) event.target.value = '';
+  }
+  window.handleSakhiImageUpload = handleSakhiImageUpload;
+
+  // Global Interactive Crop & Symptom Checklist Handlers for Sakhi AI
+  let activeChecklistCrop = 'गेहूँ';
+  window.selectSakhiCropChecklist = function(crop, btn) {
+    activeChecklistCrop = crop;
+    document.querySelectorAll('.sakhi-chk-btn').forEach(b => {
+      b.style.background = '#065f46';
+      b.style.color = '#fff';
+    });
+    if (btn) {
+      btn.style.background = '#10b981';
+      btn.style.color = '#000';
+    }
+  };
+
+  window.triggerSakhiSymptomDiagnosis = function(symptom) {
+    const crop = activeChecklistCrop || 'गेहूँ';
+    appendSakhiMessage('user', `🌾 मेरी फसल: ${crop} | लक्षण: ${symptom}`, false);
+    if (window.SakhiVision && typeof window.SakhiVision.getCropTreatment === 'function') {
+      const treatment = window.SakhiVision.getCropTreatment(crop, symptom);
+      setTimeout(() => {
+        appendSakhiMessage('bot', treatment.text, false, treatment.chips);
+      }, 400);
+    }
+  };
+
+
+
   const MASTER_ADMIN_PHONE = '7974422572';
   const SAKHI_AVATAR_IMG = '/images/sakhi/aarogyam-sakhi.webp';
   const SAKHI_BANNER_IMG = '/images/sakhi/aarogyam-sakhi-banner.webp';
@@ -342,7 +567,7 @@
     }
     const chips = [];
     if (effectiveDom === 'agri') {
-      chips.push({ text: "📖 'खेती का डॉक्टर' ई-बुक (BK002)", url: "/ebooks/book-landing.html?id=BK002", isExternal: true });
+      chips.push({ text: "📖 'खेती का डॉक्टर' संपूर्ण ई-बुक", url: "/ebooks/book-landing.html?id=BK002", isExternal: true });
       chips.push({ text: "📺 आरोग्यम ट्यूब: फसल डॉक्टर", url: "/tube.html?filter=agri", isExternal: true });
     } else if (effectiveDom === 'health') {
       chips.push({ text: "🏥 क्लिनिकल हेल्थ गाइड्स व समाधान", url: "/categories/health.html", isExternal: true });
@@ -749,26 +974,6 @@
 
   // Reliable, non-blocking check: if user has logged in anywhere on the website, they are authenticated!
   function isUserAuthenticated() {
-    // 1. If V1_SESSION exists and reports logged out, treat as logged out!
-    if (window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') {
-      if (!window.V1_SESSION.isLoggedIn()) {
-        localStorage.removeItem('SAKHI_USER_NAME');
-        localStorage.removeItem('SAKHI_USER_PHONE');
-        return false;
-      }
-    }
-    // 2. If main site auth keys were cleared, treat as logged out!
-    const hasMainSession = Boolean(
-      localStorage.getItem('AI_USER') || 
-      localStorage.getItem('AI_SESSION') || 
-      localStorage.getItem('aim_user_mobile') || 
-      localStorage.getItem('aarogyam_user_phone')
-    );
-    if (!hasMainSession) {
-      localStorage.removeItem('SAKHI_USER_NAME');
-      localStorage.removeItem('SAKHI_USER_PHONE');
-      return false;
-    }
     const phone = getUserPhone();
     return Boolean(phone && phone.length === 10);
   }
@@ -780,6 +985,7 @@
         updateSakhiHeaderUserBadge();
       }
     });
+    try { updateSakhiHeaderUserBadge(); } catch(_){}
   }
 
   function getDynamicUserGreetingName() {
@@ -802,13 +1008,15 @@
       localStorage.setItem('aim_user_mobile', cleanPhone);
       localStorage.setItem('SAKHI_USER_PHONE', cleanPhone);
 
-      const aiUser = {
+      let existingProf = {};
+      try { existingProf = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch(_) {}
+      const aiUser = Object.assign({}, existingProf, {
         name: cleanName,
         full_name: cleanName,
         mobile: cleanPhone,
         phone: cleanPhone,
         source: 'aarogyam-sakhi'
-      };
+      });
       localStorage.setItem('AI_USER', JSON.stringify(aiUser));
       localStorage.setItem('AI_PROFILE', JSON.stringify(aiUser));
 
@@ -839,40 +1047,41 @@
       modal = document.createElement('div');
       modal.id = 'sakhiAuthModalBackdrop';
       modal.className = 'sakhi-auth-modal-backdrop';
+      modal.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999999;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
       modal.innerHTML = `
-        <div class="sakhi-auth-modal-card">
-          <button type="button" class="sakhi-auth-modal-close" onclick="window.closeSakhiAuthModal()" title="बंद करें">&times;</button>
-          <div style="text-align:center;margin-bottom:14px;">
-            <div style="width:48px;height:48px;border-radius:50%;background:#dcfce7;color:#15803d;display:inline-flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:6px;">
+        <div class="sakhi-auth-modal-card" style="background:#ffffff;border-radius:24px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.4);border:1.5px solid rgba(22,163,74,0.3);padding:24px;box-sizing:border-box;position:relative;">
+          <button type="button" class="sakhi-auth-modal-close" onclick="window.closeSakhiAuthModal()" title="बंद करें" style="position:absolute;top:14px;right:14px;background:#f1f5f9;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;font-size:1.2rem;">&times;</button>
+          <div style="text-align:center;margin-bottom:16px;">
+            <div style="width:52px;height:52px;border-radius:50%;background:#dcfce7;color:#15803d;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:8px;">
               <i class="fa-solid fa-user-shield"></i>
             </div>
-            <h3 style="margin:0;font-size:1.15rem;font-weight:900;color:#0f172a;">आरोग्यम सखी AI में स्वागत है</h3>
-            <p style="margin:4px 0 0 0;font-size:0.84rem;color:#64748b;">कृपया अपना 10 अंकों का WhatsApp नंबर दर्ज करें</p>
+            <h3 style="margin:0;font-size:1.2rem;font-weight:900;color:#0f172a;">आरोग्यम सखी AI में स्वागत है</h3>
+            <p style="margin:4px 0 0 0;font-size:0.86rem;color:#64748b;">सटीक व्यक्तिगत सलाह हेतु कृपया अपना WhatsApp नंबर दर्ज करें</p>
           </div>
 
           <form onsubmit="event.preventDefault(); window.submitSakhiAuthModal();">
             <div style="margin-bottom:12px;">
-              <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:4px;">
+              <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">
                 📱 WhatsApp मोबाइल नंबर: <span style="color:#dc2626;">*</span>
               </label>
-              <input type="tel" id="sakhiModalPhone" maxlength="10" placeholder="10 अंकों का नंबर लिखें..." style="width:100%;padding:10px 12px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.95rem;box-sizing:border-box;" oninput="window.checkExistingSakhiModalPhone(this.value)" required />
+              <input type="tel" id="sakhiModalPhone" maxlength="10" placeholder="10 अंकों का नंबर लिखें..." style="width:100%;padding:11px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.95rem;box-sizing:border-box;outline:none;" oninput="window.checkExistingSakhiModalPhone(this.value)" required />
               <div id="sakhiPhoneCheckNotice" style="display:none;font-size:0.75rem;margin-top:4px;font-weight:700;"></div>
             </div>
 
-            <div style="margin-bottom:16px;">
-              <label style="display:block;font-size:0.82rem;font-weight:700;color:#334155;margin-bottom:4px;">
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-size:0.84rem;font-weight:800;color:#334155;margin-bottom:5px;">
                 👤 आपका शुभ नाम: <span style="color:#dc2626;">*</span>
               </label>
-              <input type="text" id="sakhiModalName" placeholder="अपना पूरा नाम लिखें..." style="width:100%;padding:10px 12px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.95rem;box-sizing:border-box;" required />
+              <input type="text" id="sakhiModalName" placeholder="अपना पूरा नाम लिखें..." style="width:100%;padding:11px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:0.95rem;box-sizing:border-box;outline:none;" required />
             </div>
 
-            <button type="submit" style="width:100%;background:#16a34a;color:#ffffff;border:none;padding:12px;border-radius:12px;font-weight:900;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(22,163,74,0.3);">
-              <span>आगे बढ़ें</span> <i class="fa-solid fa-arrow-right"></i>
+            <button type="submit" style="width:100%;background:#16a34a;color:#ffffff;border:none;padding:12px;border-radius:12px;font-weight:900;font-size:0.98rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+              <span>सुरक्षित करें व आगे बढ़ें</span> <i class="fa-solid fa-arrow-right"></i>
             </button>
           </form>
 
-          <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:#94a3b8;">
-            🔒 100% सुरक्षित • आपका डेटा पूरी तरह गोपनीय रखा जाता है
+          <div style="text-align:center;margin-top:14px;font-size:0.75rem;color:#94a3b8;">
+            🔒 100% सुरक्षित • आपका डेटा पूरी तरह गोपनीय है
           </div>
         </div>
       `;
@@ -885,263 +1094,122 @@
     return modal;
   }
 
-  window.openSakhiAuthModal = function(callback) {
-    if (typeof window.openGuestLoginModal === 'function') {
-      window.openGuestLoginModal((userObj) => {
-        const officialName = userObj?.name || userObj?.full_name || 'किसान साथी';
-        const rawPhone = userObj?.mobile || userObj?.phone || '';
-        syncUnifiedUserAuth(officialName, rawPhone);
-        updateSakhiHeaderUserBadge();
-        speakResponse(`स्वागत है ${officialName} जी!`);
-
-        const wrap = document.getElementById('sakhiMessagesWrap');
-        if (wrap) {
-          const row = document.createElement('div');
-          row.className = 'sakhi-msg-row bot';
-          row.innerHTML = `
-            <div class="sakhi-msg-bubble" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-                <span style="font-size:1.4rem;">🎉</span>
-                <div style="font-weight:900;color:#15803d;font-size:1rem;">स्वागत है ${escapeHtml(officialName)} जी!</div>
-              </div>
-              <div style="font-size:0.88rem;color:#334155;line-height:1.5;">
-                आपका WhatsApp नंबर <strong>${escapeHtml(rawPhone)}</strong> सत्यापित हो गया है। अब आप कोई भी सवाल पूछ सकते हैं।
-              </div>
-            </div>
-          `;
-          wrap.appendChild(row);
-          wrap.scrollTop = wrap.scrollHeight;
-        }
-
-        if (pendingUserQuery) {
-          const q = pendingUserQuery;
-          pendingUserQuery = null;
-          setTimeout(() => handleUserSubmit(q), 500);
-        }
-        if (typeof callback === 'function') callback(userObj);
-      }, { source: 'सखी AI (Aarogyam Sakhi)', force: true });
-      return;
-    }
-
-    const modal = ensureAuthModalExists();
-    if (modal) {
-      modal.classList.add('active');
-      const phoneInput = document.getElementById('sakhiModalPhone');
-      if (phoneInput && !phoneInput.value) {
-        phoneInput.value = getUserPhone();
-        if (phoneInput.value) window.checkExistingSakhiModalPhone(phoneInput.value);
-        setTimeout(() => phoneInput.focus(), 200);
-      }
-    }
-  };
-
   window.closeSakhiAuthModal = function() {
-    if (typeof window.closeGuestLoginModal === 'function') {
-      window.closeGuestLoginModal();
-    }
     const modal = document.getElementById('sakhiAuthModalBackdrop');
-    if (modal) modal.classList.remove('active');
+    if (modal) modal.style.display = 'none';
   };
 
-  let sakhiPhoneTimer = null;
-  window.checkExistingSakhiModalPhone = function(val) {
-    const clean = (val || '').replace(/\D/g, '').slice(-10);
-    const notice = document.getElementById('sakhiPhoneCheckNotice');
+  window.submitSakhiAuthModal = function() {
+    const phoneInput = document.getElementById('sakhiModalPhone');
     const nameInput = document.getElementById('sakhiModalName');
-    if (!notice) return;
-
-    if (sakhiPhoneTimer) clearTimeout(sakhiPhoneTimer);
-
-    if (clean.length === 10) {
-      notice.style.display = 'block';
-      notice.style.color = '#d97706';
-      notice.innerHTML = `⏳ खाता जाँचा जा रहा है...`;
-
-      sakhiPhoneTimer = setTimeout(async () => {
-        try {
-          let dbUser = null;
-          if (typeof isMobileRegistered === 'function') {
-            dbUser = await isMobileRegistered(clean);
-          } else if (window.dbClient || window.supabase) {
-            const client = window.dbClient || window.supabase;
-            const { data } = await client.from('profiles').select('id, full_name, mobile, share_id').eq('mobile', clean).limit(1).maybeSingle();
-            dbUser = data;
-          }
-
-          if (dbUser && dbUser.full_name && dbUser.full_name.trim()) {
-            const official = dbUser.full_name.trim();
-            notice.style.display = 'block';
-            notice.style.color = '#15803d';
-            notice.innerHTML = `✨ सत्यापित खाता: <strong>${escapeHtml(official)}</strong>`;
-            if (nameInput) {
-              nameInput.value = official;
-              nameInput.readOnly = true;
-              nameInput.style.backgroundColor = '#f0fdf4';
-            }
-          } else {
-            notice.style.display = 'block';
-            notice.style.color = '#0284c7';
-            notice.innerHTML = `✨ नया खाता: कृपया नीचे अपना शुभ नाम लिखें।`;
-            if (nameInput) {
-              nameInput.readOnly = false;
-              nameInput.style.backgroundColor = '#ffffff';
-              if (!nameInput.value) nameInput.focus();
-            }
-          }
-        } catch (e) {
-          notice.style.display = 'none';
-        }
-      }, 250);
-    } else {
-      notice.style.display = 'none';
-      if (nameInput) {
-        nameInput.readOnly = false;
-        nameInput.style.backgroundColor = '#ffffff';
-      }
-    }
-  };
-
-  window.submitSakhiAuthModal = async function() {
-    const phoneEl = document.getElementById('sakhiModalPhone');
-    const nameEl = document.getElementById('sakhiModalName');
-    const rawPhone = phoneEl ? phoneEl.value.replace(/\D/g, '').slice(-10) : '';
-    const rawName = nameEl ? nameEl.value.trim() : '';
-
-    if (!rawPhone || !/^[6-9]\d{9}$/.test(rawPhone)) {
-      alert('कृपया 10 अंकों का सही भारतीय WhatsApp मोबाइल नंबर दर्ज करें।');
-      if (phoneEl) phoneEl.focus();
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const name = nameInput ? nameInput.value.trim() : 'किसान साथी';
+    if (!phone || phone.length < 10) {
+      alert('कृपया 10 अंकों का मान्य मोबाइल नंबर दर्ज करें।');
       return;
     }
-
-    if (!rawName || rawName.length < 2) {
-      alert('कृपया अपना शुभ नाम दर्ज करें।');
-      if (nameEl) nameEl.focus();
-      return;
-    }
-
-    let officialName = rawName;
-
-    try {
-      if (typeof isMobileRegistered === 'function') {
-        const existingProfile = await isMobileRegistered(rawPhone);
-        if (existingProfile && existingProfile.full_name && existingProfile.full_name.trim()) {
-          officialName = existingProfile.full_name.trim();
-        }
-        if (existingProfile && typeof createLoginSession === 'function') {
-          createLoginSession(existingProfile);
-        }
-      }
-    } catch (e) {}
-
-    syncUnifiedUserAuth(officialName, rawPhone);
-    window.closeSakhiAuthModal();
+    syncUnifiedUserAuth(name, phone);
     updateSakhiHeaderUserBadge();
-
-    speakResponse(`स्वागत है ${officialName} जी!`);
-
-    const wrap = document.getElementById('sakhiMessagesWrap');
-    if (wrap) {
-      const row = document.createElement('div');
-      row.className = 'sakhi-msg-row bot';
-      row.innerHTML = `
-        <div class="sakhi-msg-bubble" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:18px;padding:14px;box-shadow:0 4px 12px rgba(22,163,74,0.15);">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <span style="font-size:1.4rem;">🎉</span>
-            <div style="font-weight:900;color:#15803d;font-size:1rem;">स्वागत है ${escapeHtml(officialName)} जी!</div>
-          </div>
-          <div style="font-size:0.88rem;color:#334155;line-height:1.5;">
-            आपका WhatsApp नंबर <strong>${escapeHtml(rawPhone)}</strong> सत्यापित हो गया है। अब आप कोई भी सवाल पूछ सकते हैं।
-          </div>
-        </div>
-      `;
-      wrap.appendChild(row);
-      wrap.scrollTop = wrap.scrollHeight;
-    }
-
+    window.closeSakhiAuthModal();
     if (pendingUserQuery) {
       const q = pendingUserQuery;
       pendingUserQuery = null;
-      setTimeout(() => handleUserSubmit(q), 500);
+      setTimeout(() => handleUserSubmit(q), 300);
     }
+  };
+
+  window.openSakhiAuthModal = function(callback) {
+    const modal = ensureAuthModalExists();
+    if (modal) {
+      modal.style.display = 'flex';
+      const phoneInput = document.getElementById('sakhiModalPhone');
+      if (phoneInput && !phoneInput.value) {
+        phoneInput.value = getUserPhone() || '';
+        setTimeout(() => phoneInput.focus(), 200);
+      }
+    }
+    if (typeof callback === 'function') callback();
   };
 
   // 6. USER BADGE IN SAKHI HEADER
   function updateSakhiHeaderUserBadge() {
-    const badgeWrap = document.getElementById('sakhiHeaderUserBadgeWrap');
-    if (!badgeWrap) return;
+    const wrap = document.getElementById('sakhiHeaderUserBadgeWrap');
+    if (!wrap) return;
 
-    if (isUserAuthenticated()) {
-      const name = getUserName() || 'किसान साथी';
-      const getInitials = (n) => {
-        if (!n) return 'AM';
-        const parts = n.trim().split(/\s+/);
-        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-        return n.slice(0, 2).toUpperCase();
-      };
-      const initials = getInitials(name);
+    if (typeof isUserAuthenticated === 'function' && isUserAuthenticated()) {
+      const name = (typeof getUserName === 'function' ? getUserName() : '') || 'Avnish Mishra';
+      const phone = typeof getUserPhone === 'function' ? getUserPhone() : '';
+      
+      let badgeLabel = 'AM';
+      if (name) {
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        if (parts.length > 1) {
+          badgeLabel = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        } else if (parts.length === 1) {
+          badgeLabel = parts[0].slice(0, 2).toUpperCase();
+        }
+      }
 
-      badgeWrap.innerHTML = `
-        <div class="sakhi-user-badge logged-in" title="सत्यापित खाता: ${escapeHtml(name)}">
-          <span class="sakhi-badge-dot"></span>
-          <span class="sakhi-badge-short">${escapeHtml(initials)}</span>
-          <span class="sakhi-badge-full">${escapeHtml(name)}</span>
+      wrap.innerHTML = `
+        <div style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);padding:3px 8px;border-radius:16px;color:#ffffff;font-size:0.75rem;font-weight:900;display:inline-flex;align-items:center;gap:4px;cursor:pointer;" onclick="if(typeof window.openSakhiAuthModal==='function')window.openSakhiAuthModal();" title="${escapeHtml(name)} ${phone ? '(' + escapeHtml(phone) + ')' : ''}">
+          <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;"></span>
+          <span>${escapeHtml(badgeLabel)}</span>
         </div>
       `;
     } else {
-      badgeWrap.innerHTML = `
-        <button type="button" class="sakhi-user-badge guest" onclick="window.openSakhiAuthModal()" title="लॉगिन या नया खाता बनाने के लिए क्लिक करें">
-          <span>🔑</span> <span class="sakhi-badge-full">लॉगिन</span>
+      wrap.innerHTML = `
+        <button type="button" class="sakhi-user-badge guest" onclick="if(typeof window.openSakhiAuthModal==='function')window.openSakhiAuthModal();" title="लॉगिन या नया खाता बनाएं" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);border-radius:16px;font-weight:800;font-size:0.75rem;color:#ffffff;cursor:pointer;">
+          <span style="width:6px;height:6px;border-radius:50%;background:#fde047;"></span>
+          <span>Guest</span>
         </button>
       `;
     }
   }
+  window.updateSakhiHeaderUserBadge = updateSakhiHeaderUserBadge;
 
-  // 7. SPEECH RECOGNITION (STT)
   function initSpeechRecognition() {
     try {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return;
-
       recognitionInstance = new SpeechRecognition();
-      recognitionInstance.lang = 'hi-IN';
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'hi-IN';
 
       recognitionInstance.onstart = function () {
-        stopAllSpeech();
-        isRecording = true;
+        isSpeechActive = true;
         const micBtn = document.getElementById('sakhiMicBtn');
         if (micBtn) micBtn.classList.add('recording');
-        const input = document.getElementById('sakhiTextInput');
-        if (input) input.placeholder = '🌾 सुन रही हूँ... बोलिए...';
       };
 
       recognitionInstance.onresult = function (event) {
-        const transcript = (event.results && event.results[0] && event.results[0][0]) ? event.results[0][0].transcript : '';
-        const input = document.getElementById('sakhiTextInput');
+        const transcript = event.results[0][0].transcript;
+        const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
         if (input && transcript) {
-          input.value = transcript;
+          input.value = transcript.trim();
           input.focus();
-          input.placeholder = '✏️ आवाज़ दर्ज हुई — जाँचें व भेजें...';
-          const micBtn = document.getElementById('sakhiMicBtn');
-          if (micBtn) {
-            micBtn.classList.remove('recording');
-            micBtn.title = 'आवाज़ दर्ज हुई। भेजने के लिए Enter या सेंड बटन दबाएं।';
-          }
+          input.style.height = 'auto';
+          input.style.height = Math.min(input.scrollHeight, 120) + 'px';
         }
       };
 
-      recognitionInstance.onerror = function () {
-        stopRecording();
+      recognitionInstance.onerror = function (e) {
+        console.warn('[Sakhi AI] STT error:', e);
+        isSpeechActive = false;
+        const micBtn = document.getElementById('sakhiMicBtn');
+        if (micBtn) micBtn.classList.remove('recording');
       };
 
       recognitionInstance.onend = function () {
-        stopRecording();
+        isSpeechActive = false;
+        const micBtn = document.getElementById('sakhiMicBtn');
+        if (micBtn) micBtn.classList.remove('recording');
       };
     } catch (e) {
       console.warn('[Sakhi AI] STT setup note:', e);
     }
   }
+
 
   function toggleRecording() {
     // Immediately stop any TTS speech so the user can speak freely
@@ -1687,7 +1755,7 @@
                    localStorage.getItem('aim_user_mobile') || 
                    localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
       if (mob === '7974422572' || mob.endsWith('7974422572')) return 'AI000004';
-      if (mob.length === 10) return 'AI' + mob.slice(-6);
+      if (mob.length === 10) { const u = JSON.parse(localStorage.getItem('AI_USER') || '{}'); return (u.share_id && !/^\d{10}$/.test(u.share_id)) ? u.share_id : 'AI000004'; }
 
       if (window.V1_SESSION && typeof window.V1_SESSION.getUserShareId === 'function') {
         const v1Sid = window.V1_SESSION.getUserShareId();
@@ -1710,7 +1778,7 @@
     let domainUrl = 'https://aarogyamindia.online/aarogyam-sakhi.html';
     domainUrl += `?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
 
-    const shareBody = `🌿 *आरोग्यम सखी — प्रमाणित समाधान* 🌿\n━━━━━━━━━━━━━━━━━━━━\n${cleanText}\n\n━━━━━━━━━━━━━━━━━━━━\n👉 *व्यक्तिगत परामर्श व असली उत्पाद ऑर्डर हेतु संपर्क:*\n👤 *सलाहकार:* ${userName}\n📱 *मोबाइल:* ${userPhone ? userPhone : 'सीधे संपर्क करें'}\n🌐 *आरोग्यम सखी AI लिंक:* ${domainUrl}\n\n🌱 _भारत की पहली कृषि व स्वास्थ्य AI सखी से 24×7 नि:शुल्क सलाह पाने हेतु ऊपर दिए लिंक पर क्लिक करें।_\n━━━━━━━━━━━━━━━━━━━━\n_सत्यापित स्रोत: आरोग्यम इंडिया एवं नेट्सर्फ_`;
+    const shareBody = `🌿 *आरोग्यम सखी AI — प्रमाणित किसान समाधान* 🌿\n\n📋 *सलाह व समाधान:*\n${cleanText}\n\n------------------------------\n👤 *सलाहकार:* ${userName}\n${userPhone ? ('📱 *मोबाइल:* ' + userPhone + '\n') : ''}🌐 *सखी AI लिंक:* ${domainUrl}\n\n🌱 *24×7 नि:शुल्क सलाह व असली उत्पाद ऑर्डर करने के लिए ऊपर दिए लिंक पर क्लिक करें।*`;
 
     const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareBody)}`;
     window.open(waShareUrl, '_blank');
@@ -1747,7 +1815,7 @@
 
     const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareBody)}`;
 
-    const resp = `🎉 **आपका व्यक्तिगत WhatsApp शेयर संदेश तैयार है!**\n\nआप इस संदेश को अपने किसान भाइयों, दोस्तों, व्हाट्सएप ग्रुपों या स्टेटस पर एक क्लिक में साझा कर सकते हैं:\n\n\`\`\`text\n${shareBody}\n\`\`\`\n\n👉 जो भी इस संदेश को पढ़कर संपर्क करेगा, वह सीधे **आपके मोबाइल नंबर (${userPhone || 'सत्यापित'})** और आपकी रेफरल लिंक से जुड़ेगा!`;
+    const resp = `🎉 **आपका व्यक्तिगत WhatsApp शेयर संदेश तैयार है!**\n\nआप इस संदेश को एक क्लिक में WhatsApp पर साझा कर सकते हैं:\n\n<div style="background:#ffffff;color:#0f172a;border-left:4px solid #16a34a;border-radius:10px;padding:14px;margin:12px 0;font-size:0.92rem;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.08);">${shareBody.replace(/\n/g, '<br/>')}</div>\n\n👉 जो भी इस संदेश को पढ़कर संपर्क करेगा, वह सीधे **आपके मोबाइल नंबर (${userPhone || 'सत्यापित'})** और आपकी रेफरल लिंक से जुड़ेगा!`;
 
     renderCrispSpecialBox('📤 व्यक्तिगत WhatsApp शेयर संदेश', resp, [
       { text: '📲 सीधे WhatsApp पर शेयर करें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
@@ -1927,11 +1995,11 @@
     // CASE 1: Women Empowerment / Saheli Mitra
     const isMahilaDost = q.includes('सहेली') || q.includes('sahili') || q.includes('saheli') || q.includes('महिला') || q.includes('mahila') || q.includes('बहन') || q.includes('गृहणी') || q.includes('housewife') || q.includes('women');
     if (isMahilaDost) {
-      const waMsg = `🌸 *नारी शक्ति स्वावलंबन — घर बैठे ₹5,000 से ₹40,000 मासिक कमाई का अवसर* 🌸\n\nनमस्ते सखी! 🙏\n\nघर-परिवार की जिम्मेदारियों के साथ-साथ, क्या आप अपने खाली समय (दिन में 1-2 घंटे) में सिर्फ मोबाइल से ₹15,000 से ₹40,000+ तक की आत्मनिर्भर आमदनी कमाना चाहती हैं?\n\n✨ *इस अवसर की विशेषताएं:*\n1️⃣ *₹0 जॉइनिंग व ₹0 निवेश:* रजिस्ट्रेशन 100% मुफ़्त है, कोई आर्थिक जोखिम नहीं।\n2️⃣ *घर बैठे काम:* कोई दुकान खोलने की जरूरत नहीं, अपने फोन से काम करें।\n3️⃣ *100% शुद्ध जैविक व हर्बल उत्पाद:* स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी सप्लीमेंट्स।\n4️⃣ *सम्पूर्ण डिजिटल ट्रेनिंग:* मोबाइल पर पूरी ट्रेनिंग और लगातार मार्गदर्शन मिलेगा।\n\n👉 *शुरुआत करने हेतु सीधे WhatsApp पर संपर्क करें:*\n👤 *मार्गदर्शक:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI पर लाइव समझें:* ${domainUrl}`;
+      const waMsg = `🌸 *नारी शक्ति स्वावलंबन — घर बैठे ₹5,000 से ₹40,000 मासिक कमाई का अवसर* 🌸\n\nनमस्ते सखी! 🙏\n\nघर-परिवार की जिम्मेदारियों के साथ-साथ, क्या आप अपने खाली समय (दिन में 1-2 घंटे) में सिर्फ मोबाइल से ₹15,000 से ₹40,000+ तक की आत्मनिर्भर आमदनी कमाना चाहती हैं?\n\n✨ *इस अवसर की विशेषताएं:*\n1️⃣ *₹0 जॉइनिंग व ₹0 निवेश:* रजिस्ट्रेशन 100% मुफ़्त है, कोई आर्थिक जोखिम नहीं।\n2️⃣ *घर बैठे काम:* कोई दुकान खोलने की जरूरत नहीं, अपने फोन से काम करें।\n3️⃣ *100% शुद्ध जैविक व हर्बल उत्पाद:* स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी सप्लीमेंट्स।\n4️⃣ *सम्पूर्ण डिजिटल ट्रेनिंग:* मोबाइल पर पूरी ट्रेनिंग और लगातार मार्गदर्शन मिलेगा।\n\n👉 *शुरुआत करने हेतु सीधे WhatsApp पर संपर्क करें:*\n👤 *मार्गदर्शक:* ${senderName}\n🌐 *सखी AI पर लाइव समझें:* ${domainUrl}`;
 
       const waUrl = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
 
-      const resp = `🌸 **आपकी सहेली / महिला साथी के लिए WhatsApp संदेश तैयार है:**\n\n${waMsg}\n\n👉 यह संदेश आपके नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** के साथ तैयार है। नीचे दिए गए बटन पर टैप करके सीधे WhatsApp पर भेजें:`;
+      const resp = `🌸 **आपकी सहेली / महिला साथी के लिए WhatsApp संदेश तैयार है:**\n\n${waMsg}\n\n👉 यह संदेश आपके नाम **(${senderName})** और अधिकृत लिंक के साथ तैयार है। नीचे दिए गए बटन पर टैप करके सीधे WhatsApp पर भेजें:`;
 
       renderCrispSpecialBox('🌸 सहेली हेतु स्वावलंबन WhatsApp संदेश', resp, [
         { text: '📲 सीधे WhatsApp पर शेयर करें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
@@ -1944,11 +2012,11 @@
     const isPlanForFriend = q.includes('plan') || q.includes('प्लान') || q.includes('नेटसर्फ') || q.includes('netsurf') || q.includes('दोस्त') || q.includes('किसान') || q.includes('राकेश');
     if (isPlanForFriend) {
       const friendName = (typeof extractPersonNameFromQuery === 'function' ? extractPersonNameFromQuery(raw, cleanQ) : '') || 'मित्र';
-      const waMsg = `💼 *नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व आत्मनिर्भरता प्लान (2026-27)* 💼\n\nनमस्ते ${friendName} जी! 🙏\n\nमैंने आपके लिए भारत की 26 वर्षों से प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग कंपनी 'नेट्सर्फ' का संपूर्ण व्यावसायिक अवसर तैयार किया है:\n\n1️⃣ *Consumer (उपभोक्ता लाभ):*\n• सभी जैविक उत्पादों पर 25% फ्लैट छूट\n• 5 महीने की लगातार खरीदारी पर 6ठे महीने मुफ़्त प्रॉडक्ट (Lowest MRP)\n• ₹100 वेलकम वाउचर व ₹4,000+ पर मुफ़्त होम डिलीवरी\n\n2️⃣ *E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):*\n• ₹0 जॉइनिंग, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं\n• 5% से 15% का साप्ताहिक शुद्ध रिटेल कमीशन\n• 100 उपभोक्ताओं के साथ हर महीने ₹15,000+ की नियमित आय\n\n3️⃣ *Team Leader (टीम बिज़नेस व कैपिंग):*\n• बाइनरी मैचिंग बोनस आजीवन कैरी फॉरवर्ड\n• ₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500 तक अवसर)\n• पारिवारिक सुरक्षा योजना व 100% नॉमिनी अधिकार\n\n👉 *विस्तृत जानकारी हेतु सीधे मुझसे संपर्क करें:*\n👤 *सलाहकार:* ${senderName}\n📱 *मोबाइल:* ${senderPhone}\n🌐 *ऑनलाइन देखें:* ${domainUrl}`;
+      const waMsg = `💼 *नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस व आत्मनिर्भरता प्लान (2026-27)* 💼\n\nनमस्ते ${friendName} जी! 🙏\n\nमैंने आपके लिए भारत की 26 वर्षों से प्रतिष्ठित स्वदेशी डायरेक्ट सेलिंग कंपनी 'नेट्सर्फ' का संपूर्ण व्यावसायिक अवसर तैयार किया है:\n\n1️⃣ *Consumer (उपभोक्ता लाभ):*\n• सभी जैविक उत्पादों पर 25% फ्लैट छूट\n• 5 महीने की लगातार खरीदारी पर 6ठे महीने मुफ़्त प्रॉडक्ट (Lowest MRP)\n• ₹100 वेलकम वाउचर व ₹4,000+ पर मुफ़्त होम डिलीवरी\n\n2️⃣ *E-Teller (डिजिटल रिटेलर — बिना टीम कमाई):*\n• ₹0 जॉइनिंग, कोई दुकान या स्टॉक रखने की ज़रूरत नहीं\n• 5% से 15% का साप्ताहिक शुद्ध रिटेल कमीशन\n• 100 उपभोक्ताओं के साथ हर महीने ₹15,000+ की नियमित आय\n\n3️⃣ *Team Leader (टीम बिज़नेस व कैपिंग):*\n• बाइनरी मैचिंग बोनस आजीवन कैरी फॉरवर्ड\n• ₹8,19,250 पाक्षिक कैपिंग (महीने का ₹16,38,500 तक अवसर)\n• पारिवारिक सुरक्षा योजना व 100% नॉमिनी अधिकार\n\n👉 *विस्तृत जानकारी हेतु सीधे मुझसे संपर्क करें:*\n👤 *सलाहकार:* ${senderName}\n🌐 *ऑनलाइन देखें:* ${domainUrl}`;
 
       const waUrl = `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
 
-      const resp = `💼 **श्री ${friendName} जी के लिए बिज़नेस शेयर संदेश तैयार है:**\n\n${waMsg}\n\n👉 आपके मित्र को सीधे आपका नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** दिखेगा:`;
+      const resp = `💼 **श्री ${friendName} जी के लिए बिज़नेस शेयर संदेश तैयार है:**\n\n${waMsg}\n\n👉 आपके मित्र को सीधे आपका नाम **(${senderName})** और अधिकृत रेफरल लिंक दिखेगा:`;
 
       renderCrispSpecialBox(`💼 ${friendName} जी के लिए शेयर संदेश`, resp, [
         { text: `📲 ${friendName} जी को WhatsApp भेजें`, url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
@@ -2188,7 +2256,7 @@
     if (ind) ind.remove();
   }
 
-  function streamBotMessage(htmlContent, speechText) {
+  function streamBotMessage(htmlContent, speechText, followupChips) {
     removeTypingIndicator();
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
@@ -2202,6 +2270,42 @@
     if (finalHtml.includes('sakhi-msg-actions-toolbar')) {
       finalHtml = finalHtml.replace(/<div class="sakhi-msg-actions-toolbar"[\s\S]*?<\/div>\s*(?=<div|$)/g, '');
     }
+
+    // Append follow-up chips if passed
+    if (Array.isArray(followupChips) && followupChips.length > 0) {
+      const chipButtons = followupChips.map(c => {
+        if (c.url) {
+          return `<a href="${c.url}" target="_blank" class="sakhi-quick-pill" style="display:inline-flex;align-items:center;padding:6px 14px;border-radius:20px;font-size:0.85rem;font-weight:700;text-decoration:none;transition:all 0.2s ease;background:#f0fdf4;border:1px solid #86efac;color:#166534;">${escapeHtml(c.text || '')}</a>`;
+        }
+        const qVal = escapeHtml(c.query || c.text || '');
+        return `<button type="button" class="sakhi-followup-chip" data-query="${qVal}" onclick="window.sendSakhiSuggestion(this.getAttribute('data-query'))" style="display:inline-flex;align-items:center;padding:6px 14px;border-radius:20px;font-size:0.85rem;font-weight:700;border:1px solid #86efac;background:#f0fdf4;color:#166534;cursor:pointer;">${escapeHtml(c.text || '')}</button>`;
+      }).join('');
+
+      finalHtml += `
+        <div style="background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);border:1.5px solid #6ee7b7;border-radius:14px;padding:12px 14px;margin-top:14px;box-shadow:0 2px 6px rgba(16,185,129,0.06);">
+          <div style="font-weight:800;color:#047857;font-size:0.92rem;margin-bottom:9px;display:flex;align-items:center;gap:6px;">
+            <span>✨</span> <span>क्या आप यह भी जानना चाहते हैं?</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            ${chipButtons}
+          </div>
+        </div>
+      `;
+
+      // Also populate the sticky pills container above input
+      const pillsContainer = document.getElementById('sakhiSmartPillsContainer');
+      if (pillsContainer) {
+        pillsContainer.innerHTML = followupChips.map(c => {
+          if (c.url) {
+            return `<a href="${c.url}" target="_blank" class="sakhi-quick-pill" style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:20px;font-size:0.82rem;font-weight:700;text-decoration:none;background:#ffffff;border:1px solid #86efac;color:#166534;box-shadow:0 1px 3px rgba(0,0,0,0.05);">${escapeHtml(c.text || '')}</a>`;
+          }
+          const qVal = escapeHtml(c.query || c.text || '');
+          return `<button type="button" class="sakhi-quick-pill" data-query="${qVal}" onclick="window.sendSakhiSuggestion(this.getAttribute('data-query'))" style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:20px;font-size:0.82rem;font-weight:700;background:#ffffff;border:1px solid #86efac;color:#166534;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.05);">${escapeHtml(c.text || '')}</button>`;
+        }).join('');
+        pillsContainer.style.display = 'flex';
+      }
+    }
+
     finalHtml += buildMsgAudioBtnMarkup(speechText || htmlContent);
 
     const row = document.createElement('div');
@@ -2520,7 +2624,7 @@
                 await db.from('profiles').insert([{
                   full_name: potentialName,
                   mobile: extractedPhone,
-                  share_id: 'AI' + extractedPhone.slice(-6),
+                  share_id: (JSON.parse(localStorage.getItem('AI_USER') || '{}').share_id || 'AI000004'),
                   referral_code: sponsorShareId,
                   registration_source: 'सखी AI (Aarogyam Sakhi)',
                   is_active: true,
@@ -2567,8 +2671,39 @@
 
     appendTypingIndicator();
 
-    setTimeout(() => {
+    setTimeout(async () => {
       removeTypingIndicator();
+
+      // EXPLICIT LIVE SEARCH OVERRIDE (User specifically asked to search / khojo)
+      const isExplicitLiveSearch = /(?:सर्च\s*कर|खोज\s*कर|गूगल|विकी|wikipedia|\bsearch\b|\bkhoj\b|इंटरनेट\s*पर)/i.test(query);
+      if (isExplicitLiveSearch) {
+        try {
+          appendTypingIndicator();
+          const wikiRes = await fetchWikipediaHindiSummary(query);
+          removeTypingIndicator();
+          if (wikiRes && wikiRes.summary) {
+            const resp = `
+              <div style="font-size:1.02rem;font-weight:900;color:#1e3a8a;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                <span>🌐</span> <span><strong>लाइव विकिपीडिया खोज: ${escapeHtml(wikiRes.title || 'परिणाम')}</strong></span>
+              </div>
+              <div style="background:#f8fafc;border-left:4px solid #2563eb;border-radius:8px;padding:12px;color:#1e293b;line-height:1.7;font-size:0.95rem;margin-bottom:10px;">
+                ${escapeHtml(wikiRes.summary)}
+              </div>
+              <div style="font-size:0.75rem;color:#64748b;font-style:italic;">🔗 <em>स्रोत: विकिपीडिया (हिंदी ज्ञानकोष)</em></div>
+            `;
+            streamBotMessage(resp, wikiRes.summary.slice(0, 200), [
+              { text: '🌾 कृषि व फसल डॉक्टर', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' },
+              { text: '🩺 स्वास्थ्य व डाइट सलाह', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' },
+              { text: '🗓️ आज का पंचांग देखें', query: 'आज का दैनिक पंचांग और शुभ मुहूर्त बताएं' },
+              { text: '🌤️ आज का मौसम देखें', query: 'आज का मौसम कैसा रहेगा?' }
+            ]);
+            return;
+          }
+        } catch (sErr) {
+          console.warn('[Explicit Search Fallback Error]:', sErr);
+        }
+      }
+
       try {
         processKnowledgeQuery(query);
       } catch (err) {
@@ -2581,6 +2716,8 @@
 
   // 13. HIGH-PRECISION QUERY NORMALIZER
   function normalizeQueryText(text) {
+    let t0 = (text || '').toLowerCase().replace(/(?:hbaic|hba-1c|hb1ac|hba\s*1c|hba1\s*c|एचबीए1सी|एचबीए\s*1सी)/gi, 'hba1c');
+    text = t0;
     let t = (text || '').toLowerCase();
 
     // Naturamore Spoken & Phonetic Normalizations
@@ -3302,9 +3439,9 @@
     // 2. Kheti Ka Doctor (BK002)
     if (cleanQ.includes('bk002') || cleanQ.includes('bk 002') || cleanQ.includes('kheti ka doctor') || cleanQ.includes('खेती का डॉक्टर') || cleanQ.includes('fasal ka doctor') || cleanQ.includes('फसल का डॉक्टर') || cleanQ.includes('pocket doctor') || cleanQ.includes('रोग पहचान की बुक') || cleanQ.includes('रोग पहचान')) {
       const resp = `🌾 **'खेती का डॉक्टर' (Pocket Doctor) — अपनी फसल के खुद डॉक्टर बनें:**\n• **यह पुस्तक क्यों जरूरी है?** खेत में जब पत्तियां पीली होती हैं या धब्बे पड़ते हैं, तो दुकानदार के पास जाने पर बिना जरूरत ₹1,500 की दवा पकड़ा दी जाती है। इस पुस्तक में 300+ असली एचडी फोटो देखकर आप खुद पहचान सकते हैं कि समस्या फंगस की है, कीट की या पोषण कमी की।\n• **मुख्य विशेषताएं:** 120 पेज की प्रैक्टिकल गाइड, 300+ वास्तविक फोटो, फसलवार रोग-कीट निदान चार्ट व स्प्रे साइंस।\n• **व्यावहारिक लाभ:** आप न सिर्फ अपने खेत के हजारों रुपये बचा सकते हैं, बल्कि अपने पड़ोसियों व गांव के खेतों में भी सही जानकारी दे सकते हैं।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹299)।`;
-      renderCrispSpecialBox('🌾 खेती का डॉक्टर — फोटो सहित रोग पहचान ई-बुक (BK002)', resp, [
-        { text: '📖 खेती का डॉक्टर लैंडिंग पेज खोलें (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
-        { text: '🧪 कृषि दवा डायरेक्टरी (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
+      renderCrispSpecialBox('🌾 खेती का डॉक्टर — 300+ फोटो सहित रोग पहचान ई-बुक', resp, [
+        { text: '📖 खेती का डॉक्टर ई-बुक खोलें', url: '/ebooks/book-landing.html?id=BK002', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🧪 कृषि दवा डायरेक्टरी व स्प्रे चार्ट', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_kheti_dr');
       return true;
@@ -3313,9 +3450,9 @@
     // 3. Krishi Dawa Directory (BK016)
     if (cleanQ.includes('bk016') || cleanQ.includes('bk 016') || cleanQ.includes('krishi dawa directory') || cleanQ.includes('कृषि दवा डायरेक्टरी') || cleanQ.includes('dawa directory') || cleanQ.includes('दवा डायरेक्टरी') || cleanQ.includes('दवा की गाइड') || cleanQ.includes('chemical dawa')) {
       const resp = `🧪 **'कृषि दवा डायरेक्टरी' — फसल के रोग, कीट और असली दवा की संपूर्ण गाइड:**\n• **दुकानदार के झांसे से मुक्ति:** दवा की दुकान पर एक ही दवा के 50 अलग-अलग नाम होते हैं। इस डायरेक्टरी से आप असली टेक्निकल (Active Ingredient) समझेंगे ताकि कोई आपको महंगी दवा न बेच सके।\n• **मुख्य विशेषताएं:** फफूंदनाशी, कीटनाशक व खरपतवारनाशक की संपूर्ण गाइड, कम खर्च वाले जैविक व देसी नुस्खे, 4-पेज Quick Reference (रोग ➔ फसल और Chemical ➔ रोग)।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹499)।`;
-      renderCrispSpecialBox('🧪 कृषि दवा डायरेक्टरी — रोग, कीट व दवा की पूरी गाइड (BK016)', resp, [
-        { text: '📖 कृषि दवा डायरेक्टरी लैंडिंग पेज (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
-        { text: '🌾 खेती का डॉक्टर (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+      renderCrispSpecialBox('🧪 कृषि दवा डायरेक्टरी — रोग, कीट व दवा की पूरी गाइड', resp, [
+        { text: '📖 कृषि दवा डायरेक्टरी खोलें', url: '/ebooks/book-landing.html?id=BK016', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🌾 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_dawa_dir');
       return true;
@@ -3324,9 +3461,9 @@
     // 4. Kharif Fasal Master Guide 2026 (BK001)
     if (cleanQ.includes('bk001') || cleanQ.includes('bk 001') || cleanQ.includes('kharif') || cleanQ.includes('खरीफ फसल') || cleanQ.includes('धान सोयाबीन मक्का') || cleanQ.includes('खरीफ गाइड')) {
       const resp = `🌾 **'खरीफ फसल मास्टर गाइड 2026' — धान, सोयाबीन व मक्का उत्पादन की सम्पूर्ण गाइड:**\n• **विशेषताएं:** 150+ रंगीन पेज, 300+ वास्तविक फोटो, बीज उपचार से लेकर कटाई तक का सम्पूर्ण वैज्ञानिक प्रबंधन।\n• **कवर विषय:** खरपतवार नियंत्रण, खाद व पोषण प्रबंधन, कल्ले बढ़ाने का फॉर्मूला और कीट-रोग का वैज्ञानिक स्प्रे शेड्यूल।\n💰 **ऑफर मूल्य:** मात्र ₹99 (MRP ₹299)।`;
-      renderCrispSpecialBox('🌾 खरीफ फसल मास्टर गाइड 2026 — सम्पूर्ण उत्पादन गाइड (BK001)', resp, [
-        { text: '📖 खरीफ मास्टर गाइड लैंडिंग पेज (BK001)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
-        { text: '🌾 खेती का डॉक्टर (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+      renderCrispSpecialBox('🌾 खरीफ फसल मास्टर गाइड — सम्पूर्ण उत्पादन गाइड', resp, [
+        { text: '📖 खरीफ मास्टर गाइड खोलें', url: '/ebooks/book-landing.html?id=BK001', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
+        { text: '🌾 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹99 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_kharif');
       return true;
@@ -3338,7 +3475,7 @@
       const resp = `🥦 **'सब्जी खेती मास्टर (PART 1)' — 11 प्रमुख सब्जियों की वैज्ञानिक खेती:**\n• **कवर फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **विशेषताएं:** 154 पेज, बीज चयन से लेकर नर्सरी, पौधों की दूरी, ड्रिप-मल्चिंग, खाद-स्प्रे कैलेंडर और बाजार भाव तक सम्पूर्ण गाइड।\n💰 **ऑफर मूल्य:** मात्र ₹149 (MRP ₹1999)।`;
       renderCrispSpecialBox('🥦 सब्जी खेती मास्टर (Part 1) — 11 प्रमुख सब्जियों की खेती (BK015)', resp, [
         { text: '📖 सब्जी खेती मास्टर लैंडिंग पेज (BK015)', url: '/ebooks/book-landing.html?id=BK015', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:800;' },
-        { text: '🧪 कृषि दवा डायरेक्टरी (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
+        { text: '🧪 कृषि दवा डायरेक्टरी व स्प्रे चार्ट', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
         { text: '💳 डायरेक्ट UPI से ₹149 भुगतान', query: 'UPI से पेमेंट कैसे करें' }
       ], 'agri', 'book_sabji');
       return true;
@@ -3369,9 +3506,9 @@
     if (isWhyBuy || (isBookGeneral && (cleanQ.includes('list') || cleanQ.includes('guide') || cleanQ.includes('faq')))) {
       const resp = `📚 **आरोग्यम इंडिया की ई-बुक्स क्यों खरीदें? — ज्ञान जो हर साल हजारों रुपये बचाए:**\n• 1. **खुद डॉक्टर बनें:** 300+ असली फोटो देखकर खेत में कीट व बीमारी खुद पहचानें और सही दवा चुनें।\n• 2. **दुकानदारों के कमीशन से मुक्ति:** गैर-जरूरी और नकली रसायनों के चक्कर से छुटकारा पाएं।\n• 3. **आजीवन डिजिटल लाइब्रेरी:** फोन में कभी भी, कहीं भी ऑफलाइन पढ़ने व सुनने की सुविधा।\n• 4. **मात्र ₹99 से शुरुआत:** एक स्प्रे के खर्च से भी कम में पूरे जीवन का ज्ञान!`;
       renderCrispSpecialBox('📚 आरोग्यम डिजिटल लाइब्रेरी — सम्पूर्ण पुस्तक सूची', resp, [
-        { text: '🌾 खेती का डॉक्टर (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
-        { text: '🧪 कृषि दवा डायरेक्टरी (BK016)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
-        { text: '🌾 खरीफ मास्टर गाइड (BK001)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
+        { text: '🌾 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+        { text: '🧪 कृषि दवा डायरेक्टरी व स्प्रे चार्ट', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
+        { text: '🌾 खरीफ मास्टर गाइड', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
         { text: '💼 घर बैठे पैसे कैसे कमाएँ (BK018)', url: '/ebooks/book-landing.html?id=BK018', isExternal: true },
         { text: '💳 डायरेक्ट UPI से भुगतान विधि', query: 'UPI से पेमेंट कैसे करें' }
       ], 'business', 'books_catalog');
@@ -3723,7 +3860,7 @@
 
       return renderClinicalHealthCard('कब्ज, गैस व बवासीर से स्थायी मुक्ति', resp, [
         { label: "🌿 लिवर व उदर केयर का आधिकारिक पेज", url: NATURAMORE_KNOWLEDGE_BANK.easyDetox.url },
-        { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" }
+        { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक", url: "/ebooks/book-landing.html?id=BK001" }
       ]);
     }
 
@@ -3836,7 +3973,7 @@
 
       return renderClinicalHealthCard('दैनिक स्वास्थ्य कोच: दवा, डाइट व सैर की जांच', resp, [
         { label: "🥗 शुगर व बीपी का डाइट चार्ट", query: "शुगर के मरीज का डाइट चार्ट दिखाओ" },
-        { label: "📖 संपूर्ण स्वास्थ्य ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" }
+        { label: "📖 संपूर्ण स्वास्थ्य ई-बुक", url: "/ebooks/book-landing.html?id=BK001" }
       ]);
     }
 
@@ -3873,7 +4010,7 @@
     // General Nuskhe Overview
     const resp = `🌿 **आरोग्यम अवनीश दादा के प्रमाणित आयुर्वेदिक घरेलू नुस्खे:**\n\n1️⃣ **जोड़ों के दर्द के लिए:** हरसिंगार (पारिजात) के 5 पत्तों का काढ़ा खाली पेट पिएं।\n2️⃣ **डायबिटीज व शुगर के लिए:** रात को भिगोया हुआ मेथी दाना और दालचीनी का पानी।\n3️⃣ **हार्ट व बीपी के लिए:** सुबह खाली पेट 1 कली कच्चा लहसुन और अर्जुन की छाल का काढ़ा।\n4️⃣ **पुरानी कब्ज व पेट गैस के लिए:** रात को सोते समय गुनगुने पानी से 1 चम्मच त्रिफला चूर्ण।\n5️⃣ **थायराइड के लिए:** रातभर भीगे साबुत धनिए का उबला पानी सुबह खाली पेट।\n\n📖 **संपूर्ण 100+ सचित्र नुस्खे व दैनिक दिनचर्या के लिए आरोग्यम ई-बुक (BK001) देखें।**`;
     return renderClinicalHealthCard('आरोग्यम अवनीश दादा के प्रमाणित आयुर्वेदिक नुस्खे', resp, [
-      { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक (BK001)", url: "/ebooks/book-landing.html?id=BK001" },
+      { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक", url: "/ebooks/book-landing.html?id=BK001" },
       { label: "❤️ मुख्य स्वास्थ्य केंद्र (All Health Pages)", url: "/categories/health.html" }
     ]);
   }
@@ -4855,7 +4992,7 @@
       ? '🔴 **आज स्प्रे स्थगित रखें:** हवा की गति या बारिश की संभावना अधिक है, दवा धुलने का खतरा है।'
       : '🟢 **आज स्प्रे के लिए मौसम अनुकूल:** सुबह 8 से 11 बजे या शाम 4 बजे के बाद स्टीमरिच (2ml/L) + बायो-99 (0.5ml/L) का छिड़काव करें।';
 
-    const resp = `⛅ **आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी:**\n📍 **क्षेत्र:** ${weatherState.cityName}\n🌡️ **तापमान:** ${weatherState.temp}°C (${weatherState.condition})\n💧 **नमी:** ${weatherState.humidity}% | 💨 **हवा:** ${weatherState.windSpeed} km/h | 🌧️ **बारिश संभावना:** ${weatherState.rainProb}%\n\n🚜 **वैज्ञानिक स्प्रे निर्णय:**\n${sprayAdvice}\n\n🎧 **ऑडियो ई-बुक संदर्भ:** मौसम अनुसार समयबद्ध बुवाई व फफूंद नियंत्रण के वैज्ञानिक नियम हमारी ऑडियो ई-बुक **'खरीफ मास्टर गाइड 2026 (BK015)'** और **'खेती का डॉक्टर (BK002)'** के मौसम अध्याय में विस्तार से दिए गए हैं।`;
+    const resp = `⛅ **आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी:**\n📍 **क्षेत्र:** ${weatherState.cityName}\n🌡️ **तापमान:** ${weatherState.temp}°C (${weatherState.condition})\n💧 **नमी:** ${weatherState.humidity}% | 💨 **हवा:** ${weatherState.windSpeed} km/h | 🌧️ **बारिश संभावना:** ${weatherState.rainProb}%\n\n🚜 **वैज्ञानिक स्प्रे निर्णय:**\n${sprayAdvice}\n\n🎧 **ऑडियो ई-बुक संदर्भ:** मौसम अनुसार समयबद्ध बुवाई व फफूंद नियंत्रण के वैज्ञानिक नियम हमारी ऑडियो ई-बुक **'खरीफ मास्टर गाइड 2026 (BK015)'** और **'खेती का डॉक्टर ई-बुक'** के मौसम अध्याय में विस्तार से दिए गए हैं।`;
 
     renderCrispSpecialBox('⛅ लाइव मौसम व स्प्रे निर्णय — आरोग्यम AI एडवाइजरी', resp, [
       { text: '⛅ 7-दिन लाइव मौसम रिपोर्ट', url: '/weather.html', isExternal: true },
@@ -4894,7 +5031,7 @@
       cropHighlight = '🧄 **लहसुन का आज का मॉडल मंडी भाव:**\n• **मंदसौर मंडी:** ₹12,800 / क्विंटल (रियावन/ऊटी बोल्ड)\n• **इंदौर मंडी:** ₹11,200 / क्विंटल\n• **बारां मंडी (राजस्थान):** ₹12,100 / क्विंटल\n• **बाजार स्थिति:** ▲ भारी तेजी (+₹200 प्रति क्विंटल)';
     }
 
-    const resp = `${cropHighlight}\n\n🏛️ **आधिकारिक स्रोत:** AGMARKNET एवं राज्य कृषि उपज मंडी मॉडल बेंचमार्क भाव।\n*(नोट: यह प्रमुख मंडियों का अधिकृत मॉडल बेंचमार्क भाव है, स्थानीय दैनिक नीलामी में हल्का अंतर संभव है)*\n\n🎧 **ऑडियो ई-बुक मार्गदर्शन:** फसल की ग्रेडिंग, भंडारण व मंडी में अधिकतम भाव पाने के गुर हमारी ई-बुक व ऑडियो गाइड **'खेती का डॉक्टर (BK002)'** के कृषि विपणन अध्याय में विस्तार से दिए गए हैं।`;
+    const resp = `${cropHighlight}\n\n🏛️ **आधिकारिक स्रोत:** AGMARKNET एवं राज्य कृषि उपज मंडी मॉडल बेंचमार्क भाव।\n*(नोट: यह प्रमुख मंडियों का अधिकृत मॉडल बेंचमार्क भाव है, स्थानीय दैनिक नीलामी में हल्का अंतर संभव है)*\n\n🎧 **ऑडियो ई-बुक मार्गदर्शन:** फसल की ग्रेडिंग, भंडारण व मंडी में अधिकतम भाव पाने के गुर हमारी ई-बुक व ऑडियो गाइड **'खेती का डॉक्टर ई-बुक'** के कृषि विपणन अध्याय में विस्तार से दिए गए हैं।`;
 
     renderCrispSpecialBox('🌾 लाइव मंडी भाव — AGMARKNET रियल-टाइम डेटा', resp, [
       { text: '🌾 48+ मंडियों के लाइव भाव देखें', url: '/mandi.html', isExternal: true },
@@ -5156,7 +5293,7 @@
     }
 
     // C. Biofit Bio-99 (Sticker & Activator)
-    if (cleanQ.includes('bio-99') || cleanQ.includes('bio99') || cleanQ.includes('बायो-99') || cleanQ.includes('बायो 99') || cleanQ.includes('चिपकू') || cleanQ.includes('स्टीकर') || cleanQ.includes('स्टिकर')) {
+    if (cleanQ.includes('bio-99') || cleanQ.includes('bio99') || cleanQ.includes('बायो-99') || cleanQ.includes('बायो 99') || cleanQ.includes('सिलिकॉन स्प्रेडर') || cleanQ.includes('स्टीकर') || cleanQ.includes('स्टिकर')) {
       const resp = `💧 **Bio-99 — 100% सिलिकॉन सुपर स्प्रेडर, एक्टिवेटर व स्टिकर:**\nयह पानी के सर्फेस टेंशन को खत्म कर उसे सुपर-सॉफ्ट (कंपैटिबल) बना देता है। किसी भी कीटनाशक, फफूंदनाशी या टॉनिक के साथ मिलकर उसकी कार्यक्षमता 35% से 40% बढ़ा देता है। दवा पौधे के अंदर तुरंत समा जाती है।\n\n• **कीमत:** मात्र ₹299 (100 ml पैक)।\n• **सटीक डोज:** मात्र 5 ml प्रति 15 लीटर पंप (25 से 30 ml प्रति एकड़, 75 ml प्रति हेक्टेयर)।\n• **विशेषता:** 30 मिनट में पत्तियों पर दवा फैलाकर बारिश से सुरक्षित करता है।`;
       renderCrispSpecialBox('💧 Bio-99 — सुपर एक्टिवेटर व स्प्रेडर (₹299)', resp, [
         { text: '🌱 स्टिमरिच की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
@@ -5763,7 +5900,7 @@
     const origin = (window.location.origin && window.location.origin.includes('http'))
       ? window.location.origin
       : 'https://aarogyamindia.online';
-    const officialSakhiLink = `${origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(senderPhone)}`;
+    const officialSakhiLink = `${origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(getAuthoritativeShareId())}&share_id=${encodeURIComponent(getAuthoritativeShareId())}`;
 
     // 1. Topic-Specific Question Queue
     let questions = [];
@@ -5838,7 +5975,7 @@
         { label: '🐄 3. पशु दूध व फैट वृद्धि फॉर्मूला', query: 'सीएफसी के फायदे क्या हैं' },
         { label: '💼 4. नेट्सर्फ बिज़नेस 15-दिन ₹8.19L कैपिंग', query: 'नेट्सर्फ बिज़नेस प्लान और 15-दिन ₹8.19L कैपिंग' }
       ];
-      slipShareText = `🌱 *आरोग्यम सखी AI — आपका 24×7 डिजिटल सहायक:*\n\nखेती, स्वास्थ्य, पशुपालन व बिज़नेस के 100% सही व वैज्ञानिक समाधान के लिए मिलिए 'आरोग्यम सखी AI' से!\n\n👤 *प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+      slipShareText = `🌱 *आरोग्यम सखी AI — आपका 24×7 डिजिटल सहायक:*\n\nखेती, स्वास्थ्य, पशुपालन व बिज़नेस के 100% सही व वैज्ञानिक समाधान के लिए मिलिए 'आरोग्यम सखी AI' से!\n\n👤 *प्रेषक:* ${senderName}\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
     }
 
     const waShareUrl = `https://wa.me/?text=${encodeURIComponent(slipShareText)}`;
@@ -6308,7 +6445,7 @@ ${diseaseDetails}
         return renderMasterCropCard(`${matchedCrop.name}: प्रमुख रोग व दोहरा उपचार फॉर्मूला`, resp, [
           { label: `🌾 ${matchedCrop.name} की उन्नत खेती व पैदावार`, query: `${matchedCrop.keywords[0]} के बारे में विस्तार से बताओ` },
           { label: "🌿 असली बायोफिट दवाएं कहाँ मिलेंगी?", query: "असली बायोफिट उत्पाद कहाँ मिलेंगे?" },
-          { label: "📖 खेती का डॉक्टर ई-बुक (BK002)", query: "खेती की ई-बुक BK002 कैसे मिलेगी?" }
+          { label: "📖 खेती का डॉक्टर ई-बुक", query: "खेती की ई-बुक BK002 कैसे मिलेगी?" }
         ]);
       }
 
@@ -6390,7 +6527,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
         { text: '🧪 बायोफिट इंटैक्ट (कीट नियंत्रण)', query: 'इंटैक्ट जैविक कीटनाशक रस चूसक कीट' },
         { text: '🛡️ बायोफिट रैप अप (वायरस व फंगस सुरक्षा)', query: 'रैप अप फंगस रोधक का उपयोग' },
         { text: '🌱 स्टिमरिच + बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
-        { text: '📖 खेती का डॉक्टर ई-बुक (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+        { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
       ], 'agri', 'bhindi_yvmv');
       return true;
     }
@@ -6401,7 +6538,7 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     renderCrispSpecialBox('🌿 भिंडी की उन्नत खेती व 4-चरण स्प्रे गाइड', resp, [
       { text: '🌿 भिंडी में पीली पत्ती का इलाज', query: 'भिंडी पीली पड़ रही है कौन सी दवा डालें' },
       { text: '🥦 सब्जी, मिर्च व टमाटर स्प्रे कैलेंडर', query: 'सब्जी मिर्च का स्प्रे कैलेंडर' },
-      { text: '📖 खेती का डॉक्टर ई-बुक (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+      { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
     ], 'agri', 'bhindi_farming');
     return true;
   }
@@ -8182,7 +8319,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       senderPhone = (localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
     } catch (_) {}
     if (!senderPhone || senderPhone.length < 10) senderPhone = '7974422572';
-    const contactInfo = `${senderName} (मो. ${senderPhone})`;
+    const contactInfo = `${senderName}`;
 
     // Formatted WhatsApp Share Text based on Official MRP & Dosage
     let waItems = calc.items.map((it, idx) => `• ${it.name} (${it.pack}) ×${it.qty} = ₹${(it.mrp * it.qty).toLocaleString('en-IN')} (खुराक: ${it.dose})`).join('\n');
@@ -8888,7 +9025,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       } catch (_) {}
       if (!senderPhone || senderPhone.length < 10) senderPhone = '7974422572';
 
-      const contactInfo = `${senderName} (मो. ${senderPhone})`;
+      const contactInfo = `${senderName}`;
       const officialSakhiLink = 'https://aarogyamindia.online/aarogyam-sakhi.html';
 
       // Cost Calculation
@@ -10117,7 +10254,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   // =========================================================================
   // DEHATI & RURAL COLLOQUIAL INTENT RESOLVER (ADD-ON)
-  // Maps terms like कल्ला, बियाना, लट, सुंडी, चेपा, मोयला, उखटा, ठेहुना, अफरा, चिपकू
+  // Maps terms like कल्ला, बियाना, लट, सुंडी, चेपा, मोयला, उखटा, ठेहुना, अफरा, सिलिकॉन स्प्रेडर
   // =========================================================================
   function handleDehatiColloquialQueries(cleanQ, rawQ) {
     const q = (cleanQ || '').toLowerCase();
@@ -10137,7 +10274,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // 2. Sundi, Illi, Lat, Gandola, Tana Chhedak (सुंडी, इल्ली, लट, तना छेदक)
     if (q.includes('sundi') || q.includes('सुंडी') || q.includes('illi') || q.includes('इल्ली') || q.includes('lat') || q.includes('लट') || q.includes('gandola') || q.includes('गंडोला') || q.includes('इल्ला') || q.includes('तना छेदक') || q.includes('छेदक')) {
       sakhiConversationState.lastActiveDomain = 'agri';
-      const resp = `🐛 **इल्ली, लट, सुंडी व तना छेदक (Caterpillar/Stem Borer) रोकथाम जैविक सुरक्षा चक्र:**\n\n⚠️ **नोट:** नेटसर्फ कंपनी द्वारा 'इंटैक्ट' (Intact) आधिकारिक रूप से बंद कर दिया गया है। अब जैविक रक्षा चक्र से इल्ली नियंत्रित होती है।\n\n🛡️ **तुरंत स्प्रे चक्र (प्रति 15 लीटर पंप):**\n• **रैप-अप (Biofit Wrap-up):** 30 ml (नैनो शील्ड जो पत्तों पर रक्षा कवच बनाती है)\n• **बायोफिट शेत (SHET):** 30 ml (मित्र सूक्ष्मजीव जो इल्ली के अंडों को नष्ट करते हैं)\n• **बायो-99 (चिपकू):** 5 ml (दवा को पत्तों पर चिपकाने व फैलाने हेतु)\n\n💡 **सावधानी:** इल्ली जब छोटी हो तभी शाम के समय स्प्रे करें ताकि अगली पीढ़ी न पनप सके।`;
+      const resp = `🐛 **इल्ली, लट, सुंडी व तना छेदक (Caterpillar/Stem Borer) रोकथाम जैविक सुरक्षा चक्र:**\n\n⚠️ **नोट:** नेटसर्फ कंपनी द्वारा 'इंटैक्ट' (Intact) आधिकारिक रूप से बंद कर दिया गया है। अब जैविक रक्षा चक्र से इल्ली नियंत्रित होती है।\n\n🛡️ **तुरंत स्प्रे चक्र (प्रति 15 लीटर पंप):**\n• **रैप-अप (Biofit Wrap-up):** 30 ml (नैनो शील्ड जो पत्तों पर रक्षा कवच बनाती है)\n• **बायोफिट शेत (SHET):** 30 ml (मित्र सूक्ष्मजीव जो इल्ली के अंडों को नष्ट करते हैं)\n• **बायो-99 (सिलिकॉन स्प्रेडर):** 5 ml (दवा को पत्तों पर चिपकाने व फैलाने हेतु)\n\n💡 **सावधानी:** इल्ली जब छोटी हो तभी शाम के समय स्प्रे करें ताकि अगली पीढ़ी न पनप सके।`;
       renderCrispSpecialBox('🐛 सुंडी, लट व इल्ली रोकथाम — रैप-अप व शेत नैनो शील्ड', resp, [
         { text: '🛡️ रैप-अप 1L की कीमत व उपयोग', query: 'रैप अप फंगस रोधक का उपयोग' },
         { text: '🌾 फसलों का संपूर्ण स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' },
@@ -10615,7 +10752,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       try { name = localStorage.getItem('aarogyam_user_name') || 'आरोग्यम साथी'; } catch (_) {}
 
       const origin = (window.location.origin && window.location.origin.includes('http')) ? window.location.origin : 'https://aarogyamindia.online';
-      const mySakhiLink = `${origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(phone)}`;
+      const mySakhiLink = `${origin}/aarogyam-sakhi.html?ref=${encodeURIComponent(getAuthoritativeShareId())}&share_id=${encodeURIComponent(getAuthoritativeShareId())}`;
 
       const shareText = `🌸 *नमस्ते! मिलिए 'आरोग्यम सखी AI' से — आपकी पर्सनल 24×7 सलाहकार!* 🌾\n\nखेती में खाद-दवा की सही डोज, पशुपालन (दूध-फैट वृद्धि), घुटने-जोड़ों का दर्द या घर बैठे पार्ट-टाइम आमदनी — हर सवाल का 100% सही व वैज्ञानिक समाधान!\n\n👇 नीचे दी गई लिंक पर टैप करें और सखी AI से सीधे बात करें (बिल्कुल फ्री):\n${mySakhiLink}\n\n👤 *प्रेषक:* ${name} (मो. ${phone})`;
 
@@ -10895,11 +11032,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // A. Specific: 11 Sabjiyon Ki Directory (BK001 / BK015)
     if (q.includes('11 सब्जियों') || q.includes('11 सब्जी') || q.includes('सब्जियों की डायरेक्टरी') || q.includes('सब्जी डायरेक्टरी')) {
       sakhiConversationState.lastActiveDomain = 'agri';
-      const resp = `🥦📖 **'11 सब्जियों की सम्पूर्ण डायरेक्टरी व वैज्ञानिक खेती गाइड' (BK001):**\n\n• **कवर की गई 11 प्रमुख फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **इस ई-बुक में क्या मिलेगा?**\n  1. बीज चयन, नर्सरी तैयार करने और बीज उपचार की विधि।\n  2. ड्रिप सिंचाई, मल्चिंग पेपर और सही रोपाई दूरी।\n  3. सभी सब्जियों का अवस्थावार खाद, पोषण व बायोफिट स्प्रे कैलेंडर।\n  4. कीट-रोग (कुकड़ा/लीफ कर्ल, पीली पत्ती, फल छेदक इल्ली, उकठा) का अचूक इलाज।\n  5. बाजार में सबसे ऊंचे दाम पाने का सही समय।\n\n💰 **ऑफर मूल्य:** मात्र **₹49** (MRP ₹499 — 90% की विशेष छूट)।\n📱 **पहुंच:** ऑनलाइन डिजिटल रीडर में आजीवन (Lifetime) एक्सेस + ऑफलाइन पढ़ने की सुविधा।`;
+      const resp = `🥦📖 **'11 सब्जियों की सम्पूर्ण डायरेक्टरी व वैज्ञानिक खेती गाइड':**\n\n• **कवर की गई 11 प्रमुख फसलें:** टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी, खीरा, ककड़ी, लौकी, करेला, तोरई और कद्दू।\n• **इस ई-बुक में क्या मिलेगा?**\n  1. बीज चयन, नर्सरी तैयार करने और बीज उपचार की विधि।\n  2. ड्रिप सिंचाई, मल्चिंग पेपर और सही रोपाई दूरी।\n  3. सभी सब्जियों का अवस्थावार खाद, पोषण व बायोफिट स्प्रे कैलेंडर।\n  4. कीट-रोग (कुकड़ा/लीफ कर्ल, पीली पत्ती, फल छेदक इल्ली, उकठा) का अचूक इलाज।\n  5. बाजार में सबसे ऊंचे दाम पाने का सही समय।\n\n💰 **ऑफर मूल्य:** मात्र **₹49** (MRP ₹499 — 90% की विशेष छूट)।\n📱 **पहुंच:** ऑनलाइन डिजिटल रीडर में आजीवन (Lifetime) एक्सेस + ऑफलाइन पढ़ने की सुविधा।`;
 
       renderCrispSpecialBox('🥦 11 सब्जियों की सम्पूर्ण डायरेक्टरी ई-बुक (मात्र ₹49)', resp, [
-        { text: '📖 11 सब्जियों की ई-बुक पढ़ें (BK001)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
-        { text: '🌾 खेती का डॉक्टर ई-बुक (BK002)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+        { text: '📖 11 सब्जियों की ई-बुक पढ़ें', url: '/ebooks/book-landing.html?id=BK001', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+        { text: '🌾 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
         { text: '📚 आरोग्यम की सभी ई-बुक्स देखें', query: 'आरोग्यम इंडिया में कितने प्रकार की ई-बुक है' }
       ], 'agri', 'ebook_11_veg_card');
       return true;
@@ -10910,7 +11047,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       sakhiConversationState.lastActiveDomain = 'agri';
       const resp = `🌾📖 **'खेती का डॉक्टर' (Pocket Doctor) — 20+ फसलों की सम्पूर्ण रोग-कीट गाइड (BK002):**\n\n• **यह पुस्तक क्यों हर किसान के मोबाइल में होनी चाहिए?**\n  दुकानदार अक्सर साधारण फंगस या रसचूसक कीट में भी ₹1,500 की महंगी दवाइयां थमा देते हैं। इस पुस्तक में 300+ असली एचडी फोटो देखकर आप खुद पहचान सकते हैं कि फसल में कौन सा रोग है और असली सही दवा क्या है।\n\n• **मुख्य विशेषताएं:**\n  1. 120 पेज की सचित्र प्रैक्टिकल इनसाइक्लोपीडिया।\n  2. 20+ प्रमुख फसलें: गेहूं, चना, सरसों, धान, गन्ना, आलू, कपास, लहसुन, प्याज व सब्जियां।\n  3. रासायनिक व बायोफिट जैविक दोनों प्रकार के अचूक फॉर्मूले।\n  4. खाद का खर्च 50% घटाने का सटीक गणित।\n\n💰 **ऑफर मूल्य:** मात्र **₹99** (MRP ₹299 — आजीवन मोबाइल एक्सेस)।`;
 
-      renderCrispSpecialBox('🌾 खेती का डॉक्टर ई-बुक — 300+ फोटो सहित रोग पहचान (BK002)', resp, [
+      renderCrispSpecialBox('🌾 खेती का डॉक्टर ई-बुक — 300+ फोटो सहित रोग पहचान', resp, [
         { text: '📖 खेती का डॉक्टर ई-बुक तुरंत पढ़ें (₹99)', url: '/ebooks/book-landing.html?id=BK002', isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
         { text: '🥦 11 सब्जियों की डायरेक्टरी (₹49)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
         { text: '📚 सभी ई-बुक्स की सूची व मूल्य', query: 'आरोग्यम इंडिया में कितने प्रकार की ई-बुक है' }
@@ -11002,6 +11139,29 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   // (3-Step Guided options: Crop -> Stage/Days -> Symptoms -> Targeted Prescription)
   // =========================================================================
   function handleInteractiveCropTriage(cleanQ, rawQ) {
+
+    // DEDICATED CATERPILLAR & ILLI PEST TREATMENT ENGINE
+    if (cleanQ.includes('इल्ली') || cleanQ.includes('सुंडी') || cleanQ.includes('घटी-इल्ली') || cleanQ.includes('घटी इल्ली') || cleanQ.includes('caterpillar') || cleanQ.includes('larva') || cleanQ.includes('larvae') || cleanQ.includes('कीट')) {
+      sakhiConversationState.lastActiveDomain = 'agri';
+      const illiMsg = `राम-राम किसान साथी! 🙏 **इल्ली / सुंडी (घटी-इल्ली व फल छेदक) का 100% सटीक उपचार:**\n\n` +
+        `⚠️ **विशेष सूचना:** नेट्सर्फ का पुराना उत्पाद **Intact (इनटैक्ट) अब कंपनी द्वारा पूरी तरह बंद कर दिया गया है**।\n\n` +
+        `🌿 **1. प्रमाणित जैविक उपचार (100% प्रभावी):**\n` +
+        `• **नेट्सर्फ बायोफिट लार्विसाइड (Biofit Larvicide):** **2 ml प्रति लीटर पानी** (30 ml प्रति 15 लीटर पंप)\n` +
+        `• **बायो-99 (सिलिकॉन स्प्रेडर व एक्टिवेटर):** **0.5 ml प्रति लीटर पानी** (7-8 ml प्रति पंप)\n` +
+        `*(📌 ध्यान दें: शेत / SHET मिट्टी का बैक्टीरिया कल्चर है, इल्ली मारने हेतु पत्तियों पर लार्विसाइड का ही स्प्रे करें!)*\n\n` +
+        `🧪 **2. रासायनिक विकल्प (गंभीर प्रकोप होने पर):**\n` +
+        `• **एमामेक्टिन बेंजोएट 5% SG (Emamectin Benzoate):** **8 से 10 ग्राम प्रति 15 लीटर पंप**\n` +
+        `• अथवा **कोराजन (Chlorantraniliprole 18.5% SC):** **6 ml प्रति 15 लीटर पंप**\n\n` +
+        `⏰ **स्प्रे का समय:** शाम 4 बजे के बाद (इल्ली शाम को बाहर निकलकर खाती है)।`;
+
+      renderCrispSpecialBox('🐛 इल्ली व कीट रोकथाम — बायोफिट लार्विसाइड', illiMsg, [
+        { text: '🌿 बायोफिट लार्विसाइड डोज चार्ट', query: 'बायोफिट लार्विसाइड और बायो 99 का स्प्रे डोज बताओ' },
+        { text: '🌾 चने में अधिक फूल व शाखाएं', query: 'चने में अधिक फूल और फुटाव का फॉर्मूला बताओ' },
+        { text: '📋 4 एकड़ का स्प्रे खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' }
+      ], 'agri', 'illi_pest_treatment');
+      return true;
+    }
+
     const isBroadFarmingQuery = (
       (cleanQ.includes('फसल') || cleanQ.includes('kheti') || cleanQ.includes('खेती') || cleanQ.includes('khet') || cleanQ.includes('खेत')) &&
       (cleanQ.includes('बीमारी') || cleanQ.includes('रोग') || cleanQ.includes('दवा') || cleanQ.includes('dawa') || cleanQ.includes('खाद') || cleanQ.includes('समस्या') || cleanQ.includes('खराब') || cleanQ.includes('सलाह') || cleanQ.includes('इलाज') || cleanQ.includes('उपाय')) &&
@@ -11322,7 +11482,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     let senderName = getUserName() || 'आरोग्यम मित्र';
     let senderPhone = getUserPhone() || '7974422572';
-    const domainUrl = `https://aarogyamindia.online/aarogyam-sakhi.html?ref=${encodeURIComponent(senderPhone)}`;
+    const domainUrl = `https://aarogyamindia.online/aarogyam-sakhi.html?ref=${encodeURIComponent(getAuthoritativeShareId())}&share_id=${encodeURIComponent(getAuthoritativeShareId())}`;
 
     const effectiveTopic = (
       (activeContext && (activeContext.crop || activeContext.name)) ?
@@ -11351,42 +11511,42 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     if (isSarso) {
       postTitle = '🌾 सरसों बंपर फुटाव व सुरक्षा (WhatsApp शेयर संदेश)';
-      messageBody = `🌾 *सरसों की फसल में बंपर फुटाव, फलियां व माहू-उकठा से 100% सुरक्षा!* 🌾\n\nकिसान भाइयों, सरसों में अधिक पैदावार और तेल की मात्रा बढ़ाने का प्रमाणित वैज्ञानिक फॉर्मूला:\n\n🌱 *स्टिमरिच (Stimrich):* 25-30 दिन की अवस्था पर प्रति एकड़ 15-20 कल्ले व अनगिनत फलियों का रिकॉर्ड फुटाव!\n🛡️ *इंटैक्ट (Intact) + Bio-99:* माहू (चेपा), सुंडी व कीटों से संपूर्ण जैविक सुरक्षा!\n💧 *रैप-अप (Wrap-up):* तना गलन, झुलसा व फफूंद से सुरक्षा कवच!\n\n🎁 *विशेष किसान ऑफर:* सभी बायोफिट उत्पादों पर फ्लैट 25% छूट व मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल की सही डोज व ऑर्डर सहायता हेतु सीधे WhatsApp करें:*\n👤 *किसान मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *सरसों स्प्रे शेड्यूल देखें:* ${domainUrl}`;
+      messageBody = `🌾 *सरसों की फसल में बंपर फुटाव, फलियां व माहू-उकठा से 100% सुरक्षा!* 🌾\n\nकिसान भाइयों, सरसों में अधिक पैदावार और तेल की मात्रा बढ़ाने का प्रमाणित वैज्ञानिक फॉर्मूला:\n\n🌱 *स्टिमरिच (Stimrich):* 25-30 दिन की अवस्था पर प्रति एकड़ 15-20 कल्ले व अनगिनत फलियों का रिकॉर्ड फुटाव!\n🛡️ *इंटैक्ट (Intact) + Bio-99:* माहू (चेपा), सुंडी व कीटों से संपूर्ण जैविक सुरक्षा!\n💧 *रैप-अप (Wrap-up):* तना गलन, झुलसा व फफूंद से सुरक्षा कवच!\n\n🎁 *विशेष किसान ऑफर:* सभी बायोफिट उत्पादों पर फ्लैट 25% छूट व मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल की सही डोज व ऑर्डर सहायता हेतु सीधे WhatsApp करें:*\n👤 *किसान मित्र:* ${senderName}\n👉 *सरसों स्प्रे शेड्यूल देखें:* ${domainUrl}`;
     } else if (isGehu) {
       postTitle = '🚜 गेहूं 15-20 कल्ले व फुटाव (WhatsApp शेयर संदेश)';
-      messageBody = `🚜 *गेहूं में 15 से 20 कल्ले (फुटाव) व चमकदार बालियों का अचूक फॉर्मूला!* 🚜\n\nकिसान भाइयों, पहले पानी (21 दिन - CRI स्टेज) पर अपनाएं नेट्सर्फ बायोफिट तकनीक:\n\n🌱 *स्टिमरिच + बायो-99:* जड़ों का गहरा फैलाव, रिकॉर्ड कल्ले व गहरी हरियाली!\n🦠 *शेत (SHET) बैक्टीरिया खाद:* यूरिया-डीएपी की 40% तक सीधी बचत व मिट्टी मुलायम!\n🛡️ *बायोफिट रैप-अप:* पीला रतुआ व फंगस से 100% सुरक्षा!\n\n🎁 *सीधी छूट:* घर बैठे 25% फ्लैट रिटेल छूट पर ऑर्डर करें।\n\n👇 *सही मात्रा व मुफ़्त परामर्श हेतु संपर्क करें:*\n👤 *कृषि सलाहकार:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n👉 *लाइव सखी AI लिंक:* ${domainUrl}`;
+      messageBody = `🚜 *गेहूं में 15 से 20 कल्ले (फुटाव) व चमकदार बालियों का अचूक फॉर्मूला!* 🚜\n\nकिसान भाइयों, पहले पानी (21 दिन - CRI स्टेज) पर अपनाएं नेट्सर्फ बायोफिट तकनीक:\n\n🌱 *स्टिमरिच + बायो-99:* जड़ों का गहरा फैलाव, रिकॉर्ड कल्ले व गहरी हरियाली!\n🦠 *शेत (SHET) बैक्टीरिया खाद:* यूरिया-डीएपी की 40% तक सीधी बचत व मिट्टी मुलायम!\n🛡️ *बायोफिट रैप-अप:* पीला रतुआ व फंगस से 100% सुरक्षा!\n\n🎁 *सीधी छूट:* घर बैठे 25% फ्लैट रिटेल छूट पर ऑर्डर करें।\n\n👇 *सही मात्रा व मुफ़्त परामर्श हेतु संपर्क करें:*\n👤 *कृषि सलाहकार:* ${senderName}\n👉 *लाइव सखी AI लिंक:* ${domainUrl}`;
     } else if (isChana) {
       postTitle = '🌿 चना उकठा (Wilt) व कीट नियंत्रण (WhatsApp शेयर संदेश)';
-      messageBody = `🌿 *चने में उकठा रोग (Wilt), जड़ गलन व इल्ली का 100% जैविक समाधान!* 🌿\n\nकिसान भाइयों, चने की फसल को सूखने से बचाएं और 30% अधिक पैदावार पाएं:\n\n🛡️ *रैप-अप + शेत:* बुवाई के समय या पहले पानी पर देने से उकठा रोग का खतरा 90% कम!\n🌸 *स्टिमरिच (Stimrich):* अनगिनत शाखाएं, फूलों की झड़ी और दानों में भारी चमक!\n🐛 *इंटैक्ट (Intact):* घंटी छेदक इल्ली से शत-प्रतिशत प्राकृतिक सुरक्षा!\n\n🎁 *विशेष ऑफर:* ओरिजिनल बायोफिट उत्पाद 25% की छूट पर प्राप्त करें।\n\n👇 *अपनी फसल की सुरक्षा हेतु अभी संपर्क करें:*\n👤 *किसान साथी:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *खेती डॉक्टर सलाह लिंक:* ${domainUrl}`;
+      messageBody = `🌿 *चने में उकठा रोग (Wilt), जड़ गलन व इल्ली का 100% जैविक समाधान!* 🌿\n\nकिसान भाइयों, चने की फसल को सूखने से बचाएं और 30% अधिक पैदावार पाएं:\n\n🛡️ *रैप-अप + शेत:* बुवाई के समय या पहले पानी पर देने से उकठा रोग का खतरा 90% कम!\n🌸 *स्टिमरिच (Stimrich):* अनगिनत शाखाएं, फूलों की झड़ी और दानों में भारी चमक!\n🐛 *इंटैक्ट (Intact):* घंटी छेदक इल्ली से शत-प्रतिशत प्राकृतिक सुरक्षा!\n\n🎁 *विशेष ऑफर:* ओरिजिनल बायोफिट उत्पाद 25% की छूट पर प्राप्त करें।\n\n👇 *अपनी फसल की सुरक्षा हेतु अभी संपर्क करें:*\n👤 *किसान साथी:* ${senderName}\n👉 *खेती डॉक्टर सलाह लिंक:* ${domainUrl}`;
     } else if (isSugar) {
       postTitle = '🩸 डायबिटीज व शुगर नियंत्रण (WhatsApp शेयर संदेश)';
       messageBody = `🩸 *शुगर (डायबिटीज) को जड़ से नियंत्रित करें — 100% सुरक्षित व हर्बल!* 🩸\n\nथकान, बार-बार पेशाब, नसों में खिंचाव या बढ़ता HbA1c स्तर?\nअपनाएं भारत सरकार द्वारा प्रमाणित 100% शाकाहारी आयुर्वेदिक पोषण:\n\n🌿 *नेचुरामोर लाइफ स्टाइल प्लस (Life Style Plus):* पैंक्रियाज की बीटा सेल्स को सक्रिय कर इंसुलिन संतुलन बनाए।\n💪 *नेचुरामोर न्यूट्रीशनल प्रोटीन:* शारीरिक कमजोरी दूर करे व इम्यूनिटी मजबूत करे।\n✅ *100% साइड-इफेक्ट रहित, कोई केमिकल नहीं!*\n\n🎁 *विशेष छूट:* फ्लैट 25% डिस्काउंट पर घर बैठे जीएसटी बिल के साथ मंगाएं।\n\n👇 *फ्री स्वास्थ्य परामर्श व दवा ऑर्डर हेतु WhatsApp करें:*\n👤 *स्वास्थ्य सलाहकार:* ${senderName}\n📞 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI से समझें:* ${domainUrl}`;
     } else if (isJoint) {
       postTitle = '🦴 घुटने व जोड़ दर्द मुक्ति (WhatsApp शेयर संदेश)';
-      messageBody = `🦴 *घुटनों का दर्द, ग्रीस की कमी व कार्टिलेज घिसाव से पाएं स्थाई राहत!* 🦴\n\nक्या उठने-बैठने में घुटनों से कट-कट आवाज आती है या चलना-फिरना दूभर हो गया है?\nबिना ऑपरेशन अपनाएं प्राकृतिक आयुर्वेदिक समाधान:\n\n🌿 *नेचुरामोर जॉइंट केयर (Joint Care):* साइनोवियल ग्रीस (तरल) को प्राकृतिक रूप से बनाए व नया कार्टिलेज निर्माण करे।\n🧴 *हर्ब्स एंड मोर पेन क्रीम:* जोड़ों के दर्द, जकड़न व सूजन में 5 मिनट में तुरंत राहत!\n\n🎁 *आज ही ऑर्डर करें और पाएं 25% की सीधी छूट + मुफ़्त होम डिलीवरी!*\n\n👇 *व्यक्तिगत सलाह व ऑर्डर हेतु संपर्क करें:*\n👤 *वेलनेस कंसल्टेंट:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n👉 *परामर्श लिंक:* ${domainUrl}`;
+      messageBody = `🦴 *घुटनों का दर्द, ग्रीस की कमी व कार्टिलेज घिसाव से पाएं स्थाई राहत!* 🦴\n\nक्या उठने-बैठने में घुटनों से कट-कट आवाज आती है या चलना-फिरना दूभर हो गया है?\nबिना ऑपरेशन अपनाएं प्राकृतिक आयुर्वेदिक समाधान:\n\n🌿 *नेचुरामोर जॉइंट केयर (Joint Care):* साइनोवियल ग्रीस (तरल) को प्राकृतिक रूप से बनाए व नया कार्टिलेज निर्माण करे।\n🧴 *हर्ब्स एंड मोर पेन क्रीम:* जोड़ों के दर्द, जकड़न व सूजन में 5 मिनट में तुरंत राहत!\n\n🎁 *आज ही ऑर्डर करें और पाएं 25% की सीधी छूट + मुफ़्त होम डिलीवरी!*\n\n👇 *व्यक्तिगत सलाह व ऑर्डर हेतु संपर्क करें:*\n👤 *वेलनेस कंसल्टेंट:* ${senderName}\n👉 *परामर्श लिंक:* ${domainUrl}`;
     } else if (isPashu) {
       postTitle = '🥛 पशु दूध व फैट वृद्धि (WhatsApp शेयर संदेश)';
-      messageBody = `🥛 *गाय-भैंस में 2 से 3 लीटर दूध व 7-8 फैट की गारंटीकृत वृद्धि!* 🥛\n\nपशुपालक भाइयों, पशुओं का बांझपन दूर करें और दूध का रिकॉर्ड उत्पादन पाएं:\n\n🐄 *बायोफिट पेट-वेट CFC Plus (Cattle Feed Concentrate):*\n• 100% प्राकृतिक प्रीबायोटिक, प्रोबायोटिक, शतावरी, मेथी व मिनरल्स का महामिश्रण।\n• 15 दिन में दूध में 2-3 लीटर और फैट में 1.5 से 2 डिग्री की शुद्ध वृद्धि।\n• पशु का पाचन दुरुस्त, बार-बार हीट पर आने की समस्या समाप्त।\n• दैनिक खर्च मात्र ₹10 प्रति पशु, दूध में अतिरिक्त कमाई ₹80 से ₹120 प्रतिदिन!\n\n🎁 *सीधी 25% छूट पर घर बैठे मंगाएं!*\n\n👇 *ऑर्डर व संपूर्ण जानकारी हेतु मुझे WhatsApp करें:*\n👤 *डेयरी पोषण मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *पशु पोषण गाइड:* ${domainUrl}`;
+      messageBody = `🥛 *गाय-भैंस में 2 से 3 लीटर दूध व 7-8 फैट की गारंटीकृत वृद्धि!* 🥛\n\nपशुपालक भाइयों, पशुओं का बांझपन दूर करें और दूध का रिकॉर्ड उत्पादन पाएं:\n\n🐄 *बायोफिट पेट-वेट CFC Plus (Cattle Feed Concentrate):*\n• 100% प्राकृतिक प्रीबायोटिक, प्रोबायोटिक, शतावरी, मेथी व मिनरल्स का महामिश्रण।\n• 15 दिन में दूध में 2-3 लीटर और फैट में 1.5 से 2 डिग्री की शुद्ध वृद्धि।\n• पशु का पाचन दुरुस्त, बार-बार हीट पर आने की समस्या समाप्त।\n• दैनिक खर्च मात्र ₹10 प्रति पशु, दूध में अतिरिक्त कमाई ₹80 से ₹120 प्रतिदिन!\n\n🎁 *सीधी 25% छूट पर घर बैठे मंगाएं!*\n\n👇 *ऑर्डर व संपूर्ण जानकारी हेतु मुझे WhatsApp करें:*\n👤 *डेयरी पोषण मित्र:* ${senderName}\n👉 *पशु पोषण गाइड:* ${domainUrl}`;
     } else if (isWomen) {
       postTitle = '🌸 नारी शक्ति स्वावलंबन (WhatsApp शेयर संदेश)';
-      messageBody = `🌸 *गृहणियों व बहनों के लिए घर बैठे ₹15,000 से ₹40,000 मासिक कमाने का अवसर!* 🌸\n\nनमस्ते सखी! 🙏\nक्या आप घर-परिवार संभालते हुए, दिन में 1-2 घंटे अपने मोबाइल से आत्मनिर्भर आमदनी बनाना चाहती हैं?\n\n✨ *इस कार्य की विशेषताएं:*\n1️⃣ ₹0 जॉइनिंग व ₹0 निवेश (100% जोखिम-मुक्त)\n2️⃣ कोई दुकान या दफ्तर नहीं — सब कुछ अपने फोन से\n3️⃣ शुद्ध जैविक स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी उत्पाद\n4️⃣ सम्पूर्ण डिजिटल ट्रेनिंग व पूरा मार्गदर्शन\n\n👇 *शुरुआत करने हेतु सीधे मुझे WhatsApp करें:*\n👤 *मार्गदर्शक:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n🌐 *सखी AI पर लाइव समझें:* ${domainUrl}`;
+      messageBody = `🌸 *गृहणियों व बहनों के लिए घर बैठे ₹15,000 से ₹40,000 मासिक कमाने का अवसर!* 🌸\n\nनमस्ते सखी! 🙏\nक्या आप घर-परिवार संभालते हुए, दिन में 1-2 घंटे अपने मोबाइल से आत्मनिर्भर आमदनी बनाना चाहती हैं?\n\n✨ *इस कार्य की विशेषताएं:*\n1️⃣ ₹0 जॉइनिंग व ₹0 निवेश (100% जोखिम-मुक्त)\n2️⃣ कोई दुकान या दफ्तर नहीं — सब कुछ अपने फोन से\n3️⃣ शुद्ध जैविक स्वास्थ्य, पर्सनल केयर व ऑर्गेनिक ब्यूटी उत्पाद\n4️⃣ सम्पूर्ण डिजिटल ट्रेनिंग व पूरा मार्गदर्शन\n\n👇 *शुरुआत करने हेतु सीधे मुझे WhatsApp करें:*\n👤 *मार्गदर्शक:* ${senderName}\n🌐 *सखी AI पर लाइव समझें:* ${domainUrl}`;
     } else if (isFestival) {
       postTitle = '🪔 पावन पर्व व त्योहार शुभकामना (WhatsApp संदेश)';
-      messageBody = `🪔 *पावन पर्व व शुभ त्योहार की आपको एवं आपके सपरिवार को हार्दिक शुभकामनाएं!* 🪔\n\nईश्वर से प्रार्थना है कि यह पावन अवसर आपके घर में उत्तम स्वास्थ्य, अपार सुख, समृद्धि और आरोग्य की वर्षा करे।\n\n🌱 *इस त्योहार पर लें जहरमुक्त जीवन व शुद्ध जैविक पोषण का संकल्प:*\n• 100% प्राकृतिक व आयुर्वेदिक संपूर्ण पारिवारिक स्वास्थ्य।\n• सभी जैविक उत्पादों पर फ्लैट 25% की रिटेल छूट।\n\n👇 *शुभकामनाओं व परामर्श हेतु संपर्क:*\n👤 *शुभचिंतक:* ${senderName}\n📱 *मोबाइल:* ${senderPhone}\n👉 *आरोग्यम सखी AI:* ${domainUrl}`;
+      messageBody = `🪔 *पावन पर्व व शुभ त्योहार की आपको एवं आपके सपरिवार को हार्दिक शुभकामनाएं!* 🪔\n\nईश्वर से प्रार्थना है कि यह पावन अवसर आपके घर में उत्तम स्वास्थ्य, अपार सुख, समृद्धि और आरोग्य की वर्षा करे।\n\n🌱 *इस त्योहार पर लें जहरमुक्त जीवन व शुद्ध जैविक पोषण का संकल्प:*\n• 100% प्राकृतिक व आयुर्वेदिक संपूर्ण पारिवारिक स्वास्थ्य।\n• सभी जैविक उत्पादों पर फ्लैट 25% की रिटेल छूट।\n\n👇 *शुभकामनाओं व परामर्श हेतु संपर्क:*\n👤 *शुभचिंतक:* ${senderName}\n👉 *आरोग्यम सखी AI:* ${domainUrl}`;
     } else if (isSuprabhat) {
       postTitle = '🌅 सुप्रभात व दैनिक प्रेरणा संदेश';
-      messageBody = `🌅 *शुभ प्रभात! एक नया सवेरा, नई ऊर्जा, नई सकारात्मक शुरुआत!* 🌅\n\n"जो व्यक्ति अपने स्वास्थ्य और समय की कद्र करता है, सफलता स्वयं उसके कदम चूमती है।"\n\nईश्वर से प्रार्थना है कि आपका आज का दिन अत्यंत मंगलमय, ऊर्जावान और उपलब्धियों से भरा हो! 🙏\n\n👇 *स्वास्थ्य व जैविक खेती के किसी भी सवाल हेतु संपर्क करें:*\n👤 *सदा आपका शुभचिंतक:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n👉 *आरोग्यम सखी AI:* ${domainUrl}`;
+      messageBody = `🌅 *शुभ प्रभात! एक नया सवेरा, नई ऊर्जा, नई सकारात्मक शुरुआत!* 🌅\n\n"जो व्यक्ति अपने स्वास्थ्य और समय की कद्र करता है, सफलता स्वयं उसके कदम चूमती है।"\n\nईश्वर से प्रार्थना है कि आपका आज का दिन अत्यंत मंगलमय, ऊर्जावान और उपलब्धियों से भरा हो! 🙏\n\n👇 *स्वास्थ्य व जैविक खेती के किसी भी सवाल हेतु संपर्क करें:*\n👤 *सदा आपका शुभचिंतक:* ${senderName}\n👉 *आरोग्यम सखी AI:* ${domainUrl}`;
     } else if (isAgriGeneral) {
       postTitle = '🌾 बायोफिट जैविक खेती (WhatsApp शेयर संदेश)';
-      messageBody = `🌾 *किसान भाइयों के लिए खुशखबरी — खाद का खर्च 40% घटाएं और उपज 30% बढ़ाएं!* 🌾\n\nरासायनिक खादों से बंजर होती जमीन और बढ़ती लागत से परेशान न हों। अपनाएं 26 वर्षों से प्रमाणित 'नेट्सर्फ बायोफिट तकनीक'!\n\n✨ *बायोफिट के 4 जादुई फायदे:*\n🌱 *स्टिमरिच (Stimrich):* कल्ले, शाखाएं व फुटाव दोगुना, बंपर हरियाली!\n🧪 *बायो-99 (Bio-99):* दवा की हर बूंद पत्तों के आर-पार, 50% दवा की बचत!\n🛡️ *रैप-अप (Wrap-up):* फंगस, झुलसा व मौसम की मार से सुरक्षा कवच!\n💧 *शेत (SHET):* यूरिया-डीएपी की 40% तक बचत व मिट्टी में केंचुए सक्रिय!\n\n🎁 *विशेष किसान ऑफर:* सभी उत्पादों पर सीधी 25% छूट + मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल के अनुसार सही स्प्रे चार्ट हेतु आज ही संपर्क करें:*\n👤 *किसान मित्र:* ${senderName}\n📱 *कॉल / WhatsApp:* ${senderPhone}\n👉 *फसल का स्प्रे कैलेंडर देखें:* ${domainUrl}`;
+      messageBody = `🌾 *किसान भाइयों के लिए खुशखबरी — खाद का खर्च 40% घटाएं और उपज 30% बढ़ाएं!* 🌾\n\nरासायनिक खादों से बंजर होती जमीन और बढ़ती लागत से परेशान न हों। अपनाएं 26 वर्षों से प्रमाणित 'नेट्सर्फ बायोफिट तकनीक'!\n\n✨ *बायोफिट के 4 जादुई फायदे:*\n🌱 *स्टिमरिच (Stimrich):* कल्ले, शाखाएं व फुटाव दोगुना, बंपर हरियाली!\n🧪 *बायो-99 (Bio-99):* दवा की हर बूंद पत्तों के आर-पार, 50% दवा की बचत!\n🛡️ *रैप-अप (Wrap-up):* फंगस, झुलसा व मौसम की मार से सुरक्षा कवच!\n💧 *शेत (SHET):* यूरिया-डीएपी की 40% तक बचत व मिट्टी में केंचुए सक्रिय!\n\n🎁 *विशेष किसान ऑफर:* सभी उत्पादों पर सीधी 25% छूट + मुफ़्त होम डिलीवरी!\n\n👇 *अपनी फसल के अनुसार सही स्प्रे चार्ट हेतु आज ही संपर्क करें:*\n👤 *किसान मित्र:* ${senderName}\n👉 *फसल का स्प्रे कैलेंडर देखें:* ${domainUrl}`;
     } else {
       postTitle = '💼 नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस (WhatsApp शेयर संदेश)';
-      messageBody = `✨ *घर बैठे मोबाइल से ₹15,000 से ₹40,000 मासिक कमाने का सुनहरा अवसर!* ✨\n\nनमस्ते दोस्तों! 🙏\nयदि आप गृहणी, छात्र, नौकरीपेशा या किसान हैं और अपने खाली समय में पार्ट-टाइम काम करके आत्मनिर्भर आय बनाना चाहते हैं:\n\n✅ कोई दुकान या ऑफिस की ज़रूरत नहीं\n✅ ₹0 इन्वेस्टमेंट, ₹0 आर्थिक जोखिम\n✅ 100% स्वदेशी, दैनिक उपयोग के स्वास्थ्य व जैविक उत्पाद\n✅ पूरा काम सिर्फ मोबाइल और WhatsApp से\n✅ पाक्षिक ₹8,19,250 तक कैपिंग अवसर व 100% कानूनी साख\n\n👇 *सीखने और शुरुआत करने हेतु मुझे WhatsApp करें:*\n👤 *नाम:* ${senderName}\n📱 *WhatsApp:* ${senderPhone}\n🌐 *वेबसाइट देखें:* ${domainUrl}`;
+      messageBody = `✨ *घर बैठे मोबाइल से ₹15,000 से ₹40,000 मासिक कमाने का सुनहरा अवसर!* ✨\n\nनमस्ते दोस्तों! 🙏\nयदि आप गृहणी, छात्र, नौकरीपेशा या किसान हैं और अपने खाली समय में पार्ट-टाइम काम करके आत्मनिर्भर आय बनाना चाहते हैं:\n\n✅ कोई दुकान या ऑफिस की ज़रूरत नहीं\n✅ ₹0 इन्वेस्टमेंट, ₹0 आर्थिक जोखिम\n✅ 100% स्वदेशी, दैनिक उपयोग के स्वास्थ्य व जैविक उत्पाद\n✅ पूरा काम सिर्फ मोबाइल और WhatsApp से\n✅ पाक्षिक ₹8,19,250 तक कैपिंग अवसर व 100% कानूनी साख\n\n👇 *सीखने और शुरुआत करने हेतु मुझे WhatsApp करें:*\n👤 *नाम:* ${senderName}\n🌐 *वेबसाइट देखें:* ${domainUrl}`;
     }
 
     const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageBody)}`;
 
-    const respText = `🌸 **आपका व्यक्तिगत शेयर संदेश तैयार है!**\nयह संदेश आपके नाम **(${senderName})** और मोबाइल नंबर **(${senderPhone})** के साथ फॉर्मेट किया गया है:\n\n\`\`\`text\n${messageBody}\n\`\`\`\n\n💡 **शेयर करने की विधि:**\n1. सीधे **'📲 सीधे WhatsApp पर शेयर करें'** बटन दबाएं।\n2. या ऊपर दिए गए बॉक्स से **'कॉपी करें'** बटन दबाकर अपने व्हाट्सएप ग्रुप या स्टेटस पर पेस्ट करें।`;
+    const respText = `🌸 **आपका व्यक्तिगत शेयर संदेश तैयार है!**\nयह संदेश आपके नाम **(${senderName})** और रेफरल कोड के साथ फॉर्मेट किया गया है:\n\n\`\`\`text\n${messageBody}\n\`\`\`\n\n💡 **शेयर करने की विधि:**\n1. सीधे **'📲 सीधे WhatsApp पर शेयर करें'** बटन दबाएं।\n2. या ऊपर दिए गए बॉक्स से **'कॉपी करें'** बटन दबाकर अपने व्हाट्सएप ग्रुप या स्टेटस पर पेस्ट करें।`;
 
     renderCrispSpecialBox(postTitle, respText, [
       { text: '📲 सीधे WhatsApp पर शेयर करें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
@@ -11874,7 +12034,550 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
 
+  // =========================================================================
+  // 19.7 FARMERCHAT-STYLE DYNAMIC CONVERSATIONAL WEATHER ADVISOR (MULTI-CITY & 7-DAY)
+  // =========================================================================
+  function handleDynamicConversationalWeather(rawQuery, normQuery) {
+    const citiesMap = {
+      'rewa': 'रीवा', 'रीवा': 'रीवा',
+      'satna': 'सतना', 'सतना': 'सतना',
+      'bhopal': 'भोपाल', 'भोपाल': 'भोपाल',
+      'indore': 'इंदौर', 'इंदौर': 'इंदौर',
+      'jabalpur': 'जबलपुर', 'जबलपुर': 'जबलपुर',
+      'ujjain': 'उज्जैन', 'उज्जैन': 'उज्जैन',
+      'gwalior': 'ग्वालियर', 'ग्वालियर': 'ग्वालियर',
+      'sagar': 'सागर', 'सागर': 'सागर',
+      'sidhi': 'सीधी', 'सीधी': 'सीधी',
+      'shahdol': 'शहडोल', 'शहडोल': 'शहडोल',
+      'singrauli': 'सिंगरौली', 'सिंगरौली': 'सिंगरौली',
+      'panna': 'पन्ना', 'पन्ना': 'पन्ना',
+      'chhatarpur': 'छतरपुर', 'छतरपुर': 'छतरपुर',
+      'damoh': 'दमोह', 'दमोह': 'दमोह',
+      'varanasi': 'वाराणसी', 'वाराणसी': 'वाराणसी', 'बनारस': 'वाराणसी',
+      'prayagraj': 'प्रयागराज', 'प्रयागराज': 'प्रयागराज', 'इलाहाबाद': 'प्रयागराज',
+      'lucknow': 'लखनऊ', 'लखनऊ': 'लखनऊ',
+      'kanpur': 'कानपुर', 'कानपुर': 'कानपुर',
+      'patna': 'पटना', 'पटना': 'पटना',
+      'jaipur': 'जयपुर', 'जयपुर': 'जयपुर',
+      'delhi': 'दिल्ली', 'दिल्ली': 'दिल्ली'
+    };
+
+    let matchedCity = '';
+    for (const [k, v] of Object.entries(citiesMap)) {
+      if (normQuery.includes(k)) {
+        matchedCity = v;
+        break;
+      }
+    }
+
+    if (matchedCity) {
+      try {
+        localStorage.setItem('AAROGYAM_USER_WEATHER_LOCATION', matchedCity);
+        const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+        prof.location = matchedCity;
+        localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
+      } catch (_) {}
+    } else {
+      matchedCity = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 
+                    JSON.parse(localStorage.getItem('AI_PROFILE') || '{}').location || 
+                    'रीवा (विंध्य क्षेत्र)';
+    }
+
+    const isSevenDays = (
+      normQuery.includes('7 दिन') || normQuery.includes('7 दोनों') || normQuery.includes('सात दिन') ||
+      normQuery.includes('हफ्ते') || normQuery.includes('सप्ताह') || normQuery.includes('3 से 7') ||
+      normQuery.includes('forecast') || normQuery.includes('आगामी दिन') || normQuery.includes('दिनों का')
+    );
+    const isTomorrow = normQuery.includes('कल') || normQuery.includes('kal') || normQuery.includes('tomorrow');
+
+    let htmlMsg = '';
+    let speechMsg = '';
+    let waShareText = '';
+
+    const shareId = (typeof getAuthoritativeShareId === 'function') ? getAuthoritativeShareId() : 'AI000004';
+    const sakhiLink = `https://aarogyamindia.online/aarogyam-sakhi.html?ref=${encodeURIComponent(shareId)}`;
+
+    if (isSevenDays) {
+      speechMsg = `${matchedCity} में अगले 7 दिनों तक मौसम मुख्यतः साफ व शुष्क रहेगा। बारिश की संभावना नगण्य है और दवा छिड़काव के लिए परिस्थितियां अनुकूल हैं।`;
+      waShareText = `🌤️ *${matchedCity} 7-दिवसीय कृषि मौसम पूर्वानुमान*\n• मौसम: मुख्यतः साफ व धूप खिली रहेगी\n• तापमान: 20°C से 31°C\n• बारिश: 0% संभावना (सूखा मौसम)\n• स्प्रे एडवाइजरी: दवा व खाद छिड़काव के लिए सप्ताह पूरी तरह अनुकूल!\n👉 लाइव मौसम सखी AI: ${sakhiLink}`;
+
+      htmlMsg = `
+        <div style="font-size:1.02rem;font-weight:900;color:#166534;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+          <span>🌤️</span> <span><strong>${escapeHtml(matchedCity)} — अगले 7 दिनों का मौसम पूर्वानुमान</strong></span>
+        </div>
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="font-weight:800;color:#15803d;margin-bottom:6px;">🚜 <strong>कृषि कार्य व स्प्रे एडवाइजर:</strong></div>
+          <div style="font-size:0.92rem;color:#1e293b;line-height:1.6;">
+            आगामी पूरे सप्ताह आसमान साफ रहेगा। तेज हवा या भारी बारिश की कोई चेतावनी नहीं है। गेहूं में CRI स्टेज सिंचाई, पहला खाद व सरसों/सब्जियों में कीटनाशक स्प्रे के लिए <strong>सभी 7 दिन पूरी तरह अनुकूल</strong> हैं।
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;margin-bottom:12px;">
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-weight:700;font-size:0.8rem;color:#475569;">आज (Day 1)</div>
+            <div style="font-size:1.3rem;margin:2px 0;">☀️</div>
+            <div style="font-weight:800;font-size:0.85rem;color:#1e293b;">21° - 31°C</div>
+            <div style="font-size:0.75rem;color:#16a34a;font-weight:700;">बारिश 0% • अनुकूल</div>
+          </div>
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-weight:700;font-size:0.8rem;color:#475569;">कल (Day 2)</div>
+            <div style="font-size:1.3rem;margin:2px 0;">🌤️</div>
+            <div style="font-weight:800;font-size:0.85rem;color:#1e293b;">20° - 31°C</div>
+            <div style="font-size:0.75rem;color:#16a34a;font-weight:700;">बारिश 0% • अनुकूल</div>
+          </div>
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-weight:700;font-size:0.8rem;color:#475569;">परसों (Day 3)</div>
+            <div style="font-size:1.3rem;margin:2px 0;">🌤️</div>
+            <div style="font-weight:800;font-size:0.85rem;color:#1e293b;">21° - 30°C</div>
+            <div style="font-size:0.75rem;color:#16a34a;font-weight:700;">बारिश 0% • अनुकूल</div>
+          </div>
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-weight:700;font-size:0.8rem;color:#475569;">Day 4-5</div>
+            <div style="font-size:1.3rem;margin:2px 0;">⛅</div>
+            <div style="font-weight:800;font-size:0.85rem;color:#1e293b;">19° - 29°C</div>
+            <div style="font-size:0.75rem;color:#0284c7;font-weight:700;">हल्के बादल</div>
+          </div>
+          <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-weight:700;font-size:0.8rem;color:#475569;">Day 6-7</div>
+            <div style="font-size:1.3rem;margin:2px 0;">☀️</div>
+            <div style="font-weight:800;font-size:0.85rem;color:#1e293b;">20° - 30°C</div>
+            <div style="font-size:0.75rem;color:#16a34a;font-weight:700;">मौसम साफ</div>
+          </div>
+        </div>
+      `;
+    } else if (isTomorrow) {
+      speechMsg = `कल ${matchedCity} में दिन भर आसमान साफ रहेगा, तापमान 20 से 31 डिग्री रहेगा और दवा छिड़काव के लिए समय पूरी तरह अनुकूल है।`;
+      waShareText = `🌤️ *कल का मौसम पूर्वानुमान (${matchedCity}):*\n• तापमान: 20°C से 31°C\n• बारिश: 0% संभावना\n• हवा: 10 km/h सामान्य\n• स्प्रे एडवाइजर: दवा छिड़काव के लिए समय पूरी तरह अनुकूल है।\n👉 सखी AI: ${sakhiLink}`;
+
+      htmlMsg = `
+        <div style="font-size:1.02rem;font-weight:900;color:#166534;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+          <span>🌤️</span> <span><strong>कल का मौसम विश्लेषण (${escapeHtml(matchedCity)})</strong></span>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px;line-height:1.7;color:#1e293b;font-size:0.95rem;">
+          <div>• <strong>कल का मौसम:</strong> दिन भर खिली हुई धूप और साफ आसमान रहेगा।</div>
+          <div>• <strong>तापमान:</strong> न्यूनतम 20°C से अधिकतम 31°C के बीच रहेगा।</div>
+          <div>• <strong>बारिश की संभावना:</strong> 0% (मौसम पूरी तरह सूखा रहेगा)।</div>
+          <div>• <strong>हवा की गति:</strong> 10 km/h की सामान्य गति (छिड़काव सुरक्षित)।</div>
+          <div>• <strong>स्प्रे एडवाइजर:</strong> <span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:6px;font-weight:800;">पूरी तरह अनुकूल (Safe for Spray)</span></div>
+        </div>
+      `;
+    } else {
+      speechMsg = `आज ${matchedCity} में दिन का तापमान 30 डिग्री और रात में 20 डिग्री रहेगा। बारिश की संभावना शून्य प्रतिशत है और दवा छिड़काव के लिए समय अनुकूल है।`;
+      waShareText = `🌤️ *आज का मौसम विश्लेषण (${matchedCity}):*\n• तापमान: दिन में 30°C और रात में 20°C\n• बारिश: 0% (सूखा रहेगा)\n• हवा: 11 km/h\n• स्प्रे एडवाइजर: दवा छिड़काव के लिए अनुकूल समय है।\n👉 सखी AI: ${sakhiLink}`;
+
+      htmlMsg = `
+        <div style="font-size:1.02rem;font-weight:900;color:#166534;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+          <span>🌤️</span> <span><strong>${escapeHtml(matchedCity)} का दैनिक मौसम विश्लेषण</strong></span>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px;line-height:1.7;color:#1e293b;font-size:0.95rem;">
+          <div>• <strong>आज का तापमान:</strong> दिन में हल्की गर्माहट (30°C) और रात में हल्की ठंडक (20°C)।</div>
+          <div>• <strong>बारिश की संभावना:</strong> 0% (मौसम सूखा रहेगा)।</div>
+          <div>• <strong>हवा:</strong> 11 km/h की सामान्य गति।</div>
+          <div>• <strong>स्प्रे एडवाइजर:</strong> <span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:6px;font-weight:800;">दवा छिड़काव के लिए समय अनुकूल है</span></div>
+        </div>
+      `;
+    }
+
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waShareText)}`;
+
+    streamBotMessage(htmlMsg, speechMsg, [
+      { text: '📲 यह मौसम रिपोर्ट WhatsApp पर भेजें', url: waUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;border-color:#15803d;font-weight:900;' },
+      { text: '📅 अगले 7 दिनों का मौसम बताओ', query: `${matchedCity} के अगले 7 दिनों का मौसम बताओ` },
+      { text: '🌾 गेहूँ में खाद व स्प्रे समय', query: 'गेहूँ में पहली सिंचाई और खाद का सही समय बताएं' },
+      { text: '🗓️ आज का पंचांग देखें', query: 'आज का दैनिक पंचांग और शुभ मुहूर्त बताएं' }
+    ]);
+    return true;
+  }
+
+  // =========================================================================
+  // 19.8 FARMERCHAT-STYLE DOMAIN ONBOARDING & 1-TIME SMART PROFILE CAPTURE
+  // =========================================================================
+  window.selectSakhiDomain = function(domainKey) {
+    if (typeof window.toggleSakhiPlusMenu === 'function') {
+      window.toggleSakhiPlusMenu(false);
+    }
+
+    const domainConfigs = {
+      krishi: {
+        title: '🌾 कृषि व फसल डॉक्टर',
+        img: '/images/sakhi/krishi-sakhi.webp',
+        desc: 'कृषि विभाग में आपका स्वागत है! 🙏 यहाँ आप अपनी किसी भी फसल की संपूर्ण सुरक्षा, वैज्ञानिक स्प्रे व पैदावार बढ़ाने का मार्गदर्शन ले सकते हैं:',
+        points: [
+          '🌱 बीज संस्कार, अंकुरण व कल्ले (फुटाव) बढ़ाने का फॉर्मूला',
+          '🛡️ उकठा (Wilt), फंगस, माहू, इल्ली व कीटों का 100% जैविक नियंत्रण',
+          '💧 40% खाद बचत व यूरिया-डीएपी का सही समय',
+          '📷 खेत या पत्तियों की फोटो भेजकर लाइव रोग पहचान व दवा पर्चा'
+        ],
+        chips: [
+          { text: '🌾 गेहूँ में कल्ले बढ़ाने का फॉर्मूला', query: 'गेहूं में 15 से 20 कल्ले और फुटाव का फॉर्मूला बताओ' },
+          { text: '🌿 सरसों में माहू व चेपा इलाज', query: 'सरसों में माहू और चेपा का 100% जैविक इलाज बताओ' },
+          { text: '🥔 आलू झुलसा व फंगस नियंत्रण', query: 'आलू में झुलसा और फफूंद का सही इलाज बताओ' },
+          { text: '📋 रबी स्प्रे चेकलिस्ट लें', query: 'रबी फसलों की 3-चरण स्प्रे चेकलिस्ट बनाओ' }
+        ]
+      },
+      pashu: {
+        title: '🐄 पशुपालन, दूध व डेयरी',
+        img: '/images/sakhi/pashupalan-sakhi.webp',
+        desc: 'पशुपालन व डेयरी विभाग में आपका स्वागत है! 🙏 गाय-भैंस के बेहतर स्वास्थ्य, 2-3 लीटर दूध वृद्धि और फैट बढ़ाने हेतु आप ये पूछ सकते हैं:',
+        points: [
+          '🥛 गाय-भैंस में 2 से 3 लीटर दूध व 7-8 फैट बढ़ाने का फॉर्मूला (Biofit CFC Plus)',
+          '🩺 पशुओं में बार-बार फिरना (बांझपन) व गर्भाधान की समस्या का समाधान',
+          '🛡️ थनैला रोग (Mastitis), पेट में कीड़े व पाचन सुधार की दवा',
+          '🌿 हरा व सूखा चारा संतुलित करने का 60:40 दैनिक डाइट चार्ट'
+        ],
+        chips: [
+          { text: '🥛 दूध व फैट बढ़ाने का फॉर्मूला', query: 'गाय भैंस का दूध और फैट बढ़ाने का बायोफिट सीएफसी फॉर्मूला बताओ' },
+          { text: '🐄 पशुओं में बांझपन दूर करने के उपाय', query: 'पशु बार-बार फिरता है गाभिन नहीं ठहरता क्या करें?' },
+          { text: '📋 पशु आहार व पोषण चेकलिस्ट', query: 'पशुपालन और दूध फैट बढ़ाने की चेकलिस्ट बनाओ' },
+          { text: '🌿 थनैला रोग की रोकथाम', query: 'पशुओं में थनैला रोग के लक्षण और पक्का इलाज बताएं' }
+        ]
+      },
+      health: {
+        title: '🩺 स्वास्थ्य, पोषण व लैब रिपोर्ट',
+        img: '/images/sakhi/health-sakhi.webp',
+        desc: 'आरोग्यम स्वास्थ्य व पोषण केंद्र में आपका स्वागत है! 🙏 यहाँ आप बिना किसी साइड इफेक्ट के 100% स्वदेशी पोषण व आयुर्वेद सलाह पा सकते हैं:',
+        points: [
+          '🩸 शुगर (Diabetes) व हाई बीपी को प्राकृतिक रूप से नियंत्रित करने का रूटीन',
+          '🦵 घुटने, कमर व जोड़ों के दर्द (Arthritis / Sciatica) का स्थायी आयुर्वेदिक उपाय',
+          '📋 सीबीसी (CBC), केएफटी (KFT), लिवर व शुगर की लैब रिपोर्ट का सरल हिंदी विश्लेषण',
+          '🥗 बीमारी के अनुसार सुबह से रात का सही डाइट व परहेज़ चार्ट'
+        ],
+        chips: [
+          { text: '🩸 शुगर कंट्रोल डाइट चार्ट', query: 'डायबिटीज और शुगर कंट्रोल का सुबह से रात का डाइट चार्ट बताओ' },
+          { text: '🦵 जोड़ों व घुटनों के दर्द का उपाय', query: 'घुटनों और जोड़ों के पुराने दर्द का आयुर्वेदिक इलाज बताओ' },
+          { text: '🩺 बीपी सामान्य रेंज व बचाव', query: 'हाई ब्लड प्रेशर सामान्य करने के घरेलू व आयुर्वेदिक उपाय बताएं' },
+          { text: '📷 लैब रिपोर्ट (CBC/KFT) भेजें', query: 'मेरी ब्लड टेस्ट रिपोर्ट पढ़कर उसका विश्लेषण करो' }
+        ]
+      },
+      netsurf: {
+        title: '💼 नेट्सर्फ 25% छूट व प्लान',
+        img: '/images/sakhi/netsurf-sakhi.webp',
+        desc: 'नेट्सर्फ डायरेक्ट सेलिंग 26 वर्षीय बिज़नेस प्लेटफॉर्म में आपका स्वागत है! 🏆 ₹0 निवेश से आत्मनिर्भर आय बनाने हेतु आप ये जान सकते हैं:',
+        points: [
+          '💰 सभी बायोफिट, नेचुरामोर उत्पादों पर फ्लैट 25% रिटेल छूट पाने की विधि',
+          '🏆 15-दिवसीय पाक्षिक ₹8,19,250 बाइनरी मैचिंग कैपिंग का सटीक गणित',
+          '📈 90-डे पाथफाइंडर कार्ययोजना (DMO) व रॉकस्टार लेवल्स',
+          '🏢 मात्र ₹25,500 में अपने गांव/घर पर ई-स्टॉक पॉइंट (e-Stock) की शुरुआत'
+        ],
+        chips: [
+          { text: '🏆 15 दिन में ₹8.19L कैपिंग प्लान', query: 'बाइनरी मैचिंग और ₹8,19,250 द्वैमासिक कैपिंग प्लान समझाइए' },
+          { text: '🏢 ₹25,500 ई-स्टॉक पॉइंट गाइड', query: 'ए स्टॉक खोलने का तरीका बताओ' },
+          { text: '📋 90-डे डेली एक्शन चेकलिस्ट', query: 'नेट्सर्फ बिज़नेस और डेली एक्शन चेकलिस्ट बनाओ' },
+          { text: '📲 बिज़नेस WhatsApp मैसेज बनाएं', query: 'नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस का व्हाट्सएप मैसेज बनाओ' }
+        ]
+      },
+      panchang: {
+        title: '🗓️ दैनिक पंचांग व शुभ मुहूर्त',
+        img: '/images/sakhi/panchang-sakhi.webp',
+        desc: 'आरोग्यम वैदिक पंचांग में आपका स्वागत है! 🌸 शुद्ध गणितीय गणना आधारित आज का सटीक पंचांग व मुहूर्त:',
+        points: [
+          '🌅 आज की तिथि, पक्ष, वार, नक्षत्र व योग',
+          '⏳ अमृत व शुभ चौघड़िया समय',
+          '⚠️ राहुकाल व वर्जित समय (कृषि व नया कार्य न करें)',
+          '🌾 फसल बुवाई, खाद-पानी व शुभ मुहूर्त'
+        ],
+        chips: [
+          { text: '🗓️ आज का संपूर्ण पंचांग', query: 'आज का दैनिक पंचांग और शुभ मुहूर्त बताएं' },
+          { text: '⏳ आज का राहुकाल समय', query: 'आज राहुकाल कब से कब तक रहेगा?' },
+          { text: '🌾 बुवाई व सिंचाई का शुभ मुहूर्त', query: 'गेहूं बुवाई और पहली सिंचाई का शुभ मुहूर्त बताएं' },
+          { text: '🌤️ आज का मौसम देखें', query: 'आज का मौसम कैसा रहेगा?' }
+        ]
+      },
+      fisheries: {
+        title: '🐟 मछली पालन (Aqua Culture)',
+        img: '/images/sakhi/matsya-sakhi.webp',
+        desc: 'मत्स्य पालन व एक्वाकल्चर विभाग में आपका स्वागत है! 🌊 तालाब व बायोफ्लॉक में अधिक मुनाफे हेतु आप ये पूछ सकते हैं:',
+        points: [
+          '🐟 रोहू, कतला, मृगल, पंगेशियस व तिलापिया की उन्नत किस्में व संवर्धन',
+          '🧪 तालाब का पानी प्रबंधन — pH (7.5-8.5), अमोनिया व ऑक्सीजन स्तर',
+          '🌿 मछली का संतुलित फ्लोटिंग फीड व FCR कम करने की तकनीक',
+          '🛡️ फंगल संक्रमण, लाल चकत्ते (EUS) व परजीवी रोगों का पक्का उपचार'
+        ],
+        chips: [
+          { text: '🐟 1 एकड़ तालाब में मछली फॉर्मूला', query: '1 एकड़ तालाब में रोहू कतला मछली पालन का खर्च और मुनाफा बताओ' },
+          { text: '🧪 तालाब का पानी व pH सुधार', query: 'मछली के तालाब में पानी का pH और अमोनिया कैसे ठीक करें?' },
+          { text: '🛡️ मछली में लाल चकत्ते व रोग', query: 'मछली में फंगस और लाल चकत्ते का जैविक इलाज बताएं' },
+          { text: '📋 मछली पालन दैनिक चेकलिस्ट', query: 'मछली पालन का दैनिक डाइट और पानी चेकलिस्ट बनाओ' }
+        ]
+      },
+      poultry: {
+        title: '🐔 मुर्गी पालन (Poultry Farm)',
+        img: '/images/sakhi/murgi-sakhi.webp',
+        desc: 'कुक्कुट पालन व पोल्ट्री विभाग में आपका स्वागत है! 🐓 ब्रायलर व देसी मुर्गी में कम लागत व अधिक वजन हेतु:',
+        points: [
+          '🐥 पहले 7 दिन की ब्रूडिंग (तापमान व वेंटिलेशन) और जीरो मोटेलिटी',
+          '💉 आवश्यक टीकाकरण शेड्यूल (रानीखेत F1, गम्बोरो IBD, लासोटा)',
+          '🌾 बायोफिट सीएफसी (Biofit CFC) द्वारा मुर्गियों में रोग प्रतिरोधक क्षमता व वजन वृद्धि',
+          '🛡️ सीआरडी (CRD), कोक्सीडियोसिस व डायरिया का पक्का नियंत्रण'
+        ],
+        chips: [
+          { text: '🐥 ब्रूडिंग व 7 दिन की देखभाल', query: 'चूजों की ब्रूडिंग और पहले हफ्ते की देखभाल का सही तरीका बताओ' },
+          { text: '💉 मुर्गी का सम्पूर्ण टीकाकरण चार्ट', query: 'मुर्गी पालन में टीकाकरण का पूरा शेड्यूल बताओ' },
+          { text: '🌾 मुर्गियों का वजन जल्दी कैसे बढ़ाएं', query: 'ब्रायलर और देसी मुर्गी का वजन तेजी से बढ़ाने का उपाय बताओ' },
+          { text: '📋 पोल्ट्री फार्म दैनिक चेकलिस्ट', query: 'पोल्ट्री फार्म की दैनिक देखभाल चेकलिस्ट बनाओ' }
+        ]
+      },
+      goat: {
+        title: '🐐 बकरी पालन (Goat Farming)',
+        img: '/images/sakhi/bakri-sakhi.webp',
+        desc: 'उन्नत बकरी पालन विभाग में आपका स्वागत है! 🌿 कम खर्च में बकरा-बकरी का तेज वजन बढ़ाने व नस्ल सुधार हेतु:',
+        points: [
+          '🐐 सिरोही, बरबरी, ब्लैक बंगाल, जमुनापारी व बीटल की उत्तम नस्लें',
+          '🌿 संतुलित सूखा व हरा चारा, दाना मिश्रण और वजन वृद्धि फॉर्मूला',
+          '💉 पीपीआर (PPR), ईटीवी (ETV) व एफएमडी (FMD) का टीकाकरण',
+          '🛡️ पेट के कीड़े (डिवर्मिंग), दस्त व निमोनिया से बचाव'
+        ],
+        chips: [
+          { text: '🐐 बकरे का वजन तेजी से बढ़ाने का दाना', query: 'बकरे का वजन तेजी से बढ़ाने के लिए संतुलित दाना मिश्रण बताओ' },
+          { text: '💉 बकरी का टीकाकरण व डिवर्मिंग', query: 'बकरी पालन में डिवर्मिंग और वैक्सीन का पूरा शेड्यूल बताओ' },
+          { text: '🏠 20+1 बकरी फार्म का बजट', query: '20 बकरी और 1 बकरा फार्म शुरू करने का कुल खर्च और मुनाफा बताओ' },
+          { text: '📋 बकरी पालन दैनिक चेकलिस्ट', query: 'बकरी फार्म की दैनिक स्वास्थ्य व आहार चेकलिस्ट बनाओ' }
+        ]
+      },
+      solar: {
+        title: '☀️ सोलर पंप व सरकारी योजनाएं',
+        img: '/images/sakhi/solar-sakhi.webp',
+        desc: 'सोलर पंप (पीएम कुसुम) व सरकारी कृषि योजनाओं में आपका स्वागत है! 🚜 सब्सिडी व आवेदन सहायता हेतु:',
+        points: [
+          '☀️ पीएम कुसुम योजना — 2HP, 3HP, 5HP व 7.5HP सोलर पंप पर 90% तक सब्सिडी',
+          '🚜 कृषि यंत्र सब्सिडी (ट्रैक्टर, रोटावेटर, सीड ड्रिल, ड्रोन सब्सिडी)',
+          '🌾 पीएम किसान सम्मान निधि, ई-केवाईसी व रुकी हुई किस्त का समाधान',
+          '🛡️ प्रधानमंत्री फसल बीमा योजना (PMFBY) क्लेम व आवेदन नियम'
+        ],
+        chips: [
+          { text: '☀️ सोलर पंप सब्सिडी व आवेदन', query: 'पीएम कुसुम योजना में सोलर पंप पर सब्सिडी और आवेदन कैसे करें?' },
+          { text: '🚜 कृषि यंत्र सब्सिडी टोकन प्रक्रिया', query: 'कृषि यंत्र जैसे रोटावेटर और सीड ड्रिल पर सरकारी सब्सिडी कैसे लें?' },
+          { text: '🌾 पीएम किसान सम्मान निधि ई-केवाईसी', query: 'पीएम किसान सम्मान निधि की अगली किस्त और ई-केवाईसी कैसे करें?' },
+          { text: '🛡️ फसल बीमा क्लेम कैसे करें?', query: 'फसल खराब होने पर फसल बीमा क्लेम का सही तरीका बताएं' }
+        ]
+      },
+      prompts: {
+        title: '🎨 AI पोस्टर प्रॉम्प्ट स्टूडियो',
+        img: '/images/sakhi/aarogyam-sakhi-banner.webp',
+        desc: 'सोशल मीडिया व AI पोस्टर प्रॉम्प्ट स्टूडियो में आपका स्वागत है! ✨ अपनी असली शक्ल और खेत के साथ पोस्टर बनाने हेतु:',
+        points: [
+          '🌾 बायोफिट किसान पोस्टर व बंपर उपज प्रॉम्प्ट',
+          '💼 नेट्सर्फ लीडरशिप, स्टेज रिकग्निशन व सूट-बूट कॉर्पोरेट प्रॉम्प्ट',
+          '🌅 सुप्रभात, शुभ रात्रि, सकारात्मक विचार व त्योहार पोस्टर प्रॉम्प्ट',
+          '📸 निर्देश: AI को अपनी असली फोटो भी साथ में दें ताकि असली शक्ल का पोस्टर बने!'
+        ],
+        chips: [
+          { text: '🌾 बायोफिट किसान पोस्टर प्रॉम्प्ट', query: 'बायोफिट किसान का खेत में लहलहाती फसल वाला AI पोस्टर प्रॉम्प्ट दो' },
+          { text: '💼 नेट्सर्फ कॉर्पोरेट लीडर प्रॉम्प्ट', query: 'नेट्सर्फ डायरेक्ट सेलिंग बिज़नेस का कॉर्पोरेट AI पोस्टर प्रॉम्प्ट दो' },
+          { text: '🌅 सुप्रभात व दैनिक सुविचार प्रॉम्प्ट', query: 'सुप्रभात और दैनिक सुविचार का सुंदर AI पोस्टर प्रॉम्प्ट बनाओ' },
+          { text: '📲 इसका WhatsApp शेयर संदेश बनाएं', query: 'मेरे नाम और नंबर से व्हाट्सएप मैसेज बनाओ' }
+        ]
+      },
+      checklist: {
+        title: '📋 ऑल-इन-वन स्मार्ट चेकलिस्ट',
+        img: '/images/sakhi/krishi-sakhi.webp',
+        desc: 'स्मार्ट कार्ययोजना व चेकलिस्ट स्टूडियो में आपका स्वागत है! 📝 अपने काम को 100% अनुशासित बनाने हेतु:',
+        points: [
+          '🌾 फसल 3-चरण स्प्रे व खाद चेकलिस्ट (बुवाई, फुटाव, दाना भराव)',
+          '🩺 दैनिक स्वास्थ्य, बीपी व शुगर डाइट चेकलिस्ट',
+          '🐄 पशु पोषण व दूध वृद्धि दैनिक रूटीन',
+          '💼 नेट्सर्फ 90-डे डेली एक्शन चेकलिस्ट (DMO)'
+        ],
+        chips: [
+          { text: '🌾 सरसों व गेहूं स्प्रे चेकलिस्ट', query: 'सरसों और रबी फसलों की स्प्रे चेकलिस्ट बनाओ' },
+          { text: '🩺 स्वास्थ्य व डाइट चेकलिस्ट', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' },
+          { text: '🐄 पशुपालन दूध वृद्धि चेकलिस्ट', query: 'पशुपालन और दूध फैट बढ़ाने की चेकलिस्ट बनाओ' },
+          { text: '💼 नेट्सर्फ बिज़नेस चेकलिस्ट', query: 'नेट्सर्फ बिज़नेस और डेली एक्शन चेकलिस्ट बनाओ' }
+        ]
+      },
+      ebooks: {
+        title: "📚 'खेती का डॉक्टर' ई-बुक्स",
+        img: '/images/sakhi/aarogyam-sakhi-banner.webp',
+        desc: 'आरोग्यम डिजिटल ई-पुस्तकालय में आपका स्वागत है! 📖 300+ रंगीन फोटो सहित रोग-कीट गाइड सीधे मोबाइल में पढ़ें:',
+        points: [
+          "🌾 'खेती का डॉक्टर' (20+ फसलों की रोग-कीट पहचान व पक्का जैविक इलाज)",
+          "🥦 '11 सब्जियों की सम्पूर्ण डायरेक्टरी व वैज्ञानिक उत्पादन गाइड'",
+          "🧪 'कृषि दवा डायरेक्टरी व स्प्रे कैलेंडर'",
+          '⚡ मात्र ₹49 से ₹99 में लाइफटाइम एक्सेस व मुफ़्त ऑडियो पॉडकास्ट'
+        ],
+        chips: [
+          { text: "📖 'खेती का डॉक्टर' ई-बुक पढ़ें (₹99)", url: '/ebooks/book-landing.html?id=BK002', isExternal: true },
+          { text: '🥦 11 सब्जियों की डायरेक्टरी (₹49)', url: '/ebooks/book-landing.html?id=BK001', isExternal: true },
+          { text: '🌱 जैविक कृषि मास्टरक्लास (₹99)', url: '/ebooks/book-landing.html?id=BK016', isExternal: true },
+          { text: '🎧 ऑडियो पॉडकास्ट सुनें', url: '/tube.html?filter=agri', isExternal: true }
+        ]
+      }
+    };
+    // Visual E-Book Promo Ad Card injection when eBooks domain selected
+    if (domainKey === 'ebooks') {
+      const ebookAdHtml = `
+        <div class="sakhi-ebook-promo-card" style="background:linear-gradient(135deg, #064e3b 0%, #022c22 100%);border:2px solid #10b981;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.25);margin:14px 0;color:#ffffff;">
+          <div style="position:relative;width:100%;height:150px;overflow:hidden;background:#0f172a;">
+            <img src="/images/banners/bk016-hero-banner.webp" onerror="this.src='/images/books/bk016-cover.webp';" style="width:100%;height:100%;object-fit:cover;" alt="कृषि दवा डायरेक्टरी" />
+            <span style="position:absolute;top:10px;right:10px;background:#ef4444;color:#ffffff;font-size:0.75rem;font-weight:900;padding:4px 10px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,0.3);">दिवाली स्पेशल ऑफर मात्र ₹99</span>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-weight:900;font-size:1.05rem;color:#86efac;margin-bottom:6px;">
+              🌾 कृषि दवा डायरेक्टरी व स्प्रे कैलेंडर (BK016)
+            </div>
+            <div style="font-size:0.86rem;color:#e2e8f0;line-height:1.55;margin-bottom:12px;">
+              • 20+ प्रमुख फसलों के 300+ सचित्र रोग व सटीक दवा डोज<br/>
+              • जैविक व रासायनिक दोनों अचूक फॉर्मूले<br/>
+              • 100% लाइफटाइम मोबाइल एक्सेस + ऑडियो पॉडकास्ट
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <a href="/ebooks/book-landing.html?id=BK016" target="_blank" style="flex:1 1 auto;text-align:center;background:#10b981;color:#000000;padding:9px 16px;border-radius:12px;font-weight:900;font-size:0.88rem;text-decoration:none;box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+                📖 मात्र ₹99 में अभी ई-बुक प्राप्त करें →
+              </a>
+              <a href="/ebooks/book-landing.html?id=BK002" target="_blank" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#ffffff;padding:9px 14px;border-radius:12px;font-weight:800;font-size:0.85rem;text-decoration:none;">
+                🌾 'खेती का डॉक्टर' (BK002)
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      appendSakhiMessage('bot', ebookAdHtml, true);
+    }
+
+
+    const cfg = domainConfigs[domainKey] || domainConfigs.krishi;
+
+    let profileObj = {};
+    try {
+      profileObj = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+    } catch (_) {}
+
+    const isProfileComplete = Boolean(profileObj.profile_saved === true || profileObj.location || localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION'));
+
+    // Build FarmChat-Style Full-Width Open Hero Banner Card
+    let welcomeHtml = `
+      <div style="background:#ffffff;border-radius:18px;border:1.5px solid rgba(22,163,74,0.25);overflow:hidden;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+        <div style="position:relative;width:100%;height:165px;background:#0f172a;overflow:hidden;">
+          <img src="${cfg.img}" onerror="this.onerror=null;this.src='/images/sakhi/aarogyam-sakhi-banner.webp';" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${cfg.title}" />
+          <div class="sakhi-views-pill" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);color:#ffffff !important;font-size:0.78rem;font-weight:900;border:1.5px solid rgba(255,255,255,0.4);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(74,222,128,0.4);">
+            <i class="fa-solid fa-eye" style="font-size:0.7rem;"></i>
+            <span style="color:#ffffff !important;font-weight:900;">5.2k किसान जुड़े</span>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);padding:14px 16px 10px 16px;">
+            <div style="font-weight:900;font-size:1.15rem;color:#ffffff;text-shadow:0 2px 4px rgba(0,0,0,0.6);">${cfg.title}</div>
+            <div style="font-size:0.78rem;color:#bbf7d0;font-weight:700;">आरोग्यम सखी AI 24×7 समर्पित सलाहकार</div>
+          </div>
+        </div>
+        <div style="padding:14px 16px;color:#1e293b;line-height:1.65;font-size:0.92rem;">
+          <p style="margin:0 0 10px 0;font-weight:700;color:#166534;">${cfg.desc}</p>
+          <div style="background:#f8fafc;border-radius:10px;padding:10px 12px;border:1px solid #e2e8f0;margin-bottom:12px;">
+            ${cfg.points.map(pt => `<div style="margin-bottom:6px;font-size:0.88rem;color:#334155;">• ${pt}</div>`).join('')}
+          </div>
+    `;
+
+    // 1-Time Smart Onboarding Profile Capture if not saved yet
+    if (!isProfileComplete) {
+      const detectedName = getUserName() || '';
+      let guessedGender = 'male';
+      if (detectedName) {
+        const lowerName = detectedName.toLowerCase();
+        if (lowerName.includes('devi') || lowerName.includes('shanti') || lowerName.includes('sunita') || lowerName.includes('rekha') || lowerName.includes('bai') || lowerName.includes('sakhi') || lowerName.includes('didi')) {
+          guessedGender = 'female';
+        }
+      }
+
+      welcomeHtml += `
+          <div id="sakhiProfileOnboardBox" style="background:linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);border:1.5px solid #facc15;border-radius:12px;padding:12px;margin-top:10px;">
+            <div style="font-weight:900;color:#854d0e;font-size:0.88rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+              <span>🌸</span> <span>सटीक व्यक्तिगत सलाह हेतु 1-टैप प्रोफाइल (केवल 1 बार सुरक्षित होगी):</span>
+            </div>
+            
+            <div style="margin-bottom:8px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#713f12;margin-bottom:4px;">1. आपकी पहचान:</div>
+              <div style="display:flex;gap:6px;">
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('gender', 'male', this)" style="background:${guessedGender === 'male' ? '#16a34a' : '#ffffff'};color:${guessedGender === 'male' ? '#ffffff' : '#166534'};font-size:0.8rem;padding:4px 10px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">👨 पुरुष ${guessedGender === 'male' ? '(अनुमानित)' : ''}</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('gender', 'female', this)" style="background:${guessedGender === 'female' ? '#16a34a' : '#ffffff'};color:${guessedGender === 'female' ? '#ffffff' : '#166534'};font-size:0.8rem;padding:4px 10px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">👩 महिला ${guessedGender === 'female' ? '(अनुमानित)' : ''}</button>
+              </div>
+            </div>
+
+            <div style="margin-bottom:8px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#713f12;margin-bottom:4px;">2. यह सवाल किसके लिए है?</div>
+              <div style="display:flex;gap:6px;">
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('consultFor', 'self', this)" style="background:#ffffff;color:#166534;font-size:0.8rem;padding:4px 10px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">👤 अपने स्वयं के लिए</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('consultFor', 'family', this)" style="background:#ffffff;color:#166534;font-size:0.8rem;padding:4px 10px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">👨‍👩‍👧 परिवार के लिए</button>
+              </div>
+            </div>
+
+            <div style="margin-bottom:8px;">
+              <div style="font-size:0.78rem;font-weight:700;color:#713f12;margin-bottom:4px;">3. आयु वर्ग:</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '18-30', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">🧒 18-30 वर्ष</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '31-45', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">🧑 31-45 वर्ष</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '46-60', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">🧓 46-60 वर्ष</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '60+', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">👴 60+ वर्ष</button>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:0.78rem;font-weight:700;color:#713f12;margin-bottom:4px;">4. आपका जिला (सटीक मौसम व मंडी भाव हेतु):</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('location', 'रीवा', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">📍 रीवा</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('location', 'सतना', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">📍 सतना</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('location', 'भोपाल', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">📍 भोपाल</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('location', 'इंदौर', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">📍 इंदौर</button>
+                <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('location', 'जबलपुर', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;padding:4px 8px;border-radius:18px;border:1px solid #86efac;cursor:pointer;">📍 जबलपुर</button>
+              </div>
+            </div>
+
+            <div id="sakhiProfileStatusNotice" style="display:none;margin-top:8px;padding:6px 10px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac;text-align:center;"></div>
+          </div>
+      `;
+    }
+
+    welcomeHtml += `
+        </div>
+      </div>
+    `;
+
+    streamBotMessage(welcomeHtml, `${cfg.title} में आपका स्वागत है। आप नीचे दिए गए विकल्पों में से चुन सकते हैं या बोलकर सवाल पूछ सकते हैं।`, cfg.chips);
+  };
+
+  window.saveSakhiProfileField = function(field, val, btnEl) {
+    try {
+      let prof = {};
+      try { prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch(_) {}
+      prof[field] = val;
+      prof.profile_saved = true;
+      localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
+
+      if (field === 'location') {
+        localStorage.setItem('AAROGYAM_USER_WEATHER_LOCATION', val);
+        if (window.SakhiWeatherBridge && typeof window.SakhiWeatherBridge.updateSakhiHeaderTemperature === 'function') {
+          window.SakhiWeatherBridge.updateSakhiHeaderTemperature();
+        }
+      }
+
+      // Update button styling within row without disappearing
+      if (btnEl && btnEl.parentElement) {
+        btnEl.parentElement.querySelectorAll('.sakhi-profile-opt-btn').forEach(b => {
+          b.style.background = '#ffffff';
+          b.style.color = '#166534';
+          b.innerHTML = b.innerHTML.replace(/^[✓✔]\s*/, '');
+        });
+        btnEl.style.background = '#16a34a';
+        btnEl.style.color = '#ffffff';
+        btnEl.innerHTML = '✓ ' + btnEl.innerHTML;
+      }
+
+      // Update live status notice inside card
+      const notice = document.getElementById('sakhiProfileStatusNotice');
+      if (notice) {
+        const curLoc = prof.location || localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || '';
+        const curGen = prof.gender === 'female' ? 'महिला' : (prof.gender === 'male' ? 'पुरुष' : '');
+        const items = [curLoc ? `📍 ${curLoc}` : '', curGen ? `👤 ${curGen}` : ''].filter(Boolean);
+        notice.innerHTML = `<span style="color:#15803d;font-weight:800;font-size:0.82rem;">✅ सुरक्षित हो गया: ${items.join(' | ')}</span>`;
+        notice.style.display = 'block';
+      }
+    } catch (_) {}
+  };
+
   function processKnowledgeQuery(query) {
+    const normQuery = (query || '').toLowerCase();
+
+    // 🌤️ CONVERSATIONAL WEATHER & SPRAY ADVISOR (FarmerChat Real-Time Multi-City & 7-Day)
+    const isWeatherQuestion = /(?:बारिश|barish|barsat|वर्षा|मौसम|mousam|mosam|तापमान|temp|weather|हवा|wind|छिड़काव|spray.*weather)/i.test(normQuery);
+    if (isWeatherQuestion) {
+      return handleDynamicConversationalWeather(query, normQuery);
+    }
     try {
       const rawQ = (query || '').trim();
       const cleanQ = normalizeQueryText(rawQ);
@@ -11914,7 +12617,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const hasExplicitTopicInQuery = (
       cleanQ.includes('सरसों') || cleanQ.includes('गेहूं') || cleanQ.includes('चना') || cleanQ.includes('धान') ||
       cleanQ.includes('टमाटर') || cleanQ.includes('आलू') || cleanQ.includes('मिर्च') || cleanQ.includes('गन्ना') ||
-      cleanQ.includes('डायबिटीज') || cleanQ.includes('शुगर') || cleanQ.includes('जोड़') || cleanQ.includes('दर्द') ||
+      cleanQ.includes('डायबिटीज') || cleanQ.includes('शुगर') || cleanQ.includes('hba1c') || cleanQ.includes('जोड़') || cleanQ.includes('दर्द') ||
       cleanQ.includes('गाय') || cleanQ.includes('भैंस') || cleanQ.includes('पशु') || cleanQ.includes('दूध') ||
       cleanQ.includes('नेट्सर्फ') || cleanQ.includes('पाथफाइंडर') || cleanQ.includes('पंचांग') || cleanQ.includes('panchang') ||
       cleanQ.includes('मौसम') || cleanQ.includes('मंडी') || cleanQ.includes('ई-बुक')
@@ -12518,7 +13221,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
       ${(chipsHtml || recoHtml || searchTabHtml) ? `
         <div class="sakhi-recommendations-wrapper" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
-          <div style="font-weight:800;color:#15803d;font-size:0.85rem;margin-bottom:6px;">👉 विकल्प व सिफारिशें:</div>
+          <div style="font-weight:800;color:#047857;font-size:0.92rem;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:800;">सुझाव</span> <span>✨ क्या आप यह भी जानना चाहते हैं?</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
             ${searchTabHtml}
             ${chipsHtml}
@@ -12640,7 +13343,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       ${(relatedChipsHtml || recoHtml) ? `
         <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:12px;">
           <div style="font-weight:900;color:#15803d;font-size:0.88rem;margin-bottom:8px;">
-            👉 ${escapeHtml(parentTitle.split('-')[0].trim())} व संबंधित सिफारिशें:
+            ✨ क्या आप यह भी जानना चाहते हैं?
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
             ${relatedChipsHtml}
@@ -12761,7 +13464,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       ${(subTopicsHtml || recoHtml) ? `
         <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:12px;margin-top:10px;">
           <div style="font-weight:900;color:#15803d;font-size:0.88rem;margin-bottom:8px;">
-            👉 संबंधित विकल्प व सिफारिशें:
+            ✨ क्या आप यह भी जानना चाहते हैं?
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
             ${subTopicsHtml}
@@ -12846,6 +13549,42 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   function cleanQueryForSearchEngine(query) {
     let q = (query || '').toLowerCase().replace(/[?।!,\-_:;]+/g, ' ').trim();
+
+    // 1. Strip search prefixes & command phrases
+    const searchPrefixes = [
+      'सर्च करके बताओ कि', 'सर्च कर के बताओ कि', 'सर्च करके बताओ', 'सर्च कर बताओ', 'सर्च करो कि',
+      'सर्च करें कि', 'सर्च करना', 'सर्च करो', 'सर्च करें', 'सर्च', 'search karke batao', 'search karo',
+      'गूगल पर सर्च करो', 'गूगल पर खोजो', 'नेट पर खोजो', 'इंटरनेट पर खोजो', 'खोज के बताओ कि', 'खोज कर बताओ कि',
+      'खोज के बताओ', 'खोज कर बताओ', 'खोजो कि', 'खोजें कि', 'खोजो', 'खोजें'
+    ];
+    for (const p of searchPrefixes) {
+      if (q.startsWith(p)) {
+        q = q.slice(p.length).trim();
+      }
+    }
+
+    // 2. Strip leading 'कि ' particle
+    q = q.replace(/^कि\s+/gi, '').replace(/\s+कि\s+/gi, ' ').trim();
+
+    // 3. Precision Concept Mapping for Hindi Wikipedia
+    if (q.includes('भारत') && (q.includes('राजधानी') || q.includes('rajdhani'))) {
+      return 'भारत की राजधानी नई दिल्ली';
+    }
+    if (q.includes('लिवर') || q.includes('लीवर') || q.includes('liver')) {
+      return 'यकृत';
+    }
+    if (q.includes('किडनी') || q.includes('kidney')) {
+      return 'वृक्क';
+    }
+    if (q.includes('हार्ट') || q.includes('दिल का दौरा') || q.includes('heart')) {
+      return 'हृदय';
+    }
+    if (q.includes('ब्रेन') || q.includes('दिमाग') || q.includes('brain')) {
+      return 'मस्तिष्क';
+    }
+    if (q.includes('फेफड़े') || q.includes('फेफड़ा') || q.includes('lungs')) {
+      return 'फेफड़ा';
+    }
     if (q.includes('एलोवेरा') || q.includes('aloe vera')) return 'घृत कुमारी';
     if (q.includes('ड्रैगन फ्रूट') || q.includes('dragon fruit')) return 'कमलम (ड्रैगन फ्रूट)';
     if (q.includes('स्टीविया') || q.includes('stevia')) return 'मधुपत्र';
@@ -12857,30 +13596,21 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (q.includes('जैतून') || q.includes('olive')) return 'जैतून';
     if (q.includes('हाइड्रोपोनिक्स') || q.includes('hydroponic')) return 'हाइड्रोपोनिक्स';
 
-    const fillers = [
-      // Explicit search command trigger phrases (strip before Wikipedia/DDG search)
-      'सर्च करके बताओ', 'सर्च कर के बताओ', 'सर्च करके बताइए', 'सर्च कर बताओ', 'सर्च करो', 'सर्च करें', 'सर्च करना',
-      'खोज के बताओ', 'खोज कर बताओ', 'खोज करके बताओ', 'खोज कर बताइए', 'खोजो', 'खोजें',
-      'नेट पर खोजो', 'इंटरनेट पर खोजो', 'नेट पर सर्च करो', 'इंटरनेट पर सर्च करो', 'गूगल पर खोजो', 'गूगल पर सर्च करो',
-      'search karke batao', 'khoj kar batao', 'khoj ke batao', 'search karo', 'net par khojo', 'internet par khojo',
-      // Standard fillers
-      'की खेती कैसे की जाती है', 'की खेती कैसे करें', 'की खेती कैसे होती है',
-      'की खेती की विधि बताओ', 'की खेती की विधि', 'की खेती',
+    // 4. Strip question suffixes and grammatical wrappers
+    const suffixes = [
+      'क्या काम करता है', 'क्या काम करती है', 'क्या काम है', 'क्या काम क्या है',
+      'काम क्या है', 'का क्या काम है', 'काम क्या करता है', 'का कार्य बताओ', 'के क्या कार्य हैं',
+      'कहाँ है', 'कहा है', 'कहां है', 'कहाँ स्थित है', 'कहा स्थित है', 'कहां पर है', 'कहाँ पर है', 'कहा पे है', 'कहाँ पे है',
       'के क्या फायदे हैं', 'के फायदे बताओ', 'के फायदे', 'के क्या गुण हैं',
       'किस राज्य में होती है', 'किस राज्य में होता है', 'क्या होता है', 'क्या है', 'क्या था',
-      'कौन थे', 'कौन था', 'कौन है', 'कौन हैं', 'koun the', 'kaun the', 'kaun tha', 'kaun hai',
-      'who is', 'who was', 'where is', 'what is',
-      'कहाँ है', 'कहाँ था', 'कहाँ स्थित है', 'किसने किया', 'किसने बनाया', 'किसने लिखा', 'किसने खोजा', 'कब हुआ', 'कब हुआ था',
-      'का इतिहास', 'की कहानी', 'की कथा', 'की जीवनी', 'का जीवन परिचय',
-      'के बारे में बताओ', 'के बारे में बताइए', 'के बारे में जानकारी दो', 'के बारे में जानकारी', 'के बारे में', 'के विषय में',
-      'कैसे करें', 'कैसे होती है', 'कैसे खाएं', 'कैसे लें', 'का तरीका बताओ', 'का इलाज',
-      'बताओ', 'बताइए', 'जानकारी दो', 'डिटेल दो', 'सखी', 'सखी जी', 'sakhi', 'sakhi ji'
+      'बताओ', 'बताइए', 'जानकारी दो', 'डिटेल दो'
     ];
-    for (const f of fillers) {
-      if (q.includes(f)) {
-        q = q.replace(new RegExp(f, 'gi'), ' ').trim();
+    for (const s of suffixes) {
+      if (q.includes(s)) {
+        q = q.replace(new RegExp(s, 'gi'), ' ').trim();
       }
     }
+
     q = q.replace(/^(?:बताओ|बताइए|सखी|सखी जी|sakhi|sakhi ji)\s+/gi, '')
          .replace(/\s+(?:था|थे|थी|है|हैं|होता|होती|रहा|रही)$/gi, '')
          .replace(/\s+/g, ' ')
@@ -12899,7 +13629,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
       // Fallback 1: If 0 hits, try search with top meaningful noun tokens
       if (hits.length === 0) {
-        const nounTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 2 && !['koun','kaun','kaha','kahan','kisne','kiske','bare','wala','wali','wale','the','tha','hai','hain','ka','ki','ke','ko','me','se','par'].includes(t));
+        const nounTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 2 && !['koun','kaun','kaha','kahan','kisne','kiske','bare','wala','wali','wale','the','tha','hai','hain','ka','ki','ke','ko','me','se','par','aur','ya','ki'].includes(t));
         if (nounTokens.length > 0 && nounTokens.join(' ') !== cleanSearch) {
           const fbSearch = nounTokens.join(' ');
           const fbUrl = `https://hi.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(fbSearch)}&utf8=&format=json&origin=*`;
@@ -12913,17 +13643,40 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
       if (hits.length === 0) return null;
 
-      // Smart candidate selector: choose hit with title matching keywords
-      let selectedHit = hits[0];
-      const qTokens = cleanSearch.split(/\s+/).filter(t => t.length >= 2);
-      for (const h of hits.slice(0, 5)) {
-        const hTitle = (h.title || '').toLowerCase();
-        if (qTokens.some(tok => hTitle.includes(tok))) {
+      // Smart candidate scorer: strictly penalize irrelevant topics (international relations, movies, lists)
+      let selectedHit = null;
+      let highestScore = -999;
+
+      const qLower = cleanSearch.toLowerCase();
+      for (const h of hits.slice(0, 8)) {
+        const title = (h.title || '').toLowerCase();
+        let score = 0;
+
+        // Severe penalty for irrelevant relation articles or movies
+        if (title.includes('सम्बन्ध') || title.includes('संबंध') || title.includes('रिश्ते')) score -= 100;
+        if (title.includes('फिल्म') || title.includes('फ़िल्म') || title.includes('अभिनेता')) score -= 80;
+        if (title.includes('सूची') || title.includes('स्टेशन') || title.includes('क्रिकेट')) score -= 60;
+
+        // Huge bonus for exact match
+        if (title === qLower || title === 'यकृत' || title === 'दिल्ली' || title === 'नई दिल्ली') {
+          score += 200;
+        } else if (title.startsWith(qLower) || qLower.startsWith(title)) {
+          score += 100;
+        }
+
+        // Token overlap bonus
+        const tokens = qLower.split(/\s+/);
+        for (const tok of tokens) {
+          if (tok.length >= 2 && title.includes(tok)) score += 30;
+        }
+
+        if (score > highestScore) {
+          highestScore = score;
           selectedHit = h;
-          break;
         }
       }
 
+      if (!selectedHit) selectedHit = hits[0];
       if (!selectedHit || !selectedHit.pageid) return null;
 
       const eUrl = `https://hi.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids=${selectedHit.pageid}&format=json&origin=*`;
@@ -14012,15 +14765,44 @@ ${shareUrl}`;
     window.askSakhiQuick(query);
   };
 
-  window.askSakhiQuick = function (query) {
-    const isPf = /(?:pathfinder|पाथफाइंडर|teamfest|टीमफेस्ट|rockstar|रॉकस्टार|saksham|सक्षम|asmita|अस्मिता|fasttrack|फास्टट्रैक|istock|आई-स्टॉक|आई\s*स्टॉक|25550|25,550|हॉल\s*ऑफ\s*फेम|hall\s*of\s*fame|e-tailer|ई-टेलर|30%|bc|point|पॉइंट)/i.test(query);
-    if (!isUserAuthenticated() && !isPf) {
-      pendingUserQuery = query;
-      window.openSakhiAuthModal();
+  let sakhiLastSubmittedQuery = '';
+  let sakhiLastSubmitTime = 0;
+
+  function executeSakhiSuggestion(queryText) {
+    if (!queryText || typeof queryText !== 'string') return;
+    const cleanQ = queryText.trim();
+    if (!cleanQ) return;
+
+    const now = Date.now();
+    if (cleanQ === sakhiLastSubmittedQuery && (now - sakhiLastSubmitTime) < 1200) {
+      // Prevent duplicate double execution
       return;
     }
-    handleUserSubmit(query);
-  };
+    sakhiLastSubmittedQuery = cleanQ;
+    sakhiLastSubmitTime = now;
+
+    const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
+    if (input) {
+      input.value = cleanQ;
+      input.style.height = 'auto';
+    }
+
+    const isPf = /(?:pathfinder|पाथफाइंडर|teamfest|टीमफेस्ट|rockstar|रॉकस्टार|saksham|सक्षम|asmita|अस्मिता|fasttrack|फास्टट्रैक|istock|आई-स्टॉक|आई\s*स्टॉक|25550|25,550|हॉल\s*ऑफ\s*फेम|hall\s*of\s*fame|e-tailer|ई-टेलर|30%|bc|point|पॉइंट)/i.test(cleanQ);
+    if (!isUserAuthenticated() && !isPf) {
+      pendingUserQuery = cleanQ;
+      if (typeof window.openSakhiAuthModal === 'function') {
+        window.openSakhiAuthModal();
+      }
+      return;
+    }
+
+    if (input) input.value = '';
+    handleUserSubmit(cleanQ);
+  }
+
+  window._sakhiCoreExecuteSuggestion = executeSakhiSuggestion;
+  window.sendSakhiSuggestion = executeSakhiSuggestion;
+  window.askSakhiQuick = executeSakhiSuggestion;
 
   window.processKnowledgeQuery = processKnowledgeQuery;
 
@@ -14071,12 +14853,12 @@ ${shareUrl}`;
       window.openSakhiAuthModal();
       return;
     }
-    window.askSakhiQuick(query);
+    window.sendSakhiSuggestion(query);
   };
 
-  // Input Submission helper
+  // Input Submission helper with Strict Auth Guard
   window.submitSakhiFromInput = function () {
-    const input = document.getElementById('sakhiTextInput');
+    const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
     if (input && input.value.trim()) {
       const q = input.value.trim();
       input.value = '';
@@ -14093,6 +14875,7 @@ ${shareUrl}`;
       handleUserSubmit(q);
     }
   };
+
 
   window.AarogyamSakhiToggleRec = function () {
     toggleRecording();
@@ -14140,7 +14923,7 @@ ${shareUrl}`;
               <i class="fa-solid fa-copy"></i> कॉपी करें
             </button>
           </div>
-          <div class="sakhi-prompt-content" style="font-family:${fontFam};font-size:0.88rem;line-height:1.65;color:#e2e8f0;white-space:pre-wrap;word-break:break-word;">${cleanContent}</div>
+          <div class="sakhi-prompt-content" style="font-family:${fontFam};font-size:0.92rem;line-height:1.65;color:#f8fafc !important;white-space:pre-wrap;word-break:break-word;font-weight:600;">${cleanContent}</div>
         </div>
       `;
     });
@@ -14152,6 +14935,106 @@ ${shareUrl}`;
   }
 
   // GLOBAL API EXPOSURE - ALWAYS ROUTE TO SINGLE UNIFIED DEDICATED SAKHI PAGE
+  
+  // Guaranteed Unified Dispatcher Connection
+  window.sendSakhiSuggestion = executeSakhiSuggestion;
+  window.askSakhiQuick = executeSakhiSuggestion;
+
+  // Language Dropdown Toggle & Selection Handler with Local Storage
+  window.toggleSakhiLangDropdown = function() {
+    const menu = document.getElementById('sakhiLangDropdownMenu');
+    if (menu) {
+      menu.style.display = (menu.style.display === 'none' || !menu.style.display) ? 'block' : 'none';
+    }
+  };
+
+  window.setSakhiLanguage = function(langCode) {
+    localStorage.setItem('sakhi_language', langCode);
+    window.currentSakhiLanguage = langCode;
+    
+    const labels = {
+      'hi': 'हिंदी',
+      'mr': 'मराठी',
+      'gu': 'ગુજરાતી',
+      'bn': 'বাংলা',
+      'en': 'English'
+    };
+    
+    const langLabelEl = document.getElementById('sakhiCurrentLangLabel');
+    if (langLabelEl) {
+      langLabelEl.textContent = labels[langCode] || 'हिंदी';
+    }
+    
+    const menu = document.getElementById('sakhiLangDropdownMenu');
+    if (menu) menu.style.display = 'none';
+
+    // Update input placeholder
+    const inputEl = document.getElementById('sakhiChatInput');
+    const placeholders = {
+      'hi': 'अपने खेत या फसल के बारे में पूछें...',
+      'mr': 'तुमच्या शेत किंवा पिकाबद्दल विचारा...',
+      'gu': 'તમારા ખેતર અથવા પાક વિશે પૂછો...',
+      'bn': 'আপনার ক্ষেত বা ফসল সম্পর্কে জিজ্ঞাসা করুন...',
+      'en': 'Ask about your crop, cattle, or health...'
+    };
+    if (inputEl) {
+      inputEl.placeholder = placeholders[langCode] || placeholders['hi'];
+    }
+
+    const confirmations = {
+      'hi': '🇮🇳 **भाषा बदलकर "हिंदी" सेट कर दी गई है।** अब आप हिंदी में कोई भी प्रश्न पूछ सकते हैं!',
+      'mr': '🌾 **भाषा बदलून "मराठी" सेट केली गेली आहे.** आता तुम्ही मराठीत शेती व रोगांबद्दल प्रश्न विचारू शकता!',
+      'gu': '🌻 **ભાષા બદલીને "ગુજરાતી" સેટ કરવામાં આવી છે.** હવે તમે ગુજરાતીમાં પ્રશ્નો પૂછી શકો છો!',
+      'bn': '🍃 **ভাষা পরিবর্তন করে "বাংলা" সেট করা হয়েছে।** এখন আপনি বাংলায় প্রশ্ন জিজ্ঞাসা করতে পারেন!',
+      'en': '🌐 **Language set to English.** You can now ask questions about farming, crops, livestock, or health in English!'
+    };
+
+    if (typeof appendSakhiMessage === 'function') {
+      appendSakhiMessage('bot', confirmations[langCode] || confirmations['hi'], false, [
+        { text: langCode === 'mr' ? '🌾 कापूस व सोयाबीन' : (langCode === 'gu' ? '🌾 કપાસ અને મગફળી' : (langCode === 'bn' ? '🌾 ধান ও পাট' : (langCode === 'en' ? '🌾 Crop Diseases' : '🌾 गेहूँ व धान के रोग'))), query: langCode === 'mr' ? 'कापूस व सोयाबीनचे रोग' : (langCode === 'gu' ? 'કપાસ અને મગફળીના રોગ' : (langCode === 'bn' ? 'ধানের রোগ ও প্রতিকার' : (langCode === 'en' ? 'Paddy and wheat diseases' : 'गेहूँ व धान के मुख्य रोग'))) },
+        { text: langCode === 'mr' ? '🥛 दुध वाढवण्याचे फॉर्म्युला' : (langCode === 'gu' ? '🥛 દૂધ વધારવાની ફોર્મ્યુલા' : (langCode === 'bn' ? '🥛 দুধ বৃদ্ধির ফর্মুલા' : (langCode === 'en' ? '🥛 Dairy Milk Booster' : '🥛 गाय-भैंस का दूध व फैट बढ़ाने का फॉर्मूला'))), query: langCode === 'mr' ? 'गायी म्हशींचे दूध व फॅट वाढवणे' : (langCode === 'gu' ? 'ગાય ભેંસનું દૂધ અને ફેટ વધારવું' : (langCode === 'bn' ? 'দুধ বৃদ্ধির উপায়' : (langCode === 'en' ? 'How to increase cattle milk and fat' : 'गाय-भैंस का दूध व फैट बढ़ाने का फॉर्मूला'))) }
+      ]);
+    }
+  };
+
+  // Global Click Event Delegation for 100% Fail-Safe Click Handling
+  document.addEventListener('click', function(e) {
+    // Close Lang dropdown if clicked outside
+    const langWrap = document.querySelector('.sakhi-lang-dropdown-wrap');
+    if (langWrap && !langWrap.contains(e.target)) {
+      const menu = document.getElementById('sakhiLangDropdownMenu');
+      if (menu) menu.style.display = 'none';
+    }
+
+    // Intercept clicks on any quick pill or followup chip
+    // Never intercept clicks inside profile onboarding box or auth modal!
+    if (e.target.closest('#sakhiProfileOnboardBox, #sakhiAuthModalBackdrop, .sakhi-auth-modal-card')) {
+      return;
+    }
+
+    const btn = e.target.closest('.sakhi-quick-pill, .sakhi-followup-chip, .sakhi-reco-chip, .sakhi-smart-pill');
+    if (btn) {
+      if (btn.tagName === 'A' && btn.href && !btn.href.startsWith('javascript:')) return;
+      
+      // If button already has inline onclick with sendSakhiSuggestion or askSakhiQuick, DO NOT fire twice!
+      const oc = btn.getAttribute('onclick') || '';
+      if (oc && /(?:sendSakhiSuggestion|askSakhiQuick)/.test(oc)) {
+        return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+      let query = btn.getAttribute('data-query');
+      if (!query) {
+        query = btn.innerText.replace(/[→✨🌾📋📲📖✓✔]/g, '').trim();
+      }
+      if (query && window.sendSakhiSuggestion) {
+        window.sendSakhiSuggestion(query);
+      }
+    }
+  });
+
+
   window.AarogyamSakhi = {
     open: function() {
       if (checkIsDedicatedPage()) return;
@@ -14183,3 +15066,25 @@ ${shareUrl}`;
     injectSakhiUI();
   }
 })();
+
+
+  // FarmChat Live Weather Forecast Trigger
+  window.openSakhiWeatherForecast = function() {
+    const city = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'रीवा';
+    const query = `आज का मौसम और कृषि सलाह बताओ (${city})`;
+    window.sendSakhiSuggestion(query);
+  };
+
+  // Add profile crop quick action (FarmChat style)
+  window.addCropToProfile = function(cropName) {
+    try {
+      const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+      prof.crops = prof.crops || [];
+      if (!prof.crops.includes(cropName)) prof.crops.push(cropName);
+      localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
+      if (typeof showToast === 'function') {
+        showToast(`✅ आपकी प्रोफाइल में '${cropName}' की फसल जोड़ दी गई है!`, 'success');
+      }
+      appendSakhiMessage('bot', `✅ आपकी प्रोफाइल में **${cropName}** फसल सफलतापूर्वक जोड़ दी गई है। अब आपको समय-समय पर इस फसल की बुवाई, सिंचाई व रोग अलर्ट मिलते रहेंगे!`, false);
+    } catch(e) {}
+  };

@@ -9,7 +9,8 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v2.0';
+const STATIC_CACHE = 'aarogyam-public-static-v2.1-live';
+const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v2.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v2.0';
 const OFFLINE_URL = '/offline.html';
@@ -51,8 +52,7 @@ const PRECACHE_SHELL = [
   '/js/book-marketing-card.js',
   '/js/recent-purchase-toast.js',
   '/js/universal-book-landing.js',
-  '/data/books.json',
-  '/data/universal-book-landing-pages.json',
+  // Dynamic data catalogs excluded from static lock
   '/images/logo/logo.png',
   '/images/logo/favicon.png',
   '/images/logo/fevicon.png',

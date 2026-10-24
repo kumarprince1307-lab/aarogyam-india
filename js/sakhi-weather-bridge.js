@@ -14,6 +14,11 @@
     rewa: { name: "रीवा (मध्य प्रदेश)", temp: 28, rainProb: 15, windSpeed: 10, humidity: 60, condition: "साफ आसमान" },
     indore: { name: "इंदौर (मध्य प्रदेश)", temp: 30, rainProb: 10, windSpeed: 12, humidity: 55, condition: "धूप खिली है" },
     bhopal: { name: "भोपाल (मध्य प्रदेश)", temp: 29, rainProb: 20, windSpeed: 11, humidity: 58, condition: "हल्के बादल" },
+    satna: { name: "सतना (मध्य प्रदेश)", temp: 29, rainProb: 12, windSpeed: 10, humidity: 58, condition: "साफ मौसम" },
+    jabalpur: { name: "जबलपुर (मध्य प्रदेश)", temp: 29, rainProb: 15, windSpeed: 11, humidity: 62, condition: "साफ आसमान" },
+    ujjain: { name: "उज्जैन (मध्य प्रदेश)", temp: 31, rainProb: 10, windSpeed: 12, humidity: 52, condition: "धूप" },
+    gwalior: { name: "ग्वालियर (मध्य प्रदेश)", temp: 31, rainProb: 10, windSpeed: 13, humidity: 50, condition: "साफ मौसम" },
+    sagar: { name: "सागर (मध्य प्रदेश)", temp: 29, rainProb: 15, windSpeed: 11, humidity: 57, condition: "हल्के बादल" },
     varanasi: { name: "वाराणसी (उत्तर प्रदेश)", temp: 31, rainProb: 10, windSpeed: 8, humidity: 62, condition: "साफ मौसम" },
     lucknow: { name: "लखनऊ (उत्तर प्रदेश)", temp: 30, rainProb: 15, windSpeed: 9, humidity: 64, condition: "साफ आसमान" },
     jaipur: { name: "जयपुर (राजस्थान)", temp: 32, rainProb: 5, windSpeed: 14, humidity: 45, condition: "धूप" },
@@ -22,9 +27,12 @@
 
   function getWeatherDataForLocation(locName) {
     let key = (locName || '').toLowerCase().trim();
+    if (!key) return DEFAULT_DISTRICTS.rewa;
     for (const d in DEFAULT_DISTRICTS) {
-      if (key.includes(d) || DEFAULT_DISTRICTS[d].name.toLowerCase().includes(key)) {
-        return DEFAULT_DISTRICTS[d];
+      const dist = DEFAULT_DISTRICTS[d];
+      const cityNameOnly = dist.name.split(' ')[0].toLowerCase();
+      if (key.includes(d) || dist.name.toLowerCase().includes(key) || key.includes(cityNameOnly)) {
+        return dist;
       }
     }
     // Return Rewa default if location not specified
@@ -82,10 +90,39 @@
     };
   }
 
+  function updateSakhiHeaderTemperature() {
+    try {
+      let savedLoc = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION');
+      if (!savedLoc) {
+        try {
+          const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+          if (prof && prof.location) savedLoc = prof.location;
+        } catch(_) {}
+      }
+      if (!savedLoc) savedLoc = 'रीवा';
+      const w = getWeatherDataForLocation(savedLoc);
+      const textEl = document.getElementById('sakhiHdrWeatherText');
+      if (textEl && w) {
+        const shortName = w.name ? w.name.split(' ')[0] : savedLoc;
+        textEl.textContent = `☀️ ${w.temp}°C ${shortName}`;
+      }
+    } catch (_) {}
+  }
+
   window.SakhiWeatherBridge = {
     getWeatherDataForLocation,
-    evaluateSprayDecision
+    evaluateSprayDecision,
+    updateSakhiHeaderTemperature
   };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateSakhiHeaderTemperature);
+    } else {
+      setTimeout(updateSakhiHeaderTemperature, 200);
+    }
+  }
 
   console.log("⛅ Sakhi Weather & Spray Advisory Bridge initialized successfully!");
 })();
+
