@@ -235,38 +235,55 @@
         flex-shrink: 0 !important;
         padding: max(8px, env(safe-area-inset-top, 8px)) 10px 8px 10px !important;
         position: relative !important;
-        z-index: 100 !important;
-        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                    opacity 0.2s ease,
-                    max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                    padding 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        max-height: 64px !important;
-        overflow: hidden !important;
+        z-index: 9999 !important;
+        overflow: visible !important;
       }
-      /* Smart Auto-Collapse Header when chatting or scrolling down on mobile */
-      .sakhi-chat-window.chat-input-focused .sakhi-header,
-      .sakhi-chat-window.header-smart-hidden .sakhi-header {
-        max-height: 0 !important;
-        min-height: 0 !important;
-        height: 0 !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-        margin: 0 !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        border-bottom: none !important;
-        transform: translateY(-100%) !important;
+      .sakhi-header-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        flex-shrink: 0 !important;
+        overflow: visible !important;
+        position: relative !important;
       }
-      .sakhi-chat-window.chat-input-focused .sakhi-legal-note,
-      .sakhi-chat-window.header-smart-hidden .sakhi-legal-note {
-        display: none !important;
-        max-height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
+      .sakhi-chat-dropdown-wrap {
+        position: relative !important;
+        display: inline-block !important;
+        flex-shrink: 0 !important;
+        overflow: visible !important;
       }
-      /* Clean Mobile Header: Hide bulky pills causing clutter */
+      #sakhiChatMenuDropdown {
+        position: absolute !important;
+        top: calc(100% + 6px) !important;
+        right: 0 !important;
+        z-index: 99999999 !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 14px !important;
+        min-width: 175px !important;
+      }
+      /* Compact Dynamic Weather Button on Mobile ("27'c bas") */
       #sakhiHeaderWeatherBtn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 3px !important;
+        padding: 4px 8px !important;
+        font-size: 0.78rem !important;
+        font-weight: 800 !important;
+        border-radius: 16px !important;
+        white-space: nowrap !important;
+        background: rgba(255, 255, 255, 0.18) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important;
+      }
+      #sakhiHeaderWeatherBtn .sakhi-live-weather-dot {
         display: none !important;
+      }
+      #sakhiHdrWeatherText {
+        font-size: 0.78rem !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
       }
       #sakhiHeaderUserBadgeWrap {
         display: none !important;
@@ -451,9 +468,12 @@
             </div>
             <div class="sakhi-header-info" style="min-width:0;flex-shrink:0;">
               <h3 class="sakhi-header-brand" style="margin:0;display:flex;align-items:center;gap:6px;white-space:nowrap;">
-                <span class="sakhi-brand-full" style="font-weight:900;font-size:1.05rem;color:#ffffff !important;text-shadow:0 1px 3px rgba(0,0,0,0.5);">सखी AI</span>
+                <span class="sakhi-brand-full" style="font-weight:900;font-size:1.02rem;color:#ffffff !important;text-shadow:0 1px 3px rgba(0,0,0,0.5);">सखी AI</span>
                 <span class="sakhi-live-dot" title="ऑनलाइन 24×7"></span>
               </h3>
+              <div id="sakhiHeaderUserShortName" style="font-size:0.72rem;color:#bbf7d0;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:115px;line-height:1.1;">
+                👤 किसान साथी
+              </div>
             </div>
           </div>
           <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
@@ -488,24 +508,38 @@
             <button type="button" class="sakhi-share-btn" onclick="window.shareAarogyamSakhi()" title="शेयर करें" aria-label="शेयर करें">
               <i class="fa-solid fa-share-nodes"></i>
             </button>
-            <!-- FarmChat-Style Live Temperature & Weather Pill (Blinking Live Dot) -->
-            
-            <button type="button" class="sakhi-weather-pill-btn" id="sakhiHeaderWeatherBtn" onclick="window.openSakhiWeatherForecast()" title="लाइव मौसम व तापमान देखें" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.35);border-radius:20px;color:#ffffff;font-weight:800;font-size:0.78rem;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
-              <span class="sakhi-live-weather-dot" style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;box-shadow:0 0 8px #4ade80;"></span>
-              <span id="sakhiHdrWeatherText">☀️ 30°C लाइव</span>
+            <!-- Dynamic Real-Time Temperature ("27'c bas") -->
+            <button type="button" class="sakhi-weather-pill-btn" id="sakhiHeaderWeatherBtn" onclick="window.openSakhiWeatherForecast()" title="लाइव मौसम व तापमान देखें" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.35);border-radius:16px;color:#ffffff;font-weight:800;font-size:0.78rem;cursor:pointer;white-space:nowrap;">
+              <span id="sakhiHdrWeatherText">☀️ 27°C</span>
             </button>
             <script>
-              (function() {
+              (async function() {
                 try {
-                  var _loc = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION');
-                  if (!_loc) {
-                    var _p = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
-                    if (_p && _p.location) _loc = _p.location;
+                  var tempEl = document.getElementById('sakhiHdrWeatherText');
+                  if (!tempEl) return;
+                  var t = localStorage.getItem('sakhi_live_temp');
+                  if (t) tempEl.textContent = '☀️ ' + t + '°C';
+                  
+                  var lat = localStorage.getItem('aarogyam_user_lat') || '24.53';
+                  var lon = localStorage.getItem('aarogyam_user_lon') || '81.30';
+                  var res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m');
+                  if (res.ok) {
+                    var data = await res.json();
+                    if (data && data.current && typeof data.current.temperature_2m === 'number') {
+                      var liveTemp = Math.round(data.current.temperature_2m);
+                      localStorage.setItem('sakhi_live_temp', liveTemp);
+                      tempEl.textContent = '☀️ ' + liveTemp + '°C';
+                    }
                   }
-                  if (_loc && document.getElementById('sakhiHdrWeatherText')) {
-                    document.getElementById('sakhiHdrWeatherText').textContent = '☀️ 30°C ' + _loc;
+                } catch(e) {
+                  if (window.SakhiWeatherBridge && typeof window.SakhiWeatherBridge.getWeatherDataForLocation === 'function') {
+                    var loc = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'rewa';
+                    var w = window.SakhiWeatherBridge.getWeatherDataForLocation(loc);
+                    if (w && w.temp && document.getElementById('sakhiHdrWeatherText')) {
+                      document.getElementById('sakhiHdrWeatherText').textContent = '☀️ ' + w.temp + '°C';
+                    }
                   }
-                } catch(e) {}
+                }
               })();
             </script>
           </div>
@@ -765,11 +799,20 @@
         }
 
         const el = document.getElementById('sakhiHeroDynamicName');
+        const hdrShortName = document.getElementById('sakhiHeaderUserShortName');
         if (el) {
           if (name && phone.length === 10) {
             el.textContent = name + ' जी';
           } else {
             el.textContent = 'किसान साथी';
+          }
+        }
+        if (hdrShortName) {
+          if (name && phone.length === 10) {
+            const shortFirst = name.split(' ')[0];
+            hdrShortName.textContent = '👤 ' + shortFirst + ' जी';
+          } else {
+            hdrShortName.textContent = '👤 किसान साथी';
           }
         }
       }

@@ -103,8 +103,7 @@
       const w = getWeatherDataForLocation(savedLoc);
       const textEl = document.getElementById('sakhiHdrWeatherText');
       if (textEl && w) {
-        const shortName = w.name ? w.name.split(' ')[0] : savedLoc;
-        textEl.textContent = `☀️ ${w.temp}°C ${shortName}`;
+        textEl.textContent = `☀️ ${w.temp}°C`;
       }
     } catch (_) {}
   }
