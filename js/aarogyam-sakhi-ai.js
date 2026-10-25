@@ -503,6 +503,8 @@ if (typeof document !== 'undefined') {
     if (input) input.placeholder = 'अपने खेत या फसल के बारे में पूछें...';
     const fileInput = document.getElementById('sakhiImageInput');
     if (fileInput) fileInput.value = '';
+    const camInput = document.getElementById('sakhiCameraDirectInput');
+    if (camInput) camInput.value = '';
   };
 
   function handleSakhiImageUpload(event) {
@@ -658,6 +660,54 @@ if (typeof document !== 'undefined') {
     }
   };
 
+  // Photo Source Picker Modal Controls (Live Camera vs Phone Gallery)
+  window.openSakhiPhotoPicker = function () {
+    const modal = document.getElementById('sakhiPhotoPickerModal');
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.closeSakhiPhotoPicker = function () {
+    const modal = document.getElementById('sakhiPhotoPickerModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.triggerSakhiPhotoSource = function (source) {
+    if (typeof window.closeSakhiPhotoPicker === 'function') {
+      window.closeSakhiPhotoPicker();
+    }
+    if (!isUserAuthenticated()) {
+      if (typeof window.openSakhiAuthModal === 'function') window.openSakhiAuthModal();
+      return;
+    }
+    if (window.SakhiVision && typeof window.SakhiVision.isGeminiActive === 'function' && !window.SakhiVision.isGeminiActive()) {
+      if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.showQuotaModal === 'function') {
+        window.SakhiQuotaEngine.showQuotaModal('offline', 'image');
+        return;
+      }
+    }
+    if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.checkQuota === 'function') {
+      const quotaCheck = window.SakhiQuotaEngine.checkQuota('image');
+      if (!quotaCheck.allowed) {
+        window.SakhiQuotaEngine.showQuotaModal(quotaCheck.reason || 'limit_reached', 'image', quotaCheck);
+        return;
+      }
+    }
+
+    if (source === 'camera') {
+      const camInput = document.getElementById('sakhiCameraDirectInput');
+      if (camInput) {
+        camInput.value = '';
+        camInput.click();
+      }
+    } else {
+      const galInput = document.getElementById('sakhiImageInput');
+      if (galInput) {
+        galInput.value = '';
+        galInput.click();
+      }
+    }
+  };
+
   // Camera Trigger with Auth, Quota and Master Switch Guards
   window.triggerSakhiCamera = function () {
     if (!isUserAuthenticated()) {
@@ -677,8 +727,14 @@ if (typeof document !== 'undefined') {
         return;
       }
     }
-    const fileInput = document.getElementById('sakhiImageInput');
-    if (fileInput) fileInput.click();
+    // If photo picker modal exists, give user 1-tap choice (Live Camera vs Phone Gallery)
+    const pickerModal = document.getElementById('sakhiPhotoPickerModal');
+    if (pickerModal) {
+      window.openSakhiPhotoPicker();
+    } else {
+      const fileInput = document.getElementById('sakhiImageInput');
+      if (fileInput) fileInput.click();
+    }
   };
 
   // Global Interactive Crop & Symptom Checklist Handlers for Sakhi AI

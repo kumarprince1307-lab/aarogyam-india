@@ -670,6 +670,36 @@
           <button type="button" onclick="window.clearSakhiStagedImage()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.85rem;font-weight:900;flex-shrink:0;" title="फोटो हटाएं">✕</button>
         </div>
 
+        <!-- Photo Source Picker Modal (Camera vs Gallery) -->
+        <div id="sakhiPhotoPickerModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.75);z-index:999999;align-items:flex-end;justify-content:center;padding:12px;box-sizing:border-box;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);" onclick="if(event.target===this)window.closeSakhiPhotoPicker();">
+          <div style="background:#1e293b;border:1.5px solid #334155;border-radius:24px;padding:20px 18px;width:100%;max-width:440px;box-shadow:0 -10px 40px rgba(0,0,0,0.5);margin:0 auto;box-sizing:border-box;">
+            <div style="text-align:center;margin-bottom:16px;">
+              <div style="font-size:1.1rem;color:#f8fafc;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <span>📸</span> फोटो कैसे अपलोड करना चाहते हैं?
+              </div>
+              <p style="margin:4px 0 0 0;font-size:0.80rem;color:#94a3b8;font-weight:600;">सीधे कैमरा से खींचें या फोन गैलरी से चुनें</p>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+              <!-- Camera Option -->
+              <button type="button" onclick="window.triggerSakhiPhotoSource('camera')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;background:linear-gradient(135deg, #15803d 0%, #166534 100%);color:#ffffff;border:1.5px solid #22c55e;border-radius:18px;cursor:pointer;font-family:inherit;font-weight:800;font-size:0.95rem;box-shadow:0 6px 16px rgba(22,101,52,0.35);text-align:center;">
+                <i class="fa-solid fa-camera" style="font-size:1.8rem;color:#86efac;"></i>
+                <span>📷 लाइव कैमरा<br><span style="font-size:0.75rem;font-weight:600;color:#dcfce7;display:block;margin-top:2px;">सीधी फोटो खींचें</span></span>
+              </button>
+
+              <!-- Gallery Option -->
+              <button type="button" onclick="window.triggerSakhiPhotoSource('gallery')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px 12px;background:linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);color:#ffffff;border:1.5px solid #60a5fa;border-radius:18px;cursor:pointer;font-family:inherit;font-weight:800;font-size:0.95rem;box-shadow:0 6px 16px rgba(29,78,216,0.35);text-align:center;">
+                <i class="fa-solid fa-images" style="font-size:1.8rem;color:#bfdbfe;"></i>
+                <span>🖼️ फोन गैलरी<br><span style="font-size:0.75rem;font-weight:600;color:#dbeafe;display:block;margin-top:2px;">गैलरी / फ़ाइल से चुनें</span></span>
+              </button>
+            </div>
+
+            <button type="button" onclick="window.closeSakhiPhotoPicker()" style="width:100%;padding:12px;background:rgba(255,255,255,0.08);color:#cbd5e1;border:1px solid rgba(255,255,255,0.18);border-radius:14px;cursor:pointer;font-weight:800;font-size:0.92rem;font-family:inherit;">
+              ✕ रद्द करें (Cancel)
+            </button>
+          </div>
+        </div>
+
         <!-- Input Footer: [+] on Left, Wide Textarea in Center, Camera/Mic/Send on Right Side -->
         <div class="sakhi-input-footer" style="position:relative;z-index:1000;pointer-events:auto;">
           <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="विषय व टूल्स चुनें" onclick="window.toggleSakhiPlusMenu(event)">
@@ -682,7 +712,10 @@
             <button type="button" class="sakhi-cam-btn" id="sakhiCamBtn" title="खेत से फोटो लें या गैलरी से चुनें" onclick="window.triggerSakhiCamera()" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;background:none;border:none;">
               <i class="fa-solid fa-camera"></i>
             </button>
+            <!-- Gallery Input (Standard File Picker) -->
             <input type="file" id="sakhiImageInput" accept="image/*" style="display:none;" onchange="window.handleSakhiImageUpload(event)" />
+            <!-- Direct Camera Input (Opens Device Camera Directly) -->
+            <input type="file" id="sakhiCameraDirectInput" accept="image/*" capture="environment" style="display:none;" onchange="window.handleSakhiImageUpload(event)" />
             <button type="button" class="sakhi-mic-btn" id="sakhiMicBtn" title="बोलकर पूछें (माइक)" onclick="if(window.stopAllSpeech)window.stopAllSpeech(); if(window.AarogyamSakhiToggleRec)window.AarogyamSakhiToggleRec();">
               <i class="fa-solid fa-microphone"></i>
             </button>
@@ -710,7 +743,7 @@
   <script src="/js/sakhi-vision-engine.js?v=20261025_v610"></script>
   <script src="/js/sakhi-creative-prompts.js?v=1.0"></script>
   <script src="/js/aarogyam-security-guard.js?v=1.0"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261025_v616"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261025_v617"></script>
   <script>
     (function () {
       function lockWindowScroll() {
