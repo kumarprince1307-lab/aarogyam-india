@@ -1545,6 +1545,31 @@ export async function updateUserStatus(userId, isActive) {
   }
 }
 
+export async function deleteUserProfile(userId) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+    if (!userId) throw new Error("User ID is required.");
+
+    // Clean up dependent foreign-key records cleanly
+    try { await db.from('user_permissions').delete().or(`user_id.eq.${userId},profile_id.eq.${userId}`); } catch (_) {}
+    try { await db.from('checkout_logs').delete().eq('profile_id', userId); } catch (_) {}
+    try { await db.from('purchases').delete().eq('profile_id', userId); } catch (_) {}
+    try { await db.from('interested_users').delete().eq('profile_id', userId); } catch (_) {}
+    try { await db.from('sakhi_chat_audit_logs').delete().eq('user_profile', String(userId)); } catch (_) {}
+
+    // Delete from profiles
+    const { error } = await db.from('profiles').delete().eq('id', userId);
+    if (error) throw error;
+
+    clearAdminCache();
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete user profile:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function batchUpdateUserStatuses() {
   try {
     const db = window.dbClient;

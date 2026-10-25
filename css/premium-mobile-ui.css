@@ -15,8 +15,7 @@ html, body {
   font-family: 'Noto Sans Devanagari', 'Inter', -apple-system, sans-serif;
   scroll-behavior: smooth;
   max-width: 100%;
-  overflow-x: hidden;
-  overflow-x: clip;
+  overflow-x: hidden !important;
 }
 
 h1, h2, h3, h4, h5, h6,

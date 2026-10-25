@@ -1,7 +1,7 @@
 /* Admin Users Page */
 
 import { initAdminLayout } from './admin-main.js';
-import { fetchUsers, updateUserStatus, batchUpdateUserStatuses } from './admin-api.js';
+import { fetchUsers, updateUserStatus, batchUpdateUserStatuses, deleteUserProfile } from './admin-api.js';
 
 let currentUsersData = []; // Store current user data for export
 
@@ -250,10 +250,11 @@ function renderUsersTable(users) {
                   </button>
                 </td>
                 <td>
-                  <div style="display: flex; gap: 6px; align-items: center;">
+                  <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
                       <a href="#user-details?id=${u.id}" data-route="user-details?id=${u.id}" data-id="${u.id}" class="admin-button small-button">View</a>
                       <a href="#user-permissions?userId=${u.id}" data-route="user-permissions" data-id="${u.id}" class="admin-button small-button" style="background:#0F172A;color:#FBBF24;border:1px solid #F59E0B;" title="Manage Granular Media & Platform Permissions">🔒 Perms</a>
                       <button type="button" class="admin-button small-button btn-user-quota" onclick="window.openUserQuotaModal('${u.id}', '${sanitizedMobile}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.status}')" style="background:#0284c7;color:#fff;border:1px solid #38bdf8;font-weight:800;white-space:nowrap;" title="सखी AI क्रेडिट व कोटा कस्टमाइज़ करें">⚡ क्रेडिट</button>
+                      <button type="button" class="admin-button small-button btn-delete-user" data-user-id="${u.id}" data-user-name="${(u.name || 'User').replace(/"/g, '&quot;')}" style="background:#ef4444;color:#fff;border:1px solid #dc2626;font-weight:800;padding:4px 8px;border-radius:5px;white-space:nowrap;cursor:pointer;" title="यूज़र को डेटाबेस से हमेशा के लिए हटाएं">🗑️ हटाएं</button>
                   </div>
                 </td>
               </tr>
@@ -483,6 +484,27 @@ export async function initUsers() {
             toggleBtn.textContent = originalText; // revert text
         }
         toggleBtn.disabled = false;
+    }
+
+    const deleteBtn = e.target.closest('.btn-delete-user');
+    if (deleteBtn) {
+      const uId = deleteBtn.dataset.userId;
+      const uName = deleteBtn.dataset.userName || 'इस यूज़र';
+      if (!confirm(`⚠️ क्या आप वाकई "${uName}" (ID: ${uId}) को डेटाबेस से हमेशा के लिए हटाना चाहते हैं?\n\nयह कार्यवाही वापस नहीं ली जा सकती!`)) {
+        return;
+      }
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = 'हटाया जा रहा...';
+      const delRes = await deleteUserProfile(uId);
+      if (delRes.success) {
+        alert(`✅ यूज़र "${uName}" सफलतापूर्वक हटा दिया गया है।`);
+        reload();
+      } else {
+        alert('हटाने में त्रुटि: ' + (delRes.error || 'अज्ञात त्रुटि'));
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = '🗑️ हटाएं';
+      }
+      return;
     }
   });
 

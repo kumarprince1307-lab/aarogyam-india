@@ -265,7 +265,9 @@ if (typeof window !== 'undefined') {
     const clean = String(rawText)
       .replace(/<[^>]*>/g, ' ')
       .replace(/[\u3002\uFF0E]/g, ' । ')
-      .replace(/[•▪★●◆✦✓✔■►▶❖➔→⇒—–_~*#@&|^<>{}[\]"`'()]/g, ' ')
+      .replace(/[•▪★●◆✦✧✨⭐🌟✓✔■►▶❖➔→⇒—–_~*#@&|^<>{}[\]"`'():;,=+]/gu, ' ')
+      .replace(/[^\w\s\u0900-\u097F।?]/gu, ' ')
+      .replace(/_/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
     const blocks = clean.split(/\s*।\s*/);
@@ -375,7 +377,7 @@ if (typeof window !== 'undefined') {
 
     // 2. Otherwise play Sweet Natural Hindi Voice with Chunking (Zero 15s freeze, zero repeat)
     if (!synth) {
-      if (!isAutoPlay) alert('आपके ब्राउज़र में ऑडियो स्पीच सपोर्ट उपलब्ध नहीं है।');
+      console.warn('[Audio Engine] SpeechSynthesis not supported in this browser environment.');
       return;
     }
 

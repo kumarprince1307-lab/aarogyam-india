@@ -512,12 +512,14 @@ export async function initSakhiAiHub() {
             <span style="font-size:0.84rem;font-weight:800;color:#38bdf8;">🔑 जेमिनी API टोकन (Google Gemini Key)</span>
             <button type="button" id="toggleGeminiKeyVisibilityBtn" style="background:none;border:none;color:var(--admin-muted,#94a3b8);cursor:pointer;font-size:0.80rem;font-weight:700;">👁️ देखें</button>
           </div>
-          <div style="display:flex;gap:8px;">
-            <input type="password" id="geminiApiKeyInput" value="" placeholder="जेमिनी API टोकन" class="admin-input" style="flex:1;font-family:monospace;font-size:0.85rem;" />
-            <button type="button" id="saveGeminiApiKeyBtn" class="admin-btn admin-btn-primary" style="background:#0284c7;border-color:#0284c7;font-weight:800;">सेव</button>
-          </div>
+          <form onsubmit="return false;" autocomplete="off" style="margin:0;padding:0;">
+            <div style="display:flex;gap:8px;">
+              <input type="password" id="geminiApiKeyInput" value="" placeholder="जेमिनी API टोकन" class="admin-input" autocomplete="new-password" style="flex:1;font-family:monospace;font-size:0.85rem;" />
+              <button type="button" id="saveGeminiApiKeyBtn" class="admin-btn admin-btn-primary" style="background:#0284c7;border-color:#0284c7;font-weight:800;">सेव</button>
+            </div>
+          </form>
           <div style="margin-top:8px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);display:flex;align-items:center;justify-content:space-between;">
-            <span>मॉडल: <strong>models/gemini-1.5-flash</strong></span>
+            <span>मॉडल: <strong>models/gemini-flash-latest</strong></span>
             <button type="button" id="testGeminiApiConnectionBtn" style="background:none;border:none;color:#38bdf8;text-decoration:underline;cursor:pointer;font-size:0.75rem;font-weight:700;">🔗 लाइव टेस्ट करें</button>
           </div>
           <div id="geminiTestStatusMsg" style="margin-top:6px;font-size:0.76rem;display:none;"></div>
@@ -842,9 +844,15 @@ function renderKPIs(list) {
     return String(n);
   }
 
+  const totalEl = document.getElementById('sakhiKpiTotalChats');
+  const agriEl = document.getElementById('sakhiKpiAgriChats');
+  const healthEl = document.getElementById('sakhiKpiHealthChats');
+  const unansweredEl = document.getElementById('sakhiKpiUnanswered');
+
   if (totalEl) totalEl.textContent = formatCompactNumber(totalChats);
   if (agriEl) agriEl.textContent = formatCompactNumber(agriChats);
   if (healthEl) healthEl.textContent = formatCompactNumber(healthChats);
+  if (unansweredEl) unansweredEl.textContent = formatCompactNumber(window.sakhiUnansweredQueries ? window.sakhiUnansweredQueries.length : 0);
 }
 
 // ----------------------------------------------------
@@ -2283,38 +2291,60 @@ async function initGeminiControlCenter() {
   if (testKeyBtn && keyInput) {
     testKeyBtn.onclick = async () => {
       const key = keyInput.value.trim() || currentKey;
+      if (!key) {
+        if (testMsg) {
+          testMsg.style.display = 'block';
+          testMsg.style.color = '#f87171';
+          testMsg.textContent = '❌ कृपया पहले जेमिनी API टोकन दर्ज करें।';
+        }
+        return;
+      }
       if (testMsg) {
         testMsg.style.display = 'block';
         testMsg.style.color = '#38bdf8';
         testMsg.textContent = '⏳ गूगल जेमिनी सर्वर से संपर्क किया जा रहा है...';
       }
       const t0 = performance.now();
-      try {
-        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: 'नमस्ते सखी' }] }],
-            generationConfig: { maxOutputTokens: 10 }
-          })
-        });
-        const latency = Math.round(performance.now() - t0);
-        if (resp.ok) {
-          if (testMsg) {
-            testMsg.style.color = '#4ade80';
-            testMsg.textContent = `✅ जेमिनी API टोकन 100% सक्रिय है! (लेटेंसी: ${latency}ms)`;
+      const modelsToTry = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+      let lastErr = null;
+      let matchedModel = null;
+      let latency = 0;
+
+      for (const m of modelsToTry) {
+        try {
+          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: 'नमस्ते सखी' }] }],
+              generationConfig: { maxOutputTokens: 10 }
+            })
+          });
+          latency = Math.round(performance.now() - t0);
+          if (resp.ok) {
+            matchedModel = m;
+            break;
+          } else {
+            const errData = await resp.json().catch(() => ({}));
+            lastErr = `${resp.status}: ${errData.error?.message || 'मॉडल अनुपलब्ध'}`;
+            if (resp.status !== 404) {
+              break; // Not a 404, stop trying fallbacks (e.g. invalid key or quota)
+            }
           }
-        } else {
-          const errData = await resp.json().catch(() => ({}));
-          if (testMsg) {
-            testMsg.style.color = '#f87171';
-            testMsg.textContent = `❌ API कनेक्शन विफल (${resp.status}): ${errData.error?.message || 'अमान्य टोकन या कोटा त्रुटि'}`;
-          }
+        } catch (e) {
+          lastErr = e.message;
         }
-      } catch(err) {
+      }
+
+      if (matchedModel) {
+        if (testMsg) {
+          testMsg.style.color = '#4ade80';
+          testMsg.textContent = `✅ जेमिनी API टोकन 100% सक्रिय है! (${matchedModel}, लेटेंसी: ${latency}ms)`;
+        }
+      } else {
         if (testMsg) {
           testMsg.style.color = '#f87171';
-          testMsg.textContent = `❌ नेटवर्क त्रुटि: ${err.message}`;
+          testMsg.textContent = `❌ API कनेक्शन विफल: ${lastErr || 'अमान्य टोकन या कोटा त्रुटि'}`;
         }
       }
     };

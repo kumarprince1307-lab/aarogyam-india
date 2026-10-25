@@ -77,25 +77,39 @@
     const apiKey = SakhiVision.getGeminiApiKey();
     if (!apiKey) return false;
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const modelsToTry = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 
     const systemInstruction = `आप "आरोग्यम सखी AI" (Aarogyam Sakhi AI) हैं — भारतीय किसानों व परिवारों की भारत की अग्रणी डिजिटल कृषि व स्वास्थ्य सलाहकार।
-दी गई फोटो का सूक्ष्मता से विश्लेषण करें:
+दी गई फोटो का अत्यंत गहराई, संवेदनशीलता और वैज्ञानिक शुद्धता से विस्तृत विश्लेषण करें:
+
+⚠️ विशेष दिशानिर्देश व सख्त नियम:
+• यदि उपयोगकर्ता ने कोई प्रश्न, लक्षण या फसल का नाम लिखा है, तो उसे सर्वोच्च प्राथमिकता दें।
+• फसल की सटीक पहचान करें:
+  - यदि पौधा, पत्तियां या फलियां चना (Chickpea / Gram) की हैं (संयुक्त छोटी पत्तियां, रोयेंदार सतह, फली): इसे किसी भी सूरत में धान (Paddy) या गेहूं (Wheat) का भूरा धब्बा (Brown Spot) न बताएं! चना ही पहचानें।
+  - यदि चने में छेद, कटी पत्तियां या इल्ली दिखे तो इसे 'चने की इल्ली / फली छेदक (Gram Pod Borer / Helicoverpa armigera)' पहचानें।
+• इल्ली, लट, सुंडी व कैटरपिलर (Caterpillar) नियंत्रण का नियम:
+  1. 100% जैविक समाधान: **बायोफिट लार्विसाइड (Biofit Larvicide) @ 30 ml प्रति 15 लीटर पंप** (2 ml प्रति लीटर) + **बायो-99 (100% सिलिकॉन स्प्रेडर) @ 5 ml प्रति पंप** का शाम को छिड़काव करें।
+  2. ⚠️ **सख्त चेतावनी:** शेत (SHET) मिट्टी का जीवाणु कल्चर है, इसे इल्ली मारने के लिए पत्तियों पर कभी स्प्रे न करें!
+  3. आपातकालीन रासायनिक विकल्प: कोराजन (Coragen 18.5% SC) 6 ml प्रति 15L पंप या एमामेक्टिन बेंजोएट (Emamectin Benzoate 5% SG) 10 ग्राम प्रति पंप।
+
 1. यदि फोटो फसल, पौधे, पत्ती, तने, फल या कीट की है:
-   • 🔍 रोग या कीट का नाम (हिंदी व अंग्रेजी में स्पष्ट)
-   • 🌾 मुख्य लक्षण (पत्तियों का पीलापन, धब्बे, इल्ली, रसचूसक, उकठा)
-   • 🌿 100% जैविक व सुरक्षित उपचार (नेट्सर्फ बायोफिट रैप अप, बायो-99 सिलिकॉन स्प्रेडर, स्टीमरिच, बायोफिट लार्विसाइड या ट्राइकोडर्मा)
-   • 🧪 अनुमोदित रासायनिक दवा विकल्प (यदि तीव्र संक्रमण हो — सटीक टेक्निकल नाम व प्रति 15 लीटर पंप की डोज़)
-   • ⏰ छिड़काव का सर्वोत्तम समय व मौसम सावधानियां
+   • 🔍 सही फसल व रोग/कीट का नाम: (हिंदी व अंग्रेजी दोनों में स्पष्ट वैज्ञानिक नाम)
+   • 🌾 मुख्य लक्षण व कारण: (पत्तियों पर धब्बे, पीलापन, उकठा, फफूंद, इल्ली या रसचूसक कीट की स्थिति विस्तार से समझाएं)
+   • 🌿 100% जैविक व सुरक्षित उपचार: (इल्ली के लिए बायोफिट लार्विसाइड 30ml + बायो-99 5ml; फंगस हेतु रैप अप 30ml + बायो-99 5ml; फुटाव हेतु स्टीमरिच 30ml — प्रति 15 लीटर पंप की सटीक मात्रा सहित)
+   • 🧪 आपातकालीन रासायनिक दवा विकल्प: (सटीक टेक्निकल नाम, प्रति 15 लीटर पंप की नाप व छिड़काव का सही समय)
+   • ⏰ छिड़काव सावधानियां: (मौसम, शाम का समय, धूप, हवा की दिशा व मिट्टी में नमी)
+   • 💡 विशेष सलाह: (दवा के साथ बायो-99 अवश्य मिलाएं ताकि दवा तुरंत पत्तों पर फैल जाए)
+
 2. यदि फोटो मेडिकल लैब रिपोर्ट (CBC, HbA1c, Sugar, LFT, KFT, Blood Test) की है:
    • 📋 मुख्य जांच पैरामीटर्स (हीमोग्लोबिन, प्लेटलेट्स, फास्टिंग शुगर आदि)
-   • 🩺 सामान्य व असामान्य वैल्यूज की सरल हिंदी व्याख्या
-   • 🥗 प्राकृतिक आहार व पोषण सलाह (चुकंदर, आंवला, पालक, नेचुरामोर)
+   • 🩺 सामान्य व असामान्य वैल्यूज की सरल हिंदी में विस्तृत व्याख्या
+   • 🥗 प्राकृतिक आहार, परहेज व पोषण सलाह (आंवला, चुकंदर, पालक, नेचुरामोर)
+
 3. यदि फोटो कृषि दवा/खाद की बोतल/पैकेट की है:
-   • 🧪 टेक्निकल रासायनिक नाम व उपयोग
+   • 🧪 टेक्निकल रासायनिक नाम व वास्तविक कार्य
    • 📋 सही डोज़ चार्ट व किस फसल पर उपयोग करें
 
-उत्तर सरल, प्रामाणिक, सम्मानजनक और बुलेट पॉइंट्स में दें।`;
+उत्तर अत्यंत सुंदर, क्रमबद्ध, विस्तृत और स्पष्ट बुलेट पॉइंट्स में दें ताकि किसान को पूरी जानकारी एक बार में स्पष्ट हो जाए।`;
 
     const payload = {
       contents: [
@@ -118,30 +132,35 @@
         temperature: 0.25,
         topK: 32,
         topP: 0.95,
-        maxOutputTokens: 1200
+        maxOutputTokens: 2048
       }
     };
 
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    for (const model of modelsToTry) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        console.warn('Gemini Vision API status:', response.status, errText);
-        return false;
-      }
+        if (!response.ok) {
+          const errText = await response.text();
+          console.warn(`Gemini Vision [${model}] status:`, response.status, errText);
+          if (response.status === 404) {
+            continue; // try next model
+          }
+          return false;
+        }
 
-      const data = await response.json();
-      const candidate = data.candidates?.[0];
-      const botText = candidate?.content?.parts?.[0]?.text;
+        const data = await response.json();
+        const candidate = data.candidates?.[0];
+        const botText = candidate?.content?.parts?.[0]?.text;
 
-      if (!botText || !botText.trim()) {
-        return false;
-      }
+        if (!botText || !botText.trim()) {
+          continue;
+        }
 
       // Record tokens consumed
       const totalTokens = data.usageMetadata?.totalTokenCount || 450;
@@ -162,18 +181,19 @@
         chips.push({ text: '📋 विशेषज्ञ से सलाह लें', query: 'आरोग्यम कृषि डॉक्टर से बात करवाओ' });
       }
 
-      callback({
-        isGemini: true,
-        isDiagnosed: true,
-        checklist: false,
-        response: botText,
-        chips: chips
-      });
-      return true;
-    } catch(err) {
-      console.warn('Gemini Vision fetch failed, switching to local engine:', err);
-      return false;
+        callback({
+          isGemini: true,
+          isDiagnosed: true,
+          checklist: false,
+          response: botText,
+          chips: chips
+        });
+        return true;
+      } catch(err) {
+        console.warn(`Gemini Vision [${model}] fetch failed:`, err);
+      }
     }
+    return false;
   };
 
   /**
@@ -181,43 +201,46 @@
    * 1. Checks if Gemini Vision API is ON -> calls Gemini
    * 2. If Gemini fails or is OFF -> falls back cleanly to local heuristic engine
    */
-  SakhiVision.analyzeCropImage = function(imgDataUrl, fileName, callback, userQuery) {
+  SakhiVision.analyzeCropImage = function(imgDataUrl, fileName, arg3, arg4) {
     const fn = (fileName || '').toLowerCase();
+    const callback = typeof arg3 === 'function' ? arg3 : (typeof arg4 === 'function' ? arg4 : function() {});
+    const userQuery = typeof arg3 === 'string' ? arg3 : (typeof arg4 === 'string' ? arg4 : '');
 
     // Parse base64 and mime
     let base64Data = '';
     let mimeType = 'image/jpeg';
-    if (imgDataUrl.includes(';base64,')) {
+    if (imgDataUrl && imgDataUrl.includes(';base64,')) {
       const parts = imgDataUrl.split(';base64,');
       mimeType = parts[0].replace('data:', '') || 'image/jpeg';
       base64Data = parts[1] || '';
     }
 
-    // Attempt Gemini 1.5 Flash Vision first if active
+    // Attempt Gemini Flash Vision first if active
     if (SakhiVision.isGeminiActive() && base64Data) {
       SakhiVision.callGeminiVision(base64Data, mimeType, userQuery, function(res) {
         callback(res);
       }).then(success => {
         if (!success) {
           // Fallback to local heuristic engine
-          SakhiVision.localAnalysis(imgDataUrl, fn, callback);
+          SakhiVision.localAnalysis(imgDataUrl, fn, callback, userQuery);
         }
       }).catch(err => {
         console.warn('Gemini catch, running local analysis:', err);
-        SakhiVision.localAnalysis(imgDataUrl, fn, callback);
+        SakhiVision.localAnalysis(imgDataUrl, fn, callback, userQuery);
       });
       return;
     }
 
     // Local Heuristics
-    SakhiVision.localAnalysis(imgDataUrl, fn, callback);
+    SakhiVision.localAnalysis(imgDataUrl, fn, callback, userQuery);
   };
 
   /**
    * Local Analysis Engine (100% Offline & Fallback Resilient)
    */
-  SakhiVision.localAnalysis = function(imgDataUrl, fileName, callback) {
+  SakhiVision.localAnalysis = function(imgDataUrl, fileName, callback, userQuery) {
     const fn = (fileName || '').toLowerCase();
+    const uq = (userQuery || '').toLowerCase();
 
     // 1. Check for Medical / Pathology Lab Report
     if (fn.includes('cbc') || fn.includes('report') || fn.includes('kft') || fn.includes('lft') || fn.includes('blood') || fn.includes('sugar') || fn.includes('lab') || fn.includes('test') || fn.includes('hba1c')) {
@@ -332,27 +355,60 @@
         }
 
         // C. Crop Leaf Disease Fallback
-        const fieldCropMsg = `🌾 **सखी AI फसल डॉक्टर — रोग पहचान व संपूर्ण उपचार:**\n\n` +
-          `🔍 **विश्लेषण परिणाम:**\n` +
-          `• **पहचाना गया संभावित रोग:** **धान/गेहूँ का भूरा पत्ती धब्बा (Brown Spot) / ब्लास्ट (Blast)**\n` +
-          `• **लक्षण:** पत्तियों पर अंडाकार कत्थई/भूरे धब्बे, पीले किनारे और नोक का सूखना।\n\n` +
-          `💊 **100% सटीक उपचार व दवा डोज (प्रति 15 लीटर पंप):**\n` +
-          `1. **प्रोपिकोनाज़ोल 25% EC (Propiconazole 25% EC):** 15 ml\n` +
-          `   *(अथवा नेट्सर्फ बायोफिट रैप अप @ 30 ml)*\n` +
-          `2. **नेट्सर्फ बायोफिट स्टीमरिच (वृद्धि व नई पत्तियों हेतु):** 20 ml\n` +
-          `3. **बायो-99 (100% सिलिकॉन स्प्रेडर व एक्टिवेटर):** 5 ml (दवा चिपकाने व पत्तों में फैलाने हेतु)\n\n` +
-          `⏰ **स्प्रे का समय:** सुबह 8-10 बजे या शाम 4 बजे के बाद (हल्की धूप में)।\n` +
-          `💡 **विशेष सावधानी:** यूरिया की मात्रा तुरंत आधी कर दें। खेत में 2-3 इंच पानी बनाए रखें।`;
+        const isChanaOrIlli = (
+          uq.includes('chana') || uq.includes('चना') || uq.includes('इल्ली') ||
+          uq.includes('sundi') || uq.includes('सुंडी') || uq.includes('लट') ||
+          uq.includes('छेदक') || fn.includes('chana') || fn.includes('gram') ||
+          fn.includes('illi') || fn.includes('sundi')
+        );
+
+        let fieldCropMsg = '';
+        let resultChips = [];
+
+        if (isChanaOrIlli) {
+          fieldCropMsg = `🌾 **सखी AI फसल डॉक्टर — चना व कीट विज़न विश्लेषण:**\n\n` +
+            `🔍 **विश्लेषण परिणाम:**\n` +
+            `• **पहचाना गया संभावित कीट/रोग:** **चने की इल्ली / फली छेदक (Gram Pod Borer - Helicoverpa armigera) व पत्ती पीलापन**\n` +
+            `• **लक्षण:** पत्तियों के किनारे कटे होना, फलियों में गोल छेद और पत्तियों का पीला पड़ना।\n\n` +
+            `⚠️ **सख्त तकनीकी निर्देश:** शेत (SHET) मिट्टी का जैविक जीवाणु कल्चर है, इसे पत्तियों पर इल्ली मारने हेतु कभी स्प्रे न करें!\n\n` +
+            `🛡️ **100% अचूक जैविक स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n` +
+            `1. **बायोफिट लार्विसाइड (Biofit Larvicide):** **30 ml** (इल्ली, लट, सुंडी व फल छेदक का संपूर्ण जैविक नियंत्रण)\n` +
+            `2. **बायो-99 (Bio-99 100% सिलिकॉन स्प्रेडर):** **5 ml** (दवा को पत्तियों पर चिपकाने व इल्ली की त्वचा तक पहुँचाने हेतु)\n` +
+            `3. **रैप-अप (Biofit Wrap-up):** **30 ml** (घाव भरने व फंगल संक्रमण रोकथाम हेतु)\n\n` +
+            `🧪 **आपातकालीन रासायनिक दवा विकल्प:** कोराजन (Coragen 18.5% SC) 6 ml प्रति 15L पंप अथवा एमामेक्टिन बेंजोएट (Emamectin Benzoate 5% SG) 10 ग्राम प्रति 15L पंप।\n` +
+            `⏰ **स्प्रे का समय:** शाम 4 बजे के बाद छिड़काव करें जब इल्लियां पत्तियों पर बाहर निकलती हैं।`;
+
+          resultChips = [
+            { text: '🐛 लार्विसाइड 250ml की पूरी जानकारी', query: 'लार्विसाइड कैसे काम करता है' },
+            { text: '🧪 बायो-99 सिलिकॉन स्प्रेडर का महत्व', query: 'बायो-99 स्टिकर का उपयोग और डोज क्या है?' },
+            { text: '🌾 चने में उकठा व जड़ गलन का इलाज', query: 'चने में उकठा और जड़ गलन का क्या उपाय है' },
+            { text: '📞 विशेषज्ञ से 25% छूट पर बात करें', query: 'दादा अवनीश जी से सीधे संपर्क' }
+          ];
+        } else {
+          // General Crop Leaf Spot & Health Analysis
+          fieldCropMsg = `🌾 **सखी AI फसल डॉक्टर — पत्ती स्वास्थ्य व रोग पहचान:**\n\n` +
+            `🔍 **विश्लेषण परिणाम:**\n` +
+            `• **पहचाना गया संभावित रोग:** **फसल की पत्तियों पर फंगल धब्बा (Leaf Spot / Blight) अथवा पोषक तत्वों की कमी**\n` +
+            `• **लक्षण:** पत्तियों पर कत्थई/भूरे धब्बे, किनारों का मुड़ना अथवा पीलापन।\n\n` +
+            `💊 **100% सटीक उपचार व दवा डोज (प्रति 15 लीटर पंप):**\n` +
+            `1. **नेट्सर्फ बायोफिट रैप अप (जैविक फफूंदनाशक):** 30 ml\n` +
+            `2. **नेट्सर्फ बायोफिट स्टीमरिच (पौधे की वृद्धि व नई पत्तियों हेतु):** 20 ml\n` +
+            `3. **बायो-99 (100% सिलिकॉन स्प्रेडर व एक्टिवेटर):** 5 ml (दवा को पत्तियों पर फैलाने हेतु)\n\n` +
+            `🧪 **रासायनिक विकल्प:** प्रोपिकोनाज़ोल 25% EC (Propiconazole) 15 ml प्रति पंप।\n` +
+            `⏰ **स्प्रे का समय:** सुबह हल्की धूप में अथवा शाम 4 बजे के बाद छिड़काव करें।`;
+
+          resultChips = [
+            { text: '🌾 4 एकड़ का स्प्रे खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
+            { text: '📋 बायोफिट संपूर्ण डोज़ चार्ट', query: 'बायोफिट संपूर्ण डोज़ चार्ट दिखाओ' },
+            { text: '🐛 फसलों में इल्ली व सुंडी का अचूक इलाज', query: 'इल्ली और सुंडी का पक्का इलाज बताओ' }
+          ];
+        }
 
         callback({
           isDiagnosed: true,
           checklist: false,
           response: fieldCropMsg,
-          chips: [
-            { text: '🌾 4 एकड़ का स्प्रे खर्च एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-            { text: '📋 बायोफिट संपूर्ण डोज़ चार्ट', query: 'बायोफिट संपूर्ण डोज़ चार्ट दिखाओ' },
-            { text: '🐛 चने की घटी-इल्ली रोकथाम', query: 'चने में घटी और इल्ली कीट का पक्का इलाज बताओ' }
-          ]
+          chips: resultChips
         });
       };
 

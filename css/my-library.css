@@ -30,12 +30,37 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    -webkit-text-size-adjust: 100% !important;
+}
+
 body {
     background-color: var(--bg-warm-white);
     color: var(--text-charcoal);
     min-height: 100vh;
-    padding-bottom: 90px;
-    overflow-x: clip;
+    min-height: 100dvh;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Facebook & In-App WebView Layout Stabilization */
+.container,
+.library-main,
+.welcome-card-soft,
+.lib-kpi-stats-grid,
+.book-grid-2col,
+header,
+footer {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+}
+
+img, svg, video {
+    max-width: 100% !important;
+    height: auto;
 }
 
 /* ==========================================================================

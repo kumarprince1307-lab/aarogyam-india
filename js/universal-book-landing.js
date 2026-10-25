@@ -3701,7 +3701,7 @@ if (typeof window !== 'undefined') {
       const isFbBrowser = /FBAN|FBAV|Instagram|Messenger/i.test(ua);
       const fbNotice = document.getElementById('ublFbBrowserNotice');
       if (fbNotice) {
-        fbNotice.style.display = isFbBrowser ? 'block' : 'none';
+        fbNotice.style.display = 'none';
       }
     } catch (e) {
       console.error('Error rendering Audio Experience section:', e);
