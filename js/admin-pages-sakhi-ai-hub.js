@@ -2305,7 +2305,7 @@ async function initGeminiControlCenter() {
         testMsg.textContent = '⏳ गूगल जेमिनी सर्वर से संपर्क किया जा रहा है...';
       }
       const t0 = performance.now();
-      const modelsToTry = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'];
+      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
       let lastErr = null;
       let matchedModel = null;
       let latency = 0;

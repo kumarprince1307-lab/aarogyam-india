@@ -567,9 +567,45 @@ if (typeof document !== 'undefined') {
   }
   window.handleSakhiImageUpload = handleSakhiImageUpload;
 
+  // Helper to lock and unlock input controls during AI analysis
+  window.setSakhiInputBusy = function (isBusy) {
+    window.isSakhiVisionAnalyzing = !!isBusy;
+    const sendBtn = document.getElementById('sakhiSendBtn');
+    const camBtn = document.getElementById('sakhiCamBtn');
+    const micBtn = document.getElementById('sakhiMicBtn');
+    const plusBtn = document.getElementById('sakhiPlusBtn');
+    const textInput = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
+
+    if (sendBtn) {
+      sendBtn.disabled = isBusy;
+      sendBtn.style.pointerEvents = isBusy ? 'none' : 'auto';
+      sendBtn.style.opacity = isBusy ? '0.4' : '1';
+      sendBtn.style.cursor = isBusy ? 'not-allowed' : 'pointer';
+    }
+    if (camBtn) {
+      camBtn.disabled = isBusy;
+      camBtn.style.pointerEvents = isBusy ? 'none' : 'auto';
+      camBtn.style.opacity = isBusy ? '0.4' : '1';
+    }
+    if (micBtn) {
+      micBtn.disabled = isBusy;
+      micBtn.style.pointerEvents = isBusy ? 'none' : 'auto';
+    }
+    if (plusBtn) {
+      plusBtn.disabled = isBusy;
+      plusBtn.style.pointerEvents = isBusy ? 'none' : 'auto';
+    }
+    if (textInput && isBusy) {
+      textInput.blur();
+    }
+  };
+
   // Process and send the staged image along with any user caption
   window.processSakhiStagedImage = function (staged, userCaption) {
     if (!staged || !staged.dataUrl) return;
+
+    // Hard-disable send and input controls immediately to prevent double submissions
+    window.setSakhiInputBusy(true);
 
     // Clear staging bar and input
     window.clearSakhiStagedImage();
@@ -595,7 +631,6 @@ if (typeof document !== 'undefined') {
     appendSakhiMessage('user', userHtml, true, null, { imgId: imgId, caption: userCaption });
 
     // Activate Screen Wake-Lock and Navigation Shield during AI analysis
-    window.isSakhiVisionAnalyzing = true;
     requestSakhiWakeLock();
 
     // Continuous Live Typing / Thinking Animation until search/analysis finishes!
@@ -604,8 +639,8 @@ if (typeof document !== 'undefined') {
     const fn = staged.fileName || 'crop_image.jpg';
     if (window.SakhiVision && typeof window.SakhiVision.analyzeCropImage === 'function') {
       window.SakhiVision.analyzeCropImage(staged.dataUrl, fn, userCaption, function (res) {
-        // Analysis finished: release lock and shield
-        window.isSakhiVisionAnalyzing = false;
+        // Analysis finished: release lock, buttons, and shield
+        window.setSakhiInputBusy(false);
         releaseSakhiWakeLock();
         removeTypingIndicator();
 
@@ -653,7 +688,7 @@ if (typeof document !== 'undefined') {
         ]);
       });
     } else {
-      window.isSakhiVisionAnalyzing = false;
+      window.setSakhiInputBusy(false);
       releaseSakhiWakeLock();
       removeTypingIndicator();
       appendSakhiMessage('bot', '🌾 आपकी फोटो प्राप्त हुई। कृपया अपनी फसल का नाम (गेहूँ, चना, टमाटर) और पत्ती के लक्षण बताएं ताकि सटीक दवा बताई जा सके।', false);
@@ -16588,7 +16623,6 @@ ${shareUrl}`;
     // Input Submission helper with Strict Auth Guard & Interruption Shield
     window.submitSakhiFromInput = function () {
       if (window.isSakhiVisionAnalyzing) {
-        alert("⏳ सखी अभी आपकी फोटो का वैज्ञानिक विश्लेषण कर रही है, कृपया 4-5 सेकंड प्रतीक्षा करें... 🌾");
         return;
       }
       const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
