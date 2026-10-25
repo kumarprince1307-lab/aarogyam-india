@@ -15681,6 +15681,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
             <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('खेती का डॉक्टर व कृषि ई-बुक्स की जानकारी')">
               📚 'खेती का डॉक्टर' ई-बुक्स
             </button>
+            <button type="button" class="sakhi-menu-item" onclick="window.location.href='/aarogyam-app.html'" style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);color:#1e3a8a;border:1.5px solid #60a5fa;font-weight:900;">
+              📲 ऐप इंस्टॉल गाइड (PWA)
+            </button>
           </div>
         </div>
 

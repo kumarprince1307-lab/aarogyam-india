@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v2.2-live';
+const STATIC_CACHE = 'aarogyam-public-static-v2.4-live';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v2.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v2.0';
@@ -19,6 +19,7 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE_SHELL = [
   '/',
   '/index.html',
+  '/aarogyam-app.html',
   '/offline.html',
   '/manifest.json',
   '/aarogyam-sakhi.html',
@@ -61,7 +62,8 @@ const PRECACHE_SHELL = [
   '/images/icons/pwa-maskable-192x192.png',
   '/images/icons/pwa-maskable-512x512.png',
   '/images/books/kharif-master-guide-2026-cover.webp',
-  '/images/books/fasal-ka-doctor-cover.webp'
+  '/images/books/fasal-ka-doctor-cover.webp',
+  '/images/banners/aarogyam-app-og.webp'
 ];
 
 // 0. MESSAGE: Instant Skip Waiting trigger from client
