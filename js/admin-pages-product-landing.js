@@ -825,7 +825,7 @@ export async function initProductLandingPages() {
           thumbnail_url: 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg',
           mrp: 1999,
           offer_price: 999,
-          buynow_url: 'https://aarogyamindia.in',
+          buynow_url: 'https://aarogyamindia.online',
           message: 'फसलों की पैदावार दोगुनी करने और मिट्टी को उपजाऊ बनाने के लिए संपूर्ण जैविक किट। अभी ऑर्डर करें!',
           status: 'active',
           created_at: new Date().toISOString()

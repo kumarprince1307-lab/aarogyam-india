@@ -2753,7 +2753,7 @@ export async function initAllLandingPages() {
   });
 
   function showAdminResult(page, count = 1) {
-    const origin = window.location.origin || 'https://aarogyamindia.in';
+    const origin = window.location.origin || 'https://aarogyamindia.online';
     let thumbParam = '';
     if (page.thumbnail_url && !page.thumbnail_url.startsWith('data:')) {
       thumbParam = `&thumb=${encodeURIComponent(page.thumbnail_url)}`;

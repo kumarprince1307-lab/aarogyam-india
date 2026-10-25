@@ -82,11 +82,36 @@ function renderTable(logs) {
                             if (whatsappNumber.length === 10) {
                                 whatsappNumber = '91' + whatsappNumber;
                             }
-                            const customerName = log.customer_name || 'Customer';
-                            const message = `नमस्ते ${customerName} जी 🙏\nआपने Aarogyam India पर रुचि दिखाई थी।\nक्या मैं आपकी सहायता कर सकता हूँ?`;
-                            const encodedMessage = encodeURIComponent(message);
+                            const customerName = log.customer_name || 'किसान साथी';
+                            const bookTitle = log.book_name || 'ई-बुक';
+
+                            const followUpMsg = `🙏 नमस्ते ${customerName} जी!
+
+आशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿
+
+हमने देखा कि आप आरोग्यम इंडिया से *"${bookTitle}"* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट, इंटरनेट समस्या या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।
+
+❤️ *हम आपके साथ हैं:*
+यदि पेमेंट करने में कोई भी परेशानी आई हो, तो आप सीधे हमारे आधिकारिक नंबर पर Google Pay / PhonePe / Paytm से भी राशि भेजकर तुरंत 2 मिनट में ई-बुक सक्रिय करवा सकते हैं।
+
+📲 *1. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
+अपने मोबाइल में बिना रुकावट तुरंत ऐप चलाने हेतु यहाँ से इंस्टॉल करें:
+👉 https://aarogyamindia.online
+
+🌸 *2. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
+फसल की बीमारी, पत्ती पीली पड़ना, इल्ली का जैविक स्प्रे, पशुओं का दूध व स्वास्थ्य संबंधी कोई भी सवाल पूछें या फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
+👉 https://aarogyamindia.online/aarogyam-sakhi.html
+
+🎁 *विशेष डिस्काउंट व अतिरिक्त ऑफर्स के लिए हमसे अभी संपर्क करें:*
+हम आपके लिए विशेष छूट व उपहार उपलब्ध करा सकते हैं।
+📞 WhatsApp / कॉल: +91 7974422572
+
+सप्रेम व आदर सहित,  
+*आपकी आरोग्यम इंडिया टीम* 🌾`;
+
+                            const encodedMessage = encodeURIComponent(followUpMsg);
                             const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-                            whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button">💬 WhatsApp</a>`;
+                            whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="फॉलो-अप व सहायता संदेश भेजें">💬 फॉलो-अप संदेश</a>`;
                         }
 
                         const actionButtons = (callButtonHTML || whatsappButtonHTML)

@@ -6,15 +6,62 @@ import { fetchPurchases, fetchPurchaseFilterOptions } from './admin-api.js';
 let currentPurchasesData = []; // For CSV export
 
 function renderPurchaseRow(item) {
+  const sanitizedMobile = String(item.mobile || '').replace(/\D/g, '');
+  let whatsappBtnHTML = '';
+  if (sanitizedMobile) {
+    let waNum = sanitizedMobile;
+    if (waNum.length === 10) waNum = '91' + waNum;
+    const custName = item.customer || 'किसान साथी';
+    const bookTitle = item.book || 'ई-बुक';
+
+    const waMsg = `🙏 नमस्ते ${custName} जी!
+
+🎉 बहुत-बहुत बधाई और स्वागत है! आप आरोग्यम इंडिया के सम्मानित सदस्य बन चुके हैं।
+
+📚 आपकी ई-बुक: *${bookTitle}*
+आपके खाते में सफलतापूर्वक सक्रिय (Activate) कर दी गई है।
+
+📖 *1. My Library (ऑनलाइन पढ़ें व ऑडियो सुनें):*
+आप अपनी ई-बुक को कभी भी, कहीं भी पढ़ने और ऑडियो सुनने के लिए नीचे दिए गए लिंक पर जाएं:
+👉 https://aarogyamindia.online/my-library.html
+
+📥 *2. PDF डाउनलोड करें:*
+अपनी बुक को डाउनलोड करने के लिए My Library में जाकर 'डाउनलोड' बटन दबाएं:
+👉 https://aarogyamindia.online/my-library.html
+
+📲 *3. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
+बिना ब्राउज़र खोले 1-क्लिक में उपयोग करने हेतु ऐप इंस्टॉल करें:
+👉 https://aarogyamindia.online
+
+🌸 *4. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
+फसलों के रोग, सही जैविक कीटनाशक स्प्रे चार्ट, पशुपालन या स्वास्थ्य का कोई भी सवाल पूछें या अपने खेत की फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
+👉 https://aarogyamindia.online/aarogyam-sakhi.html
+
+🎁 *विशेष ऑफर्स, छूट व किसी भी सहायता हेतु हमसे संपर्क करें:*
+📞 WhatsApp / कॉल: +91 7974422572
+
+आपका शुभचिंतक,  
+*आरोग्यम इंडिया टीम* 🌿`;
+
+    const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(waMsg)}`;
+    whatsappBtnHTML = `<a href="${waUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="सफलतापूर्वक खरीद का स्वागत संदेश भेजें">💬 स्वागत संदेश</a>`;
+  } else {
+    whatsappBtnHTML = `<span class="admin-muted" style="font-size:0.75rem;">मोबाइल नहीं</span>`;
+  }
+
   return `
     <tr>
-      <td>${item.order}</td>
-      <td>${item.customer}</td>
+      <td><strong>${item.order}</strong></td>
+      <td>
+        <div class="admin-user-name">${item.customer}</div>
+        ${item.mobile ? `<div class="admin-user-email" style="font-size:0.78rem;"><a href="tel:${item.mobile}" class="admin-subtle-link">📞 ${item.mobile}</a></div>` : ''}
+      </td>
       <td>${item.book}</td>
-      <td>${item.amount}</td>
+      <td><strong>${item.amount}</strong></td>
       <td>${item.source}</td>
       <td><span class="status-pill ${item.status}">${item.status}</span></td>
       <td>${item.date}</td>
+      <td>${whatsappBtnHTML}</td>
     </tr>
   `;
 }
@@ -28,7 +75,7 @@ function renderPurchasesTable(purchases) {
     <div class="admin-table-wrapper sticky-header-table">
       <table class="admin-table">
         <thead>
-          <tr><th>Order</th><th>Customer</th><th>Book</th><th>Amount</th><th>Source</th><th>Status</th><th>Date</th></tr>
+          <tr><th>Order</th><th>Customer</th><th>Book</th><th>Amount</th><th>Source</th><th>Status</th><th>Date</th><th>Action</th></tr>
         </thead>
         <tbody>${purchases.map(renderPurchaseRow).join('')}</tbody>
       </table>

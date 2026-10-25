@@ -161,20 +161,60 @@ function renderUsersTable(users) {
               ? `<a href="tel:${sanitizedMobile}" class="admin-subtle-link" style="font-weight:600;" title="Call"><span style="margin-right:2px;">📞</span>${u.mobile}</a>` 
               : (u.mobile || 'N/A');
 
+            const isSub = u.status === 'active' || u.totalPurchases > 0;
             let whatsappButtonHTML = '';
             if (sanitizedMobile) {
                 let whatsappNumber = sanitizedMobile;
                 if (whatsappNumber.length === 10) {
                     whatsappNumber = '91' + whatsappNumber;
                 }
-                const customerName = u.name || 'Customer';
-                const message = `नमस्ते ${customerName} जी, मैं आरोग्यम इंडिया से बात कर रहा हूँ।`;
+                const customerName = u.name || 'किसान साथी';
+                let message = '';
+                if (isSub) {
+                    message = `🙏 नमस्ते ${customerName} जी!
+
+🎉 बहुत-बहुत बधाई और स्वागत है! आप आरोग्यम इंडिया के सम्मानित सदस्य हैं।
+
+📖 *1. My Library (ऑनलाइन पढ़ें व ऑडियो सुनें):*
+अपनी ई-बुक्स को कभी भी पढ़ने और ऑडियो सुनने हेतु यहाँ क्लिक करें:
+👉 https://aarogyamindia.online/my-library.html
+
+📲 *2. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
+बिना ब्राउज़र खोले तुरंत उपयोग करने हेतु ऐप इंस्टॉल करें:
+👉 https://aarogyamindia.online
+
+🌸 *3. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
+फसल के रोग, कीटनाशक स्प्रे चार्ट, पशुपालन या सेहत का कोई भी सवाल या फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
+👉 https://aarogyamindia.online/aarogyam-sakhi.html
+
+🎁 *विशेष ऑफर्स व सहायता हेतु हमसे संपर्क करें:*
+📞 WhatsApp / कॉल: +91 7974422572
+
+आपका शुभचिंतक,  
+*आरोग्यम इंडिया टीम* 🌿`;
+                } else {
+                    message = `🙏 नमस्ते ${customerName} जी!
+
+आरोग्यम इंडिया परिवार में आपका हार्दिक स्वागत है 🌿
+
+📲 *1. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
+खेती, पशुपालन व डिजिटल कृषि पुस्तकों के लिए हमारा ऐप इंस्टॉल करें:
+👉 https://aarogyamindia.online
+
+🌸 *2. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
+फसल के रोग, सही जैविक स्प्रे चार्ट, पशुपालन व स्वास्थ्य का कोई भी सवाल पूछें या फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
+👉 https://aarogyamindia.online/aarogyam-sakhi.html
+
+🎁 *विशेष डिस्काउंट व ऑफर्स के लिए हमसे संपर्क करें:*
+📞 WhatsApp / कॉल: +91 7974422572
+
+सप्रेम व आदर सहित,  
+*आरोग्यम इंडिया टीम* 🌾`;
+                }
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-                whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button icon-button" style="background:#25D366;color:#fff;border-color:#22c55e;padding:2px 8px;border-radius:4px;" title="WhatsApp">💬</a>`;
+                whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button icon-button" style="background:#25D366;color:#fff;border-color:#22c55e;padding:2px 8px;border-radius:4px;" title="WhatsApp पर स्वागत / फॉलो-अप संदेश भेजें">💬</a>`;
             }
-
-            const isSub = u.status === 'active' || u.totalPurchases > 0;
             const rowNum = startIndex + idx + 1;
 
             return `

@@ -144,7 +144,7 @@ function renderSurveySection(surveys) {
 }
 
 function renderSharingSection(landingPages, detail) {
-  const origin = window.location.origin || 'https://aarogyamindia.in';
+  const origin = window.location.origin || 'https://aarogyamindia.online';
   return `
     <div class="admin-section">
       <div class="admin-section-header">

@@ -1047,7 +1047,7 @@ export async function fetchPurchases(params = {}) {
 
         // 3. Fetch related data in parallel
         const [profilesRes, booksRes] = await Promise.all([
-            profileIds.length > 0 ? db.from('profiles').select('id, full_name, registration_source').in('id', profileIds) : Promise.resolve({ data: [] }),
+            profileIds.length > 0 ? db.from('profiles').select('id, full_name, mobile, registration_source').in('id', profileIds) : Promise.resolve({ data: [] }),
             bookIds.length > 0 ? db.from('books').select('id, title').in('id', bookIds) : Promise.resolve({ data: [] }) // FIX: Removed 'name' column
         ]);
 
@@ -1062,6 +1062,8 @@ export async function fetchPurchases(params = {}) {
             return {
                 order: p.payment_id || 'N/A',
                 customer: profile.full_name || 'Unknown User',
+                mobile: profile.mobile || '',
+                book_id: p.book_id || '',
                 book: book.title || p.book_id || 'Unknown Book', // FIX: Use only 'title'
                 amount: `₹${p.amount || 0}`,
                 source: profile.registration_source || 'Direct',
