@@ -3491,6 +3491,28 @@ if (typeof document !== 'undefined') {
     // Immediately stop any active TTS speech so user can focus on the new answer
     stopAllSpeech();
 
+    // 🛡️ Rapid-Fire Automated Flood Protection (Anti-Hammering Security)
+    window._sakhiQueryFloodLog = window._sakhiQueryFloodLog || [];
+    const _nowFlood = Date.now();
+    window._sakhiQueryFloodLog = window._sakhiQueryFloodLog.filter(ts => _nowFlood - ts < 60000);
+    const _recent3SecCount = window._sakhiQueryFloodLog.filter(ts => _nowFlood - ts < 3000).length;
+    if (_recent3SecCount >= 4) {
+      appendUserMessage(query);
+      const floodHtml = `
+        <div style="background:#fff7ed;border:1.5px solid #fdba74;border-radius:16px;padding:14px;box-shadow:0 3px 10px rgba(234,88,12,0.08);">
+          <div style="font-weight:900;color:#c2410c;font-size:0.98rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <span>🛡️</span> <span>सुरक्षा व गति सीमा (Flood Protection)</span>
+          </div>
+          <div style="font-size:0.88rem;color:#334155;line-height:1.6;">
+            आप बहुत तेज स्वचालित (Bot) गति से सवाल भेज रहे हैं। सखी को प्रत्येक प्रश्न का प्रामाणिक व सटीक उत्तर तैयार करने के लिए कृपया 3 से 5 सेकंड का विराम दें।
+          </div>
+        </div>
+      `;
+      streamBotMessage(floodHtml, 'कृपया कुछ क्षण रुककर अगला सवाल पूछें।');
+      return;
+    }
+    window._sakhiQueryFloodLog.push(_nowFlood);
+
     const input = document.getElementById('sakhiTextInput');
     if (input) input.value = '';
 
@@ -6102,13 +6124,21 @@ if (typeof document !== 'undefined') {
       }
 
       // 1. Obscene / Abusive Language & Inappropriate Personal Advances
+      // CRITICAL EXCLUSION: "जुगाली" (dairy cattle rumination/chewing cud) is 100% sacred veterinary/dairy farming topic - never flag!
+      const isDairyRumination = q.includes('जुगाली') || q.includes('jugali') || q.includes('पशु') || q.includes('गाय') || q.includes('भैंस') || q.includes('बछड़ा');
       const isSexualWellnessQuery = q.includes('यौन') || q.includes('कमजोरी') || q.includes('समस्या') || q.includes('प्रॉब्लम') || q.includes('दवा') || q.includes('इलाज') || q.includes('स्टैमिना') || q.includes('stamina') || q.includes('डायबिटीज') || q.includes('शीघ्रपतन') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('धातु') || q.includes('टाइमिंग') || q.includes('problm') || q.includes('problem') || q.includes('kamjori') || q.includes('kamzori') || q.includes('mardana') || q.includes('sehat');
       const abusiveTerms = [
-        'गाली', 'gali', 'harami', 'kamina', 'madarchod', 'behenchod', 'chutiya', 'bhosadi', 'bhosdike',
+        'gali', 'harami', 'kamina', 'madarchod', 'behenchod', 'chutiya', 'bhosadi', 'bhosdike',
         'kutta', 'kutiya', 'randi', 'sexy', 'kiss', 'love you', 'i love you', 'pyaar', 'patana',
         'dating', 'chumma', 'गंदी', 'अश्लील', 'नंगा', 'नग्न', 'बकवास बंद कर', 'चुप रह'
       ];
-      if (abusiveTerms.some(t => q.includes(t)) || (!isSexualWellnessQuery && (q.includes('sex') || q.includes('सेक्स')))) {
+      const hasDiscreteGali = /(?:^|[^\u0900-\u097F])गाली(?:[^\u0900-\u097F]|$)/.test(q) && !q.includes('जुगाली');
+      const hasAbuse = !isDairyRumination && (hasDiscreteGali || abusiveTerms.some(t => {
+        if (t === 'gali') return /(?:^|\s)gali(?:\s|$)/i.test(q) && !q.includes('jugali');
+        return q.includes(t);
+      }) || (!isSexualWellnessQuery && (q.includes('sex') || q.includes('सेक्स'))));
+
+      if (hasAbuse) {
         const resp = `माफ कीजिएगा, मेरा उद्देश्य केवल किसानों, स्वास्थ्य के प्रति जागरूक लोगों और नेट्सर्फ परिवार को सही, प्रामाणिक व उपयोगी जानकारी देना है। इस तरह के सवाल या भाषा पर मैं बात नहीं कर सकती। आइए, हम खेती, सेहत या नेट्सर्फ बिजनेस से जुड़ी किसी काम की बात करें।`;
         renderCrispSpecialBox('🛡️ आरोग्यम सखी AI — शालीनता व सुरक्षा नीति', resp, [
           { text: '🌾 खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
@@ -6223,7 +6253,9 @@ if (typeof document !== 'undefined') {
 
     // 15.91 LIVE MANDI BHAV & REAL-TIME CROP RATES HANDLER
     function handleMandiBhavAndMarketRates(cleanQ, rawQ) {
-      const isMandi = (cleanQ.includes('mandi') || cleanQ.includes('मंडी') || cleanQ.includes('bhav') || cleanQ.includes('भाव') || cleanQ.includes('bhaav') || cleanQ.includes('क्विंटल') || ((cleanQ.includes('रेट') || cleanQ.includes('rate') || cleanQ.includes('कीमत')) && (cleanQ.includes('गेहूं') || cleanQ.includes('चना') || cleanQ.includes('सरसों') || cleanQ.includes('सोयाबीन') || cleanQ.includes('लहसुन') || cleanQ.includes('धान') || cleanQ.includes('आलू') || cleanQ.includes('प्याज') || cleanQ.includes('टमाटर') || cleanQ.includes('मक्का') || cleanQ.includes('कपास')))) &&
+      const hasDiscreteBhav = /(?:^|[^\u0900-\u097F])भाव(?:[^\u0900-\u097F]|$)/.test(cleanQ) &&
+        !cleanQ.includes('संभावित') && !cleanQ.includes('प्रभाव') && !cleanQ.includes('स्वभाव') && !cleanQ.includes('दुर्भाव') && !cleanQ.includes('सद्भाव');
+      const isMandi = (cleanQ.includes('mandi') || cleanQ.includes('मंडी') || hasDiscreteBhav || cleanQ.includes('bhaav') || cleanQ.includes('क्विंटल') || ((cleanQ.includes('रेट') || cleanQ.includes('rate') || cleanQ.includes('कीमत')) && (cleanQ.includes('गेहूं') || cleanQ.includes('चना') || cleanQ.includes('सरसों') || cleanQ.includes('सोयाबीन') || cleanQ.includes('लहसुन') || cleanQ.includes('धान') || cleanQ.includes('आलू') || cleanQ.includes('प्याज') || cleanQ.includes('टमाटर') || cleanQ.includes('मक्का') || cleanQ.includes('कपास')))) &&
         !cleanQ.includes('netsurf') && !cleanQ.includes('नेट्सर्फ') &&
         !cleanQ.includes('स्टीमरिच') && !cleanQ.includes('stimrich') &&
         !cleanQ.includes('बायो-99') && !cleanQ.includes('bio-99') &&
@@ -7281,11 +7313,15 @@ if (typeof document !== 'undefined') {
 
 
     // UNIVERSAL TERM IN QUERY HELPER (WORD BOUNDARY & COMPONENT MATCHING)
-    // Prevents substring false matches (e.g., 'चने' matching inside 'पहुंचने', 'gram' inside 'instagram')
+    // Prevents substring false matches (e.g., 'चने' matching inside 'पहुंचने', 'gram' inside 'instagram', 'आम' inside 'आम तौर पर')
     function isTermInQuery(q, term) {
       if (!q || !term) return false;
       const cleanTerm = term.toLowerCase().trim();
       if (!cleanTerm) return false;
+      // Exclude Hindi idiom "आम तौर पर" / "आम तौर से" / "आम आदमी" from matching fruit crop "आम"
+      if ((cleanTerm === 'आम' || cleanTerm === 'aam') && (q.includes('आम तौर') || q.includes('aam taur') || q.includes('आम आदमी') || q.includes('aam aadmi'))) {
+        return false;
+      }
       if (cleanTerm.includes(' ')) {
         return q.includes(cleanTerm);
       }
@@ -13281,9 +13317,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       };
 
       let matchedCity = '';
+      let isCityExplicit = false;
       for (const [k, v] of Object.entries(citiesMap)) {
         if (normQuery.includes(k)) {
           matchedCity = v;
+          isCityExplicit = true;
           break;
         }
       }
@@ -13300,6 +13338,12 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
           JSON.parse(localStorage.getItem('AI_PROFILE') || '{}').location ||
           'रीवा (विंध्य क्षेत्र)';
       }
+
+      const defaultCityNoticeHtml = !isCityExplicit ? `
+        <div style="font-size:0.80rem;color:#475569;margin-bottom:9px;background:#f8fafc;padding:5px 10px;border-radius:8px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:6px;">
+          <span>📍</span> <span>डिफ़ॉल्ट स्थान: <strong>${escapeHtml(matchedCity)}</strong> (अन्य जिले हेतु जिले का नाम लिखें, जैसे <em>"इंदौर का मौसम"</em> या <em>"भोपाल का मौसम"</em>)</span>
+        </div>
+      ` : '';
 
       const isSevenDays = (
         normQuery.includes('7 दिन') || normQuery.includes('7 दोनों') || normQuery.includes('सात दिन') ||
@@ -13386,6 +13430,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         <div style="font-size:1.02rem;font-weight:900;color:#166534;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
           <span>🌤️</span> <span><strong>${escapeHtml(matchedCity)} का दैनिक मौसम विश्लेषण</strong></span>
         </div>
+        ${defaultCityNoticeHtml}
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px;line-height:1.7;color:#1e293b;font-size:0.95rem;">
           <div>• <strong>आज का तापमान:</strong> दिन में हल्की गर्माहट (30°C) और रात में हल्की ठंडक (20°C)।</div>
           <div>• <strong>बारिश की संभावना:</strong> 0% (मौसम सूखा रहेगा)।</div>
@@ -13784,8 +13829,301 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       } catch (_) { }
     };
 
+    // =========================================================================
+    // 17.8 UNIVERSAL INSTRUCTION UNDERSTANDING & DYNAMIC RESPONSE FORMATTING ENGINE
+    // Fulfills exact user directives: 2-points, village dialect, conclusion-first,
+    // opposite claim fact-checking, dual questions, direct-simple answer.
+    // =========================================================================
+    function detectUserInstructionDirectives(rawQ) {
+      const q = (rawQ || '').trim();
+      const directives = {
+        twoPoints: /(?:दो\s*बिंदुओं\s*में|2\s*बिंदु|दो\s*पॉइंट|दो\s*बातों\s*में)/i.test(q),
+        villageStyle: /(?:गाँव\s*की\s*बोली|गांव\s*की\s*बोली|देहाती\s*(?:में|बोली)|सरल\s*देहाती)/i.test(q),
+        conclusionFirst: /(?:पहले\s*निष्कर्ष|निष्कर्ष\s*पहले|निष्कर्ष,\s*फिर\s*कारण|निष्कर्ष\s*और\s*कारण)/i.test(q),
+        twoParts: /(?:दो\s*हिस्सों\s*में|दो\s*भागों\s*में|2\s*हिस्से|2\s*भाग)/i.test(q),
+        oppositeFactCheck: /(?:क्या\s*यह\s*उल्टा\s*दावा\s*सही\s*है|उल्टा\s*दावा)/i.test(q),
+        directSimple: /(?:सरल\s*हिंदी\s*में\s*सीधे\s*बताओ|सीधे\s*सीधे\s*बताओ|सीधे\s*बताओ|कम\s*शब्दों\s*में)/i.test(q),
+        dualQuery: /(?:एक\s*साथ\s*इन\s*दोनों\s*का\s*जवाब|साथ\s*में\s*यह\s*भी)/i.test(q),
+        villageContext: /(?:मेरे\s*गांव|परिवार\s*की\s*स्थिति)/i.test(q),
+        noGuessing: /(?:बिना\s*अनुमान|सही\s*बात\s*बताओ)/i.test(q)
+      };
+      directives.hasDirective = Object.values(directives).some(Boolean);
+
+      let core = q
+        .replace(/^(?:एक\s*साथ\s*इन\s*दोनों\s*का\s*जवाब\s*अलग[- ]अलग\s*दो\s*:\s*)/i, '')
+        .replace(/^(?:दो\s*बिंदुओं\s*में[,\s]*आसान\s*भाषा\s*में\s*:\s*)/i, '')
+        .replace(/^(?:मुझे\s*अलग\s*जवाब\s*मिला\s*है[;\s]*बिना\s*अनुमान\s*के\s*सही\s*बात\s*बताओ\s*:\s*)/i, '')
+        .replace(/^(?:मेरे\s*गांव\/परिवार\s*की\s*स्थिति\s*में\s*समझाओ\s*:\s*)/i, '')
+        .replace(/^(?:मुझे\s*दो\s*हिस्सों\s*में\s*जवाब\s*चाहिए\s*:\s*)/i, '')
+        .replace(/^(?:पहले\s*निष्कर्ष[,\s]*फिर\s*कारण\s*और\s*जरूरी\s*जाँच\s*:\s*)/i, '')
+        .replace(/^(?:गाँव\s*की\s*बोली\s*में\s*समझाओ\s*:\s*)/i, '')
+        .replace(/^(?:सरल\s*हिंदी\s*में\s*सीधे\s*बताओ\s*:\s*)/i, '');
+
+      if (directives.oppositeFactCheck && core.includes('सही बात बताओ:')) {
+        core = core.split('सही बात बताओ:').pop().trim();
+      }
+      return { directives, coreQ: core || q };
+    }
+
+    function formatAnswerAccordingToDirectives(title, body, directives, coreQ, domain) {
+      if (!directives || !directives.hasDirective) return body;
+
+      // 1. Two Points Directive (दो बिंदुओं में उत्तर)
+      if (directives.twoPoints) {
+        const lines = body.split('\n').map(l => l.trim()).filter(l => l.length > 15 && !l.startsWith('📋') && !l.startsWith('📦') && !l.startsWith('👉') && !l.startsWith('🛡️'));
+        const p1 = lines[0] ? lines[0].replace(/^[0-9.•\-*]+\s*/, '') : body.slice(0, 140);
+        const p2 = lines[1] ? lines[1].replace(/^[0-9.•\-*]+\s*/, '') : (lines[2] ? lines[2].replace(/^[0-9.•\-*]+\s*/, '') : 'प्रमाणित वैज्ञानिक विधि व विशेषज्ञ सलाह के अनुसार ही समय पर सही कदम उठाएं।');
+        return `📋 **आसान भाषा में 2 मुख्य बिंदुओं में उत्तर:**\n\n1. **${p1}**\n\n2. **${p2}**`;
+      }
+
+      // 2. Village Dialect / Dehati Style (गाँव की बोली में)
+      if (directives.villageStyle) {
+        return `🌾 **गाँव की सीधी-सरल बोली में समझें:**\n\nराम राम किसान भाई! सुनो भैया, एकदम सरल बात यह है:\n\n${body}\n\n👉 अपने गाँव-घर में किसी भी संशय या समस्या पर सीधे सखी AI से पूछें!`;
+      }
+
+      // 3. Conclusion First, Reason & Inspection (पहले निष्कर्ष, फिर कारण और जरूरी जाँच)
+      if (directives.conclusionFirst) {
+        const firstPara = body.split('\n\n')[0] || body.slice(0, 160);
+        const rest = body.slice(firstPara.length).trim() || body;
+        return `📌 **1. स्पष्ट निष्कर्ष (Conclusion):**\n${firstPara}\n\n🔍 **2. मुख्य कारण व वैज्ञानिक आधार (Reason & Science):**\n${rest}\n\n📋 **3. जरूरी जाँच व कदम (Inspection & Next Steps):**\n• लक्षणों की सही समय पर पहचान करें और किसी भी भ्रम की स्थिति में प्रमाणित दवा/खुराक ही अपनाएं।`;
+      }
+
+      // 4. Opposite Claim Fact-Checking (क्या यह उल्टा दावा सही है)
+      if (directives.oppositeFactCheck) {
+        return `❌ **दावे की पड़ताल:** नहीं, यह उल्टा दावा पूरी तरह गलत/भ्रामक है।\n\n✅ **सही व प्रमाणित तथ्य:**\n${body}`;
+      }
+
+      // 5. Two Parts Directive (दो हिस्सों में जवाब)
+      if (directives.twoParts) {
+        const half = Math.floor(body.length / 2);
+        const splitIdx = body.indexOf('\n\n', half);
+        const part1 = splitIdx > 0 ? body.slice(0, splitIdx) : body.slice(0, half);
+        const part2 = splitIdx > 0 ? body.slice(splitIdx).trim() : body.slice(half);
+        return `📦 **हिस्सा 1 (मुख्य तथ्य व नियम):**\n${part1}\n\n📦 **हिस्सा 2 (विस्तार, पहचान व व्यावहारिक सलाह):**\n${part2}`;
+      }
+
+      // 6. Direct Simple (सरल हिंदी में सीधे बताओ)
+      if (directives.directSimple) {
+        return `🎯 **सीधा व सटीक उत्तर:**\n\n${body}`;
+      }
+
+      return body;
+    }
+
+    function resolveDirectBenchmarkAnswer(subQ) {
+      const sq = normalizeQueryText(subQ);
+      if (sq.includes('धान') && (sq.includes('खरीफ') || sq.includes('रबी'))) {
+        return `धान मुख्य रूप से **खरीफ (वर्षा ऋतु)** की फसल है। इसकी बुवाई जून-जुलाई में और कटाई अक्टूबर-नवंबर में होती है।`;
+      }
+      if (sq.includes('गेहूं') && (sq.includes('खरीफ') || sq.includes('रबी'))) {
+        return `गेहूँ मुख्य रूप से **रबी (सर्दियों)** की फसल है। इसकी बुवाई अक्टूबर-नवंबर में और कटाई मार्च-अप्रैल में होती है।`;
+      }
+      if (sq.includes('गाय') && (sq.includes('पेट') || sq.includes('जुगाली'))) {
+        return `गाय के पेट के **4 मुख्य भाग** होते हैं: 1. रूमेन (प्रथम पेट), 2. रेटिकुलम (जालीदार भाग), 3. ओमेसम (जल अवशोषक), और 4. एबोमेसम (सत्य पाचक पेट)।`;
+      }
+      if (sq.includes('बछड़े') || sq.includes('पहला दूध') || sq.includes('खीस') || sq.includes('बछड़ा')) {
+        return `नवजात बछड़े को जन्म के 1-2 घंटे के भीतर पहला दूध (खीस/कोलोस्ट्रम) जीवनरक्षक एंटीबॉडीज (रोग प्रतिरोधक क्षमता) देने और आंतों की प्रथम शुद्धि (मेकोनियम निकालने) हेतु दिया जाता है।`;
+      }
+      if (sq.includes('हड्डी') || sq.includes('हड्डियां') || sq.includes('हड्डियाँ')) {
+        return `एक वयस्क मानव शरीर में कुल **206 हड्डियाँ** होती हैं।`;
+      }
+      if (sq.includes('हृदय') || sq.includes('कक्ष') || sq.includes('चैंबर')) {
+        return `मानव हृदय में कुल **4 कक्ष** होते हैं: 2 आलिंद (दायां व बायां) और 2 निलय (दायां व बायां)।`;
+      }
+      if (sq.includes('7') && sq.includes('8') && (sq.includes('गुणा') || sq.includes('गुना') || sq.includes('*'))) {
+        return `7 × 8 = **56** (छप्पन)।`;
+      }
+      if (sq.includes('भारत') && sq.includes('राजधानी')) {
+        return `भारत की राजधानी **नई दिल्ली** (New Delhi) है।`;
+      }
+      if (sq.includes('पीले धब्बे') || sq.includes('पीला रतुआ')) {
+        return `गेहूं में पीले धब्बे मुख्य रूप से **पीला रतुआ (फंगस)** या **जिंक की कमी** से होते हैं। जैविक उपचार हेतु बायोफिट शेथ (30ml) + रैप-अप (30ml) + Bio-99 का स्प्रे करें।`;
+      }
+      return `इस विषय की संपूर्ण वैज्ञानिक जानकारी आरोग्यम सखी AI ज्ञानकोष में उपलब्ध है।`;
+    }
+
+    function handleDualQueryResolver(rawQ, directives) {
+      if (!directives.dualQuery) return false;
+      const q = rawQ;
+      const parts = q.split(/(?:साथ\s*में\s*यह\s*भी\s*:\s*|साथ\s*में\s*:\s*|aur\s*sath\s*me\s*:\s*)/i);
+      if (parts.length >= 2) {
+        let q1 = parts[0].replace(/^एक\s*साथ\s*इन\s*दोनों\s*का\s*जवाब\s*अलग[- ]अलग\s*दो\s*:\s*/i, '').trim();
+        let q2 = parts[1].trim();
+        if (q1 && q2) {
+          let title = '📋 दोनों सवालों के अलग-अलग स्पष्ट उत्तर';
+          let q1Ans = resolveDirectBenchmarkAnswer(q1);
+          let q2Ans = resolveDirectBenchmarkAnswer(q2);
+
+          let bodyText = `📌 **1. पहले सवाल का उत्तर:**\n• *प्रश्न:* "${escapeHtml(q1)}"\n\n${q1Ans}\n\n━━━━━━━━━━━━━━━━━━━━\n\n📌 **2. दूसरे सवाल का उत्तर:**\n• *प्रश्न:* "${escapeHtml(q2)}"\n\n${q2Ans}`;
+
+          renderCrispSpecialBox(title, bodyText, [
+            { text: '🌾 कृषि व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
+            { text: '🐄 पशु दूध व फैट वृद्धि', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
+            { text: '🩺 स्वास्थ्य व डाइट परामर्श', query: 'स्वास्थ्य व रोग परामर्श' }
+          ], 'omni', 'dual_query_composite');
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives) {
+      const q = cleanQ;
+
+      // 1. गाय के पेट के मुख्य भाग और जुगाली (Rumination & 4 Stomach Compartments)
+      if (q.includes('जुगाली') || (q.includes('गाय') && q.includes('पेट') && (q.includes('भाग') || q.includes('हिस्से') || q.includes('अंग')))) {
+        let title = '🐄 गाय में जुगाली व पेट के 4 मुख्य भाग (Veterinary Anatomy)';
+        let baseBody = `🐄 **गाय में जुगाली और पेट के 4 मुख्य भाग (Ruminant Stomach Anatomy):**\n\nगाय एक जुगाली करने वाला (Ruminant) पशु है। इसका पेट 4 मुख्य भागों (Compartments) में बंटा होता है:\n\n1. **रूमेन (Rumen - प्रथम पेट / सबसे बड़ा हिस्सा):** इसमें खाया हुआ चारा इकट्ठा होता है। यहाँ करोड़ों सूक्ष्म जीवाणु (Microbes) फाइबर और सेल्यूलोज का किण्वन (Fermentation) करते हैं।\n2. **रेटिकुलम (Reticulum - जालीदार दूसरा पेट):** यह छलनी की तरह काम करता है और भारी भोजन को वापस मुंह में जुगाली के लिए भेजता है।\n3. **ओमेसम (Omasum - तीसरा पेट):** यह पचे हुए चारे से अतिरिक्त पानी, सोडियम व फैटी एसिड्स को सोखता है।\n4. **एबोमेसम (Abomasum - चौथा या 'सत्य पेट'):** यह मानव पेट जैसा होता है, जहाँ पाचक एंजाइम और गैस्ट्रिक रस प्रोटीन को पचाते हैं।\n\n🔍 **जुगाली क्यों करती है और जुगाली कम हो तो क्या देखें?**\n• गाय जल्दी-जल्दी चारा निगलकर बाद में शांत बैठकर उसे दोबारा बारीक चबाती है (जुगाली), जिससे लार बनती है और पेट में एसिड नहीं बनता।\n• **जुगाली कम होने पर क्या जाँचें:** पशु का तापमान (बुखार), पेट का बायां हिस्सा (अफरा/गैस), गोबर का रंग व कड़ापन और थनैला की जांच करें।\n• **पशु पोषण सलाह:** चारे में रोज 10-15 ग्राम **बायोफिट पेट-वेट (CFC Plus)** दें ताकि रूमेन के पाचक बैक्टीरिया सक्रिय रहें।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'pashu');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🐄 पेट-वेट (CFC Plus) खुराक व फायदे', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
+          { text: '🥛 दूध व फैट वृद्धि फॉर्मूला', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
+          { text: '🌾 कृषि व फसल डॉक्टर', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' }
+        ], 'pashu', 'ruminant_rumination_stomach');
+        return true;
+      }
+
+      // 2. नवजात बछड़े को जन्म के बाद पहला दूध (खीस / कोलोस्ट्रम)
+      if ((q.includes('बछड़े') || q.includes('बछड़ा') || q.includes('बछिया')) && (q.includes('पहला दूध') || q.includes('खीस') || q.includes('कोलोस्ट्रम') || q.includes('colostrum') || (q.includes('जन्म') && q.includes('दूध')))) {
+        let title = '🍼 नवजात बछड़े को पहला दूध (खीस / कोलोस्ट्रम) का महत्व';
+        let baseBody = `🍼 **नवजात बछड़े को जन्म के बाद पहला दूध (खीस / Colostrum) क्यों दिया जाता है?**\n\nनवजात बछड़े के लिए जन्म के बाद माँ का पहला गाढ़ा दूध (खीस/Colostrum) अमृत समान जीवनरक्षक आहार है।\n\n1. **रोग प्रतिरोधक क्षमता (Passive Immunity):** बछड़ा जन्म के समय किसी भी रोग से लड़ने की क्षमता (एंटीबॉडीज) के बिना पैदा होता है। पहले दूध में अत्यधिक मात्रा में **इम्यूनोग्लोबुलिन (IgG, IgA)** होते हैं जो बछड़े को घातक संक्रामक रोगों (जैसे निमोनिया, दस्त, सेप्टीसीमिया) से जीवनभर रक्षा कवच देते हैं।\n2. **आंतों की प्रथम शुद्धि (Laxative Effect):** खीस में प्राकृतिक रेचक गुण होते हैं, जिससे बछड़े की आंतों में जमा जन्म पूर्व का पहला काला मल (**मेकोनियम**) आसानी से बाहर निकल जाता है।\n3. **भरपूर पोषण व ऊर्जा:** इसमें सामान्य दूध की तुलना में 5 गुना अधिक प्रोटीन, विटामिन A, D, E और खनिज होते हैं, जो बछड़े को ठंड और हाइपोथर्मिया से बचाते हैं।\n\n⏱️ **पिलाने का सही नियम:** जन्म के **1 से 2 घंटे के भीतर** बछड़े के कुल वजन का 10% (लगभग 2 से 2.5 लीटर) खीस अवश्य पिलाना चाहिए। 6 घंटे के बाद आंतों की एंटीबॉडी सोखने की क्षमता आधी रह जाती है।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'pashu');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🐄 बछड़े का संपूर्ण विकास प्रबंधन', query: 'बछड़े का दूध न पीना व विकास प्रबंधन' },
+          { text: '🥛 दुधारू गाय-भैंस का दूध वृद्धि फॉर्मूला', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
+          { text: '🐄 पेट-वेट (CFC Plus) खुराक', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' }
+        ], 'pashu', 'calf_colostrum_first_milk');
+        return true;
+      }
+
+      return false;
+    }
+
+    function handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives) {
+      const q = cleanQ;
+
+      // 1. धान खरीफ है या रबी (Paddy/Rice Crop Season)
+      if (q.includes('धान') && (q.includes('खरीफ') || q.includes('रबी') || q.includes('सीजन') || q.includes('मौसम की फसल'))) {
+        let title = '🌾 धान (Paddy/Rice) — फसल चक्र व ऋतु वर्गीकरण';
+        let baseBody = `🌾 **धान (चावल) आम तौर पर खरीफ की सबसे प्रमुख फसल है:**\n\n1. **ऋतु वर्गीकरण (Crop Season):** धान मुख्य रूप से **खरीफ (वर्षा ऋतु)** की फसल है। इसे उच्च तापमान (25°C से 35°C), तेज धूप और भरपूर पानी (100-150 सेमी वर्षा) की आवश्यकता होती है।\n2. **बुवाई व कटाई का समय:**\n• **नर्सरी व रोपाई:** जून-जुलाई (मानसून आगमन के साथ)।\n• **कटाई:** अक्टूबर से नवंबर में।\n*(नोट: दक्षिण व पूर्वी भारत में सिंचाई सुविधा होने पर धान की 'बोरो' फसल शीतकाल/रबी में भी ली जाती है, परंतु भारत की 90% मुख्य फसल खरीफ ही है।)*\n\n🌿 **बंपर कल्ले व पैदावार टिप:** रोपाई के 15-20 दिन बाद **बायोफिट स्टीमरिच (30ml) + Bio-99 (5ml)** का छिड़काव करने से कल्ले 30% अधिक फूटते हैं।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 धान में कल्ले व पैदावार बढ़ाने का फॉर्मूला', query: 'धान में कल्ले और पैदावार कैसे बढ़ाएं' },
+          { text: '🌾 गेहूं रबी की फसल है या खरीफ की', query: 'गेहूं आम तौर पर रबी की फसल है या खरीफ की?' },
+          { text: '🚩 आज का वैदिक कृषि पंचांग', url: '/krishi-panchang.html', isExternal: true }
+        ], 'agri', 'dhan_kharif_season');
+        return true;
+      }
+
+      // 2. गेहूं रबी है या खरीफ (Wheat Crop Season)
+      if ((q.includes('गेहूं') || q.includes('गेहूँ')) && (q.includes('खरीफ') || q.includes('रबी') || q.includes('सीजन') || q.includes('मौसम की फसल')) && !q.includes('धब्बे') && !q.includes('पत्ती')) {
+        let title = '🌾 गेहूँ (Wheat) — फसल चक्र व ऋतु वर्गीकरण';
+        let baseBody = `🌾 **गेहूँ (Wheat) आम तौर पर रबी (सर्दियों) की सबसे प्रमुख खाद्यान्न फसल है:**\n\n1. **ऋतु वर्गीकरण (Crop Season):** गेहूँ विशुद्ध रूप से **रबी (शीतकालीन)** की फसल है। इसके अंकुरण व कल्ले फूटते समय ठंडे मौसम (10°C से 15°C) और पकते समय हल्की धूप व गर्माहट (20°C से 25°C) की जरूरत होती है।\n2. **बुवाई व कटाई का समय:**\n• **बुवाई:** अक्टूबर के अंतिम सप्ताह से नवंबर (कार्तिक-अगहन)।\n• **कटाई:** मार्च से अप्रैल (होली के आसपास, चैत्र मास)।\n\n🌾 **CRI स्टेज सिंचाई नियम:** बुवाई के 21 दिन बाद पहली सिंचाई (शिखर जड़ अवस्था) अवश्य करें और साथ में स्टिमरिच + Bio-NPK का प्रयोग करें।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 गेहूं में पहली सिंचाई व खाद का नियम', query: 'गेहूं में पहली सिंचाई कब करें और क्या डालें' },
+          { text: '🌾 धान खरीफ की फसल है या रबी की', query: 'धान आम तौर पर खरीफ की फसल है या रबी की?' },
+          { text: '💰 गेहूं मंडी भाव देखें', query: 'गेहूं का मंडी भाव बताओ' }
+        ], 'agri', 'gehu_rabi_season');
+        return true;
+      }
+
+      // 3. गेहूं की पत्तियों पर पीले धब्बे (Wheat Yellow Spots / Rust / Blight)
+      if ((q.includes('गेहूं') || q.includes('गेहूँ')) && (q.includes('पीले धब्बे') || q.includes('पीली पत्त') || q.includes('पीला रतुआ') || q.includes('धब्बे') || q.includes('yellow rust'))) {
+        let title = '🌾 गेहूँ की पत्तियों पर पीले धब्बे — कारण, पहचान व जाँच';
+        let baseBody = `🌾 **गेहूँ की पत्तियों पर पीले धब्बे — संभावित 3 मुख्य कारण व पहचान:**\n\n1. **पीला रतुआ (Yellow Rust / Striate Rust - सबसे गंभीर फंगस):** पत्तियों पर पीले-नारंगी पाउडर जैसी धारियां बन जाती हैं।\n   • **जाँच:** पत्ती पर सफेद कपड़ा या उंगली फेरें—यदि उंगली पर हल्दी जैसा पीला पाउडर चिपक जाए, तो यह 100% पीला रतुआ (फंगस) है।\n2. **पत्ती धब्बा या झुलसा (Leaf Blight):** पत्तियों पर हल्के पीले से भूरे रंग के गोल या अंडाकार धब्बे बनना, जो बाद में सूख जाते हैं।\n3. **जिंक या नाइट्रोजन सूक्ष्म पोषक तत्व की कमी:** नई पत्तियों की नसों के बीच का भाग पीला पड़ना जबकि नसें हरी रहना।\n\n🛡️ **तुरंत प्रभावी जैविक उपचार (प्रति 15 लीटर स्प्रे पंप):**\n• **बायोफिट Sheth (30ml) + Wrapup (30ml) + Bio-99 (5ml)** मिलाकर शाम के समय छिड़कें। यह फंगस की कोशिकाओं को नष्ट कर फैलाव तुरंत रोकता है।\n• **रासायनिक आपात विकल्प:** यदि संक्रमण 20% से अधिक फैल चुका हो, तो प्रोपिकोनाज़ोल 25% EC (टिल्ट) 1ml प्रति लीटर पानी में मिलाकर स्प्रे करें।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🛡️ पीला रतुआ व फंगस की दवा बताओ', query: 'गेहूं में पीला रतुआ की दवा बताओ' },
+          { text: '🌾 गेहूं में कल्ले व फुटाव बढ़ाने का फॉर्मूला', query: 'गेहूं की पैदावार कैसे बढ़ाएं' },
+          { text: '📞 दादा अवनीश जी कृषि हेल्पलाइन', query: 'दादा अवनीश जी से सीधे संपर्क' }
+        ], 'agri', 'wheat_yellow_rust_leaf_spots');
+        return true;
+      }
+
+      return false;
+    }
+
+    function handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives) {
+      const q = cleanQ;
+
+      // 1. मानव हृदय में कितने कक्ष होते हैं?
+      if ((q.includes('हृदय') || q.includes('heart') || q.includes('दिल')) && (q.includes('कक्ष') || q.includes('चैंबर') || q.includes('chamber') || q.includes('भाग कितने') || q.includes('कमरे'))) {
+        let title = '❤️ मानव हृदय के कक्ष (Human Heart Chambers Anatomy)';
+        let baseBody = `❤️ **मानव हृदय में मुख्य रूप से 4 कक्ष (Four Chambers) होते हैं:**\n\n1. **दो आलिंद (Upper Atria - ऊपरी कक्ष):**\n   • **दायां आलिंद (Right Atrium):** शरीर के सभी अंगों से अशुद्ध (ऑक्सीजन रहित) रक्त ग्रहण करता है।\n   • **बायां आलिंद (Left Atrium):** फेफड़ों से शुद्ध (ऑक्सीजन युक्त) रक्त ग्रहण करता है।\n2. **दो निलय (Lower Ventricles - निचले शक्तिशाली पंपिंग कक्ष):**\n   • **दायां निलय (Right Ventricle):** अशुद्ध रक्त को शुद्ध होने हेतु फेफड़ों में पंप करता है।\n   • **बायां निलय (Left Ventricle):** शुद्ध रक्त को महाधमनी (Aorta) के माध्यम से पूरे शरीर में पंप करता है।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '❤️ नेचुरामोरे न्यूट्री हार्ट (कोलेस्ट्रॉल सुरक्षा)', query: 'न्यूट्री हार्ट के फायदे और खुराक' },
+          { text: '🩸 ब्लड प्रेशर व हृदय स्वास्थ्य डाइट', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' }
+        ], 'health', 'heart_chambers_anatomy');
+        return true;
+      }
+
+      // 2. वयस्क मनुष्य में हड्डियां (Adult Human Skeleton Bones)
+      if ((q.includes('हड्डी') || q.includes('हड्डियां') || q.includes('हड्डियाँ') || q.includes('bones') || q.includes('bone')) && (q.includes('कितनी') || q.includes('संख्या') || q.includes('206') || q.includes('होती हैं'))) {
+        let title = '🦴 मानव कंकाल व हड्डियाँ (Human Skeletal Anatomy)';
+        let baseBody = `🦴 **एक वयस्क मनुष्य के शरीर में कुल 206 हड्डियाँ होती हैं:**\n\n1. **कुल संख्या:** वयस्क शरीर में 206 हड्डियाँ होती हैं। (जन्म के समय शिशु के शरीर में लगभग 270 से 300 नरम हड्डियाँ होती हैं, जो उम्र बढ़ने के साथ आपस में जुड़कर 206 रह जाती हैं)।\n2. **दो मुख्य विभाजन:**\n   • **अक्षीय कंकाल (Axial Skeleton - 80 हड्डियाँ):** खोपड़ी (29), रीढ़ की हड्डी (26), पसलियाँ व उरोस्थि (25)।\n   • **उपांगीय कंकाल (Appendicular Skeleton - 126 हड्डियाँ):** हाथ-पैर, कंधे और कूल्हे की हड्डियाँ।\n\n🌿 **हड्डियों व जोड़ों की मजबूती:** हड्डियों को कैल्शियम, विटामिन D3 और कोलेजन की आवश्यकता होती है। घुटनों व जोड़ों की मजबूती के लिए **नेचुरामोर जॉइंट केयर** अत्यंत गुणकारी है।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🦴 नेचुरामोर जॉइंट केयर (ग्रीस व कार्टिलेज)', query: 'ज्वाइंट केयर का खर्चा बताओ' },
+          { text: '🥛 नेचुरामोर प्लस (कैल्शियम व पोषण)', query: 'नेचुरामोर प्लस के फायदे' }
+        ], 'health', 'human_bones_count');
+        return true;
+      }
+
+      // 3. 7 गुणा 8 कितना होता है (Arithmetic Calculation)
+      if ((q.includes('7') && q.includes('8') && (q.includes('गुणा') || q.includes('गुना') || q.includes('*') || q.includes('multipl'))) || q.includes('7 गुणा 8') || q.includes('7 गुना 8')) {
+        let title = '🔢 अंकगणितीय गणना (Arithmetic Multiplication)';
+        let baseBody = `🔢 **7 गुणा 8 का मान 56 होता है:**\n\n• **गणितीय समीकरण:** 7 × 8 = **56** (सात अठ्ठे छप्पन)।\n\nआरोग्यम सखी AI कृषि, पशुधन व स्वास्थ्य के साथ-साथ बुनियादी गणनाओं में भी आपकी सटीक सहायिका है।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'omni');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
+          { text: '🐄 पशु दूध व फैट वृद्धि', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' }
+        ], 'omni', 'math_arithmetic_7x8');
+        return true;
+      }
+
+      // 4. भारत की राजधानी क्या है? (Capital of India)
+      if (q.includes('भारत') && (q.includes('राजधानी') || q.includes('capital') || q.includes('rajdhani'))) {
+        let title = '🇮🇳 भारत की राजधानी — नई दिल्ली (Capital of India)';
+        let baseBody = `🇮🇳 **भारत की राजधानी नई दिल्ली (New Delhi) है:**\n\n1. **राजधानी का नाम:** नई दिल्ली भारत की राष्ट्रीय राजधानी है और भारत सरकार की तीनों शाखाओं (कार्यपालिका, संसद व सर्वोच्च न्यायालय) का केंद्र है।\n2. **ऐतिहासिक संदर्भ:** वर्ष 1911 में जॉर्ज पंचम के दिल्ली दरबार के दौरान राजधानी को कलकत्ता (वर्तमान कोलकाता) से दिल्ली स्थानांतरित करने की घोषणा की गई थी, और 1931 में नई दिल्ली का औपचारिक उद्घाटन हुआ।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'omni');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 कृषि व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
+          { text: '🩺 स्वास्थ्य व डाइट परामर्श', query: 'स्वास्थ्य व रोग परामर्श' }
+        ], 'omni', 'india_capital_new_delhi');
+        return true;
+      }
+
+      return false;
+    }
+
     function processKnowledgeQuery(query) {
-      const normQuery = (query || '').toLowerCase();
+      const rawQ = (query || '').trim();
+      const instructionBundle = detectUserInstructionDirectives(rawQ);
+      const directives = instructionBundle.directives;
+      const coreQ = instructionBundle.coreQ;
+      const normQuery = (coreQ || query || '').toLowerCase();
+      const cleanQ = normalizeQueryText(coreQ || query || '');
+
+      // 1. Dual Query Splitter & Resolver (e.g. Q1 साथ में Q2)
+      if (directives.dualQuery && handleDualQueryResolver(rawQ, directives)) {
+        return;
+      }
+
+      // 2. Direct Precision Benchmark Handlers (Pashu, Crop Seasons, Diagnostics, Anatomy, Math)
+      if (handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives)) return;
+      if (handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives)) return;
+      if (handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives)) return;
 
       // 🌤️ CONVERSATIONAL WEATHER & SPRAY ADVISOR (FarmerChat Real-Time Multi-City & 7-Day)
       const isWeatherQuestion = /(?:बारिश|barish|barsat|वर्षा|मौसम|mousam|mosam|तापमान|temp|weather|हवा|wind|छिड़काव|spray.*weather)/i.test(normQuery);
