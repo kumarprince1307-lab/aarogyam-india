@@ -102,9 +102,236 @@ if (typeof document !== 'undefined') {
   }
 
   // =========================================================================
+  // 1.1 ZERO-EGRESS LOCAL INDEXED-DB MEDIA STORAGE ENGINE
+  // Stores user-uploaded crop/vegetable/report images locally in browser DB.
+  // 100% Zero-Egress: No images uploaded to external servers, no localStorage quota crashes!
+  // =========================================================================
+  const SakhiLocalMediaDB = (function() {
+    const DB_NAME = 'AarogyamSakhiMediaDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'chat_images';
+    let dbPromise = null;
+
+    function openDB() {
+      if (dbPromise) return dbPromise;
+      dbPromise = new Promise((resolve) => {
+        if (!window.indexedDB) {
+          resolve(null);
+          return;
+        }
+        try {
+          const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = function(e) {
+            resolve(e.target.result);
+          };
+          req.onerror = function(e) {
+            console.warn('Sakhi Media IndexedDB open error:', e);
+            resolve(null);
+          };
+        } catch (e) {
+          resolve(null);
+        }
+      });
+      return dbPromise;
+    }
+
+    async function saveImage(id, dataUrl, caption) {
+      try {
+        const db = await openDB();
+        if (!db) return false;
+        return new Promise((resolve) => {
+          const tx = db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          store.put({
+            id: id,
+            dataUrl: dataUrl,
+            caption: caption || '',
+            createdAt: Date.now()
+          });
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    async function getImage(id) {
+      try {
+        const db = await openDB();
+        if (!db) return null;
+        return new Promise((resolve) => {
+          const tx = db.transaction([STORE_NAME], 'readonly');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.get(id);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function deleteImage(id) {
+      try {
+        const db = await openDB();
+        if (!db) return false;
+        return new Promise((resolve) => {
+          const tx = db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          store.delete(id);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    return {
+      saveImage,
+      getImage,
+      deleteImage
+    };
+  })();
+  window.SakhiLocalMediaDB = SakhiLocalMediaDB;
+
+  // =========================================================================
+  // 1.2 SCREEN WAKE-LOCK & NAVIGATION INTERRUPTION SHIELD
+  // Keeps screen awake during active AI / Gemini Vision processing.
+  // Intercepts Back button & menu clicks to prevent aborting user searches.
+  // =========================================================================
+  let sakhiWakeLockSentinel = null;
+  window.isSakhiVisionAnalyzing = false;
+
+  async function requestSakhiWakeLock() {
+    try {
+      if ('wakeLock' in navigator && typeof navigator.wakeLock.request === 'function') {
+        sakhiWakeLockSentinel = await navigator.wakeLock.request('screen');
+        sakhiWakeLockSentinel.addEventListener('release', () => {
+          sakhiWakeLockSentinel = null;
+        });
+      }
+    } catch (e) {
+      // Wake Lock might be rejected if battery saver is on - safe ignore
+    }
+  }
+
+  function releaseSakhiWakeLock() {
+    try {
+      if (sakhiWakeLockSentinel && typeof sakhiWakeLockSentinel.release === 'function') {
+        sakhiWakeLockSentinel.release();
+        sakhiWakeLockSentinel = null;
+      }
+    } catch (e) {}
+  }
+
+  // Auto re-acquire wake lock if user switches back to tab while analysis is running
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && window.isSakhiVisionAnalyzing) {
+      requestSakhiWakeLock();
+    }
+  });
+
+  // Navigation Interruption Dialog
+  function showSakhiAnalysisInterruptionModal(onConfirmLeave, onCancelStay) {
+    let modal = document.getElementById('sakhiAnalysisShieldModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'sakhiAnalysisShieldModal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.85);backdrop-filter:blur(6px);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;animation:sakhiFadeIn 0.2s ease;';
+      document.body.appendChild(modal);
+    }
+    modal.innerHTML = `
+      <div style="background:#ffffff;border-radius:22px;padding:24px 20px;max-width:390px;width:100%;box-shadow:0 20px 40px rgba(0,0,0,0.45);border:2.5px solid #16a34a;text-align:center;font-family:inherit;">
+        <div style="width:58px;height:58px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:2px solid #fecaca;font-size:1.8rem;">
+          ⏳
+        </div>
+        <div style="font-size:1.18rem;font-weight:900;color:#0f172a;margin-bottom:8px;line-height:1.35;">
+          सखी अभी विश्लेषण कर रही है...
+        </div>
+        <p style="font-size:0.90rem;color:#475569;line-height:1.55;margin:0 0 20px;">
+          सखी अभी आपकी फोटो की वैज्ञानिक जांच कर रही है। यदि आप अभी बाहर जाएंगे या बैक दबाएंगे, तो फोटो सर्च रद्द हो जाएगी।
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button type="button" id="sakhiShieldStayBtn" style="background:#16a34a;color:#ffffff;border:none;padding:13px;border-radius:16px;font-size:0.95rem;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+            ⏳ इंतज़ार करें (विश्लेषण जारी रखें)
+          </button>
+          <button type="button" id="sakhiShieldLeaveBtn" style="background:#f8fafc;color:#ef4444;border:1.5px solid #fca5a5;padding:11px;border-radius:16px;font-size:0.88rem;font-weight:700;cursor:pointer;">
+            ❌ हाँ, सर्च रद्द करें और बाहर जाएं
+          </button>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'flex';
+
+    const stayBtn = document.getElementById('sakhiShieldStayBtn');
+    const leaveBtn = document.getElementById('sakhiShieldLeaveBtn');
+
+    if (stayBtn) {
+      stayBtn.onclick = function() {
+        modal.style.display = 'none';
+        if (typeof onCancelStay === 'function') onCancelStay();
+      };
+    }
+
+    if (leaveBtn) {
+      leaveBtn.onclick = function() {
+        modal.style.display = 'none';
+        window.isSakhiVisionAnalyzing = false;
+        releaseSakhiWakeLock();
+        removeTypingIndicator();
+        if (typeof onConfirmLeave === 'function') onConfirmLeave();
+      };
+    }
+  }
+
+  // Intercept browser beforeunload
+  window.addEventListener('beforeunload', function (e) {
+    if (window.isSakhiVisionAnalyzing) {
+      e.preventDefault();
+      e.returnValue = 'सखी अभी आपकी फोटो का विश्लेषण कर रही है... क्या आप सच में बाहर जाना चाहते हैं?';
+      return e.returnValue;
+    }
+  });
+
+  // Intercept navigation clicks globally when analyzing
+  document.addEventListener('click', function(e) {
+    if (!window.isSakhiVisionAnalyzing) return;
+    const targetLink = e.target.closest('a[href], button[data-nav], .bottom-nav-item, [onclick*="location"]');
+    if (targetLink && !targetLink.closest('#sakhiAnalysisShieldModal') && !targetLink.closest('#sakhiMessagesWrap')) {
+      e.preventDefault();
+      e.stopPropagation();
+      showSakhiAnalysisInterruptionModal(function() {
+        if (targetLink.tagName === 'A' && targetLink.href) {
+          window.location.href = targetLink.href;
+        } else {
+          targetLink.click();
+        }
+      });
+    }
+  }, true);
+
+  // Intercept Android back button / popstate
+  window.addEventListener('popstate', function(e) {
+    if (window.isSakhiVisionAnalyzing) {
+      history.pushState(null, document.title, location.href);
+      showSakhiAnalysisInterruptionModal(function() {
+        history.back();
+      });
+    }
+  });
+
+  // =========================================================================
   // 1.9 GLOBAL SAKHI MESSAGE APPENDER & MULTI-MODAL PREVIEW ENGINE
   // =========================================================================
-  function appendSakhiMessage(role, htmlOrText, isHtml, chips) {
+  function appendSakhiMessage(role, htmlOrText, isHtml, chips, imgMeta) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
     const now = Date.now();
@@ -132,7 +359,7 @@ if (typeof document !== 'undefined') {
       wrap.appendChild(row);
       wrap.scrollTop = wrap.scrollHeight;
       if (typeof saveChatLogItem === 'function') {
-        saveChatLogItem('user', htmlOrText, '');
+        saveChatLogItem('user', htmlOrText, '', imgMeta);
       }
     } else {
       if (typeof streamBotMessage === 'function') {
@@ -345,25 +572,39 @@ if (typeof document !== 'undefined') {
     // Clear staging bar and input
     window.clearSakhiStagedImage();
 
+    // Unique local image identifier for zero-egress persistence
+    const imgId = 'sakhi_img_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+
+    // Save image locally in IndexedDB (zero egress, no server upload, avoids localStorage 5MB crash!)
+    if (window.SakhiLocalMediaDB && typeof window.SakhiLocalMediaDB.saveImage === 'function') {
+      window.SakhiLocalMediaDB.saveImage(imgId, staged.dataUrl, userCaption);
+    }
+
     // Render user message with photo + optional caption in chat
     const captionHtml = userCaption
       ? `<div style="padding:10px 14px;font-size:0.95rem;font-weight:700;background:rgba(15,23,42,0.85);color:#ffffff;line-height:1.45;border-top:1px solid rgba(255,255,255,0.2);">${escapeHtml(userCaption)}</div>`
       : '';
     const userHtml = `
       <div class="sakhi-open-user-photo-card" style="display:inline-block;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.4);max-width:280px;width:100%;">
-        <img src="${staged.dataUrl}" alt="किसान द्वारा भेजी गई फसल फोटो" style="width:100%;height:auto;max-height:280px;object-fit:cover;display:block;" />
+        <img src="${staged.dataUrl}" alt="किसान द्वारा भेजी गई फसल/सब्जी फोटो" style="width:100%;height:auto;max-height:280px;object-fit:cover;display:block;" />
         ${captionHtml}
       </div>
     `;
-    appendSakhiMessage('user', userHtml, true);
+    appendSakhiMessage('user', userHtml, true, null, { imgId: imgId, caption: userCaption });
+
+    // Activate Screen Wake-Lock and Navigation Shield during AI analysis
+    window.isSakhiVisionAnalyzing = true;
+    requestSakhiWakeLock();
 
     // Continuous Live Typing / Thinking Animation until search/analysis finishes!
-    appendTypingIndicator('सखी आपकी फसल फोटो का गहराई से विश्लेषण कर रही है... 🌾');
+    appendTypingIndicator('⏳ सखी आपकी फोटो का AI विश्लेषण कर रही है... (स्क्रीन चालू रखें) 🌾');
 
     const fn = staged.fileName || 'crop_image.jpg';
     if (window.SakhiVision && typeof window.SakhiVision.analyzeCropImage === 'function') {
       window.SakhiVision.analyzeCropImage(staged.dataUrl, fn, userCaption, function (res) {
-        // Remove typing indicator only when result is ready
+        // Analysis finished: release lock and shield
+        window.isSakhiVisionAnalyzing = false;
+        releaseSakhiWakeLock();
         removeTypingIndicator();
 
         if (res.isLab || res.isBook || res.isPoster || res.isDiagnosed || !res.checklist) {
@@ -410,6 +651,8 @@ if (typeof document !== 'undefined') {
         ]);
       });
     } else {
+      window.isSakhiVisionAnalyzing = false;
+      releaseSakhiWakeLock();
       removeTypingIndicator();
       appendSakhiMessage('bot', '🌾 आपकी फोटो प्राप्त हुई। कृपया अपनी फसल का नाम (गेहूँ, चना, टमाटर) और पत्ती के लक्षण बताएं ताकि सटीक दवा बताई जा सके।', false);
     }
@@ -2685,7 +2928,7 @@ if (typeof document !== 'undefined') {
   // 9.5 PERSISTENT CHAT HISTORY STORAGE ENGINE (FOR AAROGYAM MASTER 7974422572 & ALL USERS)
   const SAKHI_PERSISTENT_CHAT_KEY = 'SAKHI_PERSISTENT_CHAT_LOG';
 
-  function saveChatLogItem(role, content, speech) {
+  function saveChatLogItem(role, content, speech, imgMeta) {
     try {
       const phone = getUserPhone() || 'user';
       const key = `${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`;
@@ -2694,18 +2937,45 @@ if (typeof document !== 'undefined') {
         const raw = localStorage.getItem(key);
         if (raw) log = JSON.parse(raw) || [];
       } catch (e) { }
-      log.push({ role, content, speech, time: Date.now() });
+
+      let entry;
+      if (imgMeta && imgMeta.imgId) {
+        // Zero-Egress Image entry: do NOT bloat localStorage with multi-MB base64 data!
+        entry = {
+          role: 'user',
+          type: 'image',
+          imgId: imgMeta.imgId,
+          caption: imgMeta.caption || '',
+          content: imgMeta.caption || '📷 [फसल/सब्जी/रिपोर्ट फोटो]',
+          time: Date.now()
+        };
+      } else if (role === 'user' && typeof content === 'string' && (content.includes('sakhi-open-user-photo-card') || content.includes('data:image/'))) {
+        const captionMatch = content.match(/<div[^>]*>([^<]+)<\/div>\s*<\/div>/);
+        const extractedCaption = captionMatch ? captionMatch[1] : '';
+        entry = {
+          role: 'user',
+          type: 'image',
+          caption: extractedCaption,
+          content: extractedCaption || '📷 [फसल/सब्जी/रिपोर्ट फोटो]',
+          time: Date.now()
+        };
+      } else {
+        entry = { role, content, speech, time: Date.now() };
+      }
+      log.push(entry);
 
       // Dual-Audit Hook: If bot response and audit mode is active, log to Supabase
       if (role === 'bot') {
         const lastUser = log.filter(l => l.role === 'user').slice(-1)[0];
-        const sawal = lastUser ? lastUser.content : '';
+        const sawal = lastUser ? (lastUser.caption || lastUser.content || '') : '';
         const jawab = (speech || content || '').replace(/<[^>]+>/g, '').slice(0, 200);
         logToSupabaseAudit(phone, sawal, jawab, sakhiConversationState.lastActiveDomain || 'omni', 'PASS');
       }
       if (log.length > 50) log = log.slice(-50);
       localStorage.setItem(key, JSON.stringify(log));
-    } catch (e) { }
+    } catch (e) {
+      console.warn('saveChatLogItem warning:', e);
+    }
   }
 
   function getPersistentChatLog() {
@@ -3147,11 +3417,40 @@ if (typeof document !== 'undefined') {
       const row = document.createElement('div');
       if (item.role === 'user') {
         row.className = 'sakhi-msg-row user';
-        row.innerHTML = `
-          <div class="sakhi-msg-bubble user-bubble" style="color:#ffffff;font-weight:700;">
-            ${escapeHtml(item.content)}
-            <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.85);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(itemTime)}</div>
-          </div>`;
+        if (item.type === 'image' || item.imgId) {
+          const captionHtml = item.caption ? `<div style="padding:8px 12px;font-size:0.88rem;font-weight:700;background:rgba(15,23,42,0.85);color:#ffffff;line-height:1.4;border-top:1px solid rgba(255,255,255,0.2);">${escapeHtml(item.caption)}</div>` : '';
+          const placeholderId = `hist_img_${Math.random().toString(36).slice(2, 8)}`;
+          row.innerHTML = `
+            <div class="sakhi-msg-bubble" style="background:transparent;padding:0;box-shadow:none;border:none;">
+              <div class="sakhi-open-user-photo-card" style="display:inline-block;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.4);max-width:280px;width:100%;">
+                <div id="${placeholderId}" style="min-height:140px;min-width:180px;background:#1e293b;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:0.82rem;padding:16px;text-align:center;">
+                  <span>⏳ फोटो लोड हो रही है...</span>
+                </div>
+                ${captionHtml}
+              </div>
+              <div class="sakhi-msg-time" style="font-size:0.68rem;color:#64748b;text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(itemTime)}</div>
+            </div>`;
+          // Asynchronously retrieve image from IndexedDB (Zero-egress local browser DB)
+          if (item.imgId && window.SakhiLocalMediaDB && typeof window.SakhiLocalMediaDB.getImage === 'function') {
+            window.SakhiLocalMediaDB.getImage(item.imgId).then(rec => {
+              const el = document.getElementById(placeholderId);
+              if (el && rec && rec.dataUrl) {
+                el.outerHTML = `<img src="${rec.dataUrl}" alt="फसल/सब्जी फोटो" style="width:100%;height:auto;max-height:280px;object-fit:cover;display:block;" />`;
+              } else if (el) {
+                el.innerHTML = `<span>📷 [फसल/सब्जी फोटो]</span>`;
+              }
+            }).catch(() => {
+              const el = document.getElementById(placeholderId);
+              if (el) el.innerHTML = `<span>📷 [फसल/सब्जी फोटो]</span>`;
+            });
+          }
+        } else {
+          row.innerHTML = `
+            <div class="sakhi-msg-bubble user-bubble" style="color:#ffffff;font-weight:700;">
+              ${escapeHtml(item.content)}
+              <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.85);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(itemTime)}</div>
+            </div>`;
+        }
       } else {
         row.className = 'sakhi-msg-row bot';
         row.innerHTML = `

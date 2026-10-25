@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>आरोग्यम इंडिया ऐप इंस्टॉल गाइड | Aarogyam India Official App Install</title>
+
+  <!-- OpenGraph & Social Share Meta -->
+  <meta property="og:title" content="📲 आरोग्यम इंडिया आधिकारिक ऐप इंस्टॉल करें (Aarogyam India App)">
+  <meta property="og:description" content="आरोग्यम इंडिया का आधिकारिक PWA ऐप 1-क्लिक में अपने मोबाइल पर इंस्टॉल करें। 100% सुरक्षित, 1 MB से कम साइज, बिना इंटरनेट पुस्तकें पढ़ें व 24x7 सखी AI का लाभ उठाएं।">
+  <meta property="og:image" content="https://aarogyamindia.online/images/banners/aarogyam-app-og.webp">
+  <meta property="og:url" content="https://aarogyamindia.online/aarogyam-app.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aarogyam India">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="📲 आरोग्यम इंडिया आधिकारिक ऐप इंस्टॉल करें">
+  <meta name="twitter:description" content="100% सुरक्षित PWA ऐप। फोन में 1 MB से कम साइज, ऑफ़लाइन लाइब्रेरी व 24x7 सखी AI।">
+  <meta name="twitter:image" content="https://aarogyamindia.online/images/banners/aarogyam-app-og.webp">
+
+  <!-- Favicon & PWA Manifest -->
+  <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
+  <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
+  <link rel="manifest" href="/manifest.json?v=1.1">
+  <meta name="theme-color" content="#16a34a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Aarogyam">
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <!-- Core & Universal Revamp Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css?v=1.1">
+  <link rel="stylesheet" href="/css/user-notifications.css">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=1.3">
+  <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=1.1">
+  <link rel="stylesheet" href="/css/mobile-bottom-nav.css">
+
+  <style>
+    :root {
+      --primary-blue: #1d4ed8;
+      --deep-blue: #1e3a8a;
+      --navy-blue: #0f172a;
+      --card-blue: #1e40af;
+      --border-blue: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', 'Outfit', sans-serif;
+      background: #090d16;
+      color: #ffffff;
+      margin: 0;
+      padding-bottom: 85px;
+    }
+
+    /* Universal Floating Sakhi Pill - Repositioned to Left Below Header with Auto-Collapse */
+    .sakhi-floating-pill {
+      top: 76px !important;
+      bottom: auto !important;
+      left: 14px !important;
+      right: auto !important;
+      z-index: 99999 !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 10px rgba(59, 130, 246, 0.4) !important;
+    }
+
+    @media (max-width: 480px) {
+      .sakhi-floating-pill {
+        top: 68px !important;
+        left: 8px !important;
+      }
+    }
+
+    /* Executive Hero Box - Deep Blue & White Text */
+    .app-hero-wrap {
+      background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+      padding: 36px 16px 44px;
+      text-align: center;
+      border-bottom: 2px solid #2563eb;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-hero-wrap::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 420px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .app-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 18px;
+      background: #1e40af;
+      border: 1.5px solid #60a5fa;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .app-hero-title {
+      font-size: 1.95rem;
+      font-weight: 900;
+      line-height: 1.32;
+      margin: 0 auto 14px;
+      max-width: 680px;
+      color: #ffffff;
+    }
+
+    .app-hero-title span {
+      color: #93c5fd;
+      text-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .app-hero-desc {
+      font-size: 0.96rem;
+      color: #f1f5f9;
+      line-height: 1.65;
+      max-width: 620px;
+      margin: 0 auto 26px;
+      font-weight: 500;
+    }
+
+    /* Master Install CTA Button - Direct 1-Click Install */
+    .app-main-install-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #ffffff;
+      color: #1e3a8a;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 0 3px #60a5fa;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .app-main-install-btn:hover {
+      background: #eff6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(59, 130, 246, 0.5), 0 0 0 4px #93c5fd;
+    }
+
+    .app-main-install-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Floating KPI Badges - Solid Blue with White Text */
+    .app-benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      max-width: 680px;
+      margin: 26px auto 0;
+    }
+
+    .app-benefit-pill {
+      background: #1e3a8a;
+      border: 1.5px solid #3b82f6;
+      border-radius: 14px;
+      padding: 12px 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Audio Tutorial Player Card */
+    .audio-tutorial-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      border: 2px solid #60a5fa;
+      border-radius: 20px;
+      padding: 22px 20px;
+      max-width: 800px;
+      margin: 26px auto 10px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .audio-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .audio-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .audio-icon-pulse {
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      color: #1e3a8a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      flex-shrink: 0;
+    }
+
+    .audio-btn-play {
+      background: #ffffff;
+      color: #1e3a8a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 0.92rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .audio-btn-play:hover {
+      background: #eff6ff;
+      transform: scale(1.03);
+    }
+
+    .audio-waveform-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 28px;
+      padding: 4px 12px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 12px;
+    }
+
+    .audio-bar {
+      width: 4px;
+      height: 10px;
+      background: #93c5fd;
+      border-radius: 2px;
+      transition: height 0.2s ease;
+    }
+
+    .audio-bar.playing {
+      animation: soundWave 0.8s infinite alternate ease-in-out;
+    }
+
+    .audio-bar:nth-child(2) { animation-delay: 0.15s; }
+    .audio-bar:nth-child(3) { animation-delay: 0.3s; }
+    .audio-bar:nth-child(4) { animation-delay: 0.45s; }
+    .audio-bar:nth-child(5) { animation-delay: 0.6s; }
+    .audio-bar:nth-child(6) { animation-delay: 0.2s; }
+    .audio-bar:nth-child(7) { animation-delay: 0.35s; }
+    .audio-bar:nth-child(8) { animation-delay: 0.5s; }
+
+    @keyframes soundWave {
+      0% { height: 6px; }
+      100% { height: 24px; background: #ffffff; }
+    }
+
+    /* Container for Tutorial & Info Boxes */
+    .tutorial-section {
+      max-width: 800px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* Executive Blue Cards with Pure White Text */
+    .executive-blue-card {
+      background: #1e3a8a;
+      border: 2px solid #3b82f6;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      color: #ffffff;
+    }
+
+    .executive-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .executive-card-header .icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #ffffff;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .executive-card-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .executive-card-subtitle {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    /* Step List */
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #f8fafc;
+    }
+
+    .step-badge {
+      background: #ffffff;
+      color: #1e3a8a;
+      font-weight: 900;
+      font-size: 0.88rem;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Security Feature Grid */
+    .security-feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .security-feature-box {
+      background: #172554;
+      border: 1.5px solid #60a5fa;
+      border-radius: 14px;
+      padding: 16px;
+      color: #ffffff;
+    }
+
+    .security-feature-box h4 {
+      margin: 0 0 6px 0;
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .security-feature-box p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    /* Comparison Table Box */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .comparison-col {
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .comparison-col.shortcut {
+      background: #172554;
+      border: 1.5px solid #475569;
+    }
+
+    .comparison-col.pwa {
+      background: #1e40af;
+      border: 2px solid #93c5fd;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .comparison-col h4 {
+      margin: 0 0 12px 0;
+      font-size: 1.05rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .comparison-points {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .comparison-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================
+       1. UNIVERSAL STICKY LIVE TICKER
+  ========================================== -->
+  <div class="home-live-ticker-wrap">
+    <div class="container">
+      <div class="home-ticker-flex">
+        <div class="ticker-pulse-badge">
+          <span class="ticker-dot-pulse"></span>
+          <span>🚨 LIVE</span>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+          <div class="ticker-marquee-scroll" id="home-live-ticker-track">
+            🌾 10,000+ किसानों का पहला भरोसेमंद मंच | 24×7 AI सखी एक्सपर्ट सहायता उपलब्ध! ✦ प्रमाणित ई-बुक्स, स्वास्थ्य परामर्श व मंडी भाव
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       2. UNIVERSAL ANIMATED TIRANGA WAVING HEADER
+  ========================================== -->
+  <header class="header header-tiranga-animated" id="header">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
+      
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a href="/index.html" class="brand-logo-pill">
+          <img src="/images/logo/logo.png" alt="Aarogyam India" style="height:36px;width:auto;">
+          <div style="display:flex;flex-direction:column;">
+            <span class="brand-title-text">AAROGYAM <span style="color:#ff671f;">INDIA</span></span>
+            <span class="brand-sub-text">Digital Ecosystem Hub</span>
+          </div>
+        </a>
+        <span class="header-current-page-badge" title="Current Page">📲 ऐप इंस्टॉल</span>
+      </div>
+
+      <div class="header-actions" style="display:flex;align-items:center;gap:8px;">
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:6px 12px;border-radius:20px;font-weight:900;font-size:0.76rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <button type="button" onclick="window.triggerUniversalShare({title:'Aarogyam India App इंस्टॉल गाइड', text:'आरोग्यम इंडिया का आधिकारिक ऐप 1-क्लिक में इंस्टॉल करें:'})" class="btn" style="background:#16a34a; color:#fff; border:none; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.78rem; cursor:pointer;">
+          <span>📤</span> <span>शेयर</span>
+        </button>
+
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================
+       3. HERO SECTION - BLUE THEME & WHITE TEXT
+  ========================================== -->
+  <section class="app-hero-wrap">
+    <div class="app-hero-badge">
+      <i class="fa-solid fa-shield-halved" style="color:#60a5fa;"></i>
+      <span>आधिकारिक PWA ऐप • 100% सुरक्षित तकनीक</span>
+    </div>
+
+    <h1 class="app-hero-title">
+      आरोग्यम इंडिया का आधिकारिक ऐप<br>
+      <span>1-क्लिक में अपने मोबाइल पर इंस्टॉल करें</span>
+    </h1>
+
+    <p class="app-hero-desc">
+      प्ले स्टोर के भारी 100 MB ऐप्स से मुक्ति पाएं! आरोग्यम PWA ऐप मात्र 1 MB में चलता है, आपके फोन की कोई पर्सनल परमिशन नहीं लेता और बिना इंटरनेट आपकी खरीदी हुई पुस्तकें खोलता है।
+    </p>
+
+    <!-- Master Action Button - Direct 1-Click PWA Trigger -->
+    <button type="button" class="app-main-install-btn" id="btnMasterInstallApp" onclick="window.triggerPwaInstall()">
+      <i class="fa-solid fa-mobile-screen-button" style="font-size:1.35rem;"></i>
+      <span id="installBtnText">📲 1-क्लिक में ऐप इंस्टॉल करें</span>
+    </button>
+
+    <!-- Benefit Badges Grid - All Blue with White Text -->
+    <div class="app-benefit-grid">
+      <div class="app-benefit-pill">
+        <i class="fa-solid fa-bolt" style="color:#fde047;"></i>
+        <span>0.5s फास्ट ओपन</span>
+      </div>
+      <div class="app-benefit-pill">
+        <i class="fa-solid fa-book" style="color:#93c5fd;"></i>
+        <span>ऑफ़लाइन ई-बुक्स</span>
+      </div>
+      <div class="app-benefit-pill">
+        <i class="fa-solid fa-robot" style="color:#a7f3d0;"></i>
+        <span>24x7 सखी AI</span>
+      </div>
+      <div class="app-benefit-pill">
+        <i class="fa-solid fa-shield-check" style="color:#60a5fa;"></i>
+        <span>100% नो-परमिशन</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================
+       4. AUDIO TUTORIAL WIDGET
+  ========================================== -->
+  <div class="tutorial-section">
+    <div class="audio-tutorial-card">
+      <div class="audio-header">
+        <div class="audio-title-wrap">
+          <div class="audio-icon-pulse">
+            <i class="fa-solid fa-headphones"></i>
+          </div>
+          <div>
+            <div style="font-size:1.15rem;font-weight:900;color:#ffffff;line-height:1.3;">
+              🎧 ऑडियो ट्यूटोरियल: 1 मिनट में सुनें
+            </div>
+            <div style="font-size:0.86rem;color:#cbd5e1;font-weight:600;">
+              आरोग्यम सखी की आवाज में जानें ऐप इंस्टॉल करने का सही तरीका
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="audio-btn-play" id="btnAudioTutorial">
+          <i class="fa-solid fa-play" id="audioPlayIcon"></i>
+          <span id="audioPlayText">ऑडियो सुनें</span>
+        </button>
+      </div>
+
+      <!-- Animated Sound Bars -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+        <div class="audio-waveform-bar" id="audioWaveform">
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+          <div class="audio-bar"></div>
+        </div>
+        <div style="font-size:0.82rem;font-weight:700;color:#93c5fd;" id="audioTimerText">
+          0:00 / 0:45
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       5. SECURITY & PRIVACY COMPARISON (PWA vs ANDROID APK)
+  ========================================== -->
+  <div class="tutorial-section">
+    <div class="executive-blue-card">
+      <div class="executive-card-header">
+        <div class="icon-circle">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div>
+          <h2 class="executive-card-title">🛡️ सुरक्षा गारंटी: Android APK की तुलना में 100% अधिक सुरक्षित</h2>
+          <div class="executive-card-subtitle">आपका फोन, आपका डेटा, आपकी प्राइवेसी — शून्य खतरा!</div>
+        </div>
+      </div>
+
+      <p style="font-size:0.92rem;line-height:1.65;color:#f1f5f9;margin:0 0 16px;">
+        प्ले स्टोर या व्हाट्सएप से APK फाइल डाउनलोड करने पर कई ऐप्स आपके फोन के कॉन्टैक्ट्स, फोटो गैलरी और लोकेशन की जासूसी करते हैं। <strong>आरोग्यम इंडिया PWA (प्रोग्रेसिव वेब ऐप)</strong> तकनीक गूगल के सबसे सुरक्षित सैंडबॉक्स पर काम करती है:
+      </p>
+
+      <div class="security-feature-grid">
+        <div class="security-feature-box">
+          <h4><i class="fa-solid fa-lock"></i> 0% फोन परमिशन</h4>
+          <p>यह ऐप आपके फोन के कॉन्टैक्ट्स, गैलरी, कैमरा या SMS का कोई बैकग्राउंड एक्सेस नहीं मांगता।</p>
+        </div>
+        <div class="security-feature-box">
+          <h4><i class="fa-solid fa-shield-virus"></i> जीरो वायरस खतरा</h4>
+          <p>यह गूगल क्रोम के एन्क्रिप्टेड सैंडबॉक्स में चलता है, जिससे मोबाइल में किसी वायरस या मैलवेयर की कोई संभावना नहीं होती।</p>
+        </div>
+        <div class="security-feature-box">
+          <h4><i class="fa-solid fa-feather"></i> सिर्फ 1 MB से कम साइज</h4>
+          <p>साधारण 50 से 100 MB के भारी ऐप्स के मुकाबले यह 1 MB से भी कम जगह लेता है। फोन कभी नहीं भरेगा।</p>
+        </div>
+        <div class="security-feature-box">
+          <h4><i class="fa-solid fa-battery-full"></i> 0% बैटरी ड्रेन</h4>
+          <p>बैकग्राउंड में कोई फालतू प्रोसेस नहीं चलती, जिससे आपके मोबाइल की बैटरी और इंटरनेट डेटा 100% सुरक्षित रहता है।</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       6. APP INSTALL vs NORMAL SHORTCUT (DIFFERENCE)
+  ========================================== -->
+  <div class="tutorial-section">
+    <div class="executive-blue-card">
+      <div class="executive-card-header">
+        <div class="icon-circle">
+          <i class="fa-solid fa-code-compare"></i>
+        </div>
+        <div>
+          <h2 class="executive-card-title">⚖️ ऐप इंस्टॉल और साधारण शॉर्टकट में क्या अंतर है?</h2>
+          <div class="executive-card-subtitle">PWA ऐप एक असली सॉफ्टवेयर की तरह काम करता है</div>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+        <!-- Normal Shortcut -->
+        <div class="comparison-col shortcut">
+          <h4 style="color:#cbd5e1;"><i class="fa-solid fa-globe"></i> साधारण वेब शॉर्टकट</h4>
+          <ul class="comparison-points">
+            <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> हर बार क्लिक करने पर क्रोम ब्राउज़र खुलता है।</li>
+            <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> ऊपर यूआरएल बार (URL Bar) और ढेरों टैब्स दिखते हैं।</li>
+            <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> इंटरनेट न होने पर किताबें या पेज नहीं खुलते।</li>
+            <li><i class="fa-solid fa-xmark" style="color:#f87171;"></i> बार-बार पेज लोड होने में समय लगता है।</li>
+          </ul>
+        </div>
+
+        <!-- Official PWA App -->
+        <div class="comparison-col pwa">
+          <h4 style="color:#ffffff;"><i class="fa-solid fa-mobile-screen-button" style="color:#93c5fd;"></i> आरोग्यम PWA ऐप (Official)</h4>
+          <ul class="comparison-points">
+            <li><i class="fa-solid fa-check" style="color:#86efac;"></i> मोबाइल के बाकी ऐप्स की तरह फुल-स्क्रीन बिना एड्रेस बार के खुलता है।</li>
+            <li><i class="fa-solid fa-check" style="color:#86efac;"></i> आपके फोन के होम स्क्रीन और ऐप ड्रॉअर में ऑफिशियल लोगो बनता है।</li>
+            <li><i class="fa-solid fa-check" style="color:#86efac;"></i> <strong>ऑफ़लाइन सपोर्ट:</strong> खरीदी हुई ई-बुक्स बिना इंटरनेट भी खुलती हैं।</li>
+            <li><i class="fa-solid fa-check" style="color:#86efac;"></i> 0.5 सेकेंड में 1-टैप फास्ट लॉन्च और 24x7 सखी AI सपोर्ट।</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+       7. STEP-BY-STEP INSTALLATION TUTORIAL
+  ========================================== -->
+  <div class="tutorial-section">
+    <!-- Android / Google Chrome Method -->
+    <div class="executive-blue-card">
+      <div class="executive-card-header">
+        <div class="icon-circle">
+          <i class="fa-brands fa-android" style="color:#1e3a8a;"></i>
+        </div>
+        <div>
+          <h2 class="executive-card-title">1. एंड्रॉइड (Google Chrome) में ऐप इंस्टॉल करने का तरीका</h2>
+          <div class="executive-card-subtitle">मात्र 15 सेकेंड में इंस्टॉल करें — सबसे आसान तरीका</div>
+        </div>
+      </div>
+
+      <ul class="step-list">
+        <li class="step-item">
+          <span class="step-badge">1</span>
+          <div>
+            <strong>ऊपर दिए गए '📲 1-क्लिक में ऐप इंस्टॉल करें' बटन पर टैप करें:</strong><br>
+            बटन दबाते ही आपके स्क्रीन पर सीधा <strong>"Install"</strong> का पॉपअप आ जाएगा।
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-badge">2</span>
+          <div>
+            <strong>यदि सीधा बटन न चले, तो Chrome में ऊपर कोने पर 3 डॉट्स (⋮) दबाएं:</strong><br>
+            अपने मोबाइल स्क्रीन के सबसे ऊपर दाईं ओर दिए गए तीन बिंदुओं (Menu) पर टैप करें।
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-badge">3</span>
+          <div>
+            <strong>मेनू में "Install app" या "Add to Home screen" चुनें:</strong><br>
+            सूची में नीचे स्क्रॉल करें और <strong>"ऐप इंस्टॉल करें"</strong> विकल्प पर क्लिक करें।
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-badge">4</span>
+          <div>
+            <strong>"Install" दबाकर कन्फर्म करें:</strong><br>
+            तुरंत आपके मोबाइल होम स्क्रीन पर आरोग्यम इंडिया का सुंदर ऐप आइकन आ जाएगा!
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Apple iPhone / Safari Method -->
+    <div class="executive-blue-card">
+      <div class="executive-card-header">
+        <div class="icon-circle">
+          <i class="fa-brands fa-apple" style="color:#1e3a8a;"></i>
+        </div>
+        <div>
+          <h2 class="executive-card-title">2. आईफोन (Apple Safari) में ऐप इंस्टॉल करने का तरीका</h2>
+          <div class="executive-card-subtitle">iOS 14+ आईफोन और आईपैड पर पूर्ण समर्थित</div>
+        </div>
+      </div>
+
+      <ul class="step-list">
+        <li class="step-item">
+          <span class="step-badge">1</span>
+          <div>
+            <strong>Safari ब्राउज़र में नीचे 'शेयर' (Share) बटन दबाएं:</strong><br>
+            सफारी ब्राउज़र की निचली पट्टी में बीच वाले शेयर आइकन (तीर वाला बॉक्स <i class="fa-solid fa-arrow-up-from-bracket"></i>) पर टैप करें।
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-badge">2</span>
+          <div>
+            <strong>"Add to Home Screen" विकल्प चुनें:</strong><br>
+            मेनू को थोड़ा नीचे स्क्रॉल करें और <strong>"होम स्क्रीन में जोड़ें (+)"</strong> पर क्लिक करें।
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-badge">3</span>
+          <div>
+            <strong>ऊपर दाईं ओर "Add" पर टैप करें:</strong><br>
+            बस हो गया! आरोग्यम ऐप आपके आईफोन पर एक देशी iOS ऐप की तरह इंस्टॉल हो जाएगा।
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- =========================================
+       8. FOOTER
+  ========================================== -->
+  <footer style="background:#0a0f1d;border-top:1.5px solid #1e3a8a;padding:36px 16px 20px;color:#94a3b8;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="/images/logo/fevicon.png" alt="Logo" style="width:42px;height:42px;border-radius:10px;border:1.5px solid #3b82f6;">
+          <div>
+            <div style="font-size:1.15rem;font-weight:900;color:#ffffff;">आरोग्यम इंडिया (Aarogyam India)</div>
+            <div style="font-size:0.78rem;color:#93c5fd;">भारत का सबसे भरोसेमंद डिजिटल कृषि व स्वास्थ्य मंच</div>
+          </div>
+        </div>
+
+        <div>
+          <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20Aarogyam%20India!%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%81%E0%A4%AA%20%E0%A4%87%E0%A4%82%E0%A4%B8%E0%A5%8D%E0%A4%9F%E0%A5%89%E0%A4%B2%20%E0%A4%AE%E0%A5%87%E0%A4%82%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" rel="noopener noreferrer" style="background:#15803d;border:1.5px solid #86efac;color:#ffffff;padding:10px 18px;border-radius:24px;font-size:0.86rem;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+            <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;"></i>
+            <span>व्हाट्सएप पर सहायता लें</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #1e293b;padding-top:18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:0.82rem;color:#94a3b8;">
+        <div>© 2026 Aarogyam India. All Rights Reserved.</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-weight:700;">
+          <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 गोपनीयता नीति</a>
+          <span style="color:#475569;">•</span>
+          <a href="/terms-conditions.html" style="color:#cbd5e1;text-decoration:none;">📜 नियम एवं शर्तें</a>
+          <span style="color:#475569;">•</span>
+          <a href="/my-library.html" style="color:#cbd5e1;text-decoration:none;">📚 माय लाइब्रेरी</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================
+       9. SCRIPTS: UNIVERSAL DRAWER, PWA & AUDIO
+  ========================================== -->
+  <script>
+    // Audio Tutorial Synthesizer / Player
+    let isAudioPlaying = false;
+    let audioTimerInterval = null;
+    let audioSeconds = 0;
+    const totalAudioSeconds = 45;
+
+    const audioBtn = document.getElementById('btnAudioTutorial');
+    const audioIcon = document.getElementById('audioPlayIcon');
+    const audioText = document.getElementById('audioPlayText');
+    const timerText = document.getElementById('audioTimerText');
+    const waveBars = document.querySelectorAll('.audio-bar');
+
+    const tutorialSpeechText = "नमस्ते! आरोग्यम इंडिया का आधिकारिक ऐप इंस्टॉल करना बहुत आसान और सुरक्षित है। यदि आप एंड्रॉइड फोन पर हैं, तो क्रोम ब्राउज़र में ऊपर दिए गए 'ऐप इंस्टॉल करें' बटन पर दबाएं, या ऊपर दाहिने कोने में तीन बिंदुओं पर टैप करके 'Install app' चुनें। यह ऐप आपके फोन में सिर्फ एक मेगाबाइट जगह लेता है, आपके किसी भी फोटो या कॉन्टैक्ट्स की परमिशन नहीं मांगता, और बिना इंटरनेट भी आपकी सभी ई-बुक्स खोलता है। धन्यवाद!";
+
+    function toggleAudioTutorial() {
+      if (!('speechSynthesis' in window)) {
+        alert("आपका ब्राउज़र ऑडियो प्लेबैक सपोर्ट नहीं करता। कृपया ऊपर दिए गए स्टेप्स पढ़ें।");
+        return;
+      }
+
+      if (isAudioPlaying) {
+        window.speechSynthesis.cancel();
+        stopAudioUI();
+      } else {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(tutorialSpeechText);
+        utter.lang = 'hi-IN';
+        utter.rate = 0.95;
+        utter.pitch = 1.05;
+
+        const voices = window.speechSynthesis.getVoices();
+        const hiVoice = voices.find(v => v.lang.startsWith('hi')) || voices.find(v => v.lang.includes('IN'));
+        if (hiVoice) utter.voice = hiVoice;
+
+        utter.onstart = function () {
+          isAudioPlaying = true;
+          if (audioIcon) audioIcon.className = 'fa-solid fa-pause';
+          if (audioText) audioText.textContent = 'ऑडियो रोकें';
+          waveBars.forEach(b => b.classList.add('playing'));
+          startTimer();
+        };
+
+        utter.onend = function () { stopAudioUI(); };
+        utter.onerror = function () { stopAudioUI(); };
+
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function startTimer() {
+      audioSeconds = 0;
+      clearInterval(audioTimerInterval);
+      audioTimerInterval = setInterval(() => {
+        audioSeconds++;
+        const mins = Math.floor(audioSeconds / 60);
+        const secs = String(audioSeconds % 60).padStart(2, '0');
+        if (timerText) timerText.textContent = `${mins}:${secs} / 0:45`;
+        if (audioSeconds >= totalAudioSeconds) {
+          stopAudioUI();
+        }
+      }, 1000);
+    }
+
+    function stopAudioUI() {
+      isAudioPlaying = false;
+      clearInterval(audioTimerInterval);
+      if (audioIcon) audioIcon.className = 'fa-solid fa-play';
+      if (audioText) audioText.textContent = 'ऑडियो सुनें';
+      waveBars.forEach(b => b.classList.remove('playing'));
+      if (timerText) timerText.textContent = `0:00 / 0:45`;
+    }
+
+    if (audioBtn) {
+      audioBtn.addEventListener('click', toggleAudioTutorial);
+    }
+  </script>
+
+  <script src="/js/universal-nav-drawer.js?v=1.3"></script>
+  <script type="module" src="/js/public-pwa.js"></script>
+</body>
+
+</html>
