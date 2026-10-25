@@ -73,6 +73,12 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 10px rgba(59, 130, 246, 0.4) !important;
     }
 
+    /* Suppress duplicate floating buttons on App page */
+    #floating-action-pill,
+    #universal-sticky-pwa-install-btn {
+      display: none !important;
+    }
+
     @media (max-width: 480px) {
       .sakhi-floating-pill {
         top: 68px !important;
@@ -571,6 +577,11 @@
         <i class="fa-solid fa-shield-check" style="color:#60a5fa;"></i>
         <span>100% नो-परमिशन</span>
       </div>
+    </div>
+
+    <!-- App Preview Mockup Banner (Shows when user uploads images/banners/aarogyam-app-og.webp or .png) -->
+    <div style="max-width:540px;margin:22px auto 0;padding:0 10px;">
+      <img src="/images/banners/aarogyam-app-og.webp" onerror="this.onerror=null;this.src='/images/banners/aarogyam-app-og.png';" alt="आरोग्यम इंडिया ऐप प्रिव्यू" style="width:100%;height:auto;max-height:280px;object-fit:contain;border-radius:18px;box-shadow:0 12px 36px rgba(0,0,0,0.4);border:2px solid #3b82f6;display:block;" />
     </div>
   </section>
 

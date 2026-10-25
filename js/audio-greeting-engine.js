@@ -531,8 +531,8 @@ if (typeof window !== 'undefined') {
 
   // 5. Injects the Floating Action Bar (Audio, Share, WhatsApp)
   function renderFloatingActionBar() {
-    // If the universal sticky widget already exists, simply ensure the audio button is ready
-    if (document.getElementById('universal-sticky-float-widget')) {
+    // If the universal sticky widget or universal-nav-drawer is active, never create duplicate floating pills
+    if (document.getElementById('universal-sticky-float-widget') || document.querySelector('script[src*="universal-nav-drawer"]') || window.location.pathname.includes('aarogyam-app')) {
       const uAudioBtn = document.getElementById('universal-sticky-audio-btn');
       if (uAudioBtn) {
         uAudioBtn.style.display = 'inline-flex';

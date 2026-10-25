@@ -936,6 +936,15 @@
               <span class="drawer-tag-pill" style="background:#fde047; color:#0f172a; font-weight:900;">AI 👩‍🌾</span>
             </a>
 
+            <!-- 1.2 OFFICIAL AAROGYAM APP INSTALL GUIDE -->
+            <a href="/aarogyam-app.html" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-app') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%) !important; border-color:#60a5fa !important; box-shadow:0 4px 14px rgba(29,78,216,0.35) !important;">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#0f172a; border-color:#93c5fd;"><i class="fa-solid fa-mobile-screen-button" style="color:#60a5fa;"></i></div>
+                <span class="drawer-item-title">ऐप इंस्टॉल करें (Install App)</span>
+              </div>
+              <span class="drawer-tag-pill" style="background:#fde047; color:#0f172a; font-weight:900;">1 MB 📲</span>
+            </a>
+
             <!-- 2. MY LIBRARY (Main Menu Direct Button) -->
             <a href="/ebooks/my-library.html" class="drawer-nav-item-btn ${currentPath.includes('my-library') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
