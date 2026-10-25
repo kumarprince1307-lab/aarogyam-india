@@ -13664,9 +13664,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       // Build FarmChat-Style Full-Width Open Hero Banner Card
       let welcomeHtml = `
       <div style="background:#ffffff;border-radius:18px;border:1.5px solid rgba(22,163,74,0.25);overflow:hidden;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,0.08);width:100%;max-width:100%;">
-        <div style="position:relative;width:100%;height:165px;background:#0f172a;overflow:hidden;">
-          <img src="${cfg.img}" onerror="this.onerror=null;this.src='/images/sakhi/aarogyam-sakhi-banner.webp';" style="width:100%;max-width:100%;height:100%;object-fit:cover;display:block;" alt="${cfg.title}" />
-          <div class="sakhi-views-pill" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);color:#ffffff !important;font-size:0.80rem;font-weight:900;border:1.5px solid rgba(74,222,128,0.5);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;">
+        <div style="position:relative;width:100%;background:#0f172a;overflow:hidden;">
+          <img src="${cfg.img}" onerror="this.onerror=null;this.src='/images/sakhi/aarogyam-sakhi-banner.webp';" style="width:100%;max-width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#0f172a;display:block;" alt="${cfg.title}" />
+          <div class="sakhi-views-pill" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);color:#ffffff !important;font-size:0.80rem;font-weight:900;border:1.5px solid rgba(74,222,128,0.5);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;z-index:2;">
             <i class="fa-solid fa-eye" style="font-size:0.7rem;color:#4ade80;"></i>
             <span style="color:#ffffff !important;font-weight:900;">5.2k</span>
           </div>
@@ -16053,6 +16053,10 @@ ${shareUrl}`;
 
     // Butter-Smooth Plus Menu Toggle with Touch-Safe Backdrop and Auto-Close
     window.toggleSakhiPlusMenu = function (forceState) {
+      if (window.isSakhiVisionAnalyzing && forceState !== false) {
+        const proceed = confirm("⏳ सखी अभी आपकी फोटो का वैज्ञानिक विश्लेषण कर रही है!\n\nक्या आप सच में मेनू खोलकर इसे बीच में छोड़ना चाहते हैं?");
+        if (!proceed) return;
+      }
       const menu = document.getElementById('sakhiPlusMenu');
       const backdrop = document.getElementById('sakhiPlusMenuBackdrop');
       if (!menu) return;
@@ -16075,6 +16079,20 @@ ${shareUrl}`;
           backdrop.classList.remove('active');
           backdrop.style.setProperty('display', 'none', 'important');
         }
+      }
+    };
+
+    // Navigation Protection Shield for Back Button
+    window.handleSakhiBackNavigation = function () {
+      if (window.isSakhiVisionAnalyzing) {
+        const leave = confirm("⏳ सखी अभी आपकी फोटो का वैज्ञानिक विश्लेषण कर रही है...\n\nक्या आप सच में इसे बीच में छोड़कर बाहर जाना चाहते हैं?");
+        if (!leave) return;
+        window.isSakhiVisionAnalyzing = false;
+      }
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/index.html';
       }
     };
 
@@ -16104,8 +16122,12 @@ ${shareUrl}`;
       window.sendSakhiSuggestion(query);
     };
 
-    // Input Submission helper with Strict Auth Guard
+    // Input Submission helper with Strict Auth Guard & Interruption Shield
     window.submitSakhiFromInput = function () {
+      if (window.isSakhiVisionAnalyzing) {
+        alert("⏳ सखी अभी आपकी फोटो का वैज्ञानिक विश्लेषण कर रही है, कृपया 4-5 सेकंड प्रतीक्षा करें... 🌾");
+        return;
+      }
       const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
       const textQuery = input ? input.value.trim() : '';
 

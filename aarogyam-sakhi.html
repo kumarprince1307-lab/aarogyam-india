@@ -464,7 +464,7 @@
         <!-- Header -->
         <div class="sakhi-header">
           <div class="sakhi-header-left">
-            <a href="javascript:void(0)" onclick="window.history.length > 1 ? window.history.back() : window.location.href='/index.html'" class="sakhi-back-btn" title="वापस जाएं">
+            <a href="javascript:void(0)" onclick="if(typeof window.handleSakhiBackNavigation==='function'){window.handleSakhiBackNavigation();}else{window.history.length > 1 ? window.history.back() : window.location.href='/index.html';}" class="sakhi-back-btn" title="वापस जाएं">
               <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div class="sakhi-avatar-frame" id="sakhiAvatarFrame">
@@ -700,10 +700,10 @@
   <script type="module" src="/js/public-pwa.js?v=1.4"></script>
   <script src="/js/sakhi-panchang-engine.js?v=20261019_v2"></script>
   <script src="/js/sakhi-weather-bridge.js?v=20261024_v21"></script>
-  <script src="/js/sakhi-vision-engine.js?v=20261025_v600"></script>
+  <script src="/js/sakhi-vision-engine.js?v=20261025_v610"></script>
   <script src="/js/sakhi-creative-prompts.js?v=1.0"></script>
   <script src="/js/aarogyam-security-guard.js?v=1.0"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261025_v600"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261025_v610"></script>
   <script>
     (function () {
       function lockWindowScroll() {
