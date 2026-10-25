@@ -84,15 +84,55 @@ function renderTable(logs) {
                             }
                             const customerName = log.customer_name || 'किसान साथी';
                             const bookTitle = log.book_name || 'ई-बुक';
+                            const isSuccess = ['success', 'completed', 'paid'].includes(statusValue.trim());
 
-                            const followUpMsg = `🙏 नमस्ते ${customerName} जी!
+                            if (isSuccess) {
+                                const successMsg = `🙏 नमस्ते ${customerName} जी!
+
+🎉 बहुत-बहुत बधाई और स्वागत है! आप आरोग्यम इंडिया के सम्मानित सदस्य बन चुके हैं।
+
+📚 आपकी ई-बुक: *${bookTitle}*
+आपके खाते में सफलतापूर्वक सक्रिय (Activate) कर दी गई है।
+
+📖 *1. My Library (ऑनलाइन पढ़ें व ऑडियो सुनें):*
+आप अपनी ई-बुक को कभी भी, कहीं भी पढ़ने और ऑडियो सुनने के लिए नीचे दिए गए लिंक पर जाएं:
+👉 https://aarogyamindia.online/my-library.html
+
+📥 *2. PDF डाउनलोड करें:*
+अपनी बुक को डाउनलोड करने के लिए My Library में जाकर 'डाउनलोड' बटन दबाएं:
+👉 https://aarogyamindia.online/my-library.html
+
+📲 *3. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
+बिना ब्राउज़र खोले 1-क्लिक में उपयोग करने हेतु ऐप इंस्टॉल करें:
+👉 https://aarogyamindia.online/aarogyam-app.html
+
+🌸 *4. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
+फसलों के रोग, सही जैविक कीटनाशक स्प्रे चार्ट, पशुपालन या स्वास्थ्य का कोई भी सवाल पूछें या अपने खेत की फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
+👉 https://aarogyamindia.online/aarogyam-sakhi.html
+
+🎁 *विशेष ऑफर्स, छूट व किसी भी सहायता हेतु हमसे संपर्क करें:*
+📞 WhatsApp / कॉल: +91 7974422572
+
+आपका शुभचिंतक,  
+*आरोग्यम इंडिया टीम* 🌿`;
+
+                                const encodedMessage = encodeURIComponent(successMsg);
+                                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                                whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="सफलतापूर्वक खरीद का बधाई व स्वागत संदेश भेजें">💬 बधाई संदेश</a>`;
+                            } else {
+                                const followUpMsg = `🙏 नमस्ते ${customerName} जी!
 
 आशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿
 
 हमने देखा कि आप आरोग्यम इंडिया से *"${bookTitle}"* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट, इंटरनेट समस्या या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।
 
 ❤️ *हम आपके साथ हैं:*
-यदि पेमेंट करने में कोई भी परेशानी आई हो, तो आप सीधे हमारे आधिकारिक नंबर पर Google Pay / PhonePe / Paytm से भी राशि भेजकर तुरंत 2 मिनट में ई-बुक सक्रिय करवा सकते हैं।
+यदि ऑनलाइन पेमेंट करने में कोई भी परेशानी या असुविधा आई हो, तो आप सीधे हमारे आधिकारिक UPI नंबर पर भी राशि भेज सकते हैं:
+
+💳 *Google Pay / PhonePe / Paytm / BHIM UPI:*
+👉 UPI No: *7049294111*
+
+📸 *पेमेंट करने के बाद इसी नंबर पर स्क्रीनशॉट (Screenshot) भेजें*, हम तुरंत 2 मिनट में आपकी ई-बुक सक्रिय (Activate) करवा देंगे।
 
 📲 *1. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
 अपने मोबाइल में बिना रुकावट तुरंत ऐप चलाने हेतु यहाँ से इंस्टॉल करें:
@@ -109,9 +149,10 @@ function renderTable(logs) {
 सप्रेम व आदर सहित,  
 *आपकी आरोग्यम इंडिया टीम* 🌾`;
 
-                            const encodedMessage = encodeURIComponent(followUpMsg);
-                            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-                            whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="फॉलो-अप व सहायता संदेश भेजें">💬 फॉलो-अप संदेश</a>`;
+                                const encodedMessage = encodeURIComponent(followUpMsg);
+                                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                                whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#f59e0b;color:#000;border-color:#d97706;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="अधूरे ऑर्डर हेतु फॉलो-अप संदेश भेजें">💬 फॉलो-अप संदेश</a>`;
+                            }
                         }
 
                         const actionButtons = (callButtonHTML || whatsappButtonHTML)

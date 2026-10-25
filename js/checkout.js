@@ -889,34 +889,85 @@ async function loadBook() {
         let verifiedOfferAmount = null;
         let offerSecurityError = null;
 
+        // ⚡ INSTANT 0MS PRE-RENDER: Render book details immediately from sessionStorage or DEFAULT_BOOK_CATALOG
+        const fastTargetId = (rawId || "").toUpperCase().trim();
+        let instantBook = DEFAULT_BOOK_CATALOG[fastTargetId] || null;
+        try {
+            const cachedBook = JSON.parse(sessionStorage.getItem('AI_ACTIVE_BOOK_DATA') || 'null');
+            if (cachedBook && (cachedBook.id || '').toUpperCase() === fastTargetId) {
+                instantBook = Object.assign({}, instantBook || {}, cachedBook);
+            }
+        } catch(e) {}
+
+        if (instantBook) {
+            const fastName = instantBook.name || instantBook.title || "ई-बुक";
+            const fastMrp = instantBook.mrp || 499;
+            const fastPrice = instantBook.offerPrice || 99;
+            const fastCover = instantBook.cover || "/images/books/bk016-cover.webp";
+
+            const coverEl = document.getElementById("bookCover"); if (coverEl && !coverEl.src) coverEl.src = fastCover;
+            const nameEl = document.getElementById("bookName"); if (nameEl && nameEl.textContent === "Loading...") nameEl.textContent = fastName;
+            const mrpEl = document.getElementById("bookMrp"); if (mrpEl) mrpEl.textContent = "₹" + fastMrp;
+            const priceEl = document.getElementById("bookPrice"); if (priceEl) priceEl.textContent = "₹" + fastPrice;
+            const sumBook = document.getElementById("summaryBook"); if (sumBook) sumBook.textContent = fastName;
+            const sumMrp = document.getElementById("summaryMrp"); if (sumMrp) sumMrp.textContent = "₹" + fastMrp;
+            const sumPrice = document.getElementById("summaryPrice"); if (sumPrice) sumPrice.textContent = "₹" + fastPrice;
+            const totPrice = document.getElementById("totalPrice"); if (totPrice) totPrice.textContent = "₹" + fastPrice;
+        }
+
         let booksArray = [];
         let landingPagesArray = [];
-        const cacheTime = Math.floor(Date.now() / 300000);
+        const cacheTime = Math.floor(Date.now() / 120000);
+
+        // High-speed session cache check for instant data resolution
         try {
-            const response = await fetch("/data/books.json?v=" + cacheTime);
-            const jsonResult = await response.json();
-            booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
-        } catch (e) {
+            const cachedBooks = sessionStorage.getItem('AOI_CACHE_data_books_json') || localStorage.getItem('AOI_CACHE_data_books_json');
+            if (cachedBooks) {
+                const parsed = JSON.parse(cachedBooks);
+                const data = parsed.data || parsed;
+                booksArray = Array.isArray(data) ? data : (data.books || []);
+            }
+        } catch (e) {}
+
+        if (booksArray.length === 0) {
             try {
-                const response2 = await fetch("../data/books.json?v=" + cacheTime);
-                const jsonResult2 = await response2.json();
-                booksArray = Array.isArray(jsonResult2) ? jsonResult2 : (jsonResult2.books || []);
-            } catch (e2) {
-                console.warn("Local books.json fallback active");
+                const response = await fetch("/data/books.json?v=" + cacheTime);
+                const jsonResult = await response.json();
+                booksArray = Array.isArray(jsonResult) ? jsonResult : (jsonResult.books || []);
+            } catch (e) {
+                try {
+                    const response2 = await fetch("../data/books.json?v=" + cacheTime);
+                    const jsonResult2 = await response2.json();
+                    booksArray = Array.isArray(jsonResult2) ? jsonResult2 : (jsonResult2.books || []);
+                } catch (e2) {
+                    console.warn("Local books.json fallback active");
+                }
             }
         }
 
         try {
-            const response = await fetch("/data/universal-book-landing-pages.json?v=" + cacheTime);
-            if (response.ok) {
-                const jsonResult = await response.json();
-                const pages = Array.isArray(jsonResult) ? jsonResult : jsonResult.bookLandingPages;
+            const cachedLp = sessionStorage.getItem('AOI_CACHE_data_universal_book_landing_pages_json') || localStorage.getItem('AOI_CACHE_data_universal_book_landing_pages_json');
+            if (cachedLp) {
+                const parsed = JSON.parse(cachedLp);
+                const data = parsed.data || parsed;
+                const pages = Array.isArray(data) ? data : data.bookLandingPages;
                 landingPagesArray = Array.isArray(pages) ? pages : [];
-            } else {
-                throw new Error(`Landing page catalog request failed: ${response.status}`);
             }
-        } catch (e) {
-            console.warn("Landing page catalog unavailable for checkout merge", e);
+        } catch (e) {}
+
+        if (landingPagesArray.length === 0) {
+            try {
+                const response = await fetch("/data/universal-book-landing-pages.json?v=" + cacheTime);
+                if (response.ok) {
+                    const jsonResult = await response.json();
+                    const pages = Array.isArray(jsonResult) ? jsonResult : jsonResult.bookLandingPages;
+                    landingPagesArray = Array.isArray(pages) ? pages : [];
+                } else {
+                    throw new Error(`Landing page catalog request failed: ${response.status}`);
+                }
+            } catch (e) {
+                console.warn("Landing page catalog unavailable for checkout merge", e);
+            }
         }
 
         const hasNewerLocalVersion = (localItem, serverItem) => {
@@ -1556,6 +1607,112 @@ function autoFillUserData() {
             if (user.email && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = user.email;
         }
     }
+
+    const currentMob = (document.getElementById("customerMobile") ? document.getElementById("customerMobile").value : "").replace(/\D/g, '').slice(-10);
+    if (currentMob.length === 10) {
+        checkDuplicateBookPurchase(currentMob);
+    }
+}
+
+// -------------------------------------------------------------
+// DUPLICATE PURCHASE PREVENTION (Zero-Egress Cache First)
+// -------------------------------------------------------------
+async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
+    const rawMob = mobileInput || (document.getElementById("customerMobile") ? document.getElementById("customerMobile").value : "");
+    const cleanMob = String(rawMob || "").replace(/\D/g, "").slice(-10);
+    const bookId = bookIdInput || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
+
+    const bannerContainer = document.getElementById("checkoutAlreadyPurchasedBanner");
+    const payBtn = document.getElementById("payNowBtn");
+
+    if (!cleanMob || cleanMob.length !== 10 || !bookId) {
+        if (bannerContainer) bannerContainer.style.display = "none";
+        return false;
+    }
+
+    // Zero-Egress Cache Check
+    const cacheKey = `AI_PURCHASED_${cleanMob}_${bookId}`;
+    let isAlreadyPurchased = sessionStorage.getItem(cacheKey) === 'true';
+
+    if (!isAlreadyPurchased) {
+        try {
+            // 1. Check local storage purchases cache first
+            const localPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
+            const localMatch = localPurchases.some(p => 
+                (p.book_id === bookId || p.bookId === bookId) && 
+                (String(p.mobile || '').replace(/\D/g, '').slice(-10) === cleanMob)
+            );
+            if (localMatch) {
+                isAlreadyPurchased = true;
+            } else {
+                // 2. Single-row indexed query to Supabase (only if not found locally)
+                const db = window.dbClient || window.supabase;
+                if (db) {
+                    const { data } = await db
+                        .from('purchases')
+                        .select('id')
+                        .eq('book_id', bookId)
+                        .eq('mobile', cleanMob)
+                        .or('payment_status.eq.success,payment_status.is.null')
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (data && data.id) {
+                        isAlreadyPurchased = true;
+                    }
+                }
+            }
+            if (isAlreadyPurchased) {
+                sessionStorage.setItem(cacheKey, 'true');
+            }
+        } catch(e) {
+            console.warn("Duplicate purchase check error:", e);
+        }
+    }
+
+    if (isAlreadyPurchased) {
+        let banner = document.getElementById("checkoutAlreadyPurchasedBanner");
+        if (!banner) {
+            banner = document.createElement("div");
+            banner.id = "checkoutAlreadyPurchasedBanner";
+            const custDetailsSection = document.querySelector(".customer-details");
+            if (custDetailsSection) custDetailsSection.prepend(banner);
+        }
+
+        banner.style.cssText = "display: block; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 14px; padding: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.15); font-family: inherit;";
+        banner.innerHTML = `
+            <div style="font-size: 2rem; margin-bottom: 6px;">🎉</div>
+            <h3 style="margin: 0 0 6px 0; color: #15803d; font-size: 1.15rem; font-weight: 800;">
+                आप यह पुस्तक पहले ही खरीद चुके हैं!
+            </h3>
+            <p style="margin: 0 0 14px 0; color: #166534; font-size: 0.88rem; line-height: 1.5;">
+                आपके पंजीकृत नंबर (<strong>+91 ${cleanMob}</strong>) पर इस पुस्तक का लाइफटाइम एक्सेस पहले से सक्रिय है। आपको दोबारा पैसे खर्च करने की आवश्यकता नहीं है।
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a href="/my-library.html" style="background: #16a34a; color: #ffffff; padding: 10px 18px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                    📖 My Library में पढ़ें
+                </a>
+                <a href="/ebooks/download.html?book=${encodeURIComponent(bookId)}" style="background: #0284c7; color: #ffffff; padding: 10px 18px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+                    📥 PDF डाउनलोड करें
+                </a>
+            </div>
+        `;
+
+        if (payBtn) {
+            payBtn.dataset.alreadyPurchased = "true";
+            payBtn.style.background = "#64748b";
+            payBtn.textContent = "✓ आप पहले ही खरीद चुके हैं (Already Purchased)";
+        }
+        return true;
+    } else {
+        if (bannerContainer) bannerContainer.style.display = "none";
+        if (payBtn && payBtn.dataset.alreadyPurchased === "true") {
+            delete payBtn.dataset.alreadyPurchased;
+            payBtn.style.background = "";
+            payBtn.textContent = "Pay Now";
+        }
+        return false;
+    }
 }
 
 // -------------------------------------------------------------
@@ -1573,7 +1730,6 @@ async function logCheckoutActivity(profileId, bookId, status) {
 
         if (!currentUuid) return;
 
-        // अब यहाँ कभी भी फर्जी BK001 नहीं जाएगा, जो असली bookId होगी वही सेव होगी
         const targetBookId = bookId || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
         if (!targetBookId) return;
 
@@ -1597,6 +1753,28 @@ async function logCheckoutActivity(profileId, bookId, status) {
     }
 }
 
+// Bind live mobile input listener for immediate duplicate detection
+document.addEventListener("DOMContentLoaded", () => {
+    const mobInput = document.getElementById("customerMobile");
+    if (mobInput) {
+        mobInput.addEventListener("input", function() {
+            const val = this.value.replace(/\D/g, '').slice(-10);
+            if (val.length === 10) {
+                checkDuplicateBookPurchase(val);
+            } else {
+                const banner = document.getElementById("checkoutAlreadyPurchasedBanner");
+                if (banner) banner.style.display = "none";
+                const payBtn = document.getElementById("payNowBtn");
+                if (payBtn && payBtn.dataset.alreadyPurchased === "true") {
+                    delete payBtn.dataset.alreadyPurchased;
+                    payBtn.style.background = "";
+                    payBtn.textContent = "Pay Now";
+                }
+            }
+        });
+    }
+});
+
 // Pay Now Button Logic with Smart Referral, Razorpay Integration & Full Activity Tracking
 document.getElementById("payNowBtn").addEventListener("click", async function () {
     const name = document.getElementById("customerName").value.trim();
@@ -1617,6 +1795,13 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
     if (mobile.length !== 10) {
         alert("Enter Valid Mobile Number");
+        return;
+    }
+
+    // Check duplicate purchase before initiating Razorpay
+    const isAlreadyBought = await checkDuplicateBookPurchase(mobile, window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
+    if (isAlreadyBought) {
+        alert("🎉 आप यह पुस्तक पहले ही खरीद चुके हैं!\n\nकृपया अपनी लाइब्रेरी में जाकर इसे पढ़ें या PDF डाउनलोड करें।");
         return;
     }
 
@@ -1721,8 +1906,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
         const activeUserId = (window.V1_SESSION && typeof window.V1_SESSION.getUserId === 'function') ? window.V1_SESSION.getUserId() : finalUuid;
         
-        // 📝 1. चेकआउट लॉग दर्ज करें: पेमेंट शुरू (initiated) - असली बुक आईडी के साथ
-        await logCheckoutActivity(activeUserId, bookIdToBuy, 'initiated');
+        // 📝 1. चेकआउट लॉग दर्ज करें: पेमेंट शुरू (initiated) - नॉन-ब्लॉकिंग ताकि रेजरपे तुरंत खुले
+        logCheckoutActivity(activeUserId, bookIdToBuy, 'initiated').catch(() => {});
 
         // 🚀 100% FREE / ADMIN TEST CHECKOUT HANDLER (₹0 - Immediate Unlock)
         if (finalPayablePrice === 0 || bookPrice === 0 || bookPrice <= 0) {

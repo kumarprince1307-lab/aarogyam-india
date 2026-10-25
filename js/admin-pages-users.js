@@ -1,9 +1,11 @@
 /* Admin Users Page */
 
 import { initAdminLayout } from './admin-main.js';
-import { fetchUsers, updateUserStatus, batchUpdateUserStatuses, deleteUserProfile } from './admin-api.js';
+import { fetchUsers, fetchUsersDelta, updateUserStatus, batchUpdateUserStatuses, deleteUserProfile } from './admin-api.js';
 
-let currentUsersData = []; // Store current user data for export
+let masterUsersList = []; // In-memory master list to eliminate repeated egress
+let currentUsersData = []; // Filtered data for table and CSV export
+let lastSyncTimestamp = null; // Timestamp of last successful sync
 
 function renderUserRow(user) {
   const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
@@ -136,22 +138,21 @@ function renderUsersTable(users) {
             <th>#</th>
             <th>Name</th>
             <th>Mobile</th>
-            <th>App Status</th>
+            <th>App Status / Device (Reset)</th>
             <th>Reg. Source</th>
             <th>Share ID</th>
             <th style="background: rgba(37,99,235,0.15); color: #60a5fa; white-space: nowrap;">🎥 Webinar Report</th>
             <th style="background: rgba(22,163,74,0.15); color: #4ade80; white-space: nowrap;">🌸 सखी चैट (Sakhi Chat)</th>
-            <th>Direct Referrals</th>
-            <th>Total Shares</th>
-            <th>Total Clicks</th>
-            <th>Total Visitors</th>
-            <th>Total Direct Purchases</th>
-            <th>Total Purchases</th>
-            <th>Total Spent</th>
             <th>Downloads (Used/Limit)</th>
             <th>Subscriber</th>
             <th>Status</th>
             <th>Action</th>
+            <th>Direct Referrals</th>
+            <th>Total Shares</th>
+            <th>Total Clicks</th>
+            <th>Total Direct Purchases</th>
+            <th>Total Purchases</th>
+            <th>Total Spent</th>
           </tr>
         </thead>
         <tbody>
@@ -231,10 +232,16 @@ function renderUsersTable(users) {
                   </div>
                 </td>
                 <td>
-                  ${u.appInstalled 
-                    ? `<span class="admin-pill active" title="${u.appInstalledAt ? 'Installed: ' + u.appInstalledAt : 'App Installed'}" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">📱 Installed</span>` 
-                    : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">🌐 Web Only</span>`
-                  }
+                  <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+                    ${u.appInstalled 
+                      ? `<span class="admin-pill active" title="${u.appInstalledAt ? 'Installed: ' + u.appInstalledAt : 'App Installed'}" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">📱 App</span>` 
+                      : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">🌐 Web</span>`
+                    }
+                    <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+                      <span id="devStatusPill_${u.id}" class="admin-pill" style="background:#f1f5f9;color:#475569;font-size:0.68rem;padding:2px 5px;font-weight:700;">📱 Active</span>
+                      <button type="button" class="admin-button small-button btn-reset-user-device" onclick="window.resetUserDevice('${u.id}', '${sanitizedMobile}', this)" style="background:#f59e0b;color:#fff;border:1px solid #d97706;font-size:0.68rem;padding:2px 6px;border-radius:4px;font-weight:800;cursor:pointer;white-space:nowrap;" title="उपयोगकर्ता का डिवाइस रीसेट करें ताकि वे नए फोन पर लॉगिन कर सकें">🔄 Reset</button>
+                    </div>
+                  </div>
                 </td>
                 <td>${u.source || 'N/A'}</td>
                 <td><a href="#user-details?id=${u.id}" data-route="user-details?id=${u.id}" data-id="${u.id}" class="admin-subtle-link"><strong>${u.shareId || 'N/A'}</strong></a></td>
@@ -265,13 +272,6 @@ function renderUsersTable(users) {
                     ${u.sakhiPrimaryDomain ? `<span style="background:#166534; color:#bbf7d0; border-radius:10px; padding:1px 5px; font-size:0.68rem; font-weight:800;">${u.sakhiPrimaryDomain}</span>` : ''}
                   </a>
                 </td>
-                <td>${u.directReferrals || 0}</td>
-                <td>${u.totalShares || 0}</td>
-                <td>${u.totalClicks || 0}</td>
-                <td>${u.totalVisitors || 0}</td>
-                <td>${u.totalDirectPurchases || 0}</td>
-                <td>${u.totalPurchases || 0}</td>
-                <td>₹${(u.totalSpent || 0).toLocaleString('en-IN')}</td>
                 <td>${u.totalDownloads || 0} / ${u.downloadLimit || 0}</td>
                 <td>
                   <span style="font-size:0.75rem;font-weight:800;padding:2px 6px;border-radius:4px;background:${isSub ? '#FEF3C7' : '#F1F5F9'};color:${isSub ? '#92400E' : '#64748B'};">
@@ -297,6 +297,12 @@ function renderUsersTable(users) {
                       <button type="button" class="admin-button small-button btn-delete-user" data-user-id="${u.id}" data-user-name="${(u.name || 'User').replace(/"/g, '&quot;')}" style="background:#ef4444;color:#fff;border:1px solid #dc2626;font-weight:800;padding:4px 8px;border-radius:5px;white-space:nowrap;cursor:pointer;" title="यूज़र को डेटाबेस से हमेशा के लिए हटाएं">🗑️ हटाएं</button>
                   </div>
                 </td>
+                <td>${u.directReferrals || 0}</td>
+                <td>${u.totalShares || 0}</td>
+                <td>${u.totalClicks || 0}</td>
+                <td>${u.totalDirectPurchases || 0}</td>
+                <td>${u.totalPurchases || 0}</td>
+                <td>₹${(u.totalSpent || 0).toLocaleString('en-IN')}</td>
               </tr>
             `;
           }).join('')}
@@ -331,28 +337,43 @@ export async function initUsers() {
   content.innerHTML = `
     <div class="admin-section">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div class="admin-section-title" style="margin:0;">All Users</div>
-        <a href="#user-permissions" data-route="user-permissions" class="admin-button" style="background:linear-gradient(135deg, #1E293B 0%, #0F172A 100%);color:#FBBF24;border:1.5px solid #F59E0B;display:inline-flex;align-items:center;gap:6px;font-weight:800;text-decoration:none;padding:8px 14px;border-radius:8px;">
-          <span>🛡️</span> All User Permissions Matrix
-        </a>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="admin-section-title" style="margin:0;">All Users</div>
+          <span id="user-sync-badge" style="font-size:0.75rem;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.3);display:inline-flex;align-items:center;gap:4px;">
+            <span>🟢</span> <span id="user-sync-text">Loading...</span>
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <button id="btn-sync-delta" class="admin-button" style="background:#0284c7;color:#fff;border-color:#0369a1;display:inline-flex;align-items:center;gap:5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;" title="Fetch only new users and updates since last sync">
+            <span>⚡</span> Sync New
+          </button>
+          <button id="btn-hard-refresh" class="admin-button" style="background:#334155;color:#f8fafc;border-color:#475569;display:inline-flex;align-items:center;gap:5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;" title="Full fresh database reload">
+            <span>🔄</span> Full Reload
+          </button>
+          <a href="#user-permissions" data-route="user-permissions" class="admin-button" style="background:linear-gradient(135deg, #1E293B 0%, #0F172A 100%);color:#FBBF24;border:1.5px solid #F59E0B;display:inline-flex;align-items:center;gap:6px;font-weight:800;text-decoration:none;padding:6px 14px;border-radius:8px;">
+            <span>🛡️</span> Permissions Matrix
+          </a>
+        </div>
       </div>
-      <div class="admin-card admin-controls">
-        <input id="user-search" type="search" placeholder="🔍 नाम, मोबाइल, Share ID (e.g. AI639559), या ईमेल से खोजें..." class="admin-input" style="flex: 2; min-width: 260px;" />
-        <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" />
-        <select id="user-status-filter" class="admin-select">
+      <div class="admin-card admin-controls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <input id="user-search" type="search" placeholder="🔍 नाम, मोबाइल, Share ID (e.g. AI639559), या ईमेल से खोजें..." class="admin-input" style="flex: 2; min-width: 240px;" />
+        <div style="display:inline-flex;align-items:center;gap:4px;">
+          <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" style="min-width:140px;" />
+          <button id="btn-clear-date-filter" type="button" class="admin-button small-button" style="padding:4px 8px;font-size:0.75rem;background:#475569;color:#fff;" title="Clear date filter">❌</button>
+        </div>
+        <select id="user-status-filter" class="admin-select" style="min-width:130px;">
           <option value="all">All statuses</option>
           <option value="installed">📱 App Installed</option>
           <option value="web">🌐 Web Only</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-        <select id="user-sort-filter" class="admin-select">
+        <select id="user-sort-filter" class="admin-select" style="min-width:180px;">
           <option value="default">Sort by Registration Date</option>
           <option value="sakhiChats">🌸 सखी संवाद संख्या (Sakhi Chats: High-Low)</option>
           <option value="directReferrals">Direct Referrals (High-Low)</option>
           <option value="totalShares">Total Shares (High-Low)</option>
           <option value="totalClicks">Total Clicks (High-Low)</option>
-          <option value="totalVisitors">Total Visitors (High-Low)</option>
           <option value="totalDirectPurchases">Total Direct Purchases (High-Low)</option>
           <option value="totalPurchases">Total Purchases (High-Low)</option>
           <option value="totalSpent">Total Spent (High-Low)</option>
@@ -360,7 +381,10 @@ export async function initUsers() {
         </select>
         <button id="export-csv-btn" class="admin-button">Export CSV</button>
       </div>
-      <div id="users-table" style="margin-top:12px;"></div>
+      <div id="users-filter-stat-bar" style="font-size:0.8rem;color:#94a3b8;margin-top:6px;padding-left:4px;display:flex;justify-content:space-between;">
+        <span id="users-count-label">Showing 0 users</span>
+      </div>
+      <div id="users-table" style="margin-top:8px;"></div>
     </div>
   `;
 
@@ -368,8 +392,13 @@ export async function initUsers() {
   const searchInput = document.getElementById('user-search');
   const statusSelect = document.getElementById('user-status-filter');
   const dateInput = document.getElementById('user-reg-date-filter');
+  const clearDateBtn = document.getElementById('btn-clear-date-filter');
   const sortSelect = document.getElementById('user-sort-filter');
   const exportBtn = document.getElementById('export-csv-btn');
+  const syncDeltaBtn = document.getElementById('btn-sync-delta');
+  const hardRefreshBtn = document.getElementById('btn-hard-refresh');
+  const syncBadgeText = document.getElementById('user-sync-text');
+  const usersCountLabel = document.getElementById('users-count-label');
 
   if (!container) return;
 
@@ -384,29 +413,210 @@ export async function initUsers() {
     }
   }
 
-  async function reload(queryFromEvent) {
-    container.innerHTML = '<div class="admin-loading">Loading users…</div>';
-    const params = { 
-      query: (queryFromEvent !== undefined) ? queryFromEvent : (searchInput?.value || ''), 
-      status: statusSelect?.value || 'all',
-      registrationDate: dateInput?.value || null
-    };
-    const result = await fetchUsers(params);
+  function updateSyncBadge(statusMsg) {
+    if (!syncBadgeText) return;
+    if (statusMsg) {
+      syncBadgeText.textContent = statusMsg;
+      return;
+    }
+    const timeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    syncBadgeText.textContent = `Live Synced: ${timeStr} (${masterUsersList.length} Users)`;
+  }
 
-    let users = result.success ? result.data : [];
+  // Instant Client-Side In-Memory Filtering (0ms, 0 Egress)
+  function applyFilters() {
+    const rawQ = String(searchInput?.value || '').trim().toLowerCase();
+    const statusVal = statusSelect?.value || 'all';
+    const selectedDate = dateInput?.value || null; // Format: YYYY-MM-DD
+    const sortVal = sortSelect?.value || 'default';
 
-    // Client-side sorting
-    const sortValue = sortSelect?.value;
-    if (sortValue && sortValue !== 'default' && users.length > 0) {
-        if (sortValue === 'sakhiChats') {
-            users.sort((a, b) => (b.sakhiChatCount || 0) - (a.sakhiChatCount || 0));
-        } else {
-            users.sort((a, b) => (b[sortValue] || 0) - (a[sortValue] || 0));
-        }
+    let result = [...masterUsersList];
+
+    // 1. Text Search Filter (Multi-Field)
+    if (rawQ) {
+      result = result.filter(u => {
+        const nameMatch = String(u.name || '').toLowerCase().includes(rawQ);
+        const mobileMatch = String(u.mobile || '').replace(/\D/g, '').includes(rawQ.replace(/\D/g, ''));
+        const emailMatch = String(u.email || '').toLowerCase().includes(rawQ);
+        const shareIdMatch = String(u.shareId || '').toLowerCase().includes(rawQ);
+        return nameMatch || mobileMatch || emailMatch || shareIdMatch;
+      });
     }
 
-    currentUsersData = users; // Store for CSV export
+    // 2. Status Filter
+    if (statusVal !== 'all') {
+      if (statusVal === 'installed') {
+        result = result.filter(u => u.appInstalled === true || String(u.source || '').toLowerCase().includes('pwa') || String(u.source || '').toLowerCase().includes('app'));
+      } else if (statusVal === 'web') {
+        result = result.filter(u => !u.appInstalled && !String(u.source || '').toLowerCase().includes('pwa') && !String(u.source || '').toLowerCase().includes('app'));
+      } else if (statusVal === 'active') {
+        result = result.filter(u => u.status === 'active');
+      } else if (statusVal === 'inactive') {
+        result = result.filter(u => u.status === 'inactive');
+      }
+    }
+
+    // 3. Date Filter (Timezone-safe Indian Standard Time match)
+    if (selectedDate) {
+      result = result.filter(u => {
+        const reg = u.registrationDate || u.createdAt;
+        if (!reg) return false;
+        try {
+          const d = new Date(reg);
+          if (isNaN(d.getTime())) return false;
+          // toLocaleDateString('en-CA') returns exact YYYY-MM-DD in local time
+          return d.toLocaleDateString('en-CA') === selectedDate;
+        } catch (_) {
+          return false;
+        }
+      });
+    }
+
+    // 4. Sorting
+    if (sortVal && sortVal !== 'default' && result.length > 0) {
+      if (sortVal === 'sakhiChats') {
+        result.sort((a, b) => (b.sakhiChatCount || 0) - (a.sakhiChatCount || 0));
+      } else {
+        result.sort((a, b) => (b[sortVal] || 0) - (a[sortVal] || 0));
+      }
+    } else {
+      // Default: Most recent registrations first
+      result.sort((a, b) => new Date(b.registrationDate || b.createdAt || 0) - new Date(a.registrationDate || a.createdAt || 0));
+    }
+
+    currentUsersData = result;
+    currentUsersPage = 1;
+    if (usersCountLabel) {
+      usersCountLabel.textContent = `Showing ${currentUsersData.length} of ${masterUsersList.length} users`;
+    }
     renderTableWithPagination();
+  }
+
+  // Load Full Users List (Runs on first page load or Hard Refresh)
+  async function loadInitialUsers(forceRefresh = false) {
+    container.innerHTML = '<div class="admin-loading">डेटाबेस से यूज़र्स लोड हो रहे हैं…</div>';
+    updateSyncBadge('Syncing...');
+
+    const result = await fetchUsers({ forceRefresh });
+    if (result.success && Array.isArray(result.data)) {
+      masterUsersList = result.data;
+      lastSyncTimestamp = new Date().toISOString();
+      updateSyncBadge();
+    } else {
+      console.error("fetchUsers failed:", result.error);
+      updateSyncBadge('⚠️ Sync failed');
+    }
+
+    applyFilters();
+  }
+
+  // Delta Sync: Fetches ONLY new records since last sync (Zero egress leak)
+  async function syncDeltaUsers() {
+    if (!lastSyncTimestamp || masterUsersList.length === 0) {
+      return await loadInitialUsers(true);
+    }
+
+    if (syncDeltaBtn) {
+      syncDeltaBtn.disabled = true;
+      syncDeltaBtn.innerHTML = '<span>⏳</span> Syncing...';
+    }
+    updateSyncBadge('Checking for new records...');
+
+    try {
+      const deltaRes = await fetchUsersDelta(lastSyncTimestamp);
+      if (deltaRes.success) {
+        const { newProfiles, newPurchases, newSakhi } = deltaRes;
+        let changeCount = 0;
+
+        // Merge new or updated profiles
+        if (newProfiles && newProfiles.length > 0) {
+          newProfiles.forEach(np => {
+            const existingIdx = masterUsersList.findIndex(u => u.id === np.id);
+            const userObj = {
+              id: np.id,
+              name: np.full_name,
+              mobile: np.mobile,
+              email: np.email,
+              source: np.registration_source || 'Direct',
+              status: np.is_active ? 'active' : 'inactive',
+              shareId: np.share_id || np.referral_code || (String(np.mobile || '').replace(/\D/g, '').slice(-6) ? ('AI' + String(np.mobile || '').replace(/\D/g, '').slice(-6)) : 'AI000004'),
+              directReferrals: 0,
+              totalShares: 0,
+              totalClicks: 0,
+              totalVisitors: 0,
+              totalDirectPurchases: 0,
+              totalPurchases: 0,
+              totalSpent: 0,
+              totalDownloads: 0,
+              downloadLimit: 0,
+              appInstalled: String(np.registration_source || '').toLowerCase().includes('pwa') || String(np.registration_source || '').toLowerCase().includes('app'),
+              appInstalledAt: null,
+              registrationDate: np.created_at || null,
+              createdAt: np.created_at || null,
+              webinarLeads: 0,
+              webinarJoined: 0,
+              webinarAttendees: [],
+              sakhiChatCount: 0,
+              sakhiPrimaryDomain: null,
+              sakhiLastTopic: null,
+              sakhiRecoEbook: 'BK002'
+            };
+
+            if (existingIdx !== -1) {
+              masterUsersList[existingIdx] = { ...masterUsersList[existingIdx], ...userObj };
+            } else {
+              masterUsersList.unshift(userObj);
+              changeCount++;
+            }
+          });
+        }
+
+        // Merge new purchases to update total purchases and spend
+        if (newPurchases && newPurchases.length > 0) {
+          newPurchases.forEach(pur => {
+            const u = masterUsersList.find(x => x.id === pur.profile_id);
+            if (u) {
+              u.totalPurchases = (u.totalPurchases || 0) + 1;
+              u.totalSpent = (u.totalSpent || 0) + (Number(pur.amount) || 0);
+              u.downloadLimit = (u.totalPurchases || 0) * 3;
+              changeCount++;
+            }
+          });
+        }
+
+        // Merge new Sakhi chats
+        if (newSakhi && newSakhi.length > 0) {
+          newSakhi.forEach(sak => {
+            const cleanM = String(sak.mobile || '').replace(/\D/g, '').slice(-10);
+            const u = masterUsersList.find(x => x.id === sak.profile_id || (cleanM && String(x.mobile || '').includes(cleanM)));
+            if (u) {
+              u.sakhiChatCount = sak.interaction_count || u.sakhiChatCount || 1;
+              u.sakhiPrimaryDomain = sak.primary_domain || u.sakhiPrimaryDomain;
+              changeCount++;
+            }
+          });
+        }
+
+        lastSyncTimestamp = new Date().toISOString();
+        updateSyncBadge();
+        applyFilters();
+
+        if (changeCount > 0) {
+          console.log(`[Admin] ⚡ Delta sync: ${changeCount} updates applied successfully.`);
+        }
+      } else {
+        // Fallback to full load if delta failed
+        await loadInitialUsers(true);
+      }
+    } catch (err) {
+      console.warn("Delta sync failed, performing full refresh:", err);
+      await loadInitialUsers(true);
+    } finally {
+      if (syncDeltaBtn) {
+        syncDeltaBtn.disabled = false;
+        syncDeltaBtn.innerHTML = '<span>⚡</span> Sync New';
+      }
+    }
   }
 
   function renderTableWithPagination() {
@@ -436,7 +646,7 @@ export async function initUsers() {
 
     const headers = [
         "Name", "Mobile", "Reg. Source", "Share ID", "Direct Referrals", 
-        "Total Shares", "Total Clicks", "Total Visitors", "Total Direct Purchases", 
+        "Total Shares", "Total Clicks", "Total Direct Purchases", 
         "Total Purchases", "Total Spent", "Total Downloads", "Download Limit", "Status", "Registration Date"
     ];
     const rows = currentUsersData.map(user => [
@@ -447,7 +657,6 @@ export async function initUsers() {
         user.directReferrals || 0,
         user.totalShares || 0,
         user.totalClicks || 0,
-        user.totalVisitors || 0,
         user.totalDirectPurchases || 0,
         user.totalPurchases || 0,
         user.totalSpent || 0,
@@ -467,14 +676,38 @@ export async function initUsers() {
     document.body.removeChild(link);
   }
 
-  if (searchInput) searchInput.addEventListener('input', () => { currentUsersPage = 1; reload(); });
-  if (statusSelect) statusSelect.addEventListener('change', () => { currentUsersPage = 1; reload(); });
-  if (dateInput) dateInput.addEventListener('change', () => { currentUsersPage = 1; reload(); });
-  if (sortSelect) sortSelect.addEventListener('change', () => { currentUsersPage = 1; reload(); });
+  // Debounced search for zero-lag instant filtering
+  let searchTimer = null;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        applyFilters();
+      }, 100);
+    });
+  }
+
+  if (statusSelect) statusSelect.addEventListener('change', applyFilters);
+  if (dateInput) dateInput.addEventListener('change', applyFilters);
+  if (clearDateBtn) {
+    clearDateBtn.addEventListener('click', () => {
+      if (dateInput) dateInput.value = '';
+      applyFilters();
+    });
+  }
+  if (sortSelect) sortSelect.addEventListener('change', applyFilters);
   if (exportBtn) exportBtn.addEventListener('click', exportToCsv);
 
+  if (syncDeltaBtn) syncDeltaBtn.addEventListener('click', syncDeltaUsers);
+  if (hardRefreshBtn) hardRefreshBtn.addEventListener('click', () => loadInitialUsers(true));
+
   // Listen to global admin search
-  document.addEventListener('admin:global-search', (e) => reload(e.detail?.query || ''));
+  document.addEventListener('admin:global-search', (e) => {
+    if (searchInput) {
+      searchInput.value = e.detail?.query || '';
+      applyFilters();
+    }
+  });
 
   // Handle clicks on data-route links, webinar report drawers, and status toggles inside the table
   container.addEventListener('click', async (e) => {
@@ -490,12 +723,14 @@ export async function initUsers() {
 
     const link = e.target.closest('[data-route^="user-details"]');
     if (link) {
+      e.preventDefault();
       const uId = link.dataset.id || (link.getAttribute('href') ? new URLSearchParams(link.getAttribute('href').substring(link.getAttribute('href').indexOf('?'))).get('id') : null);
       if (uId) {
+        sessionStorage.setItem('admin_last_viewed_user_id', uId);
         if (typeof window.navigateTo === 'function') {
-          window.navigateTo(`user-details?id=${uId}`);
+          window.navigateTo(`user-details?id=${encodeURIComponent(uId)}`);
         } else {
-          window.location.hash = `user-details?id=${uId}`;
+          window.location.hash = `user-details?id=${encodeURIComponent(uId)}`;
         }
         return;
       }
@@ -516,9 +751,13 @@ export async function initUsers() {
         if (result.success) {
             const newStatusString = newStatusBool ? 'active' : 'inactive';
             toggleBtn.dataset.currentStatus = newStatusString;
-            toggleBtn.textContent = newStatusString;
+            toggleBtn.textContent = newStatusString.toUpperCase();
             toggleBtn.classList.remove('active', 'inactive');
             toggleBtn.classList.add(newStatusString);
+
+            // Live-sync the in-memory master list
+            const targetU = masterUsersList.find(x => x.id === userId);
+            if (targetU) targetU.status = newStatusString;
         } else {
             alert('Failed to update status. Please try again.');
             toggleBtn.textContent = originalText; // revert text
@@ -538,7 +777,8 @@ export async function initUsers() {
       const delRes = await deleteUserProfile(uId);
       if (delRes.success) {
         alert(`✅ यूज़र "${uName}" सफलतापूर्वक हटा दिया गया है।`);
-        reload();
+        masterUsersList = masterUsersList.filter(x => x.id !== uId);
+        applyFilters();
       } else {
         alert('हटाने में त्रुटि: ' + (delRes.error || 'अज्ञात त्रुटि'));
         deleteBtn.disabled = false;
@@ -734,10 +974,8 @@ function openUserWebinarReportDrawer(user) {
   });
 }
 
-  // Automatically sync statuses on page load to correct any discrepancies.
-  container.innerHTML = '<div class="admin-loading">Syncing user statuses...</div>';
-  await batchUpdateUserStatuses();
-  await reload();
+  // Initial load of users with in-memory caching and instant zero-egress filtering
+  await loadInitialUsers();
 }
 
 // =========================================================================
@@ -848,3 +1086,57 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
     modal.remove();
   };
 };
+
+// =========================================================================
+// 1-CLICK DEVICE RESET HELPER (Enables customer login on a new phone)
+// =========================================================================
+window.resetUserDevice = async function(userId, mobile, btnEl) {
+  const cleanMob = String(mobile || '').replace(/\D/g, '').slice(-10);
+  if (!cleanMob) {
+    alert("यूजर का मोबाइल नंबर उपलब्ध नहीं है।");
+    return;
+  }
+
+  if (!confirm(`क्या आप मोबाइल +91 ${cleanMob} का डिवाइस रीसेट करना चाहते हैं?\n\nरीसेट करने के बाद यूजर अपने नए फोन पर ई-बुक / सखी AI आसानी से खोल सकेगा।`)) {
+    return;
+  }
+
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.textContent = '...';
+  }
+
+  try {
+    const db = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+    if (db) {
+      await db.from('surveys').delete().eq('phone_number', cleanMob).eq('event_type', 'device_lock');
+    }
+
+    try {
+      sessionStorage.removeItem('AI_AUTH_DEV_' + cleanMob);
+      localStorage.removeItem('AI_AUTH_DEV_' + cleanMob);
+    } catch(_) {}
+
+    const pill = document.getElementById('devStatusPill_' + userId);
+    if (pill) {
+      pill.textContent = '🔓 Reset';
+      pill.style.background = '#dcfce7';
+      pill.style.color = '#15803d';
+    }
+
+    if (btnEl) {
+      btnEl.textContent = '✓ Done';
+      btnEl.style.background = '#16a34a';
+    }
+
+    alert(`✅ मोबाइल +91 ${cleanMob} का डिवाइस सफलतापूर्वक रीसेट हो गया है!\n\nअब यूजर अपने नए फोन पर सीधे अपनी ई-बुक और सखी AI का उपयोग कर सकते हैं।`);
+  } catch(err) {
+    console.error("Device reset error:", err);
+    alert("डिवाइस रीसेट करने में समस्या आई: " + err.message);
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.textContent = '🔄 Reset';
+    }
+  }
+};
+

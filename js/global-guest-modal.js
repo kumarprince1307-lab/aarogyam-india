@@ -522,7 +522,7 @@
               referred_by: sponsorProfileId,
               registration_source: resolvedPageSource,
               profile_complete: false,
-              is_active: true
+              is_active: false // STRICT: Inactive until user purchases or admin activates
             }]).select().single();
 
             if (!insErr && newReg) {

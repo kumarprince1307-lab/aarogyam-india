@@ -753,8 +753,10 @@ window.triggerPwaInstallPrompt = async function() {
 };
 
 // =================================================================
-// 2-SPEED PDF DOWNLOAD ENGINE (FAST ~24MB vs FULL HD)
+// 2-SPEED PDF DOWNLOAD ENGINE (FAST STATIC DELIVERY & LIMIT GUARD)
 // =================================================================
+
+window.isAoiDownloading = false;
 
 window.triggerDownloadTier = async function(tier = 'fast') {
     if (!state.bookData || !state.purchaseData) {
@@ -762,74 +764,25 @@ window.triggerDownloadTier = async function(tier = 'fast') {
         return;
     }
 
-    const fastBtn = document.getElementById('downloadFastBtn');
-    const hdBtn = document.getElementById('downloadHdBtn');
-    const activeBtn = tier === 'fast' ? fastBtn : hdBtn;
-
-    const max = state.maxAllowedDownloads || 3;
-    const used = getPersistentDownloadCount();
-    if ((max - used) <= 0) {
-        alert('⚠️ आपकी डाउनलोड लिमिट (3 डाउनलोड) पूरी हो चुकी है। आप My Library में कभी भी इस पुस्तक को ऑनलाइन असीमित बार पढ़ और सुन सकते हैं।');
+    // 🛡️ 1. RAPID-CLICK DEBOUNCE PROTECTION
+    if (window.isAoiDownloading) {
+        console.warn('⚠️ Download already in progress. Ignoring duplicate click.');
         return;
     }
+    window.isAoiDownloading = true;
 
-    const newCount = used + 1;
-    savePersistentDownloadCount(newCount);
+    const fastBtn = document.getElementById('downloadFastBtn');
+    const hdBtn = document.getElementById('downloadHdBtn');
+    const stickyFastBtn = document.getElementById('stickyDownloadFastBtn');
+    const stickyHdBtn = document.getElementById('stickyDownloadHdBtn');
+    const activeBtn = tier === 'fast' ? fastBtn : hdBtn;
 
-    const downloadsUsedEl = document.getElementById('downloadsUsed');
-    if (downloadsUsedEl) downloadsUsedEl.textContent = newCount;
-    const downloadsRemainingEl = document.getElementById('downloadsRemaining');
-    if (downloadsRemainingEl) downloadsRemainingEl.textContent = Math.max(0, max - newCount);
-
-    updateDownloadButtonCountBadges(newCount, max);
-
-    if (newCount >= max) {
-        const readyBox = document.getElementById('statusReady');
-        const exhaustedBox = document.getElementById('statusExhausted');
-        if (readyBox) readyBox.style.display = 'none';
-        if (exhaustedBox) exhaustedBox.style.display = 'block';
-
-        if (fastBtn) { fastBtn.disabled = true; fastBtn.style.opacity = '0.6'; }
-        if (hdBtn) { hdBtn.disabled = true; hdBtn.style.opacity = '0.6'; }
-
-        const stickyFastBtn = document.getElementById('stickyDownloadFastBtn');
-        const stickyHdBtn = document.getElementById('stickyDownloadHdBtn');
-        if (stickyFastBtn) { stickyFastBtn.disabled = true; stickyFastBtn.style.opacity = '0.45'; }
-        if (stickyHdBtn) { stickyHdBtn.disabled = true; stickyHdBtn.style.opacity = '0.45'; }
-    }
-
-    const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
-    if (client) {
-        try {
-            // Update purchase record directly by primary ID
-            if (state.purchaseData?.id && !String(state.purchaseData.id).startsWith('local_')) {
-                await client.from('purchases')
-                    .update({ download_count: newCount })
-                    .eq('id', state.purchaseData.id);
-            } else if (state.userData?.id) {
-                await client.from('purchases')
-                    .update({ download_count: newCount })
-                    .eq('profile_id', state.userData.id)
-                    .eq('book_id', state.bookId);
-            }
-
-            // Insert into download_logs with profile_id
-            const activeProfileId = state.purchaseData?.profile_id || (state.userData?.id && !String(state.userData.id).startsWith('local_') ? state.userData.id : null);
-            if (activeProfileId) {
-                await client.from('download_logs').insert([{
-                    profile_id: activeProfileId,
-                    purchase_id: String(state.purchaseData?.id || ''),
-                    book_id: state.bookId,
-                    download_number: newCount,
-                    device_info: `${navigator.userAgent} [Tier: ${tier}]`,
-                    ip_address: null,
-                    download_status: 'success',
-                    downloaded_at: new Date().toISOString()
-                }]);
-            }
-        } catch (err) {
-            console.warn('DB logging note:', err);
-        }
+    // Visual button feedback immediately
+    const origFastHtml = fastBtn ? fastBtn.innerHTML : '';
+    const origHdHtml = hdBtn ? hdBtn.innerHTML : '';
+    if (activeBtn) {
+        activeBtn.disabled = true;
+        activeBtn.style.opacity = '0.7';
     }
 
     const cleanId = (state.bookData.id || state.bookId || '').toUpperCase().trim();
@@ -841,48 +794,133 @@ window.triggerDownloadTier = async function(tier = 'fast') {
     }
     const dlFilename = `${cleanId}_${cleanTitle}_${tier === 'fast' ? 'Mobile' : 'HD'}.pdf`;
 
-    if (tier === 'fast') {
-        // Direct high-speed static download (1-second delivery)
-        try {
-            const check = await fetch(mainPdf, { method: 'HEAD' }).catch(() => ({ ok: false }));
-            if (check && check.ok) {
-                const link = document.createElement('a');
-                link.href = mainPdf;
-                link.download = dlFilename;
-                link.target = '_self';
-                document.body.appendChild(link);
-                link.click();
-                setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 500);
-                showDownloadSuccessPopup(cleanTitle);
-                return;
-            }
-        } catch(e) {}
-    }
+    const max = state.maxAllowedDownloads || 3;
+    const used = getPersistentDownloadCount();
 
-    // Fallback or Full HD Tier: Assemble PDF with progress
-    {
-        showDlProgress(0, 1, 'PDF इंजन लोड हो रहा है...');
-        if (activeBtn) { activeBtn.disabled = true; }
-        try {
-            const success = await assembleDownloadPdf(cleanId, cleanTitle, tier);
-            if (success) {
-                showDownloadSuccessPopup(cleanTitle);
-            } else {
-                alert('⚠️ PDF तैयार नहीं हो सका। कृपया दोबारा कोशिश करें या My Library में पढ़ें।');
-            }
-        } catch(e) {
-            console.error('PDF assembly error:', e);
-            alert('⚠️ PDF error: ' + e.message);
+    // 🛡️ 2. SMART 15-MINUTE GRACE WINDOW (Limit is NOT consumed if user re-downloads within 15 mins)
+    const graceKey = 'AI_DL_GRACE_' + cleanId;
+    const lastDlTime = parseInt(sessionStorage.getItem(graceKey) || '0', 10);
+    const isWithinGrace = (Date.now() - lastDlTime) < (15 * 60 * 1000);
+
+    let newCount = used;
+    if (!isWithinGrace) {
+        if ((max - used) <= 0) {
+            alert('⚠️ आपकी डाउनलोड लिमिट (3 डाउनलोड) पूरी हो चुकी है।\n\nचिंता न करें! आप नीचे "My Library में ऑनलाइन पढ़ें" बटन दबाकर असीमित बार कभी भी पढ़ और सुन सकते हैं।');
+            window.isAoiDownloading = false;
+            if (activeBtn) { activeBtn.disabled = false; activeBtn.style.opacity = '1'; }
+            return;
         }
-        hideDlProgress();
-        if (activeBtn) { activeBtn.disabled = false; }
+        newCount = used + 1;
+        savePersistentDownloadCount(newCount);
+        sessionStorage.setItem(graceKey, String(Date.now()));
+
+        const downloadsUsedEl = document.getElementById('downloadsUsed');
+        if (downloadsUsedEl) downloadsUsedEl.textContent = newCount;
+        const downloadsRemainingEl = document.getElementById('downloadsRemaining');
+        if (downloadsRemainingEl) downloadsRemainingEl.textContent = Math.max(0, max - newCount);
+
+        updateDownloadButtonCountBadges(newCount, max);
+
+        if (newCount >= max) {
+            const readyBox = document.getElementById('statusReady');
+            const exhaustedBox = document.getElementById('statusExhausted');
+            if (readyBox) readyBox.style.display = 'none';
+            if (exhaustedBox) exhaustedBox.style.display = 'block';
+
+            if (fastBtn) { fastBtn.disabled = true; fastBtn.style.opacity = '0.6'; }
+            if (hdBtn) { hdBtn.disabled = true; hdBtn.style.opacity = '0.6'; }
+            if (stickyFastBtn) { stickyFastBtn.disabled = true; stickyFastBtn.style.opacity = '0.45'; }
+            if (stickyHdBtn) { stickyHdBtn.disabled = true; stickyHdBtn.style.opacity = '0.45'; }
+        }
+
+        // Database log sync
+        const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
+        if (client) {
+            try {
+                if (state.purchaseData?.id && !String(state.purchaseData.id).startsWith('local_')) {
+                    await client.from('purchases').update({ download_count: newCount }).eq('id', state.purchaseData.id);
+                } else if (state.userData?.id) {
+                    await client.from('purchases').update({ download_count: newCount }).eq('profile_id', state.userData.id).eq('book_id', state.bookId);
+                }
+
+                const activeProfileId = state.purchaseData?.profile_id || (state.userData?.id && !String(state.userData.id).startsWith('local_') ? state.userData.id : null);
+                if (activeProfileId) {
+                    await client.from('download_logs').insert([{
+                        profile_id: activeProfileId,
+                        purchase_id: String(state.purchaseData?.id || ''),
+                        book_id: state.bookId,
+                        download_number: newCount,
+                        device_info: `${navigator.userAgent} [Tier: ${tier}]`,
+                        ip_address: null,
+                        download_status: 'success',
+                        downloaded_at: new Date().toISOString()
+                    }]);
+                }
+            } catch (err) {
+                console.warn('DB logging note:', err);
+            }
+        }
+    } else {
+        console.log('🛡️ [Download Guard]: Within 15-min grace window. User download limit safely preserved!');
     }
 
-    if ((max - newCount) <= 0) {
-        const readyBox = document.getElementById('statusReady');
-        const exhaustedBox = document.getElementById('statusExhausted');
-        if (readyBox) readyBox.style.display = 'none';
-        if (exhaustedBox) exhaustedBox.style.display = 'block';
+    // ⚡ 3. INSTANT STATIC DELIVERY (0.5s Direct Link - Works on Facebook In-App Browser too!)
+    let isDelivered = false;
+    try {
+        const link = document.createElement('a');
+        link.href = mainPdf;
+        link.download = dlFilename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1000);
+        isDelivered = true;
+    } catch(dlErr) {
+        console.warn('Direct link trigger note:', dlErr);
+    }
+
+    // Facebook / Mobile In-App browser fallback
+    const isFb = navigator.userAgent.includes('FBAN') || navigator.userAgent.includes('FBAV') || navigator.userAgent.includes('Instagram');
+    if (isFb) {
+        try {
+            window.location.href = mainPdf;
+            isDelivered = true;
+        } catch(_) {}
+    }
+
+    if (isDelivered) {
+        showDownloadSuccessPopup(cleanTitle, mainPdf, dlFilename);
+        setTimeout(() => {
+            window.isAoiDownloading = false;
+            if (activeBtn && newCount < max) {
+                activeBtn.disabled = false;
+                activeBtn.style.opacity = '1';
+            }
+        }, 3000);
+        return;
+    }
+
+    // Fallback: Assemble PDF only if static file fails completely
+    try {
+        showDlProgress(0, 1, 'PDF तैयार हो रही है...');
+        const success = await assembleDownloadPdf(cleanId, cleanTitle, tier);
+        if (success) {
+            showDownloadSuccessPopup(cleanTitle, mainPdf, dlFilename);
+        } else {
+            alert('⚠️ PDF तैयार नहीं हो सका। कृपया दोबारा कोशिश करें या My Library में पढ़ें।');
+        }
+    } catch(e) {
+        console.error('PDF assembly error:', e);
+        alert('⚠️ PDF Error: ' + e.message);
+    } finally {
+        hideDlProgress();
+        setTimeout(() => {
+            window.isAoiDownloading = false;
+            if (activeBtn && newCount < max) {
+                activeBtn.disabled = false;
+                activeBtn.style.opacity = '1';
+            }
+        }, 2000);
     }
 };
 
@@ -1249,15 +1287,24 @@ async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
     return true;
 }
 
-function showDownloadSuccessPopup(bookTitle) {
+function showDownloadSuccessPopup(bookTitle, pdfUrl, filename) {
     const popup = document.getElementById('successPopup');
     const nameEl = document.getElementById('popupBookName');
     const custEl = document.getElementById('popupCustomerName');
     const coverEl = document.getElementById('popupBookCover');
+    const directDlWrap = document.getElementById('popupDirectDlWrap');
 
     if (nameEl) nameEl.textContent = cleanBookTitle(bookTitle);
     if (custEl) custEl.textContent = state.userData?.full_name || 'किसान मित्र';
     if (coverEl) coverEl.src = state.bookData?.cover || '';
+
+    if (directDlWrap && pdfUrl) {
+        directDlWrap.innerHTML = `
+            <a href="${pdfUrl}" download="${filename || 'eBook.pdf'}" target="_blank" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; background:#0284c7; color:#fff; text-decoration:none; padding:10px 16px; border-radius:10px; font-weight:800; font-size:0.86rem; box-shadow:0 4px 14px rgba(2,132,199,0.35); width:100%; box-sizing:border-box;">
+                <span>📂 यदि डाउनलोड न हुआ हो, तो यहाँ से सीधे खोलें</span>
+            </a>
+        `;
+    }
 
     if (popup) popup.style.display = 'flex';
 

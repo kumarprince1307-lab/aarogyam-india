@@ -11,6 +11,18 @@
         const params = new URLSearchParams(window.location.search);
         const bookId = (params.get('id') || params.get('book') || '').trim().toUpperCase();
         if (bookId) {
+          // 🚀 Ultra-fast preconnect & checkout prefetch for mobile/Facebook in-app browser
+          try {
+            ['https://checkout.razorpay.com', 'https://api.razorpay.com', 'https://connect.facebook.net'].forEach(function(u) {
+              var l = document.createElement('link'); l.rel = 'preconnect'; l.href = u; l.crossOrigin = 'anonymous'; document.head.appendChild(l);
+              var d = document.createElement('link'); d.rel = 'dns-prefetch'; d.href = u; document.head.appendChild(d);
+            });
+            // Prefetch checkout assets so Buy Now click to Razorpay is instant 0ms
+            ['checkout.html?id=' + encodeURIComponent(bookId), '/js/checkout.js', 'https://checkout.razorpay.com/v1/checkout.js'].forEach(function(h) {
+              var p = document.createElement('link'); p.rel = 'prefetch'; p.href = h; document.head.appendChild(p);
+            });
+          } catch(e) {}
+
           // Immediately bind active book ID to share elements, checkout buttons and open graph tags
           document.addEventListener('DOMContentLoaded', function() {
             const bsd = document.getElementById('book-share-data');
@@ -20,8 +32,31 @@
             });
             ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn', 'ubl-audio-buy-btn', 'preview-buy-btn'].forEach(function(bIdKey) {
               const el = document.getElementById(bIdKey);
-              if (el) el.href = 'checkout.html?id=' + encodeURIComponent(bookId);
+              if (el) {
+                el.href = 'checkout.html?id=' + encodeURIComponent(bookId);
+                el.addEventListener('click', function() {
+                  try { sessionStorage.setItem('AI_LAST_VISITED_BOOK_ID', bookId); } catch(e) {}
+                });
+              }
             });
+
+            // ⚡ Instant pre-render for ANY book (current or future) so low-internet users see cover immediately
+            if (bookId) {
+              var hCover = document.getElementById('hero-book-cover');
+              var sThumb = document.getElementById('sticky-thumb-img');
+              var initialCover = '/images/books/' + bookId.toLowerCase() + '-cover.webp';
+              try {
+                var c = sessionStorage.getItem('AI_ACTIVE_BOOK_DATA');
+                if (c) {
+                  var b = JSON.parse(c);
+                  if (b && (b.id || '').toUpperCase() === bookId && (b.cover || b.thumbnail)) {
+                    initialCover = b.cover || b.thumbnail;
+                  }
+                }
+              } catch(e) {}
+              if (hCover && !hCover.getAttribute('src')) hCover.src = initialCover;
+              if (sThumb && !sThumb.getAttribute('src')) sThumb.src = initialCover;
+            }
             ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'].forEach(function(sKey) {
               const el = document.getElementById(sKey);
               if (el) {
@@ -114,11 +149,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Aarogyam">
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Dynamic Revalidation -->
-  <meta http-equiv="Pragma" content="no-cache">
+  <!-- High-Speed Checkout & Payment Preconnect -->
+  <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin>
+  <link rel="dns-prefetch" href="https://checkout.razorpay.com">
+  <link rel="dns-prefetch" href="https://api.razorpay.com">
+  <link rel="preconnect" href="https://connect.facebook.net" crossorigin>
+  <link rel="dns-prefetch" href="https://connect.facebook.net">
 
   <!-- CORE STYLESHEETS -->
   <link rel="stylesheet" href="../css/style.css?v=1.1">
@@ -1316,6 +1352,6 @@
   <script src="/js/share-engine-core.js?v=2.0" defer></script>
   <script src="/js/universal-preview-gallery-lightbox.js?v=20261012_v4" defer></script>
   <script src="/js/universal-book-landing.js?v=20261023_asset_revision_v1" defer></script>
-  <script src="/js/universal-nav-drawer.js?v=1.3"></script>
+  <script src="/js/universal-nav-drawer.js?v=1.3" defer></script>
 </body>
 </html>

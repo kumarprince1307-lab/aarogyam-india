@@ -461,6 +461,10 @@
                 <img id="popupBookCover" src="" alt="Book Cover" class="popup-book-cover">
                 <h3 id="popupBookName"></h3>
                 <p>धन्यवाद, <strong id="popupCustomerName"></strong>!</p>
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(52, 211, 153, 0.35); border-radius: 10px; padding: 10px 12px; margin: 12px 0; font-size: 0.82rem; color: #a7f3d0; text-align: left; line-height: 1.5;">
+                    <div>📁 <strong>फाइल कहाँ मिलेगी?</strong> आपके मोबाइल के <strong>My Files (फाइल मैनेजर) ➔ Downloads</strong> फोल्डर में यह PDF सेव हो गई है।</div>
+                </div>
+                <div id="popupDirectDlWrap" style="margin: 10px 0;"></div>
                 <p class="popup-info-text">आप इस पुस्तक को बिना डाउनलोड किए भी कभी भी My Library में पढ़ व सुन सकते हैं।</p>
             </div>
             <div class="popup-actions-vip">
@@ -479,6 +483,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/js/supabase.js"></script>
     <script src="/session.js"></script>
+    <script src="/js/device-session-guard.js"></script>
     <script src="/js/download.js?v=20260916_v6"></script>
     <script src="/js/user-notifications.js"></script>
 </body>

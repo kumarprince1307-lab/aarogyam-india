@@ -7,7 +7,7 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js').then(m => m.initDashboard()),
-  'users': () => import('./admin-pages-users.js?v=27.4').then(m => m.initUsers()),
+  'users': () => import('./admin-pages-users.js?v=27.5').then(m => m.initUsers()),
   'user-details': () => import('./admin-pages-user-details.js?v=27.5').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
   'all-phonebook': () => import('./admin-pages-phonebook.js').then(m => m.initAllPhonebook()),
@@ -19,8 +19,8 @@ const ROUTES = {
   'product-landing-pages': () => import('./admin-pages-product-landing.js').then(m => m.initProductLandingPages()),
   'marketing-templates': () => import('./admin-pages-smart-etailer.js?v=4.2').then(m => m.initSmartEtailerAdmin('adm-sec-marketing')),
   'marketing-templates-standalone': () => import('./admin-pages-marketing-templates.js?v=2.0').then(m => m.initMarketingTemplatesPage()),
-  'purchases': () => import('./admin-pages-purchases.js').then(m => m.initPurchases()),
-  'checkout-funnel': () => import('./admin-pages-checkout-funnel.js').then(m => m.initCheckoutFunnel()),
+  'purchases': () => import('./admin-pages-purchases.js?v=2.1').then(m => m.initPurchases()),
+  'checkout-funnel': () => import('./admin-pages-checkout-funnel.js?v=2.1').then(m => m.initCheckoutFunnel()),
   'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
   'reports': () => import('./admin-pages-reports.js?v=21.0').then(m => (m.initReports ? m.initReports() : m.renderReports(document.getElementById('page-content')))),
   'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),

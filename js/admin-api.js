@@ -752,9 +752,11 @@ export async function fetchCheckoutLogs(params = {}) {
 
 export async function fetchUsers(params = {}) {
   const cacheKey = 'users_' + JSON.stringify(params);
-  const cached = _adminMemoryCache.get(cacheKey);
-  if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
-    return cached.data;
+  if (!params.forceRefresh) {
+    const cached = _adminMemoryCache.get(cacheKey);
+    if (cached && (Date.now() - cached.ts < ADMIN_CACHE_TTL)) {
+      return cached.data;
+    }
   }
 
   await delay(100);
@@ -762,8 +764,8 @@ export async function fetchUsers(params = {}) {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    // Step 1: Fetch all profiles with filtering (Safe standard columns + Share IDs)
-    let queryBuilder = db.from('profiles').select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referral_code, referral_mobile, referred_by');
+    // Step 1: Fetch all profiles (all standard and dynamic fields)
+    let queryBuilder = db.from('profiles').select('*');
 
     if (params.status && params.status !== 'all') {
       if (params.status === 'installed') {
@@ -797,21 +799,21 @@ export async function fetchUsers(params = {}) {
 
     const { data: profiles, error: profilesError } = await queryBuilder;
     if (profilesError) console.error("fetchUsers query error:", profilesError.message);
-    if (!profiles) profiles = [];
+    let validProfiles = profiles || [];
 
-    const profileIds = profiles.map(p => p.id).filter(Boolean);
-    const shareIds = profiles.map(p => p.share_id || p.referral_code).filter(Boolean);
+    const profileIds = validProfiles.map(p => p.id).filter(Boolean);
+    const shareIds = validProfiles.map(p => p.share_id || p.referral_code).filter(Boolean);
 
-    // Step 2: Fetch all necessary aggregated data in parallel
+    // Step 2: Fetch only essential aggregate columns in parallel to minimize egress
     const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes, sakhiInsightsRes] = await Promise.all([
         db.from('purchases').select('profile_id, amount, download_count').or('payment_status.eq.success,payment_status.is.null'),
-        db.from('share_logs').select('share_token, event_type').in('share_token', shareIds),
+        shareIds.length > 0 ? db.from('share_logs').select('share_token, event_type').in('share_token', shareIds.slice(0, 500)) : Promise.resolve({ data: [] }),
         db.from('profiles').select('id, referred_by'), // Fetch all referral relationships
-        db.from('download_logs').select('profile_id').in('profile_id', profileIds),
-        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, category_answers, created_at'),
+        profileIds.length > 0 ? db.from('download_logs').select('profile_id').in('profile_id', profileIds.slice(0, 500)) : Promise.resolve({ data: [] }),
+        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, created_at'),
         (async () => {
           try {
-            return await db.from('sakhi_user_insights').select('*');
+            return await db.from('sakhi_user_insights').select('profile_id, user_key, user_name, mobile, interaction_count, primary_domain, last_query_topic, recommended_ebook');
           } catch (_) {
             return { data: [] };
           }
@@ -915,13 +917,15 @@ export async function fetchUsers(params = {}) {
     }
 
     // Step 4: Map profiles and merge with purchase summary
-    const mappedData = profiles.map(user => {
+    const mappedData = validProfiles.map(user => {
         const ownPurchases = purchaseSummary[user.id] || { totalPurchases: 0, totalSpent: 0 };
-        const currentShareId = user.share_id || user.referral_code || 'N/A';
+        const cleanMob = String(user.mobile || '').replace(/\D/g, '').slice(-10);
+        const last6 = cleanMob ? cleanMob.slice(-6) : '';
+        const fallbackShare = last6 ? ('AI' + last6) : 'AI000004';
+        const currentShareId = user.share_id || user.referral_code || user.share_token || fallbackShare;
         const shareStats = shareStatsMap[currentShareId] || { shares: 0, clicks: 0, visitors: 0 };
         const wbStats = webinarStatsMap[user.id] || webinarStatsMap[currentShareId] || webinarStatsMap[user.mobile] || { leads: 0, joined: 0, attendees: [] };
 
-        const cleanMob = String(user.mobile || '').replace(/\D/g, '').slice(-10);
         const sakhiIns = sakhiMap.get(String(user.id)) || (cleanMob ? sakhiMap.get(cleanMob) : null);
         const sakhiChatCount = sakhiIns ? (sakhiIns.interaction_count || 0) : 0;
         const sakhiPrimaryDomain = sakhiIns ? (sakhiIns.primary_domain || null) : null;
@@ -930,10 +934,10 @@ export async function fetchUsers(params = {}) {
 
         return {
         id: user.id,
-        name: user.full_name,
-        mobile: user.mobile,
-        email: user.email,
-        source: user.registration_source,
+        name: user.full_name || 'किसान साथी',
+        mobile: user.mobile || 'N/A',
+        email: user.email || '',
+        source: user.registration_source || 'Direct',
         status: user.is_active ? 'active' : 'inactive',
         shareId: currentShareId,
         directReferrals: directReferralCounts[user.id] || 0,
@@ -947,6 +951,8 @@ export async function fetchUsers(params = {}) {
         downloadLimit: (ownPurchases.totalPurchases || 0) * 3,
         appInstalled: user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
         appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null,
+        registrationDate: user.created_at || null,
+        createdAt: user.created_at || null,
         webinarLeads: (wbStats.leads || 0) + (wbStats.joined || 0),
         webinarJoined: wbStats.joined || 0,
         webinarAttendees: wbStats.attendees || [],
@@ -958,42 +964,7 @@ export async function fetchUsers(params = {}) {
         };
     });
 
-    // Step 4.1: Include Sakhi Chat users who do not have a profiles record yet (e.g. 8090534335)
-    const knownMobiles = new Set(profiles.map(p => String(p.mobile || '').replace(/\D/g, '').slice(-10)).filter(Boolean));
-    allSakhiInsights.forEach(ins => {
-      const mClean = String(ins.mobile || ins.user_key || '').replace(/\D/g, '').slice(-10);
-      if (mClean && mClean.length === 10 && !knownMobiles.has(mClean)) {
-        knownMobiles.add(mClean);
-        mappedData.push({
-          id: ins.profile_id || ('sakhi_' + mClean),
-          name: ins.user_name || 'सखी किसान',
-          mobile: mClean,
-          email: '',
-          source: 'Sakhi AI Chat Lead',
-          status: 'active',
-          shareId: 'N/A',
-          directReferrals: 0,
-          totalShares: 0,
-          totalClicks: 0,
-          totalVisitors: 0,
-          totalDirectPurchases: 0,
-          totalPurchases: 0,
-          totalSpent: 0,
-          totalDownloads: 0,
-          downloadLimit: 0,
-          appInstalled: false,
-          appInstalledAt: null,
-          webinarLeads: 0,
-          webinarJoined: 0,
-          webinarAttendees: [],
-          sakhiChatCount: ins.interaction_count || 1,
-          sakhiPrimaryDomain: ins.primary_domain || 'agri',
-          sakhiLastTopic: ins.last_query_topic || 'फसल परामर्श',
-          sakhiRecoEbook: ins.recommended_ebook || 'BK002',
-          sakhiInsights: ins
-        });
-      }
-    });
+
 
     if (params.sort === 'sakhiChats') {
       mappedData.sort((a, b) => (b.sakhiChatCount || 0) - (a.sakhiChatCount || 0));
@@ -1006,6 +977,41 @@ export async function fetchUsers(params = {}) {
   } catch (error) {
     console.error('Failed to fetch users:', error);
     return { success: false, data: [], error: error.message };
+  }
+}
+
+/**
+ * Incremental Delta Fetch: Fetches only profiles and purchases updated or created after sinceIsoDate
+ * Minimizes Supabase bandwidth egress to near zero.
+ */
+export async function fetchUsersDelta(sinceIsoDate) {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+    if (!sinceIsoDate) return { success: false, reason: "sinceIsoDate required" };
+
+    const [newProfilesRes, newPurchasesRes, newSakhiRes] = await Promise.all([
+      db.from('profiles')
+        .select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referral_code, referral_mobile, referred_by')
+        .gte('created_at', sinceIsoDate),
+      db.from('purchases')
+        .select('profile_id, amount, download_count, purchase_date')
+        .gte('purchase_date', sinceIsoDate)
+        .or('payment_status.eq.success,payment_status.is.null'),
+      db.from('sakhi_user_insights')
+        .select('profile_id, user_key, user_name, mobile, interaction_count, primary_domain, last_query_topic, recommended_ebook')
+        .gte('updated_at', sinceIsoDate)
+    ]);
+
+    return {
+      success: true,
+      newProfiles: newProfilesRes.data || [],
+      newPurchases: newPurchasesRes.data || [],
+      newSakhi: newSakhiRes.data || []
+    };
+  } catch (err) {
+    console.warn("fetchUsersDelta error, falling back to full:", err);
+    return { success: false, error: err.message };
   }
 }
 
@@ -1184,79 +1190,134 @@ export async function fetchDownloads() {
 }
 
 export async function fetchUserDetails(userId) {
-  await delay(120);
+  await delay(100);
   try {
     const db = window.dbClient;
     if (!db) throw new Error("Supabase client not available.");
 
-    const { data: profile, error: profileError } = await db
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(str || ''));
+    let profile = null;
+    let actualUuid = isValidUUID(userId) ? userId : null;
 
-    if (profileError) throw profileError;
-    if (!profile) return { success: false, data: null };
+    // 1. If valid UUID, fetch profile by ID
+    if (actualUuid) {
+      const { data, error } = await db
+        .from('profiles')
+        .select('*')
+        .eq('id', actualUuid)
+        .maybeSingle();
+      if (!error && data) profile = data;
+    }
 
-    // Fetch total download count for the user
-    const { count: downloadCount, error: downloadError } = await db
-        .from('download_logs')
-        .select('id', { count: 'exact', head: true })
-        .eq('profile_id', userId);
-    if (downloadError) console.error("Error fetching download count:", downloadError.message);
+    // 2. If not found or if ID was sakhi_mobile / raw mobile, look up by mobile
+    const cleanM = String(userId || '').replace(/\D/g, '').slice(-10);
+    if (!profile && cleanM && cleanM.length === 10) {
+      const { data: pByMob, error: mobErr } = await db
+        .from('profiles')
+        .select('*')
+        .eq('mobile', cleanM)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    // Fetch parent referrer's profile
+      if (!mobErr && pByMob) {
+        profile = pByMob;
+        actualUuid = pByMob.id;
+      }
+    }
+
+    // 3. Fallback for Sakhi Chat users who haven't completed formal registration yet
+    if (!profile) {
+      let sInsight = null;
+      if (cleanM) {
+        try {
+          const { data: sData } = await db
+            .from('sakhi_user_insights')
+            .select('*')
+            .eq('mobile', cleanM)
+            .maybeSingle();
+          sInsight = sData;
+        } catch (_) {}
+      }
+      profile = {
+        id: actualUuid || ('sakhi_' + cleanM),
+        full_name: sInsight?.user_name || 'सखी किसान साथी',
+        mobile: cleanM || userId,
+        email: '',
+        registration_source: 'Sakhi AI Chat Lead',
+        is_active: false,
+        created_at: sInsight?.created_at || sInsight?.updated_at || new Date().toISOString(),
+        share_id: cleanM ? ('AI' + cleanM.slice(-6)) : 'AI000004',
+        referral_code: cleanM ? ('AI' + cleanM.slice(-6)) : 'AI000004'
+      };
+    }
+
+    // Fetch total download count for the user (only if valid UUID exists)
+    let downloadCount = 0;
+    if (actualUuid) {
+      const { count } = await db
+          .from('download_logs')
+          .select('id', { count: 'exact', head: true })
+          .eq('profile_id', actualUuid);
+      downloadCount = count || 0;
+    }
+
+    // Fetch parent referrer's profile safely
     let referredByProfile = null;
-    if (profile.referred_by) {
-        const { data: parentProfile, error: parentError } = await db
+    if (profile.referred_by && isValidUUID(profile.referred_by)) {
+        const { data: parentProfile } = await db
             .from('profiles')
             .select('id, full_name')
             .eq('id', profile.referred_by)
-            .single();
-        if (parentError) console.error("Error fetching referrer profile:", parentError.message);
-        else referredByProfile = parentProfile;
+            .maybeSingle();
+        if (parentProfile) referredByProfile = parentProfile;
     }
 
     // Fetch direct referrals (children) and their purchase counts
-    const { data: directReferrals, error: referralsError } = await db
-        .from('profiles')
-        .select('id, full_name, mobile')
-        .eq('referred_by', userId);
-    
-    if (referralsError) console.error("Error fetching direct referrals:", referralsError.message);
-
     let directReferralsList = [];
-    if (directReferrals && directReferrals.length > 0) {
-        const referredUserIds = directReferrals.map(r => r.id);
+    if (actualUuid) {
+      const { data: directReferrals, error: referralsError } = await db
+          .from('profiles')
+          .select('id, full_name, mobile')
+          .eq('referred_by', actualUuid);
+      
+      if (referralsError) console.error("Error fetching direct referrals:", referralsError.message);
 
-        const { data: referralPurchases, error: refPurchaseError } = await db
-            .from('purchases')
-            .select('profile_id') // only need profile_id to count
-            .or('payment_status.eq.success,payment_status.is.null')
-            .in('profile_id', referredUserIds);
-        
-        if (refPurchaseError) console.error("Error fetching referral purchases:", refPurchaseError.message);
+      if (directReferrals && directReferrals.length > 0) {
+          const referredUserIds = directReferrals.map(r => r.id).filter(isValidUUID);
+          if (referredUserIds.length > 0) {
+            const { data: referralPurchases } = await db
+                .from('purchases')
+                .select('profile_id')
+                .or('payment_status.eq.success,payment_status.is.null')
+                .in('profile_id', referredUserIds);
+            
+            const referralPurchaseSummary = (referralPurchases || []).reduce((acc, purchase) => {
+                const pId = purchase.profile_id;
+                acc[pId] = (acc[pId] || 0) + 1;
+                return acc;
+            }, {});
 
-        const referralPurchaseSummary = (referralPurchases || []).reduce((acc, purchase) => {
-            const profileId = purchase.profile_id;
-            acc[profileId] = (acc[profileId] || 0) + 1;
-            return acc;
-        }, {});
-
-        directReferralsList = directReferrals.map(ref => ({
-            id: ref.id,
-            name: ref.full_name,
-            mobile: ref.mobile,
-            totalPurchases: referralPurchaseSummary[ref.id] || 0
-        }));
+            directReferralsList = directReferrals.map(ref => ({
+                id: ref.id,
+                name: ref.full_name,
+                mobile: ref.mobile,
+                totalPurchases: referralPurchaseSummary[ref.id] || 0
+            }));
+          }
+      }
     }
 
-    const { data: purchases, error: purchasesError } = await db
-      .from('purchases')
-      .select('id, order_id, payment_id, book_id, amount, purchase_date, payment_status')
-      .eq('profile_id', userId)
-      .order('purchase_date', { ascending: false });
-    if(purchasesError) console.error("Error fetching purchases for user:", purchasesError.message);
+    // Fetch user purchases safely using actualUuid or clean mobile
+    let purchases = [];
+    if (actualUuid) {
+      const { data: purData } = await db
+        .from('purchases')
+        .select('id, order_id, payment_id, book_id, amount, purchase_date, payment_status')
+        .eq('profile_id', actualUuid)
+        .order('purchase_date', { ascending: false });
+      purchases = purData || [];
+    }
 
     // Calculate total download limit based on successful purchases
     const successfulPurchases = (purchases || []).filter(p => p.payment_status === 'success' || p.payment_status === null);
@@ -1553,16 +1614,26 @@ export async function deleteUserProfile(userId) {
     if (!db) throw new Error("Supabase client not available.");
     if (!userId) throw new Error("User ID is required.");
 
-    // Clean up dependent foreign-key records cleanly
-    try { await db.from('user_permissions').delete().or(`user_id.eq.${userId},profile_id.eq.${userId}`); } catch (_) {}
-    try { await db.from('checkout_logs').delete().eq('profile_id', userId); } catch (_) {}
-    try { await db.from('purchases').delete().eq('profile_id', userId); } catch (_) {}
-    try { await db.from('interested_users').delete().eq('profile_id', userId); } catch (_) {}
-    try { await db.from('sakhi_chat_audit_logs').delete().eq('user_profile', String(userId)); } catch (_) {}
+    const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(str || ''));
+    const cleanMob = String(userId).replace(/\D/g, '').slice(-10);
 
-    // Delete from profiles
-    const { error } = await db.from('profiles').delete().eq('id', userId);
-    if (error) throw error;
+    // 1. If it's a valid UUID, clean all relations and delete profile
+    if (isValidUUID(userId)) {
+      try { await db.from('user_permissions').delete().or(`user_id.eq.${userId},profile_id.eq.${userId}`); } catch (_) {}
+      try { await db.from('checkout_logs').delete().eq('profile_id', userId); } catch (_) {}
+      try { await db.from('purchases').delete().eq('profile_id', userId); } catch (_) {}
+      try { await db.from('interested_users').delete().eq('profile_id', userId); } catch (_) {}
+      try { await db.from('sakhi_chat_audit_logs').delete().eq('user_profile', String(userId)); } catch (_) {}
+      try { await db.from('profiles').delete().eq('id', userId); } catch (_) {}
+    }
+
+    // 2. If it's a sakhi lead or mobile number, clean from insights, audit logs, and surveys
+    if (cleanMob && cleanMob.length === 10) {
+      try { await db.from('sakhi_user_insights').delete().eq('mobile', cleanMob); } catch (_) {}
+      try { await db.from('sakhi_chat_audit_logs').delete().eq('user_phone', cleanMob); } catch (_) {}
+      try { await db.from('surveys').delete().eq('phone_number', cleanMob); } catch (_) {}
+      try { await db.from('profiles').delete().eq('mobile', cleanMob); } catch (_) {}
+    }
 
     clearAdminCache();
     return { success: true };

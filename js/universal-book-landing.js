@@ -623,17 +623,23 @@ if (typeof window !== 'undefined') {
 
     const cacheKey = `AOI_CACHE_${cleanUrl.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
-    // High-speed Session Storage cache (0ms immediate load)
+    // 1. High-speed Stale-While-Revalidate (SWR): 0ms instant mobile load from cache
     try {
-      const cached = sessionStorage.getItem(cacheKey);
-      if (cached && !isBookConfig) {
+      const cached = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
+      if (cached) {
         const item = JSON.parse(cached);
-        if (item && item.data && (Date.now() - item.time < 300000)) { // 5-minute cache
-          // Background revalidation
-          if (Date.now() - item.time > 60000) {
-            fetch(primaryPath).then(r => r.ok ? r.json() : null).then(fresh => {
+        if (item && item.data) {
+          // If cached data is available, return immediately for instant render!
+          // Revalidate in background if older than 90 seconds
+          if (Date.now() - item.time > 90000) {
+            const bucket = Math.floor(Date.now() / 120000);
+            fetch(`${primaryPath}?v=${bucket}`).then(r => r.ok ? r.json() : null).then(fresh => {
               if (fresh) {
-                try { sessionStorage.setItem(cacheKey, JSON.stringify({ data: fresh, time: Date.now() })); } catch(e) {}
+                try {
+                  const payload = JSON.stringify({ data: fresh, time: Date.now() });
+                  sessionStorage.setItem(cacheKey, payload);
+                  localStorage.setItem(cacheKey, payload);
+                } catch(e) {}
               }
             }).catch(() => {});
           }
@@ -642,20 +648,23 @@ if (typeof window !== 'undefined') {
       }
     } catch (e) {}
 
-    // High-speed CDN/Browser caching with 5-minute revalidation for ultra-fast mobile loading
-    const cacheBucket = Math.floor(Date.now() / 300000);
+    // 2. High-speed CDN/Browser caching with 2-minute time bucket (allows single-roundtrip gzip/brotli)
+    const cacheBucket = Math.floor(Date.now() / 120000);
     const candidates = [
-      `${primaryPath}?v=${isBookConfig ? Date.now() : cacheBucket}`,
-      ...(isBookConfig ? [`${fallbackPath}?v=${Date.now()}`] : [primaryPath, fallbackPath])
+      `${primaryPath}?v=${cacheBucket}`,
+      `${fallbackPath}?v=${cacheBucket}`,
+      primaryPath
     ];
 
     for (const c of candidates) {
       try {
-        const res = await fetch(c, isBookConfig ? { cache: 'no-store' } : undefined);
+        const res = await fetch(c);
         if (res.ok) {
           const json = await res.json();
           try {
-            sessionStorage.setItem(cacheKey, JSON.stringify({ data: json, time: Date.now() }));
+            const payload = JSON.stringify({ data: json, time: Date.now() });
+            sessionStorage.setItem(cacheKey, payload);
+            localStorage.setItem(cacheKey, payload);
           } catch(e) {}
           return json;
         }
@@ -844,6 +853,13 @@ if (typeof window !== 'undefined') {
         status: currentLandingData.status || 'active'
       };
     }
+
+    // Save active book data in sessionStorage so checkout.html opens in 0ms!
+    try {
+      sessionStorage.setItem('AI_ACTIVE_BOOK_DATA', JSON.stringify(currentBookData));
+      sessionStorage.setItem('AI_ACTIVE_LANDING_DATA', JSON.stringify(currentLandingData));
+      sessionStorage.setItem('AI_LAST_VISITED_BOOK_ID', currentBookId);
+    } catch(e) {}
   }
 
   function applyThemeColors() {

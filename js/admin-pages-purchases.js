@@ -14,7 +14,10 @@ function renderPurchaseRow(item) {
     const custName = item.customer || 'किसान साथी';
     const bookTitle = item.book || 'ई-बुक';
 
-    const waMsg = `🙏 नमस्ते ${custName} जी!
+    const isSuccess = ['success', 'completed', 'paid'].includes(String(item.status || '').toLowerCase().trim());
+
+    if (isSuccess) {
+      const waMsg = `🙏 नमस्ते ${custName} जी!
 
 🎉 बहुत-बहुत बधाई और स्वागत है! आप आरोग्यम इंडिया के सम्मानित सदस्य बन चुके हैं।
 
@@ -43,8 +46,41 @@ function renderPurchaseRow(item) {
 आपका शुभचिंतक,  
 *आरोग्यम इंडिया टीम* 🌿`;
 
-    const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(waMsg)}`;
-    whatsappBtnHTML = `<a href="${waUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="सफलतापूर्वक खरीद का स्वागत संदेश भेजें">💬 स्वागत संदेश</a>`;
+      const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(waMsg)}`;
+      whatsappBtnHTML = `<a href="${waUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="सफलतापूर्वक खरीद का बधाई व स्वागत संदेश भेजें">💬 बधाई संदेश</a>`;
+    } else {
+      const followUpMsg = `🙏 नमस्ते ${custName} जी!
+
+आशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿
+
+हमने देखा कि आप आरोग्यम इंडिया से *"${bookTitle}"* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट, इंटरनेट समस्या या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।
+
+❤️ *हम आपके साथ हैं:*
+यदि ऑनलाइन पेमेंट करने में कोई भी परेशानी या असुविधा आई हो, तो आप सीधे हमारे आधिकारिक UPI नंबर पर भी राशि भेज सकते हैं:
+
+💳 *Google Pay / PhonePe / Paytm / BHIM UPI:*
+👉 UPI No: *7049294111*
+
+📸 *पेमेंट करने के बाद इसी नंबर पर स्क्रीनशॉट (Screenshot) भेजें*, हम तुरंत 2 मिनट में आपकी ई-बुक सक्रिय (Activate) करवा देंगे।
+
+📲 *1. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
+अपने मोबाइल में बिना रुकावट तुरंत ऐप चलाने हेतु यहाँ से इंस्टॉल करें:
+👉 https://aarogyamindia.online/aarogyam-app.html
+
+🌸 *2. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
+फसल की बीमारी, पत्ती पीली पड़ना, इल्ली का जैविक स्प्रे, पशुओं का दूध व स्वास्थ्य संबंधी कोई भी सवाल पूछें या फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
+👉 https://aarogyamindia.online/aarogyam-sakhi.html
+
+🎁 *विशेष डिस्काउंट व अतिरिक्त ऑफर्स के लिए हमसे अभी संपर्क करें:*
+हम आपके लिए विशेष छूट व उपहार उपलब्ध करा सकते हैं।
+📞 WhatsApp / कॉल: +91 7974422572
+
+सप्रेम व आदर सहित,  
+*आपकी आरोग्यम इंडिया टीम* 🌾`;
+
+      const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(followUpMsg)}`;
+      whatsappBtnHTML = `<a href="${waUrl}" target="_blank" class="admin-button small-button" style="background:#f59e0b;color:#000;border-color:#d97706;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="अधूरे ऑर्डर हेतु फॉलो-अप संदेश भेजें">💬 फॉलो-अप संदेश</a>`;
+    }
   } else {
     whatsappBtnHTML = `<span class="admin-muted" style="font-size:0.75rem;">मोबाइल नहीं</span>`;
   }

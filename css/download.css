@@ -33,16 +33,27 @@
     padding: 0;
 }
 
+html {
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
 body.vip-download-theme {
     font-family: var(--font-body);
     background: radial-gradient(circle at 50% 0%, #0d3320 0%, #071910 50%, #030d08 100%);
     background-color: var(--vip-bg-dark);
     color: var(--vip-text-white);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Ambient Glow Lights */
@@ -1753,13 +1764,13 @@ body.vip-download-theme {
         align-items: center;
     }
     body.vip-download-theme {
-        padding-bottom: 75px !important;
+        padding-bottom: calc(105px + env(safe-area-inset-bottom, 20px)) !important;
     }
     .download-container {
-        padding-bottom: 85px !important;
+        padding-bottom: calc(115px + env(safe-area-inset-bottom, 20px)) !important;
     }
     .floating-audio-pill {
-        bottom: 75px !important;
+        bottom: calc(90px + env(safe-area-inset-bottom, 15px)) !important;
     }
 }
 
@@ -1804,13 +1815,15 @@ body.vip-download-theme {
     left: 0;
     right: 0;
     width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
     z-index: 99995;
-    background: rgba(5, 20, 14, 0.96);
+    background: rgba(5, 20, 14, 0.98);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1.5px solid rgba(52, 211, 153, 0.4);
     box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.65);
-    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 10px));
 }
 
 .sticky-dock-inner {

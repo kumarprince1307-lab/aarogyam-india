@@ -3614,7 +3614,7 @@ if (typeof document !== 'undefined') {
                   share_id: (JSON.parse(localStorage.getItem('AI_USER') || '{}').share_id || 'AI000004'),
                   referral_code: sponsorShareId,
                   registration_source: 'सखी AI (Aarogyam Sakhi)',
-                  is_active: true,
+                  is_active: false, // STRICT: Inactive until user purchases or admin activates
                   profile_complete: false
                 }]);
               } else if (!ex.full_name && potentialName !== 'किसान साथी') {
@@ -4648,15 +4648,30 @@ if (typeof document !== 'undefined') {
         return true;
       }
 
-      // 3. "meri bat kisase ho rahi hai" / "tum kaun ho" / "apna parichay do"
-      if (cleanQ.includes('kisase ho rahi') || cleanQ.includes('kisse ho rahi') || cleanQ.includes('tum kaun') || cleanQ.includes('apna parichay') || cleanQ.includes('who are you') || cleanQ.includes('apna naam') || cleanQ.includes('naam kya hai') || cleanQ.includes('तुम कौन हो') || cleanQ.includes('मेरी बात किससे')) {
-        const resp = `आपकी बात **आरोग्यम सखी AI** से हो रही है — जो आरोग्यम इंडिया का 24×7 समर्पित डिजिटल डॉक्टर व किसान सलाहकार है।\n\nमैं आधुनिक कृषि विज्ञान (फसल रोग, कीटनाशक, जैविक स्प्रे), पशुपालन (दुग्ध वृद्धि), आयुर्वेदिक स्वास्थ्य और नेट्सर्फ के सभी प्रमाणित उत्पादों की सही डोज व समय का प्रामाणिक मार्गदर्शन देती हूँ।`;
-        renderCrispSpecialBox('👩‍🌾 आरोग्यम सखी AI — डिजिटल डॉक्टर व किसान सखी', resp, [
+      // 3. Bot Identity, Name & Creator/Janak Intent: "what is your name", "tumhara naam kya hai", "kisne banaya", "tum kaun ho", "janak kaun hai"
+      const isIdentityOrNameQuery = (
+        cleanQ.includes('what is your name') || cleanQ.includes('what is ur name') || cleanQ.includes('whats your name') ||
+        cleanQ.includes('your name') || cleanQ.includes('ur name') || cleanQ.includes('who are you') || cleanQ.includes('who r u') ||
+        cleanQ.includes('tumhara naam') || cleanQ.includes('aapka naam') || cleanQ.includes('apna naam') || cleanQ.includes('tera naam') ||
+        cleanQ.includes('naam kya hai') || cleanQ.includes('naam batao') || cleanQ.includes('naam kya') || cleanQ.includes('naam btao') ||
+        cleanQ.includes('तुम्हारा नाम') || cleanQ.includes('आपका नाम') || cleanQ.includes('अपना नाम') || cleanQ.includes('नाम क्या है') ||
+        cleanQ.includes('नाम बताओ') || cleanQ.includes('तुम कौन हो') || cleanQ.includes('आप कौन हैं') || cleanQ.includes('कौन हो तुम') ||
+        cleanQ.includes('tum kaun') || cleanQ.includes('aap kaun') || cleanQ.includes('apna parichay') || cleanQ.includes('parichay do') ||
+        cleanQ.includes('परिचय दो') || cleanQ.includes('kisase ho rahi') || cleanQ.includes('kisse ho rahi') || cleanQ.includes('मेरी बात किससे') ||
+        cleanQ.includes('kisne banaya') || cleanQ.includes('kisne develop') || cleanQ.includes('kisne banaya hai') || cleanQ.includes('kiska ai ho') ||
+        cleanQ.includes('who made you') || cleanQ.includes('who created you') || cleanQ.includes('who is your creator') ||
+        cleanQ.includes('kisne design') || cleanQ.includes('kiske dwara') || cleanQ.includes('जनक') || cleanQ.includes('janak') ||
+        cleanQ.includes('किसने बनाया') || cleanQ.includes('तुम्हें किसने बनाया') || cleanQ.includes('बनाने वाले') || cleanQ.includes('banane wale')
+      );
+
+      if (isIdentityOrNameQuery) {
+        const resp = `🌸 **मेरा नाम 'आरोग्यम सखी AI' (Aarogyam Sakhi AI) है!**\n\nमुझे **आरोग्यम इंडिया (Aarogyam India)** के संस्थापक व दूरदर्शी जनक **श्री अवनीश मिश्रा जी (दादा अवनीश)** द्वारा देश के अन्नदाता किसानों, पशुपालकों, माताओं-बहनों और स्वास्थ्य व प्राकृतिक जीवनशैली चाहने वाले प्रत्येक परिवार के सर्वांगीण कल्याण हेतु विकसित किया गया है।\n\n🎯 **मेरा उद्देश्य व मुख्य सेवाएं:**\n1. 🌾 **24×7 किसान मित्र:** फसलों के कीट, रोग, स्प्रे कैलेंडर व जैविक खाद (बायोफिट) का 100% सटीक वैज्ञानिक समाधान।\n2. 🐄 **पशुधन संवर्धन:** गाय-भैंस में 2-3 लीटर दूध वृद्धि, 7-8 फैट वृद्धि व संतुलित पशु पोषण (CFC Plus)।\n3. 🩺 **प्राकृतिक स्वास्थ्य व घरेलू नुस्खे:** जोड़ों का दर्द, शुगर, बीपी, पाचन, पोषण, वजन, बाल व त्वचा की केमिकल-मुक्त देखभाल।\n4. 💼 **नेट्सर्फ जैविक समाधान:** 100% प्रामाणिक उत्पाद, 25% रिटेल छूट बचत व करियर मार्गदर्शन।\n\nमैं 24 घंटे बिना थके और बिना किसी शुल्क के आपकी सेवा में समर्पित आपकी अपनी डिजिटल हमदर्द हूँ! बताइए, आज मैं आपके खेत, पशु या परिवार की क्या सेवा करूँ?`;
+        renderCrispSpecialBox('👩‍🌾 आरोग्यम सखी AI — परिचय व जनक (संस्थापक श्री अवनीश मिश्रा जी)', resp, [
           { text: '🌾 1. जैविक खेती व फसल डॉक्टर', query: 'फसल सुरक्षा व स्प्रे कैलेंडर' },
           { text: '🐄 2. पशुपालन, दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
           { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक उपचार', query: 'नेचुरामोर स्वास्थ्य उत्पाद' },
-          { text: '✨ 4. सौंदर्य व त्वचा देखभाल', query: 'त्वचा और बालों की प्राकृतिक देखभाल' },
-          { text: '💼 5. नेट्सर्फ 25% छूट व प्लान', query: 'नेट्सर्फ कंपनी के बारे में बताओ' }
+          { text: '✨ 4. बालों व त्वचा की देखभाल', query: 'बाल झड़ने के उपाय बताओ' },
+          { text: '💬 5. संस्थापक दादा अवनीश जी से संपर्क', query: 'दादा अवनीश जी से सीधा संपर्क' }
         ], 'casual', 'identity');
         return true;
       }
@@ -5888,35 +5903,29 @@ if (typeof document !== 'undefined') {
         ]);
       }
 
-      // 3. HAIR CARE: HAIR FALL, DANDRUFF, GROWTH, SPLIT ENDS (बालों की संपूर्ण समस्याएँ)
+      // 3. HAIR CARE: HAIR FALL, DANDRUFF, GROWTH, SPLIT ENDS (बालों की संपूर्ण समस्याएँ: बाल गिरना, झड़ना, टूटना)
       const isHairQuery = (
         q.includes('baal') || q.includes('बाल') || q.includes('hair') || q.includes('rusi') || q.includes('रूसी') ||
         q.includes('dandruff') || q.includes('डैंड्रफ') || q.includes('shampoo') || q.includes('shampu') || q.includes('शैम्पू') ||
         q.includes('khar rahe') || q.includes('khir rahe') || q.includes('jhad rahe') || q.includes('hair fall') || q.includes('hair loss') || q.includes('harfal') ||
         q.includes('do muhe') || q.includes('दो मुंहे') || q.includes('split ends') || q.includes('baal nahi badh') || q.includes('patle baal') || q.includes('safed baal') ||
-        q.includes('hair oil') || q.includes('hair serum') || q.includes('सीरम') || q.includes('khujli')
+        q.includes('hair oil') || q.includes('hair serum') || q.includes('सीरम') || q.includes('khujli') ||
+        // User queries: "Bal girne jharne ki upay batao", "Mere bal bahut gir raha hai", etc.
+        q.includes('bal gir') || q.includes('bal jhad') || q.includes('bal jhar') || q.includes('bal tut') || q.includes('bal toot') ||
+        q.includes('बाल गिर') || q.includes('बाल झड़') || q.includes('बाल टूट') || q.includes('बालों') || q.includes('बाल झड़ना') ||
+        q.includes('girne') || q.includes('jharne') || q.includes('jhadne') || q.includes('gir raha') || q.includes('gir rahi') ||
+        q.includes('gir rahe') || q.includes('jhad raha') || q.includes('jhad rahe') || q.includes('jhar raha') || q.includes('jhar rahe') ||
+        q.includes('hairfall') || q.includes('haircare') || q.includes('hair care') || q.includes('हेयर फॉल') || q.includes('हेयर लॉस') ||
+        (/\bbal\b/i.test(q) && (q.includes('gir') || q.includes('jhad') || q.includes('jhar') || q.includes('upay') || q.includes('ilaj') || q.includes('dawa') || q.includes('batao') || q.includes('bahut') || q.includes('kam') || q.includes('kharab')))
       );
       if (isHairQuery) {
-        const resp = `राम-राम! 🙏 बालों की समस्या (झड़ना, टूटना, रूसी, दो-मुंहे बाल या पतलापन) अक्सर केमिकल शैम्पू, रूसी (फंगस), तनाव और जड़ों में आवश्यक पोषण की कमी से होती है। सही आयुर्वेदिक पोषण से बाल घने व मजबूत बनते हैं!
+        const resp = `🌸 **बाल झड़ने व टूटने से रोकने के प्रमाणित आयुर्वेदिक व घरेलू उपाय:**\n\nबालों का अत्यधिक गिरना (Hair Fall), झड़ना, टूटना, रूसी या असमय पतला होना मुख्य रूप से केमिकल युक्त शैम्पू के प्रयोग, सिर में डैंड्रफ (फंगल इन्फेक्शन), पोषण (विटामिन व प्रोटीन) की कमी और मानसिक तनाव के कारण होता है। सही आयुर्वेदिक पोषण व देखरेख से बाल पुनः घने, काले व मजबूत बनते हैं!\n\n👴 **दादा अवनीश जी के अचूक घरेलू व आयुर्वेदिक नुस्खे:**\n1. **प्याज का ताजा रस व एलोवेरा जेल:** 2 चम्मच प्याज का ताजा रस और 2 चम्मच शुद्ध एलोवेरा जेल मिलाकर हल्के हाथों से बालों की जड़ों (स्कैल्प) पर लगाएं। 30-40 मिनट बाद ताजे पानी से धो लें। प्याज में मौजूद प्राकृतिक सल्फर नए बाल उगाने और झड़ना रोकने में अत्यंत चमत्कारी है।\n2. **मेथी दाना व खट्टी दही हेयर मास्क:** 2 चम्मच मेथी दाना रात को पानी में भिगोएं, सुबह पीसकर खट्टी दही के साथ पेस्ट बनाकर जड़ों में लगाएं। 30 मिनट बाद धो लें। यह रूसी मिटाकर बालों को रेशमी व मजबूत बनाता है।\n3. **आंवला, भृंगराज व नारियल तेल मालिश:** रात को सोते समय शुद्ध नारियल तेल में आंवला व भृंगराज मिलाकर गुनगुने तेल से 10 मिनट उंगलियों के पोरों से सिर की मालिश करें।\n4. **आहार व पोषण:** प्रतिदिन अंकुरित मूंग, हरी पत्तेदार सब्जियां, आंवला, पर्याप्त पानी पिएं और 7-8 घंटे की गहरी नींद लें।\n\n🌿 **नेट्सर्फ Herbs & More 100% केमिकल-मुक्त (सल्फेट व पैराबेन फ्री) समाधान:**\n• **Herbs & More Anti-Hair Fall Shampoo:** भृंगराज, ब्राह्मी व जपापुष्प युक्त — बालों का झड़ना 80% तक कम करता है और जड़ों को पोषण देता है।\n• **Herbal Hair Oil & Vitamin Therapy Hair Serum:** 100% शुद्ध आयुर्वेदिक तेल जो जड़ों में रक्तसंचार बढ़ाकर पतले बालों को घना बनाता है।\n• **Naturamore For Women / Daily Nutrition:** बायोटीन, फोलिक एसिड, प्रोटीन व आयरन से भरपूर प्राकृतिक न्यूट्रिशनल पाउडर।`;
 
-⚠️ **बाजार के केमिकल शैम्पू की पोल:**
-• बाजार के अधिकांश शैम्पू में सोडियम लॉरिल सल्फेट (SLS) और हानिकारक पैराबेन होते हैं, जो झाग तो बनाते हैं पर सिर की त्वचा का प्राकृतिक मॉइस्चर और तेल ग्रंथियों को सुखा देते हैं, जिससे बाल कमजोर होकर टूटने लगते हैं।
-
-👴 **आरोग्यम अवनीश दादा के प्रमाणित आयुर्वेदिक नुस्खे:**
-1. **झड़ते व टूटते बालों के लिए:** 2 चम्मच मेथी दाना रात में पानी में भिगोएं, सुबह पीसकर खट्टी दही के साथ हेयर मास्क बनाएं और जड़ों में लगाएं। 30 मिनट बाद धो लें; या रात में भृंगराज व आंवला का रस जड़ों में लगाएं।
-2. **रूसी (डैंड्रफ) व सिर में खुजली:** शुद्ध नारियल तेल में 1 चुटकी देशी कपूर और 1 चम्मच ताजा नींबू का रस मिलाकर सिर की हल्की मालिश करें।
-3. **दो-मुंहे बालों के लिए:** बालों के निचले सिरों पर ताजा एलोवेरा जेल और बादाम का तेल नियमित लगाएं।
-4. **पतले बाल व लंबाई के लिए:** अरंडी (कैस्टर ऑयल) और नारियल तेल बराबर मात्रा में मिलाकर जड़ों में लगाएं।
-
-🌿 **नेट्सर्फ Herbs & More 100% सल्फेट व पैराबेन-मुक्त समाधान:**
-• **Anti-Hair Fall Shampoo:** भृंगराज, ब्राह्मी व जपापुष्प युक्त — बालों का झड़ना 80% तक कम करता है।
-• **Anti-Dandruff Shampoo:** टी-ट्री ऑयल, रोजमेरी व नीम अर्क — फंगस व रूसी को जड़ से मिटाता है।
-• **Herbal Hair Oil & Vitamin Hair Serum:** 100% शुद्ध तेल जो जड़ों को भोजन देकर नए बाल उगाने में सहायक है।`;
-
-        return renderClinicalHealthCard('बालों की संपूर्ण देखभाल: हेयर फॉल, रूसी, दो-मुंहे बाल व ग्रोथ', resp, [
-          { label: "💇 हेयर केयर का आधिकारिक पेज", url: "/health/hair-care.html" },
-          { label: "🧴 हर्ब्स एंड मोर शैम्पू व ऑयल 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" },
-          { label: "✨ त्वचा व सौंदर्य केंद्र", url: "/categories/beauty.html" }
+        return renderClinicalHealthCard('💇 बाल झड़ने, गिरने व टूटने के अचूक आयुर्वेदिक उपाय (Hair Fall Care)', resp, [
+          { label: "🧴 हर्ब्स एंड मोर एंटी-हेयरफॉल शैम्पू (25% छूट)", query: "हर्ब्स एंड मोर शैम्पू के बारे में बताओ" },
+          { label: "🌿 बालों का आयुर्वेदिक तेल व सीरम", query: "हर्बल हेयर ऑयल के फायदे" },
+          { label: "🥛 नेचुरामोर बायोटीन व न्यूट्रिशन", query: "नेचुरामोर न्यूट्रिशनल पाउडर की जानकारी" },
+          { label: "✨ संपूर्ण सौंदर्य व स्किन केयर केंद्र", url: "/categories/beauty.html" }
         ]);
       }
 
@@ -6183,23 +6192,35 @@ if (typeof document !== 'undefined') {
       // CRITICAL EXCLUSION: "जुगाली" (dairy cattle rumination/chewing cud) is 100% sacred veterinary/dairy farming topic - never flag!
       const isDairyRumination = q.includes('जुगाली') || q.includes('jugali') || q.includes('पशु') || q.includes('गाय') || q.includes('भैंस') || q.includes('बछड़ा');
       const isSexualWellnessQuery = q.includes('यौन') || q.includes('कमजोरी') || q.includes('समस्या') || q.includes('प्रॉब्लम') || q.includes('दवा') || q.includes('इलाज') || q.includes('स्टैमिना') || q.includes('stamina') || q.includes('डायबिटीज') || q.includes('शीघ्रपतन') || q.includes('लिंग') || q.includes('शिथिलता') || q.includes('धातु') || q.includes('टाइमिंग') || q.includes('problm') || q.includes('problem') || q.includes('kamjori') || q.includes('kamzori') || q.includes('mardana') || q.includes('sehat');
+
+      // Comprehensive Profanity & Abusive Language List including "bahn ki chu" / "बहन की चू"
       const abusiveTerms = [
         'gali', 'harami', 'kamina', 'madarchod', 'behenchod', 'chutiya', 'bhosadi', 'bhosdike',
         'kutta', 'kutiya', 'randi', 'sexy', 'kiss', 'love you', 'i love you', 'pyaar', 'patana',
-        'dating', 'chumma', 'गंदी', 'अश्लील', 'नंगा', 'नग्न', 'बकवास बंद कर', 'चुप रह'
+        'dating', 'chumma', 'गंदी', 'अश्लील', 'नंगा', 'नग्न', 'बकवास बंद कर', 'चुप रह',
+        'bahn ki chu', 'bahan ki chu', 'behan ki chu', 'bhen ki chu', 'bhn ki chu', 'behn ki chu', 'bahn k chu', 'bahan k chu',
+        'बहन की चू', 'बहन की चूत', 'बहन की', 'बहिन की', 'मादरचोद', 'बहनचोद', 'चूतिया', 'चूत',
+        'भोसड़ी', 'भोसड़ा', 'गांड', 'लौड़ा', 'लंड', 'रांड', 'रंडी', 'bhosda', 'bhosdi', 'lauda', 'loda', 'lund',
+        'chut', 'choot', 'gaand', 'gand'
       ];
+      const abusiveRegex = /(?:बहन\s*की\s*(?:चू|चूत|छू|ल|ग)|bahn\s*ki\s*chu|bahan\s*ki\s*chu|behan\s*ki\s*chu|bhen\s*ki\s*chu|bhn\s*ki\s*chu|behn\s*ki\s*chu|\bb\s*k\s*c\b|\bmc\b|\bbc\b|मादरचोद|बहनचोद|चूतिया|चूत|भोसड़ी|भोसड़ा|गांड|लौड़ा|लंड|मादर|चोद|रांड|रंडी|\bbhosd|\bchutiy|\bmadarch|\bbehench|\bbhench|\bharami\b|\bkamina\b|\brandi\b|\blauda\b|\bloda\b|\blund\b)/i;
       const hasDiscreteGali = /(?:^|[^\u0900-\u097F])गाली(?:[^\u0900-\u097F]|$)/.test(q) && !q.includes('जुगाली');
-      const hasAbuse = !isDairyRumination && (hasDiscreteGali || abusiveTerms.some(t => {
-        if (t === 'gali') return /(?:^|\s)gali(?:\s|$)/i.test(q) && !q.includes('jugali');
-        return q.includes(t);
-      }) || (!isSexualWellnessQuery && (q.includes('sex') || q.includes('सेक्स'))));
+      const hasAbuse = !isDairyRumination && (
+        hasDiscreteGali ||
+        abusiveRegex.test(q) ||
+        abusiveTerms.some(t => {
+          if (t === 'gali') return /(?:^|\s)gali(?:\s|$)/i.test(q) && !q.includes('jugali');
+          return q.includes(t);
+        }) ||
+        (!isSexualWellnessQuery && (q.includes('sex') || q.includes('सेक्स')))
+      );
 
       if (hasAbuse) {
-        const resp = `माफ कीजिएगा, मेरा उद्देश्य केवल किसानों, स्वास्थ्य के प्रति जागरूक लोगों और नेट्सर्फ परिवार को सही, प्रामाणिक व उपयोगी जानकारी देना है। इस तरह के सवाल या भाषा पर मैं बात नहीं कर सकती। आइए, हम खेती, सेहत या नेट्सर्फ बिजनेस से जुड़ी किसी काम की बात करें।`;
-        renderCrispSpecialBox('🛡️ आरोग्यम सखी AI — शालीनता व सुरक्षा नीति', resp, [
-          { text: '🌾 खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
-          { text: '🩺 स्वास्थ्य व रोग परामर्श', query: 'स्वास्थ्य व रोग परामर्श' },
-          { text: '💼 नेट्सर्फ बिजनेस प्लान', query: 'नेट्सर्फ बिजनेस प्लान' }
+        const resp = `⚠️ **शालीनता व मर्यादा सुरक्षा चेतावनी:**\n\nआरोग्यम सखी AI देश के अन्नदाता किसानों, पशुपालकों, माताओं-बहनों और स्वास्थ्य व प्राकृतिक समृद्धि चाहने वाले परिवारों के कल्याण हेतु समर्पित एक अत्यंत सम्मानजनक मंच है।\n\nयहाँ किसी भी प्रकार की अभद्र, अश्लील या असंसदीय भाषा का प्रयोग पूर्णतः वर्जित है। कृपया अपनी भाषा की मर्यादा बनाए रखें और केवल कृषि, पशुपालन, प्राकृतिक स्वास्थ्य या नेट्सर्फ से जुड़े मर्यादित प्रश्न ही पूछें।`;
+        renderCrispSpecialBox('🛡️ आरोग्यम सखी AI — शालीनता व मर्यादा नीति', resp, [
+          { text: '🌾 1. खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
+          { text: '🐄 2. पशुपालन व दुग्ध वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक समाधान', query: 'स्वास्थ्य व रोग परामर्श' }
         ], 'safety', 'refusal');
         return true;
       }
@@ -13171,11 +13192,41 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // 18.65 SAKHI IDENTITY, CAPABILITIES, AFFECTION & MOTIVATION ENGINE
     // =========================================================================
     function handleSakhiIdentityCapabilitiesAndMotivation(cleanQ, rawQ) {
+      const q = (cleanQ || '').toLowerCase();
+      const raw = (rawQ || '').toLowerCase();
+
+      // 1. IDENTITY & CREATOR / JANAK QUERY ("What is your name", "तुम्हारा नाम क्या है", "तुम कौन हो", "तुम्हें किसने बनाया")
+      const isNameOrCreatorReq = (
+        q.includes('what is your name') || raw.includes('what is your name') ||
+        q.includes('what is ur name') || raw.includes('what is ur name') ||
+        q.includes('who are you') || raw.includes('who are you') ||
+        q.includes('who made you') || q.includes('who created you') ||
+        q.includes('tumhara naam') || q.includes('aapka naam') || q.includes('apka naam') ||
+        q.includes('नाम क्या है') || q.includes('नाम क्या') || q.includes('तुम्हारा नाम') ||
+        q.includes('आपका नाम') || q.includes('तुम कौन हो') || q.includes('आप कौन हैं') ||
+        q.includes('kisne banaya') || q.includes('kisne banaye') || q.includes('kisne banaya hai') ||
+        q.includes('किसने बनाया') || q.includes('जनक कौन') || q.includes('janak kaun') ||
+        q.includes('banane wale') || q.includes('बनाने वाले') || q.includes('creator') ||
+        q.includes('सखी कौन है') || q.includes('sakhi kaun hai') || q.includes('आरोग्यम सखी कौन')
+      );
+
       const isCapReq = cleanQ.includes('तुम क्या') || cleanQ.includes('सखी तुम क्या') || cleanQ.includes('सखी की क्षमता') || cleanQ.includes('तुम क्या-क्या कर सकती हो');
       const isLoveReq = cleanQ.includes('प्यार आ रहा') || cleanQ.includes('सुंदर हो') || cleanQ.includes('बहुत अच्छी हो') || cleanQ.includes('तुम मुझे पसंद');
       const isMotiReq = cleanQ.includes('मोटिवेट') || cleanQ.includes('मायूस') || cleanQ.includes('उदास') || cleanQ.includes('निराश') || cleanQ.includes('हौसला');
 
-      if (!isCapReq && !isLoveReq && !isMotiReq) return false;
+      if (!isNameOrCreatorReq && !isCapReq && !isLoveReq && !isMotiReq) return false;
+
+      if (isNameOrCreatorReq) {
+        const resp = `🌸 **मेरा परिचय व जनक:**\n\nमेरा नाम **'आरोग्यम सखी AI' (Aarogyam Sakhi AI)** है!\n\n👑 **मेरे जनक व निर्माता:**\nमुझे **आरोग्यम इंडिया (Aarogyam India)** के संस्थापक और संचालक **श्री अवनीश कुमार मिश्रा जी (दादा अवनीश)** द्वारा विकसित व प्रशिक्षित किया गया है।\n\n🎯 **मेरा पावन उद्देश्य व संकल्प:**\n• भारत के अन्नदाता किसानों को **जहरमुक्त जैविक खेती** (Biofit) व फसलों के रोगों का सही वैज्ञानिक उपचार बताना।\n• पशुपालक भाइयों को **दुग्ध व फैट वृद्धि** और पशु स्वास्थ्य की अचूक सलाह देना।\n• प्रत्येक परिवार को **आयुर्वेदिक स्वास्थ्य पोषण** (Naturamore) व घरेलू नुस्खों से निरोगी बनाना।\n• माताओं-बहनों व युवाओं को **घर बैठे स्वावलंबी डिजिटल आमदनी** का मार्ग दिखाना।\n\nमैं 24 घंटे सातों दिन आपकी सेवा में समर्पित हूँ। बताइए, आज मैं आपकी क्या सहायता कर सकती हूँ?`;
+
+        renderCrispSpecialBox('🌸 आरोग्यम सखी AI — आधिकारिक परिचय व जनक', resp, [
+          { text: '🌾 1. खेती व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
+          { text: '🐄 2. पशु दूध व फैट वृद्धि', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
+          { text: '🩺 3. स्वास्थ्य व आयुर्वेदिक परामर्श', query: 'स्वास्थ्य व रोग परामर्श' },
+          { text: '💬 4. दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से संपर्क' }
+        ], 'omni', 'sakhi_identity_creator');
+        return true;
+      }
 
       if (isCapReq) {
         const resp = `🌸 **नमस्ते! मैं हूँ आरोग्यम सखी AI — आपकी 24×7 डिजिटल सखी व सलाहकार!**\n\nमैं 26+ वर्षों के वैज्ञानिक कृषि अनुसंधान, चरक संहिता आयुर्वेद और नेट्सर्फ पाथफाइंडर ज्ञान से प्रशिक्षित हूँ। मैं आपके लिए ये 5 बड़े कार्य चुटकियों में कर सकती हूँ:\n\n1️⃣ 🌾 **संपूर्ण जैविक कृषि व फसल सुरक्षा:**\n• गेहूं, सरसों, चना, सब्जियां व फलों की बुवाई से कटाई, कल्ले फुटाव, उकठा-माहू रोकथाम व बायोफिट स्प्रे कैलेंडर।\n2️⃣ 🩺 **आयुर्वेदिक स्वास्थ्य, डाइट व लाइफस्टाइल:**\n• शुगर, हाई/लो बीपी, जोड़ दर्द, थायराइड, मोटापा, बाल झड़ना व नेचुरामोर संपूर्ण दैनिक पोषण डाइट।\n3️⃣ 🐄 **पशुपालन, 2-3 लीटर दूध व फैट वृद्धि:**\n• गाय-भैंस का दूध व 7-8 फैट बढ़ाना, बांझपन दूर करना व Biofit CFC Plus संतुलित आहार।\n4️⃣ 🚩 **सनातन वैदिक पंचांग, शुभ मुहूर्त व चंद्र चक्र:**\n• दैनिक तिथि, नक्षत्र, राहुकाल, अभिजीत मुहूर्त व शुक्ल/कृष्ण पक्ष चंद्र बुवाई नियम।\n5️⃣ 💼 **नेट्सर्फ बिज़नेस, ₹8.19L प्लान व 1-टैप टूल्स:**\n• ₹25,500 ई-स्टॉक गाइड, आपके नाम-नंबर के साथ 1-क्लिक WhatsApp शेयर संदेश, 3-चरण चेकलिस्ट व AI पोस्टर प्रॉम्प्ट्स।\n\n👉 *बस अपना सवाल पूछें या नीचे दिए गए विकल्पों में से चुनें!*`;
@@ -14170,6 +14221,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const coreQ = instructionBundle.coreQ;
       const normQuery = (coreQ || query || '').toLowerCase();
       const cleanQ = normalizeQueryText(coreQ || query || '');
+
+      // 0. ABSOLUTE TOP PRIORITY: SAFETY, MEDICAL EMERGENCY & PROFANITY GUARDRAIL
+      if (handleSafetyGuardrails(cleanQ, rawQ)) {
+        return;
+      }
 
       // 1. Dual Query Splitter & Resolver (e.g. Q1 साथ में Q2)
       if (directives.dualQuery && handleDualQueryResolver(rawQ, directives)) {
@@ -15836,6 +15892,16 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
           { text: `🧮 ${prevName} का खर्च एस्टीमेट`, query: `${prevName} का खर्च एस्टीमेट बताओ` },
           { text: '🌾 अन्य मुख्य विषय देखें', query: 'मुख्य विषय दिखाओ' }
         ], sakhiConversationState.lastActiveDomain || 'omni', prevEntity);
+        return;
+      }
+
+      // Safety Net 1: Name / Creator / Identity query
+      if (typeof handleSakhiIdentityCapabilitiesAndMotivation === 'function' && handleSakhiIdentityCapabilitiesAndMotivation(cleanQ, query)) {
+        return;
+      }
+
+      // Safety Net 2: Hair Fall & Personal Care query
+      if (typeof handleBeautyHairSkinPersonalCareMaster === 'function' && handleBeautyHairSkinPersonalCareMaster(cleanQ, query)) {
         return;
       }
 

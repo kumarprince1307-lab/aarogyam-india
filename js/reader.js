@@ -358,19 +358,65 @@ async function verifyUserAccessAndSession(targetBookId) {
             return;
         }
 
-        if (userId && typeof supabaseClient !== "undefined") {
-            const { data, error } = await supabaseClient
-                .from("purchases")
-                .select("id")
-                .eq("profile_id", userId)
-                .eq("book_id", canonicalBookId)
-                .single();
+        let hasAccess = false;
+        const isAdmin = (typeof window.AarogyamDeviceGuard !== 'undefined' && window.AarogyamDeviceGuard.isSuperAdmin(userIdentifier)) ||
+                        localStorage.getItem('admin_session') === 'true';
 
-            if (error || !data) {
-                console.warn("No purchase record in DB, proceeding with local access...");
-            } else {
-                isUserPurchased = true;
+        if (isAdmin) {
+            hasAccess = true;
+            isUserPurchased = true;
+        } else if (userId && typeof supabaseClient !== "undefined") {
+            try {
+                // Zero-Egress Cache Check
+                const localPurchased = JSON.parse(sessionStorage.getItem('AI_PURCHASED_BOOKS_' + userId) || '[]');
+                if (localPurchased.includes(canonicalBookId)) {
+                    hasAccess = true;
+                    isUserPurchased = true;
+                } else {
+                    const { data, error } = await supabaseClient
+                        .from("purchases")
+                        .select("id")
+                        .eq("profile_id", userId)
+                        .eq("book_id", canonicalBookId)
+                        .or("payment_status.eq.success,payment_status.is.null")
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (data && data.id) {
+                        hasAccess = true;
+                        isUserPurchased = true;
+                        localPurchased.push(canonicalBookId);
+                        sessionStorage.setItem('AI_PURCHASED_BOOKS_' + userId, JSON.stringify(localPurchased));
+                    }
+                }
+            } catch(e) {
+                console.warn("Purchase verification error:", e);
             }
+        }
+
+        if (!hasAccess) {
+            const deniedModal = document.getElementById("accessDeniedModal");
+            if (deniedModal) {
+                deniedModal.innerHTML = `
+                    <div class="modal-box" style="text-align:center; padding: 28px 20px;">
+                        <div style="font-size:2.8rem; margin-bottom:10px;">🔒</div>
+                        <h2 style="color:#ef4444; font-size:1.2rem; font-weight:900; margin-bottom:10px;">ई-बुक सुरक्षित है (Access Locked)</h2>
+                        <p style="color:#475569; font-size:0.9rem; margin-bottom:20px; line-height:1.5;">
+                            आपने यह ई-बुक (<strong>${bookTitle}</strong>) अभी तक नहीं खरीदी है या आपका लॉगिन सत्र अलग है।
+                        </p>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <a href="/ebooks/checkout.html?product=${encodeURIComponent(canonicalBookId)}" style="background:#16a34a; color:#fff; text-decoration:none; padding:12px; border-radius:8px; font-weight:800; font-size:0.95rem;">
+                                🛒 अभी खरीदें (Buy Now)
+                            </a>
+                            <a href="/my-library.html" style="background:#0f172a; color:#94a3b8; text-decoration:none; padding:10px; border-radius:8px; font-weight:700; font-size:0.85rem;">
+                                📚 My Library में जाएं
+                            </a>
+                        </div>
+                    </div>
+                `;
+                deniedModal.style.display = "flex";
+            }
+            return;
         }
     }
 
