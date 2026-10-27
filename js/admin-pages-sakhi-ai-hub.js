@@ -1803,8 +1803,22 @@ async function fetchAndRenderSakhiAuditLogs() {
   tbody.innerHTML = list.map((item, idx) => {
     const timeStr = item.date_time ? new Date(item.date_time).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
     const profile = item.user_profile || 'guest';
-    const sawal = item.sawal || 'सवाल अनुपलब्ध';
-    const jawab = item.jawab || '';
+    const rawJawab = item.jawab || '';
+    let sawal = (item.sawal && item.sawal.trim()) ? item.sawal.trim() : '';
+    if (!sawal || sawal === 'सवाल अनुपलब्ध') {
+      if (rawJawab.includes('कृषि व फसल डॉक्टर')) {
+        sawal = '🌾 [मेनू चयन: कृषि व फसल डॉक्टर]';
+      } else if (rawJawab.includes('स्वास्थ्य') || rawJawab.includes('पोषण') || rawJawab.includes('लैब')) {
+        sawal = '🩺 [मेनू चयन: स्वास्थ्य व पोषण]';
+      } else if (rawJawab.includes('पशु') || rawJawab.includes('डेयरी') || rawJawab.includes('सीएफसी')) {
+        sawal = '🐄 [मेनू चयन: पशुपालन व डेयरी]';
+      } else if (rawJawab.includes('मौसम')) {
+        sawal = '🌦️ [क्विक एक्शन: मौसम पूर्वानुमान]';
+      } else {
+        sawal = '🔘 [विकल्प / मेनू चयन]';
+      }
+    }
+    const jawab = rawJawab;
     const domain = item.domain || 'omni';
     const status = item.status || 'PASS';
 

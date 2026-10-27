@@ -3025,8 +3025,21 @@ if (typeof document !== 'undefined') {
       // Dual-Audit Hook: If bot response and audit mode is active, log to Supabase
       if (role === 'bot') {
         const lastUser = log.filter(l => l.role === 'user').slice(-1)[0];
-        const sawal = lastUser ? (lastUser.caption || lastUser.content || '') : '';
+        let sawal = lastUser ? (lastUser.caption || lastUser.content || '') : '';
         const jawab = (speech || content || '').replace(/<[^>]+>/g, '').slice(0, 200);
+        if (!sawal || !sawal.trim()) {
+          if (jawab.includes('कृषि व फसल डॉक्टर')) {
+            sawal = '🌾 [मेनू चयन: कृषि व फसल डॉक्टर]';
+          } else if (jawab.includes('स्वास्थ्य') || jawab.includes('पोषण') || jawab.includes('लैब')) {
+            sawal = '🩺 [मेनू चयन: स्वास्थ्य व पोषण]';
+          } else if (jawab.includes('पशु') || jawab.includes('डेयरी') || jawab.includes('सीएफसी')) {
+            sawal = '🐄 [मेनू चयन: पशुपालन व डेयरी]';
+          } else if (jawab.includes('मौसम')) {
+            sawal = '🌦️ [क्विक एक्शन: मौसम पूर्वानुमान]';
+          } else {
+            sawal = '🔘 [विकल्प / मेनू चयन]';
+          }
+        }
         logToSupabaseAudit(phone, sawal, jawab, sakhiConversationState.lastActiveDomain || 'omni', 'PASS');
       }
       if (log.length > 50) log = log.slice(-50);
@@ -3737,6 +3750,32 @@ if (typeof document !== 'undefined') {
       text = text.replace(/(?:\bऊस\b|\bउसाची\b|\bउसाचे\b|\boos\b)/gi, 'गन्ना');
       text = text.replace(/(?:\bपिकाविशयी\b|\bपिकाविषयी\b|\bपिकाबद्दल\b)/gi, 'फसल के बारे में');
       text = text.replace(/(?:\bसविस्तर\b|\bसांगाल\b)/gi, 'विस्तार से बताएं');
+
+      // Gujarati Agriculture, Netsurf & Health Normalization
+      text = text.replace(/(?:નેટસફૅ|નેટસર્ફ|નેટસરફ)/gi, 'नेट्सर्फ');
+      text = text.replace(/(?:બાયો\s*ફીટ|બાયોફીટ)/gi, 'बायोफिट');
+      text = text.replace(/(?:કલ્ચર|કલચર)/gi, 'कल्चर');
+      text = text.replace(/(?:પ્રોડક્ટ્સ|પ્રોડક્ટ)/gi, 'प्रोडक्ट');
+      text = text.replace(/(?:ગોબરમાં|ગોબર|છાણ)/gi, 'गोबर खाद');
+      text = text.replace(/(?:ગોળ|ગોળમાં)/gi, 'गुड़');
+      text = text.replace(/(?:છાશ|છાસ)/gi, 'छाछ');
+      text = text.replace(/(?:ટ્રેક્ટર|ટ્રેક્ટરમાં|ટ્રોલી)/gi, 'ट्रैक्टर');
+      text = text.replace(/(?:નાખવા|નાખી\s*શકાય|નાખી શકાય|નાખવું)/gi, 'मिलाना उपयोग');
+      text = text.replace(/(?:ખાતર|ખાતરની)/gi, 'खाद');
+      text = text.replace(/(?:દવા|દવાની)/gi, 'दवा');
+      text = text.replace(/(?:ખેતી|ખેતીની)/gi, 'खेती');
+      text = text.replace(/(?:કેળા|કેળાની|કેળાનું)/gi, 'केला');
+      text = text.replace(/(?:શેરડી|શેરડીની)/gi, 'गन्ना');
+      text = text.replace(/(?:ઘઉં|ઘઉંની)/gi, 'गेहूं');
+      text = text.replace(/(?:ચણા|ચણાની)/gi, 'चना');
+      text = text.replace(/(?:કપાસ|કપાસની)/gi, 'कपास');
+      text = text.replace(/(?:મગફળી|મગફળીની)/gi, 'मूंगफली');
+      text = text.replace(/(?:સોયાબીન|સોયાબીનની)/gi, 'सोयाबीन');
+      text = text.replace(/(?:જીરું|જીરાની)/gi, 'जीरा');
+      text = text.replace(/(?:ડુંગળી|ડુંગળીની)/gi, 'प्याज');
+      text = text.replace(/(?:લસણ|લસણની)/gi, 'लहसुन');
+      text = text.replace(/(?:ઇજા|મોચ)/gi, 'चोट मोच');
+      text = text.replace(/(?:દુખાવો|દુખાવો થાય)/gi, 'दर्द');
 
       let t0 = (text || '').toLowerCase().replace(/(?:hbaic|hba-1c|hb1ac|hba\s*1c|hba1\s*c|एचबीए1सी|एचबीए\s*1सी)/gi, 'hba1c');
       text = t0;
@@ -15136,6 +15175,34 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return true;
     }
 
+    // 2.5 GOBAR COMPOST & BIOFIT CULTURE ENRICHMENT (गोबर खाद संवर्धन, शेत, बायो-NPK, गुड़, छाछ)
+    function handleGobarCompostCultureQueries(cleanQ, rawQ, directives) {
+      const q = (cleanQ || '').toLowerCase();
+      const raw = (rawQ || '').toLowerCase();
+
+      const hasGobar = q.includes('गोबर') || q.includes('gobar') || raw.includes('ગોબર') || raw.includes('છાણ');
+      const hasCultureOrCompost = (
+        q.includes('शेत') || q.includes('shet') || q.includes('कल्चर') || q.includes('culture') ||
+        q.includes('छाछ') || q.includes('chhash') || q.includes('गुड़') || q.includes('gud') ||
+        q.includes('संवर्धन') || q.includes('सड़ा') || q.includes('ट्रैक्टर') || q.includes('ट्रॉली') ||
+        raw.includes('કલ્ચર') || raw.includes('છાશ') || raw.includes('ગોળ') || raw.includes('ટ્રેક્ટર')
+      );
+
+      if (!hasGobar || !hasCultureOrCompost) return false;
+
+      sakhiConversationState.lastActiveDomain = 'krishi';
+      let title = '🌾 1 ट्रैक्टर गोबर खाद हेतु नेट्सर्फ बायोफिट सुपर कल्चर व संवर्धन विधि';
+      let baseBody = `**हाँ, बिल्कुल मिला सकते हैं!** यह गोबर खाद को 10 गुना शक्तिशाली **जैविक अमृत खाद (Super Enriched Compost)** बनाने का सबसे प्रामाणिक वैज्ञानिक फार्मूला है।\n\n---\n\n### 🧪 1 ट्रैक्टर (ट्रॉली / 2-3 टन) गोबर खाद हेतु आवश्यक सामग्री:\n1. **बायोफिट शेत (SHET):** 1 लीटर *(मिट्टी व खाद के करोड़ों लाभकारी सूक्ष्मजीवाणु)*\n2. **बायो-NPK (Bio-NPK):** 1-1 लीटर *(नाइट्रोजन, फास्फोरस व पोटाश रिलीजिंग बैक्टीरिया)*\n3. **पुराना गुड़ (Jaggery):** 2 से 3 किलोग्राम *(जीवाणुओं के तेजी से गुणन हेतु मुख्य भोजन)*\n4. **खट्टी छाछ (Buttermilk):** 5 से 10 लीटर *(लैक्टोबैसिलस बैक्टीरिया जो खाद को तेजी से सड़ाते हैं)*\n5. **पानी:** 150 से 200 लीटर *(घोल तैयार करने हेतु)*\n\n---\n\n### 📋 बनाने व उपयोग की वैज्ञानिक विधि:\n1. **घोल तैयार करना:** 200 लीटर के ड्रम में पानी लें। इसमें 2-3 किलो गुड़ और 5-10 लीटर खट्टी छाछ को अच्छी तरह घोलें। फिर 1L शेत (SHET) व 1-1L बायो-NPK मिलाएं।\n2. **24 घंटे किण्वन (Fermentation):** ड्रम को छाया में रखें और लकड़ी के डंडे से क्लॉकवाइज हिलाएं। 24 घंटे में अरबों लाभकारी जीवाणु तैयार हो जाएंगे।\n3. **गोबर पर छिड़काव:** 1 ट्रॉली गोबर खाद के ढेर पर इस पूरे कल्चर का समान छिड़काव करें *(खाद में 30% से 40% नमी रखें)* और फावड़े से अच्छी तरह पलटें।\n4. **ढकना व परिपक्वता:** ढेर को तिरपाल या पुआल से ढककर 15-20 दिन रखें। सप्ताह में एक बार पलटें।\n\n---\n\n### ✨ इस संवर्धित खाद के चमत्कारिक लाभ:\n• **कच्चा गोबर पूरी तरह सड़कर** चायपत्ती जैसी भुरभुरी व बदबू-रहित अमृत खाद बन जाती है।\n• गोबर की भीषण गर्मी समाप्त हो जाती है और **दीमक (Termites), सफेद लट व हानिकारक फंगस पूरी तरह नष्ट** हो जाते हैं।\n• खेत में डालने पर जमीन मुलायम व पोली बनती है और केंचुए तेजी से सक्रिय होते हैं।\n\n> ⚠️ **विशेष सावधानी:** इस जैविक कल्चर में कभी भी रासायनिक कीटनाशक, फफूंदनाशक या यूरिया न मिलाएं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'krishi');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌱 शेत (SHET) विवरण', query: 'शेत प्रोडक्ट की जानकारी' },
+        { text: '🧪 बायो-NPK उपयोग', query: 'बायो एनपीके कैसे डालें' },
+        { text: '🛍️ कैटलॉग व स्टोर', query: 'नेट्सर्फ प्रोडक्ट कैटलॉग' }
+      ], 'krishi', 'agri_biofit_gobar_culture_gud_chhash');
+      return true;
+    }
+
     function handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives) {
       const q = cleanQ;
 
@@ -15279,6 +15346,7 @@ function processKnowledgeQuery(query) {
       // 2. Direct Precision Benchmark Handlers (Pashu, Crop Seasons, Diagnostics, Anatomy, Math)
       if (handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives)) return;
       if (handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives)) return;
+      if (handleGobarCompostCultureQueries(cleanQ, rawQ, directives)) return;
       if (handleInjuryAndSprainQueries(cleanQ, rawQ, directives)) return;
       if (handleCatalogAndStoreQueries(cleanQ, rawQ, directives)) return;
       if (handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives)) return;
