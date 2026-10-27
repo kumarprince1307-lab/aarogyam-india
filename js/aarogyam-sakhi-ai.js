@@ -3726,6 +3726,18 @@ if (typeof document !== 'undefined') {
 
     // 13. HIGH-PRECISION QUERY NORMALIZER
     function normalizeQueryText(text) {
+      // Netsurf Spoken & Typos (नेट सब, नेता सब, netsuef, net sub)
+      text = (text || '').replace(/(?:नेट\s*सब|नेता\s*सब|netsuef|\bnet\s*sub\b|\bneta\s*sub\b)/gi, 'नेट्सर्फ');
+
+      // Urea Typos (रेरिया, रूरिया)
+      text = text.replace(/(?:रेरिया|रूरिया|\breriya\b|\bretiya\b)/gi, 'यूरिया');
+
+      // Marathi Agriculture & Crop Vocabulary Normalization (केळी -> केला, ऊस -> गन्ना)
+      text = text.replace(/(?:\bकेळी\b|\bकेळीची\b|\bकेळीचे\b|\bkeli\b|\bkelee\b)/gi, 'केला');
+      text = text.replace(/(?:\bऊस\b|\bउसाची\b|\bउसाचे\b|\boos\b)/gi, 'गन्ना');
+      text = text.replace(/(?:\bपिकाविशयी\b|\bपिकाविषयी\b|\bपिकाबद्दल\b)/gi, 'फसल के बारे में');
+      text = text.replace(/(?:\bसविस्तर\b|\bसांगाल\b)/gi, 'विस्तार से बताएं');
+
       let t0 = (text || '').toLowerCase().replace(/(?:hbaic|hba-1c|hb1ac|hba\s*1c|hba1\s*c|एचबीए1सी|एचबीए\s*1सी)/gi, 'hba1c');
       text = t0;
       let t = (text || '').toLowerCase();
@@ -7325,6 +7337,38 @@ if (typeof document !== 'undefined') {
 
     const MASTER_CROPS_DIRECTORY = [
       {
+        id: 'kela',
+        name: 'केला (Banana / केळी)',
+        keywords: ['kela', 'kele', 'kelee', 'keli', 'banana', 'केला', 'केले', 'केली', 'केळी', 'केळीची शेती', 'केळी पीक', 'banana farming', 'g9 banana', 'जी9 केला', 'टिश्यू कल्चर केला', 'tissue culture banana', 'केले की खेती', 'केला की खेती'],
+        season: 'वार्षिक नकदी फसल (11 से 14 माह की लंबी अवधि)',
+        sowingTime: 'जून-जुलाई (मुख्य खरीफ) अथवा अक्टूबर-नवंबर',
+        soil: 'गहरी, उपजाऊ दोमट मिट्टी (उत्तम जल निकास, pH 6.5 से 7.5)',
+        avgYield: '30 से 45 टन प्रति एकड़ (1200-1400 पौधे प्रति एकड़)',
+        intro: 'केला भारत की अत्यधिक मुनाफे वाली 11-14 महीने की लंबी अवधि की नकदी फसल है। केले में पत्तों की मोमी (Waxy) कोटिंग होने के कारण दवा का असर कम होता है, अतः सिलिकॉन स्टिकर (Bio-99) का प्रयोग अनिवार्य है।',
+        yieldHacks: [
+          'लंबी अवधि पोषण प्रबंधन: गन्ने की तरह केला भी भारी पोषक तत्व चाहने वाली फसल है। वानस्पतिक बढ़वार के समय स्टिमरिच (Stimrich) 30ml + Bio-99 5ml का हर 25-30 दिन में स्प्रे करने से पत्तियों की चौड़ाई और प्रकाश संश्लेषण 30% बढ़ता है।',
+          'ड्रिप व मिट्टी प्रबंधन: ड्रिप द्वारा बायोफिट Sheth (1L/एकड़) + Bio-NPK (1L/एकड़) नियमित देने से जड़ों का फैलाव गहरा होता है और रासायनिक खाद की 50% बचत होती है।',
+          'घड़ व फलों की लंबाई/वजन: कमल (फूल) खिलने के बाद जब केले बाहर निकलें, तो स्टिमरिच 35ml + Bio-99 5ml का घड़ पर सीधा स्प्रे करें। इससे केलों की लंबाई, चमक और घड़ का वजन 25-30% बढ़ जाता है।'
+        ],
+        seedTreatment: 'सकर (कंद) रोपण से पहले कंद को साफ कर 5ml स्टिमरिच + 2g कार्बेन्डाजिम प्रति लीटर पानी के घोल में 15 मिनट डुबोकर उपचारित करें।',
+        fertilizerSchedule: 'रोपण के 30, 60, 90, 150 और 210 दिनों पर ड्रिप से Bio-NPK और Sheth खाद दें।',
+        diseases: [
+          {
+            name: 'पनामा विल्ट / उकठा रोग (Panama Wilt / Fusarium oxysporum f. sp. cubense)',
+            symptoms: 'पुरानी पत्तियां पीली पड़कर डंठल से लटक जाती हैं। तने के आधार में दरारें और चीरने पर अंदर संवहनी ऊतक भूरे-काले दिखते हैं।',
+            organicBiofit: 'बायोफिट Wrapup (4-5ml/L) + Bio-99 (0.5ml/L) से थाले में 2-3 लीटर घोल से गहरी ड्रेंचिंग करें। 5-7 दिन बाद Sheth (3ml/L) + Bio-NPK जड़ों में दें। (⚠️ सख्त सावधानी: रैपअप को कभी भी Sheth, Bio-NPK या VAM माइकोराइजा के साथ एक ही घोल में न मिलाएं!)',
+            chemical: 'कार्बेन्डाजिम 50% WP (2g/L) या साफ (कार्बेन्डाजिम 12% + मैंकोज़ेब 63% WP - 2.5g/L) से जड़ क्षेत्र में ड्रेंचिंग करें।'
+          },
+          {
+            name: 'सिगाटोका पत्ती धब्बा रोग (Sigatoka Leaf Spot)',
+            symptoms: 'पत्तियों पर भूरे-काले लंबे धब्बे बनना, पत्तियों का समय से पहले सूखना जिससे घड़ का आकार छोटा रह जाता है।',
+            organicBiofit: 'बायोफिट Wrapup (30ml) + Bio-99 (5ml प्रति 15L पंप) का 15 दिन के अंतराल पर 2 बार छिड़काव करें।',
+            chemical: 'प्रोपिकोनाज़ोल 25% EC (1ml/L) या मैन्कोज़ेब 75% WP (2.5g/L) का पत्तियों पर छिड़काव करें।'
+          }
+        ]
+      },
+
+      {
         id: 'ganna',
         name: 'गन्ना (Sugarcane / ईख)',
         keywords: ['ganna', 'ganne', 'गन्ना', 'गन्ने', 'गाने', 'sugarcane', 'सुगरकेन', 'शुगरकेन', 'eekh', 'ईख', 'pedi', 'पेड़ी', 'पेड़ी गन्ना', 'pedi ganna'],
@@ -7344,7 +7388,7 @@ if (typeof document !== 'undefined') {
           {
             name: 'लाल सड़न रोग (Red Rot / गन्ने का कैंसर)',
             symptoms: 'गन्ने की तीसरी-चौथी पत्ती पीली पड़कर सूखना, तना चीरने पर अंदर का गूदा लाल व बीच-बीच में सफेद धब्बे दिखना, शराब जैसी दुर्गंध आना।',
-            organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) का जड़ क्षेत्र में सिंचन व बीज शोधन।',
+            organicBiofit: 'बायोफिट Wrapup (3-4ml/L) + Bio-99 (0.5ml/L) जड़ क्षेत्र में ड्रेंचिंग। 5-7 दिन बाद Sheth + Bio-NPK दें। (⚠️ सख्त सावधानी: रैपअप को कभी भी Sheth, Bio-NPK या VAM माइकोराइजा के साथ न मिलाएं!)',
             chemical: 'कार्बेन्डाजिम 50% WP (2g/L) के घोल में टुकड़ों को उपचारित करें।'
           },
           {
@@ -7422,7 +7466,7 @@ if (typeof document !== 'undefined') {
           {
             name: 'उकठा रोग (Fusarium Wilt / सूखना)',
             symptoms: 'पौधा अचानक ऊपर से नीचे की ओर सूखने लगता है। तना चीरने पर अंदर से भूरी/काली नस दिखाई देती है।',
-            organicBiofit: 'बायोफिट Sheth (2ml/L) + Wrapup (2ml/L) + Bio-99 (5ml/पंप) से जड़ों में ड्रेंचिंग करें।',
+            organicBiofit: 'बायोफिट Wrapup (3-4ml/L) + Bio-99 (0.5ml/L) से जड़ों में ड्रेंचिंग करें। 5-7 दिन बाद Sheth + Bio-NPK दें। (⚠️ सख्त सावधानी: रैपअप को Sheth, Bio-NPK या VAM माइकोराइजा के साथ कभी न मिलाएं!)',
             chemical: 'कार्बेन्डाजिम 12% + मैंकोज़ेब 63% WP (2 ग्राम प्रति लीटर पानी) जड़ क्षेत्र में डालें।'
           },
           {
@@ -15039,6 +15083,59 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return false;
     }
 
+        // INJURY, SPRAIN, BLUNT TRAUMA & PAIN RELIEF (चोट, मोच, खिंचाव, सोट)
+    // Strictly disambiguates from Sciatica/Slip Disc!
+    function handleInjuryAndSprainQueries(cleanQ, rawQ, directives) {
+      const q = (cleanQ || '').toLowerCase();
+      const isInjury = (
+        q.includes('चोट') || q.includes('मोच') || q.includes('खिंचाव') || q.includes('सोट') ||
+        q.includes('chot') || q.includes('moch') || q.includes('injury') || q.includes('sprain') ||
+        q.includes('मुड़ गया') || q.includes('मुड़ गई') || q.includes('लग गई') || q.includes('लग गया')
+      );
+      if (!isInjury) return false;
+
+      // Ensure it's human injury, not crop damage
+      if (q.includes('fasal') || q.includes('फसल') || q.includes('kheti') || q.includes('पौधा')) {
+        return false;
+      }
+
+      sakhiConversationState.lastActiveDomain = 'health';
+      let title = '🩹 पैर व शरीर में चोट, मोच, खिंचाव व सूजन — नेट्सर्फ व प्राथमिक उपचार';
+      let baseBody = `नमस्ते! 🙏 चोट या मोच लगने पर घबराने की आवश्यकता नहीं है। यह साइटिका या नसों का पुराना दर्द नहीं है, बल्कि तीव्र आघात (Trauma/Sprain) के कारण मांसपेशियों व लिगामेंट्स की अंदरूनी सूजन है।\n\nआइए, **वैज्ञानिक और नेट्सर्फ के प्रामाणिक समाधान से इसे तुरंत ठीक करें:**\n\n🧴 **1. बाहरी लेप व मालिश (तुरंत दर्द व सूजन से राहत):**\n• **नेचुरामोर मस्कुलर पेन क्रीम (Naturamore Muscular Pain Cream) / ऑयल:** चोट और मोच वाले स्थान पर हल्के हाथ से दिन में 2 से 3 बार लगाएं। इसे ज़ोर से रगड़ें नहीं। यह जकड़न को खोलकर सूजन को तुरंत शांत करता है।\n\n💊 **2. आंतरिक लिगामेंट हीलिंग व सूजन नियंत्रण (Oral Recovery):**\n• **नेचुरामोर जॉइंट केयर (Joint Care Capsule):** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को भोजन के बाद गुनगुने पानी से लें। यह अंदरूनी ऊतकों, टेंडन्स और लिगामेंट्स की सूजन को सोखकर तेजी से रिकवर करता है।\n• **नेचुरामोर ओरिजिनल / एक्टिव प्लस पाउडर:** 1 चम्मच गुनगुने दूध या पानी में घोलकर पिएं ताकि घायल मांसपेशियों को तुरंत प्रोटीन व हीलिंग पोषण मिले।\n\n🧊 **3. आधुनिक R.I.C.E. प्राथमिक चिकित्सा (First Aid Protocol):**\n• **Rest (आराम):** घायल पैर या अंग पर वजन बिल्कुल न डालें।\n• **Ice (बर्फ की सिकाई):** शुरुआती 24 से 48 घंटे बर्फ को कपड़े में लपेटकर 15-15 मिनट सिकाई करें (तुरंत गरम सिकाई न करें, इससे सूजन बढ़ सकती है)।\n• **Compression (हल्की पट्टी):** क्रेप बैंडेज (लोचदार पट्टी) हल्के हाथ से बांधें।\n• **Elevation (ऊपर रखना):** पैर के नीचे तकिया रखकर हृदय के स्तर से थोड़ा ऊंचा रखें।\n\n⚠️ **महत्वपूर्ण डॉक्टरी सलाह:** यदि पैर पर बिल्कुल खड़ा न हुआ जा रहा हो, हड्डी में अत्यधिक तेज टीस हो या असामान्य सूजन हो, तो तुरंत नजदीकी डॉक्टर से एक्स-रे (X-Ray) करवाकर फ्रैक्चर की जांच अवश्य कराएं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🩹 मस्कुलर पेन क्रीम कैसे उपयोग करें?', query: 'नेचुरामोर मस्कुलर पेन क्रीम का उपयोग' },
+        { text: '🦴 जॉइंट केयर कैप्सूल के फायदे', query: 'नेचुरामोर जॉइंट केयर कैप्सूल के फायदे' },
+        { text: '🛍️ संपूर्ण उत्पाद कैटलॉग खोलें', query: 'आरोग्यम कैटलॉग दिखाओ' }
+      ], 'health', 'injury_sprain_pain_relief');
+      return true;
+    }
+
+    // CATALOG & STORE DIRECT ROUTING (कैटलॉग, प्रॉडक्ट लिस्ट, ब्रोशर)
+    function handleCatalogAndStoreQueries(cleanQ, rawQ, directives) {
+      const q = (cleanQ || '').toLowerCase();
+      const isCatalogReq = (
+        q.includes('कैटलॉग') || q.includes('catalog') || q.includes('catlog') ||
+        q.includes('प्रोडक्ट लिस्ट') || q.includes('उत्पाद सूची') || q.includes('दवाओं की लिस्ट') ||
+        q.includes('दवा की लिस्ट') || q.includes('ब्रोशर') || q.includes('pdf list') ||
+        q.includes('स्टोर पर उत्पाद') || q.includes('सभी प्रोडक्ट') || q.includes('store page')
+      );
+      if (!isCatalogReq) return false;
+
+      sakhiConversationState.lastActiveDomain = 'omni';
+      let title = '🛍️ आरोग्यम इंडिया एवं नेट्सर्फ संपूर्ण उत्पाद कैटलॉग (Official Store)';
+      let baseBody = `नमस्ते! 🙏 हमारे सभी 100% प्रामाणिक उत्पाद आधिकारिक 25% विशेष छूट मूल्य और वैज्ञानिक उपयोग विधि के साथ सीधे आरोग्यम स्टोर में उपलब्ध हैं:\n\n🌾 **1. बायोफिट कृषि समाधान (Biofit Agri - 25% छूट):**\n• स्टिमरिच (फुटाव), शेत (जीवाणु खाद), बायो-99 (सिलिकॉन स्टिकर), बायो-NPK, रैप-अप (फफूंद शील्ड)\n\n🥛 **2. नेचुरामोर संपूर्ण स्वास्थ्य (Naturamore Health - 25% छूट):**\n• एक्टिव प्लस, वूमन, जॉइंट केयर (जोड़ों का दर्द), ईज़ी डिटॉक्स, न्यूट्रिलिवर\n\n🐄 **3. पशुपालन उत्पाद (CFC Plus):**\n• सीएफसी प्लस (दूध उत्पादन व 7-8 फैट वृद्धि)\n\n🪥 **4. व्यक्तिगत देखभाल (Herbs & More Personal Care):**\n• हर्बल डेंटल पेस्ट (फ्लोराइड-मुक्त), नीम-हल्दी फेस वॉश, हर्बल शैम्पू\n\n👉 **नीचे दिए गए बटन पर क्लिक करके संपूर्ण कैटलॉग व कीमतें देखें:**\n<div style="margin-top:14px;margin-bottom:8px;">\n  <a href="/store.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);color:#ffffff;padding:12px 24px;border-radius:14px;font-weight:900;text-decoration:none;box-shadow:0 4px 16px rgba(22,163,74,0.4);font-size:0.95rem;">\n    <span>🛍️ संपूर्ण उत्पाद कैटलॉग खोलें (Store)</span>\n    <i class="fa-solid fa-arrow-right"></i>\n  </a>\n</div>`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'omni');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌾 बायोफिट कृषि प्रोडक्ट्स', query: 'बायोफिट के सभी कृषि उत्पाद' },
+        { text: '🥛 नेचुरामोर स्वास्थ्य प्रोडक्ट्स', query: 'नेचुरामोर के सभी उत्पाद बताओ' },
+        { text: '💬 सहायता (WhatsApp)', query: 'मुझे व्हाट्सएप पर सहायता चाहिए' }
+      ], 'omni', 'catalog_store_direct_routing');
+      return true;
+    }
+
     function handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives) {
       const q = cleanQ;
 
@@ -15182,6 +15279,8 @@ function processKnowledgeQuery(query) {
       // 2. Direct Precision Benchmark Handlers (Pashu, Crop Seasons, Diagnostics, Anatomy, Math)
       if (handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives)) return;
       if (handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives)) return;
+      if (handleInjuryAndSprainQueries(cleanQ, rawQ, directives)) return;
+      if (handleCatalogAndStoreQueries(cleanQ, rawQ, directives)) return;
       if (handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives)) return;
 
       // 🌤️ CONVERSATIONAL WEATHER & SPRAY ADVISOR (FarmerChat Real-Time Multi-City & 7-Day)
