@@ -726,6 +726,65 @@
           </div>
         </div>
 
+        <!-- 🌸 आपकी टीम सखी AI गतिविधि व रुझान कार्ड (TEAM SAKHI AI ACTIVITY INTELLIGENCE) -->
+        <div id="ucas-team-sakhi-activity-card" style="margin: 0 16px 14px 16px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 14px 16px; box-shadow: 0 4px 16px rgba(56,189,248,0.12);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.4rem;">🌸</span>
+              <div>
+                <strong style="color: #f8fafc; font-size: 0.95rem; display: block;">
+                  आपकी टीम सखी AI गतिविधि व रुझान (Team AI Intelligence)
+                </strong>
+                <span style="color: #94a3b8; font-size: 0.76rem;">
+                  आपकी टीम के सदस्यों ने सखी AI पर विभिन्न विषयों में पूछे सवाल:
+                </span>
+              </div>
+            </div>
+            <button type="button" class="ucas-btn ucas-btn-sm" onclick="UCAS_APP.openTeamReportAnudanModal()" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-weight: 800; font-size: 0.8rem; border: none; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.35);">
+              <span>📥 टीम AI लीड्स रिपोर्ट (Excel / WhatsApp तैयार)</span>
+            </button>
+          </div>
+
+          <!-- Activity Chips Breakdown Grid (100% Dynamic Domains) -->
+          <div id="ucas_team_dynamic_domains_grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+            <div style="background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; text-align: center;">
+              <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">कुल AI सवाल</div>
+              <div id="ucas_team_sakhi_total_chats" style="font-size: 1.25rem; font-weight: 900; color: #38bdf8; margin-top: 2px;">0</div>
+            </div>
+            <div style="background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; text-align: center;">
+              <div style="font-size: 0.72rem; color: #facc15; font-weight: 700;">🌾 कृषि व कीट</div>
+              <div id="ucas_team_sakhi_agri" style="font-size: 1.25rem; font-weight: 900; color: #facc15; margin-top: 2px;">0</div>
+            </div>
+            <div style="background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; text-align: center;">
+              <div style="font-size: 0.72rem; color: #34d399; font-weight: 700;">🐄 पशुपालन/दूध</div>
+              <div id="ucas_team_sakhi_dairy" style="font-size: 1.25rem; font-weight: 900; color: #34d399; margin-top: 2px;">0</div>
+            </div>
+            <div style="background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; text-align: center;">
+              <div style="font-size: 0.72rem; color: #f43f5e; font-weight: 700;">❤️ स्वास्थ्य/शुगर</div>
+              <div id="ucas_team_sakhi_health" style="font-size: 1.25rem; font-weight: 900; color: #f43f5e; margin-top: 2px;">0</div>
+            </div>
+            <div style="background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; text-align: center;">
+              <div style="font-size: 0.72rem; color: #c084fc; font-weight: 700;">🌿 नेट्सर्फ बायोफिट</div>
+              <div id="ucas_team_sakhi_netsurf" style="font-size: 1.25rem; font-weight: 900; color: #c084fc; margin-top: 2px;">0</div>
+            </div>
+          </div>
+
+          <!-- 📢 विशेष लीडर फॉलोअप व बिज़नेस टर्नओवर नोट (RED BOX WITH WHITE TEXT) -->
+          <div style="background: linear-gradient(135deg, #b91c1c, #991b1b); border: 2px solid #ef4444; border-radius: 12px; padding: 14px 18px; color: #ffffff; margin-top: 14px; box-shadow: 0 4px 16px rgba(185, 28, 28, 0.4);">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+              <span style="font-size: 1.5rem; line-height: 1;">📢</span>
+              <div>
+                <strong style="color: #ffffff; font-size: 0.94rem; display: block; margin-bottom: 4px; letter-spacing: 0.2px;">
+                  विशेष लीडर गाइड व बिज़नेस टर्नओवर नोट (Targeted High-Value Followup Advisory):
+                </strong>
+                <p style="color: #ffffff; font-size: 0.86rem; line-height: 1.55; margin: 0; font-weight: 600;">
+                  नोट: यदि आप इन सभी लोगों का फॉलोअप लेते हैं—कि किसने किस फसल कीट, रोग, पशु दुग्ध समस्या या स्वास्थ्य विषय पर सखी AI से क्या सवाल पूछा—तो उन्हें सटीक समाधान एवं नेट्सर्फ बायो-प्रोडक्ट्स (Biofit & Healthcare) की लक्षित मार्केटिंग करके आप लाखों का वास्तविक बिज़नेस व टर्नओवर निकाल सकते हैं!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 🔍 Dynamic Multi-Filter Bar -->
         <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:var(--radius-md);padding:10px 12px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
           <!-- 1. Search by Name / Mobile -->
@@ -2671,7 +2730,54 @@
 <script src="/ucas/js/ucas-pwa.js?v=19.0"></script>
 <script src="/js/global-guest-modal.js?v=1.2"></script>
 <script src="/js/user-notifications.js?v=20260926_v16"></script>
-<script src="/ucas/js/ucas-app.js?v=19.0"></script>
+<script src="/ucas/js/ucas-app.js?v=20.0"></script>
 <script src="/js/audio-greeting-engine.js?v=1.1"></script>
+<!-- Razorpay Checkout Script for Server Maintenance Contribution -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- 🏛️ सर्वर संवर्धन व स्वैच्छिक अनुदान मोडल (VOLUNTARY SERVER CONTRIBUTION MODAL) -->
+<div id="ucas-team-anudan-modal" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+  <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border:2px solid #38bdf8; border-radius:18px; max-width:520px; width:100%; padding:22px 24px; box-shadow:0 12px 40px rgba(0,0,0,0.6); color:#f8fafc; font-family:inherit; position:relative;">
+    
+    <!-- Close Button -->
+    <button type="button" onclick="UCAS_APP.closeTeamReportAnudanModal()" style="position:absolute; top:14px; right:16px; background:transparent; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">&times;</button>
+
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+      <span style="font-size:1.8rem;">🙏</span>
+      <div>
+        <h3 style="margin:0; font-size:1.2rem; font-weight:900; color:#f8fafc;">
+          आरोग्यम AI सर्वर संवर्धन व स्वैच्छिक अनुदान
+        </h3>
+        <span style="font-size:0.75rem; color:#38bdf8;">Digital AI Infrastructure & Server Maintenance Support</span>
+      </div>
+    </div>
+
+    <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin-bottom:16px;">
+      प्रिय साथी, आरोग्यम सखी AI बिना रुके 24×7 आपकी डाउनलाइन व किसानों को सटीक वैज्ञानिक सलाह दे रही है। इस डिजिटल इंफ्रास्ट्रक्चर व सर्वर संवर्धन को निरंतर बनाए रखने हेतु अपनी इच्छानुसार स्वैच्छिक अनुदान राशि चुनें या सीधे निःशुल्क डाउनलोड करें:
+    </p>
+
+    <!-- Contribution Amount Buttons (51, 101 and Free Download Only) -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:16px;">
+      <button type="button" onclick="UCAS_APP.processServerContribution(51)" style="background:linear-gradient(135deg, #1e3a8a, #1e40af); border:1.5px solid #60a5fa; color:#f8fafc; padding:12px 14px; border-radius:10px; font-weight:800; cursor:pointer; text-align:left; box-shadow:0 4px 12px rgba(37,99,235,0.35);">
+        <div style="font-size:1.20rem; color:#93c5fd; font-weight:900;">₹51 ⭐ (सुझावित)</div>
+        <div style="font-size:0.75rem; color:#bfdbfe; margin-top:2px;">🌾 फसल अनुदान (Server Support)</div>
+      </button>
+
+      <button type="button" onclick="UCAS_APP.processServerContribution(101)" style="background:#0f172a; border:1.5px solid #ec4899; color:#f8fafc; padding:12px 14px; border-radius:10px; font-weight:800; cursor:pointer; text-align:left; transition:all 0.2s;" onmouseover="this.style.background='#831843'" onmouseout="this.style.background='#0f172a'">
+        <div style="font-size:1.20rem; color:#f472b6; font-weight:900;">₹101</div>
+        <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">👑 संरक्षक अनुदान (Champion Partner)</div>
+      </button>
+
+      <button type="button" onclick="UCAS_APP.processServerContribution(0)" style="background:#0f172a; border:1.5px solid #334155; color:#cbd5e1; padding:12px 14px; border-radius:10px; font-weight:800; cursor:pointer; text-align:left; transition:all 0.2s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">
+        <div style="font-size:1.20rem; color:#4ade80; font-weight:900;">निःशुल्क</div>
+        <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">📥 सीधे रिपोर्ट डाउनलोड करें (Free)</div>
+      </button>
+    </div>
+
+    <div style="font-size:0.72rem; color:#94a3b8; text-align:center;">
+      🔒 100% सुरक्षित भुगतान • UPI / QR / NetBanking समर्थित
+    </div>
+  </div>
+</div>
 </body>
 </html>

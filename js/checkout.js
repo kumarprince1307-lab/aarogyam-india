@@ -1318,6 +1318,7 @@ async function loadBook() {
                 custMobEl.style.fontWeight = "800";
                 custMobEl.style.cursor = "not-allowed";
                 custMobEl.title = "यह वीआईपी ऑफर केवल इसी पंजीकृत मोबाइल नंबर के लिए मान्य है";
+                checkDuplicateBookPurchase(offerMobileTarget, targetId || (book ? book.id : null));
             }
 
             // Name Resolution: URL parameter 'n' -> Supabase Profiles Database lookup
@@ -1499,7 +1500,8 @@ async function loadBook() {
 
 // 🛑 One-Time Use Check: Verify if customer already purchased this book
 async function checkOfferAlreadyPurchased(mobile, userName, targetBookId, bookTitle) {
-    if (!mobile || !targetBookId) return;
+    if (!mobile || !targetBookId) return false;
+    return await checkDuplicateBookPurchase(mobile, targetBookId);
     try {
         let isAlreadyBought = false;
         let invoiceNum = '';
@@ -1586,25 +1588,24 @@ async function checkOfferAlreadyPurchased(mobile, userName, targetBookId, bookTi
 
 function autoFillUserData() {
     const custMobEl = document.getElementById("customerMobile");
-    // 🔒 If fields are locked by VIP offer link, do not overwrite them!
-    if (custMobEl && custMobEl.readOnly) return;
-
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
     const nameVal = storedUser.full_name || storedUser.name || "";
     const mobileVal = storedUser.mobile || "";
     const emailVal = storedUser.email || "";
 
-    if (nameVal && document.getElementById("customerName")) document.getElementById("customerName").value = nameVal;
-    if (mobileVal && document.getElementById("customerMobile")) document.getElementById("customerMobile").value = mobileVal;
-    if (emailVal && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = emailVal;
+    if (custMobEl && !custMobEl.readOnly) {
+        if (nameVal && document.getElementById("customerName")) document.getElementById("customerName").value = nameVal;
+        if (mobileVal && custMobEl) custMobEl.value = mobileVal;
+        if (emailVal && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = emailVal;
 
-    if (typeof getCurrentUser === "function") {
-        const user = getCurrentUser();
-        if (user) {
-            if (user.full_name && document.getElementById("customerName")) document.getElementById("customerName").value = user.full_name;
-            if (user.mobile && document.getElementById("customerMobile")) document.getElementById("customerMobile").value = user.mobile;
-            if (user.email && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = user.email;
+        if (typeof getCurrentUser === "function") {
+            const user = getCurrentUser();
+            if (user) {
+                if (user.full_name && document.getElementById("customerName")) document.getElementById("customerName").value = user.full_name;
+                if (user.mobile && custMobEl) custMobEl.value = user.mobile;
+                if (user.email && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = user.email;
+            }
         }
     }
 
@@ -1615,12 +1616,13 @@ function autoFillUserData() {
 }
 
 // -------------------------------------------------------------
-// DUPLICATE PURCHASE PREVENTION (Zero-Egress Cache First)
+// DUPLICATE PURCHASE PREVENTION (Multi-Layer Robust Verification)
 // -------------------------------------------------------------
 async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
     const rawMob = mobileInput || (document.getElementById("customerMobile") ? document.getElementById("customerMobile").value : "");
     const cleanMob = String(rawMob || "").replace(/\D/g, "").slice(-10);
-    const bookId = bookIdInput || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
+    const rawBookId = bookIdInput || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
+    const bookId = String(rawBookId || "").toUpperCase();
 
     const bannerContainer = document.getElementById("checkoutAlreadyPurchasedBanner");
     const payBtn = document.getElementById("payNowBtn");
@@ -1630,38 +1632,69 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
         return false;
     }
 
-    // Zero-Egress Cache Check
     const cacheKey = `AI_PURCHASED_${cleanMob}_${bookId}`;
     let isAlreadyPurchased = sessionStorage.getItem(cacheKey) === 'true';
 
     if (!isAlreadyPurchased) {
         try {
-            // 1. Check local storage purchases cache first
-            const localPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-            const localMatch = localPurchases.some(p => 
-                (p.book_id === bookId || p.bookId === bookId) && 
-                (String(p.mobile || '').replace(/\D/g, '').slice(-10) === cleanMob)
-            );
+            // 1. Check local storage purchases cache across all known keys
+            const localPurchases = [
+                ...(JSON.parse(localStorage.getItem('purchases') || '[]')),
+                ...(JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]'))
+            ];
+            const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]').map(x => String(x).toUpperCase());
+
+            const localMatch = localPurchases.some(p => {
+                const pId = String(p.book_id || p.bookId || '').toUpperCase();
+                const pMob = String(p.mobile || p.customerMobile || '').replace(/\D/g, '').slice(-10);
+                return (pId === bookId || pId.includes(bookId) || bookId.includes(pId)) && (pMob === cleanMob || !pMob);
+            }) || myPurchasedIds.includes(bookId);
+
             if (localMatch) {
                 isAlreadyPurchased = true;
             } else {
-                // 2. Single-row indexed query to Supabase (only if not found locally)
+                // 2. Query Supabase using profile_id resolution + direct mobile lookup
                 const db = window.dbClient || window.supabase;
                 if (db) {
-                    const { data } = await db
+                    // Check by mobile directly
+                    const { data: directMobPurchases } = await db
                         .from('purchases')
-                        .select('id')
-                        .eq('book_id', bookId)
+                        .select('id, book_id, status, payment_status')
                         .eq('mobile', cleanMob)
-                        .or('payment_status.eq.success,payment_status.is.null')
-                        .limit(1)
-                        .maybeSingle();
+                        .limit(20);
 
-                    if (data && data.id) {
-                        isAlreadyPurchased = true;
+                    if (directMobPurchases && directMobPurchases.length > 0) {
+                        const m = directMobPurchases.find(p => {
+                            const pId = String(p.book_id || '').toUpperCase();
+                            const st = (p.status || p.payment_status || '').toLowerCase();
+                            return (pId === bookId || pId.includes(bookId)) && st !== 'failed';
+                        });
+                        if (m) isAlreadyPurchased = true;
+                    }
+
+                    // Also check via profiles resolution
+                    if (!isAlreadyPurchased) {
+                        const { data: prof } = await db.from('profiles').select('id').eq('mobile', cleanMob).maybeSingle();
+                        if (prof && prof.id) {
+                            const { data: profPurchases } = await db
+                                .from('purchases')
+                                .select('id, book_id, status, payment_status')
+                                .eq('profile_id', prof.id)
+                                .limit(30);
+
+                            if (profPurchases && profPurchases.length > 0) {
+                                const m = profPurchases.find(p => {
+                                    const pId = String(p.book_id || '').toUpperCase();
+                                    const st = (p.status || p.payment_status || '').toLowerCase();
+                                    return (pId === bookId || pId.includes(bookId)) && st !== 'failed';
+                                });
+                                if (m) isAlreadyPurchased = true;
+                            }
+                        }
                     }
                 }
             }
+
             if (isAlreadyPurchased) {
                 sessionStorage.setItem(cacheKey, 'true');
             }
@@ -1679,27 +1712,30 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
             if (custDetailsSection) custDetailsSection.prepend(banner);
         }
 
-        banner.style.cssText = "display: block; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 14px; padding: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.15); font-family: inherit;";
+        banner.style.cssText = "display: block; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; text-align: center; box-shadow: 0 6px 20px rgba(34, 197, 94, 0.18); font-family: inherit;";
         banner.innerHTML = `
-            <div style="font-size: 2rem; margin-bottom: 6px;">🎉</div>
-            <h3 style="margin: 0 0 6px 0; color: #15803d; font-size: 1.15rem; font-weight: 800;">
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🎉</div>
+            <h3 style="margin: 0 0 6px 0; color: #15803d; font-size: 1.22rem; font-weight: 900;">
                 आप यह पुस्तक पहले ही खरीद चुके हैं!
             </h3>
-            <p style="margin: 0 0 14px 0; color: #166534; font-size: 0.88rem; line-height: 1.5;">
-                आपके पंजीकृत नंबर (<strong>+91 ${cleanMob}</strong>) पर इस पुस्तक का लाइफटाइम एक्सेस पहले से सक्रिय है। आपको दोबारा पैसे खर्च करने की आवश्यकता नहीं है।
+            <p style="margin: 0 0 16px 0; color: #166534; font-size: 0.90rem; line-height: 1.5;">
+                प्रिय ग्राहक, आपके पंजीकृत नंबर (<strong>+91 ${cleanMob}</strong>) पर इस ई-बुक का लाइफटाइम डिजिटल एक्सेस पहले से सक्रिय है। आपको दोबारा पैसे खर्च करने की बिल्कुल आवश्यकता नहीं है।
             </p>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <a href="/my-library.html" style="background: #16a34a; color: #ffffff; padding: 10px 18px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="/ebooks/my-library.html" style="background: #16a34a; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22,163,74,0.35);">
                     📖 My Library में पढ़ें
                 </a>
-                <a href="/ebooks/download.html?book=${encodeURIComponent(bookId)}" style="background: #0284c7; color: #ffffff; padding: 10px 18px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
-                    📥 PDF डाउनलोड करें
+                <a href="/reader.html?book=${encodeURIComponent(bookId)}" style="background: #0284c7; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-weight: 800; text-decoration: none; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(2,132,199,0.35);">
+                    🚀 डिजिटल रीडर खोलें
                 </a>
             </div>
         `;
 
         if (payBtn) {
             payBtn.dataset.alreadyPurchased = "true";
+            payBtn.disabled = true;
+            payBtn.style.pointerEvents = "none";
+            payBtn.style.opacity = "0.65";
             payBtn.style.background = "#64748b";
             payBtn.textContent = "✓ आप पहले ही खरीद चुके हैं (Already Purchased)";
         }
@@ -1708,6 +1744,9 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
         if (bannerContainer) bannerContainer.style.display = "none";
         if (payBtn && payBtn.dataset.alreadyPurchased === "true") {
             delete payBtn.dataset.alreadyPurchased;
+            payBtn.disabled = false;
+            payBtn.style.pointerEvents = "auto";
+            payBtn.style.opacity = "1";
             payBtn.style.background = "";
             payBtn.textContent = "Pay Now";
         }

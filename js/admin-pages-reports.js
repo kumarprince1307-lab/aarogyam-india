@@ -221,6 +221,23 @@ async function loadMarketingHubData(forceSync = false) {
       }
     });
 
+    const purchasesByProfile = new Map();
+    const purchasesByMobile = new Map();
+    (purchases || []).forEach(pur => {
+      if (pur.profile_id) {
+        const pid = String(pur.profile_id);
+        if (!purchasesByProfile.has(pid)) purchasesByProfile.set(pid, []);
+        purchasesByProfile.get(pid).push(pur);
+      }
+      if (pur.mobile) {
+        const cleanM = String(pur.mobile).replace(/\D/g, '').slice(-10);
+        if (cleanM) {
+          if (!purchasesByMobile.has(cleanM)) purchasesByMobile.set(cleanM, []);
+          purchasesByMobile.get(cleanM).push(pur);
+        }
+      }
+    });
+
     profiles.forEach(p => {
       const cleanM = String(p.mobile || '').replace(/\D/g, '').slice(-10);
       const ins = sakhiMap.get(String(p.id)) || (cleanM ? sakhiMap.get(cleanM) : null);
@@ -229,6 +246,15 @@ async function loadMarketingHubData(forceSync = false) {
       p.sakhiPrimaryDomain = ins ? ins.primary_domain : null;
       p.sakhiLastTopic = ins ? ins.last_query_topic : null;
       p.sakhiRecoEbook = ins ? ins.recommended_ebook : null;
+
+      // Real Purchases Attachment & Active Customer Determination
+      const userPurchases = (purchasesByProfile.get(String(p.id)) || (cleanM ? purchasesByMobile.get(cleanM) : null) || []).filter(pur => pur.payment_status !== 'failed');
+      p.purchases = userPurchases;
+      p.has_purchased = userPurchases.length > 0;
+      p.is_active = p.has_purchased || (p.is_active === true) || (p.status === 'active');
+      if (userPurchases.length > 0 && !p.primaryBook) {
+        p.primaryBook = userPurchases[0].book_id;
+      }
     });
 
     // Also include Sakhi Leads into profiles for unified reports
@@ -446,10 +472,10 @@ const OFFICIAL_SITE_PAGES = [
 ];
 
 const DEFAULT_TUBE_VIDEOS = [
-  { id: 'tube_001', youtube_id: 'sample_agri_1', title: '🌾 धान व सोयाबीन में पीलापन व फफूंद का 100% पक्का इलाज', thumb: '/images/banners/digital-training-banner.jpeg', topic: 'कृषि रोग नियंत्रण', speaker: 'डॉ. रमेश पाटिल (कृषि विशेषज्ञ)', desc: 'कम खर्च में फफूंद व इल्ली नियंत्रण का वैज्ञानिक और व्यावहारिक तरीका।' },
-  { id: 'tube_002', youtube_id: 'sample_dairy_1', title: '🥛 गाय-भैंस का दूध 2 लीटर और FAT% 8 तक कैसे बढ़ाएं?', thumb: '/images/banners/webinar-live-banner.webp', topic: 'पशुपालन व दुग्ध संवर्धन', speaker: 'डॉ. आनंद शर्मा (वरिष्ठ पशु चिकित्सक)', desc: 'सस्ता घर का मिनरल मिक्चर व बाईपास फैट बनाने का घरेलू नुस्खा।' },
-  { id: 'tube_003', youtube_id: 'sample_organic_1', title: '🌱 घर पर बनाएं 500 लीटर जीवामृत व वेस्ट डीकंपोजर', thumb: '/images/banners/kharif-master-guide-2026-hero-banner.webp', topic: 'जैविक खेती', speaker: 'किसान गुरु श्री महेंद्र वर्मा', desc: 'यूरिया और डीएपी का विकल्प — 0 रुपए में खेत की मिट्टी को उपजाऊ बनाएं।' },
-  { id: 'tube_004', youtube_id: 'sample_health_1', title: '🩸 बिना अंग्रेजी दवा शुगर (डायबिटीज) व HbA1c 6 पर लाएं', thumb: '/images/banners/og_image-whatsapp-image-202-936789-y196.webp', topic: 'आयुर्वेद स्वास्थ्य', speaker: 'वैद्यराज राजेश जोशी', desc: 'खान-पान में केवल 3 बदलाव करके ब्लड शुगर को नियंत्रित करने का प्रमाणित तरीका।' }
+  { id: 'VID_S238828', youtube_id: 'w2QAPHfkdH0', title: '🤖 आपकी अपनी FREE AI सखी 😍 खेती, मौसम, स्वास्थ्य सबका जवाब | Aarogyam India #Shorts', thumb: 'https://img.youtube.com/vi/f97r49PWuM4/hqdefault.jpg', topic: 'सखी AI डॉक्टर', speaker: 'आरोग्यम कृषि विशेषज्ञ', desc: 'खेती, मौसम, स्वास्थ्य और नेट्सर्फ जैविक उत्पादों की संपूर्ण जानकारी।' },
+  { id: 'VID_S019796', youtube_id: '9GWQlduG_AM', title: '🍅 टमाटर को रोगों से कैसे बचाए (कूकड़ा व फफूंद नियंत्रण)', thumb: 'https://img.youtube.com/vi/9GWQlduG_AM/hqdefault.jpg', topic: 'सब्जी संरक्षण', speaker: 'आरोग्यम कृषि विशेषज्ञ', desc: 'टमाटर में कूकड़ा व रसचूसक कीटों से फसल बचाने का जैविक व रासायनिक समाधान।' },
+  { id: 'VID_S041329', youtube_id: 'zry1LfjV_q0', title: '🥦 सब्जी की खेती का डॉक्टर बुक क्यों खरीदे (11 सब्जियों की गाइड)', thumb: 'https://img.youtube.com/vi/zry1LfjV_q0/hqdefault.jpg', topic: 'सब्जी खेती डॉक्टर', speaker: 'आरोग्यम कृषि विशेषज्ञ', desc: '11 प्रमुख सब्जियों की बुवाई, रोग पहचान व सटीक दवा संपूर्ण गाइड।' },
+  { id: 'VID_S218514', youtube_id: 'nI8lO64Yn5M', title: '🌽 मक्का में फाल आर्मी वर्म (FAW) इल्ली नियंत्रण', thumb: 'https://img.youtube.com/vi/nI8lO64Yn5M/hqdefault.jpg', topic: 'कीट नियंत्रण', speaker: 'आरोग्यम कृषि विशेषज्ञ', desc: 'मक्के में फाल आर्मी वर्म और तना छेदक इल्ली का 100% सटीक इलाज।' }
 ];
 
 const HOOK_STUDIO_DATABASE = {
@@ -1080,8 +1106,78 @@ function updateMarketingHubView(container) {
 
   let displayedAudience = dateFilteredUsers;
 
+  // 0. Master Category Filter (All, Core Website, Sakhi AI, AarogyamTube)
+  const activeMaster = mktState.masterFilter || 'all';
+  if (activeMaster !== 'all') {
+    if (activeMaster === 'core_website') {
+      displayedAudience = displayedAudience.filter(u => {
+        const src = (u.registration_source || '').toLowerCase();
+        const hasPur = (u.purchases && u.purchases.length > 0) || u.has_purchased;
+        const isTube = src.includes('tube') || (u.interest && u.interest.toLowerCase().includes('tube'));
+        const isSakhiOnly = src.includes('sakhi') && !hasPur;
+        return !isTube && !isSakhiOnly;
+      });
+    } else if (activeMaster === 'sakhi_ai') {
+      displayedAudience = displayedAudience.filter(u => (u.sakhiChatCount && u.sakhiChatCount > 0) || Boolean(u.sakhiInsights) || (u.interest || '').toLowerCase().includes('sakhi') || (u.registration_source || '').toLowerCase().includes('sakhi'));
+    } else if (activeMaster === 'tube_videos') {
+      displayedAudience = displayedAudience.filter(u => {
+        const src = (u.registration_source || '').toLowerCase();
+        const int = (u.interest || '').toLowerCase();
+        return src.includes('tube') || int.includes('tube') || (u.tubeRecord && u.tubeRecord.views > 0);
+      });
+    }
+  }
+
+  // 0.1 Customer Status Filter (Active vs Inactive)
+  const activeStatus = mktState.statusFilter || 'all';
+  if (activeStatus !== 'all') {
+    if (activeStatus === 'active') {
+      displayedAudience = displayedAudience.filter(u => Boolean(u.is_active || u.has_purchased || (u.purchases && u.purchases.length > 0)));
+    } else if (activeStatus === 'inactive') {
+      displayedAudience = displayedAudience.filter(u => !u.is_active && !u.has_purchased && (!u.purchases || u.purchases.length === 0));
+    }
+  }
+
   // 1. Funnel filter
   if (mktState.funnelFilter !== 'all') {
+    if (mktState.funnelFilter === 'webinar_all') {
+      displayedAudience = displayedAudience.filter(u => (u.registration_source || '').toLowerCase().includes('webinar') || (u.interest || '').toLowerCase().includes('webinar'));
+    } else if (mktState.funnelFilter === 'webinar_live') {
+      displayedAudience = displayedAudience.filter(u => (u.registration_source || '').toLowerCase().includes('webinar_live') || (u.notes && u.notes.includes('attended_live')));
+    } else if (mktState.funnelFilter === 'source_whatsapp') {
+      displayedAudience = displayedAudience.filter(u => (u.registration_source || '').toLowerCase().includes('whatsapp'));
+    } else if (mktState.funnelFilter === 'source_facebook') {
+      displayedAudience = displayedAudience.filter(u => (u.registration_source || '').toLowerCase().includes('facebook') || (u.registration_source || '').toLowerCase().includes('fb') || (u.registration_source || '').toLowerCase().includes('ad'));
+    } else if (mktState.funnelFilter === 'source_organic') {
+      displayedAudience = displayedAudience.filter(u => {
+        const src = (u.registration_source || '').toLowerCase();
+        return src.includes('direct') || src.includes('organic') || src.includes('website') || !src;
+      });
+    } else if (mktState.funnelFilter === 'source_referral') {
+      displayedAudience = displayedAudience.filter(u => (u.registration_source || '').toLowerCase().includes('referral') || Boolean(u.referred_by));
+    } else if (mktState.funnelFilter === 'converted') {
+      displayedAudience = displayedAudience.filter(u => Boolean(u.is_active || u.has_purchased || (u.purchases && u.purchases.length > 0)));
+    } else if (mktState.funnelFilter === 'tube_agri') {
+      displayedAudience = displayedAudience.filter(u => {
+        const int = `${u.interest || ''} ${u.registration_source || ''}`.toLowerCase();
+        return int.includes('tube') && (int.includes('agri') || int.includes('fasal') || int.includes('kisan'));
+      });
+    } else if (mktState.funnelFilter === 'tube_dairy') {
+      displayedAudience = displayedAudience.filter(u => {
+        const int = `${u.interest || ''} ${u.registration_source || ''}`.toLowerCase();
+        return int.includes('tube') && (int.includes('dairy') || int.includes('pashu') || int.includes('doodh'));
+      });
+    } else if (mktState.funnelFilter === 'tube_health') {
+      displayedAudience = displayedAudience.filter(u => {
+        const int = `${u.interest || ''} ${u.registration_source || ''}`.toLowerCase();
+        return int.includes('tube') && (int.includes('health') || int.includes('ayurved') || int.includes('sugar'));
+      });
+    } else if (mktState.funnelFilter === 'tube_netsurf') {
+      displayedAudience = displayedAudience.filter(u => {
+        const int = `${u.interest || ''} ${u.registration_source || ''}`.toLowerCase();
+        return int.includes('tube') && (int.includes('netsurf') || int.includes('biofit') || int.includes('jaivik'));
+      });
+    } else 
     if (mktState.funnelFilter === 'top_funnel' || mktState.funnelFilter === 'tube_viewers') {
       displayedAudience = displayedAudience.filter(u => 
         u.funnelStage === 'top_funnel' || 
@@ -2225,11 +2321,10 @@ function getPillarContacts(pillarKey) {
     } else if (pillarKey === 'sakhi') {
       return (u.sakhiChatCount && u.sakhiChatCount > 0) || Boolean(u.sakhiInsights) || (u.interest || '').toLowerCase().includes('sakhi');
     } else if (pillarKey === 'agri') {
-      const isDairy = interest.includes('पशु') || interest.includes('डेयरी') || occ.includes('पशु') || occ.includes('डेयरी') || survCats.includes('cattlecare');
-      const isHealth = interest.includes('स्वास्थ्य') || interest.includes('आयुर्वेद') || occ.includes('स्वास्थ्य') || survCats.includes('healthcare');
-      const isNetsurf = interest.includes('netsurf') || interest.includes('बायो') || src.includes('netsurf') || survCats.includes('netsurf');
-      const isSakhi = (u.sakhiChatCount && u.sakhiChatCount > 0) || Boolean(u.sakhiInsights);
-      return (!isDairy && !isHealth && !isNetsurf && !isSakhi) || uText.includes('bk001') || uText.includes('bk002') || uText.includes('bk015') || uText.includes('bk017') || uText.includes('kheti') || uText.includes('fasal');
+      const hasAgriKeywords = interest.includes('कृषि') || interest.includes('खेती') || interest.includes('फसल') || interest.includes('किसान') || occ.includes('किसान') || occ.includes('कृषि') || survCats.includes('agri') || survCats.includes('crop') || survAnswers.includes('कीट') || survAnswers.includes('फसल');
+      const hasAgriBook = uText.includes('bk001') || uText.includes('bk002') || uText.includes('bk015') || uText.includes('bk017') || uText.includes('kheti') || uText.includes('fasal');
+      const isSakhiAgri = u.sakhiPrimaryDomain === 'agri';
+      return hasAgriKeywords || hasAgriBook || isSakhiAgri;
     }
     return true;
   });
@@ -2425,26 +2520,73 @@ function renderCommonOutreachEngine(audienceList, paginatedUsers, totalPages) {
         </span>
       </div>
 
+      <!-- 🎯 MASTER CATEGORY & ACTIVE STATUS DUAL CONTROLS -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; margin-bottom:14px; background:#1e293b; border:1px solid #38bdf8; border-radius:12px; padding:12px 14px;">
+        <!-- Master Category Filter -->
+        <div>
+          <label for="mkt-master-filter" style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:900; color:#38bdf8; margin-bottom:6px;">
+            <span>🎯</span> <span>मास्टर माध्यम / मुख्य श्रेणी (Master Category)</span>
+          </label>
+          <select id="mkt-master-filter" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #38bdf8; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
+            <option value="all" ${(mktState.masterFilter || 'all') === 'all' ? 'selected' : ''}>🌟 सभी माध्यम व स्रोत (All Channels & Sources)</option>
+            <option value="core_website" ${mktState.masterFilter === 'core_website' ? 'selected' : ''}>📱 1. मुख्य वेबसाइट (Core Website: E-Books, Webinar, Sources)</option>
+            <option value="sakhi_ai" ${mktState.masterFilter === 'sakhi_ai' ? 'selected' : ''}>🤖 2. सखी AI संवाद (Sakhi AI Chat & Intent Leads)</option>
+            <option value="tube_videos" ${mktState.masterFilter === 'tube_videos' ? 'selected' : ''}>📺 3. AarogyamTube वीडियो (Tube Viewers & Engagement)</option>
+          </select>
+        </div>
+
+        <!-- Active vs Inactive Customer Status Filter -->
+        <div>
+          <label for="mkt-status-filter" style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:900; color:#4ade80; margin-bottom:6px;">
+            <span>👥</span> <span>ग्राहक स्थिति फ़िल्टर (Customer Status)</span>
+          </label>
+          <select id="mkt-status-filter" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #4ade80; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
+            <option value="all" ${(mktState.statusFilter || 'all') === 'all' ? 'selected' : ''}>👥 सभी सदस्य व ग्राहक (${(mktState.profiles || []).length})</option>
+            <option value="active" ${mktState.statusFilter === 'active' ? 'selected' : ''}>🟢 केवल सक्रिय ग्राहक (Verified Buyers • कम से कम 1 ई-बुक खरीदी)</option>
+            <option value="inactive" ${mktState.statusFilter === 'inactive' ? 'selected' : ''}>🔴 केवल निष्क्रिय सदस्य (Free Members • अभी तक कोई खरीद नहीं)</option>
+          </select>
+        </div>
+      </div>
+
       <!-- 3 Simple Filter Steps Grid -->
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
         <!-- Step 1: Who to target (Audience) -->
         <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:12px 14px;">
           <label for="mkt-filter-funnel" style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:800; color:#38bdf8; margin-bottom:6px;">
-            <span>1️⃣</span> <span>किसे भेजना है? (Audience)</span>
+            <span>1️⃣</span> <span>किसे भेजना है? (Audience Sub-Filter)</span>
           </label>
           <select id="mkt-filter-funnel" class="mkt-input-dark" style="background:#0f172a; color:#f8fafc; border:1.5px solid #3b82f6; padding:9px 12px; border-radius:8px; font-weight:800; font-size:0.85rem; width:100%;">
-            <option value="all" ${mktState.funnelFilter === 'all' ? 'selected' : ''}>👥 सभी किसान व ग्राहक (${(mktState.profiles || []).length})</option>
-            <option value="sakhi_chat" ${mktState.funnelFilter === 'sakhi_chat' ? 'selected' : ''}>🌸 सखी AI चैट दर्शक (सभी ${sakhiCount} AI संवाद लीड्स)</option>
-            <option value="sakhi_agri" ${mktState.funnelFilter === 'sakhi_agri' ? 'selected' : ''}>🌾 सखी: कृषि व फसल संवाद (Agri Leads)</option>
-            <option value="sakhi_health" ${mktState.funnelFilter === 'sakhi_health' ? 'selected' : ''}>🩺 सखी: स्वास्थ्य व क्रॉनिक केयर (Health Leads)</option>
-            <option value="sakhi_wellness" ${mktState.funnelFilter === 'sakhi_wellness' ? 'selected' : ''}>⚡ सखी: पर्सनल व सेक्सुअल वेलनेस (Vitality Leads)</option>
-            <option value="sakhi_dairy" ${mktState.funnelFilter === 'sakhi_dairy' ? 'selected' : ''}>🐄 सखी: पशुपालन व दूध-फैट (Dairy Leads)</option>
-            <option value="sakhi_business" ${mktState.funnelFilter === 'sakhi_business' ? 'selected' : ''}>💼 सखी: नेट्सर्फ 8.19L बिज़नेस (Business Leads)</option>
-            <option value="tube_viewers" ${(mktState.funnelFilter === 'tube_viewers' || mktState.funnelFilter === 'top_funnel') ? 'selected' : ''}>📺 AarogyamTube वीडियो दर्शक (शीर्ष दर्शक)</option>
-            <option value="abandoned_cart" ${mktState.funnelFilter === 'abandoned_cart' ? 'selected' : ''}>🛒 अधूरी खरीदारी वाले (छोड़े गए कार्ट / Hot Leads)</option>
-            <option value="wishlist" ${mktState.funnelFilter === 'wishlist' ? 'selected' : ''}>❤️ पसंदीदा व विशलिस्ट (इच्छुक पाठक)</option>
-            <option value="converted" ${mktState.funnelFilter === 'converted' ? 'selected' : ''}>🏆 असली खरीदार (Verified VIP Customers)</option>
-            <option value="demo_users" ${mktState.funnelFilter === 'demo_users' ? 'selected' : ''}>📋 फ्री डेमो पाठक (Demo Users)</option>
+            <option value="all" ${mktState.funnelFilter === 'all' ? 'selected' : ''}>👥 सभी संपर्क (All Contacts)</option>
+            
+            <optgroup label="📱 1. मुख्य वेबसाइट (Core Website Leads)" style="background:#0f172a; color:#38bdf8;">
+              <option value="converted" ${mktState.funnelFilter === 'converted' ? 'selected' : ''}>🏆 असली ई-बुक खरीदार (Verified VIP Customers)</option>
+              <option value="abandoned_cart" ${mktState.funnelFilter === 'abandoned_cart' ? 'selected' : ''}>🛒 अधूरी खरीदारी वाले (छोड़े गए कार्ट / Hot Leads)</option>
+              <option value="wishlist" ${mktState.funnelFilter === 'wishlist' ? 'selected' : ''}>❤️ पसंदीदा व विशलिस्ट (इच्छुक पाठक)</option>
+              <option value="demo_users" ${mktState.funnelFilter === 'demo_users' ? 'selected' : ''}>📋 फ्री डेमो पाठक (Demo Users)</option>
+              <option value="webinar_all" ${mktState.funnelFilter === 'webinar_all' ? 'selected' : ''}>🎯 सभी वेबिनार प्रतिभागी (All Webinar Leads)</option>
+              <option value="webinar_live" ${mktState.funnelFilter === 'webinar_live' ? 'selected' : ''}>🔴 लाइव वेबिनार में उपस्थित (Live Attended)</option>
+              <option value="source_whatsapp" ${mktState.funnelFilter === 'source_whatsapp' ? 'selected' : ''}>💬 स्रोत: WhatsApp से जुड़े सदस्य</option>
+              <option value="source_facebook" ${mktState.funnelFilter === 'source_facebook' ? 'selected' : ''}>📘 स्रोत: Facebook / Ads से आए</option>
+              <option value="source_organic" ${mktState.funnelFilter === 'source_organic' ? 'selected' : ''}>🌐 स्रोत: डायरेक्ट / ऑर्गेनिक विज़िटर</option>
+              <option value="source_referral" ${mktState.funnelFilter === 'source_referral' ? 'selected' : ''}>🤝 स्रोत: रेफरल / स्पॉन्सर कोड से जुड़े</option>
+            </optgroup>
+
+            <optgroup label="🤖 2. सखी AI संवाद लीड्स (Sakhi AI Intelligences)" style="background:#0f172a; color:#ec4899;">
+              <option value="sakhi_chat" ${mktState.funnelFilter === 'sakhi_chat' ? 'selected' : ''}>🌸 सखी AI चैट दर्शक (सभी ${sakhiCount} AI संवाद लीड्स)</option>
+              <option value="sakhi_agri" ${mktState.funnelFilter === 'sakhi_agri' ? 'selected' : ''}>🌾 सखी: कृषि व फसल संवाद (Agri Leads)</option>
+              <option value="sakhi_health" ${mktState.funnelFilter === 'sakhi_health' ? 'selected' : ''}>🩺 सखी: स्वास्थ्य व क्रॉनिक केयर (Health Leads)</option>
+              <option value="sakhi_wellness" ${mktState.funnelFilter === 'sakhi_wellness' ? 'selected' : ''}>⚡ सखी: पर्सनल व सेक्सुअल वेलनेस (Vitality Leads)</option>
+              <option value="sakhi_dairy" ${mktState.funnelFilter === 'sakhi_dairy' ? 'selected' : ''}>🐄 सखी: पशुपालन व दूध-फैट (Dairy Leads)</option>
+              <option value="sakhi_business" ${mktState.funnelFilter === 'sakhi_business' ? 'selected' : ''}>💼 सखी: नेट्सर्फ 8.19L बिज़नेस (Business Leads)</option>
+            </optgroup>
+
+            <optgroup label="📺 3. AarogyamTube वीडियो प्रचार (Tube Audiences)" style="background:#0f172a; color:#ef4444;">
+              <option value="tube_viewers" ${(mktState.funnelFilter === 'tube_viewers' || mktState.funnelFilter === 'top_funnel') ? 'selected' : ''}>📺 सभी AarogyamTube वीडियो दर्शक</option>
+              <option value="tube_agri" ${mktState.funnelFilter === 'tube_agri' ? 'selected' : ''}>🌾 कृषि व फसल वीडियो दर्शक</option>
+              <option value="tube_dairy" ${mktState.funnelFilter === 'tube_dairy' ? 'selected' : ''}>🐄 पशुपालन व दुग्ध वीडियो दर्शक</option>
+              <option value="tube_health" ${mktState.funnelFilter === 'tube_health' ? 'selected' : ''}>❤️ स्वास्थ्य व आयुर्वेद वीडियो दर्शक</option>
+              <option value="tube_netsurf" ${mktState.funnelFilter === 'tube_netsurf' ? 'selected' : ''}>🌿 जैविक खाद व बायोफिट वीडियो दर्शक</option>
+            </optgroup>
           </select>
         </div>
 
@@ -4169,8 +4311,8 @@ function getVideoAudienceUsers(v, recBook) {
     const survCats = uSurv && Array.isArray(uSurv.selected_categories) ? uSurv.selected_categories : [];
     const survAnswers = uSurv && uSurv.category_answers ? JSON.stringify(uSurv.category_answers).toLowerCase() : '';
 
-    // Engagement signals
-    const directViewer = (src.includes('tube') && vidId && src.includes(vidId)) || (src.includes('tube') && !vidId);
+    // Engagement signals (Real Video ID or Specific Topic Match - Zero Blanket Mocking)
+    const directViewer = Boolean(src.includes('tube') && vidId && (src.includes(vidId.toLowerCase()) || (v.category && src.includes(v.category.toLowerCase()))));
     const hasBoughtRec = purchases.some(p => p.profile_id === u.id && p.book_id === recBook);
     const hasReadRec = readerStats.some(r => (r.user_key === u.mobile || r.user_key === u.id) && r.book_id === recBook);
 
@@ -4613,7 +4755,7 @@ function renderTubeAnalyticsTab() {
     const completions = Math.max(Number(supa.completions) || 0, Number(tel.completions) || 0);
     const likes = Math.max(Number(supa.likes) || 0, Number(tel.likes) || 0);
     const commentsCount = Math.max(Number(supa.comments_count) || 0, Number(tel.comments_count) || 0);
-    const watchSecs = Math.max(Number(supa.total_watch_seconds) || 0, Number(tel.totalWatchSeconds) || (plays * 60));
+    const watchSecs = Math.max(Number(supa.total_watch_seconds) || 0, Number(tel.totalWatchSeconds) || 0);
 
     totalViews += plays;
     totalWatchSeconds += watchSecs;
@@ -7371,6 +7513,25 @@ function attachMarketingHubEvents(container) {
       mktState.currentPage = 1;
       updateMarketingHubView(container);
       showMarketingToast(e.target.checked ? '🛡️ एंटी-रिपीट शील्ड सक्रिय: आज भेजे जा चुके संपर्क बाहर!' : '⚠️ शील्ड निष्क्रिय: सभी संपर्क दिखाए जा रहे हैं।');
+    });
+  }
+
+  // Master Category & Active/Inactive Status Filters
+  const masterFilterEl = document.getElementById('mkt-master-filter');
+  if (masterFilterEl) {
+    masterFilterEl.addEventListener('change', (e) => {
+      mktState.masterFilter = e.target.value;
+      mktState.currentPage = 1;
+      updateMarketingHubView(container);
+    });
+  }
+
+  const statusFilterEl = document.getElementById('mkt-status-filter');
+  if (statusFilterEl) {
+    statusFilterEl.addEventListener('change', (e) => {
+      mktState.statusFilter = e.target.value;
+      mktState.currentPage = 1;
+      updateMarketingHubView(container);
     });
   }
 

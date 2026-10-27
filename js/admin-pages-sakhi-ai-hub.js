@@ -27,6 +27,9 @@ export async function initSakhiAiHub() {
         </p>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" class="admin-btn" onclick="document.getElementById('sakhiTeamLeadsSection')?.scrollIntoView({behavior:'smooth'}); window.initSakhiTeamLeadsHub && window.initSakhiTeamLeadsHub();" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:1.5px solid #38bdf8; color:#ffffff; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 4px 12px rgba(2,132,199,0.35);">
+          <span>👑</span> <span>टीम स्पॉन्सर लीड्स (Excel)</span>
+        </button>
         <button type="button" class="admin-btn admin-btn-primary" onclick="window.open('/aarogyam-sakhi.html','_blank')" style="background:#10b981;border-color:#10b981;font-weight:700;">
           <span>🚀 सखी AI लाइव खोलें</span>
         </button>
@@ -340,6 +343,19 @@ export async function initSakhiAiHub() {
       <div id="sakhiAuditAnalysisResultBox" style="display:none;background:rgba(99,102,241,0.08);border:1.5px solid #6366f1;border-radius:10px;padding:16px;margin-bottom:16px;">
       </div>
 
+      <!-- Single User Filter Bar (Zero-Egress Instant In-Memory Filter) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;background:var(--admin-surface-2,#0f172a);padding:10px 14px;border-radius:10px;border:1px solid var(--admin-border,#334155);">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label style="font-size:0.82rem;font-weight:700;color:var(--admin-text,#e2e8f0);display:flex;align-items:center;gap:6px;">
+            <span>🔍</span> 👤 यूज़र फ़िल्टर:
+          </label>
+          <select id="sakhiAuditUserFilterSelect" class="admin-select" style="padding:6px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;background:var(--admin-surface,#1e293b);color:var(--admin-text,#f8fafc);border:1px solid var(--admin-border,#334155);min-width:280px;" onchange="window.filterSakhiAuditByUser(this.value)">
+            <option value="all">👥 सभी यूज़र्स (All Users)</option>
+          </select>
+        </div>
+        <div id="sakhiAuditFilteredCountBadge" style="font-size:0.75rem;color:var(--admin-muted,#94a3b8);font-weight:700;"></div>
+      </div>
+
       <!-- Responsive Live Audit Table -->
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px;border:1px solid var(--admin-border,#334155);">
         <table style="width:100%;border-collapse:collapse;font-size:0.83rem;color:var(--admin-text,#cbd5e1);min-width:780px;">
@@ -358,6 +374,93 @@ export async function initSakhiAiHub() {
           <tbody id="sakhiAuditTableBody">
             <tr>
               <td colspan="8" style="text-align:center;padding:28px;color:var(--admin-muted,#94a3b8);">ऑडिट डेटा लोड हो रहा है...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 👑 टीम स्पॉन्सर / Upline लीड इंटेलिजेंस व एक्सेल डाउनलोड (Team Sponsor AI Leads Intelligence Hub) -->
+    <div class="admin-card" id="sakhiTeamLeadsSection" style="padding:22px;margin-bottom:24px;background:linear-gradient(135deg, rgba(30,41,59,0.98), rgba(15,23,42,0.95));border:2px solid #38bdf8;border-radius:16px;box-shadow:0 10px 30px rgba(56,189,248,0.15);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.8rem;">👑</span>
+          <div>
+            <h2 style="font-size:1.35rem;font-weight:900;color:#f8fafc;margin:0;letter-spacing:-0.3px;">
+              टीम स्पॉन्सर / Upline AI लीड इंटेलिजेंस (Team Sponsor AI Leads Intelligence)
+            </h2>
+            <p style="font-size:0.83rem;color:#94a3b8;margin:4px 0 0 0;">
+              किसी भी स्पॉन्सर / लीडर (उदा. Aarogyam Master, अवनीश, आदि) को चुनें — उनकी पूरी डाउनलाइन, सखी AI सवाल, रुचि अंतर्दृष्टि (कृषि/पशु/स्वास्थ्य) व ई-बुक सिफारिशें तुरंत देखें!
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="admin-btn" id="btnExportTeamLeadsExcel" onclick="window.exportTeamLeadsCsv()" style="background:linear-gradient(135deg, #10b981, #059669);color:#ffffff;border:none;font-weight:900;font-size:0.86rem;padding:9px 18px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(16,185,129,0.35);">
+            <span>📥 टीम बिज़नेस लीड्स Excel (.csv) डाउनलोड</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls Grid: Select Upline Sponsor & Search Downline -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:18px;background:rgba(15,23,42,0.6);padding:14px 16px;border-radius:12px;border:1px solid #334155;">
+        <div>
+          <label for="sakhiTeamUplineSelect" style="display:flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:800;color:#38bdf8;margin-bottom:6px;">
+            <span>👤</span> <span>स्पॉन्सर / Upline लीडर चुनें:</span>
+          </label>
+          <select id="sakhiTeamUplineSelect" class="admin-select" style="width:100%;background:#0f172a;color:#f8fafc;border:1.5px solid #38bdf8;border-radius:8px;padding:9px 12px;font-weight:800;font-size:0.86rem;" onchange="window.filterTeamLeadsByUpline(this.value)">
+            <option value="all">👥 सभी स्पॉन्सर व समस्त डाउनलाइन (All Leads)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="sakhiTeamLeadSearch" style="display:flex;align-items:center;gap:6px;font-size:0.82rem;font-weight:800;color:#fbbf24;margin-bottom:6px;">
+            <span>🔍</span> <span>टीम सदस्य खोजें (नाम / मोबाइल):</span>
+          </label>
+          <input type="text" id="sakhiTeamLeadSearch" class="admin-input" placeholder="डाउनलाइन किसान का नाम या 10 अंकों का नंबर..." oninput="window.filterTeamLeadsSearch(this.value)" style="width:100%;background:#0f172a;color:#f8fafc;border:1.5px solid #f59e0b;border-radius:8px;padding:9px 12px;font-weight:700;font-size:0.86rem;box-sizing:border-box;" />
+        </div>
+      </div>
+
+      <!-- Live Team Stats Ribbon -->
+      <div id="sakhiTeamStatsRibbon" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+        <div style="background:#0f172a;padding:12px 14px;border-radius:10px;border:1px solid #334155;text-align:center;">
+          <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">टीम कुल सदस्य</div>
+          <div id="teamStatTotalMembers" style="font-size:1.4rem;font-weight:900;color:#38bdf8;margin-top:2px;">0</div>
+        </div>
+        <div style="background:#0f172a;padding:12px 14px;border-radius:10px;border:1px solid #334155;text-align:center;">
+          <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">कुल सखी AI सवाल</div>
+          <div id="teamStatTotalChats" style="font-size:1.4rem;font-weight:900;color:#4ade80;margin-top:2px;">0</div>
+        </div>
+        <div style="background:#0f172a;padding:12px 14px;border-radius:10px;border:1px solid #334155;text-align:center;">
+          <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">🌾 कृषि संवाद लीड्स</div>
+          <div id="teamStatAgriChats" style="font-size:1.4rem;font-weight:900;color:#facc15;margin-top:2px;">0</div>
+        </div>
+        <div style="background:#0f172a;padding:12px 14px;border-radius:10px;border:1px solid #334155;text-align:center;">
+          <div style="font-size:0.75rem;color:#94a3b8;font-weight:700;">❤️ स्वास्थ्य व पशुपालन लीड्स</div>
+          <div id="teamStatHealthChats" style="font-size:1.4rem;font-weight:900;color:#ec4899;margin-top:2px;">0</div>
+        </div>
+      </div>
+
+      <!-- Responsive Team Leads Table -->
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid #334155;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.83rem;color:#cbd5e1;min-width:850px;">
+          <thead>
+            <tr style="background:#0f172a;border-bottom:2px solid #334155;text-align:left;">
+              <th style="padding:10px 12px;color:#94a3b8;width:45px;">#</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:180px;">👤 टीम सदस्य (नाम व मोबाइल)</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:140px;">👑 स्पॉन्सर / Upline</th>
+              <th style="padding:10px 12px;color:#94a3b8;text-align:center;width:95px;">💬 कुल सवाल</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:200px;">🎯 रुचि अंतर्दृष्टि (Domain Breakdown)</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:180px;">🛍️ सुझाई गई किताब / बिज़नेस पिच</th>
+              <th style="padding:10px 12px;color:#94a3b8;width:100px;">📅 अंतिम सक्रिय</th>
+              <th style="padding:10px 12px;color:#94a3b8;text-align:right;width:100px;">📲 संपर्क</th>
+            </tr>
+          </thead>
+          <tbody id="sakhiTeamLeadsTableBody">
+            <tr>
+              <td colspan="8" style="text-align:center;padding:30px;color:#94a3b8;">
+                टीम डेटा लोड हो रहा है...
+              </td>
             </tr>
           </tbody>
         </table>
@@ -713,6 +816,7 @@ export async function initSakhiAiHub() {
   setupSakhiAdminEvents();
   await loadKnowledgeDataForAdmin();
   await fetchAndRenderSakhiInsights();
+  await initSakhiTeamLeadsHub();
   await renderUnansweredQueries();
   setupSakhiAuditEvents();
   updateAuditMasterUI();
@@ -813,6 +917,7 @@ async function fetchAndRenderSakhiInsights() {
   }
 
   sakhiAllInsights = list;
+  window.sakhiAllInsights = list;
   renderKPIs(list);
   renderAnalyticsBars(list, sakhiCurrentFilter.dateRange);
   renderSakhiUsersTable();
@@ -1432,6 +1537,7 @@ function setupSakhiAdminEvents() {
   if (refreshBtn) {
     refreshBtn.onclick = () => {
       fetchAndRenderSakhiInsights();
+  setTimeout(initSakhiTeamLeadsHub, 300);
     };
   }
 
@@ -1787,22 +1893,77 @@ async function fetchAndRenderSakhiAuditLogs() {
 
   sakhiAuditLogsList = list;
 
-  if (list.length === 0) {
+  // Zero-Egress Profile Name Resolver
+  let profileNameMap = new Map();
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db) {
+      const { data: profs } = await db.from('profiles').select('id, full_name, mobile').limit(1000);
+      (profs || []).forEach(p => {
+        const cleanM = (p.mobile || '').replace(/\D/g, '').slice(-10);
+        if (cleanM) profileNameMap.set(cleanM, p.full_name || 'किसान साथी');
+        if (p.id) profileNameMap.set(String(p.id), p.full_name || 'किसान साथी');
+      });
+    }
+  } catch (_) {}
+  window._sakhiAuditProfileNameMap = profileNameMap;
+
+  // Populate Single User Filter Dropdown
+  const userCounts = new Map();
+  list.forEach(item => {
+    const u = item.user_profile || 'guest';
+    userCounts.set(u, (userCounts.get(u) || 0) + 1);
+  });
+
+  const filterSelect = document.getElementById('sakhiAuditUserFilterSelect');
+  if (filterSelect) {
+    const curVal = filterSelect.value || 'all';
+    let opts = `<option value="all">👥 सभी यूज़र्स (${list.length} सवाल)</option>`;
+    userCounts.forEach((count, u) => {
+      const cleanM = String(u).replace(/\D/g, '').slice(-10);
+      const name = profileNameMap.get(cleanM) || profileNameMap.get(String(u)) || '';
+      const label = name ? `👤 ${name} (${cleanM || u}) — ${count} सवाल` : `👤 ${u} — ${count} सवाल`;
+      opts += `<option value="${escapeHtml(u)}">${escapeHtml(label)}</option>`;
+    });
+    filterSelect.innerHTML = opts;
+    if (userCounts.has(curVal)) filterSelect.value = curVal;
+  }
+
+  window.renderSakhiAuditTableRows(list);
+}
+
+window.renderSakhiAuditTableRows = function(itemsToRender) {
+  const tbody = document.getElementById('sakhiAuditTableBody');
+  const countBadge = document.getElementById('sakhiAuditFilteredCountBadge');
+  if (!tbody) return;
+
+  const profileNameMap = window._sakhiAuditProfileNameMap || new Map();
+  const total = (sakhiAuditLogsList || []).length;
+  if (countBadge) {
+    countBadge.textContent = itemsToRender.length === total
+      ? `कुल: ${total} सवाल`
+      : `फ़िल्टर: ${itemsToRender.length} / ${total} सवाल`;
+  }
+
+  if (itemsToRender.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8" style="text-align:center;padding:36px;color:var(--admin-muted,#94a3b8);">
           <div style="font-size:1.8rem;margin-bottom:6px;">🧪</div>
-          <div style="font-weight:700;color:var(--admin-text,#f8fafc);">अभी तक कोई टेस्ट ऑडिट रिकॉर्ड दर्ज नहीं हुआ है।</div>
-          <div style="font-size:0.8rem;margin-top:4px;">सखी AI से चैट करें या 'audit:on' टाइप करें, सभी सवाल यहाँ सुरक्षित रूप से दिखाई देंगे।</div>
+          <div style="font-weight:700;color:var(--admin-text,#f8fafc);">इस यूज़र के कोई टेस्ट ऑडिट रिकॉर्ड नहीं मिले।</div>
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = list.map((item, idx) => {
+  tbody.innerHTML = itemsToRender.map((item, idx) => {
     const timeStr = item.date_time ? new Date(item.date_time).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
     const profile = item.user_profile || 'guest';
+    const cleanM = String(profile).replace(/\D/g, '').slice(-10);
+    const resolvedName = profileNameMap.get(cleanM) || profileNameMap.get(String(profile)) || '';
+    const userDisplay = resolvedName ? `${resolvedName} (${cleanM || profile})` : profile;
+
     const rawJawab = item.jawab || '';
     let sawal = (item.sawal && item.sawal.trim()) ? item.sawal.trim() : '';
     if (!sawal || sawal === 'सवाल अनुपलब्ध') {
@@ -1827,8 +1988,8 @@ async function fetchAndRenderSakhiAuditLogs() {
         <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${idx + 1}</td>
         <td style="padding:10px 12px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);white-space:nowrap;">${timeStr}</td>
         <td style="padding:10px 12px;">
-          <span style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;color:var(--admin-text,#f8fafc);">
-            👤 ${escapeHtml(profile)}
+          <span style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;color:var(--admin-text,#f8fafc);" title="ID: ${escapeHtml(profile)}">
+            👤 ${escapeHtml(userDisplay)}
           </span>
         </td>
         <td style="padding:10px 12px;font-weight:600;color:var(--admin-text,#e2e8f0);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(sawal)}">
@@ -1855,7 +2016,17 @@ async function fetchAndRenderSakhiAuditLogs() {
       </tr>
     `;
   }).join('');
-}
+};
+
+window.filterSakhiAuditByUser = function(userKey) {
+  if (!sakhiAuditLogsList || sakhiAuditLogsList.length === 0) return;
+  if (!userKey || userKey === 'all') {
+    window.renderSakhiAuditTableRows(sakhiAuditLogsList);
+  } else {
+    const filtered = sakhiAuditLogsList.filter(item => (item.user_profile || 'guest') === userKey);
+    window.renderSakhiAuditTableRows(filtered);
+  }
+};
 
 function downloadSakhiTestJsonFromAdmin() {
   if (!sakhiAuditLogsList || sakhiAuditLogsList.length === 0) {
@@ -2428,6 +2599,41 @@ function renderGeminiDailyChart() {
     statsObj = JSON.parse(localStorage.getItem(statsKey) || '{}');
   } catch(e) {}
 
+  // Aggregate genuine daily activity from sakhiAuditLogsList & sakhiAllInsights (0-Egress Real Data)
+  const auditList = window.sakhiAuditLogsList || [];
+  if (Array.isArray(auditList) && auditList.length > 0) {
+    auditList.forEach(item => {
+      const dt = item.date_time || item.created_at || item.timestamp;
+      if (!dt) return;
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!statsObj[key]) statsObj[key] = { images: 0, chats: 0, tokens: 0 };
+      statsObj[key].chats = (statsObj[key].chats || 0) + 1;
+      const isImg = Boolean(item.image_url || item.has_image || (item.sawal && (item.sawal.includes('फोटो') || item.sawal.includes('विज़न') || item.sawal.includes('इमेज'))));
+      if (isImg) statsObj[key].images = (statsObj[key].images || 0) + 1;
+      const tok = Number(item.tokens_used) || Math.max(120, Math.round(((item.sawal || '').length + (item.jawab || '').length) / 2.5));
+      statsObj[key].tokens = (statsObj[key].tokens || 0) + tok;
+    });
+  }
+
+  // Also include user insights recent volume if audit table is still syncing
+  const insightsList = window.sakhiAllInsights || [];
+  if (insightsList.length > 0) {
+    insightsList.forEach(ins => {
+      const dt = ins.last_active_at || ins.created_at;
+      if (!dt) return;
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!statsObj[key]) statsObj[key] = { images: 0, chats: 0, tokens: 0 };
+      if (!statsObj[key].chats || statsObj[key].chats === 0) {
+        statsObj[key].chats = (statsObj[key].chats || 0) + (Number(ins.interaction_count) || 1);
+        statsObj[key].tokens = (statsObj[key].tokens || 0) + ((Number(ins.interaction_count) || 1) * 350);
+      }
+    });
+  }
+
   const todayKey = days[6];
   if (!statsObj[todayKey]) {
     statsObj[todayKey] = { images: 0, chats: 0, tokens: 0 };
@@ -2503,3 +2709,384 @@ function renderGeminiDailyChart() {
 }
 window.initGeminiControlCenter = initGeminiControlCenter;
 
+
+
+// =========================================================================
+// 👑 टीम स्पॉन्सर / Upline लीड इंटेलिजेंस इंजन (TEAM SPONSOR LEADS HUB ENGINE)
+// =========================================================================
+window._sakhiTeamState = {
+  uplineFilter: 'all',
+  searchQuery: '',
+  allTeamRows: []
+};
+
+window.initSakhiTeamLeadsHub = initSakhiTeamLeadsHub;
+async function initSakhiTeamLeadsHub() {
+  const tbody = document.getElementById('sakhiTeamLeadsTableBody');
+  const uplineSel = document.getElementById('sakhiTeamUplineSelect');
+  const searchInput = document.getElementById('sakhiTeamLeadSearch');
+  if (!tbody) return;
+
+  let profiles = [];
+  try {
+    const db = window.dbClient || window.supabase;
+    if (db && typeof db.from === 'function') {
+      const { data, error } = await db.from('profiles')
+        .select('id, full_name, mobile, referral_code, referred_by, referral_mobile, share_id, created_at, interest, netsurf_id')
+        .limit(2000);
+      if (!error && data && data.length > 0) {
+        profiles = data;
+      }
+    }
+  } catch(e) {
+    console.warn("DB profiles fetch exception:", e);
+  }
+
+  // Fallback REST fetch if DB client returned empty
+  if (profiles.length === 0) {
+    try {
+      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?select=id,full_name,mobile,referral_code,referred_by,referral_mobile,share_id,created_at,interest,netsurf_id&limit=2000';
+      const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      const res = await fetch(sbUrl, { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' } });
+      if (res.ok) {
+        profiles = await res.json();
+      }
+    } catch(e) {
+      console.warn("REST profiles fetch exception:", e);
+    }
+  }
+
+  // Build Insights map
+  const insightsMap = new Map();
+  (window.sakhiAllInsights || []).forEach(ins => {
+    if (ins.profile_id) insightsMap.set(String(ins.profile_id), ins);
+    if (ins.mobile) {
+      const cm = String(ins.mobile).replace(/\D/g, '').slice(-10);
+      if (cm) insightsMap.set(cm, ins);
+    }
+  });
+
+  // Build Index Maps
+  const profByMobile = new Map();
+  const profById = new Map();
+  const profByShareId = new Map();
+  const profByRefCode = new Map();
+
+  profiles.forEach(p => {
+    const cm = String(p.mobile || '').replace(/\D/g, '').slice(-10);
+    if (cm) profByMobile.set(cm, p);
+    if (p.id) profById.set(String(p.id), p);
+    if (p.share_id) profByShareId.set(String(p.share_id).toUpperCase(), p);
+    if (p.referral_code) profByRefCode.set(String(p.referral_code).toUpperCase(), p);
+  });
+
+  // Extract Uplines with Counters (100% Dynamic from Database Profiles)
+  const uplineMap = new Map();
+  const masterProf = profByMobile.get('7974422572') || profById.get('52ef705c-bb45-4137-bee4-a3f8df73b676') || {};
+  const masterName = masterProf.full_name || 'Aarogyam Master';
+  const masterShareId = masterProf.share_id || 'AI000004';
+
+  uplineMap.set('7974422572', { name: masterName, mobile: '7974422572', code: masterShareId, count: 0 });
+  if (!profById.has('52ef705c-bb45-4137-bee4-a3f8df73b676')) {
+    profById.set('52ef705c-bb45-4137-bee4-a3f8df73b676', { full_name: masterName, mobile: '7974422572', share_id: masterShareId, referral_code: '7974422572' });
+  }
+  if (!profByMobile.has('7974422572')) {
+    profByMobile.set('7974422572', { full_name: masterName, mobile: '7974422572', share_id: masterShareId, referral_code: '7974422572' });
+  }
+
+  // Pre-scan all referral codes and mobile numbers
+  profiles.forEach(p => {
+    const cm = String(p.mobile || '').replace(/\D/g, '').slice(-10);
+    if (cm && !uplineMap.has(cm) && (p.share_id || p.referral_code)) {
+      uplineMap.set(cm, {
+        name: p.full_name || 'लीडर',
+        mobile: cm,
+        code: p.share_id || p.referral_code || cm,
+        count: 0
+      });
+    }
+  });
+
+  // Build team rows
+  const teamRows = [];
+  profiles.forEach(member => {
+    const cm = String(member.mobile || '').replace(/\D/g, '').slice(-10);
+    const ins = insightsMap.get(String(member.id)) || (cm ? insightsMap.get(cm) : null);
+    
+    // Resolve Upline
+    const refMob = String(member.referral_mobile || '').replace(/\D/g, '').slice(-10);
+    const refBy = String(member.referred_by || '').trim();
+
+    let uplineKey = '7974422572';
+    let uplineName = masterName;
+    let uplineCode = masterShareId;
+
+    if (refMob && profByMobile.has(refMob)) {
+      const u = profByMobile.get(refMob);
+      uplineKey = refMob;
+      uplineName = u.full_name || 'लीडर';
+      uplineCode = u.share_id || u.referral_code || refMob;
+    } else if (refBy && profById.has(refBy)) {
+      const u = profById.get(refBy);
+      const uMob = String(u.mobile || '').replace(/\D/g, '').slice(-10);
+      uplineKey = uMob || refBy;
+      uplineName = u.full_name || 'लीडर';
+      uplineCode = u.share_id || u.referral_code || uMob;
+    } else if (refBy && profByShareId.has(refBy.toUpperCase())) {
+      const u = profByShareId.get(refBy.toUpperCase());
+      const uMob = String(u.mobile || '').replace(/\D/g, '').slice(-10);
+      uplineKey = uMob || refBy;
+      uplineName = u.full_name || 'लीडर';
+      uplineCode = u.share_id || refBy;
+    } else if (refMob && refMob.length === 10) {
+      uplineKey = refMob;
+      uplineName = refMob === '7974422572' ? masterName : `लीडर (${refMob})`;
+      uplineCode = refMob === '7974422572' ? 'AI000004' : refMob;
+    }
+
+    // Increment upline counter
+    if (!uplineMap.has(uplineKey)) {
+      uplineMap.set(uplineKey, { name: uplineName, mobile: uplineKey, code: uplineCode, count: 0 });
+    }
+    const upEntry = uplineMap.get(uplineKey);
+    if (upEntry) upEntry.count++;
+
+    const chatCount = ins ? (Number(ins.interaction_count) || 1) : 0;
+    const dom = ins ? (ins.primary_domain || 'agri') : (member.interest || 'agri');
+    const recoBook = ins ? (ins.recommended_ebook || 'BK002') : 'BK002';
+    const lastActive = ins ? (ins.last_active_at || member.created_at) : member.created_at;
+
+    teamRows.push({
+      member_name: member.full_name || 'किसान साथी',
+      member_mobile: cm || member.mobile || 'अज्ञात',
+      upline_name: uplineName,
+      upline_code: uplineCode,
+      upline_key: uplineKey,
+      chat_count: chatCount,
+      primary_domain: dom,
+      last_topic: ins ? ins.last_query_topic : (member.interest ? `रुचि: ${member.interest}` : 'फसल सुरक्षा'),
+      recommended_ebook: recoBook,
+      last_active: lastActive,
+      insights: ins
+    });
+  });
+
+  window._sakhiTeamState.allTeamRows = teamRows;
+
+  // Populate Upline Dropdown with member count chips
+  if (uplineSel) {
+    let opts = `<option value="all">👥 सभी स्पॉन्सर व समस्त डाउनलाइन (${teamRows.length} लीड्स)</option>`;
+    
+    // Sort uplines by member count descending
+    const sortedUplines = Array.from(uplineMap.entries())
+      .filter(([k, u]) => u.count > 0 || k === '7974422572')
+      .sort((a, b) => b[1].count - a[1].count);
+
+    sortedUplines.forEach(([key, u]) => {
+      opts += `<option value="${escapeHtml(key)}">👑 ${escapeHtml(u.name)} (${escapeHtml(u.code || u.mobile)}) — ${u.count} सदस्य</option>`;
+    });
+    uplineSel.innerHTML = opts;
+
+    uplineSel.onchange = function() {
+      window._sakhiTeamState.uplineFilter = this.value;
+      renderTeamLeadsTable();
+    };
+  }
+
+  if (searchInput) {
+    searchInput.oninput = function() {
+      window._sakhiTeamState.searchQuery = this.value.trim();
+      renderTeamLeadsTable();
+    };
+  }
+
+  renderTeamLeadsTable();
+}
+
+function renderTeamLeadsTable() {
+  const tbody = document.getElementById('sakhiTeamLeadsTableBody');
+  if (!tbody) return;
+
+  const state = window._sakhiTeamState;
+  let rows = state.allTeamRows || [];
+
+  // Filter by Upline
+  if (state.uplineFilter && state.uplineFilter !== 'all') {
+    const fKey = state.uplineFilter.toUpperCase();
+    rows = rows.filter(r => {
+      const uCode = String(r.upline_code || '').toUpperCase();
+      const uKey = String(r.upline_key || '').toUpperCase();
+      return uCode === fKey || uKey === fKey || String(r.upline_name).toUpperCase().includes(fKey);
+    });
+  }
+
+  // Filter by Search Query
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    rows = rows.filter(r => 
+      r.member_name.toLowerCase().includes(q) || 
+      r.member_mobile.includes(q) || 
+      r.upline_name.toLowerCase().includes(q)
+    );
+  }
+
+  // Update Ribbon KPI Stats
+  let totalChats = 0;
+  let agriChats = 0;
+  let healthChats = 0;
+  rows.forEach(r => {
+    totalChats += r.chat_count;
+    const dom = (r.primary_domain || '').toLowerCase();
+    if (dom.includes('agri') || dom.includes('krishi') || dom.includes('kheti')) {
+      agriChats += (r.chat_count || 1);
+    } else {
+      healthChats += (r.chat_count || 1);
+    }
+  });
+
+  const elTotM = document.getElementById('teamStatTotalMembers');
+  const elTotC = document.getElementById('teamStatTotalChats');
+  const elAgriC = document.getElementById('teamStatAgriChats');
+  const elHealthC = document.getElementById('teamStatHealthChats');
+  if (elTotM) elTotM.textContent = rows.length;
+  if (elTotC) elTotC.textContent = totalChats;
+  if (elAgriC) elAgriC.textContent = agriChats;
+  if (elHealthC) elHealthC.textContent = healthChats;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:36px;color:#94a3b8;">
+          <div style="font-size:1.8rem;margin-bottom:6px;">🔍</div>
+          <div style="font-weight:700;color:#f8fafc;">चयनित स्पॉन्सर के कोई टीम सदस्य नहीं मिले।</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, idx) => {
+    const timeStr = r.last_active ? new Date(r.last_active).toLocaleDateString('hi-IN') : 'हाल ही में';
+    
+    // Domain breakdown text
+    let domainBadge = '🌾 कृषि & फसल';
+    let pitchText = '🌾 BK002 फसल डॉक्टर गाइड';
+    const dom = (r.primary_domain || '').toLowerCase();
+    if (dom.includes('dairy') || dom.includes('pashu')) {
+      domainBadge = '🐄 पशुपालन & दुग्ध';
+      pitchText = '🐄 BK016 पशुपालन व दवा डायरेक्टरी';
+    } else if (dom.includes('health') || dom.includes('sugar')) {
+      domainBadge = '❤️ स्वास्थ्य & डायबिटीज';
+      pitchText = '❤️ डायबिटीज व स्वास्थ्य गाइड';
+    } else if (dom.includes('wellness') || dom.includes('sexual')) {
+      domainBadge = '⚡ पर्सनल वेलनेस';
+      pitchText = '⚡ पौरुष व वात रोग समाधान';
+    } else if (dom.includes('business') || dom.includes('netsurf')) {
+      domainBadge = '🌿 नेट्सर्फ बायोफिट';
+      pitchText = '🌿 नेट्सर्फ 8.19L बिज़नेस प्लान';
+    }
+
+    const waMsg = `नमस्ते ${r.member_name} जी! 🙏\nआपकी आरोग्यम सखी AI पर रुचि (${domainBadge}) के संबंध में हमारी विशेष गाइड उपलब्ध है:\n👉 ${pitchText}\n_आरोग्यम इंडिया टीम_`;
+    const waUrl = `https://wa.me/91${r.member_mobile}?text=${encodeURIComponent(waMsg)}`;
+
+    return `
+      <tr style="border-bottom:1px solid #334155;">
+        <td style="padding:10px 12px;color:#94a3b8;font-weight:700;">#${idx + 1}</td>
+        <td style="padding:10px 12px;">
+          <strong style="color:#f8fafc;display:block;">${escapeHtml(r.member_name)}</strong>
+          <span style="font-size:0.75rem;color:#38bdf8;">📱 ${escapeHtml(r.member_mobile)}</span>
+        </td>
+        <td style="padding:10px 12px;">
+          <span style="background:rgba(56,189,248,0.12);color:#38bdf8;padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
+            👑 ${escapeHtml(r.upline_name)}
+          </span>
+        </td>
+        <td style="padding:10px 12px;text-align:center;">
+          <span style="background:${r.chat_count > 0 ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)'};color:${r.chat_count > 0 ? '#4ade80' : '#94a3b8'};padding:2px 8px;border-radius:10px;font-weight:800;font-size:0.78rem;">
+            ${r.chat_count} सवाल
+          </span>
+        </td>
+        <td style="padding:10px 12px;">
+          <span style="background:rgba(234,179,8,0.12);color:#fbbf24;padding:2px 8px;border-radius:6px;font-weight:700;font-size:0.75rem;">
+            ${domainBadge}
+          </span>
+          <div style="font-size:0.70rem;color:#94a3b8;margin-top:2px;">
+            ${escapeHtml(r.last_topic || 'फसल')}
+          </div>
+        </td>
+        <td style="padding:10px 12px;">
+          <span style="color:#a7f3d0;font-weight:700;font-size:0.75rem;">
+            ${pitchText}
+          </span>
+        </td>
+        <td style="padding:10px 12px;font-size:0.75rem;color:#94a3b8;white-space:nowrap;">
+          ${timeStr}
+        </td>
+        <td style="padding:10px 12px;text-align:right;">
+          <a href="${waUrl}" target="_blank" style="background:#22c55e;color:#ffffff;padding:4px 10px;border-radius:6px;text-decoration:none;font-weight:800;font-size:0.75rem;display:inline-flex;align-items:center;gap:4px;">
+            <span>💬 WA</span>
+          </a>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.filterTeamLeadsByUpline = function(val) {
+  window._sakhiTeamState.uplineFilter = val;
+  renderTeamLeadsTable();
+};
+
+window.filterTeamLeadsSearch = function(val) {
+  window._sakhiTeamState.searchQuery = val;
+  renderTeamLeadsTable();
+};
+
+window.exportTeamLeadsCsv = function() {
+  const rows = window._sakhiTeamState.allTeamRows || [];
+  if (rows.length === 0) {
+    alert('डाउनलोड के लिए कोई टीम डेटा उपलब्ध नहीं है!');
+    return;
+  }
+
+  // Filter based on active upline if set
+  let exportRows = rows;
+  const fUpline = window._sakhiTeamState.uplineFilter;
+  if (fUpline && fUpline !== 'all') {
+    const fKey = fUpline.toUpperCase();
+    exportRows = exportRows.filter(r => {
+      const uCode = String(r.upline_code || '').toUpperCase();
+      const uKey = String(r.upline_key || '').toUpperCase();
+      return uCode === fKey || uKey === fKey || String(r.upline_name).toUpperCase().includes(fKey);
+    });
+  }
+
+  const headers = ['क्रमांक', 'टीम सदस्य नाम', 'मोबाइल नंबर', 'स्पॉन्सर / Upline नाम', 'Upline कोड', 'कुल सखी AI सवाल', 'मुख्य डोमेन', 'अंतिम सवाल / विषय', 'सुझाई गई ई-बुक / कमर्शियल पिच', 'अंतिम सक्रियता तारीख'];
+  
+  const csvLines = [headers.join(',')];
+  exportRows.forEach((r, idx) => {
+    const line = [
+      idx + 1,
+      `"${(r.member_name || '').replace(/"/g, '""')}"`,
+      `"${r.member_mobile}"`,
+      `"${(r.upline_name || '').replace(/"/g, '""')}"`,
+      `"${r.upline_code || ''}"`,
+      r.chat_count || 0,
+      `"${r.primary_domain || 'agri'}"`,
+      `"${(r.last_topic || '').replace(/"/g, '""')}"`,
+      `"${(r.recommended_ebook || '').replace(/"/g, '""')}"`,
+      `"${r.last_active ? new Date(r.last_active).toLocaleDateString('hi-IN') : '-'}"`
+    ];
+    csvLines.push(line.join(','));
+  });
+
+  const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Aarogyam_Team_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};

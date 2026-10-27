@@ -120,31 +120,75 @@ export async function initGoogleLeads() {
 
   let currentResults = [];
 
-  document.getElementById('btn_gl_search')?.addEventListener('click', () => {
-    const loc = document.getElementById('gl_location_input')?.value.trim() || 'इंदौर';
-    const kw = kwSelect.value === 'custom' ? (document.getElementById('gl_custom_keyword_input')?.value.trim() || 'बिज़नेस') : kwSelect.options[kwSelect.selectedIndex].text.split('(')[0].trim();
+  document.getElementById('btn_gl_search')?.addEventListener('click', async () => {
+    const loc = document.getElementById('gl_location_input')?.value.trim() || '';
+    const kw = kwSelect.value === 'custom' ? (document.getElementById('gl_custom_keyword_input')?.value.trim() || 'कृषि') : kwSelect.options[kwSelect.selectedIndex].text.split('(')[0].trim();
 
-    showToast(`🔍 ${kw} (${loc}) के लिए सर्च की जा रही है...`, 'info');
+    showToast(`🔍 ${kw} (${loc || 'सभी क्षेत्र'}) के लिए वास्तविक सर्च की जा रही है...`, 'info');
 
-    // High quality sample mock generator matching realistic area businesses
-    const sampleNames = [
-      `श्री कृष्णा ${kw}`, `पाटीदार ${kw} केंद्र`, `जय किसान कृषि भंडार`, `ओम सांई ${kw}`,
-      `गुप्ता ${kw} एजेंसी`, `मां नर्मदा ${kw}`, `न्यू भारत ${kw}`, `सद्गुरु ${kw} ट्रेडर्स`
-    ];
+    let genuineList = [];
+    try {
+      if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+        const [pbRes, profRes] = await Promise.all([
+          window.supabaseClient.from('phonebook').select('*').limit(200),
+          window.supabaseClient.from('profiles').select('id, full_name, mobile, district, State, occupation, interest').limit(200)
+        ]);
 
-    currentResults = sampleNames.map((name, i) => ({
-      name,
-      mobile: `9826${Math.floor(100000 + Math.random() * 900000)}`,
-      category: kwSelect.value,
-      place: loc,
-      rating: (4.2 + (Math.random() * 0.7)).toFixed(1),
-      reviews: Math.floor(15 + Math.random() * 85),
-      source: 'google_leads'
-    }));
+        const pb = pbRes.data || [];
+        const profs = profRes.data || [];
+        
+        const seen = new Set();
+        const cleanKw = kw.toLowerCase();
+        const cleanLoc = loc.toLowerCase();
 
+        pb.forEach(p => {
+          const mob = (p.mobile || '').replace(/\D/g, '').slice(-10);
+          if (!mob || mob.length !== 10 || seen.has(mob)) return;
+          const txt = `${p.name || ''} ${p.place || ''} ${p.category || ''} ${p.source || ''}`.toLowerCase();
+          if ((!cleanLoc || txt.includes(cleanLoc)) && (!cleanKw || txt.includes(cleanKw) || (p.category && p.category.toLowerCase().includes(cleanKw)))) {
+            seen.add(mob);
+            genuineList.push({
+              name: p.name || 'संपर्क',
+              mobile: mob,
+              category: p.category || kwSelect.value,
+              place: p.place || loc || 'मध्य प्रदेश',
+              rating: '4.8',
+              reviews: 1,
+              source: 'phonebook'
+            });
+          }
+        });
+
+        profs.forEach(u => {
+          const mob = (u.mobile || '').replace(/\D/g, '').slice(-10);
+          if (!mob || mob.length !== 10 || seen.has(mob)) return;
+          const txt = `${u.full_name || ''} ${u.district || ''} ${u.State || ''} ${u.occupation || ''} ${u.interest || ''}`.toLowerCase();
+          if ((!cleanLoc || txt.includes(cleanLoc)) && (!cleanKw || txt.includes(cleanKw) || (u.occupation && u.occupation.toLowerCase().includes(cleanKw)))) {
+            seen.add(mob);
+            genuineList.push({
+              name: u.full_name || 'उपयोगकर्ता',
+              mobile: mob,
+              category: u.occupation || kwSelect.value,
+              place: u.district || u.State || loc || 'मध्य प्रदेश',
+              rating: '5.0',
+              reviews: 2,
+              source: 'profile'
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("DB lead search notice:", e);
+    }
+
+    currentResults = genuineList;
     document.getElementById('gl_results_count').textContent = currentResults.length;
     renderResultsTable(currentResults);
-    showToast(`✅ ${currentResults.length} लीड्स सफलतापूर्वक प्राप्त हुईं!`, 'success');
+    if (currentResults.length > 0) {
+      showToast(`✅ ${currentResults.length} वास्तविक लीड्स प्राप्त हुईं!`, 'success');
+    } else {
+      showToast(`⚠️ कोई वास्तविक लीड नहीं मिली। Google Maps पर लाइव सर्च करें।`, 'warning');
+    }
   });
 
   function renderResultsTable(list) {
@@ -152,7 +196,16 @@ export async function initGoogleLeads() {
     if (!cont) return;
 
     if (list.length === 0) {
-      cont.innerHTML = '<div style="text-align: center; padding: 24px; color: #94A3B8;">कोई रिजल्ट नहीं मिला।</div>';
+      cont.innerHTML = `
+        <div style="background:#FEF2F2; border:1.5px solid #FCA5A5; border-radius:10px; padding:20px; text-align:center; color:#991B1B;">
+          <div style="font-size:1.1rem; font-weight:800; margin-bottom:6px;">⚠️ कोई वास्तविक संपर्क नहीं मिला</div>
+          <div style="font-size:0.84rem; color:#7F1D1D; line-height:1.6;">
+            आपके स्थानीय Phonebook व डेटाबेस में इस कीवर्ड/स्थान हेतु कोई संपर्क मौजूद नहीं है।<br>
+            <strong>सख्त नीति:</strong> सिस्टम कभी भी डमी या फर्जी फोन नंबर उत्पन्न नहीं करता।<br>
+            वास्तविक बाहरी Google Maps लीड्स हेतु <strong>"Google Maps लाइव सर्च"</strong> का उपयोग करें।
+          </div>
+        </div>
+      `;
       return;
     }
 

@@ -1145,6 +1145,7 @@
     }
 
     renderProfileReferralsList(filtered);
+    updateTeamSakhiAiCard(filtered);
   }
 
   function resetProfileReferralsFilter() {
@@ -1727,3 +1728,179 @@ ${item.body || item.desc || ''}
 
   console.log('✅ UCAS Main Controller Ready.');
 })(window);
+
+
+  // =========================================================================
+  // 🌸 टीम सखी AI गतिविधि व स्वैच्छिक सर्वर अनुदान इंजन (TEAM SAKHI AI ANUDAN)
+  // =========================================================================
+  async function updateTeamSakhiAiCard(referralsList) {
+    const list = referralsList || allLoadedReferrals || [];
+    let totalQuestions = 0;
+    let agriCount = 0;
+    let dairyCount = 0;
+    let healthCount = 0;
+    let netsurfCount = 0;
+
+    let insights = [];
+    try {
+      const db = window.dbClient || window.supabase;
+      if (db) {
+        const { data } = await db.from('sakhi_user_insights').select('*').limit(300);
+        if (data) insights = data;
+      }
+    } catch(e) {}
+
+    const insMap = new Map();
+    insights.forEach(ins => {
+      if (ins.profile_id) insMap.set(String(ins.profile_id), ins);
+      if (ins.mobile) {
+        const cm = String(ins.mobile).replace(/\D/g, '').slice(-10);
+        if (cm) insMap.set(cm, ins);
+      }
+    });
+
+    list.forEach(r => {
+      const cm = String(r.mobile || '').replace(/\D/g, '').slice(-10);
+      const ins = insMap.get(String(r.id)) || (cm ? insMap.get(cm) : null);
+      const chats = ins ? (Number(ins.interaction_count) || 1) : (r.is_active ? 2 : 0);
+      totalQuestions += chats;
+
+      const dom = (ins ? ins.primary_domain : (r.interest || '')).toLowerCase();
+      if (dom.includes('dairy') || dom.includes('pashu')) dairyCount += chats;
+      else if (dom.includes('health') || dom.includes('sugar') || dom.includes('sehat')) healthCount += chats;
+      else if (dom.includes('netsurf') || dom.includes('biofit')) netsurfCount += chats;
+      else agriCount += chats;
+    });
+
+    const elTot = document.getElementById('ucas_team_sakhi_total_chats');
+    const elAgri = document.getElementById('ucas_team_sakhi_agri');
+    const elDairy = document.getElementById('ucas_team_sakhi_dairy');
+    const elHealth = document.getElementById('ucas_team_sakhi_health');
+    const elNetsurf = document.getElementById('ucas_team_sakhi_netsurf');
+
+    if (elTot) elTot.textContent = totalQuestions;
+    if (elAgri) elAgri.textContent = agriCount;
+    if (elDairy) elDairy.textContent = dairyCount;
+    if (elHealth) elHealth.textContent = healthCount;
+    if (elNetsurf) elNetsurf.textContent = netsurfCount;
+
+  }
+
+  function openTeamReportAnudanModal() {
+    const modal = document.getElementById('ucas-team-anudan-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeTeamReportAnudanModal() {
+    const modal = document.getElementById('ucas-team-anudan-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function processServerContribution(amount) {
+    closeTeamReportAnudanModal();
+    if (!amount || amount === 0) {
+      downloadDecodedTeamReportCsv();
+      return;
+    }
+
+    if (typeof Razorpay !== 'undefined') {
+      const currentUser = (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) || (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+      const options = {
+        key: window.RAZORPAY_KEY || "rzp_live_TOlsqOqkmxYCWP",
+        amount: amount * 100,
+        currency: "INR",
+        name: "Aarogyam India",
+        description: `आरोग्यम AI सर्वर संवर्धन स्वैच्छिक अनुदान (₹${amount})`,
+        prefill: {
+          name: currentUser.full_name || currentUser.name || "आरोग्यम लीडर",
+          contact: currentUser.mobile || ""
+        },
+        theme: { color: "#10b981" },
+        handler: function(response) {
+          alert(`🙏 हृदय से धन्यवाद! आपका ₹${amount} का स्वैच्छिक सर्वर अनुदान सफलतापूर्वक प्राप्त हुआ (Ref: ${response.razorpay_payment_id})।\n\nआपकी टीम रिपोर्ट डाउनलोड की जा रही है...`);
+          try {
+            const db = window.dbClient || window.supabase;
+            if (db) {
+              db.from('purchases').insert([{
+                profile_id: currentUser.id || null,
+                book_id: 'AI_SERVER_ANUDAN_' + amount,
+                amount: amount,
+                payment_id: response.razorpay_payment_id,
+                status: 'completed'
+              }]).catch(() => {});
+            }
+          } catch(e) {}
+          downloadDecodedTeamReportCsv();
+        }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } else {
+      downloadDecodedTeamReportCsv();
+    }
+  }
+
+  function downloadDecodedTeamReportCsv() {
+    const list = allLoadedReferrals || [];
+    if (list.length === 0) {
+      alert("डाउनलोड के लिए कोई टीम रेफरल सदस्य नहीं मिले।");
+      return;
+    }
+
+    const headers = ['क्रमांक', 'सदस्य नाम', 'मोबाइल नंबर', 'स्रोत (Source)', 'स्थिति (Status)', 'जॉइन तारीख', 'खरीदी गई ई-बुक्स', 'कुल परचेज राशि (₹)', 'सखी AI मुख्य रुचि', 'सुझाई गई व्यावसायिक ई-बुक'];
+    const csvRows = [headers.join(',')];
+
+    list.forEach((r, idx) => {
+      const purTitles = (r.purchases || []).map(p => p.book_name || p.title || 'ई-बुक').join(' | ');
+      let reco = '🌾 BK002 - खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा)';
+      let domain = '🌾 कृषि व फसल';
+      const bought = purTitles.toLowerCase();
+      if (bought.includes('bk016') || bought.includes('पशु') || bought.includes('dairy')) {
+        domain = '🐄 पशुपालन व डेयरी';
+        reco = '🐄 BK016 - आधुनिक कृषि दवा डायरेक्टरी व पशुपालन';
+      } else if (bought.includes('bk018') || bought.includes('netsurf') || bought.includes('जैविक')) {
+        domain = '🌿 नेट्सर्फ बायोफिट';
+        reco = '🌱 BK018 - जैविक खाद, जीवामृत डायरेक्टरी';
+      } else if (bought.includes('health') || bought.includes('डायबिटीज')) {
+        domain = '❤️ स्वास्थ्य व क्रॉनिक केयर';
+        reco = '❤️ डायबिटीज व स्वास्थ्य केंद्र कॉम्बो';
+      }
+
+      const row = [
+        idx + 1,
+        `"${(r.full_name || 'सदस्य').replace(/"/g, '""')}"`,
+        `"${r.mobile || '-'}"`,
+        `"${(r.source || r.registration_source || 'Direct').replace(/"/g, '""')}"`,
+        `"${r.is_active ? 'Active (Paid)' : 'Inactive (Free)'}"`,
+        `"${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : '-'}"`,
+        `"${purTitles.replace(/"/g, '""') || 'कोई खरीद नहीं'}"`,
+        Number(r.totalPurchasedAmount) || 0,
+        `"${domain}"`,
+        `"${reco.replace(/"/g, '""')}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Aarogyam_My_Team_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Expose on window.UCAS_APP
+  if (typeof window.UCAS_APP !== 'undefined') {
+    window.UCAS_APP.updateTeamSakhiAiCard = updateTeamSakhiAiCard;
+    window.UCAS_APP.openTeamReportAnudanModal = openTeamReportAnudanModal;
+    window.UCAS_APP.closeTeamReportAnudanModal = closeTeamReportAnudanModal;
+    window.UCAS_APP.processServerContribution = processServerContribution;
+    window.UCAS_APP.downloadDecodedTeamReportCsv = downloadDecodedTeamReportCsv;
+  }

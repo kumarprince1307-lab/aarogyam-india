@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v3.1-audit-gobar-fix';
+const STATIC_CACHE = 'aarogyam-public-static-v3.2';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v2.5';
 const MEDIA_CACHE = 'aarogyam-public-media-v2.0';
