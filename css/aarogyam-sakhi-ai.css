@@ -597,6 +597,8 @@ body.is-fullscreen .sakhi-chat-window {
   flex: 1 1 0% !important;
   min-height: 0 !important;
   overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-gutter: stable !important;
   -webkit-overflow-scrolling: touch !important;
   padding: 18px 16px;
   display: flex;
@@ -924,26 +926,12 @@ body.is-fullscreen .sakhi-chat-window {
   opacity: 1 !important;
 }
 
-/* Smart Header Collapse when typing or scrolling */
-.sakhi-chat-window.chat-input-focused .sakhi-header,
-.sakhi-chat-window.header-smart-hidden .sakhi-header {
-  max-height: 0 !important;
-  min-height: 0 !important;
-  height: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  margin: 0 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  border-bottom: none !important;
-  transform: translateY(-100%) !important;
-}
-.sakhi-chat-window.chat-input-focused .sakhi-legal-note,
-.sakhi-chat-window.header-smart-hidden .sakhi-legal-note {
-  display: none !important;
-  max-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
+/* Smart Header Stability: Keep header locked & prevent any layout shaking */
+.sakhi-chat-window .sakhi-header {
+  transform: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transition: none !important;
 }
 
 .sakhi-side-actions-group {

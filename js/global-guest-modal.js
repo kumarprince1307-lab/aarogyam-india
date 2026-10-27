@@ -700,7 +700,7 @@
   };
   window.closeLoginPopup = window.closeGuestLoginModal;
 
-  // 6. 15-Second Idle / Browsing Guest Auto-Popup
+  // 6. Idle / Browsing Guest Auto-Popup (2-Sec on Sakhi AI, 15-Sec on Other Pages)
   // STRICT RULE: Book landing pages (free demo only), checkout & admin pages are EXCLUDED!
   function init15SecGuestTimer() {
     const path = (window.location.pathname || '').toLowerCase();
@@ -720,15 +720,25 @@
       return; // Do not auto-trigger on book landing or checkout pages
     }
 
-    if (window.isUserLoggedIn() || isDismissedThisSession()) {
+    if (window.isUserLoggedIn()) {
       return;
     }
 
+    const isSakhi = path.includes('aarogyam-sakhi') || path.includes('sakhi');
+
+    // On general pages, respect dismissal; on Sakhi AI, prompt after 2s if guest
+    if (!isSakhi && isDismissedThisSession()) {
+      return;
+    }
+
+    const delayMs = isSakhi ? 2000 : 15000;
+
     setTimeout(() => {
-      if (!window.isUserLoggedIn() && !isDismissedThisSession()) {
+      if (!window.isUserLoggedIn()) {
+        if (!isSakhi && isDismissedThisSession()) return;
         window.openGuestLoginModal(null, { autoTrigger: true, source: getGranularPageSource() });
       }
-    }, 15000);
+    }, delayMs);
   }
 
   if (document.readyState === 'loading') {
