@@ -1,6 +1,28 @@
 {
   "recordings": [
     {
+      "id": "VID_S706483",
+      "format": "short_reel",
+      "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
+      "title": "⚠️ सावधान किसान! खेती में कोई भी फैसला लेने से पहले Aarogyam Sakhi AI से पूछें 🌱",
+      "description": "🚜 किसान भाइयों, सावधान! खेती में गलत जानकारी, गलत दवा या गलत तरीके से छिड़काव करने से नुकसान हो सकता है।\nअब खेती से जुड़े सवालों के लिए इस्तेमाल करें Aarogyam Sakhi AI। 🌱\n✅ फसल और खेती से जुड़ी जानकारी\n✅ फसल की समस्या पर मार्गदर्शन\n✅ खेती के सही तरीकों को समझने में मदद\n✅ अपनी भाषा में सवाल पूछने की सुविधा",
+      "subject": "Shorts & Reels",
+      "category": "Shorts & Reels",
+      "video_url": "https://youtube.com/shorts/OfEad_pk6PU?si=JiBVUY9c4wJswrGe",
+      "youtube_url": "https://youtube.com/shorts/OfEad_pk6PU?si=JiBVUY9c4wJswrGe",
+      "youtube_id": "OfEad_pk6PU",
+      "thumbnail": "https://img.youtube.com/vi/OfEad_pk6PU/hqdefault.jpg",
+      "duration": "0:28",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 50,
+      "order_type": "pinned",
+      "status": "active",
+      "created_at": "2026-10-28T15:18:26.483Z"
+    },
+    {
       "id": "VID_S238828",
       "format": "short_reel",
       "platform": "youtube",
