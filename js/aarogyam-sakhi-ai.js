@@ -3690,15 +3690,76 @@ if (typeof document !== 'undefined') {
   }
 
   // 11. GREETING & INITIALIZATION
-  function renderInitialGreeting() {
+    // 11. GREETING & INITIALIZATION WITH ANTIGRAVITY ENTRANCE & CHIME
+  let sakhiIntroTimer = null;
+  let sakhiIntroFlightTimer = null;
+
+  function playSakhiPleasantChime() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+      // Pristine crystalline chime chord: E5 (659.25Hz), G#5 (830.61Hz), B5 (987.77Hz), E6 (1318.51Hz)
+      const freqs = [659.25, 830.61, 987.77, 1318.51];
+      const now = ctx.currentTime;
+      freqs.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+        gain.gain.setValueAtTime(0, now + idx * 0.08);
+        gain.gain.linearRampToValueAtTime(0.18 / (idx + 1), now + idx * 0.08 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 1.25);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 1.3);
+      });
+    } catch (e) {
+      console.warn('Audio chime notice:', e);
+    }
+  }
+
+  function renderDefaultSmartPills() {
+    const pillsContainer = document.getElementById('sakhiSmartPillsContainer') || document.getElementById('sakhiSmartPillsBar');
+    if (!pillsContainer) return;
+    pillsContainer.style.display = 'block';
+    pillsContainer.innerHTML = `
+      <div class="sakhi-smart-pills-row">
+        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मेरी फसल में बीमारी है (crop_triage_step1)')">
+          <span class="sakhi-pill-icon-circle green">🌱</span>
+          <span>फसल की समस्या</span>
+        </button>
+        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('फसलों के लिए जैविक कीटनाशक व टॉनिक स्प्रे चार्ट बताएं')">
+          <span class="sakhi-pill-icon-circle emerald">🧪</span>
+          <span>दवा और खुराक</span>
+        </button>
+        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मिट्टी की जांच और धारा संस्कार अमृत मिट्टी कैसे तैयार करें?')">
+          <span class="sakhi-pill-icon-circle blue">💧</span>
+          <span>मिट्टी व पानी की जांच</span>
+        </button>
+        <button type="button" class="sakhi-quick-pill" onclick="document.getElementById('sakhiTextInput') && document.getElementById('sakhiTextInput').focus();">
+          <span class="sakhi-pill-icon-circle indigo">💬</span>
+          <span>कोई भी सवाल पूछें</span>
+        </button>
+      </div>
+    `;
+  }
+
+  function renderInitialGreeting(skipAnimation) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
+    if (sakhiIntroTimer) { clearTimeout(sakhiIntroTimer); sakhiIntroTimer = null; }
+    if (sakhiIntroFlightTimer) { clearTimeout(sakhiIntroFlightTimer); sakhiIntroFlightTimer = null; }
+
     const displayName = getDynamicUserGreetingName();
     const persona = loadSakhiUserPersona();
-
-    let greetingLine = `नमस्ते ${escapeHtml(displayName)} जी! 🙏`;
-    let subGreeting = `मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ।`;
 
     const savedLog = getPersistentChatLog();
     const hasHistory = savedLog && savedLog.length > 0;
@@ -3706,44 +3767,117 @@ if (typeof document !== 'undefined') {
     let historyToolbar = '';
     if (hasHistory) {
       historyToolbar = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px dashed #cbd5e1;">
-          <span style="font-size:0.78rem;color:#475569;font-weight:700;"><i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;"></i> आपकी पिछली बातचीत (${savedLog.length}) सुरक्षित है</span>
-          <button type="button" onclick="window.switchSakhiChatView('old')" title="पुरानी बातचीत देखें" style="background:#eff6ff;border:1.5px solid #93c5fd;color:#1d4ed8;padding:5px 12px;border-radius:14px;font-size:0.78rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed #cbd5e1;">
+          <span style="font-size:0.75rem;color:#475569;font-weight:700;"><i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;"></i> पिछली बातचीत (${savedLog.length}) सुरक्षित</span>
+          <button type="button" onclick="window.switchSakhiChatView('old')" title="पुरानी बातचीत देखें" style="background:#eff6ff;border:1px solid #93c5fd;color:#1d4ed8;padding:4px 10px;border-radius:12px;font-size:0.75rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
             <i class="fa-solid fa-clock-rotate-left"></i> <span>इतिहास देखें</span>
           </button>
         </div>
       `;
     }
 
-    wrap.innerHTML = `
-      <div class="sakhi-msg-row bot">
-        <div class="sakhi-msg-bubble sakhi-hero-ai-card">
-          <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
-            <div class="sakhi-avatar-ai-glow">
-              <img src="${SAKHI_AVATAR_IMG}" alt="Aarogyam Sakhi" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #ffffff;display:block;" onerror="this.src='/images/logo/fevicon.png'">
-            </div>
-            <div style="flex:1;min-width:0;">
-              <div class="sakhi-ai-badge-chip">
-                <span style="font-size:0.85rem;">⚡</span>
-                <span>Gen-AI 4.0 • 100% जैविक व वैज्ञानिक</span>
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    function renderFinalGreetingDom() {
+      wrap.innerHTML = `
+        <div style="display:flex;justify-content:center;margin-bottom:8px;width:100%;">
+          <div class="sakhi-ai-badge-chip-center">
+            <span>⚡</span> <span>GEN-AI 4.0 • 100% जैविक व वैज्ञानिक</span>
+          </div>
+        </div>
+        <div class="sakhi-msg-row bot" style="animation:sakhiMsgFadeIn 0.35s ease-out;width:100%;">
+          <div style="display:flex;align-items:flex-start;gap:10px;width:100%;">
+            <img src="${SAKHI_AVATAR_IMG}" alt="सखी AI" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #16a34a;box-shadow:0 3px 8px rgba(22,163,74,0.3);flex-shrink:0;" onerror="this.src='/images/logo/fevicon.png'">
+            <div class="sakhi-msg-bubble" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:4px 18px 18px 18px;padding:14px 16px;box-shadow:0 4px 12px rgba(22,163,74,0.06);width:100%;box-sizing:border-box;">
+              <div style="font-size:1.25rem;font-weight:900;color:#15803d;display:flex;align-items:center;gap:6px;">
+                <span>नमस्ते ${escapeHtml(displayName)} जी!</span> <span>🙏</span>
               </div>
-              <div style="font-size:1.32rem;font-weight:900;color:#0f172a;line-height:1.25;">${greetingLine}</div>
-              <div style="font-size:1.02rem;color:#166534;font-weight:700;margin-top:2px;">${subGreeting}</div>
+              <div style="font-size:1.02rem;color:#1e293b;font-weight:700;margin-top:6px;line-height:1.5;">
+                मैं आपकी <strong>सखी AI</strong> हूँ। कोई भी सवाल पूछें या मेनू देखें, मैं सही समाधान दूँगी।
+              </div>
+              <div style="font-size:0.75rem;color:#64748b;font-weight:600;margin-top:6px;text-align:right;">
+                ${timeStr}
+              </div>
+              ${historyToolbar}
             </div>
           </div>
+        </div>
+      `;
 
-          <!-- Clean ChatGPT-style Prompt Guide -->
-          <div class="sakhi-quick-action-pill" onclick="window.toggleSakhiPlusMenu(true)" style="cursor:pointer;width:100%;box-sizing:border-box;justify-content:center;">
-            <span style="font-size:1.1rem;">✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
+      renderDefaultSmartPills();
+      updateSakhiHeaderUserBadge();
+
+      // Speak welcoming voice prompt as requested by user
+      try {
+        speakResponse(`नमस्ते ${displayName} जी! मैं आपकी सखी AI हूँ। कोई भी सवाल पूछें या मेनू देखें, मैं सही समाधान दूँगी।`, 'hi');
+      } catch (e) {
+        console.warn('Initial greeting TTS error:', e);
+      }
+    }
+
+    window.skipSakhiIntroAnimation = function () {
+      if (sakhiIntroTimer) { clearTimeout(sakhiIntroTimer); sakhiIntroTimer = null; }
+      if (sakhiIntroFlightTimer) { clearTimeout(sakhiIntroFlightTimer); sakhiIntroFlightTimer = null; }
+      renderFinalGreetingDom();
+    };
+
+    if (skipAnimation) {
+      renderFinalGreetingDom();
+      return;
+    }
+
+    // ANTIGRAVITY ENTRANCE: Center Avatar with glowing cosmic rings
+    wrap.innerHTML = `
+      <div id="sakhiAntigravityIntro" class="sakhi-antigravity-intro-overlay" onclick="window.skipSakhiIntroAnimation && window.skipSakhiIntroAnimation()" title="टैप करके तुरंत शुरू करें">
+        <div class="sakhi-antigravity-rings-container" id="sakhiAntigravityRings">
+          <div class="sakhi-antigravity-ring ring-outer"></div>
+          <div class="sakhi-antigravity-ring ring-mid"></div>
+          <div class="sakhi-antigravity-ring ring-inner"></div>
+          <div class="sakhi-antigravity-avatar-circle">
+            <img src="${SAKHI_AVATAR_IMG}" alt="आरोग्यम सखी AI" onerror="this.src='/images/logo/fevicon.png'">
           </div>
-
-          ${historyToolbar}
+        </div>
+        <div class="sakhi-antigravity-caption">
+          <span>✨</span> <span>आरोग्यम सखी AI सक्रिय हो रही है...</span>
         </div>
       </div>
     `;
 
-    // DO NOT DUMP SAVED LOG AUTOMATICALLY! Keep dashboard clean and fresh!
-    updateSakhiHeaderUserBadge();
+    // 1. Play pleasant crystal chime immediately
+    playSakhiPleasantChime();
+
+    // 2. Measure flight coordinates from center to header avatar
+    setTimeout(() => {
+      const centerElem = document.getElementById('sakhiAntigravityRings');
+      const headerAvatar = document.getElementById('sakhiAvatarFrame') || document.querySelector('.sakhi-avatar-frame');
+      if (centerElem && headerAvatar && typeof centerElem.getBoundingClientRect === 'function' && typeof headerAvatar.getBoundingClientRect === 'function') {
+        const cRect = centerElem.getBoundingClientRect();
+        const hRect = headerAvatar.getBoundingClientRect();
+        const flyX = (hRect.left + hRect.width / 2) - (cRect.left + cRect.width / 2);
+        const flyY = (hRect.top + hRect.height / 2) - (cRect.top + cRect.height / 2);
+        centerElem.style.setProperty('--fly-x', `${Math.round(flyX)}px`);
+        centerElem.style.setProperty('--fly-y', `${Math.round(flyY)}px`);
+      }
+    }, 100);
+
+    // 3. Initiate flight after 1.1s
+    sakhiIntroFlightTimer = setTimeout(() => {
+      const overlay = document.getElementById('sakhiAntigravityIntro');
+      if (overlay) {
+        overlay.classList.add('flying');
+      }
+    }, 1100);
+
+    // 4. Dock in header, trigger ripple glow & render final greeting at 1.65s
+    sakhiIntroTimer = setTimeout(() => {
+      const headerAvatar = document.getElementById('sakhiAvatarFrame') || document.querySelector('.sakhi-avatar-frame');
+      if (headerAvatar) {
+        headerAvatar.classList.add('sakhi-header-dock-active');
+        setTimeout(() => headerAvatar.classList.remove('sakhi-header-dock-active'), 1000);
+      }
+      renderFinalGreetingDom();
+    }, 1650);
   }
 
   // CHAT MODE DROPDOWN & VIEW SWITCHER (Fresh Dashboard vs Old Chat Log)

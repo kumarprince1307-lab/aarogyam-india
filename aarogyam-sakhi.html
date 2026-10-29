@@ -43,7 +43,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261029_v14">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261029_v15">
 
   <style>
     /* Natural Card Layout with Dynamic Viewport Height */
@@ -555,26 +555,17 @@
 
         <!-- Messages Area -->
         <div class="sakhi-messages-wrap" id="sakhiMessagesWrap">
-          <div class="sakhi-msg-row bot">
-            <div class="sakhi-msg-bubble sakhi-hero-ai-card">
-              <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
-                <div class="sakhi-avatar-ai-glow">
-                  <img src="/images/sakhi/aarogyam-sakhi.webp" alt="Aarogyam Sakhi" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid #ffffff;display:block;" onerror="this.src='/images/logo/fevicon.png'">
-                </div>
-                <div style="flex:1;min-width:0;">
-                  <div class="sakhi-ai-badge-chip">
-                    <span style="font-size:0.85rem;">⚡</span>
-                    <span>Gen-AI 4.0 • 100% जैविक व वैज्ञानिक</span>
-                  </div>
-                  <div style="font-size:1.32rem;font-weight:900;color:#0f172a;line-height:1.25;">नमस्ते <span id="sakhiHeroDynamicName">किसान साथी</span>! 🙏</div>
-                  <div style="font-size:1.02rem;color:#166534;font-weight:700;margin-top:2px;">मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ।</div>
-                </div>
+          <div id="sakhiAntigravityIntro" class="sakhi-antigravity-intro-overlay" onclick="window.skipSakhiIntroAnimation && window.skipSakhiIntroAnimation()" title="टैप करके तुरंत शुरू करें">
+            <div class="sakhi-antigravity-rings-container" id="sakhiAntigravityRings">
+              <div class="sakhi-antigravity-ring ring-outer"></div>
+              <div class="sakhi-antigravity-ring ring-mid"></div>
+              <div class="sakhi-antigravity-ring ring-inner"></div>
+              <div class="sakhi-antigravity-avatar-circle">
+                <img src="/images/sakhi/aarogyam-sakhi.webp" alt="आरोग्यम सखी AI" onerror="this.src='/images/logo/fevicon.png'">
               </div>
-
-              <!-- Clean ChatGPT-style Prompt Guide -->
-              <div class="sakhi-quick-action-pill" onclick="window.toggleSakhiPlusMenu(true)" style="cursor:pointer;width:100%;box-sizing:border-box;justify-content:center;">
-                <span style="font-size:1.1rem;">✨</span> <span>मुख्य विषय व टूल्स चुनने के लिए नीचे <strong>[+]</strong> बटन पर टैप करें</span>
-              </div>
+            </div>
+            <div class="sakhi-antigravity-caption">
+              <span>✨</span> <span>आरोग्यम सखी AI सक्रिय हो रही है...</span>
             </div>
           </div>
         </div>
@@ -659,7 +650,26 @@
         </div>
 
         <!-- Smart 1-Tap Contextual Pills Container (Dynamic Follow-up Chips) -->
-        <div id="sakhiSmartPillsContainer" class="sakhi-smart-pills-container" style="display:none;"></div>
+        <div id="sakhiSmartPillsContainer" class="sakhi-smart-pills-container" style="display:block;">
+          <div class="sakhi-smart-pills-row">
+            <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मेरी फसल में बीमारी है (crop_triage_step1)')">
+              <span class="sakhi-pill-icon-circle green">🌱</span>
+              <span>फसल की समस्या</span>
+            </button>
+            <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('फसलों के लिए जैविक कीटनाशक व टॉनिक स्प्रे चार्ट बताएं')">
+              <span class="sakhi-pill-icon-circle emerald">🧪</span>
+              <span>दवा और खुराक</span>
+            </button>
+            <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मिट्टी की जांच और धारा संस्कार अमृत मिट्टी कैसे तैयार करें?')">
+              <span class="sakhi-pill-icon-circle blue">💧</span>
+              <span>मिट्टी व पानी की जांच</span>
+            </button>
+            <button type="button" class="sakhi-quick-pill" onclick="document.getElementById('sakhiTextInput') && document.getElementById('sakhiTextInput').focus();">
+              <span class="sakhi-pill-icon-circle indigo">💬</span>
+              <span>कोई भी सवाल पूछें</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Staged Image Attachment Preview Bar (Photo selected, waiting for user caption/send) -->
         <div id="sakhiStagedImagePreview" style="display:none;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;background:#f0fdf4;border-top:1.5px solid #86efac;border-bottom:1px solid #bbf7d0;border-radius:14px 14px 0 0;box-shadow:0 -2px 8px rgba(0,0,0,0.04);position:relative;z-index:999;">
@@ -740,13 +750,13 @@
   <script src="/session.js"></script>
   <script src="/js/global-guest-modal.js?v=1.3"></script>
   <script type="module" src="/js/public-pwa.js?v=1.4"></script>
-  <script src="/js/sakhi-panchang-engine.js?v=20261029_v14"></script>
+  <script src="/js/sakhi-panchang-engine.js?v=20261029_v15"></script>
   <script src="/js/sakhi-weather-bridge.js?v=20261024_v21"></script>
   <script src="/js/sakhi-vision-engine.js?v=20261026_v619"></script>
   <script src="/js/sakhi-creative-prompts.js?v=1.0"></script>
   <script src="/js/aarogyam-security-guard.js?v=1.0"></script>
   <script src="/js/device-session-guard.js"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261029_v14"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261029_v15"></script>
   <script>
     (function () {
       function lockWindowScroll() {

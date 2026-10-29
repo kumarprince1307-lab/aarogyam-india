@@ -2620,3 +2620,338 @@ body.sakhi-page-body {
   border-color: #86efac;
   transform: translateY(-1px);
 }
+
+
+/* ==========================================================================
+   MOBILE SCREEN RIGHT OVERFLOW FIXES (HEADER & BOOK CARD)
+   ========================================================================== */
+.sakhi-header {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  padding: 8px 10px !important;
+}
+
+.sakhi-header-left {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  gap: 6px !important;
+}
+
+#sakhiHeaderUserShortName {
+  max-width: 82px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.sakhi-header-actions {
+  flex: 1 0 auto !important;
+  justify-content: flex-end !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+#sakhiHeaderWeatherBtn {
+  padding: 3px 6px !important;
+  font-size: 0.74rem !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ensure Bot Message Row & Bubble never overflow screen width */
+.sakhi-msg-row.bot {
+  max-width: 96% !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+}
+
+.sakhi-msg-row.bot .sakhi-msg-bubble {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  word-break: break-word !important;
+}
+
+/* Contextual Book Recommendation Card - 100% responsive inside bubble */
+.sakhi-context-ad-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  margin-top: 12px !important;
+  padding: 10px 10px !important;
+  gap: 10px !important;
+}
+
+.sakhi-ad-body {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.sakhi-ad-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin-bottom: 4px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.sakhi-ad-badge-tag {
+  white-space: normal !important;
+  word-break: break-word !important;
+  font-size: 0.68rem !important;
+}
+
+.sakhi-ad-price {
+  white-space: nowrap !important;
+  font-size: 0.74rem !important;
+}
+
+.sakhi-ad-title {
+  white-space: normal !important;
+  word-break: break-word !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  line-height: 1.3 !important;
+  font-size: 0.88rem !important;
+}
+
+.sakhi-ad-desc {
+  word-break: break-word !important;
+}
+
+/* ==========================================================================
+   ANTIGRAVITY SAKHI 4.0 CENTER-TO-HEADER ENTRANCE ANIMATION & CHIME
+   ========================================================================== */
+.sakhi-antigravity-intro-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  pointer-events: auto;
+  cursor: pointer;
+  background: radial-gradient(circle at center, rgba(240, 253, 244, 0.96) 0%, rgba(255, 255, 255, 0.94) 65%, rgba(248, 250, 252, 0.90) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: sakhiOverlayFadeIn 0.3s ease-out;
+  transition: opacity 0.45s ease-out;
+}
+
+@keyframes sakhiOverlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sakhi-antigravity-rings-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sakhiLevitate 2.4s ease-in-out infinite;
+}
+
+@keyframes sakhiLevitate {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.03);
+  }
+}
+
+.sakhi-antigravity-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sakhi-antigravity-ring.ring-outer {
+  width: 128px;
+  height: 128px;
+  border: 2px dashed rgba(16, 185, 129, 0.55);
+  animation: sakhiSpinClockwise 12s linear infinite;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+}
+
+.sakhi-antigravity-ring.ring-mid {
+  width: 110px;
+  height: 110px;
+  border: 1.5px solid rgba(6, 182, 212, 0.7);
+  animation: sakhiSpinCounter 8s linear infinite;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+.sakhi-antigravity-ring.ring-inner {
+  width: 96px;
+  height: 96px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.15) 55%, transparent 75%);
+  animation: sakhiRingPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes sakhiSpinClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sakhiSpinCounter {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes sakhiRingPulse {
+  0%, 100% { transform: scale(0.96); opacity: 0.6; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+.sakhi-antigravity-avatar-circle {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45), 0 0 15px rgba(6, 182, 212, 0.35);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+}
+
+.sakhi-antigravity-avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sakhi-antigravity-caption {
+  margin-top: 18px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #065f46;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #a7f3d0;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+  letter-spacing: 0.2px;
+}
+
+/* Flight to Header transition */
+.sakhi-antigravity-intro-overlay.flying {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sakhi-antigravity-intro-overlay.flying .sakhi-antigravity-rings-container {
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
+  transform: translate3d(var(--fly-x, -130px), var(--fly-y, -260px), 0) scale(0.35) !important;
+  opacity: 0.1;
+}
+
+.sakhi-antigravity-intro-overlay.flying .sakhi-antigravity-caption {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Header Avatar Ripple Glow upon docking */
+@keyframes sakhiHeaderDockGlow {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.85); }
+  50% { transform: scale(1.22); box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.sakhi-header-dock-active {
+  animation: sakhiHeaderDockGlow 0.9s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* 4 QUICK PROMPT PILLS ROW ABOVE INPUT (Matching User Screenshot) */
+.sakhi-smart-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sakhi-smart-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.sakhi-quick-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 24px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #1e293b;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.sakhi-quick-pill:hover, .sakhi-quick-pill:active {
+  background: #f0fdf4;
+  border-color: #86efac;
+  transform: translateY(-1px);
+}
+
+.sakhi-pill-icon-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+.sakhi-pill-icon-circle.green { background: #dcfce7; }
+.sakhi-pill-icon-circle.emerald { background: #ecfdf5; }
+.sakhi-pill-icon-circle.blue { background: #e0f2fe; }
+.sakhi-pill-icon-circle.indigo { background: #e0e7ff; }
+
+.sakhi-ai-badge-chip-center {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #15803d;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.08);
+  margin: 0 auto 10px auto;
+}
