@@ -1624,7 +1624,7 @@ if (typeof document !== 'undefined') {
     }
 
     // Cow dung compost for crops -> Agri
-    if (q.includes('गोबर') && (q.includes('टमाटर') || q.includes('फसल') || q.includes('सब्जी') || q.includes('खाद') || q.includes('खेत'))) {
+    if ((q.includes('गोबर') || q.includes('compost') || q.includes('खाद')) && (q.includes('npk') || q.includes('एन.पी.के') || q.includes('एनपीके') || q.includes('बायोफिट') || q.includes('बायो फिट') || q.includes('कल्चर') || q.includes('शेत') || q.includes('कंबोज') || q.includes('टमाटर') || q.includes('फसल') || q.includes('सब्जी') || q.includes('खेत'))) {
       return 'agri';
     }
 
@@ -1664,7 +1664,13 @@ if (typeof document !== 'undefined') {
       'earning', 'income', 'बिज़नेस', 'बिजनेस', 'business', 'एफिलिएट', 'affiliate',
       'ई-टेलर', 'etailer', 'नेटवर्क बिजनेस', 'आरोग्यम इंडिया का बिजनेस प्लान', '26 साल', 'सुजीत जैन', 'घर बैठे'
     ];
-    if (!netsurf_rejected && bizTokens.some(b => q.includes(b))) {
+    // If query is specifically about cattle milk & fat or livestock CFC Plus, route to 'pashu', NOT business!
+    const isCattleMilkOrCfc = (
+      (q.includes('दूध') || q.includes('dudh') || q.includes('फैट') || q.includes('fat') || q.includes('थनैल') || q.includes('मछली')) &&
+      (q.includes('गाय') || q.includes('भैंस') || q.includes('पशु') || q.includes('cfc') || q.includes('सीएफसी'))
+    );
+
+    if (!netsurf_rejected && !isCattleMilkOrCfc && bizTokens.some(b => q.includes(b))) {
       return 'netsurf';
     }
 
@@ -1679,9 +1685,10 @@ if (typeof document !== 'undefined') {
 
     // Beauty, Dermatology, Haircare, Lips
     const beautyTokens = [
-      'सुंदर', 'त्वचा', 'चेहरा', 'चेहरे', 'skin', 'झुर्रियां', 'झाइयाँ', 'झाइयां',
+      'सुंदर', 'त्वचा', 'चेहरा', 'चेहरे', 'skin', 'झुर्रियां', 'झुरिया', 'jhuria', 'jhuriyan', 'jhurriya', 'wrinkle', 'wrinkles',
+      'chahre', 'chahra', 'chehra', 'chehre', 'ग्लो', 'glow', 'चमक', 'chamak', 'झाइयाँ', 'झाइयां',
       'रूखापन', 'काले घेरे', 'काले धब्बे', 'मुंहासे', 'कील-मुहाँसों', 'पिंपल', 'pimple',
-      'चेहरे का ग्लो', 'फेस ग्लो', 'glow', 'चमक', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
+      'चेहरे का ग्लो', 'फेस ग्लो', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
       'गंजापन', 'गंजा', 'हेयरफॉल', 'कंडीशनर', 'फेसपैक', 'फेसवाश', 'फेस वॉश', 'रंगत',
       'उबटन', 'जायफल', 'बेसन', 'मुल्तानी मिट्टी', 'मलाई', 'स्क्रब', 'हर्ब्स एंड मोर',
       'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों', 'बॉडी लोशन', 'body lotion'
@@ -1692,15 +1699,25 @@ if (typeof document !== 'undefined') {
     }
 
     // Veterinary & Dairy (Pashu Palan)
+    const hasRealCow = (
+      /(?:^|[^\u0900-\u097F]|[\s,])(?:गाय|गायें|गायों|गौमाता|गौ|cow)(?:$|[^\u0900-\u097F]|[\s,])/u.test(q) &&
+      !q.includes('लगाया') && !q.includes('लगाये') && !q.includes('लगाई') && !q.includes('लगायी') && !q.includes('लगाना')
+    );
+
     const cattleExplicit = [
-      'पशु', 'गाय', 'भैंस', 'दुधारू', 'डेयरी', 'थनैल', 'थनैला', 'mastitis',
+      'पशु', 'भैंस', 'दुधारू', 'डेयरी', 'थनैल', 'थनैला', 'mastitis',
       'बकरी', 'भेड़', 'poultry', 'मुर्गी', 'मुरगी', 'मुर्गियों', 'मुर्गा', 'अंडे', 'अंडा', 'मुर्गी पालन', 'कुक्कुट', 'सूअर', 'मछली', 'मछली पालन',
       'cfc', 'पेट वेट', 'पशु आहार', 'आफरा', 'bloat', 'बछड़ा', 'बछड़े', 'बछड़ी', 'बछड़ों', 'लैक्टेशन',
       'दुग्ध', 'गाभिन', 'जेर', 'बांझपन', 'खुरपका', 'मुंहपका', 'साइलेज', 'दाना-चारा', 'snf'
     ];
     if (!pashu_rejected) {
-      if (cattleExplicit.some(t => q.includes(t))) {
-        return 'pashu';
+      if (hasRealCow || cattleExplicit.some(t => q.includes(t))) {
+        // Exclude if it is fertilizer/compost or crop spray with NPK
+        if ((q.includes('npk') || q.includes('एन.पी.के') || q.includes('एनपीके') || q.includes('खाद') || q.includes('शेत') || q.includes('कल्चर')) && !q.includes('दूध') && !q.includes('फैट') && !q.includes('cfc') && !q.includes('चारा')) {
+          // It's agricultural manure/fertilizer
+        } else {
+          return 'pashu';
+        }
       }
       if ((q.includes('दूध') || q.includes('dudh') || q.includes('फैट') || q.includes('fat')) && (q.includes('बढ़ाना') || q.includes('बढ़ाएं') || q.includes('वृद्धि') || q.includes('पशु') || q.includes('डेयरी') || q.includes('जानवर') || q.includes('भैंस') || q.includes('गाय') || q.includes('कम') || q.includes('7 से 8') || q.includes('लीटर'))) {
         if (!q.includes('चेहरा') && !q.includes('त्वचा') && !q.includes('जायफल') && !q.includes('उबटन') && !q.includes('हल्दी दूध')) {
@@ -1746,6 +1763,18 @@ if (typeof document !== 'undefined') {
     // Agricultural Crops & Protection
     const cleanNoSamadhan = q.replace(/समाधान|सावधान|संविधान|प्रधान/g, '');
     const agriCropEntities = [
+      'आम', 'aam', 'mango', 'mangoes', 'केरी', 'आंबा', 'আম',
+      'अनार', 'anar', 'pomegranate', 'डाळिंब', 'દાડમ', 'ডালিম',
+      'केला', 'kela', 'banana', 'केळी', 'કેળા', 'কলা',
+      'पपीता', 'papita', 'papaya', 'पपई', 'પપૈયા', 'पेঁपे',
+      'अमरूद', 'amrud', 'guava', 'पेरू', 'જામફળ', 'পেয়ারা',
+      'जामुन', 'jamun', 'black plum', 'जांभूळ', 'જાંબુ', 'জাম',
+      'नींबू', 'nimbu', 'lemon', 'citrus', 'मोसंबी', 'संतरा', 'kinnow',
+      'सेब', 'seb', 'apple', 'बागवानी', 'bagwani', 'orchard', 'फल', 'फलों', 'falo', 'phal',
+      'kheti', 'fasal', 'poudha', 'poudhe', 'paudha', 'paudhe', 'lagaye', 'lagana', 'upaj', 'paidavar',
+      'prostimrich', 'pro steam rich', 'prostim', 'deemak', 'dimak', 'termite', 'termites', 'उधई', 'উইপোকা',
+      'शाकनाशी', 'shaknashi', 'shakhnashi', 'खरपतवार', 'gulli danda', 'gullidanda', 'manduasi', 'bathua',
+      'मछली', 'मछली पालन', 'fish farming', 'মাছ চাষ',
       'गेहूं', 'गेहूँ', 'gehu', 'gehun', 'geho', 'gehon', 'gahu', 'kanak',
       'सरसों', 'sarso', 'sarson', 'राई', 'rai',
       'चना', 'चने', 'चैन', 'chene', 'chena', 'chane', 'chhola', 'chickpea', 'gram',
@@ -1756,7 +1785,7 @@ if (typeof document !== 'undefined') {
       'खीरा', 'kheera', 'ककड़ी', 'kakdi', 'गाजर', 'gajar', 'मूली', 'mooli', 'मटर', 'matar',
       'धनिया', 'dhaniya', 'पालक', 'palak', 'कद्दू', 'kaddu',
       'सब्जी', 'सब्जियों', 'फसल', 'फसलों', 'खेत', 'पौधों', 'पौधे', 'पेड़', 'बागवानी',
-      'बीज', 'कृषि', 'कल्ले', 'फुटाव', 'यूरिया', 'डीएपी', 'एनपीके', 'npk', 'उर्वरक', 'खाद',
+      'बीज', 'कृषि', 'कल्ले', 'फुटाव', 'यूरिया', 'डीएपी', 'एनपीके', 'npk', 'एन.पी.के', 'एन.पी.के.', 'n.p.k', 'n.p.k.', 'उर्वरक', 'खाद',
       'कीटनाशक', 'स्प्रे', 'chhidkav', 'chhidkaw', 'छिड़काव', 'छिड़क', 'माहू', 'चेपा', 'रतुआ', 'उकठा', 'उठा लोग', 'उठा रोग', 'उग्र रोग', 'खरपतवार', 'खरपतवारनाशक',
       'इमामेक्टिन', 'कोराजन', 'स्टिमरिच', 'stimrich', 'बायो 99', 'बायो-99', 'bio-99', 'bio99',
       'shet', 'wrapup', 'रैप अप', 'इल्ली', 'फफूंद', 'फंगस', 'झुलसा', 'गलन', 'तना छेदक', 'छेदक',
@@ -3040,8 +3069,9 @@ if (typeof document !== 'undefined') {
     if (/[\u0980-\u09FF]/.test(text)) return 'bn'; // Bengali
     if (/[\u0C00-\u0C7F]/.test(text)) return 'te'; // Telugu
     if (/[\u0B80-\u0BFF]/.test(text)) return 'ta'; // Tamil
-    // Marathi vs Hindi
-    if (/(?:\bआहे\b|\bनाही\b|\bपिक\b|\bसांगा\b|\bकरावे\b|\bझाले\b|\bकेले\b|\bकसे\b|\bकाय\b|\bकेळी\b|\bऊस\b|\bपिकाविषयी\b|\bद्या\b)/i.test(text)) {
+    if (/[\u0B00-\u0B7F]/.test(text)) return 'or'; // Odia
+    // Marathi vs Hindi (Devanagari script: DO NOT USE \b on Unicode characters as JS \b fails on Devanagari!)
+    if (/(?:आहे|नाही|पिका|पिक|सांगा|करावे|झाले|केले|कसे|काय|केळी|ऊस|पिकाविषयी|द्या|गव्हाच्या|पाने|पिवळी|करण्यासाठी|कोणते|वापरावे|रोगाविषयी|कीड|औषध|माहिती|उपाय|रोगाचे|निवारण|खत|खते|फवारणी|लागवड|जाती|उत्पादन)/i.test(text)) {
       return 'mr';
     }
     if (/[\u0900-\u097F]/.test(text)) return 'hi'; // Hindi
@@ -15692,6 +15722,208 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
+
+  // =========================================================================
+  // 19.11 DEDICATED WHEAT WEED CONTROL (खरपतवार / शाकनाशी) & TERMITES (दीमक)
+  // =========================================================================
+  function handleWheatWeedAndTermiteMasterQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    // A. गेहूं में खरपतवार नियंत्रण व शाकनाशी (Weeds & Weedicide in Wheat)
+    const isWheatWeed = (
+      (combined.includes('गेहूं') || combined.includes('gehu') || combined.includes('wheat') || combined.includes('गव्हा')) &&
+      (combined.includes('खरपतवार') || combined.includes('शाकनाशी') || combined.includes('घास') || combined.includes('आगाछा') || combined.includes('নিষ্কাশন') || combined.includes('गुल्ली') || combined.includes('मंडूसी') || combined.includes('बथुआ') || combined.includes('weed') || combined.includes('नींदाई'))
+    ) || (
+      (combined.includes('खरपतवार नियंत्रण') || combined.includes('शाकनाशी का उपयोग')) &&
+      (combined.includes('गेहूं') || combined.includes('फसल') || combined.includes('खेत'))
+    );
+
+    if (isWheatWeed) {
+      const title = '🌾 गेहूं में संपूर्ण खरपतवार (शाकनाशी) नियंत्रण — गुल्ली डंडा, बथुआ व बायो-99 विधि';
+      const baseBody = `🌾 **गेहूं में खरपतवार नियंत्रण की वैज्ञानिक विधि, सही समय व प्रति एकड़ दवा:**\n\nगेहूं की फसल में खरपतवार (घास/कचरा) 25% से 40% तक पैदावार घटा देते हैं। सही समय पर सही शाकनाशी और बायो-99 स्टिकर का प्रयोग करने से 100% खरपतवार नष्ट होते हैं और गेहूं को बिल्कुल झटका नहीं लगता।\n\n⏰ **1. छिड़काव का सबसे सही समय:**\n• गेहूं की पहली सिंचाई (क्राउन रूट स्टेज - 21 से 25 दिन) के बाद जब खेत में पैर टिकने लगे (ओट/बतर आ जाए) यानी **बुवाई के 30 से 35 दिन पर** स्प्रे करें।\n• कभी भी सूखे खेत में या अत्यधिक जलभराव में स्प्रे न करें।\n\n🧪 **2. खरपतवार के प्रकार अनुसार दवा व प्रति एकड़ खुराक:**\n• **केस 1: संकरी पत्ती वाले खरपतवार (गुल्ली डंडा / मंडूसी / जंगली जई):**\n  👉 **दवा:** क्लोडिनाफॉप प्रोपर्जिल 15% WP (Clodinafop 15% WP) **160 ग्राम प्रति एकड़**।\n  👉 अथवा पिनोक्साडेन 5.1% EC (Axial) **400ml प्रति एकड़**।\n\n• **केस 2: चौड़ी पत्ती वाले खरपतवार (बथुआ, सेंजी, चटरी-मटरी, कृष्णनील):**\n  👉 **दवा:** मेटसल्फ्यूरॉन मिथाइल 20% WP (Metsulfuron 20% WP) **8 ग्राम प्रति एकड़**।\n  👉 अथवा 2,4-D अमीन साल्ट 58% SL **300-400ml प्रति एकड़**।\n\n• **केस 3: दोनों प्रकार के खरपतवार मिश्रित होने पर (सर्वोत्तम कॉम्बो):**\n  👉 **दवा:** सल्फोसल्फ्यूरॉन 75% + मेटसल्फ्यूरॉन मिथाइल 5% WG (Total / Leader) **16 ग्राम प्रति एकड़**। यह संकरी और चौड़ी दोनों प्रकार की घास को जड़ से समाप्त करता है।\n\n🚀 **3. नेट्सर्फ बायो-99 का चमत्कारिक नियम (Secret Booster):**\n• खरपतवार की पत्तियों पर मोम की परत (Waxy layer) होती है जिससे रासायनिक दवा फिसलकर गिर जाती है।\n• **घोल बनाते समय प्रति 15 लीटर पंप में केवल 5ml 'नेट्सर्फ बायो-99' अवश्य मिलाएं।**\n• बायो-99 दवा को तुरंत पत्ती की नसों में सोख देता है, जिससे आधी खुराक में ही खरपतवार 3 से 5 दिनों में पीले पड़कर सूख जाते हैं और बारिश होने पर भी दवा धुलती नहीं।\n\n💧 **पानी की मात्रा:** 1 एकड़ में फ्लैट फैन या कट नोजल से 120 से 150 लीटर पानी का उपयोग करें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '💧 बायो-99 स्टिकर की कीमत व डोज', query: 'बायो-99 स्टिकर का उपयोग और डोज क्या है?' },
+        { text: '🌾 गेहूं में कल्ले व पैदावार बढ़ाने का फॉर्मूला', query: 'गेहूं की पैदावार कैसे बढ़ाएं' },
+        { text: '🌿 बायोफिट शेत 1L डिस्काउंट', query: 'बायोफिट शेत 1 लीटर की कीमत और डिस्काउंट' }
+      ], 'agri', 'wheat_weed_control_weedicide');
+      return true;
+    }
+
+    // B. गेहूं व खेत में दीमक नियंत्रण (Termites in Wheat / Crops / Soil)
+    const isTermite = (
+      combined.includes('दीमक') || combined.includes('deemak') || combined.includes('dimak') ||
+      combined.includes('termite') || combined.includes('उधई') || combined.includes('উইপোকা')
+    );
+
+    if (isTermite) {
+      const title = '🛡️ गेहूं व फसलों में दीमक (Termite) की पहचान व 100% जैविक व वैज्ञानिक रोकथाम';
+      const baseBody = `🛡️ **गेहूं के खेत में दीमक की पहचान, नियंत्रण के पक्के उपाय व दवा खुराक:**\n\nदीमक (Termite / सफेद चींटी) जमीन के अंदर रहकर गेहूं की प्राथमिक जड़ों को कुतर देती है, जिससे पौधे सूखने लगते हैं।\n\n🔍 **1. दीमक के आक्रमण की पहचान कैसे करें?**\n• खेत में जगह-जगह पौधे पीले पड़कर सूखते हुए कतार में दिखाई देते हैं।\n• सूखे हुए पौधे को हाथ से खींचने पर वह बिना किसी जोर के आसानी से जड़ से उखड़ जाता है।\n• उखड़े हुए पौधे की जड़ को ध्यान से देखने पर वह कटी हुई मिलती है और तने के पास सफेद-हल्के पीले रंग की दीमक रेंगती दिखती है।\n\n🌱 **2. नेट्सर्फ बायोफिट जैविक स्थायी समाधान (जड़ों का सुरक्षा कवच):**\n• **बायोफिट शेत (SHET - 1 लीटर प्रति एकड़):**\n  👉 पहली या दूसरी सिंचाई के समय 1 लीटर 'शेत' को पानी की नाली या ड्रिप के साथ खेत में चलाएं।\n  👉 शेत में मौजूद लाभकारी सूक्ष्मजीवी दीमक के लार्वा और फंगस को नष्ट कर मिट्टी को रोगमुक्त बनाते हैं।\n• **बायो-99 (250ml प्रति एकड़):**\n  👉 शेत के साथ 250ml बायो-99 मिलाकर चलाने से दवा मिट्टी के कण-कण और गहराई तक पहुंचती है।\n\n⚡ **3. आपातकालीन रासायनिक नियंत्रण (यदि 20% से अधिक नुकसान हो चुका हो):**\n• **क्लोरपायरीफॉस 20% EC (Chlorpyrifos 20% EC):**\n  👉 **मात्रा:** 1.5 से 2 लीटर प्रति एकड़।\n  👉 **विधि:** 40-50 किलो सूखी बालू रेत में मिलाकर खेत में सिंचाई से ठीक पहले एकसमान बिखेरें, फिर पानी लगाएं।\n• **फिप्रोनिल 0.3% GR (Regent):**\n  👉 **मात्रा:** 8 से 10 किग्रा प्रति एकड़ रेत में मिलाकर बखेरें।\n\n⚠️ **सावधानी:** कभी भी कच्चा गोबर खेत में न डालें। कच्चा गोबर दीमक का मुख्य भोजन होता है। हमेशा बायोफिट कल्चर से उपचारित सड़ा हुआ गोबर ही डालें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌿 बायोफिट शेत 1L डिस्काउंट', query: 'बायोफिट शेत 1 लीटर की कीमत और डिस्काउंट' },
+        { text: '💧 बायो-99 स्टिकर खुराक', query: 'बायो-99 स्टिकर का उपयोग और डोज क्या है?' },
+        { text: '🌾 धारा संस्कार अमृत मिट्टी', query: 'अमृत मिट्टी या धारा संस्कार क्या है?' }
+      ], 'agri', 'wheat_termite_soil_pest_control');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.12 CHICKPEA / CHANA BRANCHING & FLOWERING (चने में फुटाव व घटी बूस्टर)
+  // =========================================================================
+  function handleChickpeaBranchingAndFloweringQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    const isChanaBranching = (
+      (combined.includes('चना') || combined.includes('चने') || combined.includes('chana') || combined.includes('chane') || combined.includes('gram')) &&
+      (combined.includes('शाखा') || combined.includes('फूल') || combined.includes('कल्ले') || combined.includes('फुटाव') || combined.includes('घटी') || combined.includes('बढ़ाने') || combined.includes('स्प्रे') || combined.includes('पैदावार') || combined.includes('इल्ली') || combined.includes('घेंटी'))
+    );
+
+    if (isChanaBranching) {
+      const title = '🌿 चने में अधिक शाखाएं, फूल व घटी (बंपर पैदावार) का वैज्ञानिक बायोफिट फॉर्मूला';
+      const baseBody = `🌿 **चने में बंपर फुटाव, शाखाएं और फूल-घटी बढ़ाने का वैज्ञानिक व बायोफिट फॉर्मूला:**\n\nचने की फसल में जितनी अधिक शाखाएं होंगी, फूल और घाटियां (Pods) उतनी ही ज्यादा लगेंगी। सही समय पर की गई 'खुटाई' (Nipping) और बायोफिट स्प्रे से चने का उत्पादन 30% से 50% तक बढ़ जाता है।\n\n✂️ **1. देशी वैज्ञानिक तकनीक — शीर्ष खुटाई (Top Nipping):**\n• बुवाई के **30 से 35 दिन बाद** जब पौधे की ऊंचाई 6 से 8 इंच हो जाए, तब ऊपर की 1-2 इंच की कोमल पत्तियां/कलियां तोड़ (खुटाई कर) दें।\n• इससे पौधे की लंबाई रुककर नीचे से 8 से 12 नई शाखाएं (फुटाव) तेजी से निकलती हैं।\n\n📅 **2. बायोफिट 2-स्प्रे मास्टर शेड्यूल (शाखाएं व फूल बूस्टर):**\n• **पहला स्प्रे (बुवाई के 30-35 दिन पर खुटाई के बाद):**\n  👉 **स्टिमरिच (30ml) + बायो-99 (5ml)** प्रति 15 लीटर पंप।\n  👉 **लाभ:** पौधे की नई शाखाओं का जबरदस्त फुटाव होता है और क्लोरोफिल बढ़ता है।\n\n• **दूसरा स्प्रे (फूल खिलने से ठीक पहले / कलियां बनते समय):**\n  👉 **प्रो स्टिमरिच (30ml) + बायोफिट इंटैक्ट (30ml) + बायो-99 (5ml)** प्रति 15L पंप।\n  👉 **लाभ:** फूलों की संख्या दोगुनी होती है, फूल गिरना रुकता है और इंटैक्ट चने की सुंडी (घाटी इल्ली / Helicoverpa) को शुरू में ही रोक देता है।\n\n• **तीसरा स्प्रे (घटी में दाना भरते समय):**\n  👉 **प्रो स्टिमरिच (30ml) + बायो-99 (5ml)**। इससे घटी में 2-2 बड़े, चमकदार व भारी दाने बनते हैं।\n\n🚫 **महत्वपूर्ण सावधानी:** जब चने में 50% से अधिक फूल खिले हों, उस समय पानी (सिंचाई) बिल्कुल न लगाएं, अन्यथा फूल झड़ जाएंगे।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌟 प्रो स्टिमरिच 25% छूट', query: 'प्रो स्टिमरिच की कीमत और डिस्काउंट' },
+        { text: '🌱 बायोफिट स्टिमरिच डिटेल', query: 'बायोफिट स्टिमरिच का उपयोग और डोज क्या है?' },
+        { text: '🐛 चने की इल्ली व कीट नियंत्रण', query: 'चने की इल्ली का जैविक उपचार क्या है?' }
+      ], 'agri', 'chana_branching_flowering_booster');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.13 FISHERIES & AQUACULTURE (मछली पालन / মাছ চাষ)
+  // =========================================================================
+  function handleFisheriesAquacultureQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    const isFish = (
+      combined.includes('मछली') || combined.includes('मछली पालन') || combined.includes('মাছ চাষ') ||
+      combined.includes('fishery') || combined.includes('aquaculture') || combined.includes('तालाब') ||
+      combined.includes('मत्स्य') || combined.includes('पंगेशियस') || combined.includes('रोहू') || combined.includes('कतला')
+    );
+
+    if (isFish) {
+      const title = '🐟 आधुनिक मछली पालन (Aquaculture) — तालाब तैयारी, पोषण व CFC Plus ग्रोथ बूस्टर';
+      const baseBody = `🐟 **आधुनिक वैज्ञानिक मछली पालन — तालाब तैयारी, पानी की जांच व नेट्सर्फ CFC Plus फॉर्मूला:**\n\nमछली पालन कम लागत में निरंतर भारी मुनाफा देने वाला व्यवसाय है। सही तालाब प्रबंधन और उच्च-प्रोटीन पूरक आहार से मछलियों का वजन तेजी से बढ़ता है।\n\n🌊 **1. तालाब की तैयारी व पानी के मानक:**\n• **पानी का pH:** 7.5 से 8.5 के बीच होना चाहिए। यदि पानी अम्लीय (pH < 7) हो, तो प्रति एकड़ 200 से 250 किग्रा चूना (कली का चूना) डालें।\n• **प्राकृतिक भोजन (Plankton निर्माण):** तालाब में प्राकृतिक काई और प्लवक बढ़ाने हेतु 1,000 किग्रा सड़ा हुआ गोबर + बायोफिट कल्चर का घोल बनाकर डालें।\n\n🐠 **2. प्रमुख व्यावसायिक मछलियां:**\n• **भारतीय प्रमुख कार्प (IMC):** रोहू (Rohu), कतला (Catla), मृगल (Mrigal) — मिश्रित पालन हेतु सर्वश्रेष्ठ।\n• **कैटफिश (Catfish):** पंगेशियस (Pangasius / प्यासी) व सिंघी — तेजी से 6-8 माह में 1.5 किग्रा वजन।\n\n🍼 **3. नेट्सर्फ सीएफसी प्लस (CFC Plus) — मछली वजन व इम्युनिटी बूस्टर:**\n• **उपयोग विधि:** प्रति **1 किलोग्राम मछली दाने (Floating Fish Feed)** में **10 ग्राम नेट्सर्फ सीएफसी प्लस (CFC Plus)** अच्छी तरह मिलाकर सुखा लें और रोजाना सुबह-शाम तालाब में खिलाएं।\n• **चमत्कारिक परिणाम:**\n  1. मछलियों की पाचन शक्ति मजबूत होती है, जिससे दाने की बर्बादी रुकती है (FCR बेहतर होता है)।\n  2. मछलियों की त्वचा चमकदार बनती है और गलफड़ों (Gill Rot) व फंगल बीमारियों से 100% सुरक्षा मिलती है।\n  3. 6 महीने में मछलियों का वजन सामान्य से 25% से 35% अधिक तेजी से बढ़ता है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'pashu');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🐄 बायोफिट सीएफसी प्लस डिटेल', query: 'बायोफिट सीएफसी प्लस क्या है और इसके फायदे?' },
+        { text: '💧 पानी की जांच व pH', query: 'पानी का pH और TDS कैसे चेक करें?' },
+        { text: '💼 नेट्सर्फ 25% छूट पर सीएफसी लें', query: 'सीएफसी प्लस 25% डिस्काउंट पर कैसे लें' }
+      ], 'pashu', 'fisheries_aquaculture_cfc_plus');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.14 NETSURF BIOFIT NPK + COW DUNG / GOBAR COMPOST ENRICHMENT
+  // =========================================================================
+  function handleNetsurfBiofitNpkWithCowDungQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    const isNpkGobar = (
+      (combined.includes('गोबर') || combined.includes('compost') || combined.includes('खाद') || combined.includes('कंबोज')) &&
+      (combined.includes('npk') || combined.includes('एन.पी.के') || combined.includes('एनपीके') || combined.includes('बायो फिट') || combined.includes('बायोफिट'))
+    ) || (
+      combined.includes('एन.पी.के. लगाया जा सकता है') || combined.includes('एन.पी.के. नांखी શકાય') || combined.includes('નેટસફૅ ની પ્રોડક્ટ્સ. n.p.k')
+    );
+
+    if (isNpkGobar) {
+      const title = '🌱 गोबर की खाद में नेट्सर्फ बायोफिट N.P.K. व शेत मिलाने की संपूर्ण वैज्ञानिक विधि';
+      const baseBody = `🌱 **गोबर की खाद में नेट्सर्फ बायोफिट N.P.K. व शेत का समृद्धिकरण (Bio-Enrichment):**\n\n**हाँ, बिल्कुल!** गोबर की खाद में नेट्सर्फ बायोफिट N.P.K., शेत और कल्चर मिलाना रासायनिक यूरिया और डीएपी का 100% जैविक व 3 गुना अधिक ताकतवर विकल्प है।\n\n🧪 **1. आवश्यक सामग्री (1 एकड़ अथवा 2 ट्रॉली गोबर खाद हेतु):**\n• 1 से 2 ट्रॉली पुरानी, ठंडी सड़ी हुई गोबर की खाद (कच्चा गोबर न लें)।\n• **बायो-एन (Bio-N):** 1 लीटर (वायुमंडलीय नाइट्रोजन फिक्सिंग बैक्टीरिया)।\n• **बायो-पी (Bio-P):** 1 लीटर (मिट्टी में फिक्स फास्फोरस को घोलने वाला बैक्टीरिया)।\n• **बायो-के (Bio-K):** 1 लीटर (पोटाश मोबिलाइजिंग बैक्टीरिया)।\n• **बायोफिट शेत (SHET):** 1 लीटर (मल्टी-माइक्रोबियल कंसोर्टियम)।\n• **बायो-99:** 250ml।\n• **गुड़:** 2 किलोग्राम (जीवाणुओं का भोजन)।\n\n🥣 **2. तैयार करने की आसान विधि:**\n1. 200 लीटर पानी के ड्रम में 2 किलो गुड़ घोलें।\n2. इसमें 1L बायो-एन, 1L बायो-पी, 1L बायो-के, 1L शेत और 250ml बायो-99 डालकर लकड़ी के डंडे से अच्छी तरह घोल लें।\n3. इस घोल को रात भर (12 घंटे) छांव में रख दें ताकि जीवाणु तेजी से कई गुना बढ़ जाएं।\n4. सुबह गोबर की खाद के ढेर पर इस घोल का एकसमान छिड़काव करें और फावड़े से खाद को ऊपर-नीचे अच्छी तरह मिला दें।\n5. इस खाद के ढेर को बोरी या तिरपाल से ढककर छांव में 48 घंटे रखें।\n\n🌾 **3. खेत में डालने का तरीका व लाभ:**\n• खेत की अंतिम जुताई के समय इस समृद्ध खाद को खेत में बिखेर दें।\n• **परिणाम:** जमीन में रासायनिक खाद की जरूरत 50% से 75% कम हो जाती है, केंचुए सक्रिय होते हैं और फसल का फुटाव व चमक देखते ही बनती है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌿 बायोफिट NPK कॉम्बो डिस्काउंट', query: 'बायोफिट एनपीके की कीमत और उपयोग' },
+        { text: '🌾 धारा संस्कार अमृत मिट्टी', query: 'अमृत मिट्टी या धारा संस्कार क्या है?' },
+        { text: '🦠 बायोफिट कल्चर डिटेल', query: 'बायोफिट कल्चर क्या है और इसकी कीमत व उपयोग' }
+      ], 'agri', 'biofit_npk_gobar_enrichment');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.15 FACIAL WRINKLES & ANTI-AGEING (चेहरे पर झुर्रियां व कसावट)
+  // =========================================================================
+  function handleSkinAntiAgeingAndWrinkleQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    const isWrinkles = (
+      combined.includes('झुर्रियां') || combined.includes('झुरिया') || combined.includes('jhuria') ||
+      combined.includes('jhurriya') || combined.includes('wrinkle') || combined.includes('ढीली त्वचा') ||
+      combined.includes('उम्र का असर') || combined.includes('anti-ageing') || combined.includes('anti ageing')
+    );
+
+    if (isWrinkles) {
+      const title = '✨ चेहरे की झुर्रियां, बारीक रेखाएं (Fine Lines) व उम्र के असर का प्राकृतिक व नेचुरामोर समाधान';
+      const baseBody = `✨ **चेहरे पर झुर्रियों, महीन रेखाओं व त्वचा के ढीलेपन का स्थाई समाधान:**\n\nउम्र बढ़ने, धूप (UV Rays), तनाव और शरीर में कोलेजन (Collagen) प्रोटीन की कमी से त्वचा की लोच (Elasticity) कम हो जाती है, जिससे चेहरे पर झुर्रियां दिखने लगती हैं।\n\n🧴 **1. बाहरी त्वचा देखभाल (नेट्सर्फ हर्ब्स एंड मोर):**\n• **हर्ब्स एंड मोर विटामिन थेरेपी एंटी-एजिंग नाइट क्रीम:**\n  👉 रात को सोने से पहले चेहरे को गुनगुने पानी से धोकर सुखाएं और हल्के हाथ से ऊपर की दिशा (Upward Strokes) में मसाज करें। इसमें मौजूद विटामिन-सी और प्राकृतिक पेप्टाइड्स त्वचा को कसते हैं और झुर्रियां मिटाते हैं।\n• **घरेलू फेसपैक:** 1 चम्मच एलोवेरा जेल + 3 बूंद बादाम का तेल मिलाकर 15 मिनट लगाएं।\n\n💊 **2. आंतरिक कोलेजन व पोषण (नेचुरामोर ओरल केयर):**\n• **नेचुरामोर विमेन वेलनेस (Women Wellness) / एक्टिव प्लस:**\n  👉 1 चम्मच सुबह और शाम गुनगुने दूध के साथ लें। यह त्वचा की अंदरूनी कोशिकाओं को प्रोटीन, एंटीऑक्सिडेंट्स और ओमेगा पोषण देकर झुर्रियों को जड़ से रोकता है।\n• **रोजाना 8-10 गिलास पानी पिएं** ताकि त्वचा हाइड्रेटेड रहे।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'beauty');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '✨ विटामिन थेरेपी एंटी-एजिंग क्रीम', query: 'हर्ब्स एंड मोर विटामिन थेरेपी एंटी एजिंग क्रीम' },
+        { text: '🌸 नेचुरामोर विमेन वेलनेस पाउडर', query: 'नेचुरामोर विमेन वेलनेस के क्या फायदे हैं?' },
+        { text: '🌿 चेहरे पर चमक के घरेलू नुस्खे', query: 'chehre me chamak badhane ke liye kya kare' }
+      ], 'beauty', 'facial_wrinkles_anti_ageing');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.16 ARTHRITIS & CHRONIC JOINT PAIN (घुटनों व जोड़ों का पुराना दर्द / गठिया)
+  // =========================================================================
+  function handleArthritisAndJointPainMasterQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    const isJointPain = (
+      (combined.includes('घुटने') || combined.includes('घुटनों') || combined.includes('जोड़ों') || combined.includes('जोड') || combined.includes('गठिया') || combined.includes('arthritis') || combined.includes('joint') || combined.includes('ग्रीस')) &&
+      (combined.includes('दर्द') || combined.includes('इलाज') || combined.includes('आयुर्वेदिक') || combined.includes('सूजन') || combined.includes('कट-कट') || combined.includes('दवा') || combined.includes('कमजोरी'))
+    );
+
+    if (isJointPain) {
+      const title = '🦴 घुटनों व जोड़ों के पुराने दर्द, गठिया (Arthritis) व ग्रीस की कमी का प्रामाणिक आयुर्वेदिक समाधान';
+      const baseBody = `🦴 **घुटनों और जोड़ों के पुराने दर्द का वैज्ञानिक व नेचुरामोर आयुर्वेदिक इलाज:**\n\nउम्र के साथ जोड़ों के बीच का कुशन (Cartilage) घिसने और सायनोवियल फ्लूइड (ग्रीस) कम होने से हड्डियों में रगड़ व कट-कट की आवाज के साथ तेज दर्द होने लगता है।\n\n💊 **1. आंतरिक कार्टिलेज हीलिंग व ग्रीस संवर्धन (नेचुरामोर जॉइंट केयर):**\n• **नेचुरामोर जॉइंट केयर कैप्सूल (Joint Care Capsule):**\n  👉 **खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम को भोजन के उपरांत गुनगुने पानी से लें।\n  👉 **घटक व लाभ:** इसमें ग्लूकोसामाइन, गुग्गुल, रास्ना और सलाई गुग्गुल है जो जोड़ों की पुरानी सूजन को मिटाकर अंदरूनी कार्टिलेज को दोबारा पोषण देते हैं।\n• **नेचुरामोर ओरिजिनल / प्लस पाउडर:**\n  👉 1 चम्मच सुबह दूध के साथ लें ताकि हड्डियों को कैल्शियम व प्रोटीन मिले।\n\n🧴 **2. बाहरी तुरंत राहत (मस्कुलर पेन क्रीम):**\n• **नेचुरामोर मस्कुलर पेन क्रीम (Naturamore Muscular Pain Cream):**\n  👉 घुटने व जोड़ों पर दिन में 2 बार हल्के हाथ से लगाएं। दर्द और जकड़न तुरंत शांत होती है।\n\n🌿 **3. दादी-नानी का देशी उपाय:**\n• 1 चम्मच मेथी दाना रात को भिगोकर सुबह चबाकर खाएं और उसका पानी पिएं। खट्टी व बादी चीजों (उड़द दाल, अरबी, चावल) का परहेज करें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🦴 नेचुरामोर जॉइंट केयर कैप्सूल', query: 'नेचुरामोर जॉइंट केयर कैप्सूल के फायदे' },
+        { text: '🩹 मस्कुलर पेन क्रीम डिटेल', query: 'नेचुरामोर मस्कुलर पेन क्रीम का उपयोग' },
+        { text: '🩸 संपूर्ण स्वास्थ्य व डाइट चार्ट', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' }
+      ], 'health', 'arthritis_chronic_joint_pain');
+      return true;
+    }
+
+    return false;
+  }
+
   // =========================================================================
   // 19.10 SAKHI 2X SMART MASTER INTEL: FRUIT ORCHARDS (आम, अनार, केला) & VAM
   // =========================================================================
@@ -16086,17 +16318,32 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // Strictly disambiguates from Sciatica/Slip Disc!
     function handleInjuryAndSprainQueries(cleanQ, rawQ, directives) {
       const q = (cleanQ || '').toLowerCase();
+
+      // ABSOLUTE CROP / VETERINARY FIREWALL: Never trigger human injury on crop pests, termites, crops, weeds!
+      if (
+        q.includes('दीमक') || q.includes('कीट') || q.includes('इल्ली') || q.includes('गेहूं') ||
+        q.includes('खेत') || q.includes('पेड़') || q.includes('फसल') || q.includes('पौध') ||
+        q.includes('जमीन') || q.includes('मिट्टी') || q.includes('शाकनाशी') || q.includes('खरपतवार') ||
+        q.includes('चने') || q.includes('चना') || q.includes('धान') || q.includes('सरसों') ||
+        q.includes('पशु') || q.includes('गाय') || q.includes('भैंस') || q.includes('बकरी') ||
+        q.includes('fasal') || q.includes('kheti') || q.includes('termite') || q.includes('deemak')
+      ) {
+        return false;
+      }
+
+      const hasExplicitBodyPart = (
+        q.includes('पैर') || q.includes('हाथ') || q.includes('घुटने') || q.includes('कमर') ||
+        q.includes('शरीर') || q.includes('पीठ') || q.includes('एड़ी') || q.includes('कलाई') ||
+        q.includes('गर्दन') || q.includes('मांसपेशी') || q.includes('हड्डी')
+      );
+
       const isInjury = (
         q.includes('चोट') || q.includes('मोच') || q.includes('खिंचाव') || q.includes('सोट') ||
         q.includes('chot') || q.includes('moch') || q.includes('injury') || q.includes('sprain') ||
-        q.includes('मुड़ गया') || q.includes('मुड़ गई') || q.includes('लग गई') || q.includes('लग गया')
+        q.includes('मुड़ गया') || q.includes('मुड़ गई') ||
+        ((q.includes('लग गई') || q.includes('लग गया')) && hasExplicitBodyPart)
       );
       if (!isInjury) return false;
-
-      // Ensure it's human injury, not crop damage
-      if (q.includes('fasal') || q.includes('फसल') || q.includes('kheti') || q.includes('पौधा')) {
-        return false;
-      }
 
       sakhiConversationState.lastActiveDomain = 'health';
       let title = '🩹 पैर व शरीर में चोट, मोच, खिंचाव व सूजन — नेट्सर्फ व प्राथमिक उपचार';
@@ -16307,14 +16554,20 @@ function processKnowledgeQuery(query) {
       if (handleKarwaChauthDirectQueries(cleanQ, rawQ, directives)) return;
     if (handleDharaSanskarAndSoilScienceQueries(cleanQ, rawQ, directives)) return;
     if (handleFruitOrchardMasterQueries(cleanQ, rawQ, directives)) return;
+    if (handleWheatWeedAndTermiteMasterQueries(cleanQ, rawQ, directives)) return;
+    if (handleChickpeaBranchingAndFloweringQueries(cleanQ, rawQ, directives)) return;
+    if (handleFisheriesAquacultureQueries(cleanQ, rawQ, directives)) return;
+    if (handleNetsurfBiofitNpkWithCowDungQueries(cleanQ, rawQ, directives)) return;
+    if (handleSkinAntiAgeingAndWrinkleQueries(cleanQ, rawQ, directives)) return;
+    if (handleArthritisAndJointPainMasterQueries(cleanQ, rawQ, directives)) return;
     if (handleProStimrichAndIngredientsQueries(cleanQ, rawQ, directives)) return;
     if (handleWomensHealthAndBeautyMasterQueries(cleanQ, rawQ, directives)) return;
     if (handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives)) return;
-      if (handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives)) return;
-      if (handleGobarCompostCultureQueries(cleanQ, rawQ, directives)) return;
-      if (handleInjuryAndSprainQueries(cleanQ, rawQ, directives)) return;
-      if (handleCatalogAndStoreQueries(cleanQ, rawQ, directives)) return;
-      if (handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives)) return;
+    if (handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives)) return;
+    if (handleGobarCompostCultureQueries(cleanQ, rawQ, directives)) return;
+    if (handleInjuryAndSprainQueries(cleanQ, rawQ, directives)) return;
+    if (handleCatalogAndStoreQueries(cleanQ, rawQ, directives)) return;
+    if (handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives)) return;
 
       // 🌤️ CONVERSATIONAL WEATHER & SPRAY ADVISOR (FarmerChat Real-Time Multi-City & 7-Day)
       const isWeatherQuestion = /(?:बारिश|barish|barsat|वर्षा|मौसम|mousam|mosam|तापमान|temperature|\bweather\b|\brain\b|weather.*spray|spray.*weather|स्प्रे.*मौसम|मौसम.*स्प्रे|छिड़काव.*मौसम|मौसम.*छिड़काव)/i.test(normQuery) && !/(?:इल्ली|सुंडी|कीट|रोग|दवा|फंगीसाइड|कीटनाशक|उर्वरक|खाद|बीज|बुवाई|झुलसा|करपा|ब्लास्ट|पत्ता|पत्ती|धान|गेहूं|चना|सरसों|केला|केळी)/i.test(normQuery);

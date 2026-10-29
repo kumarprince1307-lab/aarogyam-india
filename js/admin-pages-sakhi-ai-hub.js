@@ -396,6 +396,8 @@ export async function initSakhiAiHub() {
           </tbody>
         </table>
       </div>
+      <!-- 20-Row Pagination Bar -->
+      <div id="sakhiAuditPaginationBar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--admin-border,#334155);"></div>
     </div>
 
     <!-- 👑 टीम स्पॉन्सर / Upline लीड इंटेलिजेंस व एक्सेल डाउनलोड (Team Sponsor AI Leads Intelligence Hub) -->
@@ -483,6 +485,8 @@ export async function initSakhiAiHub() {
           </tbody>
         </table>
       </div>
+      <!-- 20-Row Pagination Bar -->
+      <div id="sakhiTeamLeadsPaginationBar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid #334155;"></div>
     </div>
 
     <!-- Live Supabase All Sakhi Users Table -->
@@ -551,6 +555,8 @@ export async function initSakhiAiHub() {
           </tbody>
         </table>
       </div>
+      <!-- 20-Row Pagination Bar -->
+      <div id="sakhiUsersPaginationBar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--admin-border,#334155);"></div>
     </div>
 
     <!-- Unanswered Questions Log Section -->
@@ -594,6 +600,8 @@ export async function initSakhiAiHub() {
           </tbody>
         </table>
       </div>
+      <!-- 20-Row Pagination Bar -->
+      <div id="sakhiUnansweredPaginationBar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--admin-border,#334155);"></div>
     </div>
 
     <!-- ========================================================================= -->
@@ -894,7 +902,7 @@ async function fetchAndRenderSakhiInsights() {
         .from('sakhi_user_insights')
         .select('*')
         .order('last_active_at', { ascending: false })
-        .limit(200);
+        .limit(1000);
 
       if (!error && data && data.length > 0) {
         list = data;
@@ -1890,7 +1898,7 @@ async function renderUnansweredQueries() {
         .eq('is_resolved', false)
         .order('hit_count', { ascending: false })
         .order('last_asked_at', { ascending: false })
-        .limit(100);
+        .limit(1000);
 
       if (!error && data && data.length > 0) {
         list = data.map(d => ({
@@ -2114,7 +2122,7 @@ async function fetchAndRenderSakhiAuditLogs() {
         .from('sakhi_chat_audit_logs')
         .select('*')
         .order('date_time', { ascending: false })
-        .limit(100);
+        .limit(1000);
 
       if (!error && Array.isArray(data)) {
         list = data;
@@ -2122,6 +2130,29 @@ async function fetchAndRenderSakhiAuditLogs() {
     }
   } catch (err) {
     console.debug('[Sakhi Audit Hub] DB query notice:', err);
+  }
+
+  // Direct REST Fetch Fallback if DB client was not ready or returned empty
+  if (list.length === 0) {
+    try {
+      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_chat_audit_logs?select=*&order=date_time.desc&limit=1000';
+      const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      const res = await fetch(sbUrl, {
+        headers: {
+          'apikey': sbKey,
+          'Authorization': `Bearer ${sbKey}`,
+          'Accept': 'application/json'
+        }
+      });
+      if (res.ok) {
+        const restData = await res.json();
+        if (Array.isArray(restData) && restData.length > 0) {
+          list = restData;
+        }
+      }
+    } catch (err) {
+      console.debug('REST fetch error for audit logs:', err?.message);
+    }
   }
 
   // Fallback to local session logs if table empty or not yet migrated
@@ -2993,7 +3024,9 @@ function renderGeminiDailyChart() {
       statsObj[key].chats = (statsObj[key].chats || 0) + 1;
       const isImg = Boolean(item.image_url || item.has_image || (item.sawal && (item.sawal.includes('फोटो') || item.sawal.includes('विज़न') || item.sawal.includes('इमेज'))));
       if (isImg) statsObj[key].images = (statsObj[key].images || 0) + 1;
-      const tok = Number(item.tokens_used) || Math.max(120, Math.round(((item.sawal || '').length + (item.jawab || '').length) / 2.5));
+      // Only count tokens if it was an image/vision query or explicit cloud API call
+      const isVisionOrApi = Boolean(item.is_gemini || item.has_image || item.image_url || (item.sawal && (item.sawal.includes('फोटो') || item.sawal.includes('विज़न') || item.sawal.includes('इमेज'))));
+      const tok = Number(item.tokens_used) || (isVisionOrApi ? Math.max(250, Math.round(((item.sawal || '').length + (item.jawab || '').length) / 2)) : 0);
       statsObj[key].tokens = (statsObj[key].tokens || 0) + tok;
     });
   }
