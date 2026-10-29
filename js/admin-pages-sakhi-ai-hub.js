@@ -343,17 +343,35 @@ export async function initSakhiAiHub() {
       <div id="sakhiAuditAnalysisResultBox" style="display:none;background:rgba(99,102,241,0.08);border:1.5px solid #6366f1;border-radius:10px;padding:16px;margin-bottom:16px;">
       </div>
 
-      <!-- Single User Filter Bar (Zero-Egress Instant In-Memory Filter) -->
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;background:var(--admin-surface-2,#0f172a);padding:10px 14px;border-radius:10px;border:1px solid var(--admin-border,#334155);">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <label style="font-size:0.82rem;font-weight:700;color:var(--admin-text,#e2e8f0);display:flex;align-items:center;gap:6px;">
-            <span>🔍</span> 👤 यूज़र फ़िल्टर:
-          </label>
-          <select id="sakhiAuditUserFilterSelect" class="admin-select" style="padding:6px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;background:var(--admin-surface,#1e293b);color:var(--admin-text,#f8fafc);border:1px solid var(--admin-border,#334155);min-width:280px;" onchange="window.filterSakhiAuditByUser(this.value)">
-            <option value="all">👥 सभी यूज़र्स (All Users)</option>
+      <!-- Enhanced Multi-Filter Bar with Mobile Responsive Controls -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;background:var(--admin-surface-2,#0f172a);padding:12px 14px;border-radius:12px;border:1px solid var(--admin-border,#334155);">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;min-width:280px;">
+          <!-- Search Input -->
+          <input type="text" id="sakhiAuditSearchInput" class="admin-input" placeholder="🔍 सवाल, उत्तर या यूज़र खोजें..." oninput="window.filterSakhiAuditBySearch(this.value)" style="flex:1;min-width:180px;background:var(--admin-surface,#1e293b);color:var(--admin-text,#f8fafc);border:1px solid var(--admin-border,#334155);border-radius:8px;padding:7px 12px;font-size:0.82rem;" />
+
+          <!-- User Filter Select -->
+          <select id="sakhiAuditUserFilterSelect" class="admin-select" style="padding:7px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;background:var(--admin-surface,#1e293b);color:var(--admin-text,#f8fafc);border:1px solid var(--admin-border,#334155);min-width:180px;" onchange="window.filterSakhiAuditByUser(this.value)">
+            <option value="all">👥 सभी यूज़र्स (All)</option>
+          </select>
+
+          <!-- Domain Filter Select -->
+          <select id="sakhiAuditDomainFilterSelect" class="admin-select" style="padding:7px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;background:var(--admin-surface,#1e293b);color:var(--admin-text,#f8fafc);border:1px solid var(--admin-border,#334155);" onchange="window.filterSakhiAuditByDomain(this.value)">
+            <option value="all">🌐 सभी डोमेन</option>
+            <option value="agri">🌾 कृषि (Agri)</option>
+            <option value="health">🩺 स्वास्थ्य (Health)</option>
+            <option value="pashu">🐄 पशुपालन (Dairy)</option>
+            <option value="netsurf">🌿 नेट्सर्फ / बिज़नेस</option>
+            <option value="omni">🔘 अन्य / मेनू</option>
+          </select>
+
+          <!-- Status Filter Select -->
+          <select id="sakhiAuditStatusFilterSelect" class="admin-select" style="padding:7px 12px;border-radius:8px;font-size:0.82rem;font-weight:700;background:var(--admin-surface,#1e293b);color:var(--admin-text,#f8fafc);border:1px solid var(--admin-border,#334155);" onchange="window.filterSakhiAuditByStatus(this.value)">
+            <option value="all">🚦 सभी स्थिति</option>
+            <option value="PASS">✔ PASS (सटीक)</option>
+            <option value="FAIL">⚠ FAIL (छूटे हुए)</option>
           </select>
         </div>
-        <div id="sakhiAuditFilteredCountBadge" style="font-size:0.75rem;color:var(--admin-muted,#94a3b8);font-weight:700;"></div>
+        <div id="sakhiAuditFilteredCountBadge" style="font-size:0.80rem;color:#38bdf8;font-weight:800;background:rgba(56,189,248,0.1);padding:4px 10px;border-radius:6px;border:1px solid rgba(56,189,248,0.2);"></div>
       </div>
 
       <!-- Responsive Live Audit Table -->
@@ -362,13 +380,13 @@ export async function initSakhiAiHub() {
           <thead>
             <tr style="background:var(--admin-surface-2,#0f172a);border-bottom:2px solid var(--admin-border,#334155);text-align:left;">
               <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:45px;">#</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:130px;">समय (Time)</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:130px;">यूज़र प्रोफाइल</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">यूज़र का सवाल (Query)</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">सखी का जवाब (Answer Preview)</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:90px;text-align:center;">डोमेन</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:80px;text-align:center;">स्टेटस</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:70px;text-align:right;">एक्शन</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:110px;">समय</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);min-width:140px;">यूज़र</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);min-width:200px;">सवाल (Query)</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);min-width:180px;">सखी का जवाब</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:85px;text-align:center;">डोमेन</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:75px;text-align:center;">स्टेटस</th>
+              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:110px;text-align:right;">एक्शन</th>
             </tr>
           </thead>
           <tbody id="sakhiAuditTableBody">
@@ -889,7 +907,7 @@ async function fetchAndRenderSakhiInsights() {
   // Guaranteed Direct REST Fetch Fallback if client wasn't ready
   if (list.length === 0) {
     try {
-      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?select=*&order=last_active_at.desc&limit=200';
+      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?select=*&order=last_active_at.desc&limit=1000';
       const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
       const res = await fetch(sbUrl, {
         headers: {
@@ -1045,6 +1063,144 @@ function setBar(barId, statId, pct, count) {
 // ----------------------------------------------------
 // RENDER REAL SAKHI USERS TABLE
 // ----------------------------------------------------
+
+// =========================================================================
+// 🚀 SAKHI ADMIN 20-ROW PAGINATION & SIDE DRAWER ENGINE
+// =========================================================================
+
+window._sakhiPagination = {
+  audit: { page: 1, pageSize: 20, domain: 'all', status: 'all', user: 'all', search: '' },
+  users: { page: 1, pageSize: 20 },
+  team: { page: 1, pageSize: 20 },
+  unanswered: { page: 1, pageSize: 20, domain: 'all', search: '' }
+};
+
+function renderPaginationControls(containerId, totalItems, currentPage, pageSize, onPageChangeFnName) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const from = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const to = Math.min(currentPage * pageSize, totalItems);
+
+  // Generate numeric page buttons (window of 5 pages)
+  let pageButtonsHtml = '';
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2)) {
+      const isCur = p === currentPage;
+      pageButtonsHtml += `<button type="button" class="admin-btn ${isCur ? 'admin-btn-primary' : 'admin-btn-secondary'}" style="padding:3px 9px;font-size:0.75rem;font-weight:${isCur ? '900' : '700'};${isCur ? 'background:#0284c7;border-color:#0284c7;color:#fff;box-shadow:0 2px 6px rgba(2,132,199,0.3);' : 'background:#1e293b;color:#cbd5e1;'}" onclick="${onPageChangeFnName}(${p})">${p}</button>`;
+    } else if (p === currentPage - 3 || p === currentPage + 3) {
+      pageButtonsHtml += `<span style="color:#64748b;font-size:0.75rem;padding:0 2px;">...</span>`;
+    }
+  }
+
+  el.innerHTML = `
+    <div style="font-size:0.80rem;color:#94a3b8;font-weight:700;">
+      दिखा रहे हैं <strong style="color:#f8fafc;">${from}-${to}</strong> (कुल <strong style="color:#38bdf8;">${totalItems}</strong> में से) • पृष्ठ <strong style="color:#4ade80;">${currentPage}</strong> / ${totalPages}
+    </div>
+    <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+      <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 10px;font-size:0.75rem;font-weight:700;${currentPage <= 1 ? 'opacity:0.35;cursor:not-allowed;' : ''}" ${currentPage <= 1 ? 'disabled' : ''} onclick="${onPageChangeFnName}(${currentPage - 1})">
+        ◀ पिछला (Prev)
+      </button>
+      ${pageButtonsHtml}
+      <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 10px;font-size:0.75rem;font-weight:700;${currentPage >= totalPages ? 'opacity:0.35;cursor:not-allowed;' : ''}" ${currentPage >= totalPages ? 'disabled' : ''} onclick="${onPageChangeFnName}(${currentPage + 1})">
+        अगला (Next) ▶
+      </button>
+    </div>
+  `;
+}
+
+window.openSakhiDetailDrawer = function(data) {
+  window._activeDrawerData = data;
+  const backdrop = document.getElementById('sakhiDrawerBackdrop');
+  const drawer = document.getElementById('sakhiDetailDrawer');
+  const body = document.getElementById('sakhiDrawerBody');
+  const title = document.getElementById('sakhiDrawerTitle');
+  const sub = document.getElementById('sakhiDrawerSubtitle');
+  if (!drawer || !body) return;
+
+  if (title) title.textContent = data.title || 'उपयोगकर्ता संवाद विवरण';
+  if (sub) sub.textContent = data.subtitle || 'आरोग्यम सखी AI इंटेलिजेंस';
+
+  const cleanPhone = String(data.mobile || data.phone || '').replace(/\D/g, '').slice(-10);
+  const waUrl = cleanPhone ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`नमस्ते ${data.name || ''} जी! 🙏 आरोग्यम सखी AI पर आपके सवाल "${(data.query || data.sawal || '').slice(0, 50)}" के संबंध में मार्गदर्शन हेतु संपर्क किया गया है।`)}` : null;
+
+  body.innerHTML = `
+    <!-- User Info Card -->
+    <div class="sakhi-drawer-card" style="border-left: 4px solid #38bdf8;">
+      <div class="sakhi-drawer-card-label">👤 उपयोगकर्ता प्रोफाइल</div>
+      <div class="sakhi-drawer-card-value" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-weight:900;font-size:1.05rem;color:#f8fafc;">${escapeHtml(data.name || 'उपयोगकर्ता')}</div>
+          <div style="font-size:0.80rem;color:#94a3b8;">${cleanPhone ? '📱 +91 ' + cleanPhone : 'वेब गेस्ट'}</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          ${waUrl ? `<a href="${waUrl}" target="_blank" class="admin-btn" style="background:#25d366;color:#fff;padding:6px 12px;font-size:0.76rem;border-radius:6px;font-weight:800;text-decoration:none;">💬 WhatsApp</a>` : ''}
+          ${cleanPhone ? `<a href="tel:${cleanPhone}" class="admin-btn admin-btn-secondary" style="padding:6px 12px;font-size:0.76rem;border-radius:6px;font-weight:800;text-decoration:none;">📞 कॉल</a>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <!-- Meta Details Card -->
+    <div class="sakhi-drawer-card">
+      <div class="sakhi-drawer-card-label">🕒 समय, डोमेन व स्थिति</div>
+      <div class="sakhi-drawer-card-value" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:0.80rem;color:#cbd5e1;">📅 ${escapeHtml(data.time || 'हाल ही में')}</span>
+        ${data.domainBadge || `<span style="background:rgba(59,130,246,0.15);color:#38bdf8;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">${escapeHtml(data.domain || 'Agri')}</span>`}
+        ${data.statusBadge || ''}
+      </div>
+    </div>
+
+    <!-- User Question Card -->
+    <div class="sakhi-drawer-card" style="border-left: 4px solid #f59e0b;">
+      <div class="sakhi-drawer-card-label">❓ उपयोगकर्ता का सवाल (User Query)</div>
+      <div class="sakhi-drawer-card-value" style="font-weight:700;color:#fef08a;font-size:0.95rem;line-height:1.5;">
+        ${escapeHtml(data.query || data.sawal || 'सवाल अनुपलब्ध')}
+      </div>
+      <div style="margin-top:8px;text-align:right;">
+        <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 10px;font-size:0.74rem;" onclick="window.copySakhiDrawerField('query')">📋 सवाल कॉपी करें</button>
+      </div>
+    </div>
+
+    <!-- Sakhi Answer Card -->
+    <div class="sakhi-drawer-card" style="border-left: 4px solid #10b981;">
+      <div class="sakhi-drawer-card-label">🤖 सखी का उत्तर (AI Answer)</div>
+      <div class="sakhi-drawer-card-value" style="font-size:0.88rem;color:#e2e8f0;line-height:1.65;white-space:pre-wrap;background:rgba(15,23,42,0.6);padding:12px;border-radius:8px;">${escapeHtml(data.answer || data.jawab || 'उत्तर उपलब्ध नहीं')}</div>
+      <div style="margin-top:8px;text-align:right;">
+        <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 10px;font-size:0.74rem;" onclick="window.copySakhiDrawerField('answer')">📋 उत्तर कॉपी करें</button>
+      </div>
+    </div>
+
+    ${data.ebook ? `
+      <!-- Recommended Ebook Card -->
+      <div class="sakhi-drawer-card" style="border-left: 4px solid #a855f7;">
+        <div class="sakhi-drawer-card-label">📚 सुझाई गई ई-बुक / समाधान</div>
+        <div class="sakhi-drawer-card-value" style="font-weight:800;color:#e9d5ff;">
+          ${escapeHtml(data.ebook)}
+        </div>
+      </div>
+    ` : ''}
+  `;
+
+  if (backdrop) backdrop.classList.add('active');
+  drawer.classList.add('active');
+};
+
+window.closeSakhiDetailDrawer = function() {
+  const backdrop = document.getElementById('sakhiDrawerBackdrop');
+  const drawer = document.getElementById('sakhiDetailDrawer');
+  if (backdrop) backdrop.classList.remove('active');
+  if (drawer) drawer.classList.remove('active');
+};
+
+// ----------------------------------------------------
+// RENDER REAL SAKHI USERS TABLE (PAGINATED 20 PER PAGE + DRAWER)
+// ----------------------------------------------------
+window.changeSakhiUsersPage = function(p) {
+  window._sakhiPagination.users.page = p;
+  renderSakhiUsersTable();
+  document.getElementById('sakhiUsersTableSection')?.scrollIntoView({ behavior: 'smooth' });
+};
+
 function renderSakhiUsersTable() {
   const tbody = document.getElementById('sakhiUsersTableBody');
   if (!tbody) return;
@@ -1070,6 +1226,14 @@ function renderSakhiUsersTable() {
     return true;
   });
 
+  const PAGE_SIZE = 20;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if (window._sakhiPagination.users.page > totalPages) window._sakhiPagination.users.page = totalPages;
+  if (window._sakhiPagination.users.page < 1) window._sakhiPagination.users.page = 1;
+  const currPage = window._sakhiPagination.users.page;
+
+  renderPaginationControls('sakhiUsersPaginationBar', filtered.length, currPage, PAGE_SIZE, 'window.changeSakhiUsersPage');
+
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
@@ -1081,7 +1245,10 @@ function renderSakhiUsersTable() {
     return;
   }
 
-  tbody.innerHTML = filtered.map((item, idx) => {
+  const paged = filtered.slice((currPage - 1) * PAGE_SIZE, currPage * PAGE_SIZE);
+
+  tbody.innerHTML = paged.map((item, idx) => {
+    const globalIdx = (currPage - 1) * PAGE_SIZE + idx + 1;
     const name = item.user_name || 'उपयोगकर्ता';
     const mobile = item.mobile || item.user_mobile || '';
     const cleanMobile = String(mobile).replace(/\D/g, '');
@@ -1096,9 +1263,23 @@ function renderSakhiUsersTable() {
     const waText = encodeURIComponent(`नमस्ते ${name} जी! आरोग्यम सखी AI पर आपके सवाल "${topic}" के संबंध में मार्गदर्शन हेतु संपर्क किया गया है।`);
     const waUrl = cleanMobile ? `https://wa.me/91${cleanMobile.slice(-10)}?text=${waText}` : null;
 
+    // Side Drawer payload
+    const safePayload = encodeURIComponent(JSON.stringify({
+      title: '👤 सखी उपयोगकर्ता संवाद अंतर्दृष्टि',
+      subtitle: 'सखी AI लाइव यूज़र रिकॉर्ड',
+      name: name,
+      phone: cleanMobile,
+      time: dateStr,
+      domain: item.primary_domain || 'agri',
+      domainBadge: domainBadge,
+      query: topic,
+      answer: `कुल चैट सत्र: ${totalChats} बार बातचीत। मुख्य रुचि: ${item.primary_domain || 'कृषि'}। सुझाई गई सामग्री: ${ebook}।`,
+      ebook: ebook
+    }));
+
     return `
-      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;">
-        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${idx + 1}</td>
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;">
           <div style="font-weight:700;color:var(--admin-text,#f8fafc);">${escapeHtml(name)}</div>
           <div style="font-size:0.75rem;color:var(--admin-muted,#94a3b8);">${cleanMobile ? '📞 ' + cleanMobile : 'वेब यूज़र'}</div>
@@ -1120,16 +1301,14 @@ function renderSakhiUsersTable() {
         <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-size:0.75rem;white-space:nowrap;">
           ${dateStr}
         </td>
-        <td style="padding:10px 12px;text-align:right;white-space:nowrap;">
+        <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
           <div style="display:inline-flex;gap:6px;">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+              👁️ विवरण
+            </button>
             ${waUrl ? `
               <a href="${waUrl}" target="_blank" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#25d366;border-color:#25d366;color:#fff;text-decoration:none;border-radius:6px;font-weight:700;" title="WhatsApp पर सलाह भेजें">
-                💬 WhatsApp
-              </a>
-            ` : ''}
-            ${item.user_id ? `
-              <a href="#user-details?id=${item.user_id}" class="admin-btn admin-btn-secondary" style="padding:4px 8px;font-size:0.72rem;border-radius:6px;text-decoration:none;font-weight:700;">
-                👤 प्रोफ़ाइल
+                💬 WA
               </a>
             ` : ''}
           </div>
@@ -1678,6 +1857,24 @@ function saveCustomIntentFromModal() {
   renderUnansweredQueries();
 }
 
+window.changeSakhiUnansweredPage = function(p) {
+  window._sakhiPagination.unanswered.page = p;
+  renderUnansweredQueries();
+  document.getElementById('sakhiUnansweredSection')?.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.filterUnansweredSearch = function(val) {
+  window._sakhiPagination.unanswered.search = (val || '').trim();
+  window._sakhiPagination.unanswered.page = 1;
+  renderUnansweredQueries();
+};
+
+window.filterUnansweredDomain = function(dom) {
+  window._sakhiPagination.unanswered.domain = dom || 'all';
+  window._sakhiPagination.unanswered.page = 1;
+  renderUnansweredQueries();
+};
+
 async function renderUnansweredQueries() {
   const tbody = document.getElementById('sakhiUnansweredTableBody');
   const kpiEl = document.getElementById('sakhiKpiUnanswered');
@@ -1693,7 +1890,7 @@ async function renderUnansweredQueries() {
         .eq('is_resolved', false)
         .order('hit_count', { ascending: false })
         .order('last_asked_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (!error && data && data.length > 0) {
         list = data.map(d => ({
@@ -1721,18 +1918,44 @@ async function renderUnansweredQueries() {
 
   if (kpiEl) kpiEl.textContent = list.length > 0 ? `${list.length}` : '0';
 
-  if (!list || list.length === 0) {
+  // Apply Search & Domain Filters
+  const uState = window._sakhiPagination.unanswered;
+  let filtered = list;
+  if (uState.domain && uState.domain !== 'all') {
+    filtered = filtered.filter(item => (item.domain || '').toLowerCase().includes(uState.domain.toLowerCase()));
+  }
+  if (uState.search) {
+    const sq = uState.search.toLowerCase();
+    filtered = filtered.filter(item => 
+      (item.query || '').toLowerCase().includes(sq) ||
+      (item.user || '').toLowerCase().includes(sq) ||
+      (item.phone || '').includes(sq)
+    );
+  }
+
+  const PAGE_SIZE = 20;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if (window._sakhiPagination.unanswered.page > totalPages) window._sakhiPagination.unanswered.page = totalPages;
+  if (window._sakhiPagination.unanswered.page < 1) window._sakhiPagination.unanswered.page = 1;
+  const currPage = window._sakhiPagination.unanswered.page;
+
+  renderPaginationControls('sakhiUnansweredPaginationBar', filtered.length, currPage, PAGE_SIZE, 'window.changeSakhiUnansweredPage');
+
+  if (!filtered || filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="7" style="text-align:center;padding:24px;color:#10b981;font-weight:700;">
-          🎉 बहुत बढ़िया! अभी कोई छूटा हुआ सवाल नहीं है। सभी सवालों के सटीक उत्तर उपलब्ध हैं।
+          🎉 बहुत बढ़िया! कोई छूटा हुआ सवाल नहीं है। सभी सवालों के उत्तर उपलब्ध हैं।
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = list.map((item, idx) => {
+  const paged = filtered.slice((currPage - 1) * PAGE_SIZE, currPage * PAGE_SIZE);
+
+  tbody.innerHTML = paged.map((item, idx) => {
+    const globalIdx = (currPage - 1) * PAGE_SIZE + idx + 1;
     const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
     let userDisplay = item.user ? `${item.user} ${item.phone ? '(' + item.phone + ')' : ''}` : (item.phone || 'अज्ञात यूजर');
     if (item.share_id) {
@@ -1741,30 +1964,50 @@ async function renderUnansweredQueries() {
     const safeQ = encodeURIComponent(item.query || '');
     const safeDom = encodeURIComponent(item.domain || 'agri');
 
+    const safePayload = encodeURIComponent(JSON.stringify({
+      title: '❓ छूटा हुआ सवाल #' + globalIdx,
+      subtitle: 'ज्ञानकोष विस्तार प्राथमिकता',
+      name: item.user || 'किसान/यूज़र',
+      phone: item.phone || '',
+      time: timeStr,
+      domain: item.domain || 'agri',
+      domainBadge: `<span style="background:rgba(239,68,68,0.15);color:#f87171;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">${escapeHtml(item.domain || 'agri')}</span>`,
+      statusBadge: `<span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">बारम्बारता: ${item.count || 1}</span>`,
+      query: item.query || '',
+      answer: '⚠️ इस सवाल का उत्तर ज्ञानकोष में दर्ज नहीं था। नीचे बटन से तुरंत नया उत्तर जोड़ें।'
+    }));
+
     return `
-      <tr style="border-bottom:1px solid var(--admin-border,#334155);">
-        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">${idx + 1}</td>
-        <td style="padding:10px 12px;font-weight:700;color:var(--admin-text,#f8fafc);">
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">${globalIdx}</td>
+        <td style="padding:10px 12px;font-weight:700;color:var(--admin-text,#f8fafc);max-width:240px;line-height:1.4;">
           "${escapeHtml(item.query || '')}"
         </td>
         <td style="padding:10px 12px;">
-          ${getDomainBadge(item.domain || '')}
+          <span style="background:rgba(59,130,246,0.12);color:#38bdf8;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
+            ${escapeHtml(item.domain || 'agri')}
+          </span>
         </td>
-        <td style="padding:10px 12px;color:var(--admin-text,#cbd5e1);font-size:0.78rem;">
+        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-size:0.80rem;">
           ${escapeHtml(userDisplay)}
         </td>
         <td style="padding:10px 12px;text-align:center;">
-          <span style="background:rgba(239,68,68,0.15);color:#f87171;padding:2px 8px;border-radius:10px;font-weight:800;font-size:0.75rem;">
+          <span style="background:rgba(239,68,68,0.15);color:#f87171;font-weight:800;padding:2px 8px;border-radius:10px;font-size:0.75rem;">
             ${item.count || 1} बार
           </span>
         </td>
-        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-size:0.75rem;">
+        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-size:0.75rem;white-space:nowrap;">
           ${timeStr}
         </td>
-        <td style="padding:10px 12px;text-align:right;">
-          <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 10px;font-size:0.75rem;background:#16a34a;border:none;font-weight:700;" onclick="window.sakhiAnswerUnanswered('${safeQ}', '${safeDom}')">
-            + उत्तर जोड़ें
-          </button>
+        <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
+          <div style="display:inline-flex;gap:4px;">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+              👁️ विवरण
+            </button>
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#16a34a;border-color:#16a34a;" onclick="window.sakhiAnswerUnanswered('${safeQ}','${safeDom}')">
+              ✍️ उत्तर जोड़ें
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -1952,6 +2195,79 @@ function formatAuditSawal(sawal) {
   return `<span>${escapeHtml(sawal)}</span>`;
 }
 
+// ----------------------------------------------------
+// AUDIT TABLE MULTI-FILTER & 20-ROW PAGINATION ENGINE
+// ----------------------------------------------------
+window.copyAuditQuery = function(btn) {
+  const q = decodeURIComponent(btn.getAttribute('data-sawal') || '');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(q).then(() => alert('सवाल कॉपी हो गया!')).catch(() => alert('कॉपी विफल रहा'));
+  }
+};
+
+window.changeSakhiAuditPage = function(p) {
+  window._sakhiPagination.audit.page = p;
+  window.applySakhiAuditFilters();
+  document.getElementById('sakhiAuditSection')?.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.filterSakhiAuditBySearch = function(q) {
+  window._sakhiPagination.audit.search = (q || '').trim();
+  window._sakhiPagination.audit.page = 1;
+  window.applySakhiAuditFilters();
+};
+
+window.filterSakhiAuditByDomain = function(dom) {
+  window._sakhiPagination.audit.domain = dom || 'all';
+  window._sakhiPagination.audit.page = 1;
+  window.applySakhiAuditFilters();
+};
+
+window.filterSakhiAuditByStatus = function(stat) {
+  window._sakhiPagination.audit.status = stat || 'all';
+  window._sakhiPagination.audit.page = 1;
+  window.applySakhiAuditFilters();
+};
+
+window.filterSakhiAuditByUser = function(userKey) {
+  window._sakhiPagination.audit.user = userKey || 'all';
+  window._sakhiPagination.audit.page = 1;
+  window.applySakhiAuditFilters();
+};
+
+window.applySakhiAuditFilters = function() {
+  if (!sakhiAuditLogsList || sakhiAuditLogsList.length === 0) return;
+  const pState = window._sakhiPagination.audit;
+
+  let filtered = sakhiAuditLogsList.filter(item => {
+    // 1. User filter
+    if (pState.user && pState.user !== 'all') {
+      if ((item.user_profile || 'guest') !== pState.user) return false;
+    }
+    // 2. Domain filter
+    if (pState.domain && pState.domain !== 'all') {
+      const itemDom = (item.domain || 'omni').toLowerCase();
+      if (!itemDom.includes(pState.domain.toLowerCase())) return false;
+    }
+    // 3. Status filter
+    if (pState.status && pState.status !== 'all') {
+      const s = (item.status || 'PASS').toUpperCase();
+      if (s !== pState.status.toUpperCase()) return false;
+    }
+    // 4. Search query
+    if (pState.search) {
+      const sq = pState.search.toLowerCase();
+      const matchSawal = (item.sawal || '').toLowerCase().includes(sq);
+      const matchJawab = (item.jawab || '').toLowerCase().includes(sq);
+      const matchUser = (item.user_profile || '').toLowerCase().includes(sq);
+      if (!matchSawal && !matchJawab && !matchUser) return false;
+    }
+    return true;
+  });
+
+  window.renderSakhiAuditTableRows(filtered);
+};
+
 window.renderSakhiAuditTableRows = function(itemsToRender) {
   const tbody = document.getElementById('sakhiAuditTableBody');
   const countBadge = document.getElementById('sakhiAuditFilteredCountBadge');
@@ -1965,19 +2281,30 @@ window.renderSakhiAuditTableRows = function(itemsToRender) {
       : `फ़िल्टर: ${itemsToRender.length} / ${total} सवाल`;
   }
 
+  const PAGE_SIZE = 20;
+  const totalPages = Math.max(1, Math.ceil(itemsToRender.length / PAGE_SIZE));
+  if (window._sakhiPagination.audit.page > totalPages) window._sakhiPagination.audit.page = totalPages;
+  if (window._sakhiPagination.audit.page < 1) window._sakhiPagination.audit.page = 1;
+  const currPage = window._sakhiPagination.audit.page;
+
+  renderPaginationControls('sakhiAuditPaginationBar', itemsToRender.length, currPage, PAGE_SIZE, 'window.changeSakhiAuditPage');
+
   if (itemsToRender.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8" style="text-align:center;padding:36px;color:var(--admin-muted,#94a3b8);">
           <div style="font-size:1.8rem;margin-bottom:6px;">🧪</div>
-          <div style="font-weight:700;color:var(--admin-text,#f8fafc);">इस यूज़र के कोई टेस्ट ऑडिट रिकॉर्ड नहीं मिले।</div>
+          <div style="font-weight:700;color:var(--admin-text,#f8fafc);">फ़िल्टर के अनुसार कोई ऑडिट रिकॉर्ड नहीं मिले।</div>
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = itemsToRender.map((item, idx) => {
+  const paged = itemsToRender.slice((currPage - 1) * PAGE_SIZE, currPage * PAGE_SIZE);
+
+  tbody.innerHTML = paged.map((item, idx) => {
+    const globalIdx = (currPage - 1) * PAGE_SIZE + idx + 1;
     const timeStr = item.date_time ? new Date(item.date_time).toLocaleString('hi-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'हाल ही में';
     const profile = item.user_profile || 'guest';
     const cleanM = String(profile).replace(/\D/g, '').slice(-10);
@@ -2001,22 +2328,38 @@ window.renderSakhiAuditTableRows = function(itemsToRender) {
     }
     const jawab = rawJawab;
     const domain = item.domain || 'omni';
-    const status = item.status || 'PASS';
+    const status = (item.status || 'PASS').toUpperCase();
+    const isPass = status === 'PASS';
+
+    const safePayload = encodeURIComponent(JSON.stringify({
+      title: '🧪 सखी AI लाइव ऑडिट रिकॉर्ड #' + globalIdx,
+      subtitle: 'सखी AI गुणवत्ता व सटीकता विश्लेषण',
+      name: resolvedName || userDisplay,
+      phone: cleanM,
+      time: timeStr,
+      domain: domain,
+      domainBadge: `<span style="background:rgba(59,130,246,0.15);color:#38bdf8;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">${escapeHtml(domain)}</span>`,
+      statusBadge: isPass 
+        ? `<span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">✔ PASS</span>`
+        : `<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">⚠ FAIL</span>`,
+      query: sawal,
+      answer: jawab
+    }));
 
     return `
-      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;">
-        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${idx + 1}</td>
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+        <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);white-space:nowrap;">${timeStr}</td>
         <td style="padding:10px 12px;">
           <span style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;color:var(--admin-text,#f8fafc);" title="ID: ${escapeHtml(profile)}">
             👤 ${escapeHtml(userDisplay)}
           </span>
         </td>
-        <td style="padding:10px 12px;font-weight:600;color:var(--admin-text,#e2e8f0);max-width:280px;line-height:1.4;" title="${escapeHtml(sawal)}">
+        <td style="padding:10px 12px;font-weight:600;color:var(--admin-text,#e2e8f0);max-width:260px;line-height:1.4;" title="${escapeHtml(sawal)}">
           ${formatAuditSawal(sawal)}
         </td>
-        <td style="padding:10px 12px;font-size:0.78rem;color:var(--admin-muted,#94a3b8);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(jawab)}">
-          ${escapeHtml(jawab.replace(/<[^>]*>/g, '').slice(0, 100))}...
+        <td style="padding:10px 12px;font-size:0.78rem;color:var(--admin-muted,#94a3b8);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(jawab)}">
+          ${escapeHtml(jawab.replace(/<[^>]*>/g, '').slice(0, 80))}...
         </td>
         <td style="padding:10px 12px;text-align:center;">
           <span style="background:rgba(59,130,246,0.15);color:#38bdf8;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;">
@@ -2024,29 +2367,24 @@ window.renderSakhiAuditTableRows = function(itemsToRender) {
           </span>
         </td>
         <td style="padding:10px 12px;text-align:center;">
-          <span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:800;">
-            ✔ ${escapeHtml(status)}
-          </span>
+          ${isPass 
+            ? `<span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:800;">✔ PASS</span>`
+            : `<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:800;">⚠ FAIL</span>`
+          }
         </td>
-        <td style="padding:10px 12px;text-align:right;white-space:nowrap;">
-          <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 8px;font-size:0.72rem;" onclick="navigator.clipboard.writeText('${escapeHtml(sawal)}');alert('सवाल कॉपी हो गया!');">
-            कॉपी
-          </button>
+        <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
+          <div style="display:inline-flex;gap:4px;">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+              👁️ विवरण
+            </button>
+            <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 8px;font-size:0.72rem;" onclick="window.copyAuditQuery(this)" data-sawal="${encodeURIComponent(sawal)}">कॉपी</button>
+          </div>
         </td>
       </tr>
     `;
   }).join('');
 };
 
-window.filterSakhiAuditByUser = function(userKey) {
-  if (!sakhiAuditLogsList || sakhiAuditLogsList.length === 0) return;
-  if (!userKey || userKey === 'all') {
-    window.renderSakhiAuditTableRows(sakhiAuditLogsList);
-  } else {
-    const filtered = sakhiAuditLogsList.filter(item => (item.user_profile || 'guest') === userKey);
-    window.renderSakhiAuditTableRows(filtered);
-  }
-};
 
 function downloadSakhiTestJsonFromAdmin() {
   if (!sakhiAuditLogsList || sakhiAuditLogsList.length === 0) {
@@ -2946,6 +3284,12 @@ async function initSakhiTeamLeadsHub() {
   renderTeamLeadsTable();
 }
 
+window.changeSakhiTeamLeadsPage = function(p) {
+  window._sakhiPagination.team.page = p;
+  renderTeamLeadsTable();
+  document.getElementById('sakhiTeamLeadsSection')?.scrollIntoView({ behavior: 'smooth' });
+};
+
 function renderTeamLeadsTable() {
   const tbody = document.getElementById('sakhiTeamLeadsTableBody');
   if (!tbody) return;
@@ -2996,6 +3340,14 @@ function renderTeamLeadsTable() {
   if (elAgriC) elAgriC.textContent = agriChats;
   if (elHealthC) elHealthC.textContent = healthChats;
 
+  const PAGE_SIZE = 20;
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  if (window._sakhiPagination.team.page > totalPages) window._sakhiPagination.team.page = totalPages;
+  if (window._sakhiPagination.team.page < 1) window._sakhiPagination.team.page = 1;
+  const currPage = window._sakhiPagination.team.page;
+
+  renderPaginationControls('sakhiTeamLeadsPaginationBar', rows.length, currPage, PAGE_SIZE, 'window.changeSakhiTeamLeadsPage');
+
   if (rows.length === 0) {
     tbody.innerHTML = `
       <tr>
@@ -3008,7 +3360,10 @@ function renderTeamLeadsTable() {
     return;
   }
 
-  tbody.innerHTML = rows.map((r, idx) => {
+  const paged = rows.slice((currPage - 1) * PAGE_SIZE, currPage * PAGE_SIZE);
+
+  tbody.innerHTML = paged.map((r, idx) => {
+    const globalIdx = (currPage - 1) * PAGE_SIZE + idx + 1;
     const timeStr = r.last_active ? new Date(r.last_active).toLocaleDateString('hi-IN') : 'हाल ही में';
     
     // Domain breakdown text
@@ -3032,43 +3387,55 @@ function renderTeamLeadsTable() {
     const waMsg = `नमस्ते ${r.member_name} जी! 🙏\nआपकी आरोग्यम सखी AI पर रुचि (${domainBadge}) के संबंध में हमारी विशेष गाइड उपलब्ध है:\n👉 ${pitchText}\n_आरोग्यम इंडिया टीम_`;
     const waUrl = `https://wa.me/91${r.member_mobile}?text=${encodeURIComponent(waMsg)}`;
 
+    const safePayload = encodeURIComponent(JSON.stringify({
+      title: '👑 टीम स्पॉन्सर लीड #' + globalIdx,
+      subtitle: 'स्पॉन्सर: ' + (r.upline_name || 'Aarogyam India'),
+      name: r.member_name,
+      phone: r.member_mobile,
+      time: timeStr,
+      domain: domainBadge,
+      domainBadge: `<span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">${escapeHtml(domainBadge)}</span>`,
+      query: 'कुल सवाल: ' + (r.chat_count || 1) + ' बार सखी AI से संवाद।',
+      answer: 'डाउनलाइन किसान की मुख्य रुचि ' + domainBadge + ' में है। स्पॉन्सर Upline: ' + (r.upline_name || '') + ' (' + (r.upline_code || '') + ')।',
+      ebook: pitchText
+    }));
+
     return `
-      <tr style="border-bottom:1px solid #334155;">
-        <td style="padding:10px 12px;color:#94a3b8;font-weight:700;">#${idx + 1}</td>
+      <tr style="border-bottom:1px solid #334155;cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+        <td style="padding:10px 12px;color:#94a3b8;font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;">
           <strong style="color:#f8fafc;display:block;">${escapeHtml(r.member_name)}</strong>
           <span style="font-size:0.75rem;color:#38bdf8;">📱 ${escapeHtml(r.member_mobile)}</span>
         </td>
         <td style="padding:10px 12px;">
-          <span style="background:rgba(56,189,248,0.12);color:#38bdf8;padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
-            👑 ${escapeHtml(r.upline_name)}
-          </span>
+          <strong style="color:#fbbf24;display:block;">${escapeHtml(r.upline_name)}</strong>
+          <span style="font-size:0.72rem;color:#94a3b8;">${escapeHtml(r.upline_code || '')}</span>
         </td>
         <td style="padding:10px 12px;text-align:center;">
-          <span style="background:${r.chat_count > 0 ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)'};color:${r.chat_count > 0 ? '#4ade80' : '#94a3b8'};padding:2px 8px;border-radius:10px;font-weight:800;font-size:0.78rem;">
-            ${r.chat_count} सवाल
+          <span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:10px;font-weight:800;font-size:0.75rem;">
+            ${r.chat_count}
           </span>
         </td>
         <td style="padding:10px 12px;">
-          <span style="background:rgba(234,179,8,0.12);color:#fbbf24;padding:2px 8px;border-radius:6px;font-weight:700;font-size:0.75rem;">
-            ${domainBadge}
-          </span>
-          <div style="font-size:0.70rem;color:#94a3b8;margin-top:2px;">
-            ${escapeHtml(r.last_topic || 'फसल')}
-          </div>
+          <span style="font-size:0.80rem;font-weight:700;color:#e2e8f0;">${domainBadge}</span>
         </td>
         <td style="padding:10px 12px;">
-          <span style="color:#a7f3d0;font-weight:700;font-size:0.75rem;">
+          <span style="background:rgba(234,179,8,0.15);color:#facc15;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
             ${pitchText}
           </span>
         </td>
-        <td style="padding:10px 12px;font-size:0.75rem;color:#94a3b8;white-space:nowrap;">
+        <td style="padding:10px 12px;color:#94a3b8;font-size:0.75rem;white-space:nowrap;">
           ${timeStr}
         </td>
-        <td style="padding:10px 12px;text-align:right;">
-          <a href="${waUrl}" target="_blank" style="background:#22c55e;color:#ffffff;padding:4px 10px;border-radius:6px;text-decoration:none;font-weight:800;font-size:0.75rem;display:inline-flex;align-items:center;gap:4px;">
-            <span>💬 WA</span>
-          </a>
+        <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
+          <div style="display:inline-flex;gap:4px;">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+              👁️ विवरण
+            </button>
+            <a href="${waUrl}" target="_blank" class="admin-btn" style="background:#10b981;color:#fff;padding:4px 8px;font-size:0.72rem;border-radius:6px;font-weight:800;text-decoration:none;">
+              💬 WA
+            </a>
+          </div>
         </td>
       </tr>
     `;
