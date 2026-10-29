@@ -1885,11 +1885,65 @@ ${item.body || item.desc || ''}
       csvRows.push(row.join(','));
     });
 
-    const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const excelHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+        <style>
+          table { border-collapse: collapse; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; }
+          th { background-color: #15803d; color: #ffffff; font-weight: bold; font-size: 11pt; border: 1px solid #166534; padding: 10px 8px; text-align: left; }
+          td { font-size: 10pt; border: 1px solid #cbd5e1; padding: 8px; vertical-align: middle; color: #1e293b; }
+          tr:nth-child(even) { background-color: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <table>
+          <thead>
+            <tr>
+              ${headers.map(h => `<th>${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map((r, idx) => {
+              const purTitles = (r.purchases || []).map(p => p.book_name || p.title || 'ई-बुक').join(' | ');
+              let reco = '🌾 BK002 - खेती का डॉक्टर (सम्पूर्ण फसल सुरक्षा)';
+              let domain = '🌾 कृषि व फसल';
+              const bought = purTitles.toLowerCase();
+              if (bought.includes('bk016') || bought.includes('पशु') || bought.includes('dairy')) {
+                domain = '🐄 पशुपालन व डेयरी';
+                reco = '🐄 BK016 - आधुनिक कृषि दवा डायरेक्टरी व पशुपालन';
+              } else if (bought.includes('bk018') || bought.includes('netsurf') || bought.includes('जैविक')) {
+                domain = '🌿 नेट्सर्फ बायोफिट';
+                reco = '🌱 BK018 - जैविक खाद, जीवामृत डायरेक्टरी';
+              } else if (bought.includes('health') || bought.includes('डायबिटीज')) {
+                domain = '❤️ स्वास्थ्य व क्रॉनिक केयर';
+                reco = '❤️ डायबिटीज व स्वास्थ्य केंद्र कॉम्बो';
+              }
+              return `
+                <tr>
+                  <td style="text-align:center;font-weight:bold;">${idx + 1}</td>
+                  <td style="font-weight:bold;">${r.full_name || 'सदस्य'}</td>
+                  <td style="mso-number-format:'\\@';">${r.mobile || '-'}</td>
+                  <td>${r.source || r.registration_source || 'Direct'}</td>
+                  <td style="text-align:center;">${r.is_active ? 'Active (Paid)' : 'Inactive (Free)'}</td>
+                  <td style="text-align:center;">${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : '-'}</td>
+                  <td>${purTitles || 'कोई खरीद नहीं'}</td>
+                  <td style="text-align:right;font-weight:bold;color:#15803d;">₹${Number(r.totalPurchasedAmount) || 0}</td>
+                  <td style="font-weight:bold;color:#166534;">${domain}</td>
+                  <td style="font-weight:bold;color:#b45309;">${reco}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+    const blob = new Blob(['\uFEFF' + excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Aarogyam_My_Team_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `Aarogyam_My_Team_Leads_${new Date().toISOString().slice(0, 10)}.xls`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

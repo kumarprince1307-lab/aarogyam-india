@@ -370,8 +370,12 @@
     const currentPath = (window.location.pathname || '').toLowerCase();
     const currentSearch = (window.location.search || '').toLowerCase();
 
-    // 1. Strictly SUPPRESS big intrusive popups on dedicated book pages, reader, or checkout
+    // 1. Strictly SUPPRESS big intrusive popups on chat pages, dedicated book pages, reader, or checkout
     if (
+      currentPath.includes('sakhi') ||
+      currentPath.includes('chat') ||
+      document.getElementById('sakhiChatApp') ||
+      document.getElementById('sakhiMessagesWrap') ||
       currentPath.includes('book-landing') || 
       currentPath.includes('reader') || 
       currentPath.includes('checkout') || 

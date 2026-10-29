@@ -2269,11 +2269,28 @@ if (typeof document !== 'undefined') {
   }
   window.stopAllSpeech = stopAllSpeech;
 
-  function getBestHindiVoice() {
+  function getBestVoiceForLanguage(targetLang = 'hi') {
     if (!window.speechSynthesis) return null;
     try {
       const voices = window.speechSynthesis.getVoices() || [];
-      // Prefer high-quality pleasant Hindi female/warm voices
+      if (!voices || voices.length === 0) return null;
+
+      // 1. Regional Language Voice Packs (Gujarati, Marathi, Punjabi, Bengali)
+      if (targetLang === 'gu') {
+        const guVoice = voices.find(v => (v.lang === 'gu-IN' || v.lang === 'gu_IN' || (v.lang && v.lang.startsWith('gu'))));
+        if (guVoice) return guVoice;
+      } else if (targetLang === 'mr') {
+        const mrVoice = voices.find(v => (v.lang === 'mr-IN' || v.lang === 'mr_IN' || (v.lang && v.lang.startsWith('mr'))));
+        if (mrVoice) return mrVoice;
+      } else if (targetLang === 'pa') {
+        const paVoice = voices.find(v => (v.lang === 'pa-IN' || v.lang === 'pa_IN' || (v.lang && v.lang.startsWith('pa'))));
+        if (paVoice) return paVoice;
+      } else if (targetLang === 'bn') {
+        const bnVoice = voices.find(v => (v.lang === 'bn-IN' || v.lang === 'bn_IN' || (v.lang && v.lang.startsWith('bn'))));
+        if (bnVoice) return bnVoice;
+      }
+
+      // 2. Hindi High-Quality Female / Warm Voices
       const priority = [
         v => (v.lang === 'hi-IN' || v.lang === 'hi_IN') && (v.name.includes('Swara') || v.name.includes('Google हिन्दी') || v.name.includes('Natural') || v.name.includes('Heera') || v.name.includes('Kalpana')),
         v => (v.lang === 'hi-IN' || v.lang === 'hi_IN') && !v.name.includes('Male') && !v.name.includes('David') && !v.name.includes('Ravi'),
@@ -2289,6 +2306,10 @@ if (typeof document !== 'undefined') {
     } catch (e) {
       return null;
     }
+  }
+
+  function getBestHindiVoice() {
+    return getBestVoiceForLanguage('hi');
   }
 
   function splitTextIntoSentences(text) {
@@ -2328,7 +2349,7 @@ if (typeof document !== 'undefined') {
     return chunks.length > 0 ? chunks : [text.trim()];
   }
 
-  function playChunkedSpeech(text, onStart, onFinish) {
+  function playChunkedSpeech(text, onStart, onFinish, customLang) {
     if (!window.speechSynthesis || !text || !isSoundEnabled) {
       if (typeof onFinish === 'function') onFinish();
       return;
@@ -2378,12 +2399,14 @@ if (typeof document !== 'undefined') {
           return;
         }
 
+        const activeLang = customLang || (sakhiConversationState && sakhiConversationState.userLang) || 'hi';
         const utterance = new SpeechSynthesisUtterance(chunkText);
-        utterance.lang = 'hi-IN';
-        utterance.rate = 0.85; // Calm, clear, soothing natural Indian Hindi speaking pace (never rushed or fast)
-        utterance.pitch = 1.0; // Natural, sweet, pleasant pitch
+        const langMap = { gu: 'gu-IN', mr: 'mr-IN', pa: 'pa-IN', bn: 'bn-IN', te: 'te-IN', ta: 'ta-IN', hi: 'hi-IN', en: 'en-IN' };
+        utterance.lang = langMap[activeLang] || 'hi-IN';
+        utterance.rate = 0.85; // Calm, natural speaking pace
+        utterance.pitch = 1.0;
 
-        const voice = getBestHindiVoice();
+        const voice = getBestVoiceForLanguage(activeLang);
         if (voice) utterance.voice = voice;
 
         // Prevent V8 garbage collection
@@ -2438,15 +2461,16 @@ if (typeof document !== 'undefined') {
     }, 60);
   }
 
-  function speakResponse(text) {
+  function speakResponse(text, targetLang) {
     if (!isSoundEnabled || !window.speechSynthesis || !text) return;
+    const lang = targetLang || (sakhiConversationState && sakhiConversationState.userLang) || 'hi';
     playChunkedSpeech(text, () => {
       const avatar = document.getElementById('sakhiAvatarFrame');
       if (avatar) avatar.classList.add('speaking');
     }, () => {
       const avatar = document.getElementById('sakhiAvatarFrame');
       if (avatar) avatar.classList.remove('speaking');
-    });
+    }, lang);
   }
 
   window.toggleMessageSpeech = function (btn, encodedText) {
@@ -2461,6 +2485,7 @@ if (typeof document !== 'undefined') {
     stopAllSpeech();
 
     const text = decodeURIComponent(encodedText);
+    const textLang = (typeof detectUserScriptLanguage === 'function') ? detectUserScriptLanguage(text) : 'hi';
     activeSpeechBtn = btn;
     btn.innerHTML = '<span class="sakhi-audio-wave"><span class="wave-bar bar-1"></span><span class="wave-bar bar-2"></span><span class="wave-bar bar-3"></span><span class="wave-bar bar-4"></span></span>';
     btn.classList.add('speaking');
@@ -2470,7 +2495,7 @@ if (typeof document !== 'undefined') {
       if (avatar) avatar.classList.add('speaking');
     }, () => {
       stopAllSpeech();
-    });
+    }, textLang);
   };
 
   // Robust Clean Message Text Extractor (Strictly excludes recommendations, menus, and toolbar buttons)
@@ -2917,11 +2942,19 @@ if (typeof document !== 'undefined') {
     if (!text) return '';
     const cleanForSpeech = cleanTextForTTS(text);
     const enc = encodeURIComponent(cleanForSpeech);
+    const ttsCap = checkTtsCapability();
+    const warnBadge = (!ttsCap.supported)
+      ? `<button type="button" class="sakhi-action-pill pill-audio-warn" onclick="window.showSakhiTtsHelp(this)" title="ऑडियो सहायता (Chrome में खोलें)" aria-label="ऑडियो सहायता" style="background:#fef2f2;border:1.5px solid #ef4444;color:#ef4444;font-weight:900;padding:3px 9px;border-radius:20px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;box-shadow:0 2px 6px rgba(239,68,68,0.2);">
+           <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> <span>!</span>
+         </button>`
+      : '';
+
     return `
       <div class="sakhi-msg-actions-toolbar">
         <button type="button" class="sakhi-action-pill pill-audio" onclick="window.toggleMessageSpeech(this, '${enc}')" title="आवाज़ में सुनें" aria-label="आवाज़ में सुनें">
           <i class="fa-solid fa-volume-high" style="color:#16a34a;"></i>
         </button>
+        ${warnBadge}
         <button type="button" class="sakhi-action-pill pill-like" onclick="window.likeSakhiMessage(this)" title="यह जानकारी उपयोगी लगी" aria-label="उपयोगी">
           <i class="fa-regular fa-thumbs-up" style="color:#0284c7;"></i>
         </button>
@@ -2986,6 +3019,100 @@ if (typeof document !== 'undefined') {
   // 9.5 PERSISTENT CHAT HISTORY STORAGE ENGINE (FOR AAROGYAM MASTER 7974422572 & ALL USERS)
   const SAKHI_PERSISTENT_CHAT_KEY = 'SAKHI_PERSISTENT_CHAT_LOG';
 
+  // =========================================================================
+  // 🌐 SAKHI MULTI-LINGUAL 2-WAY TRANSLATION BRIDGE & SMART TTS SHIELD
+  // Zero Egress • Zero API Bill • 100% Offline Safe Fallback
+  // =========================================================================
+
+  const SAKHI_OFFLINE_LANG_NOTICES = {
+    gu: "તમે ગુજરાતીમાં પ્રશ્ન પૂછ્યો છે, પરંતુ ધીમા ઇન્ટરનેટને કારણે હું અનુવાદ કરી શકી નથી. કૃપા કરીને તમારું નેટવર્ક તપાસો અથવા ત્યાં સુધી મારી સાથે હિન્દીમાં વાત કરો.",
+    mr: "तुम्ही मराठीत प्रश्न विचारला आहे, पण कमी इंटरनेटमुळे भाषांतर होऊ शकले नाही. कृपया नेटवर्क तपासा किंवा तोपर्यंत माझ्याशी हिंदीत विचारा.",
+    pa: "ਤੁਸੀਂ ਪੰਜਾਬੀ ਵਿੱਚ ਪੁੱਛਿਆ ਹੈ, ਪਰ ਘੱਟ ਇੰਟਰਨੈੱਟ ਕਰਕੇ ਅਨੁਵਾਦ ਨਹੀਂ ਹੋ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਨੈੱਟਵਰਕ ਚੈੱਕ ਕਰੋ ਜਾਂ ਹਿੰਦੀ ਵਿੱਚ ਪੁੱਛੋ।",
+    bn: "আপনি বাংলায় জিজ্ঞাসা করেছেন, কিন্তু দুর্বল ইন্টারনেটের কারণে অনুবাদ করা যায়নি। দয়া করে নেটওয়ার্ক পরীক্ষা করুন বা হিন্দিতে কথা বলুন।",
+    te: "మీరు తెలుగులో అడిగారు, కానీ నెమ్మదిగా ఉన్న ఇంటర్నెట్ కారణంగా అనుવાదం చేయలేకపోయాము. దయచేసి నెట్‌వర్క్‌ను తనిખీ చేయండి లేదా హిందీలో అడగండి.",
+    ta: "நீங்கள் தமிழில் கேட்டீர்கள், ஆனால் மெதுவான இணையம் காரணமாக மொழிபெயர்க்க முடியவில்லை. தயவுசெய்து நெட்வொர்க்கைச் சரிபார்க்கவும் அல்லது இந்தியில் கேட்கவும்."
+  };
+
+  function detectUserScriptLanguage(text) {
+    if (!text || typeof text !== 'string') return 'hi';
+    if (/[\u0A80-\u0AFF]/.test(text)) return 'gu'; // Gujarati
+    if (/[\u0A00-\u0A7F]/.test(text)) return 'pa'; // Punjabi
+    if (/[\u0980-\u09FF]/.test(text)) return 'bn'; // Bengali
+    if (/[\u0C00-\u0C7F]/.test(text)) return 'te'; // Telugu
+    if (/[\u0B80-\u0BFF]/.test(text)) return 'ta'; // Tamil
+    // Marathi vs Hindi
+    if (/(?:\bआहे\b|\bनाही\b|\bपिक\b|\bसांगा\b|\bकरावे\b|\bझाले\b|\bकेले\b|\bकसे\b|\bकाय\b|\bकेळी\b|\bऊस\b|\bपिकाविषयी\b|\bद्या\b)/i.test(text)) {
+      return 'mr';
+    }
+    if (/[\u0900-\u097F]/.test(text)) return 'hi'; // Hindi
+    return 'en'; // English / Hinglish
+  }
+
+  async function translateClientText(text, targetLang, sourceLang = 'auto') {
+    if (!text || !targetLang || targetLang === sourceLang) return text;
+    if (targetLang === 'hi' && sourceLang === 'hi') return text;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s timeout guard
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (Array.isArray(data) && Array.isArray(data[0])) {
+        const trans = data[0].map(item => (item && item[0]) ? item[0] : '').join('').trim();
+        return trans.length > 0 ? trans : null;
+      }
+      return null;
+    } catch (e) {
+      return null; // Network slow or offline
+    }
+  }
+
+  function checkTtsCapability() {
+    const ua = navigator.userAgent || '';
+    const isInApp = /FBAN|FBAV|Instagram|Line|WhatsApp/i.test(ua);
+    const hasSynth = typeof window !== 'undefined' && 'speechSynthesis' in window;
+    return {
+      supported: hasSynth && !isInApp,
+      isInApp: isInApp
+    };
+  }
+
+  window.showSakhiTtsHelp = function (btn) {
+    if (!btn) return;
+    const parent = btn.closest('.sakhi-msg-actions-toolbar') || btn.parentElement;
+    if (!parent) return;
+    let existing = parent.querySelector('.sakhi-tts-guide-pop');
+    if (existing) {
+      existing.remove();
+      return;
+    }
+    const pop = document.createElement('div');
+    pop.className = 'sakhi-tts-guide-pop';
+    pop.style.cssText = 'background:#0f172a;color:#f8fafc;border:1.5px solid #38bdf8;padding:12px 14px;border-radius:12px;font-size:0.83rem;margin-top:8px;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.5);line-height:1.5;';
+    
+    const chromeIntent = `intent://${window.location.host}${window.location.pathname}${window.location.search}#Intent;scheme=https;package=com.android.chrome;end`;
+    pop.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:5px;">
+          <span>🔊</span> <span>ऑडियो सेवा सूचना</span>
+        </span>
+        <button type="button" onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer;">✕</button>
+      </div>
+      <div style="color:#cbd5e1;font-size:0.78rem;margin-bottom:10px;">
+        फेसबुक या इन-ऐप ब्राउज़र में आवाज़ बंद हो सकती है। सखी को स्पष्ट आवाज़ में सुनने के लिए सीधे <strong>Google Chrome</strong> में खोलें:
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a href="${chromeIntent}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#10b981;color:#ffffff;font-weight:800;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:0.8rem;box-shadow:0 3px 10px rgba(16,185,129,0.3);">
+          <span>🌐 Chrome में खोलें</span>
+        </a>
+      </div>
+    `;
+    parent.appendChild(pop);
+  };
+
+
   function saveChatLogItem(role, content, speech, imgMeta) {
     try {
       const phone = getUserPhone() || 'user';
@@ -3027,6 +3154,12 @@ if (typeof document !== 'undefined') {
         const lastUser = log.filter(l => l.role === 'user').slice(-1)[0];
         let sawal = lastUser ? (lastUser.caption || lastUser.content || '') : '';
         const jawab = (speech || content || '').replace(/<[^>]+>/g, '').slice(0, 200);
+
+        if (sakhiConversationState && sakhiConversationState.translatedHindiQuery && sakhiConversationState.userLang && sakhiConversationState.userLang !== 'hi') {
+          const langFlagMap = { gu: '🇬🇺 ગુજરાતી', mr: '🇲🇷 मराठी', pa: '🇵🇦 ਪੰਜਾਬੀ', bn: '🇧🇩 বাংলা', te: 'తెలుగు', ta: 'தமிழ்' };
+          const langTag = langFlagMap[sakhiConversationState.userLang] || sakhiConversationState.userLang;
+          sawal = `[${langTag}] ${sawal} ➔ [🔤] ${sakhiConversationState.translatedHindiQuery}`;
+        }
         if (!sawal || !sawal.trim()) {
           if (jawab.includes('कृषि व फसल डॉक्टर')) {
             sawal = '🌾 [मेनू चयन: कृषि व फसल डॉक्टर]';
@@ -3040,7 +3173,21 @@ if (typeof document !== 'undefined') {
             sawal = '🔘 [विकल्प / मेनू चयन]';
           }
         }
-        logToSupabaseAudit(phone, sawal, jawab, sakhiConversationState.lastActiveDomain || 'omni', 'PASS');
+        let auditStatus = 'PASS';
+        const fallbackPhrases = [
+          'स्पेलिंग जांच लें',
+          'सटीक समाधान हेतु आप नीचे दिए गए लाल सहायता बटन',
+          'मुझे नहीं पता',
+          'माफ़ कीजिए',
+          'क्षमा करें',
+          'इसकी जानकारी अभी उपलब्ध नहीं',
+          'कृपया स्पष्ट सवाल पूछें',
+          'दायरे से अलग है'
+        ];
+        if (!jawab || jawab.length < 25 || fallbackPhrases.some(fp => jawab.includes(fp))) {
+          auditStatus = 'FAIL';
+        }
+        logToSupabaseAudit(phone, sawal, jawab, sakhiConversationState.lastActiveDomain || 'omni', auditStatus);
       }
       if (log.length > 50) log = log.slice(-50);
       localStorage.setItem(key, JSON.stringify(log));
@@ -3181,16 +3328,204 @@ if (typeof document !== 'undefined') {
     if (ind) ind.remove();
   }
 
+  
+  // =========================================================================
+  // 📚 CHATGPT-STYLE CONTEXTUAL INLINE E-BOOK / PRODUCT AD SYSTEM
+  // Keyword-driven, non-intrusive, dismissible, zero localStorage bloat
+  // =========================================================================
+  function getContextualChatAdMarkup(userQuery, botHtml, domain) {
+    const textToScan = `${userQuery || ''} ${botHtml || ''}`.toLowerCase();
+
+    // 1. Wheat -> BK017
+    if (/(?:गेहूँ|गेहूं|wheat|gehu|gehun|कल्ले|फुटाव)/i.test(textToScan)) {
+      return {
+        id: 'BK017',
+        badge: '🌾 ई-बुक सिफारिश',
+        title: 'गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका (BK017)',
+        desc: 'कल्ले बढ़ाने, पीलापन रोकने व बम्पर 30 क्विंटल पैदावार का वैज्ञानिक फॉर्मूला!',
+        price: '₹99',
+        cover: '/images/books/bk017-cover.webp',
+        url: '/ebooks/book-landing.html?id=BK017'
+      };
+    }
+
+    // 2. Gram -> BK019
+    if (/(?:चना|चने|chana|gram|उकठा|सूखने)/i.test(textToScan)) {
+      return {
+        id: 'BK019',
+        badge: '🌱 ई-बुक सिफारिश',
+        title: 'चना की खेती — संपूर्ण मार्गदर्शिका (BK019)',
+        desc: 'उकठा (विल्ट) रोग से 100% सुरक्षा व चने की अधिक शाखाओं का प्रमाणित फॉर्मूला!',
+        price: '₹99',
+        cover: '/images/books/bk019-cover.webp',
+        url: '/ebooks/book-landing.html?id=BK019'
+      };
+    }
+
+    // 3. Kharif / Rice / Maize / Soybean -> BK001 (High priority on crop names)
+    if (/(?:खरीफ|धान|चावल|मक्का|सोयाबीन|kharif|dhan|makka|soyabean)/i.test(textToScan)) {
+      return {
+        id: 'BK001',
+        badge: '🌾 लोकप्रिय ई-बुक',
+        title: 'खरीफ फसल मास्टर गाइड 2026 (BK001)',
+        desc: 'धान, मक्का व सोयाबीन की 300+ सचित्र वैज्ञानिक उत्पादन गाइड व स्प्रे चार्ट!',
+        price: '₹99',
+        cover: '/images/books/kharif-master-guide-2026-cover.webp',
+        url: '/ebooks/kharif-master-guide-2026.html'
+      };
+    }
+
+    // 4. Vegetables -> BK015
+    if (/(?:सब्जी|सब्जियां|टमाटर|मिर्च|बैंगन|आलू|प्याज|लहसुन|गोभी|vegetable|sabji)/i.test(textToScan)) {
+      return {
+        id: 'BK015',
+        badge: '🥦 सब्जी किसान गाइड',
+        title: 'सब्जी खेती मास्टर — A to Z सम्पूर्ण गाइड (BK015)',
+        desc: '11 प्रमुख सब्जियों की वैज्ञानिक खेती, नर्सरी तैयारी व रोग नियंत्रण स्प्रे चार्ट!',
+        price: '₹149',
+        cover: '/images/books/bk015-cover.webp',
+        url: '/ebooks/book-landing.html?id=BK015'
+      };
+    }
+
+    // 5. Generic Crop Disease / Pests / Medicines / Doctor -> BK002
+    if (/(?:दवा|दवाई|रोग|बीमारी|कीट|इल्ली|स्प्रे|फफूंद|doctor|dawa|bimari|spray)/i.test(textToScan)) {
+      return {
+        id: 'BK002',
+        badge: '🩺 फसल सुरक्षा ई-बुक',
+        title: 'खेती का डॉक्टर — सचित्र फसल सुरक्षा (BK002)',
+        desc: '300+ सचित्र फसलों के रोग, कीट पहचान व सटीक दवा डोज का पॉकेट डॉक्टर!',
+        price: '₹99',
+        cover: '/images/books/fasal-ka-doctor-cover.webp',
+        url: '/ebooks/kheti-dr.html'
+      };
+    }
+
+    // 6. Netsurf / Income / Business / Earning -> BK018
+    if (/(?:नेट्सर्फ|कमाई|इनकम|व्यापार|पैसे|business|income|earning|paisa|netsurf)/i.test(textToScan)) {
+      return {
+        id: 'BK018',
+        badge: '💼 करियर व इनकम गाइड',
+        title: 'घर बैठे पैसे कैसे कमाएँ? Income Guide (BK018)',
+        desc: 'स्मार्टफोन से महीने के ₹30,000 से ₹8.19 लाख कमाने का स्टेप-बाय-स्टेप रोडमैप!',
+        price: '₹149',
+        cover: '/images/books/bk018-cover.webp',
+        url: '/ebooks/book-landing.html?id=BK018'
+      };
+    }
+
+    // 7. Animal Husbandry / Dairy -> BK016
+    if (/(?:गाय|भैंस|दूध|फैट|पशु|डेयरी|पशुपालन|dairy|cattle)/i.test(textToScan)) {
+      return {
+        id: 'BK016',
+        badge: '🐄 पशु व कृषि गाइड',
+        title: 'कृषि दवा डायरेक्टरी व पशु पोषण गाइड (BK016)',
+        desc: 'पशुओं का दूध-फैट बढ़ाने के वैज्ञानिक उपाय व सम्पूर्ण रोग सुरक्षा तालिका!',
+        price: '₹99',
+        cover: '/images/books/bk016-cover.webp',
+        url: '/ebooks/book-landing.html?id=BK016'
+      };
+    }
+
+    // 8. Organic Farming / Compost -> BK008
+    if (/(?:जैविक|केंचुआ|वर्मी|जीवामृत|organic|jaivik|compost)/i.test(textToScan)) {
+      return {
+        id: 'BK008',
+        badge: '🌿 जैविक कृषि गाइड',
+        title: 'जैविक खेती संपूर्ण मार्गदर्शिका (BK008)',
+        desc: 'रासायनिक खाद मुक्त प्राकृतिक खेती, जीवामृत निर्माण व कम लागत में अधिक लाभ!',
+        price: '₹99',
+        cover: '/images/books/jaivik-kheti-guide-cover.webp',
+        url: '/ebooks/book-landing.html?id=BK008'
+      };
+    }
+
+    // Default fallback: BK001
+    return {
+      id: 'BK001',
+      badge: '🌾 विशेष डिजिटल गाइड',
+      title: 'खरीफ फसल मास्टर गाइड 2026 (BK001)',
+      desc: '300+ सचित्र वैज्ञानिक गाइड, रोग पहचान व सम्पूर्ण स्प्रे कैलेंडर मात्र ₹99 में!',
+      price: '₹99',
+      cover: '/images/books/kharif-master-guide-2026-cover.webp',
+      url: '/ebooks/kharif-master-guide-2026.html'
+    };
+  }
+
+  function renderInlineContextAdHtml(ad) {
+    if (!ad) return '';
+    return `
+      <div class="sakhi-context-ad-card" style="margin-top:12px;background:#ffffff;border:1.5px solid #cbd5e1;border-left:4px solid #10b981;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px;position:relative;box-shadow:0 3px 12px rgba(0,0,0,0.06);transition:all 0.25s ease;">
+        <img src="${ad.cover}" alt="${escapeHtml(ad.title)}" class="sakhi-ad-thumb" style="width:48px;height:62px;object-fit:cover;border-radius:6px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.15);border:1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+        <div class="sakhi-ad-body" style="flex:1;min-width:0;">
+          <div class="sakhi-ad-header" style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">
+            <span class="sakhi-ad-badge-tag" style="background:#f1f5f9;color:#475569;font-size:0.68rem;font-weight:900;padding:1px 6px;border-radius:6px;text-transform:uppercase;border:1px solid #cbd5e1;">Ad • ${escapeHtml(ad.badge)}</span>
+            <span class="sakhi-ad-price" style="font-size:0.80rem;font-weight:900;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:6px;">मात्र ${escapeHtml(ad.price)}</span>
+          </div>
+          <div class="sakhi-ad-title" style="font-weight:900;font-size:0.86rem;color:#0f172a;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">
+            ${escapeHtml(ad.title)}
+          </div>
+          <div class="sakhi-ad-desc" style="font-size:0.75rem;color:#64748b;line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;">
+            ${escapeHtml(ad.desc)}
+          </div>
+          <a href="${ad.url}" target="_blank" class="sakhi-ad-cta-btn" style="display:inline-flex;align-items:center;gap:4px;background:#10b981;color:#ffffff;font-size:0.76rem;font-weight:800;padding:4px 12px;border-radius:8px;text-decoration:none;box-shadow:0 2px 6px rgba(16,185,129,0.25);">
+            <span>📖 ई-बुक देखें</span> <span style="font-size:0.85rem;">↗</span>
+          </a>
+        </div>
+        <button type="button" class="sakhi-ad-dismiss-btn" onclick="this.closest('.sakhi-context-ad-card').remove();" title="बंद करें" style="position:absolute;top:6px;right:6px;background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer;padding:2px 6px;line-height:1;">✕</button>
+      </div>
+    `;
+  }
+
   function streamBotMessage(htmlContent, speechText, followupChips) {
     removeTypingIndicator();
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
+    // 🛡️ UNIVERSAL ZERO-BLANK SHIELD (Never let an empty response bubble reach the user)
+    const textContentOnly = (htmlContent || '').replace(/<[^>]+>/g, '').trim();
+    if (!htmlContent || typeof htmlContent !== 'string' || !textContentOnly) {
+      console.warn('[Sakhi Zero-Blank Shield Activated] Empty response prevented!');
+      htmlContent = `
+        <div style="background:#f8fafc;border-left:4px solid #16a34a;padding:14px;border-radius:12px;line-height:1.65;font-size:0.95rem;color:#1e293b;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+          <div style="font-weight:900;color:#166534;font-size:1rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <span>🌾</span> <span>आरोग्यम सखी — आपका प्रश्न प्राप्त हुआ</span>
+          </div>
+          <div>
+            नमस्ते! आपकी समस्या के सटीक समाधान के लिए कृपया अपने प्रश्न में <strong>फसल, रोग, कीट या लक्षण का नाम</strong> थोड़ा स्पष्ट लिखें, या नीचे दिए गए मुख्य विषयों में से चुनें:
+          </div>
+        </div>
+      `;
+      if (!speechText) {
+        speechText = 'नमस्ते! कृपया अपनी फसल, पशु या स्वास्थ्य से जुड़ा सवाल थोड़ा विस्तार से पूछें।';
+      }
+      if (!followupChips || !followupChips.length) {
+        followupChips = [
+          { text: '🌾 फसल व खाद परामर्श', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' },
+          { text: '🐄 पशु दूध व फैट वृद्धि', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
+          { text: '🩺 स्वास्थ्य व पोषण सलाह', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' }
+        ];
+      }
+    }
+
     const now = Date.now();
     ensureDateSeparator(wrap, now);
     saveChatLogItem('bot', htmlContent, speechText || '');
 
+    // 📚 CONTEXTUAL INLINE E-BOOK / PRODUCT AD INJECTION (Every 2-3 Bot Messages, Not Saved to History)
+    window._sakhiChatAdCounter = (window._sakhiChatAdCounter || 0) + 1;
+    let inlineAdHtml = '';
+    if (window._sakhiChatAdCounter % 3 === 2 || window._sakhiChatAdCounter === 2) {
+      const lastUserQuery = (sessionChatHistory && sessionChatHistory.filter(m => m.role === 'user').slice(-1)[0]?.text) || '';
+      const domain = (sakhiConversationState && sakhiConversationState.lastActiveDomain) || 'agri';
+      const adObj = getContextualChatAdMarkup(lastUserQuery, htmlContent, domain);
+      if (adObj) {
+        inlineAdHtml = renderInlineContextAdHtml(adObj);
+      }
+    }
+
     let finalHtml = htmlContent;
+    let finalSpeech = speechText || '';
     // Strip any mid-bubble action toolbar to ensure toolbar is always cleanly at the bottom
     if (finalHtml.includes('sakhi-msg-actions-toolbar')) {
       finalHtml = finalHtml.replace(/<div class="sakhi-msg-actions-toolbar"[\s\S]*?<\/div>\s*(?=<div|$)/g, '');
@@ -3232,6 +3567,9 @@ if (typeof document !== 'undefined') {
     }
 
     finalHtml += buildMsgAudioBtnMarkup(speechText || htmlContent);
+    if (inlineAdHtml) {
+      finalHtml += inlineAdHtml;
+    }
 
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row bot';
@@ -3254,7 +3592,9 @@ if (typeof document !== 'undefined') {
       console.debug('[Sakhi Pills] Notice:', e);
     }
 
-    if (speechText) {
+    // Smart TTS Audio: Mute / Skip speech if incoming query was in a non-Hindi regional language
+    const isRegionalLangQuery = Boolean(sakhiConversationState && sakhiConversationState.userLang && sakhiConversationState.userLang !== 'hi' && sakhiConversationState.userLang !== 'en');
+    if (speechText && !isRegionalLangQuery) {
       const audioBtn = row.querySelector('.sakhi-action-pill');
       if (audioBtn) {
         activeSpeechBtn = audioBtn;
@@ -3696,12 +4036,51 @@ if (typeof document !== 'undefined') {
       setTimeout(async () => {
         removeTypingIndicator();
 
+        // 🌐 Multi-Lingual Incoming Query Translation Shield
+        const userLang = detectUserScriptLanguage(query);
+        let effectiveQuery = query;
+        if (typeof sakhiConversationState !== 'undefined' && sakhiConversationState) {
+          sakhiConversationState.userLang = userLang;
+          sakhiConversationState.rawOriginalQuery = query;
+        }
+
+        if (userLang && userLang !== 'hi' && userLang !== 'en') {
+          appendTypingIndicator('सखी आपकी मातृभाषा को समझ रही है... 🌐');
+          const translatedHindi = await translateClientText(query, 'hi', userLang);
+          removeTypingIndicator();
+          if (translatedHindi && translatedHindi.trim().length > 0) {
+            effectiveQuery = translatedHindi;
+            sakhiConversationState.translatedHindiQuery = translatedHindi;
+          } else {
+            // Translation failed due to slow internet / offline
+            const fallbackNotice = SAKHI_OFFLINE_LANG_NOTICES[userLang] || 'कृपया अपना इंटरनेट चेक करें या हिंदी में सवाल पूछें।';
+            streamBotMessage(`
+              <div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:14px;padding:14px;box-shadow:0 3px 10px rgba(245,158,11,0.08);">
+                <div style="font-weight:900;color:#b45309;font-size:0.95rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                  <span>🌐</span> <span>मातृभाषा अनुवाद सूचना</span>
+                </div>
+                <div style="font-size:0.88rem;color:#334155;line-height:1.6;">
+                  ${escapeHtml(fallbackNotice)}
+                </div>
+              </div>
+            `, '', [
+              { text: '🌾 फसल व खेती सलाह', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' },
+              { text: '🐄 पशुपालन व डेयरी', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
+              { text: '🩺 स्वास्थ्य व पोषण', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' }
+            ]);
+            return;
+          }
+        }
+
+        // Direct Clean Normalization & Processing
+        const cleanNormQ = normalizeQueryText(effectiveQuery);
+
         // EXPLICIT LIVE SEARCH OVERRIDE (User specifically asked to search / khojo)
-        const isExplicitLiveSearch = /(?:सर्च\s*कर|खोज\s*कर|गूगल|विकी|wikipedia|\bsearch\b|\bkhoj\b|इंटरनेट\s*पर)/i.test(query);
+        const isExplicitLiveSearch = /(?:सर्च\s*कर|खोज\s*कर|गूगल|विकी|wikipedia|\bsearch\b|\bkhoj\b|इंटरनेट\s*पर)/i.test(cleanNormQ);
         if (isExplicitLiveSearch) {
           try {
             appendTypingIndicator('सखी ज्ञानकोष में सटीक जानकारी खोज रही है... 🌐');
-            const cleanSearch = cleanQueryForSearchEngine(query);
+            const cleanSearch = cleanQueryForSearchEngine(cleanNormQ);
             const wikiRes = await fetchWikipediaHindiSummary(cleanSearch);
             removeTypingIndicator();
             if (wikiRes && wikiRes.summary) {
@@ -3728,11 +4107,11 @@ if (typeof document !== 'undefined') {
         }
 
         try {
-          processKnowledgeQuery(query);
+          processKnowledgeQuery(cleanNormQ);
         } catch (err) {
           console.error('[Sakhi AI Runtime Error in processKnowledgeQuery]:', err);
           removeTypingIndicator();
-          synthesizeDynamicAnswer(query, 'omni');
+          synthesizeDynamicAnswer(cleanNormQ, 'omni');
         }
       }, 700);
     }
@@ -3744,6 +4123,9 @@ if (typeof document !== 'undefined') {
 
       // Urea Typos (रेरिया, रूरिया)
       text = text.replace(/(?:रेरिया|रूरिया|\breriya\b|\bretiya\b)/gi, 'यूरिया');
+
+      // Rice / Chawal -> Dhan Normalization
+      text = text.replace(/(?:\bचावल\b|\bचावल की\b)/gi, 'धान');
 
       // Marathi Agriculture & Crop Vocabulary Normalization (केळी -> केला, ऊस -> गन्ना)
       text = text.replace(/(?:\bकेळी\b|\bकेळीची\b|\bकेळीचे\b|\bkeli\b|\bkelee\b)/gi, 'केला');
@@ -3776,6 +4158,22 @@ if (typeof document !== 'undefined') {
       text = text.replace(/(?:લસણ|લસણની)/gi, 'लहसुन');
       text = text.replace(/(?:ઇજા|મોચ)/gi, 'चोट मोच');
       text = text.replace(/(?:દુખાવો|દુખાવો થાય)/gi, 'दर्द');
+
+      // Enhanced Gujarati & Dehati Queries
+      text = text.replace(/(?:કપાસ\s*માં\s*વાઇટ|કપાસમાં\s*વાઇટ|કપાસ\s*વાઇટ)/gi, 'કપાસ માં વાઇટ દેખાય છે');
+      text = text.replace(/(?:આંબા\s*પર\s*મધીયો|આંબા\s*મધીયો|મધીયો)/gi, 'આંબા પર મધીયો છે');
+      text = text.replace(/(?:મારો\s*નેટસફૅ\s*નો\s*રેફરનસ\s*નંબર\s*ક્યાં\s*લખવા\s*નો|રેફરનસ\s*નંબર|રેફરન્સ\s*નંબર)/gi, 'મારો નેટસફૅ નો રેફરનસ નંબર ક્યાં લખવા નો');
+      text = text.replace(/(?:કેટલી\s*બેગ\s*ભરાય|પચાસ\s*કિલો\s*વજન\s*કી\s*કિતની\s*બેગ|કિતની\s*બેગ\s*બનતી\s*હૈ)/gi, 'કેટલી બેગ ભરાય');
+      text = text.replace(/(?:છંટકાવ\s*એક\s*વખત\s*કરવો|કલ્ચર\s*કા\s*છંટકાવ\s*કિતની\s*બાર)/gi, 'છંટકાવ એક વખત કરવો');
+      text = text.replace(/(?:mara\s*casustamar|mara\s*castamar|mara\s*castomar|mera\s*customer)/gi, 'मेरे कस्टमर');
+      text = text.replace(/(?:sax\s*samndhi\s*sama\s*say|sax\s*samadhi|sax\s*samndhi|sax\s*samadhan)/gi, 'यौन कमजोरी');
+      text = text.replace(/(?:podact|pprdakha|prdakha)/gi, 'प्रोडक्ट');
+      text = text.replace(/(?:अपलेइंग|upline\s*se\s*baat)/gi, 'अपलाइन से बात');
+      text = text.replace(/(?:1121\s*ma\s*fungiside|1121\s*fungicide)/gi, 'पूसा 1121 धान फंगीसाइड');
+      text = text.replace(/(?:दान\s*में\s*कौन|धान\s*में\s*फंगी)/gi, 'धान में फंगीसाइड');
+      text = text.replace(/(?:एफएमसी\s*की\s*कोराजन|कोराजन\s*का\s*रिजल्ट|coragen)/gi, 'एफएमसी कोराजन');
+      text = text.replace(/(?:gale\s*me\s*chhote\s*chhote\s*kale\s*masse|kale\s*masse|काले\s*मस्से)/gi, 'त्वचा के मस्से');
+      text = text.replace(/(?:bal\s*girne\s*jharne|mere\s*bal\s*bahut\s*gir\s*raha|bal\s*gir\s*raha)/gi, 'बाल झड़ना रोकने के उपाय');
 
       let t0 = (text || '').toLowerCase().replace(/(?:hbaic|hba-1c|hb1ac|hba\s*1c|hba1\s*c|एचबीए1सी|एचबीए\s*1सी)/gi, 'hba1c');
       text = t0;
@@ -7153,7 +7551,7 @@ if (typeof document !== 'undefined') {
 
       // 0.2 Dehati Colloquial Style / Rural Idioms Mapping
       if (cleanQ.includes('फसल बैठ रही') || cleanQ.includes('paudhe baith rahe') || cleanQ.includes('बैठ रही है')) {
-        const resp = `अरे किसान भाई, अगर फसल बैठ रही है (मुरझाकर सूख रही है), तो यह मिट्टी में फंगस यानी उकठा रोग (Wilt / Root Rot) का हमला है। इसमें पौधे की जड़ें काली पड़ जाती हैं।\n\n• **पक्का जैविक समाधान (Wrap Up + Bio-99):** नेट्सर्फ **Wrap Up (रैप-अप)** 75 ml + **Bio-99 (बायो-99)** 5 ml प्रति 15 लीटर पंप का पौधों की जड़ों के पास ड्रिंचिंग (जड़ क्षेत्र में सिंचन) करें। Wrap Up जड़ों पर सुरक्षा कवच बनाता है और Bio-99 दवा को गहराई तक पहुंचाता है।\n• **सचित्र पहचान:** हमारी ई-बुक **'खेती का डॉक्टर'** में इसका सचित्र समाधान दिया गया है।\n\n💡 **सलाह:** फसल बैठने या गलन की स्थिति में दवा डालने से पहले विशेषज्ञ सहायता अवश्य लें।`;
+        const resp = `अरे ${getSakhiDynamicSalutation('general')}, अगर फसल बैठ रही है (मुरझाकर सूख रही है), तो यह मिट्टी में फंगस यानी उकठा रोग (Wilt / Root Rot) का हमला है। इसमें पौधे की जड़ें काली पड़ जाती हैं।\n\n• **पक्का जैविक समाधान (Wrap Up + Bio-99):** नेट्सर्फ **Wrap Up (रैप-अप)** 75 ml + **Bio-99 (बायो-99)** 5 ml प्रति 15 लीटर पंप का पौधों की जड़ों के पास ड्रिंचिंग (जड़ क्षेत्र में सिंचन) करें। Wrap Up जड़ों पर सुरक्षा कवच बनाता है और Bio-99 दवा को गहराई तक पहुंचाता है।\n• **सचित्र पहचान:** हमारी ई-बुक **'खेती का डॉक्टर'** में इसका सचित्र समाधान दिया गया है।\n\n💡 **सलाह:** फसल बैठने या गलन की स्थिति में दवा डालने से पहले विशेषज्ञ सहायता अवश्य लें।`;
         renderCrispSpecialBox('🛡️ फसल बैठना (उकठा / जड़ गलन) — Wrap Up समाधान', resp, [
           { text: '🛡️ Wrap Up की पूरी जानकारी', query: 'उकठा रोग का Wrap Up उपचार' },
           { text: '📖 खेती डॉक्टर ई-बुक', query: 'खेती का डॉक्टर के बारे में बताओ' },
@@ -7934,7 +8332,7 @@ if (typeof document !== 'undefined') {
           { label: '💰 4. चने में प्रति एकड़ दवाओं का खर्च', query: 'चने के खेत में बायोफिट खर्च कितना लगेगा' },
           { label: '🌾 5. गेहूं के साथ चने की सह-फसल', query: 'गेहूं के साथ चना या सरसों की सह-फसल कैसे लगाएं' }
         ];
-        slipShareText = `🌿 *चने (Gram) की रिकॉर्ड पैदावार व उकठा सुरक्षा सलाह:*\n\nनमस्ते किसान भाई! 🙏\nचने की फसल में उकठा (Wilt) से सुरक्षा व फूल-दाना भराव का अचूक फॉर्मूला:\n\n• *उकठा रोकथाम:* रैप अप + शेत से जड़ों की सुरक्षा।\n• *फूल झड़ना रोकना:* स्टिमरिच (30ml/पंप) से फूल गिरना बंद व अधिक फलियां।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *आरोग्यम सखी AI लिंक:* ${officialSakhiLink}`;
+        slipShareText = `🌿 *चने (Gram) की रिकॉर्ड पैदावार व उकठा सुरक्षा सलाह:*\n\n${getSakhiDynamicSalutation('crop')}\nचने की फसल में उकठा (Wilt) से सुरक्षा व फूल-दाना भराव का अचूक फॉर्मूला:\n\n• *उकठा रोकथाम:* रैप अप + शेत से जड़ों की सुरक्षा।\n• *फूल झड़ना रोकना:* स्टिमरिच (30ml/पंप) से फूल गिरना बंद व अधिक फलियां।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *आरोग्यम सखी AI लिंक:* ${officialSakhiLink}`;
       } else if (t.includes('sarso') || t.includes('सरसों')) {
         questions = [
           { label: '🌿 1. माहू (चेपा / मोयला) का जैविक इलाज', query: 'सरसों में माहू की दवा बताओ' },
@@ -7942,7 +8340,7 @@ if (typeof document !== 'undefined') {
           { label: '🌾 3. विरलीकरण (Thinning) व सल्फर प्रयोग', query: 'सरसों में कौन सी खाद डालें' },
           { label: '💰 4. सरसों में Biofit स्प्रे शेड्यूल व खर्च', query: 'सरसों के खेत में दवाओं का कुल खर्च कितना लगेगा' }
         ];
-        slipShareText = `🌿 *सरसों (Mustard) में माहू नियंत्रण व तेल वृद्धि सलाह:*\n\nनमस्ते किसान भाई! 🙏\nसरसों में माहू (चेपा) खत्म करने व तेल 42% तक बढ़ाने का फॉर्मूला:\n\n• *माहू नियंत्रण:* बायोफिट इंटैक्ट (30ml) + Bio-99 (5ml) शाम के समय स्प्रे।\n• *दाना भराव:* स्टिमरिच + सल्फर से दानों में चमक व भारी वजन।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
+        slipShareText = `🌿 *सरसों (Mustard) में माहू नियंत्रण व तेल वृद्धि सलाह:*\n\n${getSakhiDynamicSalutation('crop')}\nसरसों में माहू (चेपा) खत्म करने व तेल 42% तक बढ़ाने का फॉर्मूला:\n\n• *माहू नियंत्रण:* बायोफिट इंटैक्ट (30ml) + Bio-99 (5ml) शाम के समय स्प्रे।\n• *दाना भराव:* स्टिमरिच + सल्फर से दानों में चमक व भारी वजन।\n\n👤 *सलाह प्रेषक:* ${senderName} (मो. ${senderPhone})\n🌱 *सखी AI लिंक:* ${officialSakhiLink}`;
       } else if (t.includes('pashu') || t.includes('दूध') || t.includes('cfc') || domain === 'pashu') {
         questions = [
           { label: '🐄 1. गाय-भैंस का दूध व फैट 20 दिन में बढ़ाएं', query: 'सीएफसी के फायदे क्या हैं' },
@@ -8223,7 +8621,7 @@ if (typeof document !== 'undefined') {
         q.includes('sab kuch kar liya') || q.includes('aaram nahi mila')
       );
       if (isDawaNotWorking) {
-        const resp = `राम-राम किसान भाई! 🙏 आपकी परेशानी हम भली-भांति समझ सकते हैं। जब मेहनत और पैसे लगाने के बाद भी फसल की बीमारी न रुके तो चिंता होना स्वाभाविक है।
+        const resp = `${getSakhiDynamicSalutation('crop')} आपकी परेशानी हम भली-भांति समझ सकते हैं। जब मेहनत और पैसे लगाने के बाद भी फसल की बीमारी न रुके तो चिंता होना स्वाभाविक है।
 
 आइए, **वैज्ञानिक और ज़मीनी दृष्टिकोण से समझें कि दवा का असर क्यों नहीं हुआ:**
 
@@ -8258,7 +8656,7 @@ if (typeof document !== 'undefined') {
         q.includes('phool drop') || q.includes('fruit drop')
       );
       if (isFlowerDropQuery) {
-        const resp = `किसान भाई, फूल और छोटे फलों का झड़ना फसल की सबसे नाज़ुक समस्या है। 
+        const resp = `${getSakhiDynamicSalutation('crop')}, फूल और छोटे फलों का झड़ना फसल की सबसे नाज़ुक समस्या है। 
 
 ⚠️ **फूल झड़ने के 3 मुख्य वैज्ञानिक कारण:**
 1. **नमी का झटका:** फूल खिलते समय खेत में अत्यधिक सूखा या अत्यधिक जलभराव।
@@ -8283,7 +8681,7 @@ if (typeof document !== 'undefined') {
         (q.includes('dawa') || q.includes('दवा') || q.includes('biofit') || q.includes('बायोफिट') || q.includes('stimrich') || q.includes('sheth') || q.includes('intact') || q.includes('wrapup') || sakhiConversationState.lastActiveDomain === 'agri')
       );
       if (isWhereToBuyAgri) {
-        const resp = `किसान भाई, दोनों तरह के उत्पादों की उपलब्धता का पूरा विवरण नीचे दिया गया है:
+        const resp = `${getSakhiDynamicSalutation('general')}, दोनों तरह के उत्पादों की उपलब्धता का पूरा विवरण नीचे दिया गया है:
 
 🌿 **1. प्रामाणिक नेटसर्फ बायोफिट उत्पाद (Biofit Organic Range):**
 • **Bio-99, Stimrich, Sheth, Wrapup, Intact व Bio-NPK**
@@ -8359,7 +8757,7 @@ if (typeof document !== 'undefined') {
 
         if (targetedDisease) {
           sakhiConversationState.lastActionTopic = 'disease';
-          const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name} में ${targetedDisease.name} का संपूर्ण सटीक समाधान:**
+          const resp = `${getSakhiDynamicSalutation('crop')} **${matchedCrop.name} में ${targetedDisease.name} का संपूर्ण सटीक समाधान:**
 
 🔍 **लक्षण व पहचान:**
 • ${targetedDisease.symptoms}
@@ -8408,7 +8806,7 @@ if (typeof document !== 'undefined') {
             chemSeedFormula = `• **प्रमाणित फफूंदनाशक:** कार्बेन्डाजिम 12% + मैंकोज़ेब 63% WP (Saaf) **2 ग्राम प्रति किलो बीज**।\n• **कीटनाशक सुरक्षा:** इमिडाक्लोप्रिड 70% WS **3 से 5 ग्राम प्रति किलो बीज** मिलाकर छाया में सुखाएं।`;
           }
 
-          const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name} का प्रमाणित रासायनिक बीज उपचार (Chemical Seed Treatment):**
+          const resp = `${getSakhiDynamicSalutation('crop')} **${matchedCrop.name} का प्रमाणित रासायनिक बीज उपचार (Chemical Seed Treatment):**
 
 🧪 **रासायनिक फॉर्मूला व डोज़:**
 ${chemSeedFormula}
@@ -8448,7 +8846,7 @@ ${chemSeedFormula}
             diseaseDetails += `\n\n📌 **${idx + 1}. ${dis.name}:**\n• **लक्षण:** ${dis.symptoms}\n• 🌿 **जैविक उपचार (Biofit NetSurf):** ${dis.organicBiofit}\n• 🧪 **रासायनिक विकल्प (Chemical Emergency):** ${dis.chemical}`;
           });
 
-          const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** में लगने वाले प्रमुख रोगों व कीटों का संपूर्ण वैज्ञानिक व सटीक समाधान नीचे दिया गया है:
+          const resp = `${getSakhiDynamicSalutation('crop')} **${matchedCrop.name}** में लगने वाले प्रमुख रोगों व कीटों का संपूर्ण वैज्ञानिक व सटीक समाधान नीचे दिया गया है:
 ${diseaseDetails}
 
 ⚠️ **सुरक्षा निर्देश (Safety Precautions):**
@@ -8467,7 +8865,7 @@ ${diseaseDetails}
         // Check if asking about Fertilizer Schedule
         if (q.includes('khad') || q.includes('खाद') || q.includes('fertilizer') || q.includes('यूरिया') || q.includes('डीएपी')) {
           sakhiConversationState.lastActionTopic = 'fertilizer';
-          const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** के लिए संपूर्ण खाद, उर्वरक व पोषण प्रबंधन तालिका:
+          const resp = `${getSakhiDynamicSalutation('crop')} **${matchedCrop.name}** के लिए संपूर्ण खाद, उर्वरक व पोषण प्रबंधन तालिका:
 
 🌱 **बुवाई के समय बेसल डोज़ (प्रति एकड़):**
 • ${matchedCrop.fertilizerSchedule}
@@ -8484,7 +8882,7 @@ ${diseaseDetails}
         // Check if asking about Seed Treatment
         if (q.includes('beej upchar') || q.includes('बीज उपचार') || q.includes('seed treatment') || q.includes('शोधन') || (q.includes('beej') && q.includes('upchar'))) {
           sakhiConversationState.lastActionTopic = 'seed_treatment';
-          const resp = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** का वैज्ञानिक बीज उपचार (Seed Treatment):
+          const resp = `${getSakhiDynamicSalutation('crop')} **${matchedCrop.name}** का वैज्ञानिक बीज उपचार (Seed Treatment):
 
 🌱 **बीज उपचार का फॉर्मूला:**
 • ${matchedCrop.seedTreatment}
@@ -8502,7 +8900,7 @@ ${diseaseDetails}
         }
 
         // Default: 3-4 Line Respectful Intro + Yield Hacks + Interactive Options (First Stage)
-        const introText = `राम-राम किसान भाई! 🙏 **${matchedCrop.name}** की संपूर्ण प्रोफाइल:
+        const introText = `${getSakhiDynamicSalutation('crop')} **${matchedCrop.name}** की संपूर्ण प्रोफाइल:
 
 🌾 **फसल का स्वभाव व चक्र:**
 • ${matchedCrop.intro}
@@ -8514,7 +8912,7 @@ ${diseaseDetails}
 📈 **पैदावार 25-40% बढ़ाने के अचूक नुस्खे (Yield Hacks):**
 ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
 
-💬 **किसान भाई, आप ${matchedCrop.name} के बारे में आगे क्या जानना चाहते हैं?**  
+💬 **साथी, आप ${matchedCrop.name} के बारे में आगे क्या जानना चाहते हैं?**  
 नीचे दिए गए बटन दबाकर तुरंत संपूर्ण विवरण देखें:`;
 
         return renderMasterCropCard(`${matchedCrop.name}: फसल परिचय व पैदावार बढ़ाने के गुर`, introText, [
@@ -12277,7 +12675,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       // 1. Kalla, Futan, Biyana (शाखाओं का फुटाव / कल्ले / सोता)
       if (q.includes('kalla') || q.includes('कल्ले') || q.includes('कल्ला') || q.includes('futan') || q.includes('फूटान') || q.includes('biyana') || q.includes('बियाना') || q.includes('झाड़ मारना') || q.includes('सोता')) {
         sakhiConversationState.lastActiveDomain = 'agri';
-        const resp = `🌾 **फसल में कल्ले (फुटाव / झाड़ / बियाना / सोता) बढ़ाने का अचूक जैविक फॉर्मूला:**\n\nकिसान भाई, जब कल्ले ज्यादा फूटते हैं तभी बालियां और फलियां अधिक बनती हैं और पैदावार 30-40% बढ़ती है।\n\n🌿 **तुरंत स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n• **स्टीमरिच (Biofit Stimrich):** 30 ml\n• **बायो-99 (Bio-99 स्प्रेडर):** 5 ml\n• **स्प्रे का समय:** बुवाई के 20 से 25 दिन बाद (पहला स्प्रे) और फूल आने से पहले।\n\n💡 **देहाती नुस्खा:** खेत में हल्की नमी हो तब सुबह 10 बजे से पहले या शाम को छिड़कें। 5 दिनों में पूरे खेत में कल्ले फूटकर हरियाली छा जाएगी!`;
+        const resp = `🌾 **फसल में कल्ले (फुटाव / झाड़ / बियाना / सोता) बढ़ाने का अचूक जैविक फॉर्मूला:**\n\n${getSakhiDynamicSalutation('crop')}, जब कल्ले ज्यादा फूटते हैं तभी बालियां और फलियां अधिक बनती हैं और पैदावार 30-40% बढ़ती है।\n\n🌿 **तुरंत स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n• **स्टीमरिच (Biofit Stimrich):** 30 ml\n• **बायो-99 (Bio-99 स्प्रेडर):** 5 ml\n• **स्प्रे का समय:** बुवाई के 20 से 25 दिन बाद (पहला स्प्रे) और फूल आने से पहले।\n\n💡 **देहाती नुस्खा:** खेत में हल्की नमी हो तब सुबह 10 बजे से पहले या शाम को छिड़कें। 5 दिनों में पूरे खेत में कल्ले फूटकर हरियाली छा जाएगी!`;
         renderCrispSpecialBox('🌾 कल्ले व फुटाव बढ़ाने का फॉर्मूला (स्टीमरिच + बायो-99)', resp, [
           { text: '🌱 स्टीमरिच 1L, 500ml व 250ml की कीमतें', query: 'स्टीमरिच की सही कीमत और डोज क्या है?' },
           { text: '🌾 4 एकड़ का सम्पूर्ण स्प्रे एस्टीमेट', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
@@ -12381,7 +12779,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       // 10. General Dehati Comfort / Crop Drying
       if (q.includes('का करें') || q.includes('देहाती भाषा') || q.includes('फसल सूख रही') || q.includes('उखटा')) {
         sakhiConversationState.lastActiveDomain = 'agri';
-        const resp = `राम-राम किसान भाई! 🙏 आप बिल्कुल घबराइए मत, देहाती भाषा में ही देसी और पक्का उपाय बताएंगे।\n\nअगर फसल सूख रही है (उखटा / जड़ गलन), तो दो मुख्य कारण होते हैं:\n1. **जड़ में उकठा / फंगस (उखटा रोग):** पौधा हरा ही सूख जाता है और जड़ काली निकलती है।\n   👉 **उपाय:** नेट्सर्फ **Wrap Up** (75 ml प्रति 15 लीटर पंप) जड़ों में ड्रिंचिंग करें।\n2. **जड़ में दीमक या तना छेदक लट:** तना अंदर से खोखला हो जाता है।\n   👉 **उपाय:** **Larvicide (30ml) + Bio-99 (5ml)** का शाम को छिड़काव करें।\n\nअपनी फसल (चना, गेहूं, सरसों या सब्जी) का नाम बताइए, हम सटीक दवा और खर्च बता देंगे!`;
+        const resp = `${getSakhiDynamicSalutation('crop')} आप बिल्कुल घबराइए मत, देहाती भाषा में ही देसी और पक्का उपाय बताएंगे।\n\nअगर फसल सूख रही है (उखटा / जड़ गलन), तो दो मुख्य कारण होते हैं:\n1. **जड़ में उकठा / फंगस (उखटा रोग):** पौधा हरा ही सूख जाता है और जड़ काली निकलती है।\n   👉 **उपाय:** नेट्सर्फ **Wrap Up** (75 ml प्रति 15 लीटर पंप) जड़ों में ड्रिंचिंग करें।\n2. **जड़ में दीमक या तना छेदक लट:** तना अंदर से खोखला हो जाता है।\n   👉 **उपाय:** **Larvicide (30ml) + Bio-99 (5ml)** का शाम को छिड़काव करें।\n\nअपनी फसल (चना, गेहूं, सरसों या सब्जी) का नाम बताइए, हम सटीक दवा और खर्च बता देंगे!`;
         renderCrispSpecialBox('🌾 देसी किसान हमदर्द — फसल सूखने का पक्का समाधान', resp, [
           { text: '🛡️ उकठा व जड़ गलन का Wrap Up इलाज', query: 'उकठा रोग का Wrap Up उपचार' },
           { text: '🌾 फसलों का संपूर्ण स्प्रे शेड्यूल', query: 'फसलों का संपूर्ण स्प्रे शेड्यूल' },
@@ -12714,7 +13112,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       if (!isFertRed) return false;
 
       sakhiConversationState.lastActiveDomain = 'agri';
-      const resp = `🧪 **यूरिया व डीएपी की मात्रा 50% घटाने का अचूक वैज्ञानिक फॉर्मूला:**\n\nकिसान भाई, सच्चाई यह है कि जब आप जमीन में 1 बोरी (45kg) यूरिया फेंकते हैं, तो पौधे केवल **25 से 30%** ही ले पाते हैं; बाकी 70% यूरिया हवा में उड़कर या जमीन में बहकर बर्बाद हो जाता है!\n\n🌾 **खाद का खर्च आधा करने के 3 पक्के नियम:**\n\n1. 🧫 **Bio-NPK से डीएपी आधा करें (जमीन में):**\n   • बुवाई या पहली सिंचाई पर **बायोफिट Bio-NPK (1L/एकड़)** दें। यह जमीन में सालों से पत्थर बनकर दबे पड़े फास्फोरस और पोटाश को घोलकर सीधे जड़ों तक पहुंचा देता है। इससे आधी बोरी डीएपी में ही पूरी बोरी जितना बंपर रिजल्ट मिलता है!\n\n2. 🍃 **यूरिया का नैनो फोलियर स्प्रे (पत्तियों पर छिड़काव):**\n   • जमीन में यूरिया की बोरी फेंकने के बजाय: **15 लीटर पंप में मात्र 100 ग्राम यूरिया + 30ml स्टिमरिच + 5ml Bio-99** मिलाकर पत्तों पर छिड़कें।\n   • पत्तियों के रंध्र (Stomata) इसे 95% सोख लेते हैं। **मात्र 2 किलो यूरिया का स्प्रे पूरी 45 किलो की बोरी जितना गहरा हरापन और फुटाव देता है!**\n\n3. 🪱 **शेत (Sheth) से मिट्टी सुधार:**\n   • शेत के सूक्ष्म जीवाणु मिट्टी को पोला और भुरभुरा बनाकर केंचुओं को सक्रिय करते हैं, जिससे जमीन खुद खाद बनाने की फैक्ट्री बन जाती है।`;
+      const resp = `🧪 **यूरिया व डीएपी की मात्रा 50% घटाने का अचूक वैज्ञानिक फॉर्मूला:**\n\n${getSakhiDynamicSalutation('crop')}, सच्चाई यह है कि जब आप जमीन में 1 बोरी (45kg) यूरिया फेंकते हैं, तो पौधे केवल **25 से 30%** ही ले पाते हैं; बाकी 70% यूरिया हवा में उड़कर या जमीन में बहकर बर्बाद हो जाता है!\n\n🌾 **खाद का खर्च आधा करने के 3 पक्के नियम:**\n\n1. 🧫 **Bio-NPK से डीएपी आधा करें (जमीन में):**\n   • बुवाई या पहली सिंचाई पर **बायोफिट Bio-NPK (1L/एकड़)** दें। यह जमीन में सालों से पत्थर बनकर दबे पड़े फास्फोरस और पोटाश को घोलकर सीधे जड़ों तक पहुंचा देता है। इससे आधी बोरी डीएपी में ही पूरी बोरी जितना बंपर रिजल्ट मिलता है!\n\n2. 🍃 **यूरिया का नैनो फोलियर स्प्रे (पत्तियों पर छिड़काव):**\n   • जमीन में यूरिया की बोरी फेंकने के बजाय: **15 लीटर पंप में मात्र 100 ग्राम यूरिया + 30ml स्टिमरिच + 5ml Bio-99** मिलाकर पत्तों पर छिड़कें।\n   • पत्तियों के रंध्र (Stomata) इसे 95% सोख लेते हैं। **मात्र 2 किलो यूरिया का स्प्रे पूरी 45 किलो की बोरी जितना गहरा हरापन और फुटाव देता है!**\n\n3. 🪱 **शेत (Sheth) से मिट्टी सुधार:**\n   • शेत के सूक्ष्म जीवाणु मिट्टी को पोला और भुरभुरा बनाकर केंचुओं को सक्रिय करते हैं, जिससे जमीन खुद खाद बनाने की फैक्ट्री बन जाती है।`;
 
       renderMasterCropCard('यूरिया व रासायनिक खाद 50% घटाने का फॉर्मूला', resp, [
         { label: '🌾 गेहूं में पहली सिंचाई व कल्ले फुटाव', query: 'गेहूं में पहली सिंचाई कब करें और क्या डालें' },
@@ -13211,7 +13609,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         else if (cleanQ.includes('chilli') || cleanQ.includes('मिर्च') || cleanQ.includes('टमाटर')) { cropName = 'मिर्च व टमाटर'; cropTag = 'chilli'; }
         else if (cleanQ.includes('garlic') || cleanQ.includes('लहसुन') || cleanQ.includes('प्याज')) { cropName = 'लहसुन व प्याज'; cropTag = 'garlic'; }
 
-        const prompt = `🌾 **${cropName} फसल का चयन हुआ।**\n\nकिसान भाई, कृपया बताइए कि आपकी **${cropName}** की फसल बुवाई के बाद कितने दिन की हो चुकी है या वर्तमान में किस अवस्था में है?`;
+        const prompt = `🌾 **${cropName} फसल का चयन हुआ।**\n\n${getSakhiDynamicSalutation('crop')} कृपया बताइए कि आपकी **${cropName}** की फसल बुवाई के बाद कितने दिन की हो चुकी है या वर्तमान में किस अवस्था में है?`;
 
         renderCrispSpecialBox(`🌾 ${cropName}: चरण 2 — फसल की उम्र व अवस्था चुनें`, prompt, [
           { text: `🌱 1. शुरुआती अवस्था (15 से 30 दिन)`, query: `${cropName} बुवाई के 20-30 दिन की समस्या (triage_step3_${cropTag}_stage1)` },
@@ -14098,8 +14496,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   function getSakhiDynamicSalutation(context = 'general') {
     const prof = getCachedSakhiProfile();
-    const rawName = prof.name || prof.full_name || localStorage.getItem('SAKHI_USER_NAME') || localStorage.getItem('aim_user_name') || '';
-    const cleanName = rawName.replace(/^(श्री|श्रीमती|सुश्री|डॉ|डॉक्टर|mr|mrs|ms)\.?\s*/gi, '').trim();
+    const rawName = (typeof getUserName === 'function' ? getUserName() : '') || prof.name || prof.full_name || localStorage.getItem('SAKHI_USER_NAME') || localStorage.getItem('aim_user_name') || '';
+    const cleanName = rawName.replace(/^(श्री|श्रीमती|सुश्री|डॉ|डॉक्टर|mr|mrs|ms)\.?\s*/gi, '').replace(/\s*(जी|ji|bhai|भाई|didi|दीदी)$/gi, '').trim();
 
     // 1. Detect Gender & Age
     let gender = (prof.gender || '').toLowerCase();
@@ -14113,14 +14511,29 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       } catch (_) {}
     }
 
-    // Infer female gender if name or tone indicates
-    const femaleNameEndings = ['देवी', 'बाई', 'कुमारी', 'रानी', 'लता', 'पूजा', 'अनिता', 'सुनीता', 'रेखा', 'सीमा', 'आरती', 'प्रिया', 'नेहा', 'काजल', 'किरण'];
-    if (!gender) {
-      const pPersona = (typeof loadSakhiUserPersona === 'function') ? loadSakhiUserPersona() : null;
-      if (pPersona && pPersona.user_tone === 'homemaker') {
+    const lowerClean = cleanName.toLowerCase();
+    const femalePrefixes = ['श्रीमती', 'सुश्री', 'बहन', 'दीदी', 'माताजी', 'mrs', 'ms', 'miss', 'smt'];
+    const femaleKeywords = [
+      'manju', 'मंजू', 'मन्जू', 'lata', 'लता', 'devi', 'देवी', 'bai', 'बाई', 'rani', 'रानी',
+      'pooja', 'puja', 'पूजा', 'anita', 'अनिता', 'sunita', 'सुनीता', 'rekha', 'रेखा', 'seema', 'sima', 'सीमा',
+      'aarti', 'arti', 'आरती', 'priya', 'प्रिया', 'neha', 'नेहा', 'kajal', 'काजल', 'kiran', 'किरण',
+      'shanti', 'शांति', 'geeta', 'gita', 'गीता', 'sarita', 'सरिता', 'kavita', 'कविता', 'mamta', 'ममता',
+      'asha', 'आशा', 'kamla', 'कमला', 'pushpa', 'पुष्पा', 'radha', 'राधा', 'meena', 'mina', 'मीना',
+      'jyoti', 'ज्योति', 'preeti', 'priti', 'प्रीति', 'monika', 'मोनिका', 'poonam', 'पूनम', 'reena', 'rina', 'रीना',
+      'vandana', 'वंदना', 'komal', 'कोमल', 'anjali', 'अंजली', 'sheetal', 'शीतल', 'chhaya', 'छाया',
+      'uma', 'उमा', 'parvati', 'पार्वती', 'laxmi', 'लक्ष्मी', 'saraswati', 'सरस्वती', 'durga', 'दुर्गा', 'santosh'
+    ];
+
+    if (!gender || gender === 'unknown') {
+      if (femalePrefixes.some(p => lowerClean.startsWith(p) || rawName.toLowerCase().startsWith(p))) {
         gender = 'female';
-      } else if (femaleNameEndings.some(fn => cleanName.includes(fn))) {
+      } else if (femaleKeywords.some(fk => lowerClean.includes(fk))) {
         gender = 'female';
+      } else {
+        const pPersona = (typeof loadSakhiUserPersona === 'function') ? loadSakhiUserPersona() : null;
+        if (pPersona && pPersona.user_tone === 'homemaker') {
+          gender = 'female';
+        }
       }
     }
 
@@ -14128,16 +14541,15 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (gender === 'female') {
       if (age && age >= 58) {
         if (context === 'village') return 'प्रणाम माताजी! 🌸 ध्यान से समझें, एकदम सरल बात यह है:';
-        if (context === 'crop') return 'प्रणाम आदरणीय माताजी! 🙏';
+        if (context === 'crop') return 'प्रणाम आदरणीय माताजी! 🌸';
         return cleanName ? `प्रणाम ${cleanName} माताजी! 🌸` : 'प्रणाम माताजी! 🌸';
       } else if (age && age >= 38) {
         if (context === 'village') return 'नमस्ते दीदी! 🌸 गाँव की सरल बोली में बात यह है:';
-        if (context === 'crop') return 'नमस्ते दीदी! 🙏';
+        if (context === 'crop') return cleanName ? `नमस्ते ${cleanName} दीदी! 🌸` : 'नमस्ते दीदी! 🌸';
         return cleanName ? `नमस्ते ${cleanName} दीदी! 🌸` : 'नमस्ते दीदी! 🌸';
       } else {
-        // Young women (18-35) or general
         if (context === 'village') return 'नमस्ते बहन जी! 🌸 सीधी-सरल भाषा में बात यह है:';
-        if (context === 'crop') return 'नमस्ते बहन जी! 🙏';
+        if (context === 'crop') return cleanName ? `नमस्ते ${cleanName} जी! 🌸` : 'नमस्ते बहन जी! 🌸';
         return cleanName ? `नमस्ते ${cleanName} जी! 🌸` : 'नमस्ते बहन जी! 🌸';
       }
     } else if (gender === 'male') {
@@ -14147,15 +14559,15 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         return cleanName ? `राम-राम ${cleanName} जी! 🙏` : 'राम-राम ताऊजी! 🙏';
       } else {
         if (context === 'village') return 'राम-राम किसान भाई! 🙏 सुनो भैया, एकदम सरल बात यह है:';
-        if (context === 'crop') return 'राम-राम किसान भाई! 🙏';
+        if (context === 'crop') return cleanName ? `राम-राम ${cleanName} भाई! 🙏` : 'राम-राम किसान भाई! 🙏';
         return cleanName ? `राम-राम ${cleanName} भाई! 🙏` : 'राम-राम किसान भाई! 🙏';
       }
     }
 
-    // Gender Neutral Fallback
+    // Gender Neutral Fallback (Never assume male or say 'किसान भाई' to unidentified users!)
     if (context === 'village') return 'राम-राम जी! 🙏 गाँव की सीधी-सरल बोली में समझें:';
-    if (context === 'crop') return 'राम-राम जी! 🙏';
-    return cleanName ? `नमस्ते ${cleanName} जी! 🙏` : 'नमस्ते जी! 🙏';
+    if (context === 'crop') return cleanName ? `नमस्ते ${cleanName} जी! 🙏` : 'नमस्ते किसान साथी! 🙏';
+    return cleanName ? `नमस्ते ${cleanName} जी! 🙏` : 'नमस्ते किसान साथी! 🙏';
   }
 
 
@@ -14164,12 +14576,38 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     async function handleDynamicConversationalWeather(rawQuery, normQuery) {
       appendTypingIndicator('सखी लाइव मौसम उपग्रह से कनेक्ट कर रही है... ⛅');
 
+      // Strip any raw JSON string accidental leaks from user suggestion
+      if (rawQuery && (rawQuery.includes('{') || rawQuery.includes('savedAt') || rawQuery.includes('cityName'))) {
+        rawQuery = rawQuery.replace(/\{[^}]+\}/g, '').replace(/\([^)]*\{[^}]*\}[^)]*\)/g, '').trim();
+      }
+
       // 1. Read User Profile Saved Location safely (Never overwrite silently!)
       let savedCity = 'रीवा';
       try {
         const prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
-        savedCity = prof.location || localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'रीवा';
-      } catch (_) {}
+        if (prof.location && typeof prof.location === 'string' && !prof.location.startsWith('{')) {
+          savedCity = prof.location;
+        } else {
+          const rawLoc = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION');
+          if (rawLoc) {
+            if (rawLoc.startsWith('{')) {
+              try {
+                const parsed = JSON.parse(rawLoc);
+                savedCity = parsed.cityName || parsed.name || parsed.key || 'रीवा';
+              } catch (_) {
+                savedCity = 'रीवा';
+              }
+            } else {
+              savedCity = rawLoc;
+            }
+          }
+        }
+        if (typeof savedCity === 'string' && (savedCity.includes('{') || savedCity.includes('lat') || savedCity.includes('savedAt'))) {
+          savedCity = 'रीवा';
+        }
+      } catch (_) {
+        savedCity = 'रीवा';
+      }
 
       // 2. Dynamic Word-Token Location Extraction (Immune to character slicing, works for any place order)
       const weatherStopwords = new Set([
@@ -14568,20 +15006,20 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
           ]
         },
         health: {
-          title: '🩺 स्वास्थ्य, पोषण व लैब रिपोर्ट',
+          title: '🩺 संपूर्ण स्वास्थ्य, पोषण व आयुर्वेद',
           img: '/images/sakhi/health-sakhi.webp',
-          desc: 'आरोग्यम स्वास्थ्य व पोषण केंद्र में आपका स्वागत है! 🙏 यहाँ आप बिना किसी साइड इफेक्ट के 100% स्वदेशी पोषण व आयुर्वेद सलाह पा सकते हैं:',
+          desc: 'आरोग्यम स्वास्थ्य व पोषण केंद्र में आपका स्वागत है! 🙏 यहाँ आप परिवार के संपूर्ण स्वास्थ्य, पोषण, घरेलू नुस्खे व आयुर्वेद सलाह पा सकते हैं:',
           points: [
-            '🩸 शुगर (Diabetes) व हाई बीपी को प्राकृतिक रूप से नियंत्रित करने का रूटीन',
-            '🦵 घुटने, कमर व जोड़ों के दर्द (Arthritis / Sciatica) का स्थायी आयुर्वेदिक उपाय',
-            '📋 सीबीसी (CBC), केएफटी (KFT), लिवर व शुगर की लैब रिपोर्ट का सरल हिंदी विश्लेषण',
-            '🥗 बीमारी के अनुसार सुबह से रात का सही डाइट व परहेज़ चार्ट'
+            '🌿 संपूर्ण शारीरिक पोषण, ऊर्जा, कमजोरी व नेचुरामोर मार्गदर्शन',
+            '🦵 घुटने, कमर व जोड़ों के पुराने दर्द (Arthritis) का सफल आयुर्वेदिक उपाय',
+            '🥗 दैनिक संपूर्ण स्वास्थ्य, खानपान व 7-दिवसीय डाइट रूटीन चार्ट',
+            '🩸 शुगर, बीपी व सामान्य जीवनशैली संतुलन के प्राकृतिक नियम'
           ],
           chips: [
-            { text: '🩸 शुगर कंट्रोल डाइट चार्ट', query: 'डायबिटीज और शुगर कंट्रोल का सुबह से रात का डाइट चार्ट बताओ' },
+            { text: '🌿 दैनिक स्वास्थ्य व पोषण सलाह', query: 'दैनिक स्वास्थ्य और संपूर्ण पोषण का सही रूटीन बताओ' },
             { text: '🦵 जोड़ों व घुटनों के दर्द का उपाय', query: 'घुटनों और जोड़ों के पुराने दर्द का आयुर्वेदिक इलाज बताओ' },
-            { text: '🩺 बीपी सामान्य रेंज व बचाव', query: 'हाई ब्लड प्रेशर सामान्य करने के घरेलू व आयुर्वेदिक उपाय बताएं' },
-            { text: '📷 लैब रिपोर्ट (CBC/KFT) भेजें', query: 'मेरी ब्लड टेस्ट रिपोर्ट पढ़कर उसका विश्लेषण करो' }
+            { text: '🥗 7-दिवसीय दैनिक डाइट चार्ट', query: 'दैनिक स्वास्थ्य और डाइट चार्ट बनाओ' },
+            { text: '🩸 शुगर व बीपी संतुलन नियम', query: 'डायबिटीज और बीपी कंट्रोल कैसे करें' }
           ]
         },
         netsurf: {
@@ -15352,7 +15790,7 @@ function processKnowledgeQuery(query) {
       if (handleHumanAnatomyAndMathQueries(cleanQ, rawQ, directives)) return;
 
       // 🌤️ CONVERSATIONAL WEATHER & SPRAY ADVISOR (FarmerChat Real-Time Multi-City & 7-Day)
-      const isWeatherQuestion = /(?:बारिश|barish|barsat|वर्षा|मौसम|mousam|mosam|तापमान|temp|weather|हवा|wind|छिड़काव|spray.*weather)/i.test(normQuery);
+      const isWeatherQuestion = /(?:बारिश|barish|barsat|वर्षा|मौसम|mousam|mosam|तापमान|temperature|\bweather\b|\brain\b|weather.*spray|spray.*weather|स्प्रे.*मौसम|मौसम.*स्प्रे|छिड़काव.*मौसम|मौसम.*छिड़काव)/i.test(normQuery) && !/(?:इल्ली|सुंडी|कीट|रोग|दवा|फंगीसाइड|कीटनाशक|उर्वरक|खाद|बीज|बुवाई|झुलसा|करपा|ब्लास्ट|पत्ता|पत्ती|धान|गेहूं|चना|सरसों|केला|केळी)/i.test(normQuery);
       if (isWeatherQuestion) {
         return handleDynamicConversationalWeather(query, normQuery);
       }
@@ -17858,9 +18296,23 @@ ${shareUrl}`;
       }
     };
 
-    // FarmChat Live Weather Forecast Trigger
+    // FarmChat Live Weather Forecast Trigger (Clean City Parse - Never pass raw JSON!)
     window.openSakhiWeatherForecast = function () {
-      const city = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION') || 'रीवा';
+      let city = 'रीवा';
+      try {
+        const rawLoc = localStorage.getItem('AAROGYAM_USER_WEATHER_LOCATION');
+        if (rawLoc) {
+          if (rawLoc.trim().startsWith('{')) {
+            const parsed = JSON.parse(rawLoc);
+            city = parsed.cityName || parsed.name || parsed.city || parsed.key || 'रीवा';
+          } else {
+            city = rawLoc;
+          }
+        }
+      } catch (_) {
+        city = 'रीवा';
+      }
+      city = city.replace(/\s*\([^)]*\)/g, '').trim() || 'रीवा';
       const query = `आज का मौसम और कृषि सलाह बताओ (${city})`;
       window.sendSakhiSuggestion(query);
     };

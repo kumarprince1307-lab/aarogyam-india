@@ -397,7 +397,7 @@ export async function initSakhiAiHub() {
 
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <button type="button" class="admin-btn" id="btnExportTeamLeadsExcel" onclick="window.exportTeamLeadsCsv()" style="background:linear-gradient(135deg, #10b981, #059669);color:#ffffff;border:none;font-weight:900;font-size:0.86rem;padding:9px 18px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(16,185,129,0.35);">
-            <span>📥 टीम बिज़नेस लीड्स Excel (.csv) डाउनलोड</span>
+            <span>📥 टीम बिज़नेस लीड्स Excel (.xls) डाउनलोड</span>
           </button>
         </div>
       </div>
@@ -1932,6 +1932,26 @@ async function fetchAndRenderSakhiAuditLogs() {
   window.renderSakhiAuditTableRows(list);
 }
 
+function formatAuditSawal(sawal) {
+  if (!sawal) return '<span style="color:var(--admin-muted,#94a3b8);">सवाल अनुपलब्ध</span>';
+  if (sawal.includes('➔ [🔤]')) {
+    const parts = sawal.split('➔ [🔤]');
+    const orig = parts[0].trim();
+    const hindi = parts[1].trim();
+    return `
+      <div style="margin-bottom:3px;">
+        <span style="background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;margin-right:4px;">मूल</span>
+        <span style="color:#f8fafc;font-weight:600;">${escapeHtml(orig)}</span>
+      </div>
+      <div style="font-size:0.75rem;color:#86efac;display:flex;align-items:center;gap:4px;">
+        <span style="background:rgba(34,197,94,0.2);color:#4ade80;padding:1px 5px;border-radius:4px;font-size:0.68rem;font-weight:700;">हिंदी</span>
+        <span>${escapeHtml(hindi)}</span>
+      </div>
+    `;
+  }
+  return `<span>${escapeHtml(sawal)}</span>`;
+}
+
 window.renderSakhiAuditTableRows = function(itemsToRender) {
   const tbody = document.getElementById('sakhiAuditTableBody');
   const countBadge = document.getElementById('sakhiAuditFilteredCountBadge');
@@ -1992,8 +2012,8 @@ window.renderSakhiAuditTableRows = function(itemsToRender) {
             👤 ${escapeHtml(userDisplay)}
           </span>
         </td>
-        <td style="padding:10px 12px;font-weight:600;color:var(--admin-text,#e2e8f0);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(sawal)}">
-          ${escapeHtml(sawal)}
+        <td style="padding:10px 12px;font-weight:600;color:var(--admin-text,#e2e8f0);max-width:280px;line-height:1.4;" title="${escapeHtml(sawal)}">
+          ${formatAuditSawal(sawal)}
         </td>
         <td style="padding:10px 12px;font-size:0.78rem;color:var(--admin-muted,#94a3b8);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(jawab)}">
           ${escapeHtml(jawab.replace(/<[^>]*>/g, '').slice(0, 100))}...
@@ -2064,14 +2084,34 @@ function runSakhiAuditAnalysis() {
   }
 
   let passCount = 0;
+  let failCount = 0;
   let domains = {};
+  const fallbackIndicators = [
+    'स्पेलिंग जांच लें',
+    'सटीक समाधान हेतु आप नीचे दिए गए लाल सहायता बटन',
+    'मुझे नहीं पता',
+    'माफ़ कीजिए',
+    'क्षमा करें',
+    'इसकी जानकारी अभी उपलब्ध नहीं',
+    'कृपया स्पष्ट सवाल पूछें',
+    'दायरे से अलग है'
+  ];
+
   sakhiAuditLogsList.forEach(log => {
-    if (log.status === 'PASS' || !log.status) passCount++;
+    const ans = log.jawab || '';
+    const isExplicitFail = log.status === 'FAIL';
+    const isFallback = ans.length < 25 || fallbackIndicators.some(fi => ans.includes(fi));
+    
+    if (isExplicitFail || isFallback) {
+      failCount++;
+    } else {
+      passCount++;
+    }
     const d = log.domain || 'omni';
     domains[d] = (domains[d] || 0) + 1;
   });
 
-  const passRate = Math.round((passCount / total) * 100);
+  const passRate = total > 0 ? Math.round((passCount / total) * 100) : 0;
 
   resultBox.style.display = 'block';
   resultBox.innerHTML = `
@@ -2087,6 +2127,9 @@ function runSakhiAuditAnalysis() {
       </div>
       <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
         <span style="color:#10b981;">सफल उत्तर (Pass):</span> <strong>${passCount}</strong>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
+        <span style="color:#ef4444;">असफल/फॉलबैक (Fail):</span> <strong>${failCount}</strong>
       </div>
       <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;">
         <span style="color:#8b5cf6;">प्रमुख डोमेन:</span> <strong>${Object.keys(domains).join(', ')}</strong>
@@ -3061,30 +3104,139 @@ window.exportTeamLeadsCsv = function() {
     });
   }
 
-  const headers = ['क्रमांक', 'टीम सदस्य नाम', 'मोबाइल नंबर', 'स्पॉन्सर / Upline नाम', 'Upline कोड', 'कुल सखी AI सवाल', 'मुख्य डोमेन', 'अंतिम सवाल / विषय', 'सुझाई गई ई-बुक / कमर्शियल पिच', 'अंतिम सक्रियता तारीख'];
-  
-  const csvLines = [headers.join(',')];
-  exportRows.forEach((r, idx) => {
-    const line = [
-      idx + 1,
-      `"${(r.member_name || '').replace(/"/g, '""')}"`,
-      `"${r.member_mobile}"`,
-      `"${(r.upline_name || '').replace(/"/g, '""')}"`,
-      `"${r.upline_code || ''}"`,
-      r.chat_count || 0,
-      `"${r.primary_domain || 'agri'}"`,
-      `"${(r.last_topic || '').replace(/"/g, '""')}"`,
-      `"${(r.recommended_ebook || '').replace(/"/g, '""')}"`,
-      `"${r.last_active ? new Date(r.last_active).toLocaleDateString('hi-IN') : '-'}"`
-    ];
-    csvLines.push(line.join(','));
-  });
+  function resolveDomainInfo(domKey, topicText) {
+    const topic = (topicText || '').toLowerCase();
+    let domName = '🌾 कृषि (Agriculture)';
+    let subDom = 'फसल डॉक्टर व रोग पहचान';
 
-  const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    if (domKey === 'health' || topic.includes('दर्द') || topic.includes('बीपी') || topic.includes('शुगर') || topic.includes('घुटने') || topic.includes('जोड़')) {
+      domName = '🩺 स्वास्थ्य (Health & Care)';
+      if (topic.includes('दर्द') || topic.includes('घुटने') || topic.includes('जोड़') || topic.includes('कमर')) {
+        subDom = 'स्वास्थ्य: जोड़ों व घुटनों का दर्द';
+      } else if (topic.includes('शुगर') || topic.includes('डायबिटीज') || topic.includes('sugar')) {
+        subDom = 'स्वास्थ्य: डायबिटीज व शुगर नियंत्रण';
+      } else if (topic.includes('बीपी') || topic.includes('रक्तचाप') || topic.includes('bp')) {
+        subDom = 'स्वास्थ्य: हाई/लो बीपी केयर';
+      } else {
+        subDom = 'स्वास्थ्य: पोषण व सामान्य परामर्श';
+      }
+    } else if (domKey === 'cattle' || topic.includes('गाय') || topic.includes('भैंस') || topic.includes('दूध') || topic.includes('पशु') || topic.includes('डेयरी') || topic.includes('फैट')) {
+      domName = '🐄 पशुपालन (Animal Care)';
+      if (topic.includes('दूध') || topic.includes('फैट')) {
+        subDom = 'पशुपालन: दूध व फैट वृद्धि';
+      } else if (topic.includes('थनैला') || topic.includes('बीमारी') || topic.includes('रोग')) {
+        subDom = 'पशुपालन: पशु रोग व थनैला सुरक्षा';
+      } else {
+        subDom = 'पशुपालन: सीएफसी व डेयरी पोषण';
+      }
+    } else if (domKey === 'business' || topic.includes('नेट्सर्फ') || topic.includes('कमाई') || topic.includes('इनकम') || topic.includes('पैसे') || topic.includes('बिजनेस')) {
+      domName = '💼 व्यापार (Netsurf Income)';
+      if (topic.includes('8.19') || topic.includes('कैपिंग') || topic.includes('प्लान')) {
+        subDom = 'व्यापार: ₹8.19 लाख कैपिंग प्लान';
+      } else {
+        subDom = 'व्यापार: नेट्सर्फ कमाई व डायरेक्ट सेलिंग';
+      }
+    } else {
+      domName = '🌾 कृषि (Agriculture)';
+      if (topic.includes('गेहूं') || topic.includes('gehu')) {
+        subDom = 'कृषि: गेहूं में कल्ले व पीलापन';
+      } else if (topic.includes('चना') || topic.includes('chana')) {
+        subDom = 'कृषि: चना में उकठा व पैदावार';
+      } else if (topic.includes('धान') || topic.includes('चावल')) {
+        subDom = 'कृषि: धान पैदावार व कीट नियंत्रण';
+      } else if (topic.includes('सरसों')) {
+        subDom = 'कृषि: सरसों में माहू व चेपा';
+      } else if (topic.includes('सब्जी') || topic.includes('टमाटर') || topic.includes('मिर्च')) {
+        subDom = 'कृषि: सब्जी रोग व नर्सरी';
+      } else if (topic.includes('खाद') || topic.includes('उर्वरक') || topic.includes('स्प्रे') || topic.includes('दवा')) {
+        subDom = 'कृषि: दवा, स्प्रे व खाद प्रबंधन';
+      } else {
+        subDom = 'कृषि: फसल सुरक्षा व रोग पहचान';
+      }
+    }
+    return { domName, subDom };
+  }
+
+  function resolveBookTitle(code, domKey) {
+    const c = String(code || '').toUpperCase();
+    if (c === 'BK017' || c.includes('BK017')) return '📖 BK017: गेहूँ की खेती सम्पूर्ण मार्गदर्शिका (₹99)';
+    if (c === 'BK019' || c.includes('BK019')) return '📖 BK019: चना की खेती सम्पूर्ण मार्गदर्शिका (₹99)';
+    if (c === 'BK016' || c.includes('BK016')) return '📖 BK016: कृषि दवा डायरेक्टरी व पशु पोषण (₹99)';
+    if (c === 'BK018' || c.includes('BK018')) return '📖 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide (₹149)';
+    if (c === 'BK015' || c.includes('BK015')) return '📖 BK015: सब्जी खेती मास्टर सम्पूर्ण गाइड (₹149)';
+    if (c === 'BK001' || c.includes('BK001')) return '📖 BK001: खरीफ फसल मास्टर गाइड 2026 (₹99)';
+    if (c === 'BK002' || c.includes('BK002')) return '📖 BK002: खेती का डॉक्टर — फसल सुरक्षा (₹99)';
+    if (domKey === 'business') return '📖 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide (₹149)';
+    if (domKey === 'health') return '📖 आरोग्यम हेल्थ व डाइट कॉम्बो गाइड';
+    if (domKey === 'cattle') return '📖 BK016: कृषि दवा डायरेक्टरी व पशु पोषण (₹99)';
+    return '📖 BK002: खेती का डॉक्टर — फसल सुरक्षा (₹99)';
+  }
+
+  // Generate Real Excel Workbook HTML (.xls) - Opens directly in MS Excel, Google Sheets, WPS on Android/iOS!
+  const tableRowsHtml = exportRows.map((r, idx) => {
+    const info = resolveDomainInfo(r.primary_domain, r.last_topic);
+    const bookTitle = resolveBookTitle(r.recommended_ebook, r.primary_domain);
+    const lastActiveStr = r.last_active ? new Date(r.last_active).toLocaleDateString('hi-IN') : '-';
+    const recentTopic = (r.last_topic || 'सामान्य परामर्श').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    return `
+      <tr>
+        <td style="text-align:center;font-weight:bold;">${idx + 1}</td>
+        <td style="font-weight:bold;color:#0f172a;">${r.member_name || 'किसान साथी'}</td>
+        <td style="mso-number-format:'\\@';">${r.member_mobile}</td>
+        <td>${r.upline_name || ''}</td>
+        <td style="mso-number-format:'\\@';">${r.upline_code || ''}</td>
+        <td style="text-align:center;font-weight:bold;color:#15803d;">${r.chat_count || 0}</td>
+        <td style="font-weight:bold;color:#166534;">${info.domName}</td>
+        <td style="font-weight:bold;color:#0284c7;">${info.subDom}</td>
+        <td>${recentTopic}</td>
+        <td style="color:#b45309;font-weight:bold;">${bookTitle}</td>
+        <td style="text-align:center;">${lastActiveStr}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const excelHtml = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+      <style>
+        table { border-collapse: collapse; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; }
+        th { background-color: #15803d; color: #ffffff; font-weight: bold; font-size: 11pt; border: 1px solid #166534; padding: 10px 8px; text-align: left; }
+        td { font-size: 10pt; border: 1px solid #cbd5e1; padding: 8px; vertical-align: middle; color: #1e293b; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+      </style>
+    </head>
+    <body>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:center;">क्रमांक</th>
+            <th>टीम सदस्य नाम</th>
+            <th>मोबाइल नंबर</th>
+            <th>स्पॉन्सर / Upline नाम</th>
+            <th>Upline कोड</th>
+            <th style="text-align:center;">कुल AI सवाल</th>
+            <th>मुख्य डोमेन</th>
+            <th>सब-डोमेन (विशिष्ट विषय)</th>
+            <th>अंतिम पूछा गया सवाल / विषय</th>
+            <th>सुझाई गई ई-बुक / कमर्शियल पिच</th>
+            <th style="text-align:center;">अंतिम सक्रियता तारीख</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRowsHtml}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob(['\uFEFF' + excelHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Aarogyam_Team_Leads_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = `Aarogyam_Team_Leads_${new Date().toISOString().slice(0, 10)}.xls`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
