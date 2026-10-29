@@ -858,18 +858,83 @@ if (typeof document !== 'undefined') {
       return isUserActiveTier(p) ? 'active' : 'inactive';
     },
 
+    getDeviceId: function () {
+      let token = localStorage.getItem('AI_DEVICE_TOKEN');
+      if (!token) {
+        token = 'DEV_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        localStorage.setItem('AI_DEVICE_TOKEN', token);
+      }
+      return token;
+    },
+
+    syncDeviceQuotaFromServer: async function () {
+      try {
+        const devId = this.getDeviceId();
+        const db = window.dbClient || window.supabase;
+        if (!db || !devId) return;
+        const { data, error } = await db.from('sakhi_device_quotas')
+          .select('daily_chats, daily_images, quota_date')
+          .eq('device_id', devId)
+          .maybeSingle();
+
+        if (!error && data) {
+          const today = this.getTodayKey();
+          if (data.quota_date === today) {
+            localStorage.setItem(`sakhi_usage_dev_${devId}_${today}`, JSON.stringify({
+              images: Number(data.daily_images) || 0,
+              chats: Number(data.daily_chats) || 0
+            }));
+          }
+        }
+      } catch (e) {
+        console.debug('[Device Quota Server Sync Notice]:', e?.message);
+      }
+    },
+
+    syncDeviceUsageToDb: async function (devId, newChats, newImages, phone) {
+      try {
+        const db = window.dbClient || window.supabase;
+        if (!db || !devId) return;
+        const today = this.getTodayKey();
+        await db.from('sakhi_device_quotas').upsert({
+          device_id: devId,
+          last_mobile: phone || '',
+          daily_chats: newChats,
+          daily_images: newImages,
+          quota_date: today,
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.debug('[Device Quota DB Upsert Notice]:', e?.message);
+      }
+    },
+
     getUserUsage: function (phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'anonymous';
-      const key = `sakhi_usage_${p}_${this.getTodayKey()}`;
+      const today = this.getTodayKey();
+      const userKey = `sakhi_usage_${p}_${today}`;
+      const devId = this.getDeviceId();
+      const devKey = `sakhi_usage_dev_${devId}_${today}`;
+
+      let userData = { images: 0, chats: 0 };
+      let devData = { images: 0, chats: 0 };
+
       try {
-        const data = JSON.parse(localStorage.getItem(key) || '{}');
-        return {
-          images: Number(data.images) || 0,
-          chats: Number(data.chats) || 0
-        };
-      } catch (e) {
-        return { images: 0, chats: 0 };
-      }
+        const parsed = JSON.parse(localStorage.getItem(userKey) || '{}');
+        userData = { images: Number(parsed.images) || 0, chats: Number(parsed.chats) || 0 };
+      } catch (e) { }
+
+      try {
+        const parsedDev = JSON.parse(localStorage.getItem(devKey) || '{}');
+        devData = { images: Number(parsedDev.images) || 0, chats: Number(parsedDev.chats) || 0 };
+      } catch (e) { }
+
+      // Zero-Fraud Lock: Effective usage is the maximum of user usage and physical hardware usage!
+      // This permanently stops any user from switching SIMs/numbers on the same device to get free quota!
+      return {
+        images: Math.max(userData.images, devData.images),
+        chats: Math.max(userData.chats, devData.chats)
+      };
     },
 
     getUserCustomQuota: function (phone) {
@@ -971,13 +1036,27 @@ if (typeof document !== 'undefined') {
 
     incrementUsage: function (type, phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'anonymous';
-      const key = `sakhi_usage_${p}_${this.getTodayKey()}`;
+      const today = this.getTodayKey();
+      const userKey = `sakhi_usage_${p}_${today}`;
+      const devId = this.getDeviceId();
+      const devKey = `sakhi_usage_dev_${devId}_${today}`;
+
       const usage = this.getUserUsage(p);
-      if (type === 'image') usage.images += 1;
-      if (type === 'chat') usage.chats += 1;
+      let newImages = usage.images;
+      let newChats = usage.chats;
+
+      if (type === 'image') newImages += 1;
+      if (type === 'chat') newChats += 1;
+
+      const updatedObj = { images: newImages, chats: newChats };
+
       try {
-        localStorage.setItem(key, JSON.stringify(usage));
+        localStorage.setItem(userKey, JSON.stringify(updatedObj));
+        localStorage.setItem(devKey, JSON.stringify(updatedObj));
       } catch (e) { }
+
+      // Asynchronously upsert hardware device quota to Supabase without blocking UI
+      this.syncDeviceUsageToDb(devId, newChats, newImages, p);
 
       this.recordGlobalDailyStat(type);
       this.updatePlusMenuCreditsUI();
@@ -16233,7 +16312,55 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   function handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives) {
-      const q = cleanQ;
+      const q = (cleanQ || '').toLowerCase();
+      const origQ = (rawQ || '').toLowerCase();
+      const combined = q + ' ' + origQ;
+
+      // 0. MASTER CATTLE MILK & FAT BOOSTER (गाय-भैंस में दूध व फैट वृद्धि फॉर्मूला — Multi-Path Invariant)
+      // Multi-Path: Matches any phrasing of cow/buffalo/cattle + milk/fat + increase/decrease/remedy (Hindi, Marathi, Gujarati)
+      const hasCattleMention = (
+        combined.includes('गाय') || combined.includes('भैंस') || combined.includes('पशु') || combined.includes('दुधारू') ||
+        combined.includes('डेयरी') || combined.includes('गाई') || combined.includes('म्हण') || combined.includes('cow') ||
+        combined.includes('buffalo') || combined.includes('cattle') || combined.includes('जानवर') || combined.includes('ગાય') || combined.includes('ભેંસ')
+      );
+
+      const hasMilkMention = (
+        combined.includes('दूध') || combined.includes('doodh') || combined.includes('dudh') ||
+        combined.includes('दुग्ध') || combined.includes('milk') || combined.includes('दुध') || combined.includes('દૂધ') || combined.includes('દુધ')
+      );
+
+      const hasFatMention = (
+        combined.includes('फैट') || combined.includes('fat') || combined.includes('फेंट') ||
+        combined.includes('मलाई') || combined.includes('गाढ़ा') || combined.includes('लेवा') || combined.includes('अयन')
+      );
+
+      const hasIncreaseOrRemedy = (
+        combined.includes('बढ़ा') || combined.includes('बढा') || combined.includes('वृद्धि') || combined.includes('कसे') ||
+        combined.includes('वाढ') || combined.includes('વધાર') || combined.includes('कम') || combined.includes('पतला') ||
+        combined.includes('उपाय') || combined.includes('फॉर्मूला') || combined.includes('फार्मूला') || combined.includes('दवा') ||
+        combined.includes('तरीका') || combined.includes('खुराक') || combined.includes('इलाज') || combined.includes('कैसे')
+      );
+
+      const isCattleMilkIncrease = (
+        ((hasCattleMention || hasFatMention) && hasMilkMention && hasIncreaseOrRemedy) ||
+        (hasMilkMention && hasFatMention) ||
+        combined.includes('दूध बढ़ाना') || combined.includes('दूध कैसे बढ़ाएं') || combined.includes('दूध कैसे बढ़ाऊं') || combined.includes('दूध बढ़ाने')
+      );
+
+      if (isCattleMilkIncrease) {
+        sakhiConversationState.lastActiveDomain = 'pashu';
+        const title = '🥛 गाय-भैंस में 2 से 3 लीटर दूध व 1 से 2 डिग्री फैट वृद्धि — अचूक वैज्ञानिक फॉर्मूला (CFC Plus)';
+        const baseBody = `🥛 **गाय-भैंस में बाल्टी भर दूध, गाढ़ापन व फैट (मलाई) बढ़ाने का संपूर्ण वैज्ञानिक फॉर्मूला:**\n\nदुधारू पशुओं में दूध केवल अधिक चारा खिलाने से नहीं, बल्कि पेट (रूमेन) में मौजूद पाचक बैक्टीरिया द्वारा चारे के संपूर्ण किण्वन (Fermentation) और संतुलित पोषण से बनता है।\n\n🌿 **1. नेट्सर्फ बायोफिट पेट-वेट (CFC Plus / Pet-Vet — 100% जैविक पूरक आहार):**\n• 💰 **आधिकारिक MRP:** 1 kg = **₹1,275** (500g = **₹699**)\n• 🥛 **दैनिक खुराक:** 10 से 15 ग्राम प्रतिदिन सुबह-शाम बांटे, दाने या चोकर में मिलाकर दें।\n• ✨ **चमत्कारिक परिणाम:**\n  1. **दूध उत्पादन में 15% से 25% की शुद्ध वृद्धि:** औसतन 1.5 से 2.5 लीटर दूध प्रतिदिन बढ़ता है।\n  2. **फैट (फेंट) व एसएनएफ में भारी उछाल:** 0.5 से 1.2 डिग्री फैट बढ़ता है जिससे दूध गाढ़ा व मलाईदार होता है और डेयरी पर सबसे ऊंचा भाव मिलता है।\n  3. **पाचन सुधार:** गोबर में दाना-चारा बिना पचा निकलना 100% बंद होता है।\n  4. **प्रजनन व लेवा विकास:** पशु समय पर हीट में आता है, गर्भधारण आसानी से होता है और अयन (लेवा) का पूरा विकास होता है।\n\n🌾 **2. संतुलित देशी आहार व प्रबंधन नियम:**\n• **चारे का अनुपात:** 60% सूखा चारा (गेहूं का भूसा) + 40% हरा चारा (बरसीम, मक्का, नेपियर)।\n• **मीठा सोडा (Baking Soda):** सप्ताह में 2 बार 50 ग्राम मीठा सोडा देने से रूमेन में एसिडिटी नहीं बनती और फैट गिरना रुकता है।\n• **साफ ताजा पानी:** 1 लीटर दूध बनाने हेतु पशु को कम से कम 4 से 5 लीटर पानी की आवश्यकता होती है। पशु को दिन में 3-4 बार भरपूर पानी पिलाएं।`;
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'pashu');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🐄 बायोफिट पेट-वेट (CFC) खुराक व घटक', query: 'पेट वेट और सीएफसी प्लस का काम बताओ' },
+          { text: '🛒 25% छूट पर पेट-वेट खरीदें', url: '/categories/pashupalan.html', isExternal: true },
+          { text: '📋 पशु आहार व पोषण दैनिक चेकलिस्ट', query: 'पशुपालन और दूध फैट बढ़ाने की चेकलिस्ट बनाओ' },
+          { text: '📞 दादा अवनीश जी से सीधे परामर्श', query: 'दादा अवनीश जी से सीधे संपर्क' }
+        ], 'pashu', 'cattle_milk_fat_booster_master');
+        return true;
+      }
 
       // 1. गाय के पेट के मुख्य भाग और जुगाली (Rumination & 4 Stomach Compartments)
       if (q.includes('जुगाली') || (q.includes('गाय') && q.includes('पेट') && (q.includes('भाग') || q.includes('हिस्से') || q.includes('अंग')))) {
@@ -18799,8 +18926,14 @@ ${shareUrl}`;
       const isCurrentlyActive = menu.classList.contains('active') && menu.style.display !== 'none';
       const shouldOpen = (typeof forceState === 'boolean') ? forceState : !isCurrentlyActive;
       if (shouldOpen) {
-        if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
-          window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+        if (window.SakhiQuotaEngine) {
+          if (typeof window.SakhiQuotaEngine.syncDeviceQuotaFromServer === 'function') {
+            window.SakhiQuotaEngine.syncDeviceQuotaFromServer().then(() => {
+              window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+            });
+          } else if (typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
+            window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+          }
         }
         menu.classList.add('active');
         menu.style.setProperty('display', 'block', 'important');
@@ -19119,8 +19252,14 @@ ${shareUrl}`;
         loadKnowledgeBase();
         initSpeechRecognition();
         injectSakhiUI();
-        if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
-          window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+        if (window.SakhiQuotaEngine) {
+          if (typeof window.SakhiQuotaEngine.syncDeviceQuotaFromServer === 'function') {
+            window.SakhiQuotaEngine.syncDeviceQuotaFromServer().then(() => {
+              window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+            });
+          } else if (typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
+            window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
+          }
         }
       });
     } else {

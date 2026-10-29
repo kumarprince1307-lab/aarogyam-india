@@ -195,6 +195,7 @@
   }
 
   // 6. Public API
+  window.getClientDeviceToken = getClientDeviceToken;
   window.AarogyamDeviceGuard = {
     verify: verifyDeviceAuthorization,
     isSuperAdmin: isSuperAdminDevice,
