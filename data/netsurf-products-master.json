@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
   "updated_at": "2026-10-10T09:50:04.459Z",
-  "total_products": 39,
+  "total_products": 40,
   "categories": [
     {
       "id": "agri",
@@ -1050,6 +1050,34 @@
         "home_care"
       ],
       "discounted_price": 350
+    },
+    {
+      "id": "ns_prod_pro_stimrich",
+      "name": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
+      "category": "agri",
+      "category_label": "कृषि देखभाल (Biofit Agriculture)",
+      "subcategory": "plant_growth",
+      "subcategory_label": "🌱 पादप वृद्धि व टॉनिक (Plant Growth)",
+      "badge": "🔥 New Premium Launch",
+      "mrp": 1450,
+      "discount_pct": 25,
+      "discounted_price": 1088,
+      "image": "/images/products/biofit-stim-rich.webp",
+      "description": "नेट्सर्फ बायोफिट की नवीनतम उन्नत पीढ़ी का क्रांतिकारी बायो-स्टिमुलेंट। उन्नत बायो-एक्टिव पेप्टाइड्स, अमीनो एसिड्स व फुल्विक कॉम्प्लेक्स से समृद्ध। फसलों के बीजों के तेज अंकुरण, अधिक कल्ले/फुटाव, बंपर फूल व फल विकास में चमत्कारी परिणाम देता है।",
+      "ingredients": "बायो-एक्टिव पेप्टाइड्स (Bio-active Peptides), बायो-अमीनो एसिड्स (L-Amino Acids), फुल्विक-ह्यूमिक चेलेट, सीवीड अर्क (Seaweed Extract Ascophyllum nodosum), सूक्ष्म पोषक तत्व (Chelated Micronutrients) व प्राकृतिक ऑक्सिन-साइटोकाइनिन प्रिकर्सर।",
+      "dose": "1.5 से 2 ml प्रति लीटर पानी (स्प्रे) अथवा 500 ml से 1 लीटर प्रति एकड़ (ड्रिप/सिंचाई)।",
+      "precautions": "सुबह 10 बजे से पहले या शाम 4 बजे के बाद छिड़काव करें। बेहतर फैलाव हेतु Bio-99 (0.5 ml/L) अवश्य मिलाएं।",
+      "pack_size": "1 Litre / 500 ml",
+      "problem_tags": [
+        "कल्ले",
+        "फुटाव",
+        "फूल गिरना",
+        "फल विकास",
+        "पैदावार",
+        "प्रो स्टिमरिच",
+        "pro stimrich",
+        "stimrich"
+      ]
     }
   ]
 }

@@ -1302,7 +1302,7 @@
   <script src="/session.js"></script>
   <script src="/js/universal-nav-drawer.js?v=1.1"></script>
   <script src="/js/sakhi-panchang-engine.js"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261029_v10"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261029_v12"></script>
 
   <script>
     let currentPanchangDate = new Date();
@@ -1546,8 +1546,26 @@
             <!-- Vrat Ki Vidhi -->
             ${p.vratVidhi ? `
               <div style="display:flex; flex-direction:column; gap:8px; font-size:0.83rem;">
+                ${p.vratVidhi.pujaMuhurat ? `
+                  <div style="background:#fef3c7; border:1px solid #f59e0b; border-left:4px solid #b45309; padding:8px 12px; border-radius:6px; box-shadow:0 2px 6px rgba(180,83,9,0.08);">
+                    <strong style="color:#b45309; font-size:0.88rem;">✨ करवा चौथ पूजा शुभ मुहूर्त:</strong> 
+                    <span style="color:#78350f; font-weight:800; font-size:0.88rem;">${p.vratVidhi.pujaMuhurat}</span>
+                  </div>
+                ` : ''}
+                ${p.vratVidhi.chandraArghya ? `
+                  <div style="background:#eff6ff; border:1px solid #60a5fa; border-left:4px solid #1d4ed8; padding:8px 12px; border-radius:6px; box-shadow:0 2px 6px rgba(29,78,216,0.08);">
+                    <strong style="color:#1d4ed8; font-size:0.88rem;">🌕 चंद्रोदय व अर्घ्य समय:</strong> 
+                    <span style="color:#1e3a8a; font-weight:800; font-size:0.88rem;">${p.vratVidhi.chandraArghya}</span>
+                  </div>
+                ` : ''}
+                ${p.vratVidhi.bhadraNivaran ? `
+                  <div style="background:#ecfdf5; border:1px solid #34d399; border-left:4px solid #047857; padding:8px 12px; border-radius:6px; box-shadow:0 2px 6px rgba(4,120,87,0.08);">
+                    <strong style="color:#047857; font-size:0.86rem;">🛡️ भद्रा संशय समाधान:</strong> 
+                    <span style="color:#064e3b; font-weight:700; font-size:0.84rem;">${p.vratVidhi.bhadraNivaran}</span>
+                  </div>
+                ` : ''}
                 <div style="background:#f8fafc; border-left:3px solid #d97706; padding:8px 10px; border-radius:4px;">
-                  <strong style="color:#b45309;">1. प्रातः संकल्प:</strong> 
+                  <strong style="color:#b45309;">1. प्रातः संकल्प व सरगी:</strong> 
                   <span style="color:#334155;">${p.vratVidhi.sankalp}</span>
                 </div>
                 <div style="background:#f8fafc; border-left:3px solid #f59e0b; padding:8px 10px; border-radius:4px;">
@@ -1555,7 +1573,7 @@
                   <span style="color:#334155;">${p.vratVidhi.pujaSamagri}</span>
                 </div>
                 <div style="background:#f8fafc; border-left:3px solid #16a34a; padding:8px 10px; border-radius:4px;">
-                  <strong style="color:#15803d;">3. फलाहार नियम:</strong> 
+                  <strong style="color:#15803d;">3. फलाहार व निर्जला नियम:</strong> 
                   <span style="color:#334155;">${p.vratVidhi.falaharNiyam}</span>
                 </div>
                 <div style="background:#f8fafc; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px;">

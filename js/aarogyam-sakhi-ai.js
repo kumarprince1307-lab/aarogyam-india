@@ -3279,15 +3279,21 @@ if (typeof document !== 'undefined') {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
 
+    let cleanDisplayText = (text || '').trim();
+    if (cleanDisplayText.includes('{') && cleanDisplayText.includes('}')) {
+      cleanDisplayText = cleanDisplayText.replace(/\s*\(\s*\{[^}]*\}\s*\)/g, '').replace(/\{[^}]*\}/g, '').trim();
+    }
+    if (!cleanDisplayText) cleanDisplayText = 'आज का मौसम बताओ';
+
     const now = Date.now();
     ensureDateSeparator(wrap, now);
-    saveChatLogItem('user', text, '');
+    saveChatLogItem('user', cleanDisplayText, '');
 
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row user';
     row.innerHTML = `
       <div class="sakhi-msg-bubble user-bubble">
-        ${escapeHtml(text)}
+        ${escapeHtml(cleanDisplayText)}
         <div class="sakhi-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.8);text-align:right;margin-top:4px;font-weight:600;">${formatMsgTime(now)}</div>
       </div>
     `;
@@ -3455,24 +3461,24 @@ if (typeof document !== 'undefined') {
   function renderInlineContextAdHtml(ad) {
     if (!ad) return '';
     return `
-      <div class="sakhi-context-ad-card" style="margin-top:12px;background:#ffffff;border:1.5px solid #cbd5e1;border-left:4px solid #10b981;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px;position:relative;box-shadow:0 3px 12px rgba(0,0,0,0.06);transition:all 0.25s ease;">
-        <img src="${ad.cover}" alt="${escapeHtml(ad.title)}" class="sakhi-ad-thumb" style="width:48px;height:62px;object-fit:cover;border-radius:6px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.15);border:1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+      <div class="sakhi-context-ad-card" style="margin-top:14px;background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #38bdf8;border-left:5px solid #0284c7;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;position:relative;box-shadow:0 4px 16px rgba(2,132,199,0.12);transition:all 0.25s ease;">
+        <img src="${ad.cover}" alt="${escapeHtml(ad.title)}" class="sakhi-ad-thumb" style="width:50px;height:66px;object-fit:cover;border-radius:8px;flex-shrink:0;box-shadow:0 3px 8px rgba(0,0,0,0.18);border:1.5px solid #7dd3fc;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
         <div class="sakhi-ad-body" style="flex:1;min-width:0;">
-          <div class="sakhi-ad-header" style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">
-            <span class="sakhi-ad-badge-tag" style="background:#f1f5f9;color:#475569;font-size:0.68rem;font-weight:900;padding:1px 6px;border-radius:6px;text-transform:uppercase;border:1px solid #cbd5e1;">Ad • ${escapeHtml(ad.badge)}</span>
-            <span class="sakhi-ad-price" style="font-size:0.80rem;font-weight:900;color:#16a34a;background:#dcfce7;padding:1px 6px;border-radius:6px;">मात्र ${escapeHtml(ad.price)}</span>
+          <div class="sakhi-ad-header" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+            <span class="sakhi-ad-badge-tag" style="background:#bae6fd;color:#0369a1;font-size:0.70rem;font-weight:900;padding:2px 7px;border-radius:6px;text-transform:uppercase;border:1px solid #7dd3fc;letter-spacing:0.3px;">📘 ${escapeHtml(ad.badge)}</span>
+            <span class="sakhi-ad-price" style="font-size:0.80rem;font-weight:900;color:#ffffff;background:#0284c7;padding:2px 7px;border-radius:6px;box-shadow:0 2px 5px rgba(2,132,199,0.3);">मात्र ${escapeHtml(ad.price)}</span>
           </div>
-          <div class="sakhi-ad-title" style="font-weight:900;font-size:0.86rem;color:#0f172a;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">
+          <div class="sakhi-ad-title" style="font-weight:900;font-size:0.92rem;color:#0369a1;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">
             ${escapeHtml(ad.title)}
           </div>
-          <div class="sakhi-ad-desc" style="font-size:0.75rem;color:#64748b;line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;">
+          <div class="sakhi-ad-desc" style="font-size:0.80rem;font-weight:700;color:#1e293b;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:7px;">
             ${escapeHtml(ad.desc)}
           </div>
-          <a href="${ad.url}" target="_blank" class="sakhi-ad-cta-btn" style="display:inline-flex;align-items:center;gap:4px;background:#10b981;color:#ffffff;font-size:0.76rem;font-weight:800;padding:4px 12px;border-radius:8px;text-decoration:none;box-shadow:0 2px 6px rgba(16,185,129,0.25);">
-            <span>📖 ई-बुक देखें</span> <span style="font-size:0.85rem;">↗</span>
+          <a href="${ad.url}" target="_blank" class="sakhi-ad-cta-btn" style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#ffffff;font-size:0.78rem;font-weight:900;padding:5px 14px;border-radius:8px;text-decoration:none;box-shadow:0 3px 8px rgba(2,132,199,0.35);">
+            <span>📖 ई-बुक देखें</span> <span style="font-size:0.88rem;">↗</span>
           </a>
         </div>
-        <button type="button" class="sakhi-ad-dismiss-btn" onclick="this.closest('.sakhi-context-ad-card').remove();" title="बंद करें" style="position:absolute;top:6px;right:6px;background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer;padding:2px 6px;line-height:1;">✕</button>
+        <button type="button" class="sakhi-ad-dismiss-btn" onclick="this.closest('.sakhi-context-ad-card').remove();" title="बंद करें" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.7);border:1px solid #bae6fd;color:#0369a1;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.80rem;cursor:pointer;line-height:1;">✕</button>
       </div>
     `;
   }
@@ -3896,8 +3902,14 @@ if (typeof document !== 'undefined') {
 
   // 12. SUBMISSION HANDLER & USER INPUT PROCESSING
   function handleUserSubmit(userQuery) {
-    const query = (userQuery || '').trim();
+    let query = (userQuery || '').trim();
     if (!query) return;
+
+    // 🛡️ Strip any raw JSON leaked from location/weather buttons before displaying or processing
+    if (query.includes('{') && query.includes('}')) {
+      query = query.replace(/\s*\(\s*\{[^}]*\}\s*\)/g, '').replace(/\{[^}]*\}/g, '').trim();
+    }
+    if (!query) query = 'आज का मौसम बताओ';
 
     // Immediately stop any active TTS speech so user can focus on the new answer
     stopAllSpeech();
@@ -15478,7 +15490,317 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return false;
     }
 
-    function handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives) {
+    
+  // =========================================================================
+  // 19.9 SAKHI 2X SMART MASTER INTEL: DHARA SANSKAR, SOIL SCIENCE & COMPOST
+  // =========================================================================
+  function handleDharaSanskarAndSoilScienceQueries(cleanQ, rawQ, directives) {
+    const q = cleanQ.toLowerCase();
+
+    // 1. अमृत मिट्टी / धारा संस्कार (अवनीश जी का विशेष जैविक फॉर्मूला)
+    if (q.includes('धारा संस्कार') || q.includes('अमृत मिट्टी') || q.includes('dhara sanskar') || q.includes('amrit mitti') ||
+        (q.includes('मिट्टी') && (q.includes('तैयार') || q.includes('तैयारी') || q.includes('उपजाऊ') || q.includes('शक्तिशाली') || q.includes('सुधार'))) ||
+        (q.includes('गोबर') && (q.includes('शेत') || q.includes('npk') || q.includes('संवर्धन') || q.includes('बैक्टीरिया'))) ||
+        ((q.includes('आलू') || q.includes('प्याज') || q.includes('अदरक') || q.includes('हल्दी') || q.includes('लहसुन')) && (q.includes('मिट्टी') || q.includes('कंद')))) {
+      
+      const title = '🌱 अमृत मिट्टी व धारा संस्कार — मिट्टी की संपूर्ण तैयारी व जीवाणु संवर्धन';
+      const baseBody = `🌱 **आरोग्यम धारा संस्कार (अमृत मिट्टी संवर्धन विधि):**\n\nयह दादा अवनीश जी द्वारा अनुसंधित एवं हजारों किसानों द्वारा परीक्षित मिट्टी को महा-शक्तिशाली व जीवित बनाने का 100% जैविक वैज्ञानिक फॉर्मूला है। यह विशेषकर **आलू, प्याज, अदरक, हल्दी, लहसुन** जैसी कंद (Tuber) वाली फसलों और सभी बागवानी/अनाज फसलों के लिए वरदान है।\n\n🧪 **सामग्री (प्रति 1 हेक्टेयर या 2.5 एकड़ खेत हेतु):**\n1. 1 ट्रॉली अच्छी तरह सड़ा व सूखा हुआ देशी गोबर\n2. **बायोफिट कल्चर सेट:**\n   • 1 लीटर **बायोफिट N (नाइट्रोबैक्ट)**\n   • 1 लीटर **बायोफिट P (फॉस्फोबैक्टीरिया)**\n   • 1 लीटर **बायोफिट K (पोटाश मोबिलाइज़र)**\n   • 1 लीटर **बायोफिट शेत (SHET - मृदा सूक्ष्मजीव संवर्धन)**\n   • 1 लीटर **बायोफिट Zn (जिंक सॉल्युबिलाइज़र)**\n   • 1 किलोग्राम / 1 लीटर **मायकोराइजा वैम (VAM)**\n3. 2 किलोग्राम पुराना देशी गुड़\n4. 100 से 150 लीटर स्वच्छ पानी (क्लोरीन रहित)\n\n🥣 **बनाने की विधि (चरणबद्ध):**\n1. **रात की तैयारी:** 100-150 लीटर पानी के ड्रम में 2 किलो गुड़ घोलें। इसमें 1-1 लीटर बायोफिट N, P, K, SHET, Zn और VAM मिला दें। इसे डंडे से चलाकर रात भर ठंडक व छायादार स्थान में ढककर छोड़ दें।\n2. **सुबह का मिश्रण:** सुबह इस सक्रिय जीवाणु घोल को 1 ट्रॉली सूखे गोबर की खाद के ढेर पर समान रूप से छिड़ककर फावड़े से अच्छी तरह मिला दें।\n3. **जीवाणु संवर्धन (24-48 घंटे):** इस ढेर को जूट के बोरे या तिरपाल से ढककर छाया में 24 से 48 घंटे के लिए छोड़ दें। इस दौरान अरबों लाभकारी सूक्ष्मजीव और मायकोराइजा कवक जाल तेजी से गुणन (Multiply) करेंगे। ढेर में हल्की गर्माहट आना जीवित जीवाणुओं का पक्का प्रमाण है।\n4. **खेत में बिखराव:** खेत की अंतिम जुताई से ठीक पहले इस 'अमृत मिट्टी' को पूरे खेत में समान रूप से बिखेर दें और तुरंत रोटावेटर या कल्टीवेटर चलाकर मिट्टी में मिला दें।\n\n🌟 **चमत्कारी लाभ:**\n• मिट्टी का कार्बन (Organic Carbon) बढ़ता है और मिट्टी मक्खन जैसी भुरभुरी बनती है।\n• जड़ों का जाल 3 गुना बढ़ता है और कंद का आकार, वजन व चमक दोगुनी होती है।\n• रासायनिक डीएपी/यूरिया की निर्भरता 40-50% तक कम हो जाती है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌿 बायोफिट शेत (SHET) विवरण', query: 'बायोफिट शेत का उपयोग और डोज क्या है?' },
+        { text: '🍄 मायकोराइजा VAM के फायदे', query: 'मायकोराइजा VAM मिट्टी में कैसे काम करता है?' },
+        { text: '🥔 आलू-प्याज स्पेशल स्प्रे चार्ट', query: 'आलू और प्याज में बंपर पैदावार हेतु स्प्रे चार्ट' }
+      ], 'agri', 'dhara_sanskar_soil_prep');
+      return true;
+    }
+
+    // 2. मिट्टी का pH, पानी का TDS और EC (वैज्ञानिक मृदा व जल विज्ञान)
+    if (q.includes('मिट्टी का ph') || q.includes('soil ph') || q.includes('पानी का tds') || q.includes('water tds') ||
+        q.includes('ec क्या है') || q.includes('electrical conductivity') || q.includes('खारी मिट्टी') || q.includes('खारा पानी') ||
+        q.includes('नमकीन पानी') || q.includes('khari mitti') || (q.includes('मिट्टी') && (q.includes('ph') || q.includes('पीएच') || q.includes('तेजाबी') || q.includes('क्षारीय')))) {
+      
+      const title = '🔬 मृदा व सिंचाई जल विज्ञान — Soil pH, Water TDS एवं EC संपूर्ण गाइड';
+      const baseBody = `🔬 **मिट्टी व सिंचाई जल की वैज्ञानिक गुणवत्ता मार्गदर्शिका:**\n\nकिसी भी खाद या टॉनिक का असर तभी होता है जब खेत की मिट्टी का pH और पानी का TDS/EC सही दायरे में हो।\n\n📊 **1. मिट्टी का pH (मृदा सामर्थ्य):**\n• **सर्वोत्तम स्तर:** 6.5 से 7.5 (उदासीन - सभी पोषक तत्व 100% सुलभ होते हैं)\n• **अम्लीय मिट्टी (pH < 6.0):** फास्फोरस व कैल्शियम लॉक हो जाते हैं। सुधार हेतु: 2-3 क्विंटल चूना (कृषि ग्रेड) या डोलोमाइट प्रति एकड़ मिलाएं।\n• **क्षारीय/ऊसर मिट्टी (pH > 8.0):** जिंक, आयरन व बोरॉन की भारी कमी आती है। सुधार हेतु: जिप्सम (2-4 क्विंटल/एकड़) + हरी खाद (ढैंचा) + **बायोफिट शेत (SHET)** 1 लीटर/एकड़ ड्रिप या फ्लड में दें। शेत के ऑर्गेनिक एसिड pH को तेजी से न्यूट्रल करते हैं।\n\n💧 **2. सिंचाई जल का TDS (Total Dissolved Solids):**\n• **उत्कृष्ट जल:** TDS < 500 ppm (फसलें तेजी से बढ़ती हैं)\n• **सुरक्षित जल:** 500 से 1,000 ppm (सामान्य फसलों हेतु उपयुक्त)\n• **मध्यम खारा:** 1,000 से 1,500 ppm (दलहन व संवेदनशील सब्जियों में हल्की रुकावट)\n• **अत्यधिक खारा (TDS > 2,000 ppm):** पत्तों के किनारे जलने लगते हैं और अंकुरण रुक जाता है। इसमें हर पानी के साथ बायो-99 (0.5ml/L) और शेत का प्रयोग करें।\n\n⚡ **3. विद्युत चालकता (EC - Electrical Conductivity):**\n• **परिभाषा:** पानी या मिट्टी में घुले लवणों (Salts) की सांद्रता नापने की इकाई (dS/m या mS/cm)।\n• **आदर्श स्तर:** < 1.0 dS/m (लवण रहित उपजाऊ जमीन)\n• **चेतावनी स्तर:** 1.0 से 2.0 dS/m (मध्यम लवणीय)\n• **खतरनाक स्तर:** > 2.0 dS/m (जड़ें पानी खींचना बंद कर देती हैं - ऑस्मोसिस रुक जाता है)।\n\n🛡️ **सखी विशेष सलाह:** खारी मिट्टी और खारे पानी में रासायनिक खादों का प्रयोग कम करें और **बायोफिट शेत (SHET)** व **बायो-99** का नियमित उपयोग करें जो सॉल्ट इंडेक्स को कम करके जड़ों को स्वतंत्र करते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🧪 बायोफिट शेत (SHET)', query: 'बायोफिट शेत से मिट्टी का सुधार कैसे होता है?' },
+        { text: '💧 बायो-99 स्टिकर व कंडीशनर', query: 'बायो-99 पानी का तनाव कैसे तोड़ता है?' },
+        { text: '🌾 धारा संस्कार विधि', query: 'अमृत मिट्टी या धारा संस्कार क्या है?' }
+      ], 'agri', 'soil_ph_tds_ec_science');
+      return true;
+    }
+
+    // 3. कृषि अवशेष, नरवाई व वेस्ट डीकंपोजर (30-45 दिन में कंपोस्ट निर्माण)
+    if (q.includes('डीकंपोजर') || q.includes('decomposer') || q.includes('नरवाई') || q.includes('पराली') ||
+        (q.includes('कचरा') && (q.includes('सड़ा') || q.includes('खाद'))) || (q.includes('गोबर') && q.includes('जल्दी') && q.includes('सड़ा'))) {
+      
+      const title = '♻️ कृषि अवशेष व नरवाई वेस्ट डीकंपोजर — 30 से 45 दिन में सुपर कंपोस्ट';
+      const baseBody = `♻️ **कृषि अवशेष व नरवाई से 30-45 दिन में सुपर कंपोस्ट निर्माण:**\n\nपराली, नरवाई, गन्ने की पत्ती, गेहूं का भूसा या फसल अवशेष जलाना मिट्टी की जान जलाने जैसा है। बायोफिट तकनीक से इसे मात्र 30 से 45 दिन में काला सोना (ह्यूमस युक्त कंपोस्ट) बनाएं:\n\n🧪 **घोल तैयार करने का फॉर्मूला (1 एकड़ अवशेष या 5 टन कंपोस्ट हेतु):**\n1. 200 लीटर का प्लास्टिक ड्रम लें।\n2. इसमें 190 लीटर स्वच्छ पानी भरें।\n3. 2 किलोग्राम पुराना गुड़ और 2 किलोग्राम बेसन या चने का आटा अच्छी तरह घोलें।\n4. इसमें **1 लीटर बायोफिट शेत (Biofit SHET)** और **250ml बायो-99 (Bio-99)** मिलाएं।\n5. ड्रम को छाया में रखकर जूट के बोरे से ढक दें और सुबह-शाम 2 मिनट डंडे से चलाएं।\n6. 4 से 5 दिनों में घोल झागदार और सौंधी गंध वाला तैयार हो जाएगा।\n\n🌾 **खेत में नरवाई/अवशेष पर प्रयोग:**\n• हार्वेस्टर के बाद बचे अवशेषों पर इस 200 लीटर घोल का छिड़काव पूरे 1 एकड़ में कर दें।\n• इसके तुरंत बाद रोटावेटर चलाकर मिट्टी में मिला दें और खेत में हल्का पानी लगा दें।\n• 25-30 दिनों के भीतर सारा डंठल व कचरा गलकर उच्च कोटि की जैविक खाद में बदल जाएगा।\n\n🍂 **ढेर विधि (गोबर व कचरा गड्ढा):**\n• कचरे व गोबर की 1-1 फीट की परत बिछाते जाएं और हर परत पर इस घोल का छिड़काव करें। नमी 60% बनाए रखें। 35-40 दिन में पूरी तरह बदबू रहित भुरभुरी वर्मीकंपोस्ट जैसी खाद तैयार मिलेगी।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌿 बायोफिट शेत 1L डिस्काउंट', query: 'बायोफिट शेत 1 लीटर की कीमत और डिस्काउंट' },
+        { text: '💧 बायो-99 स्टिकर खुराक', query: 'बायो-99 स्टिकर का उपयोग और डोज क्या है?' },
+        { text: '🌾 धारा संस्कार अमृत मिट्टी', query: 'अमृत मिट्टी या धारा संस्कार क्या है?' }
+      ], 'agri', 'crop_residue_compost_decomposer');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.10 SAKHI 2X SMART MASTER INTEL: FRUIT ORCHARDS (आम, अनार, केला) & VAM
+  // =========================================================================
+  function handleFruitOrchardMasterQueries(cleanQ, rawQ, directives) {
+    const q = cleanQ.toLowerCase();
+
+    // 1. आम की खेती, किस्में, बौर, पाउडरी मिल्ड्यू व स्प्रे शेड्यूल
+    if (q.includes('आम की खेती') || q.includes('aam ki kheti') || q.includes('mango farming') ||
+        (q.includes('आम') && (q.includes('किस्म') || q.includes('बौर') || q.includes('मंजर') || q.includes('दशहरी') || q.includes('आम्रपाली') || q.includes('लंगड़ा') || q.includes('चौसा') || q.includes('पाउडरी') || q.includes('भुनगा')))) {
+      
+      const title = '🥭 आम की उन्नत बागवानी — किस्में, बौर सुरक्षा व बायोफिट स्प्रे शेड्यूल';
+      const baseBody = `🥭 **आम की उन्नत बागवानी — किस्में, रोग सुरक्षा व बायोफिट स्प्रे शेड्यूल:**\n\nआम को फलों का राजा कहा जाता है। सही जैविक पोषण से आम के बौर का झड़ना रुकता है और फलों का वजन व मिठास 30% तक बढ़ जाती है।\n\n🌾 **1. प्रमुख व्यावसायिक किस्में व उत्पादन:**\n• **दशहरी, लंगड़ा, चौसा, बॉम्बे ग्रीन:** उत्तर व मध्य भारत हेतु सर्वोत्तम (8-15 टन/हेक्टेयर)।\n• **आम्रपाली व मल्लिका:** सघन बागवानी (High Density Planting) हेतु उपयुक्त (12-16 टन/हेक्टेयर, आम्रपाली को 2.5 x 2.5 मीटर पर लगा सकते हैं)।\n• **केसर व अल्फांसो (हापुस):** पश्चिमी भारत व निर्यात गुणवत्ता हेतु प्रसिद्ध।\n\n🛡️ **2. प्रमुख रोग व कीट नियंत्रण:**\n• **पाउडरी मिल्ड्यू (भभूतिया रोग):** बौर पर सफेद चूर्ण जमना। उपचार: बौर खिलने से पहले **रैप-अप (30ml) + बायो-99 (5ml)** का स्प्रे।\n• **एंथ्रेक्नोज (काला धब्बा):** पत्तों व फलों पर काले धब्बे। उपचार: बायोफिट **रैप-अप (Wrap-up) 2ml/L** का नियमित छिड़काव।\n• **भुनगा (मैंगो हॉपर) व फल मक्खी:** रस चूसक कीटों हेतु **बायोफिट इंटैक्ट (Intact) 2ml/L** + बायो-99।\n\n📅 **3. बायोफिट आम स्पेशल स्प्रे शेड्यूल (प्रति 15 लीटर पंप):**\n1. **अक्टूबर-नवंबर (शाखा परिपक्वता):** जड़ों में 1 पेड़ हेतु 50ml **शेत (SHET) + VAM** ड्रिप या तने के चारों ओर गड्ढे में दें।\n2. **दिसंबर-जनवरी (बौर निकलने से पूर्व):** **स्टिमरिच (30ml) + बायो-99 (5ml) + रैप-अप (30ml)** का छिड़काव करें। इससे मजबूत बौर निकलेगा।\n3. **मटर दाना अवस्था (फल बनने पर):** **प्रो स्टिमरिच (30ml) + इंटैक्ट (30ml) + बायो-99 (5ml)**। इससे फल ड्रॉपिंग 0% होगी और फल का आकार बढ़ेगा।\n4. **फल पकने से 20 दिन पूर्व:** **प्रो स्टिमरिच (30ml) + बायो-99 (5ml)** छिड़कने से फलों में प्राकृतिक चमक और मिठास (Brix) बढ़ती है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌟 प्रो स्टिमरिच विवरण', query: 'बायोफिट प्रो स्टिमरिच क्या है और इसके फायदे?' },
+        { text: '🛡️ बायोफिट रैप-अप फंगीसाइड', query: 'बायोफिट रैप अप का उपयोग कैसे करें?' },
+        { text: '🌿 बायोफिट शेत ड्रिप उपयोग', query: 'बायोफिट शेत का ड्रिप में उपयोग कैसे करें?' }
+      ], 'agri', 'mango_aam_cultivation_care');
+      return true;
+    }
+
+    // 2. अनार की खेती, किस्में, भगवा, तेला/बैक्टीरियल ब्लाइट, फल फटना
+    if (q.includes('अनार की खेती') || q.includes('anaar ki kheti') || q.includes('pomegranate farming') ||
+        (q.includes('अनार') && (q.includes('किस्म') || q.includes('भगवा') || q.includes('तेला') || q.includes('ब्लाइट') || q.includes('फटना') || q.includes('बहार')))) {
+      
+      const title = '🍎 अनार की उन्नत बागवानी — किस्में, बहार प्रबंधन, तेला सुरक्षा व बायोफिट शेड्यूल';
+      const baseBody = `🍎 **अनार की उन्नत बागवानी — किस्में, रोग नियंत्रण व बायोफिट प्रबंधन:**\n\nअनार एक अत्यधिक मुनाफे वाली बागवानी फसल है। सही प्रबंधन से 1 एकड़ में ₹5 लाख से ₹12 लाख तक की शुद्ध आय ली जा सकती है।\n\n🌾 **1. सर्वश्रेष्ठ किस्में:**\n• **भगवा (सिंदूरी):** भारत की नंबर-1 व्यावसायिक किस्म। गहरे लाल दाने, मुलायम बीज और भारी मांग (उत्पादन: 12-15 टन/हेक्टेयर)।\n• **आरक्ता, गणेश, मृदुला:** अन्य लोकप्रिय किस्में।\n\n🛡️ **2. प्रमुख रोग व समाधान:**\n• **बैक्टीरियल ब्लाइट (तेला / ब्लैक स्पॉट - Xanthomonas):** पत्तों व फलों पर काले तैलीय धब्बे और चीरे। **उपचार:** तांबे के रासायनिक स्प्रे के स्थान पर **बायोफिट रैप-अप (40ml) + बायो-99 (5ml)** प्रति पंप नियमित चलाएं। खेत में ताजे गोमूत्र व छाछ का प्रयोग करें।\n• **फल फटना (Fruit Cracking):** बोरॉन व कैल्शियम की कमी और नमी का असंतुलन। उपचार: जड़ों में **बायोफिट शेत (SHET) 1 लीटर/एकड़** और पत्तों पर **प्रो स्टिमरिच (2ml/L)** दें।\n\n📅 **3. बायोफिट अनार बहार स्पेशल शेड्यूल:**\n1. **बहार छांटाई के बाद (विश्राम टूटने पर):** 1 लीटर **शेत (SHET)** + 1 किलो **VAM** प्रति एकड़ ड्रिप से दें।\n2. **फूल अवस्था (Flowering):** **स्टिमरिच (30ml) + बायो-99 (5ml)** प्रति 15L पंप।\n3. **फल विकास (दाने भरते समय):** **प्रो स्टिमरिच (30ml) + रैप-अप (30ml) + बायो-99 (5ml)**। इससे फल का छिलका चमकदार, सिंदूरी लाल और दाने मीठे बनते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌿 बायोफिट शेत ड्रिप उपयोग', query: 'बायोफिट शेत का ड्रिप में उपयोग कैसे करें?' },
+        { text: '🌟 प्रो स्टिमरिच 25% छूट', query: 'प्रो स्टिमरिच की कीमत और डिस्काउंट' },
+        { text: '🛡️ बायोफिट रैप-अप फंगीसाइड', query: 'बायोफिट रैप अप का उपयोग कैसे करें?' }
+      ], 'agri', 'pomegranate_anaar_cultivation_care');
+      return true;
+    }
+
+    // 3. केले की खेती, G9, पनामा विल्ट, सिगाटोका व घार वजन
+    if (q.includes('केले की खेती') || q.includes('kela ki kheti') || q.includes('banana farming') || q.includes('केळी') ||
+        (q.includes('केला') && (q.includes('g9') || q.includes('पनामा') || q.includes('विल्ट') || q.includes('सिगाटोका') || q.includes('घार') || q.includes('टिशू')))) {
+      
+      const title = '🍌 केले की बंपर खेती — G9 टिशू कल्चर, पनामा विल्ट, सिगाटोका व बायोफिट शेड्यूल';
+      const baseBody = `🍌 **केले की आधुनिक वैज्ञानिक खेती — किस्में, रोग सुरक्षा व बायोफिट शेड्यूल:**\n\nकेला सबसे तेजी से नकदी देने वाली फल फसल है। सही पोषण से प्रति पौधा 30 से 38 किलो की घार ली जा सकती है।\n\n🌾 **1. सर्वोत्तम किस्म:**\n• **ग्रैंड नैने (Grand Naine - G-9) टिशू कल्चर:** 100% एकसमान पौधे, मजबूत तना, कम ऊंचाई और 30-35 किग्रा की लंबी घार (उत्पादन: 80-100 टन/हेक्टेयर)।\n\n🛡️ **2. खतरनाक रोग व जैविक सुरक्षा:**\n• **पनामा विल्ट (Fusarium Wilt - उकठा):** पत्ते पीले होकर डंठल से लटक जाते हैं और तना चीरने पर भूरी धारियां दिखती हैं। **रोकथाम:** पौधे लगाते समय गड्ढे में **मायकोराइजा VAM** और **बायोफिट शेत (SHET)** का ड्रेंचिंग करें। रासायनिक फंगीसाइड की जगह शेत के मित्र फंगस (Trichoderma) जड़ों को पूरी तरह सुरक्षित रखते हैं।\n• **सिगाटोका लीफ स्पॉट (Sigatoka):** पत्तों पर नाव के आकार के भूरे-काले धब्बे। **उपचार:** **बायोफिट रैप-अप (30ml) + बायो-99 (5ml)** प्रति पंप का 15 दिन के अंतराल पर 2 स्प्रे।\n\n📅 **3. बायोफिट केला वजन व लंबाई बूस्टर शेड्यूल:**\n1. **पौध रोपाई के 15 दिन बाद:** 1 लीटर **शेत (SHET) + VAM** ड्रिप से दें। जड़ों का जाल तेजी से फैलेगा।\n2. **तीसरे व पांचवें महीने (वानस्पतिक बढ़वार):** **स्टिमरिच (30ml) + बायो-99 (5ml)** का पत्तों पर स्प्रे।\n3. **कमल (फूल/घार) निकलने पर:** **प्रो स्टिमरिच (35ml) + बायो-99 (5ml)** का घार पर सीधा स्प्रे करें। इससे उंगलियों (Fingers) की लंबाई और मोटाई 25% बढ़ जाती है और छिलके पर दाग-धब्बे नहीं आते।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🍄 मायकोराइजा VAM के फायदे', query: 'मायकोराइजा VAM मिट्टी में कैसे काम करता है?' },
+        { text: '🌿 बायोफिट शेत ड्रिप डोज', query: 'बायोफिट शेत का उपयोग और डोज क्या है?' },
+        { text: '🌟 प्रो स्टिमरिच विवरण', query: 'बायोफिट प्रो स्टिमरिच क्या है और इसके फायदे?' }
+      ], 'agri', 'banana_kela_cultivation_care');
+      return true;
+    }
+
+    // 4. मायकोराइजा वैम (VAM - Vesicular Arbuscular Mycorrhiza)
+    if (q.includes('मायकोराइजा') || q.includes('mycorrhiza') || q.includes('vam') || q.includes('वैम') || (q.includes('जड़') && q.includes('कवक'))) {
+      const title = '🍄 मायकोराइजा वैम (VAM) — जड़ों का दूसरा जीवन व फॉस्फोरस अवशोषक';
+      const baseBody = `🍄 **मायकोराइजा वैम (VAM) — मिट्टी व जड़ों का चमत्कारी मित्र कवक:**\n\nमायकोराइजा (Vesicular Arbuscular Mycorrhizae) एक अत्यंत लाभकारी जीवित फंगस है जो पौधे की जड़ों के साथ सहजीवी (Symbiotic) संबंध बनाकर रहता है।\n\n🌟 **मायकोराइजा कैसे काम करता है?**\nसाधारण पौधे की जड़ें मिट्टी के केवल 5% हिस्से से ही भोजन खींच पाती हैं। मायकोराइजा पौधे की जड़ों में घुसकर मिट्टी में लाखों सूक्ष्म रेशों (Hyphae) का एक विशाल जाल फैला देता है, जिससे पौधे की जड़ों का प्रभावी क्षेत्रफल **100 से 1000 गुना** बढ़ जाता है।\n\n🎯 **मुख्य वैज्ञानिक लाभ:**\n1. **फिक्स्ड फास्फोरस का अवशोषण:** मिट्टी में बंधा हुआ अप्रयुक्त फास्फोरस, जिंक और कैल्शियम पौधे को आसानी से मिलने लगता है।\n2. **सूखा व पानी की कमी से रक्षा:** यह मिट्टी की गहराई और बारीक छिद्रों से भी पानी खींचकर पौधे को हरा-भरा रखता है।\n3. **उकठा व जड़ गलन से प्राकृतिक सुरक्षा:** यह हानिकारक फंगस (Fusarium, Pythium) को जड़ के पास फटकने नहीं देता।\n4. **आलू, अदरक, प्याज में बंपर आकार:** कंद वाली फसलों में मायकोराइजा डालने से कंदों का आकार व वजन बहुत अधिक बढ़ता है।\n\n💧 **उपयोग विधि व डोज:**\n• **मात्रा:** 1 किग्रा या 1 लीटर प्रति एकड़।\n• **प्रयोग:** बुवाई के समय धारा संस्कार (गोबर खाद) में मिलाकर मिट्टी में दें या रोपाई के समय ड्रिप/ड्रेंचिंग से चलाएं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌾 धारा संस्कार अमृत मिट्टी विधि', query: 'अमृत मिट्टी या धारा संस्कार क्या है?' },
+        { text: '🌿 बायोफिट शेत विवरण', query: 'बायोफिट शेत का उपयोग और डोज क्या है?' },
+        { text: '🥔 आलू-प्याज स्पेशल स्प्रे चार्ट', query: 'आलू और प्याज में बंपर पैदावार हेतु स्प्रे चार्ट' }
+      ], 'agri', 'mycorrhiza_vam_benefits');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.11 SAKHI 2X SMART MASTER INTEL: PRO STIMRICH & PRODUCT INGREDIENTS
+  // =========================================================================
+  function handleProStimrichAndIngredientsQueries(cleanQ, rawQ, directives) {
+    const q = cleanQ.toLowerCase();
+
+    // 1. बायोफिट प्रो स्टिमरिच (Biofit Pro Stimrich - New Launch)
+    if (q.includes('प्रो स्टिमरिच') || q.includes('pro stimrich') || (q.includes('नया') && q.includes('स्टिमरिच')) ||
+        (q.includes('stimrich') && (q.includes('pro') || q.includes('1450')))) {
+      
+      const title = '🌟 बायोफिट प्रो स्टिमरिच (Pro Stimrich) — प्रीमियम बायोस्टिमुलेंट सम्पूर्ण विवरण';
+      const baseBody = `🌟 **बायोफिट प्रो स्टिमरिच (Biofit Pro Stimrich) — नेट्सर्फ का नया प्रीमियम बायो-एक्टिवेटर:**\n\nबायोफिट प्रो स्टिमरिच नेट्सर्फ रिसर्च एंड डेवलपमेंट (R&D) का अत्याधुनिक नैनो-पेप्टाइड आधारित बायोस्टिमुलेंट है, जिसे उच्च मूल्य वाली नकदी फसलों, बागवानी (फल-सब्जी) और बंपर फूलों-फलों के विकास हेतु तैयार किया गया है।\n\n💰 **आधिकारिक मूल्य व पैकेजिंग:**\n• **MRP:** ₹1,450 (1 लीटर पैक) | ₹780 (500ml पैक)\n• **आरोग्यम 25% विशेष छूट पर मूल्य:** ₹1,088 (1 लीटर) | ₹585 (500ml)\n\n🧪 **मुख्य सक्रिय घटक (Active Ingredients & Formulation):**\n1. **बायो-एक्टिव पेप्टाइड्स व 18+ L-अमीनो एसिड्स (15% w/w):** पौधों की कोशिकाओं को त्वरित पोषण देकर प्रकाश संश्लेषण को 40% तक बढ़ाते हैं।\n2. **फुलविक व ह्यूमिक नैनो-चेलेटेड एक्सट्रैक्ट (10% w/w):** मिट्टी व पत्तों से सूक्ष्म पोषक तत्वों के अवशोषण को 3 गुना तेज करते हैं।\n3. **प्राकृतिक साइटोकिनिन व ऑक्सिन प्रिकर्सर (सी-वीड एक्सट्रैक्ट Ascophyllum Nodosum):** फूलों को झड़ने से रोकते हैं और मादा फूलों की संख्या बढ़ाते हैं।\n4. **प्राकृतिक एंजाइम्स व कार्बनिक सह-कारक:** विपरीत मौसम (पाला, सूखा, तेज गर्मी) में फसल को ग्रीन और तनावमुक्त रखते हैं।\n\n🎯 **डोज व छिड़काव का समय:**\n• **स्प्रे डोज:** 1.5 से 2 ml प्रति लीटर पानी (25-30 ml प्रति 15 लीटर पंप)\n• **अवस्था 1:** वानस्पतिक वृद्धि व कल्ले (फुटाव) के समय\n• **अवस्था 2:** फूल आने से ठीक पहले (Pre-flowering)\n• **अवस्था 3:** फल/दाने बनते समय (Fruit development)\n\n💡 **विशेषता:** इसे **बायो-99 (5ml/पंप)** के साथ मिलाकर छिड़कने पर इसका रिजल्ट 100% अवशोषित होता है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'netsurf');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🛒 प्रो स्टिमरिच 25% छूट ऑर्डर', query: 'प्रो स्टिमरिच ऑर्डर करने की प्रक्रिया बताएं' },
+        { text: '🧪 साधारण vs प्रो स्टिमरिच अंतर', query: 'स्टिमरिच और प्रो स्टिमरिच में मुख्य अंतर क्या है?' },
+        { text: '🌾 फसलों का संपूर्ण स्प्रे चार्ट', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' }
+      ], 'netsurf', 'pro_stimrich_launch_details');
+      return true;
+    }
+
+    // 2. नेट्सर्फ प्रोडक्ट्स के घटक / इसमें क्या है (Ingredients Inquiry)
+    if (q.includes('घटक') || q.includes('ingredients') || q.includes('इसमें क्या है') || q.includes('isme kya hai') ||
+        (q.includes('नेट्सर्फ') && (q.includes('केमिकल') || q.includes('मिलावट') || q.includes('कंटेंट') || q.includes('फॉर्मूला'))) ||
+        ((q.includes('स्टिमरिच') || q.includes('बायो 99') || q.includes('शेत') || q.includes('रैप अप') || q.includes('नैचुरामोर')) && (q.includes('घटक') || q.includes('क्या है') || q.includes('कंटेंट')))) {
+      
+      const title = '🔬 नेट्सर्फ बायोफिट व वेलनेस प्रोडक्ट्स के प्रामाणिक घटक (Ingredients List)';
+      const baseBody = `🔬 **नेट्सर्फ बायोफिट व नेचुरामोर — 100% जैविक व प्रामाणिक घटक सूची:**\n\nनेट्सर्फ के सभी कृषि उत्पाद Central Insecticide Board (CIB) और इकोसर्ट (ECOCERT) प्रमाणित जैविक हैं। इनमें कोई जहरीला केमिकल नहीं होता:\n\n🌿 **1. बायोफिट स्टिमरिच (Stimrich):**\n• **घटक:** जैविक समुद्री शैवाल (Seaweed extract), हाइड्रोलाइज्ड पादप प्रोटीन (Plant proteins), आवश्यक विटामिन्स, प्राकृतिक ऑक्सिन व साइटोकिनिन प्रिकर्सर।\n• **कार्य:** कल्ले, जड़ विकास, बंपर फूल और फलों की संख्या बढ़ाना।\n\n🌟 **2. बायोफिट प्रो स्टिमरिच (Pro Stimrich):**\n• **घटक:** बायो-एक्टिव पेप्टाइड्स, 18+ L-अमीनो एसिड्स (15%), नैनो फुलविक एक्सट्रैक्ट (10%), Ascophyllum Nodosum सी-वीड व प्राकृतिक एंटी-स्ट्रेस एंजाइम्स।\n• **कार्य:** हाई-वैल्यू फसलों में प्रीमियम चमक, आकार, वजन और तनाव सुरक्षा।\n\n💧 **3. बायोफिट बायो-99 (Bio-99):**\n• **घटक:** 100% सिलिकॉन आधारित नॉन-आयनिक सर्फेक्टेंट (Organosilicone Spreader & Penetrator)।\n• **कार्य:** पानी का सतही तनाव तोड़ना, दवा को 5 सेकंड में पत्तों के आर-पार फैलाना और बारिश में धुलने से बचाना।\n\n🦠 **4. बायोफिट शेत (SHET - Soil Health Enhancement Technology):**\n• **घटक:** जीवित लाभकारी सूक्ष्मजीव कंसोर्टियम (Azotobacter, Bacillus, Pseudomonas, Trichoderma, Cellulolytic bacteria) न्यूनतम 1x10^9 CFU/ml।\n• **कार्य:** मिट्टी में फिक्स डीएपी/पोटाश को घोलना, मिट्टी को नरम बनाना और उकठा/फंगस रोकना।\n\n🛡️ **5. बायोफिट रैप-अप (Wrap-up):**\n• **घटक:** प्राकृतिक फॉस्फोलिपिड्स और प्लांट डिराइव्ड वेक्स एक्सट्रैक्ट।\n• **कार्य:** पत्तों पर अदृश्य जैविक सुरक्षा कवच बनाना जिससे फंगस व वायरस अंदर नहीं घुस पाते।\n\n🥛 **6. नेचुरामोर प्लस (Naturamore Plus):**\n• **घटक:** 5 प्रोटीन स्रोत (सोया, व्हे, मटर, चावल, दूध प्रोटीन) + एलोवेरा, अश्वगंधा, ओमेगा-3 डीएचए, ल्यूटिन, ज़ेक्सैंथिन और 13 विटामिन्स व 10 मिनरल्स। 100% शाकाहारी।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'netsurf');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌱 बायोफिट संपूर्ण कैटलॉग', query: 'बायोफिट के सभी कृषि उत्पादों की लिस्ट दिखाओ' },
+        { text: '💼 नेट्सर्फ 25% छूट प्लान', query: 'नेट्सर्फ 25% छूट व प्लान' },
+        { text: '🌟 प्रो स्टिमरिच विवरण', query: 'बायोफिट प्रो स्टिमरिच क्या है और इसके फायदे?' }
+      ], 'netsurf', 'netsurf_products_ingredients_list');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.12 SAKHI 2X SMART MASTER INTEL: WOMEN'S HEALTH, BEAUTY & FITNESS
+  // =========================================================================
+  function handleWomensHealthAndBeautyMasterQueries(cleanQ, rawQ, directives) {
+    const q = cleanQ.toLowerCase();
+
+    // 1. त्वचा, मुंहासे, झाइयां, पिगमेंटेशन व चेहरे पर ग्लो
+    if (q.includes('कील मुंहासे') || q.includes('झाइयां') || q.includes('पिगमेंटेशन') || q.includes('pigmentation') ||
+        q.includes('चेहरे पर चमक') || q.includes('skin glow') || q.includes('acne') || (q.includes('चेहरे') && (q.includes('दाग') || q.includes('धब्बे') || q.includes('निखार')))) {
+      
+      const title = '🌸 महिला त्वचा सौंदर्य — कील-मुंहासे, झाइयां (पिगमेंटेशन) व प्राकृतिक निखार';
+      const baseBody = `🌸 **महिला त्वचा सौंदर्य व स्वास्थ्य — मुँहासे, झाइयों और डलनेस का स्थायी समाधान:**\n\nमहिलाओं में त्वचा की अधिकांश समस्याएं (पिंपल्स, झाइयां, मेलास्मा) हार्मोन्स के असंतुलन, पेट की गर्मी/कब्ज या रक्त में टॉक्सिन्स के कारण होती हैं। केवल ऊपर से क्रीम लगाने के बजाय अंदरूनी पोषण पर ध्यान दें:\n\n🌿 **1. आयुर्वेदिक व घरेलू उपचार:**\n• **कच्चे दूध व जायफल लेप:** झाइयों और काले धब्बों पर कच्चे दूध में थोड़ा जायफल घिसकर 15 मिनट लगाएं, फिर गुनगुने पानी से धो लें।\n• **नीम व मुल्तानी मिट्टी:** तैलीय त्वचा और मुंहासों हेतु 1 चम्मच मुल्तानी मिट्टी + चुटकी भर हल्दी + गुलाब जल का पैक हफ्ते में 2 बार लगाएं।\n• **एलोवेरा जेल:** रात को सोने से पहले ताजा एलोवेरा जेल चेहरे पर हल्के हाथों से मसाज करें।\n\n🥗 **2. रक्त शुद्धि व डाइट चार्ट:**\n• प्रतिदिन सुबह खाली पेट 1 गिलास गुनगुने पानी में आधा नींबू या 1 चम्मच आंवला जूस पिएं।\n• दिन भर में 2.5 से 3 लीटर पानी अवश्य पिएं ताकि टॉक्सिन्स बाहर निकलें।\n• तली-भुनी, अत्यधिक तीखी और मैदे वाली चीजों से परहेज करें।\n\n💊 **3. अंदरूनी पोषण (हार्मोनल बैलेंस):**\n• **नैचुरामोर फॉर विमेन (Naturamore for Women):** इसमें शतावरी, एलोवेरा और एंटीऑक्सीडेंट्स हैं जो हार्मोन्स को संतुलित कर त्वचा में अंदरूनी प्राकृतिक निखार लाते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन विवरण', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🩺 महिला स्वास्थ्य संपूर्ण गाइड', query: 'महिलाओं के स्वास्थ्य और पोषण की संपूर्ण गाइड' },
+        { text: '💇‍♀️ बाल झड़ने का समाधान', query: 'महिलाओं में तेजी से बाल झड़ना कैसे रोकें?' }
+      ], 'health', 'women_skin_acne_pigmentation');
+      return true;
+    }
+
+    // 2. बाल झड़ना व डैंड्रफ (Hair Fall & Dandruff)
+    if (q.includes('बाल झड़ना') || q.includes('hair fall') || q.includes('डैंड्रफ') || q.includes('dandruff') ||
+        q.includes('रूसी') || (q.includes('बाल') && (q.includes('घने') || q.includes('मजबूत') || q.includes('झड़')))) {
+      
+      const title = '💇‍♀️ बालों का झड़ना व डैंड्रफ — महिलाओं में घने व मजबूत बालों का संपूर्ण समाधान';
+      const baseBody = `💇‍♀️ **महिलाओं में बालों का झड़ना (Hair Fall) व डैंड्रफ का समग्र उपचार:**\n\nमहिलाओं में बाल झड़ने के 3 सबसे बड़े वैज्ञानिक कारण होते हैं: 1. आयरन/हीमोग्लोबिन की कमी, 2. थाइरॉइड या डिलीवरी के बाद हार्मोनल बदलाव, 3. फंगल डैंड्रफ व मानसिक तनाव।\n\n🌿 **1. स्कैल्प व डैंड्रफ उपचार:**\n• **दही व नींबू लेप:** ताजे दही में आधा नींबू निचोड़कर बालों की जड़ों में लगाएं और 30 मिनट बाद हल्के हर्बल शैम्पू से धोएं। फंगल डैंड्रफ 2 बार में समाप्त हो जाता है।\n• **मेथी दाना व करी पत्ता तेल:** नारियल तेल में 1 चम्मच मेथी दाना और 10 करी पत्ते धीमी आंच पर पका लें। इस तेल से हफ्ते में 2 बार गुनगुनी मालिश करें।\n\n🥗 **2. पोषण व आहार (जड़ों की खुराक):**\n• **आयरन व बायोटिन रिच फूड्स:** रोजाना पालक, चुकंदर, भुने चने, गुड़, आंवला और भीगे बादाम का सेवन करें।\n• हीमोग्लोबिन स्तर कम से कम 11-12 gm/dL होना चाहिए।\n\n💊 **3. सप्लीमेंट्री सपोर्ट:**\n• **नैचुरामोर फॉर विमेन:** इसमें बायोटिन, जिंक, फोलिक एसिड और ओमेगा फैटी एसिड्स हैं जो नए बालों के रोम (Follicles) को सक्रिय करते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🩸 हीमोग्लोबिन व खून बढ़ाने के उपाय', query: 'हीमोग्लोबिन और खून बढ़ाने के उपाय' },
+        { text: '🌸 त्वचा का निखार व झाइयां', query: 'चेहरे के कील-मुंहासे और झाइयां कैसे ठीक करें?' }
+      ], 'health', 'women_hair_fall_dandruff');
+      return true;
+    }
+
+    // 3. अनियमित पीरियड्स व माहवारी में असहनीय दर्द (Period Cramps)
+    if (q.includes('अनियमित पीरियड्स') || q.includes('irregular periods') || q.includes('पीरियड्स में दर्द') ||
+        q.includes('period cramps') || q.includes('माहवारी') || q.includes('मासिक धर्म') || (q.includes('पीरियड') && (q.includes('दर्द') || q.includes('देरी') || q.includes('खुलकर')))) {
+      
+      const title = '🌸 माहवारी की अनियमितता व दर्द (Period Cramps) — सुरक्षित प्राकृतिक समाधान';
+      const baseBody = `🌸 **अनियमित माहवारी व असहनीय दर्द (Period Cramps) का प्राकृतिक उपचार:**\n\nमाहवारी का समय पर न आना या अत्यधिक दर्द (Dysmenorrhea) होना शरीर में वात दोष के बढ़ने और एस्ट्रोजन/प्रोजेस्टेरोन हार्मोन के असंतुलन का संकेत है।\n\n☕ **1. दर्द से तत्काल राहत (घरेलू काढ़ा):**\n• **अजवाइन व गुड़ का काढ़ा:** 1 गिलास पानी में आधा चम्मच अजवाइन, 1 छोटा टुकड़ा अदरक और 1 चम्मच गुड़ डालकर 5 मिनट उबालें। इसे गुनगुना चाय की तरह पिएं। गर्भाशय की ऐंठन तुरंत शांत होती है।\n• **हॉट वॉटर बैग सिकाई:** नाभि के नीचे गर्म पानी की थैली से सिकाई करें।\n\n🌿 **2. चक्र को नियमित करने के उपाय:**\n• **पपीता व तिल-गुड़:** पीरियड्स आने की संभावित तारीख से 5 दिन पहले कच्चा पपीता खाएं या 1 चम्मच काले तिल गुड़ के साथ लें।\n• अत्यधिक ठंडे पानी और खट्टी-तली चीजों से माहवारी के दिनों में बचें।\n\n💊 **3. स्थायी हार्मोनल संतुलन:**\n• **शतावरी व अशोक छाल:** ये दोनों जड़ी-बूटियां गर्भाशय की टॉनिक मानी जाती हैं। **नैचुरामोर फॉर विमेन** में शतावरी और आवश्यक माइक्रोन्यूट्रिएंट्स का संतुलित मिश्रण है जो 2-3 चक्रों में पीरियड्स को प्राकृतिक रूप से नियमित करता है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🩺 महिला स्वास्थ्य संपूर्ण गाइड', query: 'महिलाओं के स्वास्थ्य और पोषण की संपूर्ण गाइड' }
+      ], 'health', 'women_irregular_periods_cramps');
+      return true;
+    }
+
+    // 4. सफेद पानी / श्वेत प्रदर (Leucorrhea)
+    if (q.includes('सफेद पानी') || q.includes('safed pani') || q.includes('श्वेत प्रदर') || q.includes('leucorrhea') ||
+        q.includes('लिकोरिया') || (q.includes('कमजोरी') && q.includes('कमर दर्द') && q.includes('महिला'))) {
+      
+      const title = '🌺 श्वेत प्रदर (सफेद पानी / Leucorrhea) — कारण, लक्षण व स्थायी आयुर्वेदिक समाधान';
+      const baseBody = `🌺 **श्वेत प्रदर (सफेद पानी / Leucorrhea) — सुरक्षित, संवेदनशील व स्थायी समाधान:**\n\nसफेद पानी की समस्या महिलाओं में अत्यधिक शारीरिक कमजोरी, कमर में भारी दर्द, चक्कर आना, स्वभाव में चिड़चिड़ापन और रोग प्रतिरोधक क्षमता की कमी पैदा कर देती है। यह इन्फेक्शन या शरीर की कमजोरी के कारण होता है।\n\n🥣 **1. सरल एवं अचूक घरेलू उपाय:**\n• **चावल का मांड़ (धोवन):** 2 चम्मच चावल को रात में पानी में भिगो दें। सुबह उस पानी को छानकर उसमें चुटकी भर मिश्री मिलाकर 7 से 10 दिन पिएं। यह सफेद पानी का अचूक पारंपरिक नुस्खा है।\n• **भुने चने व गुड़:** प्रतिदिन दोपहर में 1 मुट्ठी भुने चने गुड़ के साथ चबाकर खाएं। इससे गर्भाशय को ताकत मिलती है और कमर दर्द गायब होता है।\n• **केला व घी:** सुबह 1 पके केले के साथ आधा चम्मच शुद्ध देशी घी मिलाकर खाएं।\n\n🚿 **2. स्वच्छता व सावधानियां:**\n• व्यक्तिगत स्वच्छता का विशेष ध्यान रखें। सूती (Cotton) अंतःवस्त्र पहनें।\n• अत्यधिक मिर्च-मसाले, चाय, कॉफी और तनाव से बचें।\n\n💊 **3. दीर्घकालिक पोषण:**\n• **नैचुरामोर फॉर विमेन + इम्यूनप्लस:** शरीर की अंदरूनी कमजोरी को मिटाकर इंफेक्शन से लड़ने की ताकत देते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🩸 खून व हीमोग्लोबिन सुधार', query: 'हीमोग्लोबिन और खून बढ़ाने के उपाय' }
+      ], 'health', 'women_leucorrhea_safed_pani');
+      return true;
+    }
+
+    // 5. PCOD / PCOS
+    if (q.includes('pcod') || q.includes('pcos') || q.includes('पॉलीसिस्टिक ओवरी') || (q.includes('अनचाहे बाल') && q.includes('चेहरे'))) {
+      const title = '🌸 PCOD एवं PCOS प्रबंधन — हार्मोनल संतुलन, वजन नियंत्रण व सिस्ट मुक्ति';
+      const baseBody = `🌸 **PCOD / PCOS (पॉलीसिस्टिक ओवेरियन सिंड्रोम) — समग्र वैज्ञानिक नियंत्रण:**\n\nPCOD/PCOS कोई बीमारी नहीं बल्कि एक मेटाबॉलिक व हार्मोनल असंतुलन है जिसमें अंडाशय (Ovaries) में अपरिपक्व अंडे सिस्ट का रूप ले लेते हैं। सही डाइट और एक्टिव लाइफस्टाइल से इसे 100% रिवर्स किया जा सकता है।\n\n📋 **1. मुख्य लक्षण:**\n• पीरियड्स में 2 से 3 महीने की देरी\n• अचानक वजन बढ़ना (विशेषकर पेट के आसपास)\n• चेहरे, ठोड़ी पर मोटे अनचाहे बाल (Hirsutism) व बाल झड़ना\n• इंसुलिन रेजिस्टेंस व थकान\n\n🥗 **2. PCOD डाइट व लाइफस्टाइल प्रोटोकॉल:**\n• **नो शुगर / नो रिफाइंड कार्ब्स:** चीनी, मैदा, कोल्ड ड्रिंक्स और जंक फूड 100% बंद करें क्योंकि इंसुलिन स्पाइक से टेस्टोस्टेरोन बढ़ता है।\n• **सीड साइकिलिंग (Seed Cycling):**\n  - दिन 1 से 14 (पीरियड शुरू होने से): 1 चम्मच अलसी (Flax seeds) + 1 चम्मच कद्दू के बीज (Pumpkin seeds)\n  - दिन 15 से 28: 1 चम्मच तिल (Sesame seeds) + 1 चम्मच सूरजमुखी के बीज (Sunflower seeds)\n• **रोजाना 40 मिनट वॉक या योग:** बटरफ्लाई आसन (तितली आसन), भुजंगासन और सूर्य नमस्कार पेल्विक ब्लड फ्लो को सुधारते हैं।\n\n💊 **3. पोषण सहायता:**\n• **नैचुरामोर फॉर विमेन:** इसमें मौजूद विटामिन्स व एंटीऑक्सीडेंट्स इंसुलिन सेंसिटिविटी बढ़ाकर ओव्यूलेशन को सक्रिय करते हैं, जिससे गर्भधारण की संभावनाएं सामान्य हो जाती हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🤰 गर्भधारण व फर्टिलिटी पोषण', query: 'गर्भधारण और फर्टिलिटी बढ़ाने के लिए क्या खाएं?' }
+      ], 'health', 'women_pcod_pcos_care');
+      return true;
+    }
+
+    // 6. गर्भधारण व फर्टिलिटी पोषण (Conception & Fertility Diet)
+    if (q.includes('गर्भधारण') || q.includes('conception') || q.includes('फर्टिलिटी') || q.includes('fertility') ||
+        q.includes('प्रेग्नेंसी की तैयारी') || q.includes('एग क्वालिटी') || (q.includes('कंसीव') && q.includes('तैयारी'))) {
+      
+      const title = '🤰 गर्भधारण पूर्व पोषण व फर्टिलिटी बूस्ट (Conception & Fertility Diet)';
+      const baseBody = `🤰 **गर्भधारण (Conception) पूर्व पोषण व फर्टिलिटी संवर्धन मार्गदर्शिका:**\n\nस्वस्थ गर्भधारण हेतु गर्भाशय की मजबूती, अंडों की गुणवत्ता (Egg Quality) और रक्त में पर्याप्त पोषण सबसे महत्वपूर्ण स्तंभ हैं। कंसीव करने की योजना बनाते समय कम से कम 3 महीने पहले से यह तैयारी करें:\n\n🥗 **1. फर्टिलिटी सुपरफूड्स:**\n• **फोलिक एसिड व आयरन:** हरी पत्तेदार सब्जियां (पालक, मेथी), चुकंदर, दालें और अनार का नियमित सेवन करें। यह भ्रूण के तंत्रिका तंत्र (Neural tube) के विकास हेतु अनिवार्य है।\n• **एंटीऑक्सीडेंट्स व हेल्दी फैट्स:** भीगे अखरोट, बादाम, कद्दू के बीज और नारियल का पानी ओवरी में ऑक्सीडेटिव स्ट्रेस को कम करते हैं और एग क्वालिटी बढ़ाते हैं।\n• **दूध व घी:** रात को 1 गिलास गुनगुने देशी गाय के दूध में चुटकी भर हल्दी और आधा चम्मच घी मिलाकर पिएं।\n\n🧘‍♀️ **2. ओव्यूलेशन (Ovulation) ट्रैक करना:**\n• मासिक धर्म चक्र के 12वें से 18वें दिन के बीच ओव्यूलेशन होता है। इस उपजाऊ खिड़की (Fertile Window) में शारीरिक संबंध बनाना गर्भधारण की संभावना को 4 गुना बढ़ा देता है।\n\n💊 **3. संपूर्ण माइक्रोन्यूट्रिएंट सपोर्ट:**\n• **नैचुरामोर फॉर विमेन (Naturamore for Women):** इसमें फोलिक एसिड, विटामिन B12, विटामिन D, कैल्शियम, आयरन और ओमेगा-3 डीएचए मौजूद हैं जो शरीर को मातृत्व के लिए पूर्णतः तैयार करते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🩺 महिला स्वास्थ्य संपूर्ण गाइड', query: 'महिलाओं के स्वास्थ्य और पोषण की संपूर्ण गाइड' }
+      ], 'health', 'women_fertility_conception_nutrition');
+      return true;
+    }
+
+    // 7. महिला वजन घटाना व फिटनेस (Weight Loss & Body Toning)
+    if ((q.includes('वजन') && (q.includes('घटा') || q.includes('कम') || q.includes('चर्बी') || q.includes('मोटापा')) && (q.includes('महिला') || q.includes('पेट'))) ||
+        q.includes('बॉडी टोनिंग') || q.includes('body toning') || (q.includes('महिला') && q.includes('फिटनेस'))) {
+      
+      const title = '🏃‍♀️ महिलाओं में स्वस्थ वजन घटाना व बॉडी टोनिंग (Healthy Weight Loss for Women)';
+      const baseBody = `🏃‍♀️ **महिलाओं में सुरक्षित व स्थायी वजन घटाना (Healthy Weight Loss):**\n\nक्रैश डाइटिंग या भूखे रहने से वजन कम नहीं होता बल्कि बाल झड़ने लगते हैं, त्वचा लटक जाती है और मेटाबॉलिज्म धीमा पड़ जाता है। वजन घटाने का सही वैज्ञानिक फॉर्मूला है:\n\n🌅 **1. मॉर्निंग फैट-कटर ड्रिंक:**\n• सुबह खाली पेट 1 गिलास गुनगुने पानी में 1 चम्मच जीरा और आधा चम्मच सौंफ रात भर भिगोकर उबाला हुआ पानी पिएं। इसमें आधा नींबू और चुटकी भर दालचीनी मिलाएं। यह मेटाबॉलिज्म को 20% तेज करता है।\n\n🥗 **2. संतुलित डाइट चार्ट (80/20 नियम):**\n• **नाश्ता (8:30 AM):** बेसन का चीला / मूंग दाल स्प्राउट्स / 1 कटोरी दलिया व फल।\n• **दोपहर का भोजन (1:00 PM):** 1-2 मल्टीग्रेन रोटी + 1 बड़ी कटोरी हरी सब्जी + 1 कटोरी गाढ़ी दाल + खीरा/टमाटर का सलाद। भोजन से 20 मिनट पहले 1 गिलास पानी पिएं।\n• **शाम (5:00 PM):** ग्रीन टी या भुने मखाने / चने।\n• **रात का भोजन (8:00 PM से पहले):** बहुत हल्का — लौकी का सूप, उबली सब्जियां या मूंग दाल खिचड़ी।\n\n🧘‍♀️ **3. दैनिक दिनचर्या:**\n• रोजाना 8,000 से 10,000 कदम चलें।\n• रात को 7-8 घंटे की गहरी नींद लें (नींद की कमी से कोर्टिसोल हार्मोन बढ़ता है जो पेट पर चर्बी जमा करता है)।\n\n💊 **4. मेटाबॉलिक सपोर्ट:**\n• **नैचुरामोर फॉर विमेन:** कम कैलोरी में संपूर्ण प्रोटीन व विटामिन्स देकर कमजोरी नहीं आने देता और मांसपेशियों को टोंड रखता है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌸 नैचुरामोर फॉर विमेन', query: 'नैचुरामोर फॉर विमेन के फायदे और घटक' },
+        { text: '🩺 दैनिक स्वास्थ्य चेकलिस्ट', query: 'दैनिक स्वास्थ्य और डाइट चेकलिस्ट बनाओ' }
+      ], 'health', 'women_weight_loss_diet');
+      return true;
+    }
+
+    return false;
+  }
+
+  // =========================================================================
+  // 19.13 SAKHI 2X SMART MASTER INTEL: KARWA CHAUTH & FASTING RULES
+  // =========================================================================
+  function handleKarwaChauthDirectQueries(cleanQ, rawQ, directives) {
+    const q = cleanQ.toLowerCase();
+    if (q.includes('करवा चौथ') || q.includes('karwa chauth') ||
+        (q.includes('चांद') && (q.includes('निकलेगा') || q.includes('समय') || q.includes('अर्घ्य') || q.includes('दर्शन'))) ||
+        (q.includes('करवा') && (q.includes('मुहूर्त') || q.includes('पूजा') || q.includes('भद्रा')))) {
+      
+      const title = '🌕 करवा चौथ (करक चतुर्थी) महापर्व — संपूर्ण पंचांग, शुभ मुहूर्त व चंद्रोदय समय';
+      const baseBody = `🌕 **करवा चौथ (करक चतुर्थी) महापर्व — संपूर्ण पंचांग व पूजन विधान:**\n\nकरवा चौथ सुहागिन महिलाओं द्वारा अखंड सौभाग्य, दांपत्य प्रेम और पति की दीर्घायु हेतु रखा जाने वाला सर्वश्रेष्ठ निर्जला व्रत है।\n\n⏰ **1. आज का शुभ करवा चौथ पूजा मुहूर्त:**\n• **संध्या पूजन मुहूर्त:** **शाम 05:46 PM से रात्रि 07:02 PM तक** (अवधि: 1 घंटा 16 मिनट)\n• **सर्वोत्तम चौघड़िया:** अमृत व शुभ चौघड़िया पूजन हेतु अति उत्तम है।\n\n🌙 **2. चंद्रोदय (चांद निकलने का समय) व अर्घ्य:**\n• **चंद्रोदय समय:** **रात्रि 08:12 PM से 08:24 PM** (स्थान भेद के अनुसार भारत के प्रमुख शहरों में 8:10 से 8:30 PM के मध्य)।\n• **अर्घ्य विधि:** चंद्र देव के दर्शन कर चलनी (छलनी) से पति व चंद्रमा को देखें, तांबे के लोटे से जल, अक्षत व रोली अर्पित कर पति के हाथों जल ग्रहण कर व्रत का पारण करें।\n\n🛡️ **3. भद्रा दोष स्थिति (शास्त्रोक्त समाधान):**\n• इस वर्ष भद्रा दोपहर में ही समाप्त हो चुकी है। प्रदोष काल पूजा और रात्रि चंद्र दर्शन के समय **भद्रा का कोई दोष नहीं है**। सभी माताएं-बहनें पूर्ण श्रद्धा व निष्ठा से निर्विघ्न पूजन संपन्न करें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'omni');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🗓️ आज का पूरा पंचांग', query: 'आज का दैनिक पंचांग और शुभ मुहूर्त बताएं' },
+        { text: '🌸 दैनिक स्वास्थ्य सलाह', query: 'दैनिक स्वास्थ्य और डाइट चेकलिस्ट बनाओ' }
+      ], 'omni', 'karwa_chauth_fasting_rules');
+      return true;
+    }
+    return false;
+  }
+
+  function handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives) {
       const q = cleanQ;
 
       // 1. गाय के पेट के मुख्य भाग और जुगाली (Rumination & 4 Stomach Compartments)
@@ -15782,7 +16104,12 @@ function processKnowledgeQuery(query) {
       }
 
       // 2. Direct Precision Benchmark Handlers (Pashu, Crop Seasons, Diagnostics, Anatomy, Math)
-      if (handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives)) return;
+      if (handleKarwaChauthDirectQueries(cleanQ, rawQ, directives)) return;
+    if (handleDharaSanskarAndSoilScienceQueries(cleanQ, rawQ, directives)) return;
+    if (handleFruitOrchardMasterQueries(cleanQ, rawQ, directives)) return;
+    if (handleProStimrichAndIngredientsQueries(cleanQ, rawQ, directives)) return;
+    if (handleWomensHealthAndBeautyMasterQueries(cleanQ, rawQ, directives)) return;
+    if (handlePashuAndCattleMasterQueries(cleanQ, rawQ, directives)) return;
       if (handleCropSeasonAndDiagnosticQueries(cleanQ, rawQ, directives)) return;
       if (handleGobarCompostCultureQueries(cleanQ, rawQ, directives)) return;
       if (handleInjuryAndSprainQueries(cleanQ, rawQ, directives)) return;

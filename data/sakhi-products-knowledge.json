@@ -1,7 +1,7 @@
 {
   "_comment": "Authoritative Master Verified Product Catalog & Pricing Registry for Aarogyam Sakhi AI",
   "updated_at": "2026-10-17T14:52:00Z",
-  "total_products": 50,
+  "total_products": 51,
   "discount_policy": {
     "retail_flat_discount": "25% off on MRP for all consumers",
     "ebook_discount": "50% off on MRP",
@@ -804,6 +804,18 @@
       "discount_pct": 25,
       "discounted_price": 600,
       "usage": "आंतों व पेट की संपूर्ण शुद्धि"
+    },
+    {
+      "id": "ns_prod_pro_stimrich",
+      "name": "Biofit Pro Stimrich (प्रो स्टिमरिच - न्यू लॉन्च)",
+      "category": "agri",
+      "pack_size": "1 Litre / 500 ml",
+      "mrp": 1450,
+      "discount_pct": 25,
+      "discounted_price": 1088,
+      "per_pump_dose": "25-30 ml प्रति 15 लीटर पंप (1.5 - 2 ml प्रति लीटर)",
+      "usage": "शाखा फुटाव, कल्ले वृद्धि, फूल आने से पूर्व व फल विकास अवस्था पर। Bio-99 के साथ मिलाकर सर्वोत्तम परिणाम।",
+      "ingredients": "बायो-एक्टिव पेप्टाइड्स, शुद्ध एल-अमीनो एसिड्स, फुल्विक एसिड, सीवीड अर्क व चिलेटेड माइक्रोन्यूट्रिएंट्स।"
     }
   ],
   "source": "Official NetSurf Catalog & netsurfdirect.com (Direct User Verified)",
