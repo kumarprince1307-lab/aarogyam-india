@@ -3805,11 +3805,11 @@ if (typeof document !== 'undefined') {
     container.style.overflowX = 'auto';
     container.style.gap = '8px';
     container.style.padding = '6px 8px';
-    container.innerHTML = pills.map(p => `
-      <button type="button" class="sakhi-smart-pill" onclick="window.askSakhiQuick('${escapeHtml(p.query)}')" style="white-space:nowrap;flex-shrink:0;padding:6px 12px;border-radius:16px;font-size:0.8rem;font-weight:700;background:#f0fdf4;border:1.5px solid #86efac;color:#15803d;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 5px rgba(0,0,0,0.04);transition:all 0.15s;">
-        ${escapeHtml(p.label)}
-      </button>
-    `).join('');
+    container.innerHTML = pills.map(p => {
+      const qVal = escapeHtml(p.query || '');
+      const lVal = escapeHtml(p.label || '');
+      return '<button type="button" class="sakhi-smart-pill" data-query="' + qVal + '" onclick="window.sendSakhiSuggestion(this.getAttribute(\'data-query\'))" style="white-space:nowrap;flex-shrink:0;padding:6px 12px;border-radius:16px;font-size:0.8rem;font-weight:700;background:#f0fdf4;border:1.5px solid #86efac;color:#15803d;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 5px rgba(0,0,0,0.04);transition:all 0.15s;">' + lVal + '</button>';
+    }).join('');
   }
 
   // 11. GREETING & INITIALIZATION
@@ -19341,5 +19341,5 @@ ${shareUrl}`;
       if (window.SakhiQuotaEngine && typeof window.SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
         window.SakhiQuotaEngine.updatePlusMenuCreditsUI();
       }
-  }
-})();
+    }
+  })();
