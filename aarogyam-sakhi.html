@@ -455,6 +455,16 @@
   }
   </script>
 
+  <!-- Instant PWA & Mobile Chrome Update Shield -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (var i = 0; i < registrations.length; i++) {
+          registrations[i].update();
+        }
+      });
+    }
+  </script>
 </head>
 <body class="sakhi-page-body">
 
