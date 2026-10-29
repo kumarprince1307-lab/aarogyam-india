@@ -1826,6 +1826,7 @@ if (typeof document !== 'undefined') {
     const cropKeywordsForDisease = [
       'चना', 'चने', 'गेहूं', 'गेहूँ', 'धान', 'आलू', 'सरसों', 'राई', 'सोयाबीन', 'कपास',
       'टमाटर', 'मिर्च', 'मक्का', 'गन्ना', 'बैंगन', 'प्याज', 'लहसुन', 'भिंडी', 'मटर',
+      'आम', 'अनार', 'केला', 'पपीता', 'अमरूद', 'नींबू', 'संतरा', 'सेब', 'फल', 'फलों', 'बागवानी', 'बगीचा', 'पेड़',
       'फसल', 'सब्जी', 'सब्जियों', 'खेत', 'पौध', 'पौधे', 'पत्ती', 'पत्तियां', 'पत्ते'
     ];
     const cropDiseaseTokens = [
@@ -4400,6 +4401,12 @@ if (typeof document !== 'undefined') {
 
     // 13. HIGH-PRECISION QUERY NORMALIZER
     function normalizeQueryText(text) {
+      // Triage and Step tag cleanup (crop_triage_step1, triage_step2_gehu, etc.)
+      text = (text || '').replace(/\s*\([a-z0-9_]*triage[a-z0-9_]*\)/gi, '');
+      text = text.replace(/\s*\([a-z_]+_step[0-9]+\)/gi, '');
+      text = text.replace(/\b(?:jodo\s*me\s*dard|jodo\s*ka\s*dard|jodon\s*me\s*dard|ghutno\s*me\s*dard)\b/gi, 'जोड़ों में दर्द');
+      text = text.replace(/(?:gharelu\s*nuskhe\s*aur\s*prakritik\s*swasthya|घरेलू\s*नुस्खे\s*और\s*प्राकृतिक\s*स्वास्थ्य)/gi, 'दादी के आयुर्वेदिक घरेलू नुस्खे');
+
       // Netsurf Spoken & Typos (नेट सब, नेता सब, netsuef, net sub)
       text = (text || '').replace(/(?:नेट\s*सब|नेता\s*सब|netsuef|\bnet\s*sub\b|\bneta\s*sub\b)/gi, 'नेट्सर्फ');
 
@@ -13884,7 +13891,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       );
 
       // Step 1: Broad Query -> Select Crop
-      if (isBroadFarmingQuery || cleanQ === 'crop_triage_step1') {
+      if (isBroadFarmingQuery || cleanQ.includes('crop_triage_step1') || (rawQ && rawQ.includes('crop_triage_step1'))) {
         sakhiConversationState.lastActiveDomain = 'agri';
         const prompt = `राम-राम किसान साथी! 🙏 आपकी फसल की सही पहचान और 100% सटीक वैज्ञानिक दवा व खुराक बताने के लिए, कृपया पहले अपनी फसल चुनें:`;
 
@@ -13900,7 +13907,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       }
 
       // Step 2: Crop Selected -> Select Days/Stage
-      if (cleanQ.includes('triage_step2') || cleanQ.includes('फसल की समस्या का निदान')) {
+      if (cleanQ.includes('triage_step2') || (rawQ && rawQ.includes('triage_step2')) || cleanQ.includes('फसल की समस्या का निदान')) {
         sakhiConversationState.lastActiveDomain = 'agri';
         let cropName = 'फसल';
         let cropTag = 'gehu';
@@ -13923,7 +13930,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       }
 
       // Step 3: Days Selected -> Select Symptom
-      if (cleanQ.includes('triage_step3')) {
+      if (cleanQ.includes('triage_step3') || (rawQ && rawQ.includes('triage_step3'))) {
         sakhiConversationState.lastActiveDomain = 'agri';
         let cropName = 'फसल';
         let stageName = 'वर्तमान अवस्था';
@@ -15884,6 +15891,44 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return true;
     }
 
+    // C. गेहूं में कल्ले, फुटाव, शाखाएं, NPK खाद व बंपर पैदावार फॉर्मूला (Wheat Tillering, Branches & Nutrition Booster)
+    const isWheatTilleringOrNutrition = (
+      (combined.includes('गेहूं') || combined.includes('gehu') || combined.includes('wheat') || combined.includes('गव्हा')) &&
+      (combined.includes('कल्ले') || combined.includes('फुटाव') || combined.includes('शाखा') || combined.includes('टिलरिंग') || combined.includes('tillering') || combined.includes('पैदावार') || combined.includes('बढ़ाने') || combined.includes('बढ़ाएं') || combined.includes('खाद') || combined.includes('यूरिया') || combined.includes('एनपीके') || combined.includes('dap') || combined.includes('डीएपी') || combined.includes('स्प्रे फॉर्मूला') || combined.includes('डोज'))
+    );
+
+    if (isWheatTilleringOrNutrition) {
+      const title = '🌾 गेहूं में बंपर कल्ले, फुटाव व रिकॉर्ड पैदावार का वैज्ञानिक बायोफिट फॉर्मूला';
+      const baseBody = `🌾 **गेहूं में बंपर कल्ले (Tillering), फुटाव व 25-30 क्विंटल पैदावार का 100% सटीक वैज्ञानिक फॉर्मूला:**\n\nगेहूं की फसल में जितने अधिक कल्ले (Tillers) बनेंगे, बालियों की संख्या और पैदावार उतनी ही रिकॉर्ड होगी। बुवाई के **20 से 45 दिन का समय (Tillering Phase)** कल्ले निर्माण के लिए सबसे महत्वपूर्ण होता है।\n\n⏰ **1. पहली सिंचाई (CRI स्टेज - 21 से 25 दिन) पर जड़ों का बूस्टर:**\n• गेहूं की ताज जड़ें (Crown Roots) 21 दिन पर निकलती हैं। इस समय पहली हल्की सिंचाई करें।\n• **बायोफिट शेत (SHET - 1 लीटर) + बायो-99 (250ml) प्रति एकड़:** सिंचाई के पानी के साथ नाली या ड्रिप में चलाएं।\n• **लाभ:** मिट्टी भुरभुरी होती है, जमीन में फिक्स पड़ा फास्फोरस व पोटाश पौधों को तुरंत मिलता है और प्राथमिक जड़ों का जाल 3 गुना तेजी से फैलता है।\n\n🌿 **2. कल्ले व फुटाव स्पेशल बायोफिट फोलियर स्प्रे (बुवाई के 30 से 35 दिन पर):**\n• **प्रति 15 लीटर स्प्रे पंप:**\n  👉 **बायोफिट स्टिमरिच (Biofit Stimrich):** **30 ml** (कोशिका विभाजन व नए कल्ले बूस्टर)\n  👉 **बायो-99 (Bio-99 स्प्रेडर व एक्टिवेटर):** **5 ml** (दवा को नसों तक सोखने हेतु)\n  👉 **बायोफिट एनपीके (NPK कल्चर):** 30 ml\n• **परिणाम:** प्रति पौधे **8 से 14 मजबूत कल्ले** निकलते हैं, पत्तियां चौड़ी व गहरे हरे रंग की हो जाती हैं और पीलापन 48 घंटे में गायब हो जाता है।\n\n🌱 **3. रासायनिक खाद का संतुलित व सही नियम:**\n• पहली सिंचाई पर प्रति एकड़ **35 से 40 किग्रा यूरिया** + **5 किग्रा जिंक सल्फेट 33%** डालें।\n• अत्यधिक यूरिया एक साथ न डालें, इससे पौधे लंबे होकर गिर जाते हैं। यूरिया हमेशा दो भागों में बांटकर दें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '💧 बायोफिट स्टिमरिच डोज व कीमत', query: 'बायोफिट स्टिमरिच का उपयोग और डोज क्या है?' },
+        { text: '🌾 गेहूं में पहली सिंचाई व पीलापन', query: 'गेहूं में पहली सिंचाई कब करें और पीलापन कैसे दूर करें' },
+        { text: '🛡️ गेहूं में खरपतवार शाकनाशी स्प्रे', query: 'गेहूं में खरपतवार नियंत्रण का स्प्रे बताओ' }
+      ], 'agri', 'wheat_tillering_nutrition_booster');
+      return true;
+    }
+
+    // D. गेहूं में पहली सिंचाई (CRI Stage) व पीलापन दूर करने का उपाय (Irrigation & Yellowing Master)
+    const isWheatIrrigationOrYellowing = (
+      (combined.includes('गेहूं') || combined.includes('gehu') || combined.includes('wheat') || combined.includes('गव्हा')) &&
+      (combined.includes('सिंचाई') || combined.includes('पानी') || combined.includes('पहला पानी') || combined.includes('कब दें') || combined.includes('कब लगाएं') || combined.includes('पीलापन') || combined.includes('पीली') || combined.includes('yellow'))
+    );
+
+    if (isWheatIrrigationOrYellowing) {
+      const title = '🌾 गेहूं में पहली सिंचाई का सही समय (CRI स्टेज) व पीलापन दूर करने का उपाय';
+      const baseBody = `🌾 **गेहूं में पहली सिंचाई का वैज्ञानिक समय व पत्तियों का पीलापन दूर करने का पक्का समाधान:**\n\n💧 **1. पहली सिंचाई का सबसे सटीक समय (CRI Stage):**\n• गेहूं की पहली सिंचाई बुवाई के ठीक **21 से 25 दिन बाद (क्राउन रूट इनीशिएशन / शिखर जड़ अवस्था)** पर अवश्य कर देनी चाहिए।\n• यह गेहूं की सबसे संवेदनशील अवस्था है। यदि इस समय पानी में 7 दिन की भी देरी हो जाए, तो कल्ले बनना रुक जाते हैं और पैदावार 25% तक घट जाती है।\n• **नियम:** पहली सिंचाई हमेशा हल्की करें, खेत में पानी भरा नहीं रहना चाहिए।\n\n🟡 **2. गेहूं में पीलापन आने के 3 प्रमुख कारण व उनका सटीक इलाज:**\n• **कारण 1: पहली सिंचाई के बाद जलभराव (हवा न मिलना):** अधिक पानी से जड़ें दब जाती हैं और नई पत्तियां पीली पड़ती हैं।\n  👉 **उपचार:** खेत से फालतू पानी निकालें। बतर आने पर **बायोफिट स्टिमरिच (30ml) + बायो-99 (5ml)** प्रति 15L पंप का स्प्रे करें।\n• **कारण 2: जिंक या नाइट्रोजन की कमी:** निचली पत्तियां पीली पड़कर सूखने लगती हैं।\n  👉 **उपचार:** 19:19:19 NPK (75 ग्राम) + 33% जिंक (20 ग्राम) + बायो-99 (5ml) प्रति पंप छिड़कें।\n• **कारण 3: पीला रतुआ (Yellow Rust फंगस):** पत्तियों पर हल्दी जैसा पीला पाउडर चिपकता है।\n  👉 **उपचार:** **बायोफिट रैप-अप (Wrap-up 30ml) + शेत (30ml) + बायो-99 (5ml)** तुरंत स्प्रे करें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌾 गेहूं में कल्ले व पैदावार फॉर्मूला', query: 'गेहूं में कल्ले और पैदावार बढ़ाने का फॉर्मूला' },
+        { text: '🛡️ गेहूं में पीला रतुआ व फंगस की दवा', query: 'गेहूं में पीला रतुआ की दवा बताओ' },
+        { text: '🌿 बायोफिट शेत 1L डिस्काउंट', query: 'बायोफिट शेत 1 लीटर की कीमत और डिस्काउंट' }
+      ], 'agri', 'wheat_irrigation_yellowing_master');
+      return true;
+    }
+
     // B. गेहूं व खेत में दीमक नियंत्रण (Termites in Wheat / Crops / Soil)
     const isTermite = (
       combined.includes('दीमक') || combined.includes('deemak') || combined.includes('dimak') ||
@@ -15914,9 +15959,48 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const origQ = (rawQ || '').toLowerCase();
     const combined = q + ' ' + origQ;
 
+    // A. चने में इल्ली / सुंडी / फल छेदक / घांटी इल्ली (Chickpea Pod Borer / Caterpillar / ઈયળોનો ઉપદ્રવ)
+    const isChanaPestOrIlli = (
+      (combined.includes('चना') || combined.includes('चने') || combined.includes('chana') || combined.includes('chane') || combined.includes('gram') || combined.includes('ચણા')) &&
+      (combined.includes('इल्ली') || combined.includes('सुंडी') || combined.includes('लारवा') || combined.includes('कीट') || combined.includes('घाटी') || combined.includes('घटी इल्ली') || combined.includes('घेंटी इल्ली') || combined.includes('पोड बोरर') || combined.includes('caterpillar') || combined.includes('larva') || combined.includes('pod borer') || combined.includes('ઈયળ') || combined.includes('ઈયળો') || combined.includes('उपद्रव'))
+    );
+
+    if (isChanaPestOrIlli) {
+      const title = '🐛 चने में इल्ली व सुंडी (घाटी इल्ली / Pod Borer) का 100% पक्का जैविक व वैज्ञानिक इलाज';
+      const baseBody = `🐛 **चने की फसल में इल्ली (घाटी-इल्ली / Helicoverpa Armigera) का वैज्ञानिक व प्रमाणित समाधान:**\n\nचने में इल्ली फलियों (घाटियों) में छेद करके अंदर का सारा दाना खा जाती है।\n\n⚠️ **विशेष सूचना:** नेट्सर्फ का पुराना उत्पाद **Intact (इनटैक्ट) अब कंपनी द्वारा पूरी तरह बंद कर दिया गया है**। उसकी जगह नया और अत्यधिक शक्तिशाली **बायोफिट लार्विसाइड (Biofit Larvicide)** प्रमाणित है।\n\n🌿 **1. प्रमाणित जैविक उपचार (100% सेफ व प्राकृतिक):**\n• **नेट्सर्फ बायोफिट लार्विसाइड (Biofit Larvicide):** **2 ml प्रति लीटर पानी** (यानी **30 ml प्रति 15 लीटर पंप**)\n• **बायो-99 (सिलिकॉन एक्टिवेटर व स्टिकर):** **5 ml प्रति 15 लीटर पंप**\n👉 **कार्यप्रणाली:** यह इल्ली के पाचन तंत्र और त्वचा पर सीधा वार करता है। छिड़काव के 24 से 48 घंटे के अंदर इल्ली खाना बंद कर देती है और पूरी तरह समाप्त हो जाती है।\n\n🧪 **2. रासायनिक आपात विकल्प (यदि प्रकोप 25% से अधिक हो):**\n• **एमामेक्टिन बेंजोएट 5% SG (Emamectin Benzoate):** **8 से 10 ग्राम प्रति 15 लीटर पंप**\n• अथवा **कोराजन (Chlorantraniliprole 18.5% SC):** **6 ml प्रति 15 लीटर पंप**\n\n⏰ **छिड़काव का सबसे सही समय:** शाम 4 बजे के बाद (इल्ली शाम और रात में बाहर निकलकर खाती है)।\n💡 **सलाह:** खेत में प्रति एकड़ 4 से 5 'टी-आकार' (T-shape) की लकड़ी की खूंटियां लगाएं ताकि पक्षी बैठकर इल्लियों को खा सकें।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌿 बायोफिट लार्विसाइड डोज चार्ट', query: 'बायोफिट लार्विसाइड और बायो 99 का स्प्रे डोज बताओ' },
+        { text: '🌾 चने में अधिक फूल व शाखाएं', query: 'चने में अधिक फूल और फुटाव का फॉर्मूला बताओ' },
+        { text: '💧 चने में पहला पानी कब लगाएं', query: 'चने में पहली सिंचाई कब करें' }
+      ], 'agri', 'chana_illi_pest_control');
+      return true;
+    }
+
+    // B. चने में सिंचाई / पहला पानी नियम (Chickpea Irrigation Master)
+    const isChanaIrrigation = (
+      (combined.includes('चना') || combined.includes('चने') || combined.includes('chana') || combined.includes('chane') || combined.includes('gram') || combined.includes('ચણા')) &&
+      (combined.includes('सिंचाई') || combined.includes('पानी') || combined.includes('पहला पानी') || combined.includes('कब दें') || combined.includes('कब लगाएं') || combined.includes('sinchai') || combined.includes('paani'))
+    );
+
+    if (isChanaIrrigation) {
+      const title = '💧 चने में सिंचाई (पहला पानी) का वैज्ञानिक नियम व फूल झड़ने से बचाव';
+      const baseBody = `💧 **चने की फसल में पहली व दूसरी सिंचाई का सही समय व फूल सुरक्षा नियम:**\n\nचना कम पानी की दलहनी फसल है। अधिक या गलत समय पर पानी देने से उकठा (Wilt) रोग लग जाता है और फूल गिर जाते हैं।\n\n📅 **1. पहली सिंचाई (शाखाएं व फुटाव अवस्था):**\n• बुवाई के **40 से 45 दिन बाद** जब पौधे में शाखाएं फूट रही हों, तब पहली **हल्की सिंचाई (स्प्रिंकलर या हल्की क्यारी)** करें।\n• पहली सिंचाई के समय पानी के साथ **बायोफिट शेत (SHET - 1 लीटर प्रति एकड़)** चलाने से उकठा व जड़ गलन की फंगस 100% रुकती है।\n\n🚫 **2. सबसे महत्वपूर्ण वैज्ञानिक नियम (सख्त निषेध):**\n• **जब चने में 50% से अधिक फूल खिले हों, उस समय खेत में पानी (सिंचाई) बिल्कुल भी न लगाएं!**\n• फूल अवस्था में पानी देने से वानस्पतिक वृद्धि (Vegetative growth) तेज हो जाती है और सारे फूल झड़ जाते हैं।\n\n🌸 **3. दूसरी सिंचाई (घटी में दाना भरते समय):**\n• जब फूल झड़कर छोटी-छोटी फलियां (घाटियां) बन जाएं यानी बुवाई के **65 से 75 दिन बाद**, तब दूसरी हल्की सिंचाई करें। इससे दाने मोटे और चमकदार बनते हैं।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🌾 चने में फुटाव व अधिक फूल', query: 'चने में अधिक फूल और फुटाव का फॉर्मूला बताओ' },
+        { text: '🐛 चने की इल्ली की दवा', query: 'चने की इल्ली का पक्का इलाज बताओ' },
+        { text: '🌿 बायोफिट शेत 1L डिटेल', query: 'बायोफिट शेत 1 लीटर की कीमत और डिस्काउंट' }
+      ], 'agri', 'chana_irrigation_timing');
+      return true;
+    }
+
+    // C. चने में शाखाएं, कल्ले, फूल व घटी (खुटाई व Nipping)
     const isChanaBranching = (
-      (combined.includes('चना') || combined.includes('चने') || combined.includes('chana') || combined.includes('chane') || combined.includes('gram')) &&
-      (combined.includes('शाखा') || combined.includes('फूल') || combined.includes('कल्ले') || combined.includes('फुटाव') || combined.includes('घटी') || combined.includes('बढ़ाने') || combined.includes('स्प्रे') || combined.includes('पैदावार') || combined.includes('इल्ली') || combined.includes('घेंटी'))
+      (combined.includes('चना') || combined.includes('चने') || combined.includes('chana') || combined.includes('chane') || combined.includes('gram') || combined.includes('ચણા')) &&
+      (combined.includes('शाखा') || combined.includes('फूल') || combined.includes('कल्ले') || combined.includes('फुटाव') || combined.includes('घटी') || combined.includes('बढ़ाने') || combined.includes('स्प्रे') || combined.includes('पैदावार') || combined.includes('घेंटी') || combined.includes('खुटाई'))
     );
 
     if (isChanaBranching) {
@@ -15936,6 +16020,55 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   // =========================================================================
+
+  // =========================================================================
+  // 19.145 HIGH-PRECISION DIABETES, SUGAR & METABOLISM MASTER ENGINE
+  // (Prevents fall-through to generic off-topic and gives 100% authentic clinical & diet advice)
+  // =========================================================================
+  function handleDiabetesDietAndMetabolismMasterQueries(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const origQ = (rawQ || '').toLowerCase();
+    const combined = q + ' ' + origQ;
+
+    const isDiabetes = (
+      combined.includes('शुगर') || combined.includes('sugar') || combined.includes('डायबिटीज') ||
+      combined.includes('diabetes') || combined.includes('मधुमेह') || combined.includes('hba1c') ||
+      combined.includes('lifestyle plus') || combined.includes('लाइफ स्टाइल प्लस')
+    );
+
+    if (!isDiabetes) return false;
+
+    // Check if specifically asking for diet chart / what to eat / what to avoid
+    const isDietAsk = combined.includes('डाइट') || combined.includes('diet') || combined.includes('क्या खाएं') ||
+      combined.includes('क्या खाये') || combined.includes('क्या खाना') || combined.includes('परहेज') ||
+      combined.includes('चार्ट') || combined.includes('भोजन') || combined.includes('फल') || combined.includes('रोटी');
+
+    if (isDietAsk) {
+      const title = '🩸 मधुमेह (शुगर) संपूर्ण दैनिक डाइट चार्ट — क्या खाएं, क्या न खाएं व आयुर्वेदिक नियम';
+      const baseBody = `🩸 **मधुमेह (डायबिटीज) का संपूर्ण वैज्ञानिक डाइट चार्ट व दैनिक खानपान नियम:**\n\nडायबिटीज को 80% खानपान और जीवनशैली के अनुशासन से पूरी तरह नियंत्रित रखा जा सकता है।\n\n🥗 **1. क्या खाएं (स्वीकृत अमृत आहार):**\n• **अनाज:** गेहूं के आटे में चना और जौ मिलाकर (मिस्सी रोटी / Multigrain) खाएं। यह खून में शुगर को धीरे-धीरे छोड़ता है (Low Glycemic Index)।\n• **सब्जियां:** मेथी, पालक, बथुआ, करेला, परवल, लौकी, तोरी, खीरा और टमाटर प्रचुर मात्रा में लें।\n• **दालें:** मूंग दाल, चना दाल, अंकुरित मेथी व चना (High Protein & Fiber)।\n• **फल:** जामुन, पपीता, अमरूद, आंवला, संतरा (सीमित मात्रा में)।\n• **मसाले:** दालचीनी, मेथी दाना, हल्दी और जीरा।\n\n🚫 **2. क्या बिल्कुल न खाएं (सख्त परहेज):**\n• सफेद चीनी, गुड़, मिठाई, शहद, मैदा, और सफेद पॉलिश चावल।\n• मीठे फल: चीकू, आम, केला, अंगूर, लीची।\n• आलू, अरबी, शकरकंद (High Starch Root Vegetables)।\n• पैकेटबंद जूस, कोल्ड ड्रिंक्स, तली-भुनी चीजें व रिफाइंड तेल।\n\n⏰ **3. दैनिक दिनचर्या व अवनीश दादा का प्रमाणित नुस्खा:**\n• **सुबह खाली पेट:** रात को 1 चम्मच मेथी दाना 1 गिलास पानी में भिगोएं। सुबह उस पानी को गुनगुना करके पिएं और मेथी चबाकर खाएं।\n• **30 मिनट वॉक:** सुबह या शाम को 30 मिनट तेज गति से टहलने से इंसुलिन संवेदनशीलता तुरंत सुधरती है।\n\n🌿 **4. नेचुरामोर लाइफ स्टाइल प्लस (Naturamore Life Style Plus):**\n• **खुराक:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम भोजन से 30 मिनट पहले गुनगुने पानी से।\n• **घटक:** विजयसार, गुड़मार, जामुन व करेला — यह पैंक्रियाज की बीटा कोशिकाओं को पुनर्जीवित कर प्राकृतिक इंसुलिन स्राव बढ़ाता है।`;
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '🩸 नेचुरामोर लाइफ स्टाइल प्लस 25% छूट', query: 'नेचुरामोर लाइफ स्टाइल प्लस के फायदे और कीमत' },
+        { text: '📋 शुगर लक्षण व HbA1c टेस्ट', query: 'शुगर का लक्षण टेस्ट करो' },
+        { text: '🦴 घुटनों और जोड़ों के दर्द का इलाज', query: 'घुटनों और जोड़ों के दर्द का आयुर्वेदिक इलाज' }
+      ], 'health', 'diabetes_diet_and_lifestyle_chart');
+      return true;
+    }
+
+    // General Diabetes Clinical Overview
+    const title = '🩸 डायबिटीज (शुगर) नियंत्रण — वैज्ञानिक कारण, अवनीश दादा के नुस्खे व लाइफ स्टाइल प्लस';
+    const baseBody = `🩸 **डायबिटीज (शुगर) का वैज्ञानिक लॉजिक, आयुर्वेदिक सुरक्षा व स्थायी नियंत्रण:**\n\nडायबिटीज कोई लाइलाज बीमारी नहीं है। संतुलित खानपान, 30 मिनट की सैर और सही आयुर्वेदिक पोषण से शुगर हमेशा 100% सामान्य रह सकती है।\n\n🧬 **1. शरीर के अंदर का लॉजिक (Why Sugar Increases):**\n• जब हमारा अग्न्याशय (Pancreas) पर्याप्त इंसुलिन नहीं बना पाता या कोशिकाएं इंसुलिन को पहचानना बंद कर देती हैं (Insulin Resistance), तो खून में ग्लूकोज की मात्रा अनियंत्रित होकर बढ़ने लगती है।\n\n⚠️ **2. अनदेखा करने का गंभीर खतरा:**\n• अगर शुगर लगातार 200+ बनी रहे, तो यह सीधे किडनी को खराब (Nephropathy), आँखों का पर्दा जलाकर अंधापन (Retinopathy), और पैरों की नसों को सुन्न कर गैंग्रीन का रूप ले लेती है।\n\n👴 **3. आरोग्यम अवनीश दादा का प्रमाणित नुस्खा:**\n• रात को 1 चम्मच मेथी दाना + 1/4 चम्मच दालचीनी पाउडर 1 गिलास पानी में भिगोकर रखें। सुबह गुनगुना करके छानकर खाली पेट पिएं।\n• जामुन की गुठली का 1 चम्मच चूर्ण सुबह-शाम लेने से बार-बार पेशाब आना और कमजोरी तुरंत बंद होती है।\n\n🌿 **4. नेचुरामोर लाइफ स्टाइल प्लस कैप्सूल (प्रामाणिक ऑर्गन न्यूट्रिशन):**\n• **मुख्य घटक:** विजयसार, गुड़मार, जामुन, नीम, करेला, कुटकी व चिरायता।\n• **सेवन विधि:** 1 कैप्सूल सुबह और 1 कैप्सूल शाम भोजन से 30 मिनट पहले।\n• **लाभ:** यह इंसुलिन रिसेप्टर्स को सक्रिय कर HbA1c स्तर को सुरक्षित सीमा में लाता है।`;
+
+    const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'health');
+    renderCrispSpecialBox(title, finalBody, [
+      { text: '🥗 शुगर का संपूर्ण डाइट चार्ट दिखाओ', query: 'शुगर के मरीज का डाइट चार्ट दिखाओ' },
+      { text: '🩸 लाइफ स्टाइल प्लस 25% छूट', query: 'नेचुरामोर लाइफ स्टाइल प्लस के फायदे और कीमत' },
+      { text: '👴 अवनीश दादा के प्रमाणित नुस्खे', query: 'दादा के नुस्खे बताओ' }
+    ], 'health', 'diabetes_master_intelligence');
+    return true;
+  }
+
   // 19.13 FISHERIES & AQUACULTURE (मछली पालन / মাছ চাষ)
   // =========================================================================
   function handleFisheriesAquacultureQueries(cleanQ, rawQ, directives) {
@@ -16735,6 +16868,7 @@ function processKnowledgeQuery(query) {
     if (handleFruitOrchardMasterQueries(cleanQ, rawQ, directives)) return;
     if (handleWheatWeedAndTermiteMasterQueries(cleanQ, rawQ, directives)) return;
     if (handleChickpeaBranchingAndFloweringQueries(cleanQ, rawQ, directives)) return;
+    if (handleDiabetesDietAndMetabolismMasterQueries(cleanQ, rawQ, directives)) return;
     if (handleFisheriesAquacultureQueries(cleanQ, rawQ, directives)) return;
     if (handleNetsurfBiofitNpkWithCowDungQueries(cleanQ, rawQ, directives)) return;
     if (handleSkinAntiAgeingAndWrinkleQueries(cleanQ, rawQ, directives)) return;
@@ -18297,21 +18431,22 @@ function processKnowledgeQuery(query) {
         consecutiveAmbiguousCount = 0;
         const html = `
         <div style="font-weight:900;color:#166534;font-size:1.02rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-          <i class="fa-solid fa-seedling" style="color:#16a34a;"></i>
-          <span>🌾 आरोग्यम सखी AI — आपका प्रश्न</span>
+          <i class="fa-solid fa-compass" style="color:#16a34a;"></i>
+          <span>🧭 आरोग्यम सखी AI — त्वरित सहायता नेविगेटर</span>
         </div>
         <div style="font-size:0.93rem;line-height:1.65;color:#1e293b;margin-bottom:12px;">
-          मुझे आपके सवाल <b>"${escapeHtml(query)}"</b> का सटीक विवरण इंटरनेट संदर्भों में तुरंत नहीं मिल सका।<br><br>
-          आरोग्यम सखी AI मुख्य रूप से <b>कृषि (फसल सुरक्षा, खाद, मंडी, मौसम), पशुपालन (दुग्ध व फैट), प्राकृतिक स्वास्थ्य (घरेलू नुस्खे, पोषण) और नेट्सर्फ जैविक समाधानों</b> की समर्पित डिजिटल सलाहकार है।
+          नमस्ते साथी! 🙏 आपके प्रश्न <b>"${escapeHtml(query)}"</b> की 100% सटीक वैज्ञानिक सहायता के लिए, कृपया नीचे दिए गए प्रमुख विषयों में से चुनें या थोड़ा स्पष्ट लिखकर पूछें:
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('फसलों का संपूर्ण स्प्रे कैलेंडर')">🌾 फसल सुरक्षा व स्प्रे</button>
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय भैंस का दूध और फैट बढ़ाने का तरीका')">🐄 पशुपालन व डेयरी</button>
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('घरेलू नुस्खे और प्राकृतिक स्वास्थ्य')">🌿 स्वास्थ्य व घरेलू नुस्खे</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मेरी फसल में बीमारी है (crop_triage_step1)')">🌾 फसल 3-चरणीय निदान</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">🌾 गेहूं कल्ले व खाद</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय भैंस का दूध और फैट बढ़ाने का तरीका')">🐄 पशुपालन व दुग्ध फैट</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('शुगर के मरीज का डाइट चार्ट दिखाओ')">🩸 शुगर व डाइट चार्ट</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('घुटनों और जोड़ों के दर्द का आयुर्वेदिक इलाज')">🦴 जोड़ों व घुटनों का दर्द</button>
           <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('नेट्सर्फ 25% छूट और प्लान समझें')">💼 नेट्सर्फ 25% छूट</button>
         </div>
       `;
-        streamBotMessage(html, cleanTextForTTS('यह विषय कृषि या स्वास्थ्य के मुख्य दायरे से अलग है। कृपया खेती, पशुपालन या स्वास्थ्य से जुड़ा सवाल पूछें।'));
+        streamBotMessage(html, cleanTextForTTS('नमस्ते! आपके प्रश्न की सटीक सहायता के लिए कृपया नीचे दिए गए प्रमुख विषयों में से चुनें या स्पष्ट शब्दों में दोबारा पूछें। मैं आपकी पूरी सहायता करूँगी।'));
         return;
       }
 
