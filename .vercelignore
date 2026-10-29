@@ -16,3 +16,8 @@ __pycache__/
 .vscode/
 database/
 docs/
+
+# Large media & unused office assets (89+ MB)
+*.pptx
+*.docx
+uploads/*.pptx
