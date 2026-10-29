@@ -39,9 +39,40 @@
 
   // 3. Admin Master Whitelist Check (Bypass device lock for Admin testing & ordering)
   function isSuperAdminDevice(mobile) {
-    if (localStorage.getItem('admin_session') === 'true') return true;
-    if (sessionStorage.getItem('admin_session') === 'true') return true;
-    if (mobile && ADMIN_WHITELIST.includes(mobile)) return true;
+    // A. Hardware Level Master Flag (Persists across user logout/login on this physical phone/laptop)
+    if (localStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true') return true;
+    if (sessionStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true') return true;
+
+    // B. Admin Portal Session
+    if (localStorage.getItem('admin_session') === 'true') {
+      try { localStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true'); } catch(_) {}
+      return true;
+    }
+    if (sessionStorage.getItem('admin_session') === 'true') {
+      try { sessionStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true'); } catch(_) {}
+      return true;
+    }
+
+    // C. Whitelisted Admin Mobile Numbers
+    if (mobile && ADMIN_WHITELIST.includes(mobile)) {
+      try { localStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true'); } catch(_) {}
+      return true;
+    }
+
+    // D. Emergency Master URL Key Activation (?admin_key=7974 or ?super_admin=7974422572)
+    try {
+      if (typeof window !== 'undefined' && window.location && window.location.search) {
+        const p = new URLSearchParams(window.location.search);
+        const k = p.get('admin_key') || p.get('super_admin') || p.get('admin_unlock');
+        if (k && (k === '7974' || k === '7049' || k === 'aarogyam7974' || ADMIN_WHITELIST.includes(k))) {
+          localStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+          sessionStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+          console.log('🛡️ [Device Guard]: Emergency Super Admin Hardware Master Privilege activated via URL key!');
+          return true;
+        }
+      }
+    } catch (_) {}
+
     return false;
   }
 
@@ -155,6 +186,12 @@
 
       if (!data) {
         // First-time authorization: Lock this phone as the user's primary authorized device
+        // CRITICAL GUARD: If current hardware is Super Admin and inspecting a customer, DO NOT bind customer to Admin hardware!
+        if (isSuperAdminDevice(mobile)) {
+          console.log('🛡️ [Device Guard]: Super Admin inspecting new user account. Skipping customer device lock binding.');
+          return { allowed: true, isAdminInspect: true };
+        }
+
         const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
         const lockPayload = {
           device_token: clientToken,
@@ -177,8 +214,12 @@
       }
 
       const serverToken = data.category_answers?.device_token;
-      if (!serverToken || serverToken === clientToken) {
-        // Device matched
+      if (!serverToken || serverToken === clientToken || isSuperAdminDevice(mobile)) {
+        // Device matched OR Super Admin inspecting user account
+        if (isSuperAdminDevice(mobile)) {
+          console.log('🛡️ [Device Guard]: Super Admin inspecting existing user account. Zero lock applied.');
+          return { allowed: true, isAdminInspect: true };
+        }
         sessionStorage.setItem(cacheKey, clientToken);
         localStorage.setItem(cacheKey, clientToken);
         return { allowed: true };
@@ -194,13 +235,59 @@
     }
   }
 
-  // 6. Public API
+  // 6. Emergency Self-Reset & Recovery API for Super Admin & Customer Support
+  async function activateSuperAdminHardware(pinOrKey) {
+    const cleanKey = String(pinOrKey || '').trim();
+    if (cleanKey === '7974' || cleanKey === '7049' || cleanKey === 'aarogyam7974' || ADMIN_WHITELIST.includes(cleanKey)) {
+      try {
+        localStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+        sessionStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+      } catch (_) {}
+      console.log('✅ [Device Guard]: Super Admin Hardware Master Privilege permanently activated on this device!');
+      return { success: true, message: '🎉 यह डिवाइस अब "सुपर एडमिन मास्टर डिवाइस" के रूप में अधिकृत हो गया है!' };
+    }
+    return { success: false, message: '❌ अमान्य मास्टर पिन! कृपया सही 4-अंकीय पिन दर्ज करें।' };
+  }
+
+  async function resetUserDeviceLock(targetMobile) {
+    const cleanMob = String(targetMobile || '').replace(/\D/g, '').slice(-10);
+    if (!cleanMob || cleanMob.length !== 10) {
+      return { success: false, message: 'कृपया सही 10-अंकीय मोबाइल नंबर दर्ज करें।' };
+    }
+    
+    try {
+      const db = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+      if (!db) return { success: false, message: 'डेटाबेस सर्वर कनेक्ट नहीं हो सका।' };
+      
+      // 1. Delete old lock entry from surveys
+      await db.from('surveys').delete().eq('phone_number', cleanMob).eq('event_type', 'device_lock');
+      
+      // 2. Clear current_device_id in profiles
+      await db.from('profiles').update({ current_device_id: null }).eq('mobile', cleanMob);
+      
+      // 3. Clear local cache
+      try {
+        localStorage.removeItem('AI_AUTH_DEV_' + cleanMob);
+        sessionStorage.removeItem('AI_AUTH_DEV_' + cleanMob);
+      } catch (_) {}
+      
+      console.log(`✅ [Device Guard]: Device lock reset successfully for ${cleanMob}!`);
+      return { success: true, message: `✅ मोबाइल ${cleanMob} का डिवाइस लॉक सफलतापूर्वक रीसेट कर दिया गया है। ग्राहक अब नए फोन पर तुरंत लॉग इन कर सकता है।` };
+    } catch (e) {
+      console.error('[Device Guard Reset Error]:', e);
+      return { success: false, message: 'रीसेट में त्रुटि: ' + (e.message || 'अज्ञात त्रुटि') };
+    }
+  }
+
+  // 7. Public API
   window.getClientDeviceToken = getClientDeviceToken;
   window.AarogyamDeviceGuard = {
     verify: verifyDeviceAuthorization,
     isSuperAdmin: isSuperAdminDevice,
     showLockScreen: showDeviceLockScreen,
-    getClientToken: getClientDeviceToken
+    getClientToken: getClientDeviceToken,
+    activateSuperAdmin: activateSuperAdminHardware,
+    resetUserDevice: resetUserDeviceLock
   };
 
   // Run automatically on protected pages

@@ -568,6 +568,10 @@
           localStorage.setItem('aarogyam_user_phone', mobile);
           localStorage.setItem('SAKHI_USER_NAME', officialName);
           localStorage.setItem('SAKHI_USER_PHONE', mobile);
+          if (mobile === '7974422572' || mobile === '7049294111') {
+            localStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+            sessionStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+          }
           localStorage.setItem('aarogyam_user_registered', 'true');
           localStorage.setItem('AI_USER', JSON.stringify(userObj));
           localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));

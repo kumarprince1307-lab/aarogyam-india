@@ -39,6 +39,30 @@ export async function initSakhiAiHub() {
       </div>
     </div>
 
+    <!-- Super Admin Hardware Master Privilege & Customer Device Reset Panel -->
+    <div class="admin-card" style="padding:16px 20px;margin-bottom:20px;border-radius:12px;background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);border:1.5px solid #3b82f6;box-shadow:0 4px 15px rgba(59,130,246,0.15);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.6rem;">🛡️</span>
+          <div>
+            <div style="font-weight:800;color:#f8fafc;font-size:1rem;">सुपर एडमिन हार्डवेयर प्रिविलेज व डिवाइस रीसेट सेंटर</div>
+            <div style="font-size:0.82rem;color:#94a3b8;margin-top:2px;" id="sakhiAdminHardwareStatusText">स्थिति जांची जा रही है...</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="admin-btn" id="sakhiToggleMasterHardwareBtn" onclick="window.handleSakhiHardwareMasterToggle()" style="background:#2563eb;color:#fff;font-weight:700;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;">
+            <span>💻</span> <span>इस लैपटॉप/फोन को "मास्टर डिवाइस" बनाएं</span>
+          </button>
+          <div style="display:inline-flex;align-items:center;background:#0f172a;border:1px solid #475569;border-radius:8px;padding:2px 6px;">
+            <input type="tel" id="sakhiCustomerResetMobileInput" placeholder="ग्राहक मोबाइल (10 अंक)" maxlength="10" style="background:transparent;border:none;color:#f8fafc;padding:6px 8px;font-size:0.85rem;outline:none;width:150px;">
+            <button type="button" onclick="window.handleSakhiCustomerDeviceReset()" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.82rem;font-weight:700;cursor:pointer;">
+              <span>🔄 डिवाइस रीसेट</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 4 Live Clickable & Interactive KPI Cards -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
       
@@ -1811,6 +1835,7 @@ function openSakhiIntentModal(prefillTitle = '', prefillDomain = 'agri') {
 
   modal.style.display = 'flex';
   setTimeout(() => {
+    updateAdminHardwareUI();
     if (answerEl) answerEl.focus();
   }, 200);
 }
@@ -3642,3 +3667,64 @@ window.exportTeamLeadsCsv = function() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 };
+
+// =========================================================================
+// SUPER ADMIN HARDWARE PRIVILEGE & CUSTOMER DEVICE RESET CONTROLLERS
+// =========================================================================
+window.handleSakhiHardwareMasterToggle = async function() {
+  const isNow = localStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true';
+  if (isNow) {
+    if (confirm('यह डिवाइस पहले से ही "सुपर एडमिन मास्टर डिवाइस" है। क्या आप इसे सामान्य बनाना चाहते हैं?')) {
+      localStorage.removeItem('AAROGYAM_SUPERADMIN_HARDWARE');
+      sessionStorage.removeItem('AAROGYAM_SUPERADMIN_HARDWARE');
+      alert('सुपर एडमिन हार्डवेयर स्थिति हटा दी गई है।');
+      updateAdminHardwareUI();
+    }
+  } else {
+    if (window.AarogyamDeviceGuard && typeof window.AarogyamDeviceGuard.activateSuperAdmin === 'function') {
+      const res = await window.AarogyamDeviceGuard.activateSuperAdmin('7974');
+      alert(res.message);
+      updateAdminHardwareUI();
+    } else {
+      localStorage.setItem('AAROGYAM_SUPERADMIN_HARDWARE', 'true');
+      alert('🎉 यह डिवाइस अब सुपर एडमिन मास्टर डिवाइस बन गया है!');
+      updateAdminHardwareUI();
+    }
+  }
+};
+
+window.handleSakhiCustomerDeviceReset = async function() {
+  const input = document.getElementById('sakhiCustomerResetMobileInput');
+  const mob = (input?.value || '').trim();
+  if (!mob || mob.length !== 10) {
+    alert('कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें!');
+    return;
+  }
+  if (!confirm('क्या आप सच में मोबाइल ' + mob + ' का डिवाइस लॉक रीसेट करना चाहते हैं?\n(इससे ग्राहक नए फोन पर तुरंत लॉग इन कर सकेगा)')) {
+    return;
+  }
+  if (window.AarogyamDeviceGuard && typeof window.AarogyamDeviceGuard.resetUserDevice === 'function') {
+    const res = await window.AarogyamDeviceGuard.resetUserDevice(mob);
+    alert(res.message);
+    if (input) input.value = '';
+  } else {
+    alert('डिवाइस गार्ड लोड नहीं हुआ है। कृपया पेज रिफ्रेश करें।');
+  }
+};
+
+function updateAdminHardwareUI() {
+  const statusEl = document.getElementById('sakhiAdminHardwareStatusText');
+  const btnEl = document.getElementById('sakhiToggleMasterHardwareBtn');
+  const isMaster = localStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true' || localStorage.getItem('admin_session') === 'true';
+  if (statusEl) {
+    statusEl.innerHTML = isMaster 
+      ? '<span style="color:#4ade80;font-weight:700;">🟢 सक्रिय: यह डिवाइस "सुपर एडमिन मास्टर" है (Zero Lock • बिना कोटा कटे असीमित टेस्टिंग)</span>'
+      : '<span style="color:#f87171;">🔴 सामान्य मोड: डिवाइस लॉक सक्रिय है। मास्टर मोड चालू करने के लिए बटन दबाएं।</span>';
+  }
+  if (btnEl) {
+    btnEl.innerHTML = isMaster 
+      ? '<span>✅ मास्टर मोड सक्रिय</span>'
+      : '<span>💻 इस लैपटॉप को मास्टर बनाएं</span>';
+    btnEl.style.background = isMaster ? '#059669' : '#2563eb';
+  }
+}

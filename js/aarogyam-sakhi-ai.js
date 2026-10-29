@@ -835,6 +835,18 @@ if (typeof document !== 'undefined') {
   // =========================================================================
   const SakhiQuotaEngine = {
     ADMIN_PHONE: '7974422572',
+    ADMIN_PHONES: ['7974422572', '7049294111'],
+
+    isSuperAdmin: function (phone) {
+      try {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true') return true;
+        if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true') return true;
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('admin_session') === 'true') return true;
+        const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+        if (p && this.ADMIN_PHONES.includes(p)) return true;
+      } catch (_) {}
+      return false;
+    },
 
     getDefaultLimits: function () {
       let inactiveLimits = { images: 5, chats: 50 };
@@ -854,7 +866,7 @@ if (typeof document !== 'undefined') {
 
     getUserTier: function (phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
-      if (p === this.ADMIN_PHONE) return 'admin';
+      if (this.isSuperAdmin(p)) return 'admin';
       return isUserActiveTier(p) ? 'active' : 'inactive';
     },
 
@@ -911,6 +923,7 @@ if (typeof document !== 'undefined') {
 
     getUserUsage: function (phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'anonymous';
+      if (this.isSuperAdmin(p)) return { images: 0, chats: 0 };
       const today = this.getTodayKey();
       const userKey = `sakhi_usage_${p}_${today}`;
       const devId = this.getDeviceId();
@@ -950,7 +963,7 @@ if (typeof document !== 'undefined') {
 
     getUserLimits: function (phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
-      if (p === this.ADMIN_PHONE) {
+      if (this.isSuperAdmin(p)) {
         return { images: Infinity, chats: Infinity, isUnlimited: true };
       }
       const custom = this.getUserCustomQuota(p);
@@ -977,7 +990,7 @@ if (typeof document !== 'undefined') {
 
     getRemainingCredits: function (phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
-      if (p === this.ADMIN_PHONE) {
+      if (this.isSuperAdmin(p)) {
         return { imagesRemaining: 'असीमित (∞)', chatsRemaining: 'असीमित (∞)', isUnlimited: true, tier: 'admin' };
       }
       const limits = this.getUserLimits(p);
@@ -1001,7 +1014,7 @@ if (typeof document !== 'undefined') {
 
     checkQuota: function (type, phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
-      if (p === this.ADMIN_PHONE) return { allowed: true, isUnlimited: true };
+      if (this.isSuperAdmin(p)) return { allowed: true, isUnlimited: true };
 
       const limits = this.getUserLimits(p);
       if (limits.blocked) {
@@ -1036,6 +1049,7 @@ if (typeof document !== 'undefined') {
 
     incrementUsage: function (type, phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '') || 'anonymous';
+      if (this.isSuperAdmin(p)) return { images: 0, chats: 0 };
       const today = this.getTodayKey();
       const userKey = `sakhi_usage_${p}_${today}`;
       const devId = this.getDeviceId();
@@ -4375,6 +4389,13 @@ if (typeof document !== 'undefined') {
           synthesizeDynamicAnswer(cleanNormQ, 'omni');
         }
       }, 700);
+    }
+
+    // 🌾 Universal High-Precision Crop Mention Guard: Never let 'रचना' or 'सूचना' trigger Chana!
+    function hasChanaCropMention(text) {
+      if (!text || typeof text !== 'string') return false;
+      const cleaned = text.replace(/(?:रचना|सूचना|याचना|बचना|खींचना|पहुंचाना|रोचना|सोचना)/g, ' ');
+      return /(?:^|[^\u0900-\u097Fa-zA-Z0-9])(?:चना|चने|चनों|chana|chane|gram)(?:[^\u0900-\u097Fa-zA-Z0-9]|$)/i.test(cleaned);
     }
 
     // 13. HIGH-PRECISION QUERY NORMALIZER
@@ -9941,6 +9962,10 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
         isBinaryMatching ||
         (isPlanKeyword && (hasNetsurfExplicit || inNetsurfSession || q.includes('direct selling') || q.includes('network') || q.includes('mlm'))) ||
         (inNetsurfSession && isTwistWord) ||
+        ((q.includes('दुकान') || q.includes('dukan')) && (q.includes('स्टॉक') || q.includes('stock'))) ||
+        ((q.includes('जुड़') || q.includes('judne')) && (q.includes('पैसा') || q.includes('खर्च') || q.includes('kitna'))) ||
+        (q.includes('कोई न जुड़े') || q.includes('koi na jude') || q.includes('बिना टीम')) ||
+        (q.includes('टारगेट') && (q.includes('आईडी') || q.includes('महीने'))) ||
         (inNetsurfSession && (q.includes('aur batao') || q.includes('aur jankari') || q.includes('kaise join') || q.includes('aur kya') || q.includes('iske bare me')))
       );
 
@@ -10275,6 +10300,16 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       // -------------------------------------------------------------------------
       // TWIST 1 TO 9: COMMON OBJECTIONS & CONVERSATIONAL ANSWERS FROM PART 2
       // -------------------------------------------------------------------------
+      const isTrustFraudQuery = (q.includes('dhokha') || q.includes('धोखा') || q.includes('fraud') || q.includes('farzi') || q.includes('legal') || q.includes('लीगल') || q.includes('bhaag') || q.includes('सुरक्षित') || q.includes('कंपनी भागेगी'));
+      const isJoiningFeeQuery = (q.includes('kitna paisa') || q.includes('kitna lagta') || q.includes('joining fee') || q.includes('जुड़ने') || q.includes('खर्च लगता') || q.includes('कितना पैसा') || q.includes('जुड़ने का खर्च'));
+      const isShopStockQuery = (q.includes('dukan') || q.includes('दुकान') || q.includes('stock') || q.includes('स्टॉक') || q.includes('गोदाम') || q.includes('माल भरना'));
+      const isTargetLapseQuery = (q.includes('target') || q.includes('टारगेट') || q.includes('lapse') || q.includes('लैप्स') || q.includes('आईडी बंद'));
+      const isPayoutMethodQuery = (q.includes('payout') || q.includes('पेआउट') || q.includes('khate me') || q.includes('खाते में') || q.includes('bank transfer') || q.includes('पैसा कब आता'));
+      const isNoTeamQuery = (q.includes('koi na jude') || q.includes('कोई न जुड़े') || q.includes('bina team') || q.includes('बिना टीम') || q.includes('अकेले'));
+      const isWhatWorkQuery = (q.includes('karna kya') || q.includes('kya kaam') || q.includes('क्या काम') || q.includes('करना पड़ेगा') || q.includes('मेरा काम क्या'));
+      const isQualificationQuery = (q.includes('padhai') || q.includes('qualification') || q.includes('डिग्री') || q.includes('anpadh') || q.includes('पढ़ाई') || q.includes('योग्यता'));
+      const isProductsRangeQuery = (q.includes('range') || q.includes('kaunse product') || q.includes('कौन से प्रोडक्ट') || q.includes('category') || q.includes('उत्पाद श्रेणी'));
+
       if (isTrustFraudQuery) {
         const resp = `🛡️ **सुरक्षा व भरोसा: नेटसर्फ की वास्तविकता व 100% लीगल स्टेटस:**
 
@@ -11768,7 +11803,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       // =========================================================================
       const hasAgriKw = (
         q.includes('gehu') || q.includes('गेहूं') || q.includes('sarso') || q.includes('सरसों') ||
-        q.includes('chana') || q.includes('चना') || q.includes('dhan') || q.includes('धान') ||
+        hasChanaCropMention(q) || q.includes('dhan') || q.includes('धान') ||
         q.includes('tamatar') || q.includes('टमाटर') || q.includes('mirch') || q.includes('मिर्च') ||
         q.includes('ganna') || q.includes('गन्ना') || q.includes('fasal') || q.includes('फसल') ||
         q.includes('kheti') || q.includes('खेती') || q.includes('khad') || q.includes('खाद') ||
@@ -13514,19 +13549,25 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
       // 1. Exact canonical question match or high-score inclusion
       for (const item of qaBank) {
-        const qLower = item.question.toLowerCase().trim();
-        if (q === qLower || raw === qLower || q.includes(qLower) || raw.includes(qLower)) {
+        const itemQ = item.question || (item.questions && item.questions[0]) || item.title || '';
+        const qLower = itemQ.toLowerCase().trim();
+        if (qLower && (q === qLower || raw === qLower || q.includes(qLower) || raw.includes(qLower))) {
           renderMaster200QABox(item);
           return true;
         }
       }
 
-      // 2. High-precision keyword matching
+      // 2. High-precision keyword matching with Devanagari word boundary protection
+      // (Protects against 'रचना' triggering 'चना', '200' triggering '206', etc.)
       for (const item of qaBank) {
         if (item.keywords && Array.isArray(item.keywords)) {
           for (const kw of item.keywords) {
-            const kwLower = kw.toLowerCase().trim();
-            if (kwLower && (q.includes(kwLower) || raw.includes(kwLower))) {
+            const kwLower = (kw || '').toLowerCase().trim();
+            if (!kwLower) continue;
+
+            // Safe Devanagari Word Boundary Test
+            const kwRegex = new RegExp('(?:^|[^\\u0900-\\u097Fa-zA-Z0-9])' + kwLower.replace(/[.*+?^$\\{}()|[\]\\]/g, '\\$&') + '(?:[^\\u0900-\\u097Fa-zA-Z0-9]|$)', 'i');
+            if (kwRegex.test(q) || kwRegex.test(raw)) {
               renderMaster200QABox(item);
               return true;
             }
@@ -14269,7 +14310,18 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       let checklistContent = '';
       let shareWaText = '';
 
-      if (isSarso) {
+      const isExplicitHealthChecklist = (
+        cleanQ.includes('sugar') || cleanQ.includes('शुगर') || cleanQ.includes('डायबिटीज') || cleanQ.includes('diabetes') ||
+        cleanQ.includes('health') || cleanQ.includes('स्वास्थ्य') || cleanQ.includes('डाइट') || cleanQ.includes('diet') ||
+        cleanQ.includes('bp') || cleanQ.includes('बीपी') || cleanQ.includes('नेचुरामोर') || cleanQ.includes('naturamore') ||
+        cleanQ.includes('घुटने') || cleanQ.includes('जोड़ों') || cleanQ.includes('joint')
+      );
+
+      if (isExplicitHealthChecklist) {
+        categoryTitle = '🩺 दैनिक स्वास्थ्य, डायबिटीज व जोड़ दर्द केयर चेकलिस्ट';
+        checklistContent = `📋 **दैनिक स्वास्थ्य व नेचुरामोर संपूर्ण रूटीन चेकलिस्ट:**\n👤 **नाम:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **सुबह (7:00 AM - 9:00 AM):**\n  [ ] 1 गिलास गुनगुना पानी (मेथी/तांबा जल) घूंट-घूंट करके पिया?\n  [ ] 1 चम्मच नेचुरामोर (Daily Nutrition) गुनगुने पानी या दूध के साथ नाश्ते के बाद लिया?\n  [ ] 20-30 मिनट ताजी हवा में तेज चाल (Morning Walk) पूरी की?\n\n☑️ **दोपहर (1:00 PM - 2:00 PM):**\n  [ ] भोजन से पहले 1 पूरी प्लेट हरी कच्ची सलाद (खीरा, ककड़ी, टमाटर) खाई?\n  [ ] भारी तेल-मसाले व चीनी/मैदे से परहेज रखा?\n\n☑️ **शाम व रात (7:00 PM - 10:00 PM):**\n  [ ] शाम 5 बजे भुने चने या दालचीनी चाय ली?\n  [ ] रात का भोजन हल्का व 8 बजे से पहले समाप्त किया?\n  [ ] सोने से पहले अपनी निर्धारित सप्लीमेंट (लाइफ स्टाइल प्लस / जॉइंट केयर) ली?\n  [ ] रात को 7-8 घंटे की गहरी शांत नींद सुनिश्चित की?`;
+        shareWaText = `🩺 *दैनिक स्वास्थ्य व पोषण चेकलिस्ट*\nनाम: ${userName}\n1. सुबह: गुनगुना पानी + नेचुरामोर पोषण + मॉर्निंग वॉक\n2. दोपहर: भोजन से पहले सलाद + मल्टीग्रेन रोटी\n3. रात: हल्का भोजन + समय पर नींद\n👉 स्वास्थ्य सलाह सखी AI: https://aarogyamindia.online/aarogyam-sakhi.html`;
+      } else if (isSarso) {
         categoryTitle = '🌾 सरसों फसल 100% बंपर पैदावार व सुरक्षा चेकलिस्ट';
         checklistContent = `📋 **सरसों फसल 3-चरण स्मार्ट चेकलिस्ट:**\n👤 **किसान साथी:** ${userName} | 📅 **दिनांक:** ${new Date().toLocaleDateString('hi-IN')}\n\n☑️ **चरण 1: बुवाई व बीज संस्कार (शुरुआती 0 दिन)**\n  [ ] 1 किलो बीज में 5ml स्टिमरिच + 10ml शेत (SHET) का लेप लगाकर छाया में 4 घंटे सुखाया?\n  [ ] जमीन की तैयारी में 1 लीटर शेत प्रति एकड़ पानी के साथ दिया?\n\n☑️ **चरण 2: पहला स्प्रे (25 से 30 दिन - कल्ले फुटाव अवस्था)**\n  [ ] स्टिमरिच (30ml) + बायो-99 (5ml) प्रति 15 लीटर पंप घोल तैयार किया?\n  [ ] सुबह 10 बजे से पूर्व या दोपहर 3 बजे बाद शांत मौसम में छिड़काव पूरा किया?\n\n☑️ **चरण 3: फूल व दाना भराव (माहू व झुलसा सुरक्षा)**\n  [ ] माहू (चेपा) की रोकथाम हेतु इंटैक्ट (30ml) + बायो-99 (5ml) का स्प्रे किया?\n  [ ] तना गलन व फंगस सुरक्षा हेतु रैप-अप (30ml) मिलाया?`;
         shareWaText = `🌾 *सरसों फसल 3-चरण स्मार्ट चेकलिस्ट*\nकिसान साथी: ${userName}\n1. बीज संस्कार: स्टिमरिच + शेत (छाया में सुखाएं)\n2. 25 दिन पर: स्टिमरिच + बायो-99 (15-20 कल्ले)\n3. फूल अवस्था: इंटैक्ट + रैप-अप (माहू व झुलसा मुक्ति)\n👉 सखी AI से पूछें: https://aarogyamindia.online/aarogyam-sakhi.html`;
@@ -16330,7 +16382,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       );
 
       const hasFatMention = (
-        combined.includes('फैट') || combined.includes('fat') || combined.includes('फेंट') ||
+        combined.includes('फैट') || combined.includes('fat') || combined.includes('फेंट') || combined.includes('वसा') ||
         combined.includes('मलाई') || combined.includes('गाढ़ा') || combined.includes('लेवा') || combined.includes('अयन')
       );
 
@@ -18910,6 +18962,26 @@ ${shareUrl}`;
 
     window._sakhiCoreExecuteSuggestion = executeSakhiSuggestion;
     window.sendSakhiSuggestion = executeSakhiSuggestion;
+
+    // 🌐 SAKHI DIRECT INTENT & CHIP ROUTER (Permanent Collision-Free Dispatch)
+    window.sendSakhiDirectIntent = function (btnOrEl) {
+      if (!btnOrEl) return;
+      const query = btnOrEl.getAttribute('data-query') || btnOrEl.innerText.replace(/[→✨🌾📋📲📖✓✔]/g, '').trim();
+      const domain = btnOrEl.getAttribute('data-domain');
+      const intent = btnOrEl.getAttribute('data-intent');
+
+      if (domain && typeof sakhiConversationState !== 'undefined' && sakhiConversationState) {
+        sakhiConversationState.lastActiveDomain = domain;
+      }
+      if (intent && typeof sakhiConversationState !== 'undefined' && sakhiConversationState) {
+        sakhiConversationState.lastActiveIntent = intent;
+      }
+
+      if (typeof window.sendSakhiSuggestion === 'function') {
+        window.sendSakhiSuggestion(query);
+      }
+    };
+
     window.askSakhiQuick = executeSakhiSuggestion;
 
     window.processKnowledgeQuery = processKnowledgeQuery;
