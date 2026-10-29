@@ -1439,6 +1439,16 @@
       if (e) e.preventDefault();
       window.location.href = '/aarogyam-sakhi.html';
     };
+    pill.style.position = 'fixed';
+    pill.style.setProperty('top', '76px', 'important');
+    pill.style.setProperty('left', '14px', 'important');
+    pill.style.setProperty('bottom', 'auto', 'important');
+    pill.style.setProperty('right', 'auto', 'important');
+    pill.style.setProperty('z-index', '999999', 'important');
+    if (window.innerWidth <= 768) {
+      pill.style.setProperty('top', '72px', 'important');
+      pill.style.setProperty('left', '12px', 'important');
+    }
 
     if (document.body) {
       document.body.appendChild(pill);
@@ -1470,7 +1480,7 @@
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '/css/aarogyam-sakhi-ai.css?v=20261015_v125';
+      link.href = '/css/aarogyam-sakhi-ai.css?v=20261029_v15';
       document.head.appendChild(link);
     }
 

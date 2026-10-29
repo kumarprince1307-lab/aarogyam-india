@@ -2013,11 +2013,11 @@ body.pf-body {
 
   /* 7. Sakhi AI Floating Pill: Fixed to Bottom-Left (Never Covers Header or Content) */
   .sakhi-floating-pill {
-    top: auto !important;
-    bottom: 74px !important;
-    left: 10px !important;
+    top: 72px !important;
+    bottom: auto !important;
+    left: 12px !important;
     right: auto !important;
-    z-index: 9999 !important;
+    z-index: 999999 !important;
   }
 }
 

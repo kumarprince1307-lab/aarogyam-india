@@ -1339,18 +1339,19 @@ body {
 
 /* 10. Sakhi Floating Pill: Clean Bottom-Right Positioning (Never Overlaps Top Header / Audio Bar) */
 .sakhi-floating-pill {
-  bottom: 84px !important;
-  top: auto !important;
-  right: 18px !important;
-  left: auto !important;
+  position: fixed !important;
+  top: 76px !important;
+  left: 14px !important;
+  bottom: auto !important;
+  right: auto !important;
   z-index: 999999 !important;
 }
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    bottom: 78px !important;
-    top: auto !important;
-    right: 12px !important;
-    left: auto !important;
+    top: 72px !important;
+    left: 12px !important;
+    bottom: auto !important;
+    right: auto !important;
     z-index: 999999 !important;
   }
 }
