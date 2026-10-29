@@ -1,6 +1,28 @@
 {
   "recordings": [
     {
+      "id": "VID_S974645",
+      "format": "short_reel",
+      "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
+      "title": "​किसानों के लिए बुरी खबर या सबसे बड़ा वरदान? 💥 Naya ProStim ₹1450 Launch!",
+      "description": "जब कड़कती धूप, सूखा और ठंड फसलों को बर्बाद करने पर तुली थी, तब हुआ कृषि जगत का सबसे बड़ा धमाका! Stimrich का युग खत्म या फिर आया है फसल का असली ‘सुपरहीरो’?",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/jC_6pz1EsEM?si=-B01ze8HBT837wu5",
+      "youtube_url": "https://youtube.com/shorts/jC_6pz1EsEM?si=-B01ze8HBT837wu5",
+      "youtube_id": "jC_6pz1EsEM",
+      "thumbnail": "https://img.youtube.com/vi/jC_6pz1EsEM/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 10,
+      "order_type": "normal",
+      "status": "active",
+      "created_at": "2026-10-29T06:06:14.645Z"
+    },
+    {
       "id": "VID_S706483",
       "format": "short_reel",
       "platform": "youtube",
