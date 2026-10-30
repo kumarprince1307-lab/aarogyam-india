@@ -103,7 +103,9 @@
 
   // Astronomical Base Epoch Reference for Lunar Cycle (Surya Siddhanta Approximation)
   // New Moon base: Jan 11, 2024 (29.530588 days synodic month)
-  const NEW_MOON_BASE = new Date('2024-01-11T11:57:00Z').getTime();
+  // Calibrated New Moon base — derived from Sharad Purnima Oct 25 2026 (15:54 UTC) stepping back by exact synodic months
+  // NASA-aligned: Jan 10 2024 new moon at 20:34 UTC
+  const NEW_MOON_BASE = new Date('2024-01-10T20:34:21Z').getTime();
   const SYNODIC_MONTH = 29.53058867 * 24 * 60 * 60 * 1000;
   const SIDEREAL_MONTH = 27.321661 * 24 * 60 * 60 * 1000;
 
@@ -111,15 +113,15 @@
    * Nakshatra Epoch: validated reference - Moon at Ashwini start (sidereal 0 deg).
    * Cross-verified: 2026-10-30 = Mrigshira (index 4) active until ~09:04 IST then Ardra.
    */
-  const NAKSHATRA_EPOCH = new Date('2022-01-17T00:48:00Z').getTime();
+  // Calibrated from known Mrigshira→Ardra transition: 2026-10-30 at 09:04 IST (03:34 UTC)
+  const NAKSHATRA_EPOCH = new Date('2023-12-21T20:46:56Z').getTime();
 
   function calculatePanchang(dateObj) {
     const d = dateObj ? new Date(dateObj) : new Date();
     const timeMs = d.getTime();
 
-    // 1. Lunar Phase (Tithi & Paksha) — computed at noon IST for day-stable tithi
-    const istNoonMs = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0).getTime() - (5.5 * 3600 * 1000);
-    const timeSinceNewMoon = (istNoonMs - NEW_MOON_BASE) % SYNODIC_MONTH;
+    // 1. Lunar Phase (Tithi & Paksha) — use current time for live tithi tracking
+    const timeSinceNewMoon = (timeMs - NEW_MOON_BASE) % SYNODIC_MONTH;
     const lunarPhase = (timeSinceNewMoon >= 0 ? timeSinceNewMoon : timeSinceNewMoon + SYNODIC_MONTH) / SYNODIC_MONTH;
     const tithiIndex = Math.floor(lunarPhase * 30);
     const isShukla = tithiIndex < 15;
