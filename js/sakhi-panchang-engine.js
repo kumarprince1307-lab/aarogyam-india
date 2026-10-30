@@ -144,11 +144,16 @@
     const dayOfWeek = d.getDay();
     const rahuKaal = RAHU_KAAL[dayOfWeek];
 
-    // 5. Sunrise & Sunset (IST standard central India approximation)
-    const sunriseStr = "06:18 AM";
-    const sunsetStr = "06:05 PM";
-    const abhijitMuhurat = dayOfWeek === 3 ? "बुधवार को अभिजीत वर्जित" : "11:44 AM - 12:32 PM (अत्यंत शुभ)";
-
+    // 5. Sunrise & Sunset — seasonal approximation for central India (IST, ~22N lat)
+    // Monthly averages: Jan=07:12, Feb=06:58, Mar=06:33, Apr=06:07, May=05:50, Jun=05:45
+    //                   Jul=05:55, Aug=06:06, Sep=06:15, Oct=06:35, Nov=06:50, Dec=07:08
+    const SUNRISE_BY_MONTH = ["07:12 AM","06:58 AM","06:33 AM","06:07 AM","05:50 AM","05:45 AM","05:55 AM","06:06 AM","06:15 AM","06:35 AM","06:50 AM","07:08 AM"];
+    const SUNSET_BY_MONTH  = ["05:48 PM","06:04 PM","06:17 PM","06:31 PM","06:45 PM","07:00 PM","07:05 PM","06:55 PM","06:30 PM","06:05 PM","05:38 PM","05:30 PM"];
+    const ABHIJIT_BY_MONTH = ["11:29 AM - 12:12 PM","11:28 AM - 12:11 PM","11:24 AM - 12:08 PM","11:18 AM - 12:01 PM","11:17 AM - 12:00 PM","11:22 AM - 12:05 PM","11:30 AM - 12:13 PM","11:30 AM - 12:13 PM","11:23 AM - 12:06 PM","11:26 AM - 12:09 PM","11:27 AM - 12:10 PM","11:29 AM - 12:12 PM"];
+    const mIdx = d.getMonth(); // 0-11
+    const sunriseStr = SUNRISE_BY_MONTH[mIdx];
+    const sunsetStr  = SUNSET_BY_MONTH[mIdx];
+    const abhijitMuhurat = dayOfWeek === 3 ? "बुधवार को अभिजीत वर्जित" : (ABHIJIT_BY_MONTH[mIdx] + " (अत्यंत शुभ)");
     // 6. Day & Night Choghadiya
     const dayChoghadiyaNames = CHOGHADIYA_ORDER.day[dayOfWeek];
     const nightChoghadiyaNames = CHOGHADIYA_ORDER.night[dayOfWeek];
