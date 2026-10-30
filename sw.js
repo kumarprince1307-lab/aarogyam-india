@@ -1,4 +1,4 @@
-/* Aarogyam India - Universal High-Performance Service Worker (PWA Builder 100% Compliant)
+﻿/* Aarogyam India - Universal High-Performance Service Worker (PWA Builder 100% Compliant)
    Scope: /
    Features:
    - Deep Precache Shell & Offline Fallback (/offline.html)
@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v4.5';
+const STATIC_CACHE = 'aarogyam-public-static-v4.6';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v3.2';
+const PAGES_CACHE = 'aarogyam-public-pages-v3.3';
 const MEDIA_CACHE = 'aarogyam-public-media-v3.0';
 const OFFLINE_URL = '/offline.html';
 

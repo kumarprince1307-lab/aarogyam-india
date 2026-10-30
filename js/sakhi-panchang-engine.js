@@ -118,6 +118,12 @@
 
   function calculatePanchang(dateObj) {
     const d = dateObj ? new Date(dateObj) : new Date();
+    // When a plain date-string "YYYY-MM-DD" is passed (e.g. from date-picker),
+    // the Date lands at midnight UTC = 05:30 IST which may predate that day's nakshatra.
+    // We normalise to noon IST (06:30 UTC) so the *primary* element of the chosen day is shown.
+    // A live new Date() (no arg or full Date object) keeps real-time accuracy.
+    const isDateOnlyStr = dateObj && typeof dateObj === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateObj);
+    if (isDateOnlyStr) { d.setUTCHours(6, 30, 0, 0); } // noon IST
     const timeMs = d.getTime();
 
     // 1. Lunar Phase (Tithi & Paksha) — use current time for live tithi tracking

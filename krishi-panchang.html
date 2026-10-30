@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="hi">
 
 <head>
@@ -1405,7 +1405,7 @@
       if (!dateStr) return;
       document.getElementById('btn-date-today').classList.remove('active');
       document.getElementById('btn-date-tomorrow').classList.remove('active');
-      currentPanchangDate = new Date(dateStr);
+      const _cd = new Date(dateStr); _cd.setUTCHours(6, 30, 0, 0); currentPanchangDate = _cd;
       renderPanchang(currentPanchangDate);
     };
 
@@ -1861,7 +1861,7 @@
 
     // Niyam 2: Living Interactive Date Selection
     window.selectCalendarDay = function(year, monthIdx, dayNum) {
-      const d = new Date(year, monthIdx, dayNum);
+      const d = new Date(year, monthIdx, dayNum, 12, 0, 0); // noon IST for stable nakshatra
       const mNum = monthIdx + 1;
 
       // 1. Remove previous active highlight from all calendar cells
