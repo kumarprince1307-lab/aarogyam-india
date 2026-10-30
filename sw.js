@@ -42,7 +42,7 @@ const PRECACHE_SHELL = [
   '/css/universal-nav-drawer.css',
   '/css/premium-mobile-ui.css',
   '/js/public-pwa.js',
-  '/js/sakhi-panchang-engine.js',
+  '/js/sakhi-panchang-engine.js?v=20261030_v16_panchang_fix',
   '/js/aarogyam-sakhi-ai.js',
   '/js/universal-nav-drawer.js',
   '/js/viral-share-engine.js',
