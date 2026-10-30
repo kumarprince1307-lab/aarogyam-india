@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 html, body {
   overflow-x: hidden !important;
@@ -1340,7 +1340,7 @@ body {
 /* 10. Sakhi Floating Pill: Clean Bottom-Right Positioning (Never Overlaps Top Header / Audio Bar) */
 .sakhi-floating-pill {
   position: fixed !important;
-  top: 76px !important;
+  top: 88px !important;
   left: 14px !important;
   bottom: auto !important;
   right: auto !important;
@@ -1348,7 +1348,7 @@ body {
 }
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    top: 72px !important;
+    top: 84px !important;
     left: 12px !important;
     bottom: auto !important;
     right: auto !important;

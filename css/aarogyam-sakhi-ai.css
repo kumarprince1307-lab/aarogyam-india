@@ -1,4 +1,4 @@
-/* ====================================================================
+﻿/* ====================================================================
    AAROGYAM SAKHI AI - BUTTER-SMOOTH VOICE & DIAGNOSTIC CHATBOT
    Aarogyam India Next-Gen Agri AI Assistant
    ==================================================================== */
@@ -23,7 +23,7 @@ html, body {
 /* 1. FLOATING ACTION PILL (FAB - HIGH CONTRAST BLACK & WHITE WITH BLINKING RED DOT) */
 .sakhi-floating-pill {
   position: fixed;
-  top: 76px !important;
+  top: 88px !important;
   left: 14px !important;
   bottom: auto !important;
   right: auto !important;
@@ -51,7 +51,7 @@ html, body {
 
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    top: 72px !important;
+    top: 84px !important;
     left: 12px !important;
     bottom: auto !important;
     right: auto !important;

@@ -1,4 +1,4 @@
-
+﻿
 // Global Coming Soon Popup Helper
 window.showSakhiComingSoon = function (msg) {
   const existing = document.getElementById('sakhiComingSoonToast');
@@ -18992,6 +18992,17 @@ function processKnowledgeQuery(query) {
         <span class="sakhi-pill-label">${pillLabel}</span>
         <span class="sakhi-pill-live-dot"></span>
       `;
+        // Enforce left-side fixed position regardless of CSS load order
+        pill.style.position = 'fixed';
+        pill.style.setProperty('top', '88px', 'important');
+        pill.style.setProperty('left', '14px', 'important');
+        pill.style.setProperty('bottom', 'auto', 'important');
+        pill.style.setProperty('right', 'auto', 'important');
+        pill.style.setProperty('z-index', '999999', 'important');
+        if (window.innerWidth <= 768) {
+          pill.style.setProperty('top', '84px', 'important');
+          pill.style.setProperty('left', '12px', 'important');
+        }
         document.body.appendChild(pill);
 
         let collapseTimer = setTimeout(() => {

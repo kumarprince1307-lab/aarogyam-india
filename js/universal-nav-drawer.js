@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ====================================================================
  * AAROGYAM INDIA - UNIVERSAL RESPONSIVE ACCORDION DRAWER & SHARE ENGINE
  * Version: 17.0 (Zero Lag, Instant Accordion Toggle, Exact Verified Routes)
@@ -1440,13 +1440,13 @@
       window.location.href = '/aarogyam-sakhi.html';
     };
     pill.style.position = 'fixed';
-    pill.style.setProperty('top', '76px', 'important');
+    pill.style.setProperty('top', '88px', 'important');
     pill.style.setProperty('left', '14px', 'important');
     pill.style.setProperty('bottom', 'auto', 'important');
     pill.style.setProperty('right', 'auto', 'important');
     pill.style.setProperty('z-index', '999999', 'important');
     if (window.innerWidth <= 768) {
-      pill.style.setProperty('top', '72px', 'important');
+      pill.style.setProperty('top', '84px', 'important');
       pill.style.setProperty('left', '12px', 'important');
     }
 

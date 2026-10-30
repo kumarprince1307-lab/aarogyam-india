@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ====================================================================
  * AAROGYAM INDIA - ULTRA FAST 60FPS DRAWER & ACCORDION SYSTEM
  * Version: 18.0 (Zero Lag, High Floating Stack, Ultra Smooth Accordions)
@@ -1451,7 +1451,7 @@ body:has(.sticky-buy-bar) .universal-mobile-bottom-nav {
    ========================================================================== */
 .sakhi-floating-pill {
   position: fixed !important;
-  top: 76px !important;
+  top: 88px !important;
   left: 14px !important;
   bottom: auto !important;
   right: auto !important;
@@ -1480,7 +1480,7 @@ body:has(.sticky-buy-bar) .universal-mobile-bottom-nav {
 
 @media (max-width: 768px) {
   .sakhi-floating-pill {
-    top: 72px !important;
+    top: 84px !important;
     left: 12px !important;
     bottom: auto !important;
     right: auto !important;

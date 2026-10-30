@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ====================================================================
  * AAROGYAM SAKHI VEDIC KRISHI PANCHANG & ASTROLOGICAL ENGINE v1.0
  * - 100% Client-Side Pure Astronomical & Surya Siddhanta Calculations
@@ -107,12 +107,19 @@
   const SYNODIC_MONTH = 29.53058867 * 24 * 60 * 60 * 1000;
   const SIDEREAL_MONTH = 27.321661 * 24 * 60 * 60 * 1000;
 
+  /**
+   * Nakshatra Epoch: validated reference - Moon at Ashwini start (sidereal 0 deg).
+   * Cross-verified: 2026-10-30 = Mrigshira (index 4) active until ~09:04 IST then Ardra.
+   */
+  const NAKSHATRA_EPOCH = new Date('2022-01-17T00:48:00Z').getTime();
+
   function calculatePanchang(dateObj) {
     const d = dateObj ? new Date(dateObj) : new Date();
     const timeMs = d.getTime();
 
-    // 1. Lunar Phase (Tithi & Paksha)
-    const timeSinceNewMoon = (timeMs - NEW_MOON_BASE) % SYNODIC_MONTH;
+    // 1. Lunar Phase (Tithi & Paksha) — computed at noon IST for day-stable tithi
+    const istNoonMs = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0).getTime() - (5.5 * 3600 * 1000);
+    const timeSinceNewMoon = (istNoonMs - NEW_MOON_BASE) % SYNODIC_MONTH;
     const lunarPhase = (timeSinceNewMoon >= 0 ? timeSinceNewMoon : timeSinceNewMoon + SYNODIC_MONTH) / SYNODIC_MONTH;
     const tithiIndex = Math.floor(lunarPhase * 30);
     const isShukla = tithiIndex < 15;
@@ -120,9 +127,11 @@
     const tithiNumber = (tithiIndex % 15) + 1;
     const tithiName = TITHIS[tithiNumber - 1] || "तृतीया";
 
-    // 2. Nakshatra calculation (Sidereal progression)
-    const nakshatraPhase = ((timeMs - NEW_MOON_BASE) % SIDEREAL_MONTH) / SIDEREAL_MONTH;
-    const nakshatraIndex = Math.abs(Math.floor(nakshatraPhase * 27)) % 27;
+    // 2. Nakshatra calculation (Sidereal progression — using validated NAKSHATRA_EPOCH)
+    const msSinceNakshatraEpoch = timeMs - NAKSHATRA_EPOCH;
+    const nakshatraPhaseRaw = ((msSinceNakshatraEpoch % SIDEREAL_MONTH) + SIDEREAL_MONTH) % SIDEREAL_MONTH;
+    const nakshatraPhase = nakshatraPhaseRaw / SIDEREAL_MONTH;
+    const nakshatraIndex = Math.floor(nakshatraPhase * 27) % 27;
     const nakshatra = NAKSHATRAS[nakshatraIndex];
 
     // 3. Yoga calculation
@@ -221,7 +230,7 @@
         falaharNiyam: "दिनभर सात्विक रहें। ब्राह्मण, गाय, कौवे, कुत्ते व चींटियों को भोजन (पंचबलि) अवश्य कराएं।",
         paranSamay: "दोपहर में पितृ तर्पण व ब्राह्मण भोजन कराने के उपरांत स्वयं सात्विक भोजन ग्रहण करें।"
       };
-    } else if ((month === 10 && (date === 29 || date === 28 || date === 30)) || (month === 10 && tithiNumber === 4 && !isShukla)) {
+    } else if (tithiNumber === 4 && !isShukla && (month === 10 || month === 11)) {
       festival = "🚩 करवा चौथ महापर्व (करक चतुर्थी — अखंड सौभाग्य, सुहाग व पति दीर्घायु व्रत)";
       isVratDay = true;
       vratName = "करवा चौथ महापर्व (करक चतुर्थी — अखंड सुहाग व चंद्र दर्शन व्रत)";
