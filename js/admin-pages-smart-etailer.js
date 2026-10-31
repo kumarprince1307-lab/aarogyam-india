@@ -111,10 +111,10 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
         <div>
           <h1 style="font-size:1.5rem; font-weight:800; color:#f8fafc; margin:0; display:flex; align-items:center; gap:8px;">
-            <span>👑 स्मार्ट ई-टेलर कंट्रोल सेंटर (Mission ₹8,19,250)</span>
+            <span>📖 मेरी डायरी & 8-लेवल कंट्रोल सेंटर</span>
           </h1>
           <p style="color:#94a3b8; margin:4px 0 0 0; font-size:0.85rem;">
-            15-दिवसीय क्लोजिंग डेट, ट्यूटोरियल, बिज़नेस प्लान्स/ऑफर्स, TTS पॉडकास्ट, To-Do व सिंक वॉल्ट का संपूर्ण नियंत्रण
+            यूज़र डायरी कोटा, 8-लेवल फील्ड प्रोग्रेस, मल्टी-वीडियो गाइड व मुख्य रिपोर्ट्स का केंद्रीय नियंत्रण
           </p>
         </div>
         <div style="display:flex; gap:10px;">
@@ -127,34 +127,19 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
         </div>
       </div>
 
-      <!-- Admin Functional Tab Switcher -->
-      <div style="display:flex; gap:8px; overflow-x:auto; margin-bottom:20px; padding-bottom:6px; border-bottom:1px solid #334155;">
-        <button type="button" class="adm-section-btn active" data-target="adm-sec-diary-quotas" style="background:#0284c7; color:#fff; border:none; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          📖 यूज़र डायरी & कोटा लिमिट्स
+      <!-- Admin Functional Tab Switcher (Clean 4 Focus Tabs) -->
+      <div style="display:flex; gap:10px; overflow-x:auto; margin-bottom:20px; padding-bottom:8px; border-bottom:1.5px solid #334155;">
+        <button type="button" class="adm-section-btn active" data-target="adm-sec-diary-quotas" style="background:#0284c7; color:#fff; border:none; padding:10px 18px; border-radius:8px; font-size:0.88rem; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 2px 10px rgba(2,132,199,0.3);">
+          📖 1. यूज़र डायरी, कोटा व 8-लेवल मॉनिटर
         </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-closing" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          ⏳ क्लोजिंग व टेक्स्ट
+        <button type="button" class="adm-section-btn" data-target="adm-sec-tutorial" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:10px 18px; border-radius:8px; font-size:0.88rem; font-weight:800; cursor:pointer; white-space:nowrap;">
+          🎥 2. ट्यूटोरियल, मल्टी-वीडियो व ऑडियो गाइड
         </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-survey" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          🌱 सर्वे & केटेगरी मैनेजर
+        <button type="button" class="adm-section-btn" data-target="adm-sec-closing" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:10px 18px; border-radius:8px; font-size:0.88rem; font-weight:800; cursor:pointer; white-space:nowrap;">
+          ⏳ 3. क्लोजिंग व साइकिल सेटिंग्स
         </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-plans" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          🔥 बिज़नेस प्लान्स व ऑफर्स
-        </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-tutorial" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          🎥 ट्यूटोरियल गाइड
-        </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-tts" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          🎙️ AI ऑडियो स्टूडियो
-        </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-marketing" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          🚀 मार्केटिंग & हुक्स स्टूडियो
-        </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-todo" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          📋 To-Do टेम्पलेट्स
-        </button>
-        <button type="button" class="adm-section-btn" data-target="adm-sec-vault" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 14px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; white-space:nowrap;">
-          📊 सिंक वॉल्ट मॉनिटर
+        <button type="button" class="adm-section-btn" data-target="adm-sec-vault" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:10px 18px; border-radius:8px; font-size:0.88rem; font-weight:800; cursor:pointer; white-space:nowrap;">
+          📊 4. मुख्य रिपोर्ट्स व एनालिटिक्स ब्रिज
         </button>
       </div>
 
@@ -360,13 +345,14 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
           <div style="overflow-x:auto;">
             <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
               <thead>
-                <tr style="border-bottom:1px solid #475569; text-align:left; color:#94a3b8;">
-                  <th style="padding:8px 10px;">यूज़र (User)</th>
-                  <th style="padding:8px 10px;">मोबाइल (Mobile)</th>
-                  <th style="padding:8px 10px;">कुल संपर्क (Contacts)</th>
-                  <th style="padding:8px 10px;">सर्वे (Surveys)</th>
-                  <th style="padding:8px 10px;">टर्नओवर (Turnover)</th>
-                  <th style="padding:8px 10px;">अंतिम सक्रियता (Active)</th>
+                <tr style="border-bottom:1.5px solid #475569; text-align:left; color:#cbd5e1; font-size:0.80rem;">
+                  <th style="padding:10px;">यूज़र नाम</th>
+                  <th style="padding:10px;">मोबाइल नंबर</th>
+                  <th style="padding:10px; text-align:center;">वर्तमान लेवल (Level 1-8)</th>
+                  <th style="padding:10px; text-align:center;">कुल अंक (Points)</th>
+                  <th style="padding:10px; text-align:center;">प्रविष्टियां</th>
+                  <th style="padding:10px; text-align:right;">टर्नओवर / उधारी</th>
+                  <th style="padding:10px; text-align:center;">अंतिम सक्रियता</th>
                 </tr>
               </thead>
               <tbody id="diary-users-table-body">
@@ -635,44 +621,46 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
       ==================================================================== -->
       <div id="adm-sec-tutorial" class="adm-pane" style="display:none;">
         <div class="admin-card" style="background:#1e293b; border:1.5px solid #38bdf8; border-radius:12px; padding:20px; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="background:#38bdf822; color:#38bdf8; padding:6px 10px; border-radius:8px; font-size:1.2rem;">🎥</div>
+              <div style="background:#38bdf822; color:#38bdf8; padding:8px 12px; border-radius:8px; font-size:1.3rem;">🎥</div>
               <div>
-                <h3 style="margin:0; font-size:1.1rem; color:#f8fafc;">ट्यूटोरियल वीडियो व स्टेप-बाय-स्टेप गाइड मैनेजर</h3>
-                <span style="font-size:0.75rem; color:#94a3b8;">यूजर ऐप में '🎥 ट्यूटोरियल' बटन का वीडियो व हिंदी गाइड बदलें</span>
+                <h3 style="margin:0; font-size:1.15rem; color:#f8fafc; font-weight:800;">ट्यूटोरियल, मल्टी-वीडियो व ऑडियो गाइड मैनेजर</h3>
+                <span style="font-size:0.78rem; color:#94a3b8;">यूज़र ऐप में 'गाइड' मोडल के 3 वीडियो लिंक्स, ऑडियो व 8-लेवल निर्देश यहाँ से बदलें</span>
               </div>
             </div>
-            <button id="btn-save-tutorial-config" class="admin-btn admin-btn-primary" style="background:#0284c7; color:#fff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; cursor:pointer;">
-              💾 ट्यूटोरियल गाइड सेव करें
+            <button id="btn-save-tutorial-config" class="admin-btn admin-btn-primary" style="background:#0284c7; color:#fff; font-weight:800; padding:10px 20px; border-radius:8px; border:none; cursor:pointer;">
+              💾 ट्यूटोरियल सेटिंग्स लाइव सेव करें
             </button>
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
-            <div>
-              <label style="display:block; font-size:0.75rem; color:#cbd5e1; margin-bottom:4px; font-weight:600;">ट्यूटोरियल मोडल शीर्षक (Title):</label>
-              <input type="text" id="admin-tutorial-title" class="admin-input" style="width:100%; background:#0f172a; border:1px solid #475569; color:#fff; padding:8px 10px; border-radius:8px;" value="${savedTutorial.title}">
+          <!-- Video Links Grid -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:16px;">
+            <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155;">
+              <label style="display:block; font-size:0.78rem; color:#60a5fa; margin-bottom:4px; font-weight:700;">📹 वीडियो 1: 30-सेकंड डायरी एंट्री YouTube Embed URL:</label>
+              <input type="text" id="admin-tutorial-video-url" class="admin-input" style="width:100%; background:#1e293b; border:1px solid #475569; color:#fff; padding:8px; border-radius:6px; font-size:0.80rem;" value="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1">
             </div>
-            <div>
-              <label style="display:block; font-size:0.75rem; color:#cbd5e1; margin-bottom:4px; font-weight:600;">उप-शीर्षक (Subtitle):</label>
-              <input type="text" id="admin-tutorial-subtitle" class="admin-input" style="width:100%; background:#0f172a; border:1px solid #475569; color:#fff; padding:8px 10px; border-radius:8px;" value="${savedTutorial.subtitle}">
+            <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155;">
+              <label style="display:block; font-size:0.78rem; color:#60a5fa; margin-bottom:4px; font-weight:700;">📹 वीडियो 2: खाता बुक व उधारी हिसाब YouTube Embed URL:</label>
+              <input type="text" id="admin-tutorial-video-2-url" class="admin-input" style="width:100%; background:#1e293b; border:1px solid #475569; color:#fff; padding:8px; border-radius:6px; font-size:0.80rem;" value="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1">
+            </div>
+            <div style="background:#0f172a; padding:12px; border-radius:8px; border:1px solid #334155;">
+              <label style="display:block; font-size:0.78rem; color:#60a5fa; margin-bottom:4px; font-weight:700;">📹 वीडियो 3: 1-टैप WhatsApp फॉलो-अप YouTube Embed URL:</label>
+              <input type="text" id="admin-tutorial-video-3-url" class="admin-input" style="width:100%; background:#1e293b; border:1px solid #475569; color:#fff; padding:8px; border-radius:6px; font-size:0.80rem;" value="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1">
             </div>
           </div>
 
-          <label style="display:block; font-size:0.75rem; color:#cbd5e1; margin-bottom:4px; font-weight:600;">YouTube वीडियो Embed URL:</label>
-          <input type="text" id="admin-tutorial-video-url" class="admin-input" style="width:100%; background:#0f172a; border:1px solid #475569; color:#38bdf8; padding:8px 10px; border-radius:8px; margin-bottom:12px;" value="${savedTutorial.video_url}">
-
-          <label style="display:block; font-size:0.75rem; color:#cbd5e1; margin-bottom:6px; font-weight:600;">हिंदी गाइड स्टेप्स:</label>
-          <div id="admin-tutorial-steps-container" style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;">
-            ${(savedTutorial.steps || []).map((step, idx) => `
-              <div style="display:flex; gap:6px; align-items:center;">
-                <span style="background:#0f172a; border:1px solid #475569; color:#fbbf24; font-weight:800; width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:0.75rem; flex-shrink:0;">${idx + 1}</span>
-                <input type="text" class="admin-tutorial-step-input admin-input" style="flex:1; background:#0f172a; border:1px solid #475569; color:#fff; padding:6px 10px; border-radius:8px; font-size:0.82rem;" value="${step}">
-                <button class="btn-del-tutorial-step" style="background:#ef444422; border:1px solid #ef4444; color:#ef4444; border-radius:6px; padding:6px 10px; cursor:pointer;">🗑️</button>
-              </div>
-            `).join('')}
+          <!-- Audio & Level Details -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; font-weight:700;">🎙️ गाइड मास्टर ऑडियो URL (वैकल्पिक MP3):</label>
+              <input type="text" id="admin-tutorial-audio-url" class="admin-input" style="width:100%; background:#0f172a; border:1px solid #475569; color:#fff; padding:8px; border-radius:6px; font-size:0.82rem;" placeholder="खाली रखने पर डिफ़ॉल्ट AI वॉयस बोलेगा">
+            </div>
+            <div>
+              <label style="display:block; font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; font-weight:700;">📖 मोडल शीर्षक (Modal Title):</label>
+              <input type="text" id="admin-tutorial-title" class="admin-input" style="width:100%; background:#0f172a; border:1px solid #475569; color:#fff; padding:8px; border-radius:6px; font-size:0.82rem;" value="मेरी डायरी गाइड व 8-लेवल सिस्टम">
+            </div>
           </div>
-          <button id="btn-add-tutorial-step" class="admin-btn admin-btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#1e293b; color:#38bdf8; border:1px solid #38bdf8;">+ नया स्टेप जोड़ें</button>
         </div>
       </div>
 
@@ -1078,14 +1066,31 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
         const turnover = Number(r.fortnight_turnover || r.friday_retail_total || 0);
         const dateStr = r.last_synced_at ? new Date(r.last_synced_at).toLocaleDateString('hi-IN') : 'हाल ही में';
 
+        // Calculate Level 1 to 8 based on activity
+        const calculatedPts = (cCount * 10) + (turnover > 0 ? 15 : 0);
+        let userLevel = '🥉 L1: शुरुआत';
+        let levelColor = '#94a3b8';
+        if (calculatedPts >= 2000) { userLevel = '🔱 L8: क्राउन लीजेंड'; levelColor = '#f472b6'; }
+        else if (calculatedPts >= 1200) { userLevel = '🌟 L7: डायमंड मेंटर'; levelColor = '#60a5fa'; }
+        else if (calculatedPts >= 800) { userLevel = '🏆 L6: गोल्ड मास्टर'; levelColor = '#fde047'; }
+        else if (calculatedPts >= 500) { userLevel = '👑 L5: सिल्वर लीडर'; levelColor = '#e2e8f0'; }
+        else if (calculatedPts >= 300) { userLevel = '💎 L4: स्टार डिस्ट्रीब्यूटर'; levelColor = '#38bdf8'; }
+        else if (calculatedPts >= 150) { userLevel = '🥇 L3: एक्टिव प्रमोटर'; levelColor = '#facc15'; }
+        else if (calculatedPts >= 50) { userLevel = '🥈 L2: फील्ड साथी'; levelColor = '#93c5fd'; }
+
         return `
           <tr style="border-bottom:1px solid #334155;">
             <td style="padding:10px; font-weight:800; color:#f8fafc;">${escapeHtml(name)}</td>
             <td style="padding:10px; color:#38bdf8;">📱 ${escapeHtml(mob)}</td>
+            <td style="padding:10px; text-align:center;">
+              <span style="background:rgba(15,23,42,0.9); border:1px solid ${levelColor}; color:${levelColor}; padding:3px 10px; border-radius:12px; font-weight:900; font-size:0.75rem;">
+                ${userLevel}
+              </span>
+            </td>
+            <td style="padding:10px; text-align:center; font-weight:900; color:#38bdf8;">⚡ ${calculatedPts}</td>
             <td style="padding:10px; text-align:center;"><span style="background:rgba(56,189,248,0.15); color:#38bdf8; padding:2px 8px; border-radius:10px; font-weight:800;">${cCount}</span></td>
-            <td style="padding:10px; text-align:center;"><span style="background:rgba(234,179,8,0.15); color:#facc15; padding:2px 8px; border-radius:10px; font-weight:800;">✔ दर्ज</span></td>
-            <td style="padding:10px; font-weight:800; color:#10b981;">₹${turnover.toLocaleString('hi-IN')}</td>
-            <td style="padding:10px; font-size:0.75rem; color:#94a3b8;">${dateStr}</td>
+            <td style="padding:10px; text-align:right; font-weight:800; color:#10b981;">₹${turnover.toLocaleString('hi-IN')}</td>
+            <td style="padding:10px; text-align:center; font-size:0.75rem; color:#94a3b8;">${dateStr}</td>
           </tr>
         `;
       }).join('');

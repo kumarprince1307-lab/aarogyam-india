@@ -1780,15 +1780,73 @@
     return true;
   }
 
-  // Level Progression Calculator
+  // ====================================================================
+  // AAROGYAM 8-LEVEL GAMIFIED FIELD PROGRESSION ENGINE
+  // ====================================================================
+  const DIARY_LEVELS = [
+    { level: 1, name: 'शुरुआत', icon: '🥉', minPts: 0, maxPts: 50, hint: 'फील्ड में कदम रखा! पहले 5 किसान या साथी जोड़ें।' },
+    { level: 2, name: 'फील्ड साथी', icon: '🥈', minPts: 51, maxPts: 150, hint: 'नियमित फील्ड विजिट व फॉलो-अप शुरू करें।' },
+    { level: 3, name: 'एक्टिव प्रमोटर', icon: '🥇', minPts: 151, maxPts: 300, hint: 'मजबूत ग्राहक आधार बनाएं और WhatsApp फॉलो-अप करें।' },
+    { level: 4, name: 'स्टार डिस्ट्रीब्यूटर', icon: '💎', minPts: 301, maxPts: 500, hint: 'उधारी वसूली व नियमित डायरी प्रविष्टियों से टीम विस्तार।' },
+    { level: 5, name: 'सिल्वर लीडर', icon: '👑', minPts: 501, maxPts: 800, hint: 'फील्ड लीडरशिप व खाता नियंत्रण में महारत हासिल।' },
+    { level: 6, name: 'गोल्ड मास्टर', icon: '🏆', minPts: 801, maxPts: 1200, hint: 'हाई-टर्नओवर व एक्टिव टीम मेंटॉरिंग चैंपियन।' },
+    { level: 7, name: 'डायमंड मेंटर', icon: '🌟', minPts: 1201, maxPts: 2000, hint: 'बड़े नेटवर्क का कुशल संचालन व डिजिटल ट्रेनिंग।' },
+    { level: 8, name: 'क्राउन लीजेंड', icon: '🔱', minPts: 2001, maxPts: 999999, hint: 'सर्वोच्च आरोग्यम लीजेंड! आपका फील्ड रिकॉर्ड प्रेरणादायक है।' }
+  ];
+
+  function calculateDiaryPoints() {
+    const entries = getLocalDiaryEntries();
+    const cashflows = getLocalCashflow();
+    let pts = 0;
+    entries.forEach(e => {
+      if (e.type === 'customer') pts += 10;
+      else pts += 15;
+      if (e.followup_done) pts += 5;
+    });
+    pts += (cashflows.length * 5);
+    return pts;
+  }
+
+  function getDiaryLevelInfo(points) {
+    for (let i = DIARY_LEVELS.length - 1; i >= 0; i--) {
+      if (points >= DIARY_LEVELS[i].minPts) {
+        const cur = DIARY_LEVELS[i];
+        const next = DIARY_LEVELS[i + 1] || null;
+        const ptsInLevel = points - cur.minPts;
+        const totalNeededInLevel = next ? (next.minPts - cur.minPts) : 100;
+        const pct = next ? Math.min(100, Math.round((ptsInLevel / totalNeededInLevel) * 100)) : 100;
+        const remaining = next ? Math.max(0, next.minPts - points) : 0;
+        return {
+          current: cur,
+          next: next,
+          points: points,
+          pct: pct,
+          remaining: remaining
+        };
+      }
+    }
+    return {
+      current: DIARY_LEVELS[0],
+      next: DIARY_LEVELS[1],
+      points: points,
+      pct: 0,
+      remaining: 51
+    };
+  }
+
   function updateDiaryHeroLevel() {
+    const pts = calculateDiaryPoints();
+    const info = getDiaryLevelInfo(pts);
     const entries = getLocalDiaryEntries();
     const count = entries.length;
+
     const bar = document.getElementById('diaryHeroProgressBar');
     const rankEl = document.getElementById('diaryHeroRankBadge');
     const badgeEl = document.getElementById('diaryQuotaCounterBadge');
     const hintEl = document.getElementById('diaryHeroNextRankHint');
     const userEl = document.getElementById('diaryHeroUserName');
+    const ptsEl = document.getElementById('diaryPointsMeter');
+    const tipEl = document.getElementById('diaryHeroActionTip');
 
     // Get user name from session
     try {
@@ -1796,32 +1854,64 @@
       if (u.name && userEl) userEl.textContent = '👤 ' + u.name;
     } catch (_) {}
 
-    let rank = '🥉 लेवल 1: शुरुआत';
-    let pct = Math.min(100, Math.round((count / 10) * 100));
-    let nextHint = `अगले स्तर (सिल्वर) हेतु ${Math.max(0, 10 - count)} फील्ड प्रविष्टियां शेष!`;
-
-    if (count >= 10 && count < 30) {
-      rank = '🥈 लेवल 2: सक्रिय फील्ड प्रमोटर';
-      pct = Math.min(100, Math.round(((count - 10) / 20) * 100));
-      nextHint = `अगले स्तर (गोल्ड लीडर) हेतु ${Math.max(0, 30 - count)} फील्ड प्रविष्टियां शेष!`;
-    } else if (count >= 30) {
-      rank = '🥇 लेवल 3: मास्टर टीम स्टार';
-      pct = 100;
-      nextHint = '🎉 बधाई! आप आरोग्यम मास्टर लीडर स्तर पर हैं!';
+    if (bar) bar.style.width = Math.max(8, info.pct) + '%';
+    if (rankEl) rankEl.innerHTML = `${info.current.icon} लेवल ${info.current.level}: ${info.current.name}`;
+    if (ptsEl) ptsEl.innerHTML = `⚡ <strong>${pts}</strong> अंक ${info.next ? `(अगला लक्ष्य: ${info.next.minPts})` : '🏆'}`;
+    
+    if (hintEl) {
+      if (info.next) {
+        hintEl.innerHTML = `🎯 अगले स्तर (लेवल ${info.next.level}: ${info.next.name}) हेतु <strong>${info.remaining} अंक शेष!</strong>`;
+      } else {
+        hintEl.innerHTML = `🎉 बधाई! आप सर्वोच्च ${info.current.name} स्तर पर हैं!`;
+      }
     }
 
-    if (bar) bar.style.width = Math.max(12, pct) + '%';
-    if (rankEl) rankEl.textContent = rank;
-    if (hintEl) hintEl.textContent = '🎯 ' + nextHint;
+    if (tipEl && info.next) {
+      const kisanNeeded = Math.ceil(info.remaining / 10);
+      const fuNeeded = Math.ceil(info.remaining / 5);
+      tipEl.innerHTML = `👉 <strong>${kisanNeeded}</strong> किसान जोड़ें (+10 अंक) या <strong>${fuNeeded}</strong> फॉलो-अप पूर्ण करें (+5 अंक)!`;
+    }
 
     const limit = Number(diaryGlobalConfig.free_limit) || 50;
     if (badgeEl) {
-      badgeEl.textContent = `⚡ ${count}/${limit} प्रविष्टियां`;
-      badgeEl.style.color = count >= limit ? '#f87171' : '#38bdf8';
+      badgeEl.textContent = `कुल प्रविष्टियां: ${count}/${limit}`;
+      badgeEl.style.color = count >= limit ? '#f87171' : '#94a3b8';
     }
   }
 
-  // Toggle Entity Type
+  function openLevelRoadmapModal() {
+    let modal = document.getElementById('diaryLevelRoadmapModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+  }
+
+  function closeLevelRoadmapModal() {
+    let modal = document.getElementById('diaryLevelRoadmapModal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+  }
+
+  function switchTutorialVideo(url, btn) {
+    const iframe = document.getElementById('tutorialVideoIframe');
+    if (iframe && url) {
+      iframe.src = url;
+    }
+    if (btn) {
+      document.querySelectorAll('.btn-tutorial-video-tab').forEach(b => {
+        b.style.background = '#1e293b';
+        b.style.borderColor = '#334155';
+        b.style.color = '#cbd5e1';
+      });
+      btn.style.background = '#2563eb';
+      btn.style.borderColor = '#60a5fa';
+      btn.style.color = '#ffffff';
+    }
+  }
+
+    // Toggle Entity Type
   function setEntityType(type) {
     currentEntityType = type;
     const btnCust = document.getElementById('btnEntityCustomer');
@@ -3198,3 +3288,21 @@
   }
 
 })(window, document);
+
+
+  // Auto-play page audio greeting (with interaction fallback)
+  setTimeout(() => {
+    try {
+      if (typeof window.playPageAudioGreeting === 'function') {
+        window.playPageAudioGreeting(true);
+      } else if (typeof window.togglePageAudioGreeting === 'function') {
+        const startAudioOnce = () => {
+          try { window.togglePageAudioGreeting(); } catch (_) {}
+          document.removeEventListener('click', startAudioOnce);
+          document.removeEventListener('touchstart', startAudioOnce);
+        };
+        document.addEventListener('click', startAudioOnce, { once: true });
+        document.addEventListener('touchstart', startAudioOnce, { once: true });
+      }
+    } catch (_) {}
+  }, 1200);

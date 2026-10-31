@@ -1175,7 +1175,7 @@
               <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
                   <div class="drawer-sub-icon-box"><i class="fa-solid fa-wallet"></i></div>
-                  <span>स्मार्ट ई-टेलर खाता (₹8.19L)</span>
+                  <span>मेरी डायरी खाता (फील्ड मैनेजर)</span>
                 </div>
                 <span class="drawer-tag-pill">HOT 🔥</span>
               </a>
@@ -1282,10 +1282,10 @@
           <div class="u-icon-wrap"><i class="fa-solid fa-cow" style="color:#0284c7;"></i></div>
           <span style="color:#0284c7;font-weight:800;">पशु पालन</span>
         </a>
-        <!-- 7. eTailer -->
+        <!-- 7. मेरी डायरी (My Diary) -->
         <a href="/pages/smart-etailer.html" class="u-nav-tab ${currentPath.includes('smart-etailer') || currentPath.includes('marketing') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-crown" style="color:#10b981;"></i></div>
-          <span style="color:#10b981;font-weight:800;">eTailer</span>
+          <div class="u-icon-wrap"><i class="fa-solid fa-book-bookmark" style="color:#10b981;"></i></div>
+          <span style="color:#10b981;font-weight:800;">मेरी डायरी</span>
         </a>
         <!-- 8. Profile -->
         <a href="/ucas/index.html" class="u-nav-tab ${(currentPath.includes('ucas') || currentPath.includes('profile')) && !currentPath.includes('smart-etailer') ? 'active' : ''}">

@@ -38,7 +38,7 @@ const MENU = [
     { label: '🩺 खेती का डॉक्टर लैंडिंग पेज', href: 'page-editor.html?page=page_kheti_dr', route: 'page-editor?page=page_kheti_dr' },
     { label: '💼 Netsurf Career (नेटसर्फ करियर) Editor', href: 'page-editor.html?page=page_netsurf_career', route: 'page-editor?page=page_netsurf_career' }
   ] },
-  { label: '👑 Smart eTailer (₹8.19L)', icon: '👑', href: 'smart-etailer.html', route: 'smart-etailer' },
+  { label: '📖 मेरी डायरी (My Diary)', icon: '📖', href: 'smart-etailer.html', route: 'smart-etailer' },
   { label: 'Products (उत्पाद)', icon: '🛍️', children: [ 
     { label: 'Product Landing Pages', href: 'product-landing-pages.html', route: 'product-landing-pages' }, 
     { label: '📁 Categories (श्रेणियां)', href: 'product-landing-pages.html#categories', route: 'product-landing-pages' }, 

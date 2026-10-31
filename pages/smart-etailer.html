@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>मिशन ₹8,19,250 — स्मार्ट ई-टेलर (Smart eTailer) गेमिंग कमांड सेंटर | Aarogyam India</title>
+  <title>आरोग्यम मेरी डायरी — किसान व टीम खाता, 8-लेवल फील्ड मैनेजर | Aarogyam India</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
@@ -13,7 +13,7 @@
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="/manifest.json?v=1.1">
   <meta name="theme-color" content="#090d16">
-  <meta name="description" content="स्मार्ट ई-टेलर खाता बुक, 15-दिवसीय क्लोजिंग, ऑटोशिप 6th मंथ फ्री रडार और डायरेक्ट सेलिंग गेमिंग कमांड सेंटर">
+  <meta name="description" content="आरोग्यम मेरी डायरी: किसान व टीम खाता बुक, 1-टैप WhatsApp फॉलो-अप, 8-लेवल गेमिंग प्रोग्रेस व फील्ड खर्च-कमाई ट्रैकर।">
 
   <!-- FontAwesome & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,7 +28,10 @@
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   
   <!-- Core CSS -->
-  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v32_diary_revamp">
+  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v35_diary_level8">
+  <meta property="og:title" content="आरोग्यम मेरी डायरी — किसान व टीम खाता व 8-लेवल फील्ड मैनेजर">
+  <meta property="og:description" content="30-सेकंड में किसान व टीम प्रविष्टि दर्ज करें, 1-टैप WhatsApp फॉलो-अप और 8-लेवल फील्ड लीडरशिप।">
+  <meta property="og:type" content="website">
 </head>
 
 <body>
@@ -73,9 +76,7 @@
         </a>
 
         <!-- Current Active Page Indicator Badge with High Contrast -->
-        <span class="header-current-page-badge" title="Smart eTailer Command Center" style="background:#0f172a !important;color:#fde047 !important;border:1.5px solid #fde047 !important;font-weight:900 !important;padding:4px 10px;border-radius:20px;font-size:0.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:inline-flex;align-items:center;gap:4px;">
-          👑 स्मार्ट ई-टेलर (₹8.19L)
-        </span>
+        <span class="header-current-page-badge" title="मेरी डायरी (My Diary)" style="background:#0f172a !important;color:#fde047 !important;border:1.5px solid #fde047 !important;font-weight:900 !important;padding:5px 12px;border-radius:20px;font-size:0.78rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);display:inline-flex;align-items:center;gap:6px;">📖 मेरी डायरी (My Diary)</span>
       </div>
 
       <!-- Header Actions Right: Tutorial, Theme, Sync, 3-Line Menu -->
@@ -159,10 +160,13 @@
           <!-- Basic Info Fields -->
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:14px;">
             <div>
-              <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">
+              <label style="display:block; font-size:0.95rem; font-weight:800; color:#ffffff; margin-bottom:6px;">
                 व्यक्ति का नाम (Full Name) *
               </label>
-              <input type="text" id="diaryInputName" class="game-input" placeholder="उदा. रमेश कुमार / किसान साथी" required style="margin:0; width:100%;">
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" id="diaryInputName" class="game-input" placeholder="उदा. रमेश कुमार / किसान साथी" required style="margin:0; flex:1;">
+                <button type="button" class="btn-voice-mic" id="btnMicDiaryName" onclick="window.AarogyamETailer.startVoiceInput('diaryInputName', 'btnMicDiaryName')" title="बोलकर नाम लिखें">🎙️</button>
+              </div>
             </div>
             <div>
               <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">
@@ -171,10 +175,13 @@
               <input type="tel" id="diaryInputMobile" class="game-input" placeholder="उदा. 9826012345" maxlength="10" required style="margin:0; width:100%;">
             </div>
             <div>
-              <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">
+              <label style="display:block; font-size:0.95rem; font-weight:800; color:#ffffff; margin-bottom:6px;">
                 गाँव / शहर (Village / Town)
               </label>
-              <input type="text" id="diaryInputPlace" class="game-input" placeholder="उदा. सागर / पिपरिया" style="margin:0; width:100%;">
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" id="diaryInputPlace" class="game-input" placeholder="उदा. सागर / पिपरिया" style="margin:0; flex:1;">
+                <button type="button" class="btn-voice-mic" id="btnMicDiaryPlace" onclick="window.AarogyamETailer.startVoiceInput('diaryInputPlace', 'btnMicDiaryPlace')" title="बोलकर गाँव लिखें">🎙️</button>
+              </div>
             </div>
           </div>
 
@@ -250,23 +257,38 @@
           </div>
         </form>
 
-        <!-- Gamified Animated Level Progress Bar (Placed below entry form) -->
-        <div class="diary-level-hero" id="diaryLevelHero" style="margin:16px 0 0 0; background:linear-gradient(135deg, #090e17 0%, #0f172a 100%); border:2px solid #0284c7; border-radius:12px; box-shadow:0 0 20px rgba(2,132,199,0.35);">
-          <div class="diary-level-header">
-            <div class="diary-user-badge" style="color:#ffffff; font-weight:900;">
-              <span id="diaryHeroUserName">👤 किसान साथी</span>
-              <span class="diary-rank-pill" id="diaryHeroRankBadge" style="background:#0284c7; color:#ffffff; font-weight:900;">🥈 लेवल 2: सक्रिय फील्ड प्रमोटर</span>
+        <!-- Gamified 8-Level Progression Card -->
+        <div id="diaryLevelHero" class="diary-level-8-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="diaryHeroUserName" style="font-weight:900; font-size:1.0rem; color:#ffffff;">👤 फील्ड साथी</span>
+              <span class="level-badge-pill" id="diaryHeroRankBadge">🥉 लेवल 1: शुरुआत</span>
             </div>
-            <div id="diaryQuotaCounterBadge" style="font-size:0.80rem; background:#10b981; color:#000000; padding:3px 10px; border-radius:20px; font-weight:900;">
-              ⚡ 0 प्रविष्टियां दर्ज
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="diaryPointsMeter" style="font-size:1.0rem; font-weight:900; color:#38bdf8;">⚡ 0 अंक</span>
+              <button type="button" onclick="window.AarogyamETailer.openLevelRoadmapModal()" class="admin-btn" style="background:#1e3a8a; color:#ffffff; border:1.5px solid #38bdf8; padding:5px 12px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+                🏆 8-लेवल रोडमैप
+              </button>
             </div>
           </div>
-          <div class="diary-progress-bar-wrap" style="height:12px; background:#1e293b; border-radius:10px; border:1px solid #334155;">
-            <div class="diary-progress-bar-fill" id="diaryHeroProgressBar" style="width: 25%; background:linear-gradient(90deg, #0284c7 0%, #38bdf8 50%, #10b981 100%);"></div>
+
+          <!-- Animated Game Progress Meter -->
+          <div class="game-progress-track" style="margin-bottom:10px;">
+            <div class="game-progress-fill" id="diaryHeroProgressBar" style="width:12%;"></div>
           </div>
-          <div class="diary-progress-footer" style="color:#ffffff; font-weight:700; font-size:0.78rem;">
-            <span id="diaryHeroNextRankHint">🎯 अगले स्तर (गोल्ड लीडर) हेतु फील्ड गतिविधियां दर्ज करें!</span>
-            <span style="color:#38bdf8; font-weight:900; cursor:pointer;" onclick="window.AarogyamETailer.switchTab('tab-diary-pocket')">विकास अनुमान ➔</span>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <div>
+              <div id="diaryHeroNextRankHint" style="font-size:0.88rem; font-weight:800; color:#ffffff;">
+                🎯 अगले स्तर (लेवल 2: फील्ड साथी) हेतु 50 अंक शेष!
+              </div>
+              <div id="diaryHeroActionTip" style="font-size:0.76rem; color:#93c5fd; margin-top:2px;">
+                👉 5 किसान जोड़ें (+10 अंक) या 10 फॉलो-अप पूर्ण करें (+5 अंक)!
+              </div>
+            </div>
+            <span id="diaryQuotaCounterBadge" style="font-size:0.76rem; color:#94a3b8; font-weight:700;">
+              कुल प्रविष्टियां: 0/50
+            </span>
           </div>
         </div>
       </div>
@@ -949,121 +971,108 @@
   <!-- =========================================
        5.2 MODAL: IN-DEPTH TUTORIAL & AUDIO MASTER GUIDE
   ========================================== -->
-  <div class="game-modal-overlay" id="smartETailerTutorialModal">
-    <div class="game-modal-card" style="max-width:620px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--border-subtle);padding-bottom:8px;">
+    <!-- =========================================
+       5.2 MODAL: IN-DEPTH TUTORIAL & AUDIO MASTER GUIDE
+  ========================================== -->
+  <div class="game-modal-overlay" id="smartETailerTutorialModal" style="display:none;">
+    <div class="game-modal-card" style="max-width:680px; max-height:90vh; overflow-y:auto; background:#070d18; border:2px solid #2563eb; border-radius:16px; padding:20px; box-shadow:0 8px 32px rgba(0,0,0,0.8);">
+      
+      <!-- Modal Header with Large Cross Button -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1.5px solid #1e3a8a; padding-bottom:10px;">
         <div>
-          <h3 style="font-size:1.15rem;margin:0;font-weight:900;color:var(--text-title);display:flex;align-items:center;gap:6px;">
-            <span>🎥</span> <span>स्मार्ट ई-टेलर ट्यूटोरियल & बिज़नेस गाइड</span>
+          <h3 style="font-size:1.2rem; margin:0; font-weight:900; color:#60a5fa; display:flex; align-items:center; gap:8px;">
+            <span>📖</span> <span>मेरी डायरी गाइड व 8-लेवल सिस्टम</span>
           </h3>
-          <span style="font-size:0.75rem;color:var(--text-muted);">ऑडियो सुनें या विस्तार से पढ़ें — सब कुछ 100% हिंदी में</span>
+          <span style="font-size:0.76rem; color:#94a3b8;">वीडियो देखें या ऑडियो सुनें — 100% सरल हिंदी में</span>
         </div>
-        <button type="button" onclick="window.AarogyamETailer.closeTutorialModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.6rem;cursor:pointer;line-height:1;">&times;</button>
+        <button type="button" class="btn-close-guide" onclick="window.AarogyamETailer.closeTutorialModal()" title="गाइड बंद करें">&times;</button>
       </div>
 
       <!-- Quick Audio Guide Bar -->
-      <div style="background:linear-gradient(135deg, #1d4ed8, #2563eb);color:#fff;padding:12px;border-radius:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="background:linear-gradient(135deg, #1d4ed8, #2563eb); color:#fff; padding:12px 16px; border-radius:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div>
-          <strong style="font-size:0.88rem;display:block;">🎙️ मास्टर ऑडियो गाइड (3 मिनट में सब समझें)</strong>
-          <span style="font-size:0.72rem;color:#e0e7ff;">AI वॉयस द्वारा पूरे पेज और प्लान की संपूर्ण जानकारी</span>
+          <strong style="font-size:0.92rem; display:block;">🎙️ मास्टर ऑडियो गाइड (3 मिनट में समझें)</strong>
+          <span style="font-size:0.75rem; color:#e0e7ff;">AI वॉयस द्वारा पूरे पेज और 8-लेवल फील्ड खाता की संपूर्ण जानकारी</span>
         </div>
-        <div style="display:flex;gap:6px;">
-          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="background:#ffffff !important;color:#1d4ed8 !important;font-weight:900;" onclick="window.AarogyamETailer.playTutorialMasterAudio()">
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn-royal-blue" style="background:#ffffff !important; color:#1d4ed8 !important; font-weight:900; padding:6px 14px; border-radius:8px; font-size:0.82rem;" onclick="if(window.togglePageAudioGreeting){window.togglePageAudioGreeting();}else{window.AarogyamETailer.playTutorialMasterAudio();}">
             <span>▶️ ऑडियो सुनें</span>
           </button>
-          <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="background:rgba(0,0,0,0.3) !important;" onclick="window.AarogyamETailer.stopAllAudio()">
-            <span>⏹️ स्टॉप</span>
+        </div>
+      </div>
+
+      <!-- Multi-Video Tabs Switcher -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:0.80rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
+          📹 वीडियो ट्यूटोरियल चुनें:
+        </div>
+        <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;">
+          <button type="button" class="btn-tutorial-video-tab" onclick="window.AarogyamETailer.switchTutorialVideo('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1', this)" style="background:#2563eb; color:#ffffff; border:1.5px solid #60a5fa; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; white-space:nowrap;">
+            📹 1. 30-सेकंड डायरी एंट्री
+          </button>
+          <button type="button" class="btn-tutorial-video-tab" onclick="window.AarogyamETailer.switchTutorialVideo('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1', this)" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; white-space:nowrap;">
+            📹 2. खाता बुक व उधारी हिसाब
+          </button>
+          <button type="button" class="btn-tutorial-video-tab" onclick="window.AarogyamETailer.switchTutorialVideo('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1', this)" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:6px 12px; border-radius:8px; font-size:0.76rem; font-weight:800; cursor:pointer; white-space:nowrap;">
+            📹 3. 1-टैप WhatsApp फॉलो-अप
           </button>
         </div>
       </div>
 
-      <!-- Video Embed -->
-      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;margin-bottom:14px;background:#000;">
-        <iframe id="tutorialVideoIframe" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+      <!-- Video Player Embed -->
+      <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; margin-bottom:16px; background:#000; border:1.5px solid #1e3a8a;">
+        <iframe id="tutorialVideoIframe" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1" style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
       </div>
 
-      <!-- Comprehensive Feature Explanation Accordion -->
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:0.84rem;color:var(--text-main);">
-        
-        <!-- Section 1: Company Profile & Heritage -->
-        <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h4 style="font-size:0.95rem;font-weight:800;color:var(--text-title);margin:0;">🏢 1. नेटसर्फ कंपनी प्रोफाइल (25 साल की विरासत)</h4>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:3px 8px;font-size:0.72rem;" onclick="window.AarogyamETailer.playCustomAudio('al_company_profile')">
-              <span>🔊 प्रोफाइल ऑडियो</span>
-            </button>
-          </div>
-          <p style="margin:0;line-height:1.5;font-size:0.8rem;">
-            सन 2000 से स्थापित 25 साल पुरानी डायरेक्ट सेलिंग कंपनी, खुद का DSIR अप्रूव्ड R&D सेंटर, GMP फैक्ट्रियां और 100% केमिकल-मुक्त प्रोडक्ट्स।
-          </p>
+      <!-- 8-Level System Explanation Table -->
+      <div style="background:#090d16; border:1.5px solid #1e3a8a; border-radius:12px; padding:14px; margin-bottom:14px;">
+        <h4 style="margin:0 0 10px 0; font-size:0.95rem; font-weight:900; color:#facc15; display:flex; align-items:center; gap:6px;">
+          <span>🏆</span> <span>8-लेवल फील्ड गेमिंग सिस्टम व अंक नियम</span>
+        </h4>
+        <div style="font-size:0.78rem; color:#cbd5e1; line-height:1.5; margin-bottom:10px;">
+          • <strong>🌾 किसान / ग्राहक एंट्री:</strong> +10 अंक<br>
+          • <strong>🤝 टीम साथी एंट्री:</strong> +15 अंक<br>
+          • <strong>💬 WhatsApp फॉलो-अप पूर्ण:</strong> +5 अंक<br>
+          • <strong>💰 दैनिक खर्च / कमाई दर्ज:</strong> +5 अंक
         </div>
 
-        <!-- Section 2: Smart eTailer Guide -->
-        <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h4 style="font-size:0.95rem;font-weight:800;color:var(--text-title);margin:0;">👑 2. स्मार्ट ई-टेलर क्या है और इसका क्या फायदा है?</h4>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:3px 8px;font-size:0.72rem;" onclick="window.AarogyamETailer.playCustomAudio('al_smart_guide')">
-              <span>🔊 गाइड ऑडियो</span>
-            </button>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:8px;">
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">🥉 लेवल 1: शुरुआत</strong><br><span style="color:#94a3b8;">0 - 50 अंक</span>
           </div>
-          <p style="margin:0 0 6px 0;line-height:1.5;">
-            स्मार्ट ई-टेलर हर नेटसर्फ लीडर की <strong>डिजिटल फील्ड डायरी</strong> है। इसके 4 मुख्य फायदे हैं:
-          </p>
-          <ul style="padding-left:18px;margin:0;line-height:1.6;font-size:0.8rem;">
-            <li><strong>30-सेकंड सर्वे:</strong> किसान की फसल समस्या चुनकर 1-क्लिक में सही नुस्खा भेजें।</li>
-            <li><strong>खाता बुक & 15% शुक्रवार:</strong> नकद व उधारी दर्ज करें, जो स्वतः आपके शुक्रवार रिटेल बोनस में जुड़ती है।</li>
-            <li><strong>6th Month Free Autoship:</strong> 5 महीने लगातार लेने वाले ग्राहक को 6वें महीने फ्री गिफ्ट अलर्ट भेजें।</li>
-            <li><strong>DSR & ₹1Cr डेट:</strong> रोज 5 किसानों से मिलकर अपने ₹8,19,250 15-दिन कैप तक पहुंचने की सटीक तारीख देखें।</li>
-          </ul>
-        </div>
-
-        <!-- Section 3: Business Plan -->
-        <div style="background:var(--bg-card-inner);border:1.5px solid #f59e0b;border-radius:10px;padding:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h4 style="font-size:0.95rem;font-weight:800;color:#f59e0b;margin:0;">💼 3. नेटसर्फ 15% शुक्रवार व ₹8,19,250 बिज़नेस प्लान</h4>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="padding:3px 8px;font-size:0.72rem;" onclick="window.AarogyamETailer.playCustomAudio('al_netsurf_plan')">
-              <span>🔊 प्लान ऑडियो</span>
-            </button>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">🥈 लेवल 2: फील्ड साथी</strong><br><span style="color:#94a3b8;">51 - 150 अंक</span>
           </div>
-          <ul style="padding-left:18px;margin:0;line-height:1.6;font-size:0.8rem;">
-            <li><strong>शुक्रवार रिटेल बोनस:</strong> हफ्ते में ₹8,000 की सेल पर 15% मैक्सिमम रिटेल बोनस अनलॉक होता है।</li>
-            <li><strong>15-दिन टर्नओवर मैचिंग:</strong> Team 1 व Team 2 से टर्नओवर मैचिंग पर 3% से 5% बाइनरी इनकम मिलती है।</li>
-            <li><strong>₹8,19,250 कैपिंग:</strong> दोनों टीमों से 81.92 लाख मैचिंग पर 15 दिन का ₹8.19L उच्चतम पे-आउट मिलता है।</li>
-          </ul>
-        </div>
-
-        <!-- Section 3 -->
-        <div style="background:var(--bg-card-inner);border:1px solid var(--border-subtle);border-radius:10px;padding:12px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <h4 style="font-size:0.95rem;font-weight:800;color:var(--text-title);margin:0;">3. 4 मुख्य प्रोडक्ट कैटेगरीज (Agriculture, Cattle, Health & Beauty)</h4>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">🥇 लेवल 3: एक्टिव प्रमोटर</strong><br><span style="color:#94a3b8;">151 - 300 अंक</span>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_biofit_agri')">
-              <span>🌾 Biofit Agri ऑडियो</span>
-            </button>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_cfc_dairy')">
-              <span>🐄 CFC Dairy ऑडियो</span>
-            </button>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_naturamore_health')">
-              <span>💊 Naturamore ऑडियो</span>
-            </button>
-            <button type="button" class="btn-royal-blue btn-royal-blue-sm" style="font-size:0.74rem;" onclick="window.AarogyamETailer.playCustomAudio('al_herbs_cosmetics')">
-              <span>💄 Cosmetics ऑडियो</span>
-            </button>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">💎 लेवल 4: स्टार डिस्ट्रीब्यूटर</strong><br><span style="color:#94a3b8;">301 - 500 अंक</span>
+          </div>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">👑 लेवल 5: सिल्वर लीडर</strong><br><span style="color:#94a3b8;">501 - 800 अंक</span>
+          </div>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">🏆 लेवल 6: गोल्ड मास्टर</strong><br><span style="color:#94a3b8;">801 - 1200 अंक</span>
+          </div>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">🌟 लेवल 7: डायमंड मेंटर</strong><br><span style="color:#94a3b8;">1201 - 2000 अंक</span>
+          </div>
+          <div style="background:#0f172a; border:1px solid #1e293b; padding:8px; border-radius:6px; font-size:0.74rem;">
+            <strong style="color:#ffffff;">🔱 लेवल 8: क्राउन लीजेंड</strong><br><span style="color:#94a3b8;">2000+ अंक</span>
           </div>
         </div>
-
       </div>
 
-      <div style="margin-top:14px;">
-        <button type="button" class="btn-royal-blue" style="width:100%;" onclick="window.AarogyamETailer.closeTutorialModal()">
-          <span>✅ समझ गया! काम शुरू करें</span>
-        </button>
-      </div>
+      <!-- Close Action -->
+      <button type="button" class="btn-royal-blue" style="width:100%; padding:12px; font-size:1.0rem; font-weight:800; border-radius:10px;" onclick="window.AarogyamETailer.closeTutorialModal()">
+        ✓ सब समझ गया, डायरी खोलें
+      </button>
+
     </div>
   </div>
 
-  <!-- =========================================
+  =========================================
        5.3 MODAL: INSTANT LEAD CAPTURE (AAROGYAMTUBE STYLE)
   ========================================== -->
   <!-- =========================================
@@ -1119,7 +1128,76 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/universal-nav-drawer.js?v=1.1"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261031_v32_diary_revamp"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261031_v35_diary_level8"></script>
+
+  <!-- =========================================
+       5.4 MODAL: 8-LEVEL PROGRESSION ROADMAP
+  ========================================== -->
+  <div class="game-modal-overlay" id="diaryLevelRoadmapModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:16px;">
+    <div style="max-width:580px; width:100%; max-height:85vh; overflow-y:auto; background:#070d18; border:2px solid #2563eb; border-radius:16px; padding:20px; box-shadow:0 8px 32px rgba(0,0,0,0.9);">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1.5px solid #1e3a8a; padding-bottom:8px;">
+        <div>
+          <h3 style="font-size:1.15rem; margin:0; font-weight:900; color:#60a5fa; display:flex; align-items:center; gap:8px;">
+            <span>🏆</span> <span>आरोग्यम 8-लेवल सफलता रोडमैप</span>
+          </h3>
+          <span style="font-size:0.74rem; color:#94a3b8;">फील्ड में हर गतिविधि के अंक जोड़ें और लेवल अपग्रेड करें</span>
+        </div>
+        <button type="button" class="btn-close-guide" onclick="window.AarogyamETailer.closeLevelRoadmapModal()">&times;</button>
+      </div>
+
+      <div style="background:#0f172a; border:1px solid #1e3a8a; border-radius:10px; padding:12px; margin-bottom:14px; font-size:0.82rem; color:#ffffff;">
+        <div style="font-weight:800; color:#38bdf8; margin-bottom:6px;">⚡ अंक कैसे अर्जित करें:</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.76rem; color:#cbd5e1;">
+          <div>🌾 किसान ग्राहक जोड़ें: <strong>+10 अंक</strong></div>
+          <div>🤝 टीम साथी जोड़ें: <strong>+15 अंक</strong></div>
+          <div>💬 WhatsApp फॉलो-अप: <strong>+5 अंक</strong></div>
+          <div>💰 दैनिक खर्च/कमाई: <strong>+5 अंक</strong></div>
+        </div>
+      </div>
+
+      <div class="level-roadmap-grid">
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#f8fafc;">🥉 लेवल 1: शुरुआत (0 - 50 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">फील्ड में कदम रखा! पहले 5 किसान या साथी जोड़ें।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#93c5fd;">🥈 लेवल 2: फील्ड साथी (51 - 150 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">नियमित फील्ड विजिट व फॉलो-अप शुरू करें।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#facc15;">🥇 लेवल 3: एक्टिव प्रमोटर (151 - 300 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">मजबूत ग्राहक आधार बनाएं और WhatsApp फॉलो-अप करें।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#38bdf8;">💎 लेवल 4: स्टार डिस्ट्रीब्यूटर (301 - 500 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">उधारी वसूली व नियमित डायरी प्रविष्टियों से टीम विस्तार।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#cbd5e1;">👑 लेवल 5: सिल्वर लीडर (501 - 800 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">फील्ड लीडरशिप व खाता नियंत्रण में महारत हासिल।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#fde047;">🏆 लेवल 6: गोल्ड मास्टर (801 - 1200 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">हाई-टर्नओवर व एक्टिव टीम मेंटॉरिंग चैंपियन।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#60a5fa;">🌟 लेवल 7: डायमंड मेंटर (1201 - 2000 अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">बड़े नेटवर्क का कुशल संचालन व डिजिटल ट्रेनिंग।</div>
+        </div>
+        <div class="level-roadmap-item">
+          <div style="font-weight:900; font-size:0.90rem; color:#f472b6;">🔱 लेवल 8: क्राउन लीजेंड (2000+ अंक)</div>
+          <div style="font-size:0.74rem; color:#94a3b8; margin-top:2px;">सर्वोच्च आरोग्यम लीजेंड! आपका फील्ड रिकॉर्ड प्रेरणादायक है।</div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-royal-blue" style="width:100%; margin-top:14px; padding:12px; font-weight:800; border-radius:8px;" onclick="window.AarogyamETailer.closeLevelRoadmapModal()">
+        ✓ ठीक है, बंद करें
+      </button>
+
+    </div>
+  </div>
+
 </body>
 
 </html>
