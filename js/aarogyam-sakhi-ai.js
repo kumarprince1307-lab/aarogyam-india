@@ -837,6 +837,14 @@ if (typeof document !== 'undefined') {
     ADMIN_PHONE: '7974422572',
     ADMIN_PHONES: ['7974422572', '7049294111'],
 
+    isApiActive: function () {
+      try {
+        return localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') !== 'OFF';
+      } catch (e) {
+        return true;
+      }
+    },
+
     isSuperAdmin: function (phone) {
       try {
         if (typeof localStorage !== 'undefined' && localStorage.getItem('AAROGYAM_SUPERADMIN_HARDWARE') === 'true') return true;
@@ -898,6 +906,31 @@ if (typeof document !== 'undefined') {
             }));
           }
         }
+
+        // Sync Global Cloud Configuration (API Switch & Quota Limits)
+        try {
+          const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+          const r = await fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?user_key=eq.__SAKHI_GLOBAL_CONFIG__', {
+            headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' }
+          });
+          if (r.ok) {
+            const arr = await r.json();
+            if (Array.isArray(arr) && arr[0] && arr[0].last_query_topic) {
+              const cfg = JSON.parse(arr[0].last_query_topic);
+              if (typeof cfg.api_active === 'boolean') {
+                localStorage.setItem('SAKHI_GEMINI_MASTER_SWITCH', cfg.api_active ? 'ON' : 'OFF');
+              }
+              const inImgs = cfg.inactive?.images || cfg.inactive_images || 5;
+              const inChats = cfg.inactive?.chats || cfg.inactive_chats || 50;
+              const acImgs = cfg.active?.images || cfg.active_images || 15;
+              const acChats = cfg.active?.chats || cfg.active_chats || 200;
+              localStorage.setItem('SAKHI_GLOBAL_QUOTA_CONFIG', JSON.stringify({
+                inactive: { images: inImgs, chats: inChats },
+                active: { images: acImgs, chats: acChats }
+              }));
+            }
+          }
+        } catch (_) {}
       } catch (e) {
         console.debug('[Device Quota Server Sync Notice]:', e?.message);
       }
@@ -1015,6 +1048,16 @@ if (typeof document !== 'undefined') {
     checkQuota: function (type, phone) {
       const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
       if (this.isSuperAdmin(p)) return { allowed: true, isUnlimited: true };
+
+      // Master API Switch: If Master Switch is OFF, block ONLY camera/photo vision!
+      // Chat questions continue normally until the user reaches their daily quota limit!
+      if (type === 'image' && !this.isApiActive()) {
+        return {
+          allowed: false,
+          reason: 'offline',
+          message: 'सखी AI विज़न इंजन एडमिन द्वारा अस्थायी रूप से बंद किया गया है।'
+        };
+      }
 
       const limits = this.getUserLimits(p);
       if (limits.blocked) {
@@ -1189,12 +1232,15 @@ if (typeof document !== 'undefined') {
 
       let contentHtml = '';
       if (reason === 'offline') {
+        const isChat = type === 'chat';
         contentHtml = `
           <div style="background:#ffffff;border-radius:24px;max-width:390px;width:92%;padding:26px 20px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.45);border:2px solid #cbd5e1;box-sizing:border-box;">
             <div style="font-size:3rem;margin-bottom:8px;">⚙️</div>
-            <h3 style="margin:0 0 8px 0;font-size:1.25rem;font-weight:900;color:#0f172a;">सखी AI विज़न मेंटेनेंस</h3>
+            <h3 style="margin:0 0 8px 0;font-size:1.25rem;font-weight:900;color:#0f172a;">${isChat ? 'सखी AI सेवा मेंटेनेंस' : 'सखी AI विज़न मेंटेनेंस'}</h3>
             <p style="font-size:0.92rem;color:#475569;line-height:1.5;margin-bottom:20px;">
-              सखी AI विज़न इंजन एडमिन द्वारा अस्थायी रूप से बंद (Maintenance) किया गया है। कृपया थोड़ी देर बाद पुनः प्रयास करें या टेक्स्ट लिखकर पूछें।
+              ${isChat 
+                ? 'नमस्ते! आरोग्यम सखी AI सेवा वर्तमान में सिस्टम मेंटेनेंस के कारण अस्थायी रूप से बंद है। कृपया कुछ समय बाद पुनः प्रयास करें।'
+                : 'सखी AI विज़न इंजन एडमिन द्वारा अस्थायी रूप से बंद (Maintenance) किया गया है। कृपया थोड़ी देर बाद पुनः प्रयास करें या टेक्स्ट लिखकर पूछें।'}
             </p>
             <button type="button" onclick="document.getElementById('sakhiQuotaModalContainer').remove()" style="width:100%;background:#0f172a;color:#ffffff;border:none;border-radius:14px;padding:12px;font-size:0.95rem;font-weight:800;cursor:pointer;">
               ठीक है, समझा
@@ -3404,6 +3450,7 @@ if (typeof document !== 'undefined') {
     if (!wrap) return;
 
     let cleanDisplayText = (text || '').trim();
+    cleanDisplayText = cleanDisplayText.replace(/\s*\([a-z0-9_]*triage[a-z0-9_]*\)/gi, '').replace(/\s*\([a-z_]+_step[0-9]+[a-z0-9_]*\)/gi, '').trim();
     if (cleanDisplayText.includes('{') && cleanDisplayText.includes('}')) {
       cleanDisplayText = cleanDisplayText.replace(/\s*\(\s*\{[^}]*\}\s*\)/g, '').replace(/\{[^}]*\}/g, '').trim();
     }
@@ -3793,7 +3840,7 @@ if (typeof document !== 'undefined') {
       ];
     } else {
       pills = [
-        { label: '🌾 फसलों का 3-चरणीय निदान', query: 'मेरी फसल में बीमारी है (crop_triage_step1)' },
+        { label: '🌾 फसलों का 3-चरणीय निदान', query: 'मेरी फसल में बीमारी है' },
         { label: '☀️ पीएम कुसुम सोलर पंप 60% सब्सिडी', query: 'पीएम कुसुम सोलर पंप योजना में आवेदन और सब्सिडी बताओ' },
         { label: '⚡ पीएम सूर्य घर मुफ़्त बिजली योजना', query: 'पीएम सूर्य घर मुफ्त बिजली योजना की सब्सिडी और फॉर्म' },
         { label: '🩸 बीपी, शुगर व HbA1c गाइड', query: 'बीपी और शुगर का क्या संबंध है?' },
@@ -3855,7 +3902,7 @@ if (typeof document !== 'undefined') {
     pillsContainer.style.display = 'block';
     pillsContainer.innerHTML = `
       <div class="sakhi-smart-pills-row">
-        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मेरी फसल में बीमारी है (crop_triage_step1)')">
+        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मेरी फसल में बीमारी है')">
           <span class="sakhi-pill-icon-circle green">🌱</span>
           <span>फसल की समस्या</span>
         </button>
@@ -12300,7 +12347,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         if (sb && typeof sb.from === 'function') {
           await sb.from('sakhi_chat_audit_logs').insert([{
             user_profile: String(userProfile || 'guest'),
-            sawal: String(sawal || '').slice(0, 500),
+            sawal: String(sawal || '').replace(/\s*\([a-z0-9_]*triage[a-z0-9_]*\)/gi, '').replace(/\s*\([a-z_]+_step[0-9]+[a-z0-9_]*\)/gi, '').slice(0, 500),
             jawab: String(jawab || '').slice(0, 500),
             domain: String(domain || 'omni'),
             status: String(status || 'PASS'),
@@ -17066,6 +17113,11 @@ function processKnowledgeQuery(query) {
           return;
         }
 
+        // 0.0000297 INTERACTIVE CROP TRIAGE (Priority for broad crop disease queries)
+        if (typeof handleInteractiveCropTriage === 'function' && handleInteractiveCropTriage(effectiveCleanQ, rawQ)) {
+          return;
+        }
+
         // 0.0000298 MASTER 200 QA BANK (Direct Knowledge Matching)
         if (typeof handleMaster200QABank === 'function' && handleMaster200QABank(effectiveCleanQ, rawQ)) {
           return;
@@ -18438,7 +18490,7 @@ function processKnowledgeQuery(query) {
           नमस्ते साथी! 🙏 आपके प्रश्न <b>"${escapeHtml(query)}"</b> की 100% सटीक वैज्ञानिक सहायता के लिए, कृपया नीचे दिए गए प्रमुख विषयों में से चुनें या थोड़ा स्पष्ट लिखकर पूछें:
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मेरी फसल में बीमारी है (crop_triage_step1)')">🌾 फसल 3-चरणीय निदान</button>
+          <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('मेरी फसल में बीमारी है')">🌾 फसल 3-चरणीय निदान</button>
           <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गेहूं में कल्ले और पैदावार बढ़ाने का फॉर्मूला')">🌾 गेहूं कल्ले व खाद</button>
           <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('गाय भैंस का दूध और फैट बढ़ाने का तरीका')">🐄 पशुपालन व दुग्ध फैट</button>
           <button type="button" class="sakhi-followup-chip" onclick="window.askSakhiQuick('शुगर के मरीज का डाइट चार्ट दिखाओ')">🩸 शुगर व डाइट चार्ट</button>

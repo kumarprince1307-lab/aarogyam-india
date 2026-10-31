@@ -857,6 +857,19 @@ export async function initSakhiAiHub() {
         </form>
       </div>
     </div>
+
+    <!-- Sakhi Detail Drawer & Backdrop -->
+    <div id="sakhiDrawerBackdrop" class="sakhi-drawer-backdrop" onclick="window.closeSakhiDetailDrawer()"></div>
+    <div id="sakhiDetailDrawer" class="sakhi-detail-drawer">
+      <div class="sakhi-drawer-header">
+        <div>
+          <h3 id="sakhiDrawerTitle" style="margin:0;font-size:1.15rem;font-weight:900;color:#f8fafc;">उपयोगकर्ता संवाद विवरण</h3>
+          <p id="sakhiDrawerSubtitle" style="margin:4px 0 0 0;font-size:0.78rem;color:#94a3b8;">आरोग्यम सखी AI इंटेलिजेंस</p>
+        </div>
+        <button type="button" class="sakhi-drawer-close-btn" onclick="window.closeSakhiDetailDrawer()" title="बंद करें">&times;</button>
+      </div>
+      <div id="sakhiDrawerBody" class="sakhi-drawer-body"></div>
+    </div>
   `;
 
   // Attach chip styling dynamically if needed
@@ -909,6 +922,83 @@ function injectSakhiStyles() {
       background: #10b981 !important;
       color: #ffffff !important;
       border-color: #10b981 !important;
+    }
+    .sakhi-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 99998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .sakhi-drawer-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sakhi-detail-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      background: var(--admin-surface, #1e293b);
+      border-left: 1.5px solid var(--admin-border, #334155);
+      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.6);
+      z-index: 99999;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .sakhi-detail-drawer.active {
+      transform: translateX(0);
+    }
+    .sakhi-drawer-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--admin-border, #334155);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--admin-surface-2, #0f172a);
+    }
+    .sakhi-drawer-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: var(--admin-muted, #94a3b8);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      transition: color 0.15s;
+    }
+    .sakhi-drawer-close-btn:hover {
+      color: #f8fafc;
+    }
+    .sakhi-drawer-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sakhi-drawer-card {
+      background: var(--admin-surface-2, #0f172a);
+      border: 1px solid var(--admin-border, #334155);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .sakhi-drawer-card-label {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--admin-muted, #94a3b8);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
   `;
   document.head.appendChild(style);
@@ -966,6 +1056,7 @@ async function fetchAndRenderSakhiInsights() {
     } catch (_) {}
   }
 
+  list = list.filter(item => item.user_key !== '__SAKHI_GLOBAL_CONFIG__' && (item.mobile !== 'SYSTEM' || !item.user_key));
   sakhiAllInsights = list;
   window.sakhiAllInsights = list;
   renderKPIs(list);
@@ -1143,12 +1234,36 @@ function renderPaginationControls(containerId, totalItems, currentPage, pageSize
 
 window.openSakhiDetailDrawer = function(data) {
   window._activeDrawerData = data;
-  const backdrop = document.getElementById('sakhiDrawerBackdrop');
-  const drawer = document.getElementById('sakhiDetailDrawer');
+  let backdrop = document.getElementById('sakhiDrawerBackdrop');
+  let drawer = document.getElementById('sakhiDetailDrawer');
+
+  if (!drawer) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'sakhiDrawerBackdrop';
+    backdrop.className = 'sakhi-drawer-backdrop';
+    backdrop.onclick = () => window.closeSakhiDetailDrawer();
+    document.body.appendChild(backdrop);
+
+    drawer = document.createElement('div');
+    drawer.id = 'sakhiDetailDrawer';
+    drawer.className = 'sakhi-detail-drawer';
+    drawer.innerHTML = `
+      <div class="sakhi-drawer-header">
+        <div>
+          <h3 id="sakhiDrawerTitle" style="margin:0;font-size:1.15rem;font-weight:900;color:#f8fafc;">उपयोगकर्ता संवाद विवरण</h3>
+          <p id="sakhiDrawerSubtitle" style="margin:4px 0 0 0;font-size:0.78rem;color:#94a3b8;">आरोग्यम सखी AI इंटेलिजेंस</p>
+        </div>
+        <button type="button" class="sakhi-drawer-close-btn" onclick="window.closeSakhiDetailDrawer()" title="बंद करें">&times;</button>
+      </div>
+      <div id="sakhiDrawerBody" class="sakhi-drawer-body"></div>
+    `;
+    document.body.appendChild(drawer);
+  }
+
   const body = document.getElementById('sakhiDrawerBody');
   const title = document.getElementById('sakhiDrawerTitle');
   const sub = document.getElementById('sakhiDrawerSubtitle');
-  if (!drawer || !body) return;
+  if (!body) return;
 
   if (title) title.textContent = data.title || 'उपयोगकर्ता संवाद विवरण';
   if (sub) sub.textContent = data.subtitle || 'आरोग्यम सखी AI इंटेलिजेंस';
@@ -1213,15 +1328,29 @@ window.openSakhiDetailDrawer = function(data) {
     ` : ''}
   `;
 
-  if (backdrop) backdrop.classList.add('active');
-  drawer.classList.add('active');
+  if (backdrop) {
+    backdrop.classList.add('active');
+    backdrop.style.opacity = '1';
+    backdrop.style.pointerEvents = 'auto';
+  }
+  if (drawer) {
+    drawer.classList.add('active');
+    drawer.style.transform = 'translateX(0)';
+  }
 };
 
 window.closeSakhiDetailDrawer = function() {
   const backdrop = document.getElementById('sakhiDrawerBackdrop');
   const drawer = document.getElementById('sakhiDetailDrawer');
-  if (backdrop) backdrop.classList.remove('active');
-  if (drawer) drawer.classList.remove('active');
+  if (backdrop) {
+    backdrop.classList.remove('active');
+    backdrop.style.opacity = '0';
+    backdrop.style.pointerEvents = 'none';
+  }
+  if (drawer) {
+    drawer.classList.remove('active');
+    drawer.style.transform = 'translateX(100%)';
+  }
 };
 
 // ----------------------------------------------------
@@ -1335,7 +1464,7 @@ function renderSakhiUsersTable() {
         </td>
         <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
           <div style="display:inline-flex;gap:6px;">
-            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
               👁️ विवरण
             </button>
             ${waUrl ? `
@@ -2034,7 +2163,7 @@ async function renderUnansweredQueries() {
         </td>
         <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
           <div style="display:inline-flex;gap:4px;">
-            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
               👁️ विवरण
             </button>
             <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#16a34a;border-color:#16a34a;" onclick="window.sakhiAnswerUnanswered('${safeQ}','${safeDom}')">
@@ -2191,6 +2320,7 @@ async function fetchAndRenderSakhiAuditLogs() {
   }
 
   sakhiAuditLogsList = list;
+  window.sakhiAuditLogsList = list;
 
   // Zero-Egress Profile Name Resolver
   let profileNameMap = new Map();
@@ -2228,13 +2358,19 @@ async function fetchAndRenderSakhiAuditLogs() {
     if (userCounts.has(curVal)) filterSelect.value = curVal;
   }
 
-  window.renderSakhiAuditTableRows(list);
+  if (typeof renderSakhiAuditTableRows === 'function') {
+    renderSakhiAuditTableRows(list);
+  }
+  if (typeof renderGeminiDailyChart === 'function') {
+    renderGeminiDailyChart();
+  }
 }
 
 function formatAuditSawal(sawal) {
   if (!sawal) return '<span style="color:var(--admin-muted,#94a3b8);">सवाल अनुपलब्ध</span>';
-  if (sawal.includes('➔ [🔤]')) {
-    const parts = sawal.split('➔ [🔤]');
+  let clean = sawal.replace(/\s*\([a-z0-9_]*triage[a-z0-9_]*\)/gi, '').replace(/\s*\([a-z_]+_step[0-9]+[a-z0-9_]*\)/gi, '').trim();
+  if (clean.includes('➔ [🔤]')) {
+    const parts = clean.split('➔ [🔤]');
     const orig = parts[0].trim();
     const hindi = parts[1].trim();
     return `
@@ -2248,7 +2384,7 @@ function formatAuditSawal(sawal) {
       </div>
     `;
   }
-  return `<span>${escapeHtml(sawal)}</span>`;
+  return `<span>${escapeHtml(clean)}</span>`;
 }
 
 // ----------------------------------------------------
@@ -2324,7 +2460,8 @@ window.applySakhiAuditFilters = function() {
   window.renderSakhiAuditTableRows(filtered);
 };
 
-window.renderSakhiAuditTableRows = function(itemsToRender) {
+function renderSakhiAuditTableRows(itemsToRender) {
+window.renderSakhiAuditTableRows = renderSakhiAuditTableRows;
   const tbody = document.getElementById('sakhiAuditTableBody');
   const countBadge = document.getElementById('sakhiAuditFilteredCountBadge');
   if (!tbody) return;
@@ -2382,13 +2519,15 @@ window.renderSakhiAuditTableRows = function(itemsToRender) {
         sawal = '🔘 [विकल्प / मेनू चयन]';
       }
     }
+    sawal = (sawal || '').replace(/\s*\([a-z0-9_]*triage[a-z0-9_]*\)/gi, '').replace(/\s*\([a-z_]+_step[0-9]+[a-z0-9_]*\)/gi, '').trim();
     const jawab = rawJawab;
     const domain = item.domain || 'omni';
     const status = (item.status || 'PASS').toUpperCase();
     const isPass = status === 'PASS';
 
-    const safePayload = encodeURIComponent(JSON.stringify({
-      title: '🧪 सखी AI लाइव ऑडिट रिकॉर्ड #' + globalIdx,
+    const drawerKey = 'sakhi_audit_' + (item.id || globalIdx) + '_' + Math.random().toString(36).slice(2, 7);
+    const drawerPayload = {
+      title: '📋 सखी संवाद ऑडिट विवरण #' + globalIdx,
       subtitle: 'सखी AI गुणवत्ता व सटीकता विश्लेषण',
       name: resolvedName || userDisplay,
       phone: cleanM,
@@ -2400,10 +2539,12 @@ window.renderSakhiAuditTableRows = function(itemsToRender) {
         : `<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">⚠ FAIL</span>`,
       query: sawal,
       answer: jawab
-    }));
+    };
+    window._sakhiDrawerItems = window._sakhiDrawerItems || new Map();
+    window._sakhiDrawerItems.set(drawerKey, drawerPayload);
 
     return `
-      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;cursor:pointer;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
         <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);white-space:nowrap;">${timeStr}</td>
         <td style="padding:10px 12px;">
@@ -2856,6 +2997,49 @@ async function initGeminiControlCenter() {
   const actImgs = document.getElementById('quotaActiveImages');
   const actChats = document.getElementById('quotaActiveChats');
 
+  // Helper to sync Global Config (API Master Switch + Quotas) to Supabase Cloud
+  async function syncGlobalConfigToSupabase(updatedSwitchState) {
+    try {
+      const curSwitch = (typeof updatedSwitchState === 'boolean')
+        ? updatedSwitchState
+        : (localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') !== 'OFF');
+      const inImgs = Number(inactImgs?.value) || 5;
+      const inChats = Number(inactChats?.value) || 50;
+      const acImgs = Number(actImgs?.value) || 15;
+      const acChats = Number(actChats?.value) || 200;
+
+      const payload = {
+        api_active: curSwitch,
+        inactive: { images: inImgs, chats: inChats },
+        active: { images: acImgs, chats: acChats },
+        inactive_images: inImgs,
+        inactive_chats: inChats,
+        active_images: acImgs,
+        active_chats: acChats,
+        updated_at: new Date().toISOString()
+      };
+
+      const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+      await fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights', {
+        method: 'POST',
+        headers: {
+          'apikey': sbKey,
+          'Authorization': `Bearer ${sbKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({
+          user_key: '__SAKHI_GLOBAL_CONFIG__',
+          user_name: 'SYSTEM_CONFIG',
+          last_query_topic: JSON.stringify(payload),
+          updated_at: new Date().toISOString()
+        })
+      });
+    } catch(err) {
+      console.warn('[Gemini Control] Sync to Supabase warning:', err);
+    }
+  }
+
   // Load Master State
   function updateMasterSwitchUI() {
     const isOff = localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') === 'OFF';
@@ -2870,12 +3054,42 @@ async function initGeminiControlCenter() {
   }
   updateMasterSwitchUI();
 
+  // Load Cloud Config from Supabase on load
+  try {
+    const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+    fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?user_key=eq.__SAKHI_GLOBAL_CONFIG__', {
+      headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' }
+    }).then(res => res.json()).then(data => {
+      if (Array.isArray(data) && data[0] && data[0].last_query_topic) {
+        try {
+          const cfg = JSON.parse(data[0].last_query_topic);
+          if (typeof cfg.api_active === 'boolean') {
+            localStorage.setItem('SAKHI_GEMINI_MASTER_SWITCH', cfg.api_active ? 'ON' : 'OFF');
+            updateMasterSwitchUI();
+          }
+          const inImgs = cfg.inactive?.images || cfg.inactive_images || 5;
+          const inChats = cfg.inactive?.chats || cfg.inactive_chats || 50;
+          const acImgs = cfg.active?.images || cfg.active_images || 15;
+          const acChats = cfg.active?.chats || cfg.active_chats || 200;
+          if (inactImgs) inactImgs.value = inImgs;
+          if (inactChats) inactChats.value = inChats;
+          if (actImgs) actImgs.value = acImgs;
+          if (actChats) actChats.value = acChats;
+        } catch (_) {}
+      }
+    }).catch(() => {});
+  } catch(e) {}
+
   if (masterBtn) {
-    masterBtn.onclick = () => {
+    masterBtn.onclick = async () => {
       const isOff = localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') === 'OFF';
-      localStorage.setItem('SAKHI_GEMINI_MASTER_SWITCH', isOff ? 'ON' : 'OFF');
+      const newSwitch = isOff ? 'ON' : 'OFF';
+      localStorage.setItem('SAKHI_GEMINI_MASTER_SWITCH', newSwitch);
       updateMasterSwitchUI();
-      alert(isOff ? '✅ जेमिनी AI विज़न इंजन सफलतापूर्वक चालू (ON) कर दिया गया है!' : '🛑 जेमिनी AI विज़न इंजन बंद (OFF) कर दिया गया है। यूजर को मेंटेनेंस संदेश दिखेगा।');
+      await syncGlobalConfigToSupabase(newSwitch === 'ON');
+      alert(newSwitch === 'ON' 
+        ? '✅ सखी AI कैमरा व विज़न इंजन चालू (ON) कर दिया गया है! सभी यूजर्स के लिए कैमरा फोटो विज़न सक्रिय है।' 
+        : '🛑 सखी AI कैमरा/विज़न बंद (OFF) कर दिया गया है! सामान्य यूजर्स के लिए केवल कैमरा फोटो अपलोड बंद रहेगा, चैट सवाल तय कोटा सीमा तक चालू रहेंगे।');
     };
   }
 
@@ -2987,7 +3201,7 @@ async function initGeminiControlCenter() {
 
   // Save Global Quotas
   if (saveQuotasBtn) {
-    saveQuotasBtn.onclick = () => {
+    saveQuotasBtn.onclick = async () => {
       const config = {
         inactive: {
           images: Number(inactImgs?.value) || 5,
@@ -2999,7 +3213,8 @@ async function initGeminiControlCenter() {
         }
       };
       localStorage.setItem('SAKHI_GLOBAL_QUOTA_CONFIG', JSON.stringify(config));
-      alert('✅ ग्लोबल कोटा सेटिंग्स सफलतापूर्वक अपडेट की गईं!\nइनएक्टिव: ' + config.inactive.images + ' फोटो, ' + config.inactive.chats + ' चैट\nएक्टिव: ' + config.active.images + ' फोटो, ' + config.active.chats + ' चैट');
+      await syncGlobalConfigToSupabase();
+      alert('✅ ग्लोबल कोटा सेटिंग्स क्लाउड में सफलतापूर्वक अपडेट की गईं!\n\nयह कोटा सभी सामान्य यूजर्स पर लाइव लागू होगा (एडमिन को छोड़कर):\n\n🟡 इनएक्टिव: ' + config.inactive.images + ' फोटो, ' + config.inactive.chats + ' चैट/दिन\n🟢 एक्टिव: ' + config.active.images + ' फोटो, ' + config.active.chats + ' चैट/दिन');
     };
   }
 
@@ -3036,8 +3251,8 @@ function renderGeminiDailyChart() {
     statsObj = JSON.parse(localStorage.getItem(statsKey) || '{}');
   } catch(e) {}
 
-  // Aggregate genuine daily activity from sakhiAuditLogsList & sakhiAllInsights (0-Egress Real Data)
-  const auditList = window.sakhiAuditLogsList || [];
+  // Aggregate genuine daily activity from sakhiAuditLogsList (Real Data)
+  const auditList = window.sakhiAuditLogsList || sakhiAuditLogsList || [];
   if (Array.isArray(auditList) && auditList.length > 0) {
     auditList.forEach(item => {
       const dt = item.date_time || item.created_at || item.timestamp;
@@ -3056,31 +3271,24 @@ function renderGeminiDailyChart() {
     });
   }
 
-  // Also include user insights recent volume if audit table is still syncing
-  const insightsList = window.sakhiAllInsights || [];
-  if (insightsList.length > 0) {
-    insightsList.forEach(ins => {
-      const dt = ins.last_active_at || ins.created_at;
-      if (!dt) return;
-      const d = new Date(dt);
-      if (isNaN(d.getTime())) return;
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      if (!statsObj[key]) statsObj[key] = { images: 0, chats: 0, tokens: 0 };
-      if (!statsObj[key].chats || statsObj[key].chats === 0) {
-        statsObj[key].chats = (statsObj[key].chats || 0) + (Number(ins.interaction_count) || 1);
-        statsObj[key].tokens = (statsObj[key].tokens || 0) + ((Number(ins.interaction_count) || 1) * 350);
-      }
-    });
-  }
-
   const todayKey = days[6];
   if (!statsObj[todayKey]) {
     statsObj[todayKey] = { images: 0, chats: 0, tokens: 0 };
   }
 
+  // Accurately count today's real chats from auditList
+  const todayRealChats = (auditList || []).filter(item => {
+    const dt = item.date_time || item.created_at || item.timestamp;
+    if (!dt) return false;
+    const d = new Date(dt);
+    if (isNaN(d.getTime())) return false;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return key === todayKey;
+  }).length;
+
   let total7dTokens = 0;
   let todayImgs = statsObj[todayKey]?.images || 0;
-  let todayChats = statsObj[todayKey]?.chats || 0;
+  let todayChats = todayRealChats > 0 ? todayRealChats : (statsObj[todayKey]?.chats || 0);
 
   days.forEach((dk) => {
     const s = statsObj[dk] || { images: 0, chats: 0, tokens: 0 };
@@ -3445,7 +3653,8 @@ function renderTeamLeadsTable() {
     const waMsg = `नमस्ते ${r.member_name} जी! 🙏\nआपकी आरोग्यम सखी AI पर रुचि (${domainBadge}) के संबंध में हमारी विशेष गाइड उपलब्ध है:\n👉 ${pitchText}\n_आरोग्यम इंडिया टीम_`;
     const waUrl = `https://wa.me/91${r.member_mobile}?text=${encodeURIComponent(waMsg)}`;
 
-    const safePayload = encodeURIComponent(JSON.stringify({
+    const drawerKey = 'sakhi_lead_' + (r.id || globalIdx) + '_' + Math.random().toString(36).slice(2, 7);
+    const drawerPayload = {
       title: '👑 टीम स्पॉन्सर लीड #' + globalIdx,
       subtitle: 'स्पॉन्सर: ' + (r.upline_name || 'Aarogyam India'),
       name: r.member_name,
@@ -3456,10 +3665,12 @@ function renderTeamLeadsTable() {
       query: 'कुल सवाल: ' + (r.chat_count || 1) + ' बार सखी AI से संवाद।',
       answer: 'डाउनलाइन किसान की मुख्य रुचि ' + domainBadge + ' में है। स्पॉन्सर Upline: ' + (r.upline_name || '') + ' (' + (r.upline_code || '') + ')।',
       ebook: pitchText
-    }));
+    };
+    window._sakhiDrawerItems = window._sakhiDrawerItems || new Map();
+    window._sakhiDrawerItems.set(drawerKey, drawerPayload);
 
     return `
-      <tr style="border-bottom:1px solid #334155;cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+      <tr style="border-bottom:1px solid #334155;cursor:pointer;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
         <td style="padding:10px 12px;color:#94a3b8;font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;">
           <strong style="color:#f8fafc;display:block;">${escapeHtml(r.member_name)}</strong>
