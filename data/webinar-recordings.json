@@ -1,6 +1,28 @@
 {
   "recordings": [
     {
+      "id": "VID_S612726",
+      "format": "short_reel",
+      "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
+      "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱 | पहले सावधान हों!",
+      "description": "किसान भाइयों, क्या आप बिना पूरी जानकारी के फसल में दवा का छिड़काव कर रहे हैं? ⚠️\nगलत दवा, गलत मात्रा और गलत समय आपकी मेहनत और फसल दोनों को नुकसान पहुँचा सकते हैं।",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtube.com/shorts/Pv2-wbzjXEc?feature=share",
+      "youtube_url": "https://youtube.com/shorts/Pv2-wbzjXEc?feature=share",
+      "youtube_id": "Pv2-wbzjXEc",
+      "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+      "duration": "0:58",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 10,
+      "order_type": "normal",
+      "status": "active",
+      "created_at": "2026-10-31T13:00:12.726Z"
+    },
+    {
       "id": "VID_S974645",
       "format": "short_reel",
       "platform": "youtube",
