@@ -2077,3 +2077,165 @@ body.light-theme .game-modal-card label {
   align-items: center;
   gap: 4px;
 }
+
+
+/* ====================================================================
+   AAROGYAM SMART BUSINESS DIARY - HIGH-CONTRAST BLUE/BLACK/WHITE THEME
+   ==================================================================== */
+
+/* Game-Style Animated Progress Bar */
+@keyframes gameBarShimmer {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 50px 50px;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.8), inset 0 1px 4px rgba(255, 255, 255, 0.6);
+  }
+}
+
+.game-progress-track {
+  width: 100%;
+  background: #090d16;
+  border: 1.5px solid #1e3a8a;
+  border-radius: 999px;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+}
+
+.game-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 40%, #38bdf8 70%, #60a5fa 100%);
+  background-size: 30px 30px;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.25) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.25) 75%,
+    transparent 75%,
+    transparent
+  );
+  animation: gameBarShimmer 2s linear infinite, pulseGlow 3s ease-in-out infinite;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+/* Form Label & Input Contrast Fixes: Zero muddy grey or dark-blue text */
+#tab-diary-entry label,
+#tab-diary-ledger label,
+#tab-diary-followup label,
+#tab-diary-pocket label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  margin-bottom: 5px !important;
+  display: block;
+}
+
+#smartDiaryForm input,
+#smartDiaryForm select,
+#smartDiaryForm textarea,
+#diaryCashflowForm input,
+#diaryCashflowForm select {
+  background: #0b1120 !important;
+  border: 1.5px solid #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+#smartDiaryForm input:focus,
+#smartDiaryForm select:focus,
+#smartDiaryForm textarea:focus,
+#diaryCashflowForm input:focus,
+#diaryCashflowForm select:focus {
+  border-color: #38bdf8 !important;
+  outline: none !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
+}
+
+/* Category Filter Chips in Follow-up Hub */
+.followup-filter-chip {
+  background: #0b1120;
+  border: 1.5px solid #1e293b;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.followup-filter-chip:hover {
+  border-color: #38bdf8;
+  background: #1e293b;
+}
+
+.followup-filter-chip.active {
+  background: #2563eb !important;
+  border-color: #60a5fa !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+}
+
+/* Ledger & Khata Cards Decent Contrast */
+.ledger-entry-card {
+  background: #090d16;
+  border: 1.5px solid #1e293b;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.ledger-entry-card:hover {
+  border-color: #2563eb;
+}
+
+.badge-jama {
+  background: #064e3b;
+  color: #34d399;
+  border: 1px solid #059669;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.72rem;
+}
+
+.badge-udhar {
+  background: #450a0a;
+  color: #f87171;
+  border: 1px solid #dc2626;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.72rem;
+}
+
+/* Growth & Closing Projection Box */
+.growth-projection-card {
+  background: linear-gradient(135deg, #02132e 0%, #030712 100%);
+  border: 1.5px solid #2563eb;
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
+}

@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   
   <!-- Core CSS -->
-  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v30_diary_live">
+  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v32_diary_revamp">
 </head>
 
 <body>
@@ -101,76 +101,6 @@
 
     </div>
   </header>
-
-  <!-- =========================================
-       2. DUAL CLOSING COUNTDOWN ENGINE
-  ========================================== -->
-  <section class="closing-command-strip">
-    
-    <!-- 1. Weekly Friday Retail Closing -->
-    <div class="closing-card friday-card">
-      <div class="closing-card-header">
-        <span class="closing-tag friday-tag">🛒 शुक्रवार वीकली रिटेल</span>
-        <span class="closing-countdown-digits friday-countdown" id="fridayCountdownDisplay">00d : 00h : 00m : 00s</span>
-      </div>
-      <div class="closing-stat-row">
-        <span class="closing-stat-label">इस हफ्ते का रिटेल:</span>
-        <span class="closing-stat-value" id="fridayRetailTotalVal" style="color:#34d399;">₹0</span>
-      </div>
-      <div class="closing-progress-track">
-        <div class="closing-progress-bar-green" id="fridayProgressBar" style="width: 5%;"></div>
-      </div>
-      <div class="slab-indicator">
-        <span id="fridayCurrentSlabBadge">5% स्टार्टर</span>
-        <span id="fridayNextSlabHint" style="color:#fbbf24;">अगले स्लैब के लिए ₹2,001 शेष</span>
-      </div>
-    </div>
-
-    <!-- 2. 15-Day Mega Cycle Closing (₹8,19,250 Cap) -->
-    <div class="closing-card mega-cycle-card">
-      <div class="closing-card-header">
-        <span class="closing-tag mega-tag">⏳ 15-दिवसीय टर्नओवर साइकल</span>
-        <span class="closing-countdown-digits mega-countdown" id="megaCycleCountdownDisplay">00d : 00h : 00m : 00s</span>
-      </div>
-      <div class="closing-stat-row">
-        <span class="closing-stat-label">15-दिन कुल टर्नओवर:</span>
-        <span class="closing-stat-value" id="fortnightTurnoverVal" style="color:#fbbf24;">₹0</span>
-      </div>
-      <div class="closing-progress-track">
-        <div class="closing-progress-bar-gold" id="megaCycleProgressBar" style="width: 2%;"></div>
-      </div>
-      <div class="slab-indicator">
-        <span id="megaCycleCapText" style="color:#f59e0b;">लक्ष्य: ₹8,19,250</span>
-        <label style="font-size:0.68rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer;">
-          <span>📅 क्लोजिंग:</span>
-          <input type="date" id="customCycleDateInput" onchange="window.AarogyamETailer.setCustomCycleDate(this.value)" style="background:var(--bg-input);color:var(--text-gold);border:1px solid var(--border-card);border-radius:4px;padding:2px 4px;font-size:0.68rem;">
-        </label>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- =========================================
-       2.5 LEVEL PROGRESSION & SMART QUOTA RADAR
-  ========================================== -->
-  <section class="diary-level-hero" id="diaryLevelHero">
-    <div class="diary-level-header">
-      <div class="diary-user-badge">
-        <span id="diaryHeroUserName">👤 किसान साथी</span>
-        <span class="diary-rank-pill" id="diaryHeroRankBadge">🥈 लेवल 2: सक्रिय फील्ड प्रमोटर</span>
-      </div>
-      <div id="diaryQuotaCounterBadge" style="font-size:0.75rem; background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.35); padding:3px 10px; border-radius:20px; font-weight:800;">
-        ⚡ 0 प्रविष्टियां दर्ज
-      </div>
-    </div>
-    <div class="diary-progress-bar-wrap">
-      <div class="diary-progress-bar-fill" id="diaryHeroProgressBar" style="width: 25%;"></div>
-    </div>
-    <div class="diary-progress-footer">
-      <span id="diaryHeroNextRankHint">🎯 अगले स्तर (गोल्ड लीडर) हेतु फील्ड गतिविधियां दर्ज करें!</span>
-      <span style="color:#38bdf8; font-weight:700; cursor:pointer;" onclick="window.AarogyamETailer.switchTab('tab-diary-pocket')">लक्ष्य कैलकुलेटर ➔</span>
-    </div>
-  </section>
 
   <!-- =========================================
        3. 4 PRIMARY BUSINESS DIARY TABS
@@ -319,6 +249,26 @@
             🔒 100% सुरक्षित • ऑफलाइन मोड सपोर्टेड
           </div>
         </form>
+
+        <!-- Gamified Animated Level Progress Bar (Placed below entry form) -->
+        <div class="diary-level-hero" id="diaryLevelHero" style="margin:16px 0 0 0; background:linear-gradient(135deg, #090e17 0%, #0f172a 100%); border:2px solid #0284c7; border-radius:12px; box-shadow:0 0 20px rgba(2,132,199,0.35);">
+          <div class="diary-level-header">
+            <div class="diary-user-badge" style="color:#ffffff; font-weight:900;">
+              <span id="diaryHeroUserName">👤 किसान साथी</span>
+              <span class="diary-rank-pill" id="diaryHeroRankBadge" style="background:#0284c7; color:#ffffff; font-weight:900;">🥈 लेवल 2: सक्रिय फील्ड प्रमोटर</span>
+            </div>
+            <div id="diaryQuotaCounterBadge" style="font-size:0.80rem; background:#10b981; color:#000000; padding:3px 10px; border-radius:20px; font-weight:900;">
+              ⚡ 0 प्रविष्टियां दर्ज
+            </div>
+          </div>
+          <div class="diary-progress-bar-wrap" style="height:12px; background:#1e293b; border-radius:10px; border:1px solid #334155;">
+            <div class="diary-progress-bar-fill" id="diaryHeroProgressBar" style="width: 25%; background:linear-gradient(90deg, #0284c7 0%, #38bdf8 50%, #10b981 100%);"></div>
+          </div>
+          <div class="diary-progress-footer" style="color:#ffffff; font-weight:700; font-size:0.78rem;">
+            <span id="diaryHeroNextRankHint">🎯 अगले स्तर (गोल्ड लीडर) हेतु फील्ड गतिविधियां दर्ज करें!</span>
+            <span style="color:#38bdf8; font-weight:900; cursor:pointer;" onclick="window.AarogyamETailer.switchTab('tab-diary-pocket')">विकास अनुमान ➔</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -326,6 +276,54 @@
          TAB 2: DIARY LEDGER & SMART REPORTS (KHATABOOK STYLE)
     ============================================================== -->
     <section id="tab-diary-ledger" class="tab-pane" style="display:none;">
+
+      <!-- 15-दिवसीय टर्नओवर व शुक्रवार रिटेल क्लोजिंग कार्ड्स (रिपोर्ट सेक्शन में) -->
+      <div style="margin-bottom:16px;">
+          <section class="closing-command-strip">
+    
+    <!-- 1. Weekly Friday Retail Closing -->
+    <div class="closing-card friday-card">
+      <div class="closing-card-header">
+        <span class="closing-tag friday-tag">🛒 शुक्रवार वीकली रिटेल</span>
+        <span class="closing-countdown-digits friday-countdown" id="fridayCountdownDisplay">00d : 00h : 00m : 00s</span>
+      </div>
+      <div class="closing-stat-row">
+        <span class="closing-stat-label">इस हफ्ते का रिटेल:</span>
+        <span class="closing-stat-value" id="fridayRetailTotalVal" style="color:#34d399;">₹0</span>
+      </div>
+      <div class="closing-progress-track">
+        <div class="closing-progress-bar-green" id="fridayProgressBar" style="width: 5%;"></div>
+      </div>
+      <div class="slab-indicator">
+        <span id="fridayCurrentSlabBadge">5% स्टार्टर</span>
+        <span id="fridayNextSlabHint" style="color:#fbbf24;">अगले स्लैब के लिए ₹2,001 शेष</span>
+      </div>
+    </div>
+
+    <!-- 2. 15-Day Mega Cycle Closing (₹8,19,250 Cap) -->
+    <div class="closing-card mega-cycle-card">
+      <div class="closing-card-header">
+        <span class="closing-tag mega-tag">⏳ 15-दिवसीय टर्नओवर साइकल</span>
+        <span class="closing-countdown-digits mega-countdown" id="megaCycleCountdownDisplay">00d : 00h : 00m : 00s</span>
+      </div>
+      <div class="closing-stat-row">
+        <span class="closing-stat-label">15-दिन कुल टर्नओवर:</span>
+        <span class="closing-stat-value" id="fortnightTurnoverVal" style="color:#fbbf24;">₹0</span>
+      </div>
+      <div class="closing-progress-track">
+        <div class="closing-progress-bar-gold" id="megaCycleProgressBar" style="width: 2%;"></div>
+      </div>
+      <div class="slab-indicator">
+        <span id="megaCycleCapText" style="color:#f59e0b;">लक्ष्य: ₹8,19,250</span>
+        <label style="font-size:0.68rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;cursor:pointer;">
+          <span>📅 क्लोजिंग:</span>
+          <input type="date" id="customCycleDateInput" onchange="window.AarogyamETailer.setCustomCycleDate(this.value)" style="background:var(--bg-input);color:var(--text-gold);border:1px solid var(--border-card);border-radius:4px;padding:2px 4px;font-size:0.68rem;">
+        </label>
+      </div>
+    </div>
+
+  </section>
+      </div>
       
       <!-- Top Ledger Metric Strip -->
       <div class="cashflow-kpi-grid">
@@ -375,20 +373,45 @@
     </section>
 
     <!-- =============================================================
-         TAB 3: FOLLOW-UP & WHATSAPP ACTION HUB
+         TAB 3: FOLLOW-UP & WHATSAPP ACTION HUB (SEGMENTED CATEGORIES)
     ============================================================== -->
     <section id="tab-diary-followup" class="tab-pane" style="display:none;">
-      <div class="smart-form-card" style="border-color:#38bdf8;">
+      <div class="smart-form-card" style="border:2px solid #0284c7;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
           <div>
-            <h3 style="margin:0; font-size:1.10rem; font-weight:900; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px;">
               <span>🎯</span> <span>आज का प्राथमिकता फॉलो-अप रडार</span>
             </h3>
-            <span style="font-size:0.75rem; color:#94a3b8;">1-टैप में सीधे ग्राहक या साथी के WhatsApp पर पर्सनल मैसेज भेजें</span>
+            <span style="font-size:0.80rem; color:#f8fafc; font-weight:600;">श्रेणी के अनुसार चुनें और 1-क्लिक में पर्सनलाइज्ड WhatsApp या कॉल करें</span>
           </div>
-          <span style="background:rgba(56,189,248,0.15); color:#38bdf8; padding:3px 10px; border-radius:20px; font-weight:800; font-size:0.74rem;">
+          <span style="background:#0284c7; color:#ffffff; padding:4px 12px; border-radius:20px; font-weight:900; font-size:0.78rem;">
             1-TAP ACTIONS
           </span>
+        </div>
+
+        <!-- Follow-up Segmented Category Filter Tabs -->
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
+          <button type="button" class="status-pill-btn active" data-fu-filter="all" onclick="window.AarogyamETailer.setFollowupFilter('all')" style="white-space:nowrap; font-weight:800;">
+            👥 सभी फॉलो-अप
+          </button>
+          <button type="button" class="status-pill-btn" data-fu-filter="customer" onclick="window.AarogyamETailer.setFollowupFilter('customer')" style="white-space:nowrap; font-weight:800;">
+            🌾 किसान ग्राहक
+          </button>
+          <button type="button" class="status-pill-btn" data-fu-filter="prospect" onclick="window.AarogyamETailer.setFollowupFilter('prospect')" style="white-space:nowrap; font-weight:800;">
+            1️⃣ नया प्रोस्पेक्ट
+          </button>
+          <button type="button" class="status-pill-btn" data-fu-filter="joined" onclick="window.AarogyamETailer.setFollowupFilter('joined')" style="white-space:nowrap; font-weight:800;">
+            2️⃣ नई जॉइनिंग
+          </button>
+          <button type="button" class="status-pill-btn" data-fu-filter="active" onclick="window.AarogyamETailer.setFollowupFilter('active')" style="white-space:nowrap; font-weight:800;">
+            3️⃣ सक्रिय साथी
+          </button>
+          <button type="button" class="status-pill-btn" data-fu-filter="core" onclick="window.AarogyamETailer.setFollowupFilter('core')" style="white-space:nowrap; font-weight:800;">
+            4️⃣ कोर लीडर
+          </button>
+          <button type="button" class="status-pill-btn" data-fu-filter="dues" onclick="window.AarogyamETailer.setFollowupFilter('dues')" style="white-space:nowrap; font-weight:800; color:#f87171;">
+            🔴 उधारी वसूली
+          </button>
         </div>
 
         <div id="diaryFollowupList">
@@ -401,6 +424,24 @@
          TAB 4: POCKET CASHFLOW & INCOME GOAL CALCULATOR
     ============================================================== -->
     <section id="tab-diary-pocket" class="tab-pane" style="display:none;">
+
+      <!-- Smart Business Closing & Income Projection Card -->
+      <div class="smart-form-card" style="background:linear-gradient(135deg, #090e17 0%, #1e1b4b 100%); border:2px solid #818cf8; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px;">
+              <span>🚀</span> <span>आपकी संभावित ग्रोथ व क्लोजिंग अनुमान</span>
+            </h3>
+            <span style="font-size:0.80rem; color:#e0e7ff; font-weight:600;">आपकी डायरी में दर्ज वास्तविक संपर्कों के आधार पर लाइव संभावित आय:</span>
+          </div>
+          <span style="background:#4f46e5; color:#ffffff; padding:4px 10px; border-radius:20px; font-weight:900; font-size:0.75rem;">
+            LIVE PROJECTION
+          </span>
+        </div>
+        <div id="diaryGrowthProjectionBox" style="background:rgba(15,23,42,0.8); border:1px solid rgba(129,140,248,0.4); border-radius:10px; padding:14px;">
+          <!-- Populated via JS -->
+        </div>
+      </div>
       
       <!-- Income Goal Calculator -->
       <div class="goal-calc-box">
@@ -1078,7 +1119,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/universal-nav-drawer.js?v=1.1"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261031_v30_diary_live"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261031_v32_diary_revamp"></script>
 </body>
 
 </html>

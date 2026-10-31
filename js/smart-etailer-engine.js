@@ -2033,32 +2033,108 @@
     showToast('प्रविष्टि हटा दी गई!', 'info');
   }
 
-  // Follow-up Hub Rendering
+  // Follow-up Hub State & Filtering
+  let currentFollowupFilter = 'all';
+
+  function setFollowupFilter(filter) {
+    currentFollowupFilter = filter;
+    
+    // Update active filter pill UI
+    const pills = document.querySelectorAll('.followup-filter-chip');
+    pills.forEach(pill => {
+      const onclickAttr = pill.getAttribute('onclick') || '';
+      if (onclickAttr.includes(`'${filter}'`)) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+
+    renderDiaryFollowups();
+  }
+
   function renderDiaryFollowups() {
     const wrap = document.getElementById('diaryFollowupList');
     if (!wrap) return;
 
-    const entries = getLocalDiaryEntries();
-    if (entries.length === 0) {
-      wrap.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">कोई सक्रिय फॉलो-अप नहीं है।</div>';
+    let entries = getLocalDiaryEntries();
+    if (!entries || entries.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center; padding:25px; color:#94a3b8; font-size:0.85rem;">📭 कोई फॉलो-अप प्रविष्टि उपलब्ध नहीं है। ऊपर "सरल एंट्री" से किसान या साथी जोड़ें!</div>';
       return;
     }
 
-    wrap.innerHTML = entries.slice(0, 8).map(e => {
-      const waMsg = encodeURIComponent(`नमस्ते ${e.name} जी! 🙏 आरोग्यम इंडिया से संपर्क किया गया है। आपकी (${e.need}) के संबंध में उचित मार्गदर्शन और समाधान उपलब्ध है।`);
-      const waUrl = `https://wa.me/91${e.mobile}?text=${waMsg}`;
+    // Apply Filter
+    if (currentFollowupFilter === 'customer') {
+      entries = entries.filter(e => e.type === 'customer');
+    } else if (currentFollowupFilter === 'prospect') {
+      entries = entries.filter(e => e.type === 'team' && (e.team_status === 'prospect' || !e.team_status));
+    } else if (currentFollowupFilter === 'joined') {
+      entries = entries.filter(e => e.type === 'team' && e.team_status === 'joined');
+    } else if (currentFollowupFilter === 'active') {
+      entries = entries.filter(e => e.type === 'team' && e.team_status === 'active');
+    } else if (currentFollowupFilter === 'core') {
+      entries = entries.filter(e => e.type === 'team' && e.team_status === 'core');
+    } else if (currentFollowupFilter === 'dues') {
+      entries = entries.filter(e => Number(e.due_amount) > 0);
+    }
+
+    if (entries.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.85rem;">इस श्रेणी में फिलहाल कोई सक्रिय फॉलो-अप नहीं है।</div>';
+      return;
+    }
+
+    wrap.innerHTML = entries.map(e => {
+      const isDone = !!e.followup_done;
+      const dueAmt = Number(e.due_amount) || 0;
+      
+      // Determine badge
+      let typeBadge = '';
+      if (e.type === 'customer') {
+        typeBadge = '<span style="background:#064e3b; color:#34d399; font-size:0.70rem; padding:2px 7px; border-radius:6px; font-weight:800;">🌾 किसान ग्राहक</span>';
+      } else {
+        const statusMap = {
+          prospect: '1️⃣ नया प्रोस्पेक्ट',
+          joined: '2️⃣ नया जॉइन हुआ',
+          active: '3️⃣ सक्रिय साथी',
+          core: '4️⃣ कोर लीडर'
+        };
+        typeBadge = `<span style="background:#1e3a8a; color:#93c5fd; font-size:0.70rem; padding:2px 7px; border-radius:6px; font-weight:800;">${statusMap[e.team_status] || '👥 टीम साथी'}</span>`;
+      }
+
+      // WhatsApp Message based on context
+      let customMsg = `नमस्ते ${e.name} जी! 🙏 आरोग्यम इंडिया से संपर्क किया गया है।`;
+      if (dueAmt > 0) {
+        customMsg = `नमस्ते ${e.name} जी! 🙏 आरोग्यम से आपका हिसाब: आपके खाते में ₹${dueAmt} की उधारी शेष है। कृपया समय पर चुकता करें। धन्यवाद!`;
+      } else if (e.type === 'customer') {
+        customMsg = `नमस्ते ${e.name} जी! 🌱 आपकी फसल व जैविक उपचार (${e.need || 'आरोग्यम उत्पाद'}) के संबंध में आपसे बात करनी थी। क्या आप अभी उपलब्ध हैं?`;
+      } else if (e.team_status === 'prospect') {
+        customMsg = `नमस्ते ${e.name} जी! 🚀 आरोग्यम बिजनेस मॉडल और जैविक खेती से आर्थिक प्रगति के बारे में बात करने हेतु संपर्क किया है।`;
+      } else if (e.team_status === 'joined') {
+        customMsg = `नमस्ते ${e.name} जी! 🌟 आरोग्यम टीम में आपका स्वागत है। अगले चरण और फील्ड ऑर्डर की योजना हेतु कॉल करें।`;
+      }
+
+      const waUrl = `https://wa.me/91${e.mobile}?text=${encodeURIComponent(customMsg)}`;
 
       return `
-        <div class="followup-item-card">
-          <div>
-            <div style="font-weight:800; font-size:0.95rem; color:#f8fafc;">${e.name} (${e.place})</div>
-            <div style="font-size:0.76rem; color:#38bdf8; margin-top:3px;">
-              🌱 आवश्यकता: <strong>${e.need}</strong> • 📱 ${e.mobile}
+        <div class="followup-item-card" style="background:${isDone ? '#091322' : '#0f172a'}; border:1px solid ${isDone ? '#10b981' : '#1e3a8a'};">
+          <div style="flex:1; min-width:200px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <span style="font-weight:900; font-size:0.95rem; color:#ffffff;">${e.name}</span>
+              ${typeBadge}
+              ${dueAmt > 0 ? `<span class="badge-udhar">उधारी: ₹${dueAmt}</span>` : ''}
+              ${isDone ? '<span style="background:#065f46; color:#a7f3d0; font-size:0.68rem; padding:2px 6px; border-radius:4px; font-weight:800;">✔️ संपर्क हुआ</span>' : ''}
+            </div>
+            <div style="font-size:0.78rem; color:#cbd5e1;">
+              📍 <strong>${e.place || 'क्षेत्र दर्ज नहीं'}</strong> • 📱 <span style="color:#38bdf8; font-weight:700;">${e.mobile}</span>
+              ${e.need ? ` • 🎯 विषय: <span style="color:#fde047;">${e.need}</span>` : ''}
             </div>
           </div>
-          <div class="followup-action-btn-group">
+          <div class="followup-action-btn-group" style="margin-top:6px;">
             <a href="tel:${e.mobile}" class="btn-action-call">📞 कॉल</a>
-            <a href="${waUrl}" target="_blank" class="btn-action-wa" onclick="window.AarogyamETailer.markFollowupDone('${e.id}')">💬 1-टैप WhatsApp</a>
+            <a href="${waUrl}" target="_blank" class="btn-action-wa">💬 WhatsApp</a>
+            <button type="button" class="btn-action-call" style="background:${isDone ? '#065f46' : '#334155'}; color:#ffffff;" onclick="window.AarogyamETailer.markFollowupDone('${e.id}')">
+              ${isDone ? '🔄 री-ओपन' : '✅ पूर्ण'}
+            </button>
           </div>
         </div>
       `;
@@ -2068,13 +2144,92 @@
   function markFollowupDone(id) {
     let entries = getLocalDiaryEntries();
     entries.forEach(e => {
-      if (e.id === id) e.followup_done = true;
+      if (e.id === id) {
+        e.followup_done = !e.followup_done;
+      }
     });
     saveLocalDiaryEntries(entries);
-    showToast('फॉलो-अप पूर्ण चिन्हित किया गया! (+15 अंक)', 'success');
+    renderDiaryFollowups();
+    updateDiaryHeroLevel();
+    renderGrowthProjection();
+    showToast('फॉलो-अप स्थिति अपडेट हुई! 🎯 (+10 पॉइंट्स)', 'success');
   }
 
-  // Report Download (Permissions-aware)
+  // Growth & Closing Projection Engine
+  function renderGrowthProjection() {
+    const box = document.getElementById('diaryGrowthProjectionBox');
+    if (!box) return;
+
+    const entries = getLocalDiaryEntries();
+    let custCount = 0;
+    let prospectCount = 0;
+    let joinedCount = 0;
+    let activeCount = 0;
+    let totalDues = 0;
+
+    entries.forEach(e => {
+      totalDues += (Number(e.due_amount) || 0);
+      if (e.type === 'customer') {
+        custCount++;
+      } else {
+        if (e.team_status === 'prospect' || !e.team_status) prospectCount++;
+        else if (e.team_status === 'joined') joinedCount++;
+        else if (e.team_status === 'active' || e.team_status === 'core') activeCount++;
+      }
+    });
+
+    const retailPotential = custCount * 600; // Average retail profit per customer order
+    const teamBonusPotential = (prospectCount * 300) + (joinedCount * 800) + (activeCount * 1500);
+    const totalPotential = retailPotential + teamBonusPotential;
+
+    box.innerHTML = `
+      <div class="growth-projection-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #1e3a8a; padding-bottom:8px;">
+          <div>
+            <div style="font-weight:900; font-size:0.95rem; color:#60a5fa; display:flex; align-items:center; gap:6px;">
+              <span>🚀 आपकी डायरी से संभावित कमाई व ग्रोथ (AI Projection)</span>
+            </div>
+            <div style="font-size:0.74rem; color:#cbd5e1; margin-top:2px;">
+              आपके दर्ज किए गए ${entries.length} संपर्कों के आधार पर क्लोजिंग कैलकुलेशन:
+            </div>
+          </div>
+          <span style="background:#2563eb; color:#ffffff; font-size:0.72rem; padding:4px 9px; border-radius:12px; font-weight:800;">
+            CEO डैशबोर्ड
+          </span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:12px;">
+          <div style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px; text-align:center;">
+            <div style="font-size:0.72rem; color:#cbd5e1; font-weight:700;">🌾 किसान रिटेल लाभ</div>
+            <div style="font-size:1.05rem; font-weight:900; color:#34d399; margin-top:2px;">+₹${retailPotential.toLocaleString('en-IN')}</div>
+            <div style="font-size:0.68rem; color:#60a5fa;">${custCount} किसान ग्राहक</div>
+          </div>
+          <div style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px; text-align:center;">
+            <div style="font-size:0.72rem; color:#cbd5e1; font-weight:700;">👥 टीम लीडरशिप बोनस</div>
+            <div style="font-size:1.05rem; font-weight:900; color:#38bdf8; margin-top:2px;">+₹${teamBonusPotential.toLocaleString('en-IN')}</div>
+            <div style="font-size:0.68rem; color:#60a5fa;">${prospectCount + joinedCount + activeCount} टीम साथी</div>
+          </div>
+          <div style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px; text-align:center;">
+            <div style="font-size:0.72rem; color:#cbd5e1; font-weight:700;">🔴 उधारी वसूली लक्ष्य</div>
+            <div style="font-size:1.05rem; font-weight:900; color:#f87171; margin-top:2px;">₹${totalDues.toLocaleString('en-IN')}</div>
+            <div style="font-size:0.68rem; color:#fca5a5;">खाता बुक बकाया</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(37, 99, 235, 0.15); border:1px solid #2563eb; border-radius:8px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:800; font-size:0.86rem; color:#ffffff;">🎯 कुल संभावित फील्ड ग्रोथ कमाई:</div>
+            <div style="font-size:0.72rem; color:#93c5fd;">इन सभी संपर्कों को फॉलो-अप कर क्लोज करने पर संभावित शुद्ध मुनाफा</div>
+          </div>
+          <div style="font-size:1.25rem; font-weight:900; color:#fde047;">
+            ₹${totalPotential.toLocaleString('en-IN')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+    // Report Download (Permissions-aware)
   function downloadDiaryReport() {
     const perm = diaryGlobalConfig.download_perm || 'all';
     const entries = getLocalDiaryEntries();
@@ -2233,6 +2388,9 @@
 
 
   window.AarogyamETailer = {
+    setFollowupFilter: setFollowupFilter,
+    renderDiaryFollowups: renderDiaryFollowups,
+    renderGrowthProjection: renderGrowthProjection,
     // Smart Business Diary API
     setEntityType: setEntityType,
     setTeamStatus: setTeamStatus,

@@ -183,6 +183,59 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
           </div>
         </div>
 
+        
+        <!-- Reports System Bridge & Database Architecture Strip -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:20px;">
+          <!-- Reports Integration Card -->
+          <div class="admin-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 1.5px solid #6366f1; border-radius:12px; padding:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <h4 style="margin:0 0 6px 0; color:#a5b4fc; font-size:1.02rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  <span>📊</span> <span>मुख्य रिपोर्ट्स व मार्केटिंग फनल एकीकरण</span>
+                </h4>
+                <p style="margin:0 0 12px 0; font-size:0.78rem; color:#cbd5e1; line-height:1.4;">
+                  स्मार्ट डायरी के किसानों व साथियों का डेटाबेस सीधा मुख्य एनालिटिक्स और 4-स्टेज मार्केटिंग फनल (जागरूकता ➔ इच्छा ➔ कार्ट ➔ खरीदार) से जुड़ा हुआ है।
+                </p>
+              </div>
+              <span style="background:#4338ca; color:#e0e7ff; font-size:0.70rem; padding:3px 8px; border-radius:10px; font-weight:800;">
+                Live Bridge
+              </span>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a href="reports.html" onclick="if(window.adminRouter){event.preventDefault();window.adminRouter.navigateTo('reports');}" class="admin-btn" style="background:#4f46e5; color:#ffffff; padding:7px 14px; border-radius:6px; font-weight:800; font-size:0.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                🚀 मुख्य रिपोर्ट्स व फनल खोलें ➔
+              </a>
+              <a href="webinar-reports.html" onclick="if(window.adminRouter){event.preventDefault();window.adminRouter.navigateTo('webinar-reports');}" class="admin-btn" style="background:#1e293b; color:#cbd5e1; border:1px solid #475569; padding:7px 12px; border-radius:6px; font-weight:700; font-size:0.78rem; text-decoration:none;">
+                🎥 वेबिनार रिपोर्ट
+              </a>
+            </div>
+          </div>
+
+          <!-- Zero-Egress Database Security Card -->
+          <div class="admin-card" style="background: linear-gradient(135deg, #091322 0%, #042f2e 100%); border: 1.5px solid #14b8a6; border-radius:12px; padding:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <h4 style="margin:0 0 6px 0; color:#5eead4; font-size:1.02rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  <span>🛡️</span> <span>डेटाबेस तालिकाएँ & Zero-Egress सुरक्षा</span>
+                </h4>
+                <p style="margin:0 0 10px 0; font-size:0.78rem; color:#cbd5e1; line-height:1.4;">
+                  डेटा कहाँ स्टोर होता है और इग्रेस (Egress) कैसे 0 रखा गया है:
+                </p>
+              </div>
+              <span style="background:#0f766e; color:#ccfbf1; font-size:0.70rem; padding:3px 8px; border-radius:10px; font-weight:800;">
+                0 Egress
+              </span>
+            </div>
+            <div style="font-size:0.72rem; color:#e2e8f0; line-height:1.6;">
+              • <strong>phonebook:</strong> यूज़र संपर्क (नाम, मोबाइल, गाँव)<br>
+              • <strong>surveys:</strong> किसान फसल/रोग डायग्नोसिस<br>
+              • <strong>site_configs:</strong> डायरी कोटा व लिमिट्स (SMART_ETAILER_GLOBAL_CONFIG)<br>
+              • <strong>retail_distributor_vault:</strong> 15-दिवसीय चक्र, DSR एवं लेजर<br>
+              • <strong>सुरक्षा ढाँचा:</strong> लोकल-फर्स्ट स्टोरेज + हेड-क्वेरी (कोई अतिरिक्त बिलिंग नहीं)
+            </div>
+          </div>
+        </div>
+
         <!-- Master Quota Settings Form -->
         <div class="admin-card" style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:20px; margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
