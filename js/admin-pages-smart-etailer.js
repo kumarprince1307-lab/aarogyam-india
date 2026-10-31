@@ -650,6 +650,22 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
             </div>
           </div>
 
+          <!-- Custom Audio Speech Script Editor -->
+          <div style="background:#0f172a; border:1.5px solid #38bdf8; border-radius:10px; padding:14px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label style="font-size:0.84rem; color:#facc15; font-weight:800; margin:0;">
+                🎙️ मेरी डायरी AI ऑडियो भाषण स्क्रिप्ट (Hindi Voice Script):
+              </label>
+              <button type="button" id="btn-preview-admin-audio" class="admin-btn" style="background:#0284c7; color:#fff; font-size:0.75rem; padding:4px 10px; border-radius:6px; cursor:pointer;">
+                🔊 आवाज़ टेस्ट करें
+              </button>
+            </div>
+            <textarea id="adm-diary-audio-script" rows="4" class="admin-input" style="width:100%; background:#1e293b; border:1px solid #475569; color:#ffffff; padding:10px; border-radius:8px; font-size:0.86rem; line-height:1.5; resize:vertical;">राम राम जी! आरोग्यम मेरी डायरी में आपका स्वागत है। यह आपका अपना डिजिटल फील्ड खाता है। यहाँ आप मात्र 30 सेकंड में किसान या टीम साथी की प्रविष्टि दर्ज कर सकते हैं, 1-टैप में खताबुक स्टाइल व्हाट्सएप हिसाब भेज सकते हैं, और नकद व उधारी का पूरा हिसाब रख सकते हैं। जैसे-जैसे आप फील्ड में काम करेंगे, आपका लेवल 1 से 8 तक अपग्रेड होगा और आपके अंक बढ़ेंगे। बोलकर लिखने के लिए माइक बटन दबाएं। चलिए, पहली प्रविष्टि दर्ज करें!</textarea>
+            <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-top:4px;">
+              एडमिन यहाँ जो भी लिखेगा, यूज़र PWA में वही आवाज़ में सुनाई देगा (0 KB Egress / Realtime Sync)
+            </span>
+          </div>
+
           <!-- Audio & Level Details -->
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
             <div>
@@ -1154,7 +1170,53 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
     div.querySelector('.btn-del-tutorial-step').onclick = () => div.remove();
   });
 
-  document.getElementById('btn-save-tutorial-config')?.addEventListener('click', () => {
+  document.getElementById('btn-save-tutorial-config')?.addEventListener('click', async () => {
+    const audioScript = document.getElementById('adm-diary-audio-script')?.value.trim() || '';
+    const video1 = document.getElementById('admin-tutorial-video-url')?.value.trim() || '';
+    const video2 = document.getElementById('admin-tutorial-video-2-url')?.value.trim() || '';
+    const video3 = document.getElementById('admin-tutorial-video-3-url')?.value.trim() || '';
+    const audioUrl = document.getElementById('admin-tutorial-audio-url')?.value.trim() || '';
+    const title = document.getElementById('admin-tutorial-title')?.value.trim() || 'मेरी डायरी गाइड व 8-लेवल सिस्टम';
+
+    const guideConfig = {
+      title: title,
+      audio_script: audioScript,
+      audio_url: audioUrl,
+      video1: video1,
+      video2: video2,
+      video3: video3,
+      updated_at: new Date().toISOString()
+    };
+
+    localStorage.setItem('SMART_ETAILER_GUIDE_CONFIG', JSON.stringify(guideConfig));
+    localStorage.setItem('SMART_ETAILER_AUDIO_SCRIPT', audioScript);
+
+    // Sync to Supabase site_configs
+    try {
+      if (typeof syncToSupabaseConfig === 'function') {
+        await syncToSupabaseConfig('SMART_ETAILER_GUIDE_CONFIG', guideConfig);
+        await syncToSupabaseConfig('SMART_ETAILER_AUDIO_SCRIPT', { script: audioScript });
+      }
+    } catch (_) {}
+
+    showToastNotification('🎉 ट्यूटोरियल, मल्टी-वीडियो व ऑडियो स्क्रिप्ट लाइव सेव हो गई!');
+  });
+
+  // Audio Preview Button
+  document.getElementById('btn-preview-admin-audio')?.addEventListener('click', () => {
+    const script = document.getElementById('adm-diary-audio-script')?.value.trim();
+    if (!script) return;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(script);
+      u.lang = 'hi-IN';
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }
+  });
+
+  // Old tutorial save handler replaced above
+  const oldTutorialSaveTarget = () => {
     const title = document.getElementById('admin-tutorial-title').value.trim();
     const subtitle = document.getElementById('admin-tutorial-subtitle').value.trim();
     const videoUrl = document.getElementById('admin-tutorial-video-url').value.trim();
@@ -1174,7 +1236,7 @@ export async function initSmartEtailerAdmin(initialTargetTab = null) {
     localStorage.setItem('AI_ADMIN_TUTORIAL_CONFIG', JSON.stringify(tutObj));
     syncToSupabaseConfig('tutorial_config', tutObj);
     alert("✅ ट्यूटोरियल गाइड व वीडियो सेटिंग्स सफलतापूर्वक सेव हो गई!");
-  });
+  };
 
   // -------------------------------------------------------------
   // EVENT BINDINGS: CUSTOM BUSINESS PLANS & OFFERS

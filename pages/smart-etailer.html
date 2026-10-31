@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   
   <!-- Core CSS -->
-  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v35_diary_level8">
+  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v38_hybrid_khata">
   <meta property="og:title" content="आरोग्यम मेरी डायरी — किसान व टीम खाता व 8-लेवल फील्ड मैनेजर">
   <meta property="og:description" content="30-सेकंड में किसान व टीम प्रविष्टि दर्ज करें, 1-टैप WhatsApp फॉलो-अप और 8-लेवल फील्ड लीडरशिप।">
   <meta property="og:type" content="website">
@@ -125,6 +125,9 @@
        4. TAB CONTENT CONTAINER
   ========================================== -->
   <main class="tab-content-container">
+
+    <!-- Incoming Khatabook Payment / Statement Card (Dynamic via URL Token) -->
+    <div id="incomingKhataBannerWrap" style="display:none; max-width:700px; margin:0 auto 16px auto;"></div>
 
     <!-- =============================================================
          TAB 1: SMART SINGLE FORM ENTRY (30-SEC ENTRY)
@@ -1128,7 +1131,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/universal-nav-drawer.js?v=1.1"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261031_v35_diary_level8"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261031_v38_hybrid_khata"></script>
 
   <!-- =========================================
        5.4 MODAL: 8-LEVEL PROGRESSION ROADMAP
@@ -1193,6 +1196,104 @@
 
       <button type="button" class="btn-royal-blue" style="width:100%; margin-top:14px; padding:12px; font-weight:800; border-radius:8px;" onclick="window.AarogyamETailer.closeLevelRoadmapModal()">
         ✓ ठीक है, बंद करें
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- =========================================
+       5.5 MODAL: SMART FOLLOW-UP MESSAGE PICKER
+  ========================================== -->
+  <div class="game-modal-overlay" id="smartFollowupPickerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:16px;">
+    <div style="max-width:540px; width:100%; max-height:85vh; overflow-y:auto; background:#070d18; border:2px solid #2563eb; border-radius:16px; padding:20px; box-shadow:0 8px 32px rgba(0,0,0,0.9);">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1.5px solid #1e3a8a; padding-bottom:8px;">
+        <div>
+          <h3 style="font-size:1.15rem; margin:0; font-weight:900; color:#60a5fa; display:flex; align-items:center; gap:8px;">
+            <span>💬</span> <span>स्मार्ट WhatsApp संदेश चुनें</span>
+          </h3>
+          <span style="font-size:0.75rem; color:#94a3b8;">1-टैप में पर्सनलाइज्ड मैसेज व लिंक भेजें</span>
+        </div>
+        <button type="button" class="btn-close-guide" onclick="window.AarogyamETailer.closeSmartFollowupPicker()">&times;</button>
+      </div>
+
+      <!-- Target Person Summary Card -->
+      <div style="background:#0f172a; border:1px solid #1e3a8a; border-radius:10px; padding:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div id="fuPickerTargetName" style="font-size:1.0rem; font-weight:900; color:#ffffff;">नाम</div>
+          <div id="fuPickerTargetMobile" style="font-size:0.78rem; color:#38bdf8; margin-top:2px;">मोबाइल</div>
+        </div>
+        <div id="fuPickerTargetDue" style="text-align:right;"></div>
+      </div>
+
+      <!-- 6 Smart Message Options -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        
+        <!-- 1. Khatabook Payment Reminder -->
+        <button type="button" onclick="window.AarogyamETailer.sendSmartFollowupOption('payment_reminder')" style="background:#091322; border:1.5px solid #ef4444; color:#ffffff; padding:12px; border-radius:10px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+          <span style="font-size:1.5rem; background:#450a0a; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0;">💳</span>
+          <div style="flex:1;">
+            <strong style="display:block; font-size:0.92rem; color:#f87171;">1. खताबुक पेमेंट रिमाइंडर (डिजिटल हिसाब लिंक सहित)</strong>
+            <span style="font-size:0.72rem; color:#94a3b8;">बकाया राशि, पुष्टि लिंक व रसीद के साथ पेशेवर रिमाइंडर</span>
+          </div>
+          <span style="color:#ef4444; font-size:1.2rem;">➔</span>
+        </button>
+
+        <!-- 2. Crop Catalog & Spray Schedule -->
+        <button type="button" onclick="window.AarogyamETailer.sendSmartFollowupOption('catalog')" style="background:#091322; border:1.5px solid #10b981; color:#ffffff; padding:12px; border-radius:10px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+          <span style="font-size:1.5rem; background:#064e3b; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0;">🌾</span>
+          <div style="flex:1;">
+            <strong style="display:block; font-size:0.92rem; color:#34d399;">2. फसल डॉक्टर व जैविक उत्पाद कैटलॉग</strong>
+            <span style="font-size:0.72rem; color:#94a3b8;">किसान की समस्या के अनुसार स्प्रे शेड्यूल व रेफरल लिंक</span>
+          </div>
+          <span style="color:#10b981; font-size:1.2rem;">➔</span>
+        </button>
+
+        <!-- 3. Weather & Spray Advisory -->
+        <button type="button" onclick="window.AarogyamETailer.sendSmartFollowupOption('weather')" style="background:#091322; border:1.5px solid #38bdf8; color:#ffffff; padding:12px; border-radius:10px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+          <span style="font-size:1.5rem; background:#0c4a6e; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0;">⛅</span>
+          <div style="flex:1;">
+            <strong style="display:block; font-size:0.92rem; color:#38bdf8;">3. आज का मौसम व फसल स्प्रे एडवाइजरी</strong>
+            <span style="font-size:0.72rem; color:#94a3b8;">वैज्ञानिक बारिश रडार व स्प्रे निर्णय सलाह</span>
+          </div>
+          <span style="color:#38bdf8; font-size:1.2rem;">➔</span>
+        </button>
+
+        <!-- 4. Vedic Panchang -->
+        <button type="button" onclick="window.AarogyamETailer.sendSmartFollowupOption('panchang')" style="background:#091322; border:1.5px solid #facc15; color:#ffffff; padding:12px; border-radius:10px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+          <span style="font-size:1.5rem; background:#451a03; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0;">📅</span>
+          <div style="flex:1;">
+            <strong style="display:block; font-size:0.92rem; color:#facc15;">4. दैनिक सनातन पंचांग व शुभ मुहूर्त</strong>
+            <span style="font-size:0.72rem; color:#94a3b8;">चौघड़िया, शुभ मुहूर्त व कृषि पंचांग बुलेटिन</span>
+          </div>
+          <span style="color:#facc15; font-size:1.2rem;">➔</span>
+        </button>
+
+        <!-- 5. Tube Training Video -->
+        <button type="button" onclick="window.AarogyamETailer.sendSmartFollowupOption('tube_video')" style="background:#091322; border:1.5px solid #a855f7; color:#ffffff; padding:12px; border-radius:10px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+          <span style="font-size:1.5rem; background:#3b0764; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0;">🎥</span>
+          <div style="flex:1;">
+            <strong style="display:block; font-size:0.92rem; color:#c084fc;">5. आरोग्यम ट्यूब — सफल किसान वीडियो</strong>
+            <span style="font-size:0.72rem; color:#94a3b8;">लागत आधी और उत्पादन दोगुना करने के प्रमाणिक वीडियो</span>
+          </div>
+          <span style="color:#c084fc; font-size:1.2rem;">➔</span>
+        </button>
+
+        <!-- 6. Business Plan -->
+        <button type="button" onclick="window.AarogyamETailer.sendSmartFollowupOption('business_plan')" style="background:#091322; border:1.5px solid #60a5fa; color:#ffffff; padding:12px; border-radius:10px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+          <span style="font-size:1.5rem; background:#1e3a8a; width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0;">💼</span>
+          <div style="flex:1;">
+            <strong style="display:block; font-size:0.92rem; color:#60a5fa;">6. 8-लेवल बिज़नेस प्लान व स्वरोजगार</strong>
+            <span style="font-size:0.72rem; color:#94a3b8;">महीने के ₹25,000 से ₹8,00,000 कमाने का डिजिटल मॉडल</span>
+          </div>
+          <span style="color:#60a5fa; font-size:1.2rem;">➔</span>
+        </button>
+
+      </div>
+
+      <button type="button" class="btn-royal-blue" style="width:100%; margin-top:14px; padding:10px; font-weight:800; border-radius:8px;" onclick="window.AarogyamETailer.closeSmartFollowupPicker()">
+        रद्द करें
       </button>
 
     </div>

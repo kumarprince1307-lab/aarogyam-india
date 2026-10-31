@@ -1751,6 +1751,7 @@
     updateDiaryHeroLevel();
     renderDiaryLedger();
     renderDiaryFollowups();
+    syncDiaryToVaultAsync(entries);
   }
 
   function getLocalCashflow() {
@@ -1778,6 +1779,261 @@
       return false;
     }
     return true;
+  }
+
+  // ====================================================================
+  // KHATABOOK-STYLE DUAL-SIDED HYBRID KHATA & VIRAL REFERRAL ENGINE
+  // ====================================================================
+
+  function getUserMobile() {
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      if (u && (u.mobile || u.phone)) return String(u.mobile || u.phone).replace(/\D/g, '');
+    } catch (_) {}
+    return localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_mobile') || '';
+  }
+
+  function getUserDisplayName() {
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      if (u && (u.name || u.full_name)) return u.name || u.full_name;
+    } catch (_) {}
+    return 'आरोग्यम साथी';
+  }
+
+  // Generate Encrypted / Base64 URL Token for 0-Egress Khatabook Sharing
+  function generateKhataShareToken(entry) {
+    const sMob = getUserMobile();
+    const sName = getUserDisplayName();
+    const payload = {
+      id: entry.id,
+      smob: sMob || '9XXXXXXXXX',
+      sname: sName,
+      rmob: entry.mobile,
+      rname: entry.name,
+      rplace: entry.place || 'स्थानीय',
+      amt: Math.abs(Number(entry.due_amount) || 0),
+      type: Number(entry.due_amount) > 0 ? 'give' : 'got',
+      need: entry.need || 'दैनिक हिसाब',
+      date: new Date(entry.created_at || Date.now()).toLocaleDateString('hi-IN')
+    };
+    try {
+      return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function parseKhataShareToken(token) {
+    try {
+      const json = decodeURIComponent(escape(atob(token)));
+      return JSON.parse(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Asynchronous Zero-Egress Cloud Backup to retail_distributor_vault
+  async function syncDiaryToVaultAsync(entries) {
+    const mob = getUserMobile();
+    if (!mob || mob.length < 10) return;
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let totalDues = 0;
+        entries.forEach(e => { totalDues += (Number(e.due_amount) || 0); });
+
+        const payload = {
+          user_mobile: mob,
+          distributor_name: getUserDisplayName(),
+          khata_ledger_json: entries,
+          friday_retail_total: Math.max(0, totalDues),
+          last_synced_at: new Date().toISOString()
+        };
+        await client.from('retail_distributor_vault').upsert([payload], { onConflict: 'user_mobile' });
+      }
+    } catch (e) {
+      console.warn("Silent vault sync error:", e);
+    }
+  }
+
+  // Check incoming Khata Token when page loads
+  function checkIncomingKhataShare() {
+    const params = new URLSearchParams(window.location.search);
+    const kdataToken = params.get('kdata');
+    if (!kdataToken) return;
+
+    const data = parseKhataShareToken(kdataToken);
+    if (!data) return;
+
+    // Display Incoming Statement Banner
+    const wrap = document.getElementById('incomingKhataBannerWrap');
+    if (!wrap) return;
+
+    wrap.innerHTML = `
+      <div style="background: linear-gradient(135deg, #091a36 0%, #030712 100%); border: 2px solid #38bdf8; border-radius: 14px; padding: 18px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(56, 189, 248, 0.35);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #1e3a8a; padding-bottom:8px;">
+          <span style="background:#0284c7; color:#fff; font-size:0.75rem; padding:4px 10px; border-radius:20px; font-weight:800;">
+            🧾 डिजिटल हिसाब व पेमेंट रिक्वेस्ट
+          </span>
+          <span style="font-size:0.75rem; color:#94a3b8;">${data.date}</span>
+        </div>
+
+        <div style="font-size:1.05rem; font-weight:900; color:#ffffff; margin-bottom:6px;">
+          नमस्ते ${escapeHtml(data.rname)} जी! 🙏
+        </div>
+        <p style="font-size:0.84rem; color:#cbd5e1; margin:0 0 12px 0; line-height:1.5;">
+          <strong>${escapeHtml(data.sname)}</strong> (📱 ${escapeHtml(data.smob)}) ने आपके खाते में <strong>₹${data.amt}</strong> का हिसाब दर्ज किया है।
+        </p>
+
+        <div style="background:#0b1120; border:1.5px solid #1e3a8a; border-radius:10px; padding:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:0.75rem; color:#94a3b8;">लेन-देन का विवरण:</div>
+            <div style="font-size:0.88rem; font-weight:800; color:#fde047;">${escapeHtml(data.need || 'आरोग्यम फील्ड लेन-देन')}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.75rem; color:#94a3b8;">देय राशि:</div>
+            <div style="font-size:1.35rem; font-weight:900; color:#f87171;">₹${data.amt}</div>
+          </div>
+        </div>
+
+        <button type="button" class="admin-btn admin-btn-primary" style="width:100%; padding:14px; font-size:1.05rem; font-weight:900; background:#10b981; border:none; border-radius:10px; cursor:pointer;" onclick="window.AarogyamETailer.acceptIncomingKhata('${kdataToken}')">
+          ✓ हिसाब स्वीकार करें और अपनी डायरी में जोड़ें
+        </button>
+      </div>
+    `;
+    wrap.style.display = 'block';
+  }
+
+  function acceptIncomingKhata(kdataToken) {
+    const data = parseKhataShareToken(kdataToken);
+    if (!data) return;
+
+    // 1. If user not logged in, auto-register profile with sender as referral
+    try {
+      const curUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (!curUser.mobile) {
+        localStorage.setItem('AI_USER', JSON.stringify({
+          name: data.rname,
+          mobile: data.rmob,
+          ref: data.smob,
+          source: 'khatabook_viral_share'
+        }));
+      }
+    } catch (_) {}
+
+    // 2. Add reciprocal ledger entry in receiver's diary
+    const reverseEntry = {
+      id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: data.sname,
+      mobile: data.smob,
+      place: 'आरोग्यम साथी',
+      type: 'customer',
+      team_status: null,
+      need: data.need || 'डिजिटल खाता हिसाब',
+      due_amount: -data.amt, // Negative means I have to give (देने हैं)
+      khata_type: 'got',
+      created_at: new Date().toISOString(),
+      followup_done: true
+    };
+
+    const entries = getLocalDiaryEntries();
+    // Check if not already added
+    const exists = entries.some(e => e.mobile === data.smob && Math.abs(e.due_amount) === data.amt);
+    if (!exists) {
+      entries.unshift(reverseEntry);
+      saveLocalDiaryEntries(entries);
+      showToast(`🎉 ${data.sname} जी का खाता आपकी डायरी में जुड़ गया!`, 'success');
+    } else {
+      showToast('यह हिसाब पहले से आपकी डायरी में दर्ज है!', 'info');
+    }
+
+    const wrap = document.getElementById('incomingKhataBannerWrap');
+    if (wrap) wrap.style.display = 'none';
+
+    // Switch to Ledger view
+    switchTab('tab-diary-ledger');
+  }
+
+  // ====================================================================
+  // SMART MULTI-OPTION FOLLOW-UP & WHATSAPP HUB
+  // ====================================================================
+  let activeFollowupEntry = null;
+
+  function openSmartFollowupPicker(entryId) {
+    const entries = getLocalDiaryEntries();
+    const entry = entries.find(e => e.id === entryId);
+    if (!entry) return;
+
+    activeFollowupEntry = entry;
+    const modal = document.getElementById('smartFollowupPickerModal');
+    if (!modal) return;
+
+    const nameEl = document.getElementById('fuPickerTargetName');
+    const mobEl = document.getElementById('fuPickerTargetMobile');
+    const dueEl = document.getElementById('fuPickerTargetDue');
+
+    if (nameEl) nameEl.textContent = entry.name + (entry.place ? ` (${entry.place})` : '');
+    if (mobEl) mobEl.textContent = '📱 ' + entry.mobile;
+    if (dueEl) {
+      const amt = Number(entry.due_amount) || 0;
+      dueEl.innerHTML = amt > 0 ? `<span class="badge-udhar">उधारी: ₹${amt}</span>` : '<span class="badge-jama">हिसाब चुकता</span>';
+    }
+
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+  }
+
+  function closeSmartFollowupPicker() {
+    const modal = document.getElementById('smartFollowupPickerModal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+  }
+
+  function sendSmartFollowupOption(optionType) {
+    const e = activeFollowupEntry;
+    if (!e) return;
+
+    const sMob = getUserMobile();
+    const sName = getUserDisplayName();
+    const token = generateKhataShareToken(e);
+    const khataLink = `https://aarogyamindia.online/pages/smart-etailer.html?kdata=${token}&ref=${sMob}`;
+
+    let msg = '';
+    const dueAmt = Number(e.due_amount) || 0;
+
+    if (optionType === 'payment_reminder') {
+      // 1. Khatabook Style Payment Reminder
+      msg = `*आरोग्यम मेरी डायरी — डिजिटल हिसाब व पेमेंट रिमाइंडर* 🧾\n\nनमस्ते *${e.name}* जी! 🙏\n\n*${sName}* (${sMob}) ने आपके खाते में *₹${Math.abs(dueAmt)}* का हिसाब / पेमेंट रिमाइंडर दर्ज किया है।\n\n👉 अपना पूरा खाता विवरण देखने, पुष्टि करने व रसीद पाने हेतु नीचे दिए गए लिंक पर जाएं:\n${khataLink}\n\n*(यदि लिंक नीली न दिखे, तो कृपया इस नंबर को अपने फ़ोन में सहेजें और पुनः प्रयास करें)*\n\n_Aarogyam India — सुरक्षित डिजिटल खाता व किसान समृद्धि मंच_`;
+    } else if (optionType === 'catalog') {
+      // 2. Crop Catalog & Organic Prescription
+      const catLink = `https://aarogyamindia.online/netsurf-products.html?ref=${sMob}`;
+      msg = `*आरोग्यम कृषि व फसल सुरक्षा केंद्र* 🌾\n\nनमस्ते *${e.name}* जी!\nआपकी फसल समस्या व मिट्टी सुधार (*${e.need || 'जैविक कृषि उत्पाद'}*) के लिए प्रमाणित बायो-फिट कैटलॉग और स्प्रे शेड्यूल तैयार है।\n\n👉 संपूर्ण कैटलॉग व डिस्काउंट ऑफर देखने हेतु लिंक पर क्लिक करें:\n${catLink}\n\nधन्यवाद! 🙏 — *${sName}*`;
+    } else if (optionType === 'weather') {
+      // 3. Weather & Spray Advisory
+      const wLink = `https://aarogyamindia.online/weather.html?ref=${sMob}`;
+      msg = `*आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी* ⛅\n\nनमस्ते *${e.name}* जी!\nआज अपने क्षेत्र का सटीक तापमान, वर्षा रडार और 'फसल पर स्प्रे करें या नहीं' का वैज्ञानिक निर्णय यहाँ देखें:\n${wLink}\n\nसुरक्षित खेती, अधिकतम उपज! 🌾`;
+    } else if (optionType === 'panchang') {
+      // 4. Vedic Panchang
+      const pLink = `https://aarogyamindia.online/krishi-panchang.html?ref=${sMob}`;
+      msg = `*दैनिक वैदिक सनातन पंचांग व शुभ मुहूर्त* 📅\n\nराम राम *${e.name}* जी!\nआज की तिथि, चौघड़िया, राहुकाल और फसल बुवाई/कटाई का श्रेष्ठ मुहूर्त यहाँ देखें:\n${pLink}\n\nशुभ दिन की मंगलकामनाएं! 🙏`;
+    } else if (optionType === 'tube_video') {
+      // 5. Aarogyam Tube
+      const tLink = `https://aarogyamindia.online/tube.html?ref=${sMob}`;
+      msg = `*आरोग्यम ट्यूब — सफल किसान ट्रेनिंग वीडियो* 🎥\n\nनमस्ते *${e.name}* जी!\nजैविक खेती से लागत आधी और उत्पादन दोगुना करने वाले सफल किसानों का वीडियो यहाँ देखें:\n${tLink}\n\nदेखें और अपनी फसल सुरक्षित करें!`;
+    } else if (optionType === 'business_plan') {
+      // 6. Business Plan & 8-Level Growth
+      msg = `*आरोग्यम स्वरोजगार व 8-लेवल बिज़नेस अवसर* 💼\n\nनमस्ते *${e.name}* जी!\nजैविक खेती के साथ जुड़कर घर बैठे महीने के ₹25,000 से ₹8,00,000 कमाने का डिजिटल मॉडल देखें:\n${khataLink}\n\nआइए मिलकर आत्मनिर्भर भारत बनाएं! 🚀`;
+    }
+
+    const waUrl = `https://wa.me/91${e.mobile}?text=${encodeURIComponent(msg)}`;
+    window.open(waUrl, '_blank');
+
+    // Mark follow-up as done automatically
+    markFollowupDone(e.id);
+    closeSmartFollowupPicker();
   }
 
   // ====================================================================
@@ -2221,7 +2477,7 @@
           </div>
           <div class="followup-action-btn-group" style="margin-top:6px;">
             <a href="tel:${e.mobile}" class="btn-action-call">📞 कॉल</a>
-            <a href="${waUrl}" target="_blank" class="btn-action-wa">💬 WhatsApp</a>
+            <button type="button" class="btn-action-wa" onclick="window.AarogyamETailer.openSmartFollowupPicker('${e.id}')">💬 WhatsApp संदेश</button>
             <button type="button" class="btn-action-call" style="background:${isDone ? '#065f46' : '#334155'}; color:#ffffff;" onclick="window.AarogyamETailer.markFollowupDone('${e.id}')">
               ${isDone ? '🔄 री-ओपन' : '✅ पूर्ण'}
             </button>
@@ -2478,6 +2734,11 @@
 
 
   window.AarogyamETailer = {
+    openSmartFollowupPicker: openSmartFollowupPicker,
+    closeSmartFollowupPicker: closeSmartFollowupPicker,
+    sendSmartFollowupOption: sendSmartFollowupOption,
+    acceptIncomingKhata: acceptIncomingKhata,
+    checkIncomingKhataShare: checkIncomingKhataShare,
     setFollowupFilter: setFollowupFilter,
     renderDiaryFollowups: renderDiaryFollowups,
     renderGrowthProjection: renderGrowthProjection,
@@ -3306,3 +3567,9 @@
       }
     } catch (_) {}
   }, 1200);
+
+
+  // Auto-check incoming Khata token on load
+  setTimeout(() => {
+    checkIncomingKhataShare();
+  }, 300);
