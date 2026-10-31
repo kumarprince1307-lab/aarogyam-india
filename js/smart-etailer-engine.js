@@ -2250,74 +2250,123 @@
     e.preventDefault();
     if (!checkDiaryQuota()) return;
 
-    const name = (document.getElementById('diaryInputName')?.value || '').trim();
-    const mobile = (document.getElementById('diaryInputMobile')?.value || '').trim().replace(/\\D/g, '');
-    const place = (document.getElementById('diaryInputPlace')?.value || '').trim();
-    const amt = Number(document.getElementById('diaryInputAmount')?.value) || 0;
-    const khataType = document.getElementById('diaryInputKhataType')?.value || 'none';
-
-    if (!name || mobile.length < 10) {
-      alert('कृपया वैध नाम और 10 अंकों का मोबाइल नंबर दर्ज करें!');
-      return;
-    }
-
-    const newEntry = {
-      id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      name: name,
-      mobile: mobile,
-      place: place || 'स्थानीय',
-      type: currentEntityType,
-      team_status: currentEntityType === 'team' ? currentTeamStatus : null,
-      is_autoship: currentEntityType === 'autoship',
-      autoship_month: currentEntityType === 'autoship' ? asMonth : null,
-      autoship_order: currentEntityType === 'autoship' ? asOrder : null,
-      autoship_free_gift: currentEntityType === 'autoship' ? asGift : null,
-      autoship_free_mrp: currentEntityType === 'autoship' ? asFreeMrp : null,
-      autoship_months: currentEntityType === 'autoship' ? asMonthsObj : null,
-      netsurf_id: currentEntityType === 'team' ? netsurfId : null,
-      crop_name: cropName,
-      crop_problem: cropProb,
-      need: currentNeedCategory,
-      due_amount: khataType === 'give' ? amt : (khataType === 'got' ? -amt : 0),
-      khata_type: khataType,
-      bill_details: billDetails,
-      due_date: dueDate,
-      created_at: new Date().toISOString(),
-      followup_done: false,
-      activity_log: []
-    };
-
-    const entries = getLocalDiaryEntries();
-    entries.unshift(newEntry);
-    saveLocalDiaryEntries(entries);
-
-    // Asynchronously push to Supabase phonebook without blocking UI
     try {
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        client.from('phonebook').insert([{
-          name: name,
-          mobile: mobile,
-          place: place || 'स्थानीय',
-          source: 'smart_diary'
-        }]).then(() => {}).catch(() => {});
+      const name = (document.getElementById('diaryInputName')?.value || '').trim();
+      const mobile = (document.getElementById('diaryInputMobile')?.value || '').trim().replace(/\D/g, '');
+      const place = (document.getElementById('diaryInputPlace')?.value || '').trim();
+      const amt = Number(document.getElementById('diaryInputAmount')?.value) || 0;
+      const khataType = document.getElementById('diaryInputKhataType')?.value || 'none';
+      const asMonth = Number(document.getElementById('diaryAutoshipMonth')?.value) || 1;
+      const asOrder = Number(document.getElementById('diaryAutoshipAvgOrder')?.value) || 2000;
+      const asGift = document.getElementById('diaryAutoshipFreeGift')?.value || 'Stimrich (1L) + Bio99';
+      const asFreeMrp = Number(document.getElementById('diaryAutoshipFreeMrp')?.value) || 2000;
+      const netsurfId = (document.getElementById('diaryInputNetsurfId')?.value || '').trim();
+      const cropName = (document.getElementById('diaryCropName')?.value || '').trim();
+      const cropProb = document.getElementById('diaryCropProblem')?.value || '';
+      const billDetails = (document.getElementById('diaryInputBillDetails')?.value || '').trim();
+      const dueDate = document.getElementById('diaryInputDueDate')?.value || '';
+
+      const asMonthsObj = {
+        m1: Number(document.getElementById('asMonth1')?.value) || 2000,
+        m2: Number(document.getElementById('asMonth2')?.value) || 2000,
+        m3: Number(document.getElementById('asMonth3')?.value) || 2000,
+        m4: Number(document.getElementById('asMonth4')?.value) || 2000,
+        m5: Number(document.getElementById('asMonth5')?.value) || 2000,
+        m6: Number(document.getElementById('asMonth6')?.value) || 0
+      };
+
+      if (!name || mobile.length < 10) {
+        alert('कृपया वैध नाम और 10 अंकों का मोबाइल नंबर दर्ज करें!');
+        return;
       }
-    } catch (_) {}
 
-    showToast(`🎉 ${name} जी की डायरी एंट्री सुरक्षित हो गई!`, 'success');
+      const entries = getLocalDiaryEntries();
+      const existingIndex = entries.findIndex(item => item.mobile === mobile);
+      if (existingIndex !== -1) {
+        const exist = entries[existingIndex];
+        const typeLabel = exist.type === 'team' ? 'टीम साथी' : (exist.is_autoship ? 'ऑटोशिप ग्राहक' : 'किसान ग्राहक');
+        const doEdit = confirm(`यह मोबाइल नंबर (${mobile}) आपकी डायरी में पहले से "${exist.name}" (${typeLabel}) के रूप में दर्ज है!\n\nक्या आप इसे एडिट या नई श्रेणी में अपग्रेड करना चाहते हैं?`);
+        if (doEdit) {
+          openEditCategoryModal(exist.id);
+          return;
+        }
+      }
 
-    // Reset Form
-    document.getElementById('diaryInputName').value = '';
-    document.getElementById('diaryInputMobile').value = '';
-    document.getElementById('diaryInputPlace').value = '';
-    document.getElementById('diaryInputAmount').value = '';
-    document.getElementById('diaryInputKhataType').value = 'none';
+      const newEntry = {
+        id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        name: name,
+        mobile: mobile,
+        place: place || 'स्थानीय',
+        type: currentEntityType,
+        team_status: currentEntityType === 'team' ? currentTeamStatus : null,
+        is_autoship: currentEntityType === 'autoship',
+        autoship_month: currentEntityType === 'autoship' ? asMonth : null,
+        autoship_order: currentEntityType === 'autoship' ? asOrder : null,
+        autoship_free_gift: currentEntityType === 'autoship' ? asGift : null,
+        autoship_free_mrp: currentEntityType === 'autoship' ? asFreeMrp : null,
+        autoship_months: currentEntityType === 'autoship' ? asMonthsObj : null,
+        netsurf_id: currentEntityType === 'team' ? netsurfId : null,
+        crop_name: cropName,
+        crop_problem: cropProb,
+        need: currentNeedCategory,
+        due_amount: khataType === 'give' ? amt : (khataType === 'got' ? -amt : 0),
+        khata_type: khataType,
+        bill_details: billDetails,
+        due_date: dueDate,
+        created_at: new Date().toISOString(),
+        followup_done: false,
+        activity_log: []
+      };
 
-    // Switch to Ledger view to see the entry
-    switchTab('tab-diary-ledger');
+      entries.unshift(newEntry);
+      saveLocalDiaryEntries(entries);
+      syncDiaryToVaultAsync(entries);
+
+      // Also save to local phonebook cache
+      try {
+        let pb = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
+        if (!pb.some(p => p.mobile === mobile)) {
+          pb.unshift({ name: name, mobile: mobile, place: place || 'स्थानीय' });
+          localStorage.setItem('AI_PHONEBOOK_CACHE', JSON.stringify(pb));
+        }
+      } catch (_) {}
+
+      // Asynchronously push to Supabase phonebook without blocking UI
+      try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          client.from('phonebook').insert([{
+            name: name,
+            mobile: mobile,
+            place: place || 'स्थानीय',
+            source: 'smart_diary'
+          }]).then(() => {}).catch(() => {});
+        }
+      } catch (_) {}
+
+      // Award XP
+      calculateDiaryPoints();
+      updateDiaryHeroLevel();
+
+      // Refresh all views
+      renderDiaryLedger();
+      renderDiaryFollowups();
+      renderTodoPlanner();
+      renderAutoshipTracker();
+
+      alert(`🎉 ${name} जी की डायरी प्रविष्टि सफलतापूर्वक सुरक्षित हो गई!`);
+
+      // Reset form
+      document.getElementById('smartDiaryForm').reset();
+      document.getElementById('btnEntityCustomer')?.click();
+    } catch (err) {
+      console.error('Error saving diary entry:', err);
+      alert('प्रविष्टि सुरक्षित करते समय त्रुटि: ' + err.message);
+    }
   }
 
-  // Render Ledger
+  
+  // Render Diary Ledger View (Tab 2: खाता बुक)
   function renderDiaryLedger() {
     const listEl = document.getElementById('diaryLedgerCardsList');
     const mContacts = document.getElementById('ledgerMetricContacts');
@@ -2351,10 +2400,10 @@
     const filtered = entries.filter(e => {
       if (currentLedgerFilter === 'customer' && e.type !== 'customer') return false;
       if (currentLedgerFilter === 'team' && e.type !== 'team') return false;
-      if (currentLedgerFilter === 'dues' && e.due_amount <= 0) return false;
+      if (currentLedgerFilter === 'dues' && Number(e.due_amount) <= 0) return false;
 
       if (searchQ) {
-        const str = `${e.name} ${e.mobile} ${e.place} ${e.need}`.toLowerCase();
+        const str = `${e.name} ${e.mobile} ${e.place} ${e.need} ${e.bill_details}`.toLowerCase();
         return str.includes(searchQ);
       }
       return true;
@@ -2364,11 +2413,8 @@
       listEl.innerHTML = `
         <div style="text-align:center; padding:32px 14px; background:#0f172a; border-radius:12px; border:1px solid #1e293b; color:#94a3b8;">
           <div style="font-size:2rem; margin-bottom:8px;">📖</div>
-          <div style="font-weight:700; color:#cbd5e1; font-size:0.95rem;">कोई प्रविष्टि नहीं मिली</div>
-          <p style="font-size:0.75rem; margin:4px 0 14px 0;">पहले टैब से अपनी पहली ग्राहक या टीम एंट्री जोड़ें।</p>
-          <button type="button" class="admin-btn admin-btn-primary" style="padding:8px 16px; font-weight:800; font-size:0.80rem;" onclick="window.AarogyamETailer.switchTab('tab-diary-entry')">
-            ✍️ नई एंट्री जोड़ें
-          </button>
+          <div style="font-weight:700; color:#cbd5e1; font-size:0.95rem;">कोई खाता प्रविष्टि नहीं मिली</div>
+          <p style="font-size:0.75rem; margin:4px 0 14px 0;">ऊपर फॉर्म से नया खाता या उधारी जोड़ें।</p>
         </div>
       `;
       return;
@@ -2377,35 +2423,46 @@
     listEl.innerHTML = filtered.map(e => {
       const isTeam = e.type === 'team';
       const statusBadge = isTeam
-        ? `<span style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🤝 टीम: ${e.team_status || 'साथी'}</span>`
+        ? `<span style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🤝 टीम साथी</span>`
         : `<span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🌾 ग्राहक / किसान</span>`;
 
       let duesBadge = '';
-      if (e.due_amount > 0) {
-        duesBadge = `<span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🔴 ₹${e.due_amount} बाकी</span>`;
-      } else if (e.due_amount < 0) {
-        duesBadge = `<span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🟢 जमा ₹${Math.abs(e.due_amount)}</span>`;
+      const amt = Number(e.due_amount) || 0;
+      if (amt > 0) {
+        duesBadge = `<span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🔴 ₹${amt} बाकी (लेना है)</span>`;
+      } else if (amt < 0) {
+        duesBadge = `<span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🟢 जमा ₹${Math.abs(amt)} (प्राप्त हुआ)</span>`;
+      } else {
+        duesBadge = `<span style="background:#1e293b; color:#94a3b8; padding:2px 8px; border-radius:12px; font-size:0.72rem;">नकद चुकता</span>`;
       }
-
-      const waMsg = encodeURIComponent(`नमस्ते ${e.name} जी! 🙏 आरोग्यम इंडिया से संपर्क किया गया है। आपकी (${e.need}) के संबंध में उचित मार्गदर्शन और समाधान उपलब्ध है।`);
-      const waUrl = `https://wa.me/91${e.mobile}?text=${waMsg}`;
 
       return `
         <div style="background:#0f172a; border:1.5px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <strong style="font-size:0.95rem; color:#f8fafc;">${e.name}</strong>
+              <strong style="font-size:1.0rem; color:#f8fafc;">${e.name}</strong>
               ${statusBadge}
               ${duesBadge}
             </div>
-            <div style="font-size:0.76rem; color:#94a3b8; margin-top:4px;">
-              📍 ${e.place || 'स्थानीय'} • 📱 ${e.mobile} • 💡 ${e.need}
+            <div style="font-size:0.78rem; color:#cbd5e1; margin-top:4px;">
+              📍 <strong>${e.place || 'स्थानीय'}</strong> • 📱 <span style="color:#38bdf8; font-weight:700;">${e.mobile}</span>
+              ${e.bill_details ? ` • 📝 विवरण: <span style="color:#fde047;">${e.bill_details}</span>` : ''}
+              ${e.due_date ? ` • 📅 वादा: <span style="color:#f87171; font-weight:700;">${e.due_date}</span>` : ''}
             </div>
           </div>
-          <div style="display:flex; gap:6px;">
-            <a href="tel:${e.mobile}" class="btn-action-call" title="कॉल करें">📞 कॉल</a>
-            <a href="${waUrl}" target="_blank" class="btn-action-wa" title="WhatsApp भेजें">💬 WA</a>
-            <button type="button" class="admin-btn admin-btn-secondary" style="padding:6px 10px; color:#ef4444; border-color:#475569; font-size:0.72rem;" onclick="window.AarogyamETailer.deleteDiaryEntry('${e.id}')" title="हटाएं">🗑️</button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-action-call" style="background:#d97706; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.openCallQueue('${e.id}')">
+              📞 कॉल
+            </button>
+            <button type="button" class="btn-action-wa" style="background:#16a34a; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.sendKhataStatementWhatsApp('${e.id}')">
+              💬 WA
+            </button>
+            <button type="button" class="admin-btn" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:6px 10px; border-radius:8px; font-size:0.76rem; cursor:pointer;" onclick="window.AarogyamETailer.openEditCategoryModal('${e.id}')">
+              ✏️ एडिट
+            </button>
+            <button type="button" class="admin-btn" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:6px 10px; border-radius:8px; font-size:0.76rem; cursor:pointer;" onclick="window.AarogyamETailer.deleteDiaryEntry('${e.id}')">
+              🗑️
+            </button>
           </div>
         </div>
       `;
@@ -2797,16 +2854,106 @@
 
   
   
+  
+  // Quick Khata Entry Handler in Tab 2
+  function handleTab2KhataSubmit(e) {
+    e.preventDefault();
+    const name = (document.getElementById('tab2KhataName')?.value || '').trim();
+    const mobile = (document.getElementById('tab2KhataMobile')?.value || '').trim().replace(/\D/g, '');
+    const place = (document.getElementById('tab2KhataPlace')?.value || '').trim();
+    const type = document.getElementById('tab2KhataType')?.value || 'give';
+    const amt = Number(document.getElementById('tab2KhataAmount')?.value) || 0;
+    const details = (document.getElementById('tab2KhataDetails')?.value || '').trim();
+    const dueDate = document.getElementById('tab2KhataDueDate')?.value || '';
+
+    if (!name || mobile.length < 10 || amt <= 0) {
+      alert('कृपया नाम, 10 अंकों का मोबाइल नंबर और वैध राशि दर्ज करें!');
+      return;
+    }
+
+    const entries = getLocalDiaryEntries();
+    const newEntry = {
+      id: 'kh_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: name,
+      mobile: mobile,
+      place: place || 'स्थानीय',
+      type: 'customer',
+      need: details || 'खाता हिसाब / उधारी',
+      due_amount: type === 'give' ? amt : -amt,
+      khata_type: type,
+      bill_details: details,
+      due_date: dueDate,
+      created_at: new Date().toISOString(),
+      followup_done: false,
+      activity_log: []
+    };
+
+    entries.unshift(newEntry);
+    saveLocalDiaryEntries(entries);
+    syncDiaryToVaultAsync(entries);
+
+    renderDiaryLedger();
+    renderTodoPlanner();
+
+    // Reset Form
+    document.getElementById('tab2QuickKhataForm').reset();
+
+    alert(`🎉 ${name} जी का खाता सफलतापूर्वक दर्ज हुआ! अब WhatsApp स्टेटमेंट भेजा जा रहा है...`);
+    sendKhataStatementWhatsApp(newEntry.id);
+  }
+
+  // Authentic Khatabook Payment Reminder WhatsApp Sender
+  function sendKhataStatementWhatsApp(id) {
+    const entries = getLocalDiaryEntries();
+    const e = entries.find(item => item.id === id);
+    if (!e) return;
+
+    const sMob = getUserMobile();
+    const sName = getUserDisplayName();
+    const shareId = getAppUserShareId();
+    const token = generateKhataShareToken(e);
+    const khataLink = `https://aarogyamindia.online/pages/smart-etailer.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}&kdata=${token}`;
+
+    const amt = Math.abs(Number(e.due_amount) || 0);
+    const bill = e.bill_details || e.need || 'सामान व उत्पाद का हिसाब';
+    const dueD = e.due_date ? `📅 *भुगतान वादा तारीख:* ${e.due_date}\n` : '';
+
+    const msg = `🧾 *आरोग्यम मेरी डायरी — डिजिटल हिसाब व पेमेंट रिमाइंडर*\n\nनमस्ते *${e.name}* जी! 🙏\n\n*${sName}* (${sMob}) ने आपके खाते में *₹${amt}* का हिसाब दर्ज किया है।\n\n📝 *विवरण:* ${bill}\n${dueD}\n👉 *अपना पूरा खाता देखने, पुष्टि करने व रसीद पाने हेतु लिंक पर जाएं:*\n${khataLink}\n\n*(यदि लिंक नीली न दिखे, तो कृपया इस नंबर को अपने फ़ोन में सहेजें)*\n\n_Aarogyam India — सुरक्षित डिजिटल खाता व किसान समृद्धि मंच_`;
+
+    // Increment WA counter
+    let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
+    counts.wa = (counts.wa || 0) + 1;
+    localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
+
+    window.open(`https://api.whatsapp.com/send?phone=91${e.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
   // =============================================================
   // MASTER SMART BUSINESS DIARY - EXTENSIONS & AUTOMATIONS V2
   // =============================================================
 
-  // 1. DIARY & PHONEBOOK CONTACT PICKERS
-  function openDiaryContactPicker() {
+    // 1. DIARY & PHONEBOOK CONTACT PICKERS (SEARCHES LOCAL DIARY + PHONEBOOK)
+  let currentPickerTarget = 'main'; // 'main' or 'khata'
+
+  function openDiaryContactPicker(targetMode = 'main') {
+    currentPickerTarget = targetMode;
     const modal = document.getElementById('diaryContactPickerModal');
     if (!modal) return;
     renderDiaryPickerList('');
     modal.style.display = 'flex';
+
+    // If local entries are few, asynchronously fetch from Supabase phonebook to enrich list
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        client.from('phonebook').select('name, mobile, place').limit(100).then(({ data }) => {
+          if (data && data.length > 0) {
+            localStorage.setItem('AI_PHONEBOOK_CACHE', JSON.stringify(data));
+            renderDiaryPickerList(document.getElementById('diaryContactSearchInput')?.value || '');
+          }
+        }).catch(() => {});
+      }
+    } catch (_) {}
   }
 
   function closeDiaryContactPicker() {
@@ -2821,10 +2968,28 @@
   function renderDiaryPickerList(query) {
     const listWrap = document.getElementById('diaryContactPickerList');
     if (!listWrap) return;
-    const entries = getLocalDiaryEntries();
+
+    const diaryEntries = getLocalDiaryEntries();
+    let pbEntries = [];
+    try {
+      pbEntries = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
+    } catch (_) {}
+
+    // Merge without duplicates by mobile
+    const allContactsMap = new Map();
+    diaryEntries.forEach(e => {
+      if (e.mobile) allContactsMap.set(e.mobile, { id: e.id, name: e.name, mobile: e.mobile, place: e.place, source: 'diary', type: e.type, crop_name: e.crop_name, netsurf_id: e.netsurf_id });
+    });
+    pbEntries.forEach(p => {
+      if (p.mobile && !allContactsMap.has(p.mobile)) {
+        allContactsMap.set(p.mobile, { id: 'pb_' + p.mobile, name: p.name, mobile: p.mobile, place: p.place, source: 'phonebook', type: 'customer' });
+      }
+    });
+
+    const allContacts = Array.from(allContactsMap.values());
     const q = (query || '').toLowerCase().trim();
 
-    const filtered = entries.filter(e => {
+    const filtered = allContacts.filter(e => {
       if (!q) return true;
       return (e.name && e.name.toLowerCase().includes(q)) ||
              (e.mobile && e.mobile.includes(q)) ||
@@ -2833,42 +2998,54 @@
 
     if (filtered.length === 0) {
       listWrap.innerHTML = `
-        <div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.82rem;">
-          कोई संपर्क नहीं मिला।
+        <div style="text-align:center; padding:24px; color:#94a3b8; font-size:0.85rem;">
+          <div style="font-size:1.6rem; margin-bottom:6px;">📭</div>
+          <strong style="color:#cbd5e1; display:block;">कोई संपर्क नहीं मिला</strong>
+          <span style="font-size:0.75rem;">फॉर्म में नया नाम और 10 अंकों का मोबाइल नंबर सीधे भरें।</span>
         </div>
       `;
       return;
     }
 
     listWrap.innerHTML = filtered.map(e => `
-      <div onclick="window.AarogyamETailer.selectContactFromDiary('${e.id}')" style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s;">
+      <div onclick="window.AarogyamETailer.selectContactFromDiary('${e.mobile}')" style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s;">
         <div>
-          <strong style="color:#ffffff; font-size:0.92rem; display:block;">${e.name}</strong>
+          <strong style="color:#ffffff; font-size:0.94rem; display:block;">${e.name}</strong>
           <span style="font-size:0.75rem; color:#94a3b8;">📱 ${e.mobile} • 📍 ${e.place || 'स्थानीय'}</span>
         </div>
         <span style="background:#1e293b; color:#38bdf8; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:6px;">
-          ${e.type === 'team' ? '🤝 टीम' : (e.is_autoship ? '🎁 ऑटोशिप' : '🌾 किसान')}
+          ${e.source === 'diary' ? '📖 डायरी' : '📱 फोन बुक'}
         </span>
       </div>
     `).join('');
   }
 
-  function selectContactFromDiary(id) {
-    const entries = getLocalDiaryEntries();
-    const entry = entries.find(e => e.id === id);
-    if (!entry) return;
+  function selectContactFromDiary(mobile) {
+    const diaryEntries = getLocalDiaryEntries();
+    let pbEntries = [];
+    try { pbEntries = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]'); } catch (_) {}
 
-    if (document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = entry.name || '';
-    if (document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = entry.mobile || '';
-    if (document.getElementById('diaryInputPlace')) document.getElementById('diaryInputPlace').value = entry.place || '';
-    if (entry.type) setEntityType(entry.type);
-    if (entry.crop_name && document.getElementById('diaryCropName')) document.getElementById('diaryCropName').value = entry.crop_name;
-    if (entry.netsurf_id && document.getElementById('diaryInputNetsurfId')) document.getElementById('diaryInputNetsurfId').value = entry.netsurf_id;
+    const contact = diaryEntries.find(e => e.mobile === mobile) || pbEntries.find(p => p.mobile === mobile);
+    if (!contact) return;
+
+    if (currentPickerTarget === 'khata') {
+      if (document.getElementById('tab2KhataName')) document.getElementById('tab2KhataName').value = contact.name || '';
+      if (document.getElementById('tab2KhataMobile')) document.getElementById('tab2KhataMobile').value = contact.mobile || '';
+      if (document.getElementById('tab2KhataPlace')) document.getElementById('tab2KhataPlace').value = contact.place || '';
+    } else {
+      if (document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = contact.name || '';
+      if (document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = contact.mobile || '';
+      if (document.getElementById('diaryInputPlace')) document.getElementById('diaryInputPlace').value = contact.place || '';
+      if (contact.type) setEntityType(contact.type);
+      if (contact.crop_name && document.getElementById('diaryCropName')) document.getElementById('diaryCropName').value = contact.crop_name;
+      if (contact.netsurf_id && document.getElementById('diaryInputNetsurfId')) document.getElementById('diaryInputNetsurfId').value = contact.netsurf_id;
+    }
 
     closeDiaryContactPicker();
   }
 
-  async function pickFromPhonebook() {
+  async function pickFromPhonebook(targetMode = 'main') {
+    currentPickerTarget = targetMode;
     if ('contacts' in navigator && 'ContactsManager' in window) {
       try {
         const props = ['name', 'tel'];
@@ -2878,16 +3055,22 @@
           const name = (c.name && c.name[0]) || '';
           let tel = (c.tel && c.tel[0]) || '';
           tel = tel.replace(/\D/g, '').slice(-10);
-          if (name && document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = name;
-          if (tel && document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = tel;
+
+          if (currentPickerTarget === 'khata') {
+            if (name && document.getElementById('tab2KhataName')) document.getElementById('tab2KhataName').value = name;
+            if (tel && document.getElementById('tab2KhataMobile')) document.getElementById('tab2KhataMobile').value = tel;
+          } else {
+            if (name && document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = name;
+            if (tel && document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = tel;
+          }
           return;
         }
       } catch (err) {
-        console.warn('Contacts picker cancelled or failed:', err);
+        console.warn('Native contacts picker cancelled or not permitted:', err);
       }
     }
-    // Fallback if not supported on browser/desktop
-    openDiaryContactPicker();
+    // Fallback: open Diary & Phonebook modal
+    openDiaryContactPicker(targetMode);
   }
 
   // 2. MARKETING HUB & 1-TAP AUTOMATION ENGINE (MATCHING SCREENSHOT)
@@ -2896,35 +3079,28 @@
   let hubCurrentQueueIndex = 0;
   let hubSentCount = 0;
 
-  const hubCatalogData = {
-    crop_doctor: [
-      { id: 'stimrich', title: 'Stimrich (बायो-ग्रोथ प्रमोटर)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=stimrich' },
-      { id: 'bio99', title: 'Bio 99 (स्प्रेडर व सिलिकॉन एक्टिवेटर)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=bio99' },
-      { id: 'wrapup', title: 'Wrap-Up (फसल कवच व फंगस सुरक्षा)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=wrapup' },
-      { id: 'intact', title: 'Intact (जैविक इल्ली व कीट नियंत्रक)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=intact' },
-      { id: 'cfc_plus', title: 'CFC Plus (दुधारू पशु पोषण व फैट वृद्धि)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=cfc' },
-      { id: 'naturamore', title: 'Naturamore (संपूर्ण परिवार पोषण पाउडर)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=naturamore' }
-    ],
-    tube_videos: [
-      { id: 'tube_stimrich', title: '📹 सफल किसान की कहानी (स्टीमरिच परिणाम)', link: 'https://aarogyamindia.online/tube.html?v=stimrich' },
-      { id: 'tube_wheat', title: '📹 गेहूं व चना में 40% अधिक पैदावार कैसे लें?', link: 'https://aarogyamindia.online/tube.html?v=wheat' },
-      { id: 'tube_dairy', title: '📹 पशुओं में 2 से 3 लीटर दूध व फैट वृद्धि तकनीक', link: 'https://aarogyamindia.online/tube.html?v=dairy' },
-      { id: 'tube_biz', title: '📹 जैविक खेती से महीने के ₹50,000 कमाने का मॉडल', link: 'https://aarogyamindia.online/tube.html?v=biz' }
-    ],
+    const hubCatalogData = {
+    crop_doctor: [{"id": "ns_prod_00027", "title": "Pet-Vet Breed 500 GM  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_00027"}, {"id": "ns_prod_46333", "title": "Pet-Vet Breed 500 GRAM  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_46333"}, {"id": "ns_prod_98099", "title": "Spot Eraser Anti Pigmentation Cream 20 GMS | (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_98099"}, {"id": "ns_prod_03157", "title": "Klearkof Cough Remedy 100 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_03157"}, {"id": "ns_prod_66758", "title": "Klear Cdt Acidity Remedy 100 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_66758"}, {"id": "ns_prod_56695", "title": "Blood Detox 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_56695"}, {"id": "ns_prod_32472", "title": "Omega Triple Strength 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_32472"}, {"id": "ns_prod_68977", "title": "Multi Vitamin For Women 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_68977"}, {"id": "ns_prod_56442", "title": "Multi Vitamin For Men 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_56442"}, {"id": "ns_prod_40011", "title": "Women'S Wellness 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_40011"}, {"id": "ns_prod_85933", "title": "Nutriliver 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_85933"}, {"id": "ns_prod_47328", "title": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_47328"}, {"id": "ns_agri_stimrich", "title": "स्टीमरिच (Biofit Stimrich) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_stimrich"}, {"id": "ns_agri_bio99", "title": "बायो-99 (Biofit Bio-99) 100mL (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_bio99"}, {"id": "ns_agri_shet", "title": "सेट (Biofit Shet - Soil Health) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_shet"}, {"id": "ns_agri_wrapup", "title": "रैपअप (Biofit Wrapup) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_wrapup"}, {"id": "ns_agri_npk", "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_npk"}, {"id": "ns_cattle_cfc", "title": "Pet-Vet Advanced Cattle Feed Supplement 1 KG (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc"}, {"id": "ns_cattle_cfc_1kg", "title": "Pet-Vet Advanced Cattle Feed Supplement 500 gm (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc_1kg"}, {"id": "ns_health_plus", "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 | (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_plus"}, {"id": "ns_health_vanilla", "title": "Naturamore Original Vanilla Flavour 400 GMS  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_vanilla"}, {"id": "ns_health_joint", "title": " Joint Care New 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_joint"}, {"id": "ns_health_sugar", "title": "नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_sugar"}, {"id": "ns_health_heart", "title": "नेचुरामोरे हार्ट केयर (Nutri Heart Capsules) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_heart"}, {"id": "ns_health_detox", "title": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_detox"}, {"id": "ns_health_women", "title": "नेचुरामोरे फॉर विमेन (Naturamore Women 400g) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_women"}, {"id": "ns_health_men", "title": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_men"}, {"id": "ns_health_kids", "title": "नेचुरामोरे फॉर किड्स (Naturamore Kids 400g) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_kids"}, {"id": "ns_herbs_facewash", "title": "Anti Pollution Face Wash 100 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_facewash"}, {"id": "ns_herbs_antiacne", "title": "Anti Acne Gel New 20 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_antiacne"}, {"id": "ns_herbs_undereye", "title": " Under Eye Rejuvenating Gel 20 GMS  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_undereye"}, {"id": "ns_herbs_hairoil", "title": "Scalp Renaissance Hair Nutriment (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_hairoil"}, {"id": "ns_herbs_shampoo", "title": "Scalp Renaissance Anti Dandruff Shampoo 200 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_shampoo"}, {"id": "ns_herbs_conditioner", "title": "Scalp Renaissance Anti Hair Fall Shampoo 200 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_conditioner"}, {"id": "ns_herbs_toothpaste", "title": "Herbal Dental Paste Pack Of 2 125 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_toothpaste"}, {"id": "ns_herbs_soap", "title": "Moisturizing Soap Pack Of 5 375 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_soap"}, {"id": "ns_clean_fabric", "title": "Clean & More Fabric Wash & Conditioner 500 500 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_clean_fabric"}, {"id": "ns_clean_multipurpose", "title": "Clean & More Dish Washing Liquid 250 250 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_clean_multipurpose"}, {"id": "ns_clean_home_cleaner", "title": "Clean & More Multi-Purpose Home Cleaner 500ml (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_clean_home_cleaner"}, {"id": "ns_prod_pro_stimrich", "title": "Biofit Pro Stimrich (प्रो स्टिमरिच) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_pro_stimrich"}, {"id": "ns_agri_culture", "title": "बायोफिट कल्चर (Biofit Culture - Rapid Compost Decomposer) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_culture"}],
+    tube_videos: [{"id": "VID_S612726", "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱 | पहले सावधान हों!", "link": "https://youtube.com/shorts/Pv2-wbzjXEc?feature=share"}, {"id": "VID_S974645", "title": "​किसानों के लिए बुरी खबर या सबसे बड़ा वरदान? 💥 Naya ProStim ₹1450 Launch!", "link": "https://youtube.com/shorts/jC_6pz1EsEM?si=-B01ze8HBT837wu5"}, {"id": "VID_S706483", "title": "⚠️ सावधान किसान! खेती में कोई भी फैसला लेने से पहले Aarogyam Sakhi AI से पूछें 🌱", "link": "https://youtube.com/shorts/OfEad_pk6PU?si=JiBVUY9c4wJswrGe"}, {"id": "VID_S238828", "title": "🤖 आपकी अपनी FREE AI सखी 😍 खेती, मौसम, स्वास्थ्य सबका जवाब | Aarogyam India #Shorts", "link": "https://youtube.com/shorts/w2QAPHfkdH0?si=OIYmM6kalHP8p55c"}, {"id": "VID_S019796", "title": "टमाटर को रोगों से कैसे बचाए", "link": "https://youtube.com/shorts/9GWQlduG_AM?si=t1YHAy16lAdwlgml"}, {"id": "VID_S041329", "title": "सब्जी की खेती का डॉक्टर बुक क्यों खरीदे", "link": "https://youtube.com/shorts/zry1LfjV_q0?feature=share"}, {"id": "VID_187128", "title": "जोड़ों के दर्द से राहत! | Naturamore Joint Care Testimonial | Aarogyam India", "link": "https://youtube.com/shorts/-SPS50UQPjA?si=XwJt60FL38PvYGNW"}, {"id": "VID_242806", "title": "Joint pain se paresan hai to aaj hi call kare", "link": "https://youtu.be/wsjJBysrrOc?si=aFQPkePh0mMZyI6w"}, {"id": "VID_082318", "title": "Yadi aap joint pain se paresan hai to abhi call kare 100%  dard se mukt", "link": "https://youtu.be/y0nXI5v8KtE?si=IsRmWFcHFx2B3_KB"}, {"id": "VID_S771406", "title": "क्या आप जॉइंट पेन से परेशान है तो अभी कॉल करे दर्द से मुक्त हो जाए", "link": "https://youtube.com/shorts/BkWypyfof_g?si=FgQ_3WZVgpaME_nI"}, {"id": "VID_S540013", "title": "खेती में खेत के कचड़े गोबर  से कैसे बनाए शक्तिशाली खाद", "link": "https://youtube.com/shorts/XOTCgz8VJKg?si=aM64BpEh9BXKtJWA"}, {"id": "VID_S391850", "title": "क्या चने के खेत में चना ही चना चाहिएब्टो अभी ये वीडियो देखिए", "link": "https://youtube.com/shorts/elfPs4vU_s0?si=iZZI3cfnh5CDkz19"}, {"id": "VID_S298494", "title": "सरसों की खेती करने जा रहे है तो अभी रुकिए  रिजल्ट बायोफिट", "link": "https://youtube.com/shorts/EOmAH2HdfZA?si=x4KO3xltO33He5bQ"}, {"id": "VID_032275", "title": "​🛑 फसल का तनाज़ोर और दाना मजबूत क्यों नहीं? जानिए पोटाश का समाधान!", "link": "https://youtube.com/shorts/DOAn6BkMvwE?si=6fJxHrZKdj97x98m"}, {"id": "VID_S741306", "title": "​🌱 मिट्टी में दबा फॉस्फोरस होगा अब अनलॉक! | Biofit PSB", "link": "https://youtube.com/shorts/vsgklcgevs8?si=MrV61wYuyY7XWcay"}, {"id": "VID_S284427", "title": "खेती का डॉक्टर बुक क्यों खरीदे", "link": "https://youtube.com/shorts/bvCuBEuyg48?si=G9wcjjVaQJd3881z"}, {"id": "VID_S432998", "title": "HOW TO USE #NPK IN #dripirrigation | #biofitnpk का उपयोग ड्रिप में कैसे करे ?#organicfarming", "link": "https://youtube.com/shorts/qbiC_1E3bgM?si=nDcRjcIzIpuHGRm1"}, {"id": "VID_291096", "title": "जानिए Naturamore और Biofit प्रोडक्ट्स की Manufacturing की पूरी कहानी | Netsurf की Factory के अंदर!", "link": "https://youtu.be/bk2bxcHeKsM?si=vGsmUMjuaCGBFd4f"}, {"id": "VID_S102593", "title": "टमाटर में कुकड़ा रोग का इलाज | TYLCV वायरस की दवाई | टमाटर की फसल बचाने का तरीका", "link": "https://youtu.be/KMvbvTV0dHg?si=B1YsqtH2uZq4s6Wb"}, {"id": "VID_S988091", "title": "सेक्सुअल कमजोरी से छुटकारा पाएं | #NATURAMOR #Manswellness से बढ़ाएं शक्ति और उत्साह!", "link": "https://youtu.be/qAux7BHnpyo?si=3eWY3DoFV8eDApKp"}, {"id": "VID_S843947", "title": "बैंगन की खेती में रिकॉर्ड तोड़ पैदावार | #SHET, #Stimrich & #Bio99 का कमाल! #biofit_result", "link": "https://youtu.be/8I9qX1elzgg?si=iMZkLV3EUwKIV5vg"}, {"id": "VID_742716", "title": "NetSurf की Nominee Facility ने उनके परिवार को आर्थिक सुरक्षा और निरंतर अवसर प्रदान किया।", "link": "https://youtu.be/OlX2t84-8Es?si=JDDUyDdjtr60UOO5"}, {"id": "VID_617621", "title": "👉 😱 NetSurf Me 90% Log Fail Kyon Ho Jate Hain? | Sach Jo Koi Nahi Batata ‪@AAROGYAMINDIA‬", "link": "https://youtu.be/HI5D8KYWJK0?si=j5qFtKJzsk177t2x"}, {"id": "VID_472590", "title": "देखे क्या खिलाया इसने 15 दिन में 5 लीटर दूध बढ़ा डेरी वालो के लिए वरदान 5 liter milk extra in 15 day", "link": "https://youtu.be/W37dZEnnQ74?si=ypt7ztQL5XduHC5R"}, {"id": "VID_266689", "title": "🏆 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका | Biofit PET-VET", "link": "https://youtu.be/xwZ3gV_PIa8?si=vPFSYGXS8LnG3EAZ"}, {"id": "VID_S730902", "title": "किसान की परेशानी, किसान का दर्द 😢🌾", "link": "https://youtube.com/shorts/GEN9mJfsiIY?si=77kBTeTdCHsboVim"}, {"id": "VID_S218514", "title": "चना बीज उपचार: सही तरीका 🌱", "link": "https://youtube.com/shorts/mHRWuIRq604?si=9fMrz_evXwzAXp3i"}, {"id": "VID_S037479", "title": "21वीं सदी का प्यार: प्यार या पैसा? 💔💰", "link": "https://youtube.com/shorts/_io2Mn9xnw0?si=HoHDhgBYuXwYHMSo"}, {"id": "VID_S872947", "title": "आयुर्वेदिक मिल्क शेक कैसे बनाएं? 🌿🥛", "link": "https://youtube.com/shorts/hRq2OvN8aiA?si=X-t1wWc-RD7BRypX"}, {"id": "VID_S691508", "title": "सब्जियों का ज़हर कैसे साफ करें? ⚠️", "link": "https://youtube.com/shorts/39P15VvLneA?si=FwiGhY9OZpCmudj8"}, {"id": "VID_S475456", "title": "Direct Selling Scam है या सच? 🤔", "link": "https://youtube.com/shorts/UBVrsEY2dXY?si=sYxIeKC0Zmrs56Ll"}, {"id": "VID_S363050", "title": "बीज संस्कार: मजबूत फसल का राज 🌱", "link": "https://youtube.com/shorts/Ae9E-arA8lo?si=MJcPQzkUxP8YDedp"}, {"id": "VID_S261730", "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱", "link": "https://youtube.com/shorts/jxu9W_s-C70?si=fO-5zc90_uKlsqGG"}, {"id": "VID_S169791", "title": "धारा संस्कार: मिट्टी को फिर से ज़िंदा बनाएं 🌱", "link": "https://youtube.com/shorts/TTuJF_iyzmk?si=Fn9cFF5mC1TfF7Wo"}, {"id": "VID_S893799", "title": "Jamin ke", "link": "https://youtube.com/shorts/tcgZG7uIyuk?si=J87biZTITiaE2oAA"}, {"id": "VID_S106444", "title": "🐄 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका | Biofit PET-VET", "link": "https://youtube.com/shorts/Y1lrwNHaAcE?si=HLCSVUd1cH7oJLq6"}, {"id": "VID_S037883", "title": "☠️ गौ माता को बचाओ - संपूर्ण प्राथमिक चिकित्सा गाइड", "link": "https://youtube.com/shorts/ew5tDJgGTK8?si=BbUS2vtVe65OOrYS"}],
     web_pages: [
-      { id: 'page_cat', title: '🌐 संपूर्ण जैविक उत्पाद कैटलॉग', link: 'https://aarogyamindia.online/netsurf-products.html' },
-      { id: 'page_weather', title: '🌐 दैनिक कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी', link: 'https://aarogyamindia.online/weather.html' },
-      { id: 'page_panchang', title: '🌐 सनातन वैदिक कृषि पंचांग व शुभ मुहूर्त', link: 'https://aarogyamindia.online/krishi-panchang.html' },
-      { id: 'page_sakhi', title: '🌐 पशुपालन सखी व डेयरी केयर बुलेटिन', link: 'https://aarogyamindia.online/aarogyam-sakhi.html' },
-      { id: 'page_diary', title: '🌐 मेरी डायरी डिजिटल फील्ड खाता', link: 'https://aarogyamindia.online/pages/smart-etailer.html' }
+      { id: 'page_cat', title: '🌾 संपूर्ण जैविक उत्पाद कैटलॉग', link: 'https://aarogyamindia.online/netsurf-products.html' },
+      { id: 'page_sakhi', title: '🐄 पशुपालन सखी व डेयरी केयर बुलेटिन', link: 'https://aarogyamindia.online/aarogyam-sakhi.html' },
+      { id: 'page_weather', title: '⛅ दैनिक कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी', link: 'https://aarogyamindia.online/weather.html' },
+      { id: 'page_panchang', title: '📅 सनातन वैदिक कृषि पंचांग व शुभ मुहूर्त', link: 'https://aarogyamindia.online/krishi-panchang.html' },
+      { id: 'page_mandi', title: '📊 दैनिक मंडी भाव बुलेटिन', link: 'https://aarogyamindia.online/mandi.html' },
+      { id: 'page_health', title: '🩺 संपूर्ण हेल्थ केयर व पोषण पोर्टल', link: 'https://aarogyamindia.online/health.html' },
+      { id: 'page_tube', title: '🎥 आरोग्यम ट्यूब किसान वीडियो', link: 'https://aarogyamindia.online/tube.html' },
+      { id: 'page_diary', title: '📖 मेरी डायरी डिजिटल फील्ड खाता', link: 'https://aarogyamindia.online/pages/smart-etailer.html' },
+      { id: 'page_home', title: '🏠 आरोग्यम भारत मुख्य पोर्टल', link: 'https://aarogyamindia.online' }
     ],
     suvichar: [
-      { id: 'gm_kisan', title: '☀️ शुभ प्रभात — समृद्ध किसान विचार', text: 'राम राम किसान साथी! 🙏 "जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा।" शुभ दिन!' },
-      { id: 'gn_kisan', title: '🌙 शुभ रात्रि — जैविक किसान संकल्प', text: 'शुभ रात्रि किसान भाई! 🙏 कल सुबह की नई किरण आपकी फसलों में हरियाली और घर में खुशहाली लाए। आरोग्यम भारत!' },
-      { id: 'prerna_biz', title: '🚀 स्वावलंबन प्रेरणा — खुद का व्यापार', text: 'नमस्ते साथी! 🙏 नौकरी तलाशने के बजाय खुद का जैविक कृषि व्यापार शुरू करें। 8-लेवल मॉडल से आत्मनिर्भर बनें!' }
+      { id: 'gm_kisan', title: '☀️ शुभ प्रभात — समृद्ध किसान विचार', text: 'राम राम किसान साथी! 🙏\n"जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा।"\nशुभ दिन की मंगलकामनाएं!' },
+      { id: 'gn_kisan', title: '🌙 शुभ रात्रि — जैविक किसान संकल्प', text: 'शुभ रात्रि किसान भाई! 🙏\nकल सुबह की नई किरण आपकी फसलों में हरियाली और घर में खुशहाली लाए।\nआरोग्यम भारत!' },
+      { id: 'prerna_biz', title: '🚀 स्वावलंबन प्रेरणा — खुद का व्यापार', text: 'नमस्ते साथी! 🙏\nनौकरी तलाशने के बजाय खुद का जैविक कृषि व्यापार शुरू करें। 8-लेवल मॉडल से आत्मनिर्भर बनें!' },
+      { id: 'gaumata_vichar', title: '🐄 गोमाता व पशुधन संरक्षण विचार', text: 'गौमाता और पशुधन हमारे जीवन और कृषि की रीढ़ हैं। शुद्ध पोषण (CFC) दें और समृद्ध बनें! 🙏' }
     ],
     autoship_rem: [
-      { id: 'as_monthly', title: '🎁 ऑटोशिप मासिक ऑर्डर रिमाइंडर', text: 'नमस्ते! आपके 6-महीने ऑटोशिप प्लान का इस महीने का ऑर्डर तैयार है। 5 महीने पूर्ण होते ही 6वें महीने मुफ़्त गिफ्ट मिलेगा!' },
+      { id: 'as_monthly', title: '🎁 ऑटोशिप मासिक ऑर्डर रिमाइंडर', text: 'नमस्ते! आपके 6-महीने ऑटोशिप लॉयल्टी प्लान का इस महीने का ऑर्डर तैयार है। 5 महीने पूर्ण होते ही 6वें महीने मुफ़्त गिफ्ट मिलेगा!' },
       { id: 'as_free_unlock', title: '🎉 6th Month Free Gift Unlock Alert!', text: 'बधाई हो! आपके लगातार 5 महीने के ऑर्डर्स पूरे हो चुके हैं। इस महीने आपका मुफ़्त गिफ्ट 100% FREE अनलॉक हो चुका है!' }
     ],
     khata_due: [
@@ -3051,7 +3227,7 @@
         const pageLink = (item.link || 'https://aarogyamindia.online') + `?ref=${shareId}&share_id=${shareId}`;
         msg = `🌐 *नमस्ते ${target.name} जी!* 🙏\n\nआरोग्यम इंडिया का महत्वपूर्ण कृषि बुलेटिन व डिजिटल टूल:\n👉 *${item.title || 'वेब पेज'}*\nदेखने हेतु लिंक पर जाएँ:\n${pageLink}\n\n— *${sName}* (${sMob})`;
       } else if (mainSubj === 'suvichar') {
-        msg = `${item.text || 'राम राम साथी! शुभ दिन की मंगलकामनाएं।'}\n\n— *${sName}* (आरोग्यम इंडिया) 🙏`;
+        msg = `${item.text || 'राम राम साथी! शुभ दिन की मंगलकामनाएं।'}\n\n👉 *अधिक जानकारी व जुड़ने हेतु देखें:*\nhttps://aarogyamindia.online/?ref=${shareId}&share_id=${shareId}\n\n— *${sName}* (${sMob}) 🙏`;
       } else if (mainSubj === 'autoship_rem') {
         msg = `🎁 *नमस्ते ${target.name} जी!* 🙏\n\n${item.text || 'आपके 6-महीने ऑटोशिप का ऑर्डर तैयार है।'}\n\nअधिक जानकारी हेतु संपर्क करें:\n— *${sName}* (${sMob})`;
       } else if (mainSubj === 'khata_due') {
@@ -3691,6 +3867,9 @@
 
 
   window.AarogyamETailer = {
+    renderDiaryLedger: renderDiaryLedger,
+    handleTab2KhataSubmit: handleTab2KhataSubmit,
+    sendKhataStatementWhatsApp: sendKhataStatementWhatsApp,
     openDiaryContactPicker: openDiaryContactPicker,
     closeDiaryContactPicker: closeDiaryContactPicker,
     filterDiaryPickerContacts: filterDiaryPickerContacts,
