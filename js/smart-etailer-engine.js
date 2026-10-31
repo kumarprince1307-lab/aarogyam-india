@@ -2233,6 +2233,99 @@
     });
   }
 
+  // Dynamic Fields for Need Category
+  function renderDynamicNeedFields(need) {
+    const wrap = document.getElementById('diaryKisanCropWrap');
+    if (!wrap) return;
+
+    if (need === 'पशुपालन व दूध वृद्धि' || need.includes('पशु')) {
+      wrap.innerHTML = `
+        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
+          🐄 पशु का प्रकार व डेयरी संबंधित आवश्यकता:
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <input type="text" id="diaryCropName" class="game-input" placeholder="पशु का प्रकार व संख्या (उदा. 2 गाय, 4 भैंस)" style="width:100%; margin:0;">
+          </div>
+          <div>
+            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
+              <option value="दूध उत्पादन वृद्धि (CFC)">🥛 दूध उत्पादन कम होना (दूध बढ़ाना)</option>
+              <option value="फैट व SNF वृद्धि">🧈 फैट व स्निग्धता (FAT कम होना)</option>
+              <option value="बांझपन व रिपीट ब्रीडिंग">🩺 बांझपन व रिपीट ब्रीडिंग समस्या</option>
+              <option value="थनैला रोग रोकथाम">🛑 थनैला (Mastitis) व थन सूजन</option>
+              <option value="पाचन व भूख न लगना">🌿 पाचन, गैस व भूख न लगना</option>
+              <option value="सामान्य स्वास्थ्य व चमक">🛡️ सामान्य स्वास्थ्य व वजन वृद्धि</option>
+            </select>
+          </div>
+        </div>
+      `;
+    } else if (need === 'स्वास्थ्य व पोषण' || need.includes('स्वास्थ्य')) {
+      wrap.innerHTML = `
+        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
+          🩺 स्वास्थ्य आवश्यकता व पोषण समाधान:
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <input type="text" id="diaryCropName" class="game-input" placeholder="मरीज / व्यक्ति (उदा. पिता जी उम्र 55 वर्ष)" style="width:100%; margin:0;">
+          </div>
+          <div>
+            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
+              <option value="डायबिटीज व शुगर नियंत्रण">🩸 डायबिटीज व अनियंत्रित शुगर</option>
+              <option value="बीपी व हृदय स्वास्थ्य">🫀 बीपी, कोलेस्ट्रॉल व हृदय स्वास्थ्य</option>
+              <option value="जोड़ों का दर्द व गठिया">🦴 जोड़ों का दर्द, गठिया व यूरिक एसिड</option>
+              <option value="गैस, एसिडिटी व कब्ज">🥗 गैस, कब्ज, एसिडिटी व पाचन</option>
+              <option value="मोटापा व पेट की चर्बी">⚖️ मोटापा व पेट की अतिरिक्त चर्बी</option>
+              <option value="कमजोरी व कम रोग प्रतिरोधक">⚡ कमजोरी, थकान व कम इम्यूनिटी</option>
+              <option value="बाल झड़ना व त्वचा रोग">💇 बालों का झड़ना व त्वचा विकार</option>
+            </select>
+          </div>
+        </div>
+      `;
+    } else if (need === 'डायरेक्ट बिज़नेस प्लान' || need.includes('बिज़नेस')) {
+      wrap.innerHTML = `
+        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
+          💼 बिज़नेस / पार्ट-टाइम कमाई लक्ष्य:
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <input type="text" id="diaryCropName" class="game-input" placeholder="वर्तमान पेशा (उदा. किसान, छात्र, दुकानदार)" style="width:100%; margin:0;">
+          </div>
+          <div>
+            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
+              <option value="पार्ट-टाइम ₹25k मासिक">💰 पार्ट-टाइम ₹15,000 से ₹25,000 मासिक आय</option>
+              <option value="फुल-टाइम करियर">🚀 फुल-टाइम डायरेक्ट सेलर बिज़नेस मॉडल</option>
+              <option value="विलेज स्टोर फ्रेंचाइजी">🏪 आरोग्यम विलेज स्टोर / डीलरशिप</option>
+              <option value="सक्षम व अस्मिता क्लब">🏆 सक्षम व अस्मिता क्लब अचिवमेंट</option>
+              <option value="15-दिन रॉयल्टी क्लोजिंग">📈 15-दिवसीय क्लोजिंग व रॉयल्टी</option>
+            </select>
+          </div>
+        </div>
+      `;
+    } else {
+      // Default: Agriculture
+      wrap.innerHTML = `
+        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
+          🌱 फसल व समस्या का त्वरित चयन:
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <input type="text" id="diaryCropName" class="game-input" placeholder="फसल (उदा. गेहूं, चना, सोयाबीन, मिर्च)" style="width:100%; margin:0;">
+          </div>
+          <div>
+            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
+              <option value="कीट व इल्ली नियंत्रण">🐛 कीट व इल्ली नियंत्रण</option>
+              <option value="फसल पीलापन व टॉनिक">🌿 पीलापन व टॉनिक/ग्रोथ</option>
+              <option value="फंगस व फफूंद रोग">🍄 फंगस व फफूंद रोग</option>
+              <option value="मिट्टी सुधार व जड़ विकास">🌱 मिट्टी सुधार व जड़ विकास</option>
+              <option value="फूल-फल झड़ना रोकना">🌸 फूल-फल वृद्धि व पोषण</option>
+              <option value="खरपतवार नियंत्रण">🌾 खरपतवार नियंत्रण</option>
+            </select>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // Toggle Need Category
   function setNeedCategory(need) {
     currentNeedCategory = need;
@@ -2243,6 +2336,7 @@
         btn.classList.remove('active');
       }
     });
+    renderDynamicNeedFields(need);
   }
 
   // Form Submit Handler
@@ -2379,7 +2473,13 @@
     let totalCredit = 0;
     let pendingFollowups = 0;
 
-    entries.forEach(e => {
+    // Filter strictly to contacts having khata / udhari transaction
+    const khataEntries = entries.filter(e => {
+      const amt = Number(e.due_amount) || 0;
+      return amt !== 0 || e.khata_type === 'give' || e.khata_type === 'got';
+    });
+
+    khataEntries.forEach(e => {
       const amt = Number(e.due_amount) || 0;
       if (amt > 0) totalDebit += amt;
       else if (amt < 0) totalCredit += Math.abs(amt);
@@ -2391,13 +2491,13 @@
     if (debitValEl) debitValEl.textContent = '₹' + totalDebit.toLocaleString('hi-IN');
     if (creditValEl) creditValEl.textContent = '₹' + totalCredit.toLocaleString('hi-IN');
 
-    if (mContacts) mContacts.textContent = entries.length;
+    if (mContacts) mContacts.textContent = khataEntries.length;
     if (mFollowups) mFollowups.textContent = pendingFollowups;
     if (mDues) mDues.textContent = '₹' + totalDebit.toLocaleString('hi-IN');
 
     const searchQ = (document.getElementById('ledgerSearchInput')?.value || '').toLowerCase().trim();
 
-    const filtered = entries.filter(e => {
+    const filtered = khataEntries.filter(e => {
       if (currentLedgerFilter === 'customer' && e.type !== 'customer') return false;
       if (currentLedgerFilter === 'team' && e.type !== 'team') return false;
       if (currentLedgerFilter === 'dues' && Number(e.due_amount) <= 0) return false;
@@ -2413,8 +2513,8 @@
       listEl.innerHTML = `
         <div style="text-align:center; padding:32px 14px; background:#0f172a; border-radius:12px; border:1px solid #1e293b; color:#94a3b8;">
           <div style="font-size:2rem; margin-bottom:8px;">📖</div>
-          <div style="font-weight:700; color:#cbd5e1; font-size:0.95rem;">कोई खाता प्रविष्टि नहीं मिली</div>
-          <p style="font-size:0.75rem; margin:4px 0 14px 0;">ऊपर फॉर्म से नया खाता या उधारी जोड़ें।</p>
+          <div style="font-weight:700; color:#cbd5e1; font-size:0.95rem;">वर्तमान में कोई उधारी / खाता प्रविष्टि नहीं मिली</div>
+          <p style="font-size:0.75rem; margin:4px 0 14px 0;">ऊपर '➕ नया खाता / उधारी जोड़ें' फॉर्म से सीधे नया लेन-देन दर्ज करें।</p>
         </div>
       `;
       return;
@@ -2935,6 +3035,79 @@
     // 1. DIARY & PHONEBOOK CONTACT PICKERS (SEARCHES LOCAL DIARY + PHONEBOOK)
   let currentPickerTarget = 'main'; // 'main' or 'khata'
 
+  
+  // VCF / vCard & CSV File Parser for 1-Click Phonebook Import
+  function handleVcfFileImport(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const content = e.target.result;
+      const parsedContacts = [];
+      
+      if (file.name.toLowerCase().endsWith('.vcf') || content.includes('BEGIN:VCARD')) {
+        // Parse vCard
+        const vcards = content.split(/END:VCARD/i);
+        vcards.forEach(card => {
+          let name = '';
+          let tel = '';
+          const lines = card.split(/\r?\n/);
+          for (const line of lines) {
+            if (line.startsWith('FN:')) {
+              name = line.replace('FN:', '').trim();
+            } else if (!name && line.startsWith('N:')) {
+              const parts = line.replace('N:', '').split(';');
+              name = parts.filter(Boolean).reverse().join(' ').trim();
+            } else if (line.includes('TEL') && line.includes(':')) {
+              const rawTel = line.split(':')[1] || '';
+              const cleanTel = rawTel.replace(/\D/g, '').slice(-10);
+              if (cleanTel.length === 10) {
+                tel = cleanTel;
+              }
+            }
+          }
+          if (name && tel) {
+            parsedContacts.push({ name: name, mobile: tel, place: 'फोन संपर्क', source: 'phonebook' });
+          }
+        });
+      } else {
+        // Parse CSV (Name, Mobile, Place)
+        const lines = content.split(/\r?\n/);
+        lines.forEach((line, idx) => {
+          if (idx === 0 && line.toLowerCase().includes('name')) return;
+          const cols = line.split(',');
+          if (cols.length >= 2) {
+            const name = cols[0].replace(/["']/g, '').trim();
+            const tel = cols[1].replace(/\D/g, '').slice(-10);
+            const place = cols[2] ? cols[2].replace(/["']/g, '').trim() : 'फोन संपर्क';
+            if (name && tel.length === 10) {
+              parsedContacts.push({ name: name, mobile: tel, place: place, source: 'phonebook' });
+            }
+          }
+        });
+      }
+
+      if (parsedContacts.length > 0) {
+        let existing = [];
+        try { existing = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]'); } catch (_) {}
+        const map = new Map();
+        existing.forEach(c => map.set(c.mobile, c));
+        parsedContacts.forEach(c => map.set(c.mobile, c));
+        const updated = Array.from(map.values());
+        localStorage.setItem('AI_PHONEBOOK_CACHE', JSON.stringify(updated));
+
+        renderDiaryPickerList('');
+        alert(`✓ बधाई! ${parsedContacts.length} संपर्क आपकी फ़ोन बुक से सफलतापूर्वक लोड हो गए!`);
+      } else {
+        alert('फ़ाइल में कोई मान्य 10 अंकों का संपर्क नहीं मिला। कृपया सही .vcf फ़ाइल चुनें।');
+      }
+    };
+
+    reader.readAsText(file);
+  }
+
+
   function openDiaryContactPicker(targetMode = 'main') {
     currentPickerTarget = targetMode;
     const modal = document.getElementById('diaryContactPickerModal');
@@ -3240,25 +3413,24 @@
     previewEl.value = msg;
   }
 
-  function sendAndNext() {
+  function sendAndNext(forcedMode) {
     const list = getHubQueueList();
     if (hubCurrentQueueIndex >= list.length) {
       alert('🎉 बधाई! कतार के सभी संपर्क पूरे हो चुके हैं।');
       return;
     }
 
+    const mode = forcedMode || currentAutomationMode;
     const target = list[hubCurrentQueueIndex];
     const msg = document.getElementById('hubMessagePreviewText')?.value || '';
 
-    if (currentAutomationMode === 'whatsapp') {
+    if (mode === 'whatsapp') {
       window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
-      // Increment WA counter
       let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
       counts.wa = (counts.wa || 0) + 1;
       localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
     } else {
-      window.open(`sms:${target.mobile}?body=${encodeURIComponent(msg)}`, '_self');
-      // Increment SMS counter
+      window.location.href = `sms:${target.mobile}?body=${encodeURIComponent(msg)}`;
       let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
       counts.sms = (counts.sms || 0) + 1;
       localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
@@ -3267,20 +3439,56 @@
     hubSentCount++;
     hubCurrentQueueIndex++;
     updateHubQueueProgressUI();
+    renderTodoPlanner();
   }
 
   function sendBroadcastToWhatsApp() {
     const msg = document.getElementById('hubMessagePreviewText')?.value || '';
     if (!msg) return;
-    // Broadcast directly to WhatsApp so user picks 5 contacts to forward
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    if (navigator.share) {
+      navigator.share({
+        title: 'Aarogyam India',
+        text: msg
+      }).catch(err => {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+      });
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    }
   }
 
   function callAndRemarkActiveTarget() {
     const list = getHubQueueList();
     const target = list[hubCurrentQueueIndex];
     if (!target) return;
-    openCallQueue(target.id);
+
+    // Setup Remark Modal
+    const modal = document.getElementById('callRemarkModal');
+    const targetNameEl = document.getElementById('callRemarkTargetName');
+    const targetIdInput = document.getElementById('callRemarkContactId');
+    const remarkText = document.getElementById('callRemarkText');
+    const nextDate = document.getElementById('callRemarkNextDate');
+
+    if (modal && targetIdInput) {
+      targetIdInput.value = target.id;
+      if (targetNameEl) targetNameEl.textContent = `${target.name} (${target.mobile})`;
+      if (remarkText) remarkText.value = '';
+      if (nextDate) {
+        const tom = new Date();
+        tom.setDate(tom.getDate() + 1);
+        nextDate.value = tom.toISOString().split('T')[0];
+      }
+      modal.style.display = 'flex';
+    }
+
+    // Increment Call Counter
+    let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
+    counts.call = (counts.call || 0) + 1;
+    localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
+    renderTodoPlanner();
+
+    // Trigger phone dialer
+    window.location.href = `tel:${target.mobile}`;
   }
 
   function skipToNextTarget() {
@@ -3866,7 +4074,207 @@
   }
 
 
+  
+  
+  // =============================================================
+  // 8-LEVEL DETAILED METADATA & INTERACTIVE GAMIFICATION ENGINE
+  // =============================================================
+  const EIGHT_LEVELS_META = [
+    {
+      lvl: 1, min: 0, max: 50, name: 'शुरुआत', icon: '🥉', color: '#94a3b8',
+      perks: 'शुरुआती फील्ड टूल्स, 30-सेकंड सरल डायरी एंट्री, डिजिटल खताबुक एक्सेस।',
+      tips: 'पहले 5 किसानों या साथियों की एंट्री दर्ज करें (+10 अंक प्रति किसान)।'
+    },
+    {
+      lvl: 2, min: 51, max: 150, name: 'फील्ड साथी', icon: '🥈', color: '#38bdf8',
+      perks: '1-टैप ऑटोमेशन कतार, प्राथमिकता WhatsApp टेम्पलेट्स, बेसिक रिपोर्ट डाउनलोड।',
+      tips: '10 फॉलो-अप पूर्ण करें (+50 अंक) और 5 नए किसान जोड़ें (+50 अंक)।'
+    },
+    {
+      lvl: 3, min: 151, max: 300, name: 'एक्टिव प्रमोटर', icon: '🥇', color: '#facc15',
+      perks: '6-महीने ऑटोशिप ट्रैकर, कस्टम SMS शेड्यूलर, वीकली रिटेल स्लैब 10% बोनस।',
+      tips: '15 किसानों को बायोफिट जैविक उत्पाद व वीडियो शेयर करें (+75 अंक)।'
+    },
+    {
+      lvl: 4, min: 301, max: 500, name: 'स्टार डिस्ट्रीब्यूटर', icon: '💎', color: '#60a5fa',
+      perks: 'डिजिटल पेमेंट रसीद लिंक, उधारी ऑटो-रिकवरी रिमाइंडर, लीडरशिप टिप्स।',
+      tips: 'उधारी वसूली पूर्ण करें और 20 सक्रिय ग्राहक बनाएं।'
+    },
+    {
+      lvl: 5, min: 501, max: 800, name: 'सिल्वर लीडर', icon: '👑', color: '#cbd5e1',
+      perks: 'टीम नेटवर्क मॉनिटर, डायरेक्ट क्लोजिंग रॉयल्टी, कंपनी ई-बुक्स फ्री एक्सेस।',
+      tips: 'टीम साथियों को गाइड करें और 50 नियमित फॉलो-अप करें।'
+    },
+    {
+      lvl: 6, min: 801, max: 1200, name: 'गोल्ड मास्टर', icon: '🏆', color: '#f59e0b',
+      perks: 'नेशनल टूर क्वालिफायर रडार, 15-दिवसीय क्लोजिंग बूस्ट, स्पेशल लीडरशिप बैज।',
+      tips: '15-दिन में ₹50,000 टर्नओवर अचीव करें और 30 नई एंट्रीज जोड़ें।'
+    },
+    {
+      lvl: 7, min: 1201, max: 2000, name: 'डायमंड मेंटर', icon: '🌟', color: '#a855f7',
+      perks: 'कार फंड क्लब मान्यता, वीआईपी डिजिटल सपोर्ट, लाइफटाइम 0-एग्रेस वॉल्ट।',
+      tips: 'नेटवर्क में 5 नए गोल्ड मास्टर्स तैयार करें।'
+    },
+    {
+      lvl: 8, min: 2001, max: 99999, name: 'क्राउन लीजेंड', icon: '🔱', color: '#ec4899',
+      perks: '₹8,19,250 हाईएस्ट 15-दिन कैप क्लब, नेशनल कन्वेंशन मुख्य वक्ता, हॉल ऑफ फेम।',
+      tips: 'आरोग्यम भारत के सर्वोच्च मार्गदर्शक! फील्ड लीजेंड।'
+    }
+  ];
+
+  function render8LevelLockGrid() {
+    const gridEl = document.getElementById('diaryInteractiveLevelsGrid');
+    if (!gridEl) return;
+
+    const currentPts = Number(localStorage.getItem('AI_DIARY_USER_POINTS') || '15');
+
+    gridEl.innerHTML = EIGHT_LEVELS_META.map(item => {
+      const isUnlocked = currentPts >= item.min;
+      const statusIcon = isUnlocked ? '🔓' : '🔒';
+      const statusText = isUnlocked ? 'खुला है' : `लॉक (${item.min} अंक)`;
+      const statusColor = isUnlocked ? '#34d399' : '#94a3b8';
+      const cardBorder = isUnlocked ? '1.5px solid #38bdf8' : '1px dashed #334155';
+      const cardBg = isUnlocked ? 'linear-gradient(135deg, #091a32 0%, #0f274a 100%)' : '#080c14';
+
+      return `
+        <div style="${cardBg}; border:${cardBorder}; border-radius:10px; padding:10px; position:relative; box-shadow:${isUnlocked ? '0 2px 10px rgba(56,189,248,0.2)' : 'none'};">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:1.1rem;">${item.icon}</span>
+            <button type="button" onclick="window.AarogyamETailer.openLevelInfoModal(${item.lvl})" style="background:#1e293b; border:1px solid #3b82f6; color:#93c5fd; width:22px; height:22px; border-radius:50%; font-size:0.72rem; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="विवरण देखें">ℹ️</button>
+          </div>
+          <div style="font-weight:900; font-size:0.82rem; color:${item.color};">
+            लेवल ${item.lvl}: ${item.name}
+          </div>
+          <div style="font-size:0.70rem; color:${statusColor}; font-weight:800; margin-top:3px; display:flex; align-items:center; gap:4px;">
+            <span>${statusIcon}</span> <span>${statusText}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openLevelInfoModal(lvlNum) {
+    const item = EIGHT_LEVELS_META.find(x => x.lvl === Number(lvlNum));
+    if (!item) return;
+
+    const modal = document.getElementById('levelDetailInfoModal');
+    const titleEl = document.getElementById('lvlModalTitle');
+    const bodyEl = document.getElementById('lvlModalBody');
+    if (!modal) return;
+
+    const currentPts = Number(localStorage.getItem('AI_DIARY_USER_POINTS') || '15');
+    const isUnlocked = currentPts >= item.min;
+
+    if (titleEl) {
+      titleEl.innerHTML = `<span>${item.icon}</span> <span>लेवल ${item.lvl}: ${item.name} (${item.min} - ${item.max === 99999 ? 'अनंत' : item.max} अंक)</span>`;
+    }
+
+    if (bodyEl) {
+      bodyEl.innerHTML = `
+        <div style="background:#0f172a; border:1px solid #1e3a8a; border-radius:10px; padding:12px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.80rem; color:#94a3b8;">वर्तमान स्थिति:</span>
+            <span style="font-size:0.84rem; font-weight:900; color:${isUnlocked ? '#34d399' : '#f87171'};">
+              ${isUnlocked ? '🔓 यह स्तर आपके लिए सक्रिय व अनलॉक है!' : `🔒 यह स्तर लॉक है (आवश्यक: ${item.min} अंक, आपके पास: ${currentPts} अंक)`}
+            </span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <strong style="color:#facc15; font-size:0.88rem; display:block; margin-bottom:4px;">🎁 इस स्तर के विशेष अधिकार व लाभ:</strong>
+          <p style="margin:0; color:#e2e8f0; font-size:0.82rem; line-height:1.6;">${item.perks}</p>
+        </div>
+
+        <div style="margin-bottom:8px;">
+          <strong style="color:#38bdf8; font-size:0.88rem; display:block; margin-bottom:4px;">🎯 अनलॉक करने हेतु फील्ड टिप्स:</strong>
+          <p style="margin:0; color:#cbd5e1; font-size:0.82rem; line-height:1.6;">${item.tips}</p>
+        </div>
+      `;
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  function openUniversalShareModalFromHub() {
+    const previewEl = document.getElementById('hubMessagePreviewText');
+    const msg = previewEl ? previewEl.value : 'आरोग्यम मेरी डायरी';
+    const shareId = getAppUserShareId();
+    const refUrl = `https://aarogyamindia.online/?ref=${encodeURIComponent(shareId)}&share_id=${encodeURIComponent(shareId)}`;
+
+    // NOTE: XP is NOT awarded on simple share; only on actual referral registration (+15 XP) and purchase (+25 XP)
+    const currentPts = Number(localStorage.getItem('AI_DIARY_USER_POINTS') || '15');
+    render8LevelLockGrid();
+
+    if (typeof window.openUniversalShareModal === 'function') {
+      window.openUniversalShareModal({
+        title: 'आरोग्यम मेरी डायरी — किसान व टीम डिजिटल असिस्टेंट',
+        text: msg,
+        url: refUrl
+      });
+    } else if (typeof window.triggerUniversalShare === 'function') {
+      window.triggerUniversalShare({
+        title: 'आरोग्यम मेरी डायरी',
+        text: msg,
+        url: refUrl
+      });
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+  }
+
+  // 15 Master FAQs Controller
+  function toggleFaq(num) {
+    const ans = document.getElementById(`faqAnswer${num}`);
+    const arrow = document.getElementById(`faqArrow${num}`);
+    if (!ans) return;
+
+    if (ans.style.display === 'none' || ans.style.display === '') {
+      ans.style.display = 'block';
+      if (arrow) arrow.textContent = '▴';
+    } else {
+      ans.style.display = 'none';
+      if (arrow) arrow.textContent = '▾';
+    }
+  }
+
+  function filterFaqs(q) {
+    const term = (q || '').toLowerCase().trim();
+    document.querySelectorAll('.faq-accordion-item').forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (!term || text.includes(term)) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  function updateLiveAnnouncementTicker() {
+    const track = document.getElementById('home-live-ticker-track');
+    if (!track) return;
+    const entries = getLocalDiaryEntries();
+    let totalDebit = 0;
+    let autoshipCount = 0;
+    entries.forEach(e => {
+      const amt = Number(e.due_amount) || 0;
+      if (amt > 0) totalDebit += amt;
+      if (e.is_autoship || e.type === 'autoship') autoshipCount++;
+    });
+    const pts = Number(localStorage.getItem('AI_DIARY_USER_POINTS') || '15');
+    const rank = getRankByPoints(pts);
+
+    track.innerHTML = `⚡ <strong>मेरी डायरी लाइव:</strong> ${rank.name} (${pts} अंक) • 👥 कुल संपर्क: <strong>${entries.length}</strong> • 🔴 बाकी उधारी: <strong>₹${totalDebit.toLocaleString('hi-IN')}</strong> • 🎁 ऑटोशिप ग्राहक: <strong>${autoshipCount}</strong> • 🛡️ 100% सुरक्षित 0-एग्रेस लोकल सिक्योर वॉल्ट`;
+  }
+
+
   window.AarogyamETailer = {
+    handleVcfFileImport: handleVcfFileImport,
+    render8LevelLockGrid: render8LevelLockGrid,
+    openLevelInfoModal: openLevelInfoModal,
+    openUniversalShareModalFromHub: openUniversalShareModalFromHub,
+    toggleFaq: toggleFaq,
+    filterFaqs: filterFaqs,
+    updateLiveAnnouncementTicker: updateLiveAnnouncementTicker,
     renderDiaryLedger: renderDiaryLedger,
     handleTab2KhataSubmit: handleTab2KhataSubmit,
     sendKhataStatementWhatsApp: sendKhataStatementWhatsApp,
@@ -4069,7 +4477,21 @@
 
     closeTutorialModal: function () {
       const modal = document.getElementById('smartETailerTutorialModal');
-      if (modal) modal.classList.remove('show');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      const audioEl = document.getElementById('globalVoiceNarrationAudio');
+      if (audioEl) {
+        audioEl.pause();
+      }
+      const iframe = document.getElementById('tutorialVideoIframe');
+      if (iframe) {
+        iframe.src = iframe.src;
+      }
     },
 
     completeCareerRank: function (rankId, rewardXp) {

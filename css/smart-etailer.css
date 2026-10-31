@@ -2444,9 +2444,12 @@ body.light-theme .game-modal-card label {
     grid-template-columns: 1fr !important;
   }
 
+  /* Preserve side-by-side 2-column paired buttons on mobile */
+  .pair-grid-2,
   div[style*="grid-template-columns: 1fr 1fr"],
   div[style*="grid-template-columns:1fr 1fr"] {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
   }
 
   .admin-btn {
@@ -2475,4 +2478,156 @@ body.light-theme .game-modal-card label {
     padding: 10px 6px !important;
     justify-content: center !important;
   }
+}
+
+
+/* ====================================================================
+   WORLD-CLASS 3D MODERN GAMIFIED CARDS & VIBRANT STYLING
+   ==================================================================== */
+
+.smart-form-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(11, 19, 41, 0.95) 100%) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(12px) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.diary-level-8-card {
+  background: linear-gradient(135deg, #091224 0%, #150f38 100%) !important;
+  border: 2px solid #8b5cf6 !important;
+  box-shadow: 0 12px 35px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+.faq-accordion-item {
+  transition: all 0.2s ease;
+}
+
+.faq-accordion-item:hover {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.2);
+}
+
+.admin-btn:active {
+  transform: scale(0.97);
+}
+
+/* 5-Channel Universal Share Overlay Styling Support */
+.ai-share-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.ai-share-drawer-overlay.active {
+  opacity: 1;
+}
+
+.ai-share-buttons-stack {
+  max-width: 440px;
+  width: 100%;
+  background: #0b1329;
+  border: 2px solid #3b82f6;
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.ai-share-btn-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  text-decoration: none;
+  font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+.ai-share-btn-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ai-share-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.ai-share-btn-text {
+  flex: 1;
+  text-align: left;
+}
+
+.ai-share-btn-text strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.ai-share-btn-text span {
+  font-size: 0.74rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+.ai-share-arrow {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+
+/* === LIGHT THEME OVERRIDES FOR 3D CARDS & FAQS === */
+body.light-theme .smart-form-card {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-theme .diary-level-8-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border: 2px solid #8b5cf6 !important;
+  color: #0f172a !important;
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.15) !important;
+}
+
+body.light-theme .faq-accordion-item {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .faq-accordion-item > div:first-child {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .faq-accordion-item strong {
+  color: #0f172a !important;
+}
+
+body.light-theme .faq-accordion-item div[id^="faqAnswer"] {
+  background: #ffffff !important;
+  color: #334155 !important;
 }

@@ -4801,24 +4801,7 @@
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(reel.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${reel.title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
-        if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
-          navigator.share({
-            title: reel.title,
-            text: promoText,
-            url: shareUrl
-          }).catch(() => {
-            if (typeof window.openUniversalShareModal === 'function') {
-              window.openUniversalShareModal({
-                title: reel.title,
-                text: promoText,
-                url: shareUrl,
-                image: reel.thumbnail
-              });
-            }
-          });
-          return;
-        }
-
+        // Direct 5-channel universal share modal (no double popup)
         if (typeof window.openUniversalShareModal === 'function') {
           window.openUniversalShareModal({
             title: reel.title,
@@ -5386,24 +5369,7 @@
         const shareUrl = `https://aarogyamindia.online/api/share?type=video&id=${encodeURIComponent(vid.id)}&ref=${encodeURIComponent(userShare)}`;
         const promoText = `🎬 *${vid.title}*\n${vid.description ? vid.description.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
-        if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
-          navigator.share({
-            title: vid.title,
-            text: promoText,
-            url: shareUrl
-          }).catch(() => {
-            if (typeof window.openUniversalShareModal === 'function') {
-              window.openUniversalShareModal({
-                title: vid.title,
-                text: promoText,
-                url: shareUrl,
-                image: vid.thumbnail
-              });
-            }
-          });
-          return;
-        }
-
+        // Direct 5-channel universal share modal (no double popup)
         if (typeof window.openUniversalShareModal === 'function') {
           window.openUniversalShareModal({
             title: vid.title,
@@ -5447,24 +5413,7 @@
           ? `🎬 *${title}*\n1-मिनट का प्रैक्टिकल कृषि वीडियो। AarogyamTube पर अभी देखें:\n${shareUrl}`
           : `🎬 *${title}*\n${desc ? desc.slice(0, 100) + '...\n' : ''}विशेषज्ञों द्वारा संपूर्ण कृषि मास्टरक्लास ट्रेनिंग। AarogyamTube पर अभी देखें:\n${shareUrl}`;
 
-        if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
-          navigator.share({
-            title: title,
-            text: promoText,
-            url: shareUrl
-          }).catch(() => {
-            if (typeof window.openUniversalShareModal === 'function') {
-              window.openUniversalShareModal({
-                title: title,
-                text: promoText,
-                url: shareUrl,
-                image: match?.thumbnail
-              });
-            }
-          });
-          return;
-        }
-
+        // Direct 5-channel universal share modal (no double popup)
         if (typeof window.openUniversalShareModal === 'function') {
           window.openUniversalShareModal({
             title: title,
