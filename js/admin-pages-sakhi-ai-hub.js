@@ -1425,7 +1425,8 @@ function renderSakhiUsersTable() {
     const waUrl = cleanMobile ? `https://wa.me/91${cleanMobile.slice(-10)}?text=${waText}` : null;
 
     // Side Drawer payload
-    const safePayload = encodeURIComponent(JSON.stringify({
+    const drawerKey = 'sakhi_usr_' + (item.user_key || globalIdx) + '_' + Math.random().toString(36).slice(2, 7);
+    const drawerPayload = {
       title: '👤 सखी उपयोगकर्ता संवाद अंतर्दृष्टि',
       subtitle: 'सखी AI लाइव यूज़र रिकॉर्ड',
       name: name,
@@ -1436,10 +1437,12 @@ function renderSakhiUsersTable() {
       query: topic,
       answer: `कुल चैट सत्र: ${totalChats} बार बातचीत। मुख्य रुचि: ${item.primary_domain || 'कृषि'}। सुझाई गई सामग्री: ${ebook}।`,
       ebook: ebook
-    }));
+    };
+    window._sakhiDrawerItems = window._sakhiDrawerItems || new Map();
+    window._sakhiDrawerItems.set(drawerKey, drawerPayload);
 
     return `
-      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);transition:background 0.15s;cursor:pointer;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
         <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;">
           <div style="font-weight:700;color:var(--admin-text,#f8fafc);">${escapeHtml(name)}</div>
@@ -2126,7 +2129,8 @@ async function renderUnansweredQueries() {
     const safeQ = encodeURIComponent(item.query || '');
     const safeDom = encodeURIComponent(item.domain || 'agri');
 
-    const safePayload = encodeURIComponent(JSON.stringify({
+    const drawerKey = 'sakhi_unans_' + globalIdx + '_' + Math.random().toString(36).slice(2, 7);
+    const drawerPayload = {
       title: '❓ छूटा हुआ सवाल #' + globalIdx,
       subtitle: 'ज्ञानकोष विस्तार प्राथमिकता',
       name: item.user || 'किसान/यूज़र',
@@ -2137,10 +2141,12 @@ async function renderUnansweredQueries() {
       statusBadge: `<span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">बारम्बारता: ${item.count || 1}</span>`,
       query: item.query || '',
       answer: '⚠️ इस सवाल का उत्तर ज्ञानकोष में दर्ज नहीं था। नीचे बटन से तुरंत नया उत्तर जोड़ें।'
-    }));
+    };
+    window._sakhiDrawerItems = window._sakhiDrawerItems || new Map();
+    window._sakhiDrawerItems.set(drawerKey, drawerPayload);
 
     return `
-      <tr style="border-bottom:1px solid var(--admin-border,#334155);cursor:pointer;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+      <tr style="border-bottom:1px solid var(--admin-border,#334155);cursor:pointer;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
         <td style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">${globalIdx}</td>
         <td style="padding:10px 12px;font-weight:700;color:var(--admin-text,#f8fafc);max-width:240px;line-height:1.4;">
           "${escapeHtml(item.query || '')}"
@@ -2571,7 +2577,7 @@ window.renderSakhiAuditTableRows = renderSakhiAuditTableRows;
         </td>
         <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
           <div style="display:inline-flex;gap:4px;">
-            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
               👁️ विवरण
             </button>
             <button type="button" class="admin-btn admin-btn-secondary" style="padding:4px 8px;font-size:0.72rem;" onclick="window.copyAuditQuery(this)" data-sawal="${encodeURIComponent(sawal)}">कॉपी</button>
@@ -3698,7 +3704,7 @@ function renderTeamLeadsTable() {
         </td>
         <td style="padding:10px 12px;text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">
           <div style="display:inline-flex;gap:4px;">
-            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer(JSON.parse(decodeURIComponent('${safePayload}')))">
+            <button type="button" class="admin-btn admin-btn-primary" style="padding:4px 8px;font-size:0.72rem;background:#0284c7;border-color:#0284c7;color:#fff;font-weight:700;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
               👁️ विवरण
             </button>
             <a href="${waUrl}" target="_blank" class="admin-btn" style="background:#10b981;color:#fff;padding:4px 8px;font-size:0.72rem;border-radius:6px;font-weight:800;text-decoration:none;">

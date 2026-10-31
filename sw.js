@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v4.8';
+const STATIC_CACHE = 'aarogyam-public-static-v4.9';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v3.3';
 const MEDIA_CACHE = 'aarogyam-public-media-v3.0';
@@ -92,7 +92,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => !allowedCaches.includes(name))
+          .filter((name) => !allowedCaches.includes(name) && !name.startsWith('aarogyam-admin-'))
           .map((name) => {
             console.log('[Aarogyam PWA SW] Deleting obsolete cache:', name);
             return caches.delete(name);
