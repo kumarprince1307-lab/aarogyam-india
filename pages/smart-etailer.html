@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   
   <!-- Core CSS -->
-  <link rel="stylesheet" href="/css/smart-etailer.css?v=20260911_v4">
+  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261031_v30_diary_live">
 </head>
 
 <body>
@@ -151,29 +151,42 @@
   </section>
 
   <!-- =========================================
-       3. 7 NAVIGATION TABS (TOUCH OPTIMIZED)
+       2.5 LEVEL PROGRESSION & SMART QUOTA RADAR
   ========================================== -->
-  <nav class="gaming-tabs-nav">
-    <button type="button" class="g-tab-btn active" id="tab-btn-survey" data-tab="tab-survey" onclick="window.AarogyamETailer.switchTab('tab-survey')">
-      <span>🌾</span> <span>कंज्यूमर सर्वे & समाधान</span>
+  <section class="diary-level-hero" id="diaryLevelHero">
+    <div class="diary-level-header">
+      <div class="diary-user-badge">
+        <span id="diaryHeroUserName">👤 किसान साथी</span>
+        <span class="diary-rank-pill" id="diaryHeroRankBadge">🥈 लेवल 2: सक्रिय फील्ड प्रमोटर</span>
+      </div>
+      <div id="diaryQuotaCounterBadge" style="font-size:0.75rem; background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.35); padding:3px 10px; border-radius:20px; font-weight:800;">
+        ⚡ 0 प्रविष्टियां दर्ज
+      </div>
+    </div>
+    <div class="diary-progress-bar-wrap">
+      <div class="diary-progress-bar-fill" id="diaryHeroProgressBar" style="width: 25%;"></div>
+    </div>
+    <div class="diary-progress-footer">
+      <span id="diaryHeroNextRankHint">🎯 अगले स्तर (गोल्ड लीडर) हेतु फील्ड गतिविधियां दर्ज करें!</span>
+      <span style="color:#38bdf8; font-weight:700; cursor:pointer;" onclick="window.AarogyamETailer.switchTab('tab-diary-pocket')">लक्ष्य कैलकुलेटर ➔</span>
+    </div>
+  </section>
+
+  <!-- =========================================
+       3. 4 PRIMARY BUSINESS DIARY TABS
+  ========================================== -->
+  <nav class="diary-tabs-grid">
+    <button type="button" class="diary-nav-btn active" id="tab-btn-entry" data-tab="tab-diary-entry" onclick="window.AarogyamETailer.switchTab('tab-diary-entry')">
+      <span style="font-size:1.15rem;">✍️</span> <span>सरल एंट्री</span>
     </button>
-    <button type="button" class="g-tab-btn" id="tab-btn-marketing" data-tab="tab-marketing" onclick="window.AarogyamETailer.switchTab('tab-marketing')">
-      <span>🚀</span> <span>मार्केटिंग इंजन & WhatsApp हुक्स</span>
+    <button type="button" class="diary-nav-btn" id="tab-btn-ledger" data-tab="tab-diary-ledger" onclick="window.AarogyamETailer.switchTab('tab-diary-ledger')">
+      <span style="font-size:1.15rem;">📊</span> <span>डायरी व खाता</span>
     </button>
-    <button type="button" class="g-tab-btn" id="tab-btn-khata" data-tab="tab-khata" onclick="window.AarogyamETailer.switchTab('tab-khata')">
-      <span>📖</span> <span>ई-टेलर खाता बुक</span>
+    <button type="button" class="diary-nav-btn" id="tab-btn-followup" data-tab="tab-diary-followup" onclick="window.AarogyamETailer.switchTab('tab-diary-followup')">
+      <span style="font-size:1.15rem;">🎯</span> <span>फॉलो-अप हब</span>
     </button>
-    <button type="button" class="g-tab-btn" id="tab-btn-autoship" data-tab="tab-autoship" onclick="window.AarogyamETailer.switchTab('tab-autoship')">
-      <span>🔄</span> <span>ऑटोशिप 6th मंथ रडार</span>
-    </button>
-    <button type="button" class="g-tab-btn" id="tab-btn-dsr" data-tab="tab-dsr" onclick="window.AarogyamETailer.switchTab('tab-dsr')">
-      <span>🎯</span> <span>1-टैप DSR व टारगेट</span>
-    </button>
-    <button type="button" class="g-tab-btn" id="tab-btn-success-path" data-tab="tab-success-path" onclick="window.AarogyamETailer.switchTab('tab-success-path')">
-      <span>🏆</span> <span>सक्सेस पाथ & ₹1Cr डेट</span>
-    </button>
-    <button type="button" class="g-tab-btn" id="tab-btn-training" data-tab="tab-training" onclick="window.AarogyamETailer.switchTab('tab-training')">
-      <span>🎧</span> <span>लीडरशिप ट्रेनिंग हब</span>
+    <button type="button" class="diary-nav-btn" id="tab-btn-pocket" data-tab="tab-diary-pocket" onclick="window.AarogyamETailer.switchTab('tab-diary-pocket')">
+      <span style="font-size:1.15rem;">💰</span> <span>खर्च व कमाई</span>
     </button>
   </nav>
 
@@ -181,6 +194,297 @@
        4. TAB CONTENT CONTAINER
   ========================================== -->
   <main class="tab-content-container">
+
+    <!-- =============================================================
+         TAB 1: SMART SINGLE FORM ENTRY (30-SEC ENTRY)
+    ============================================================== -->
+    <section id="tab-diary-entry" class="tab-pane active" style="display:block;">
+      <div class="smart-form-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+              <span>✍️</span> <span>30-सेकंड सरल डायरी एंट्री</span>
+            </h3>
+            <p style="margin:4px 0 0 0; font-size:0.78rem; color:#94a3b8;">
+              ग्राहक या टीम साथी की जानकारी डालें — रिपोर्ट व WhatsApp फॉलो-अप स्वतः तैयार होगा
+            </p>
+          </div>
+          <button type="button" class="admin-btn admin-btn-secondary" style="font-size:0.72rem; padding:4px 10px; border-radius:6px;" onclick="window.AarogyamETailer.openTutorialModal()">
+            🎥 गाइड
+          </button>
+        </div>
+
+        <form id="smartDiaryForm" onsubmit="window.AarogyamETailer.handleDiaryFormSubmit(event)">
+          
+          <!-- 1. Entity Type Toggle -->
+          <div class="entity-toggle-wrap">
+            <button type="button" class="entity-toggle-btn active" id="btnEntityCustomer" onclick="window.AarogyamETailer.setEntityType('customer')">
+              👤 ग्राहक / किसान (Customer)
+            </button>
+            <button type="button" class="entity-toggle-btn" id="btnEntityTeam" onclick="window.AarogyamETailer.setEntityType('team')">
+              🤝 टीम साथी (Team Member)
+            </button>
+          </div>
+
+          <!-- Basic Info Fields -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">
+                व्यक्ति का नाम (Full Name) *
+              </label>
+              <input type="text" id="diaryInputName" class="game-input" placeholder="उदा. रमेश कुमार / किसान साथी" required style="margin:0; width:100%;">
+            </div>
+            <div>
+              <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">
+                मोबाइल नंबर (10 Digit Mobile) *
+              </label>
+              <input type="tel" id="diaryInputMobile" class="game-input" placeholder="उदा. 9826012345" maxlength="10" required style="margin:0; width:100%;">
+            </div>
+            <div>
+              <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:4px;">
+                गाँव / शहर (Village / Town)
+              </label>
+              <input type="text" id="diaryInputPlace" class="game-input" placeholder="उदा. सागर / पिपरिया" style="margin:0; width:100%;">
+            </div>
+          </div>
+
+          <!-- Team Status Section (Visible only when 'Team' is selected) -->
+          <div id="diaryTeamStatusWrap" style="display:none; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px; margin-bottom:14px;">
+            <label style="display:block; font-size:0.80rem; font-weight:800; color:#38bdf8; margin-bottom:6px;">
+              🎯 टीम साथी की वर्तमान स्थिति चुनें:
+            </label>
+            <div class="status-pills-grid">
+              <button type="button" class="status-pill-btn active" data-status="prospect" onclick="window.AarogyamETailer.setTeamStatus('prospect')">
+                1️⃣ नया प्लान बताया (Prospect)
+              </button>
+              <button type="button" class="status-pill-btn" data-status="joined" onclick="window.AarogyamETailer.setTeamStatus('joined')">
+                2️⃣ नया जॉइन हुआ (Joined)
+              </button>
+              <button type="button" class="status-pill-btn" data-status="active" onclick="window.AarogyamETailer.setTeamStatus('active')">
+                3️⃣ सक्रिय फील्ड साथी (Active)
+              </button>
+              <button type="button" class="status-pill-btn" data-status="core" onclick="window.AarogyamETailer.setTeamStatus('core')">
+                4️⃣ कोर मोटिवेटेड लीडर (Core)
+              </button>
+            </div>
+          </div>
+
+          <!-- Need / Category Selector -->
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.80rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+              🌾 मुख्य आवश्यकता / रुचि (Category & Need):
+            </label>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;" id="diaryNeedPillsWrap">
+              <button type="button" class="status-pill-btn active" data-need="कृषि व फसल रोग" onclick="window.AarogyamETailer.setNeedCategory('कृषि व फसल रोग')">
+                🌾 कृषि / फसल रोग
+              </button>
+              <button type="button" class="status-pill-btn" data-need="पशुपालन व दूध वृद्धि" onclick="window.AarogyamETailer.setNeedCategory('पशुपालन व दूध वृद्धि')">
+                🐄 पशुपालन / डेयरी
+              </button>
+              <button type="button" class="status-pill-btn" data-need="स्वास्थ्य व पोषण" onclick="window.AarogyamETailer.setNeedCategory('स्वास्थ्य व पोषण')">
+                🩺 स्वास्थ्य व पोषण
+              </button>
+              <button type="button" class="status-pill-btn" data-need="डायरेक्ट बिज़नेस प्लान" onclick="window.AarogyamETailer.setNeedCategory('डायरेक्ट बिज़नेस प्लान')">
+                💼 बिज़नेस / पार्ट-टाइम आय
+              </button>
+            </div>
+          </div>
+
+          <!-- Optional Khata / Ledger Entry -->
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:0.80rem; font-weight:800; color:#facc15;">📖 खाता / हिसाब-किताब (वैकल्पिक)</span>
+              <span style="font-size:0.70rem; color:#94a3b8;">लेन-देन होने पर ही भरें</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <input type="number" id="diaryInputAmount" class="game-input" placeholder="₹ राशि (उदा. 500)" style="margin:0; width:100%;">
+              </div>
+              <div>
+                <select id="diaryInputKhataType" class="game-input" style="margin:0; width:100%;">
+                  <option value="none">कोई उधारी नहीं (नकद / सामान्य)</option>
+                  <option value="give">🔴 मैंने उधार दिए (मार्केट से लेना है)</option>
+                  <option value="got">🟢 मुझे जमा मिले (प्राप्त हुए)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="btnSubmitDiaryEntry" class="admin-btn admin-btn-primary" style="width:100%; padding:14px; font-size:1.05rem; font-weight:900; background:linear-gradient(135deg, #0284c7 0%, #2563eb 100%); border:none; border-radius:10px; cursor:pointer; box-shadow:0 6px 20px rgba(2, 132, 199, 0.4);">
+            💾 डायरी में सुरक्षित करें
+          </button>
+          
+          <div style="text-align:center; margin-top:8px; font-size:0.72rem; color:#94a3b8;" id="diaryFormQuotaNotice">
+            🔒 100% सुरक्षित • ऑफलाइन मोड सपोर्टेड
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- =============================================================
+         TAB 2: DIARY LEDGER & SMART REPORTS (KHATABOOK STYLE)
+    ============================================================== -->
+    <section id="tab-diary-ledger" class="tab-pane" style="display:none;">
+      
+      <!-- Top Ledger Metric Strip -->
+      <div class="cashflow-kpi-grid">
+        <div class="cashflow-kpi-card" style="border-left: 4px solid #38bdf8;">
+          <div class="cashflow-kpi-label" style="color:#38bdf8;">कुल संपर्क</div>
+          <div class="cashflow-kpi-val" id="ledgerMetricContacts" style="color:#f8fafc;">0</div>
+        </div>
+        <div class="cashflow-kpi-card" style="border-left: 4px solid #f59e0b;">
+          <div class="cashflow-kpi-label" style="color:#f59e0b;">आज के फॉलो-अप</div>
+          <div class="cashflow-kpi-val" id="ledgerMetricFollowups" style="color:#facc15;">0</div>
+        </div>
+        <div class="cashflow-kpi-card" style="border-left: 4px solid #ef4444;">
+          <div class="cashflow-kpi-label" style="color:#ef4444;">मार्केट से लेना (उधारी)</div>
+          <div class="cashflow-kpi-val" id="ledgerMetricPendingDues" style="color:#f87171;">₹0</div>
+        </div>
+      </div>
+
+      <!-- Search & WhatsApp-style Label Filter Chips -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <input type="text" id="ledgerSearchInput" class="game-input" placeholder="🔍 नाम, गाँव या मोबाइल से खोजें..." style="margin:0; flex:1;" oninput="window.AarogyamETailer.filterLedgerEntries(this.value)">
+          <button type="button" class="admin-btn admin-btn-primary" style="background:#10b981; border:none; padding:0 14px; font-weight:800; font-size:0.80rem; border-radius:8px;" onclick="window.AarogyamETailer.downloadDiaryReport()">
+            📥 रिपोर्ट
+          </button>
+        </div>
+        
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
+          <button type="button" class="status-pill-btn active" data-filter="all" onclick="window.AarogyamETailer.setLedgerFilter('all')">
+            👥 सभी (All)
+          </button>
+          <button type="button" class="status-pill-btn" data-filter="customer" onclick="window.AarogyamETailer.setLedgerFilter('customer')">
+            🌾 किसान ग्राहक
+          </button>
+          <button type="button" class="status-pill-btn" data-filter="team" onclick="window.AarogyamETailer.setLedgerFilter('team')">
+            🤝 टीम साथी
+          </button>
+          <button type="button" class="status-pill-btn" data-filter="dues" onclick="window.AarogyamETailer.setLedgerFilter('dues')">
+            🔴 बाकी उधारी
+          </button>
+        </div>
+      </div>
+
+      <!-- Ledger Cards Container -->
+      <div id="diaryLedgerCardsList">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </section>
+
+    <!-- =============================================================
+         TAB 3: FOLLOW-UP & WHATSAPP ACTION HUB
+    ============================================================== -->
+    <section id="tab-diary-followup" class="tab-pane" style="display:none;">
+      <div class="smart-form-card" style="border-color:#38bdf8;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <div>
+            <h3 style="margin:0; font-size:1.10rem; font-weight:900; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+              <span>🎯</span> <span>आज का प्राथमिकता फॉलो-अप रडार</span>
+            </h3>
+            <span style="font-size:0.75rem; color:#94a3b8;">1-टैप में सीधे ग्राहक या साथी के WhatsApp पर पर्सनल मैसेज भेजें</span>
+          </div>
+          <span style="background:rgba(56,189,248,0.15); color:#38bdf8; padding:3px 10px; border-radius:20px; font-weight:800; font-size:0.74rem;">
+            1-TAP ACTIONS
+          </span>
+        </div>
+
+        <div id="diaryFollowupList">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================================================
+         TAB 4: POCKET CASHFLOW & INCOME GOAL CALCULATOR
+    ============================================================== -->
+    <section id="tab-diary-pocket" class="tab-pane" style="display:none;">
+      
+      <!-- Income Goal Calculator -->
+      <div class="goal-calc-box">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="margin:0; font-size:1.05rem; font-weight:900; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+            <span>🧮</span> <span>मासिक आय लक्ष्य कैलकुलेटर</span>
+          </h3>
+          <span style="font-size:0.72rem; color:#facc15; font-weight:800;">ZERO-MATH TARGET</span>
+        </div>
+        <p style="font-size:0.78rem; color:#94a3b8; margin:4px 0 10px 0;">
+          अपना मनचाहा मासिक लक्ष्य चुनें — रोज़ाना कितना काम करना है कैलकुलेटर खुद बताएगा:
+        </p>
+
+        <div class="goal-target-chips">
+          <button type="button" class="goal-target-chip" data-target="10000" onclick="window.AarogyamETailer.setIncomeTarget(10000)">
+            ₹10,000 / महीना
+          </button>
+          <button type="button" class="goal-target-chip active" data-target="25000" onclick="window.AarogyamETailer.setIncomeTarget(25000)">
+            ₹25,000 / महीना
+          </button>
+          <button type="button" class="goal-target-chip" data-target="50000" onclick="window.AarogyamETailer.setIncomeTarget(50000)">
+            ₹50,000 / महीना
+          </button>
+        </div>
+
+        <div class="goal-result-card" id="goalResultCard">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+      <!-- Field Pocket Cashflow & Expense Tracker -->
+      <div class="smart-form-card" style="border-color:#10b981;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:900; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+              <span>⛽</span> <span>दैनिक फील्ड खर्च व फंड मैनेजर (Pocket Manager)</span>
+            </h3>
+            <span style="font-size:0.74rem; color:#94a3b8;">सही फील्ड खर्च बनाम फालतू फिजूलखर्ची का साफ हिसाब</span>
+          </div>
+        </div>
+
+        <!-- Cashflow Quick Entry Form -->
+        <form id="cashflowForm" onsubmit="window.AarogyamETailer.handleCashflowSubmit(event)" style="background:#1e293b; padding:12px; border-radius:10px; margin-bottom:14px; border:1px solid #334155;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="display:block; font-size:0.75rem; color:#cbd5e1; font-weight:700; margin-bottom:4px;">प्रकार (Type):</label>
+              <select id="cashflowType" class="game-input" style="margin:0; width:100%;" onchange="window.AarogyamETailer.toggleExpenseCategories(this.value)">
+                <option value="expense_good">🔴 ज़रूरी फील्ड खर्च (पेट्रोल / भोजन)</option>
+                <option value="expense_bad">⚠️ फालतू खर्च (गुटखा / अनावश्यक नाश्ता)</option>
+                <option value="income">🟢 आज की कमाई (बिक्री लाभ / जमा)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; color:#cbd5e1; font-weight:700; margin-bottom:4px;">राशि (Amount ₹) *:</label>
+              <input type="number" id="cashflowAmount" class="game-input" placeholder="₹ राशि (उदा. 150)" required style="margin:0; width:100%;">
+            </div>
+          </div>
+          <div>
+            <input type="text" id="cashflowNote" class="game-input" placeholder="विवरण (उदा. बाइक पेट्रोल सागर ट्रिप)" style="margin:0 0 10px 0; width:100%;">
+          </div>
+          <button type="submit" class="admin-btn admin-btn-primary" style="width:100%; padding:10px; font-weight:800; background:#10b981; border:none; border-radius:8px;">
+            ➕ खर्च / आय दर्ज करें
+          </button>
+        </form>
+
+        <!-- Cashflow History List -->
+        <div id="cashflowHistoryList">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =============================================================
+         SECONDARY ADVANCED TOOLS TOGGLE BUTTON
+    ============================================================== -->
+    <div style="text-align:center; margin:24px 0 16px 0;">
+      <button type="button" class="admin-btn admin-btn-secondary" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:8px 16px; border-radius:20px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.toggleLegacyTools()">
+        🛠️ उन्नत टूल्स: सर्वे, मार्केटिंग हुक्स व ट्रेनिंग देखें ▾
+      </button>
+    </div>
+
+    <!-- Container for legacy tools (initially collapsed) -->
+    <div id="legacyToolsWrap" style="display:none;">
 
     <!-- -------------------------------------------------------------
          TAB 1: 30-SEC CONSUMER SURVEY & PRODUCT DIAGNOSIS
@@ -518,6 +822,7 @@
       </div>
     </section>
 
+      </div>
   </main>
 
   <!-- =========================================
@@ -773,7 +1078,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/universal-nav-drawer.js?v=1.1"></script>
-  <script src="/js/smart-etailer-engine.js?v=20260911_v4"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261031_v30_diary_live"></script>
 </body>
 
 </html>

@@ -444,7 +444,7 @@
     if (!tabId) return;
 
     // 1. Update Buttons
-    const buttons = document.querySelectorAll('.g-tab-btn');
+    const buttons = document.querySelectorAll('.g-tab-btn, .diary-nav-btn');
     buttons.forEach(b => {
       const bTab = b.getAttribute('data-tab');
       if (bTab === tabId) {
@@ -1698,7 +1698,556 @@
   // -------------------------------------------------------------
   // 15. PUBLIC GLOBAL CONTROLLER EXPORT
   // -------------------------------------------------------------
+  // =============================================================
+  // SMART BUSINESS DIARY - ZERO EGRESS ENGINE
+  // Dynamic Quotas | Single Form | Cashflow Manager | 1-Tap WhatsApp
+  // =============================================================
+  let currentEntityType = 'customer';
+  let currentTeamStatus = 'prospect';
+  let currentNeedCategory = 'कृषि व फसल रोग';
+  let currentLedgerFilter = 'all';
+  let currentIncomeTarget = Number(localStorage.getItem('AAROGYAM_INCOME_TARGET')) || 25000;
+
+  // Cloud Config (Zero-Egress Cache with Supabase fallback)
+  let diaryGlobalConfig = {
+    free_limit: 50,
+    active_limit: 500,
+    paid_mode: 'freemium',
+    pro_price: 49,
+    download_perm: 'all',
+    expense_module: 'enabled',
+    wa_action: 'enabled'
+  };
+
+  try {
+    const savedCfg = localStorage.getItem('SMART_ETAILER_GLOBAL_CONFIG');
+    if (savedCfg) diaryGlobalConfig = { ...diaryGlobalConfig, ...JSON.parse(savedCfg) };
+  } catch (_) {}
+
+  // Sync Global Quotas in Background once
+  try {
+    fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/site_configs?key=eq.SMART_ETAILER_GLOBAL_CONFIG&limit=1', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Accept': 'application/json' }
+    }).then(r => r.json()).then(arr => {
+      if (Array.isArray(arr) && arr[0] && arr[0].value) {
+        const val = typeof arr[0].value === 'string' ? JSON.parse(arr[0].value) : arr[0].value;
+        diaryGlobalConfig = { ...diaryGlobalConfig, ...val };
+        localStorage.setItem('SMART_ETAILER_GLOBAL_CONFIG', JSON.stringify(diaryGlobalConfig));
+        updateDiaryHeroLevel();
+      }
+    }).catch(() => {});
+  } catch (_) {}
+
+  function getLocalDiaryEntries() {
+    try {
+      return JSON.parse(localStorage.getItem('AAROGYAM_SMART_DIARY_ENTRIES') || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveLocalDiaryEntries(entries) {
+    localStorage.setItem('AAROGYAM_SMART_DIARY_ENTRIES', JSON.stringify(entries));
+    updateDiaryHeroLevel();
+    renderDiaryLedger();
+    renderDiaryFollowups();
+  }
+
+  function getLocalCashflow() {
+    try {
+      return JSON.parse(localStorage.getItem('AAROGYAM_SMART_CASHFLOW') || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveLocalCashflow(cf) {
+    localStorage.setItem('AAROGYAM_SMART_CASHFLOW', JSON.stringify(cf));
+    renderCashflowSummary();
+  }
+
+  // Check Quota Limit (No Hardcoded Numbers)
+  function checkDiaryQuota() {
+    const entries = getLocalDiaryEntries();
+    const limit = Number(diaryGlobalConfig.free_limit) || 50;
+    const mode = diaryGlobalConfig.paid_mode || 'freemium';
+
+    if (mode === 'freemium' && entries.length >= limit) {
+      const price = diaryGlobalConfig.pro_price ? `₹${diaryGlobalConfig.pro_price}` : 'प्रो अपग्रेड';
+      alert(`⚠️ आपकी ${limit} मुफ़्त प्रविष्टियों की सीमा पूरी हो चुकी है!\n\nअसीमित डायरी, क्लाउड बैकअप व PDF डाउनलोड हेतु ${price} में प्रो एक्टिवेट करें या एडमिन से संपर्क करें।`);
+      return false;
+    }
+    return true;
+  }
+
+  // Level Progression Calculator
+  function updateDiaryHeroLevel() {
+    const entries = getLocalDiaryEntries();
+    const count = entries.length;
+    const bar = document.getElementById('diaryHeroProgressBar');
+    const rankEl = document.getElementById('diaryHeroRankBadge');
+    const badgeEl = document.getElementById('diaryQuotaCounterBadge');
+    const hintEl = document.getElementById('diaryHeroNextRankHint');
+    const userEl = document.getElementById('diaryHeroUserName');
+
+    // Get user name from session
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (u.name && userEl) userEl.textContent = '👤 ' + u.name;
+    } catch (_) {}
+
+    let rank = '🥉 लेवल 1: शुरुआत';
+    let pct = Math.min(100, Math.round((count / 10) * 100));
+    let nextHint = `अगले स्तर (सिल्वर) हेतु ${Math.max(0, 10 - count)} फील्ड प्रविष्टियां शेष!`;
+
+    if (count >= 10 && count < 30) {
+      rank = '🥈 लेवल 2: सक्रिय फील्ड प्रमोटर';
+      pct = Math.min(100, Math.round(((count - 10) / 20) * 100));
+      nextHint = `अगले स्तर (गोल्ड लीडर) हेतु ${Math.max(0, 30 - count)} फील्ड प्रविष्टियां शेष!`;
+    } else if (count >= 30) {
+      rank = '🥇 लेवल 3: मास्टर टीम स्टार';
+      pct = 100;
+      nextHint = '🎉 बधाई! आप आरोग्यम मास्टर लीडर स्तर पर हैं!';
+    }
+
+    if (bar) bar.style.width = Math.max(12, pct) + '%';
+    if (rankEl) rankEl.textContent = rank;
+    if (hintEl) hintEl.textContent = '🎯 ' + nextHint;
+
+    const limit = Number(diaryGlobalConfig.free_limit) || 50;
+    if (badgeEl) {
+      badgeEl.textContent = `⚡ ${count}/${limit} प्रविष्टियां`;
+      badgeEl.style.color = count >= limit ? '#f87171' : '#38bdf8';
+    }
+  }
+
+  // Toggle Entity Type
+  function setEntityType(type) {
+    currentEntityType = type;
+    const btnCust = document.getElementById('btnEntityCustomer');
+    const btnTeam = document.getElementById('btnEntityTeam');
+    const teamWrap = document.getElementById('diaryTeamStatusWrap');
+
+    if (type === 'team') {
+      if (btnCust) btnCust.classList.remove('active');
+      if (btnTeam) btnTeam.classList.add('active');
+      if (teamWrap) teamWrap.style.display = 'block';
+    } else {
+      if (btnCust) btnCust.classList.add('active');
+      if (btnTeam) btnTeam.classList.remove('active');
+      if (teamWrap) teamWrap.style.display = 'none';
+    }
+  }
+
+  // Toggle Team Status
+  function setTeamStatus(st) {
+    currentTeamStatus = st;
+    document.querySelectorAll('.status-pills-grid .status-pill-btn').forEach(btn => {
+      if (btn.getAttribute('data-status') === st) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // Toggle Need Category
+  function setNeedCategory(need) {
+    currentNeedCategory = need;
+    document.querySelectorAll('#diaryNeedPillsWrap .status-pill-btn').forEach(btn => {
+      if (btn.getAttribute('data-need') === need) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // Form Submit Handler
+  async function handleDiaryFormSubmit(e) {
+    e.preventDefault();
+    if (!checkDiaryQuota()) return;
+
+    const name = (document.getElementById('diaryInputName')?.value || '').trim();
+    const mobile = (document.getElementById('diaryInputMobile')?.value || '').trim().replace(/\\D/g, '');
+    const place = (document.getElementById('diaryInputPlace')?.value || '').trim();
+    const amt = Number(document.getElementById('diaryInputAmount')?.value) || 0;
+    const khataType = document.getElementById('diaryInputKhataType')?.value || 'none';
+
+    if (!name || mobile.length < 10) {
+      alert('कृपया वैध नाम और 10 अंकों का मोबाइल नंबर दर्ज करें!');
+      return;
+    }
+
+    const newEntry = {
+      id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: name,
+      mobile: mobile,
+      place: place || 'स्थानीय',
+      type: currentEntityType,
+      team_status: currentEntityType === 'team' ? currentTeamStatus : null,
+      need: currentNeedCategory,
+      due_amount: khataType === 'give' ? amt : (khataType === 'got' ? -amt : 0),
+      khata_type: khataType,
+      created_at: new Date().toISOString(),
+      followup_done: false
+    };
+
+    const entries = getLocalDiaryEntries();
+    entries.unshift(newEntry);
+    saveLocalDiaryEntries(entries);
+
+    // Asynchronously push to Supabase phonebook without blocking UI
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        client.from('phonebook').insert([{
+          name: name,
+          mobile: mobile,
+          place: place || 'स्थानीय',
+          source: 'smart_diary'
+        }]).then(() => {}).catch(() => {});
+      }
+    } catch (_) {}
+
+    showToast(`🎉 ${name} जी की डायरी एंट्री सुरक्षित हो गई!`, 'success');
+
+    // Reset Form
+    document.getElementById('diaryInputName').value = '';
+    document.getElementById('diaryInputMobile').value = '';
+    document.getElementById('diaryInputPlace').value = '';
+    document.getElementById('diaryInputAmount').value = '';
+    document.getElementById('diaryInputKhataType').value = 'none';
+
+    // Switch to Ledger view to see the entry
+    switchTab('tab-diary-ledger');
+  }
+
+  // Render Ledger
+  function renderDiaryLedger() {
+    const listEl = document.getElementById('diaryLedgerCardsList');
+    const mContacts = document.getElementById('ledgerMetricContacts');
+    const mFollowups = document.getElementById('ledgerMetricFollowups');
+    const mDues = document.getElementById('ledgerMetricPendingDues');
+    if (!listEl) return;
+
+    const entries = getLocalDiaryEntries();
+    let totalDues = 0;
+    let pendingFollowups = 0;
+
+    entries.forEach(e => {
+      if (e.due_amount > 0) totalDues += e.due_amount;
+      if (!e.followup_done) pendingFollowups += 1;
+    });
+
+    if (mContacts) mContacts.textContent = entries.length;
+    if (mFollowups) mFollowups.textContent = pendingFollowups;
+    if (mDues) mDues.textContent = '₹' + totalDues.toLocaleString('hi-IN');
+
+    const searchQ = (document.getElementById('ledgerSearchInput')?.value || '').toLowerCase().trim();
+
+    const filtered = entries.filter(e => {
+      if (currentLedgerFilter === 'customer' && e.type !== 'customer') return false;
+      if (currentLedgerFilter === 'team' && e.type !== 'team') return false;
+      if (currentLedgerFilter === 'dues' && e.due_amount <= 0) return false;
+
+      if (searchQ) {
+        const str = `${e.name} ${e.mobile} ${e.place} ${e.need}`.toLowerCase();
+        return str.includes(searchQ);
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:32px 14px; background:#0f172a; border-radius:12px; border:1px solid #1e293b; color:#94a3b8;">
+          <div style="font-size:2rem; margin-bottom:8px;">📖</div>
+          <div style="font-weight:700; color:#cbd5e1; font-size:0.95rem;">कोई प्रविष्टि नहीं मिली</div>
+          <p style="font-size:0.75rem; margin:4px 0 14px 0;">पहले टैब से अपनी पहली ग्राहक या टीम एंट्री जोड़ें।</p>
+          <button type="button" class="admin-btn admin-btn-primary" style="padding:8px 16px; font-weight:800; font-size:0.80rem;" onclick="window.AarogyamETailer.switchTab('tab-diary-entry')">
+            ✍️ नई एंट्री जोड़ें
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(e => {
+      const isTeam = e.type === 'team';
+      const statusBadge = isTeam
+        ? `<span style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🤝 टीम: ${e.team_status || 'साथी'}</span>`
+        : `<span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🌾 ग्राहक / किसान</span>`;
+
+      let duesBadge = '';
+      if (e.due_amount > 0) {
+        duesBadge = `<span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🔴 ₹${e.due_amount} बाकी</span>`;
+      } else if (e.due_amount < 0) {
+        duesBadge = `<span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🟢 जमा ₹${Math.abs(e.due_amount)}</span>`;
+      }
+
+      const waMsg = encodeURIComponent(`नमस्ते ${e.name} जी! 🙏 आरोग्यम इंडिया से संपर्क किया गया है। आपकी (${e.need}) के संबंध में उचित मार्गदर्शन और समाधान उपलब्ध है।`);
+      const waUrl = `https://wa.me/91${e.mobile}?text=${waMsg}`;
+
+      return `
+        <div style="background:#0f172a; border:1.5px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <strong style="font-size:0.95rem; color:#f8fafc;">${e.name}</strong>
+              ${statusBadge}
+              ${duesBadge}
+            </div>
+            <div style="font-size:0.76rem; color:#94a3b8; margin-top:4px;">
+              📍 ${e.place || 'स्थानीय'} • 📱 ${e.mobile} • 💡 ${e.need}
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <a href="tel:${e.mobile}" class="btn-action-call" title="कॉल करें">📞 कॉल</a>
+            <a href="${waUrl}" target="_blank" class="btn-action-wa" title="WhatsApp भेजें">💬 WA</a>
+            <button type="button" class="admin-btn admin-btn-secondary" style="padding:6px 10px; color:#ef4444; border-color:#475569; font-size:0.72rem;" onclick="window.AarogyamETailer.deleteDiaryEntry('${e.id}')" title="हटाएं">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setLedgerFilter(filter) {
+    currentLedgerFilter = filter;
+    document.querySelectorAll('[data-filter]').forEach(b => {
+      if (b.getAttribute('data-filter') === filter) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+    renderDiaryLedger();
+  }
+
+  function filterLedgerEntries() {
+    renderDiaryLedger();
+  }
+
+  function deleteDiaryEntry(id) {
+    if (!confirm('क्या आप वाकई इस डायरी प्रविष्टि को हटाना चाहते हैं?')) return;
+    let entries = getLocalDiaryEntries().filter(e => e.id !== id);
+    saveLocalDiaryEntries(entries);
+    showToast('प्रविष्टि हटा दी गई!', 'info');
+  }
+
+  // Follow-up Hub Rendering
+  function renderDiaryFollowups() {
+    const wrap = document.getElementById('diaryFollowupList');
+    if (!wrap) return;
+
+    const entries = getLocalDiaryEntries();
+    if (entries.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">कोई सक्रिय फॉलो-अप नहीं है।</div>';
+      return;
+    }
+
+    wrap.innerHTML = entries.slice(0, 8).map(e => {
+      const waMsg = encodeURIComponent(`नमस्ते ${e.name} जी! 🙏 आरोग्यम इंडिया से संपर्क किया गया है। आपकी (${e.need}) के संबंध में उचित मार्गदर्शन और समाधान उपलब्ध है।`);
+      const waUrl = `https://wa.me/91${e.mobile}?text=${waMsg}`;
+
+      return `
+        <div class="followup-item-card">
+          <div>
+            <div style="font-weight:800; font-size:0.95rem; color:#f8fafc;">${e.name} (${e.place})</div>
+            <div style="font-size:0.76rem; color:#38bdf8; margin-top:3px;">
+              🌱 आवश्यकता: <strong>${e.need}</strong> • 📱 ${e.mobile}
+            </div>
+          </div>
+          <div class="followup-action-btn-group">
+            <a href="tel:${e.mobile}" class="btn-action-call">📞 कॉल</a>
+            <a href="${waUrl}" target="_blank" class="btn-action-wa" onclick="window.AarogyamETailer.markFollowupDone('${e.id}')">💬 1-टैप WhatsApp</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function markFollowupDone(id) {
+    let entries = getLocalDiaryEntries();
+    entries.forEach(e => {
+      if (e.id === id) e.followup_done = true;
+    });
+    saveLocalDiaryEntries(entries);
+    showToast('फॉलो-अप पूर्ण चिन्हित किया गया! (+15 अंक)', 'success');
+  }
+
+  // Report Download (Permissions-aware)
+  function downloadDiaryReport() {
+    const perm = diaryGlobalConfig.download_perm || 'all';
+    const entries = getLocalDiaryEntries();
+
+    if (entries.length === 0) {
+      alert('डाउनलोड हेतु डायरी में कम से कम 1 प्रविष्टि होना आवश्यक है!');
+      return;
+    }
+
+    // Generate CSV content
+    let csv = 'नाम,मोबाइल,गाँव,श्रेणी,स्थिति,बकाया राशि,तारीख\n';
+    entries.forEach(e => {
+      csv += `"${e.name}","${e.mobile}","${e.place}","${e.need}","${e.type}","${e.due_amount}","${new Date(e.created_at).toLocaleDateString('hi-IN')}"\n`;
+    });
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `आरोग्यम_स्मार्ट_डायरी_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('🎉 डायरी रिपोर्ट सफलतापूर्वक डाउनलोड हो गई!', 'success');
+  }
+
+  // Income Target Calculator
+  function setIncomeTarget(target) {
+    currentIncomeTarget = Number(target) || 25000;
+    localStorage.setItem('AAROGYAM_INCOME_TARGET', String(currentIncomeTarget));
+    document.querySelectorAll('.goal-target-chip').forEach(c => {
+      if (Number(c.getAttribute('data-target')) === currentIncomeTarget) {
+        c.classList.add('active');
+      } else {
+        c.classList.remove('active');
+      }
+    });
+    renderIncomeTarget();
+  }
+
+  function renderIncomeTarget() {
+    const card = document.getElementById('goalResultCard');
+    if (!card) return;
+
+    let dailyFarmers = 2;
+    let weeklyTeam = 3;
+    let dailyNet = Math.round(currentIncomeTarget / 30);
+
+    if (currentIncomeTarget <= 10000) {
+      dailyFarmers = 1;
+      weeklyTeam = 1;
+    } else if (currentIncomeTarget >= 50000) {
+      dailyFarmers = 4;
+      weeklyTeam = 5;
+    }
+
+    card.innerHTML = `
+      <div style="font-size:0.85rem; font-weight:900; color:#38bdf8; margin-bottom:8px;">
+        🎯 ₹${currentIncomeTarget.toLocaleString('hi-IN')}/माह हेतु आपका दैनिक एक्शन प्लान:
+      </div>
+      <div style="font-size:0.80rem; color:#e2e8f0; line-height:1.6;">
+        <div>🌾 <strong>प्रतिदिन 1-2 किसानों</strong> को फसल सुरक्षा या पशु आहार का डेमो दें।</div>
+        <div>🤝 <strong>हफ्ते में ${weeklyTeam} नए साथियों</strong> को आरोग्यम बिज़नेस मॉडल शेयर करें।</div>
+        <div style="margin-top:6px; color:#34d399; font-weight:800;">
+          💵 दैनिक शुद्ध इन-हैंड बचत लक्ष्य: <strong>₹${dailyNet} / दिन</strong>
+        </div>
+      </div>
+    `;
+  }
+
+  // Pocket Cashflow Manager
+  function handleCashflowSubmit(e) {
+    e.preventDefault();
+    const type = document.getElementById('cashflowType')?.value || 'expense_good';
+    const amt = Number(document.getElementById('cashflowAmount')?.value) || 0;
+    const note = (document.getElementById('cashflowNote')?.value || '').trim();
+
+    if (amt <= 0) {
+      alert('कृपया वैध राशि दर्ज करें!');
+      return;
+    }
+
+    const item = {
+      id: 'cf_' + Date.now(),
+      type: type,
+      amount: amt,
+      note: note || (type === 'income' ? 'दैनिक बिक्री कमाई' : (type === 'expense_good' ? 'पेट्रोल / फील्ड भोजन' : 'अनावश्यक / फालतू खर्च')),
+      timestamp: new Date().toISOString()
+    };
+
+    const list = getLocalCashflow();
+    list.unshift(item);
+    saveLocalCashflow(list);
+
+    showToast('खर्च / आय सफलतापूर्वक दर्ज हुई!', 'success');
+    document.getElementById('cashflowAmount').value = '';
+    document.getElementById('cashflowNote').value = '';
+  }
+
+  function renderCashflowSummary() {
+    const list = getLocalCashflow();
+    let totalIn = 0;
+    let totalGoodExp = 0;
+    let totalBadExp = 0;
+
+    list.forEach(c => {
+      if (c.type === 'income') totalIn += c.amount;
+      else if (c.type === 'expense_good') totalGoodExp += c.amount;
+      else if (c.type === 'expense_bad') totalBadExp += c.amount;
+    });
+
+    const netSavings = totalIn - (totalGoodExp + totalBadExp);
+
+    const histWrap = document.getElementById('cashflowHistoryList');
+    if (!histWrap) return;
+
+    histWrap.innerHTML = `
+      <div style="background:#0b1120; border:1px solid #1e293b; border-radius:10px; padding:12px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.80rem; margin-bottom:4px;">
+          <span style="color:#34d399; font-weight:700;">🟢 कुल कमाई: +₹${totalIn}</span>
+          <span style="color:#f87171; font-weight:700;">🔴 ज़रूरी खर्च: -₹${totalGoodExp}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.80rem; margin-bottom:6px;">
+          <span style="color:#fbbf24; font-weight:700;">⚠️ फालतू खर्च: -₹${totalBadExp}</span>
+          <span style="color:#38bdf8; font-weight:900;">💵 शुद्ध बचत: ₹${netSavings}</span>
+        </div>
+      </div>
+      <div style="font-size:0.75rem; color:#94a3b8; font-weight:800; margin-bottom:6px;">हालिया लेन-देन:</div>
+      ${list.slice(0, 6).map(c => {
+        const isInc = c.type === 'income';
+        const isBad = c.type === 'expense_bad';
+        const color = isInc ? '#34d399' : (isBad ? '#f87171' : '#cbd5e1');
+        const sign = isInc ? '+' : '-';
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:0.76rem;">
+            <span style="color:#e2e8f0;">${escapeHtml(c.note)}</span>
+            <strong style="color:${color};">${sign}₹${c.amount}</strong>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
+
+  function toggleExpenseCategories() {}
+
+  function toggleLegacyTools() {
+    const wrap = document.getElementById('legacyToolsWrap');
+    if (wrap) {
+      const isHidden = wrap.style.display === 'none';
+      wrap.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        wrap.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+
+
   window.AarogyamETailer = {
+    // Smart Business Diary API
+    setEntityType: setEntityType,
+    setTeamStatus: setTeamStatus,
+    setNeedCategory: setNeedCategory,
+    handleDiaryFormSubmit: handleDiaryFormSubmit,
+    setLedgerFilter: setLedgerFilter,
+    filterLedgerEntries: filterLedgerEntries,
+    deleteDiaryEntry: deleteDiaryEntry,
+    downloadDiaryReport: downloadDiaryReport,
+    setIncomeTarget: setIncomeTarget,
+    handleCashflowSubmit: handleCashflowSubmit,
+    toggleExpenseCategories: toggleExpenseCategories,
+    toggleLegacyTools: toggleLegacyTools,
+    markFollowupDone: markFollowupDone,
+
     switchTab: switchTab,
     
     toggleTheme: function () {
@@ -2446,6 +2995,12 @@
   // -------------------------------------------------------------
   async function initEngine() {
     loadLocalVault();
+    // Initialize Smart Business Diary Components
+    updateDiaryHeroLevel();
+    renderDiaryLedger();
+    renderDiaryFollowups();
+    renderIncomeTarget();
+    renderCashflowSummary();
     initTheme();
     initUserProfile();
     await loadDiagnosisCatalog();
