@@ -103,21 +103,7 @@
     </div>
   </header>
 
-  <!-- Interactive 1-Tap Audio Guide Floating Trigger -->
-  <div style="max-width:1200px; margin:8px auto; padding:0 12px;">
-    <div style="background:linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%); border:1.5px solid #60a5fa; border-radius:12px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; box-shadow:0 4px 16px rgba(37,99,235,0.3);">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:1.3rem; animation: pulseGlow 1.5s infinite;">🔊</span>
-        <div>
-          <strong style="font-size:0.92rem; color:#ffffff; display:block;">आरोग्यम मेरी डायरी — ऑडियो परिचय</strong>
-          <span style="font-size:0.75rem; color:#bfdbfe;">सुनने के लिए 1-टैप करें • शुद्ध हिंदी AI आवाज़</span>
-        </div>
-      </div>
-      <button type="button" id="btnPageAudioPlayPill" onclick="if(window.togglePageAudioGreeting){window.togglePageAudioGreeting();}else if(window.playPageAudioGreeting){window.playPageAudioGreeting();}" style="background:#ffffff; color:#1d4ed8; border:none; padding:8px 16px; border-radius:20px; font-weight:900; font-size:0.85rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.3); display:inline-flex; align-items:center; gap:6px;">
-        <span>▶️ ऑडियो सुनें</span>
-      </button>
-    </div>
-  </div>
+  
 
 
     <!-- =========================================
@@ -182,7 +168,21 @@
               🎁 ऑटोशिप ग्राहक (6th Month Free)
             </button>
           </div>
-                      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:14px;">
+                      
+          <!-- Quick Contact Picker Dock (Diary or Mobile Phonebook) -->
+          <div style="background:#091322; border:1px solid #1e3a8a; border-radius:10px; padding:10px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:0.82rem; font-weight:800; color:#38bdf8;">⚡ ऑटो-फ़िल संपर्क:</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" class="admin-btn" onclick="window.AarogyamETailer.openDiaryContactPicker()" style="background:#1e293b; color:#93c5fd; border:1px solid #3b82f6; font-size:0.78rem; font-weight:700; padding:6px 14px; border-radius:6px; cursor:pointer;">
+                📖 मेरी डायरी से चुनें
+              </button>
+              <button type="button" class="admin-btn" onclick="window.AarogyamETailer.pickFromPhonebook()" style="background:#1e293b; color:#34d399; border:1px solid #10b981; font-size:0.78rem; font-weight:700; padding:6px 14px; border-radius:6px; cursor:pointer;">
+                📱 फ़ोन बुक से चुनें
+              </button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-bottom:14px;">
             <div>
               <label style="display:block; font-size:0.86rem; font-weight:800; color:#ffffff; margin-bottom:4px;">
                 व्यक्ति का नाम (Full Name) *
@@ -226,7 +226,15 @@
               </button>
               <button type="button" class="status-pill-btn" data-status="core" onclick="window.AarogyamETailer.setTeamStatus('core')">
                 4️⃣ कोर मोटिवेटेड लीडर (Core)
-              </button>
+              
+            <!-- NetSurf ID for Team Member -->
+            <div style="margin-top:10px;">
+              <label style="display:block; font-size:0.80rem; font-weight:800; color:#cbd5e1; margin-bottom:4px;">
+                🆔 नेटसर्फ आईडी (NetSurf ID / Distributor ID):
+              </label>
+              <input type="text" id="diaryInputNetsurfId" class="game-input" placeholder="उदा. 167046 या नेटसर्फ ID" style="margin:0; width:100%;">
+            </div>
+</button>
             </div>
           </div>
 
@@ -275,35 +283,47 @@
           </div>
 
           <!-- Contextual Field: Autoship 6-Month Plan Details (Visible only when Autoship selected) -->
+                    <!-- Contextual Field: Autoship 6-Month Plan Details -->
           <div id="diaryAutoshipDetailsWrap" style="display:none; background:#0b1120; border:1.5px solid #f59e0b; border-radius:10px; padding:12px; margin-bottom:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
               <span style="font-size:0.86rem; font-weight:800; color:#facc15;">🎁 6-महीने ऑटोशिप लॉयल्टी प्लान:</span>
-              <span style="font-size:0.74rem; background:#f59e0b; color:#000; font-weight:900; padding:2px 8px; border-radius:10px;">6th Month FREE</span>
+              <span style="font-size:0.74rem; background:#f59e0b; color:#000; font-weight:900; padding:2px 8px; border-radius:10px;">6th Month FREE MRP</span>
             </div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px;">
+            
+            <div style="margin-bottom:10px;">
+              <label style="font-size:0.78rem; color:#cbd5e1; margin-bottom:4px; display:block;">
+                🎁 6वें महीने मुफ़्त मिलने वाले उत्पाद का कुल मूल्य (MRP ₹):
+              </label>
+              <input type="number" id="diaryAutoshipFreeMrp" class="game-input" placeholder="₹ मुफ़्त उत्पाद MRP (उदा. 2000)" style="width:100%; margin:0;" value="2000">
+            </div>
+
+            <div style="font-size:0.78rem; font-weight:700; color:#93c5fd; margin-bottom:6px;">
+              महीना 1 से 6 तक की खरीद राशि (₹):
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
               <div>
-                <label style="font-size:0.75rem; color:#cbd5e1; margin-bottom:4px; display:block;">वर्तमान महीना:</label>
-                <select id="diaryAutoshipMonth" class="game-input" style="width:100%; margin:0;">
-                  <option value="1">महीना 1 (शुरुआत)</option>
-                  <option value="2">महीना 2</option>
-                  <option value="3">महीना 3</option>
-                  <option value="4">महीना 4</option>
-                  <option value="5">महीना 5 (अगले ऑर्डर पर फ्री!)</option>
-                  <option value="6">महीना 6 (🎁 मुफ़्त गिफ्ट अनलॉक!)</option>
-                </select>
+                <label style="font-size:0.70rem; color:#94a3b8; display:block;">माह 1 (₹):</label>
+                <input type="number" id="asMonth1" class="game-input" value="2000" style="width:100%; margin:0; padding:6px;">
               </div>
               <div>
-                <label style="font-size:0.75rem; color:#cbd5e1; margin-bottom:4px; display:block;">मासिक अनुमानित ऑर्डर:</label>
-                <input type="number" id="diaryAutoshipAvgOrder" class="game-input" placeholder="₹ राशि (उदा. 2000)" style="width:100%; margin:0;" value="2000">
+                <label style="font-size:0.70rem; color:#94a3b8; display:block;">माह 2 (₹):</label>
+                <input type="number" id="asMonth2" class="game-input" value="2000" style="width:100%; margin:0; padding:6px;">
               </div>
               <div>
-                <label style="font-size:0.75rem; color:#cbd5e1; margin-bottom:4px; display:block;">6वें महीने का मुफ़्त गिफ्ट:</label>
-                <select id="diaryAutoshipFreeGift" class="game-input" style="width:100%; margin:0;">
-                  <option value="Stimrich (1L) + Bio99">Stimrich (1L) + Bio99</option>
-                  <option value="CFC Plus (1kg) Combo">CFC Plus (1kg) Combo</option>
-                  <option value="Naturamore Family Pack">Naturamore Family Pack</option>
-                  <option value="Wrap-Up + Intact Combo">Wrap-Up + Intact Combo</option>
-                </select>
+                <label style="font-size:0.70rem; color:#94a3b8; display:block;">माह 3 (₹):</label>
+                <input type="number" id="asMonth3" class="game-input" value="2000" style="width:100%; margin:0; padding:6px;">
+              </div>
+              <div>
+                <label style="font-size:0.70rem; color:#94a3b8; display:block;">माह 4 (₹):</label>
+                <input type="number" id="asMonth4" class="game-input" value="2000" style="width:100%; margin:0; padding:6px;">
+              </div>
+              <div>
+                <label style="font-size:0.70rem; color:#94a3b8; display:block;">माह 5 (₹):</label>
+                <input type="number" id="asMonth5" class="game-input" value="2000" style="width:100%; margin:0; padding:6px;">
+              </div>
+              <div>
+                <label style="font-size:0.70rem; color:#facc15; font-weight:800; display:block;">माह 6 (🎁 FREE):</label>
+                <input type="number" id="asMonth6" class="game-input" value="0" style="width:100%; margin:0; padding:6px; border-color:#f59e0b;">
               </div>
             </div>
           </div>
@@ -379,6 +399,21 @@
          TAB 2: DIARY LEDGER & SMART REPORTS (KHATABOOK STYLE)
     ============================================================== -->
     <section id="tab-diary-ledger" class="tab-pane" style="display:none;">
+
+      <!-- Total Debit (Red) and Total Credit (Green) Summary Strip -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div style="background:#1f1315; border:1.5px solid #ef4444; border-radius:12px; padding:14px; text-align:center;">
+          <div style="font-size:0.80rem; font-weight:800; color:#f87171;">🔴 कुल डेबिट (मार्केट से लेना है)</div>
+          <div id="ledgerTotalDebitVal" style="font-size:1.6rem; font-weight:900; color:#ef4444; margin-top:4px;">₹0</div>
+          <span style="font-size:0.72rem; color:#cbd5e1;">बकाया उधारी राशि</span>
+        </div>
+        <div style="background:#091b15; border:1.5px solid #10b981; border-radius:12px; padding:14px; text-align:center;">
+          <div style="font-size:0.80rem; font-weight:800; color:#34d399;">🟢 कुल क्रेडिट (जमा प्राप्त हुआ)</div>
+          <div id="ledgerTotalCreditVal" style="font-size:1.6rem; font-weight:900; color:#10b981; margin-top:4px;">₹0</div>
+          <span style="font-size:0.72rem; color:#cbd5e1;">भुगतान प्राप्त हुआ</span>
+        </div>
+      </div>
+
 
       <!-- 15-दिवसीय टर्नओवर व शुक्रवार रिटेल क्लोजिंग कार्ड्स (रिपोर्ट सेक्शन में) -->
       <div style="margin-bottom:16px;">
@@ -526,7 +561,119 @@
           </div>
         </div>
 
-<div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
+
+        <!-- ==============================================================
+             INLINE MARKETING HUB & 1-TAP AUTOMATION ENGINE (MATCHING SCREENSHOT)
+        =============================================================== -->
+        <div class="smart-form-card" style="background:#070d18; border:2px solid #2563eb; margin-bottom:16px; padding:16px; border-radius:14px;">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #1e3a8a; padding-bottom:8px;">
+            <div>
+              <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#60a5fa; display:flex; align-items:center; gap:8px;">
+                <span>📱</span> <span>1-Tap ऑटोमेशन (1-Tap Send ➔ Next Engine)</span>
+              </h3>
+              <p style="margin:3px 0 0 0; font-size:0.76rem; color:#94a3b8;">
+                एक-एक कर भेजने की सबसे तेज़ प्रणाली — भेजते ही किसान 'Sent' में जाएगा और अगला नाम तुरंत स्क्रीन पर आएगा!
+              </p>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" id="btnModeWhatsApp" onclick="window.AarogyamETailer.setAutomationMode('whatsapp')" class="status-pill-btn active" style="font-weight:800; font-size:0.78rem; background:#16a34a; color:#fff; border:none; padding:5px 12px; border-radius:8px; cursor:pointer;">
+                📱 WhatsApp मोड
+              </button>
+              <button type="button" id="btnModeSms" onclick="window.AarogyamETailer.setAutomationMode('sms')" class="status-pill-btn" style="font-weight:800; font-size:0.78rem; background:#1e293b; color:#94a3b8; border:1px solid #334155; padding:5px 12px; border-radius:8px; cursor:pointer;">
+                💬 Text SMS मोड
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Cascading Dropdown Message Builder -->
+          <div style="background:#0b1120; border:1px solid #1e3a8a; border-radius:10px; padding:12px; margin-bottom:14px;">
+            <div style="font-size:0.82rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
+              🎯 मैसेज का मुख्य विषय व सब-कैटेगरी चुनें:
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:8px;">
+              <div>
+                <label style="font-size:0.74rem; color:#cbd5e1; display:block; margin-bottom:3px;">1. मुख्य विषय (Subject):</label>
+                <select id="hubMainSubjectSelect" class="game-input" style="width:100%; margin:0;" onchange="window.AarogyamETailer.handleMainSubjectChange(this.value)">
+                  <option value="crop_doctor">🌾 फसल डॉक्टर व जैविक उत्पाद (Biofit)</option>
+                  <option value="tube_videos">🎥 आरोग्यम ट्यूब किसान वीडियो</option>
+                  <option value="web_pages">🌐 आरोग्यम वेब पेजेस व टूल्स</option>
+                  <option value="suvichar">☀️ सुविचार व मोटिवेशन (GM, GN, प्रेरक)</option>
+                  <option value="autoship_rem">🎁 6-महीने ऑटोशिप रिमाइंडर</option>
+                  <option value="khata_due">💳 उधारी / पेमेंट रिमाइंडर</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.74rem; color:#cbd5e1; display:block; margin-bottom:3px;">2. विशिष्ट उत्पाद / वीडियो / पेज:</label>
+                <select id="hubSubItemSelect" class="game-input" style="width:100%; margin:0;" onchange="window.AarogyamETailer.handleSubItemChange(this.value)">
+                  <!-- Populated dynamically via JS -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Image Selection Option for WhatsApp -->
+            <div id="hubImageAttachRow" style="display:flex; align-items:center; gap:8px; margin-top:8px; padding-top:8px; border-top:1px dashed #1e3a8a; flex-wrap:wrap;">
+              <span style="font-size:0.76rem; color:#cbd5e1; font-weight:700;">🖼️ फ़ोटो/इमेज अटैच करें (वैकल्पिक):</span>
+              <input type="file" id="hubAttachmentFileInput" accept="image/*" class="game-input" style="padding:4px 8px; font-size:0.74rem; width:auto; margin:0;" onchange="window.AarogyamETailer.handleImageAttach(this)">
+              <span id="hubImageAttachedLabel" style="font-size:0.72rem; color:#34d399; font-weight:800;"></span>
+            </div>
+          </div>
+
+          <!-- Queue Progress Counter Strip -->
+          <div style="background:#091322; border:1px solid #1e3a8a; border-radius:10px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.86rem; font-weight:800; color:#ffffff;">
+              कतार प्रगति: <span id="hubQueueProgressText" style="color:#38bdf8;">0 / 0 (0%)</span> • 
+              <span style="color:#34d399;">✅ भेजे गए: <strong id="hubQueueSentCount">0</strong></span> • 
+              <span style="color:#f59e0b;">⏳ बाकी: <strong id="hubQueueRemainingCount">0</strong></span>
+            </div>
+            <span style="font-size:0.74rem; color:#94a3b8;">📍 भारत</span>
+          </div>
+
+          <!-- Active Contact Card in Queue -->
+          <div id="hubActiveTargetCard" style="background:#0f172a; border:1.5px solid #38bdf8; border-radius:10px; padding:12px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div>
+                <strong id="hubTargetName" style="font-size:1.05rem; color:#ffffff; display:block;">संपर्क लोड हो रहा है...</strong>
+                <span style="font-size:0.78rem; color:#cbd5e1;">🎯 विषय: <span id="hubTargetSubject" style="color:#fde047;">सामान्य कृषि</span></span>
+              </div>
+              <div style="font-size:0.95rem; font-weight:800; color:#38bdf8;" id="hubTargetMobile">
+                📞 +91 ----------
+              </div>
+            </div>
+          </div>
+
+          <!-- Compiled Message Preview Textarea -->
+          <div style="margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-size:0.78rem; font-weight:800; color:#cbd5e1;">
+                💬 तैयार संदेश पूर्वावलोकन (<span id="hubPreviewModeBadge">WHATSAPP</span>):
+              </label>
+              <button type="button" onclick="window.AarogyamETailer.copyMessageText()" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:3px 10px; border-radius:6px; font-size:0.72rem; cursor:pointer;">
+                📋 कॉपी
+              </button>
+            </div>
+            <textarea id="hubMessagePreviewText" rows="5" class="game-input" style="width:100%; margin:0; font-size:0.86rem; line-height:1.5; font-family:inherit;"></textarea>
+          </div>
+
+          <!-- 1-Tap Action Buttons Strip -->
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" id="btnHubSendAndNext" onclick="window.AarogyamETailer.sendAndNext()" class="admin-btn" style="flex:2; min-width:200px; padding:12px; font-weight:900; background:#16a34a; color:#fff; border:none; border-radius:10px; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(22,163,74,0.4);">
+              <span>📱 1-Tap WhatsApp भेजें & Next ➔</span>
+            </button>
+            <button type="button" onclick="window.AarogyamETailer.sendBroadcastToWhatsApp()" class="admin-btn" style="flex:1; min-width:140px; padding:12px; font-weight:800; background:#0284c7; color:#fff; border:none; border-radius:10px; font-size:0.86rem; cursor:pointer;">
+              📢 ब्रॉडकास्ट (सभी को)
+            </button>
+            <button type="button" onclick="window.AarogyamETailer.callAndRemarkActiveTarget()" class="admin-btn" style="flex:1; min-width:130px; padding:12px; font-weight:800; background:#d97706; color:#fff; border:none; border-radius:10px; font-size:0.86rem; cursor:pointer;">
+              📞 कॉल & रिमार्क
+            </button>
+            <button type="button" onclick="window.AarogyamETailer.skipToNextTarget()" class="admin-btn" style="padding:12px 16px; font-weight:800; background:#1e293b; color:#cbd5e1; border:1px solid #334155; border-radius:10px; font-size:0.86rem; cursor:pointer;">
+              ⏭️ छोड़ें (Next)
+            </button>
+          </div>
+
+        </div>
+
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
           <button type="button" class="status-pill-btn active" data-fu-filter="all" onclick="window.AarogyamETailer.setFollowupFilter('all')" style="white-space:nowrap; font-weight:800;">
             👥 सभी फॉलो-अप
           </button>
@@ -1439,7 +1586,8 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/universal-nav-drawer.js?v=1.1"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261031_v40_master_diary"></script>
+  <script src="/js/audio-greeting-engine.js?v=20261101_v1"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261101_v41_master_hub"></script>
 
   <!-- =========================================
        5.4 MODAL: 8-LEVEL PROGRESSION ROADMAP
@@ -1712,6 +1860,31 @@
           ✓ रिमार्क सेव करें और क्यू में आगे बढ़ें ➔
         </button>
       </form>
+
+    </div>
+  </div>
+
+
+  <!-- =========================================
+       5.8 MODAL: SELECT CONTACT FROM MY DIARY
+  ========================================== -->
+  <div class="game-modal-overlay" id="diaryContactPickerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:16px;">
+    <div style="max-width:540px; width:100%; max-height:85vh; overflow-y:auto; background:#070d18; border:2px solid #2563eb; border-radius:16px; padding:20px; box-shadow:0 8px 32px rgba(0,0,0,0.9);">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #1e3a8a; padding-bottom:8px;">
+        <h3 style="font-size:1.15rem; margin:0; font-weight:900; color:#60a5fa; display:flex; align-items:center; gap:8px;">
+          <span>📖</span> <span>मेरी डायरी से संपर्क चुनें</span>
+        </h3>
+        <button type="button" class="btn-close-guide" onclick="window.AarogyamETailer.closeDiaryContactPicker()">&times;</button>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <input type="text" id="diaryContactSearchInput" class="game-input" placeholder="🔍 नाम, मोबाइल या गाँव से खोजें..." style="width:100%; margin:0;" oninput="window.AarogyamETailer.filterDiaryPickerContacts(this.value)">
+      </div>
+
+      <div id="diaryContactPickerList" style="display:flex; flex-direction:column; gap:8px; max-height:55vh; overflow-y:auto;">
+        <!-- Populated dynamically via JS -->
+      </div>
 
     </div>
   </div>

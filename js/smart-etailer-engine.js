@@ -471,6 +471,8 @@
       renderDiaryLedger();
     } else if (tabId === 'tab-diary-followup') {
       renderDiaryFollowups();
+      handleMainSubjectChange(document.getElementById('hubMainSubjectSelect')?.value || 'crop_doctor');
+      updateHubQueueProgressUI();
     } else if (tabId === 'tab-diary-todo') {
       renderTodoPlanner();
     } else if (tabId === 'tab-diary-autoship') {
@@ -1761,6 +1763,10 @@
     updateDiaryHeroLevel();
     renderDiaryLedger();
     renderDiaryFollowups();
+    setTimeout(() => {
+      handleMainSubjectChange('crop_doctor');
+      updateHubQueueProgressUI();
+    }, 200);
     syncDiaryToVaultAsync(entries);
   }
 
@@ -2196,16 +2202,20 @@
     if (btnTeam) btnTeam.classList.toggle('active', type === 'team');
     if (btnAutoship) btnAutoship.classList.toggle('active', type === 'autoship');
 
+    const netsurfWrap = document.getElementById('diaryTeamNetsurfIdWrap');
     if (type === 'team') {
       if (teamWrap) teamWrap.style.display = 'block';
+      if (netsurfWrap) netsurfWrap.style.display = 'block';
       if (cropWrap) cropWrap.style.display = 'none';
       if (autoshipWrap) autoshipWrap.style.display = 'none';
     } else if (type === 'autoship') {
       if (teamWrap) teamWrap.style.display = 'none';
+      if (netsurfWrap) netsurfWrap.style.display = 'none';
       if (cropWrap) cropWrap.style.display = 'block';
       if (autoshipWrap) autoshipWrap.style.display = 'block';
     } else {
       if (teamWrap) teamWrap.style.display = 'none';
+      if (netsurfWrap) netsurfWrap.style.display = 'none';
       if (cropWrap) cropWrap.style.display = 'block';
       if (autoshipWrap) autoshipWrap.style.display = 'none';
     }
@@ -2262,6 +2272,9 @@
       autoship_month: currentEntityType === 'autoship' ? asMonth : null,
       autoship_order: currentEntityType === 'autoship' ? asOrder : null,
       autoship_free_gift: currentEntityType === 'autoship' ? asGift : null,
+      autoship_free_mrp: currentEntityType === 'autoship' ? asFreeMrp : null,
+      autoship_months: currentEntityType === 'autoship' ? asMonthsObj : null,
+      netsurf_id: currentEntityType === 'team' ? netsurfId : null,
       crop_name: cropName,
       crop_problem: cropProb,
       need: currentNeedCategory,
@@ -2313,17 +2326,25 @@
     if (!listEl) return;
 
     const entries = getLocalDiaryEntries();
-    let totalDues = 0;
+    let totalDebit = 0;
+    let totalCredit = 0;
     let pendingFollowups = 0;
 
     entries.forEach(e => {
-      if (e.due_amount > 0) totalDues += e.due_amount;
+      const amt = Number(e.due_amount) || 0;
+      if (amt > 0) totalDebit += amt;
+      else if (amt < 0) totalCredit += Math.abs(amt);
       if (!e.followup_done) pendingFollowups += 1;
     });
 
+    const debitValEl = document.getElementById('ledgerTotalDebitVal');
+    const creditValEl = document.getElementById('ledgerTotalCreditVal');
+    if (debitValEl) debitValEl.textContent = '₹' + totalDebit.toLocaleString('hi-IN');
+    if (creditValEl) creditValEl.textContent = '₹' + totalCredit.toLocaleString('hi-IN');
+
     if (mContacts) mContacts.textContent = entries.length;
     if (mFollowups) mFollowups.textContent = pendingFollowups;
-    if (mDues) mDues.textContent = '₹' + totalDues.toLocaleString('hi-IN');
+    if (mDues) mDues.textContent = '₹' + totalDebit.toLocaleString('hi-IN');
 
     const searchQ = (document.getElementById('ledgerSearchInput')?.value || '').toLowerCase().trim();
 
@@ -2775,6 +2796,336 @@
 
 
   
+  
+  // =============================================================
+  // MASTER SMART BUSINESS DIARY - EXTENSIONS & AUTOMATIONS V2
+  // =============================================================
+
+  // 1. DIARY & PHONEBOOK CONTACT PICKERS
+  function openDiaryContactPicker() {
+    const modal = document.getElementById('diaryContactPickerModal');
+    if (!modal) return;
+    renderDiaryPickerList('');
+    modal.style.display = 'flex';
+  }
+
+  function closeDiaryContactPicker() {
+    const modal = document.getElementById('diaryContactPickerModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function filterDiaryPickerContacts(q) {
+    renderDiaryPickerList(q || '');
+  }
+
+  function renderDiaryPickerList(query) {
+    const listWrap = document.getElementById('diaryContactPickerList');
+    if (!listWrap) return;
+    const entries = getLocalDiaryEntries();
+    const q = (query || '').toLowerCase().trim();
+
+    const filtered = entries.filter(e => {
+      if (!q) return true;
+      return (e.name && e.name.toLowerCase().includes(q)) ||
+             (e.mobile && e.mobile.includes(q)) ||
+             (e.place && e.place.toLowerCase().includes(q));
+    });
+
+    if (filtered.length === 0) {
+      listWrap.innerHTML = `
+        <div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.82rem;">
+          कोई संपर्क नहीं मिला।
+        </div>
+      `;
+      return;
+    }
+
+    listWrap.innerHTML = filtered.map(e => `
+      <div onclick="window.AarogyamETailer.selectContactFromDiary('${e.id}')" style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s;">
+        <div>
+          <strong style="color:#ffffff; font-size:0.92rem; display:block;">${e.name}</strong>
+          <span style="font-size:0.75rem; color:#94a3b8;">📱 ${e.mobile} • 📍 ${e.place || 'स्थानीय'}</span>
+        </div>
+        <span style="background:#1e293b; color:#38bdf8; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:6px;">
+          ${e.type === 'team' ? '🤝 टीम' : (e.is_autoship ? '🎁 ऑटोशिप' : '🌾 किसान')}
+        </span>
+      </div>
+    `).join('');
+  }
+
+  function selectContactFromDiary(id) {
+    const entries = getLocalDiaryEntries();
+    const entry = entries.find(e => e.id === id);
+    if (!entry) return;
+
+    if (document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = entry.name || '';
+    if (document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = entry.mobile || '';
+    if (document.getElementById('diaryInputPlace')) document.getElementById('diaryInputPlace').value = entry.place || '';
+    if (entry.type) setEntityType(entry.type);
+    if (entry.crop_name && document.getElementById('diaryCropName')) document.getElementById('diaryCropName').value = entry.crop_name;
+    if (entry.netsurf_id && document.getElementById('diaryInputNetsurfId')) document.getElementById('diaryInputNetsurfId').value = entry.netsurf_id;
+
+    closeDiaryContactPicker();
+  }
+
+  async function pickFromPhonebook() {
+    if ('contacts' in navigator && 'ContactsManager' in window) {
+      try {
+        const props = ['name', 'tel'];
+        const contacts = await navigator.contacts.select(props, { multiple: false });
+        if (contacts && contacts.length > 0) {
+          const c = contacts[0];
+          const name = (c.name && c.name[0]) || '';
+          let tel = (c.tel && c.tel[0]) || '';
+          tel = tel.replace(/\D/g, '').slice(-10);
+          if (name && document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = name;
+          if (tel && document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = tel;
+          return;
+        }
+      } catch (err) {
+        console.warn('Contacts picker cancelled or failed:', err);
+      }
+    }
+    // Fallback if not supported on browser/desktop
+    openDiaryContactPicker();
+  }
+
+  // 2. MARKETING HUB & 1-TAP AUTOMATION ENGINE (MATCHING SCREENSHOT)
+  let currentAutomationMode = 'whatsapp';
+  let attachedImageFileName = '';
+  let hubCurrentQueueIndex = 0;
+  let hubSentCount = 0;
+
+  const hubCatalogData = {
+    crop_doctor: [
+      { id: 'stimrich', title: 'Stimrich (बायो-ग्रोथ प्रमोटर)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=stimrich' },
+      { id: 'bio99', title: 'Bio 99 (स्प्रेडर व सिलिकॉन एक्टिवेटर)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=bio99' },
+      { id: 'wrapup', title: 'Wrap-Up (फसल कवच व फंगस सुरक्षा)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=wrapup' },
+      { id: 'intact', title: 'Intact (जैविक इल्ली व कीट नियंत्रक)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=intact' },
+      { id: 'cfc_plus', title: 'CFC Plus (दुधारू पशु पोषण व फैट वृद्धि)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=cfc' },
+      { id: 'naturamore', title: 'Naturamore (संपूर्ण परिवार पोषण पाउडर)', link: 'https://aarogyamindia.online/netsurf-products.html?prod=naturamore' }
+    ],
+    tube_videos: [
+      { id: 'tube_stimrich', title: '📹 सफल किसान की कहानी (स्टीमरिच परिणाम)', link: 'https://aarogyamindia.online/tube.html?v=stimrich' },
+      { id: 'tube_wheat', title: '📹 गेहूं व चना में 40% अधिक पैदावार कैसे लें?', link: 'https://aarogyamindia.online/tube.html?v=wheat' },
+      { id: 'tube_dairy', title: '📹 पशुओं में 2 से 3 लीटर दूध व फैट वृद्धि तकनीक', link: 'https://aarogyamindia.online/tube.html?v=dairy' },
+      { id: 'tube_biz', title: '📹 जैविक खेती से महीने के ₹50,000 कमाने का मॉडल', link: 'https://aarogyamindia.online/tube.html?v=biz' }
+    ],
+    web_pages: [
+      { id: 'page_cat', title: '🌐 संपूर्ण जैविक उत्पाद कैटलॉग', link: 'https://aarogyamindia.online/netsurf-products.html' },
+      { id: 'page_weather', title: '🌐 दैनिक कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी', link: 'https://aarogyamindia.online/weather.html' },
+      { id: 'page_panchang', title: '🌐 सनातन वैदिक कृषि पंचांग व शुभ मुहूर्त', link: 'https://aarogyamindia.online/krishi-panchang.html' },
+      { id: 'page_sakhi', title: '🌐 पशुपालन सखी व डेयरी केयर बुलेटिन', link: 'https://aarogyamindia.online/aarogyam-sakhi.html' },
+      { id: 'page_diary', title: '🌐 मेरी डायरी डिजिटल फील्ड खाता', link: 'https://aarogyamindia.online/pages/smart-etailer.html' }
+    ],
+    suvichar: [
+      { id: 'gm_kisan', title: '☀️ शुभ प्रभात — समृद्ध किसान विचार', text: 'राम राम किसान साथी! 🙏 "जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा।" शुभ दिन!' },
+      { id: 'gn_kisan', title: '🌙 शुभ रात्रि — जैविक किसान संकल्प', text: 'शुभ रात्रि किसान भाई! 🙏 कल सुबह की नई किरण आपकी फसलों में हरियाली और घर में खुशहाली लाए। आरोग्यम भारत!' },
+      { id: 'prerna_biz', title: '🚀 स्वावलंबन प्रेरणा — खुद का व्यापार', text: 'नमस्ते साथी! 🙏 नौकरी तलाशने के बजाय खुद का जैविक कृषि व्यापार शुरू करें। 8-लेवल मॉडल से आत्मनिर्भर बनें!' }
+    ],
+    autoship_rem: [
+      { id: 'as_monthly', title: '🎁 ऑटोशिप मासिक ऑर्डर रिमाइंडर', text: 'नमस्ते! आपके 6-महीने ऑटोशिप प्लान का इस महीने का ऑर्डर तैयार है। 5 महीने पूर्ण होते ही 6वें महीने मुफ़्त गिफ्ट मिलेगा!' },
+      { id: 'as_free_unlock', title: '🎉 6th Month Free Gift Unlock Alert!', text: 'बधाई हो! आपके लगातार 5 महीने के ऑर्डर्स पूरे हो चुके हैं। इस महीने आपका मुफ़्त गिफ्ट 100% FREE अनलॉक हो चुका है!' }
+    ],
+    khata_due: [
+      { id: 'khata_bill_due', title: '💳 उधारी हिसाब व पेमेंट रिमाइंडर', text: 'नमस्ते! आरोग्यम मेरी डायरी से आपका बकाया हिसाब दर्ज है। कृपया समय पर भुगतान कर सहयोग करें।' }
+    ]
+  };
+
+  function setAutomationMode(mode) {
+    currentAutomationMode = mode;
+    const btnWa = document.getElementById('btnModeWhatsApp');
+    const btnSms = document.getElementById('btnModeSms');
+    const badge = document.getElementById('hubPreviewModeBadge');
+    const sendBtnSpan = document.querySelector('#btnHubSendAndNext span');
+
+    if (mode === 'whatsapp') {
+      if (btnWa) { btnWa.style.background = '#16a34a'; btnWa.style.color = '#fff'; }
+      if (btnSms) { btnSms.style.background = '#1e293b'; btnSms.style.color = '#94a3b8'; }
+      if (badge) badge.textContent = 'WHATSAPP';
+      if (sendBtnSpan) sendBtnSpan.textContent = '📱 1-Tap WhatsApp भेजें & Next ➔';
+    } else {
+      if (btnWa) { btnWa.style.background = '#1e293b'; btnWa.style.color = '#94a3b8'; }
+      if (btnSms) { btnSms.style.background = '#0284c7'; btnSms.style.color = '#fff'; }
+      if (badge) badge.textContent = 'TEXT SMS';
+      if (sendBtnSpan) sendBtnSpan.textContent = '💬 1-Tap Text SMS भेजें & Next ➔';
+    }
+    updateHubPreviewText();
+  }
+
+  function handleMainSubjectChange(val) {
+    const subSelect = document.getElementById('hubSubItemSelect');
+    if (!subSelect) return;
+    const items = hubCatalogData[val] || [];
+    subSelect.innerHTML = items.map((item, idx) => `
+      <option value="${item.id}" ${idx === 0 ? 'selected' : ''}>${item.title}</option>
+    `).join('');
+    updateHubPreviewText();
+  }
+
+  function handleSubItemChange(val) {
+    updateHubPreviewText();
+  }
+
+  function handleImageAttach(input) {
+    const lbl = document.getElementById('hubImageAttachedLabel');
+    if (input.files && input.files[0]) {
+      attachedImageFileName = input.files[0].name;
+      if (lbl) lbl.textContent = `✓ फ़ोटो: ${attachedImageFileName}`;
+    } else {
+      attachedImageFileName = '';
+      if (lbl) lbl.textContent = '';
+    }
+  }
+
+  function getHubQueueList() {
+    let entries = getLocalDiaryEntries();
+    if (selectedContactIds.size > 0) {
+      return entries.filter(e => selectedContactIds.has(e.id));
+    }
+    return entries;
+  }
+
+  function updateHubQueueProgressUI() {
+    const list = getHubQueueList();
+    const total = list.length;
+    const progressEl = document.getElementById('hubQueueProgressText');
+    const sentEl = document.getElementById('hubQueueSentCount');
+    const remEl = document.getElementById('hubQueueRemainingCount');
+    const cardEl = document.getElementById('hubActiveTargetCard');
+    const nameEl = document.getElementById('hubTargetName');
+    const mobEl = document.getElementById('hubTargetMobile');
+    const subjEl = document.getElementById('hubTargetSubject');
+
+    const pct = total > 0 ? Math.round((hubCurrentQueueIndex / total) * 100) : 0;
+    if (progressEl) progressEl.textContent = `${hubCurrentQueueIndex + 1} / ${total} (${pct}%)`;
+    if (sentEl) sentEl.textContent = hubSentCount;
+    if (remEl) remEl.textContent = Math.max(0, total - hubCurrentQueueIndex);
+
+    if (total === 0 || hubCurrentQueueIndex >= total) {
+      if (nameEl) nameEl.textContent = total === 0 ? 'कोई संपर्क उपलब्ध नहीं है' : '🎉 सभी संपर्क पूरे हो गए!';
+      if (mobEl) mobEl.textContent = '';
+      if (subjEl) subjEl.textContent = 'क्यू संपन्न';
+      return;
+    }
+
+    const target = list[hubCurrentQueueIndex];
+    if (nameEl) nameEl.textContent = target.name || 'किसान साथी';
+    if (mobEl) mobEl.textContent = `📞 +91 ${target.mobile}`;
+    if (subjEl) subjEl.textContent = target.need || (target.type === 'team' ? 'टीम बिजनेस' : 'सामान्य कृषि');
+
+    updateHubPreviewText();
+  }
+
+  function updateHubPreviewText() {
+    const list = getHubQueueList();
+    const target = list[hubCurrentQueueIndex] || { name: 'किसान साथी', mobile: '9XXXXXXXXX', due_amount: 0 };
+    const mainSubj = document.getElementById('hubMainSubjectSelect')?.value || 'crop_doctor';
+    const subItemId = document.getElementById('hubSubItemSelect')?.value;
+    const previewEl = document.getElementById('hubMessagePreviewText');
+    if (!previewEl) return;
+
+    const sName = getUserDisplayName();
+    const sMob = getUserMobile();
+    const shareId = getAppUserShareId();
+    const items = hubCatalogData[mainSubj] || [];
+    const item = items.find(i => i.id === subItemId) || items[0] || {};
+
+    let msg = '';
+    if (currentAutomationMode === 'sms') {
+      // Short 160-char SMS
+      if (mainSubj === 'khata_due') {
+        msg = `नमस्ते ${target.name} जी! आरोग्यम हिसाब: ₹${Math.abs(Number(target.due_amount) || 0)} बकाया है। विवरण: https://aarogyamindia.online/?ref=${shareId} - ${sName}`;
+      } else {
+        msg = `नमस्ते ${target.name} जी! आरोग्यम जैविक कृषि व उत्पाद जानकारी हेतु देखें: https://aarogyamindia.online/?ref=${shareId} - ${sName} (${sMob})`;
+      }
+    } else {
+      // Rich WhatsApp Message
+      if (mainSubj === 'crop_doctor') {
+        const prodLink = (item.link || 'https://aarogyamindia.online/netsurf-products.html') + `?ref=${shareId}&share_id=${shareId}`;
+        msg = `🌾 *नमस्ते ${target.name} जी!* 🙏\n\nआप हमारे अति महत्वपूर्ण पाठक हैं। आज आरोग्यम इंडिया की ओर से आपकी फसल व जैविक सुरक्षा हेतु प्रमाणित समाधान तैयार किया गया है:\n\n👉 *${item.title || 'जैविक फसल सुरक्षा उत्पाद'}*\nसंपूर्ण विवरण व किसान परिणाम देखने हेतु नीचे लिंक पर क्लिक करें:\n${prodLink}\n\nधन्यवाद! — *${sName}* (${sMob})`;
+      } else if (mainSubj === 'tube_videos') {
+        const vidLink = (item.link || 'https://aarogyamindia.online/tube.html') + `?ref=${shareId}&share_id=${shareId}`;
+        msg = `🎥 *नमस्ते ${target.name} जी!* 🙏\n\nजैविक खेती से लागत आधी और पैदावार दोगुनी करने वाले सफल किसानों का वास्तविक वीडियो देखें:\n\n👉 *${item.title || 'सफल किसान वीडियो'}*\nलिंक पर क्लिक कर वीडियो देखें:\n${vidLink}\n\nसुरक्षित खेती, खुशहाल किसान! 🌾 — *${sName}*`;
+      } else if (mainSubj === 'web_pages') {
+        const pageLink = (item.link || 'https://aarogyamindia.online') + `?ref=${shareId}&share_id=${shareId}`;
+        msg = `🌐 *नमस्ते ${target.name} जी!* 🙏\n\nआरोग्यम इंडिया का महत्वपूर्ण कृषि बुलेटिन व डिजिटल टूल:\n👉 *${item.title || 'वेब पेज'}*\nदेखने हेतु लिंक पर जाएँ:\n${pageLink}\n\n— *${sName}* (${sMob})`;
+      } else if (mainSubj === 'suvichar') {
+        msg = `${item.text || 'राम राम साथी! शुभ दिन की मंगलकामनाएं।'}\n\n— *${sName}* (आरोग्यम इंडिया) 🙏`;
+      } else if (mainSubj === 'autoship_rem') {
+        msg = `🎁 *नमस्ते ${target.name} जी!* 🙏\n\n${item.text || 'आपके 6-महीने ऑटोशिप का ऑर्डर तैयार है।'}\n\nअधिक जानकारी हेतु संपर्क करें:\n— *${sName}* (${sMob})`;
+      } else if (mainSubj === 'khata_due') {
+        const token = generateKhataShareToken(target);
+        const khataLink = `https://aarogyamindia.online/pages/smart-etailer.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}&kdata=${token}`;
+        msg = `🧾 *आरोग्यम मेरी डायरी — डिजिटल हिसाब*\n\nनमस्ते *${target.name}* जी! 🙏\n\n*${sName}* (${sMob}) ने आपके खाते में *₹${Math.abs(Number(target.due_amount) || 0)}* का हिसाब / पेमेंट रिमाइंडर दर्ज किया है।\n\n👉 अपना डिजिटल बिल व खाता देखने हेतु लिंक पर जाएँ:\n${khataLink}\n\nधन्यवाद!`;
+      }
+    }
+
+    previewEl.value = msg;
+  }
+
+  function sendAndNext() {
+    const list = getHubQueueList();
+    if (hubCurrentQueueIndex >= list.length) {
+      alert('🎉 बधाई! कतार के सभी संपर्क पूरे हो चुके हैं।');
+      return;
+    }
+
+    const target = list[hubCurrentQueueIndex];
+    const msg = document.getElementById('hubMessagePreviewText')?.value || '';
+
+    if (currentAutomationMode === 'whatsapp') {
+      window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+      // Increment WA counter
+      let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
+      counts.wa = (counts.wa || 0) + 1;
+      localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
+    } else {
+      window.open(`sms:${target.mobile}?body=${encodeURIComponent(msg)}`, '_self');
+      // Increment SMS counter
+      let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
+      counts.sms = (counts.sms || 0) + 1;
+      localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
+    }
+
+    hubSentCount++;
+    hubCurrentQueueIndex++;
+    updateHubQueueProgressUI();
+  }
+
+  function sendBroadcastToWhatsApp() {
+    const msg = document.getElementById('hubMessagePreviewText')?.value || '';
+    if (!msg) return;
+    // Broadcast directly to WhatsApp so user picks 5 contacts to forward
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function callAndRemarkActiveTarget() {
+    const list = getHubQueueList();
+    const target = list[hubCurrentQueueIndex];
+    if (!target) return;
+    openCallQueue(target.id);
+  }
+
+  function skipToNextTarget() {
+    const list = getHubQueueList();
+    if (hubCurrentQueueIndex < list.length - 1) {
+      hubCurrentQueueIndex++;
+      updateHubQueueProgressUI();
+    } else {
+      alert('आप कतार के अंतिम संपर्क पर हैं!');
+    }
+  }
+
+  function copyMessageText() {
+    const previewEl = document.getElementById('hubMessagePreviewText');
+    if (previewEl) {
+      previewEl.select();
+      navigator.clipboard.writeText(previewEl.value);
+      alert('✓ संदेश कॉपी हो गया!');
+    }
+  }
+
   // =============================================================
   // MASTER SMART BUSINESS DIARY - EXTENSIONS & AUTOMATIONS
   // =============================================================
@@ -3095,6 +3446,10 @@
     closeEditCategoryModal();
     renderDiaryLedger();
     renderDiaryFollowups();
+    setTimeout(() => {
+      handleMainSubjectChange('crop_doctor');
+      updateHubQueueProgressUI();
+    }, 200);
     renderTodoPlanner();
     renderAutoshipTracker();
     alert('✓ संपर्क जानकारी व श्रेणी सफलतापूर्वक अपडेट हो गई!');
@@ -3336,6 +3691,21 @@
 
 
   window.AarogyamETailer = {
+    openDiaryContactPicker: openDiaryContactPicker,
+    closeDiaryContactPicker: closeDiaryContactPicker,
+    filterDiaryPickerContacts: filterDiaryPickerContacts,
+    selectContactFromDiary: selectContactFromDiary,
+    pickFromPhonebook: pickFromPhonebook,
+    setAutomationMode: setAutomationMode,
+    handleMainSubjectChange: handleMainSubjectChange,
+    handleSubItemChange: handleSubItemChange,
+    handleImageAttach: handleImageAttach,
+    sendAndNext: sendAndNext,
+    sendBroadcastToWhatsApp: sendBroadcastToWhatsApp,
+    callAndRemarkActiveTarget: callAndRemarkActiveTarget,
+    skipToNextTarget: skipToNextTarget,
+    copyMessageText: copyMessageText,
+    updateHubQueueProgressUI: updateHubQueueProgressUI,
     // Master Smart Diary Upgrades
     toggleAccordion: toggleAccordion,
     playStepAudio: playStepAudio,
@@ -4129,6 +4499,10 @@
     updateDiaryHeroLevel();
     renderDiaryLedger();
     renderDiaryFollowups();
+    setTimeout(() => {
+      handleMainSubjectChange('crop_doctor');
+      updateHubQueueProgressUI();
+    }, 200);
     renderIncomeTarget();
     renderCashflowSummary();
     initTheme();
