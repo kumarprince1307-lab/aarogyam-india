@@ -4359,13 +4359,36 @@
 
   // Helper: Reliable DB Client
   function getActiveDbClient() {
-    return window.dbClient || window.supabaseClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+    if (window.dbClient && typeof window.dbClient.from === 'function') {
+      return window.dbClient;
+    }
+    if (window.supabase && typeof window.supabase.from === 'function') {
+      return window.supabase;
+    }
+    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+      return window.supabaseClient;
+    }
+    const sbLib = (window.supabase && typeof window.supabase.createClient === 'function')
+      ? window.supabase
+      : ((window.supabaseClient && typeof window.supabaseClient.createClient === 'function') ? window.supabaseClient : null);
+    if (sbLib) {
+      try {
+        window.dbClient = sbLib.createClient(
+          "https://qjhjrzsnrtahmhswxyvb.supabase.co",
+          "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU"
+        );
+        return window.dbClient;
+      } catch (err) {
+        console.warn('Direct client init error:', err);
+      }
+    }
+    return null;
   }
 
   // Helper: User-Scoped Khatabook Storage Key
   function getKbStorageKey() {
     const mob = getUserMobile();
-    return mob ? `AI_KHATABOOK_ENTRIES_${mob}` : 'AI_KHATABOOK_ENTRIES';
+    return mob ? ('AI_KHATABOOK_ENTRIES_' + mob) : 'AI_KHATABOOK_ENTRIES';
   }
 
   // Helper: Get or Init Khatabook Entries (NO FAKE / DUMMY SEEDS)
@@ -4426,33 +4449,67 @@
 
   // Bidirectional Cloud Fetch: Load entries where user is Distributor OR Customer
   async function loadKbEntriesFromSupabase() {
+    const sbUrl = "https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/khatabook_entries";
+    const sbKey = "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU";
+
     try {
-      const myMob = getUserMobile();
+      let myMob = getUserMobile();
+      if (!myMob || myMob.length < 10) {
+        if (window.AarogyamSession && typeof window.AarogyamSession.getUserMobile === 'function') {
+          myMob = window.AarogyamSession.getUserMobile();
+        }
+      }
       if (!myMob || myMob.length < 10) return;
-      const client = getActiveDbClient();
-      if (!client || typeof client.from !== 'function') return;
 
       console.log('🔄 Fetching live Khatabook entries from Supabase for mobile:', myMob);
-      const { data, error } = await client
-        .from('khatabook_entries')
-        .select('*')
-        .or(`distributor_mobile.eq.${myMob},customer_mobile.eq.${myMob}`)
-        .order('created_at', { ascending: false });
+      let fetchedRows = null;
 
-      if (error) {
-        console.warn('Khatabook Supabase fetch notice:', error.message);
-        return;
+      // Method 1: SDK Client
+      const client = getActiveDbClient();
+      if (client && typeof client.from === 'function') {
+        try {
+          const { data, error } = await client
+            .from('khatabook_entries')
+            .select('*')
+            .or('distributor_mobile.eq.' + myMob + ',customer_mobile.eq.' + myMob)
+            .order('created_at', { ascending: false });
+          if (!error && Array.isArray(data)) {
+            fetchedRows = data;
+          } else if (error) {
+            console.warn('SDK fetch notice:', error.message);
+          }
+        } catch (e) {
+          console.warn('SDK fetch error:', e);
+        }
       }
 
-      if (Array.isArray(data)) {
-        console.log(`✅ Loaded ${data.length} live Khatabook entries from Supabase!`);
+      // Method 2: Guaranteed Direct REST API Fallback
+      if (!fetchedRows && typeof fetch === 'function') {
+        try {
+          const queryUrl = sbUrl + '?or=(distributor_mobile.eq.' + myMob + ',customer_mobile.eq.' + myMob + ')&order=created_at.desc';
+          const res = await fetch(queryUrl, {
+            headers: {
+              'apikey': sbKey,
+              'Authorization': 'Bearer ' + sbKey
+            }
+          });
+          if (res.ok) {
+            fetchedRows = await res.json();
+          }
+        } catch (e) {
+          console.warn('Direct REST fetch error:', e);
+        }
+      }
+
+      if (Array.isArray(fetchedRows)) {
+        console.log('✅ Loaded ' + fetchedRows.length + ' live Khatabook entries from Supabase cloud!');
         const local = getKbEntries();
         const mergedMap = new Map();
         local.forEach(e => {
-          const k = e.id || `${e.tx_date}_${e.amount}_${e.customer_mobile}_${e.tx_type}`;
+          const k = e.id || (e.tx_date + '_' + e.amount + '_' + e.customer_mobile + '_' + e.tx_type);
           mergedMap.set(k, e);
         });
-        data.forEach(remote => {
+        fetchedRows.forEach(remote => {
           mergedMap.set(remote.id, remote);
         });
         const merged = Array.from(mergedMap.values());
@@ -4464,15 +4521,12 @@
     }
   }
 
-  // Real-Time 2-Way Sync to Supabase `public.khatabook_entries`
+  // Real-Time 2-Way Sync to Supabase public.khatabook_entries (Dual SDK + REST Engine)
   async function syncKbEntryToSupabaseAsync(entry) {
-    try {
-      const client = getActiveDbClient();
-      if (!client || typeof client.from !== 'function') {
-        console.warn('DB client not ready for Khatabook sync.');
-        return;
-      }
+    const sbUrl = "https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/khatabook_entries";
+    const sbKey = "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU";
 
+    try {
       const myMob = getUserMobile();
       const payload = {
         distributor_mobile: entry.distributor_mobile || myMob || '9999999999',
@@ -4494,24 +4548,72 @@
         payload.id = entry.id;
       }
 
-      const { data, error } = await client
-        .from('khatabook_entries')
-        .insert([payload])
-        .select();
+      let syncedSuccessfully = false;
+      let returnedId = null;
 
-      if (error) {
-        console.warn('Khatabook Cloud sync notice:', error.message);
-      } else {
-        console.log('✅ Khatabook entry synced LIVE to Supabase cloud!', data); if (typeof showToast === 'function') { showToast('☁️ क्लाउड में लाइव सुरक्षित हो गया!', 'success'); }
-        if (data && data[0] && data[0].id) {
-          entry.id = data[0].id;
+      // Method 1: Try SDK Client
+      const client = getActiveDbClient();
+      if (client && typeof client.from === 'function') {
+        try {
+          const { data, error } = await client
+            .from('khatabook_entries')
+            .insert([payload])
+            .select();
+          if (!error && data && data[0]) {
+            syncedSuccessfully = true;
+            returnedId = data[0].id;
+          } else if (error) {
+            console.warn('SDK sync error, falling back to direct REST:', error.message);
+          }
+        } catch (sdkErr) {
+          console.warn('SDK sync exception:', sdkErr);
+        }
+      }
+
+      // Method 2: Guaranteed Direct REST API Fallback
+      if (!syncedSuccessfully && typeof fetch === 'function') {
+        try {
+          const res = await fetch(sbUrl, {
+            method: 'POST',
+            headers: {
+              'apikey': sbKey,
+              'Authorization': 'Bearer ' + sbKey,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data[0]) {
+              syncedSuccessfully = true;
+              returnedId = data[0].id;
+            }
+          } else {
+            const errTxt = await res.text();
+            console.warn('REST API sync notice:', res.status, errTxt);
+          }
+        } catch (restErr) {
+          console.warn('REST API sync fetch error:', restErr);
+        }
+      }
+
+      if (syncedSuccessfully) {
+        console.log('✅ Khatabook entry synced LIVE to Supabase cloud!', returnedId);
+        if (typeof showToast === 'function') {
+          showToast('☁️ क्लाउड में लाइव सुरक्षित हो गया!', 'success');
+        }
+        if (returnedId) {
+          entry.id = returnedId;
           const current = getKbEntries();
           const idx = current.findIndex(e => e.short_code === entry.short_code);
           if (idx !== -1) {
-            current[idx].id = data[0].id;
+            current[idx].id = returnedId;
             saveKbEntries(current);
           }
         }
+      } else {
+        console.log('ℹ️ Entry safely preserved in local vault (will auto-sync on next connect).');
       }
     } catch (err) {
       console.warn('Khatabook Cloud offline fallback:', err);
@@ -4613,10 +4715,25 @@
       if (e.short_code) c.short_code = e.short_code;
     });
 
-    let customers = Array.from(customerMap.values());
+    let allParties = Array.from(customerMap.values());
+    const custCount = allParties.filter(c => c.party_type === 'customer').length;
+    const suppCount = allParties.filter(c => c.party_type === 'supplier').length;
 
-    // Filter by Party Type (ग्राहक / सप्लायर)
-    customers = customers.filter(c => c.party_type === kbPartyType);
+    const custBtn = document.getElementById('kbTabCustomerBtn');
+    const suppBtn = document.getElementById('kbTabSupplierBtn');
+    if (custBtn) custBtn.innerHTML = 'ग्राहक' + (custCount > 0 ? ' (' + custCount + ')' : '');
+    if (suppBtn) suppBtn.innerHTML = 'सप्लायर' + (suppCount > 0 ? ' (' + suppCount + ')' : '');
+
+    // Auto-select supplier tab if user has NO customer entries but HAS supplier entries!
+    if (custCount === 0 && suppCount > 0 && kbPartyType === 'customer') {
+      kbPartyType = 'supplier';
+      if (custBtn && suppBtn) {
+        suppBtn.classList.add('active');
+        custBtn.classList.remove('active');
+      }
+    }
+
+    let customers = allParties.filter(c => c.party_type === kbPartyType);
 
     // Calculate Summary Totals
     let totalWillGive = 0;  // You Will Give (आप देंगे - Credit/Got)
@@ -6483,6 +6600,7 @@
     // Initialize Smart Business Diary Components
     updateDiaryHeroLevel();
     renderDiaryLedger();
+    loadKbEntriesFromSupabase();
     renderDiaryFollowups();
     setTimeout(() => {
       handleMainSubjectChange('crop_doctor');

@@ -28,10 +28,46 @@
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   
   <!-- Core CSS -->
-  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261101_v80_ultra_sharp">
+  <link rel="stylesheet" href="/css/smart-etailer.css?v=20261101_v300_production_final">
   <meta property="og:title" content="आरोग्यम मेरी डायरी — किसान व टीम खाता व 8-लेवल फील्ड मैनेजर">
   <meta property="og:description" content="30-सेकंड में किसान व टीम प्रविष्टि दर्ज करें, 1-टैप WhatsApp फॉलो-अप और 8-लेवल फील्ड लीडरशिप।">
   <meta property="og:type" content="website">
+
+    <!-- Zero-Delay Synchronous Purge of Zombie Dummy Seeds before DOM Rendering -->
+  <script>
+    (function() {
+      try {
+        var dummyTerms = ['124294', 'netsurf customer', 'nc124k', 'agm001', 'rajesh'];
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+          var k = localStorage.key(i);
+          if (k && (k.indexOf('AI_KHATABOOK') === 0 || k.indexOf('AI_KB_') === 0 || k.indexOf('AAROGYAM_SMART') === 0 || k.indexOf('AI_DIARY_') === 0)) {
+            try {
+              var val = localStorage.getItem(k);
+              if (val && (val.charAt(0) === '[' || val.charAt(0) === '{')) {
+                var items = JSON.parse(val);
+                if (Array.isArray(items)) {
+                  var filtered = items.filter(function(it) {
+                    var cName = ((it.customer_name || it.name || '') + '').toLowerCase();
+                    var amt = Number(it.amount) || 0;
+                    var sc = (it.short_code || '') + '';
+                    var id = (it.id || '') + '';
+                    if (amt === 124294) return false;
+                    if (sc === 'NC124K' || sc === 'AGM001') return false;
+                    if (id.indexOf('seed') !== -1) return false;
+                    if (cName.indexOf('netsurf customer') !== -1) return false;
+                    if (cName.indexOf('rajesh') !== -1) return false;
+                    if (cName === 'aarogyam' && amt === 0) return false;
+                    return true;
+                  });
+                  localStorage.setItem(k, JSON.stringify(filtered));
+                }
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (_) {}
+    })();
+  </script>
 
   <style id="smart-etailer-ultra-sharp-override">
     /* =========================================================
@@ -1567,15 +1603,7 @@
     </div>
   </div>
 
-  <!-- =========================================
-       6. SCRIPTS
-  ========================================== -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/js/supabase.js"></script>
-  <script src="/session.js"></script>
-  <script src="/js/universal-nav-drawer.js?v=1.1"></script>
-  <script src="/js/audio-greeting-engine.js?v=20261101_v1"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261101_v80_ultra_sharp"></script>
+  <!-- Core scripts moved to end of body for full DOM hydration -->
 
   <!-- =========================================
        5.4 MODAL: 8-LEVEL PROGRESSION ROADMAP
@@ -2294,6 +2322,16 @@
       </form>
     </div>
   </div>
+
+  <!-- =========================================
+       6. PRODUCTION SCRIPTS (FULL DOM HYDRATION)
+  ========================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js?v=20261101_v300_production_final"></script>
+  <script src="/session.js?v=20261101_v300_production_final"></script>
+  <script src="/js/universal-nav-drawer.js?v=2.0"></script>
+  <script src="/js/audio-greeting-engine.js?v=20261101_v2"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261101_v300_production_final"></script>
 
 </body>
 
