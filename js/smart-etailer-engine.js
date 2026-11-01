@@ -2386,7 +2386,7 @@
 
     try {
       const name = (document.getElementById('diaryInputName')?.value || '').trim();
-      const mobile = (document.getElementById('diaryInputMobile')?.value || '').trim().replace(/\D/g, '');
+      const mobile = sanitize10DigitMobile(document.getElementById('diaryInputMobile')?.value || '');
       const place = (document.getElementById('diaryInputPlace')?.value || '').trim();
       const amt = Number(document.getElementById('diaryInputAmount')?.value) || 0;
       const khataType = document.getElementById('diaryInputKhataType')?.value || 'none';
@@ -3272,7 +3272,7 @@
           const c = contacts[0];
           const name = (c.name && c.name[0]) || '';
           let tel = (c.tel && c.tel[0]) || '';
-          tel = tel.replace(/\D/g, '').slice(-10);
+          tel = sanitize10DigitMobile(tel);
 
           if (currentPickerTarget === 'kb_party') {
             if (name && document.getElementById('kbPartyName')) document.getElementById('kbPartyName').value = name;
@@ -4938,7 +4938,7 @@
   function handleKbAddPartySubmit(e) {
     e.preventDefault();
     const name = (document.getElementById('kbPartyName')?.value || '').trim();
-    const mobile = (document.getElementById('kbPartyMobile')?.value || '').trim().replace(/\D/g, '').slice(-10);
+    const mobile = sanitize10DigitMobile(document.getElementById('kbPartyMobile')?.value || '');
     const place = (document.getElementById('kbPartyPlace')?.value || '').trim();
     const radios = document.getElementsByName('kbPartyTypeRadio');
     let partyType = 'customer';
@@ -5697,8 +5697,39 @@
 
   // Instant Zero-Egress Auto-Lookup by Mobile Number in Khatabook (Diary -> Phonebook -> Khata -> Local Cache -> 1-Time Supabase)
   let kbLookupDebounceTimer = null;
-  async function handleKbMobileAutoLookup(val) {
-    const clean = (val || '').replace(/\D/g, '').slice(-10);
+    // Universal 10-Digit Mobile Sanitizer (+91, leading 0, spaces, dashes auto-clean)
+  function sanitize10DigitMobile(raw) {
+    if (!raw) return '';
+    let str = String(raw).trim();
+    let digits = str.replace(/\D/g, '');
+    if (digits.length === 12 && digits.startsWith('91')) {
+      digits = digits.slice(2);
+    } else if (digits.length === 11 && digits.startsWith('0')) {
+      digits = digits.slice(1);
+    } else if (digits.length > 10) {
+      if (digits.startsWith('91') && digits.length === 12) {
+        digits = digits.slice(2);
+      } else {
+        digits = digits.slice(-10);
+      }
+    }
+    return digits.slice(0, 10);
+  }
+
+  function handleMobileInputSanitize(inputEl) {
+    if (!inputEl) return '';
+    const raw = inputEl.value || '';
+    if (!raw) return '';
+    const clean = sanitize10DigitMobile(raw);
+    if (/\D/.test(raw) || (raw.startsWith('0') && raw.length > 1) || raw.length > 10 || (clean.length === 10 && raw !== clean)) {
+      inputEl.value = clean;
+    }
+    return clean;
+  }
+
+  async function handleKbMobileAutoLookup(val, el) {
+    const inputEl = el || document.getElementById('kbPartyMobile');
+    const clean = handleMobileInputSanitize(inputEl) || sanitize10DigitMobile(val);
     const hintEl = document.getElementById('kbMobileLookupHint');
     const nameInput = document.getElementById('kbPartyName');
     const placeInput = document.getElementById('kbPartyPlace');
@@ -6001,6 +6032,8 @@
     closeDiaryContactPicker: closeDiaryContactPicker,
     filterDiaryPickerContacts: filterDiaryPickerContacts,
     selectContactFromDiary: selectContactFromDiary,
+    handleMobileInputSanitize: handleMobileInputSanitize,
+    sanitize10DigitMobile: sanitize10DigitMobile,
     pickFromPhonebook: pickFromPhonebook,
     setAutomationMode: setAutomationMode,
     handleMainSubjectChange: handleMainSubjectChange,

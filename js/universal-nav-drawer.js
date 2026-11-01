@@ -1131,6 +1131,15 @@
               </a>
             </div>
 
+            <!-- 📕 AAROGYAM BAHI KHATA (Main Menu Direct Button) -->
+            <a href="/pages/smart-etailer.html" class="drawer-nav-item-btn ${currentPath.includes('smart-etailer') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #fff1f2, #ffe4e6); border:1.5px solid #fecdd3;">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#e11d48; color:#ffffff;"><i class="fa-solid fa-book-journal-whills"></i></div>
+                <span class="drawer-item-title" style="color:#9f1239; font-weight:900;">आरोग्यम बहीखाता (Bahi Khata)</span>
+              </div>
+              <span class="drawer-tag-pill" style="background:#e11d48; color:#ffffff; font-weight:900;">नया 📕</span>
+            </a>
+
             <!-- 5. LIVE WEBINAR (Main Menu Direct Button) -->
             <a href="/webinar.html" class="drawer-nav-item-btn ${currentPath.includes('webinar') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
