@@ -298,6 +298,28 @@
             </div>
           </div>
 
+          <!-- Essential Contact Details (Name, Mobile, Place) - Clean White, Sharp Text & High Contrast -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:14px;">
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:900; color:#f8fafc; margin-bottom:5px;">
+                👤 व्यक्ति का नाम (Full Name) *
+              </label>
+              <input type="text" id="diaryInputName" class="game-input" placeholder="उदा. रमेश कुमार / किसान साथी" required style="width:100%; margin:0; background:#ffffff !important; color:#0f172a !important; font-weight:800; font-size:0.95rem; border:1.5px solid #cbd5e1; padding:10px 12px; border-radius:8px; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:900; color:#f8fafc; margin-bottom:5px;">
+                📱 मोबाइल नंबर (10 Digit Mobile) *
+              </label>
+              <input type="tel" id="diaryInputMobile" class="game-input" placeholder="उदा. 9826012345" maxlength="10" required style="width:100%; margin:0; background:#ffffff !important; color:#0f172a !important; font-weight:800; font-size:0.95rem; border:1.5px solid #cbd5e1; padding:10px 12px; border-radius:8px; box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:900; color:#f8fafc; margin-bottom:5px;">
+                📍 गाँव / शहर (Village / City)
+              </label>
+              <input type="text" id="diaryInputPlace" class="game-input" placeholder="उदा. सागर / पिपरिया" style="width:100%; margin:0; background:#ffffff !important; color:#0f172a !important; font-weight:800; font-size:0.95rem; border:1.5px solid #cbd5e1; padding:10px 12px; border-radius:8px; box-sizing:border-box;">
+            </div>
+          </div>
+
           <!-- Team Status Section (Visible only when 'Team' is selected) -->
           <div id="diaryTeamStatusWrap" style="display:none; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:12px; margin-bottom:14px;">
             <label style="display:block; font-size:0.80rem; font-weight:800; color:#38bdf8; margin-bottom:6px;">
@@ -315,15 +337,14 @@
               </button>
               <button type="button" class="status-pill-btn" data-status="core" onclick="window.AarogyamETailer.setTeamStatus('core')">
                 4️⃣ कोर मोटिवेटेड लीडर (Core)
-              
+              </button>
+            </div>
             <!-- NetSurf ID for Team Member -->
             <div style="margin-top:10px;">
               <label style="display:block; font-size:0.80rem; font-weight:800; color:#cbd5e1; margin-bottom:4px;">
                 🆔 नेटसर्फ आईडी (NetSurf ID / Distributor ID):
               </label>
-              <input type="text" id="diaryInputNetsurfId" class="game-input" placeholder="उदा. 167046 या नेटसर्फ ID" style="margin:0; width:100%;">
-            </div>
-</button>
+              <input type="text" id="diaryInputNetsurfId" class="game-input" placeholder="उदा. 167046 या नेटसर्फ ID" style="margin:0; width:100%; background:#ffffff !important; color:#0f172a !important; font-weight:800; border:1.5px solid #cbd5e1; padding:10px 12px; border-radius:8px; box-sizing:border-box;">
             </div>
           </div>
 
@@ -1887,18 +1908,18 @@
     <!-- =============================================================
        KHATABOOK PRO MODAL 1: पार्टी जोड़ें (ADD PARTY MODAL - 100% MOBILE RESPONSIVE)
   ============================================================== -->
-  <div class="game-modal-overlay" id="kbAddPartyModal" onclick="if(event.target === this) window.AarogyamETailer.closeAddPartyModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; align-items:center; justify-content:center; padding:12px; box-sizing:border-box;">
-    <div style="max-width:440px; width:100%; max-height:92vh; overflow-y:auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,0.35); font-family:inherit; box-sizing:border-box; margin:auto;">
+  <div class="game-modal-overlay" id="kbAddPartyModal" onclick="if(event.target === this) window.AarogyamETailer.closeAddPartyModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; overflow-y:auto;">
+    <div style="width:calc(100vw - 20px); max-width:440px; max-height:90vh; overflow-y:auto; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,0.45); font-family:inherit; box-sizing:border-box; margin:auto;">
       
-      <!-- Royal Blue Header with BOTH Back Arrow & Bold Cross ✕ Button -->
-      <div style="background:#0052cc; color:#ffffff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; box-sizing:border-box;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <button type="button" onclick="window.AarogyamETailer.closeAddPartyModal()" style="background:rgba(255,255,255,0.2); border:none; color:#ffffff; font-size:1.3rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0;" title="पीछे जाएं">
+      <!-- Royal Blue Header with BOTH Back Arrow & Bold Red Cross ✕ Button -->
+      <div style="background:#0052cc; color:#ffffff; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; box-sizing:border-box;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" onclick="window.AarogyamETailer.closeAddPartyModal()" style="background:rgba(255,255,255,0.2); border:none; color:#ffffff; font-size:1.25rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0;" title="पीछे जाएं">
             ←
           </button>
-          <h3 style="margin:0; font-size:1.1rem; font-weight:900; color:#ffffff;">पार्टी जोड़ें</h3>
+          <h3 style="margin:0; font-size:1.05rem; font-weight:900; color:#ffffff; white-space:nowrap;">➕ नया ग्राहक जोड़ें</h3>
         </div>
-        <button type="button" onclick="window.AarogyamETailer.closeAddPartyModal()" style="background:rgba(255,255,255,0.2); border:none; color:#ffffff; font-size:1.3rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0;" title="बंद करें (Close)">
+        <button type="button" onclick="window.AarogyamETailer.closeAddPartyModal()" style="background:#dc2626; border:none; color:#ffffff; font-size:1.2rem; font-weight:900; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0; box-shadow:0 2px 8px rgba(220,38,38,0.5);" title="बंद करें (Close)">
           ✕
         </button>
       </div>

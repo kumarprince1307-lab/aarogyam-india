@@ -572,6 +572,19 @@ function logoutUser() {
     localStorage.removeItem('aarogyam_upline_phone');
     localStorage.removeItem('aim_last_sponsor_id');
     localStorage.removeItem('AOI_REFERRER_ID');
+    localStorage.removeItem('AI_KHATABOOK_ENTRIES');
+    localStorage.removeItem('AAROGYAM_SMART_DIARY_ENTRIES');
+    localStorage.removeItem('AAROGYAM_SMART_CASHFLOW');
+    localStorage.removeItem('AI_PHONEBOOK_CACHE');
+    localStorage.removeItem('AI_DIARY_TODAY_COUNTS');
+    try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith('AI_KHATABOOK_') || k.startsWith('AAROGYAM_SMART_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_') || k.startsWith('aim_') || k.startsWith('ai_'))) {
+                localStorage.removeItem(k);
+            }
+        }
+    } catch(e) {}
     try { sessionStorage.clear(); } catch(e) {}
     return true;
 }

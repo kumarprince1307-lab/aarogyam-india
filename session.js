@@ -316,6 +316,19 @@
         localStorage.removeItem('SAKHI_PERSONA_PROFILE');
         localStorage.removeItem('SAKHI_CURRENT_SESSION_ID');
         localStorage.removeItem('user_mobile');
+        localStorage.removeItem('AI_KHATABOOK_ENTRIES');
+        localStorage.removeItem('AAROGYAM_SMART_DIARY_ENTRIES');
+        localStorage.removeItem('AAROGYAM_SMART_CASHFLOW');
+        localStorage.removeItem('AI_PHONEBOOK_CACHE');
+        localStorage.removeItem('AI_DIARY_TODAY_COUNTS');
+        try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && (k.startsWith('AI_KHATABOOK_') || k.startsWith('AAROGYAM_SMART_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_') || k.startsWith('aim_') || k.startsWith('ai_'))) {
+                    localStorage.removeItem(k);
+                }
+            }
+        } catch(e) {}
         try { sessionStorage.clear(); } catch(e) {}
         
         console.log("100% User session cleared across site and Sakhi AI. Reloading...");

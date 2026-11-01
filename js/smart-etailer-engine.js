@@ -469,6 +469,7 @@
     // 3. Trigger Sub-Views
     if (tabId === 'tab-diary-ledger') {
       renderDiaryLedger();
+      loadKbEntriesFromSupabase();
     } else if (tabId === 'tab-diary-followup') {
       renderDiaryFollowups();
       handleMainSubjectChange(document.getElementById('hubMainSubjectSelect')?.value || 'crop_doctor');
@@ -1750,18 +1751,33 @@
     }).catch(() => {});
   } catch (_) {}
 
+  function getDiaryStorageKey() {
+    const mob = getUserMobile();
+    return mob ? `AAROGYAM_SMART_DIARY_ENTRIES_${mob}` : 'AAROGYAM_SMART_DIARY_ENTRIES';
+  }
+
   function getLocalDiaryEntries() {
     try {
-      return JSON.parse(localStorage.getItem('AAROGYAM_SMART_DIARY_ENTRIES') || '[]');
+      const key = getDiaryStorageKey();
+      let val = localStorage.getItem(key);
+      if (!val && key !== 'AAROGYAM_SMART_DIARY_ENTRIES') {
+        val = localStorage.getItem('AAROGYAM_SMART_DIARY_ENTRIES');
+        if (val) localStorage.setItem(key, val);
+      }
+      return JSON.parse(val || '[]');
     } catch (_) {
       return [];
     }
   }
 
   function saveLocalDiaryEntries(entries) {
+    const key = getDiaryStorageKey();
+    localStorage.setItem(key, JSON.stringify(entries));
+    // Also mirror to global key for backwards compatibility
     localStorage.setItem('AAROGYAM_SMART_DIARY_ENTRIES', JSON.stringify(entries));
     updateDiaryHeroLevel();
     renderDiaryLedger();
+    loadKbEntriesFromSupabase();
     renderDiaryFollowups();
     setTimeout(() => {
       handleMainSubjectChange('crop_doctor');
@@ -4317,76 +4333,34 @@
   let kbCalcMemory = 0;
   let kbActiveLocalFile = null; // compressed base64 local file
 
-  // Helper: Get or Init Khatabook Entries
+  // Helper: Reliable DB Client
+  function getActiveDbClient() {
+    return window.dbClient || window.supabaseClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+  }
+
+  // Helper: User-Scoped Khatabook Storage Key
+  function getKbStorageKey() {
+    const mob = getUserMobile();
+    return mob ? `AI_KHATABOOK_ENTRIES_${mob}` : 'AI_KHATABOOK_ENTRIES';
+  }
+
+  // Helper: Get or Init Khatabook Entries (NO FAKE / DUMMY SEEDS)
   function getKbEntries() {
     try {
-      let entries = JSON.parse(localStorage.getItem('AI_KHATABOOK_ENTRIES') || '[]');
-      if (entries.length === 0) {
-        // Migrate from old diary entries if available
-        const oldDiary = getLocalDiaryEntries();
-        const migrated = [];
-        oldDiary.forEach(e => {
-          const amt = Number(e.due_amount) || 0;
-          if (amt !== 0 || e.khata_type) {
-            migrated.push({
-              id: 'kb_' + (e.id || Date.now() + Math.random().toString(36).substr(2, 4)),
-              distributor_mobile: getUserMobile(),
-              distributor_name: getUserDisplayName(),
-              customer_mobile: e.mobile || '9826012345',
-              customer_name: e.name || 'किसान साथी',
-              customer_place: e.place || 'गाँव / शहर',
-              party_type: 'customer',
-              tx_type: (amt > 0 || e.khata_type === 'give') ? 'GAVE' : 'GOT',
-              amount: Math.abs(amt) || 150,
-              bill_details: e.bill_details || e.crop_name || 'खाता प्रविष्टि',
-              tx_date: e.date || new Date().toISOString().split('T')[0],
-              due_date: e.due_date || '',
-              short_code: generateShortCode(e.mobile || '9826012345'),
-              created_at: new Date().toISOString()
-            });
-          }
+      const key = getKbStorageKey();
+      let entries = JSON.parse(localStorage.getItem(key) || '[]');
+      if (entries.length === 0 && key !== 'AI_KHATABOOK_ENTRIES') {
+        const legacy = JSON.parse(localStorage.getItem('AI_KHATABOOK_ENTRIES') || '[]');
+        const myMob = getUserMobile();
+        const valid = legacy.filter(e => {
+          const cName = ((e.customer_name || '') + '').toLowerCase();
+          const isDummy = cName.includes('rajesh') || e.customer_mobile === '7976655444' || e.customer_mobile === '9826012345';
+          if (isDummy) return false;
+          return !myMob || e.distributor_mobile === myMob || e.customer_mobile === myMob;
         });
-
-        if (migrated.length > 0) {
-          entries = migrated;
-          localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
-        } else {
-          // Initial seed matching Khatabook screenshot
-          entries = [
-            {
-              id: 'kb_seed_1',
-              distributor_mobile: getUserMobile(),
-              distributor_name: getUserDisplayName(),
-              customer_mobile: '9826012345',
-              customer_name: 'Netsurf Customer',
-              customer_place: 'पिपरिया',
-              party_type: 'customer',
-              tx_type: 'GAVE',
-              amount: 124294,
-              bill_details: 'कृषि उत्पाद व बायोफिट किट',
-              tx_date: '2026-10-31',
-              due_date: '2026-11-15',
-              short_code: 'NC124K',
-              created_at: new Date().toISOString()
-            },
-            {
-              id: 'kb_seed_2',
-              distributor_mobile: getUserMobile(),
-              distributor_name: getUserDisplayName(),
-              customer_mobile: '7974422572',
-              customer_name: 'Aarogyam',
-              customer_place: 'सागर',
-              party_type: 'customer',
-              tx_type: 'GOT',
-              amount: 0,
-              bill_details: 'नया खाता शुरू',
-              tx_date: '2026-11-01',
-              due_date: '',
-              short_code: 'AGM001',
-              created_at: new Date().toISOString()
-            }
-          ];
-          localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
+        if (valid.length > 0) {
+          entries = valid;
+          localStorage.setItem(key, JSON.stringify(entries));
         }
       }
       return entries;
@@ -4396,6 +4370,9 @@
   }
 
   function saveKbEntries(entries) {
+    const key = getKbStorageKey();
+    localStorage.setItem(key, JSON.stringify(entries));
+    // Mirror to global key for offline safety
     localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
   }
 
@@ -4411,36 +4388,109 @@
     return code.toUpperCase();
   }
 
-  // Background 1-Way Sync to Supabase `public.khatabook_entries`
-  function syncKbEntryToSupabaseAsync(entry) {
-    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
-      window.supabaseClient
+  // UUID Generator for PostgreSQL UUID compatibility
+  function generateKbUUID() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  // Bidirectional Cloud Fetch: Load entries where user is Distributor OR Customer
+  async function loadKbEntriesFromSupabase() {
+    try {
+      const myMob = getUserMobile();
+      if (!myMob || myMob.length < 10) return;
+      const client = getActiveDbClient();
+      if (!client || typeof client.from !== 'function') return;
+
+      console.log('🔄 Fetching live Khatabook entries from Supabase for mobile:', myMob);
+      const { data, error } = await client
         .from('khatabook_entries')
-        .insert([{
-          id: entry.id,
-          distributor_mobile: entry.distributor_mobile,
-          distributor_name: entry.distributor_name,
-          customer_mobile: entry.customer_mobile,
-          customer_name: entry.customer_name,
-          customer_place: entry.customer_place,
-          party_type: entry.party_type || 'customer',
-          tx_type: entry.tx_type,
-          amount: Number(entry.amount),
-          bill_details: entry.bill_details || '',
-          tx_date: entry.tx_date,
-          due_date: entry.due_date || null,
-          short_code: entry.short_code
-        }])
-        .then(({ data, error }) => {
-          if (error) {
-            console.warn('Khatabook Cloud sync notice:', error.message);
-          } else {
-            console.log('✅ Khatabook entry synced to Supabase cloud!');
-          }
-        })
-        .catch(err => {
-          console.warn('Khatabook Cloud offline fallback:', err);
+        .select('*')
+        .or(`distributor_mobile.eq.${myMob},customer_mobile.eq.${myMob}`)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.warn('Khatabook Supabase fetch notice:', error.message);
+        return;
+      }
+
+      if (Array.isArray(data)) {
+        console.log(`✅ Loaded ${data.length} live Khatabook entries from Supabase!`);
+        const local = getKbEntries();
+        const mergedMap = new Map();
+        local.forEach(e => {
+          const k = e.id || `${e.tx_date}_${e.amount}_${e.customer_mobile}_${e.tx_type}`;
+          mergedMap.set(k, e);
         });
+        data.forEach(remote => {
+          mergedMap.set(remote.id, remote);
+        });
+        const merged = Array.from(mergedMap.values());
+        saveKbEntries(merged);
+        renderKhatabookPro();
+      }
+    } catch (err) {
+      console.warn('loadKbEntriesFromSupabase error:', err);
+    }
+  }
+
+  // Real-Time 2-Way Sync to Supabase `public.khatabook_entries`
+  async function syncKbEntryToSupabaseAsync(entry) {
+    try {
+      const client = getActiveDbClient();
+      if (!client || typeof client.from !== 'function') {
+        console.warn('DB client not ready for Khatabook sync.');
+        return;
+      }
+
+      const myMob = getUserMobile();
+      const payload = {
+        distributor_mobile: entry.distributor_mobile || myMob || '9999999999',
+        distributor_name: entry.distributor_name || getUserDisplayName(),
+        customer_mobile: entry.customer_mobile,
+        customer_name: entry.customer_name,
+        customer_place: entry.customer_place || '',
+        party_type: entry.party_type || 'customer',
+        tx_type: entry.tx_type,
+        amount: Number(entry.amount),
+        bill_details: entry.bill_details || '',
+        tx_date: entry.tx_date || new Date().toISOString().split('T')[0],
+        due_date: entry.due_date || null,
+        short_code: entry.short_code
+      };
+
+      // Only pass id if it is a valid UUID
+      if (entry.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(entry.id)) {
+        payload.id = entry.id;
+      }
+
+      const { data, error } = await client
+        .from('khatabook_entries')
+        .insert([payload])
+        .select();
+
+      if (error) {
+        console.warn('Khatabook Cloud sync notice:', error.message);
+      } else {
+        console.log('✅ Khatabook entry synced LIVE to Supabase cloud!', data);
+        if (data && data[0] && data[0].id) {
+          entry.id = data[0].id;
+          const current = getKbEntries();
+          const idx = current.findIndex(e => e.short_code === entry.short_code);
+          if (idx !== -1) {
+            current[idx].id = data[0].id;
+            saveKbEntries(current);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Khatabook Cloud offline fallback:', err);
     }
   }
 
@@ -4499,32 +4549,43 @@
     }
 
     const allEntries = getKbEntries();
+    const myMob = getUserMobile();
 
-    // Group entries by customer_mobile
+    // Group entries by Counterparty (bidirectional support: customer vs distributor)
     const customerMap = new Map();
     allEntries.forEach(e => {
-      const mob = e.customer_mobile || '0000000000';
-      if (!customerMap.has(mob)) {
-        customerMap.set(mob, {
-          mobile: mob,
-          name: e.customer_name || 'ग्राहक',
-          place: e.customer_place || 'गाँव / शहर',
-          party_type: e.party_type || 'customer',
-          short_code: e.short_code || generateShortCode(mob),
+      const isMeCustomer = (myMob && e.customer_mobile === myMob && e.distributor_mobile !== myMob);
+      const partyMob = isMeCustomer ? (e.distributor_mobile || '0000000000') : (e.customer_mobile || '0000000000');
+      const partyName = isMeCustomer ? (e.distributor_name || 'दुकानदार / साथी') : (e.customer_name || 'ग्राहक');
+      const partyPlace = isMeCustomer ? '' : (e.customer_place || 'गाँव / शहर');
+      const partyType = isMeCustomer ? 'supplier' : (e.party_type || 'customer');
+
+      if (!customerMap.has(partyMob)) {
+        customerMap.set(partyMob, {
+          mobile: partyMob,
+          name: partyName,
+          place: partyPlace,
+          party_type: partyType,
+          short_code: e.short_code || generateShortCode(partyMob),
           last_date: e.tx_date || '',
           total_gave: 0,
           total_got: 0,
           entries: []
         });
       }
-      const c = customerMap.get(mob);
+      const c = customerMap.get(partyMob);
       c.entries.push(e);
-      if (e.tx_type === 'GAVE') c.total_gave += Number(e.amount) || 0;
-      else if (e.tx_type === 'GOT') c.total_got += Number(e.amount) || 0;
+      
+      // If viewing as customer, distributor GAVE means customer owes (I will give / got)
+      if (isMeCustomer) {
+        if (e.tx_type === 'GAVE') c.total_got += Number(e.amount) || 0;
+        else if (e.tx_type === 'GOT') c.total_gave += Number(e.amount) || 0;
+      } else {
+        if (e.tx_type === 'GAVE') c.total_gave += Number(e.amount) || 0;
+        else if (e.tx_type === 'GOT') c.total_got += Number(e.amount) || 0;
+      }
+
       if (e.tx_date && (!c.last_date || e.tx_date > c.last_date)) c.last_date = e.tx_date;
-      if (e.party_type) c.party_type = e.party_type;
-      if (e.customer_name) c.name = e.customer_name;
-      if (e.customer_place) c.place = e.customer_place;
       if (e.short_code) c.short_code = e.short_code;
     });
 
@@ -4980,7 +5041,7 @@
     }
 
     const newTx = {
-      id: 'kb_tx_' + Date.now(),
+      id: generateKbUUID(),
       distributor_mobile: getUserMobile(),
       distributor_name: getUserDisplayName(),
       customer_mobile: activeKbCustomer.mobile,
@@ -5087,8 +5148,9 @@
     // If empty locally, try finding by mobile or fallback
     if (entries.length === 0) {
       // If we have internet and Supabase, query Supabase
-      if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
-        window.supabaseClient
+      const client = getActiveDbClient();
+      if (client && typeof client.from === 'function') {
+        client
           .from('khatabook_entries')
           .select('*')
           .eq('short_code', shortCode)
@@ -5441,8 +5503,9 @@
     saveKbEntries(entries);
 
     // Delete from Supabase in background
-    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
-      window.supabaseClient
+    const client = getActiveDbClient();
+    if (client && typeof client.from === 'function') {
+      client
         .from('khatabook_entries')
         .delete()
         .eq('customer_mobile', activeKbCustomer.mobile)
@@ -5466,8 +5529,9 @@
     saveKbEntries(entries);
 
     // Delete from Supabase
-    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
-      window.supabaseClient
+    const client = getActiveDbClient();
+    if (client && typeof client.from === 'function') {
+      client
         .from('khatabook_entries')
         .delete()
         .eq('id', txId)
@@ -5495,6 +5559,7 @@
     filterKhatabookList: filterKhatabookList,
     toggleKhatabookFilter: toggleKhatabookFilter,
     renderKhatabookPro: renderKhatabookPro,
+    loadKbEntriesFromSupabase: loadKbEntriesFromSupabase,
     openAddPartyModal: openAddPartyModal,
     closeAddPartyModal: closeAddPartyModal,
     handleKbAddPartySubmit: handleKbAddPartySubmit,
@@ -6301,8 +6366,9 @@
   // -------------------------------------------------------------
   async function syncRemoteAdminSettings() {
     try {
-      if (window.supabaseClient) {
-        const { data } = await window.supabaseClient
+      const client = getActiveDbClient();
+      if (client) {
+        const { data } = await client
           .from('site_configs')
           .select('key, value');
         
