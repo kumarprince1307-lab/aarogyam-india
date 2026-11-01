@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v38.0';
+const STATIC_CACHE = 'aarogyam-public-static-v39.0';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v28.0';
+const PAGES_CACHE = 'aarogyam-public-pages-v29.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v3.0';
 const OFFLINE_URL = '/offline.html';
 
@@ -45,6 +45,8 @@ const PRECACHE_SHELL = [
   '/js/sakhi-panchang-engine.js?v=20261030_v16_panchang_fix',
   '/js/aarogyam-sakhi-ai.js',
   '/js/sakhi-persona-engine.js',
+  '/js/sakhi-tutorial-guide.js',
+  '/js/sakhi-notification-engine.js',
   '/js/universal-nav-drawer.js',
   '/js/viral-share-engine.js',
   '/js/global-guest-modal.js',
@@ -252,7 +254,7 @@ self.addEventListener('fetch', (event) => {
           if (freshResponse && freshResponse.status === 200) {
             caches.open(STATIC_CACHE).then((cache) => cache.put(request, freshResponse));
           }
-        }).catch(() => {});
+        }).catch(() => { });
         return cachedResponse;
       }
 

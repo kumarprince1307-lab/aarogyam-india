@@ -24,6 +24,11 @@ window.sendSakhiSuggestion = function (queryText) {
   if (input) input.value = cleanQ;
   if (typeof window._sakhiCoreExecuteSuggestion === 'function') {
     window._sakhiCoreExecuteSuggestion(cleanQ);
+  } else if (typeof window.handleSakhiUserSubmit === 'function') {
+    window.handleSakhiUserSubmit(cleanQ);
+  } else {
+    const f = document.getElementById('sakhiChatForm') || document.getElementById('sakhiInputForm');
+    if (f) f.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
   }
 };
 window.askSakhiQuick = function (queryText) {
@@ -79,10 +84,7 @@ if (typeof document !== 'undefined') {
 'use strict';
 
 (function () {
-
-  // =========================================================================
   // 1. AUTO-EXPANDING TEXTAREA CHAT INPUT (ChatGPT Style)
-  // =========================================================================
   function initAutoExpandingInput() {
     const txtInput = document.getElementById('sakhiTextInput');
     if (!txtInput) return;
@@ -329,10 +331,7 @@ if (typeof document !== 'undefined') {
       });
     }
   });
-
-  // =========================================================================
   // 1.9 GLOBAL SAKHI MESSAGE APPENDER & MULTI-MODAL PREVIEW ENGINE
-  // =========================================================================
   function appendSakhiMessage(role, htmlOrText, isHtml, chips, imgMeta) {
     const wrap = document.getElementById('sakhiMessagesWrap');
     if (!wrap) return;
@@ -369,9 +368,7 @@ if (typeof document !== 'undefined') {
       }
     }
   }
-  // =========================================================================
   // 1.95 BEAUTIFUL SAKHI VISION CARD FORMATTER (Attractive Star & Badge Sections)
-  // =========================================================================
   function formatSakhiVisionCard(rawText) {
     if (!rawText) return '';
     let text = String(rawText).trim();
@@ -488,10 +485,7 @@ if (typeof document !== 'undefined') {
 
     return formattedHtml;
   }
-
-  // =========================================================================
   // 2. MULTI-MODAL IMAGE & CAMERA UPLOAD HANDLER (Preview + Analysis)
-  // =========================================================================
   // Staged Image Storage for optional user captioning
   window.sakhiStagedImage = null;
 
@@ -831,10 +825,7 @@ if (typeof document !== 'undefined') {
 
     return false;
   }
-
-  // =========================================================================
   // SAKHI ZERO-EGRESS QUOTA & MULTI-TIER USAGE ENGINE
-  // =========================================================================
   const SakhiQuotaEngine = {
     ADMIN_PHONE: '7974422572',
     ADMIN_PHONES: ['7974422572', '7049294111'],
@@ -2902,10 +2893,7 @@ if (typeof document !== 'undefined') {
       { text: '📋 शेयर संदेश कॉपी करें', query: 'संदेश कॉपी करो' }
     ], 'business', 'share_with_name_no');
   }
-
-  // =========================================================================
   // VIRAL WHATSAPP & STATUS HOOK MESSAGE GENERATOR (Category-Aware, Short & Crisp)
-  // =========================================================================
   const SAKHI_HOOK_REPOSITORY = {
     agri: [
       {
@@ -3401,9 +3389,7 @@ if (typeof document !== 'undefined') {
   window.clearSakhiChatHistory = window.startSakhiNewChat;
 
   // 10. CHAT UI INJECTION & MESSAGE STREAMER
-  // =========================================================================
   // WHATSAPP-STYLE MESSAGE TIMESTAMPS & DATE DIVIDERS ENGINE
-  // =========================================================================
   function formatMsgTime(ts) {
     const d = ts ? new Date(ts) : new Date();
     let hours = d.getHours();
@@ -3912,13 +3898,13 @@ if (typeof document !== 'undefined') {
           <span class="sakhi-pill-icon-circle emerald">🧪</span>
           <span>दवा और खुराक</span>
         </button>
-        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('मिट्टी की जांच और धारा संस्कार अमृत मिट्टी कैसे तैयार करें?')">
-          <span class="sakhi-pill-icon-circle blue">💧</span>
-          <span>मिट्टी व पानी की जांच</span>
+        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('डिजिटल बही खाता और मेरी डेयरी कैसे चलाएं')">
+          <span class="sakhi-pill-icon-circle blue">📖</span>
+          <span>बही खाता व डेयरी</span>
         </button>
-        <button type="button" class="sakhi-quick-pill" onclick="document.getElementById('sakhiTextInput') && document.getElementById('sakhiTextInput').focus();">
-          <span class="sakhi-pill-icon-circle indigo">💬</span>
-          <span>कोई भी सवाल पूछें</span>
+        <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('आरोग्यम शेयर करके ₹200-₹500 रोज कैसे कमाएं')">
+          <span class="sakhi-pill-icon-circle indigo">💰</span>
+          <span>शेयर & ₹500 कमाई</span>
         </button>
       </div>
     `;
@@ -4960,18 +4946,9 @@ if (typeof document !== 'undefined') {
 
     return false;
   }
-
-
-  // =========================================================================
   // 19.66 SAKHI INTELLIGENT PERSONALIZATION: DOB/AGE, NETSURF ID & EMOTIONAL EMPATHY
   // =========================================================================
-
-
-  // =========================================================================
-
-  // =========================================================================
   // 19.63 SAKHI UPLINE, SPONSOR & ADVISOR BRIDGE (USER A -> USER B REFERRAL)
-  // =========================================================================
   function getSakhiStoredAdvisor() {
     // 1. Immediate URL Referral Capture
     try {
@@ -6215,10 +6192,7 @@ if (typeof document !== 'undefined') {
   }
 
   // 14.6 13 HEALTH PAGES, MEDICAL SCIENCE, DIET CHARTS & EMPATHETIC HEALTH ROUTER
-  // ============================================================================
   // 14. CERTIFIED CLINICAL HEALTH, NATURAMORE & AVNISH DADA KE NUSKHE ENGINE V4
-  // ============================================================================
-
   // 14.1 Verified Naturamore Products & Ingredients Bank (Zero Error)
   const NATURAMORE_KNOWLEDGE_BANK = {
     jointCare: {
@@ -6380,10 +6354,7 @@ if (typeof document !== 'undefined') {
   function handle13HealthPagesAndSponsor(cleanQ, rawQ) {
     const q = (cleanQ || '').toLowerCase().trim();
     const { relation, target } = parseRelationAndGender(q);
-
-    // =========================================================================
     // SPECIFIC PRODUCT INGREDIENTS QUERY ("joint care me kya hai", "life style me kya hai")
-    // =========================================================================
     if (q.includes('kya hai') || q.includes('samagri') || q.includes('ingredients') || q.includes('घटक') || q.includes('सामग्री')) {
       if (q.includes('joint care') || q.includes('जॉइंट केयर')) {
         const prod = NATURAMORE_KNOWLEDGE_BANK.jointCare;
@@ -6426,10 +6397,7 @@ if (typeof document !== 'undefined') {
         ]);
       }
     }
-
-    // =========================================================================
     // 1. JOINT PAIN & ARTHRITIS (जोड़ों का दर्द, गठिया, यूरिक एसिड)
-    // =========================================================================
     const isJointQuery = q.includes('joint') || q.includes('ghutna') || q.includes('ghutno') || q.includes('घुटने') || q.includes('gathiya') || q.includes('गठिया') || q.includes('jod dard') || q.includes('जोड़ों का दर्द') || q.includes('uric acid') || q.includes('cartilage');
     if (isJointQuery) {
       const resp = `राम-राम! 🙏 सबसे पहले हम आपको आश्वस्त करना चाहते हैं कि **${target} घबराएं नहीं — सही आयुर्वेदिक पोषण, वजन संतुलन और दैनिक दिनचर्या से जोड़ों का दर्द और घिसाव बिल्कुल ठीक हो सकता है! हिम्मत रखिए!**
@@ -6457,10 +6425,7 @@ if (typeof document !== 'undefined') {
         { label: "🛍️ नेचुरामोर जॉइंट केयर 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
       ]);
     }
-
-    // =========================================================================
     // 2. DIABETES & METABOLISM (शुगर, मधुमेह, डायबिटीज)
-    // =========================================================================
     const isDiabetesQuery = q.includes('sugar') || q.includes('diabetes') || q.includes('शुगर') || q.includes('डायबिटीज') || q.includes('मधुमेह') || q.includes('lifestyle plus');
     if (isDiabetesQuery) {
       const resp = `राम-राम! 🙏 हम आपको पूरा भरोसा दिलाते हैं कि **डायबिटीज कोई लाइलाज बीमारी नहीं है। ${target} हिम्मत रखिए — संतुलित खानपान, 30 मिनट की सैर और सही आयुर्वेदिक पोषण से शुगर हमेशा सामान्य रह सकती है!**
@@ -6488,10 +6453,7 @@ if (typeof document !== 'undefined') {
         { label: "🥗 शुगर का संपूर्ण डाइट चार्ट", query: "शुगर के मरीज का डाइट चार्ट दिखाओ" }
       ]);
     }
-
-    // =========================================================================
     // 3. HEART, BP & CHOLESTEROL (हृदय, बीपी, कोलेस्ट्रॉल, ब्लॉकेज)
-    // =========================================================================
     const isHeartQuery = q.includes('heart') || q.includes('दिल') || q.includes('bp') || q.includes('बीपी') || q.includes('cholesterol') || q.includes('कोलेस्ट्रॉल') || q.includes('blood pressure') || q.includes('blockage');
     if (isHeartQuery) {
       const resp = `राम-राम! 🙏 **${target} घबराएं नहीं — सकारात्मक सोच, हल्का आहार और नसों की सफाई से दिल को हमेशा मजबूत और युवा रखा जा सकता है!**
@@ -6519,10 +6481,7 @@ if (typeof document !== 'undefined') {
         { label: "🛍️ नेचुरामोर न्यूट्री हार्ट 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
       ]);
     }
-
-    // =========================================================================
     // 4. THYROID CARE (थायराइड, मोटापा, हार्मोनल असंतुलन)
-    // =========================================================================
     const isThyroidQuery = q.includes('thyroid') || q.includes('थायराइड') || q.includes('thayroid');
     if (isThyroidQuery) {
       const resp = `राम-राम! 🙏 **${target} हिम्मत रखिए — थायराइड कोई स्थायी अभिशाप नहीं है, सही दिनचर्या और पोषण से टीएसएच (TSH) स्तर को संतुलित किया जा सकता है!**
@@ -6539,10 +6498,7 @@ if (typeof document !== 'undefined') {
         { label: "📋 थायराइड लक्षण टेस्ट", query: "थायराइड का लक्षण टेस्ट करो" }
       ]);
     }
-
-    // =========================================================================
     // 5. DIGESTION, CONSTIPATION, GAS & PILES (कब्ज, गैस, एसिडिटी, बवासीर)
-    // =========================================================================
     const isDigestiveQuery = q.includes('kabz') || q.includes('कब्ज') || q.includes('piles') || q.includes('bawasir') || q.includes('बवासीर') || q.includes('gas') || q.includes('गैस') || q.includes('acidity') || q.includes('पेट साफ');
     if (isDigestiveQuery) {
       const resp = `राम-राम! 🙏 **आयुर्वेद कहता है: 'सर्वे रोगाः मलाशयात्' — यानी 90% बीमारियों की जड़ पेट की खराबी और पुरानी कब्ज है। घबराएं नहीं, आंतों को प्राकृतिक रूप से साफ किया जा सकता है!**
@@ -6559,10 +6515,7 @@ if (typeof document !== 'undefined') {
         { label: "📖 संपूर्ण स्वास्थ्य व नुस्खे ई-बुक", url: "/ebooks/book-landing.html?id=BK001" }
       ]);
     }
-
-    // =========================================================================
     // 5.5 LIVER CARE, FATTY LIVER, JAUNDICE & CIRRHOSIS (लिवर, फैटी लिवर, सिरोसिस, पीलिया)
-    // =========================================================================
     const isLiverQuery = q.includes('liver') || q.includes('लिवर') || q.includes('लीवर') ||
       q.includes('fatty liver') || q.includes('फैटी लिवर') || q.includes('सिरोसिस') ||
       q.includes('cirrhosis') || (q.includes('सोरायसिस') && (q.includes('लिवर') || q.includes('लीवर'))) ||
@@ -6627,10 +6580,7 @@ if (typeof document !== 'undefined') {
         { label: "🛍️ नेचुरामोर लिवर केयर 25% छूट पर", query: "असली नेचुरामोर उत्पाद कहाँ मिलेंगे?" }
       ]);
     }
-
-    // =========================================================================
     // 6. SYMPTOM QUESTIONNAIRE (10-15 हाँ/ना सवाल व गंभीरता असेसमेंट)
-    // =========================================================================
     if (q.includes('test') || q.includes('टेस्ट') || q.includes('सर्वे') || q.includes('survey') || q.includes('lakshan') || q.includes('लक्षण')) {
       const resp = `प्रिय साथी! 🙏 आपकी बीमारी की सही गंभीरता को समझने के लिए नीचे 5 महत्वपूर्ण सवाल दिए गए हैं।
 
@@ -6652,10 +6602,7 @@ if (typeof document !== 'undefined') {
         { label: "❤️ हार्ट व बीपी का टेस्ट करें", query: "हार्ट और बीपी का लक्षण टेस्ट करो" }
       ]);
     }
-
-    // =========================================================================
     // 7. DAILY COACH: MEDICINE & DIET CHECKING ("kya aapne aaj dawa khayi?")
-    // =========================================================================
     if (q.includes('dawa khai') || q.includes('dawa khayi') || q.includes('khana khaya') || q.includes('exercise') || q.includes('sair') || q.includes('दिनचर्या')) {
       const resp = `प्रिय साथी! 🙏 आपका पर्सनल स्वास्थ्य हमदर्द होने के नाते मेरा पहला कर्तव्य आपकी दैनिक देखभाल करना है:
 
@@ -6719,10 +6666,7 @@ if (typeof document !== 'undefined') {
     const isMore = cleanQ.includes('aur batao') || cleanQ.includes('aur jankari') || cleanQ.includes('और बताओ') || cleanQ.includes('aage batao') || cleanQ.includes('aur kya');
 
     const activeEntity = sakhiConversationState.lastActiveEntity;
-
-    // =========================================================================
     // MULTI-TURN TWIST 1: "गैस बनती है" -> Klear CDT Syrup (MRP ₹210) Recommendation
-    // =========================================================================
     if (cleanQ.includes('gas banti') || cleanQ.includes('गैस बनती') || cleanQ.includes('gas hoti') || cleanQ.includes('गैस होती') || cleanQ.includes('acidity') || cleanQ.includes('एसिडिटी') || cleanQ.includes('पेट में जलन') || cleanQ.includes('खट्टी डकार')) {
       const resp = `🌿 **गैस व एसिडिटी की स्थिति में विशेष मार्गदर्शन एवं समाधान:**\n\n1. **कैप्सूल सेवन नियम:** चूंकि आपको गैस बनती है, इसलिए लाइफस्टाइल प्लस या किसी भी हेल्थ सप्लीमेंट को खाली पेट बिल्कुल न लें। इसे हमेशा **भोजन करने के 30 मिनट बाद** ही हल्के गुनगुने पानी से लें।\n\n2. **आरोग्यम का प्रामाणिक समाधान — Klear CDT Syrup (MRP ₹210):**\nपेट की पुरानी गैस, खट्टी डकार, सीने की जलन और एसिडिटी को 10 मिनट में शांत करने के लिए आरोग्यम का **Klear CDT Acidity Remedy Syrup (MRP मात्र ₹210)** अत्यंत लाभकारी और सुरक्षित आयुर्वेदिक औषधि है!\n• **सेवन विधि:** भोजन के 15-20 मिनट बाद 10 से 15 ml पिएं। यह पित्त को शांत कर पाचन को सुगम बनाता है।`;
       renderCrispSpecialBox('🌿 गैस व एसिडिटी समाधान — Klear CDT Syrup (MRP ₹210)', resp, [
@@ -6731,10 +6675,7 @@ if (typeof document !== 'undefined') {
       ], 'health', 'gas_acidity_klear_cdt');
       return true;
     }
-
-    // =========================================================================
     // MULTI-TURN TWIST 2: "खाने के पहले कि बाद में?" (भोजन से पहले या बाद में)
-    // =========================================================================
     if (cleanQ.includes('khane ke pahle') || cleanQ.includes('khane ke baad') || cleanQ.includes('खाने के पहले') || cleanQ.includes('खाने के बाद') || cleanQ.includes('पहले की बाद') || cleanQ.includes('पहले या बाद') || cleanQ.includes('before or after') || cleanQ.includes('pehle ya baad')) {
       const resp = `🍽️ **भोजन के पहले या बाद में लेने का वैज्ञानिक नियम:**\n\n• 1. **यदि आपको पेट में गैस या एसिडिटी की समस्या नहीं बनती है:** तो इसे भोजन करने से 30 से 45 मिनट **पहले** (खाली पेट) लेना सबसे उचित और अधिक प्रभावशाली है, क्योंकि यह सीधे पैंक्रियाज और अवशोषण पर काम करता है।\n• 2. **यदि आपको गैस या एसिडिटी बनती है:** तो इसे खाली पेट न लें, बल्कि भोजन करने के 30 मिनट **बाद** ही लेना चाहिए।`;
       renderCrispSpecialBox('🍽️ भोजन से पहले या बाद में सेवन नियम', resp, [
@@ -6743,10 +6684,7 @@ if (typeof document !== 'undefined') {
       ], 'health', 'timing_before_after_meals');
       return true;
     }
-
-    // =========================================================================
     // MULTI-TURN TWIST 3: "दूध के साथ कि पानी के साथ?"
-    // =========================================================================
     if (cleanQ.includes('dudh') || cleanQ.includes('doodh') || cleanQ.includes('दूध') || cleanQ.includes('pani ke sath') || cleanQ.includes('पानी के साथ') || cleanQ.includes('दूध के साथ कि पानी') || cleanQ.includes('दूध या पानी')) {
       const resp = `🥛💧 **दूध के साथ या पानी के साथ सेवन का नियम:**\n\nआप इसे **सामान्य गुनगुने पानी के साथ भी ले सकते हैं और दूध के साथ भी ले सकते हैं**। दोनों ही माध्यम सुरक्षित हैं।\n\n💡 **विशेष सलाह:** कैप्सूल के तेजी से घुलने और पेट में सर्वोत्तम अवशोषण (Absorption) के लिए **हल्का गुनगुना पानी सबसे उत्तम** माना जाता है।`;
       renderCrispSpecialBox('🥛💧 दूध या पानी के साथ सेवन नियम', resp, [
@@ -6755,10 +6693,7 @@ if (typeof document !== 'undefined') {
       ], 'health', 'milk_vs_water_rule');
       return true;
     }
-
-    // =========================================================================
     // MULTI-TURN TWIST 4: Nutri Heart vs Lifestyle Plus Dose Disambiguation
-    // =========================================================================
     const recentMentionsHeartAndLifestyle = (sakhiConversationState.history || []).slice(-6).some(h => (h.clean || '').includes('nutri heart') || (h.clean || '').includes('हार्ट')) &&
       (sakhiConversationState.history || []).slice(-6).some(h => (h.clean || '').includes('lifestyle') || (h.clean || '').includes('शुगर') || (h.clean || '').includes('लाइफस्टाइल'));
 
@@ -6800,10 +6735,7 @@ if (typeof document !== 'undefined') {
       ], 'health', 'nutri_heart_dose');
       return true;
     }
-
-    // =========================================================================
     // MULTI-TURN TWIST 5: "यह महंगा है / इसके अंदर क्या है / कैसे काम करता है?"
-    // =========================================================================
     const isMahngaOrContentTwist = cleanQ.includes('mahga') || cleanQ.includes('mahnga') || cleanQ.includes('महंगा') ||
       (cleanQ.includes('iske andar kya') || cleanQ.includes('iske andar ke content') || cleanQ.includes('kaise kam karta') || cleanQ.includes('कैसे काम करता'));
 
@@ -6826,10 +6758,7 @@ if (typeof document !== 'undefined') {
         return true;
       }
     }
-
-    // =========================================================================
     // CRITICAL USER RULE: "मैं इसे खरीदना चाहता हूँ" -> State MRP FIRST, NO UPFRONT DISCOUNT!
-    // =========================================================================
     const isDirectBuyIntent = cleanQ.includes('kharidna chahta') || cleanQ.includes('kharidna hai') || cleanQ.includes('khareedna chahta') ||
       cleanQ.includes('खरीदना चाहता') || cleanQ.includes('खरीदना है') || cleanQ.includes('order karna hai') ||
       cleanQ.includes('ऑर्डर करना है') || cleanQ.includes('मंगवाना चाहता') || cleanQ.includes('buy karna hai');
@@ -17090,6 +17019,23 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0. ABSOLUTE TOP PRIORITY: SAFETY, MEDICAL EMERGENCY & PROFANITY GUARDRAIL
     if (handleSafetyGuardrails(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.001 SAKHI TUTORIAL & INTERACTIVE ENGAGEMENT ENGINE (SAKHI_MANAS.md Compliant)
+    if (window.SakhiTutorialEngine && typeof window.SakhiTutorialEngine.handleQuery === 'function') {
+      if (window.SakhiTutorialEngine.handleQuery(cleanQ, rawQ)) return;
+    }
+    // Resilient Fallback for Bahi Khata, Dairy, Share & Earn, and Tutorials
+    if (/(?:बही\s*खाता|मेरी\s*डेयरी|उधारी|खाता\s*बुक|dairy|शेयर\s*करके|200.*500|पइसा\s*कइसे|रेफरल.*कौन|पंचांग.*मौसम|मंडी\s*भाव|ऐप\s*डाउनलोड|सखी\s*नोटिफिकेशन)/i.test(cleanQ)) {
+      const fbTitle = /बही|डेयरी|उधार/i.test(cleanQ) ? '📖 डिजिटल बही खाता व मेरी डेयरी' : (/कमाई|शेयर|200|500/i.test(cleanQ) ? '📲 शेयर और अर्न — पार्ट-टाइम ₹200-₹500 कमाई' : '🌾 आरोग्यम सखी डिजिटल सेवा');
+      const fbBody = 'राम-राम भैया! 🙏 आरोग्यम सखी पर आपका स्वागत है। आप सीधे नीचे दिए गए बटन पर टैप करके इस सुविधा को 1 मिनट में शुरू कर सकते हैं:\n\n1. **डिजिटल बही खाता:** उधारी-जमा का पक्का हिसाब और WhatsApp पासबुक लिंक।\n2. **मेरी डेयरी:** दूध लीटर, फैट व सरकारी दरों पर आधारित सटीक पर्चा।\n3. **शेयर & अर्न:** सही सलाह शेयर करके घर बैठे ₹200 से ₹500 रोज की कमाई।';
+      const fbChips = [
+        { text: '📖 बही खाता व डेयरी खोलें', url: '/pages/smart-etailer.html', isExternal: true, style: 'background:#16a34a;color:#ffffff;font-weight:800;' },
+        { text: '📲 ₹200-₹500 रोज कमाने का तरीका', query: 'आरोग्यम शेयर करके पैसे कैसे कमाएं' },
+        { text: '🌾 आज का मौसम व मंडी भाव', query: 'आज का मंडी भाव क्या है' }
+      ];
+      renderCrispSpecialBox(fbTitle, fbBody, fbChips, 'business', 'tutorial_resilient_fallback');
       return;
     }
 
