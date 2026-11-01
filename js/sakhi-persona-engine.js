@@ -49,6 +49,32 @@
       };
     }
 
+    // Auto-discover past topic from chat logs if empty
+    if (!activePersona.lastTopic) {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('SAKHI_CHAT_LOG_')) {
+            const rawLog = localStorage.getItem(k);
+            if (rawLog) {
+              const arr = JSON.parse(rawLog);
+              if (Array.isArray(arr) && arr.length > 0) {
+                for (let j = arr.length - 1; j >= 0; j--) {
+                  const item = arr[j];
+                  if (item.role === 'user' && item.content && !item.content.includes('{') && !item.content.startsWith('[')) {
+                    activePersona.lastTopic = item.content.slice(0, 80);
+                    activePersona.lastTopicTimestamp = Date.now();
+                    break;
+                  }
+                }
+                if (activePersona.lastTopic) break;
+              }
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
     // Sync with global user profile if logged in
     try {
       const userRaw = localStorage.getItem('AI_USER');

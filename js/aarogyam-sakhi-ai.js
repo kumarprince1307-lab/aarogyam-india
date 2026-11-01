@@ -3950,7 +3950,103 @@ if (typeof document !== 'undefined') {
     const now = new Date();
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // 🧠 SAKHI PERSONA: Universal Past Topic Retriever across LocalStorage & Chat Logs
+    function getLatestUserPastTopic() {
+      try {
+        const rawP = localStorage.getItem('SAKHI_PERSISTENT_PERSONA_V2');
+        if (rawP) {
+          const p = JSON.parse(rawP);
+          if (p.lastTopic) return p.lastTopic;
+        }
+      } catch (_) {}
+
+      try {
+        const phone = getUserPhone() || 'user';
+        const candidateKeys = [`${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`, `${SAKHI_PERSISTENT_CHAT_KEY}_user`, SAKHI_PERSISTENT_CHAT_KEY];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('SAKHI_CHAT_LOG_')) candidateKeys.push(k);
+        }
+        for (const k of candidateKeys) {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr) && arr.length > 0) {
+              for (let j = arr.length - 1; j >= 0; j--) {
+                const item = arr[j];
+                if (item.role === 'user' && item.content && !item.content.includes('{') && !item.content.startsWith('[')) {
+                  return item.content.slice(0, 80);
+                }
+              }
+            }
+          }
+        }
+      } catch (_) {}
+
+      try {
+        const rawAudit = localStorage.getItem('SAKHI_LOCAL_AUDIT_LOGS');
+        if (rawAudit) {
+          const logs = JSON.parse(rawAudit);
+          if (Array.isArray(logs) && logs.length > 0) {
+            const last = logs[logs.length - 1];
+            if (last && last.sawal) return last.sawal.slice(0, 80);
+          }
+        }
+      } catch (_) {}
+
+      return null;
+    }
+
     function renderFinalGreetingDom() {
+      const pastTopic = getLatestUserPastTopic();
+      const pastTopicClean = pastTopic ? pastTopic.replace(/[?।!,]+/g, '').trim() : '';
+
+      let greetingContentHtml = '';
+      if (pastTopicClean) {
+        greetingContentHtml = `
+          <div style="font-size:1.22rem;font-weight:900;color:#15803d;display:flex;align-items:center;gap:6px;">
+            <span>राम-राम ${escapeHtml(displayName)} जी!</span> <span>🙏</span>
+          </div>
+          <div style="font-size:0.98rem;color:#1e293b;font-weight:700;margin-top:6px;line-height:1.5;">
+            पिछली बार आप <strong>"${escapeHtml(pastTopicClean)}"</strong> के बारे में चर्चा कर रहे थे। क्या वह कार्य पूरा हो गया? या आगे की सलाह चाहिए?
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.handleReviewReply('yes') : window.handleSakhiUserSubmit('हाँ कार्य पूरा हो गया, आगे की सलाह बताएं')" style="background:#16a34a;color:#ffffff;border:none;border-radius:20px;padding:7px 14px;font-size:0.80rem;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(22,163,74,0.3);">
+              ✅ हाँ, पूरा हो गया • आगे का प्लान बताएं
+            </button>
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.autoSendQuery('मेरी फसल के लिए आगे का पूरा खाद व स्प्रे शेड्यूल बताएं') : window.handleSakhiUserSubmit('मेरी फसल के लिए आगे का पूरा खाद व स्प्रे शेड्यूल बताएं')" style="background:#ffffff;color:#15803d;border:1.5px solid #86efac;border-radius:20px;padding:7px 14px;font-size:0.80rem;font-weight:800;cursor:pointer;">
+              🌾 आगे का स्प्रे शेड्यूल बताएं
+            </button>
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.autoSendQuery('अवनीश दादा से बात कराओ') : window.handleSakhiUserSubmit('अवनीश दादा से बात कराओ')" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:20px;padding:7px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;">
+              💬 एक्सपर्ट से पूछें
+            </button>
+          </div>
+        `;
+      } else {
+        greetingContentHtml = `
+          <div style="font-size:1.22rem;font-weight:900;color:#15803d;display:flex;align-items:center;gap:6px;">
+            <span>राम-राम ${escapeHtml(displayName)} जी!</span> <span>🙏</span>
+          </div>
+          <div style="font-size:0.98rem;color:#1e293b;font-weight:700;margin-top:6px;line-height:1.5;">
+            मैं आपकी <strong>आरोग्यम सखी AI</strong> हूँ। बताइए आज आपके खेत, पशु या परिवार के स्वास्थ्य के लिए किस विषय पर चर्चा करें?
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.autoSendQuery('गेहूं में अधिक कल्ले और फुटाव कैसे लाएं') : window.handleSakhiUserSubmit('गेहूं में अधिक कल्ले और फुटाव कैसे लाएं')" style="background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:20px;padding:6px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;">
+              🌾 गेहूं में कल्ले व फुटाव
+            </button>
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.autoSendQuery('गाय भैंस का दूध और फैट बढ़ाने का उपाय') : window.handleSakhiUserSubmit('गाय भैंस का दूध और फैट बढ़ाने का उपाय')" style="background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:20px;padding:6px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;">
+              🐄 गाय-भैंस का दूध व फैट
+            </button>
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.autoSendQuery('मधुमेह में क्या खाएं और डाइट चार्ट') : window.handleSakhiUserSubmit('मधुमेह में क्या खाएं और डाइट चार्ट')" style="background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:20px;padding:6px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;">
+              🩸 शुगर डाइट चार्ट
+            </button>
+            <button type="button" onclick="window.SakhiPersona ? window.SakhiPersona.autoSendQuery('घुटनों और जोड़ों के दर्द का आयुर्वेदिक इलाज') : window.handleSakhiUserSubmit('घुटनों और जोड़ों के दर्द का आयुर्वेदिक इलाज')" style="background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:20px;padding:6px 12px;font-size:0.80rem;font-weight:800;cursor:pointer;">
+              🦵 जोड़ों का दर्द नुस्खा
+            </button>
+          </div>
+        `;
+      }
+
       wrap.innerHTML = `
         <div style="display:flex;justify-content:center;margin-bottom:8px;width:100%;">
           <div class="sakhi-ai-badge-chip-center">
@@ -3961,13 +4057,8 @@ if (typeof document !== 'undefined') {
           <div style="display:flex;align-items:flex-start;gap:10px;width:100%;">
             <img src="${SAKHI_AVATAR_IMG}" alt="सखी AI" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #16a34a;box-shadow:0 3px 8px rgba(22,163,74,0.3);flex-shrink:0;" onerror="this.src='/images/logo/fevicon.png'">
             <div class="sakhi-msg-bubble" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:4px 18px 18px 18px;padding:14px 16px;box-shadow:0 4px 12px rgba(22,163,74,0.06);width:100%;box-sizing:border-box;">
-              <div style="font-size:1.25rem;font-weight:900;color:#15803d;display:flex;align-items:center;gap:6px;">
-                <span>नमस्ते ${escapeHtml(displayName)} जी!</span> <span>🙏</span>
-              </div>
-              <div style="font-size:1.02rem;color:#1e293b;font-weight:700;margin-top:6px;line-height:1.5;">
-                मैं आपकी <strong>सखी AI</strong> हूँ। कोई भी सवाल पूछें या मेनू देखें, मैं सही समाधान दूँगी।
-              </div>
-              <div style="font-size:0.75rem;color:#64748b;font-weight:600;margin-top:6px;text-align:right;">
+              ${greetingContentHtml}
+              <div style="font-size:0.75rem;color:#64748b;font-weight:600;margin-top:10px;text-align:right;">
                 ${timeStr}
               </div>
               ${historyToolbar}
