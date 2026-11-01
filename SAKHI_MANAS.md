@@ -154,3 +154,17 @@ Vercel की 100 GB फ्री लिमिट और ब्राउज़�
    * सारा नया ज्ञान JSON में रखा गया है (JS फाइल साइज 20k से नीचे नियंत्रित)।
    * sw.js में STATIC_CACHE को **v34.0** व PAGES_CACHE को **v24.0** पर अपग्रेड करके /js/sakhi-persona-engine.js को प्री-कैश कर दिया गया है।
    * सिंटैक्स टेस्ट 100% पास (node -c clean)।
+
+---
+
+## 8. SAKHI GREETING & PERSONA ISOLATION REFINEMENT (2026-11-01 v37.0)
+
+1. **User Phone Isolation (Rule 1 Enforcement)**:
+   * Persona Storage Key अब उपयोगकर्ता के मोबाइल नंबर के अनुसार व्यक्तिगत है: `SAKHI_PERSISTENT_PERSONA_V2_${phone}`।
+   * कोई भी ID किसी अन्य ID का सवाल या डेटा नहीं पढ़ेगी। जब नया यूजर या गेस्ट लॉगिन करेगा, उसे केवल उसका अपना इतिहास दिखेगा या डिफॉल्ट स्वागत मिलेगा।
+2. **Greeting Hierarchy**:
+   * सखी का मुख्य स्वागत मैसेज हमेशा सबसे पहले और शीर्ष पर रहेगा (`नमस्ते [Name] जी! मैं आपकी सखी AI हूँ...`)।
+   * इसके तुरंत बाद/नीचे पिछली बातचीत की समीक्षा कार्ड या 4 मुख्य टॉपिक पिल्स दिखाई देंगी।
+   * कोई भी डुप्लीकेट ग्रीन कार्ड ऊपर फ्लोट नहीं करेगा (`renderProactivePastReviewCard` disabled)।
+3. **100% Guaranteed Clickability**:
+   * सभी बटन और सुझाव सीधे `window.sendSakhiSuggestion(queryText)` द्वारा इनपुट बॉक्स (`sakhiTextInput`) को भरकर सबमिट करते हैं, जिससे कोई भी बटन अनक्लिकेबल नहीं रहेगा।
