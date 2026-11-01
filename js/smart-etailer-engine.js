@@ -5304,14 +5304,25 @@
       : `✅ ₹${amt} का जमा भुगतान दर्ज हो गया!\n\nक्या आप ${activeKbCustomer.name} को WhatsApp पर भुगतान रसीद भेजना चाहते हैं?`;
 
     if (confirm(promptMsg)) {
-      sendKbWhatsAppReminder();
+      sendKbWhatsAppReminderForCustomer(activeKbCustomer.mobile, newTx);
     }
   }
 
   // Send WhatsApp Reminder / Statement with Short Link
   function sendKbWhatsAppReminder() {
     if (!activeKbCustomer) return;
-    sendKbWhatsAppReminderForCustomer(activeKbCustomer.mobile);
+    const allEntries = getKbEntries();
+    const customerEntries = allEntries.filter(e => e.customer_mobile === activeKbCustomer.mobile);
+    const today = new Date().toISOString().split('T')[0];
+    const latestTx = (customerEntries.length > 0 && customerEntries[0].tx_date === today) ? customerEntries[0] : null;
+    sendKbWhatsAppReminderForCustomer(activeKbCustomer.mobile, latestTx);
+  }
+
+  function shareKbTransaction(txId) {
+    const allEntries = getKbEntries();
+    const tx = allEntries.find(e => e.id === txId);
+    if (!tx) return;
+    sendKbWhatsAppReminderForCustomer(tx.customer_mobile, tx);
   }
 
   function sendKbWhatsAppReminderForCustomer(mobile, recentTx) {
@@ -5346,20 +5357,15 @@
       const recentDate = recentTx.tx_date || new Date().toISOString().split('T')[0];
       const statusText = net > 0 ? 'बाकी देना है' : (net < 0 ? 'एडवांस जमा है' : 'हिसाब चुकता');
 
-      msg = '📕 *आरोग्यम डिजिटल बहीखाता*\n' +
-            '━━━━━━━━━━━━━━━━━━━\n' +
-            '🌾 *नमस्ते ' + custName + ' जी!* 🙏\n\n' +
-            'आज आपके खाते में नया लेन-देन दर्ज हुआ है:\n\n' +
-            '🔹 *आज की प्रविष्टि:* ₹' + recentAmt + ' (' + txTypeText + ')\n' +
+      msg = '🌾 *नमस्ते ' + custName + ' जी!* 🙏\n\n' +
+            'आज आपके खाते में नया लेन-देन दर्ज हुआ है:\n' +
+            '🔹 *आज की एंट्री:* ₹' + recentAmt + ' (' + txTypeText + ')\n' +
             (recentTx.bill_details ? ('📝 *सामान/बिल विवरण:* ' + recentTx.bill_details + '\n') : '') +
-            '📅 *तारीख:* ' + recentDate + '\n' +
-            '━━━━━━━━━━━━━━━━━━━\n' +
-            '💰 *अब कुल बकाया हिसाब:* *₹' + Math.abs(net).toLocaleString('hi-IN') + '* (' + statusText + ')\n' +
-            '━━━━━━━━━━━━━━━━━━━\n\n' +
-            '📖 *अपनी पूरी डिजिटल पासबुक और सभी बिल यहाँ देखें:*\n' +
-            '👉 ' + shortLink + '\n\n' +
-            '*(इस लिंक पर क्लिक करके आप अपने सारे पुराने और नए बिल पारदर्शी रूप से देख सकते हैं)*\n\n' +
-            'धन्यवाद! — *' + sName + '* (📞 ' + sMob + ')';
+            '💰 *अब आपका कुल बकाया हिसाब:* *₹' + Math.abs(net).toLocaleString('hi-IN') + '* (' + statusText + ')\n\n' +
+            '📖 *अपनी पूरी डिजिटल पासबुक और बिल यहाँ देखें:*\n' +
+            shortLink + '\n\n' +
+            '*(इस लिंक पर क्लिक करके आप अपना पूरा हिसाब पारदर्शी रूप से देख सकते हैं)*\n\n' +
+            '— *' + sName + '* (' + sMob + ') • *Aarogyam India डिजिटल खाता बुक*';
     } else {
       // 2. General Ledger Statement Reminder
       if (net > 0) {
@@ -6009,6 +6015,7 @@
     saveKbTransaction: saveKbTransaction,
     sendKbWhatsAppReminder: sendKbWhatsAppReminder,
     sendKbWhatsAppReminderForCustomer: sendKbWhatsAppReminderForCustomer,
+    shareKbTransaction: shareKbTransaction,
     sendKbSmsReminder: sendKbSmsReminder,
     openCustomerPassbookDirect: openCustomerPassbookDirect,
     openPublicPassbookByCode: openPublicPassbookByCode,

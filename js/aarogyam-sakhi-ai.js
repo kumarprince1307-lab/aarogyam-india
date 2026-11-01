@@ -4454,6 +4454,18 @@ if (typeof document !== 'undefined') {
       text = text.replace(/\b(?:jodo\s*me\s*dard|jodo\s*ka\s*dard|jodon\s*me\s*dard|ghutno\s*me\s*dard)\b/gi, 'जोड़ों में दर्द');
       text = text.replace(/(?:gharelu\s*nuskhe\s*aur\s*prakritik\s*swasthya|घरेलू\s*नुस्खे\s*और\s*प्राकृतिक\s*स्वास्थ्य)/gi, 'दादी के आयुर्वेदिक घरेलू नुस्खे');
 
+      // Sugar / Diabetes Typos (Suger, shugar, madhumeh)
+      text = text.replace(/\b(?:suger|shugar|shuger|sugar|madhumeh|diabetis|dibeties)\b/gi, 'मधुमेह डायबिटीज शुगर');
+
+      // Zinc Typos (33% जैक, 33% जिंक, 21% जिंक, जिक)
+      text = text.replace(/(?:33%?\s*जैक|33%?\s*जिक|33%?\s*जिंक|21%?\s*जिंक|\b33%\s*zinc\b)/gi, '33 प्रतिशत जिंक सल्फेट');
+
+      // Humic Acid Typos (ह्यूमस एसिड, मोहम्मद एसिड, ह्यूमस ऐड)
+      text = text.replace(/(?:ह्यूमस\s*एसिड|मोहम्मद\s*एसिड|ह्यूमस\s*ऐड|\bhumus\s*acid\b)/gi, '98 प्रतिशत ह्यूमिक एसिड');
+
+      // Potash Typos (पोटाश खाद)
+      text = text.replace(/\b(?:potash|mop|0:0:50)\b/gi, 'पोटाश खाद');
+
       // Netsurf Spoken & Typos (नेट सब, नेता सब, netsuef, net sub)
       text = (text || '').replace(/(?:नेट\s*सब|नेता\s*सब|netsuef|\bnet\s*sub\b|\bneta\s*sub\b)/gi, 'नेट्सर्फ');
 
@@ -16078,7 +16090,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const combined = q + ' ' + origQ;
 
     const isDiabetes = (
-      combined.includes('शुगर') || combined.includes('sugar') || combined.includes('डायबिटीज') ||
+      combined.includes('शुगर') || combined.includes('sugar') || combined.includes('suger') || combined.includes('shugar') || combined.includes('madhumeh') || combined.includes('डायबिटीज') ||
       combined.includes('diabetes') || combined.includes('मधुमेह') || combined.includes('hba1c') ||
       combined.includes('lifestyle plus') || combined.includes('लाइफ स्टाइल प्लस')
     );
@@ -16909,7 +16921,227 @@ function processKnowledgeQuery(query) {
         return;
       }
 
-      // 2. Direct Precision Benchmark Handlers (Pashu, Crop Seasons, Diagnostics, Anatomy, Math)
+  
+    // 🛡️ USER FRUSTRATION & ANTI-REPETITION APOLOGY GUARD
+    function handleUserFrustrationAndApology(cleanQ, rawQ, directives) {
+      const q = (cleanQ || '').toLowerCase();
+      const raw = (rawQ || '').toLowerCase();
+      const comb = q + ' ' + raw;
+
+      const isFrustrated = /(?:एक\s*ही\s*उत्तर|एक\s*ही\s*जवाब|ek\s*hi\s*javab|ek\s*hi\s*jawab|bar\s*bar\s*ek\s*hi|बार[- ]बार\s*एक\s*ही|गलत\s*उत्तर|गलत\s*जवाब|galat\s*javab|samajh\s*nahi\s*aaya|kuch\s*aur\s*batao|firse\s*wahi)/i.test(comb);
+      if (!isFrustrated) return false;
+
+      const title = '🙏 हाथ जोड़कर क्षमा किसान साथी! आपकी समस्या का पक्का समाधान';
+      const baseBody = '🙏 **हाथ जोड़कर क्षमा किसान साथी!** लगता है मैं आपके पिछले सवाल को ठीक से नहीं समझ पाई और वही बात दोहरा दी।\n\n' +
+        'कृषि व स्वास्थ्य में हर किसान और मरीज की परिस्थिति अलग होती है। कृपया नीचे दिए गए 3 विकल्पों में से बताएं कि आप क्या जानना चाहते हैं:\n\n' +
+        '🌱 **1. फसल रोग व संपूर्ण स्प्रे पर्चा:** अपनी फसल का नाम (जैसे गेहूं, चना, सरसों, आलू) लिखकर रोग बताएं।\n' +
+        '🐄 **2. पशुपालन (दूध, फैट व स्वास्थ्य):** गाय-भैंस का दूध, फैट या बीमारी का विवरण लिखें।\n' +
+        '👨‍⚕️ **3. विशेषज्ञ अवनीश दादा से 1-टैप सीधा संपर्क:** यदि कोई विशेष जटिल समस्या है, तो आप तुरंत हमारे व्हाट्सएप एक्सपर्ट से निःशुल्क बात कर सकते हैं।';
+
+      const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'omni');
+      renderCrispSpecialBox(title, finalBody, [
+        { text: '💬 अवनीश दादा से WhatsApp पर पूछें', query: 'अवनीश दादा से बात कराओ' },
+        { text: '🌾 गेहूं की संपूर्ण वैज्ञानिक सलाह', query: 'गेहूं में अधिक कल्ले और फुटाव कैसे लाएं' },
+        { text: '🐄 गाय-भैंस का दूध व फैट बढ़ाएं', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' }
+      ], 'omni', 'user_frustration_apology_guard');
+      return true;
+    }
+
+    // 🌾 CORE AGRICULTURAL INPUTS, FERTILIZERS & PRICING MASTER HANDLER
+    function handleCoreAgriculturalInputsAndPricingMaster(cleanQ, rawQ, directives) {
+      const q = (cleanQ || '').toLowerCase();
+      const raw = (rawQ || '').toLowerCase();
+      const comb = q + ' ' + raw;
+
+      // A. POTASH FERTILIZER (पोटाश खाद का प्रयोग, महत्व व खुराक)
+      if (comb.includes('पोटाश') || comb.includes('potash') || comb.includes('mop') || comb.includes('0:0:50')) {
+        const title = '🌾 खेती में पोटाश खाद (K) का वैज्ञानिक प्रयोग, सही समय व बंपर पैदावार में महत्व';
+        const baseBody = '🌾 **खेती में पोटाश (Potassium / K) खाद का संपूर्ण वैज्ञानिक महत्व व प्रयोग विधि:**\n\n' +
+          'पोटाश पौधों के 3 मुख्य पोषक तत्वों (NPK) में से तीसरा और सबसे महत्वपूर्ण पोषक तत्व है। जैसे यूरिया बढ़वार करता है और फास्फोरस जड़ें मजबूत करता है, वैसे ही **पोटाश फसल में दाने भरने और चमक लाने का काम करता है**।\n\n' +
+          '🔬 **1. पोटाश के 4 सबसे बड़े कार्य:**\n' +
+          '• **दाने का भराव व वजन:** बालियों व फलियों में दूध से दाना बनने की प्रक्रिया तेज करता है, जिससे दाना ठोस, चमकदार व वजनी होता है।\n' +
+          '• **सूखा व पाला सहने की क्षमता:** यह पत्तियों में पानी के वाष्पोत्सर्जन (Stomata Control) को नियंत्रित करता है, जिससे कम पानी या सूखे में भी फसल हरी रहती है।\n' +
+          '• **रोग व कीट रोधी क्षमता:** तने की कोशिकाओं (Cell Walls) को मजबूत करता है, जिससे तेज हवा या बारिश में फसल गिरती (Lodging) नहीं है और फफूंद का हमला कम होता है।\n' +
+          '• **फलों में मिठास व रंग:** फल-सब्जियों (आलू, टमाटर, प्याज, केला) में शर्करा (TSS) बढ़ाकर साइज और रंग निखारता है।\n\n' +
+          '⚖️ **2. सही खुराक व डालने का समय:**\n' +
+          '• **बुवाई के समय (बेसल डोज़):** म्यूरेट ऑफ पोटाश (MOP 60% K2O) — 25 से 30 किलो प्रति एकड़ डीएपी के साथ डालें।\n' +
+          '• **फूल व दाना भरते समय (स्प्रे):** NPK 0:0:50 (सल्फेट ऑफ पोटाश) — 75 से 100 ग्राम प्रति 15 लीटर पंप घोलकर छिड़काव करें।\n\n' +
+          '🌱 **3. नेट्सर्फ बायोफिट का 100% जैविक विकल्प:**\n' +
+          '• **बायोफिट शेत (SHET 1L) + बायो-NPK (KSB - पोटाश सोलुबिलाइजिंग बैक्टीरिया):** जमीन में पड़ा 70% रासायनिक पोटाश अघुलनशील होकर लॉक हो जाता है। शेत और बायो-NPK उस लॉक पोटाश को घोलकर सीधे पौधों की जड़ों तक पहुंचाते हैं।';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌱 बायो-NPK व शेत का प्रयोग कैसे करें?', query: 'बायोफिट शेत और बायो एनपीके का प्रयोग' },
+          { text: '🌾 गेहूं में अधिक कल्ले कैसे लाएं?', query: 'गेहूं में अधिक कल्ले और फुटाव कैसे लाएं' },
+          { text: '📋 संपूर्ण खाद व स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' }
+        ], 'agri', 'potash_fertilizer_master');
+        return true;
+      }
+
+      // B. ZINC SULPHATE 33% & 21% (जिंक सल्फेट का प्रयोग व सख्त चेतावनी)
+      if (comb.includes('जिंक') || comb.includes('जैक') || comb.includes('जिक') || comb.includes('zinc') || comb.includes('खैरा')) {
+        const title = '⚡ खेती में 33% व 21% जिंक सल्फेट का प्रयोग, सही खुराक व सख्त वैज्ञानिक सावधानी';
+        const baseBody = '⚡ **खेती में जिंक सल्फेट (Zinc / Zn) का महत्व, सही खुराक व सावधानियां:**\n\n' +
+          'जिंक पौधों के लिए एक अत्यंत आवश्यक सूक्ष्म पोषक तत्व (Micro-nutrient) है। जिंक की कमी होने पर पौधा बौना रह जाता है और पत्तियां बीच से पीली या कत्थई होकर सूखने लगती हैं।\n\n' +
+          '🔬 **1. जिंक के मुख्य कार्य:**\n' +
+          '• **क्लोरोफिल व एंजाइम निर्माण:** पत्तियों को गहरा हरा रखता है और प्रकाश संश्लेषण (Photosynthesis) 2 गुना बढ़ाता है।\n' +
+          '• **ग्रोथ हार्मोन (ऑक्सिन) बढ़ाना:** नए फुटाव, शाखाओं और कल्लों की संख्या को तेज करता है।\n' +
+          '• **खैरा रोग से बचाव:** धान और गेहूं में पत्तियों पर कत्थई/भूरे धब्बे पड़ने वाले खैरा रोग को जड़ से रोकता है।\n\n' +
+          '⚖️ **2. सही खुराक व प्रयोग विधि:**\n' +
+          '• **33% जिंक मोनोहाइड्रेट:** 5 किलो प्रति एकड़ (मिट्टी में छिड़काव)।\n' +
+          '• **21% जिंक हेप्टाहाइड्रेट:** 10 किलो प्रति एकड़ (मिट्टी में छिड़काव)।\n' +
+          '• **खड़ी फसल में स्प्रे हेतु (चिलेटेड जिंक 12%):** 15 से 20 ग्राम प्रति 15 लीटर पंप छिड़कें।\n\n' +
+          '⚠️ **सख्त वैज्ञानिक चेतावनी (Never Mix Zinc with Phosphate):**\n' +
+          'जिंक सल्फेट को कभी भी डीएपी (DAP), एनपीके (NPK) या सिंगल सुपर फास्फेट (SSP) के साथ मिलाकर न डालें! फास्फोरस और जिंक आपस में क्रिया करके अघुलनशील जिंक फास्फेट बना लेते हैं, जिससे दोनों खादें पूरी तरह नष्ट हो जाती हैं। जिंक को हमेशा यूरिया या बालू रेत में मिलाकर अलग डालें।';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 गेहूं में पीली पत्तियां ठीक करने की दवा', query: 'गेहूं में पीली पत्तियां ठीक करने की दवा' },
+          { text: '🌱 बायोफिट शेत के कार्य व फायदे', query: 'बायोफिट शेत के कार्य और खुराक' },
+          { text: '📋 फसलों के लिए जैविक स्प्रे चार्ट', query: 'फसलों के लिए जैविक कीटनाशक व टॉनिक स्प्रे चार्ट बताएं' }
+        ], 'agri', 'zinc_sulphate_master');
+        return true;
+      }
+
+      // C. HUMIC ACID 98% (ह्यूमिक एसिड 98% का प्रयोग, खुराक व फायदे)
+      if (comb.includes('ह्यूमिक') || comb.includes('ह्यूमस') || comb.includes('मोहम्मद एसिड') || comb.includes('humic')) {
+        const title = '🌿 खेती में 98% ह्यूमिक एसिड (Potassium Humate) का वैज्ञानिक प्रयोग व सफेद जड़ों का विकास';
+        const baseBody = '🌿 **98% ह्यूमिक एसिड (Potassium Humate) का संपूर्ण वैज्ञानिक महत्व व प्रयोग विधि:**\n\n' +
+          'ह्यूमिक एसिड कोई रासायनिक खाद नहीं, बल्कि जैविक कार्बन और प्राकृतिक जीवाश्म का समृद्ध अर्क है। यह मिट्टी में भोजन बनाने वाली सफेद जड़ों (Feeding Roots) का जबरदस्त जाल तैयार करता है।\n\n' +
+          '🔬 **1. ह्यूमिक एसिड 98% के 4 सबसे बड़े फायदे:**\n' +
+          '• **सफेद जड़ों का 5 गुना विकास:** रोपाई या बुवाई के बाद नई जड़ों को मिट्टी की गहराई में तेजी से फैलाता है।\n' +
+          '• **मिट्टी को भुरभुरा व नरम बनाना:** भारी, चिकनी व कठोर मिट्टी की जलधारण क्षमता और हवा का संचार (Aeration) सुधारता है।\n' +
+          '• **खाद अवशोषण (Nutrient Uptake):** जमीन में लॉक पड़े नाइट्रोजन, फास्फोरस, पोटाश और जिंक को चेलेट करके जड़ों को आसानी से पिलाता है।\n' +
+          '• **बीज का 100% तेज अंकुरण:** बीजोपचार में प्रयोग करने से अंकुरण प्रतिशत 95% से अधिक होता है।\n\n' +
+          '⚖️ **2. सही खुराक व प्रयोग विधि:**\n' +
+          '• **स्प्रे के लिए:** 15 से 20 ग्राम प्रति 15 लीटर पंप (1 से 1.5 ग्राम प्रति लीटर पानी)।\n' +
+          '• **ड्रिप या सिंचाई पानी में:** 250 से 500 ग्राम प्रति एकड़ सिंचाई के साथ दें।\n' +
+          '• **बीज उपचार (Seed Treatment):** 5 से 10 ग्राम प्रति किलो बीज हल्के पानी के साथ लेप करें।\n\n' +
+          '🌱 **नेट्सर्फ बायोफिट का संपूर्ण विकल्प:**\n' +
+          '• **बायोफिट स्टीमरिच (Stimrich 30ml/पंप) + शेत (SHET 1L/एकड़):** इसमें प्राकृतिक सीवीड, ह्यूमिक और मित्र जीवाणु बैक्टीरिया मौजूद हैं जो ह्यूमिक एसिड से भी 3 गुना अधिक रिजल्ट देते हैं।';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌱 बायोफिट स्टीमरिच के कार्य व खुराक', query: 'बायोफिट स्टीमरिच के फायदे और प्रयोग' },
+          { text: '🌾 गेहूं में पहली सिंचाई पर क्या डालें?', query: 'गेहूं में पहली सिंचाई कब करें' },
+          { text: '📋 खाद व स्प्रे की पूरी जानकारी', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' }
+        ], 'agri', 'humic_acid_master');
+        return true;
+      }
+
+      // D. SEED TREATMENT & SOWING (बीज उपचार व बुवाई से पहले शोधन)
+      if (comb.includes('seed') || comb.includes('सीड') || comb.includes('बीज उपचार') || comb.includes('शोधन') || comb.includes('ट्रीटमेंट') || (comb.includes('बीज') && (comb.includes('उपचार') || comb.includes('बुवाई') || comb.includes('sowing')))) {
+        const title = '🌱 गेहूं व सभी फसलों का बीज उपचार (Seed Treatment) — 100% तेज अंकुरण व उकठा-दीमक सुरक्षा';
+        const baseBody = '🌱 **गेहूं, चना, सरसों व सभी फसलों का 100% वैज्ञानिक बीज उपचार फॉर्मूला:**\n\n' +
+          'बुवाई से पहले बीज उपचार करना फसल की पहली और सबसे सस्ती जीवन बीमा पॉलिसी है। ₹50 प्रति एकड़ के बीज उपचार से फसल में 30% अधिक फुटाव और उकठा (विल्ट)/जड़ गलन से 100% सुरक्षा मिलती है।\n\n' +
+          '🔬 **1. प्रमाणित 3-स्तरीय जैविक बीज उपचार फॉर्मूला:**\n' +
+          '• **स्टेप 1 (तेज अंकुरण व फुटाव):** बायोफिट स्टीमरिच (Stimrich) — 5 से 10 मिलीलीटर प्रति किलो बीज।\n' +
+          '• **स्टेप 2 (फफूंद व जड़ गलन सुरक्षा):** बायोफिट रैप-अप (Wrapup) — 5 मिलीलीटर प्रति किलो बीज (या रासायनिक में बाविस्टिन/कार्बेन्डाजिम 2g प्रति किलो बीज)।\n' +
+          '• **स्टेप 3 (दीमक व जमीन के कीड़े):** क्लोरपायरीफॉस 20% EC (2ml प्रति किलो बीज) दीमक प्रभावित खेतों में।\n\n' +
+          '🥣 **2. उपचार करने की सही विधि:**\n' +
+          '1. बीजों को तिरपाल या पक्के फर्श पर फैलाएं।\n' +
+          '2. स्टीमरिच और रैप-अप को थोड़े से पानी (लगभग 50-100ml प्रति 10kg बीज) में घोलें।\n' +
+          '3. बीजों पर घोल छिड़ककर हल्के हाथों से लेप करें ताकि बीज का छिलका न टूटे।\n' +
+          '4. उपचारित बीजों को **30 मिनट छाया में सुखाएं** (धूप में बिल्कुल न सुखाएं) और उसी दिन बुवाई करें।\n\n' +
+          '🌟 **3. सबसे बड़ा लाभ:** 95%+ तेज अंकुरण, एकसमान पौधे और शुरुआती 30 दिनों तक उकठा व पीलापन से पूरी सुरक्षा!';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 गेहूं में अधिक कल्ले कैसे लाएं?', query: 'गेहूं में अधिक कल्ले और फुटाव कैसे लाएं' },
+          { text: '🌱 बायोफिट स्टीमरिच 25% छूट पर ऑर्डर', query: 'बायोफिट स्टीमरिच की कीमत और डिस्काउंट' },
+          { text: '📋 रबी फसलों का संपूर्ण कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' }
+        ], 'agri', 'seed_treatment_master');
+        return true;
+      }
+
+      // E. MYCORRHIZA VAM (माइकोराइजा जड़ों का फैलाव व फास्फोरस बचत)
+      if (comb.includes('माइकोराइजा') || comb.includes('vam') || comb.includes('माइक्रो राजा') || comb.includes('जड़ों को 10 गुना')) {
+        const title = '🍄 माइकोराइजा (VAM) क्या है — जड़ों का 10 गुना फैलाव, 25% DAP बचत व सूखा सुरक्षा';
+        const baseBody = '🍄 **माइकोराइजा (VAM - Vesicular Arbuscular Mycorrhiza) का संपूर्ण वैज्ञानिक रहस्य:**\n\n' +
+          'माइकोराइजा कोई रासायनिक उर्वरक नहीं, बल्कि प्रकृति की सबसे चमत्कारी **मित्र फफूंद (Beneficial Fungi)** है जो पौधे की जड़ों के साथ सहजीवन (Symbiosis) बनाकर रहती है।\n\n' +
+          '🔬 **1. यह जड़ों को 10 गुना कैसे फैलाता है:**\n' +
+          '• सामान्य पौधे की जड़ें मिट्टी के केवल 5-10% हिस्से तक ही पहुंच पाती हैं।\n' +
+          '• माइकोराइजा जड़ों के सिरों से लाखों बारीक तंतु (Hyphae) पैदा करता है जो मिट्टी में 10 गुना दूर और गहराई तक फैल जाते हैं। यह पौधे के लिए एक अतिरिक्त विशालकाय जड़ तंत्र (Secondary Root System) का काम करता है।\n\n' +
+          '🌟 **2. 3 सबसे बड़े चमत्कारी लाभ:**\n' +
+          '• **25% डीएपी (फास्फोरस) की सीधी बचत:** फास्फोरस मिट्टी में स्थिर (Immobile) रहता है। माइकोराइजा उसे घोलकर सीधे पौधे के अंदर पंप कर देता है।\n' +
+          '• **सूखे व कम पानी में फसल की सुरक्षा:** मिट्टी की गहराई में मौजूद सूक्ष्म नमी और जिंक, बोरॉन, लोहा खींचकर पौधे को हरा-भरा रखता है।\n' +
+          '• **जड़ गलन से सुरक्षा:** यह जड़ों के चारों ओर एक सुरक्षा कवच बना लेता है जिससे हानिकारक नेमाटोड और उकठा फंगस जड़ों पर हमला नहीं कर पाते।\n\n' +
+          '⚖️ **3. प्रयोग मात्रा:** दानेदार 4 किलो प्रति एकड़ बुवाई पर, या बायोफिट शेत (SHET 1L) के साथ ड्रिप या सिंचाई से दें।';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌱 बायोफिट शेत में मौजूद सूक्ष्म जीवाणु', query: 'बायोफिट शेत के कार्य और खुराक' },
+          { text: '🌾 गेहूं में पहली सिंचाई का सही समय', query: 'गेहूं में पहली सिंचाई कब करें' },
+          { text: '📋 संपूर्ण खाद व स्प्रे तालिका', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' }
+        ], 'agri', 'mycorrhiza_vam_master');
+        return true;
+      }
+
+      // F. PRODUCT PRICING, MRP & DISCOUNT (शेत, स्टीमरिच, बायो-99 आदि की सही कीमत व छूट)
+      if (comb.includes('कीमत') || comb.includes('रेट') || comb.includes('price') || comb.includes('mrp') || comb.includes('discount') || comb.includes('डिस्काउंट') || comb.includes('kitne ka hai') || comb.includes('कितने का है')) {
+        const title = '🏷️ आरोग्यम नेट्सर्फ बायोफिट व नेचुरामोर प्रमाणित मूल्य सूची (MRP व डिस्काउंट रेट)';
+        const baseBody = '🏷️ **नेट्सर्फ बायोफिट व नेचुरामोर उत्पादों की अधिकृत रेट लिस्ट व डिस्काउंट:**\n\n' +
+          'आरोग्यम इंडिया पर सभी किसानों व डिस्ट्रीब्यूटरों को 100% ओरिजिनल सीलबंद उत्पाद 25% से 40% तक की भारी छूट पर उपलब्ध कराए जाते हैं:\n\n' +
+          '🌱 **1. कृषि बायोफिट उत्पाद (Biofit Agricultural Products):**\n' +
+          '• **बायोफिट शेत (SHET 1 Litre):** MRP ₹1,695 ➔ **छूट पर ₹1,271** (बचत ₹424)\n' +
+          '• **बायोफिट स्टीमरिच (Stimrich 1 Litre):** MRP ₹1,695 ➔ **छूट पर ₹1,271** (बचत ₹424) | 250ml: MRP ₹475 (छूट पर ₹356)\n' +
+          '• **बायोफिट बायो-99 (Bio-99 1 Litre):** MRP ₹2,325 ➔ **छूट पर ₹1,744** | 300ml: MRP ₹825 (छूट पर ₹619)\n' +
+          '• **बायोफिट रैप-अप (Wrapup 1 Litre):** MRP ₹1,695 ➔ **छूट पर ₹1,271**\n' +
+          '• **बायो-NPK कॉम्बो (Bio-NPK 1L×3 Set):** MRP ₹1,695 ➔ **छूट पर ₹1,271**\n\n' +
+          '🐄 **2. पशु आहार व स्वास्थ्य (Livestock Care):**\n' +
+          '• **सीएफसी प्लस (CFC Plus 500g):** MRP ₹700 ➔ **छूट पर ₹525** (दूध व फैट वृद्धि)\n' +
+          '• **नेचुरामोर कैल-डी (Pet/Cattle Cal-D):** MRP ₹450 ➔ **छूट पर ₹338**\n\n' +
+          '🩸 **3. मानव स्वास्थ्य (Naturamore Health Care):**\n' +
+          '• **नेचुरामोर लाइफ स्टाइल प्लस (60 कैप्सूल):** MRP ₹800 ➔ **छूट पर ₹600** (डायबिटीज शुगर)\n' +
+          '• **नेचुरामोर जॉइंट केयर (30 कैप्सूल):** MRP ₹450 ➔ **छूट पर ₹338** (जोड़ों का दर्द)\n' +
+          '• **हर्ब्स एंड मोर हर्बल डेंटल पेस्ट (125g):** MRP ₹140 ➔ **छूट पर ₹105**\n\n' +
+          '📦 **ऑर्डर विधि:** आप सीधे ऐप से ऑर्डर कर सकते हैं या अवनीश दादा (📞 7049294111) से संपर्क करके फ्री होम डिलीवरी प्राप्त कर सकते हैं।';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'business');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🛒 ऐप पर संपूर्ण कैटलॉग देखें', query: 'आरोग्यम कैटलॉग दिखाओ' },
+          { text: '💬 WhatsApp पर तुरंत ऑर्डर बुक करें', query: 'अवनीश दादा से बात कराओ' },
+          { text: '📋 डिस्ट्रीब्यूटर रिटेल डिस्काउंट स्लैब', query: 'नेट्सर्फ डिस्काउंट स्लैब क्या है' }
+        ], 'business', 'product_pricing_master');
+        return true;
+      }
+
+      // G. SOLAR PUMP (PM-KUSUM 7.5 HP सोलर पंप अनुदान व खर्च)
+      if (comb.includes('सोलर पंप') || comb.includes('solar pump') || comb.includes('सोलर') || comb.includes('कुसुम योजना')) {
+        const title = '☀️ 7.5 HP सोलर पंप (PM-KUSUM योजना) अनुदान, कुल लागत व किसान का खर्च विवरण';
+        const baseBody = '☀️ **7.5 HP सोलर पंप (प्रधानमंत्री कुसुम योजना) अनुदान व सब्सिडी का संपूर्ण विवरण:**\n\n' +
+          'पीएम कुसुम (PM-KUSUM) योजना के तहत किसानों को खेतों में सिंचाई हेतु 7.5 HP तक के सोलर पंप पर 60% भारी सरकारी सब्सिडी प्रदान की जाती है।\n\n' +
+          '💰 **1. 7.5 HP सोलर पंप का संपूर्ण खर्च व सब्सिडी ब्रेकअप:**\n' +
+          '• **कुल प्रोजेक्ट लागत:** 7.5 HP AC/DC सोलर पंप सेट की कुल लागत लगभग **₹3,50,000 से ₹3,80,000** होती है।\n' +
+          '• **सरकारी अनुदान (60% सब्सिडी):**\n' +
+          '  - केंद्र सरकार (MNRE) सब्सिडी: 30% (~₹1,05,000 से ₹1,14,000)\n' +
+          '  - राज्य सरकार अतिरिक्त सब्सिडी: 30% (~₹1,05,000 से ₹1,14,000)\n' +
+          '  - **कुल सरकारी सब्सिडी (60%): लगभग ₹2,10,000 से ₹2,28,000 सीधी छूट!**\n' +
+          '• **किसान का हिस्सा (40% अंशदान):** किसान को केवल **₹1,40,000 से ₹1,52,000** देना होता है।\n\n' +
+          '🏦 **2. बैंक लोन व नकद भुगतान की सुविधा:**\n' +
+          '• किसान के 40% हिस्से पर भी 30% तक नाबार्ड/बैंक लोन मिल जाता है।\n' +
+          '• **किसान को जेब से नकद केवल 10% (लगभग ₹35,000 से ₹40,000)** जमा करना होता है!\n\n' +
+          '📋 **3. जरूरी दस्तावेज व पात्रता:**\n' +
+          '1. खेत की खतौनी/जमीन के कागजात (कम से कम 2 से 3 एकड़ भूमि)।\n' +
+          '2. आधार कार्ड, बैंक पासबुक व पासपोर्ट फोटो।\n' +
+          '3. बोरवेल या कुआं (जल स्रोत) की एनओसी/सेल्फ डिक्लेरेशन।\n' +
+          '4. आवेदन राज्य के कृषि विभाग पोर्टल (जैसे mpkrishi, upagriculture, rajkisan) पर ऑनलाइन किया जाता है।';
+
+        const finalBody = formatAnswerAccordingToDirectives(title, baseBody, directives, cleanQ, 'agri');
+        renderCrispSpecialBox(title, finalBody, [
+          { text: '🌾 गेहूं की सिंचाई का सही समय', query: 'गेहूं में पहली सिंचाई कब करें' },
+          { text: '💬 योजना सहायता हेतु एक्सपर्ट से जुड़ें', query: 'अवनीश दादा से बात कराओ' },
+          { text: '📋 फसलों के लिए संपूर्ण स्प्रे तालिका', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर' }
+        ], 'agri', 'solar_pump_kusum_master');
+        return true;
+      }
+
+      return false;
+    }
+
+        // 2. Direct Precision Benchmark Handlers (Pashu, Crop Seasons, Diagnostics, Anatomy, Math)
+      if (handleUserFrustrationAndApology(cleanQ, rawQ, directives)) return;
+      if (handleCoreAgriculturalInputsAndPricingMaster(cleanQ, rawQ, directives)) return;
       if (handleKarwaChauthDirectQueries(cleanQ, rawQ, directives)) return;
     if (handleDharaSanskarAndSoilScienceQueries(cleanQ, rawQ, directives)) return;
     if (handleFruitOrchardMasterQueries(cleanQ, rawQ, directives)) return;
@@ -18094,10 +18326,18 @@ function processKnowledgeQuery(query) {
       removeTypingIndicator();
 
       if (result && result.summary) {
-        let cleanSummary = result.summary
+                let cleanSummary = result.summary
           .replace(/\[\d+\]/g, '')
           .replace(/http[s]?:\/\/\S+/g, '')
           .trim();
+
+        // 🛡️ STRICT QUALITY & RELEVANCE FILTER: Discard Western historical/unrelated biographies (e.g. Abbot Suger)
+        const isIrrelevantNoise = /(?:abbot|statesman|crusade|regent\s*during|king\s*louis|12th\s*century|parish|monk)/i.test(cleanSummary);
+        if (isIrrelevantNoise) {
+          console.warn('[Sakhi Search Guard] Discarded irrelevant external noise:', cleanSummary.slice(0, 80));
+          synthesizeDynamicAnswer(rawQ, targetDomain);
+          return;
+        }
 
         const newRecord = {
           id: 'vault_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
