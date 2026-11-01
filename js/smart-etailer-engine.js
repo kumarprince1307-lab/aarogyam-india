@@ -3301,31 +3301,78 @@
   let hubSentCount = 0;
 
     const hubCatalogData = {
-    crop_doctor: [{"id": "ns_prod_00027", "title": "Pet-Vet Breed 500 GM  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_00027"}, {"id": "ns_prod_46333", "title": "Pet-Vet Breed 500 GRAM  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_46333"}, {"id": "ns_prod_98099", "title": "Spot Eraser Anti Pigmentation Cream 20 GMS | (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_98099"}, {"id": "ns_prod_03157", "title": "Klearkof Cough Remedy 100 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_03157"}, {"id": "ns_prod_66758", "title": "Klear Cdt Acidity Remedy 100 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_66758"}, {"id": "ns_prod_56695", "title": "Blood Detox 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_56695"}, {"id": "ns_prod_32472", "title": "Omega Triple Strength 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_32472"}, {"id": "ns_prod_68977", "title": "Multi Vitamin For Women 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_68977"}, {"id": "ns_prod_56442", "title": "Multi Vitamin For Men 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_56442"}, {"id": "ns_prod_40011", "title": "Women'S Wellness 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_40011"}, {"id": "ns_prod_85933", "title": "Nutriliver 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_85933"}, {"id": "ns_prod_47328", "title": "Naturamore Pre Meal Nutrition 200 Gm 200 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_47328"}, {"id": "ns_agri_stimrich", "title": "स्टीमरिच (Biofit Stimrich) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_stimrich"}, {"id": "ns_agri_bio99", "title": "बायो-99 (Biofit Bio-99) 100mL (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_bio99"}, {"id": "ns_agri_shet", "title": "सेट (Biofit Shet - Soil Health) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_shet"}, {"id": "ns_agri_wrapup", "title": "रैपअप (Biofit Wrapup) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_wrapup"}, {"id": "ns_agri_npk", "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_npk"}, {"id": "ns_cattle_cfc", "title": "Pet-Vet Advanced Cattle Feed Supplement 1 KG (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc"}, {"id": "ns_cattle_cfc_1kg", "title": "Pet-Vet Advanced Cattle Feed Supplement 500 gm (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc_1kg"}, {"id": "ns_health_plus", "title": "Naturamore Active Chocolate Flavour 400 GMS | MRP : ₹ 1450.00 | (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_plus"}, {"id": "ns_health_vanilla", "title": "Naturamore Original Vanilla Flavour 400 GMS  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_vanilla"}, {"id": "ns_health_joint", "title": " Joint Care New 30 NOS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_joint"}, {"id": "ns_health_sugar", "title": "नेचुरामोरे लाइफस्टाइल प्लस (Lifestyle Plus Capsules) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_sugar"}, {"id": "ns_health_heart", "title": "नेचुरामोरे हार्ट केयर (Nutri Heart Capsules) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_heart"}, {"id": "ns_health_detox", "title": "नेचुरामोरे ईज़ी डिटॉक्स (Easy Detox Tablets) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_detox"}, {"id": "ns_health_women", "title": "नेचुरामोरे फॉर विमेन (Naturamore Women 400g) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_women"}, {"id": "ns_health_men", "title": "नेचुरामोरे मेन्स वेलनेस (Men's Wellness Capsules) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_men"}, {"id": "ns_health_kids", "title": "नेचुरामोरे फॉर किड्स (Naturamore Kids 400g) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_kids"}, {"id": "ns_herbs_facewash", "title": "Anti Pollution Face Wash 100 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_facewash"}, {"id": "ns_herbs_antiacne", "title": "Anti Acne Gel New 20 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_antiacne"}, {"id": "ns_herbs_undereye", "title": " Under Eye Rejuvenating Gel 20 GMS  (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_undereye"}, {"id": "ns_herbs_hairoil", "title": "Scalp Renaissance Hair Nutriment (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_hairoil"}, {"id": "ns_herbs_shampoo", "title": "Scalp Renaissance Anti Dandruff Shampoo 200 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_shampoo"}, {"id": "ns_herbs_conditioner", "title": "Scalp Renaissance Anti Hair Fall Shampoo 200 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_conditioner"}, {"id": "ns_herbs_toothpaste", "title": "Herbal Dental Paste Pack Of 2 125 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_toothpaste"}, {"id": "ns_herbs_soap", "title": "Moisturizing Soap Pack Of 5 375 GMS (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_soap"}, {"id": "ns_clean_fabric", "title": "Clean & More Fabric Wash & Conditioner 500 500 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_clean_fabric"}, {"id": "ns_clean_multipurpose", "title": "Clean & More Dish Washing Liquid 250 250 MLT (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_clean_multipurpose"}, {"id": "ns_clean_home_cleaner", "title": "Clean & More Multi-Purpose Home Cleaner 500ml (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_clean_home_cleaner"}, {"id": "ns_prod_pro_stimrich", "title": "Biofit Pro Stimrich (प्रो स्टिमरिच) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_pro_stimrich"}, {"id": "ns_agri_culture", "title": "बायोफिट कल्चर (Biofit Culture - Rapid Compost Decomposer) (बायो-केयर)", "link": "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_culture"}],
-    tube_videos: [{"id": "VID_S612726", "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱 | पहले सावधान हों!", "link": "https://youtube.com/shorts/Pv2-wbzjXEc?feature=share"}, {"id": "VID_S974645", "title": "​किसानों के लिए बुरी खबर या सबसे बड़ा वरदान? 💥 Naya ProStim ₹1450 Launch!", "link": "https://youtube.com/shorts/jC_6pz1EsEM?si=-B01ze8HBT837wu5"}, {"id": "VID_S706483", "title": "⚠️ सावधान किसान! खेती में कोई भी फैसला लेने से पहले Aarogyam Sakhi AI से पूछें 🌱", "link": "https://youtube.com/shorts/OfEad_pk6PU?si=JiBVUY9c4wJswrGe"}, {"id": "VID_S238828", "title": "🤖 आपकी अपनी FREE AI सखी 😍 खेती, मौसम, स्वास्थ्य सबका जवाब | Aarogyam India #Shorts", "link": "https://youtube.com/shorts/w2QAPHfkdH0?si=OIYmM6kalHP8p55c"}, {"id": "VID_S019796", "title": "टमाटर को रोगों से कैसे बचाए", "link": "https://youtube.com/shorts/9GWQlduG_AM?si=t1YHAy16lAdwlgml"}, {"id": "VID_S041329", "title": "सब्जी की खेती का डॉक्टर बुक क्यों खरीदे", "link": "https://youtube.com/shorts/zry1LfjV_q0?feature=share"}, {"id": "VID_187128", "title": "जोड़ों के दर्द से राहत! | Naturamore Joint Care Testimonial | Aarogyam India", "link": "https://youtube.com/shorts/-SPS50UQPjA?si=XwJt60FL38PvYGNW"}, {"id": "VID_242806", "title": "Joint pain se paresan hai to aaj hi call kare", "link": "https://youtu.be/wsjJBysrrOc?si=aFQPkePh0mMZyI6w"}, {"id": "VID_082318", "title": "Yadi aap joint pain se paresan hai to abhi call kare 100%  dard se mukt", "link": "https://youtu.be/y0nXI5v8KtE?si=IsRmWFcHFx2B3_KB"}, {"id": "VID_S771406", "title": "क्या आप जॉइंट पेन से परेशान है तो अभी कॉल करे दर्द से मुक्त हो जाए", "link": "https://youtube.com/shorts/BkWypyfof_g?si=FgQ_3WZVgpaME_nI"}, {"id": "VID_S540013", "title": "खेती में खेत के कचड़े गोबर  से कैसे बनाए शक्तिशाली खाद", "link": "https://youtube.com/shorts/XOTCgz8VJKg?si=aM64BpEh9BXKtJWA"}, {"id": "VID_S391850", "title": "क्या चने के खेत में चना ही चना चाहिएब्टो अभी ये वीडियो देखिए", "link": "https://youtube.com/shorts/elfPs4vU_s0?si=iZZI3cfnh5CDkz19"}, {"id": "VID_S298494", "title": "सरसों की खेती करने जा रहे है तो अभी रुकिए  रिजल्ट बायोफिट", "link": "https://youtube.com/shorts/EOmAH2HdfZA?si=x4KO3xltO33He5bQ"}, {"id": "VID_032275", "title": "​🛑 फसल का तनाज़ोर और दाना मजबूत क्यों नहीं? जानिए पोटाश का समाधान!", "link": "https://youtube.com/shorts/DOAn6BkMvwE?si=6fJxHrZKdj97x98m"}, {"id": "VID_S741306", "title": "​🌱 मिट्टी में दबा फॉस्फोरस होगा अब अनलॉक! | Biofit PSB", "link": "https://youtube.com/shorts/vsgklcgevs8?si=MrV61wYuyY7XWcay"}, {"id": "VID_S284427", "title": "खेती का डॉक्टर बुक क्यों खरीदे", "link": "https://youtube.com/shorts/bvCuBEuyg48?si=G9wcjjVaQJd3881z"}, {"id": "VID_S432998", "title": "HOW TO USE #NPK IN #dripirrigation | #biofitnpk का उपयोग ड्रिप में कैसे करे ?#organicfarming", "link": "https://youtube.com/shorts/qbiC_1E3bgM?si=nDcRjcIzIpuHGRm1"}, {"id": "VID_291096", "title": "जानिए Naturamore और Biofit प्रोडक्ट्स की Manufacturing की पूरी कहानी | Netsurf की Factory के अंदर!", "link": "https://youtu.be/bk2bxcHeKsM?si=vGsmUMjuaCGBFd4f"}, {"id": "VID_S102593", "title": "टमाटर में कुकड़ा रोग का इलाज | TYLCV वायरस की दवाई | टमाटर की फसल बचाने का तरीका", "link": "https://youtu.be/KMvbvTV0dHg?si=B1YsqtH2uZq4s6Wb"}, {"id": "VID_S988091", "title": "सेक्सुअल कमजोरी से छुटकारा पाएं | #NATURAMOR #Manswellness से बढ़ाएं शक्ति और उत्साह!", "link": "https://youtu.be/qAux7BHnpyo?si=3eWY3DoFV8eDApKp"}, {"id": "VID_S843947", "title": "बैंगन की खेती में रिकॉर्ड तोड़ पैदावार | #SHET, #Stimrich & #Bio99 का कमाल! #biofit_result", "link": "https://youtu.be/8I9qX1elzgg?si=iMZkLV3EUwKIV5vg"}, {"id": "VID_742716", "title": "NetSurf की Nominee Facility ने उनके परिवार को आर्थिक सुरक्षा और निरंतर अवसर प्रदान किया।", "link": "https://youtu.be/OlX2t84-8Es?si=JDDUyDdjtr60UOO5"}, {"id": "VID_617621", "title": "👉 😱 NetSurf Me 90% Log Fail Kyon Ho Jate Hain? | Sach Jo Koi Nahi Batata ‪@AAROGYAMINDIA‬", "link": "https://youtu.be/HI5D8KYWJK0?si=j5qFtKJzsk177t2x"}, {"id": "VID_472590", "title": "देखे क्या खिलाया इसने 15 दिन में 5 लीटर दूध बढ़ा डेरी वालो के लिए वरदान 5 liter milk extra in 15 day", "link": "https://youtu.be/W37dZEnnQ74?si=ypt7ztQL5XduHC5R"}, {"id": "VID_266689", "title": "🏆 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका | Biofit PET-VET", "link": "https://youtu.be/xwZ3gV_PIa8?si=vPFSYGXS8LnG3EAZ"}, {"id": "VID_S730902", "title": "किसान की परेशानी, किसान का दर्द 😢🌾", "link": "https://youtube.com/shorts/GEN9mJfsiIY?si=77kBTeTdCHsboVim"}, {"id": "VID_S218514", "title": "चना बीज उपचार: सही तरीका 🌱", "link": "https://youtube.com/shorts/mHRWuIRq604?si=9fMrz_evXwzAXp3i"}, {"id": "VID_S037479", "title": "21वीं सदी का प्यार: प्यार या पैसा? 💔💰", "link": "https://youtube.com/shorts/_io2Mn9xnw0?si=HoHDhgBYuXwYHMSo"}, {"id": "VID_S872947", "title": "आयुर्वेदिक मिल्क शेक कैसे बनाएं? 🌿🥛", "link": "https://youtube.com/shorts/hRq2OvN8aiA?si=X-t1wWc-RD7BRypX"}, {"id": "VID_S691508", "title": "सब्जियों का ज़हर कैसे साफ करें? ⚠️", "link": "https://youtube.com/shorts/39P15VvLneA?si=FwiGhY9OZpCmudj8"}, {"id": "VID_S475456", "title": "Direct Selling Scam है या सच? 🤔", "link": "https://youtube.com/shorts/UBVrsEY2dXY?si=sYxIeKC0Zmrs56Ll"}, {"id": "VID_S363050", "title": "बीज संस्कार: मजबूत फसल का राज 🌱", "link": "https://youtube.com/shorts/Ae9E-arA8lo?si=MJcPQzkUxP8YDedp"}, {"id": "VID_S261730", "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱", "link": "https://youtube.com/shorts/jxu9W_s-C70?si=fO-5zc90_uKlsqGG"}, {"id": "VID_S169791", "title": "धारा संस्कार: मिट्टी को फिर से ज़िंदा बनाएं 🌱", "link": "https://youtube.com/shorts/TTuJF_iyzmk?si=Fn9cFF5mC1TfF7Wo"}, {"id": "VID_S893799", "title": "Jamin ke", "link": "https://youtube.com/shorts/tcgZG7uIyuk?si=J87biZTITiaE2oAA"}, {"id": "VID_S106444", "title": "🐄 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका | Biofit PET-VET", "link": "https://youtube.com/shorts/Y1lrwNHaAcE?si=HLCSVUd1cH7oJLq6"}, {"id": "VID_S037883", "title": "☠️ गौ माता को बचाओ - संपूर्ण प्राथमिक चिकित्सा गाइड", "link": "https://youtube.com/shorts/ew5tDJgGTK8?si=BbUS2vtVe65OOrYS"}],
+    // 1. किसान व जैविक फसल सुरक्षा (Biofit)
+    crop_doctor: [
+      { id: "ns_agri_stimrich", title: "🌱 स्टीमरिच (Biofit Stimrich) — 25-40% अधिक फुटाव व चमक", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_stimrich", benefit: "बीज अंकुरण, फुटाव, शाखाएं और उपज में 25-40% बढ़ोत्तरी करता है।" },
+      { id: "ns_agri_bio99", title: "💧 बायो-99 (Biofit Bio-99) — 100% सिलिकॉन स्प्रेडर व स्टीकर", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_bio99", benefit: "दवा को पत्तियों पर चिपकाता है और दवा की बर्बादी 40% कम करता है।" },
+      { id: "ns_agri_shet", title: "🌍 शेत (Biofit Shet) — मिट्टी को भुरभुरी व उपजाऊ बनाने वाला", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_shet", benefit: "मिट्टी के मित्र जीवाणुओं को जगाकर जमीन को उपजाऊ और नरम बनाता है।" },
+      { id: "ns_agri_wrapup", title: "🛡️ रैपअप (Biofit Wrapup) — फफूंद व रोग सुरक्षा कवच", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_wrapup", benefit: "फसल पर प्राकृतिक सुरक्षा कवच बनाकर फफूंद और रोगों से बचाता है।" },
+      { id: "ns_agri_npk", title: "🧪 एनपीके बायो-फर्टिलाइजर (Biofit NPK) — यूरिया/डीएपी का 50% विकल्प", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_npk", benefit: "नाइट्रोजन, फास्फोरस व पोटाश को जमीन से पौधों तक पहुंचाता है।" },
+      { id: "ns_agri_culture", title: "🍂 बायो-कल्चर (Compost Decomposer) — 45 दिन में शक्तिशाली जैविक खाद", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_culture", benefit: "गोबर और फसल अवशेषों को तेजी से सड़ाकर सुपर-खाद बनाता है।" }
+    ],
+
+    // 2. महिला सौंदर्य व स्किनकेयर (Herbs & More)
+    beauty_care: [
+      { id: "ns_prod_98099", title: "🌸 स्पॉट इरेज़र एंटी-पिग्मेंटेशन क्रीम (झाइयां व काले धब्बे मुक्ति)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_98099", benefit: "चेहरे की झाइयों, डार्क स्पॉट्स और काले धब्बों को जड़ से हटाकर प्राकृतिक निखार देती है।" },
+      { id: "ns_herbs_antiacne", title: "✨ एंटी एक्ने जेल (मुंहासे व पिम्पल्स समाधान)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_antiacne", benefit: "मुंहासों, दानों और तैलीय त्वचा से 100% प्राकृतिक सुरक्षा प्रदान करता है।" },
+      { id: "ns_herbs_undereye", title: "👁️ अंडर आई रिजुवेनेटिंग जेल (आंखों के काले घेरे व सूजन)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_undereye", benefit: "आंखों के नीचे के काले घेरों (Dark Circles) और थकान को दूर करता है।" },
+      { id: "ns_herbs_hairoil", title: "💇 स्कैल्प न्यूट्रिमेंट हेयर ऑयल (बालों का झड़ना रोके व घना बनाए)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_hairoil", benefit: "बालों की जड़ों को पोषण देकर बालों का गिरना रोकता है और नए बाल उगाता है।" },
+      { id: "ns_herbs_shampoo", title: "🧴 एंटी-डैंड्रफ व एंटी-हेयरफॉल हर्बल शैम्पू", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_shampoo", benefit: "रूसी (Dandruff) को जड़ से खत्म करता है और बालों को रेशमी बनाता है।" },
+      { id: "ns_herbs_facewash", title: "🌿 एंटी पॉल्यूशन फेस वॉश (धूल-मिट्टी व मैल से मुक्ति)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_facewash", benefit: "चेहरे की रोमछिद्रों की गहरी सफाई कर दिन भर ताजगी देता है।" },
+      { id: "ns_herbs_toothpaste", title: "🦷 हर्बल डेंटल पेस्ट (मसूड़ों से खून, पायरिया व बदबू मुक्ति)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_toothpaste", benefit: "दांतों का पीलापन, संवेदनशीलता और सांसों की दुर्गंध को दूर करता है।" },
+      { id: "ns_herbs_soap", title: "🧼 मॉइस्चराइजिंग सोप (त्वचा को कोमल व चमकदार बनाए)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_herbs_soap", benefit: "शुद्ध जड़ी-बूटियों से बना साबुन जो त्वचा को सूखा नहीं होने देता।" }
+    ],
+
+    // 3. स्वास्थ्य, पोषण व रोग समाधान (Naturamore)
+    health_wellness: [
+      { id: "ns_health_joint", title: "🦵 नेचुरामोरे जॉइंट केयर (घुटनों, जोड़ों व कमर दर्द से मुक्ति)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_joint", benefit: "कार्टिलेज को मजबूत कर जोड़ों के पुराने दर्द और सूजन में चमत्कारी राहत देता है।" },
+      { id: "ns_prod_68977", title: "👩 महिलाओं का संपूर्ण पोषण (Multi-Vitamin For Women)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_68977", benefit: "महिलाओं की कमजोरी, थकान, कमर दर्द और हार्मोनल असंतुलन को दूर करता है।" },
+      { id: "ns_health_men", title: "💪 पुरुषों का ऊर्जा व स्टैमिना (Men's Wellness Capsules)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_men", benefit: "शारीरिक दुर्बलता दूर कर दिन भर चुस्ती, फुर्ती और ताकत बनाए रखता है।" },
+      { id: "ns_health_kids", title: "🧒 बच्चों का विकास व स्मृति (Naturamore For Kids)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_kids", benefit: "बच्चों की लंबाई, वजन, रोग प्रतिरोधक क्षमता (Immunity) और याददाश्त बढ़ाता है।" },
+      { id: "ns_prod_66758", title: "🔥 गैस व एसिडिटी समाधान (Klear Cdt Acidity Remedy)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_66758", benefit: "खट्टी डकारें, सीने में जलन और पुरानी एसिडिटी से तुरंत राहत देता है।" },
+      { id: "ns_prod_03157", title: "🍯 खांसी, कफ व गले की खराश (Klearkof Cough Remedy)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_03157", benefit: "बिना सुस्ती लाए सूखी और बलगम वाली खांसी को ठीक करता है।" },
+      { id: "ns_health_sugar", title: "🩸 शुगर व डायबिटीज केयर (Lifestyle Plus Capsules)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_sugar", benefit: "ब्लड शुगर लेवल को सामान्य रखने और पैंक्रियाज को सक्रिय करने में मददगार।" },
+      { id: "ns_prod_85933", title: "🫀 लिवर सुरक्षा व फैटी लिवर (Nutriliver Capsules)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_85933", benefit: "लिवर को डिटॉक्स कर भूख बढ़ाता है और फैटी लिवर में राहत देता है।" },
+      { id: "ns_prod_56695", title: "✨ ब्लड प्यूरिफायर (Blood Detox — कील, मुंहासे व चर्म रोग)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_56695", benefit: "खून को साफ कर त्वचा के रोगों, खुजली और एलर्जी से रक्षा करता है।" },
+      { id: "ns_prod_32472", title: "❤️ दिल की सुरक्षा व ओमेगा-3 (Omega Triple Strength)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_32472", benefit: "कोलेस्ट्रॉल को नियंत्रित कर दिल और नसों को स्वस्थ रखता है।" }
+    ],
+
+    // 4. पशुपालन, दूध व फैट वृद्धि (CFC Plus)
+    pashupalan: [
+      { id: "ns_cattle_cfc", title: "🐄 Pet-Vet CFC Plus 1 KG (गाय-भैंस का दूध व फैट वर्धक)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc", benefit: "दूध में 1 से 2 लीटर की वृद्धि, फैट में बढ़ोत्तरी और पशु को स्वस्थ रखता है।" },
+      { id: "ns_cattle_cfc_1kg", title: "🥛 Pet-Vet CFC Plus 500g (पशु पोषण पूरक)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc_1kg", benefit: "पशु की पाचन शक्ति बढ़ाता है और समय पर गाभिन होने में मदद करता है।" },
+      { id: "ns_prod_00027", title: "🐕 Pet-Vet Breed 500g (पशु प्रजनन व स्वास्थ्य केयर)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_00027", benefit: "पशुओं की रोग प्रतिरोधक क्षमता और संपूर्ण शारीरिक शक्ति बढ़ाता है।" }
+    ],
+
+    // 5. यूट्यूब वीडियो
+    tube_videos: [
+      { id: "VID_187128", title: "🦵 जोड़ों के दर्द से राहत का वास्तविक अनुभव", link: "https://youtube.com/shorts/-SPS50UQPjA" },
+      { id: "VID_266689", title: "🐄 15 दिन में 5 लीटर दूध बढ़ाने का सफल तरीका", link: "https://youtu.be/xwZ3gV_PIa8" },
+      { id: "VID_S843947", title: "🌾 बैंगन व सब्जियों में रिकॉर्ड तोड़ पैदावार (Biofit)", link: "https://youtu.be/8I9qX1elzgg" },
+      { id: "VID_S612726", title: "🚨 किसान भाई! फसल बचाने का प्रमाणित तरीका", link: "https://youtube.com/shorts/Pv2-wbzjXEc" }
+    ],
+
+    // 6. वेब पेजेस
     web_pages: [
       { id: 'page_cat', title: '🌾 संपूर्ण जैविक उत्पाद कैटलॉग', link: 'https://aarogyamindia.online/netsurf-products.html' },
-      { id: 'page_sakhi', title: '🐄 पशुपालन सखी व डेयरी केयर बुलेटिन', link: 'https://aarogyamindia.online/aarogyam-sakhi.html' },
-      { id: 'page_weather', title: '⛅ दैनिक कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी', link: 'https://aarogyamindia.online/weather.html' },
-      { id: 'page_panchang', title: '📅 सनातन वैदिक कृषि पंचांग व शुभ मुहूर्त', link: 'https://aarogyamindia.online/krishi-panchang.html' },
-      { id: 'page_mandi', title: '📊 दैनिक मंडी भाव बुलेटिन', link: 'https://aarogyamindia.online/mandi.html' },
       { id: 'page_health', title: '🩺 संपूर्ण हेल्थ केयर व पोषण पोर्टल', link: 'https://aarogyamindia.online/health.html' },
-      { id: 'page_tube', title: '🎥 आरोग्यम ट्यूब किसान वीडियो', link: 'https://aarogyamindia.online/tube.html' },
-      { id: 'page_diary', title: '📖 मेरी डायरी डिजिटल फील्ड खाता', link: 'https://aarogyamindia.online/pages/smart-etailer.html' },
-      { id: 'page_home', title: '🏠 आरोग्यम भारत मुख्य पोर्टल', link: 'https://aarogyamindia.online' }
+      { id: 'page_sakhi', title: '🐄 पशुपालन सखी व डेयरी बुलेटिन', link: 'https://aarogyamindia.online/aarogyam-sakhi.html' },
+      { id: 'page_diary', title: '📕 आरोग्यम बहीखाता (डिजिटल लेज़र)', link: 'https://aarogyamindia.online/pages/smart-etailer.html' }
     ],
+
+    // 7. सुविचार व प्रेरणा
     suvichar: [
-      { id: 'gm_kisan', title: '☀️ शुभ प्रभात — समृद्ध किसान विचार', text: 'राम राम किसान साथी! 🙏\n"जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा।"\nशुभ दिन की मंगलकामनाएं!' },
-      { id: 'gn_kisan', title: '🌙 शुभ रात्रि — जैविक किसान संकल्प', text: 'शुभ रात्रि किसान भाई! 🙏\nकल सुबह की नई किरण आपकी फसलों में हरियाली और घर में खुशहाली लाए।\nआरोग्यम भारत!' },
-      { id: 'prerna_biz', title: '🚀 स्वावलंबन प्रेरणा — खुद का व्यापार', text: 'नमस्ते साथी! 🙏\nनौकरी तलाशने के बजाय खुद का जैविक कृषि व्यापार शुरू करें। 8-लेवल मॉडल से आत्मनिर्भर बनें!' },
-      { id: 'gaumata_vichar', title: '🐄 गोमाता व पशुधन संरक्षण विचार', text: 'गौमाता और पशुधन हमारे जीवन और कृषि की रीढ़ हैं। शुद्ध पोषण (CFC) दें और समृद्ध बनें! 🙏' }
+      { id: 'gm_kisan', title: '☀️ शुभ प्रभात — समृद्ध किसान विचार', text: 'राम राम साथी! 🙏\n"जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा।"\nशुभ दिन की मंगलकामनाएं!' },
+      { id: 'gn_kisan', title: '🌙 शुभ रात्रि — खुशहाली संदेश', text: 'शुभ रात्रि! 🙏\nकल सुबह की नई किरण आपके जीवन में स्वास्थ्य, सुख और समृद्धि लाए।' }
     ],
+
+    // 8. ऑटोशिप रिमाइंडर
     autoship_rem: [
-      { id: 'as_monthly', title: '🎁 ऑटोशिप मासिक ऑर्डर रिमाइंडर', text: 'नमस्ते! आपके 6-महीने ऑटोशिप लॉयल्टी प्लान का इस महीने का ऑर्डर तैयार है। 5 महीने पूर्ण होते ही 6वें महीने मुफ़्त गिफ्ट मिलेगा!' },
-      { id: 'as_free_unlock', title: '🎉 6th Month Free Gift Unlock Alert!', text: 'बधाई हो! आपके लगातार 5 महीने के ऑर्डर्स पूरे हो चुके हैं। इस महीने आपका मुफ़्त गिफ्ट 100% FREE अनलॉक हो चुका है!' }
+      { id: 'as_monthly', title: '🎁 ऑटोशिप मासिक ऑर्डर रिमाइंडर', text: 'नमस्ते! आपके 6-महीने ऑटोशिप लॉयल्टी प्लान का मासिक ऑर्डर तैयार है। 5 महीने पूर्ण होते ही 6वें महीने मुफ़्त उपहार मिलेगा!' }
     ],
+
     khata_due: [
-      { id: 'khata_bill_due', title: '💳 उधारी हिसाब व पेमेंट रिमाइंडर', text: 'नमस्ते! आरोग्यम मेरी डायरी से आपका बकाया हिसाब दर्ज है। कृपया समय पर भुगतान कर सहयोग करें।' }
+      { id: 'khata_bill_due', title: '💳 बहीखाता बकाया हिसाब रिमाइंडर', text: 'नमस्ते! आरोग्यम बहीखाता से आपका बकाया हिसाब दर्ज है। कृपया समय पर भुगतान कर सहयोग करें।' }
     ]
   };
 
@@ -3420,7 +3467,7 @@
 
   function updateHubPreviewText() {
     const list = getHubQueueList();
-    const target = list[hubCurrentQueueIndex] || { name: 'किसान साथी', mobile: '9XXXXXXXXX', due_amount: 0 };
+    const target = list[hubCurrentQueueIndex] || { name: 'साथी', mobile: '9XXXXXXXXX', due_amount: 0 };
     const mainSubj = document.getElementById('hubMainSubjectSelect')?.value || 'crop_doctor';
     const subItemId = document.getElementById('hubSubItemSelect')?.value;
     const previewEl = document.getElementById('hubMessagePreviewText');
@@ -3431,34 +3478,68 @@
     const shareId = getAppUserShareId();
     const items = hubCatalogData[mainSubj] || [];
     const item = items.find(i => i.id === subItemId) || items[0] || {};
+    const prodLink = (item.link || 'https://aarogyamindia.online') + '?ref=' + shareId + '&share_id=' + shareId;
 
     let msg = '';
     if (currentAutomationMode === 'sms') {
       // Short 160-char SMS
-      if (mainSubj === 'khata_due') {
-        msg = `नमस्ते ${target.name} जी! आरोग्यम हिसाब: ₹${Math.abs(Number(target.due_amount) || 0)} बकाया है। विवरण: https://aarogyamindia.online/?ref=${shareId} - ${sName}`;
+      if (mainSubj === 'beauty_care') {
+        msg = 'नमस्ते ' + target.name + ' जी! प्राकृतिक सौंदर्य व स्किनकेयर समाधान देखें: ' + prodLink + ' - ' + sName;
+      } else if (mainSubj === 'health_wellness') {
+        msg = 'नमस्ते ' + target.name + ' जी! स्वास्थ्य, जोड़ दर्द व पोषण समाधान देखें: ' + prodLink + ' - ' + sName;
+      } else if (mainSubj === 'pashupalan') {
+        msg = 'नमस्ते ' + target.name + ' जी! गाय-भैंस दूध व फैट वृद्धि समाधान: ' + prodLink + ' - ' + sName;
       } else {
-        msg = `नमस्ते ${target.name} जी! आरोग्यम जैविक कृषि व उत्पाद जानकारी हेतु देखें: https://aarogyamindia.online/?ref=${shareId} - ${sName} (${sMob})`;
+        msg = 'नमस्ते ' + target.name + ' जी! आरोग्यम बहीखाता व कृषि समाधान देखें: ' + prodLink + ' - ' + sName;
       }
     } else {
-      // Rich WhatsApp Message
-      if (mainSubj === 'crop_doctor') {
-        const prodLink = (item.link || 'https://aarogyamindia.online/netsurf-products.html') + `?ref=${shareId}&share_id=${shareId}`;
-        msg = `🌾 *नमस्ते ${target.name} जी!* 🙏\n\nआप हमारे अति महत्वपूर्ण पाठक हैं। आज आरोग्यम इंडिया की ओर से आपकी फसल व जैविक सुरक्षा हेतु प्रमाणित समाधान तैयार किया गया है:\n\n👉 *${item.title || 'जैविक फसल सुरक्षा उत्पाद'}*\nसंपूर्ण विवरण व किसान परिणाम देखने हेतु नीचे लिंक पर क्लिक करें:\n${prodLink}\n\nधन्यवाद! — *${sName}* (${sMob})`;
+      // Culturally Tailored WhatsApp Messages
+      if (mainSubj === 'beauty_care') {
+        // Woman-to-Woman Beauty & Skincare Message
+        msg = '🌸 *नमस्ते ' + target.name + ' जी!* 🙏\n\n' +
+              'क्या आप भी प्राकृतिक, केमिकल-मुक्त और सुरक्षित सौंदर्य समाधान चाहती हैं?\n\n' +
+              '👉 *' + (item.title || 'हर्ब्स & मोर पर्सनल केयर') + '*\n' +
+              '✨ *फायदे:* ' + (item.benefit || 'त्वचा और बालों को दे 100% प्राकृतिक निखार।') + '\n\n' +
+              'पूरी जानकारी, उपयोग विधि व ऑर्डर करने के लिए नीचे लिंक देखें:\n' +
+              prodLink + '\n\n' +
+              'सुंदर दिखें, सुरक्षित रहें! 💖 — *' + sName + '* (' + sMob + ')';
+      } else if (mainSubj === 'health_wellness') {
+        // Health, Immunity & Disease Care Message
+        msg = '🩺 *नमस्ते ' + target.name + ' जी!* 🙏\n\n' +
+              'आपके और आपके परिवार के उत्तम स्वास्थ्य हेतु प्रमाणित आयुर्वेदिक पोषण समाधान:\n\n' +
+              '👉 *' + (item.title || 'नेचुरामोरे हेल्थ केयर') + '*\n' +
+              '🌿 *मुख्य लाभ:* ' + (item.benefit || 'रोगों से बचाव, संपूर्ण पोषण व प्राकृतिक राहत।') + '\n\n' +
+              'विस्तृत जानकारी व डॉक्टरों की सलाह देखने हेतु लिंक पर क्लिक करें:\n' +
+              prodLink + '\n\n' +
+              'स्वस्थ रहें, दीर्घायु बनें! 🌿 — *' + sName + '* (' + sMob + ')';
+      } else if (mainSubj === 'pashupalan') {
+        // Cattle, Milk & Fat Booster Message
+        msg = '🐄 *राम राम ' + target.name + ' जी!* 🙏\n\n' +
+              'क्या आप अपनी गाय-भैंस का दूध 1 से 2 लीटर और फैट बढ़ाना चाहते हैं?\n\n' +
+              '👉 *' + (item.title || 'Pet-Vet CFC Plus') + '*\n' +
+              '🥛 *फायदा:* ' + (item.benefit || 'दूध में बढ़ोत्तरी, फैट वृद्धि और पशु की तंदुरुस्ती।') + '\n\n' +
+              'पशुपालकों के वास्तविक परिणाम देखने हेतु नीचे लिंक देखें:\n' +
+              prodLink + '\n\n' +
+              'सफेद क्रांति, खुशहाल किसान! 🥛 — *' + sName + '* (' + sMob + ')';
+      } else if (mainSubj === 'crop_doctor') {
+        // Farming & Organic Biofit Message
+        msg = '🌾 *राम राम ' + target.name + ' जी!* 🙏\n\n' +
+              'आपकी फसल की सुरक्षा, अधिक फुटाव और पैदावार बढ़ाने हेतु प्रमाणित जैविक समाधान:\n\n' +
+              '👉 *' + (item.title || 'बायोफिट जैविक उत्पाद') + '*\n' +
+              '🌱 *फायदा:* ' + (item.benefit || 'लागत कम करे और पैदावार में 25-40% बढ़ोत्तरी दे।') + '\n\n' +
+              'उपयोग विधि व किसान परिणाम देखने हेतु नीचे लिंक पर क्लिक करें:\n' +
+              prodLink + '\n\n' +
+              'जैविक खेती, समृद्ध किसान! 🌾 — *' + sName + '* (' + sMob + ')';
       } else if (mainSubj === 'tube_videos') {
-        const vidLink = (item.link || 'https://aarogyamindia.online/tube.html') + `?ref=${shareId}&share_id=${shareId}`;
-        msg = `🎥 *नमस्ते ${target.name} जी!* 🙏\n\nजैविक खेती से लागत आधी और पैदावार दोगुनी करने वाले सफल किसानों का वास्तविक वीडियो देखें:\n\n👉 *${item.title || 'सफल किसान वीडियो'}*\nलिंक पर क्लिक कर वीडियो देखें:\n${vidLink}\n\nसुरक्षित खेती, खुशहाल किसान! 🌾 — *${sName}*`;
-      } else if (mainSubj === 'web_pages') {
-        const pageLink = (item.link || 'https://aarogyamindia.online') + `?ref=${shareId}&share_id=${shareId}`;
-        msg = `🌐 *नमस्ते ${target.name} जी!* 🙏\n\nआरोग्यम इंडिया का महत्वपूर्ण कृषि बुलेटिन व डिजिटल टूल:\n👉 *${item.title || 'वेब पेज'}*\nदेखने हेतु लिंक पर जाएँ:\n${pageLink}\n\n— *${sName}* (${sMob})`;
-      } else if (mainSubj === 'suvichar') {
-        msg = `${item.text || 'राम राम साथी! शुभ दिन की मंगलकामनाएं।'}\n\n👉 *अधिक जानकारी व जुड़ने हेतु देखें:*\nhttps://aarogyamindia.online/?ref=${shareId}&share_id=${shareId}\n\n— *${sName}* (${sMob}) 🙏`;
-      } else if (mainSubj === 'autoship_rem') {
-        msg = `🎁 *नमस्ते ${target.name} जी!* 🙏\n\n${item.text || 'आपके 6-महीने ऑटोशिप का ऑर्डर तैयार है।'}\n\nअधिक जानकारी हेतु संपर्क करें:\n— *${sName}* (${sMob})`;
-      } else if (mainSubj === 'khata_due') {
-        const token = generateKhataShareToken(target);
-        const khataLink = `https://aarogyamindia.online/pages/smart-etailer.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}&kdata=${token}`;
-        msg = `🧾 *आरोग्यम मेरी डायरी — डिजिटल हिसाब*\n\nनमस्ते *${target.name}* जी! 🙏\n\n*${sName}* (${sMob}) ने आपके खाते में *₹${Math.abs(Number(target.due_amount) || 0)}* का हिसाब / पेमेंट रिमाइंडर दर्ज किया है।\n\n👉 अपना डिजिटल बिल व खाता देखने हेतु लिंक पर जाएँ:\n${khataLink}\n\nधन्यवाद!`;
+        msg = '🎥 *नमस्ते ' + target.name + ' जी!* 🙏\n\n' +
+              'आरोग्यम भारत का यह महत्वपूर्ण वीडियो अवश्य देखें:\n\n' +
+              '👉 *' + (item.title || 'सफल किसान वीडियो') + '*\n' +
+              'वीडियो देखने हेतु लिंक पर क्लिक करें:\n' +
+              prodLink + '\n\n' +
+              'धन्यवाद! — *' + sName + '*';
+      } else {
+        msg = (item.text || 'आरोग्यम भारत में आपका स्वागत है!') + '\n\n' +
+              'अधिक जानकारी: ' + prodLink + '\n\n— *' + sName + '* (' + sMob + ')';
       }
     }
 
@@ -5233,7 +5314,7 @@
     sendKbWhatsAppReminderForCustomer(activeKbCustomer.mobile);
   }
 
-  function sendKbWhatsAppReminderForCustomer(mobile) {
+  function sendKbWhatsAppReminderForCustomer(mobile, recentTx) {
     const allEntries = getKbEntries();
     const customerEntries = allEntries.filter(e => e.customer_mobile === mobile);
     if (customerEntries.length === 0) return;
@@ -5251,17 +5332,59 @@
     });
 
     const net = gave - got;
-    const shortCode = first.short_code || generateShortCode(mobile);
-    const shortLink = `https://aarogyamindia.online/pages/smart-etailer.html?k=${shortCode}&ref=${encodeURIComponent(shareId)}`;
+    const shortCode = (recentTx && recentTx.short_code) || first.short_code || generateShortCode(mobile);
+    const shortLink = 'https://aarogyamindia.online/pages/smart-etailer.html?k=' + shortCode + '&ref=' + encodeURIComponent(shareId);
 
+    const custName = first.customer_name || 'किसान साथी';
     let msg = '';
-    if (net > 0) {
-      msg = `🌾 *नमस्ते ${first.customer_name} जी!* 🙏\n\nआपके खाते में *${sName}* (${sMob}) का कुल बकाया *₹${net.toLocaleString('hi-IN')}* बाकी है।\n\n📖 *अपनी पूरी डिजिटल पासबुक और बिल यहाँ देखें:*\n${shortLink}\n\n*(इस लिंक पर क्लिक करके आप अपना पूरा हिसाब पारदर्शी रूप से देख सकते हैं)*\n\n— *Aarogyam India डिजिटल खाता बुक*`;
+
+    if (recentTx && recentTx.amount) {
+      // 1. Transaction Alert with BOTH Today's Entry AND Total Balance
+      const recentAmt = Number(recentTx.amount).toLocaleString('hi-IN');
+      const isGave = recentTx.tx_type === 'GAVE';
+      const txTypeText = isGave ? 'आपने सामान लिया / दिए' : 'भुगतान जमा मिला / आपने दिए';
+      const recentDate = recentTx.tx_date || new Date().toISOString().split('T')[0];
+      const statusText = net > 0 ? 'बाकी देना है' : (net < 0 ? 'एडवांस जमा है' : 'हिसाब चुकता');
+
+      msg = '📕 *आरोग्यम डिजिटल बहीखाता*\n' +
+            '━━━━━━━━━━━━━━━━━━━\n' +
+            '🌾 *नमस्ते ' + custName + ' जी!* 🙏\n\n' +
+            'आज आपके खाते में नया लेन-देन दर्ज हुआ है:\n\n' +
+            '🔹 *आज की प्रविष्टि:* ₹' + recentAmt + ' (' + txTypeText + ')\n' +
+            (recentTx.bill_details ? ('📝 *सामान/बिल विवरण:* ' + recentTx.bill_details + '\n') : '') +
+            '📅 *तारीख:* ' + recentDate + '\n' +
+            '━━━━━━━━━━━━━━━━━━━\n' +
+            '💰 *अब कुल बकाया हिसाब:* *₹' + Math.abs(net).toLocaleString('hi-IN') + '* (' + statusText + ')\n' +
+            '━━━━━━━━━━━━━━━━━━━\n\n' +
+            '📖 *अपनी पूरी डिजिटल पासबुक और सभी बिल यहाँ देखें:*\n' +
+            '👉 ' + shortLink + '\n\n' +
+            '*(इस लिंक पर क्लिक करके आप अपने सारे पुराने और नए बिल पारदर्शी रूप से देख सकते हैं)*\n\n' +
+            'धन्यवाद! — *' + sName + '* (📞 ' + sMob + ')';
     } else {
-      msg = `🌾 *नमस्ते ${first.customer_name} जी!* 🙏\n\n*${sName}* (${sMob}) के साथ आपका हिसाब चुकता है।\n\n📖 *अपनी डिजिटल पासबुक यहाँ देखें:*\n${shortLink}\n\n— *Aarogyam India डिजिटल खाता बुक*`;
+      // 2. General Ledger Statement Reminder
+      if (net > 0) {
+        msg = '📕 *आरोग्यम डिजिटल बहीखाता*\n' +
+              '━━━━━━━━━━━━━━━━━━━\n' +
+              '🌾 *नमस्ते ' + custName + ' जी!* 🙏\n\n' +
+              'आपके खाते में *' + sName + '* (📞 ' + sMob + ') का कुल हिसाब दर्ज है:\n\n' +
+              '💰 *कुल बकाया राशि:* *₹' + net.toLocaleString('hi-IN') + '* (बाकी देना है)\n' +
+              '━━━━━━━━━━━━━━━━━━━\n\n' +
+              '📖 *अपनी पूरी डिजिटल पासबुक और सभी बिल यहाँ देखें:*\n' +
+              '👉 ' + shortLink + '\n\n' +
+              '*(इस लिंक पर क्लिक करके आप अपना पूरा हिसाब पारदर्शी रूप से देख सकते हैं)*\n\n' +
+              'धन्यवाद! — *' + sName + '*';
+      } else {
+        msg = '📕 *आरोग्यम डिजिटल बहीखाता*\n' +
+              '━━━━━━━━━━━━━━━━━━━\n' +
+              '🌾 *नमस्ते ' + custName + ' जी!* 🙏\n\n' +
+              '*' + sName + '* (📞 ' + sMob + ') के साथ आपका हिसाब चुकता है।\n\n' +
+              '📖 *अपनी पूरी डिजिटल पासबुक यहाँ देखें:*\n' +
+              '👉 ' + shortLink + '\n\n' +
+              'धन्यवाद! — *' + sName + '*';
+      }
     }
 
-    window.open(`https://api.whatsapp.com/send?phone=91${mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+    window.open('https://api.whatsapp.com/send?phone=91' + mobile + '&text=' + encodeURIComponent(msg), '_blank');
   }
 
   // Send SMS Reminder
@@ -5289,38 +5412,93 @@
     openPublicPassbookByCode(activeKbCustomer.short_code || generateShortCode(activeKbCustomer.mobile));
   }
 
-  function openPublicPassbookByCode(shortCode) {
-    const allEntries = getKbEntries();
-    let entries = allEntries.filter(e => e.short_code === shortCode);
+  async function openPublicPassbookByCode(shortCode) {
+    if (!shortCode) return;
+    const cleanCode = shortCode.trim();
+    const sbUrl = "https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/khatabook_entries";
+    const sbKey = "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU";
 
-    // If empty locally, try finding by mobile or fallback
-    if (entries.length === 0) {
-      // If we have internet and Supabase, query Supabase
-      const client = getActiveDbClient();
-      if (client && typeof client.from === 'function') {
-        client
-          .from('khatabook_entries')
-          .select('*')
-          .eq('short_code', shortCode)
-          .then(({ data, error }) => {
-            if (!error && data && data.length > 0) {
-              renderPassbookModalWithEntries(data);
-            } else {
-              alert('पासबुक रिकॉर्ड लोड नहीं हो सका या लिंक अमान्य है।');
-            }
-          })
-          .catch(() => alert('ऑफलाइन हैं, पासबुक लोड नहीं हो सकी।'));
-        return;
-      } else {
-        alert('पासबुक रिकॉर्ड नहीं मिला।');
-        return;
+    console.log('📖 Opening Public Passbook for code:', cleanCode);
+
+    // 1. Locate the anchor entry (locally or from Supabase cloud)
+    const local = getKbEntries();
+    let anchorEntry = local.find(e => e.short_code === cleanCode);
+
+    if (!anchorEntry) {
+      try {
+        const res = await fetch(sbUrl + '?short_code=eq.' + encodeURIComponent(cleanCode) + '&limit=1', {
+          headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+        });
+        if (res.ok) {
+          const rows = await res.json();
+          if (rows && rows.length > 0) anchorEntry = rows[0];
+        }
+      } catch (err) {
+        console.warn('Initial short_code fetch notice:', err);
       }
     }
 
-    renderPassbookModalWithEntries(entries);
+    // Fallback: check by prefix (before _)
+    if (!anchorEntry && cleanCode.includes('_')) {
+      const prefix = cleanCode.split('_')[0];
+      anchorEntry = local.find(e => e.short_code && e.short_code.startsWith(prefix));
+      if (!anchorEntry) {
+        try {
+          const res = await fetch(sbUrl + '?short_code=like.' + encodeURIComponent(prefix) + '%25&limit=1', {
+            headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            if (rows && rows.length > 0) anchorEntry = rows[0];
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (!anchorEntry) {
+      alert('पासबुक रिकॉर्ड लोड नहीं हो सका या लिंक अमान्य है।');
+      return;
+    }
+
+    // 2. CRITICAL FIX: Load ALL transactions between this Customer & Distributor (Complete Statement!)
+    const custMob = anchorEntry.customer_mobile;
+    const distMob = anchorEntry.distributor_mobile;
+
+    let fullStatement = [];
+
+    // A) Local matches
+    const localStatement = local.filter(e => e.customer_mobile === custMob && e.distributor_mobile === distMob);
+    fullStatement = [...localStatement];
+
+    // B) Supabase remote matches
+    try {
+      const qUrl = sbUrl + '?customer_mobile=eq.' + encodeURIComponent(custMob) + '&distributor_mobile=eq.' + encodeURIComponent(distMob) + '&order=tx_date.asc,created_at.asc';
+      const res = await fetch(qUrl, {
+        headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey }
+      });
+      if (res.ok) {
+        const remoteRows = await res.json();
+        if (Array.isArray(remoteRows) && remoteRows.length > 0) {
+          const mergedMap = new Map();
+          fullStatement.forEach(r => mergedMap.set(r.id || (r.tx_date + '_' + r.amount + '_' + r.tx_type), r));
+          remoteRows.forEach(r => mergedMap.set(r.id, r));
+          fullStatement = Array.from(mergedMap.values());
+        }
+      }
+    } catch (e) {
+      console.warn('Full statement remote fetch notice:', e);
+    }
+
+    if (fullStatement.length === 0) {
+      fullStatement = [anchorEntry];
+    }
+
+    // 3. Render the Complete, Beautiful, Fully-Responsive Passbook!
+    renderPassbookModalWithEntries(fullStatement);
   }
 
   function renderPassbookModalWithEntries(entries) {
+    if (!entries || entries.length === 0) return;
     const first = entries[0];
     const distNameEl = document.getElementById('kbPassbookDistributorName');
     const distDetEl = document.getElementById('kbPassbookDistributorDetails');
@@ -5328,15 +5506,43 @@
     const totCredEl = document.getElementById('kbPassbookTotalCredit');
     const netBalEl = document.getElementById('kbPassbookNetBalance');
     const tableBody = document.getElementById('kbPassbookTableBody');
+    const dateRangeEl = document.getElementById('kbPassbookDateRange');
 
     let totalGave = 0;
     let totalGot = 0;
 
-    // Sort chronologically (oldest to newest for running balance)
-    const sorted = [...entries].sort((a, b) => (a.tx_date || '').localeCompare(b.tx_date || ''));
-    let runningBalance = 0;
+    // Sort chronologically (oldest to newest for accurate running balance)
+    const sorted = [...entries].sort((a, b) => {
+      const dA = (a.tx_date || '') + ' ' + (a.created_at || '');
+      const dB = (b.tx_date || '') + ' ' + (b.created_at || '');
+      return dA.localeCompare(dB);
+    });
 
-    const rowsHtml = sorted.map(e => {
+    let runningBalance = 0;
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const formatKhataDate = function(dStr) {
+      if (!dStr) return 'आज';
+      const parts = dStr.split('-');
+      if (parts.length !== 3) return dStr;
+      const day = parts[2].padStart(2, '0');
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const mName = monthNames[mIdx] || parts[1];
+      return day + ' ' + mName;
+    };
+
+    const formatFullDate = function(dStr) {
+      if (!dStr) return '';
+      const parts = dStr.split('-');
+      if (parts.length !== 3) return dStr;
+      const day = parts[2].padStart(2, '0');
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const mName = monthNames[mIdx] || parts[1];
+      return day + ' ' + mName + ' ' + parts[0];
+    };
+
+    // Calculate running balance per entry
+    const entriesWithBalance = sorted.map((e) => {
       const isGave = e.tx_type === 'GAVE';
       const amt = Number(e.amount) || 0;
       if (isGave) {
@@ -5346,59 +5552,104 @@
         totalGot += amt;
         runningBalance -= amt;
       }
+      return {
+        entry: e,
+        isGave: isGave,
+        amount: amt,
+        balanceAfter: runningBalance
+      };
+    });
 
-      const dateStr = e.tx_date ? e.tx_date.split('-').slice(1).reverse().join(' ') : 'आज';
-      const balStr = runningBalance > 0 
-        ? `${runningBalance.toLocaleString('hi-IN')} Dr` 
-        : (runningBalance < 0 ? `${Math.abs(runningBalance).toLocaleString('hi-IN')} Cr` : '0');
+    // Display latest entries on top (like Khatabook)
+    const reversed = [...entriesWithBalance].reverse();
 
-      return `
-        <tr>
-          <td style="font-weight:700; color:#334155; font-size:0.80rem;">${dateStr}</td>
-          <td class="debit-cell" style="text-align:right;">
-            ${isGave ? amt.toLocaleString('hi-IN') : ''}
-          </td>
-          <td class="credit-cell" style="text-align:right;">
-            ${!isGave ? amt.toLocaleString('hi-IN') : ''}
-          </td>
-          <td style="text-align:right; font-weight:800; color:${runningBalance > 0 ? '#dc2626' : (runningBalance < 0 ? '#16a34a' : '#64748b')}; font-size:0.82rem;">
-            ₹ ${balStr}
-          </td>
-        </tr>
-      `;
-    }).reverse().join(''); // Show latest on top like khata.pe
+    const rowsHtml = reversed.map((item, idx) => {
+      const e = item.entry;
+      const isGave = item.isGave;
+      const amt = item.amount;
+      const bal = item.balanceAfter;
+      const dateFormatted = formatKhataDate(e.tx_date);
+      const isLatest = (idx === 0);
 
-    if (distNameEl) distNameEl.textContent = first.distributor_name || 'Aarogyam Master';
+      const balStr = bal > 0 
+        ? (bal.toLocaleString('hi-IN') + ' Dr') 
+        : (bal < 0 ? (Math.abs(bal).toLocaleString('hi-IN') + ' Cr') : '0');
+
+      const detailsNote = (e.bill_details && e.bill_details.trim() && e.bill_details !== 'नया खाता सृजित') 
+        ? e.bill_details.trim() 
+        : '';
+
+      return '<tr>' +
+        // Column 1: Date (White Background with 'Latest' badge on top row)
+        '<td style="border:1px solid #e5e7eb; padding:8px 6px; text-align:left; background:#ffffff; vertical-align:middle;">' +
+          (isLatest ? '<div style="font-size:0.65rem; font-weight:800; color:#dc2626; line-height:1; margin-bottom:2px;">Latest</div>' : '') +
+          '<div style="font-size:0.84rem; font-weight:600; color:#111827; white-space:nowrap;">' + dateFormatted + '</div>' +
+          (detailsNote ? ('<div style="font-size:0.68rem; color:#6b7280; font-weight:500; margin-top:2px; line-height:1.2; word-break:break-word;">' + detailsNote + '</div>') : '') +
+        '</td>' +
+        // Column 2: Debit(-) (Signature Khatabook Light Pink Background #fdf2f2)
+        '<td style="border:1px solid #e5e7eb; padding:8px 6px; text-align:right; background:#fdf2f2; vertical-align:middle; font-weight:600; color:#111827; font-size:0.86rem; white-space:nowrap;">' +
+          (isGave ? amt.toLocaleString('hi-IN') : '') +
+        '</td>' +
+        // Column 3: Credit(+) (Signature Khatabook Light Green Background #f0fdf4)
+        '<td style="border:1px solid #e5e7eb; padding:8px 6px; text-align:right; background:#f0fdf4; vertical-align:middle; font-weight:600; color:#111827; font-size:0.86rem; white-space:nowrap;">' +
+          (!isGave ? amt.toLocaleString('hi-IN') : '') +
+        '</td>' +
+        // Column 4: Balance (White Background with red text if Dr)
+        '<td style="border:1px solid #e5e7eb; padding:8px 6px; text-align:right; background:#ffffff; vertical-align:middle; font-weight:600; color:' + (bal > 0 ? '#b91c1c' : (bal < 0 ? '#15803d' : '#6b7280')) + '; font-size:0.84rem; white-space:nowrap;">' +
+          balStr +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    if (distNameEl) distNameEl.textContent = first.distributor_name || 'Avnish Mishra';
     if (distDetEl) {
-      distDetEl.textContent = `मोबाइल: ${first.distributor_mobile || '7974422572'} • ग्राहक: ${first.customer_name || 'किसान साथी'}`;
+      distDetEl.textContent = (first.distributor_mobile || '7049294111') + ' • ग्राहक: ' + (first.customer_name || 'साथी');
     }
-    if (totDebEl) totDebEl.textContent = '₹ ' + totalGave.toLocaleString('hi-IN');
-    if (totCredEl) totCredEl.textContent = '₹ ' + totalGot.toLocaleString('hi-IN');
+    if (totDebEl) totDebEl.textContent = '₹' + totalGave.toLocaleString('hi-IN');
+    if (totCredEl) totCredEl.textContent = '₹' + totalGot.toLocaleString('hi-IN');
     
     const net = totalGave - totalGot;
+    const netMeaningEl = document.getElementById('kbPassbookNetBalanceMeaning');
     if (netBalEl) {
       if (net > 0) {
-        netBalEl.textContent = '₹ ' + net.toLocaleString('hi-IN') + ' Dr';
+        netBalEl.textContent = '₹' + net.toLocaleString('hi-IN') + ' Dr';
         netBalEl.style.color = '#dc2626';
+        if (netMeaningEl) {
+          netMeaningEl.textContent = '(बाकी लेना है)';
+          netMeaningEl.style.color = '#dc2626';
+        }
       } else if (net < 0) {
-        netBalEl.textContent = '₹ ' + Math.abs(net).toLocaleString('hi-IN') + ' Cr';
-        netBalEl.style.color = '#16a34a';
+        netBalEl.textContent = '₹' + Math.abs(net).toLocaleString('hi-IN') + ' Cr';
+        netBalEl.style.color = '#15803d';
+        if (netMeaningEl) {
+          netMeaningEl.textContent = '(एडवांस जमा है)';
+          netMeaningEl.style.color = '#15803d';
+        }
       } else {
-        netBalEl.textContent = '₹ 0 (चुकता)';
-        netBalEl.style.color = '#64748b';
+        netBalEl.textContent = '₹0';
+        netBalEl.style.color = '#6b7280';
+        if (netMeaningEl) {
+          netMeaningEl.textContent = '(हिसाब चुकता)';
+          netMeaningEl.style.color = '#6b7280';
+        }
       }
+    }
+
+    if (dateRangeEl && sorted.length > 0) {
+      const earliest = sorted[0].tx_date;
+      const latest = sorted[sorted.length - 1].tx_date;
+      dateRangeEl.textContent = '(' + formatFullDate(earliest) + ' - ' + formatFullDate(latest) + ')';
     }
 
     if (tableBody) tableBody.innerHTML = rowsHtml;
 
-    // Permanent Referral Locking for this customer!
+    // Referral Locking for viral growth
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) {
       try {
         localStorage.setItem('AAROGYAM_REF_ID', ref);
-        document.cookie = `AAROGYAM_REF_ID=${encodeURIComponent(ref)};path=/;max-age=31536000`;
-        console.log('🔒 Direct Lifetime Referral locked:', ref);
+        document.cookie = 'AAROGYAM_REF_ID=' + encodeURIComponent(ref) + ';path=/;max-age=31536000';
       } catch (_) {}
     }
 

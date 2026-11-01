@@ -1172,12 +1172,15 @@
                 </div>
                 <span class="drawer-tag-pill">VIP</span>
               </a>
-              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item">
+              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item" style="background:#fff1f2; border:1.5px solid #fecdd3; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
                 <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-wallet"></i></div>
-                  <span>मेरी डायरी खाता (फील्ड मैनेजर)</span>
+                  <div class="drawer-sub-icon-box" style="background:#e11d48; color:#ffffff; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-book"></i></div>
+                  <div>
+                    <span style="font-weight:900; color:#be123c; font-size:0.92rem; display:block;">आरोग्यम बहीखाता</span>
+                    <span style="font-size:0.72rem; color:#64748b; font-weight:700;">उधारी लेज़र, किसान व टीम डायरी</span>
+                  </div>
                 </div>
-                <span class="drawer-tag-pill">HOT 🔥</span>
+                <span class="drawer-tag-pill" style="background:#e11d48; color:#ffffff; font-weight:900;">नया 📕</span>
               </a>
               <a href="/ucas/index.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
@@ -1282,10 +1285,10 @@
           <div class="u-icon-wrap"><i class="fa-solid fa-cow" style="color:#0284c7;"></i></div>
           <span style="color:#0284c7;font-weight:800;">पशु पालन</span>
         </a>
-        <!-- 7. मेरी डायरी (My Diary) -->
+        <!-- 7. बहीखाता (Bahi Khata) -->
         <a href="/pages/smart-etailer.html" class="u-nav-tab ${currentPath.includes('smart-etailer') || currentPath.includes('marketing') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-book-bookmark" style="color:#10b981;"></i></div>
-          <span style="color:#10b981;font-weight:800;">मेरी डायरी</span>
+          <div class="u-icon-wrap"><i class="fa-solid fa-book-journal-whills" style="color:#e11d48; font-size:1.15rem;"></i></div>
+          <span style="color:#e11d48;font-weight:900;">बहीखाता</span>
         </a>
         <!-- 8. Profile -->
         <a href="/ucas/index.html" class="u-nav-tab ${(currentPath.includes('ucas') || currentPath.includes('profile')) && !currentPath.includes('smart-etailer') ? 'active' : ''}">
