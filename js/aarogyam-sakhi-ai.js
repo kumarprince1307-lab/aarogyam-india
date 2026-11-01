@@ -4032,15 +4032,15 @@ if (typeof document !== 'undefined') {
       }
     }, 100);
 
-    // 3. Initiate flight after 1.1s
+    // 3. Initiate flight after 2.8s (Graceful opening so user clearly sees Avatar)
     sakhiIntroFlightTimer = setTimeout(() => {
       const overlay = document.getElementById('sakhiAntigravityIntro');
       if (overlay) {
         overlay.classList.add('flying');
       }
-    }, 1100);
+    }, 2800);
 
-    // 4. Dock in header, trigger ripple glow & render final greeting at 1.65s
+    // 4. Dock in header, trigger ripple glow & render final greeting at 3.8s
     sakhiIntroTimer = setTimeout(() => {
       const headerAvatar = document.getElementById('sakhiAvatarFrame') || document.querySelector('.sakhi-avatar-frame');
       if (headerAvatar) {
@@ -4212,6 +4212,7 @@ if (typeof document !== 'undefined') {
   }
 
   // 12. SUBMISSION HANDLER & USER INPUT PROCESSING
+  window.handleSakhiUserSubmit = handleUserSubmit;
   function handleUserSubmit(userQuery) {
     let query = (userQuery || '').trim();
     if (!query) return;
@@ -4221,6 +4222,11 @@ if (typeof document !== 'undefined') {
       query = query.replace(/\s*\(\s*\{[^}]*\}\s*\)/g, '').replace(/\{[^}]*\}/g, '').trim();
     }
     if (!query) query = 'आज का मौसम बताओ';
+
+    // 🧠 SAKHI PERSONA: Track user interaction & interest state machine
+    if (window.SakhiPersona && typeof window.SakhiPersona.trackUserInteraction === 'function') {
+      window.SakhiPersona.trackUserInteraction(query);
+    }
 
     // Immediately stop any active TTS speech so user can focus on the new answer
     stopAllSpeech();

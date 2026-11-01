@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v33.0';
+const STATIC_CACHE = 'aarogyam-public-static-v34.0';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v23.0';
+const PAGES_CACHE = 'aarogyam-public-pages-v24.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v3.0';
 const OFFLINE_URL = '/offline.html';
 
@@ -44,6 +44,7 @@ const PRECACHE_SHELL = [
   '/js/public-pwa.js',
   '/js/sakhi-panchang-engine.js?v=20261030_v16_panchang_fix',
   '/js/aarogyam-sakhi-ai.js',
+  '/js/sakhi-persona-engine.js',
   '/js/universal-nav-drawer.js',
   '/js/viral-share-engine.js',
   '/js/global-guest-modal.js',
