@@ -1,3 +1,4 @@
+ALTER TABLE public.khatabook_entries DROP CONSTRAINT IF EXISTS khatabook_entries_short_code_key;
 -- ============================================================================
 -- AAROGYAM DIGITAL KHATA BOOK (PRO LEDGER & CUSTOMER PASSBOOK)
 -- समर्पित लेज़र टेबल: प्रत्येक लेन-देन की स्वतंत्र प्रविष्टि और ग्राहक की डिजिटल पासबुक
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.khatabook_entries (
     due_date DATE, -- भुगतान वादा तारीख (वैकल्पिक)
     
     -- ग्राहक की निजी पासबुक के लिए 6-अंकीय शॉर्ट कोड (उदा. K9X2P1)
-    short_code TEXT UNIQUE,
+    short_code TEXT,
     
     -- टाइमस्टैम्प
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

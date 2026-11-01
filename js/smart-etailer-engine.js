@@ -1819,17 +1819,41 @@
 
   function getUserMobile() {
     try {
-      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-      if (u && (u.mobile || u.phone)) return String(u.mobile || u.phone).replace(/\D/g, '');
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+      if (u && (u.mobile || u.phone)) {
+        const clean = String(u.mobile || u.phone).replace(/\D/g, '').slice(-10);
+        if (clean.length === 10) return clean;
+      }
     } catch (_) {}
-    return localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_mobile') || '';
+    const candidateKeys = [
+      'aim_user_mobile',
+      'aarogyam_user_phone',
+      'user_phone',
+      'user_mobile',
+      'SAKHI_USER_PHONE',
+      'farmer_mobile',
+      'aarogyam_user_mobile'
+    ];
+    for (const k of candidateKeys) {
+      const val = localStorage.getItem(k);
+      if (val) {
+        const clean = String(val).replace(/\D/g, '').slice(-10);
+        if (clean.length === 10) return clean;
+      }
+    }
+    return '';
   }
 
   function getUserDisplayName() {
     try {
-      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
       if (u && (u.name || u.full_name)) return u.name || u.full_name;
     } catch (_) {}
+    const candidateKeys = ['aim_user_name', 'aarogyam_user_name', 'user_name', 'SAKHI_USER_NAME', 'farmer_name'];
+    for (const k of candidateKeys) {
+      const val = localStorage.getItem(k);
+      if (val && val.trim()) return val.trim();
+    }
     return 'आरोग्यम साथी';
   }
 
@@ -4348,22 +4372,22 @@
   function getKbEntries() {
     try {
       const key = getKbStorageKey();
-      let entries = JSON.parse(localStorage.getItem(key) || '[]');
-      if (entries.length === 0 && key !== 'AI_KHATABOOK_ENTRIES') {
-        const legacy = JSON.parse(localStorage.getItem('AI_KHATABOOK_ENTRIES') || '[]');
-        const myMob = getUserMobile();
-        const valid = legacy.filter(e => {
-          const cName = ((e.customer_name || '') + '').toLowerCase();
-          const isDummy = cName.includes('rajesh') || e.customer_mobile === '7976655444' || e.customer_mobile === '9826012345';
-          if (isDummy) return false;
-          return !myMob || e.distributor_mobile === myMob || e.customer_mobile === myMob;
-        });
-        if (valid.length > 0) {
-          entries = valid;
-          localStorage.setItem(key, JSON.stringify(entries));
-        }
-      }
-      return entries;
+      const entries = JSON.parse(localStorage.getItem(key) || '[]');
+      // Clean filter to prevent any zombie seeds
+      return entries.filter(e => {
+        const cName = ((e.customer_name || e.name || '') + '').toLowerCase();
+        const amt = Number(e.amount) || 0;
+        const id = (e.id || '') + '';
+        const sc = (e.short_code || '') + '';
+        const isDummy = id.includes('seed') || 
+                        cName.includes('netsurf customer') || 
+                        cName.includes('rajesh') || 
+                        (cName === 'aarogyam' && amt === 0) || 
+                        amt === 124294 || 
+                        sc === 'NC124K' || 
+                        sc === 'AGM001';
+        return !isDummy;
+      });
     } catch (_) {
       return [];
     }
@@ -4478,7 +4502,7 @@
       if (error) {
         console.warn('Khatabook Cloud sync notice:', error.message);
       } else {
-        console.log('✅ Khatabook entry synced LIVE to Supabase cloud!', data);
+        console.log('✅ Khatabook entry synced LIVE to Supabase cloud!', data); if (typeof showToast === 'function') { showToast('☁️ क्लाउड में लाइव सुरक्षित हो गया!', 'success'); }
         if (data && data[0] && data[0].id) {
           entry.id = data[0].id;
           const current = getKbEntries();
@@ -4753,7 +4777,8 @@
     if (!exists) {
       entries.unshift(newEntry);
       saveKbEntries(entries);
-      syncKbEntryToSupabaseAsync(newEntry);
+      // Note: Supabase khatabook_entries requires amount > 0, so initial party entry
+      // is stored locally and syncs to Supabase on the very first transaction.
     }
 
     closeAddPartyModal();
@@ -5040,21 +5065,27 @@
       }
     }
 
+    const myMob = getUserMobile();
+    const custMob = activeKbCustomer.mobile;
+    const baseCode = generateShortCode(custMob);
+    // Ensure globally unique code for Supabase unique constraint
+    const uniqueTxCode = baseCode + '_' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
     const newTx = {
       id: generateKbUUID(),
-      distributor_mobile: getUserMobile(),
+      distributor_mobile: myMob || '7049294111',
       distributor_name: getUserDisplayName(),
-      customer_mobile: activeKbCustomer.mobile,
+      customer_mobile: custMob,
       customer_name: activeKbCustomer.name,
-      customer_place: activeKbCustomer.place,
-      party_type: activeKbCustomer.party_type,
+      customer_place: activeKbCustomer.place || '',
+      party_type: activeKbCustomer.party_type || 'customer',
       tx_type: activeKbTxMode,
       amount: amt,
       bill_details: details,
       bill_local_id: localFileId,
       tx_date: txDate,
       due_date: dueDate,
-      short_code: activeKbCustomer.short_code || generateShortCode(activeKbCustomer.mobile),
+      short_code: uniqueTxCode,
       created_at: new Date().toISOString()
     };
 
@@ -5498,8 +5529,14 @@
     const confirmed = confirm(`⚠️ क्या आप "${activeKbCustomer.name}" का पूरा खाता और सभी लेन-देन डिलीट करना चाहते हैं?\n\nयह क्रिया वापस नहीं हो सकती!`);
     if (!confirmed) return;
 
+    const targetName = activeKbCustomer.name;
+    const targetMob = activeKbCustomer.mobile;
     let entries = getKbEntries();
-    entries = entries.filter(item => item.customer_mobile !== activeKbCustomer.mobile);
+    entries = entries.filter(item => 
+      item.customer_mobile !== targetMob && 
+      item.distributor_mobile !== targetMob &&
+      item.customer_name !== targetName
+    );
     saveKbEntries(entries);
 
     // Delete from Supabase in background
@@ -5508,7 +5545,7 @@
       client
         .from('khatabook_entries')
         .delete()
-        .eq('customer_mobile', activeKbCustomer.mobile)
+        .or(`customer_mobile.eq.${targetMob},distributor_mobile.eq.${targetMob}`)
         .then(() => console.log('Deleted customer from Supabase'))
         .catch(err => console.warn('Supabase delete error:', err));
     }
@@ -6411,20 +6448,37 @@
   // -------------------------------------------------------------
   async function initEngine() {
     loadLocalVault();
-    // 1-Time Auto-Purge of Test/Dummy Records ('rajesh', dummy test numbers)
+    // Comprehensive Auto-Purge of Legacy Test / Dummy Seeds across ALL localStorage keys
     try {
-      const purgeKeys = ['AAROGYAM_SMART_DIARY_ENTRIES', 'AAROGYAM_KHATABOOK_ENTRIES_V1'];
-      purgeKeys.forEach(k => {
-        let items = JSON.parse(localStorage.getItem(k) || '[]');
-        const filtered = items.filter(it => {
-          const name = ((it.name || it.customer_name || '') + '').toLowerCase();
-          const mob = ((it.mobile || it.customer_mobile || '') + '').replace(/\D/g, '');
-          return !name.includes('rajesh') && mob !== '7976655444' && mob !== '7976655443' && mob !== '9999999999';
-        });
-        if (filtered.length !== items.length) {
-          localStorage.setItem(k, JSON.stringify(filtered));
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('AI_KHATABOOK') || k.startsWith('AAROGYAM_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_'))) {
+          try {
+            const raw = localStorage.getItem(k);
+            if (raw && (raw.startsWith('[') || raw.startsWith('{'))) {
+              let items = JSON.parse(raw);
+              if (Array.isArray(items)) {
+                const cleaned = items.filter(it => {
+                  const cName = ((it.customer_name || it.name || '') + '').toLowerCase();
+                  const mob = ((it.customer_mobile || it.mobile || '') + '').replace(/\D/g, '');
+                  const amt = Number(it.amount) || 0;
+                  const id = (it.id || '') + '';
+                  const sc = (it.short_code || '') + '';
+                  const isDummy = id.includes('seed') ||
+                                  cName.includes('netsurf customer') ||
+                                  cName.includes('rajesh') ||
+                                  (cName === 'aarogyam' && amt === 0) ||
+                                  amt === 124294 ||
+                                  mob === '7976655444' || mob === '7976655443' || mob === '9999999999' ||
+                                  sc === 'NC124K' || sc === 'AGM001';
+                  return !isDummy;
+                });
+                localStorage.setItem(k, JSON.stringify(cleaned));
+              }
+            }
+          } catch (_) {}
         }
-      });
+      }
     } catch (_) {}
     // Initialize Smart Business Diary Components
     updateDiaryHeroLevel();
