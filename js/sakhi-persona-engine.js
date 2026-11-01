@@ -19,18 +19,40 @@
 (function () {
   'use strict';
 
-  // 1. STATE & USER PERSONA STORE
-  const PERSONA_STORAGE_KEY = 'SAKHI_PERSISTENT_PERSONA_V2';
+  // 1. STATE & USER PERSONA STORE (STRICTLY SCOPED PER USER PHONE - SAKHI_MANAS.md RULE 1)
+  function getCurrentUserPhone() {
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+      if (u.mobile || u.phone) return String(u.mobile || u.phone).trim();
+    } catch (_) {}
+    try {
+      const p = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}');
+      if (p.mobile || p.phone) return String(p.mobile || p.phone).trim();
+    } catch (_) {}
+    try {
+      const s = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
+      if (s.mobile || s.phone) return String(s.mobile || s.phone).trim();
+    } catch (_) {}
+    return '';
+  }
+
+  function getPersonaStorageKey() {
+    const phone = getCurrentUserPhone();
+    return phone ? `SAKHI_PERSISTENT_PERSONA_V2_${phone}` : `SAKHI_PERSISTENT_PERSONA_V2_guest`;
+  }
+
   let activePersona = null;
   let sessionQueryStreak = 0;
   let currentDomainStreak = 0;
   let lastDomain = '';
   let authenticNuskheCache = null;
 
-  // Load Persona from LocalStorage with safe fallbacks
+  // Load Persona from LocalStorage scoped strictly to current user
   function loadPersona() {
+    const key = getPersonaStorageKey();
+    const phone = getCurrentUserPhone();
     try {
-      const raw = localStorage.getItem(PERSONA_STORAGE_KEY);
+      const raw = localStorage.getItem(key);
       if (raw) {
         activePersona = JSON.parse(raw);
       }
@@ -39,7 +61,7 @@
     if (!activePersona) {
       activePersona = {
         name: '',
-        mobile: '',
+        mobile: phone,
         primaryDomain: 'agri',
         domainScores: { agri: 0, pashu: 0, health: 0, beauty: 0, weight: 0 },
         lastTopic: '',
@@ -49,25 +71,20 @@
       };
     }
 
-    // Auto-discover past topic from chat logs if empty
-    if (!activePersona.lastTopic) {
+    // Auto-discover past topic ONLY from current user's personal chat log
+    if (!activePersona.lastTopic && phone) {
       try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k && k.startsWith('SAKHI_CHAT_LOG_')) {
-            const rawLog = localStorage.getItem(k);
-            if (rawLog) {
-              const arr = JSON.parse(rawLog);
-              if (Array.isArray(arr) && arr.length > 0) {
-                for (let j = arr.length - 1; j >= 0; j--) {
-                  const item = arr[j];
-                  if (item.role === 'user' && item.content && !item.content.includes('{') && !item.content.startsWith('[')) {
-                    activePersona.lastTopic = item.content.slice(0, 80);
-                    activePersona.lastTopicTimestamp = Date.now();
-                    break;
-                  }
-                }
-                if (activePersona.lastTopic) break;
+        const chatKey = `SAKHI_CHAT_LOG_V1_${phone}`;
+        const rawLog = localStorage.getItem(chatKey);
+        if (rawLog) {
+          const arr = JSON.parse(rawLog);
+          if (Array.isArray(arr) && arr.length > 0) {
+            for (let j = arr.length - 1; j >= 0; j--) {
+              const item = arr[j];
+              if (item.role === 'user' && item.content && !item.content.includes('{') && !item.content.startsWith('[')) {
+                activePersona.lastTopic = item.content.slice(0, 80);
+                activePersona.lastTopicTimestamp = Date.now();
+                break;
               }
             }
           }
@@ -92,7 +109,7 @@
 
   function savePersona() {
     try {
-      localStorage.setItem(PERSONA_STORAGE_KEY, JSON.stringify(activePersona));
+      localStorage.setItem(getPersonaStorageKey(), JSON.stringify(activePersona));
     } catch (_) {}
   }
 
@@ -147,66 +164,14 @@
     }
   }
 
-  // 2. PROACTIVE OPENING REVIEW GREETING (Review Past Conversation)
+  // 2. PROACTIVE OPENING REVIEW GREETING (Handled inline inside main greeting bubble - SAKHI_MANAS.md)
   function renderProactivePastReviewCard() {
-    const p = loadPersona();
-    if (!p || !p.lastTopic) return;
-
-    // Only show if last topic was asked within past 7 days
-    const diffHours = (Date.now() - (p.lastTopicTimestamp || 0)) / (1000 * 60 * 60);
-    if (diffHours > 168) return; // Older than 7 days
-
-    const wrap = document.getElementById('sakhiMessagesWrap') || document.querySelector('.sakhi-messages-wrap');
-    if (!wrap) return;
-
-    // Avoid duplicate cards
-    if (document.getElementById('sakhiProactivePastReviewBox')) return;
-
-    const uName = p.name ? `${p.name} जी` : 'किसान साथी';
-    const topicText = p.lastTopic.replace(/[?।!,]+/g, '').trim();
-
-    const reviewCardHtml = `
-      <div id="sakhiProactivePastReviewBox" style="background:linear-gradient(135deg, #f0fdf4, #ecfdf5); border:1.5px solid #86efac; border-radius:14px; padding:12px 14px; margin:10px 12px; box-shadow:0 3px 10px rgba(22,163,74,0.08); animation:sakhiFadeInUp 0.4s ease-out;">
-        <div style="display:flex; align-items:flex-start; gap:10px;">
-          <div style="background:#16a34a; color:#ffffff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1.0rem;">
-            🌾
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:0.75rem; color:#15803d; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">
-              पिछली बातचीत की समीक्षा • आपकी सखी
-            </div>
-            <strong style="color:#0f172a; font-size:0.92rem; display:block; margin:3px 0 6px 0; line-height:1.35;">
-              राम-राम ${uName}! 🙏 पिछली बार आप "<i>${topicText}</i>" के बारे में पूछ रहे थे, क्या वह कार्य पूरा हो गया?
-            </strong>
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
-              <button type="button" onclick="window.SakhiPersona.handleReviewReply('yes')" style="background:#16a34a; color:#ffffff; border:none; border-radius:20px; padding:5px 12px; font-size:0.78rem; font-weight:800; cursor:pointer;">
-                ✅ हाँ, पूरा हो गया
-              </button>
-              <button type="button" onclick="window.SakhiPersona.handleReviewReply('next_step')" style="background:#ffffff; color:#15803d; border:1px solid #86efac; border-radius:20px; padding:5px 12px; font-size:0.78rem; font-weight:800; cursor:pointer;">
-                🌾 आगे का स्प्रे प्लान बताओ
-              </button>
-              <button type="button" onclick="window.SakhiPersona.handleReviewReply('new_topic')" style="background:#f1f5f9; color:#475569; border:none; border-radius:20px; padding:5px 10px; font-size:0.75rem; font-weight:700; cursor:pointer;">
-                ✕ कुछ नया पूछना है
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Insert right after the welcome banner or top of messages
-    const firstMsg = wrap.firstElementChild;
-    if (firstMsg) {
-      firstMsg.insertAdjacentHTML('afterend', reviewCardHtml);
-    } else {
-      wrap.insertAdjacentHTML('afterbegin', reviewCardHtml);
-    }
+    // Disabled standalone top card to eliminate duplicate bubbles and preserve natural conversation flow.
+    // Past topic review is rendered inside/directly below the official Sakhi greeting bubble in aarogyam-sakhi-ai.js.
+    return;
   }
 
   function handleReviewReply(action) {
-    const box = document.getElementById('sakhiProactivePastReviewBox');
-    if (box) box.remove();
-
     if (action === 'yes') {
       window.SakhiPersona.autoSendQuery("बहुत बढ़िया! बुवाई व प्राथमिक कार्य पूरा हो गया है, अब आगे की पहली सिंचाई व फुटाव का वैज्ञानिक फॉर्मूला बताएं।");
     } else if (action === 'next_step') {
@@ -219,18 +184,19 @@
     const q = (text || '').trim();
     if (!q) return;
 
-    const input = document.getElementById('sakhiChatInput') || document.getElementById('sakhiInput');
-    const form = document.getElementById('sakhiChatForm') || document.getElementById('sakhiForm');
+    if (typeof window.sendSakhiSuggestion === 'function') {
+      window.sendSakhiSuggestion(q);
+      return;
+    }
 
-    if (input) {
-      input.value = q;
-      // Trigger native submit
-      if (typeof window.handleSakhiUserSubmit === 'function') {
-        window.handleSakhiUserSubmit(q);
-      } else if (form) {
-        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-      }
-      input.value = '';
+    const input = document.getElementById('sakhiTextInput') || document.getElementById('sakhiChatInput');
+    if (input) input.value = q;
+
+    if (typeof window.handleSakhiUserSubmit === 'function') {
+      window.handleSakhiUserSubmit(q);
+    } else {
+      const form = document.getElementById('sakhiChatForm') || document.getElementById('sakhiInputForm');
+      if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
   }
 
@@ -382,10 +348,6 @@
   // Auto-init on DOM ready
   document.addEventListener('DOMContentLoaded', () => {
     loadPersona();
-    // Render past review card after avatar entrance finishes
-    setTimeout(() => {
-      renderProactivePastReviewCard();
-    }, 4200);
   });
 
   // Export to Global Window under SAKHI_MANAS.md Protocol
