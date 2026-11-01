@@ -2631,3 +2631,272 @@ body.light-theme .faq-accordion-item div[id^="faqAnswer"] {
   background: #ffffff !important;
   color: #334155 !important;
 }
+
+/* =============================================================
+   KHATABOOK PRO - BLUE & WHITE NATIVE APP UI THEME
+============================================================== */
+.kb-header-pro {
+  background: linear-gradient(135deg, #0052cc 0%, #1d4ed8 100%);
+  border-radius: 14px 14px 0 0;
+  padding: 16px 16px 6px 16px;
+  color: #ffffff;
+}
+
+.kb-subtab-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.kb-subtab-btn.active {
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.kb-subtab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: #fbbf24;
+  border-radius: 3px 3px 0 0;
+}
+
+.kb-summary-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.kb-customer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: #ffffff;
+}
+
+.kb-customer-item:hover {
+  background: #f8fafc;
+}
+
+.kb-customer-item:last-child {
+  border-bottom: none;
+}
+
+.kb-avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #1e40af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.kb-fab-btn {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  right: auto;
+  background: linear-gradient(135deg, #0052cc 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 13px 22px;
+  font-size: 0.98rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0, 82, 204, 0.5);
+  z-index: 99999;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.kb-fab-btn:active {
+  transform: scale(0.96);
+}
+
+.kb-fab-btn:active {
+  transform: scale(0.96);
+}
+
+.kb-calc-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 6px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  user-select: none;
+}
+
+.kb-calc-btn:active {
+  background: #e2e8f0;
+  transform: scale(0.97);
+}
+
+.kb-calc-btn.op {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+  font-weight: 900;
+}
+
+.kb-calc-btn.action {
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 800;
+}
+
+.khata-pe-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.khata-pe-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 800;
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.khata-pe-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+}
+
+.khata-pe-table td.debit-cell {
+  background: #fef2f2;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.khata-pe-table td.credit-cell {
+  background: #f0fdf4;
+  color: #16a34a;
+  font-weight: 700;
+}
+
+
+/* =============================================================
+   CRYSTAL-CLEAR SHARP TYPOGRAPHY & ZERO-BLUR CONTRAST
+============================================================== */
+* {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* Eliminate blurry text shadows across diary, tabs, and modals */
+#tab-diary-ledger *, #kbCustomerList *, #kbCustomerLedgerModal *, #kbAddPartyModal *, #kbAddTxModal *, #kbPublicPassbookModal *, .smart-form-card *, .game-input, .kb-header-pro * {
+  text-shadow: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Crisp Dark Colors on Light Backgrounds */
+.kb-customer-item strong, #kbCustomerList strong {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  font-size: 0.96rem !important;
+}
+
+.kb-customer-item span, #kbCustomerList span {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+label {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+input, select, textarea {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+/* =========================================================
+   CLEAN WHITE MODALS & SHARP BLACK TYPOGRAPHY (KHATABOOK PRO)
+========================================================= */
+.game-modal-card,
+.modal-white-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25) !important;
+}
+
+.game-modal-card label,
+.game-modal-overlay label {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+.game-modal-card .game-input,
+.game-modal-overlay .game-input,
+.game-modal-card input,
+.game-modal-overlay input:not([type="checkbox"]):not([type="radio"]),
+.game-modal-card select,
+.game-modal-overlay select,
+.game-modal-card textarea,
+.game-modal-overlay textarea {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+.game-modal-card input:focus,
+.game-modal-overlay input:focus,
+.game-modal-card select:focus,
+.game-modal-overlay select:focus,
+.game-modal-card textarea:focus,
+.game-modal-overlay textarea:focus {
+  border-color: #0052cc !important;
+  box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.15) !important;
+  outline: none !important;
+}
+
+.status-pill-btn {
+  background: #f1f5f9 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+.status-pill-btn:hover,
+.status-pill-btn.active {
+  background: #dbeafe !important;
+  border-color: #2563eb !important;
+  color: #0052cc !important;
+}

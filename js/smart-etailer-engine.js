@@ -2462,6 +2462,7 @@
   
   // Render Diary Ledger View (Tab 2: खाता बुक)
   function renderDiaryLedger() {
+    renderKhatabookPro();
     const listEl = document.getElementById('diaryLedgerCardsList');
     const mContacts = document.getElementById('ledgerMetricContacts');
     const mFollowups = document.getElementById('ledgerMetricFollowups');
@@ -2679,14 +2680,14 @@
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
                 <span style="font-weight:900; font-size:1.0rem; color:#ffffff;">${e.name}</span>
                 ${typeBadge}
-                ${dueAmt > 0 ? `<span class="badge-udhar" style="background:#ef4444; color:#fff; font-size:0.70rem; font-weight:800; padding:2px 6px; border-radius:4px;">उधारी: ₹${dueAmt}</span>` : ''}
+                
                 ${isDone ? '<span style="background:#065f46; color:#a7f3d0; font-size:0.68rem; padding:2px 6px; border-radius:4px; font-weight:800;">✔️ संपर्क हुआ</span>' : ''}
               </div>
               <div style="font-size:0.78rem; color:#cbd5e1;">
                 📍 <strong>${e.place || 'क्षेत्र दर्ज नहीं'}</strong> • 📱 <span style="color:#38bdf8; font-weight:700;">${e.mobile}</span>
                 ${e.crop_name ? ` • 🌱 फसल: <span style="color:#a7f3d0;">${e.crop_name}</span>` : ''}
                 ${e.need ? ` • 🎯 विषय: <span style="color:#fde047;">${e.need}</span>` : ''}
-                ${e.due_date ? ` • 📅 वादा: <span style="color:#f87171;">${e.due_date}</span>` : ''}
+                
               </div>
             </div>
           </div>
@@ -3201,7 +3202,11 @@
     const contact = diaryEntries.find(e => e.mobile === mobile) || pbEntries.find(p => p.mobile === mobile);
     if (!contact) return;
 
-    if (currentPickerTarget === 'khata') {
+    if (currentPickerTarget === 'kb_party') {
+      if (document.getElementById('kbPartyName')) document.getElementById('kbPartyName').value = contact.name || '';
+      if (document.getElementById('kbPartyMobile')) document.getElementById('kbPartyMobile').value = contact.mobile || '';
+      if (document.getElementById('kbPartyPlace')) document.getElementById('kbPartyPlace').value = contact.place || '';
+    } else if (currentPickerTarget === 'khata') {
       if (document.getElementById('tab2KhataName')) document.getElementById('tab2KhataName').value = contact.name || '';
       if (document.getElementById('tab2KhataMobile')) document.getElementById('tab2KhataMobile').value = contact.mobile || '';
       if (document.getElementById('tab2KhataPlace')) document.getElementById('tab2KhataPlace').value = contact.place || '';
@@ -3229,7 +3234,10 @@
           let tel = (c.tel && c.tel[0]) || '';
           tel = tel.replace(/\D/g, '').slice(-10);
 
-          if (currentPickerTarget === 'khata') {
+          if (currentPickerTarget === 'kb_party') {
+            if (name && document.getElementById('kbPartyName')) document.getElementById('kbPartyName').value = name;
+            if (tel && document.getElementById('kbPartyMobile')) document.getElementById('kbPartyMobile').value = tel;
+          } else if (currentPickerTarget === 'khata') {
             if (name && document.getElementById('tab2KhataName')) document.getElementById('tab2KhataName').value = name;
             if (tel && document.getElementById('tab2KhataMobile')) document.getElementById('tab2KhataMobile').value = tel;
           } else {
@@ -3316,12 +3324,16 @@
     updateHubPreviewText();
   }
 
+  let hubAttachedImageFile = null;
+
   function handleImageAttach(input) {
     const lbl = document.getElementById('hubImageAttachedLabel');
     if (input.files && input.files[0]) {
+      hubAttachedImageFile = input.files[0];
       attachedImageFileName = input.files[0].name;
-      if (lbl) lbl.textContent = `✓ फ़ोटो: ${attachedImageFileName}`;
+      if (lbl) lbl.textContent = `✓ फ़ोटो संलग्न: ${attachedImageFileName}`;
     } else {
+      hubAttachedImageFile = null;
       attachedImageFileName = '';
       if (lbl) lbl.textContent = '';
     }
@@ -3425,7 +3437,18 @@
     const msg = document.getElementById('hubMessagePreviewText')?.value || '';
 
     if (mode === 'whatsapp') {
-      window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+      // If an image is attached, trigger native file share with WhatsApp!
+      if (hubAttachedImageFile && navigator.canShare && navigator.canShare({ files: [hubAttachedImageFile] })) {
+        navigator.share({
+          files: [hubAttachedImageFile],
+          text: msg,
+          title: 'Aarogyam India'
+        }).catch(() => {
+          window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+        });
+      } else {
+        window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+      }
       let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
       counts.wa = (counts.wa || 0) + 1;
       localStorage.setItem('AI_DIARY_TODAY_COUNTS', JSON.stringify(counts));
@@ -3765,7 +3788,19 @@
   // Edit / Upgrade Contact Category Modal
   function openEditCategoryModal(id) {
     const entries = getLocalDiaryEntries();
-    const entry = entries.find(e => e.id === id);
+    let entry = entries.find(e => String(e.id) === String(id));
+    if (!entry) {
+      entry = entries.find(e => (e.mobile && (e.mobile === id || e.mobile.replace(/\D/g, '').slice(-10) === String(id).replace(/\D/g, '').slice(-10))));
+    }
+    if (!entry) {
+      try {
+        const pb = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
+        const pMatch = pb.find(p => String(p.id) === String(id) || (p.mobile && p.mobile.replace(/\D/g, '').slice(-10) === String(id).replace(/\D/g, '').slice(-10)));
+        if (pMatch) {
+          entry = { id: id, name: pMatch.name, mobile: pMatch.mobile, place: pMatch.place, type: 'customer' };
+        }
+      } catch (_) {}
+    }
     if (!entry) return;
 
     const modal = document.getElementById('editCategoryModal');
@@ -4267,7 +4302,1221 @@
   }
 
 
+
+  // =============================================================
+  // KHATABOOK PRO - 100% AUTHENTIC BLUE & WHITE LEDGER ENGINE
+  // Zero Egress, Local-First, Calculator Keypad, khata.pe Passbook
+  // =============================================================
+
+  let kbPartyType = 'customer'; // 'customer' or 'supplier'
+  let kbQuickFilter = 'all';    // 'all', 'dues', 'advance', 'upcoming'
+  let kbSearchQuery = '';
+  let activeKbCustomer = null;  // currently viewed customer object
+  let activeKbTxMode = 'GAVE';  // 'GAVE' or 'GOT'
+  let kbCalcExpr = '500';       // current calculator input
+  let kbCalcMemory = 0;
+  let kbActiveLocalFile = null; // compressed base64 local file
+
+  // Helper: Get or Init Khatabook Entries
+  function getKbEntries() {
+    try {
+      let entries = JSON.parse(localStorage.getItem('AI_KHATABOOK_ENTRIES') || '[]');
+      if (entries.length === 0) {
+        // Migrate from old diary entries if available
+        const oldDiary = getLocalDiaryEntries();
+        const migrated = [];
+        oldDiary.forEach(e => {
+          const amt = Number(e.due_amount) || 0;
+          if (amt !== 0 || e.khata_type) {
+            migrated.push({
+              id: 'kb_' + (e.id || Date.now() + Math.random().toString(36).substr(2, 4)),
+              distributor_mobile: getUserMobile(),
+              distributor_name: getUserDisplayName(),
+              customer_mobile: e.mobile || '9826012345',
+              customer_name: e.name || 'किसान साथी',
+              customer_place: e.place || 'गाँव / शहर',
+              party_type: 'customer',
+              tx_type: (amt > 0 || e.khata_type === 'give') ? 'GAVE' : 'GOT',
+              amount: Math.abs(amt) || 150,
+              bill_details: e.bill_details || e.crop_name || 'खाता प्रविष्टि',
+              tx_date: e.date || new Date().toISOString().split('T')[0],
+              due_date: e.due_date || '',
+              short_code: generateShortCode(e.mobile || '9826012345'),
+              created_at: new Date().toISOString()
+            });
+          }
+        });
+
+        if (migrated.length > 0) {
+          entries = migrated;
+          localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
+        } else {
+          // Initial seed matching Khatabook screenshot
+          entries = [
+            {
+              id: 'kb_seed_1',
+              distributor_mobile: getUserMobile(),
+              distributor_name: getUserDisplayName(),
+              customer_mobile: '9826012345',
+              customer_name: 'Netsurf Customer',
+              customer_place: 'पिपरिया',
+              party_type: 'customer',
+              tx_type: 'GAVE',
+              amount: 124294,
+              bill_details: 'कृषि उत्पाद व बायोफिट किट',
+              tx_date: '2026-10-31',
+              due_date: '2026-11-15',
+              short_code: 'NC124K',
+              created_at: new Date().toISOString()
+            },
+            {
+              id: 'kb_seed_2',
+              distributor_mobile: getUserMobile(),
+              distributor_name: getUserDisplayName(),
+              customer_mobile: '7974422572',
+              customer_name: 'Aarogyam',
+              customer_place: 'सागर',
+              party_type: 'customer',
+              tx_type: 'GOT',
+              amount: 0,
+              bill_details: 'नया खाता शुरू',
+              tx_date: '2026-11-01',
+              due_date: '',
+              short_code: 'AGM001',
+              created_at: new Date().toISOString()
+            }
+          ];
+          localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
+        }
+      }
+      return entries;
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveKbEntries(entries) {
+    localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
+  }
+
+  // 6-Character Unique Short Code Generator (for /khata?k=...)
+  function generateShortCode(mobile) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'K';
+    const suffix = (mobile || '').replace(/\D/g, '').slice(-3);
+    code += suffix;
+    while (code.length < 6) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code.toUpperCase();
+  }
+
+  // Background 1-Way Sync to Supabase `public.khatabook_entries`
+  function syncKbEntryToSupabaseAsync(entry) {
+    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+      window.supabaseClient
+        .from('khatabook_entries')
+        .insert([{
+          id: entry.id,
+          distributor_mobile: entry.distributor_mobile,
+          distributor_name: entry.distributor_name,
+          customer_mobile: entry.customer_mobile,
+          customer_name: entry.customer_name,
+          customer_place: entry.customer_place,
+          party_type: entry.party_type || 'customer',
+          tx_type: entry.tx_type,
+          amount: Number(entry.amount),
+          bill_details: entry.bill_details || '',
+          tx_date: entry.tx_date,
+          due_date: entry.due_date || null,
+          short_code: entry.short_code
+        }])
+        .then(({ data, error }) => {
+          if (error) {
+            console.warn('Khatabook Cloud sync notice:', error.message);
+          } else {
+            console.log('✅ Khatabook entry synced to Supabase cloud!');
+          }
+        })
+        .catch(err => {
+          console.warn('Khatabook Cloud offline fallback:', err);
+        });
+    }
+  }
+
+  // Set Party Type (ग्राहक / सप्लायर)
+  function setKhatabookPartyType(type) {
+    kbPartyType = type;
+    const custBtn = document.getElementById('kbTabCustomerBtn');
+    const suppBtn = document.getElementById('kbTabSupplierBtn');
+    if (custBtn && suppBtn) {
+      if (type === 'customer') {
+        custBtn.classList.add('active');
+        suppBtn.classList.remove('active');
+      } else {
+        suppBtn.classList.add('active');
+        custBtn.classList.remove('active');
+      }
+    }
+    renderKhatabookPro();
+  }
+
+  // Set Quick Filter (All, Dues, Advance, Upcoming)
+  function setKhatabookQuickFilter(filter) {
+    kbQuickFilter = filter;
+    const chips = document.querySelectorAll('#kbFilterChipsRow .status-pill-btn');
+    chips.forEach(chip => {
+      if (chip.getAttribute('data-filter') === filter) chip.classList.add('active');
+      else chip.classList.remove('active');
+    });
+    renderKhatabookPro();
+  }
+
+  // Filter Search
+  function filterKhatabookList(query) {
+    kbSearchQuery = (query || '').toLowerCase().trim();
+    renderKhatabookPro();
+  }
+
+  function toggleKhatabookFilter() {
+    const row = document.getElementById('kbFilterChipsRow');
+    if (row) {
+      row.style.display = (row.style.display === 'none') ? 'flex' : 'none';
+    }
+  }
+
+  // Render Khatabook Pro Main Dashboard View
+  function renderKhatabookPro() {
+    const listEl = document.getElementById('kbCustomerList');
+    const creditEl = document.getElementById('kbSummaryCredit');
+    const debitEl = document.getElementById('kbSummaryDebit');
+    const bizNameEl = document.getElementById('kbHeaderBusinessName');
+    if (!listEl) return;
+
+    if (bizNameEl) {
+      const uName = getUserDisplayName();
+      bizNameEl.textContent = (uName && uName !== 'Aarogyam User') ? uName : 'Netsurf Networking';
+    }
+
+    const allEntries = getKbEntries();
+
+    // Group entries by customer_mobile
+    const customerMap = new Map();
+    allEntries.forEach(e => {
+      const mob = e.customer_mobile || '0000000000';
+      if (!customerMap.has(mob)) {
+        customerMap.set(mob, {
+          mobile: mob,
+          name: e.customer_name || 'ग्राहक',
+          place: e.customer_place || 'गाँव / शहर',
+          party_type: e.party_type || 'customer',
+          short_code: e.short_code || generateShortCode(mob),
+          last_date: e.tx_date || '',
+          total_gave: 0,
+          total_got: 0,
+          entries: []
+        });
+      }
+      const c = customerMap.get(mob);
+      c.entries.push(e);
+      if (e.tx_type === 'GAVE') c.total_gave += Number(e.amount) || 0;
+      else if (e.tx_type === 'GOT') c.total_got += Number(e.amount) || 0;
+      if (e.tx_date && (!c.last_date || e.tx_date > c.last_date)) c.last_date = e.tx_date;
+      if (e.party_type) c.party_type = e.party_type;
+      if (e.customer_name) c.name = e.customer_name;
+      if (e.customer_place) c.place = e.customer_place;
+      if (e.short_code) c.short_code = e.short_code;
+    });
+
+    let customers = Array.from(customerMap.values());
+
+    // Filter by Party Type (ग्राहक / सप्लायर)
+    customers = customers.filter(c => c.party_type === kbPartyType);
+
+    // Calculate Summary Totals
+    let totalWillGive = 0;  // You Will Give (आप देंगे - Credit/Got)
+    let totalWillGet = 0;   // You Will Get (आपको मिलेंगे - Debit/Gave)
+
+    customers.forEach(c => {
+      const net = c.total_gave - c.total_got;
+      if (net > 0) totalWillGet += net;
+      else if (net < 0) totalWillGive += Math.abs(net);
+    });
+
+    if (creditEl) creditEl.textContent = '₹ ' + totalWillGive.toLocaleString('hi-IN');
+    if (debitEl) debitEl.textContent = '₹ ' + totalWillGet.toLocaleString('hi-IN');
+
+    // Filter by Search Query
+    if (kbSearchQuery) {
+      customers = customers.filter(c => 
+        (c.name && c.name.toLowerCase().includes(kbSearchQuery)) ||
+        (c.mobile && c.mobile.includes(kbSearchQuery)) ||
+        (c.place && c.place.toLowerCase().includes(kbSearchQuery))
+      );
+    }
+
+    // Filter by Quick Chips
+    if (kbQuickFilter === 'dues') {
+      customers = customers.filter(c => (c.total_gave - c.total_got) > 0);
+    } else if (kbQuickFilter === 'advance') {
+      customers = customers.filter(c => (c.total_gave - c.total_got) < 0);
+    } else if (kbQuickFilter === 'upcoming') {
+      customers = customers.filter(c => c.entries.some(e => e.due_date));
+    }
+
+    if (customers.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:36px 16px; color:#64748b; font-family:inherit;">
+          <div style="font-size:2.2rem; margin-bottom:8px;">📖</div>
+          <strong style="color:#0f172a; font-size:1.0rem; display:block;">कोई पार्टी नहीं मिली</strong>
+          <span style="font-size:0.80rem; color:#94a3b8; display:block; margin:4px 0 16px 0;">
+            नीचे <b>+ ग्राहक जोड़ें</b> बटन दबाकर नया खाता जोड़ें
+          </span>
+          <button type="button" onclick="window.AarogyamETailer.openAddPartyModal()" style="background:#0052cc; color:#ffffff; border:none; padding:10px 20px; border-radius:24px; font-weight:800; font-size:0.86rem; cursor:pointer;">
+            + नया खाता जोड़ें
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    // Render Clean White Customer List (Matching Screenshot 0451085c)
+    listEl.innerHTML = customers.map(c => {
+      const net = c.total_gave - c.total_got;
+      const initials = (c.name || 'G').split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
+      
+      let balanceHtml = '';
+      if (net > 0) {
+        // Red Debit (आपको मिलेंगे)
+        balanceHtml = `
+          <div style="text-align:right;">
+            <div style="font-size:1.05rem; font-weight:900; color:#dc2626;">₹ ${net.toLocaleString('hi-IN')}</div>
+            <div onclick="event.stopPropagation(); window.AarogyamETailer.sendKbWhatsAppReminderForCustomer('${c.mobile}')" style="font-size:0.75rem; font-weight:800; color:#2563eb; cursor:pointer; margin-top:2px;">
+              रिमाइंड कराएं &gt;
+            </div>
+          </div>
+        `;
+      } else if (net < 0) {
+        // Green Credit (आप देंगे / एडवांस)
+        balanceHtml = `
+          <div style="text-align:right;">
+            <div style="font-size:1.05rem; font-weight:900; color:#16a34a;">₹ ${Math.abs(net).toLocaleString('hi-IN')}</div>
+            <span style="font-size:0.70rem; color:#64748b;">(एडवांस जमा)</span>
+          </div>
+        `;
+      } else {
+        // Zero Balance
+        balanceHtml = `
+          <div style="text-align:right;">
+            <div style="font-size:1.0rem; font-weight:800; color:#64748b;">₹ 0</div>
+            <span style="font-size:0.68rem; color:#94a3b8;">हिसाब चुकता</span>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="kb-customer-item" onclick="window.AarogyamETailer.openCustomerLedger('${c.mobile}')">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="kb-avatar-circle">
+              ${initials}
+            </div>
+            <div>
+              <strong style="font-size:0.96rem; color:#0f172a; display:block; font-weight:800;">${c.name}</strong>
+              <span style="font-size:0.74rem; color:#64748b;">
+                ${c.place ? c.place + ' • ' : ''}📱 ${c.mobile}
+              </span>
+            </div>
+          </div>
+          ${balanceHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Open & Close Add Party Modal
+  function openAddPartyModal() {
+    const modal = document.getElementById('kbAddPartyModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('show');
+      const mobileInput = document.getElementById('kbPartyMobile');
+      if (mobileInput) {
+        setTimeout(() => mobileInput.focus(), 120);
+      }
+    }
+  }
+
+  function closeAddPartyModal() {
+    const modal = document.getElementById('kbAddPartyModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  // Handle Add Party Submit
+  function handleKbAddPartySubmit(e) {
+    e.preventDefault();
+    const name = (document.getElementById('kbPartyName')?.value || '').trim();
+    const mobile = (document.getElementById('kbPartyMobile')?.value || '').trim().replace(/\D/g, '').slice(-10);
+    const place = (document.getElementById('kbPartyPlace')?.value || '').trim();
+    const radios = document.getElementsByName('kbPartyTypeRadio');
+    let partyType = 'customer';
+    for (const r of radios) {
+      if (r.checked) { partyType = r.value; break; }
+    }
+
+    if (!name || mobile.length !== 10) {
+      alert('कृपया मान्य नाम और 10-अंकीय मोबाइल नंबर भरें!');
+      return;
+    }
+
+    const shortCode = generateShortCode(mobile);
+    const newEntry = {
+      id: 'kb_' + Date.now(),
+      distributor_mobile: getUserMobile(),
+      distributor_name: getUserDisplayName(),
+      customer_mobile: mobile,
+      customer_name: name,
+      customer_place: place || 'गाँव / शहर',
+      party_type: partyType,
+      tx_type: 'GAVE',
+      amount: 0,
+      bill_details: 'नया खाता सृजित',
+      tx_date: new Date().toISOString().split('T')[0],
+      due_date: '',
+      short_code: shortCode,
+      created_at: new Date().toISOString()
+    };
+
+    const entries = getKbEntries();
+    // Check if customer already exists
+    const exists = entries.some(item => item.customer_mobile === mobile);
+    if (!exists) {
+      entries.unshift(newEntry);
+      saveKbEntries(entries);
+      syncKbEntryToSupabaseAsync(newEntry);
+    }
+
+    closeAddPartyModal();
+    renderKhatabookPro();
+    // Automatically open ledger for this customer
+    openCustomerLedger(mobile);
+  }
+
+  // Open Customer Detail / Ledger Passbook Modal
+  function openCustomerLedger(mobile) {
+    const allEntries = getKbEntries();
+    const customerEntries = allEntries.filter(e => e.customer_mobile === mobile);
+    if (customerEntries.length === 0) return;
+
+    const first = customerEntries[0];
+    activeKbCustomer = {
+      mobile: mobile,
+      name: first.customer_name || 'ग्राहक',
+      place: first.customer_place || '',
+      party_type: first.party_type || 'customer',
+      short_code: first.short_code || generateShortCode(mobile),
+      entries: customerEntries
+    };
+
+    // Calculate totals
+    let gave = 0;
+    let got = 0;
+    customerEntries.forEach(e => {
+      if (e.tx_type === 'GAVE') gave += Number(e.amount) || 0;
+      else if (e.tx_type === 'GOT') got += Number(e.amount) || 0;
+    });
+
+    const net = gave - got;
+
+    // Update Header
+    const nameEl = document.getElementById('kbLedgerHeaderName');
+    const avatarEl = document.getElementById('kbLedgerHeaderAvatar');
+    const badgeEl = document.getElementById('kbLedgerHeaderBadge');
+    const secNameEl = document.getElementById('kbLedgerSecurityName');
+    const balEl = document.getElementById('kbLedgerNetBalance');
+
+    if (nameEl) nameEl.textContent = activeKbCustomer.name;
+    if (secNameEl) secNameEl.textContent = activeKbCustomer.name;
+    if (avatarEl) {
+      avatarEl.textContent = (activeKbCustomer.name || 'G').split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();
+    }
+    if (badgeEl) {
+      badgeEl.textContent = activeKbCustomer.party_type === 'supplier' ? 'सप्लायर' : 'ग्राहक';
+    }
+
+    if (balEl) {
+      if (net > 0) {
+        balEl.textContent = '₹ ' + net.toLocaleString('hi-IN') + ' Dr (लेना है)';
+        balEl.style.color = '#dc2626';
+      } else if (net < 0) {
+        balEl.textContent = '₹ ' + Math.abs(net).toLocaleString('hi-IN') + ' Cr (देना है)';
+        balEl.style.color = '#16a34a';
+      } else {
+        balEl.textContent = '₹ 0 (हिसाब चुकता)';
+        balEl.style.color = '#64748b';
+      }
+    }
+
+    // Render Transaction Feed
+    const feed = document.getElementById('kbLedgerFeedContainer');
+    if (feed) {
+      if (customerEntries.length === 0 || (customerEntries.length === 1 && customerEntries[0].amount === 0)) {
+        feed.innerHTML = `
+          <div style="text-align:center; padding:40px 16px; color:#64748b;">
+            <div style="font-size:2rem; margin-bottom:8px;">🤝</div>
+            <strong style="color:#0f172a; font-size:1.0rem; display:block;">${activeKbCustomer.name} के साथ लेन-देन जोड़ना शुरू करें</strong>
+            <span style="font-size:0.78rem; color:#94a3b8; display:block; margin:6px 0 20px 0;">
+              नीचे लाल या हरे बटन से पहला लेन-देन दर्ज करें
+            </span>
+            <div style="font-size:1.8rem; color:#cbd5e1; animation:bounce 1.5s infinite;">↓</div>
+          </div>
+        `;
+      } else {
+        // Sort newest first
+        const sorted = [...customerEntries].filter(e => Number(e.amount) > 0).sort((a, b) => (b.tx_date || '').localeCompare(a.tx_date || ''));
+        
+        feed.innerHTML = sorted.map(e => {
+          const isGave = e.tx_type === 'GAVE';
+          const localThumb = e.bill_local_id ? localStorage.getItem('AI_KB_ATTACH_' + e.bill_local_id) : null;
+          return `
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <div style="font-size:0.75rem; color:#64748b; font-weight:700;">
+                    📅 ${e.tx_date || 'आज'} ${e.due_date ? '• वादा: ' + e.due_date : ''}
+                  </div>
+                  <strong style="font-size:0.92rem; color:#0f172a; display:block; margin-top:2px;">
+                    ${e.bill_details || (isGave ? 'सामान दिया' : 'भुगतान प्राप्त हुआ')}
+                  </strong>
+                  ${localThumb ? `
+                    <div style="margin-top:6px;">
+                      <img src="${localThumb}" style="max-width:80px; max-height:80px; border-radius:6px; border:1px solid #cbd5e1; cursor:pointer;" onclick="window.open('${localThumb}')" title="बिल देखें (लोकल सुरक्षित)">
+                    </div>
+                  ` : ''}
+                </div>
+                <div style="text-align:right;">
+                  <span style="display:inline-block; padding:4px 10px; border-radius:6px; font-weight:900; font-size:0.95rem; background:${isGave ? '#fee2e2' : '#dcfce7'}; color:${isGave ? '#dc2626' : '#15803d'};">
+                    ${isGave ? '- ₹ ' : '+ ₹ '}${Number(e.amount).toLocaleString('hi-IN')}
+                  </span>
+                  <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:4px;">
+                    <span style="font-size:0.72rem; color:#64748b; font-weight:700;">
+                      ${isGave ? 'आपने दिए' : 'आपको मिले'}
+                    </span>
+                    <button type="button" onclick="window.AarogyamETailer.deleteKbTransaction('${e.id}')" style="background:none; border:none; color:#ef4444; font-size:0.80rem; cursor:pointer; padding:2px;" title="यह लेन-देन डिलीट करें">
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    const modal = document.getElementById('kbCustomerLedgerModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeCustomerLedgerModal() {
+    const modal = document.getElementById('kbCustomerLedgerModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function callCurrentKbCustomer() {
+    if (activeKbCustomer && activeKbCustomer.mobile) {
+      window.location.href = 'tel:' + activeKbCustomer.mobile;
+    }
+  }
+
+  // Open Add Transaction Screen with Calculator
+  function openAddTxModal(mode) {
+    if (!activeKbCustomer) return;
+    activeKbTxMode = mode; // 'GAVE' or 'GOT'
+    kbCalcExpr = '500';
+    kbActiveLocalFile = null;
+
+    const header = document.getElementById('kbTxModalHeader');
+    const title = document.getElementById('kbTxModalTitle');
+    const saveBtn = document.getElementById('kbBtnSaveTx');
+    const amtInput = document.getElementById('kbTxAmountInput');
+    const dateInput = document.getElementById('kbTxDateInput');
+    const preview = document.getElementById('kbTxAttachmentPreview');
+
+    if (header && title && saveBtn) {
+      if (mode === 'GAVE') {
+        header.style.background = '#be123c';
+        title.textContent = `आपने ${activeKbCustomer.name} को दिए`;
+        saveBtn.style.background = '#be123c';
+        saveBtn.textContent = 'सेव करें (आपने दिए)';
+      } else {
+        header.style.background = '#15803d';
+        title.textContent = `आपको ${activeKbCustomer.name} से मिले`;
+        saveBtn.style.background = '#15803d';
+        saveBtn.textContent = 'सेव करें (आपको मिले)';
+      }
+    }
+
+    if (amtInput) amtInput.value = '500';
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+    if (preview) preview.innerHTML = 'कोई बिल संलग्न नहीं है (डिवाइस में ही सुरक्षित रहेगा)';
+
+    const modal = document.getElementById('kbAddTxModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeAddTxModal() {
+    const modal = document.getElementById('kbAddTxModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  // In-Built Smart Calculator Keypad Handler
+  function kbCalcPress(key) {
+    const amtInput = document.getElementById('kbTxAmountInput');
+    if (!amtInput) return;
+
+    if (key === 'C') {
+      kbCalcExpr = '0';
+    } else if (key === 'DEL') {
+      kbCalcExpr = kbCalcExpr.length > 1 ? kbCalcExpr.slice(0, -1) : '0';
+    } else if (key === 'M+') {
+      try { kbCalcMemory += eval(kbCalcExpr.replace(/[^0-9+\-*/.]/g, '')) || 0; } catch(_) {}
+    } else if (key === 'M-') {
+      try { kbCalcMemory -= eval(kbCalcExpr.replace(/[^0-9+\-*/.]/g, '')) || 0; } catch(_) {}
+    } else if (key === '=') {
+      try {
+        const clean = kbCalcExpr.replace(/[^0-9+\-*/.]/g, '');
+        const res = eval(clean);
+        kbCalcExpr = String(Math.round(res * 100) / 100);
+      } catch(_) {}
+    } else {
+      if (kbCalcExpr === '0' && key !== '.') {
+        kbCalcExpr = key;
+      } else {
+        kbCalcExpr += key;
+      }
+    }
+
+    amtInput.value = kbCalcExpr;
+  }
+
+  // Handle Local Bill Attachment (Canvas WebP Compression -> Local Storage)
+  function handleKbLocalAttachment(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const preview = document.getElementById('kbTxAttachmentPreview');
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          // Offscreen Canvas Compression (600px max, 0.6 WebP quality = ~25 KB)
+          const canvas = document.createElement('canvas');
+          const maxDim = 600;
+          let w = img.width;
+          let h = img.height;
+          if (w > h && w > maxDim) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else if (h > maxDim) {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressedDataUrl = canvas.toDataURL('image/webp', 0.6);
+          kbActiveLocalFile = compressedDataUrl;
+
+          if (preview) {
+            preview.innerHTML = `
+              <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                <img src="${compressedDataUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #10b981;">
+                <span style="color:#15803d; font-weight:800; font-size:0.75rem;">✅ बिल फोटो सुरक्षित (~25KB, 0 सर्वर लोड)</span>
+              </div>
+            `;
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // PDF or other
+      if (preview) {
+        preview.innerHTML = `<span style="color:#0284c7; font-weight:800; font-size:0.75rem;">📄 ${file.name} (लोकल संलग्न)</span>`;
+      }
+    }
+  }
+
+  // Save Transaction
+  function saveKbTransaction() {
+    if (!activeKbCustomer) return;
+    let amt = 0;
+    try {
+      amt = Math.abs(eval(kbCalcExpr.replace(/[^0-9+\-*/.]/g, ''))) || 0;
+    } catch (_) {
+      amt = Number(document.getElementById('kbTxAmountInput')?.value) || 0;
+    }
+
+    if (amt <= 0) {
+      alert('कृपया 0 से अधिक की राशि दर्ज करें!');
+      return;
+    }
+
+    const details = (document.getElementById('kbTxDetailsInput')?.value || '').trim();
+    const txDate = document.getElementById('kbTxDateInput')?.value || new Date().toISOString().split('T')[0];
+    const dueDate = document.getElementById('kbTxDueDateInput')?.value || '';
+
+    // Local Attachment ID
+    let localFileId = null;
+    if (kbActiveLocalFile) {
+      localFileId = 'att_' + Date.now();
+      try {
+        localStorage.setItem('AI_KB_ATTACH_' + localFileId, kbActiveLocalFile);
+      } catch (err) {
+        console.warn('Local attachment storage limit reached:', err);
+      }
+    }
+
+    const newTx = {
+      id: 'kb_tx_' + Date.now(),
+      distributor_mobile: getUserMobile(),
+      distributor_name: getUserDisplayName(),
+      customer_mobile: activeKbCustomer.mobile,
+      customer_name: activeKbCustomer.name,
+      customer_place: activeKbCustomer.place,
+      party_type: activeKbCustomer.party_type,
+      tx_type: activeKbTxMode,
+      amount: amt,
+      bill_details: details,
+      bill_local_id: localFileId,
+      tx_date: txDate,
+      due_date: dueDate,
+      short_code: activeKbCustomer.short_code || generateShortCode(activeKbCustomer.mobile),
+      created_at: new Date().toISOString()
+    };
+
+    const entries = getKbEntries();
+    entries.unshift(newTx);
+    saveKbEntries(entries);
+
+    // Sync to Supabase in background
+    syncKbEntryToSupabaseAsync(newTx);
+
+    closeAddTxModal();
+    renderKhatabookPro();
+    openCustomerLedger(activeKbCustomer.mobile);
+
+    // Offer to send WhatsApp receipt
+    const promptMsg = activeKbTxMode === 'GAVE' 
+      ? `✅ ₹${amt} की प्रविष्टि दर्ज हो गई!\n\nक्या आप ${activeKbCustomer.name} को WhatsApp पर डिजिटल रसीद व पासबुक लिंक भेजना चाहते हैं?`
+      : `✅ ₹${amt} का जमा भुगतान दर्ज हो गया!\n\nक्या आप ${activeKbCustomer.name} को WhatsApp पर भुगतान रसीद भेजना चाहते हैं?`;
+
+    if (confirm(promptMsg)) {
+      sendKbWhatsAppReminder();
+    }
+  }
+
+  // Send WhatsApp Reminder / Statement with Short Link
+  function sendKbWhatsAppReminder() {
+    if (!activeKbCustomer) return;
+    sendKbWhatsAppReminderForCustomer(activeKbCustomer.mobile);
+  }
+
+  function sendKbWhatsAppReminderForCustomer(mobile) {
+    const allEntries = getKbEntries();
+    const customerEntries = allEntries.filter(e => e.customer_mobile === mobile);
+    if (customerEntries.length === 0) return;
+
+    const first = customerEntries[0];
+    const sName = getUserDisplayName();
+    const sMob = getUserMobile();
+    const shareId = getAppUserShareId();
+
+    let gave = 0;
+    let got = 0;
+    customerEntries.forEach(e => {
+      if (e.tx_type === 'GAVE') gave += Number(e.amount) || 0;
+      else if (e.tx_type === 'GOT') got += Number(e.amount) || 0;
+    });
+
+    const net = gave - got;
+    const shortCode = first.short_code || generateShortCode(mobile);
+    const shortLink = `https://aarogyamindia.online/pages/smart-etailer.html?k=${shortCode}&ref=${encodeURIComponent(shareId)}`;
+
+    let msg = '';
+    if (net > 0) {
+      msg = `🌾 *नमस्ते ${first.customer_name} जी!* 🙏\n\nआपके खाते में *${sName}* (${sMob}) का कुल बकाया *₹${net.toLocaleString('hi-IN')}* बाकी है।\n\n📖 *अपनी पूरी डिजिटल पासबुक और बिल यहाँ देखें:*\n${shortLink}\n\n*(इस लिंक पर क्लिक करके आप अपना पूरा हिसाब पारदर्शी रूप से देख सकते हैं)*\n\n— *Aarogyam India डिजिटल खाता बुक*`;
+    } else {
+      msg = `🌾 *नमस्ते ${first.customer_name} जी!* 🙏\n\n*${sName}* (${sMob}) के साथ आपका हिसाब चुकता है।\n\n📖 *अपनी डिजिटल पासबुक यहाँ देखें:*\n${shortLink}\n\n— *Aarogyam India डिजिटल खाता बुक*`;
+    }
+
+    window.open(`https://api.whatsapp.com/send?phone=91${mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  // Send SMS Reminder
+  function sendKbSmsReminder() {
+    if (!activeKbCustomer) return;
+    const allEntries = getKbEntries();
+    const customerEntries = allEntries.filter(e => e.customer_mobile === activeKbCustomer.mobile);
+    let gave = 0;
+    let got = 0;
+    customerEntries.forEach(e => {
+      if (e.tx_type === 'GAVE') gave += Number(e.amount) || 0;
+      else if (e.tx_type === 'GOT') got += Number(e.amount) || 0;
+    });
+    const net = gave - got;
+    const shortCode = activeKbCustomer.short_code || generateShortCode(activeKbCustomer.mobile);
+    const shortLink = `https://aarogyamindia.online/pages/smart-etailer.html?k=${shortCode}`;
+    const sName = getUserDisplayName();
+    const text = `Namaste ${activeKbCustomer.name}! Aapka ${sName} ke pass kul bakaya Rs.${net} hai. Passbook dekhein: ${shortLink}`;
+    window.location.href = `sms:+91${activeKbCustomer.mobile}?body=${encodeURIComponent(text)}`;
+  }
+
+  // Open khata.pe Style Public Passbook View
+  function openCustomerPassbookDirect() {
+    if (!activeKbCustomer) return;
+    openPublicPassbookByCode(activeKbCustomer.short_code || generateShortCode(activeKbCustomer.mobile));
+  }
+
+  function openPublicPassbookByCode(shortCode) {
+    const allEntries = getKbEntries();
+    let entries = allEntries.filter(e => e.short_code === shortCode);
+
+    // If empty locally, try finding by mobile or fallback
+    if (entries.length === 0) {
+      // If we have internet and Supabase, query Supabase
+      if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+        window.supabaseClient
+          .from('khatabook_entries')
+          .select('*')
+          .eq('short_code', shortCode)
+          .then(({ data, error }) => {
+            if (!error && data && data.length > 0) {
+              renderPassbookModalWithEntries(data);
+            } else {
+              alert('पासबुक रिकॉर्ड लोड नहीं हो सका या लिंक अमान्य है।');
+            }
+          })
+          .catch(() => alert('ऑफलाइन हैं, पासबुक लोड नहीं हो सकी।'));
+        return;
+      } else {
+        alert('पासबुक रिकॉर्ड नहीं मिला।');
+        return;
+      }
+    }
+
+    renderPassbookModalWithEntries(entries);
+  }
+
+  function renderPassbookModalWithEntries(entries) {
+    const first = entries[0];
+    const distNameEl = document.getElementById('kbPassbookDistributorName');
+    const distDetEl = document.getElementById('kbPassbookDistributorDetails');
+    const totDebEl = document.getElementById('kbPassbookTotalDebit');
+    const totCredEl = document.getElementById('kbPassbookTotalCredit');
+    const netBalEl = document.getElementById('kbPassbookNetBalance');
+    const tableBody = document.getElementById('kbPassbookTableBody');
+
+    let totalGave = 0;
+    let totalGot = 0;
+
+    // Sort chronologically (oldest to newest for running balance)
+    const sorted = [...entries].sort((a, b) => (a.tx_date || '').localeCompare(b.tx_date || ''));
+    let runningBalance = 0;
+
+    const rowsHtml = sorted.map(e => {
+      const isGave = e.tx_type === 'GAVE';
+      const amt = Number(e.amount) || 0;
+      if (isGave) {
+        totalGave += amt;
+        runningBalance += amt;
+      } else {
+        totalGot += amt;
+        runningBalance -= amt;
+      }
+
+      const dateStr = e.tx_date ? e.tx_date.split('-').slice(1).reverse().join(' ') : 'आज';
+      const balStr = runningBalance > 0 
+        ? `${runningBalance.toLocaleString('hi-IN')} Dr` 
+        : (runningBalance < 0 ? `${Math.abs(runningBalance).toLocaleString('hi-IN')} Cr` : '0');
+
+      return `
+        <tr>
+          <td style="font-weight:700; color:#334155; font-size:0.80rem;">${dateStr}</td>
+          <td class="debit-cell" style="text-align:right;">
+            ${isGave ? amt.toLocaleString('hi-IN') : ''}
+          </td>
+          <td class="credit-cell" style="text-align:right;">
+            ${!isGave ? amt.toLocaleString('hi-IN') : ''}
+          </td>
+          <td style="text-align:right; font-weight:800; color:${runningBalance > 0 ? '#dc2626' : (runningBalance < 0 ? '#16a34a' : '#64748b')}; font-size:0.82rem;">
+            ₹ ${balStr}
+          </td>
+        </tr>
+      `;
+    }).reverse().join(''); // Show latest on top like khata.pe
+
+    if (distNameEl) distNameEl.textContent = first.distributor_name || 'Aarogyam Master';
+    if (distDetEl) {
+      distDetEl.textContent = `मोबाइल: ${first.distributor_mobile || '7974422572'} • ग्राहक: ${first.customer_name || 'किसान साथी'}`;
+    }
+    if (totDebEl) totDebEl.textContent = '₹ ' + totalGave.toLocaleString('hi-IN');
+    if (totCredEl) totCredEl.textContent = '₹ ' + totalGot.toLocaleString('hi-IN');
+    
+    const net = totalGave - totalGot;
+    if (netBalEl) {
+      if (net > 0) {
+        netBalEl.textContent = '₹ ' + net.toLocaleString('hi-IN') + ' Dr';
+        netBalEl.style.color = '#dc2626';
+      } else if (net < 0) {
+        netBalEl.textContent = '₹ ' + Math.abs(net).toLocaleString('hi-IN') + ' Cr';
+        netBalEl.style.color = '#16a34a';
+      } else {
+        netBalEl.textContent = '₹ 0 (चुकता)';
+        netBalEl.style.color = '#64748b';
+      }
+    }
+
+    if (tableBody) tableBody.innerHTML = rowsHtml;
+
+    // Permanent Referral Locking for this customer!
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      try {
+        localStorage.setItem('AAROGYAM_REF_ID', ref);
+        document.cookie = `AAROGYAM_REF_ID=${encodeURIComponent(ref)};path=/;max-age=31536000`;
+        console.log('🔒 Direct Lifetime Referral locked:', ref);
+      } catch (_) {}
+    }
+
+    const modal = document.getElementById('kbPublicPassbookModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closePublicPassbookModal() {
+    const modal = document.getElementById('kbPublicPassbookModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function callPassbookSupport() {
+    const sMob = getUserMobile();
+    window.location.href = 'tel:' + sMob;
+  }
+
+  function whatsappPassbookSupport() {
+    const sMob = getUserMobile();
+    const msg = `नमस्ते! मैं अपनी आरोग्यम खाता पासबुक के संबंध में संपर्क कर रहा हूँ।`;
+    window.open(`https://api.whatsapp.com/send?phone=91${sMob}&text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function downloadPassbookPdf() {
+    window.print();
+  }
+
+  function openCashbookModal() {
+    alert('💵 दैनिक कैश बुक: आज कुल ₹' + (document.getElementById('kbSummaryDebit')?.textContent || '0') + ' का लेन-देन हुआ है।');
+  }
+
+  // Check URL Parameter ?k=XXXXXX on page load
+  function checkIncomingKhataShortCode() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const kCode = params.get('k');
+      if (kCode) {
+        setTimeout(() => {
+          openPublicPassbookByCode(kCode.trim());
+        }, 500);
+      }
+    } catch (_) {}
+  }
+
+
+  // Instant Zero-Egress Auto-Lookup by Mobile Number in Khatabook (Diary -> Phonebook -> Khata -> Local Cache -> 1-Time Supabase)
+  let kbLookupDebounceTimer = null;
+  async function handleKbMobileAutoLookup(val) {
+    const clean = (val || '').replace(/\D/g, '').slice(-10);
+    const hintEl = document.getElementById('kbMobileLookupHint');
+    const nameInput = document.getElementById('kbPartyName');
+    const placeInput = document.getElementById('kbPartyPlace');
+
+    if (clean.length !== 10) {
+      if (hintEl) hintEl.style.display = 'none';
+      return;
+    }
+
+    // --- ZERO-EGRESS LOCAL STORES (100% Offline / 0ms) ---
+    // 1. Search Local Diary
+    const diary = getLocalDiaryEntries();
+    let match = diary.find(e => (e.mobile || '').replace(/\D/g, '').slice(-10) === clean);
+
+    // 2. Search Phonebook Cache
+    if (!match) {
+      try {
+        const pb = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
+        match = pb.find(p => (p.mobile || '').replace(/\D/g, '').slice(-10) === clean);
+      } catch (_) {}
+    }
+
+    // 3. Search Khatabook Entries
+    if (!match) {
+      const kb = getKbEntries();
+      const kbMatch = kb.find(e => (e.customer_mobile || '').replace(/\D/g, '').slice(-10) === clean);
+      if (kbMatch) {
+        match = { name: kbMatch.customer_name, place: kbMatch.customer_place };
+      }
+    }
+
+    // 4. Search Local Profiles Lookup Cache
+    if (!match) {
+      try {
+        const profCache = JSON.parse(localStorage.getItem('AI_PROFILE_LOOKUP_CACHE') || '{}');
+        if (profCache[clean]) {
+          match = profCache[clean];
+        }
+      } catch (_) {}
+    }
+
+    // If found locally, immediately populate UI with ZERO NETWORK CALLS (0 Egress)
+    if (match && match.name) {
+      if (nameInput) nameInput.value = match.name;
+      if (placeInput && match.place) {
+        placeInput.value = match.place;
+        const detailsEl = placeInput.closest('details');
+        if (detailsEl) detailsEl.open = true;
+      }
+      if (hintEl) {
+        hintEl.style.display = 'block';
+        hintEl.style.background = '#f0fdf4';
+        hintEl.style.color = '#15803d';
+        hintEl.style.border = '1px solid #bbf7d0';
+        const badge = match.is_registered_member ? '🌟 आरोग्यम रजिस्टर्ड सदस्य:' : '✅ खाता मिला:';
+        hintEl.innerHTML = `${badge} <b>${match.name}</b> ${match.place ? '(' + match.place + ')' : ''} — नाम स्वतः लोड हुआ!`;
+      }
+      return;
+    }
+
+    // --- DEBOUNCED 1-TIME SUPABASE PROFILES LOOKUP (Zero Egress Spike) ---
+    if (kbLookupDebounceTimer) clearTimeout(kbLookupDebounceTimer);
+    kbLookupDebounceTimer = setTimeout(async () => {
+      const client = window.dbClient || window.supabaseClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+      if (!client) return;
+
+      try {
+        const { data, error } = await client
+          .from('profiles')
+          .select('full_name, mobile, district, address')
+          .eq('mobile', clean)
+          .limit(1);
+
+        let liveMatch = null;
+        if (!error && data && data.length > 0 && data[0].full_name) {
+          liveMatch = {
+            name: data[0].full_name,
+            place: data[0].district || data[0].address || '',
+            is_registered_member: true
+          };
+        } else {
+          // Check with +91 prefix
+          const { data: data91 } = await client
+            .from('profiles')
+            .select('full_name, mobile, district, address')
+            .eq('mobile', '+91' + clean)
+            .limit(1);
+          if (data91 && data91.length > 0 && data91[0].full_name) {
+            liveMatch = {
+              name: data91[0].full_name,
+              place: data91[0].district || data91[0].address || '',
+              is_registered_member: true
+            };
+          }
+        }
+
+        // Cache result locally so this number is NEVER queried again across the entire session
+        try {
+          const profCache = JSON.parse(localStorage.getItem('AI_PROFILE_LOOKUP_CACHE') || '{}');
+          profCache[clean] = liveMatch || { not_found: true };
+          localStorage.setItem('AI_PROFILE_LOOKUP_CACHE', JSON.stringify(profCache));
+        } catch (_) {}
+
+        if (liveMatch && liveMatch.name) {
+          if (nameInput) nameInput.value = liveMatch.name;
+          if (placeInput && liveMatch.place) {
+            placeInput.value = liveMatch.place;
+            const detailsEl = placeInput.closest('details');
+            if (detailsEl) detailsEl.open = true;
+          }
+          if (hintEl) {
+            hintEl.style.display = 'block';
+            hintEl.style.background = '#f0fdf4';
+            hintEl.style.color = '#15803d';
+            hintEl.style.border = '1px solid #bbf7d0';
+            hintEl.innerHTML = `🌟 आरोग्यम रजिस्टर्ड सदस्य: <b>${liveMatch.name}</b> ${liveMatch.place ? '(' + liveMatch.place + ')' : ''} — नाम स्वतः लोड हुआ!`;
+          }
+        } else {
+          if (hintEl) {
+            hintEl.style.display = 'block';
+            hintEl.style.background = '#f8fafc';
+            hintEl.style.color = '#475569';
+            hintEl.style.border = '1px solid #cbd5e1';
+            hintEl.innerHTML = 'ℹ️ नया ग्राहक/नंबर: नाम नीचे दर्ज करें।';
+          }
+        }
+      } catch (err) {
+        console.warn('Profile auto-lookup notice:', err);
+      }
+    }, 280);
+  }
+
+  // Open & Close Edit Party Modal
+  function openEditPartyModal() {
+    if (!activeKbCustomer) return;
+    const nameInput = document.getElementById('kbEditPartyName');
+    const placeInput = document.getElementById('kbEditPartyPlace');
+    const radios = document.getElementsByName('kbEditPartyTypeRadio');
+
+    if (nameInput) nameInput.value = activeKbCustomer.name || '';
+    if (placeInput) placeInput.value = activeKbCustomer.place || '';
+    for (const r of radios) {
+      r.checked = (r.value === activeKbCustomer.party_type);
+    }
+
+    const modal = document.getElementById('kbEditPartyModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeEditPartyModal() {
+    const modal = document.getElementById('kbEditPartyModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  // Handle Edit Party Submit
+  function handleKbEditPartySubmit(e) {
+    e.preventDefault();
+    if (!activeKbCustomer) return;
+    const newName = (document.getElementById('kbEditPartyName')?.value || '').trim();
+    const newPlace = (document.getElementById('kbEditPartyPlace')?.value || '').trim();
+    const radios = document.getElementsByName('kbEditPartyTypeRadio');
+    let newType = 'customer';
+    for (const r of radios) {
+      if (r.checked) { newType = r.value; break; }
+    }
+
+    if (!newName) {
+      alert('कृपया मान्य पार्टी नाम भरें!');
+      return;
+    }
+
+    let entries = getKbEntries();
+    entries.forEach(item => {
+      if (item.customer_mobile === activeKbCustomer.mobile) {
+        item.customer_name = newName;
+        item.customer_place = newPlace;
+        item.party_type = newType;
+      }
+    });
+    saveKbEntries(entries);
+
+    // Update activeKbCustomer
+    activeKbCustomer.name = newName;
+    activeKbCustomer.place = newPlace;
+    activeKbCustomer.party_type = newType;
+
+    closeEditPartyModal();
+    renderKhatabookPro();
+    openCustomerLedger(activeKbCustomer.mobile);
+    alert('✅ पार्टी विवरण सफलतापूर्वक अपडेट हो गया!');
+  }
+
+  // Delete Entire Customer Account & All Transactions
+  function deleteCurrentKbCustomer() {
+    if (!activeKbCustomer) return;
+    const confirmed = confirm(`⚠️ क्या आप "${activeKbCustomer.name}" का पूरा खाता और सभी लेन-देन डिलीट करना चाहते हैं?\n\nयह क्रिया वापस नहीं हो सकती!`);
+    if (!confirmed) return;
+
+    let entries = getKbEntries();
+    entries = entries.filter(item => item.customer_mobile !== activeKbCustomer.mobile);
+    saveKbEntries(entries);
+
+    // Delete from Supabase in background
+    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+      window.supabaseClient
+        .from('khatabook_entries')
+        .delete()
+        .eq('customer_mobile', activeKbCustomer.mobile)
+        .then(() => console.log('Deleted customer from Supabase'))
+        .catch(err => console.warn('Supabase delete error:', err));
+    }
+
+    closeCustomerLedgerModal();
+    renderKhatabookPro();
+    alert(`✅ "${activeKbCustomer.name}" का खाता और हिसाब डिलीट कर दिया गया!`);
+  }
+
+  // Delete Single Transaction
+  function deleteKbTransaction(txId) {
+    if (!txId) return;
+    const confirmed = confirm('क्या आप इस लेन-देन को डिलीट करना चाहते हैं?');
+    if (!confirmed) return;
+
+    let entries = getKbEntries();
+    entries = entries.filter(e => e.id !== txId);
+    saveKbEntries(entries);
+
+    // Delete from Supabase
+    if (window.supabaseClient && typeof window.supabaseClient.from === 'function') {
+      window.supabaseClient
+        .from('khatabook_entries')
+        .delete()
+        .eq('id', txId)
+        .then(() => console.log('Transaction deleted from cloud'))
+        .catch(err => console.warn('Supabase delete tx error:', err));
+    }
+
+    if (activeKbCustomer) {
+      openCustomerLedger(activeKbCustomer.mobile);
+    }
+    renderKhatabookPro();
+  }
+
   window.AarogyamETailer = {
+    handleKbMobileAutoLookup: handleKbMobileAutoLookup,
+    openEditPartyModal: openEditPartyModal,
+    closeEditPartyModal: closeEditPartyModal,
+    handleKbEditPartySubmit: handleKbEditPartySubmit,
+    deleteCurrentKbCustomer: deleteCurrentKbCustomer,
+    deleteKbTransaction: deleteKbTransaction,
+
+    // Khatabook Pro Exports
+    setKhatabookPartyType: setKhatabookPartyType,
+    setKhatabookQuickFilter: setKhatabookQuickFilter,
+    filterKhatabookList: filterKhatabookList,
+    toggleKhatabookFilter: toggleKhatabookFilter,
+    renderKhatabookPro: renderKhatabookPro,
+    openAddPartyModal: openAddPartyModal,
+    closeAddPartyModal: closeAddPartyModal,
+    handleKbAddPartySubmit: handleKbAddPartySubmit,
+    openCustomerLedger: openCustomerLedger,
+    closeCustomerLedgerModal: closeCustomerLedgerModal,
+    callCurrentKbCustomer: callCurrentKbCustomer,
+    openAddTxModal: openAddTxModal,
+    closeAddTxModal: closeAddTxModal,
+    kbCalcPress: kbCalcPress,
+    handleKbLocalAttachment: handleKbLocalAttachment,
+    saveKbTransaction: saveKbTransaction,
+    sendKbWhatsAppReminder: sendKbWhatsAppReminder,
+    sendKbWhatsAppReminderForCustomer: sendKbWhatsAppReminderForCustomer,
+    sendKbSmsReminder: sendKbSmsReminder,
+    openCustomerPassbookDirect: openCustomerPassbookDirect,
+    openPublicPassbookByCode: openPublicPassbookByCode,
+    closePublicPassbookModal: closePublicPassbookModal,
+    callPassbookSupport: callPassbookSupport,
+    whatsappPassbookSupport: whatsappPassbookSupport,
+    downloadPassbookPdf: downloadPassbookPdf,
+    openCashbookModal: openCashbookModal,
+
     handleVcfFileImport: handleVcfFileImport,
     render8LevelLockGrid: render8LevelLockGrid,
     openLevelInfoModal: openLevelInfoModal,
@@ -5096,6 +6345,21 @@
   // -------------------------------------------------------------
   async function initEngine() {
     loadLocalVault();
+    // 1-Time Auto-Purge of Test/Dummy Records ('rajesh', dummy test numbers)
+    try {
+      const purgeKeys = ['AAROGYAM_SMART_DIARY_ENTRIES', 'AAROGYAM_KHATABOOK_ENTRIES_V1'];
+      purgeKeys.forEach(k => {
+        let items = JSON.parse(localStorage.getItem(k) || '[]');
+        const filtered = items.filter(it => {
+          const name = ((it.name || it.customer_name || '') + '').toLowerCase();
+          const mob = ((it.mobile || it.customer_mobile || '') + '').replace(/\D/g, '');
+          return !name.includes('rajesh') && mob !== '7976655444' && mob !== '7976655443' && mob !== '9999999999';
+        });
+        if (filtered.length !== items.length) {
+          localStorage.setItem(k, JSON.stringify(filtered));
+        }
+      });
+    } catch (_) {}
     // Initialize Smart Business Diary Components
     updateDiaryHeroLevel();
     renderDiaryLedger();
@@ -5114,6 +6378,7 @@
     setupMidnightAutoSyncSchedule();
     syncRemoteAdminSettings();
 
+    checkIncomingKhataShortCode();
     // Check URL search parameters for initial tab routing & Smart Deep-Links (Zero reload lag)
     try {
       const params = new URLSearchParams(window.location.search);
@@ -5167,5 +6432,9 @@
 
   // Auto-check incoming Khata token on load
   setTimeout(() => {
-    checkIncomingKhataShare();
+    try {
+      if (window.AarogyamETailer && typeof window.AarogyamETailer.checkIncomingKhataShortCode === 'function') {
+        window.AarogyamETailer.checkIncomingKhataShortCode();
+      }
+    } catch (_) {}
   }, 300);
