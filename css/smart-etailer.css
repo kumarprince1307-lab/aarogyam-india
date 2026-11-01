@@ -2712,26 +2712,26 @@ body.light-theme .faq-accordion-item div[id^="faqAnswer"] {
 }
 
 .kb-fab-btn {
-  position: fixed;
-  bottom: 80px;
-  left: 20px;
-  right: auto;
-  background: linear-gradient(135deg, #0052cc 0%, #1d4ed8 100%);
-  color: #ffffff;
-  border: none;
-  border-radius: 30px;
-  padding: 13px 22px;
-  font-size: 0.98rem;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 6px 22px rgba(0, 82, 204, 0.5);
-  z-index: 99999;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: fixed !important;
+  bottom: 82px !important;
+  left: 20px !important;
+  right: auto !important;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 30px !important;
+  padding: 13px 22px !important;
+  font-size: 0.96rem !important;
+  font-weight: 900 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 6px 22px rgba(190, 18, 60, 0.5) !important;
+  z-index: 99999 !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
 }
 .kb-fab-btn:active {
   transform: scale(0.96);
@@ -2899,4 +2899,82 @@ input, select, textarea {
   background: #dbeafe !important;
   border-color: #2563eb !important;
   color: #0052cc !important;
+}
+
+/* Clean Khatabook Pro Chips */
+.kb-chip-btn {
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.kb-chip-btn.active {
+  background: #0052cc !important;
+  border-color: #0052cc !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(0, 82, 204, 0.3) !important;
+}
+
+/* ULTRA SHARP FONT & BUTTON TYPOGRAPHY */
+.diary-nav-btn {
+  background: #0f172a !important;
+  border: 1.5px solid #334155 !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 0.88rem !important;
+  text-shadow: none !important;
+  letter-spacing: 0.2px !important;
+}
+
+.diary-nav-btn span {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+.diary-nav-btn.active {
+  background: #0052cc !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 82, 204, 0.45) !important;
+}
+
+.diary-nav-btn.active span {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+}
+
+.kb-fab-btn, #kbMainFabBtn {
+  position: fixed !important;
+  bottom: 82px !important;
+  left: 20px !important;
+  right: auto !important;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 30px !important;
+  padding: 13px 22px !important;
+  font-size: 0.98rem !important;
+  font-weight: 900 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 6px 22px rgba(190, 18, 60, 0.55) !important;
+  z-index: 99999 !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  text-shadow: none !important;
+}
+
+.kb-fab-btn span, #kbMainFabBtn span {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
 }
