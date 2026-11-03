@@ -47,6 +47,7 @@ const PRECACHE_SHELL = [
   '/js/sakhi-persona-engine.js',
   '/js/sakhi-tutorial-guide.js',
   '/js/sakhi-notification-engine.js',
+  '/js/sakhi-knowledge-vault-v2.js',
   '/js/universal-nav-drawer.js',
   '/js/viral-share-engine.js',
   '/js/global-guest-modal.js',

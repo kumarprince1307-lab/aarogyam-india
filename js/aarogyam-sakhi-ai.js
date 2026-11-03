@@ -8220,6 +8220,7 @@ if (typeof document !== 'undefined') {
     {
       id: 'alu',
       name: 'आलू (Potato)',
+      intro: 'आलू भारत की सबसे लोकप्रिय कंदवर्गीय (Tuber) नकदी फसल है जो 90 से 110 दिनों में तैयार होती है। इसके बंपर उत्पादन के लिए कंदों का अंकुरण, पोटाश पोषण और झुलसा रोग नियंत्रण सबसे महत्वपूर्ण है।',
       keywords: ['alu', 'aalu', 'aaloo', 'aloo', 'आलू', 'potato', 'batata', 'आलू की खेती'],
       season: 'रबी (Rabi)',
       sowingTime: '15 अक्टूबर से 15 नवंबर (अगेती: 25 सितंबर से)',
@@ -14198,10 +14199,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const prompt = `🩸 **परामर्श संदर्भ:** ${recipientType}\n\nवर्तमान में स्वास्थ्य स्थिति क्या है? क्या मरीज की कोई **अंग्रेजी दवा (जैसे मेटफॉर्मिन/ग्लिमेपिराइड)** या इंसुलिन चल रहा है?`;
 
       renderCrispSpecialBox('💊 चरण 3 — वर्तमान अंग्रेजी दवा व इंसुलिन स्थिति', prompt, [
-        { text: '💊 1. मेटफॉर्मिन या अन्य शुगर की गोली चल रही है', query: 'अंग्रेजी दवा चल रही है संपूर्ण पर्चा व डाइट बनाओ (health_triage_step4_allopathy)' },
-        { text: '💉 2. इंसुलिन के इंजेक्शन लग रहे हैं', query: 'इंसुलिन चल रहा है संपूर्ण पर्चा व डाइट बनाओ (health_triage_step4_insulin)' },
-        { text: '🌱 3. अभी कोई अंग्रेजी दवा नहीं, सिर्फ खानपान', query: 'बिना दवा सिर्फ डाइट व नेचुरामोर पर्चा बनाओ (health_triage_step4_dietonly)' },
-        { text: '⚠️ 4. हाल ही में पहली बार शुगर पता चला है', query: 'नई डायबिटीज हेतु संपूर्ण डाइट व पर्चा बनाओ (health_triage_step4_newly)' }
+        { text: '💊 1. मेटफॉर्मिन या अन्य शुगर की गोली चल रही है', query: 'अंग्रेजी दवा चल रही है संपूर्ण पर्चा व डाइट बनाओ' },
+        { text: '💉 2. इंसुलिन के इंजेक्शन लग रहे हैं', query: 'इंसुलिन चल रहा है संपूर्ण पर्चा व डाइट बनाओ' },
+        { text: '🌱 3. अभी कोई अंग्रेजी दवा नहीं, सिर्फ खानपान', query: 'बिना दवा सिर्फ डाइट व नेचुरामोर पर्चा बनाओ' },
+        { text: '⚠️ 4. हाल ही में पहली बार शुगर पता चला है', query: 'नई डायबिटीज हेतु संपूर्ण डाइट व पर्चा बनाओ' }
       ], 'health', 'health_triage_step3_meds');
       return true;
     }
@@ -14314,10 +14315,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const prompt = `नमस्ते! 🙏 नेट्सर्फ 2026-27 के नए बिज़नेस मॉडल में आप अपनी गति और इच्छानुसार आय प्राप्त कर सकते हैं। कृपया अपना मुख्य लक्ष्य चुनें:`;
 
       renderCrispSpecialBox('💼 नेट्सर्फ 3-चरणीय बिज़नेस निदान (चरण 1: लक्ष्य चुनें)', prompt, [
-        { text: '🛒 1. उत्पादों पर 25% छूट व घरेलू बचत (Consumer)', query: 'नेट्सर्फ उपभोक्ता 25% छूट प्लान (netsurf_triage_step2_consumer)' },
-        { text: '📱 2. बिना टीम हर महीने ₹15,000-₹30,000 आय (E-Teller)', query: 'डिजिटल ई-टेलर रिटेल कमाई प्लान (netsurf_triage_step2_eteller)' },
-        { text: '🏆 3. Q3 पाथफाइंडर 2026-27 व रॉकस्टार अचीवमेंट', query: 'Q3 पाथफाइंडर टीमफेस्ट क्लब रॉकस्टार (netsurf_triage_step2_q3)' },
-        { text: '🚀 4. फुल-टाइम करियर व ₹8.19 लाख पाक्षिक कैपिंग', query: 'फुल टाइम करियर और 8.19 लाख कैपिंग प्लान (netsurf_triage_step2_capping)' }
+        { text: '🛒 1. उत्पादों पर 25% छूट व घरेलू बचत (Consumer)', query: 'नेट्सर्फ उपभोक्ता 25% छूट प्लान' },
+        { text: '📱 2. बिना टीम हर महीने ₹15,000-₹30,000 आय (E-Teller)', query: 'डिजिटल ई-टेलर रिटेल कमाई प्लान' },
+        { text: '🏆 3. Q3 पाथफाइंडर 2026-27 व रॉकस्टार अचीवमेंट', query: 'Q3 पाथफाइंडर टीमफेस्ट क्लब रॉकस्टार' },
+        { text: '🚀 4. फुल-टाइम करियर व ₹8.19 लाख पाक्षिक कैपिंग', query: 'फुल टाइम करियर और 8.19 लाख कैपिंग प्लान' }
       ], 'business', 'netsurf_triage_step1');
       return true;
     }
@@ -14334,10 +14335,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const prompt = `💼 **लक्ष्य:** ${goalName}\n\nआपकी वर्तमान पृष्ठभूमि क्या है ताकि आपके अनुकूल 90 दिन की कार्ययोजना दी जा सके?`;
 
       renderCrispSpecialBox(`💼 ${goalName}: चरण 2 — आपकी प्रोफाइल चुनें`, prompt, [
-        { text: '👩 1. गृहणी / महिला (घर बैठे 2 घंटे समय)', query: `${goalName} महिला स्वावलंबन रोडमैप (netsurf_triage_step3_women)` },
-        { text: '🌾 2. किसान / ग्रामीण युवा (खेती व पशुपालन संपर्क)', query: `${goalName} किसान मित्र रोडमैप (netsurf_triage_step3_farmer)` },
-        { text: '💼 3. नौकरीपेशा / व्यवसायी (पार्ट-टाइम काम)', query: `${goalName} पार्ट-टाइम प्रोफेशनल रोडमैप (netsurf_triage_step3_pro)` },
-        { text: '🌐 4. डायरेक्ट सेलर / अनुभवी नेटवर्क लीडर', query: `${goalName} मास्टर लीडरशिप रोडमैप (netsurf_triage_step3_leader)` }
+        { text: '👩 1. गृहणी / महिला (घर बैठे 2 घंटे समय)', query: `${goalName} महिला स्वावलंबन रोडमैप` },
+        { text: '🌾 2. किसान / ग्रामीण युवा (खेती व पशुपालन संपर्क)', query: `${goalName} किसान मित्र रोडमैप` },
+        { text: '💼 3. नौकरीपेशा / व्यवसायी (पार्ट-टाइम काम)', query: `${goalName} पार्ट-टाइम प्रोफेशनल रोडमैप` },
+        { text: '🌐 4. डायरेक्ट सेलर / अनुभवी नेटवर्क लीडर', query: `${goalName} मास्टर लीडरशिप रोडमैप` }
       ], 'business', 'netsurf_triage_step2');
       return true;
     }
@@ -17020,6 +17021,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // 0. ABSOLUTE TOP PRIORITY: SAFETY, MEDICAL EMERGENCY & PROFANITY GUARDRAIL
     if (handleSafetyGuardrails(cleanQ, rawQ)) {
       return;
+    }
+
+    // 0.0001 SAKHI KNOWLEDGE VAULT V2, PRICING & ESTIMATES (SAKHI_MANAS.md Compliant)
+    if (window.SakhiKnowledgeVaultV2 && typeof window.SakhiKnowledgeVaultV2.handleQuery === 'function') {
+      if (window.SakhiKnowledgeVaultV2.handleQuery(cleanQ, rawQ)) return;
     }
 
     // 0.001 SAKHI TUTORIAL & INTERACTIVE ENGAGEMENT ENGINE (SAKHI_MANAS.md Compliant)
