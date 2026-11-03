@@ -17899,6 +17899,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   // 18. CRISP SPECIAL BOX RENDERER
   function renderCrispSpecialBox(title, bodyText, chips, domain, entityKey) {
+    if (typeof window !== 'undefined') window.renderCrispSpecialBox = renderCrispSpecialBox;
     if (domain) sakhiConversationState.lastActiveDomain = domain;
     if (entityKey) sakhiConversationState.lastActiveEntity = entityKey;
     if (title) sakhiConversationState.lastActiveEntityName = title;
@@ -18485,9 +18486,25 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const isIrrelevantNoise = /(?:abbot|statesman|crusade|regent\s*during|king\s*louis|12th\s*century|parish|monk)/i.test(cleanSummary);
       if (isIrrelevantNoise) {
         console.warn('[Sakhi Search Guard] Discarded irrelevant external noise:', cleanSummary.slice(0, 80));
-        synthesizeDynamicAnswer(rawQ, targetDomain);
-        return;
+        result = null; // Mark as null so Gemini AI fallback can answer it accurately
       }
+    }
+
+    // 5. 3-Tier Fallback: If Wikipedia & DuckDuckGo returned nothing (or noise), query Gemini Flash AI
+    if (!result && window.SakhiKnowledgeVaultV2 && typeof window.SakhiKnowledgeVaultV2.queryGeminiTextFallback === 'function') {
+      appendTypingIndicator();
+      const geminiRes = await window.SakhiKnowledgeVaultV2.queryGeminiTextFallback(rawQ, cleanQ, targetDomain);
+      removeTypingIndicator();
+      if (geminiRes && geminiRes.summary) {
+        result = geminiRes;
+      }
+    }
+
+    if (result && result.summary) {
+      let cleanSummary = result.summary
+        .replace(/\[\d+\]/g, '')
+        .replace(/http[s]?:\/\/\S+/g, '')
+        .trim();
 
       const newRecord = {
         id: 'vault_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
@@ -18509,7 +18526,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       return;
     }
 
-    // 5. If both search engines returned nothing, standard graceful response
+    // 6. If all 3 search tiers returned nothing, standard graceful response
     synthesizeDynamicAnswer(rawQ, targetDomain);
   }
 

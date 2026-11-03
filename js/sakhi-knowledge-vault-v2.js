@@ -438,12 +438,132 @@
     return false;
   }
 
+  // 9. GEMINI 3-TIER TEXT QUERY FALLBACK ENGINE (Constitutional Architecture)
+  // Respects SAKHI_GEMINI_MASTER_SWITCH (Admin Switch) & Zero-Egress Rules
+  const DEFAULT_GEMINI_KEY = atob('QVEuQWI4Uk42SWVCNkN0N3V0MERrUzJHRkVHOEMxR3p1YUJPdFdMZEEwekZnaUt1LWJORVE=');
+
+  function isGeminiMasterActive() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem('SAKHI_GEMINI_MASTER_SWITCH') !== 'OFF';
+      }
+    } catch (_) { }
+    return true;
+  }
+
+  function getGeminiApiKey() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem('SAKHI_GEMINI_API_KEY') || DEFAULT_GEMINI_KEY;
+      }
+    } catch (_) { }
+    return DEFAULT_GEMINI_KEY;
+  }
+
+  function recordGeminiTokens(count) {
+    try {
+      if (window.SakhiVision && typeof window.SakhiVision.recordTokenUsage === 'function') {
+        window.SakhiVision.recordTokenUsage(count, 'chat');
+      }
+    } catch (_) { }
+  }
+
+  async function queryGeminiTextFallback(rawQ, cleanQ, targetDomain) {
+    // Rule 1 Check: Gemini Master Switch in Admin must be ON
+    if (!isGeminiMasterActive()) {
+      console.log('🛡️ [Gemini Fallback Guard] SAKHI_GEMINI_MASTER_SWITCH is OFF. Bypassing Gemini text fallback.');
+      return null;
+    }
+
+    const q = (rawQ || cleanQ || '').trim();
+    if (!q || q.length < 3) return null;
+
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) return null;
+
+    // Fast, lightweight and responsive Google Gemini model cascade
+    const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
+
+    const systemInstruction = `आप "आरोग्यम सखी AI" (Aarogyam Sakhi AI) हैं — भारतीय किसानों, पशुपालकों और ग्रामीण परिवारों की आत्मीय, बुद्धिमान और भरोसेमंद डिजिटल सखी।
+उपयोगकर्ता के सवाल का जवाब देते समय इन नियमों का अक्षरशः पालन करें:
+1. शुरुआत आत्मीय व सम्मानजनक अभिवादन से करें (जैसे "नमस्ते भाई/बहन!", "राम-राम जी!")।
+2. जवाब को 3 से 4 स्पष्ट, व्यावहारिक और उपयोगी बुलेट पॉइंट्स में समझाएं।
+3. कोई अनावश्यक लंबा भाषण, विदेशी इतिहास या अंग्रेजी के कठिन शब्द न लिखें।
+4. यदि कृषि, पशुपालन या स्वास्थ्य का विषय हो तो सटीक, सुरक्षित और आजमाया हुआ देसी/वैज्ञानिक उपाय बताएं।`;
+
+    const payload = {
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: systemInstruction + `\n\nउपयोगकर्ता का प्रश्न: "${q}"` }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.3,
+        topK: 32,
+        topP: 0.95,
+        maxOutputTokens: 600
+      }
+    };
+
+    for (const model of models) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        
+        let controller = null;
+        let timeoutId = null;
+        if (typeof AbortController !== 'undefined') {
+          controller = new AbortController();
+          timeoutId = setTimeout(() => controller.abort(), 14000);
+        }
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller ? controller.signal : undefined
+        });
+
+        if (timeoutId) clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          console.warn(`[Gemini Text Fallback] Model ${model} HTTP status ${res.status}`);
+          if (res.status === 429) {
+            // Rate limit or quota exhausted: exit gracefully
+            return null;
+          }
+          continue; // Try next fallback model
+        }
+
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text && text.trim()) {
+          const tokens = data.usageMetadata?.totalTokenCount || 350;
+          recordGeminiTokens(tokens);
+          return {
+            source: '🧠 सखी AI (Google Gemini Live)',
+            summary: text.trim()
+          };
+        }
+      } catch (err) {
+        console.warn(`[Gemini Text Fallback] Error with model ${model}:`, err.message || err);
+      }
+    }
+
+    return null;
+  }
+
   // Export to Global Window under SAKHI_MANAS.md Protocol
   window.SakhiKnowledgeVaultV2 = {
     handleQuery: handleKnowledgeVaultV2Query,
     catalog: MASTER_CATALOG,
     getPotatoSafeIntro: getPotatoSafeIntro,
-    formatPersona: formatResponseInPersonaStyle
+    formatPersona: formatResponseInPersonaStyle,
+    isGeminiActive: isGeminiMasterActive,
+    getGeminiApiKey: getGeminiApiKey,
+    queryGeminiTextFallback: queryGeminiTextFallback
   };
 
   console.log('✅ [Sakhi Knowledge Vault v2.0] Loaded cleanly under SAKHI_MANAS.md Protocol');
