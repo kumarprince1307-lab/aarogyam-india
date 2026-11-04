@@ -160,13 +160,13 @@
     "popupEnabled": true,
     "popupDelaySeconds": 15,
     "sakhiTriggerEnabled": true,
-    "status": "active",
+    "status": "inactive",
     "updated_at": "2026-11-04T05:57:40.113Z"
   },
   {
     "id": "BUNDLE_KISAN_4IN1",
     "slug": "kisan-master-bundle",
-    "title": "महाबचत 4-इन-1 किसान मास्टर बंडल",
+    "title": "महाबचत 4-इन-1 किसान मास्टर बंडल (Legacy)",
     "subtitle": "धान, सोयाबीन, मक्का, सब्जी व संपूर्ण फसल डॉक्टर मास्टर गाइड्स का एक संपूर्ण संग्रह!",
     "description": "बीज उपचार से लेकर कटाई तक सम्पूर्ण वैज्ञानिक एवं Practical समाधान। सभी प्रमुख फसलों, कीट-रोग नियंत्रण व आधुनिक कृषि तकनीकों का एक संपूर्ण डिजिटल संग्रह भारी कॉम्बो छूट पर।",
     "badge": "त्योहार स्पेशल / 83% की महाबचत",
@@ -203,6 +203,6 @@
       "/images/books/kharif-master-guide-2026-preview-02.webp"
     ],
     "status": "active",
-    "updated_at": "2026-11-04T10:45:00.000Z"
+    "updated_at": "2026-11-03T10:00:00.000Z"
   }
 ]
