@@ -1246,7 +1246,7 @@
         </button>
 
         <!-- 2. Purple Audio Greeting Button -->
-        <button type="button" onclick="if(window.togglePageAudioGreeting){window.togglePageAudioGreeting();}else if(window.playPageAudioGreeting){window.playPageAudioGreeting();}" class="sticky-float-pill sticky-float-audio-pill" id="universal-sticky-audio-btn" title="पेज ऑडियो सुनें" aria-label="Audio" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+        <button type="button" onclick="window.handleUniversalStickyAudioToggle?.(event)" class="sticky-float-pill sticky-float-audio-pill" id="universal-sticky-audio-btn" title="पेज ऑडियो सुनें / रोकें" aria-label="Audio" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-solid fa-volume-high"></i>
         </button>
 
@@ -1554,3 +1554,50 @@
     }
   });
 })();
+
+
+// Universal Sticky Audio Toggle & Auto-Loader Helper
+window.handleUniversalStickyAudioToggle = function (e) {
+  if (e) {
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+  }
+
+  // If on My Library page, delegate to the sub-header library guide
+  if (window.location.pathname.includes('my-library')) {
+    if (typeof window.toggleLibraryAudioGuide === 'function') {
+      window.toggleLibraryAudioGuide(e);
+      return;
+    }
+  }
+
+  // If audio greeting engine is already loaded, toggle it directly
+  if (typeof window.togglePageAudioGreeting === 'function') {
+    window.togglePageAudioGreeting(e);
+    return;
+  }
+
+  // Otherwise, load audio-greeting-engine dynamically on demand
+  const btn = document.getElementById('universal-sticky-audio-btn');
+  if (btn) {
+    btn.classList.add('playing');
+    const icon = btn.querySelector('i');
+    if (icon) icon.className = 'fa-solid fa-spinner fa-spin';
+  }
+
+  const s = document.createElement('script');
+  s.src = '/js/audio-greeting-engine.js?v=' + Date.now();
+  s.onload = function () {
+    if (typeof window.togglePageAudioGreeting === 'function') {
+      window.togglePageAudioGreeting(e);
+    }
+  };
+  s.onerror = function () {
+    if (btn) {
+      btn.classList.remove('playing');
+      const icon = btn.querySelector('i');
+      if (icon) icon.className = 'fa-solid fa-volume-high';
+    }
+  };
+  document.head.appendChild(s);
+};

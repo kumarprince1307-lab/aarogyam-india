@@ -318,7 +318,7 @@ function updateSubscriptionTimerAndStatus(storedUser) {
     } catch (_) {}
 
     const isFlagActive = localStorage.getItem("user_is_active") === "true" || localStorage.getItem("user_is_subscriber") === "true";
-    const isActive = Boolean(storedUser.is_active || storedUser.is_subscriber || storedUser.status === "active" || isFlagActive || hasPurchases);
+    const isActive = Boolean(storedUser.is_active === true || storedUser.is_active === "true" || storedUser.is_subscriber === true || storedUser.status === "active" || isFlagActive || hasPurchases || localStorage.getItem("user_is_active") === "true");
 
     // Auto-sync back to storedUser if active via purchases/flags
     if (isActive && !storedUser.is_active) {
@@ -667,28 +667,6 @@ async function renderLibrarySections(booksArray) {
     const comingSoonGrid = document.getElementById('comingSoonGrid');
 
     if (purchasedGrid) purchasedGrid.innerHTML = '';
-    // Dynamic Admin-Connected Bundle Promo Tray in My Library
-    try {
-      if (typeof window.getOrFetchActiveBundle === 'function') {
-        window.getOrFetchActiveBundle().then(activeB => {
-          // Render Mega Deal of the Day at Top of My Library (Amazon / Flipkart Style)
-    const topDealSlot = document.getElementById('library-top-mega-deal-slot');
-    if (topDealSlot && typeof window.renderMegaDealBannerHTML === 'function') {
-      topDealSlot.innerHTML = window.renderMegaDealBannerHTML();
-    }
-    const slot = document.getElementById('library-bundle-promo-tray-slot');
-          if (slot && typeof window.renderBundlePromoCardHTML === 'function') {
-            slot.innerHTML = window.renderBundlePromoCardHTML(activeB);
-          }
-          // Single top banner used to avoid duplicate clutter
-        });
-      }
-    } catch (_) {}
-
-    const slot = document.getElementById('library-bundle-promo-tray-slot');
-    if (slot && typeof window.renderBundlePromoCardHTML === 'function') {
-      slot.innerHTML = window.renderBundlePromoCardHTML();
-    }
     const secAvail = document.getElementById('section-available');
     if (secAvail) secAvail.style.display = 'block';
 
@@ -722,7 +700,7 @@ async function renderLibrarySections(booksArray) {
                 const raw = sessionStorage.getItem(libCacheKey);
                 if (raw) {
                     const parsed = JSON.parse(raw);
-                    if (parsed && (Date.now() - (parsed._ts || 0) < 900000) && Array.isArray(parsed.data)) {
+                    if (false && parsed && (Date.now() - (parsed._ts || 0) < 900000) && Array.isArray(parsed.data)) {
                         userPurchases = parsed.data;
                         fromCache = true;
                     }

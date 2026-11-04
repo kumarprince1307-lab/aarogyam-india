@@ -3,21 +3,9 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>My Library - Aarogyam India</title>
   <!-- Favicon & PWA Manifest -->
-  
-  <!-- OpenGraph & Social Share Meta (Synced from Admin) -->
-  <meta property="og:title" content="📖 मेरी डिजिटल लाइब्रेरी (My Library)">
-  <meta property="og:description" content="Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच।">
-  <meta property="og:image" content="https://aarogyamindia.online/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp">
-  <meta property="og:url" content="https://aarogyamindia.online/ebooks/my-library.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Aarogyam India">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="📖 मेरी डिजिटल लाइब्रेरी (My Library)">
-  <meta name="twitter:description" content="Aarogyam India - भारत का सम्पूर्ण डिजिटल मंच।">
-  <meta name="twitter:image" content="https://aarogyamindia.online/images/banners/og_image-bk015-sec_audio-ba-436589-2buf.webp">
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
   <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
   <link rel="manifest" href="/manifest.json?v=1.1">
@@ -218,42 +206,78 @@
       </div>
 
     </div>
-
-    <!-- =========================================
-         2. ULTRA-SLIM STICKY LIVE AUDIO GUIDE BAR INSIDE HEADER
-    ========================================== -->
-    <div class="sub-header-audio-bar" id="subHeaderAudioBar" style="padding: 3px 0;">
-      <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 0;">
-        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-          <div class="sub-audio-avatar" id="subAudioAvatar" style="width:28px;height:28px;font-size:0.95rem;">
-            <span>🎧</span>
-          </div>
-          <div style="min-width:0;">
-            <div style="font-size:0.8rem;font-weight:900;color:#ffffff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              🌸 कृषि सखी ऑडियो गाइड
-            </div>
-            <div style="font-size:0.68rem;color:#a7f3d0;font-weight:600;line-height:1.1;" id="subAudioStatusText">
-              लाइब्रेरी व पुस्तकों की जानकारी सुनें
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Play Action Button (Slim & Easy to Tap) -->
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-          <button type="button" id="subHeaderPlayBtn" onclick="window.toggleLibraryAudioGuide?.(event)" class="sub-audio-play-btn" title="लाइब्रेरी ऑडियो गाइड सुनें" style="padding:4px 12px;font-size:0.76rem;border-radius:18px;">
-            <span id="subHeaderPlayIcon">▶️</span>
-            <span id="subHeaderPlayText">गाइड सुनें</span>
-            <span class="sub-audio-waves" id="subAudioWaves">
-              <i class="wave-bar"></i><i class="wave-bar"></i><i class="wave-bar"></i>
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
   </header>
 
   <!-- MAIN LIBRARY CONTENT CONTAINER (Full Width, Centered) -->
   <main class="library-main" id="mainLibraryContent">
+
+    <!-- ==============================================================
+         HOT-SELLING MEGA DEAL OF THE DAY (AMAZON / FLIPKART STYLE)
+         Directly connected to Admin Panel active bundle
+         ============================================================== -->
+    <div id="library-top-mega-deal-slot" class="aarogyam-mega-deal-slot" style="max-width: 1200px; margin: 12px auto 16px auto; padding: 0 10px; box-sizing: border-box;">
+      <div class="aarogyam-mega-combo-container" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; box-sizing: border-box;">
+        
+        <!-- CARD 1: 5-IN-1 MEGA COMBO -->
+        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=BUNDLE_KISAN_5IN1'" style="cursor:pointer; background: linear-gradient(135deg, #052816 0%, #064e3b 45%, #021a10 100%); border: 2px solid #facc15; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
+          <div style="flex: 1; min-width: 170px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+              <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
+                🔥 5-इन-1 कॉम्बो
+              </span>
+              <span style="background: rgba(250,204,21,0.2); color: #fde047; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(250,204,21,0.4);">
+                ⚡ 94% छूट
+              </span>
+            </div>
+            <div style="font-size: 1.05rem; font-weight: 900; color: #ffffff; line-height: 1.25; margin-bottom: 3px;">
+              महाबचत 5-इन-1 किसान मास्टर
+            </div>
+            <div style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.35;">
+              खेती डॉक्टर + दवा डायरेक्टरी + 11 सब्जी + गेहूँ + चना
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+            <div style="text-align: right;">
+              <div style="font-size: 1.45rem; font-weight: 900; color: #facc15; line-height: 1;">₹199</div>
+              <div style="font-size: 0.74rem; color: #94a3b8; text-decoration: line-through;">₹3,395</div>
+            </div>
+            <a href="/bundle.html?id=BUNDLE_KISAN_5IN1" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(245,158,11,0.4); white-space: nowrap;">
+              कॉम्बो देखें →
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 2: 4-IN-1 KISAN MASTER BUNDLE -->
+        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=BUNDLE_KISAN_4IN1'" style="cursor:pointer; background: linear-gradient(135deg, #091a24 0%, #0f2d3d 50%, #03151f 100%); border: 2px solid #38bdf8; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
+          <div style="flex: 1; min-width: 170px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+              <span style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
+                ⚡ 4-इन-1 कॉम्बो
+              </span>
+              <span style="background: rgba(56,189,248,0.2); color: #7dd3fc; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4);">
+                ⚡ 83% छूट
+              </span>
+            </div>
+            <div style="font-size: 1.05rem; font-weight: 900; color: #ffffff; line-height: 1.25; margin-bottom: 3px;">
+              महाबचत 4-इन-1 किसान बंडल
+            </div>
+            <div style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.35;">
+              धान, सोयाबीन + खेती डॉक्टर + दवा डायरेक्टरी + चना
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+            <div style="text-align: right;">
+              <div style="font-size: 1.45rem; font-weight: 900; color: #38bdf8; line-height: 1;">₹199</div>
+              <div style="font-size: 0.74rem; color: #94a3b8; text-decoration: line-through;">₹1,196</div>
+            </div>
+            <a href="/bundle.html?id=BUNDLE_KISAN_4IN1" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(56,189,248,0.4); white-space: nowrap;">
+              कॉम्बो देखें →
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
 
     <!-- 4. Dashboard Style Welcome Card (Digital Locker View) -->
     <div class="welcome-card-soft"
@@ -546,7 +570,7 @@
       </div>
 
       <!-- Section 2: Available Books -->
-      <div id="section-available" class="book-section" style="display: none;">
+      <div id="section-available" class="book-section" style="display: block;">
         <div class="section-title">
           <span>खरीद के लिए उपलब्ध प्रमुख पुस्तकें (Available Books)</span>
         </div>
@@ -615,6 +639,11 @@
             <input type="text" id="leadState" class="modal-input" placeholder="राज्य (State)" style="margin-bottom: 0;">
             <input type="date" id="leadDob" class="modal-input" placeholder="जन्म तिथि (Date of Birth)"
               style="margin-bottom: 0;" title="जन्म तिथि (DOB)">
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <input type="number" step="0.5" id="leadKhet" class="modal-input" placeholder="खेती / जमीन (एकड़ में)" style="margin-bottom: 0;">
+            <input type="text" id="leadPashu" class="modal-input" placeholder="पशु विवरण (उदा. 2 गाय, 3 भैंस)" style="margin-bottom: 0;">
           </div>
 
           <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
@@ -803,33 +832,33 @@
 
       </div>
 
-      <div style="border-top:1.5px solid #1e293b;padding-top:20px;text-align:center;font-size:0.8rem;color:#64748b;">
-        © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
-      </div>
-    
-      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center;font-size:0.8rem;font-weight:700;">
-        <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 Privacy Policy</a>
-        <span style="color:#64748b;">•</span>
-        <a href="/terms.html" style="color:#cbd5e1;text-decoration:none;">📜 Terms & Conditions</a>
-        <span style="color:#64748b;">•</span>
-        <a href="/faq.html" style="color:#cbd5e1;text-decoration:none;">❓ FAQ</a>
-        <span style="color:#64748b;">•</span>
-        <a href="/return-refund.html" style="color:#cbd5e1;text-decoration:none;">💳 Refund Policy</a>
+      <div style="border-top:1.5px solid #1e293b;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:0.82rem;color:#94a3b8;">
+        <div>
+          © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-weight:700;">
+          <a href="/privacy-policy.html" style="color:#cbd5e1;text-decoration:none;">🔒 Privacy Policy</a>
+          <span style="color:#475569;">•</span>
+          <a href="/terms.html" style="color:#cbd5e1;text-decoration:none;">📜 Terms & Conditions</a>
+          <span style="color:#475569;">•</span>
+          <a href="/faq.html" style="color:#cbd5e1;text-decoration:none;">❓ FAQ</a>
+          <span style="color:#475569;">•</span>
+          <a href="/return-refund.html" style="color:#cbd5e1;text-decoration:none;">💳 Refund Policy</a>
+        </div>
       </div>
     </div>
   </footer>
 
   <!-- 10. JavaScript Links -->
-  <script src="/js/book-marketing-card.js?v=20260911_v7"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261101_v32_bahi_khata"></script>
+  <script src="/js/book-marketing-card.js?v=20261104_v99_clean"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261104_v45_live"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
-  <script src="/js/device-session-guard.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
   <script src="/js/global-guest-modal.js?v=1.2"></script>
   <script src="/js/recent-purchase-toast.js"></script>
-  <script src="/js/my-library.js?v=20260917_v9_stable_direct"></script>
+  <script src="/js/my-library.js?v=20261104_v99_clean"></script>
   <script type="module" src="/js/public-pwa.js"></script>
   <script src="/js/weather.js"></script>
 </body>

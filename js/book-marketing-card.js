@@ -810,372 +810,169 @@
 
 
   // =========================================================================
-  // =========================================================================
-  // FESTIVE DIWALI ANIMATED DUAL-COMBO SHOWCASE (100% DYNAMIC & ADMIN-LINKED)
-  // Displays ALL Active Combos (5-in-1, 4-in-1, etc.) side-by-side on desktop
-  // and smoothly stacked on mobile with golden wave shimmer & Diwali sparkle
-  // =========================================================================
-  window._cachedActiveBundles = [];
-  window._cachedActiveBundle = null;
-  let _bundlesFetchPromise = null;
-  let _dealCountdownTimer = null;
-
-  window.initDealCountdown = function () {
-    if (_dealCountdownTimer) return;
-    let secondsLeft = 14 * 60 + 36;
-    _dealCountdownTimer = setInterval(function () {
-      secondsLeft--;
-      if (secondsLeft <= 0) secondsLeft = 15 * 60;
-      const m = Math.floor(secondsLeft / 60);
-      const s = secondsLeft % 60;
-      const str = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      document.querySelectorAll('.deal-countdown-digits').forEach(function (el) {
-        el.textContent = str;
-      });
-    }, 1000);
-  };
-
-  // Helper to refresh all slots across the site
-  window.refreshAllMegaDealSlots = function () {
-    const slots = document.querySelectorAll('#library-top-mega-deal-slot, .library-top-mega-deal-slot, .bundle-featured-promo-tray-slot');
-    if (slots.length > 0) {
-      const html = typeof window.renderMegaDealBannerHTML === 'function' ? window.renderMegaDealBannerHTML() : '';
-      slots.forEach(s => {
-        if (s && html) s.innerHTML = html;
-      });
+  
+  // Clean Standalone Marketing Dual-Combo Engine (100% Reliable, Clean, Zero-Flicker)
+  // -------------------------------------------------------------
+  // 5. DYNAMIC MEGA DEAL & COMBO CARDS RENDERER (CONNECTED TO ADMIN)
+  // -------------------------------------------------------------
+  window.renderDynamicBundleCards = function (bundlesList) {
+    if (!Array.isArray(bundlesList) || bundlesList.length === 0) {
+      return '';
     }
-  };
 
-  // Inject Festive Diwali Styles Once
-  function ensureFestiveComboStyles() {
-    if (document.getElementById('ai-festive-combo-styles')) return;
-    const st = document.createElement('style');
-    st.id = 'ai-festive-combo-styles';
-    st.textContent = `
-      @keyframes festiveSheen {
-        0% { transform: translateX(-150%) skewX(-25deg); }
-        35%, 100% { transform: translateX(250%) skewX(-25deg); }
-      }
-      @keyframes diyaSparkle {
-        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.7)); }
-        50% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.85)); }
-      }
-      .festive-combos-wrapper {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 14px;
-        width: 100%;
-        margin-bottom: 16px;
-        grid-column: 1 / -1;
-      }
-      .festive-combo-card {
-        position: relative;
-        overflow: hidden;
-        border-radius: 18px;
-        background: linear-gradient(135deg, #052816 0%, #064e3b 45%, #021a10 100%);
-        border: 2px solid #facc15;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), 0 0 20px rgba(250, 204, 21, 0.22);
-        color: #ffffff;
-        padding: 14px 18px;
-        box-sizing: border-box;
-        cursor: pointer;
-        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
-        grid-column: 1 / -1;
-        width: 100%;
-      }
-      .festive-combo-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 28px rgba(250, 204, 21, 0.35);
-      }
-      .festive-combo-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 60%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), rgba(250, 204, 21, 0.3), transparent);
-        transform: translateX(-150%) skewX(-25deg);
-        animation: festiveSheen 4.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
-        pointer-events: none;
-        z-index: 2;
-      }
-      .festive-card-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        width: 100%;
-        position: relative;
-        z-index: 3;
-      }
-      .festive-books-fan {
-        position: relative;
-        width: 130px;
-        height: 70px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-      @media (max-width: 640px) {
-        .festive-combo-card {
-          padding: 12px 14px;
-          border-radius: 16px;
-        }
-        .festive-card-inner {
-          flex-direction: column !important;
-          align-items: stretch !important;
-          gap: 10px !important;
-        }
-        .festive-mobile-bottom {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: space-between !important;
-          width: 100% !important;
-          padding-top: 8px !important;
-          border-top: 1px dashed rgba(255, 255, 255, 0.2) !important;
-        }
-        .festive-books-fan {
-          width: 110px !important;
-          height: 60px !important;
-        }
-        .festive-book-mini {
-          width: 44px !important;
-          height: 62px !important;
-        }
-      }
-    `;
-    document.head.appendChild(st);
-  }
-
-  window.getOrFetchAllActiveBundles = async function () {
-    if (window._cachedActiveBundles && window._cachedActiveBundles.length > 0) {
-      return window._cachedActiveBundles;
+    // Filter ONLY active bundles (if status is 'inactive' or active===false, hide it)
+    const activeBundles = bundlesList.filter(b => b && b.status === 'active' && b.active !== false);
+    if (activeBundles.length === 0) {
+      return '';
     }
-    if (_bundlesFetchPromise) return _bundlesFetchPromise;
 
-    _bundlesFetchPromise = (async () => {
-      try {
-        let masterBundles = [];
+    const cardsHtml = activeBundles.map(bundle => {
+      const id = bundle.id || '';
+      const title = bundle.title || 'महाबचत किसान कॉम्बो';
+      const subtitle = bundle.subtitle || '';
+      const badge = bundle.badge || 'विशेष कॉम्बो';
+      const mrp = Number(bundle.mrp || 1196);
+      const offerPrice = Number(bundle.offerPrice || bundle.price || 199);
+      const discount = mrp > offerPrice ? Math.round((1 - (offerPrice / mrp)) * 100) : 0;
+      const discountBadge = discount > 0 ? `⚡ ${discount}% छूट` : 'विशेष ऑफर';
 
-        // 1. Check LocalStorage
-        try {
-          const localB = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
-          if (Array.isArray(localB) && localB.length > 0) {
-            masterBundles = localB;
-          }
-        } catch (_) {}
+      // Visual styling (Gold for 5-in-1, Blue for 4-in-1 & others)
+      const isGold = (id || '').includes('5IN1') || (bundle.themeColor === '#facc15');
+      const borderColor = isGold ? '#facc15' : '#38bdf8';
+      const priceColor = isGold ? '#facc15' : '#38bdf8';
+      const btnBg = isGold ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #38bdf8, #0284c7)';
+      const bgGradient = isGold 
+        ? 'linear-gradient(135deg, #052816 0%, #064e3b 45%, #021a10 100%)' 
+        : 'linear-gradient(135deg, #091a24 0%, #0f2d3d 50%, #03151f 100%)';
 
-        // 2. Load from data/book-bundles.json (Server Git Master)
-        try {
-          const res = await fetch('/data/book-bundles.json?v=' + Date.now());
-          if (res.ok) {
-            const data = await res.json();
-            const serverBundles = Array.isArray(data) ? data : (data.bundles || []);
-            if (serverBundles.length > 0) {
-              if (masterBundles.length === 0) {
-                masterBundles = serverBundles;
-              } else {
-                serverBundles.forEach(sb => {
-                  if (!sb || !sb.id) return;
-                  const idx = masterBundles.findIndex(m => m && m.id && sb.id && m.id.toLowerCase() === sb.id.toLowerCase());
-                  if (idx >= 0) {
-                    if (new Date(sb.updated_at || 0) > new Date(masterBundles[idx].updated_at || 0)) {
-                      masterBundles[idx] = sb;
-                    }
-                  } else {
-                    masterBundles.push(sb);
-                  }
-                });
-              }
-            }
-          }
-        } catch (_) {}
-
-        // Filter active bundles
-        const activeBundles = masterBundles.filter(b => b && b.status === 'active');
-        const finalBundles = activeBundles.length > 0 ? activeBundles : (masterBundles.length > 0 ? [masterBundles[0]] : []);
-
-        // Fetch catalog books to resolve covers and titles
-        let catalogBooks = [];
-        try {
-          const cRes = await fetch('/data/books.json?v=' + Date.now());
-          if (cRes.ok) {
-            const cData = await cRes.json();
-            catalogBooks = cData.books || cData || [];
-          }
-        } catch (_) {}
-
-        try {
-          const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
-          if (Array.isArray(customBooks)) catalogBooks = [...catalogBooks, ...customBooks];
-        } catch (_) {}
-
-        // Resolve each bundle
-        window._cachedActiveBundles = finalBundles.map(bundle => {
-          const resolvedBooks = (bundle.bookIds || []).map(bId => {
-            const cleanId = String(bId || '').toUpperCase().trim();
-            const match = catalogBooks.find(b => b && String(b.id || '').toUpperCase().trim() === cleanId);
-            return {
-              id: cleanId,
-              title: match?.heading || match?.title || match?.name || cleanId,
-              cover: match?.cover || match?.thumbnail || match?.hero?.cover_image || ('/images/books/' + cleanId.toLowerCase() + '-cover.webp'),
-              mrp: match?.mrp || 299,
-              offerPrice: match?.offerPrice || 99
-            };
-          });
-
-          const calcMrp = bundle.mrp || resolvedBooks.reduce((sum, b) => sum + (Number(b.mrp) || 0), 0) || 1999;
-          const offer = bundle.offerPrice || 199;
-          const discountPct = calcMrp > offer ? Math.round(((calcMrp - offer) / calcMrp) * 100) + '%' : '90%';
-
-          return {
-            ...bundle,
-            resolvedBooks,
-            computedMrp: calcMrp,
-            computedOffer: offer,
-            computedDiscount: discountPct
-          };
-        });
-
-        window._cachedActiveBundle = window._cachedActiveBundles[0] || null;
-        return window._cachedActiveBundles;
-      } catch (err) {
-        console.warn('Error fetching all active bundles:', err);
-        return [];
-      } finally {
-        _bundlesFetchPromise = null;
-      }
-    })();
-
-    return _bundlesFetchPromise;
-  };
-
-  window.getOrFetchActiveBundle = async function () {
-    const all = await window.getOrFetchAllActiveBundles();
-    return all[0] || null;
-  };
-
-  // Helper to render a SINGLE festive compact card
-  function renderSingleFestiveCardHTML(b) {
-    const title = b?.title || '🌾 सम्पूर्ण किसान महाबचत कॉम्बो पैक';
-    const subtitle = b?.subtitle || 'सर्वश्रेष्ठ वैज्ञानिक कृषि पुस्तकें • रंगीन सचित्र पेज • सम्पूर्ण समाधान';
-    const offerPrice = b?.computedOffer || b?.offerPrice || 199;
-    const mrp = b?.computedMrp || b?.mrp || 1999;
-    const discount = b?.computedDiscount || '90%';
-    const bundleId = b?.id || 'BUNDLE_KISAN_5IN1';
-    const bundleUrl = '/bundle.html?id=' + encodeURIComponent(bundleId);
-
-    const books = (b && Array.isArray(b.resolvedBooks) && b.resolvedBooks.length > 0)
-      ? b.resolvedBooks
-      : [
-          { id: 'BK017', title: 'प्राकृतिक खेती', cover: '/images/books/bk017-cover.webp' },
-          { id: 'BK016', title: 'दवा डायरेक्टरी', cover: '/images/books/bk016-cover.webp' },
-          { id: 'BK002', title: '11 सब्जियां', cover: '/images/books/bk002-cover.webp' },
-          { id: 'BK019', title: 'गेहूं की खेती', cover: '/images/books/bk019-cover.webp' }
-        ];
-
-    const totalBooks = books.length;
-
-    return `
-      <div class="festive-combo-card" onclick="window.location.href='${bundleUrl}'" title="क्लिक करके ${escapeHtml(title)} देखें">
-        <div class="festive-card-inner">
-          <div style="flex: 1 1 240px; min-width: 180px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap;">
-              <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #ffffff; font-size: 0.72rem; font-weight: 900; padding: 3px 9px; border-radius: 12px; letter-spacing: 0.3px; display: inline-flex; align-items: center; gap: 4px;">
-                <span style="animation: diyaSparkle 1.8s infinite ease-in-out;">✨🪔</span>
-                <span>${totalBooks}-इन-1 कॉम्बो</span>
+      return `
+        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=${encodeURIComponent(id)}'" style="cursor:pointer; background: ${bgGradient}; border: 2px solid ${borderColor}; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
+          <div style="flex: 1; min-width: 170px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+              <span style="background: ${isGold ? 'linear-gradient(135deg, #dc2626, #ef4444)' : 'linear-gradient(135deg, #2563eb, #1d4ed8)'}; color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
+                ${badge}
               </span>
-              <span style="background: rgba(250,204,21,0.22); color: #fde047; border: 1px solid rgba(250,204,21,0.4); font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;">
-                ⚡ ${discount} छूट
-              </span>
-              <span style="font-size: 0.7rem; color: #a7f3d0; font-weight: 700; background: rgba(0,0,0,0.3); padding: 2px 7px; border-radius: 10px;">
-                ⏰ <span class="deal-countdown-digits">14:25</span>
+              <span style="background: ${isGold ? 'rgba(250,204,21,0.2)' : 'rgba(56,189,248,0.2)'}; color: ${isGold ? '#fde047' : '#7dd3fc'}; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid ${isGold ? 'rgba(250,204,21,0.4)' : 'rgba(56,189,248,0.4)'};">
+                ${discountBadge}
               </span>
             </div>
-            
-            <div style="font-size: 1.05rem; font-weight: 900; color: #ffffff; line-height: 1.25; font-family: 'Outfit', sans-serif;">
-              ${escapeHtml(title)}
+            <div style="font-size: 1.05rem; font-weight: 900; color: #ffffff; line-height: 1.25; margin-bottom: 3px;">
+              ${title}
             </div>
-            <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 3px; line-height: 1.35;">
-              ${escapeHtml(subtitle)}
+            <div style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.35;">
+              ${subtitle}
             </div>
           </div>
-
-          <div class="festive-mobile-bottom" style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
-            <div class="festive-books-fan">
-              ${books.map((bk, i) => {
-                const centerIdx = Math.floor(totalBooks / 2);
-                const offsetStep = totalBooks > 1 ? Math.min(24, 90 / (totalBooks - 1)) : 0;
-                const x = (i - (totalBooks - 1) / 2) * offsetStep;
-                const r = (i - (totalBooks - 1) / 2) * 5;
-                const z = (i === centerIdx) ? 6 : (5 - Math.abs(i - centerIdx));
-                const isCenter = (i === centerIdx);
-                return `
-                  <div class="festive-book-mini" style="position: absolute; left: 50%; transform: translateX(-50%) translateX(${x}px) rotate(${r}deg); z-index: ${z}; width: 48px; height: 68px; border-radius: 4px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.65); border: ${isCenter ? '1.5px solid #22c55e' : '1px solid rgba(255,255,255,0.25)'}; background: #0f172a;">
-                    <img src="${bk.cover}" alt="${escapeHtml(bk.title)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
-                  </div>
-                `;
-              }).join('')}
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+            <div style="text-align: right;">
+              <div style="font-size: 1.45rem; font-weight: 900; color: ${priceColor}; line-height: 1;">₹${offerPrice}</div>
+              <div style="font-size: 0.74rem; color: #94a3b8; text-decoration: line-through;">₹${mrp.toLocaleString('en-IN')}</div>
             </div>
-
-            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-              <div style="text-align: right;">
-                <div style="font-size: 1.45rem; font-weight: 900; color: #facc15; font-family: 'Outfit', sans-serif; line-height: 1;">
-                  ₹${offerPrice}
-                </div>
-                <div style="font-size: 0.74rem; color: #94a3b8; text-decoration: line-through;">
-                  ₹${mrp}
-                </div>
-              </div>
-
-              <a href="${bundleUrl}" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000000; font-weight: 900; font-size: 0.82rem; padding: 8px 15px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(245,158,11,0.45); white-space: nowrap; border: 1px solid #fde047;">
-                <span>कॉम्बो देखें</span> →
-              </a>
-            </div>
+            <a href="/bundle.html?id=${encodeURIComponent(id)}" style="background: ${btnBg}; color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap;">
+              कॉम्बो देखें →
+            </a>
           </div>
         </div>
-      </div>
-    `;
-  }
-
-  window.renderMegaDealBannerHTML = function (bundleInput) {
-    ensureFestiveComboStyles();
-
-    if (bundleInput) {
-      return renderSingleFestiveCardHTML(bundleInput);
-    }
-
-    if (!window._cachedActiveBundles || window._cachedActiveBundles.length === 0) {
-      window.getOrFetchAllActiveBundles().then(() => {
-        window.refreshAllMegaDealSlots();
-      });
-      return renderSingleFestiveCardHTML(window._cachedActiveBundle);
-    }
-
-    const bundles = window._cachedActiveBundles;
-    setTimeout(window.initDealCountdown, 100);
-
-    if (bundles.length === 1) {
-      return renderSingleFestiveCardHTML(bundles[0]);
-    }
+      `;
+    }).join('');
 
     return `
-      <div class="festive-combos-wrapper">
-        ${bundles.map(b => renderSingleFestiveCardHTML(b)).join('')}
+      <div class="aarogyam-mega-combo-container" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; box-sizing: border-box;">
+        ${cardsHtml}
       </div>
     `;
   };
 
-  window.renderBundlePromoCardHTML = function (bundleInput) {
-    return window.renderMegaDealBannerHTML(bundleInput);
+  window.renderMegaDealBannerHTML = function () {
+    return window.renderBundlePromoCardHTML();
   };
 
-  // Auto-init badges on DOM load
+  window.renderBundlePromoCardHTML = function () {
+    return window.renderCleanStaticComboCards();
+  };
+
+  window.renderCleanStaticComboCards = function () {
+    return window.renderDynamicBundleCards([
+      {
+        id: 'BUNDLE_KISAN_5IN1',
+        title: 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो',
+        subtitle: 'खेती का डॉक्टर + दवा सलाहकार + 11 सब्जी खेती + गेहूँ व चना मास्टर गाइड्स',
+        badge: '🔥 5-इन-1 कॉम्बो',
+        mrp: 3395,
+        offerPrice: 199,
+        status: 'active'
+      },
+      {
+        id: 'BUNDLE_KISAN_4IN1',
+        title: 'महाबचत 4-इन-1 किसान मास्टर बंडल',
+        subtitle: 'धान, सोयाबीन, मक्का, सब्जी व संपूर्ण फसल डॉक्टर मास्टर गाइड्स',
+        badge: '⚡ 4-इन-1 कॉम्बो',
+        mrp: 1196,
+        offerPrice: 199,
+        status: 'active'
+      }
+    ]);
+  };
+
+  // Live Slot Refresher - dynamically pulls latest Admin configuration
+  window.refreshAllMegaDealSlots = async function () {
+    const slots = document.querySelectorAll('#library-top-mega-deal-slot, #home-top-mega-deal-slot, .aarogyam-mega-deal-slot');
+    if (!slots || slots.length === 0) return;
+
+    try {
+      let bundlesList = [];
+
+      // 1. Fetch fresh JSON from server with cache-busting timestamp
+      try {
+        const resp = await fetch('/data/book-bundles.json?v=' + Date.now());
+        if (resp.ok) {
+          const data = await resp.json();
+          bundlesList = Array.isArray(data) ? data : (data.bundles || []);
+        }
+      } catch (_) {}
+
+      // 2. Merge local storage overrides if available (e.g. while testing in admin panel)
+      try {
+        const localBundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+        if (Array.isArray(localBundles) && localBundles.length > 0) {
+          localBundles.forEach(loc => {
+            if (!loc || !loc.id) return;
+            const idx = bundlesList.findIndex(m => m.id && m.id.toLowerCase() === loc.id.toLowerCase());
+            if (idx >= 0) {
+              if (new Date(loc.updated_at || 0) >= new Date(bundlesList[idx].updated_at || 0)) {
+                bundlesList[idx] = loc;
+              }
+            } else {
+              bundlesList.push(loc);
+            }
+          });
+        }
+      } catch (_) {}
+
+      // If no bundles retrieved at all, preserve fallback HTML
+      if (!bundlesList || bundlesList.length === 0) return;
+
+      // 3. Render HTML dynamically based on active status
+      const html = window.renderDynamicBundleCards(bundlesList);
+
+      slots.forEach(slot => {
+        if (!html || html.trim() === '') {
+          slot.style.display = 'none';
+          slot.innerHTML = '';
+        } else {
+          slot.style.display = 'block';
+          slot.innerHTML = html;
+        }
+      });
+    } catch (err) {
+      console.warn('[MegaDealSlot] Auto-sync notice:', err);
+    }
+  };
+
+  // Auto-init badges and mega deal slots on DOM load
   document.addEventListener('DOMContentLoaded', function () {
     window.AarogyamWishlist.updateBadges();
     window.AarogyamCart.updateBadges();
+    window.refreshAllMegaDealSlots();
   });
 })();
-
