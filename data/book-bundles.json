@@ -160,7 +160,7 @@
     "popupEnabled": true,
     "popupDelaySeconds": 15,
     "sakhiTriggerEnabled": true,
-    "status": "active",
+    "status": "inactive",
     "updated_at": "2026-11-04T05:57:40.113Z"
   },
   {
