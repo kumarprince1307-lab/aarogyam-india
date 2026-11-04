@@ -496,6 +496,19 @@ module.exports = async function handler(req, res) {
     // -------------------------------------------------------------
     // ACTION: SAVE WEBINAR RECORDINGS & AAROGYAMTUBE VIDEOS / SHORTS
     // -------------------------------------------------------------
+        // -------------------------------------------------------------
+    // ACTION: SAVE BOOK BUNDLES CONFIG (data/book-bundles.json)
+    // -------------------------------------------------------------
+    if (action === 'save_book_bundles' || action === 'save_bundles') {
+      const bundlesData = payload.bundles || [];
+      const updatedBundlesBase64 = Buffer.from(JSON.stringify(bundlesData, null, 2), 'utf8').toString('base64');
+      await commitFile('data/book-bundles.json', updatedBundlesBase64, 'Publish book bundles config [Auto-Sync]', token);
+      return sendJson(res, 200, {
+        success: true,
+        message: 'Book bundles published to GitHub repository. Vercel auto-deployment triggered.'
+      });
+    }
+
     if (action === 'save_webinar_recordings') {
       const recordings = Array.isArray(payload.recordings) ? payload.recordings : [];
       const recordingsData = { recordings: recordings };

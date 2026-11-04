@@ -1347,11 +1347,10 @@
               <th>#</th>
               <th>सदस्य का नाम</th>
               <th>मोबाइल / संपर्क</th>
-              <th>स्रोत (Source)</th>
-              <th>स्थिति</th>
-              <th>जॉइन तारीख</th>
+              <th>🌸 सखी AI रुचि व पूछे गए सवाल</th>
+              <th>स्रोत व स्थिति</th>
               <th>खरीदी गई किताब (Book)</th>
-              <th>परचेज राशि</th>
+              <th>🎯 1-क्लिक समाधान</th>
             </tr>
           </thead>
           <tbody>
@@ -1375,31 +1374,75 @@
                 <tr>
                   <td><strong>#${globalIndex}</strong></td>
                   <td>
-                    <div style="font-weight:700;color:var(--text-main);">${r.full_name || 'Member'}</div>
-                    ${r.net_surf_id ? `<div style="font-size:0.7rem;color:#0284c7;">NetSurf: ${r.net_surf_id}</div>` : ''}
+                    <div style="font-weight:800;color:var(--text-main);font-size:0.86rem;">${r.full_name || 'किसान साथी'}</div>
+                    <div style="font-size:0.7rem;color:#64748b;margin-top:2px;">
+                      📅 ${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : 'हाल ही में'} 
+                      ${r.share_id ? `• 🆔 ${r.share_id}` : ''}
+                    </div>
+                    ${r.net_surf_id ? `<div style="font-size:0.7rem;color:#0284c7;font-weight:700;">NetSurf ID: ${r.net_surf_id}</div>` : ''}
                   </td>
                   <td>
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                       <a href="tel:${r.mobile}" style="color:var(--primary-dark);font-weight:700;text-decoration:none;" title="कॉल करें">
                         📞 <code>${r.mobile}</code>
                       </a>
-                      <a href="https://wa.me/91${r.mobile}?text=${encodeURIComponent('नमस्ते ' + (r.full_name || '') + ' जी! आरोग्यम इंडिया से संपर्क करने के लिए धन्यवाद।')}" target="_blank" style="color:#16a34a;background:#ecfdf5;padding:2px 6px;border-radius:6px;text-decoration:none;font-size:0.75rem;" title="व्हाट्सएप मैसेज">
-                        <i class="fa-brands fa-whatsapp"></i>
-                      </a>
                     </div>
                   </td>
-                  <td>${srcBadge}</td>
-                  <td>${statusBadge}</td>
-                  <td>${r.created_at ? new Date(r.created_at).toLocaleDateString('hi-IN') : '-'}</td>
-                  <td>${bookDisplay}</td>
                   <td>
+                    ${(() => {
+                      const ins = r.sakhi_insights;
+                      if (!ins) {
+                        return `<span style="color:#94a3b8;font-size:0.74rem;">सामान्य विज़िटर (कोई चैट नहीं)</span>`;
+                      }
+                      const dom = ins.primary_domain || 'agri';
+                      let domLabel = '🌾 कृषि व फसल';
+                      let domColor = '#f59e0b';
+                      let domBg = '#fef3c7';
+                      if (dom.includes('health') || dom.includes('sugar')) { domLabel = '🩺 स्वास्थ्य व शुगर'; domColor = '#e11d48'; domBg = '#ffe4e6'; }
+                      else if (dom.includes('business') || dom.includes('netsurf')) { domLabel = '💼 नेट्सर्फ 25% छूट'; domColor = '#059669'; domBg = '#d1fae5'; }
+                      else if (dom.includes('pashu') || dom.includes('dairy')) { domLabel = '🐄 पशुपालन व डेयरी'; domColor = '#0284c7'; domBg = '#e0f2fe'; }
+                      else if (dom.includes('beauty')) { domLabel = '🌸 सौंदर्य व त्वचा'; domColor = '#9333ea'; domBg = '#f3e8ff'; }
+
+                      const topic = ins.last_query_topic || 'परामर्श';
+                      const chats = ins.interaction_count || 1;
+                      return `
+                        <div>
+                          <span style="background:${domBg};color:${domColor};font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:12px;display:inline-block;margin-bottom:3px;">
+                            ${domLabel} (${chats} चैट)
+                          </span>
+                          <div style="font-size:0.73rem;color:#334155;font-weight:600;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${topic}">
+                            "${topic}"
+                          </div>
+                        </div>
+                      `;
+                    })()}
+                  </td>
+                  <td>
+                    <div style="margin-bottom:3px;">${srcBadge}</div>
+                    <div>${statusBadge}</div>
+                  </td>
+                  <td>
+                    ${bookDisplay}
                     ${r.totalPurchasedAmount > 0 ? `
-                      <span style="font-weight:800;color:#15803D;background:#DCFCE7;padding:3px 8px;border-radius:6px;">
-                        ₹${r.totalPurchasedAmount}
-                      </span>
-                    ` : `
-                      <span style="color:var(--text-muted);font-size:0.75rem;">₹0</span>
-                    `}
+                      <div style="font-weight:800;color:#15803D;font-size:0.74rem;margin-top:2px;">
+                        कुल खरीद: ₹${r.totalPurchasedAmount}
+                      </div>
+                    ` : ''}
+                  </td>
+                  <td>
+                    ${(() => {
+                      const ins = r.sakhi_insights;
+                      const topic = ins ? (ins.last_query_topic || 'फसल व स्वास्थ्य समस्या') : 'नेट्सर्फ 25% डिस्काउंट व समाधान';
+                      const waMsg = `नमस्ते ${r.full_name || ''} जी! 🙏\n\nआरोग्यम सखी AI पर आपके सवाल "${topic}" के संबंध में संपर्क कर रहा हूँ।\n\nमैं आपको नेट्सर्फ का 100% ओरिजिनल समाधान सीधे 25% छूट पर उपलब्ध करा सकता हूँ। क्या आप विस्तार से समझना चाहेंगे?`;
+                      const cleanMob = String(r.mobile || '').replace(/\D/g, '').slice(-10);
+                      const waUrl = `https://wa.me/91${cleanMob}?text=${encodeURIComponent(waMsg)}`;
+                      return `
+                        <a href="${waUrl}" target="_blank" class="ucas-btn ucas-btn-sm" style="background:linear-gradient(135deg, #10b981, #059669);color:#ffffff;border:none;font-weight:800;font-size:0.74rem;padding:6px 12px;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(16,185,129,0.3);white-space:nowrap;">
+                          <i class="fa-brands fa-whatsapp" style="font-size:0.85rem;"></i>
+                          <span>समाधान भेजें</span>
+                        </a>
+                      `;
+                    })()}
                   </td>
                 </tr>
               `;
@@ -1830,7 +1873,9 @@ ${item.body || item.desc || ''}
                 book_id: 'AI_SERVER_ANUDAN_' + amount,
                 amount: amount,
                 payment_id: response.razorpay_payment_id,
-                status: 'completed'
+                order_id: 'ORD_ANUDAN_' + Date.now(),
+                payment_status: 'success',
+                purchase_date: new Date().toISOString()
               }]).catch(() => {});
             }
           } catch(e) {}

@@ -13,6 +13,7 @@ const MENU = [
   ] },
   { label: 'Books & Audio (पुस्तकें)', icon: '📚', children: [ 
     { label: 'Book Landing Pages (बुक पेज)', href: 'book-landing-pages.html', route: 'book-landing-pages' },
+    { label: '🎁 मेगा कॉम्बो बंडल हब (Bundles)', href: 'book-bundles.html', route: 'book-bundles' },
     { label: '🎧 Audio Book Studio (वॉइस रिकॉर्डर)', href: 'book-audio-studio.html', route: 'book-audio-studio' },
     { label: '📁 Categories (श्रेणियां)', href: 'book-landing-pages.html#categories', route: 'book-landing-pages' },
     { label: '📚 All Books (सभी पुस्तकें)', href: 'book-landing-pages.html#all-books', route: 'book-landing-pages' },

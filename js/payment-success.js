@@ -161,15 +161,29 @@ async function loadSuccessPage() {
                 }
 
                 // Save to Database if connected
-                if (activeDb && profileId) {
+                let targetProfileId = profileId;
+                if (!targetProfileId && activeDb) {
+                    const mob = currentUser.mobile || storedOrder.mobile || storedOrder.customerMobile || localStorage.getItem('user_mobile');
+                    if (mob) {
+                        const cleanM = String(mob).replace(/\D/g, '').slice(-10);
+                        if (cleanM) {
+                            try {
+                                const { data: prof } = await activeDb.from('profiles').select('id').eq('mobile', cleanM).maybeSingle();
+                                if (prof && prof.id) targetProfileId = prof.id;
+                            } catch (_) {}
+                        }
+                    }
+                }
+                if (activeDb && targetProfileId) {
                     try {
                         await activeDb.from('purchases').insert([{
-                            profile_id: profileId,
+                            profile_id: targetProfileId,
                             book_id: b.id,
                             amount: b.amount,
                             payment_id: paymentId,
                             order_id: orderId,
-                            status: 'completed'
+                            payment_status: 'success',
+                            purchase_date: new Date().toISOString()
                         }]);
                     } catch (dbErr) {
                         console.warn("DB purchase insert note:", dbErr);
@@ -195,11 +209,15 @@ async function loadSuccessPage() {
             localStorage.setItem('user_is_active', 'true');
             if (isSub) localStorage.setItem('user_is_subscriber', 'true');
 
-            if (activeDb && profileId) {
-                await activeDb.from('profiles').update({
-                    is_active: true,
-                    is_subscriber: isSub ? true : userObj.is_subscriber
-                }).eq('id', profileId);
+            const finalActiveProfId = profileId || targetProfileId;
+            if (activeDb && finalActiveProfId) {
+                try {
+                    await activeDb.from('profiles').update({
+                        is_active: true
+                    }).eq('id', finalActiveProfId);
+                } catch (e) {
+                    console.warn("Profile activation error:", e);
+                }
             }
         } catch (e) {
             console.error("Purchase processing error:", e);
@@ -224,12 +242,17 @@ async function loadSuccessPage() {
             targetBookId = String(rawBookId).split(',')[0].trim().toUpperCase();
         }
 
-        const targetDownloadUrl = `download.html?book=${encodeURIComponent(targetBookId)}`;
+        const isBundle = resolvedBooks && resolvedBooks.length > 1;
+        const targetDownloadUrl = isBundle 
+            ? `download.html?book=${encodeURIComponent(targetBookId)}&bundle=true` 
+            : `download.html?book=${encodeURIComponent(targetBookId)}`;
 
         const downloadBtn = document.getElementById("btnDownloadNow") || document.querySelector(".library-btn");
         if (downloadBtn) {
             downloadBtn.href = targetDownloadUrl;
-            downloadBtn.innerHTML = `📥 ई-बुक तुरंत डाउनलोड करें / ऐप में खोलें`;
+            downloadBtn.innerHTML = isBundle 
+                ? `📥 सभी ${resolvedBooks.length} पुस्तकें डाउनलोड करें / पढ़ें` 
+                : `📥 ई-बुक तुरंत डाउनलोड करें / ऐप में खोलें`;
         }
 
         // Auto-redirect to download.html in 3 seconds (fast & smooth)

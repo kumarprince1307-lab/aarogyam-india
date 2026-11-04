@@ -938,7 +938,7 @@ export async function fetchUsers(params = {}) {
         mobile: user.mobile || 'N/A',
         email: user.email || '',
         source: user.registration_source || 'Direct',
-        status: user.is_active ? 'active' : 'inactive',
+        status: (user.is_active || (ownPurchases && ownPurchases.totalPurchases > 0)) ? 'active' : 'inactive',
         shareId: currentShareId,
         directReferrals: directReferralCounts[user.id] || 0,
         totalShares: shareStats.shares,
@@ -1535,6 +1535,7 @@ export async function addManualPurchase(params) {
 
     // 3. Mark user active in localStorage override
     localStorage.setItem(`UCAS_USER_STATUS_${profileId}`, 'ACTIVE');
+    clearAdminCache();
 
     return { success: true, data: insertedData };
   } catch (error) {
@@ -1580,6 +1581,7 @@ export async function deletePurchase(purchaseId, profileId) {
       }
     }
 
+    clearAdminCache();
     return { success: true };
   } catch (error) {
     console.error('Failed to delete purchase:', error);

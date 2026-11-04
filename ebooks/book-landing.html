@@ -30,6 +30,27 @@
             document.querySelectorAll('[data-share-button="true"]').forEach(function(b) {
               b.dataset.assetId = bookId;
             });
+            const isBundlePreview = params.get('bundle_preview') === '1' || window.self !== window.top;
+            if (isBundlePreview) {
+              const previewStyle = document.createElement('style');
+              previewStyle.textContent = '.header, #header, .top-notice-banner, .header-cart-icon, .menu-button, .sticky-buy-bar, .floating-wa-help-btn, .floating-pwa-install-btn, .library-header, #login-popup-overlay, #nav-drawer, .nav-drawer, #sidebar-backdrop, #aarogyam-sakhi-root, .sakhi-floating-trigger, .sakhi-widget-pill, .sakhi-chat-window, .ai-lightbox-overlay { display: none !important; } body { padding-top: 0 !important; padding-bottom: 70px !important; }';
+              document.head.appendChild(previewStyle);
+            }
+
+            ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn', 'ubl-audio-buy-btn', 'preview-buy-btn'].forEach(function(bIdKey) {
+              const el = document.getElementById(bIdKey);
+              if (el) {
+                if (isBundlePreview && window.parent && typeof window.parent.initiateBundleCheckout === 'function') {
+                  el.href = 'javascript:void(0)';
+                  el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.parent.initiateBundleCheckout();
+                  });
+                  return;
+                }
+              }
+            });
+
             ['hero-buy-btn', 'vip-stack-unlock-btn', 'final-buy-btn', 'sticky-buy-btn', 'ubl-audio-buy-btn', 'preview-buy-btn'].forEach(function(bIdKey) {
               const el = document.getElementById(bIdKey);
               if (el) {

@@ -47,6 +47,39 @@ if (isset($payload['action']) && $payload['action'] === 'save_popups' && isset($
     ]);
 }
 
+// Check if this is a save_book_bundles action
+if (isset($payload['action']) && ($payload['action'] === 'save_book_bundles' || $payload['action'] === 'save_bundles') && isset($payload['bundles'])) {
+    $bundleJsonPath = __DIR__ . '/../data/book-bundles.json';
+    $backupDir = __DIR__ . '/../data/backups';
+    if (!is_dir($backupDir)) {
+        @mkdir($backupDir, 0755, true);
+    }
+    $timestamp = date('Ymd_His');
+    if (file_exists($bundleJsonPath)) {
+        @copy($bundleJsonPath, $backupDir . "/bundles_backup_{$timestamp}.json");
+    }
+    $tmpBundles = $bundleJsonPath . '.tmp';
+    $jsonContent = is_array($payload['bundles']) ? $payload['bundles'] : json_decode($payload['bundles'], true);
+    file_put_contents($tmpBundles, json_encode($jsonContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    rename($tmpBundles, $bundleJsonPath);
+
+    $commitMsg = "Publish book bundles config update [PHP-Auto-Sync]";
+    $gitCmd = sprintf(
+        'git -C %s add %s && git -C %s commit -m %s && git -C %s push',
+        escapeshellarg(__DIR__ . '/..'),
+        escapeshellarg('data/book-bundles.json'),
+        escapeshellarg(__DIR__ . '/..'),
+        escapeshellarg('"' . $commitMsg . '"'),
+        escapeshellarg(__DIR__ . '/..')
+    );
+    @exec($gitCmd, $out, $rc);
+
+    json_resp(200, [
+        'success' => true,
+        'message' => 'Book bundles config saved successfully and committed to Git'
+    ]);
+}
+
 // Check if this is a save_site_pages action
 if (isset($payload['action']) && $payload['action'] === 'save_site_pages' && isset($payload['sitePages'])) {
     $pagesJsonPath = __DIR__ . '/../data/site-pages-config.json';

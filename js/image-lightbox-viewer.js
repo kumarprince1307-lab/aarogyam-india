@@ -238,6 +238,16 @@
 
   // Bind zoom on all images
   function bindZoomableImages() {
+    // Completely disable on bundle landing page and book landing pages
+    if (document.body && (
+        document.body.classList.contains('bundle-landing-page') || 
+        document.body.classList.contains('book-landing-page') || 
+        window.location.pathname.includes('bundle') || 
+        window.location.pathname.includes('book-landing')
+    )) {
+      return;
+    }
+
     const images = document.querySelectorAll(`
       .landscape-hero-banner-img,
       .home-hero-slide-item img,
@@ -251,7 +261,7 @@
       .ns-product-card img,
       .doctor-consult-img,
       .remedy-diagram-img,
-      section:not(#header) img:not([src*="logo"]):not([src*="fevicon"]):not([src*="icon"]):not(.header-brand-wrap img)
+      section:not(#header) img:not([src*="logo"]):not([src*="fevicon"]):not([src*="icon"]):not(.header-brand-wrap img):not(.bundle-fan-book):not(.bundle-card-thumb):not(.sticky-multi-thumb):not(.hero-banner-bg)
     `);
 
     images.forEach(img => {

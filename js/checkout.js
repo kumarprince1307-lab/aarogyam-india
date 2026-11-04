@@ -1025,7 +1025,8 @@ async function loadBook() {
         // Combo and Multi-Book Bundle Check
         const comboParam = (params.get("combo") || "").toLowerCase().trim();
         const booksParam = (params.get("books") || "").trim();
-        if (comboParam || rawIds || booksParam) {
+        const bundleParam = (params.get("bundle") || params.get("bundle_id") || "").trim();
+        if (comboParam || rawIds || booksParam || bundleParam) {
             let idList = [];
             let comboPrice = null;
             let comboMrp = null;
@@ -1066,8 +1067,32 @@ async function loadBook() {
                     calcOffer += (b.offerPrice !== undefined ? b.offerPrice : (catalogDef?.offerPrice || 99));
                 });
 
-                // 🛡️ Cryptographic Security Check for Combo
-                if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
+                // 🛡️ Cryptographic Security Check for Combo or Authorized Admin Bundle
+                if (bundleParam) {
+                    let bConfig = null;
+                    try {
+                        const localBundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+                        if (Array.isArray(localBundles)) {
+                            bConfig = localBundles.find(b =>
+                                (b.id && b.id.toLowerCase() === bundleParam.toLowerCase()) ||
+                                (b.slug && b.slug.toLowerCase() === bundleParam.toLowerCase())
+                            );
+                        }
+                    } catch (_) {}
+                    const validPrice = (bConfig && bConfig.offerPrice) || (customAmount ? parseInt(customAmount, 10) : 199);
+                    verifiedOfferAmount = validPrice;
+                    comboPrice = validPrice;
+                    if (bConfig && bConfig.mrp) comboMrp = bConfig.mrp;
+                    if (customTitle || (bConfig && bConfig.title)) comboTitle = customTitle || bConfig.title;
+                    offerSecurityError = null;
+                    window.activeBundleId = bundleParam;
+                    window.activeVerifiedOffer = {
+                        amount: comboPrice,
+                        bookId: idList.join(','),
+                        isBundle: true,
+                        bundleId: bundleParam
+                    };
+                } else if (customAmount !== null && customAmount !== undefined && customAmount !== "") {
                     const rawAmt = parseInt(customAmount, 10);
                     const targetCheckId = idList.join(",");
                     if (!offerSig) {
@@ -1992,7 +2017,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                             book_id: bId,
                             amount: 0,
                             payment_id: freePaymentId,
-                            status: 'completed'
+                            order_id: 'FREE_ORD_' + Date.now(),
+                            payment_status: 'success',
+                            purchase_date: new Date().toISOString()
                         }]).catch(() => {});
                     }
                 }
@@ -2003,6 +2030,9 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 localStorage.removeItem('AI_CART_ITEMS');
 
                 userObj.is_active = true;
+                if (db && (activeUserId || userObj.id)) {
+                    db.from('profiles').update({ is_active: true }).eq('id', activeUserId || userObj.id).catch(() => {});
+                }
                 localStorage.setItem('AI_USER', JSON.stringify(userObj));
                 localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
                 localStorage.setItem('user_is_active', 'true');
@@ -2072,8 +2102,10 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                                     book_id: bId,
                                     amount: bAmt,
                                     payment_id: response.razorpay_payment_id,
-                                    status: 'completed'
-                                }]);
+                                    order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
+                                    payment_status: 'success',
+                                    purchase_date: new Date().toISOString()
+                                }]).catch(err => console.warn('Supabase purchase insert error:', err));
                             }
                         }
 
@@ -2094,9 +2126,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
                         if (db && (activeUserId || userObj.id)) {
                             await db.from('profiles').update({
-                                is_active: true,
-                                is_subscriber: isSub ? true : userObj.is_subscriber
-                            }).eq('id', activeUserId || userObj.id);
+                                is_active: true
+                            }).eq('id', activeUserId || userObj.id).catch(err => console.warn('Supabase profile activate error:', err));
                         }
 
                         markCheckoutOfferPurchased(mobile, bookIdToBuy, finalPayablePrice, response.razorpay_order_id || response.razorpay_payment_id);

@@ -1,0 +1,1028 @@
+/* ==========================================================================
+   AAROGYAM INDIA — DYNAMIC BUNDLE LANDING PAGE ENHANCEMENTS (V4)
+   Matches standard Aarogyam India Book Landing Page Theme & Mobile Fit
+   ========================================================================== */
+
+/* Prevent any horizontal blowout on mobile and FB WebView, ensure zero gaps at top */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body.bundle-landing-page {
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 80px !important; /* Space for sticky buy bar */
+}
+
+/* 1. TOP NOTICE / COUNTDOWN RIBBON */
+.bundle-top-ribbon {
+  background: linear-gradient(90deg, #991b1b, #dc2626, #b91c1c);
+  color: #fff;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+  position: sticky !important;
+  top: 0 !important;
+  margin: 0 !important;
+  z-index: 100000 !important;
+  box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
+}
+
+body.bundle-landing-page .header.header-tiranga-animated {
+  top: 36px !important;
+  margin: 0 !important;
+  z-index: 99999 !important;
+}
+
+.bundle-timer-badge {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #fef08a;
+  border: 1px solid rgba(254, 240, 138, 0.4);
+}
+
+/* 2. 3D BOOK FAN STACK FOR HERO (NO TOP CLIPPING, LARGER SIZE, SYMMETRICAL FAN) */
+.hero-book,
+.book-hero,
+.hero-container {
+  overflow: visible !important;
+  padding-top: 35px !important;
+}
+
+.bundle-fan-stack-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding-top: 35px !important;
+  padding-bottom: 20px !important;
+  overflow: visible !important;
+}
+
+.bundle-fan-stack {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 440px !important;
+  perspective: 1200px;
+  margin-bottom: 14px;
+  overflow: visible !important;
+}
+
+.bundle-fan-book {
+  position: absolute;
+  width: 220px !important;
+  height: 315px !important;
+  border-radius: 14px;
+  box-shadow: -8px 16px 36px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.35);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, z-index 0.2s ease;
+  cursor: pointer;
+  border: 2.5px solid #ffffff;
+  background: #0f172a;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Symmetrical 5-Book Fan Layout: Book #3 is Center Front Cover, Books #1 & #5 on left/right edges with ample visibility */
+.bundle-fan-book:nth-child(1) { transform: translateX(-105px) translateY(14px) rotate(-14deg) scale(0.92); z-index: 1; }
+.bundle-fan-book:nth-child(2) { transform: translateX(-55px) translateY(7px) rotate(-7deg) scale(0.96); z-index: 3; }
+.bundle-fan-book:nth-child(3) { transform: translateX(0px) translateY(-10px) rotate(0deg) scale(1.08); z-index: 10; border-color: #22c55e !important; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(34, 197, 94, 0.35) !important; }
+.bundle-fan-book:nth-child(4) { transform: translateX(55px) translateY(7px) rotate(7deg) scale(0.96); z-index: 3; }
+.bundle-fan-book:nth-child(5) { transform: translateX(105px) translateY(14px) rotate(14deg) scale(0.92); z-index: 1; }
+
+.bundle-fan-book:hover, .bundle-fan-book:active {
+  transform: translateY(-28px) scale(1.14) !important;
+  z-index: 30 !important;
+  box-shadow: 0 30px 55px rgba(22, 163, 74, 0.65) !important;
+  border-color: #22c55e !important;
+}
+
+.bundle-fan-hint {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 700;
+  text-align: center;
+  background: #f1f5f9;
+  padding: 4px 14px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 3. INCLUDED BOOKS SHOWCASE IN DAYLIGHT THEME */
+.bundle-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 20px;
+  margin: 24px 0;
+}
+
+.bundle-book-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.bundle-book-card:hover {
+  transform: translateY(-3px);
+  border-color: #16a34a;
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.15);
+}
+
+.bundle-card-thumb {
+  width: 90px;
+  height: 125px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.bundle-card-thumb:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+}
+
+.bundle-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.bundle-card-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  transition: color 0.2s ease;
+}
+
+.bundle-card-title:hover {
+  color: #16a34a;
+}
+
+.bundle-card-meta {
+  font-size: 0.82rem;
+  color: #64748b;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.bundle-card-pricing {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 10px;
+}
+
+.bundle-card-pricing .old-mrp {
+  color: #dc2626;
+  text-decoration: line-through;
+  font-weight: 800;
+  margin-right: 6px;
+}
+
+.bundle-card-pricing .single-offer {
+  color: #16a34a;
+  font-weight: 900;
+}
+
+.bundle-preview-btn {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.bundle-preview-btn:hover {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+/* 4. GRAND TOTAL CALCULATION STACK */
+.bundle-calc-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 2px solid #38bdf8;
+  border-radius: 20px;
+  padding: 26px;
+  color: #ffffff;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.bundle-calc-badge {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #f59e0b;
+  color: #000;
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bundle-calc-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bundle-calc-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+.bundle-calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.bundle-calc-row.final-highlight {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1.5px solid #22c55e;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #4ade80;
+  margin-top: 6px;
+}
+
+.bundle-calc-cta {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #ffffff;
+  text-align: center;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-size: 1.28rem;
+  font-weight: 900;
+  text-decoration: none;
+  border: 2px solid #ffffff;
+  box-shadow: 0 6px 22px rgba(220, 38, 38, 0.5);
+  cursor: pointer;
+  margin-top: 18px;
+  transition: transform 0.15s ease;
+}
+
+.bundle-calc-cta:active {
+  transform: scale(0.98);
+}
+
+/* 5. BABY BROWSER / FULL-SCREEN IN-APP MODAL SHEET */
+.baby-browser-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999999999 !important;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.baby-browser-backdrop.open {
+  display: flex !important;
+  opacity: 1 !important;
+}
+
+.baby-browser-sheet {
+  position: fixed;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: #ffffff;
+  border-radius: 0 !important;
+  border: none !important;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  z-index: 1000000000 !important;
+  transform: translateY(100%);
+}
+
+.baby-browser-backdrop.open .baby-browser-sheet {
+  transform: translateY(0) !important;
+}
+
+.baby-browser-header {
+  background: #0f172a;
+  color: #fff;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #334155;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.baby-btn-back {
+  background: #14532d !important;
+  color: #ffffff !important;
+  border: 1.5px solid #22c55e !important;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(20, 83, 45, 0.4);
+}
+
+.baby-btn-back:hover {
+  background: #15803d !important;
+}
+
+.baby-btn-buy {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
+}
+
+.baby-btn-buy:active {
+  transform: scale(0.97);
+}
+
+.baby-browser-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  flex: 1;
+  background: #ffffff;
+}
+
+/* 6. FLOATING BUTTONS (DESKTOP ONLY — HIDDEN ON MOBILE TO PREVENT COLLISION WITH STICKY BUY BAR) */
+.floating-share {
+  position: fixed !important;
+  right: 12px !important;
+  bottom: 120px !important;
+  z-index: 9990 !important;
+}
+
+.floating-wa-help-btn {
+  position: fixed !important;
+  right: 14px !important;
+  bottom: 72px !important;
+  z-index: 9998 !important;
+  width: 46px !important;
+  height: 46px !important;
+  background: #25D366 !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 26px !important;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45) !important;
+  text-decoration: none !important;
+}
+
+.floating-pwa-install-btn {
+  position: fixed !important;
+  left: 14px !important;
+  bottom: 72px !important;
+  z-index: 9998 !important;
+  background: linear-gradient(135deg, #15803d, #166534) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #86efac !important;
+  padding: 7px 14px !important;
+  border-radius: 30px !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  cursor: pointer !important;
+}
+
+/* 7. MOBILE RESPONSIVE OPTIMIZATION */
+@media (max-width: 768px) {
+  /* HIDE FLOATING WA & INSTALL BUTTONS ON MOBILE (matches book-landing.html to prevent collision) */
+  .floating-wa-help-btn,
+  .floating-pwa-install-btn,
+  .floating-share {
+    display: none !important;
+  }
+
+  /* Make Hero Stack fit mobile screen (Larger & Unclipped) */
+  .bundle-fan-stack-container {
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .bundle-fan-stack-container {
+    padding-top: 25px !important;
+    overflow: visible !important;
+  }
+
+  .bundle-fan-stack {
+    height: 380px !important;
+    overflow: visible !important;
+  }
+
+  .bundle-fan-book {
+    width: 190px !important;
+    height: 270px !important;
+  }
+
+  .bundle-fan-book:nth-child(1) { transform: translateX(-75px) translateY(10px) rotate(-12deg) scale(0.88); z-index: 1; }
+  .bundle-fan-book:nth-child(2) { transform: translateX(-38px) translateY(5px) rotate(-6deg) scale(0.94); z-index: 3; }
+  .bundle-fan-book:nth-child(3) { transform: translateX(0px) translateY(-8px) rotate(0deg) scale(1.06); z-index: 10; border-color: #22c55e !important; }
+  .bundle-fan-book:nth-child(4) { transform: translateX(38px) translateY(5px) rotate(6deg) scale(0.94); z-index: 3; }
+  .bundle-fan-book:nth-child(5) { transform: translateX(75px) translateY(10px) rotate(12deg) scale(0.88); z-index: 1; }
+
+  .bundle-calc-card {
+    padding: 18px 14px !important;
+  }
+
+  .bundle-calc-title {
+    font-size: 1.15rem !important;
+  }
+
+  .bundle-calc-row.final-highlight {
+    font-size: 1.05rem !important;
+    padding: 10px 12px !important;
+  }
+
+  .bundle-card-desc {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* ==========================================================================
+   6. PULSING DARK-RED COMBO BARGAIN BAR (BABY BROWSER BOTTOM OVERLAY)
+   ========================================================================== */
+.baby-combo-bargain-bar {
+  background: linear-gradient(90deg, #7f1d1d, #991b1b, #dc2626) !important;
+  border-top: 2px solid #fde047 !important;
+  color: #ffffff !important;
+  padding: 8px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+  box-shadow: 0 -4px 20px rgba(185, 28, 28, 0.5) !important;
+  animation: comboBargainPulse 1.2s infinite ease-in-out !important;
+  z-index: 1000000005 !important;
+}
+
+@keyframes comboBargainPulse {
+  0%, 100% {
+    filter: brightness(1);
+    box-shadow: 0 -4px 18px rgba(185, 28, 28, 0.45);
+  }
+  50% {
+    filter: brightness(1.22);
+    box-shadow: 0 -6px 28px rgba(239, 68, 68, 0.9);
+  }
+}
+
+.bargain-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bargain-blink-dot {
+  width: 10px;
+  height: 10px;
+  background: #fde047;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px #fde047;
+  animation: dotBlink 0.8s infinite alternate;
+}
+
+@keyframes dotBlink {
+  from { opacity: 0.3; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+.bargain-price-comparison {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.bargain-price-comparison .single-notice {
+  color: #fca5a5;
+  text-decoration: line-through;
+  font-size: 0.74rem;
+}
+
+.bargain-price-comparison .combo-advantage {
+  color: #fef08a;
+  font-weight: 800;
+  font-size: 0.84rem;
+}
+
+.bargain-cta-btn {
+  background: #fde047 !important;
+  color: #0f172a !important;
+  border: none !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  font-weight: 900 !important;
+  font-size: 0.85rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   7. FLOATING AUDIO NARRATION PILL (TOP-RIGHT PINNED - NO SAKHI COLLISION)
+   ========================================================================== */
+.bundle-floating-audio-pill {
+  position: fixed !important;
+  top: 86px !important;
+  right: 14px !important;
+  left: auto !important;
+  bottom: auto !important;
+  max-width: 230px !important;
+  z-index: 1000002 !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1.5px solid #fbbf24 !important;
+  border-radius: 30px !important;
+  padding: 6px 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.bundle-floating-audio-pill:hover {
+  transform: scale(1.03);
+}
+
+.bundle-audio-wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 14px;
+}
+
+.bundle-audio-wave .bar {
+  width: 3px;
+  background: #fbbf24;
+  border-radius: 2px;
+  height: 4px;
+}
+
+.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-1 { animation: soundBar 0.6s infinite ease-in-out; }
+.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-2 { animation: soundBar 0.8s 0.2s infinite ease-in-out; }
+.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-3 { animation: soundBar 0.5s 0.4s infinite ease-in-out; }
+.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-4 { animation: soundBar 0.7s 0.1s infinite ease-in-out; }
+
+@keyframes soundBar {
+  0%, 100% { height: 4px; }
+  50% { height: 14px; }
+}
+
+.bundle-audio-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #f8fafc;
+  white-space: nowrap;
+}
+
+.bundle-audio-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #fbbf24;
+  padding: 0;
+}
+
+.bundle-audio-compress-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.bundle-audio-compress-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.bundle-audio-close-btn {
+  background: rgba(239, 68, 68, 0.85) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: transform 0.2s ease, background 0.2s ease;
+  font-weight: 900 !important;
+}
+
+.bundle-audio-close-btn:hover {
+  background: #dc2626 !important;
+  transform: scale(1.15) !important;
+}
+
+/* COMPRESSED SLEEK FLOATING AUDIO PILL */
+.bundle-floating-audio-pill.compressed {
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  justify-content: center !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), 0 0 10px rgba(251, 191, 36, 0.3) !important;
+}
+
+.bundle-floating-audio-pill.compressed .bundle-audio-label,
+.bundle-floating-audio-pill.compressed .bundle-audio-toggle-btn,
+.bundle-floating-audio-pill.compressed .bundle-audio-compress-btn,
+.bundle-floating-audio-pill.compressed .bundle-audio-close-btn {
+  display: none !important;
+}
+
+.bundle-floating-audio-pill.compressed .bundle-audio-wave {
+  display: flex !important;
+}
+
+/* ==========================================================================
+   8. MOBILE STICKY BUY BAR (100% RESPONSIVE FIXED AT BOTTOM)
+   ========================================================================== */
+.mobile-sticky-bar.bundle-mobile-sticky-bar {
+  position: fixed !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-top: 6px !important;
+  padding-left: max(10px, env(safe-area-inset-left, 10px)) !important;
+  padding-right: max(10px, env(safe-area-inset-right, 10px)) !important;
+  padding-bottom: max(8px, calc(6px + env(safe-area-inset-bottom, 0px))) !important;
+  background: #ffffff !important;
+  box-shadow: 0 -4px 22px rgba(0, 0, 0, 0.18) !important;
+  z-index: 99999 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mobile-sticky-bar.bundle-mobile-sticky-bar .mobile-sticky-bar-inner {
+  width: 100% !important;
+  max-width: 900px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+.bundle-mobile-sticky-bar .sticky-thumb-img {
+  width: 38px !important;
+  height: 50px !important;
+  border-radius: 6px !important;
+  object-fit: cover !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.bundle-mobile-sticky-bar .mobile-book-price {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  line-height: 1.15 !important;
+  gap: 1px !important;
+  white-space: nowrap !important;
+}
+
+.bundle-mobile-sticky-bar .mobile-book-price .old-price {
+  font-size: 13px !important;
+  color: #dc2626 !important;
+  font-weight: 800 !important;
+  text-decoration: line-through !important;
+  line-height: 1 !important;
+}
+
+.bundle-mobile-sticky-bar .mobile-book-price .offer-price {
+  font-size: 21px !important;
+  font-weight: 900 !important;
+  color: #16a34a !important;
+  line-height: 1 !important;
+}
+
+.bundle-mobile-sticky-bar .sticky-buy-btn {
+  flex: 1 1 auto !important;
+  min-width: 130px !important;
+  height: 44px !important;
+  background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  border: 1px solid #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 0.96rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45) !important;
+  cursor: pointer !important;
+}
+
+.bundle-mobile-sticky-bar .sticky-share-btn {
+  width: 44px !important;
+  height: 44px !important;
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.1rem !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35) !important;
+}
+
+/* ==========================================================================
+   9. HORIZONTAL SWIPEABLE AAROGYAMTUBE VIDEO CAROUSEL
+   ========================================================================== */
+.bundle-videos-slider-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.bundle-videos-carousel-track {
+  display: flex !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  gap: 18px !important;
+  padding: 10px 4px 16px !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth !important;
+}
+
+.bundle-videos-carousel-track::-webkit-scrollbar {
+  display: none !important;
+}
+
+.bundle-video-slide {
+  flex: 0 0 100% !important;
+  max-width: 680px !important;
+  scroll-snap-align: center !important;
+  margin: 0 auto !important;
+  background: #0f172a;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border: 2px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bundle-video-slide-header {
+  padding: 10px 16px;
+  background: #1e293b;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #334155;
+}
+
+.bundle-video-slide-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #f8fafc;
+}
+
+.bundle-video-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  font-size: 1.1rem;
+}
+
+.bundle-video-arrow:hover {
+  background: #16a34a;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.bundle-video-arrow.left-arrow { left: -14px; }
+.bundle-video-arrow.right-arrow { right: -14px; }
+
+@media (max-width: 768px) {
+  .bundle-video-slide {
+    flex: 0 0 90% !important;
+  }
+  .bundle-video-arrow {
+    display: none !important; /* Touch swipe is primary on mobile */
+  }
+}
+
+.bundle-videos-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.bundle-video-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.bundle-video-dot.active {
+  width: 24px;
+  border-radius: 10px;
+  background: #dc2626;
+}
+
+/* ==========================================================================
+   10. STICKY COMBO DUAL-BOOK STACK BADGE
+   ========================================================================== */
+.sticky-bundle-multi-stack {
+  position: relative;
+  width: 48px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.sticky-multi-thumb {
+  position: absolute;
+  width: 34px;
+  height: 46px;
+  border-radius: 5px;
+  object-fit: cover;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  border: 1px solid #cbd5e1;
+}
+
+.sticky-multi-thumb.thumb-back {
+  top: 0;
+  left: 0;
+  transform: rotate(-8deg);
+  opacity: 0.9;
+}
+
+.sticky-multi-thumb.thumb-front {
+  top: 4px;
+  left: 14px;
+  transform: rotate(5deg);
+  z-index: 2;
+}
+
+.sticky-combo-pill {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 4px;
+  z-index: 3;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}

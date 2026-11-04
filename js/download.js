@@ -515,6 +515,64 @@ function populateUI() {
         };
     }
 
+    // Render Other Bundle Books if purchased
+    try {
+        const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+        const uniqueOtherBookIds = Array.from(new Set(localPurchases.map(p => p.book_id).filter(id => id && id !== state.bookId)));
+        
+        let bundleSection = document.getElementById('bundleOtherBooksSection');
+        if (!bundleSection && uniqueOtherBookIds.length > 0) {
+            bundleSection = document.createElement('div');
+            bundleSection.id = 'bundleOtherBooksSection';
+            bundleSection.style.cssText = 'margin:24px auto; max-width:600px; background:#1e293b; border:1.5px solid #10b981; border-radius:16px; padding:18px 14px; box-shadow:0 8px 25px rgba(0,0,0,0.4); color:#fff;';
+            
+            const cardEl = document.getElementById('downloadCard');
+            if (cardEl && cardEl.parentNode) {
+                cardEl.parentNode.insertBefore(bundleSection, cardEl.nextSibling);
+            }
+        }
+
+        if (bundleSection && uniqueOtherBookIds.length > 0) {
+            bundleSection.innerHTML = `
+                <div style="font-weight:900; color:#34d399; font-size:1.05rem; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                    <span>🎁</span> <span>आपके बंडल की अन्य पुस्तकें (Download All Bundle Books):</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    ${uniqueOtherBookIds.map(oId => {
+                        const bCat = (typeof allBooks !== "undefined" && Array.isArray(allBooks)) ? allBooks : [];
+                        const matchedBook = bCat.find(b => (b.id && b.id.toUpperCase() === oId.toUpperCase()) || (b.book_id && b.book_id.toUpperCase() === oId.toUpperCase())) || {};
+                        const bTitle = matchedBook.name || matchedBook.heading || matchedBook.title || oId;
+                        const bCover = matchedBook.cover || matchedBook.cover_image || `/images/books/${oId.toLowerCase()}-cover.webp`;
+                        return `
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:#0f172a; padding:10px 12px; border-radius:10px; border:1px solid #334155;">
+                            <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                                <img src="${bCover}" alt="Cover" style="width:38px; height:52px; border-radius:4px; object-fit:cover; flex-shrink:0; border:1px solid rgba(255,255,255,0.2);" onerror="this.style.display='none'" />
+                                <div style="min-width:0;">
+                                    <strong style="font-size:0.88rem; color:#fff; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${bTitle}</strong>
+                                    <span style="font-size:0.75rem; color:#34d399; font-weight:700;">✓ 100% अनलॉक व सुरक्षित</span>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:6px; flex-shrink:0;">
+                                <a href="download.html?book=${encodeURIComponent(oId)}" style="background:#10b981; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:800; font-size:0.78rem;">
+                                    📥 डाउनलोड
+                                </a>
+                                <a href="reader.html?book=${encodeURIComponent(oId)}" style="background:#0284c7; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:800; font-size:0.78rem;">
+                                    📖 पढ़ें
+                                </a>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div style="text-align:center; margin-top:14px;">
+                    <a href="/my-library.html" style="color:#38bdf8; font-weight:700; font-size:0.84rem; text-decoration:none;">
+                        📚 My Library में अपनी सभी पुस्तकें देखें ➔
+                    </a>
+                </div>
+            `;
+        }
+    } catch (_) {}
+
     // Wire up sticky Read Now button
     const stickyReadNowBtn = document.getElementById('stickyReadNowBtn');
     if (stickyReadNowBtn) {

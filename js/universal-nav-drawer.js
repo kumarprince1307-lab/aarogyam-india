@@ -838,6 +838,7 @@
       currentPath.includes('landingpage') ||
       currentPath.includes('sample-ai-book') ||
       currentPath.includes('book-details') ||
+      currentPath.includes('bundle') ||
       currentPath.includes('ai-website-guide')
     ) {
       return true;
@@ -963,6 +964,10 @@
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-ebooks">
+              <a href="/bundle.html" class="drawer-sub-link-item" style="background:rgba(16,185,129,0.12); border:1.5px solid #10b981; border-radius:8px; margin:4px 0 6px 0; padding:8px 10px;">
+                <span class="drawer-sub-dot" style="background:#10b981;"></span>
+                <span style="font-weight:900; color:#10b981;">🎁 महाबचत 5-इन-1 कॉम्बो ऑफर (Combo)</span>
+              </a>
               <a href="/ebooks/ebook.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left">
                   <div class="drawer-sub-icon-box"><i class="fa-solid fa-store"></i></div>

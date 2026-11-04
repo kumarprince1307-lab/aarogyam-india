@@ -406,6 +406,32 @@
         } catch (e) {}
       }
 
+      // 2B. Attach Sakhi AI Insights (Topics, Domain Scores & Chats) for Actionable Team CRM
+      if (userList.length > 0) {
+        try {
+          const mobiles = userList.map(u => String(u.mobile || '').replace(/\D/g, '').slice(-10)).filter(Boolean);
+          if (mobiles.length > 0) {
+            const { data: insList } = await client
+              .from('sakhi_user_insights')
+              .select('mobile, profile_id, primary_domain, last_query_topic, interaction_count, domain_scores, last_active_at')
+              .in('mobile', mobiles);
+            if (insList && insList.length > 0) {
+              const insMap = new Map();
+              insList.forEach(ins => {
+                const m = String(ins.mobile || '').replace(/\D/g, '').slice(-10);
+                if (m) insMap.set(m, ins);
+              });
+              userList.forEach(u => {
+                const m = String(u.mobile || '').replace(/\D/g, '').slice(-10);
+                if (insMap.has(m)) u.sakhi_insights = insMap.get(m);
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('Sakhi insights attach warning:', e);
+        }
+      }
+
       if (userList.length === 0) {
         return {
           success: true,

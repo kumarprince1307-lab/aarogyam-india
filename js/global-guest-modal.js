@@ -473,15 +473,36 @@
               existingProfile = data;
             }
 
-            // Sponsor Lookup
-            if (sponsorShareId !== 'AI000004') {
+            // Sponsor Lookup (100% Manas Compliant Dual Resolution & Zero-Null Rule)
+            if (sponsorShareId && sponsorShareId !== 'AI000004') {
               try {
-                const { data: refUser } = await db.from('profiles').select('id, mobile').eq('share_id', sponsorShareId).limit(1).maybeSingle();
+                const cleanDigits = sponsorShareId.replace(/\D/g, '');
+                let query = db.from('profiles').select('id, mobile, share_id');
+                if (cleanDigits && cleanDigits.length >= 6) {
+                  query = query.or(`share_id.eq.${sponsorShareId},referral_code.eq.${sponsorShareId},mobile.like.%${cleanDigits}`);
+                } else {
+                  query = query.or(`share_id.eq.${sponsorShareId},referral_code.eq.${sponsorShareId}`);
+                }
+                const { data: refUserList } = await query.limit(1);
+                const refUser = refUserList && refUserList[0];
                 if (refUser && refUser.id) {
                   sponsorProfileId = refUser.id;
                   if (refUser.mobile) sponsorMobile = refUser.mobile;
+                  if (refUser.share_id) sponsorShareId = refUser.share_id;
                 }
               } catch(e) {}
+            }
+
+            // Share ID Collision Guard (Zero Duplicate Share IDs in Aarogyam Manas)
+            if (!existingProfile && userUniqueShareId !== 'AI000004') {
+              try {
+                const { data: colUser } = await db.from('profiles').select('id, mobile').eq('share_id', userUniqueShareId).limit(1).maybeSingle();
+                if (colUser && colUser.mobile !== mobile) {
+                  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'M'];
+                  const randChar = letters[Math.floor(Math.random() * letters.length)];
+                  userUniqueShareId = 'AI' + mobile.slice(-5) + randChar;
+                }
+              } catch(_) {}
             }
           } catch (e) {
             console.warn('Profile check warning:', e);

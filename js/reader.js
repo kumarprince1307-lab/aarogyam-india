@@ -763,6 +763,7 @@ function renderPage(num) {
                 imgSrc += (imgSrc.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(bookVer);
             }
             pageImgEl.onerror = () => {
+                pageImgEl.onerror = null;
                 if (imgSrc && imgSrc.includes('?v=')) {
                     pageImgEl.src = imgSrc.split('?')[0];
                 }
@@ -840,7 +841,11 @@ function renderPage(num) {
             viewport: renderViewport
         };
 
+        if (window._activePdfRenderTask && typeof window._activePdfRenderTask.cancel === 'function') {
+            try { window._activePdfRenderTask.cancel(); } catch (_) {}
+        }
         const renderTask = page.render(renderContext);
+        window._activePdfRenderTask = renderTask;
 
         renderTask.promise.then(() => {
             aoiPageRendering = false;
