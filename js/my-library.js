@@ -629,6 +629,33 @@ async function renderLibrarySections(booksArray) {
     const comingSoonGrid = document.getElementById('comingSoonGrid');
 
     if (purchasedGrid) purchasedGrid.innerHTML = '';
+    // Dynamic Admin-Connected Bundle Promo Tray in My Library
+    try {
+      if (typeof window.getOrFetchActiveBundle === 'function') {
+        window.getOrFetchActiveBundle().then(activeB => {
+          const slot = document.getElementById('library-bundle-promo-tray-slot');
+          if (slot && typeof window.renderBundlePromoCardHTML === 'function') {
+            slot.innerHTML = window.renderBundlePromoCardHTML(activeB);
+          }
+          if (availableGrid && typeof window.renderBundlePromoCardHTML === 'function') {
+            const existingTray = availableGrid.querySelector('.bundle-featured-promo-tray');
+            if (!existingTray) {
+              const temp = document.createElement('div');
+              temp.innerHTML = window.renderBundlePromoCardHTML(activeB);
+              if (temp.firstElementChild) availableGrid.prepend(temp.firstElementChild);
+            }
+          }
+        });
+      }
+    } catch (_) {}
+
+    const slot = document.getElementById('library-bundle-promo-tray-slot');
+    if (slot && typeof window.renderBundlePromoCardHTML === 'function') {
+      slot.innerHTML = window.renderBundlePromoCardHTML();
+    }
+    const secAvail = document.getElementById('section-available');
+    if (secAvail) secAvail.style.display = 'block';
+
     if (availableGrid) {
         availableGrid.innerHTML = (typeof window.renderBundlePromoCardHTML === 'function') ? window.renderBundlePromoCardHTML() : '';
     }

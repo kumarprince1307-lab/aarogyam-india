@@ -1187,7 +1187,17 @@ if (typeof window !== 'undefined') {
       return 0;
     });
 
-    grid.innerHTML = uniqueBestsellers.map(book => `
+    let promoTrayHTML = '';
+    try {
+      if (typeof window.getOrFetchActiveBundle === 'function') {
+        const activeBundle = await window.getOrFetchActiveBundle();
+        if (activeBundle) promoTrayHTML = window.renderBundlePromoCardHTML(activeBundle);
+      } else if (typeof window.renderBundlePromoCardHTML === 'function') {
+        promoTrayHTML = window.renderBundlePromoCardHTML();
+      }
+    } catch (_) {}
+
+    grid.innerHTML = promoTrayHTML + uniqueBestsellers.map(book => `
       <div class="shelf-book-card" style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">
         <div class="kindle-book-cover-3d" style="width:110px;height:150px;flex-shrink:0;cursor:pointer;" onclick="window.location.href='${book.link}'">
           <img src="${book.image}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 12px 12px 6px;box-shadow:-6px 8px 20px rgba(0,0,0,0.35);" />

@@ -357,7 +357,12 @@
       return;
     }
 
-    const bundlePromoHTML = (typeof window.renderBundlePromoCardHTML === 'function') ? window.renderBundlePromoCardHTML() : '';
+    let bundlePromoHTML = '';
+    try {
+      if (typeof window.renderBundlePromoCardHTML === 'function') {
+        bundlePromoHTML = window.renderBundlePromoCardHTML();
+      }
+    } catch (_) {}
     grid.innerHTML = bundlePromoHTML + uniqueList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
   }
 

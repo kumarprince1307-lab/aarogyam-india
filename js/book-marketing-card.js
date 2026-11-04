@@ -810,40 +810,174 @@
 
 
   // =========================================================================
-  // UNIVERSAL 5-IN-1 COMBO BUNDLE FEATURED PROMO CARD / TRAY
   // =========================================================================
-  window.renderBundlePromoCardHTML = function (customBundle) {
-    const b = customBundle || {
-      id: 'BUNDLE_KISAN_5IN1',
-      title: '🌾 सम्पूर्ण किसान 5-इन-1 महाबचत कॉम्बो पैक',
-      subtitle: '5 सर्वश्रेष्ठ वैज्ञानिक कृषि पुस्तकें • 490+ रंगीन सचित्र पेज • सम्पूर्ण समाधान',
-      offerPrice: 199,
-      originalPrice: 3395,
-      discount: '94%',
-      pages: 490,
-      booksCount: 5,
-      books: [
-        { id: 'BK017', title: 'प्राकृतिक व वैज्ञानिक खेती', cover: '/images/books/bk017-cover.webp' },
-        { id: 'BK016', title: 'कृषि दवा डायरेक्टरी', cover: '/images/books/bk016-cover.webp' },
-        { id: 'BK002', title: '11 प्रमुख सब्जियों की खेती', cover: '/images/books/bk002-cover.webp' },
-        { id: 'BK019', title: 'गेहूं की उन्नत खेती', cover: '/images/books/bk019-cover.webp' },
-        { id: 'BK015', title: 'चना व दलहनी फसलें', cover: '/images/books/bk015-cover.webp' }
-      ]
-    };
+  // 100% DYNAMIC COMBO BUNDLE ENGINE (CONNECTED DIRECTLY TO ADMIN PANEL)
+  // =========================================================================
+  window._cachedActiveBundle = null;
+  let _bundleFetchPromise = null;
 
-    const bundleUrl = '/bundle.html?id=' + encodeURIComponent(b.id || 'BUNDLE_KISAN_5IN1');
+  window.getOrFetchActiveBundle = async function () {
+    if (window._cachedActiveBundle) return window._cachedActiveBundle;
+    if (_bundleFetchPromise) return _bundleFetchPromise;
+
+    _bundleFetchPromise = (async () => {
+      try {
+        let masterBundles = [];
+
+        // 1. Check LocalStorage (Immediate live changes from Admin Panel)
+        try {
+          const localB = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+          if (Array.isArray(localB) && localB.length > 0) {
+            masterBundles = localB;
+          }
+        } catch (_) {}
+
+        // 2. Load from data/book-bundles.json (Server / Git Master)
+        try {
+          const res = await fetch('/data/book-bundles.json?v=' + Date.now());
+          if (res.ok) {
+            const data = await res.json();
+            const serverBundles = Array.isArray(data) ? data : (data.bundles || []);
+            if (serverBundles.length > 0) {
+              if (masterBundles.length === 0) {
+                masterBundles = serverBundles;
+              } else {
+                serverBundles.forEach(sb => {
+                  if (!sb || !sb.id) return;
+                  const idx = masterBundles.findIndex(m => m && m.id && m.id.toLowerCase() === sb.id.toLowerCase());
+                  if (idx >= 0) {
+                    if (new Date(sb.updated_at || 0) > new Date(masterBundles[idx].updated_at || 0)) {
+                      masterBundles[idx] = sb;
+                    }
+                  } else {
+                    masterBundles.push(sb);
+                  }
+                });
+              }
+            }
+          }
+        } catch (_) {}
+
+        const activeBundle = masterBundles.find(b => b && b.status === 'active') || masterBundles[0] || null;
+        if (!activeBundle) return null;
+
+        // Fetch all catalog books to resolve covers and titles dynamically
+        let catalogBooks = [];
+        try {
+          const cRes = await fetch('/data/books.json?v=' + Date.now());
+          if (cRes.ok) {
+            const cData = await cRes.json();
+            catalogBooks = cData.books || cData || [];
+          }
+        } catch (_) {}
+
+        try {
+          const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+          if (Array.isArray(customBooks)) catalogBooks = [...catalogBooks, ...customBooks];
+        } catch (_) {}
+
+        // Resolve Book Objects
+        const resolvedBooks = (activeBundle.bookIds || []).map(bId => {
+          const cleanId = String(bId || '').toUpperCase().trim();
+          const match = catalogBooks.find(b => b && String(b.id || '').toUpperCase().trim() === cleanId);
+          return {
+            id: cleanId,
+            title: match?.heading || match?.title || match?.name || cleanId,
+            cover: match?.cover || match?.thumbnail || match?.hero?.cover_image || ('/images/books/' + cleanId.toLowerCase() + '-cover.webp'),
+            mrp: match?.mrp || 299,
+            offerPrice: match?.offerPrice || 99
+          };
+        });
+
+        // Compute dynamic MRP & Offer
+        const calcMrp = activeBundle.mrp || resolvedBooks.reduce((sum, b) => sum + (Number(b.mrp) || 0), 0) || 1999;
+        const offer = activeBundle.offerPrice || 199;
+        const discountPct = calcMrp > offer ? Math.round(((calcMrp - offer) / calcMrp) * 100) + '%' : '90%';
+
+        window._cachedActiveBundle = {
+          ...activeBundle,
+          resolvedBooks,
+          computedMrp: calcMrp,
+          computedOffer: offer,
+          computedDiscount: discountPct
+        };
+
+        return window._cachedActiveBundle;
+      } catch (err) {
+        console.warn('Error fetching active bundle:', err);
+        return null;
+      } finally {
+        _bundleFetchPromise = null;
+      }
+    })();
+
+    return _bundleFetchPromise;
+  };
+
+  // Auto-refresh trays dynamically when active bundle data loads
+  window.refreshBundlePromoTrays = async function () {
+    const bundle = await window.getOrFetchActiveBundle();
+    if (!bundle) return;
+    const trays = document.querySelectorAll('.bundle-featured-promo-tray[data-dynamic-bundle]');
+    trays.forEach(tray => {
+      const parent = tray.parentElement;
+      if (parent) {
+        const temp = document.createElement('div');
+        temp.innerHTML = window.renderBundlePromoCardHTML(bundle);
+        const newTray = temp.firstElementChild;
+        if (newTray) parent.replaceChild(newTray, tray);
+      }
+    });
+  };
+
+  // Render Function (100% Dynamic, reads admin bundle)
+  window.renderBundlePromoCardHTML = function (bundleInput) {
+    const b = bundleInput || window._cachedActiveBundle;
+
+    // Trigger background async load if cache is empty
+    if (!window._cachedActiveBundle) {
+      window.getOrFetchActiveBundle().then(() => {
+        window.refreshBundlePromoTrays();
+      });
+    }
+
+    const title = b?.title || '🌾 सम्पूर्ण किसान 5-इन-1 महाबचत कॉम्बो पैक';
+    const subtitle = b?.subtitle || '5 सर्वश्रेष्ठ वैज्ञानिक कृषि पुस्तकें एक साथ • 490+ रंगीन सचित्र पेज • सम्पूर्ण समाधान';
+    const offerPrice = b?.computedOffer || b?.offerPrice || 199;
+    const mrp = b?.computedMrp || b?.mrp || 3395;
+    const discount = b?.computedDiscount || (mrp > offerPrice ? Math.round(((mrp - offerPrice) / mrp) * 100) + '%' : '94%');
+    const bundleId = b?.id || 'BUNDLE_KISAN_5IN1';
+    const bundleUrl = '/bundle.html?id=' + encodeURIComponent(bundleId);
+    const buyBtnText = b?.buyBtnText || ('🛒 पूरा कॉम्बो ₹' + offerPrice + ' में लें');
+
+    const books = (b && Array.isArray(b.resolvedBooks) && b.resolvedBooks.length > 0)
+      ? b.resolvedBooks
+      : [
+          { id: 'BK017', title: 'प्राकृतिक खेती', cover: '/images/books/bk017-cover.webp' },
+          { id: 'BK016', title: 'दवा डायरेक्टरी', cover: '/images/books/bk016-cover.webp' },
+          { id: 'BK002', title: '11 सब्जियां', cover: '/images/books/bk002-cover.webp' },
+          { id: 'BK019', title: 'गेहूं की खेती', cover: '/images/books/bk019-cover.webp' },
+          { id: 'BK015', title: 'चना की खेती', cover: '/images/books/bk015-cover.webp' }
+        ];
+
+    const totalBooks = books.length;
+    let totalPages = '490+ रंगीन पेज';
+    if (b && Array.isArray(b.heroKpis)) {
+      const pMatch = b.heroKpis.find(k => String(k).includes('पेज'));
+      if (pMatch) totalPages = pMatch;
+    }
 
     return `
-      <div class="bundle-featured-promo-tray" style="grid-column: 1 / -1; width: 100%; margin-bottom: 24px; position: relative; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #091a10 0%, #064e3b 45%, #022c22 100%); border: 2px solid #facc15; box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 25px rgba(250,204,21,0.2); color: #ffffff; padding: 22px 20px; box-sizing: border-box;">
+      <div class="bundle-featured-promo-tray" data-dynamic-bundle="1" style="grid-column: 1 / -1; width: 100%; margin-bottom: 24px; position: relative; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #091a10 0%, #064e3b 45%, #022c22 100%); border: 2px solid #facc15; box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 25px rgba(250,204,21,0.2); color: #ffffff; padding: 22px 20px; box-sizing: border-box;">
         
         <!-- Top Ribbon -->
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #ffffff; font-size: 0.76rem; font-weight: 900; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(239,68,68,0.4);">
-              🔥 महाबचत 5-इन-1 कॉम्बो ऑफर
+              🔥 महाबचत कॉम्बो ऑफर (${totalBooks} Books)
             </span>
             <span style="background: rgba(250,204,21,0.2); color: #fde047; border: 1px solid rgba(250,204,21,0.4); font-size: 0.74rem; font-weight: 800; padding: 3px 10px; border-radius: 14px;">
-              ⚡ ${b.discount || '94%'} की भारी छूट
+              ⚡ ${discount} की भारी छूट
             </span>
           </div>
           <a href="${bundleUrl}" style="color: #fef08a; font-size: 0.82rem; font-weight: 700; text-decoration: underline; display: flex; align-items: center; gap: 4px;">
@@ -851,25 +985,25 @@
           </a>
         </div>
 
-        <!-- Main Body: 2 Columns (Info + 5-Book Miniature Overlap) -->
+        <!-- Main Body: Info + Dynamic miniature fan -->
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
           
           <!-- Left Content -->
           <div style="flex: 1 1 320px; min-width: 260px;">
             <h3 style="margin: 0 0 8px 0; font-size: 1.35rem; font-weight: 900; line-height: 1.3; color: #ffffff; font-family: 'Outfit', sans-serif;">
-              ${escapeHtml(b.title)}
+              ${escapeHtml(title)}
             </h3>
             <p style="margin: 0 0 14px 0; color: #cbd5e1; font-size: 0.88rem; line-height: 1.45;">
-              ${escapeHtml(b.subtitle)}
+              ${escapeHtml(subtitle)}
             </p>
 
             <!-- Highlights Badges -->
             <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
               <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
-                📚 5 सम्पूर्ण ई-बुक्स
+                📚 ${totalBooks} सम्पूर्ण ई-बुक्स
               </span>
               <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
-                📄 ${b.pages || 490}+ रंगीन पेज
+                📄 ${totalPages}
               </span>
               <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
                 🎯 100% वैज्ञानिक गाइड
@@ -883,32 +1017,31 @@
             <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
               <div>
                 <span style="font-size: 1.6rem; font-weight: 900; color: #facc15; font-family: 'Outfit', sans-serif;">
-                  ₹${b.offerPrice || 199}
+                  ₹${offerPrice}
                 </span>
                 <span style="font-size: 0.95rem; color: #94a3b8; text-decoration: line-through; margin-left: 6px;">
-                  ₹${b.originalPrice || 3395}
+                  ₹${mrp}
                 </span>
                 <div style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">
-                  (कुल बचत: ₹${(b.originalPrice || 3395) - (b.offerPrice || 199)})
+                  (कुल बचत: ₹${Math.max(0, mrp - offerPrice)})
                 </div>
               </div>
 
               <a href="${bundleUrl}" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000000; font-weight: 900; font-size: 0.9rem; padding: 10px 18px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 18px rgba(245,158,11,0.45); transition: transform 0.2s ease;">
-                <span>🛒 पूरा कॉम्बो ₹${b.offerPrice || 199} में लें</span> →
+                <span>${escapeHtml(buyBtnText)}</span> →
               </a>
             </div>
           </div>
 
-          <!-- Right: Miniature 5-Book Overlapping Display -->
-          <div style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; position: relative; width: 280px; height: 160px; margin: 0 auto; cursor: pointer;" onclick="window.location.href='${bundleUrl}'" title="क्लिक करके 5-इन-1 कॉम्बो ऑफर देखें">
-            ${b.books.map((bk, i) => {
-              const offsets = [-72, -36, 0, 36, 72];
-              const rots = [-12, -6, 0, 6, 12];
-              const zIndexes = [1, 2, 5, 2, 1];
-              const x = offsets[i] || 0;
-              const r = rots[i] || 0;
-              const z = zIndexes[i] || 1;
-              const isCenter = (i === 2);
+          <!-- Right: Miniature Dynamic Books Overlapping Fan -->
+          <div style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; position: relative; width: 280px; height: 160px; margin: 0 auto; cursor: pointer;" onclick="window.location.href='${bundleUrl}'" title="क्लिक करके ${totalBooks}-इन-1 कॉम्बो ऑफर देखें">
+            ${books.map((bk, i) => {
+              const centerIdx = Math.floor(totalBooks / 2);
+              const offsetStep = totalBooks > 1 ? Math.min(36, 140 / (totalBooks - 1)) : 0;
+              const x = (i - (totalBooks - 1) / 2) * offsetStep;
+              const r = (i - (totalBooks - 1) / 2) * 6;
+              const z = (i === centerIdx) ? 6 : (5 - Math.abs(i - centerIdx));
+              const isCenter = (i === centerIdx);
               return `
                 <div style="position: absolute; left: 50%; transform: translateX(-50%) translateX(${x}px) rotate(${r}deg); z-index: ${z}; width: 85px; height: 125px; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 24px rgba(0,0,0,0.6); border: ${isCenter ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.25)'}; transition: transform 0.3s ease;">
                   <img src="${bk.cover}" alt="${escapeHtml(bk.title)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
@@ -922,7 +1055,6 @@
       </div>
     `;
   };
-
 
   // Auto-init badges on DOM load
   document.addEventListener('DOMContentLoaded', function () {
