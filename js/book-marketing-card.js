@@ -811,28 +811,22 @@
 
   // =========================================================================
   // =========================================================================
-  // WORLD-CLASS MEGA DEAL OF THE DAY ENGINE (AMAZON / FLIPKART STYLE)
-  // 100% Dynamic & Connected Directly to Admin Panel (data/book-bundles.json)
+  // SHORT, SWEET & SLEEK DYNAMIC COMBO BUNDLE ENGINE (ADMIN CONNECTED)
   // =========================================================================
   window._cachedActiveBundle = null;
   let _bundleFetchPromise = null;
   let _dealCountdownTimer = null;
 
-  // Global Countdown Timer for Deal Urgency (15-Minute Rolling FOMO Timer)
   window.initDealCountdown = function () {
     if (_dealCountdownTimer) return;
-    let secondsLeft = 14 * 60 + 42; // 14 min 42 sec
-    const timerEls = document.querySelectorAll('.deal-countdown-digits');
-    
+    let secondsLeft = 14 * 60 + 28;
     _dealCountdownTimer = setInterval(function () {
       secondsLeft--;
-      if (secondsLeft <= 0) secondsLeft = 15 * 60; // Reset rolling 15 min
+      if (secondsLeft <= 0) secondsLeft = 15 * 60;
       const m = Math.floor(secondsLeft / 60);
       const s = secondsLeft % 60;
       const str = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      
-      const currentEls = document.querySelectorAll('.deal-countdown-digits');
-      currentEls.forEach(function (el) {
+      document.querySelectorAll('.deal-countdown-digits').forEach(function (el) {
         el.textContent = str;
       });
     }, 1000);
@@ -854,7 +848,7 @@
           }
         } catch (_) {}
 
-        // 2. Load from data/book-bundles.json (Server / Git Master)
+        // 2. Load from data/book-bundles.json (Server Git Master)
         try {
           const res = await fetch('/data/book-bundles.json?v=' + Date.now());
           if (res.ok) {
@@ -866,7 +860,7 @@
               } else {
                 serverBundles.forEach(sb => {
                   if (!sb || !sb.id) return;
-                  const idx = masterBundles.findIndex(m => m && m.id && m.id.toLowerCase() === sb.id.toLowerCase());
+                  const idx = masterBundles.findIndex(m => m && m.id && sb.id && m.id.toLowerCase() === sb.id.toLowerCase());
                   if (idx >= 0) {
                     if (new Date(sb.updated_at || 0) > new Date(masterBundles[idx].updated_at || 0)) {
                       masterBundles[idx] = sb;
@@ -881,9 +875,9 @@
         } catch (_) {}
 
         // Pick active bundle (prefer BUNDLE_KISAN_5IN1 or status active)
-        const activeBundle = masterBundles.find(b => b && b.status === 'active' && b.id !== 'BUNDLE_KISAN_4IN1') 
-                          || masterBundles.find(b => b && b.status === 'active') 
-                          || masterBundles[0] 
+        const activeBundle = masterBundles.find(b => b && b.status === 'active' && b.id === 'BUNDLE_KISAN_5IN1')
+                          || masterBundles.find(b => b && b.status === 'active')
+                          || masterBundles[0]
                           || null;
 
         if (!activeBundle) return null;
@@ -941,39 +935,25 @@
     return _bundleFetchPromise;
   };
 
-  // Refresh all deal banners and trays across the page dynamically
+  // Auto-refresh dynamic slots across the page
   window.refreshAllMegaDealSlots = async function () {
     const bundle = await window.getOrFetchActiveBundle();
     if (!bundle) return;
 
-    // Refresh Top Mega Deal Slots
-    const dealSlots = document.querySelectorAll('#library-top-mega-deal-slot, .mega-deal-banner-container');
-    dealSlots.forEach(slot => {
+    const slots = document.querySelectorAll('#library-top-mega-deal-slot, .compact-bundle-banner-slot');
+    slots.forEach(slot => {
       slot.innerHTML = window.renderMegaDealBannerHTML(bundle);
-    });
-
-    // Refresh Grids Promo Trays
-    const trays = document.querySelectorAll('.bundle-featured-promo-tray[data-dynamic-bundle]');
-    trays.forEach(tray => {
-      const parent = tray.parentElement;
-      if (parent) {
-        const temp = document.createElement('div');
-        temp.innerHTML = window.renderBundlePromoCardHTML(bundle);
-        const newTray = temp.firstElementChild;
-        if (newTray) parent.replaceChild(newTray, tray);
-      }
     });
 
     window.initDealCountdown();
   };
 
   // -------------------------------------------------------------
-  // MASTER RENDER 1: FULL-WIDTH MEGA HERO DEAL BANNER (AMAZON STYLE)
+  // SHORT & SWEET COMPACT COMBO BANNER (Clean, Sleek, High-Converting)
   // -------------------------------------------------------------
   window.renderMegaDealBannerHTML = function (bundleInput) {
     const b = bundleInput || window._cachedActiveBundle;
 
-    // Trigger async load in background if not ready
     if (!window._cachedActiveBundle) {
       window.getOrFetchActiveBundle().then(() => {
         window.refreshAllMegaDealSlots();
@@ -981,13 +961,13 @@
     }
 
     const title = b?.title || '🌾 सम्पूर्ण किसान 5-इन-1 महाबचत कॉम्बो पैक';
-    const subtitle = b?.subtitle || 'खेती का डॉक्टर + दवा सलाहकार + 11 सब्जी खेती + गेहूँ व चना मास्टर गाइड्स का सम्पूर्ण संग्रह!';
+    const subtitle = b?.subtitle || '5 सर्वश्रेष्ठ वैज्ञानिक कृषि पुस्तकें • 490+ रंगीन सचित्र पेज • सम्पूर्ण समाधान';
     const offerPrice = b?.computedOffer || b?.offerPrice || 199;
     const mrp = b?.computedMrp || b?.mrp || 3395;
     const discount = b?.computedDiscount || (mrp > offerPrice ? Math.round(((mrp - offerPrice) / mrp) * 100) + '%' : '94%');
     const bundleId = b?.id || 'BUNDLE_KISAN_5IN1';
     const bundleUrl = '/bundle.html?id=' + encodeURIComponent(bundleId);
-    const buyBtnText = b?.buyBtnText || ('🛒 पूरा कॉम्बो ₹' + offerPrice + ' में अभी अनलॉक करें');
+    const buyBtnText = b?.buyBtnText || ('🛒 पूरा कॉम्बो ₹' + offerPrice + ' में लें');
 
     const books = (b && Array.isArray(b.resolvedBooks) && b.resolvedBooks.length > 0)
       ? b.resolvedBooks
@@ -1000,116 +980,70 @@
         ];
 
     const totalBooks = books.length;
-    let totalPages = '490+ रंगीन पेज';
-    if (b && Array.isArray(b.heroKpis)) {
-      const pMatch = b.heroKpis.find(k => String(k).includes('पेज'));
-      if (pMatch) totalPages = pMatch;
-    }
-
-    // Trigger countdown ticker
     setTimeout(window.initDealCountdown, 100);
 
     return `
-      <div class="mega-deal-banner-container" style="width: 100%; border-radius: 22px; overflow: hidden; background: radial-gradient(circle at top left, #064e3b 0%, #062413 55%, #021a12 100%); border: 2.5px solid #facc15; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 35px rgba(250, 204, 21, 0.28); color: #ffffff; padding: 22px 24px; box-sizing: border-box; position: relative;">
-        
-        <!-- Live Deal Ticker Header -->
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 12px;">
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #ffffff; font-size: 0.8rem; font-weight: 900; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 14px rgba(239,68,68,0.45); animation: aiPulsePill 2s infinite ease-in-out;">
-              🔥 आज का हॉट सेलिंग महा-ऑफर (Deal of the Day)
-            </span>
-            <span style="background: rgba(250,204,21,0.22); color: #fde047; border: 1px solid rgba(250,204,21,0.45); font-size: 0.78rem; font-weight: 800; padding: 4px 12px; border-radius: 14px;">
-              ⚡ ${discount} की ऐतिहासिक बचत
-            </span>
-          </div>
-
-          <!-- FOMO Countdown Timer -->
-          <div style="display: flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); padding: 5px 14px; border-radius: 20px;">
-            <span style="font-size: 0.8rem; color: #f1f5f9;">⏰ ऑफर समाप्त होने में:</span>
-            <span class="deal-countdown-digits" style="font-size: 0.95rem; font-weight: 900; color: #facc15; font-family: 'Outfit', monospace; letter-spacing: 1px;">
-              14:42
-            </span>
-          </div>
-        </div>
-
-        <!-- 2 Columns: Persuasive Pitch + 3D Interactive Fan Display -->
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+      <div class="compact-bundle-banner" onclick="window.location.href='${bundleUrl}'" style="grid-column: 1 / -1; width: 100%; border-radius: 18px; overflow: hidden; background: linear-gradient(135deg, #062b17 0%, #064e3b 50%, #021e13 100%); border: 2px solid #facc15; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(250, 204, 21, 0.22); color: #ffffff; padding: 14px 20px; box-sizing: border-box; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
           
-          <!-- Left Column (Copy + Pricing + Conversion Action) -->
-          <div style="flex: 1 1 340px; min-width: 280px;">
-            <h2 style="margin: 0 0 8px 0; font-size: 1.55rem; font-weight: 900; line-height: 1.3; color: #ffffff; font-family: 'Outfit', sans-serif;">
-              ${escapeHtml(title)}
-            </h2>
-            <p style="margin: 0 0 16px 0; color: #cbd5e1; font-size: 0.92rem; line-height: 1.5;">
-              ${escapeHtml(subtitle)}
-            </p>
-
-            <!-- 4 Badges Pillars -->
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
-              <span style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; color: #ffffff;">
-                📚 ${totalBooks} सम्पूर्ण ई-बुक्स
+          <!-- Left: Title & Subtitle (Concise 2 lines) -->
+          <div style="flex: 1 1 280px; min-width: 220px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+              <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #ffffff; font-size: 0.72rem; font-weight: 900; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.3px;">
+                🔥 ${totalBooks}-इन-1 महाबचत कॉम्बो
               </span>
-              <span style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; color: #ffffff;">
-                📄 ${totalPages}
+              <span style="background: rgba(250,204,21,0.22); color: #fde047; border: 1px solid rgba(250,204,21,0.4); font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 10px;">
+                ⚡ ${discount} छूट
               </span>
-              <span style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; color: #ffffff;">
-                🎯 100% वैज्ञानिक गाइड
-              </span>
-              <span style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; color: #ffffff;">
-                ⚡ लाइफटाइम लाइब्रेरी एक्सेस
+              <span style="font-size: 0.72rem; color: #a7f3d0; font-weight: 700; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px;">
+                ⏰ <span class="deal-countdown-digits">14:28</span>
               </span>
             </div>
-
-            <!-- Price & Call-To-Action (Amazon Lightning Deal Styling) -->
-            <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
-              <div>
-                <div style="display: flex; align-items: baseline; gap: 8px;">
-                  <span style="font-size: 2.1rem; font-weight: 900; color: #facc15; font-family: 'Outfit', sans-serif; line-height: 1;">
-                    ₹${offerPrice}
-                  </span>
-                  <span style="font-size: 1.1rem; color: #94a3b8; text-decoration: line-through; font-weight: 600;">
-                    ₹${mrp}
-                  </span>
-                </div>
-                <div style="font-size: 0.78rem; color: #4ade80; font-weight: 800; margin-top: 4px;">
-                  (कुल सीधी बचत: ₹${Math.max(0, mrp - offerPrice)})
-                </div>
-              </div>
-
-              <!-- High-Converting Pulsing Buy Button -->
-              <a href="${bundleUrl}" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000000; font-weight: 900; font-size: 1rem; padding: 13px 24px; border-radius: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(245,158,11,0.5); border: 1px solid #fde047; transition: transform 0.2s ease, box-shadow 0.2s ease;">
-                <span>${escapeHtml(buyBtnText)}</span>
-                <span style="font-size: 1.2rem;">→</span>
-              </a>
+            <div style="font-size: 1.15rem; font-weight: 900; color: #ffffff; line-height: 1.25; font-family: 'Outfit', sans-serif;">
+              ${escapeHtml(title)}
+            </div>
+            <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 3px; line-height: 1.3;">
+              ${escapeHtml(subtitle)}
             </div>
           </div>
 
-          <!-- Right Column: 3D Interactive Miniature Books Stack -->
-          <div style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; position: relative; width: 310px; height: 190px; margin: 10px auto; cursor: pointer;" onclick="window.location.href='${bundleUrl}'" title="क्लिक करके ${totalBooks}-इन-1 कॉम्बो ऑफर देखें">
+          <!-- Center: Compact 3D Miniature Books Fan Stack -->
+          <div style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; position: relative; width: 140px; height: 75px; margin: 4px 6px;">
             ${books.map((bk, i) => {
               const centerIdx = Math.floor(totalBooks / 2);
-              const offsetStep = totalBooks > 1 ? Math.min(42, 170 / (totalBooks - 1)) : 0;
+              const offsetStep = totalBooks > 1 ? Math.min(26, 95 / (totalBooks - 1)) : 0;
               const x = (i - (totalBooks - 1) / 2) * offsetStep;
-              const r = (i - (totalBooks - 1) / 2) * 7;
-              const z = (i === centerIdx) ? 8 : (6 - Math.abs(i - centerIdx));
+              const r = (i - (totalBooks - 1) / 2) * 5;
+              const z = (i === centerIdx) ? 6 : (5 - Math.abs(i - centerIdx));
               const isCenter = (i === centerIdx);
               return `
-                <div style="position: absolute; left: 50%; transform: translateX(-50%) translateX(${x}px) translateY(${Math.abs(r)*0.8}px) rotate(${r}deg); z-index: ${z}; width: 95px; height: 140px; border-radius: 8px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,0.65); border: ${isCenter ? '2.5px solid #22c55e' : '1px solid rgba(255,255,255,0.3)'}; transition: transform 0.3s ease; background: #0f172a;">
+                <div style="position: absolute; left: 50%; transform: translateX(-50%) translateX(${x}px) rotate(${r}deg); z-index: ${z}; width: 50px; height: 72px; border-radius: 4px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.6); border: ${isCenter ? '1.5px solid #22c55e' : '1px solid rgba(255,255,255,0.25)'}; background: #0f172a;">
                   <img src="${bk.cover}" alt="${escapeHtml(bk.title)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
                 </div>
               `;
             }).join('')}
           </div>
 
-        </div>
+          <!-- Right: Price & Compact Action Button -->
+          <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 14px;">
+            <div style="text-align: right;">
+              <div style="font-size: 1.55rem; font-weight: 900; color: #facc15; font-family: 'Outfit', sans-serif; line-height: 1;">
+                ₹${offerPrice}
+              </div>
+              <div style="font-size: 0.78rem; color: #94a3b8; text-decoration: line-through;">
+                ₹${mrp}
+              </div>
+            </div>
+            <a href="${bundleUrl}" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000000; font-weight: 900; font-size: 0.86rem; padding: 10px 18px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(245,158,11,0.45); white-space: nowrap; border: 1px solid #fde047;">
+              <span>कॉम्बो देखें</span> →
+            </a>
+          </div>
 
+        </div>
       </div>
     `;
   };
 
-  // -------------------------------------------------------------
-  // MASTER RENDER 2: GRID-COMPATIBLE PROMO TRAY (FOR SHELVES)
-  // -------------------------------------------------------------
   window.renderBundlePromoCardHTML = function (bundleInput) {
     return window.renderMegaDealBannerHTML(bundleInput);
   };

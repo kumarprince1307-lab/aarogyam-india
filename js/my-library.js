@@ -226,6 +226,27 @@ function calculateProfileProgress() {
 function initUserData() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
+    // Auto-sync active status from Supabase in background for users like Rajesh Kumar (6009564859)
+    const checkMob = storedUser.mobile || (localStorage.getItem('aarogyam_user_phone') || '').replace(/\D/g, '').slice(-10);
+    if (checkMob && checkMob.length === 10) {
+      setTimeout(async () => {
+        try {
+          const db = getLibrarySupabaseClient();
+          if (db) {
+            const { data: p } = await db.from('profiles').select('id, is_active, is_subscriber').or(`mobile.eq.${checkMob},mobile.eq.+91${checkMob}`).limit(1).maybeSingle();
+            if (p && (p.is_active || p.is_subscriber)) {
+              storedUser.is_active = true;
+              storedUser.is_subscriber = true;
+              localStorage.setItem('user_is_active', 'true');
+              localStorage.setItem('user_is_subscriber', 'true');
+              localStorage.setItem('AI_USER', JSON.stringify(storedUser));
+              updateSubscriptionTimerAndStatus(storedUser);
+            }
+          }
+        } catch (_) {}
+      }, 300);
+    }
+    
     const userName = storedUser.full_name || storedUser.name || "प्रिय पाठक";
     const userMobile = storedUser.mobile || "";
     const userEmail = storedUser.email || "";
@@ -642,14 +663,7 @@ async function renderLibrarySections(booksArray) {
           if (slot && typeof window.renderBundlePromoCardHTML === 'function') {
             slot.innerHTML = window.renderBundlePromoCardHTML(activeB);
           }
-          if (availableGrid && typeof window.renderBundlePromoCardHTML === 'function') {
-            const existingTray = availableGrid.querySelector('.bundle-featured-promo-tray');
-            if (!existingTray) {
-              const temp = document.createElement('div');
-              temp.innerHTML = window.renderBundlePromoCardHTML(activeB);
-              if (temp.firstElementChild) availableGrid.prepend(temp.firstElementChild);
-            }
-          }
+          // Single top banner used to avoid duplicate clutter
         });
       }
     } catch (_) {}
@@ -662,7 +676,7 @@ async function renderLibrarySections(booksArray) {
     if (secAvail) secAvail.style.display = 'block';
 
     if (availableGrid) {
-        availableGrid.innerHTML = (typeof window.renderBundlePromoCardHTML === 'function') ? window.renderBundlePromoCardHTML() : '';
+        availableGrid.innerHTML = '';
     }
     if (bonusGrid) bonusGrid.innerHTML = '';
     if (demoGrid) demoGrid.innerHTML = '';

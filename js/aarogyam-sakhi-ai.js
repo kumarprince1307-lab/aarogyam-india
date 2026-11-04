@@ -4362,12 +4362,43 @@ if (typeof document !== 'undefined') {
             if (db) {
               const { data: ex } = await db.from('profiles').select('id, full_name, share_id').eq('mobile', extractedPhone).limit(1).maybeSingle();
               if (!ex) {
-                const sponsorShareId = (typeof getActiveSponsorShareId === 'function') ? getActiveSponsorShareId() : 'AI000004';
+                // Resolve actual sponsor from URL (?ref=), localStorage, or session
+                let activeReferrerShareId = 'AI000004';
+                let activeReferrerUuid = null;
+                let activeReferrerMobile = '7974422572';
+
+                try {
+                  const urlParamRef = new URLSearchParams(window.location.search).get('ref') || new URLSearchParams(window.location.search).get('referrer');
+                  const storedCtx = JSON.parse(localStorage.getItem('AI_SHARE_CONTEXT') || '{}');
+                  const refCandidate = urlParamRef || storedCtx.share_id || storedCtx.code || localStorage.getItem('AI_REF_CODE') || localStorage.getItem('aim_last_sponsor_id');
+                  
+                  if (refCandidate && String(refCandidate).trim()) {
+                    const cleanCandidate = String(refCandidate).trim();
+                    const { data: refProfile } = await db.from('profiles')
+                      .select('id, mobile, share_id, referral_code')
+                      .or(`share_id.eq.${cleanCandidate},referral_code.eq.${cleanCandidate},mobile.eq.${cleanCandidate}`)
+                      .limit(1)
+                      .maybeSingle();
+
+                    if (refProfile && refProfile.id) {
+                      activeReferrerUuid = refProfile.id;
+                      activeReferrerMobile = refProfile.mobile || activeReferrerMobile;
+                      activeReferrerShareId = refProfile.share_id || refProfile.referral_code || cleanCandidate;
+                    }
+                  }
+                } catch (refErr) {
+                  console.warn('[Sakhi Registration] Sponsor resolve note:', refErr);
+                }
+
+                const myNewShareId = 'AI' + extractedPhone.slice(-6);
+
                 await db.from('profiles').insert([{
                   full_name: potentialName,
                   mobile: extractedPhone,
-                  share_id: (JSON.parse(localStorage.getItem('AI_USER') || '{}').share_id || 'AI000004'),
-                  referral_code: sponsorShareId,
+                  share_id: myNewShareId,
+                  referral_code: activeReferrerShareId,
+                  referred_by: activeReferrerUuid,
+                  referral_mobile: activeReferrerMobile,
                   registration_source: 'सखी AI (Aarogyam Sakhi)',
                   is_active: false,
                   profile_complete: false
