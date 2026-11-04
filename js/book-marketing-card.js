@@ -835,6 +835,17 @@
     }, 1000);
   };
 
+  // Helper to refresh all slots across the site
+  window.refreshAllMegaDealSlots = function () {
+    const slots = document.querySelectorAll('#library-top-mega-deal-slot, .library-top-mega-deal-slot, .bundle-featured-promo-tray-slot');
+    if (slots.length > 0) {
+      const html = typeof window.renderMegaDealBannerHTML === 'function' ? window.renderMegaDealBannerHTML() : '';
+      slots.forEach(s => {
+        if (s && html) s.innerHTML = html;
+      });
+    }
+  };
+
   // Inject Festive Diwali Styles Once
   function ensureFestiveComboStyles() {
     if (document.getElementById('ai-festive-combo-styles')) return;
@@ -1155,16 +1166,6 @@
         ${bundles.map(b => renderSingleFestiveCardHTML(b)).join('')}
       </div>
     `;
-  };
-
-  window.refreshAllMegaDealSlots = function () {
-    const slots = document.querySelectorAll('#library-top-mega-deal-slot, .library-top-mega-deal-slot, .bundle-featured-promo-tray-slot');
-    if (slots.length > 0) {
-      const html = window.renderMegaDealBannerHTML();
-      slots.forEach(s => {
-        if (s) s.innerHTML = html;
-      });
-    }
   };
 
   window.renderBundlePromoCardHTML = function (bundleInput) {
