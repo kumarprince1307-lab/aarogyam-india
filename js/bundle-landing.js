@@ -341,21 +341,10 @@
       }
     }
 
-    // Render 3D Book Fan Stack (Large, Unclipped)
-    if (fanStackEl) {
-      fanStackEl.innerHTML = resolvedBooks.slice(0, 5).map((b) => {
-        return `
-          <img 
-            src="${b.cover}" 
-            alt="${escapeHtml(b.title)}" 
-            class="bundle-fan-book" 
-            title="${escapeHtml(b.title)} - क्लिक करके अंदर देखें"
-            onclick="window.openBabyBrowser('${b.id}')"
-            onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';"
-          />
-        `;
-      }).join('');
-    }
+
+    // 3D Book Fan Stack with Touch Swipe & 2-sec Smooth Auto-Slide Carousel
+    initInteractive3DFanStack(resolvedBooks);
+
 
     const heroBuyBtn = document.getElementById('hero-buy-btn');
     if (heroBuyBtn) {
@@ -363,6 +352,211 @@
       heroBuyBtn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> ${escapeHtml(btnText.replace(/^🛒\s*/, ''))}`;
     }
   }
+
+
+  // =========================================================================
+  // 3D FAN STACK TOUCH SWIPE & AUTO-SLIDE CAROUSEL ENGINE
+  // =========================================================================
+  let _fanBooks = [];
+  let _fanCenterIdx = 2;
+  let _fanAutoSlideTimer = null;
+  let _fanTouchStartX = 0;
+  let _fanTouchStartY = 0;
+  let _fanIsSwiping = false;
+
+  function updateFanPositions() {
+    const stackEl = document.getElementById('bundleFanStack');
+    if (!stackEl || _fanBooks.length === 0) return;
+
+    const items = stackEl.querySelectorAll('.bundle-fan-book-item');
+    const total = _fanBooks.length;
+
+    items.forEach((item) => {
+      const idx = parseInt(item.getAttribute('data-book-idx'), 10);
+      let diff = (idx - _fanCenterIdx + total) % total;
+      if (diff > total / 2) diff -= total;
+
+      item.className = 'bundle-fan-book-item';
+      if (diff === 0) {
+        item.classList.add('fan-slot-center');
+      } else if (diff === -1) {
+        item.classList.add('fan-slot-left');
+      } else if (diff === -2 || diff < -2) {
+        item.classList.add('fan-slot-far-left');
+      } else if (diff === 1) {
+        item.classList.add('fan-slot-right');
+      } else if (diff >= 2) {
+        item.classList.add('fan-slot-far-right');
+      }
+    });
+
+    // Update dots
+    const dots = document.querySelectorAll('#fanDotsContainer .fan-dot');
+    dots.forEach((dot) => {
+      const dIdx = parseInt(dot.getAttribute('data-idx'), 10);
+      if (dIdx === _fanCenterIdx) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
+  function setFanCenterIndex(newIdx) {
+    if (_fanBooks.length === 0) return;
+    _fanCenterIdx = (newIdx + _fanBooks.length) % _fanBooks.length;
+    updateFanPositions();
+  }
+
+  function rotateFanStack(dir) {
+    setFanCenterIndex(_fanCenterIdx + dir);
+  }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    _fanAutoSlideTimer = setInterval(() => {
+      rotateFanStack(1);
+    }, 2000);
+  }
+
+  function stopAutoSlide() {
+    if (_fanAutoSlideTimer) {
+      clearInterval(_fanAutoSlideTimer);
+      _fanAutoSlideTimer = null;
+    }
+  }
+
+  let _fanResumeTimer = null;
+  function resetAutoSlide() {
+    stopAutoSlide();
+    if (_fanResumeTimer) clearTimeout(_fanResumeTimer);
+    _fanResumeTimer = setTimeout(() => {
+      startAutoSlide();
+    }, 4000);
+  }
+
+  function initInteractive3DFanStack(books) {
+    const stackEl = document.getElementById('bundleFanStack');
+    const container = document.querySelector('.bundle-fan-stack-container');
+    const hintEl = document.querySelector('.bundle-fan-hint');
+    if (!stackEl || !Array.isArray(books) || books.length === 0) return;
+
+    _fanBooks = books.slice(0, 5);
+    _fanCenterIdx = Math.min(2, Math.floor(_fanBooks.length / 2));
+
+    stackEl.innerHTML = _fanBooks.map((b, idx) => {
+      return `
+        <div 
+          class="bundle-fan-book-item" 
+          data-book-idx="${idx}" 
+          data-book-id="${escapeHtml(b.id)}"
+          title="${escapeHtml(b.title)} - क्लिक करके अंदर देखें"
+        >
+          <img 
+            src="${b.cover}" 
+            alt="${escapeHtml(b.title)}" 
+            class="bundle-fan-book-cover"
+            onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';"
+          />
+          <div class="bundle-fan-book-label">
+            <span class="fan-book-name">${escapeHtml(b.title)}</span>
+            <span class="fan-book-action">📖 अंदर देखें</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    if (hintEl) {
+      hintEl.innerHTML = `
+        <div class="fan-controls-row">
+          <button type="button" class="fan-arrow-btn prev" title="पिछली किताब">◀</button>
+          <div class="fan-dots" id="fanDotsContainer">
+            ${_fanBooks.map((_, i) => `<span class="fan-dot ${i === _fanCenterIdx ? 'active' : ''}" data-idx="${i}"></span>`).join('')}
+          </div>
+          <button type="button" class="fan-arrow-btn next" title="अगली किताब">▶</button>
+        </div>
+        <div class="fan-hint-text">
+          <span>👆 स्वाइप करें या टैप करें • बीच वाली किताब पर क्लिक कर अंदर का पेज देखें</span>
+        </div>
+      `;
+
+      hintEl.querySelector('.fan-arrow-btn.prev')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        rotateFanStack(-1);
+        resetAutoSlide();
+      });
+      hintEl.querySelector('.fan-arrow-btn.next')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        rotateFanStack(1);
+        resetAutoSlide();
+      });
+      hintEl.querySelectorAll('.fan-dot').forEach((dot) => {
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetIdx = parseInt(dot.getAttribute('data-idx'), 10);
+          setFanCenterIndex(targetIdx);
+          resetAutoSlide();
+        });
+      });
+    }
+
+    const bookItems = stackEl.querySelectorAll('.bundle-fan-book-item');
+    bookItems.forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const bookIdx = parseInt(item.getAttribute('data-book-idx'), 10);
+        const bookId = item.getAttribute('data-book-id');
+
+        if (bookIdx === _fanCenterIdx) {
+          if (window.openBabyBrowser) window.openBabyBrowser(bookId);
+        } else {
+          setFanCenterIndex(bookIdx);
+          resetAutoSlide();
+        }
+      });
+    });
+
+    if (container && !container.dataset.swipeBound) {
+      container.dataset.swipeBound = '1';
+      container.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length === 0) return;
+        _fanTouchStartX = e.touches[0].clientX;
+        _fanTouchStartY = e.touches[0].clientY;
+        _fanIsSwiping = true;
+        stopAutoSlide();
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (e) => {
+        if (!_fanIsSwiping || !e.touches || e.touches.length === 0) return;
+        const currentY = e.touches[0].clientY;
+        if (Math.abs(currentY - _fanTouchStartY) > 50 && Math.abs(e.touches[0].clientX - _fanTouchStartX) < 25) {
+          _fanIsSwiping = false;
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', (e) => {
+        if (!_fanIsSwiping) return;
+        _fanIsSwiping = false;
+        const touchEndX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : _fanTouchStartX;
+        const diffX = touchEndX - _fanTouchStartX;
+
+        if (diffX > 35) {
+          rotateFanStack(-1);
+        } else if (diffX < -35) {
+          rotateFanStack(1);
+        }
+        resetAutoSlide();
+      });
+
+      container.addEventListener('mouseenter', stopAutoSlide);
+      container.addEventListener('mouseleave', resetAutoSlide);
+    }
+
+    updateFanPositions();
+    startAutoSlide();
+  }
+
 
   // --- 4. RENDER MULTI-VIDEO HORIZONTAL CAROUSEL ---
   let _activeVideoIdx = 0;

@@ -808,6 +808,122 @@
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+
+  // =========================================================================
+  // UNIVERSAL 5-IN-1 COMBO BUNDLE FEATURED PROMO CARD / TRAY
+  // =========================================================================
+  window.renderBundlePromoCardHTML = function (customBundle) {
+    const b = customBundle || {
+      id: 'BUNDLE_KISAN_5IN1',
+      title: '🌾 सम्पूर्ण किसान 5-इन-1 महाबचत कॉम्बो पैक',
+      subtitle: '5 सर्वश्रेष्ठ वैज्ञानिक कृषि पुस्तकें • 490+ रंगीन सचित्र पेज • सम्पूर्ण समाधान',
+      offerPrice: 199,
+      originalPrice: 3395,
+      discount: '94%',
+      pages: 490,
+      booksCount: 5,
+      books: [
+        { id: 'BK017', title: 'प्राकृतिक व वैज्ञानिक खेती', cover: '/images/books/bk017-cover.webp' },
+        { id: 'BK016', title: 'कृषि दवा डायरेक्टरी', cover: '/images/books/bk016-cover.webp' },
+        { id: 'BK002', title: '11 प्रमुख सब्जियों की खेती', cover: '/images/books/bk002-cover.webp' },
+        { id: 'BK019', title: 'गेहूं की उन्नत खेती', cover: '/images/books/bk019-cover.webp' },
+        { id: 'BK015', title: 'चना व दलहनी फसलें', cover: '/images/books/bk015-cover.webp' }
+      ]
+    };
+
+    const bundleUrl = '/bundle.html?id=' + encodeURIComponent(b.id || 'BUNDLE_KISAN_5IN1');
+
+    return `
+      <div class="bundle-featured-promo-tray" style="grid-column: 1 / -1; width: 100%; margin-bottom: 24px; position: relative; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, #091a10 0%, #064e3b 45%, #022c22 100%); border: 2px solid #facc15; box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 25px rgba(250,204,21,0.2); color: #ffffff; padding: 22px 20px; box-sizing: border-box;">
+        
+        <!-- Top Ribbon -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #ffffff; font-size: 0.76rem; font-weight: 900; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(239,68,68,0.4);">
+              🔥 महाबचत 5-इन-1 कॉम्बो ऑफर
+            </span>
+            <span style="background: rgba(250,204,21,0.2); color: #fde047; border: 1px solid rgba(250,204,21,0.4); font-size: 0.74rem; font-weight: 800; padding: 3px 10px; border-radius: 14px;">
+              ⚡ ${b.discount || '94%'} की भारी छूट
+            </span>
+          </div>
+          <a href="${bundleUrl}" style="color: #fef08a; font-size: 0.82rem; font-weight: 700; text-decoration: underline; display: flex; align-items: center; gap: 4px;">
+            <span>ऑफर विवरण देखें</span> →
+          </a>
+        </div>
+
+        <!-- Main Body: 2 Columns (Info + 5-Book Miniature Overlap) -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+          
+          <!-- Left Content -->
+          <div style="flex: 1 1 320px; min-width: 260px;">
+            <h3 style="margin: 0 0 8px 0; font-size: 1.35rem; font-weight: 900; line-height: 1.3; color: #ffffff; font-family: 'Outfit', sans-serif;">
+              ${escapeHtml(b.title)}
+            </h3>
+            <p style="margin: 0 0 14px 0; color: #cbd5e1; font-size: 0.88rem; line-height: 1.45;">
+              ${escapeHtml(b.subtitle)}
+            </p>
+
+            <!-- Highlights Badges -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+              <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
+                📚 5 सम्पूर्ण ई-बुक्स
+              </span>
+              <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
+                📄 ${b.pages || 490}+ रंगीन पेज
+              </span>
+              <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
+                🎯 100% वैज्ञानिक गाइड
+              </span>
+              <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; color: #f1f5f9;">
+                ⚡ लाइफटाइम लाइब्रेरी एक्सेस
+              </span>
+            </div>
+
+            <!-- Price & Buy Actions -->
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+              <div>
+                <span style="font-size: 1.6rem; font-weight: 900; color: #facc15; font-family: 'Outfit', sans-serif;">
+                  ₹${b.offerPrice || 199}
+                </span>
+                <span style="font-size: 0.95rem; color: #94a3b8; text-decoration: line-through; margin-left: 6px;">
+                  ₹${b.originalPrice || 3395}
+                </span>
+                <div style="font-size: 0.72rem; color: #4ade80; font-weight: 700;">
+                  (कुल बचत: ₹${(b.originalPrice || 3395) - (b.offerPrice || 199)})
+                </div>
+              </div>
+
+              <a href="${bundleUrl}" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000000; font-weight: 900; font-size: 0.9rem; padding: 10px 18px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 18px rgba(245,158,11,0.45); transition: transform 0.2s ease;">
+                <span>🛒 पूरा कॉम्बो ₹${b.offerPrice || 199} में लें</span> →
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: Miniature 5-Book Overlapping Display -->
+          <div style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; position: relative; width: 280px; height: 160px; margin: 0 auto; cursor: pointer;" onclick="window.location.href='${bundleUrl}'" title="क्लिक करके 5-इन-1 कॉम्बो ऑफर देखें">
+            ${b.books.map((bk, i) => {
+              const offsets = [-72, -36, 0, 36, 72];
+              const rots = [-12, -6, 0, 6, 12];
+              const zIndexes = [1, 2, 5, 2, 1];
+              const x = offsets[i] || 0;
+              const r = rots[i] || 0;
+              const z = zIndexes[i] || 1;
+              const isCenter = (i === 2);
+              return `
+                <div style="position: absolute; left: 50%; transform: translateX(-50%) translateX(${x}px) rotate(${r}deg); z-index: ${z}; width: 85px; height: 125px; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 24px rgba(0,0,0,0.6); border: ${isCenter ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.25)'}; transition: transform 0.3s ease;">
+                  <img src="${bk.cover}" alt="${escapeHtml(bk.title)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+        </div>
+
+      </div>
+    `;
+  };
+
+
   // Auto-init badges on DOM load
   document.addEventListener('DOMContentLoaded', function () {
     window.AarogyamWishlist.updateBadges();

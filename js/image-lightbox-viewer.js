@@ -270,6 +270,9 @@
       img.classList.add('ai-zoomable-img');
 
       img.addEventListener('click', (e) => {
+        if (img.closest('.bundle-fan-stack-container, .bundle-fan-book-item, .bundle-fan-book, .bundle-card-img-wrap, .demo-slide, #babyBrowserBackdrop, .baby-browser-backdrop, [data-no-lightbox]')) {
+          return;
+        }
         const parentLink = img.closest('a');
         if (parentLink) {
           const href = parentLink.getAttribute('href') || '';

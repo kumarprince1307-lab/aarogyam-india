@@ -357,7 +357,8 @@
       return;
     }
 
-    grid.innerHTML = uniqueList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
+    const bundlePromoHTML = (typeof window.renderBundlePromoCardHTML === 'function') ? window.renderBundlePromoCardHTML() : '';
+    grid.innerHTML = bundlePromoHTML + uniqueList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
   }
 
   function renderAgriCombo() {

@@ -269,7 +269,24 @@ function initUserData() {
 }
 
 function updateSubscriptionTimerAndStatus(storedUser) {
-    const isActive = Boolean(storedUser.is_active || storedUser.is_subscriber || storedUser.status === 'active');
+    // Check all sources of truth for active status: user object, flag in localStorage, or any paid purchases
+    let hasPurchases = false;
+    try {
+        const localPurchases = JSON.parse(localStorage.getItem("AI_PURCHASES") || localStorage.getItem("purchases") || "[]");
+        const myBookIds = JSON.parse(localStorage.getItem("my_purchased_book_ids") || "[]");
+        if ((Array.isArray(localPurchases) && localPurchases.length > 0) || (Array.isArray(myBookIds) && myBookIds.length > 0)) {
+            hasPurchases = true;
+        }
+    } catch (_) {}
+
+    const isFlagActive = localStorage.getItem("user_is_active") === "true" || localStorage.getItem("user_is_subscriber") === "true";
+    const isActive = Boolean(storedUser.is_active || storedUser.is_subscriber || storedUser.status === "active" || isFlagActive || hasPurchases);
+
+    // Auto-sync back to storedUser if active via purchases/flags
+    if (isActive && !storedUser.is_active) {
+        storedUser.is_active = true;
+        try { localStorage.setItem("AI_USER", JSON.stringify(storedUser)); } catch (_) {}
+    }
     const badgeEl = document.getElementById('userStatusBadge');
     const badgeText = document.getElementById('userStatusText');
     const activeCard = document.getElementById('activeSubscriptionCard');
@@ -612,7 +629,9 @@ async function renderLibrarySections(booksArray) {
     const comingSoonGrid = document.getElementById('comingSoonGrid');
 
     if (purchasedGrid) purchasedGrid.innerHTML = '';
-    if (availableGrid) availableGrid.innerHTML = '';
+    if (availableGrid) {
+        availableGrid.innerHTML = (typeof window.renderBundlePromoCardHTML === 'function') ? window.renderBundlePromoCardHTML() : '';
+    }
     if (bonusGrid) bonusGrid.innerHTML = '';
     if (demoGrid) demoGrid.innerHTML = '';
     if (comingSoonGrid) comingSoonGrid.innerHTML = '';
@@ -665,13 +684,21 @@ async function renderLibrarySections(booksArray) {
                                     profileIds.push(p.id);
                                 }
                             });
+                            const anyActive = pList.some(p => p && (p.is_active || p.is_subscriber));
+                            if (anyActive) {
+                                localUser.is_active = true;
+                                localUser.is_subscriber = true;
+                                localStorage.setItem('user_is_active', 'true');
+                                localStorage.setItem('user_is_subscriber', 'true');
+                            }
                             if (!localUser.id && pList[0].id) {
                                 localUser.id = pList[0].id;
                                 if (pList[0].full_name && !localUser.full_name) localUser.full_name = pList[0].full_name;
                                 if (pList[0].is_active) localUser.is_active = true;
                                 if (pList[0].is_subscriber) localUser.is_subscriber = true;
-                                localStorage.setItem('AI_USER', JSON.stringify(localUser));
                             }
+                            try { localStorage.setItem('AI_USER', JSON.stringify(localUser)); } catch (_) {}
+                            updateSubscriptionTimerAndStatus(localUser);
                         }
                     } catch (pe) {
                         console.warn("Profile query note:", pe);
@@ -707,6 +734,12 @@ async function renderLibrarySections(booksArray) {
                         userPurchases = freshPurchases;
                         localStorage.setItem('AI_PURCHASES', JSON.stringify(userPurchases));
                         localStorage.setItem('purchases', JSON.stringify(userPurchases));
+                        if (userPurchases && userPurchases.length > 0) {
+                            localUser.is_active = true;
+                            localStorage.setItem('user_is_active', 'true');
+                            try { localStorage.setItem('AI_USER', JSON.stringify(localUser)); } catch (_) {}
+                            updateSubscriptionTimerAndStatus(localUser);
+                        }
                         // Save to session cache for 15 minutes
                         try { sessionStorage.setItem(libCacheKey, JSON.stringify({ data: userPurchases, _ts: Date.now() })); } catch(e) {}
                     }

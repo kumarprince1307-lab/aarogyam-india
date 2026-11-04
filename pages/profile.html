@@ -480,7 +480,35 @@
 
       if (nameEl) nameEl.textContent = savedUser.full_name || savedUser.name || savedUser.fullName || 'प्रिय किसान मित्र';
       if (phoneEl) phoneEl.textContent = savedUser.mobile || savedUser.phone ? `📱 +91 ${savedUser.mobile || savedUser.phone}` : 'गेस्ट मोड (लॉगिन करें)';
-      if (roleEl) roleEl.textContent = savedUser.role === 'admin' ? '👑 Admin' : (savedUser.isVip ? '👑 VIP Pro Member' : '🌱 किसान सदस्य');
+      // Check if user is active via flags, purchases, or user object
+      let isUserActive = Boolean(savedUser.is_active || savedUser.is_subscriber || savedUser.status === 'active' || savedUser.isVip);
+      if (!isUserActive) {
+        if (localStorage.getItem('user_is_active') === 'true' || localStorage.getItem('user_is_subscriber') === 'true') {
+          isUserActive = true;
+        } else {
+          try {
+            const p = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+            const b = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
+            if ((Array.isArray(p) && p.length > 0) || (Array.isArray(b) && b.length > 0)) isUserActive = true;
+          } catch (_) {}
+        }
+      }
+
+      if (roleEl) {
+        if (savedUser.role === 'admin') {
+          roleEl.textContent = '👑 Admin';
+          roleEl.style.background = '#eab308';
+          roleEl.style.color = '#000000';
+        } else if (isUserActive) {
+          roleEl.textContent = '🟢 सक्रिय किसान सदस्य (Active)';
+          roleEl.style.background = '#10b981';
+          roleEl.style.color = '#ffffff';
+        } else {
+          roleEl.textContent = '🌱 किसान सदस्य (निःशुल्क)';
+          roleEl.style.background = '#64748b';
+          roleEl.style.color = '#ffffff';
+        }
+      }
 
       // Update wishlist count
       try {

@@ -234,7 +234,8 @@
       }
     });
 
-    grid.innerHTML = uniqueList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
+    const bundlePromoHTML = (typeof window.renderBundlePromoCardHTML === 'function' && (activeCategory === 'all' || activeCategory === 'agriculture')) ? window.renderBundlePromoCardHTML() : '';
+    grid.innerHTML = bundlePromoHTML + uniqueList.map(b => window.renderUniversalBookMarketingCard(b)).join('');
   }
 
   // -------------------------------------------------------------
