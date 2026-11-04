@@ -2026,15 +2026,49 @@ window.editBundle = function (bundleId) {
 };
 
 window.toggleBundleStatus = async function (bundleId) {
-  let localBundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
-  const item = localBundles.find(b => b.id === bundleId);
+  let list = (_activeBundlesList && _activeBundlesList.length > 0)
+    ? _activeBundlesList
+    : JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+
+  if (!list || list.length === 0) {
+    try {
+      const resp = await fetch('/data/book-bundles.json?v=' + Date.now());
+      if (resp.ok) list = await resp.json();
+    } catch (_) {}
+  }
+
+  const bIdNorm = String(bundleId || '').trim().toLowerCase();
+  const item = (list || []).find(b => b && b.id && b.id.toLowerCase() === bIdNorm);
+
   if (item) {
+    // 1. Optimistic instant flip
     item.status = item.status === 'active' ? 'inactive' : 'active';
-    localStorage.setItem('AAROGYAM_BUNDLE_LANDING_PAGES', JSON.stringify(localBundles));
+    item.updated_at = new Date().toISOString();
+    _activeBundlesList = list;
+    try {
+      localStorage.setItem('AAROGYAM_BUNDLE_LANDING_PAGES', JSON.stringify(list));
+    } catch (_) {}
 
-    await syncBundlesToAllBackends(localBundles);
+    // 2. Instant DOM visual feedback (0ms latency)
+    const btn = document.querySelector(`.btn-bundle-status[data-id="${bundleId}"]`);
+    if (btn) {
+      const isAct = item.status === 'active';
+      btn.style.background = isAct ? '#15803d' : '#854d0e';
+      btn.textContent = isAct ? 'ACTIVE' : 'INACTIVE';
+    }
 
-    await loadAndRenderBundles();
+    if (typeof showToast === 'function') {
+      showToast(`बंडल "${item.title || bundleId}" अब ${item.status === 'active' ? 'ACTIVE' : 'INACTIVE'} है।`, 'success');
+    }
+
+    // 3. Non-blocking background sync (never freezes the admin panel)
+    syncBundlesToAllBackends(list).then(() => {
+      console.log('[Admin Bundle] Synced status update to backends successfully');
+    }).catch(err => {
+      console.warn('[Admin Bundle] Sync warning:', err);
+    });
+  } else {
+    alert('कॉम्बो बंडल नहीं मिला: ' + bundleId);
   }
 };
 

@@ -888,30 +888,25 @@
   };
 
   window.renderBundlePromoCardHTML = function () {
-    return window.renderCleanStaticComboCards();
+    let bundles = [];
+    try {
+      bundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+    } catch (_) {}
+    if (Array.isArray(bundles) && bundles.length > 0) {
+      return window.renderDynamicBundleCards(bundles);
+    }
+    return '';
   };
 
   window.renderCleanStaticComboCards = function () {
-    return window.renderDynamicBundleCards([
-      {
-        id: 'BUNDLE_KISAN_5IN1',
-        title: 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो',
-        subtitle: 'खेती का डॉक्टर + दवा सलाहकार + 11 सब्जी खेती + गेहूँ व चना मास्टर गाइड्स',
-        badge: '🔥 5-इन-1 कॉम्बो',
-        mrp: 3395,
-        offerPrice: 199,
-        status: 'active'
-      },
-      {
-        id: 'BUNDLE_KISAN_4IN1',
-        title: 'महाबचत 4-इन-1 किसान मास्टर बंडल',
-        subtitle: 'धान, सोयाबीन, मक्का, सब्जी व संपूर्ण फसल डॉक्टर मास्टर गाइड्स',
-        badge: '⚡ 4-इन-1 कॉम्बो',
-        mrp: 1196,
-        offerPrice: 199,
-        status: 'active'
-      }
-    ]);
+    let bundles = [];
+    try {
+      bundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+    } catch (_) {}
+    if (Array.isArray(bundles) && bundles.length > 0) {
+      return window.renderDynamicBundleCards(bundles);
+    }
+    return '';
   };
 
   // Live Slot Refresher - dynamically pulls latest Admin configuration
