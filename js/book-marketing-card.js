@@ -849,6 +849,14 @@
         0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.7)); }
         50% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.85)); }
       }
+      .festive-combos-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 14px;
+        width: 100%;
+        margin-bottom: 16px;
+        grid-column: 1 / -1;
+      }
       .festive-combo-card {
         position: relative;
         overflow: hidden;
@@ -861,9 +869,8 @@
         box-sizing: border-box;
         cursor: pointer;
         transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        grid-column: 1 / -1;
+        width: 100%;
       }
       .festive-combo-card:hover {
         transform: translateY(-3px);
@@ -1144,10 +1151,20 @@
     }
 
     return `
-      <div class="festive-combos-wrapper" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; width: 100%; margin-bottom: 16px;">
+      <div class="festive-combos-wrapper">
         ${bundles.map(b => renderSingleFestiveCardHTML(b)).join('')}
       </div>
     `;
+  };
+
+  window.refreshAllMegaDealSlots = function () {
+    const slots = document.querySelectorAll('#library-top-mega-deal-slot, .library-top-mega-deal-slot, .bundle-featured-promo-tray-slot');
+    if (slots.length > 0) {
+      const html = window.renderMegaDealBannerHTML();
+      slots.forEach(s => {
+        if (s) s.innerHTML = html;
+      });
+    }
   };
 
   window.renderBundlePromoCardHTML = function (bundleInput) {

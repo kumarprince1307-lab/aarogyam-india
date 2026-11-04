@@ -226,17 +226,34 @@ function calculateProfileProgress() {
 function initUserData() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     
-    // Auto-sync active status from Supabase in background for users like Rajesh Kumar (6009564859)
-    const checkMob = storedUser.mobile || (localStorage.getItem('aarogyam_user_phone') || '').replace(/\D/g, '').slice(-10);
+    // Auto-sync active status & purchases from Supabase immediately on page load
+    const checkMob = (storedUser.mobile || storedUser.phone || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
     if (checkMob && checkMob.length === 10) {
-      setTimeout(async () => {
+      (async () => {
         try {
           const db = getLibrarySupabaseClient();
           if (db) {
-            const { data: p } = await db.from('profiles').select('id, is_active, is_subscriber').or(`mobile.eq.${checkMob},mobile.eq.+91${checkMob}`).limit(1).maybeSingle();
+            // 1. Check profile active status
+            const { data: p } = await db.from('profiles').select('id, full_name, is_active, is_subscriber').or(`mobile.eq.${checkMob},mobile.eq.+91${checkMob},mobile.eq.91${checkMob}`).limit(1).maybeSingle();
+            let isUserActive = false;
+            let pId = p?.id || storedUser.id;
+
             if (p && (p.is_active || p.is_subscriber)) {
+              isUserActive = true;
+            }
+
+            // 2. Also check purchases table directly
+            if (pId) {
+              const { data: purs } = await db.from('purchases').select('id, book_id').eq('profile_id', pId);
+              if (Array.isArray(purs) && purs.length > 0) {
+                isUserActive = true;
+              }
+            }
+
+            if (isUserActive) {
               storedUser.is_active = true;
               storedUser.is_subscriber = true;
+              if (p?.full_name && !storedUser.full_name) storedUser.full_name = p.full_name;
               localStorage.setItem('user_is_active', 'true');
               localStorage.setItem('user_is_subscriber', 'true');
               localStorage.setItem('AI_USER', JSON.stringify(storedUser));
@@ -244,7 +261,7 @@ function initUserData() {
             }
           }
         } catch (_) {}
-      }, 300);
+      })();
     }
     
     const userName = storedUser.full_name || storedUser.name || "प्रिय पाठक";

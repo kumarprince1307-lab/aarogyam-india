@@ -1189,9 +1189,8 @@ if (typeof window !== 'undefined') {
 
     let promoTrayHTML = '';
     try {
-      if (typeof window.getOrFetchActiveBundle === 'function') {
-        const activeBundle = await window.getOrFetchActiveBundle();
-        if (activeBundle) promoTrayHTML = window.renderMegaDealBannerHTML(activeBundle);
+      if (typeof window.renderMegaDealBannerHTML === 'function') {
+        promoTrayHTML = window.renderMegaDealBannerHTML();
       } else if (typeof window.renderBundlePromoCardHTML === 'function') {
         promoTrayHTML = window.renderBundlePromoCardHTML();
       }
