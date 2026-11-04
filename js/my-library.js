@@ -633,7 +633,12 @@ async function renderLibrarySections(booksArray) {
     try {
       if (typeof window.getOrFetchActiveBundle === 'function') {
         window.getOrFetchActiveBundle().then(activeB => {
-          const slot = document.getElementById('library-bundle-promo-tray-slot');
+          // Render Mega Deal of the Day at Top of My Library (Amazon / Flipkart Style)
+    const topDealSlot = document.getElementById('library-top-mega-deal-slot');
+    if (topDealSlot && typeof window.renderMegaDealBannerHTML === 'function') {
+      topDealSlot.innerHTML = window.renderMegaDealBannerHTML();
+    }
+    const slot = document.getElementById('library-bundle-promo-tray-slot');
           if (slot && typeof window.renderBundlePromoCardHTML === 'function') {
             slot.innerHTML = window.renderBundlePromoCardHTML(activeB);
           }
@@ -943,7 +948,7 @@ async function renderLibrarySections(booksArray) {
         const isLiveAgri = !isComingSoonBook && !isStudioDemo && !isStudioBonus && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
-            let targetUrl = book.landingPage || (rawId === 'SUB001' ? '/subscription.html' : (rawId === 'BK001' ? '/ebooks/kharif-master-guide-2026.html' : (rawId === 'BK002' ? '/ebooks/kheti-dr.html' : `/ebooks/book-landing.html?id=${bookId}`)));
+            let targetUrl = book.landingPage || (rawId === 'SUB001' ? '/subscription.html' : `/ebooks/book-landing.html?id=${bookId}`);
 
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
                 const tempDiv = document.createElement('div');
@@ -965,7 +970,7 @@ async function renderLibrarySections(booksArray) {
                     </div>
                     <div class="book-btn-group" style="margin-top: 6px; display:flex; gap:6px;">
                         <a href="${targetUrl}" class="btn-available" style="flex:1;text-align:center;display:block;padding:9px;background:#E86A17;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;">Buy Now / Details</a>
-                        ${hasAudioBook ? `<a href="/ebooks/reader.html?book=${bookId}&audio=1" class="btn-audio" style="min-width:75px;padding:9px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो बुक सुनें">🎧 ऑडियो</a>` : ''}
+                        ${hasAudioBook ? `<a href="${targetUrl}" class="btn-audio" style="min-width:75px;padding:9px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;" title="ऑडियो विवरण देखें">🎧 ऑडियो</a>` : ''}
                     </div>
                 `;
                 if (availableGrid) availableGrid.appendChild(availCard);

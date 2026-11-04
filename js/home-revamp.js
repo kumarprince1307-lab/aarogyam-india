@@ -1191,7 +1191,7 @@ if (typeof window !== 'undefined') {
     try {
       if (typeof window.getOrFetchActiveBundle === 'function') {
         const activeBundle = await window.getOrFetchActiveBundle();
-        if (activeBundle) promoTrayHTML = window.renderBundlePromoCardHTML(activeBundle);
+        if (activeBundle) promoTrayHTML = window.renderMegaDealBannerHTML(activeBundle);
       } else if (typeof window.renderBundlePromoCardHTML === 'function') {
         promoTrayHTML = window.renderBundlePromoCardHTML();
       }
