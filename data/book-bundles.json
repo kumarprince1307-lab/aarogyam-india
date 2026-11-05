@@ -211,8 +211,8 @@
       "sec-final-cta": true,
       "bundleFloatingAudioPill": true
     },
-    "status": "active",
-    "updated_at": "2026-11-04T20:32:13.374Z"
+    "status": "inactive",
+    "updated_at": "2026-11-05T05:40:52.928Z"
   },
   {
     "id": "BUNDLE_KISAN_4IN1",
@@ -253,7 +253,7 @@
       "/images/books/kharif-master-guide-2026-preview-01.webp",
       "/images/books/kharif-master-guide-2026-preview-02.webp"
     ],
-    "status": "active",
-    "updated_at": "2026-11-04T20:32:14.227Z"
+    "status": "inactive",
+    "updated_at": "2026-11-05T05:40:53.867Z"
   }
 ]
