@@ -110,6 +110,16 @@
   const SB_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
   const SB_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
 
+  function getActiveDeviceId() {
+    try {
+      let t = localStorage.getItem('AI_DEVICE_TOKEN') || localStorage.getItem('sakhi_device_id');
+      if (!t && window.SakhiDeviceQuota && typeof window.SakhiDeviceQuota.getDeviceId === 'function') {
+        t = window.SakhiDeviceQuota.getDeviceId();
+      }
+      return t || '';
+    } catch (_) { return ''; }
+  }
+
   function updateUserRecord(record) {
     const store = getLocalStore();
     store[record.phone] = record;
@@ -122,58 +132,57 @@
   async function syncToSupabase(record) {
     try {
       const cleanPhone = String(record.phone || '').replace(/\D/g, '').slice(-10);
-      if (!cleanPhone || cleanPhone.length < 10) return;
+      const devId = getActiveDeviceId();
+      if (!cleanPhone && !devId) return;
 
       const durMs = record.blocked_until ? Math.max(0, record.blocked_until - Date.now()) : 0;
-      const hours = durMs > 0 ? Math.ceil(durMs / (1000 * 60 * 60)) : 0;
-      const blockTopic = record.blocked
-        ? `BLOCKED_UNTIL:${record.blocked_until}|${record.last_abuse_query || 'Admin Block (' + hours + 'h)'}`
-        : 'Active / Unblocked';
+      const blockedUntilIso = (record.blocked && record.blocked_until) ? new Date(record.blocked_until).toISOString() : null;
+      const reason = record.blocked ? (record.last_abuse_query || 'Blocked for violation') : null;
 
-      const sb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+      const headers = {
+        'apikey': SB_ANON_KEY,
+        'Authorization': `Bearer ${SB_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      };
 
-      if (sb) {
-        // 1. Live persistence in sakhi_user_insights
-        await sb.from('sakhi_user_insights').upsert([{
-          user_key: cleanPhone,
-          mobile: cleanPhone,
-          user_tone: record.blocked ? 'blocked' : 'active',
-          last_query_topic: blockTopic,
-          updated_at: new Date().toISOString()
-        }], { onConflict: 'user_key' });
-
-        // 2. Also update profiles table is_active flag
-        try {
-          await sb.from('profiles').update({ is_active: !record.blocked }).eq('mobile', cleanPhone);
-        } catch (_) {}
-      } else {
-        // Fallback: Direct REST API Upsert
-        const headers = {
-          'apikey': SB_ANON_KEY,
-          'Authorization': `Bearer ${SB_ANON_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates'
-        };
-        await fetch(`${SB_REST_URL}/sakhi_user_insights`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify([{
-            user_key: cleanPhone,
-            mobile: cleanPhone,
-            user_tone: record.blocked ? 'blocked' : 'active',
-            last_query_topic: blockTopic,
-            updated_at: new Date().toISOString()
-          }])
-        });
-        try {
-          await fetch(`${SB_REST_URL}/profiles?mobile=eq.${cleanPhone}`, {
+      if (cleanPhone && cleanPhone.length >= 10) {
+        if (record.blocked) {
+          // Dual Lock: Store phone + hardware device ID in sakhi_user_insights
+          await fetch(`${SB_REST_URL}/sakhi_user_insights`, {
+            method: 'POST',
+            headers: { ...headers, 'Prefer': 'resolution=merge-duplicates' },
+            body: JSON.stringify([{
+              user_key: cleanPhone,
+              mobile: cleanPhone,
+              device_id: devId || null,
+              is_blocked: true,
+              block_reason: reason,
+              blocked_until: blockedUntilIso,
+              updated_at: new Date().toISOString()
+            }])
+          });
+          if (record.blocked_until) {
+            localStorage.setItem('SAKHI_DEVICE_BLOCKED_UNTIL', String(record.blocked_until));
+            localStorage.setItem('SAKHI_DEVICE_BLOCKED_REASON', reason);
+          }
+        } else {
+          // Live Unblock in Supabase
+          await fetch(`${SB_REST_URL}/sakhi_user_insights?user_key=eq.${cleanPhone}`, {
             method: 'PATCH',
             headers,
-            body: JSON.stringify({ is_active: !record.blocked })
+            body: JSON.stringify({
+              is_blocked: false,
+              block_reason: null,
+              blocked_until: null,
+              updated_at: new Date().toISOString()
+            })
           });
-        } catch (_) {}
+          localStorage.removeItem('SAKHI_DEVICE_BLOCKED_UNTIL');
+          localStorage.removeItem('SAKHI_DEVICE_BLOCKED_REASON');
+        }
       }
-      console.log(`[Sakhi Moderation] Live Synced ${cleanPhone} to Supabase (blocked: ${record.blocked})`);
+
+      console.log(`[Sakhi Moderation] Live Synced to Supabase: phone=${cleanPhone}, dev=${devId}, blocked=${record.blocked}`);
     } catch (e) {
       console.warn('[Sakhi Moderation Supabase Sync Warning]:', e?.message);
     }
@@ -217,6 +226,21 @@
         }
         return false;
       }
+
+      // 1. Hardware Device-Level Lock Check (Persists across SIM/Mobile changes)
+      try {
+        const devUntil = parseInt(localStorage.getItem('SAKHI_DEVICE_BLOCKED_UNTIL') || '0', 10);
+        if (devUntil > 0) {
+          if (Date.now() < devUntil) {
+            return true;
+          } else {
+            localStorage.removeItem('SAKHI_DEVICE_BLOCKED_UNTIL');
+            localStorage.removeItem('SAKHI_DEVICE_BLOCKED_REASON');
+          }
+        }
+      } catch (_) {}
+
+      // 2. User phone level check
       const rec = getUserRecord(userPhone);
       if (!rec.blocked || !rec.blocked_until) return false;
 
@@ -237,9 +261,16 @@
      */
     getBlockRemainingTime: function (userPhone) {
       const rec = getUserRecord(userPhone);
-      if (!rec.blocked || !rec.blocked_until) return null;
+      let until = (rec && rec.blocked) ? rec.blocked_until : null;
+      if (!until) {
+        try {
+          const devUntil = parseInt(localStorage.getItem('SAKHI_DEVICE_BLOCKED_UNTIL') || '0', 10);
+          if (devUntil && Date.now() < devUntil) until = devUntil;
+        } catch (_) {}
+      }
+      if (!until) return null;
 
-      const diffMs = rec.blocked_until - Date.now();
+      const diffMs = until - Date.now();
       if (diffMs <= 0) return null;
 
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -416,22 +447,25 @@
      */
     adminBlockUser: function (phone, hours, reason) {
       if (!phone) return false;
-      const rec = getUserRecord(phone);
+      const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
+      const rec = getUserRecord(cleanPhone);
       rec.blocked = true;
       rec.block_count = (rec.block_count || 0) + 1;
       const dur = Number(hours) || 24;
       rec.blocked_until = Date.now() + (dur * 60 * 60 * 1000);
-      rec.last_abuse_query = reason || 'Admin Manual Block';
+      rec.last_abuse_query = reason || 'Admin Manual Block (' + dur + 'h)';
+      rec.strikes = 3;
       updateUserRecord(rec);
       return true;
     },
 
     /**
-     * Admin APIs: Manually unblock a user
+     * Admin APIs: Manually unblock a user (Guaranteed Supabase Sync)
      */
     adminUnblockUser: function (phone) {
       if (!phone) return false;
-      const rec = getUserRecord(phone);
+      const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
+      const rec = getUserRecord(cleanPhone);
       rec.blocked = false;
       rec.blocked_until = null;
       rec.strikes = 0;
@@ -459,47 +493,37 @@
     adminFetchLiveModerationList: async function () {
       const store = getLocalStore();
       try {
-        const sb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
-        let dbRows = [];
-        if (sb) {
-          const { data } = await sb.from('sakhi_user_insights').select('*').eq('user_tone', 'blocked');
-          if (data) dbRows = data;
-        } else {
-          const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?user_tone=eq.blocked&select=*`, {
-            headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
-          });
-          if (res.ok) dbRows = await res.json();
-        }
+        const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?is_blocked=eq.true&select=*`, {
+          headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
+        });
+        if (res.ok) {
+          const dbRows = await res.json();
+          if (Array.isArray(dbRows)) {
+            dbRows.forEach(row => {
+              const p = String(row.mobile || row.user_key || '').replace(/\D/g, '').slice(-10);
+              if (!p || p.length < 10) return;
 
-        if (Array.isArray(dbRows)) {
-          dbRows.forEach(row => {
-            const p = String(row.mobile || row.user_key || '').replace(/\D/g, '').slice(-10);
-            if (!p || p.length < 10) return;
-            
-            let blockedUntil = Date.now() + (24 * 60 * 60 * 1000);
-            let reason = 'Admin Live Blocked';
-            const topic = row.last_query_topic || '';
-            if (topic.startsWith('BLOCKED_UNTIL:')) {
-              const parts = topic.replace('BLOCKED_UNTIL:', '').split('|');
-              const parsedUntil = parseInt(parts[0], 10);
-              if (!isNaN(parsedUntil)) blockedUntil = parsedUntil;
-              if (parts[1]) reason = parts[1];
-            }
+              let blockedUntil = Date.now() + (24 * 60 * 60 * 1000);
+              if (row.blocked_until) {
+                const parsed = new Date(row.blocked_until).getTime();
+                if (!isNaN(parsed)) blockedUntil = parsed;
+              }
 
-            const isStillBlocked = Date.now() < blockedUntil;
+              const isStillBlocked = Date.now() < blockedUntil;
 
-            store[p] = {
-              phone: p,
-              strikes: isStillBlocked ? 3 : 0,
-              blocked: isStillBlocked,
-              blocked_until: isStillBlocked ? blockedUntil : null,
-              block_count: (store[p]?.block_count || 1),
-              last_abuse_at: row.updated_at || new Date().toISOString(),
-              last_abuse_query: reason,
-              history: store[p]?.history || []
-            };
-          });
-          saveLocalStore(store);
+              store[p] = {
+                phone: p,
+                strikes: isStillBlocked ? 3 : 0,
+                blocked: isStillBlocked,
+                blocked_until: isStillBlocked ? blockedUntil : null,
+                block_count: (store[p]?.block_count || 1),
+                last_abuse_at: row.updated_at || new Date().toISOString(),
+                last_abuse_query: row.block_reason || 'Live Admin Block',
+                history: store[p]?.history || []
+              };
+            });
+            saveLocalStore(store);
+          }
         }
       } catch (err) {
         console.warn('[Sakhi Moderation] Failed to fetch live blocked users from Supabase:', err);
@@ -508,54 +532,100 @@
     },
 
     /**
-     * Checks live block status against Supabase for active user
+     * Checks live block status against Supabase for active user and active device hardware
      */
     checkLiveBlockStatus: async function (phone) {
-      const p = String(phone || getActiveUserPhone() || '').replace(/\D/g, '').slice(-10);
-      if (!p || p.length < 10) return false;
-      if (p === '7974422572' || p === '7049294111') return false; // Superadmin protection
+      const cleanPhone = String(phone || getActiveUserPhone() || '').replace(/\D/g, '').slice(-10);
+      const devId = getActiveDeviceId();
+
+      // Superadmin bypass
+      if (cleanPhone === '7974422572' || cleanPhone === '7049294111') {
+        return false;
+      }
 
       try {
-        const sb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
-        let row = null;
-        if (sb) {
-          const { data } = await sb.from('sakhi_user_insights').select('user_tone, last_query_topic, updated_at').eq('user_key', p).maybeSingle();
-          row = data;
+        let queryUrl = `${SB_REST_URL}/sakhi_user_insights?is_blocked=eq.true&select=user_key,mobile,device_id,is_blocked,blocked_until,block_reason`;
+        if (cleanPhone && cleanPhone.length >= 10 && devId) {
+          queryUrl += `&or=(user_key.eq.${cleanPhone},mobile.eq.${cleanPhone},device_id.eq.${encodeURIComponent(devId)})`;
+        } else if (cleanPhone && cleanPhone.length >= 10) {
+          queryUrl += `&or=(user_key.eq.${cleanPhone},mobile.eq.${cleanPhone})`;
+        } else if (devId) {
+          queryUrl += `&device_id=eq.${encodeURIComponent(devId)}`;
         } else {
-          const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?user_key=eq.${p}&select=user_tone,last_query_topic,updated_at`, {
-            headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
-          });
-          if (res.ok) {
-            const arr = await res.json();
-            if (Array.isArray(arr) && arr.length > 0) row = arr[0];
-          }
+          return false;
         }
 
-        if (row && row.user_tone === 'blocked') {
+        const res = await fetch(queryUrl, {
+          headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
+        });
+        if (!res.ok) return this.isUserBlocked(cleanPhone);
+
+        const rows = await res.json();
+        const store = getLocalStore();
+
+        if (Array.isArray(rows) && rows.length > 0) {
+          const row = rows[0];
           let blockedUntil = Date.now() + (24 * 60 * 60 * 1000);
-          let reason = 'Admin Live Blocked';
-          const topic = row.last_query_topic || '';
-          if (topic.startsWith('BLOCKED_UNTIL:')) {
-            const parts = topic.replace('BLOCKED_UNTIL:', '').split('|');
-            const parsedUntil = parseInt(parts[0], 10);
-            if (!isNaN(parsedUntil)) blockedUntil = parsedUntil;
-            if (parts[1]) reason = parts[1];
+          if (row.blocked_until) {
+            const parsed = new Date(row.blocked_until).getTime();
+            if (!isNaN(parsed)) blockedUntil = parsed;
           }
 
-          if (Date.now() < blockedUntil) {
-            const rec = getUserRecord(p);
-            rec.blocked = true;
-            rec.blocked_until = blockedUntil;
-            rec.strikes = 3;
-            rec.last_abuse_query = reason;
-            const store = getLocalStore();
-            store[p] = rec;
-            saveLocalStore(store);
-            return true;
+          // Check if time expired
+          if (Date.now() >= blockedUntil) {
+            // Time naturally expired -> auto unblock in DB and local
+            fetch(`${SB_REST_URL}/sakhi_user_insights?user_key=eq.${encodeURIComponent(row.user_key)}`, {
+              method: 'PATCH',
+              headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ is_blocked: false, block_reason: null, blocked_until: null })
+            }).catch(() => {});
+
+            localStorage.removeItem('SAKHI_DEVICE_BLOCKED_UNTIL');
+            localStorage.removeItem('SAKHI_DEVICE_BLOCKED_REASON');
+
+            const key = cleanPhone || row.user_key;
+            if (store[key]) {
+              store[key].blocked = false;
+              store[key].blocked_until = null;
+              store[key].strikes = 0;
+              saveLocalStore(store);
+            }
+            return false;
           }
+
+          // STILL ACTIVELY BLOCKED!
+          const key = cleanPhone || row.user_key;
+          store[key] = {
+            phone: key,
+            strikes: 3,
+            blocked: true,
+            blocked_until: blockedUntil,
+            block_count: (store[key]?.block_count || 1),
+            last_abuse_at: row.updated_at || new Date().toISOString(),
+            last_abuse_query: row.block_reason || 'Live Blocked',
+            history: store[key]?.history || []
+          };
+          localStorage.setItem('SAKHI_DEVICE_BLOCKED_UNTIL', String(blockedUntil));
+          localStorage.setItem('SAKHI_DEVICE_BLOCKED_REASON', row.block_reason || 'Device Blocked');
+          saveLocalStore(store);
+          return true;
+        } else {
+          // No active block row in Supabase -> Unblocked by Admin!
+          localStorage.removeItem('SAKHI_DEVICE_BLOCKED_UNTIL');
+          localStorage.removeItem('SAKHI_DEVICE_BLOCKED_REASON');
+          const key = cleanPhone;
+          if (key && store[key] && store[key].blocked) {
+            store[key].blocked = false;
+            store[key].blocked_until = null;
+            store[key].strikes = 0;
+            saveLocalStore(store);
+          }
+          return false;
         }
-      } catch (_) {}
-      return false;
+      } catch (e) {
+        console.warn('[Sakhi Moderation] Check error:', e);
+        return this.isUserBlocked(cleanPhone);
+      }
     },
 
     adminGetModerationList: function () {
@@ -570,5 +640,6 @@
     }
   };
 
-  console.log('✅ [Sakhi Moderation Engine 1.0] Loaded & Active (3-Strike Auto-Block & Dissatisfaction Recovery)');
+  try { setTimeout(() => { root.SakhiModeration.checkLiveBlockStatus(); }, 200); } catch (_) {}
+  console.log('✅ [Sakhi Moderation Engine 1.0] Loaded & Active (Live Supabase Dual-Lock)');
 })();

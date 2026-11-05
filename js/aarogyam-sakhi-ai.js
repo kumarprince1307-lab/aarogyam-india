@@ -1457,6 +1457,7 @@ if (typeof document !== 'undefined') {
       const insightRecord = {
         user_key: userKey,
         mobile: phone || null,
+        device_id: deviceId || null,
         user_name: userName,
         primary_domain: persona.primary_domain || 'omni',
         domain_scores: persona.domain_scores || {},

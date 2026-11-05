@@ -4308,8 +4308,8 @@ window.adminBlockSakhiUser = async function(phone, hours) {
   }
   const h = hours || parseInt(document.getElementById('sakhiModBlockDuration')?.value || '24', 10);
   if (window.SakhiModeration && typeof window.SakhiModeration.adminBlockUser === 'function') {
-    window.SakhiModeration.adminBlockUser(cleanPhone, h, 'एडमिन मैनुअल ब्लॉक (' + h + 'h)');
-    alert('✅ यूज़र ' + cleanPhone + ' को ' + h + ' घंटे के लिए ब्लॉक कर दिया गया है। यह लाइव डेटाबेस (Supabase) में सेव हो गया है और रिफ्रेश के बाद भी ब्लॉक रहेगा।');
+    await window.SakhiModeration.adminBlockUser(cleanPhone, h, 'एडमिन मैनुअल ब्लॉक (' + h + 'h)');
+    alert('✅ यूज़र ' + cleanPhone + ' को ' + h + ' घंटे के लिए ब्लॉक कर दिया गया है। यह लाइव Supabase sakhi_user_insights में सेव हो गया है और रिफ्रेश के बाद भी ब्लॉक रहेगा।');
     await renderAdminModerationTable(false);
   }
 };
@@ -4321,7 +4321,7 @@ window.adminUnblockSakhiUser = async function(phone) {
     return;
   }
   if (window.SakhiModeration && typeof window.SakhiModeration.adminUnblockUser === 'function') {
-    window.SakhiModeration.adminUnblockUser(cleanPhone);
+    await window.SakhiModeration.adminUnblockUser(cleanPhone);
     alert('✅ यूज़र ' + cleanPhone + ' को सफलतापूर्वक अनब्लॉक कर दिया गया है (Live Supabase Synchronized)।');
     await renderAdminModerationTable(false);
   }
