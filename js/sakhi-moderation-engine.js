@@ -110,6 +110,10 @@
   const SB_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
   const SB_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
 
+  // Zero-Egress In-Memory Throttle Cache (prevents duplicate API queries)
+  let _lastLiveCheckTs = 0;
+  let _lastLiveCheckVal = false;
+
   function getActiveDeviceId() {
     try {
       let t = localStorage.getItem('AI_DEVICE_TOKEN') || localStorage.getItem('sakhi_device_id');
@@ -493,7 +497,7 @@
     adminFetchLiveModerationList: async function () {
       const store = getLocalStore();
       try {
-        const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?is_blocked=eq.true&select=*`, {
+        const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?is_blocked=eq.true&select=user_key,mobile,device_id,is_blocked,blocked_until,block_reason,updated_at&limit=50`, {
           headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
         });
         if (res.ok) {
@@ -532,15 +536,20 @@
     },
 
     /**
-     * Checks live block status against Supabase for active user and active device hardware
+     * Zero-Egress Guard: Throttled Live block check (Max 1 API call per 60s per session)
      */
-    checkLiveBlockStatus: async function (phone) {
+    checkLiveBlockStatus: async function (phone, force = false) {
       const cleanPhone = String(phone || getActiveUserPhone() || '').replace(/\D/g, '').slice(-10);
       const devId = getActiveDeviceId();
 
       // Superadmin bypass
       if (cleanPhone === '7974422572' || cleanPhone === '7049294111') {
         return false;
+      }
+
+      const now = Date.now();
+      if (!force && (now - _lastLiveCheckTs < 60000)) {
+        return _lastLiveCheckVal;
       }
 
       try {
@@ -608,6 +617,8 @@
           localStorage.setItem('SAKHI_DEVICE_BLOCKED_UNTIL', String(blockedUntil));
           localStorage.setItem('SAKHI_DEVICE_BLOCKED_REASON', row.block_reason || 'Device Blocked');
           saveLocalStore(store);
+          _lastLiveCheckTs = Date.now();
+          _lastLiveCheckVal = true;
           return true;
         } else {
           // No active block row in Supabase -> Unblocked by Admin!
@@ -620,6 +631,8 @@
             store[key].strikes = 0;
             saveLocalStore(store);
           }
+          _lastLiveCheckTs = Date.now();
+          _lastLiveCheckVal = false;
           return false;
         }
       } catch (e) {
