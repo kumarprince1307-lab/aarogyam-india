@@ -323,6 +323,135 @@ export async function fetchTodaysBirthdays() {
     }
 }
 
+// =========================================================================
+// LIGHTWEIGHT TODAY-PRIORITY DASHBOARD DATA (ULTRA-FAST < 200MS, ZERO-WAIT)
+// Loads ONLY Today's priority operational metrics:
+// 1. आज कितने जुड़े (Today's new profiles)
+// 2. किसने खरीदा (Today's successful purchases with buyer details)
+// 3. किसने ड्रॉप किया (Today's abandoned/failed checkouts for quick follow-up)
+// =========================================================================
+export async function fetchTodayPriorityDashboardData() {
+  try {
+    const db = window.dbClient;
+    if (!db) throw new Error("Supabase client not available.");
+
+    // IST / Local start of today (00:00:00)
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const todayIso = todayStart.toISOString();
+
+    // 3 lightning-fast indexed queries restricted to today
+    const [profilesRes, purchasesRes, checkoutRes] = await Promise.all([
+      db.from('profiles')
+        .select('id, full_name, mobile, created_at, registration_source')
+        .gte('created_at', todayIso)
+        .order('created_at', { ascending: false })
+        .limit(100),
+      db.from('purchases')
+        .select('id, profile_id, book_id, amount, purchase_date, payment_status')
+        .or('payment_status.eq.success,payment_status.is.null')
+        .gte('purchase_date', todayIso)
+        .order('purchase_date', { ascending: false })
+        .limit(100),
+      db.from('checkout_logs')
+        .select('id, profile_id, book_id, status, created_at')
+        .in('status', ['initiated', 'dropped', 'failed'])
+        .gte('created_at', todayIso)
+        .order('created_at', { ascending: false })
+        .limit(100)
+    ]);
+
+    const todayProfiles = profilesRes.data || [];
+    const todayPurchases = purchasesRes.data || [];
+    const rawCheckoutLogs = checkoutRes.data || [];
+
+    // Unique profile & book IDs needed for display
+    const neededProfileIds = [...new Set([
+      ...todayProfiles.map(p => p.id),
+      ...todayPurchases.map(p => p.profile_id),
+      ...rawCheckoutLogs.map(c => c.profile_id)
+    ].filter(Boolean))];
+
+    const neededBookIds = [...new Set([
+      ...todayPurchases.map(p => p.book_id),
+      ...rawCheckoutLogs.map(c => c.book_id)
+    ].filter(Boolean))];
+
+    const [extraProfilesRes, booksRes] = await Promise.all([
+      neededProfileIds.length > 0
+        ? db.from('profiles').select('id, full_name, mobile').in('id', neededProfileIds)
+        : Promise.resolve({ data: [] }),
+      neededBookIds.length > 0
+        ? db.from('books').select('id, title').in('id', neededBookIds)
+        : Promise.resolve({ data: [] })
+    ]);
+
+    const profilesMap = (extraProfilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
+    todayProfiles.forEach(p => { if (p && p.id) profilesMap[p.id] = p; });
+
+    const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b.title; return acc; }, {});
+
+    // Set of profileId_bookId that succeeded today
+    const successPurchaseSet = new Set(todayPurchases.map(p => `${p.profile_id}_${p.book_id}`));
+
+    // Deduplicate and filter dropped logs
+    const droppedMap = new Map();
+    for (const log of rawCheckoutLogs) {
+      if (!log.profile_id) continue;
+      const key = `${log.profile_id}_${log.book_id}`;
+      if (successPurchaseSet.has(key)) continue; // Already bought today!
+      if (!droppedMap.has(key)) {
+        const prof = profilesMap[log.profile_id] || {};
+        droppedMap.set(key, {
+          id: log.id,
+          profile_id: log.profile_id,
+          book_id: log.book_id,
+          book_title: booksMap[log.book_id] || log.book_id || 'ई-बुक',
+          status: log.status,
+          created_at: log.created_at,
+          customer_name: prof.full_name || 'किसान साथी',
+          customer_mobile: prof.mobile || ''
+        });
+      }
+    }
+    const todayDropped = Array.from(droppedMap.values());
+
+    const enrichedPurchases = todayPurchases.map(p => {
+      const prof = profilesMap[p.profile_id] || {};
+      return {
+        id: p.id,
+        profile_id: p.profile_id,
+        book_id: p.book_id,
+        book_title: booksMap[p.book_id] || p.book_id || 'ई-बुक',
+        amount: p.amount || 0,
+        purchase_date: p.purchase_date,
+        customer_name: prof.full_name || 'अज्ञात खरीदार',
+        customer_mobile: prof.mobile || ''
+      };
+    });
+
+    const totalRevenueToday = enrichedPurchases.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    return {
+      success: true,
+      data: {
+        todayCount: {
+          joined: todayProfiles.length,
+          purchased: enrichedPurchases.length,
+          revenue: totalRevenueToday,
+          dropped: todayDropped.length
+        },
+        todayProfiles,
+        todayPurchases: enrichedPurchases,
+        todayDropped
+      }
+    };
+  } catch (error) {
+    console.error("fetchTodayPriorityDashboardData error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 export async function fetchDashboardData(params = {}) {
   const cacheKey = `dashboard_${params.startDate || 'def'}_${params.endDate || 'def'}`;
   const cached = _adminMemoryCache.get(cacheKey);

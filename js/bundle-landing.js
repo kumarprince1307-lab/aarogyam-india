@@ -376,7 +376,7 @@
       let diff = (idx - _fanCenterIdx + total) % total;
       if (diff > total / 2) diff -= total;
 
-      item.className = 'bundle-fan-book-item';
+      item.className = 'bundle-fan-book-item bundle-fan-book';
       if (diff === 0) {
         item.classList.add('fan-slot-center');
       } else if (diff === -1) {
@@ -447,7 +447,7 @@
     stackEl.innerHTML = _fanBooks.map((b, idx) => {
       return `
         <div 
-          class="bundle-fan-book-item" 
+          class="bundle-fan-book-item bundle-fan-book" 
           data-book-idx="${idx}" 
           data-book-id="${escapeHtml(b.id)}"
           title="${escapeHtml(b.title)} - क्लिक करके अंदर देखें"
