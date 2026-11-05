@@ -1082,6 +1082,13 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
     };
 
     localStorage.setItem('SAKHI_CUSTOM_USER_QUOTAS', JSON.stringify(customMap));
+    if (window.SakhiModeration) {
+      if (blocked && typeof window.SakhiModeration.adminBlockUser === 'function') {
+        window.SakhiModeration.adminBlockUser(cleanMobile, 24, 'Admin Users Modal Block');
+      } else if (!blocked && typeof window.SakhiModeration.adminUnblockUser === 'function') {
+        window.SakhiModeration.adminUnblockUser(cleanMobile);
+      }
+    }
     alert(`✅ ${name} (${cleanMobile}) के सखी AI क्रेडिट सफलतापूर्वक अपडेट किए गए!`);
     modal.remove();
   };

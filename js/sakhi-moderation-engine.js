@@ -107,30 +107,75 @@
     };
   }
 
+  const SB_REST_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1';
+  const SB_ANON_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+
   function updateUserRecord(record) {
     const store = getLocalStore();
     store[record.phone] = record;
     saveLocalStore(store);
 
-    // Asynchronously sync to Supabase if connected
-    syncToSupabase(record);
+    // Live sync to Supabase (Database Backed)
+    return syncToSupabase(record);
   }
 
   async function syncToSupabase(record) {
     try {
-      const sb = window.dbClient || window.supabase;
-      if (!sb || typeof sb.from !== 'function') return;
-      await sb.from(SUPABASE_TABLE).upsert([{
-        phone: record.phone,
-        strikes: record.strikes,
-        blocked: record.blocked,
-        blocked_until: record.blocked_until ? new Date(record.blocked_until).toISOString() : null,
-        block_count: record.block_count || 0,
-        last_abuse_query: record.last_abuse_query || '',
-        updated_at: new Date().toISOString()
-      }], { onConflict: 'phone' });
+      const cleanPhone = String(record.phone || '').replace(/\D/g, '').slice(-10);
+      if (!cleanPhone || cleanPhone.length < 10) return;
+
+      const durMs = record.blocked_until ? Math.max(0, record.blocked_until - Date.now()) : 0;
+      const hours = durMs > 0 ? Math.ceil(durMs / (1000 * 60 * 60)) : 0;
+      const blockTopic = record.blocked
+        ? `BLOCKED_UNTIL:${record.blocked_until}|${record.last_abuse_query || 'Admin Block (' + hours + 'h)'}`
+        : 'Active / Unblocked';
+
+      const sb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+
+      if (sb) {
+        // 1. Live persistence in sakhi_user_insights
+        await sb.from('sakhi_user_insights').upsert([{
+          user_key: cleanPhone,
+          mobile: cleanPhone,
+          user_tone: record.blocked ? 'blocked' : 'active',
+          last_query_topic: blockTopic,
+          updated_at: new Date().toISOString()
+        }], { onConflict: 'user_key' });
+
+        // 2. Also update profiles table is_active flag
+        try {
+          await sb.from('profiles').update({ is_active: !record.blocked }).eq('mobile', cleanPhone);
+        } catch (_) {}
+      } else {
+        // Fallback: Direct REST API Upsert
+        const headers = {
+          'apikey': SB_ANON_KEY,
+          'Authorization': `Bearer ${SB_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        };
+        await fetch(`${SB_REST_URL}/sakhi_user_insights`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify([{
+            user_key: cleanPhone,
+            mobile: cleanPhone,
+            user_tone: record.blocked ? 'blocked' : 'active',
+            last_query_topic: blockTopic,
+            updated_at: new Date().toISOString()
+          }])
+        });
+        try {
+          await fetch(`${SB_REST_URL}/profiles?mobile=eq.${cleanPhone}`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify({ is_active: !record.blocked })
+          });
+        } catch (_) {}
+      }
+      console.log(`[Sakhi Moderation] Live Synced ${cleanPhone} to Supabase (blocked: ${record.blocked})`);
     } catch (e) {
-      console.debug('[Sakhi Moderation Supabase Sync Notice]:', e?.message);
+      console.warn('[Sakhi Moderation Supabase Sync Warning]:', e?.message);
     }
   }
 
@@ -408,10 +453,114 @@
     /**
      * Admin APIs: List all moderated/blocked users
      */
+    /**
+     * Admin APIs: Asynchronously fetch live blocked users from Supabase and merge with local store
+     */
+    adminFetchLiveModerationList: async function () {
+      const store = getLocalStore();
+      try {
+        const sb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+        let dbRows = [];
+        if (sb) {
+          const { data } = await sb.from('sakhi_user_insights').select('*').eq('user_tone', 'blocked');
+          if (data) dbRows = data;
+        } else {
+          const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?user_tone=eq.blocked&select=*`, {
+            headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
+          });
+          if (res.ok) dbRows = await res.json();
+        }
+
+        if (Array.isArray(dbRows)) {
+          dbRows.forEach(row => {
+            const p = String(row.mobile || row.user_key || '').replace(/\D/g, '').slice(-10);
+            if (!p || p.length < 10) return;
+            
+            let blockedUntil = Date.now() + (24 * 60 * 60 * 1000);
+            let reason = 'Admin Live Blocked';
+            const topic = row.last_query_topic || '';
+            if (topic.startsWith('BLOCKED_UNTIL:')) {
+              const parts = topic.replace('BLOCKED_UNTIL:', '').split('|');
+              const parsedUntil = parseInt(parts[0], 10);
+              if (!isNaN(parsedUntil)) blockedUntil = parsedUntil;
+              if (parts[1]) reason = parts[1];
+            }
+
+            const isStillBlocked = Date.now() < blockedUntil;
+
+            store[p] = {
+              phone: p,
+              strikes: isStillBlocked ? 3 : 0,
+              blocked: isStillBlocked,
+              blocked_until: isStillBlocked ? blockedUntil : null,
+              block_count: (store[p]?.block_count || 1),
+              last_abuse_at: row.updated_at || new Date().toISOString(),
+              last_abuse_query: reason,
+              history: store[p]?.history || []
+            };
+          });
+          saveLocalStore(store);
+        }
+      } catch (err) {
+        console.warn('[Sakhi Moderation] Failed to fetch live blocked users from Supabase:', err);
+      }
+      return this.adminGetModerationList();
+    },
+
+    /**
+     * Checks live block status against Supabase for active user
+     */
+    checkLiveBlockStatus: async function (phone) {
+      const p = String(phone || getActiveUserPhone() || '').replace(/\D/g, '').slice(-10);
+      if (!p || p.length < 10) return false;
+      if (p === '7974422572' || p === '7049294111') return false; // Superadmin protection
+
+      try {
+        const sb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+        let row = null;
+        if (sb) {
+          const { data } = await sb.from('sakhi_user_insights').select('user_tone, last_query_topic, updated_at').eq('user_key', p).maybeSingle();
+          row = data;
+        } else {
+          const res = await fetch(`${SB_REST_URL}/sakhi_user_insights?user_key=eq.${p}&select=user_tone,last_query_topic,updated_at`, {
+            headers: { 'apikey': SB_ANON_KEY, 'Authorization': `Bearer ${SB_ANON_KEY}` }
+          });
+          if (res.ok) {
+            const arr = await res.json();
+            if (Array.isArray(arr) && arr.length > 0) row = arr[0];
+          }
+        }
+
+        if (row && row.user_tone === 'blocked') {
+          let blockedUntil = Date.now() + (24 * 60 * 60 * 1000);
+          let reason = 'Admin Live Blocked';
+          const topic = row.last_query_topic || '';
+          if (topic.startsWith('BLOCKED_UNTIL:')) {
+            const parts = topic.replace('BLOCKED_UNTIL:', '').split('|');
+            const parsedUntil = parseInt(parts[0], 10);
+            if (!isNaN(parsedUntil)) blockedUntil = parsedUntil;
+            if (parts[1]) reason = parts[1];
+          }
+
+          if (Date.now() < blockedUntil) {
+            const rec = getUserRecord(p);
+            rec.blocked = true;
+            rec.blocked_until = blockedUntil;
+            rec.strikes = 3;
+            rec.last_abuse_query = reason;
+            const store = getLocalStore();
+            store[p] = rec;
+            saveLocalStore(store);
+            return true;
+          }
+        }
+      } catch (_) {}
+      return false;
+    },
+
     adminGetModerationList: function () {
       const store = getLocalStore();
       const list = Object.values(store);
-      // Sort: blocked first, then by strikes desc
       list.sort((a, b) => {
         if (a.blocked && !b.blocked) return -1;
         if (!a.blocked && b.blocked) return 1;
