@@ -484,9 +484,27 @@
     // Fast, lightweight and responsive Google Gemini model cascade
     const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
 
+    // Dynamic Persona & Salutation Guide based on actual user profile (SAKHI_MANAS.md Protocol)
+    let userSalutationRule = 'शुरुआत आत्मीय व सम्मानजनक अभिवादन से करें (जैसे "राम-राम जी!", "नमस्ते जी!")। कभी भी "भाई/बहन" स्लैश न लगाएं।';
+    try {
+      let prof = {};
+      try { prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
+      const rawName = (typeof localStorage !== 'undefined' ? (localStorage.getItem('aarogyam_user_name') || localStorage.getItem('SAKHI_USER_NAME') || prof.name || '') : '').trim();
+      const cleanName = rawName.replace(/^(श्री|श्रीमती|सुश्री|डॉ|डॉक्टर|mr|mrs|ms)\.?\s*/gi, '').replace(/\s*(जी|ji|bhai|भाई|didi|दीदी)$/gi, '').trim();
+      const gender = (prof.gender || '').toLowerCase();
+      
+      if (gender === 'female') {
+        userSalutationRule = `उपयोगकर्ता महिला हैं${cleanName ? ` (नाम: "${cleanName}")` : ''}। उन्हें सम्मानपूर्वक "नमस्ते ${cleanName ? cleanName + ' दीदी' : 'दीदी / बहन जी'}!" या "राम-राम दीदी!" से संबोधित करें। कभी भी "भाई/बहन" स्लैश न लगाएं।`;
+      } else if (gender === 'male' || (cleanName && !['user', 'guest', 'farmer'].includes(cleanName.toLowerCase()))) {
+        userSalutationRule = `उपयोगकर्ता पुरुष हैं${cleanName ? ` (नाम: "${cleanName}")` : ''}। उन्हें सम्मानपूर्वक "राम-राम ${cleanName ? cleanName + ' भाई' : 'किसान साथी'}!" या "नमस्ते ${cleanName ? cleanName + ' जी' : 'भाई जी'}!" से संबोधित करें। कभी भी "भाई/बहन" स्लैश न लगाएं।`;
+      } else if (cleanName) {
+        userSalutationRule = `उपयोगकर्ता का नाम "${cleanName}" है। उन्हें सम्मानपूर्वक "नमस्ते ${cleanName} जी!" या "राम-राम जी!" से संबोधित करें। कभी भी "भाई/बहन" स्लैश न लगाएं।`;
+      }
+    } catch (_) { }
+
     const systemInstruction = `आप "आरोग्यम सखी AI" (Aarogyam Sakhi AI) हैं — भारतीय किसानों, पशुपालकों और ग्रामीण परिवारों की आत्मीय, बुद्धिमान और भरोसेमंद डिजिटल सखी।
 उपयोगकर्ता के सवाल का जवाब देते समय इन नियमों का अक्षरशः पालन करें:
-1. शुरुआत आत्मीय व सम्मानजनक अभिवादन से करें (जैसे "नमस्ते भाई/बहन!", "राम-राम जी!")।
+1. ${userSalutationRule}
 2. जवाब को 3 से 4 स्पष्ट, व्यावहारिक और उपयोगी बुलेट पॉइंट्स में समझाएं।
 3. कोई अनावश्यक लंबा भाषण, विदेशी इतिहास या अंग्रेजी के कठिन शब्द न लिखें।
 4. यदि कृषि, पशुपालन या स्वास्थ्य का विषय हो तो सटीक, सुरक्षित और आजमाया हुआ देसी/वैज्ञानिक उपाय बताएं।`;

@@ -1187,17 +1187,6 @@ if (typeof window !== 'undefined') {
       return 0;
     });
 
-    let promoTrayHTML = '';
-    try {
-      if (typeof window.renderMegaDealBannerHTML === 'function') {
-        promoTrayHTML = window.renderMegaDealBannerHTML();
-      } else if (typeof window.renderBundlePromoCardHTML === 'function') {
-        promoTrayHTML = window.renderBundlePromoCardHTML();
-      }
-    } catch (_) {}
-
-    const promoSlotHTML = `<div id="home-top-mega-deal-slot" class="aarogyam-mega-deal-slot" style="grid-column: 1 / -1; width: 100%; margin-bottom: 20px; ${promoTrayHTML ? 'display:block;' : 'display:none;'};">${promoTrayHTML}</div>`;
-
     // Auto-refresh dynamic combo slots after bestsellers render
     setTimeout(() => {
       if (typeof window.refreshAllMegaDealSlots === 'function') {
@@ -1205,7 +1194,7 @@ if (typeof window !== 'undefined') {
       }
     }, 50);
 
-    grid.innerHTML = promoSlotHTML + uniqueBestsellers.map(book => `
+    grid.innerHTML = uniqueBestsellers.map(book => `
       <div class="shelf-book-card" style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">
         <div class="kindle-book-cover-3d" style="width:110px;height:150px;flex-shrink:0;cursor:pointer;" onclick="window.location.href='${book.link}'">
           <img src="${book.image}" alt="${book.title}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 12px 12px 6px;box-shadow:-6px 8px 20px rgba(0,0,0,0.35);" />

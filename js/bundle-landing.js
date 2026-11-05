@@ -1176,7 +1176,7 @@
     const pill = document.getElementById('bundleFloatingAudioPill');
     if (pill) {
       pill.style.display = 'none';
-      try { sessionStorage.setItem('AIM_BUNDLE_AUDIO_CLOSED', 'true'); } catch (_) {}
+      try { sessionStorage.setItem('AIM_BUNDLE_AUDIO_CLOSED', 'true'); } catch (_) { }
     }
   };
   window.stopBundleAudio = window.closeBundleAudioPill;
@@ -1219,12 +1219,16 @@
 
     // 2. Section Reordering
     if (Array.isArray(bundle.sectionOrder) && bundle.sectionOrder.length > 0) {
-      const anchor = document.getElementById('bundleStickyBar') || document.querySelector('footer');
-      if (anchor && anchor.parentNode) {
+      const headerEl = document.getElementById('header') || document.querySelector('header');
+      const footerEl = document.querySelector('footer.site-footer') || document.querySelector('footer');
+      if (footerEl && footerEl.parentNode) {
         bundle.sectionOrder.forEach(secId => {
           const secEl = document.getElementById(secId);
-          if (secEl && secEl.parentNode === anchor.parentNode) {
-            anchor.parentNode.insertBefore(secEl, anchor);
+          if (!secEl) return;
+          if (secId === 'sec-top-ribbon' && headerEl && headerEl.parentNode) {
+            headerEl.parentNode.insertBefore(secEl, headerEl);
+          } else if (secEl !== footerEl && secEl.parentNode === footerEl.parentNode) {
+            footerEl.parentNode.insertBefore(secEl, footerEl);
           }
         });
       }

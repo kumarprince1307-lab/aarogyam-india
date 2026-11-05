@@ -35,7 +35,6 @@ window.askSakhiQuick = function (queryText) {
   window.sendSakhiSuggestion(queryText);
 };
 
-
 // Language Dropdown Toggle & Selection Handler
 window.toggleSakhiLangDropdown = function () {
   const menu = document.getElementById('sakhiLangDropdownMenu');
@@ -1515,7 +1514,6 @@ if (typeof document !== 'undefined') {
     }
   }
 
-
   function updateSakhiUserPersonaFromQuery(cleanQ, detectedDomain) {
     const p = loadSakhiUserPersona();
     p.interaction_count = (p.interaction_count || 0) + 1;
@@ -2165,7 +2163,6 @@ if (typeof document !== 'undefined') {
     });
   }
 
-
   // 6. USER BADGE IN SAKHI HEADER
   function updateSakhiHeaderUserBadge() {
     const wrap = document.getElementById('sakhiHeaderUserBadgeWrap');
@@ -2244,7 +2241,6 @@ if (typeof document !== 'undefined') {
       console.warn('[Sakhi AI] STT setup note:', e);
     }
   }
-
 
   function toggleRecording() {
     // Immediately stop any TTS speech so the user can speak freely
@@ -2807,7 +2803,6 @@ if (typeof document !== 'undefined') {
     }
   };
 
-
   function getAuthoritativeShareId() {
     try {
       if (window.V1_SESSION && typeof window.V1_SESSION.getUserShareId === 'function') {
@@ -3272,7 +3267,6 @@ if (typeof document !== 'undefined') {
     parent.appendChild(pop);
   };
 
-
   function saveChatLogItem(role, content, speech, imgMeta) {
     try {
       const phone = getUserPhone() || 'user';
@@ -3493,7 +3487,6 @@ if (typeof document !== 'undefined') {
     if (ind) ind.remove();
   }
 
-
   // =========================================================================
   // 📚 CHATGPT-STYLE CONTEXTUAL INLINE E-BOOK / PRODUCT AD SYSTEM
   // Keyword-driven, non-intrusive, dismissible, zero localStorage bloat
@@ -3694,6 +3687,21 @@ if (typeof document !== 'undefined') {
     // Strip any mid-bubble action toolbar to ensure toolbar is always cleanly at the bottom
     if (finalHtml.includes('sakhi-msg-actions-toolbar')) {
       finalHtml = finalHtml.replace(/<div class="sakhi-msg-actions-toolbar"[\s\S]*?<\/div>\s*(?=<div|$)/g, '');
+    }
+
+    // 💡 PROACTIVE CARE & DOSE FOLLOW-UP ENGINE (User Haal-chaal & Treatment Feedback)
+    const hasMedicationOrDosage = /(?:ml\s*प्रति|ग्राम\s*प्रति|स्प्रे\s*शेड्यूल|खुराक|डोज़|डोज|लीटर\s*पानी)/i.test(finalHtml);
+    if (window._sakhiChatAdCounter >= 2 && hasMedicationOrDosage && !finalHtml.includes('sakhi-block-card') && !finalHtml.includes('deescalation_card')) {
+      finalHtml += `
+        <div class="sakhi-care-followup" style="margin-top:10px;padding:9px 12px;background:#f0fdf4;border-left:3.5px solid #16a34a;border-radius:0 10px 10px 0;font-size:0.83rem;color:#166534;line-height:1.5;">
+          <strong>💡 सखी आत्मीय हाल-चाल:</strong> अन्नदाता, क्या आपने सुझाई गई दवा/नुस्खे का प्रयोग किया था? खुराक (डोज़) सही रही या फसल/पशु में कोई सुधार दिखा?
+        </div>
+      `;
+      // Enhance followupChips if available to provide 1-tap feedback
+      if (Array.isArray(followupChips) && followupChips.length > 0 && !followupChips.some(c => (c.text || '').includes('सुधार'))) {
+        followupChips.push({ text: '✅ फायदा हुआ • आगे बताएं', query: 'दवा से फायदा हुआ है आगे का स्प्रे और प्लान बताएं' });
+        followupChips.push({ text: '⚠️ सुधार नहीं दिखा • अन्य उपाय दें', query: 'दवा से सुधार नहीं दिखा कोई दूसरा उपाय या कारण बताएं' });
+      }
     }
 
     // Append follow-up chips if passed
@@ -3959,10 +3967,11 @@ if (typeof document !== 'undefined') {
           if (Array.isArray(arr) && arr.length > 0) {
             for (let j = arr.length - 1; j >= 0; j--) {
               const item = arr[j];
+              if (item.role && item.role !== 'user') continue;
               const content = item.content || item.sawal || item.q || '';
-              if (content && typeof content === 'string' && !content.includes('{') && !content.startsWith('[')) {
-                const cleaned = content.replace(/[?।!,]+/g, '').trim();
-                if (cleaned.length > 3) return cleaned.slice(0, 80);
+              if (content && typeof content === 'string' && !content.includes('{') && !content.startsWith('[') && !content.includes('<div') && !content.includes('style=')) {
+                const cleaned = content.replace(/<[^>]+>/g, '').replace(/[?।!,]+/g, '').trim();
+                if (cleaned.length > 3 && !cleaned.includes('class=')) return cleaned.slice(0, 80);
               }
             }
           }
@@ -4034,6 +4043,29 @@ if (typeof document !== 'undefined') {
         `;
       }
 
+      let prof = {};
+      try { prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
+      const needsProfileCapture = !prof.gender || prof.gender === 'unknown';
+      let profilePromptHtml = '';
+      if (needsProfileCapture) {
+        profilePromptHtml = `
+          <div id="sakhiCompactProfilePrompt" style="margin-top:10px;background:#fefce8;border:1.5px solid #facc15;border-radius:12px;padding:9px 12px;">
+            <div style="font-size:0.80rem;font-weight:800;color:#854d0e;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <span>🌸</span> <span>सटीक व्यक्तिगत आदर व सलाह हेतु आपकी पहचान:</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+              <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('gender', 'male', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:16px;border:1px solid #86efac;cursor:pointer;">👨 पुरुष (भाई/काका)</button>
+              <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('gender', 'female', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:16px;border:1px solid #86efac;cursor:pointer;">👩 महिला (बहन/दीदी)</button>
+              <span style="font-size:0.75rem;color:#a16207;margin-left:2px;">|</span>
+              <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '18-35', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;font-weight:700;padding:4px 8px;border-radius:16px;border:1px solid #86efac;cursor:pointer;">🧒 युवा</button>
+              <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '36-55', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;font-weight:700;padding:4px 8px;border-radius:16px;border:1px solid #86efac;cursor:pointer;">🧑 मध्यम आयु</button>
+              <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('ageGroup', '55+', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;font-weight:700;padding:4px 8px;border-radius:16px;border:1px solid #86efac;cursor:pointer;">🧓 वरिष्ठ</button>
+            </div>
+            <div id="sakhiCompactProfileMsg" style="display:none;font-size:0.76rem;color:#15803d;font-weight:800;margin-top:6px;"></div>
+          </div>
+        `;
+      }
+
       wrap.innerHTML = `
         <div style="display:flex;justify-content:center;margin-bottom:8px;width:100%;">
           <div class="sakhi-ai-badge-chip-center">
@@ -4051,6 +4083,7 @@ if (typeof document !== 'undefined') {
                 मैं आपकी <strong>सखी AI</strong> हूँ। कोई भी सवाल पूछें या मेनू देखें, मैं सही समाधान दूँगी।
               </div>
               ${reviewOrSuggestionsHtml}
+              ${profilePromptHtml}
               <div style="font-size:0.75rem;color:#64748b;font-weight:600;margin-top:10px;text-align:right;">
                 ${timeStr}
               </div>
@@ -4316,6 +4349,14 @@ if (typeof document !== 'undefined') {
     stopAllSpeech();
 
     // 🛡️ Rapid-Fire Automated Flood Protection (Anti-Hammering Security)
+    // 🛡️ User Moderation: Check if active user is suspended / blocked
+    if (window.SakhiModeration && typeof window.SakhiModeration.isUserBlocked === 'function' && window.SakhiModeration.isUserBlocked()) {
+      appendUserMessage(query);
+      const blockCardHtml = window.SakhiModeration.renderBlockCard();
+      streamBotMessage(blockCardHtml, 'आपका खाता अस्थायी रूप से ब्लॉक है। कृपया मर्यादा का ध्यान रखें या सहायता टीम से संपर्क करें।');
+      return;
+    }
+
     window._sakhiQueryFloodLog = window._sakhiQueryFloodLog || [];
     const _nowFlood = Date.now();
     window._sakhiQueryFloodLog = window._sakhiQueryFloodLog.filter(ts => _nowFlood - ts < 60000);
@@ -4433,7 +4474,28 @@ if (typeof document !== 'undefined') {
     }
 
     // Vulgar & Asocial Word Moderation Shield
-    if (checkVulgarOrAsocialContent(query)) {
+    // 🛡️ Comprehensive Abuse & Profanity Moderation Shield with 3-Strike Escalation
+    const isQueryAbusive = (window.SakhiModeration && typeof window.SakhiModeration.isAbusive === 'function' && window.SakhiModeration.isAbusive(query)) || checkVulgarOrAsocialContent(query);
+    if (isQueryAbusive) {
+      appendUserMessage(query);
+      let guardHtml = '';
+      let guardSpeech = '';
+      if (window.SakhiModeration && typeof window.SakhiModeration.recordStrike === 'function') {
+        const strikeRes = window.SakhiModeration.recordStrike(query);
+        guardHtml = strikeRes.cardHtml || strikeRes.html;
+        guardSpeech = strikeRes.speech || strikeRes.spokenText;
+      } else {
+        guardHtml = politeGuardHtml;
+        guardSpeech = 'कृपया मर्यादित और सम्मानजनक भाषा का प्रयोग करें। हम आपकी सहायता के लिए सदैव तत्पर हैं।';
+      }
+      streamBotMessage(guardHtml, guardSpeech, [
+        { text: '🌾 फसल व जैविक खेती सलाह', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' },
+        { text: '🐄 पशु दूध व फैट वृद्धि', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
+        { text: '🩺 स्वास्थ्य व डाइट परामर्श', query: 'दैनिक स्वास्थ्य और शुगर बीपी डाइट चेकलिस्ट बनाओ' }
+      ]);
+      return;
+    }
+    if (false && checkVulgarOrAsocialContent(query)) {
       appendUserMessage(query);
       const politeGuardHtml = `
         <div style="background:#fff1f2;border:1.5px solid #fda4af;border-radius:18px;padding:16px;box-shadow:0 4px 14px rgba(225,29,72,0.08);">
@@ -4517,7 +4579,29 @@ if (typeof document !== 'undefined') {
       }
 
       // Direct Clean Normalization & Processing
-      const cleanNormQ = normalizeQueryText(effectiveQuery);
+      let cleanNormQ = normalizeQueryText(effectiveQuery);
+
+      // 🛡️ User Frustration & Wrong-Answer Context Breaker (Prevents Lauki vs Wheat Context Trap)
+      if (window.SakhiModeration && typeof window.SakhiModeration.isFrustrated === 'function' && window.SakhiModeration.isFrustrated(cleanNormQ)) {
+        const recovery = window.SakhiModeration.recoverFromFrustration(cleanNormQ);
+        if (typeof sakhiConversationState !== 'undefined' && sakhiConversationState) {
+          sakhiConversationState.lastActiveCrop = null;
+          sakhiConversationState.lastActiveEntity = null;
+          sakhiConversationState.lastActiveEntityName = '';
+        }
+        const cleanedSub = (recovery && recovery.refinedQuery ? recovery.refinedQuery : '').replace(/[?।,!]/g, '').trim();
+        const isPureComplaint = /(?:गलत\s*जवाब|दिमाग\s*खराब|गलत\s*बोल|गलत\s*बता|कुछ\s*भी|बकवास|उल्टा\s*जवाब)/i.test(cleanNormQ) && cleanedSub.split(/\s+/).length <= 4 && !/(?:अमिताभ|बच्चन|प्रेमचंद|लौकी|संतरा|अनार|चीकू|गेहूं|धान)/i.test(cleanedSub);
+        
+        if (isPureComplaint) {
+          if (typeof handleMisunderstandingAndDeescalation === 'function') {
+            handleMisunderstandingAndDeescalation(cleanNormQ, query);
+            return;
+          }
+        } else if (cleanedSub.length >= 2) {
+          cleanNormQ = normalizeQueryText(cleanedSub);
+          effectiveQuery = cleanedSub;
+        }
+      }
 
       // EXPLICIT LIVE SEARCH OVERRIDE (User specifically asked to search / khojo)
       const isExplicitLiveSearch = /(?:सर्च\s*कर|खोज\s*कर|गूगल|विकी|wikipedia|\bsearch\b|\bkhoj\b|इंटरनेट\s*पर)/i.test(cleanNormQ);
@@ -5305,7 +5389,6 @@ if (typeof document !== 'undefined') {
     return false;
   }
 
-
   // A. Emotional Distress & Loss Empathy Guard
   function handleEmotionalDistressReassurance(cleanQ, rawQ) {
     const isDistressed = /(?:बहुत\s*नुकसान|सब\s*बर्बाद|फसल\s*बर्बाद|रोने\s*का\s*मन|कर्ज\s*हो\s*गया|तबीयत\s*बहुत\s*खराब|बहुत\s*परेशान|हताश\s*हूँ|जान\s*परेशान|शर्मिंदगी)/i.test(cleanQ);
@@ -5462,7 +5545,6 @@ if (typeof document !== 'undefined') {
 
     return false;
   }
-
 
   // =========================================================================
   // 13.95 COMPREHENSIVE GOVERNMENT SCHEMES & SOLAR ENERGY MASTER VAULT
@@ -6049,8 +6131,10 @@ if (typeof document !== 'undefined') {
       cleanQ.includes('naam kya hai') || cleanQ.includes('naam batao') || cleanQ.includes('naam kya') || cleanQ.includes('naam btao') ||
       cleanQ.includes('तुम्हारा नाम') || cleanQ.includes('आपका नाम') || cleanQ.includes('अपना नाम') || cleanQ.includes('नाम क्या है') ||
       cleanQ.includes('नाम बताओ') || cleanQ.includes('तुम कौन हो') || cleanQ.includes('आप कौन हैं') || cleanQ.includes('कौन हो तुम') ||
-      cleanQ.includes('tum kaun') || cleanQ.includes('aap kaun') || cleanQ.includes('apna parichay') || cleanQ.includes('parichay do') ||
-      cleanQ.includes('परिचय दो') || cleanQ.includes('kisase ho rahi') || cleanQ.includes('kisse ho rahi') || cleanQ.includes('मेरी बात किससे') ||
+      cleanQ.includes('tum kaun') || cleanQ.includes('aap kaun') || cleanQ.includes('apna parichay') || cleanQ.includes('अपना परिचय') ||
+      ((cleanQ === 'परिचय दो' || cleanQ === 'parichay do' || cleanQ === 'सखी परिचय दो') &&
+       !cleanQ.includes('अमिताभ') && !cleanQ.includes('बच्चन') && !cleanQ.includes('प्रेमचंद') &&
+       !cleanQ.includes('जीवन परिचय') && !cleanQ.includes('का परिचय')) || cleanQ.includes('kisase ho rahi') || cleanQ.includes('kisse ho rahi') || cleanQ.includes('मेरी बात किससे') ||
       cleanQ.includes('kisne banaya') || cleanQ.includes('kisne develop') || cleanQ.includes('kisne banaya hai') || cleanQ.includes('kiska ai ho') ||
       cleanQ.includes('who made you') || cleanQ.includes('who created you') || cleanQ.includes('who is your creator') ||
       cleanQ.includes('kisne design') || cleanQ.includes('kiske dwara') || cleanQ.includes('जनक') || cleanQ.includes('janak') ||
@@ -8669,7 +8753,7 @@ if (typeof document !== 'undefined') {
     {
       id: 'fal_bagwani',
       name: 'फल व बागवानी: सेब, संतरा, आम, अमरूद, पपीता, अनार',
-      keywords: ['sev', 'seb', 'सेब', 'apple', 'santra', 'sanstra', 'संतरा', 'orange', 'aam', 'आम', 'mango', 'amrud', 'अमरूद', 'guava', 'papita', 'pappita', 'पपीता', 'papaya', 'anar', 'अनार', 'pomegranate'],
+      keywords: ['sev', 'seb', 'सेब', 'apple', 'aam', 'आम', 'mango', 'amrud', 'अमरूद', 'guava', 'papita', 'pappita', 'पपीता', 'papaya'],
       season: 'सदाबहार व मौसमी',
       sowingTime: 'पौध रोपण: जुलाई-अगस्त (मानसून) या फरवरी-मार्च',
       soil: 'गहरी उपजाऊ दोमट मिट्टी (जलभराव रहित)',
@@ -8695,7 +8779,185 @@ if (typeof document !== 'undefined') {
           chemical: 'घुलनशील सल्फर 80% WDG (3g/L) या कार्बेन्डाजिम 50% WP (1g/L)।'
         }
       ]
-    }
+    },
+
+    {
+      id: 'anar',
+      name: 'अनार (Pomegranate / डाळिंब)',
+      keywords: ['anar', 'anaar', 'dalimb', 'अनार', 'डाळिंब', 'दाड़िम', 'pomegranate', 'bhagwa', 'भगवा', 'गणेश', 'सोलापुर लाल', 'मृदुला', 'अनार की खेती', 'अनार का बगीचा', 'अंबे बहार', 'मृग बहार', 'हस्त बहार'],
+      season: 'सदाबहार बहुवर्षीय बागवानी (उपोष्ण व शुष्क जलवायु)',
+      sowingTime: 'पौध रोपण: जुलाई-अगस्त (मानसून) अथवा फरवरी-मार्च',
+      soil: 'उत्तम जल निकास वाली गहरी रेतीली दोमट या मध्यम काली मिट्टी (pH 6.5 से 7.8)',
+      avgYield: 'चौथे वर्ष से 25 से 40 किलो प्रति पेड़ (8 से 12 टन प्रति एकड़)',
+      intro: 'अनार भारत की अत्यधिक लोकप्रिय व निर्यात योग्य नकदी बागवानी फसल है। अनार में बहार प्रबंधन (अंबे, मृग, हस्त बहार), तेलिया जीवाणु रोग और फल फटने से बचाव सबसे महत्वपूर्ण कदम हैं।',
+      yieldHacks: [
+        'बहार प्रबंधन व फूल सेटिंग: बहार लेने से पूर्व 35-45 दिन पानी रोककर तनाव दें। कली व फूल अवस्था पर स्टिमरिच (Stimrich 30ml) + Bio-99 5ml का स्प्रे करने से 30% अधिक मादा फूल व फल सेटिंग होती है।',
+        'फल का आकार, चमक व दाना भराव: फल नींबू के आकार का होने पर स्टिमरिच 35ml + Bio-99 5ml का 20 दिन के अंतराल पर 2 स्प्रे करें। छिलके पर आकर्षक भगवा केसरिया रंग और दानों में भरपूर रस आता है।',
+        'ड्रिप पोषण प्रबंधन: ड्रिप द्वारा बायोफिट Sheth (1L/एकड़) + Bio-NPK (1L/एकड़) नियमित देने से जड़ों का गहरा विकास होता है।'
+      ],
+      seedTreatment: 'नर्सरी से लाए गए पौधों की जड़ों को Sheth (5ml/L) + स्टिमरिच (5ml/L) के घोल में 15 मिनट डुबोकर रोपण करें।',
+      fertilizerSchedule: 'बहार शुरू होने पर: प्रति पेड़ 25kg सड़ी गोबर खाद + 500g सिंगल सुपर फास्फेट + 250g पोटाश। ड्रिप से Sheth व Bio-NPK दें।',
+      diseases: [
+        {
+          name: 'तेलिया रोग / जीवाणु धब्बा (Bacterial Blight / Xanthomonas axonopodis pv. punicae)',
+          symptoms: 'पत्तियों, टहनियों और फलों पर गहरे भूरे-काले तैलीय (Oily) धब्बे बनना। फल पर L या Y आकार की दरारें पड़ना और फल का सड़ जाना।',
+          organicBiofit: 'बायोफिट Wrapup (30-40ml प्रति 15L पंप) + Bio-99 (5ml) का 15 दिन के अंतराल पर सुरक्षात्मक छिड़काव करें। यह जीवाणु के प्रवेश पर जैविक कवच बनाता है। थाले में Sheth (30ml/15L) की ड्रेंचिंग करें। (⚠️ सख्त सावधानी: रैपअप को कभी भी Sheth, Bio-NPK या VAM के साथ एक ही घोल में न मिलाएं!)',
+          chemical: 'स्ट्रेप्टोसाइक्लिन (0.5g प्रति 10L पानी) + कॉपर ऑक्सीक्लोराइड 50% WP (2.5g/L) या बोर्डो मिश्रण (1%) का 10-12 दिन के अंतराल पर छिड़काव करें।'
+        },
+        {
+          name: 'फल फटना रोग (Fruit Cracking / Boron & Moisture Stress)',
+          symptoms: 'विकसित होते फलों का बीच में से फट जाना और दाने बाहर दिखना।',
+          organicBiofit: 'स्टिमरिच (30ml) + Bio-99 (5ml) का छिड़काव करें। ड्रिप द्वारा मिट्टी में समान व नियमित नमी बनाए रखें।',
+          chemical: 'घुलनशील बोरॉन 20% (1.5g प्रति लीटर पानी) का फल विकास अवस्था पर 15 दिन के अंतराल पर 2 बार छिड़काव करें।'
+        },
+        {
+          name: 'फल छेदक तितली व इल्ली (Fruit Borer / Deudorix isocrates)',
+          symptoms: 'फलों पर बारीक छेद और मल (विष्ठा) का बाहर निकलना, फल का अंदर से सड़कर गिरना।',
+          organicBiofit: 'बायोफिट Intact (2ml/L) + बायोफिट Larvicide/कीटनाशक (2ml/L) + Bio-99 (0.5ml/L) का छिड़काव करें। छोटे फलों पर बटर पेपर बैगिंग करें।',
+          chemical: 'कोराजन (Chlorantraniliprole 18.5% SC - 0.4ml/L) या स्पिनोसैड 45% SC (0.3ml/L) का छिड़काव करें।'
+        }
+      ]
+    },
+
+    {
+      id: 'santra',
+      name: 'संतरा (Citrus / Nagpur Mandarin Orange)',
+      keywords: ['santra', 'santre', 'sanstra', 'संतरा', 'संतरे', 'नागपुर संतरा', 'orange', 'mandarin', 'citrus', 'kinnow', 'किन्नू', 'संतरे की खेती', 'सिट्रस', 'संतरा बागवानी'],
+      season: 'सदाबहार बहुवर्षीय बागवानी (उपोष्ण जलवायु)',
+      sowingTime: 'पौध रोपण: जुलाई-अगस्त (वर्षा ऋतु) अथवा फरवरी',
+      soil: 'गहरी, उपजाऊ, उत्तम जल निकास वाली दोमट या हल्की बलुई दोमट मिट्टी (pH 6.5 से 7.5, चूना रहित)',
+      avgYield: '5वें वर्ष से 40 से 80 किलो प्रति पेड़ (800 से 1200 फल प्रति वयस्क पेड़)',
+      intro: 'संतरा भारत का सबसे प्रमुख खट्टा फल है, जिसमें नागपुर संतरा विश्व प्रसिद्ध है। संतरे में फल ड्रॉप (झड़ना), गमोसिस (गोंद निकलना) और सिट्रस सायला कीट 3 सबसे गंभीर समस्याएं हैं जिनका सही प्रबंधन जरूरी है।',
+      yieldHacks: [
+        'फल ड्रॉप (Fruit Drop / गिरना) रोकथाम: मटर आकार पर पहला स्प्रे स्टिमरिच (Stimrich 30ml) + Bio-99 5ml का करें। नींबू आकार पर दूसरा स्प्रे स्टिमरिच 30ml + 0:0:50 पोटाश (75g) + Bio-99 5ml का करें। फल गिरना 80% रुकता है।',
+        'रस, मिठास व नारंगी चमक वृद्धि: फल पकने से 30-40 दिन पहले स्टिमरिच 35ml + Bio-99 5ml का छिड़काव करने से फलों में मिठास (TSS), रस की मात्रा और बाजार में बिकने वाली सुनहरी चमक भरपूर आती है।',
+        'जड़ स्वास्थ्य व ड्रिप पोषण: ड्रिप से बायोफिट Sheth (1L/एकड़) + Bio-NPK (1L/एकड़) देने से मिट्टी भुरभुरी होती है और पोषक तत्व सीधे जड़ों तक पहुंचते हैं।'
+      ],
+      seedTreatment: 'पौध रोपण के समय गड्ढे में Sheth (15ml) + Bio-NPK (20ml) गोबर खाद में मिलाकर डालें।',
+      fertilizerSchedule: 'वयस्क पेड़ हेतु: 40-50kg सड़ी गोबर खाद + 600g यूरिया, 400g डीएपी, 400g पोटाश प्रति वर्ष 2 किस्तों में दें।',
+      diseases: [
+        {
+          name: 'फल ड्रॉप / फल झड़ना (Fruit Drop / Physiological & Fungal)',
+          symptoms: 'फूल आने के बाद, मटर आकार पर और फल पकने से पहले (Pre-harvest Drop) बड़ी संख्या में फलों का डंठल से टूटकर गिरना।',
+          organicBiofit: 'स्टिमरिच (30ml) + बायोफिट Wrapup (30ml) + Bio-99 (5ml प्रति 15L पंप) का 15 दिन के अंतराल पर 2 छिड़काव करें। यह डंठल को मजबूत करता है और फंगस से बचाता है।',
+          chemical: 'NAA (प्लानोफिक्स) 10 ppm (4ml प्रति 15L पंप) + कॉपर ऑक्सीक्लोराइड (2.5g/L) का छिड़काव करें।'
+        },
+        {
+          name: 'गमोसिस / गोंदिया रोग व जड़ गलन (Phytophthora Gummosis & Root Rot)',
+          symptoms: 'तने की छाल फटना और उससे चिपचिपा भूरा-काला गोंद निकलना। पत्तियां पीली पड़कर गिरना और पेड़ का ऊपर से सूखना (Dieback)।',
+          organicBiofit: 'तने के प्रभावित हिस्से को साफ कर उस पर बायोफिट Wrapup (10ml/L) का गाढ़ा लेप लगाएं। थाले में Sheth (30ml/15L) + Bio-NPK की ड्रेंचिंग करें। (⚠️ रैपअप को Sheth के साथ एक ही घोल में न मिलाएं!)',
+          chemical: 'तने पर बोर्डो पेस्ट (1kg कॉपर सल्फेट + 1kg चूना + 10L पानी) लगाएं। मेटलएक्सिल + मैंकोज़ेब (2.5g/L) से जड़ क्षेत्र में ड्रेंचिंग करें।'
+        },
+        {
+          name: 'सिट्रस सायला व थ्रिप्स (Citrus Psylla - Greening Vector & Thrips)',
+          symptoms: 'नई पत्तियों का मुड़ना, पत्तियों पर सफेदी व चिपचिपा पदार्थ छूटना। सिट्रस सायला विनाशकारी ग्रीनिंग रोग फैलाता है।',
+          organicBiofit: 'बायोफिट Intact (2ml/L) + Bio-99 (0.5ml/L) का नई पत्तियों (Flush) के आते ही छिड़काव करें।',
+          chemical: 'इमिडाक्लोप्रिड 17.8% SL (0.5ml/L) या थायमेथोक्सम 25% WG (0.3g/L) का छिड़काव करें।'
+        }
+      ]
+    },
+
+    {
+      id: 'lauki',
+      name: 'लौकी (Bottle Gourd / घिया / दूधी)',
+      keywords: ['lauki', 'louki', 'loki', 'ghiya', 'doodhi', 'dudhi', 'bottle gourd', 'लौकी', 'घिया', 'दूधी', 'कद्दू लौकी', 'लौकी की खेती', 'लौकी का पौधा', 'लौकी की बीमारी', 'लौकी सड़ना', 'छोटा लौकी सड़ रहा'],
+      season: 'जायद (ग्रीष्मकालीन) व खरीफ (बरसाती)',
+      sowingTime: 'जायद: फरवरी-मार्च | खरीफ: जून-जुलाई',
+      soil: 'अच्छे जल निकास वाली बलुई दोमट या दोमट मिट्टी (pH 6.0 से 7.5, भरपूर जीवांश)',
+      avgYield: '120 से 180 क्विंटल प्रति एकड़ (उन्नत व हाइब्रिड किस्में)',
+      intro: 'लौकी भारत की प्रमुख बेलवर्गीय सब्जी फसल है जो मचान विधि (Trellis) पर उगाने से 2 गुना अधिक उपज देती है। छोटे फलों का पीला पड़कर सड़ना और फल मक्खी लौकी की 2 सबसे बड़ी चुनौतियां हैं।',
+      yieldHacks: [
+        '3G कटिंग तकनीक: जब मुख्य बेल 8-10 फीट (10-12 पत्ती) की हो जाए, तो मुख्य तने का ऊपरी सिरा चुटकी से तोड़ दें (1G कटिंग)। साइड से निकली शाखाओं (2G) को भी 8-9 पत्ती पर काटें। इनसे निकलने वाली 3G शाखाओं पर 90% केवल मादा फूल (लौकी) आते हैं।',
+        'फूल व फल सेटिंग फॉर्मूला: फूल आने की शुरुआत में स्टिमरिच (Stimrich 30ml) + Bio-99 5ml का हर 12-15 दिन में स्प्रे करें। इससे छोटे फल पीले नहीं पड़ते और तेजी से सीधे व लंबे बढ़ते हैं।',
+        'मचान विधि (Mandap / Trellis): बेलों को जमीन पर फैलाने की बजाय बांस-तार के मचान पर चढ़ाएं। इससे फल सड़न 70% कम होती है और फलों का रंग एकदम चमकदार हरा रहता है।'
+      ],
+      seedTreatment: 'बुवाई से पहले 1 किलो बीज को Sheth (5ml) + स्टिमरिच (5ml) को 50ml पानी में घोलकर उपचारित करें। इससे जमाव 95% होता है।',
+      fertilizerSchedule: 'बुवाई पर प्रति नाली: 5-8 टन सड़ी गोबर खाद, 30kg डीएपी, 20kg पोटाश। पहली सिंचाई व फल लगते समय Bio-NPK (1L/एकड़) ड्रिप से दें।',
+      diseases: [
+        {
+          name: 'छोटे फल सड़न रोग (Fruit Rot / Choanephora & Pythium Fungal Rot)',
+          symptoms: 'छोटे फलों का डंठल या सिरे की तरफ से पीला पड़ना, मुलायम होकर काला पड़ना और सड़कर गिर जाना।',
+          organicBiofit: 'बायोफिट Wrapup (30ml प्रति 15L पंप) + स्टिमरिच (30ml) + Bio-99 (5ml) का 7 से 10 दिन के अंतराल पर 2 छिड़काव करें। थाले में Sheth (30ml/15L) से ड्रेंचिंग करें।',
+          chemical: 'कॉपर ऑक्सीक्लोराइड 50% WP (2.5g/L) + स्ट्रेप्टोसाइक्लिन (1g प्रति 15L पंप) अथवा रिडोमिल गोल्ड (2.5g/L) का छिड़काव करें।'
+        },
+        {
+          name: 'फल मक्खी कीट (Fruit Fly / Bactrocera cucurbitae)',
+          symptoms: 'छोटे फलों में मक्खी द्वारा डंक मारना, फल का टेढ़ा-मेढ़ा होना और चीरने पर अंदर बारीक कीड़े (Maggots) निकलना।',
+          organicBiofit: 'खेत में प्रति एकड़ 4 से 6 फेरोमोन ल्यूर ट्रैप (Pheromone Traps) लगाएं। बायोफिट Intact (2ml/L) + Bio-99 (0.5ml/L) का शाम 5 बजे के बाद छिड़काव करें।',
+          chemical: 'मैलाथियान 50% EC (2ml/L) + 20g पुराना गुड़ प्रति लीटर पानी में मिलाकर चारा (Poison Bait) के रूप में मचान के नीचे छिड़कें।'
+        },
+        {
+          name: 'चूर्णी फफूंद व डाउनी मिल्ड्यू (Powdery & Downy Mildew / पत्ती पीली पड़ना)',
+          symptoms: 'पत्तियों की ऊपरी सतह पर सफेद चूर्ण जैसा पाउडर जमना या निचली सतह पर बैगनी-भूरे धब्बे बनना और पत्तियां सूखना।',
+          organicBiofit: 'बायोफिट Wrapup (30ml प्रति 15L पंप) + Bio-99 (5ml) का छिड़काव करें।',
+          chemical: 'एजोक्सीस्ट्रोबिन + डाईफेनोकोनाज़ोल (Amistar Top - 1ml/L) या घुलनशील सल्फर 80% WDG (2.5g/L) का छिड़काव करें।'
+        }
+      ]
+    },
+
+    {
+      id: 'cheeku',
+      name: 'चीकू (Sapota / Chiku / चिकू)',
+      keywords: ['cheeku', 'chiku', 'sapota', 'चीकू', 'चिकू', 'चिक्कू', 'काली पत्ती', 'क्रिकेट बॉल', 'चीकू की खेती', 'चीकू का बगीचा'],
+      season: 'सदाबहार बहुवर्षीय बागवानी (साल में 2 मुख्य तुड़ाई)',
+      sowingTime: 'पौध रोपण: जून-जुलाई (वर्षा ऋतु) अथवा फरवरी-मार्च',
+      soil: 'गहरी, उपजाऊ दोमट, बलुई दोमट या मध्यम काली मिट्टी (pH 6.0 से 7.8, उत्तम जल निकास)',
+      avgYield: '5वें वर्ष से 40-50 किलो और 8वें वर्ष से 100-150 किलो प्रति पेड़ प्रति वर्ष',
+      intro: 'चीकू भारत की प्रमुख स्वादिष्ट व लगातार आय देने वाली नकदी बागवानी फसल है। चीकू के पेड़ 50-60 वर्षों तक भरपूर फल देते हैं। फूल-फल का झड़ना और कली छेदक इल्ली चीकू के 2 मुख्य कीट-रोग हैं।',
+      yieldHacks: [
+        'फूल व फल सेटिंग फॉर्मूला: फूल खिलने के समय स्टिमरिच (Stimrich 30ml) + Bio-99 5ml का स्प्रे करने से 25-30% अधिक फल बनते हैं और फल गिरना रुकता है।',
+        'फल का आकार व मिठास वृद्धि: फल जब कंचे के आकार का हो, तब स्टिमरिच 35ml + Bio-99 5ml + बायो-NPK KSB का 20 दिन के अंतर पर 2 स्प्रे करें। फलों में रस, मिठास व वजन भरपूर आता है।',
+        'ड्रिप व मिट्टी प्रबंधन: ड्रिप द्वारा बायोफिट Sheth (1L/एकड़) + Bio-NPK (1L/एकड़) नियमित देने से जड़ों का गहरा फैलाव होता है।'
+      ],
+      seedTreatment: 'पौध लगाते समय गड्ढे में 15kg सड़ी गोबर खाद के साथ Sheth (15ml) + Bio-NPK (20ml) मिलाकर डालें।',
+      fertilizerSchedule: 'वयस्क पेड़ हेतु: 40kg गोबर खाद, 500g यूरिया, 400g डीएपी, 400g पोटाश प्रति वर्ष 2 किस्तों में दें।',
+      diseases: [
+        {
+          name: 'कली छेदक व पत्ती लपेटक इल्ली (Chiku Moth / Bud Borer - Nephopteryx eugraphella)',
+          symptoms: 'कलियों, फूलों और छोटी पत्तियों को जाले में लपेटना, कलियों में छेद करना जिससे फूल सूखकर गिर जाते हैं।',
+          organicBiofit: 'बायोफिट Intact (2ml/L) + बायोफिट Larvicide (2ml/L) + Bio-99 (0.5ml/L) का जाले दिखने पर तुरंत शाम को छिड़काव करें।',
+          chemical: 'स्पिनोसैड 45% SC (0.3ml/L) या कोराजन (0.4ml/L) का छिड़काव करें।'
+        },
+        {
+          name: 'काली फफूंद व पत्ती धब्बा रोग (Sooty Mold & Leaf Spot)',
+          symptoms: 'पत्तियों और फलों की ऊपरी सतह पर काली कालिख (काली फफूंद) जमना जिससे प्रकाश संश्लेषण रुक जाता है।',
+          organicBiofit: 'बायोफिट Wrapup (30-40ml प्रति 15L पंप) + Bio-99 (5ml) का छिड़काव करें। रस चूसक कीटों को हटाने हेतु Intact (2ml/L) मिलाएं।',
+          chemical: 'घुलनशील कॉपर ऑक्सीक्लोराइड 50% WP (2.5g/L) या कार्बेन्डाजिम (1g/L) का छिड़काव करें।'
+        }
+      ]
+    },
+
+    {
+      id: 'dragon_fruit',
+      name: 'ड्रैगन फ्रूट (Dragon Fruit / कमलम / Pitaya)',
+      keywords: ['dragon_fruit', 'dragon fruit', 'kamalam', 'pitaya', 'ड्रैगन फ्रूट', 'कमलम', 'ड्रैगन फ्रुट', 'रेड ड्रैगन फ्रूट', 'ड्रैगन फ्रूट की खेती', 'कमलम की खेती'],
+      season: 'सदाबहार कैक्टस बहुवर्षीय (मई से अक्टूबर फल तुड़ाई के 5-6 चक्र)',
+      sowingTime: 'पौध रोपण: जून-जुलाई (मानसून) अथवा फरवरी-मार्च',
+      soil: 'उत्तम जल निकास वाली हल्की रेतीली दोमट या पथरीली मिट्टी (pH 5.5 से 7.2, जलभराव बिल्कुल नहीं)',
+      avgYield: 'दूसरे वर्ष से 3 से 5 टन और चौथे वर्ष से 8 से 10 टन प्रति एकड़ प्रति वर्ष',
+      intro: 'ड्रैगन फ्रूट (कमलम) कम पानी, कम मेहनत और 20-25 साल तक लाखों रुपये का मुनाफा देने वाली आधुनिक सुपर-फ्रूट फसल है। इसमें तना सड़न (एंथ्रेक्नोज), सनबर्न और फूल सेटिंग 3 मुख्य बिंदु हैं।',
+      yieldHacks: [
+        'खंभा-रिंग संरचना: 1 कंक्रीट पोल पर 4 पौधे 10×10 फीट की दूरी पर लगाएं। ऊपर सीमेंट रिंग या टायर लगाएं ताकि शाखाएं छतरीनुमा लटककर बंपर फल दें।',
+        'फूल व फल सेटिंग व जंबो साइज: मई से अक्टूबर तक हर फूल चक्र में कली बनते समय स्टिमरिच (Stimrich 30ml) + Bio-99 5ml का स्प्रे करें। फल 400 से 600 ग्राम का चमकदार व गहरा लाल बनता है।',
+        'ड्रिप व जैविक पोषण: ड्रिप से बायोफिट Sheth (1L/एकड़) + Bio-NPK (1L/एकड़) हर महीने देने से पौधों की शाखाएं मोटी, हरी व रोगमुक्त रहती हैं।'
+      ],
+      seedTreatment: 'कटिंग लगाते समय निचले सिरे को Sheth (5ml/L) के घोल में 15 मिनट डुबोकर छाया में सुखाएं और लगाएं।',
+      fertilizerSchedule: 'प्रति खंभा (4 पौधे): 15-20kg सड़ी गोबर खाद या वर्मीकंपोस्ट + 100g सिंगल सुपर फास्फेट वर्ष में 3 बार दें।',
+      diseases: [
+        {
+          name: 'तना व फल सड़न रोग (Stem Rot / Anthracnose / Bipolaris Fungal Rot)',
+          symptoms: 'शाखाओं पर पीले-भूरे धब्बे बनना, गूदा सड़ना और केवल बीच का कड़ा रेशा (कंकाल) बचना।',
+          organicBiofit: 'बायोफिट Wrapup (30-40ml प्रति 15L पंप) + Bio-99 (5ml) का नियमित छिड़काव करें। सड़े हुए हिस्से को साफ चाकू से काटकर उस पर Wrapup का गाढ़ा लेप लगाएं। थाले में Sheth की ड्रेंचिंग करें।',
+          chemical: 'अमीस्टार टॉप (Azoxystrobin + Difenoconazole - 1ml/L) या कॉपर ऑक्सीक्लोराइड (2.5g/L) का छिड़काव करें।'
+        },
+        {
+          name: 'चींटियां, मिलीबग व रस चूसक कीट (Ants & Mealybug)',
+          symptoms: 'कलियों और फूलों पर सफेद चिपचिपे मिलीबग जमना और चींटियों द्वारा रस चूसना जिससे कली सूख जाती है।',
+          organicBiofit: 'बायोफिट Intact (2ml/L) + Bio-99 (0.5ml/L) का तेज धार से छिड़काव करें। खंभों के आधार पर ग्रीस का घेरा बनाएं।',
+          chemical: 'क्लोरपायरीफॉस 20% EC (2ml/L) का खंभे के चारों ओर छिड़काव करें।'
+        }
+      ]
+    },
   ];
 
   // =========================================================================
@@ -8880,7 +9142,6 @@ if (typeof document !== 'undefined') {
     streamBotMessage(html, cleanTextForTTS(bodyMarkdown));
     return true;
   }
-
 
   // UNIVERSAL TERM IN QUERY HELPER (WORD BOUNDARY & COMPONENT MATCHING)
   // Prevents substring false matches (e.g., 'चने' matching inside 'पहुंचने', 'gram' inside 'instagram', 'आम' inside 'आम तौर पर')
@@ -9891,7 +10152,6 @@ ${matchedCrop.yieldHacks.map(h => `• ${h}`).join('\n')}
     streamBotMessage(html, cleanTextForTTS('नेट्सर्फ Q3 पाथफाइंडर 2026 में रॉकस्टार लेवल्स, क्लब सक्षम व अस्मिता, फास्टट्रैक टूर और नया आई-स्टॉक मात्र 25 हजार 550 रुपये में उपलब्ध है।'));
     return true;
   }
-
 
   // 18. MASTER NETSURF DIRECT SELLING, 15-DAY CAPPING & CONVERSATIONAL INTELLIGENCE V3
   // ============================================================================
@@ -12185,8 +12445,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-
-
   // =========================================================================
   // NATURAMORE 5-VARIANT PRECISION ROUTER (OFFICIAL CATALOG & NETSURFDIRECT.COM)
   // Variants: Women (Masala Milk & Vanilla ₹1425), Original (₹1450), Active/Plus (₹1450), Kids (₹1225), Men (₹1450)
@@ -12297,7 +12555,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-
   // =========================================================================
   // SPECIALIZED BIOFIT (SHET, VAM), NETSURF REALITY & HUMAN SENTIMENT ENGINE
   // =========================================================================
@@ -12360,7 +12617,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     return false;
   }
-
 
   // =========================================================================
   // SAKHI ZERO-EGRESS DUAL AUDIT LOGGING ENGINE
@@ -12517,7 +12773,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       alert('डाउनलोड में त्रुटि: ' + (err.message || err));
     }
   }
-
 
   // =========================================================================
   // UNIVERSAL HUMAN ANATOMY & CHARAK SAMHITA KNOWLEDGE MATRIX (ADD-ON)
@@ -12763,7 +13018,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-
   // =========================================================================
   // SAKHI MASTER CAPABILITIES INDEX (तुम क्या-क्या जानती हो / अपनी क्षमताएं बताओ)
   // =========================================================================
@@ -12877,7 +13131,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-
   // =========================================================================
   // INTERACTIVE ALLOPATHIC DRUG RESOLVER & SPELLING ASSISTANT (PHASE 3)
   // Handles questions like "मैं एलोपैथिक दवा खा रहा हूँ", "कौन सी दवा ले रहे हैं", typos in drug names
@@ -12958,7 +13211,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     ], 'omni', 'family_health_income_survey_card');
     return true;
   }
-
 
   // =========================================================================
   // VEDIC KRISHI PANCHANG, CHOGHADIYA, LIVE SPRAY DECISION & DEHATI DICTIONARY (ADD-ON)
@@ -13731,7 +13983,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       q.includes('यह नहीं पूछा') || q.includes('पागल हो गई हो क्या') || q.includes('तुम पागल हो') ||
       q.includes('pagal ho') || q.includes('paagal') || q.includes('dimag kharab') ||
       q.includes('bakwas band') || q.includes('chup rah') || q.includes('jhuth bol rahi') ||
-      q.includes('kuch nahi aata') || q.includes('faltu bol')
+      q.includes('kuch nahi aata') || q.includes('faltu bol') ||
+      q.includes('संतुष्ट नहीं') || q.includes('संतुष्टि नहीं') || q.includes('asantust') ||
+      q.includes('santust nahi') || q.includes('jawab se santust')
     );
 
     if (!isMisunderstanding) return false;
@@ -13740,40 +13994,42 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     let detectedHint = '';
     let followupChips = [];
 
+    const expertReportUrl = 'https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते, सखी AI चैट में मुझे तकनीकी सहायता व मार्गदर्शन चाहिए।');
+
     if (q.includes('नेचुरामोर') || q.includes('पाउडर') || q.includes('महिला') || q.includes('women')) {
       detectedHint = 'नेचुरामोर (Naturamore पोषण व स्वास्थ्य)';
       followupChips = [
         { text: '🌸 नेचुरामोर फॉर विमेन (हीमोग्लोबिन व शक्ति)', query: 'नेचुरामोर फॉर विमेन क्या हीमोग्लोबिन बढ़ाएगा' },
         { text: '🧒 नेचुरामोर फॉर किड्स (बच्चों की भूख व दिमाग)', query: '10 साल के बच्चे को कौन सा नेचुरामोर दें' },
-        { text: '⚡ नेचुरामोर प्लस (ऊर्जा व कमजोरी)', query: 'नेचुरामोर एक्टिव प्लस के फायदे' },
-        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+        { text: '🌐 इंटरनेट / विकिपीडिया पर खोजें', query: 'इंटरनेट पर लाइव खोजें नेचुरामोर पोषण स्वास्थ्य' },
+        { text: '📢 विशेषज्ञ सहायता व रिपोर्ट करें', url: expertReportUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;font-weight:800;' }
       ];
-    } else if (q.includes('फसल') || q.includes('गेहूं') || q.includes('चना') || q.includes('सरसों') || q.includes('स्प्रे') || q.includes('खाद')) {
+    } else if (q.includes('फसल') || q.includes('गेहूं') || q.includes('चना') || q.includes('सरसों') || q.includes('स्प्रे') || q.includes('खाद') || q.includes('लौकी') || q.includes('अनार')) {
       detectedHint = 'आपकी फसल व खेती समाधान';
       followupChips = [
         { text: '🌾 फसलों का संपूर्ण स्प्रे कैलेंडर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
         { text: '🌱 बीज उपचार का सही फॉर्मूला', query: 'बीज उपचार कैसे करें' },
-        { text: '💰 4 एकड़ में दवाओं का खर्च', query: '4 एकड़ खेत में दवाओं का कुल खर्च कितना लगेगा' },
-        { text: '📞 दादा अवनीश जी से सीधे बात', query: 'दादा अवनीश जी से सीधे संपर्क' }
+        { text: '🌐 इंटरनेट / विकिपीडिया पर खोजें', query: 'इंटरनेट पर लाइव खोजें फसल स्प्रे शेड्यूल' },
+        { text: '📢 विशेषज्ञ सहायता व रिपोर्ट करें', url: expertReportUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;font-weight:800;' }
       ];
     } else if (q.includes('ई-बुक') || q.includes('किताब') || q.includes('बुक')) {
       detectedHint = 'आरोग्यम डिजिटल ई-बुक्स';
       followupChips = [
         { text: '📖 खेती का डॉक्टर ई-बुक (₹99)', query: 'खेती का डॉक्टर ई-बुक के बारे में बताओ' },
         { text: '🥦 11 सब्जियों की डायरेक्टरी (₹49)', query: '11 सब्जियों की डायरेक्टरी वाली बुक के बारे में बताओ' },
-        { text: '📚 आरोग्यम के पास कितनी ई-बुक्स हैं', query: 'आरोग्यम इंडिया में कितने प्रकार की ई-बुक है' }
+        { text: '📢 विशेषज्ञ सहायता व रिपोर्ट करें', url: expertReportUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;font-weight:800;' }
       ];
     } else {
       detectedHint = 'खेती, पशुपालन या स्वास्थ्य परामर्श';
       followupChips = [
         { text: '🌾 खेती व फसल डॉक्टर', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },
         { text: '🐄 पशु का दूध व फैट बढ़ाना', query: 'गाय-भैंस का दूध और फैट बढ़ाने का फॉर्मूला' },
-        { text: '🩸 हीमोग्लोबिन व खून की कमी', query: 'हीमोग्लोबिन बहुत कम है क्या नेचुरामोर से बढ़ जाएगा' },
-        { text: '📞 दादा अवनीश जी से WhatsApp संपर्क', query: 'दादा अवनीश जी से सीधे संपर्क' }
+        { text: '🌐 इंटरनेट / विकिपीडिया पर खोजें', query: 'इंटरनेट पर लाइव खोजें कृषि व स्वास्थ्य' },
+        { text: '📢 विशेषज्ञ सहायता व रिपोर्ट करें', url: expertReportUrl, isExternal: true, style: 'background:#16a34a;color:#ffffff;font-weight:800;' }
       ];
     }
 
-    const resp = `माफ़ कीजिएगा! 🙏 मुझसे समझने में भारी भूल हो गई।\n\nकभी-कभी आवाज़, माइक्रोफ़ोन या शब्दों के उच्चारण में मुझसे चूक हो जाती है जिसके कारण मैंने अनुचित उत्तर दे दिया। आप बिल्कुल सही कह रहे हैं। मैं अपनी गलती स्वीकार करती हूँ और अब पूरी निष्ठा से आपकी बात सुन रही हूँ।\n\nकृपया मुझे बताएं कि आप **${detectedHint}** के बारे में क्या जानना चाहते हैं? मैं तुरंत 100% सटीक और प्रमाणित वैज्ञानिक समाधान प्रस्तुत करूँगी।`;
+    const resp = `माफ़ कीजिएगा! 🙏 मुझसे समझने में भूल हो गई।\n\nकभी-कभी शब्दों को पहचानने में मुझसे चूक हो जाती है जिसके कारण मैंने आपके अनुरूप उत्तर नहीं दिया। मैं अपनी गलती स्वीकार करती हूँ और अब पूरी निष्ठा से आपकी बात सुन रही हूँ।\n\nकृपया मुझे बताएं कि आप **${detectedHint}** के बारे में क्या जानना चाहते हैं? आप नीचे दिए गए विकल्पों में से चुन सकते हैं, सीधे इंटरनेट से लाइव खोज सकते हैं, या हमारी विशेषज्ञ सहायता टीम को रिपोर्ट कर सकते हैं।`;
 
     renderCrispSpecialBox('🌸 आरोग्यम सखी AI — विनम्र स्पष्टीकरण व समाधान', resp, followupChips, 'omni', 'deescalation_card');
     return true;
@@ -14648,7 +14904,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return true;
   }
 
-
   // =========================================================================
   // 18.61 LIVE REAL-TIME DATE, DAY & CLOCK ENGINE
   // =========================================================================
@@ -15014,7 +15269,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-
   // =========================================================================
 
   // =========================================================================
@@ -15107,7 +15361,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (context === 'crop') return cleanName ? `नमस्ते ${cleanName} जी! 🙏` : 'नमस्ते किसान साथी! 🙏';
     return cleanName ? `नमस्ते ${cleanName} जी! 🙏` : 'नमस्ते किसान साथी! 🙏';
   }
-
 
   // 19.7 FARMERCHAT-STYLE DYNAMIC CONVERSATIONAL WEATHER ADVISOR (MULTI-CITY & 7-DAY)
   // =========================================================================
@@ -15745,7 +15998,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       appendSakhiMessage('bot', ebookAdHtml, true);
     }
 
-
     const cfg = domainConfigs[domainKey] || domainConfigs.krishi;
 
     let profileObj = {};
@@ -15874,6 +16126,13 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         const items = [curLoc ? `📍 ${curLoc}` : '', curGen ? `👤 ${curGen}` : ''].filter(Boolean);
         notice.innerHTML = `<span style="color:#15803d;font-weight:800;font-size:0.82rem;">✅ सुरक्षित हो गया: ${items.join(' | ')}</span>`;
         notice.style.display = 'block';
+      }
+
+      // Update compact prompt if present in greeting
+      const compactMsg = document.getElementById('sakhiCompactProfileMsg');
+      if (compactMsg) {
+        compactMsg.innerHTML = '✅ आपकी जानकारी सुरक्षित हो गई! अब सखी आपको सही आत्मीय संबोधन देगी।';
+        compactMsg.style.display = 'block';
       }
     } catch (_) { }
   };
@@ -16016,7 +16275,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return false;
   }
 
-
   // =========================================================================
   // 19.9 SAKHI 2X SMART MASTER INTEL: DHARA SANSKAR, SOIL SCIENCE & COMPOST
   // =========================================================================
@@ -16077,7 +16335,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     return false;
   }
-
 
   // =========================================================================
   // 19.11 DEDICATED WHEAT WEED CONTROL (खरपतवार / शाकनाशी) & TERMITES (दीमक)
@@ -16415,7 +16672,13 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const combined = q + ' ' + origQ;
 
     // 1. आम (Mango / Aam / કેરી / आंबा / আম) — किस्में, बौर सुरक्षा, रोग व स्प्रे शेड्यूल
-    const isMango = /(?:आम|aam\b|mango|केरी|કેરી|आंबा|आंब्या|আম(?:\s|$)|kairi|दशहरी|आम्रपाली|लंगड़ा|चौसा|हापुस|अल्फांसो|\bमंजर\b|\bबौर\b)/i.test(combined);
+    // 🛡️ High-Precision Mango Guard: Never let "आम" (common/ordinary) phrases trigger Mango orchard!
+    const isCommonAdjective = /(?:आम\s*तौर|आम\s*बात|आम\s*लक्षण|आम\s*बीमारी|आम\s*रोग|आम\s*समस्या|आम\s*आदमी|आम\s*भाषा|आम\s*बोलचाल|आम\s*दिनों|आम\s*लोगों)/i.test(combined);
+    const isDefiniteMangoVariety = /(?:mango\b|केरी|કેરી|आंबा|आंब्या|kairi|दशहरी|आम्रपाली|लंगड़ा|चौसा|हापुस|अल्फांसो|alphonso|मल्लिका|तोतापरी|केसर\s*आम)/i.test(combined);
+    const hasStandaloneAam = /(?:^|[^\u0900-\u097Fa-zA-Z0-9])(?:आम|aam)(?:[^\u0900-\u097Fa-zA-Z0-9]|$)/i.test(combined);
+    const hasOrchardContext = /(?:पेड़|पौधा|बाग|बगीचा|फल|खेती|फसल|बौर|मंजर|भुनगा|हॉपर|गुठली|अचार|रस|पत्ते|किस्म|स्प्रे|खाद|छंटाई)/i.test(combined);
+
+    const isMango = !isCommonAdjective && (isDefiniteMangoVariety || (hasStandaloneAam && hasOrchardContext));
     if (isMango) {
       const title = '🥭 आम की उन्नत बागवानी — किस्में, बौर सुरक्षा व बायोफिट स्प्रे शेड्यूल';
       const baseBody = `🥭 **आम की उन्नत वैज्ञानिक बागवानी — किस्में, रोग सुरक्षा व बायोफिट स्प्रे शेड्यूल:**\n\nआम को फलों का राजा कहा जाता है। सही जैविक पोषण और समयबद्ध स्प्रे से आम के बौर का झड़ना 100% रुकता है, परागण बढ़ता है और फलों का वजन व मिठास 30% तक बढ़ जाती है।\n\n🌾 **1. प्रमुख व्यावसायिक किस्में व उत्पादन:**\n• **दशहरी, लंगड़ा, चौसा, बॉम्बे ग्रीन:** उत्तर व मध्य भारत हेतु सर्वश्रेष्ठ किस्में (8-15 टन/हेक्टेयर)।\n• **आम्रपाली व मल्लिका:** सघन बागवानी (High Density Planting) हेतु सर्वोत्तम (12-16 टन/हेक्टेयर)। आम्रपाली को 2.5 x 2.5 मीटर पर 1 एकड़ में 640 पौधे लगाकर भारी उत्पादन लिया जा सकता है।\n• **केसर व अल्फांसो (हापुस):** पश्चिमी भारत (गुजरात, महाराष्ट्र) व निर्यात गुणवत्ता हेतु सर्वोच्च मांग।\n\n🛡️ **2. प्रमुख रोग व कीट नियंत्रण (जैविक समाधान):**\n• **पाउडरी मिल्ड्यू (भभूतिया / सफेद चूर्ण रोग):** बौर पर सफेद फंगस जमने से फूल सूख जाते हैं। **उपचार:** बौर खिलने से पहले **बायोफिट रैप-अप (30ml) + बायो-99 (5ml)** प्रति 15L पंप का छिड़काव करें।\n• **एंथ्रेक्नोज (काला धब्बा रोग):** पत्तों, टहनियों व फलों पर काले धब्बे। **उपचार:** बायोफिट **रैप-अप (Wrap-up) 2ml/L** का नियमित स्प्रे।\n• **भुनगा (मैंगो हॉपर) व फल मक्खी:** रस चूसक कीटों और फल मक्खी हेतु **बायोफिट इंटैक्ट (Intact) 30ml + बायो-99 (5ml)** प्रति पंप।\n\n📅 **3. बायोफिट आम स्पेशल 4-स्टेज स्प्रे शेड्यूल (प्रति 15 लीटर पंप):**\n1. **अक्टूबर-नवंबर (शाखा परिपक्वता व जड़ पोषण):** प्रति पेड़ थाले में 50ml **शेत (SHET) + VAM** ड्रिप या तने के चारों ओर गड्ढे में दें।\n2. **दिसंबर-जनवरी (बौर निकलने से ठीक पूर्व):** **स्टिमरिच (30ml) + बायो-99 (5ml) + रैप-अप (30ml)**। इससे मजबूत बौर निकलता है और पाले से सुरक्षा होती है।\n3. **मटर दाना अवस्था (फल बनते समय):** **प्रो स्टिमरिच (30ml) + इंटैक्ट (30ml) + बायो-99 (5ml)**। इससे फल ड्रॉपिंग 0% होगी और फल का आकार दोगुना तेजी से बढ़ेगा।\n4. **फल पकने से 20 दिन पूर्व:** **प्रो स्टिमरिच (30ml) + बायो-99 (5ml)** छिड़कने से फलों में प्राकृतिक शाइन (चमक) और शुगर (Brix) बढ़ती है।`;
@@ -17101,7 +17364,6 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (directives.dualQuery && handleDualQueryResolver(rawQ, directives)) {
       return;
     }
-
 
     // 🛡️ USER FRUSTRATION & ANTI-REPETITION APOLOGY GUARD
     function handleUserFrustrationAndApology(cleanQ, rawQ, directives) {
@@ -17831,7 +18093,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       const STOP_WORDS = new Set([
         'का', 'की', 'के', 'में', 'पर', 'और', 'हैं', 'है', 'यह', 'से', 'को', 'ने', 'या', 'तो', 'बताओ', 'बताइए', 'दीजिए', 'दवा', 'इलाज', 'उपचार', 'डोज', 'मात्रा', 'बारे', 'क्या', 'कैसे', 'कब',
         'हो', 'कर', 'रही', 'रहा', 'रहे', 'होना', 'होने', 'होता', 'होती', 'होते', 'कहाँ', 'कहां', 'कहा', 'आजकल', 'था', 'थी', 'थे', 'हुआ', 'हुई', 'हुए', 'गया', 'गई', 'गए', 'सकते', 'सकती', 'सकता', 'चाहिए', 'अपना', 'अपनी', 'अपने', 'यहाँ', 'यहाँ', 'वहाँ', 'वहां', 'कैसा', 'कैसी', 'क्यो', 'क्यों', 'कितना', 'कितनी', 'कितने', 'भी', 'ही', 'अब', 'तक', 'जब', 'तब',
-        'mein', 'bare', 'kare', 'kaise', 'kya', 'batao', 'dawa', 'dose', 'ilaj', 'hain', 'thi', 'tha', 'karo', 'ho', 'kar', 'rahi', 'raha', 'rahe', 'hona', 'hota', 'hoti', 'hote', 'the', 'kaha', 'kahan', 'aajkal', 'apna', 'apni', 'apne', 'bhi', 'hii'
+        'हूं', 'हूँ', 'hu', 'hoon', 'hun', 'mein', 'bare', 'kare', 'kaise', 'kya', 'batao', 'dawa', 'dose', 'ilaj', 'hain', 'thi', 'tha', 'karo', 'ho', 'kar', 'rahi', 'raha', 'rahe', 'hona', 'hota', 'hoti', 'hote', 'the', 'kaha', 'kahan', 'aajkal', 'apna', 'apni', 'apne', 'bhi', 'hii'
       ]);
       const qTokens = cleanQ.split(/[\s,?!।]+/).filter(t => t.length >= 2 && !STOP_WORDS.has(t));
 
@@ -17875,7 +18137,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         const titleWords = new Set(titleLower.split(/[\s,?!।()\-:]+/));
 
         // Title exact / partial match
-        if (cleanQ.includes(titleLower) || (cleanQ.length >= 4 && titleLower.includes(cleanQ))) score += 35;
+        if (titleLower && titleLower.length >= 3 && (cleanQ.includes(titleLower) || (cleanQ.length >= 4 && titleLower.includes(cleanQ)))) score += 35;
         qTokens.forEach(token => {
           if (titleWords.has(token)) {
             score += 15;
@@ -17891,8 +18153,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
           if (cleanQ.includes(kwLower)) {
             score += (kwLower.length >= 3 ? 12 : 8);
           }
+          const kwWordSet = new Set(kwLower.split(/[\s,?!।()\-:]+/));
           qTokens.forEach(tok => {
-            if (tok.length >= 3 && kwLower.includes(tok)) {
+            if (tok.length >= 2 && (kwWordSet.has(tok) || tok === kwLower)) {
               // Safety Guard: Avoid sexual health false match on common tokens like "गुप्त" (e.g. from "चैट गुप्त")
               if (tok === 'गुप्त' && !cleanQ.includes('रोग') && !cleanQ.includes('धातु') && !cleanQ.includes('पौरुष') && !cleanQ.includes('सेक्स') && !cleanQ.includes('शीघ्रपतन')) {
                 return;
@@ -18333,7 +18596,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   function cleanQueryForSearchEngine(query) {
-    let q = (query || '').replace(/[?।!,\-_:;]+/g, ' ').trim();
+    let q = (query || '').replace(/[?।!,:;]+/g, ' ').replace(/\s*-\s*/g, '-').trim();
 
     // Only strip pure conversational bot prefixes (keep the substantive question 100% full & intact!)
     q = q.replace(/^(?:सखी|सखी\s*जी|sakhi|sakhi\s*ji|नमस्ते|प्रणाम|राम\s*राम|जय\s*श्री\s*राम|हेलो|hello|hi|hey|कृपया|please|plz|सुनो|ज़रा|जरा|सर्च\s*करके\s*बताओ\s*कि|सर्च\s*कर\s*बताओ\s*कि|सर्च\s*करो\s*कि|सर्च\s*करें\s*कि|सर्च\s*करो|गूगल\s*पर\s*सर्च\s*करो|गूगल\s*पर\s*खोजो|गूगल\s*पर|गूगल\s*से|इंटरनेट\s*पर\s*खोजो|इंटरनेट\s*पर|नेट\s*पर\s*खोजो|नेट\s*पर|विकीपीडिया\s*पर|विकिपीडिया\s*पर|विकी\s*पर|wikipedia)\s+/gi, ' ').trim();
@@ -18981,6 +19244,18 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     // Safety Net 2: Hair Fall & Personal Care query
     if (typeof handleBeautyHairSkinPersonalCareMaster === 'function' && handleBeautyHairSkinPersonalCareMaster(cleanQ, query)) {
       return;
+    }
+
+    // 🌐 Multi-Tier Live Search Cascade (Wikipedia -> DuckDuckGo -> Gemini AI)
+    // Never defect with "spelling check" if external knowledge can answer!
+    if (!window._inSearchFallback && typeof handleDualSearchEngineAndLearningFallback === 'function') {
+      window._inSearchFallback = true;
+      try {
+        handleDualSearchEngineAndLearningFallback(query, cleanQ, domain || 'omni');
+        return;
+      } finally {
+        setTimeout(() => { window._inSearchFallback = false; }, 3000);
+      }
     }
 
     // E. Polite Spelling Check & Topic Navigation (Per User Rule: Never say "Mujhe nahi pata")
@@ -19740,7 +20015,6 @@ ${shareUrl}`;
     }
   };
 
-
   window.AarogyamSakhiToggleRec = function () {
     toggleRecording();
   };
@@ -19897,7 +20171,6 @@ ${shareUrl}`;
       }
     }
   });
-
 
   window.AarogyamSakhi = {
     open: function () {

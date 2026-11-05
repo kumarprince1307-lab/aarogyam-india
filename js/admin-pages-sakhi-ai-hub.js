@@ -64,6 +64,70 @@ export async function initSakhiAiHub() {
     </div>
 
     <!-- 4 Live Clickable & Interactive KPI Cards -->
+    <!-- 🛡️ SAKHI USER MODERATION & 3-STRIKE BLACKLIST CONTROLLER -->
+    <div class="admin-card" id="sakhi-moderation-control-hub" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:1.5px solid #ef4444;border-radius:14px;box-shadow:0 4px 18px rgba(239,68,68,0.12);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;border-bottom:1px solid #334155;padding-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.8rem;">🛡️</span>
+          <div>
+            <h2 style="font-size:1.2rem;font-weight:900;color:#f87171;margin:0;display:flex;align-items:center;gap:8px;">
+              सखी AI यूज़र मॉडरेशन, अनुशासन व 3-स्ट्राइक नियंत्रण
+            </h2>
+            <p style="font-size:0.82rem;color:#94a3b8;margin:3px 0 0 0;">
+              अपशब्द / गाली-गलौज करने वाले उपयोगकर्ताओं का स्वत: निलंबन, 1-क्लिक अनब्लॉक व स्ट्राइक रीसेट हब।
+            </p>
+          </div>
+        </div>
+        <button type="button" class="admin-btn" id="sakhiModerationRefreshBtn" style="background:#334155;color:#f8fafc;font-size:0.82rem;padding:6px 12px;display:inline-flex;align-items:center;gap:6px;">
+          <span>🔄</span> <span>सूची ताज़ा करें</span>
+        </button>
+      </div>
+
+      <!-- Quick Manual Action Bar -->
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.82rem;font-weight:700;color:#cbd5e1;">🎯 यूज़र मोबाइल:</span>
+          <input type="tel" id="sakhiModTargetMobile" placeholder="उदा: 7974422572" maxlength="10" style="background:#1e293b;border:1px solid #475569;border-radius:6px;color:#f8fafc;padding:7px 12px;font-size:0.88rem;font-family:monospace;width:150px;outline:none;" />
+          
+          <span style="font-size:0.82rem;font-weight:700;color:#cbd5e1;margin-left:6px;">अवधि:</span>
+          <select id="sakhiModBlockDuration" style="background:#1e293b;border:1px solid #475569;border-radius:6px;color:#f8fafc;padding:7px 10px;font-size:0.84rem;outline:none;">
+            <option value="24" selected>24 घंटे (1 दिन)</option>
+            <option value="48">48 घंटे (2 दिन)</option>
+            <option value="168">7 दिन (1 सप्ताह)</option>
+          </select>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <button type="button" id="sakhiModBlockBtn" class="admin-btn" style="background:#dc2626;color:#ffffff;border:none;padding:7px 14px;font-weight:800;font-size:0.84rem;border-radius:6px;cursor:pointer;">
+            <span>🚫 1-क्लिक ब्लॉक</span>
+          </button>
+          <button type="button" id="sakhiModUnblockBtn" class="admin-btn" style="background:#16a34a;color:#ffffff;border:none;padding:7px 14px;font-weight:800;font-size:0.84rem;border-radius:6px;cursor:pointer;">
+            <span>🟢 तुरंत अनब्लॉक</span>
+          </button>
+          <button type="button" id="sakhiModResetBtn" class="admin-btn" style="background:#475569;color:#ffffff;border:none;padding:7px 12px;font-size:0.84rem;border-radius:6px;cursor:pointer;" title="स्ट्राइक 0 करें">
+            <span>🔄 स्ट्राइक रीसेट</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Blocked & Flagged Users Table -->
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.84rem;color:#cbd5e1;min-width:650px;">
+          <thead>
+            <tr style="border-bottom:2px solid #334155;background:#0f172a;text-align:left;">
+              <th style="padding:10px 14px;color:#94a3b8;font-weight:800;">यूज़र मोबाइल</th>
+              <th style="padding:10px 14px;color:#94a3b8;font-weight:800;">अनुशासन स्थिति (स्ट्राइक)</th>
+              <th style="padding:10px 14px;color:#94a3b8;font-weight:800;">वर्तमान स्थिति</th>
+              <th style="padding:10px 14px;color:#94a3b8;font-weight:800;">अंतिम आपत्तिजनक इनपुट</th>
+              <th style="padding:10px 14px;color:#94a3b8;font-weight:800;text-align:right;">कार्रवाई (Action)</th>
+            </tr>
+          </thead>
+          <tbody id="sakhiModerationTableBody">
+            <!-- Dynamically populated by renderAdminModerationTable() -->
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
       
       <!-- KPI 1: Total Conversations -->
@@ -878,6 +942,7 @@ export async function initSakhiAiHub() {
   setupSakhiVaultAdminEvents();
   await fetchAndRenderSakhiVaultData();
   await initGeminiControlCenter();
+  setupAdminModerationEvents();
 }
 
 function injectSakhiStyles() {
@@ -4137,4 +4202,150 @@ function updateAdminHardwareUI() {
       : '<span>💻 इस लैपटॉप को मास्टर बनाएं</span>';
     btnEl.style.background = isMaster ? '#059669' : '#2563eb';
   }
+}
+
+
+// =========================================================================
+// SAKHI USER MODERATION & BLACKLIST CONTROLLER (Module Bridge)
+// =========================================================================
+function renderAdminModerationTable() {
+  const tbody = document.getElementById('sakhiModerationTableBody');
+  if (!tbody) return;
+
+  const modEngine = window.SakhiModeration;
+  const list = modEngine && typeof modEngine.adminGetModerationList === 'function' ? modEngine.adminGetModerationList() : [];
+
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">
+          🌸 अभी तक कोई भी यूज़र ब्लैकलिस्ट या स्ट्राइक सूची में नहीं है। सभी उपयोगकर्ता मर्यादित हैं।
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = list.map(item => {
+    const isBlocked = item.blocked && item.blocked_until && Date.now() < item.blocked_until;
+    const remTime = modEngine.getBlockRemainingTime(item.phone);
+    const remText = remTime ? remTime.text : 'समाप्त';
+    
+    const strikeBadge = item.strikes >= 3 
+      ? `<span style="background:#dc2626;color:#fff;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:800;">🚫 ${item.strikes} स्ट्राइक (ब्लॉक)</span>`
+      : (item.strikes === 2 
+        ? `<span style="background:#f59e0b;color:#fff;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:800;">⚠️ 2 स्ट्राइक (अंतिम चेतावनी)</span>`
+        : `<span style="background:#3b82f6;color:#fff;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">✋ ${item.strikes} स्ट्राइक</span>`);
+
+    const statusBadge = isBlocked
+      ? `<span style="color:#ef4444;font-weight:800;display:flex;align-items:center;gap:4px;"><span>🔒 ब्लॉक है</span> <small style="color:#f87171;">(शेष: ${remText})</small></span>`
+      : `<span style="color:#22c55e;font-weight:700;">🟢 सक्रिय (Active)</span>`;
+
+    const lastAbuse = item.last_abuse_query 
+      ? `<div style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fca5a5;font-size:0.80rem;" title="${item.last_abuse_query}">${item.last_abuse_query}</div>`
+      : `<span style="color:#64748b;font-style:italic;">--</span>`;
+
+    return `
+      <tr style="border-bottom:1px solid #334155;">
+        <td style="padding:12px 14px;font-weight:800;font-family:monospace;color:#f8fafc;">
+          ${item.phone}
+        </td>
+        <td style="padding:12px 14px;">
+          ${strikeBadge}
+        </td>
+        <td style="padding:12px 14px;">
+          ${statusBadge}
+        </td>
+        <td style="padding:12px 14px;">
+          ${lastAbuse}
+        </td>
+        <td style="padding:12px 14px;text-align:right;">
+          <div style="display:inline-flex;gap:6px;">
+            ${isBlocked ? `
+              <button type="button" class="admin-btn" style="background:#16a34a;color:#fff;padding:5px 10px;font-size:0.78rem;font-weight:800;" onclick="window.adminUnblockSakhiUser('${item.phone}')">
+                🟢 अनब्लॉक
+              </button>
+            ` : `
+              <button type="button" class="admin-btn" style="background:#dc2626;color:#fff;padding:5px 10px;font-size:0.78rem;font-weight:800;" onclick="window.adminBlockSakhiUser('${item.phone}')">
+                🚫 ब्लॉक (24h)
+              </button>
+            `}
+            <button type="button" class="admin-btn" style="background:#475569;color:#fff;padding:5px 8px;font-size:0.78rem;" title="स्ट्राइक रीसेट" onclick="window.adminResetSakhiStrikes('${item.phone}')">
+              🔄
+            </button>
+            <a href="https://wa.me/91${item.phone.replace(/[^0-9]/g, '')}" target="_blank" class="admin-btn" style="background:#25d366;color:#fff;padding:5px 8px;font-size:0.78rem;text-decoration:none;" title="WhatsApp पर संपर्क">
+              💬
+            </a>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.adminBlockSakhiUser = function(phone, hours) {
+  const h = hours || parseInt(document.getElementById('sakhiModBlockDuration')?.value || '24', 10);
+  if (window.SakhiModeration && typeof window.SakhiModeration.adminBlockUser === 'function') {
+    window.SakhiModeration.adminBlockUser(phone, h, 'एडमिन मैनुअल ब्लॉक');
+    alert('यूज़र ' + phone + ' को ' + h + ' घंटे के लिए ब्लॉक कर दिया गया है।');
+    renderAdminModerationTable();
+  }
+};
+
+window.adminUnblockSakhiUser = function(phone) {
+  if (window.SakhiModeration && typeof window.SakhiModeration.adminUnblockUser === 'function') {
+    window.SakhiModeration.adminUnblockUser(phone);
+    alert('यूज़र ' + phone + ' को सफलतापूर्वक अनब्लॉक कर दिया गया है।');
+    renderAdminModerationTable();
+  }
+};
+
+window.adminResetSakhiStrikes = function(phone) {
+  if (window.SakhiModeration && typeof window.SakhiModeration.adminResetStrikes === 'function') {
+    window.SakhiModeration.adminResetStrikes(phone);
+    alert('यूज़र ' + phone + ' की सभी स्ट्राइक 0 कर दी गई हैं।');
+    renderAdminModerationTable();
+  }
+};
+
+function setupAdminModerationEvents() {
+  const blockBtn = document.getElementById('sakhiModBlockBtn');
+  const unblockBtn = document.getElementById('sakhiModUnblockBtn');
+  const resetBtn = document.getElementById('sakhiModResetBtn');
+  const refreshBtn = document.getElementById('sakhiModerationRefreshBtn');
+  const phoneInput = document.getElementById('sakhiModTargetMobile');
+  const durSelect = document.getElementById('sakhiModBlockDuration');
+
+  if (blockBtn && phoneInput) {
+    blockBtn.onclick = () => {
+      const p = (phoneInput.value || '').trim();
+      if (!p || p.length < 10) { alert('कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें!'); return; }
+      const h = parseInt(durSelect?.value || '24', 10);
+      window.adminBlockSakhiUser(p, h);
+    };
+  }
+
+  if (unblockBtn && phoneInput) {
+    unblockBtn.onclick = () => {
+      const p = (phoneInput.value || '').trim();
+      if (!p || p.length < 10) { alert('कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें!'); return; }
+      window.adminUnblockSakhiUser(p);
+    };
+  }
+
+  if (resetBtn && phoneInput) {
+    resetBtn.onclick = () => {
+      const p = (phoneInput.value || '').trim();
+      if (!p || p.length < 10) { alert('कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें!'); return; }
+      window.adminResetSakhiStrikes(p);
+    };
+  }
+
+  if (refreshBtn) {
+    refreshBtn.onclick = () => {
+      renderAdminModerationTable();
+    };
+  }
+
+  renderAdminModerationTable();
 }
