@@ -4046,13 +4046,30 @@ if (typeof document !== 'undefined') {
 
       let prof = {};
       try { prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
-      const needsProfileCapture = !prof.gender || prof.gender === 'unknown';
+      const phone = (typeof getUserPhone === 'function') ? getUserPhone() : '';
+      const isPhoneHandled = phone && (
+        localStorage.getItem(`SAKHI_IDENTITY_SAVED_${phone}`) === 'true' || 
+        localStorage.getItem(`SAKHI_IDENTITY_SHOWN_${phone}`) === 'true'
+      );
+      const alreadyCaptured = localStorage.getItem('SAKHI_IDENTITY_SAVED') === 'true' || 
+                              localStorage.getItem('SAKHI_IDENTITY_SHOWN') === 'true' ||
+                              Boolean(isPhoneHandled) ||
+                              Boolean(prof.identity_saved) || 
+                              Boolean(prof.gender && prof.gender !== 'unknown');
+      const needsProfileCapture = !alreadyCaptured;
       let profilePromptHtml = '';
       if (needsProfileCapture) {
+        // Mark as shown once so it never appears again on subsequent opens
+        try {
+          localStorage.setItem('SAKHI_IDENTITY_SHOWN', 'true');
+          if (phone) localStorage.setItem(`SAKHI_IDENTITY_SHOWN_${phone}`, 'true');
+        } catch (_) {}
+
         profilePromptHtml = `
-          <div id="sakhiCompactProfilePrompt" style="margin-top:10px;background:#fefce8;border:1.5px solid #facc15;border-radius:12px;padding:9px 12px;">
-            <div style="font-size:0.80rem;font-weight:800;color:#854d0e;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-              <span>🌸</span> <span>सटीक व्यक्तिगत आदर व सलाह हेतु आपकी पहचान:</span>
+          <div id="sakhiCompactProfilePrompt" style="margin-top:10px;background:#fefce8;border:1.5px solid #facc15;border-radius:12px;padding:9px 12px;position:relative;animation:sakhiMsgFadeIn 0.3s ease;">
+            <div style="font-size:0.80rem;font-weight:800;color:#854d0e;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="display:flex;align-items:center;gap:6px;"><span>🌸</span> <span>सटीक व्यक्तिगत आदर व सलाह हेतु आपकी पहचान:</span></span>
+              <button type="button" onclick="window.dismissSakhiIdentityPrompt && window.dismissSakhiIdentityPrompt()" style="background:rgba(133,77,14,0.1);border:none;color:#854d0e;width:22px;height:22px;border-radius:50%;font-size:0.85rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-weight:900;" title="बंद करें (दोबारा नहीं दिखेगा)">✕</button>
             </div>
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
               <button type="button" class="sakhi-profile-opt-btn" onclick="window.saveSakhiProfileField('gender', 'male', this)" style="background:#ffffff;color:#166534;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:16px;border:1px solid #86efac;cursor:pointer;">👨 पुरुष (भाई/काका)</button>
@@ -16094,11 +16111,29 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   window.saveSakhiProfileField = function (field, val, btnEl) {
     try {
+      localStorage.setItem('SAKHI_IDENTITY_SAVED', 'true');
       let prof = {};
       try { prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
       prof[field] = val;
       prof.profile_saved = true;
+      prof.identity_saved = true;
       localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
+
+      // Also persist to AI_USER
+      try {
+        let u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+        u[field] = val;
+        localStorage.setItem('AI_USER', JSON.stringify(u));
+      } catch (_) {}
+
+      // If user has Supabase profile, sync quietly
+      if (window.supabase && prof.id) {
+        try {
+          const updateObj = {};
+          if (field === 'gender') updateObj.gender = val;
+          window.supabase.from('profiles').update(updateObj).eq('id', prof.id).then(() => {}).catch(() => {});
+        } catch (_) {}
+      }
 
       if (field === 'location') {
         localStorage.setItem('AAROGYAM_USER_WEATHER_LOCATION', val);
@@ -16129,13 +16164,36 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         notice.style.display = 'block';
       }
 
-      // Update compact prompt if present in greeting
-      const compactMsg = document.getElementById('sakhiCompactProfileMsg');
-      if (compactMsg) {
-        compactMsg.innerHTML = '✅ आपकी जानकारी सुरक्षित हो गई! अब सखी आपको सही आत्मीय संबोधन देगी।';
-        compactMsg.style.display = 'block';
+      // Update compact prompt if present in greeting and auto-hide so it never reappears
+      const compactPrompt = document.getElementById('sakhiCompactProfilePrompt');
+      if (compactPrompt) {
+        const compactMsg = document.getElementById('sakhiCompactProfileMsg');
+        if (compactMsg) {
+          compactMsg.innerHTML = '✅ आपकी पहचान सुरक्षित हो गई!';
+          compactMsg.style.display = 'block';
+        }
+        setTimeout(() => {
+          if (compactPrompt) {
+            compactPrompt.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            compactPrompt.style.opacity = '0';
+            compactPrompt.style.transform = 'translateY(-8px)';
+            setTimeout(() => compactPrompt.remove(), 320);
+          }
+        }, 1200);
       }
     } catch (_) { }
+  };
+
+  window.dismissSakhiIdentityPrompt = function () {
+    try {
+      localStorage.setItem('SAKHI_IDENTITY_SAVED', 'true');
+      let prof = {};
+      try { prof = JSON.parse(localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
+      prof.identity_saved = true;
+      localStorage.setItem('AI_PROFILE', JSON.stringify(prof));
+      const compactPrompt = document.getElementById('sakhiCompactProfilePrompt');
+      if (compactPrompt) compactPrompt.remove();
+    } catch (_) {}
   };
 
   // =========================================================================

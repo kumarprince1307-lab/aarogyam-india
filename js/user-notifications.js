@@ -61,7 +61,7 @@
                 ) {
                     return true;
                 }
-            } catch (e) {}
+            } catch (e) { }
             return false;
         },
 
@@ -74,14 +74,14 @@
 
             let bellBtn = document.querySelector('.user-notif-bell-btn');
             if (!bellBtn) {
-                const headerActions = document.querySelector('.header-actions') || 
-                                      document.querySelector('.reader-header .header-right') ||
-                                      document.querySelector('.vip-header .header-inner') ||
-                                      document.querySelector('.header-inner') ||
-                                      document.querySelector('.header .nav-actions') || 
-                                      document.querySelector('.nav-actions') || 
-                                      document.querySelector('.header-right') || 
-                                      document.querySelector('header .actions');
+                const headerActions = document.querySelector('.header-actions') ||
+                    document.querySelector('.reader-header .header-right') ||
+                    document.querySelector('.vip-header .header-inner') ||
+                    document.querySelector('.header-inner') ||
+                    document.querySelector('.header .nav-actions') ||
+                    document.querySelector('.nav-actions') ||
+                    document.querySelector('.header-right') ||
+                    document.querySelector('header .actions');
 
                 if (headerActions) {
                     bellBtn = document.createElement('button');
@@ -139,7 +139,7 @@
             if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
                 const promoScript = document.createElement('script');
                 promoScript.id = 'agy-promo-gateway-script';
-                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261106_v2';
+                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261106_v9_avnish_clean';
                 promoScript.defer = true;
                 document.head.appendChild(promoScript);
             }
@@ -170,7 +170,7 @@
             try {
                 const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('UCAS_USER') || localStorage.getItem('AI_PROFILE') || '{}');
                 if (u && (u.id || u.mobile)) return u;
-            } catch (e) {}
+            } catch (e) { }
 
             return {
                 id: localStorage.getItem('user_id') || localStorage.getItem('profile_id') || null,
@@ -265,7 +265,7 @@
                             return; // 🛡️ 100% ZERO EGRESS
                         }
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
 
             const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${userKey}`) || '[]');
@@ -405,7 +405,7 @@
                 try {
                     const localBc = JSON.parse(localStorage.getItem('AAROGYAM_GLOBAL_BROADCASTS') || '[]');
                     if (Array.isArray(localBc)) globalBroadcasts = localBc;
-                } catch(e) {}
+                } catch (e) { }
 
                 // Fetch static Zero-Egress broadcast JSON from GitHub/CDN
                 try {
@@ -420,7 +420,7 @@
                             globalBroadcasts = Array.from(bcMap.values());
                         }
                     }
-                } catch(netErr) {}
+                } catch (netErr) { }
 
                 if (Array.isArray(globalBroadcasts) && globalBroadcasts.length > 0) {
                     const today = new Date();
@@ -432,9 +432,9 @@
                     })());
 
                     const hasPurchased = Boolean(
-                        localStorage.getItem('AI_PURCHASES') || 
-                        localStorage.getItem('purchases') || 
-                        user.is_subscriber || 
+                        localStorage.getItem('AI_PURCHASES') ||
+                        localStorage.getItem('purchases') ||
+                        user.is_subscriber ||
                         user.totalPurchases > 0
                     );
 
@@ -487,7 +487,7 @@
                         }
                     });
                 }
-            } catch (err) {}
+            } catch (err) { }
 
             // --- F. Targeted Personal Notifications from Admin Marketing Hub ---
             try {
@@ -518,7 +518,7 @@
                         isRead: readStore.includes(notifId)
                     });
                 });
-            } catch (tErr) {}
+            } catch (tErr) { }
 
             // Sort by timestamp descending
             list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -530,7 +530,7 @@
                 localStorage.setItem(cacheKey, JSON.stringify(list));
                 localStorage.setItem(lastFetchDateKey, todayStr);
                 localStorage.setItem(processedDispatchKey, String(lastAdminDispatch || Date.now()));
-            } catch (e) {}
+            } catch (e) { }
             this.updateBadgeCount();
             this.renderList();
         },
@@ -726,7 +726,7 @@
 
             try {
                 localStorage.setItem(`AI_NOTIFS_CACHE_${userKey}`, JSON.stringify(this.items));
-            } catch (e) {}
+            } catch (e) { }
 
             this.updateBadgeCount();
             this.renderList();
@@ -742,7 +742,7 @@
 
             try {
                 localStorage.setItem(`AI_NOTIFS_CACHE_${userKey}`, JSON.stringify(this.items));
-            } catch (e) {}
+            } catch (e) { }
 
             this.updateBadgeCount();
             this.renderList();
@@ -896,11 +896,11 @@
                                     });
                                 });
                             }
-                        } catch (e) {}
+                        } catch (e) { }
                         toast.remove();
                     });
                 }, 4000);
-            } catch (err) {}
+            } catch (err) { }
         },
 
         // 14. Universal Festival & Flash Sale Banner (Flipkart / Amazon Style)
@@ -915,13 +915,13 @@
                     if (local && typeof local.active === 'boolean') {
                         conf = local;
                     }
-                } catch (e) {}
+                } catch (e) { }
 
                 if (!conf || typeof conf.active !== 'boolean') {
                     try {
                         const resp = await fetch('/data/festival-campaign.json?v=' + Math.floor(Date.now() / 300000));
                         if (resp.ok) conf = await resp.json();
-                    } catch (e) {}
+                    } catch (e) { }
                 }
 
                 if (!conf || !conf.active) return;
@@ -1033,7 +1033,7 @@
                     updateCountdown();
                     setInterval(updateCountdown, 1000);
                 }
-            } catch (err) {}
+            } catch (err) { }
         },
 
         // 15. Relative Time Formatter

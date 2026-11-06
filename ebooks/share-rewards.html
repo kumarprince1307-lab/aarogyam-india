@@ -281,8 +281,13 @@
             लॉग-इन आईडी: <strong id="userShareIdText" style="color:#38bdf8; font-family:monospace;">---</strong>
           </div>
         </div>
-        <div class="timer-badge">
-          <div id="liveWalletTimer">⏳ वैधता: 90 दिन शेष</div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button type="button" onclick="openMyPassbookModal()" style="background:#1e293b; color:#38bdf8; border:1.5px solid #38bdf8; padding:6px 14px; border-radius:20px; font-weight:800; font-size:0.8rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            📜 मेरी पासबुक
+          </button>
+          <div class="timer-badge">
+            <div id="liveWalletTimer">⏳ वैधता: 90 दिन शेष</div>
+          </div>
         </div>
       </div>
 
@@ -304,6 +309,43 @@
           <div style="font-size:1.4rem; font-weight:900; color:#f59e0b; margin-top:4px;">+₹<span id="userRefText">0</span></div>
           <div style="font-size:0.72rem; color:#64748b; margin-top:3px;">आपके शेयर लिंक से जुड़े खरीदारों से</div>
         </div>
+      </div>
+    </section>
+
+    <!-- 🪔 Festive & Viral Promotion Share Program -->
+    <section style="background:linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(15,23,42,0.95) 100%); border:2px solid #f59e0b; border-radius:20px; padding:24px; margin-bottom:35px; box-shadow:0 12px 32px rgba(245,158,11,0.15);">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <span style="font-size:1.8rem;">🪔</span>
+        <div>
+          <h2 style="font-size:1.25rem; font-weight:900; color:#fef08a; margin:0;">उत्सव शुभकामना व वायरल शेयरिंग रिवॉर्ड्स (Festive Viral Rewards)</h2>
+          <p style="font-size:0.82rem; color:#fde68a; margin:2px 0 0 0;">हर त्योहार, राष्ट्रीय पर्व व वीडियो शेयर पर पाएं सीधे पॉइंट्स</p>
+        </div>
+      </div>
+      
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-top:16px;">
+        <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(245,158,11,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:1.3rem;">📲</span>
+            <strong style="color:#f59e0b; font-size:0.95rem;">1. हर WhatsApp शेयर पर +1 पॉइंट</strong>
+          </div>
+          <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin:0;">
+            जब भी आप किसी त्योहार (जैसे धनतेरस, दीपावली, 15 अगस्त आदि) या AarogyamTube वीडियो को WhatsApp पर अपने नाम से शेयर करते हैं, आपको तुरंत <strong>+1 पॉइंट</strong> मिलता है और मधुर 'Chin' घंटी बजती है!
+          </p>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.35); border:1px solid rgba(16,185,129,0.3); border-radius:14px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:1.3rem;">🎁</span>
+            <strong style="color:#10b981; font-size:0.95rem;">2. नए मित्र के जुड़ने पर +5 पॉइंट्स</strong>
+          </div>
+          <p style="font-size:0.84rem; color:#cbd5e1; line-height:1.5; margin:0;">
+            आपके शेयर किए गए शुभकामना लिंक पर क्लिक करके जब भी कोई नया सदस्य रजिस्टर करता है, तो उसे <strong>+5 पॉइंट्स वेलकम गिफ्ट</strong> मिलता है और आपको भी <strong>+5 पॉइंट्स रेफरल रिवॉर्ड</strong> जुड़ता है!
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:rgba(239,68,68,0.12); border:1px dashed #ef4444; border-radius:12px; padding:12px; font-size:0.84rem; color:#fca5a5;">
+        <strong>⏳ 90-दिन का लाइफलाइन रिन्यूअल नियम:</strong> जब भी आपके वॉलेट में कोई नया पॉइंट जुड़ता है (चाहे वह +1 शेयर से हो, +5 रेफरल से हो या 10% कैशबैक से), आपके पूरे वॉलेट की <strong>90-दिन की वैधता (Validity) स्वतः नए सिरे से 90 दिन के लिए रिन्यू</strong> हो जाती है!
       </div>
     </section>
 
@@ -426,6 +468,9 @@
   </main>
 
   <!-- JavaScript Modules -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/session.js"></script>
   <script src="/js/wallet-reward-engine.js"></script>
   <script>
     let hasAttemptedAutoPlay = false;
@@ -524,6 +569,178 @@
         el.style.display = 'block';
         setTimeout(() => { el.style.display = 'none'; }, 3000);
       }
+    }
+
+    async function openMyPassbookModal() {
+      const old = document.getElementById('user-share-passbook-modal');
+      if (old) { old.remove(); return; }
+
+      const w = window.AarogyamWallet;
+      if (w && typeof w.init === 'function') w.init();
+
+      const user = (w && typeof w.getCurrentUser === 'function') ? w.getCurrentUser() : {};
+      const state = (w && w.state) ? w.state : {};
+      const balance = (w && typeof w.getBalance === 'function') ? w.getBalance() : (state.balance || 0);
+
+      // Get local ledger entries
+      let ledger = Array.isArray(state.ledger) ? [...state.ledger] : [];
+
+      // Query Supabase live for any additional transactions if user is identified
+      if (window.supabase && (user.id || user.mobile)) {
+        try {
+          let query = window.supabase.from('wallet_transactions').select('*').order('created_at', { ascending: false }).limit(60);
+          if (user.id) {
+            query = query.eq('profile_id', user.id);
+          }
+          const { data: remoteTxns } = await query;
+          if (Array.isArray(remoteTxns) && remoteTxns.length > 0) {
+            const seen = new Set(ledger.map(x => x.id || (x.title + '_' + x.timestamp)));
+            remoteTxns.forEach(tx => {
+              const uniqueKey = tx.id;
+              if (!seen.has(uniqueKey)) {
+                ledger.push({
+                  id: tx.id,
+                  type: tx.type,
+                  title: tx.title || (tx.type === 'debit' ? 'ई-बुक खरीद छूट' : 'पॉइंट्स क्रेडिट'),
+                  points: tx.type === 'debit' ? -Math.abs(tx.amount) : Math.abs(tx.amount),
+                  timestamp: tx.created_at,
+                  status: tx.type === 'debit' ? 'debited' : 'credited'
+                });
+                seen.add(uniqueKey);
+              }
+            });
+          }
+        } catch (err) {}
+      }
+
+      // Sort newest first
+      ledger.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+      const totalEarned = state.total_earned || (ledger.filter(x => (x.points || 0) > 0).reduce((s, x) => s + (x.points || 0), 0)) || balance;
+      const totalSpent = state.total_spent || (ledger.filter(x => (x.points || 0) < 0).reduce((s, x) => s + Math.abs(x.points || 0), 0)) || 0;
+
+      // Calculate 90-day validity
+      let validityText = "90 दिन शेष";
+      if (w && typeof w.getRemainingTime === 'function') {
+        const rem = w.getRemainingTime();
+        if (rem.isExpired) validityText = "एक्सपायर हो चुका है";
+        else validityText = `${rem.days} दिन ${String(rem.hours).padStart(2,'0')}:${String(rem.minutes).padStart(2,'0')} शेष`;
+      }
+
+      const modal = document.createElement('div');
+      modal.id = 'user-share-passbook-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(8,12,22,0.85);backdrop-filter:blur(8px);z-index:999999;display:flex;align-items:flex-end;justify-content:center;padding:0;font-family:Outfit,sans-serif;';
+
+      modal.innerHTML = `
+        <div style="background:linear-gradient(180deg, #0f172a 0%, #090e17 100%);border-top:2px solid #3b82f6;border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,0.8);color:#fff;overflow:hidden;animation:agyPassbookSlideUp 0.3s cubic-bezier(0.16,1,0.3,1);">
+          <style>
+            @keyframes agyPassbookSlideUp {
+              0% { transform: translateY(100%); }
+              100% { transform: translateY(0); }
+            }
+          </style>
+
+          <!-- Header -->
+          <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg, #10b981, #059669);display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+                  📜
+                </div>
+                <div>
+                  <h3 style="margin:0;font-size:1.15rem;font-weight:900;">मेरी रिवॉर्ड पासबुक (बहीखाता)</h3>
+                  <div style="font-size:0.75rem;color:#94a3b8;">शेयर आईडी: <strong style="color:#38bdf8;font-family:monospace;">${user.share_id || 'AI000004'}</strong> • ${user.full_name || 'किसान साथी'}</div>
+                </div>
+              </div>
+              <button type="button" id="btn-close-my-passbook" style="background:rgba(255,255,255,0.08);border:none;color:#cbd5e1;width:34px;height:34px;border-radius:10px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+
+            <!-- 3 Stat Cards -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:8px 10px;text-align:center;">
+                <div style="font-size:0.68rem;color:#6ee7b7;font-weight:700;">वर्तमान बैलेंस</div>
+                <div style="font-size:1.2rem;font-weight:900;color:#10b981;">₹${balance}</div>
+              </div>
+              <div style="background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:8px 10px;text-align:center;">
+                <div style="font-size:0.68rem;color:#7dd3fc;font-weight:700;">कुल कमाई</div>
+                <div style="font-size:1.2rem;font-weight:900;color:#38bdf8;">+₹${totalEarned}</div>
+              </div>
+              <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:8px 10px;text-align:center;">
+                <div style="font-size:0.68rem;color:#fca5a5;font-weight:700;">कुल खर्च</div>
+                <div style="font-size:1.2rem;font-weight:900;color:#f87171;">-₹${totalSpent}</div>
+              </div>
+            </div>
+
+            <!-- Validity renewal alert -->
+            <div style="margin-top:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:6px 12px;font-size:0.75rem;color:#fde047;display:flex;align-items:center;justify-content:space-between;">
+              <span>⏳ वैधता: <strong>${validityText}</strong></span>
+              <span style="font-size:0.68rem;color:#cbd5e1;">(नए क्रेडिट पर 90 दिन रिन्यू)</span>
+            </div>
+          </div>
+
+          <!-- Transaction List -->
+          <div style="overflow-y:auto;flex:1;padding:8px 16px;">
+            <div style="font-size:0.75rem;font-weight:800;color:#94a3b8;text-transform:uppercase;margin:6px 0 8px 0;letter-spacing:0.5px;">
+              क्रेडिट / डेबिट लेन-देन विवरण (${ledger.length})
+            </div>
+
+            ${ledger.length === 0 ? `
+              <div style="text-align:center;padding:36px 16px;color:#94a3b8;">
+                <div style="font-size:2.4rem;margin-bottom:8px;">🎁</div>
+                <h4 style="color:#fff;margin:0 0 6px 0;font-size:1rem;">अभी कोई लेन-देन दर्ज नहीं है</h4>
+                <p style="font-size:0.82rem;line-height:1.5;max-width:320px;margin:0 auto 16px auto;">
+                  WhatsApp पर त्योहारों की शुभकामनाएँ शेयर करें (+1 पॉइंट), दोस्तों को जोड़ें (+5 पॉइंट्स) या किताबें खरीदकर 10% कैशबैक कमाएँ!
+                </p>
+                <button type="button" onclick="shareOnWhatsApp()" style="background:linear-gradient(135deg, #10b981, #059669);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:800;font-size:0.84rem;cursor:pointer;">
+                  📲 अभी शेयर करें
+                </button>
+              </div>
+            ` : `
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                ${ledger.map(entry => {
+                  const pts = Number(entry.points) || 0;
+                  const isCredit = pts > 0;
+                  const sign = isCredit ? '+' : '';
+                  const color = isCredit ? '#10b981' : '#ef4444';
+                  const bg = isCredit ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
+                  const icon = isCredit ? '🟢' : '🔴';
+                  const dateStr = entry.timestamp 
+                    ? new Date(entry.timestamp).toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '-';
+                  return `
+                    <div style="background:${bg};border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+                      <div style="display:flex;align-items:center;gap:10px;">
+                        <span style="font-size:1rem;">${icon}</span>
+                        <div>
+                          <div style="font-size:0.88rem;font-weight:700;color:#fff;">${entry.title || (isCredit ? 'रिवॉर्ड पॉइंट्स' : 'ई-बुक खरीद उपयोग')}</div>
+                          <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">${dateStr}</div>
+                        </div>
+                      </div>
+                      <div style="font-size:1.05rem;font-weight:900;color:${color};white-space:nowrap;">
+                        ${sign}₹${Math.abs(pts)}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `}
+          </div>
+
+          <!-- Footer -->
+          <div style="padding:12px 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,0.25);">
+            <div style="font-size:0.75rem;color:#94a3b8;">किताब खरीद पर 20% तक सीधी छूट</div>
+            <a href="/ebooks/ebook.html" style="background:linear-gradient(135deg, #10b981, #059669);color:#fff;text-decoration:none;padding:7px 16px;border-radius:20px;font-size:0.8rem;font-weight:800;">
+              📚 किताबें देखें
+            </a>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const closeBtn = document.getElementById('btn-close-my-passbook');
+      if (closeBtn) closeBtn.onclick = () => modal.remove();
+      modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
   </script>
   <script src="/js/universal-nav-drawer.js?v=20261101_v32_bahi_khata"></script>

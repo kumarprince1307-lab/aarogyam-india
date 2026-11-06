@@ -148,6 +148,9 @@ function renderUsersTable(users) {
             <th>Status</th>
             <th>Action</th>
             <th>Direct Referrals</th>
+            <th style="background: rgba(245,158,11,0.15); color: #f59e0b; white-space: nowrap;">🪙 Points Earned</th>
+            <th style="background: rgba(34,197,94,0.15); color: #22c55e; white-space: nowrap;">💰 Wallet Balance</th>
+            <th style="background: rgba(99,102,241,0.15); color: #818cf8; white-space: nowrap;">📜 Passbook</th>
             <th>Total Shares</th>
             <th>Total Clicks</th>
             <th>Total Direct Purchases</th>
@@ -298,8 +301,19 @@ function renderUsersTable(users) {
                   </div>
                 </td>
                 <td>${u.directReferrals || 0}</td>
-                <td>${u.totalShares || 0}</td>
-                <td>${u.totalClicks || 0}</td>
+                <td style="font-weight:800; color:#f59e0b; text-align:center;">
+                  ${(u.sharePointsEarned || 0) > 0 ? `🪙 ${u.sharePointsEarned}` : '<span style="color:#64748b;">0</span>'}
+                </td>
+                <td style="font-weight:800; color:#10b981; text-align:center;">
+                  ${(u.walletBalance || 0) > 0 ? `₹${u.walletBalance}` : '<span style="color:#64748b;">₹0</span>'}
+                </td>
+                <td style="text-align:center;">
+                  <button type="button" class="admin-button small-button" onclick="window.openAdminUserPassbookModal('${u.id}')" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer; white-space:nowrap;" title="उपयोगकर्ता की पूरी पासबुक व क्रेडिट/डेबिट लेन-देन देखें">
+                    📜 पासबुक
+                  </button>
+                </td>
+                <td style="text-align:center; font-weight:700;">${u.totalShares || 0}</td>
+                <td style="text-align:center; font-weight:700;">${u.totalClicks || 0}</td>
                 <td>${u.totalDirectPurchases || 0}</td>
                 <td>${u.totalPurchases || 0}</td>
                 <td>₹${(u.totalSpent || 0).toLocaleString('en-IN')}</td>
@@ -361,19 +375,24 @@ export async function initUsers() {
           <input id="user-reg-date-filter" type="date" title="Filter by registration date" class="admin-input" style="min-width:140px;" />
           <button id="btn-clear-date-filter" type="button" class="admin-button small-button" style="padding:4px 8px;font-size:0.75rem;background:#475569;color:#fff;" title="Clear date filter">❌</button>
         </div>
-        <select id="user-status-filter" class="admin-select" style="min-width:130px;">
+        <select id="user-status-filter" class="admin-select" style="min-width:145px;">
           <option value="all">All statuses</option>
+          <option value="wallet_earners">🪙 Wallet Earners (>0 Pts)</option>
+          <option value="active_sharers">📲 Active Sharers (Shares >0)</option>
+          <option value="has_referrals">👥 Referrers (Refs >0)</option>
           <option value="installed">📱 App Installed</option>
           <option value="web">🌐 Web Only</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-        <select id="user-sort-filter" class="admin-select" style="min-width:180px;">
+        <select id="user-sort-filter" class="admin-select" style="min-width:185px;">
           <option value="default">Sort by Registration Date</option>
-          <option value="sakhiChats">🌸 सखी संवाद संख्या (Sakhi Chats: High-Low)</option>
+          <option value="walletBalance">💰 Wallet Balance (High-Low)</option>
+          <option value="sharePointsEarned">🪙 Share Points (High-Low)</option>
+          <option value="totalShares">📲 Total Shares (High-Low)</option>
+          <option value="totalClicks">👆 Total Clicks (High-Low)</option>
           <option value="directReferrals">Direct Referrals (High-Low)</option>
-          <option value="totalShares">Total Shares (High-Low)</option>
-          <option value="totalClicks">Total Clicks (High-Low)</option>
+          <option value="sakhiChats">🌸 सखी संवाद संख्या (Sakhi Chats: High-Low)</option>
           <option value="totalDirectPurchases">Total Direct Purchases (High-Low)</option>
           <option value="totalPurchases">Total Purchases (High-Low)</option>
           <option value="totalSpent">Total Spent (High-Low)</option>
@@ -381,7 +400,7 @@ export async function initUsers() {
         </select>
         <button id="export-csv-btn" class="admin-button">Export CSV</button>
       </div>
-      <div id="users-filter-stat-bar" style="font-size:0.8rem;color:#94a3b8;margin-top:6px;padding-left:4px;display:flex;justify-content:space-between;">
+      <div id="users-filter-stat-bar" style="font-size:0.82rem;color:#94a3b8;margin-top:8px;padding:6px 12px;background:rgba(15,23,42,0.4);border-radius:8px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <span id="users-count-label">Showing 0 users</span>
       </div>
       <div id="users-table" style="margin-top:8px;"></div>
@@ -445,7 +464,13 @@ export async function initUsers() {
 
     // 2. Status Filter
     if (statusVal !== 'all') {
-      if (statusVal === 'installed') {
+      if (statusVal === 'wallet_earners') {
+        result = result.filter(u => (u.sharePointsEarned || 0) > 0 || (u.walletBalance || 0) > 0);
+      } else if (statusVal === 'active_sharers') {
+        result = result.filter(u => (u.totalShares || 0) > 0 || (u.totalClicks || 0) > 0);
+      } else if (statusVal === 'has_referrals') {
+        result = result.filter(u => (u.directReferrals || 0) > 0);
+      } else if (statusVal === 'installed') {
         result = result.filter(u => u.appInstalled === true || String(u.source || '').toLowerCase().includes('pwa') || String(u.source || '').toLowerCase().includes('app'));
       } else if (statusVal === 'web') {
         result = result.filter(u => !u.appInstalled && !String(u.source || '').toLowerCase().includes('pwa') && !String(u.source || '').toLowerCase().includes('app'));
@@ -477,7 +502,7 @@ export async function initUsers() {
       if (sortVal === 'sakhiChats') {
         result.sort((a, b) => (b.sakhiChatCount || 0) - (a.sakhiChatCount || 0));
       } else {
-        result.sort((a, b) => (b[sortVal] || 0) - (a[sortVal] || 0));
+        result.sort((a, b) => (Number(b[sortVal]) || 0) - (Number(a[sortVal]) || 0));
       }
     } else {
       // Default: Most recent registrations first
@@ -486,8 +511,26 @@ export async function initUsers() {
 
     currentUsersData = result;
     currentUsersPage = 1;
+
+    // Calculate aggregated metrics across master users
+    let totalAllPoints = 0;
+    let totalAllShares = 0;
+    let totalAllClicks = 0;
+    masterUsersList.forEach(u => {
+      totalAllPoints += (u.sharePointsEarned || 0);
+      totalAllShares += (u.totalShares || 0);
+      totalAllClicks += (u.totalClicks || 0);
+    });
+
     if (usersCountLabel) {
-      usersCountLabel.textContent = `Showing ${currentUsersData.length} of ${masterUsersList.length} users`;
+      usersCountLabel.innerHTML = `
+        <span>Showing <strong>${currentUsersData.length}</strong> of ${masterUsersList.length} users</span>
+        <span style="display:inline-flex;gap:14px;align-items:center;flex-wrap:wrap;">
+          <span style="color:#f59e0b;font-weight:800;">🪙 कुल बांटे गए पॉइंट्स: <strong>${totalAllPoints.toLocaleString('en-IN')}</strong></span>
+          <span style="color:#38bdf8;font-weight:800;">📲 कुल शेयर्स: <strong>${totalAllShares.toLocaleString('en-IN')}</strong></span>
+          <span style="color:#4ade80;font-weight:800;">👆 कुल क्लिक्स: <strong>${totalAllClicks.toLocaleString('en-IN')}</strong></span>
+        </span>
+      `;
     }
     renderTableWithPagination();
   }
@@ -1145,5 +1188,113 @@ window.resetUserDevice = async function(userId, mobile, btnEl) {
       btnEl.textContent = '🔄 Reset';
     }
   }
+};
+
+// =========================================================================
+// 📜 ADMIN USER PASSBOOK MODAL (Full Points Credit / Debit History)
+// =========================================================================
+window.openAdminUserPassbookModal = function (userId) {
+  const user = (masterUsersList && masterUsersList.find(x => x.id === userId)) || (currentUsersData && currentUsersData.find(x => x.id === userId));
+  if (!user) {
+    alert("उपयोगकर्ता का डेटा नहीं मिला।");
+    return;
+  }
+
+  const old = document.getElementById('admin-user-passbook-modal');
+  if (old) old.remove();
+
+  const ledger = user.passbookLedger || [];
+  let ledgerRows = '';
+
+  if (ledger.length === 0) {
+    ledgerRows = '<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:26px;font-size:0.88rem;">अभी तक कोई पॉइंट्स लेन-देन (Transactions) दर्ज नहीं हुआ है।</td></tr>';
+  } else {
+    ledger.forEach(entry => {
+      const isCredit = entry.type === 'credit';
+      const sign = isCredit ? '+' : '-';
+      const color = isCredit ? '#10b981' : '#ef4444';
+      const bg = isCredit ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)';
+      const badge = isCredit 
+        ? '<span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.72rem;letter-spacing:0.5px;">CREDIT</span>' 
+        : '<span style="background:#fee2e2;color:#b91c1c;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.72rem;letter-spacing:0.5px;">DEBIT</span>';
+      
+      const dateStr = entry.created_at 
+        ? new Date(entry.created_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+        : '-';
+
+      ledgerRows += `
+        <tr style="background:${bg};border-bottom:1px solid rgba(255,255,255,0.06);">
+          <td style="padding:10px 12px;font-size:0.8rem;color:#94a3b8;white-space:nowrap;">${dateStr}</td>
+          <td style="padding:10px 12px;font-size:0.86rem;color:#f8fafc;font-weight:600;">${entry.title || 'लेन-देन'}</td>
+          <td style="padding:10px 12px;text-align:center;">${badge}</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:900;font-size:0.95rem;color:${color};white-space:nowrap;">${sign}₹${Math.abs(entry.amount || 0)}</td>
+        </tr>
+      `;
+    });
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'admin-user-passbook-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,17,32,0.85);backdrop-filter:blur(8px);z-index:9999999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  modal.innerHTML = `
+    <div style="background:#0f172a;border:1.5px solid #334155;border-radius:20px;max-width:640px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 50px rgba(0,0,0,0.85);color:#fff;font-family:system-ui,sans-serif;overflow:hidden;">
+      <!-- Modal Header -->
+      <div style="padding:16px 20px;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between;background:#1e293b;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(16,185,129,0.35);">📜</div>
+          <div>
+            <div style="font-size:1.08rem;font-weight:800;color:#fff;">उपयोगकर्ता पासबुक लेजर (Wallet Passbook)</div>
+            <div style="font-size:0.78rem;color:#94a3b8;margin-top:2px;">
+              👤 <strong>${user.name}</strong> • <code>${user.shareId || 'AI000004'}</code> • 📞 ${user.mobile}
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="document.getElementById('admin-user-passbook-modal').remove()" style="background:rgba(255,255,255,0.08);border:none;color:#cbd5e1;width:34px;height:34px;border-radius:10px;font-size:1.2rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- Quick Summary Cards -->
+      <div style="padding:14px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:rgba(15,23,42,0.6);border-bottom:1px solid #1e293b;">
+        <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:0.72rem;color:#86efac;font-weight:700;">वर्तमान उपलब्ध बैलेंस</div>
+          <div style="font-size:1.3rem;font-weight:900;color:#22c55e;margin-top:2px;">₹${user.walletBalance || 0}</div>
+        </div>
+        <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:0.72rem;color:#fde047;font-weight:700;">कुल अर्जित पॉइंट्स</div>
+          <div style="font-size:1.3rem;font-weight:900;color:#f59e0b;margin-top:2px;">+${user.sharePointsEarned || 0}</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:0.72rem;color:#fca5a5;font-weight:700;">कुल खर्च / रिडीम</div>
+          <div style="font-size:1.3rem;font-weight:900;color:#ef4444;margin-top:2px;">-${user.totalSpentPoints || 0}</div>
+        </div>
+      </div>
+
+      <!-- Passbook Table -->
+      <div style="padding:14px 20px;overflow-y:auto;flex:1;">
+        <div style="font-size:0.76rem;font-weight:800;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">
+          क्रेडिट एवं डेबिट लेन-देन इतिहास (Ledger):
+        </div>
+        <table style="width:100%;border-collapse:collapse;text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid #334155;color:#94a3b8;font-size:0.75rem;">
+              <th style="padding:8px 12px;">तारीख</th>
+              <th style="padding:8px 12px;">विवरण (Description)</th>
+              <th style="padding:8px 12px;text-align:center;">प्रकार</th>
+              <th style="padding:8px 12px;text-align:right;">अंक (Points)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ledgerRows}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:12px 20px;border-top:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between;background:#1e293b;">
+        <span style="font-size:0.75rem;color:#94a3b8;">*Aarogyam Manas Zero-Egress Ledger Engine</span>
+        <button type="button" onclick="document.getElementById('admin-user-passbook-modal').remove()" style="background:#334155;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;">बंद करें (Close)</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 };
 

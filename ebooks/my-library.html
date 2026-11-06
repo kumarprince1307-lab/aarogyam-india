@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>My Library - Aarogyam India</title>
   <!-- Favicon & PWA Manifest -->
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
@@ -159,7 +160,7 @@
   ========================================== -->
   <header class="header header-tiranga-animated" id="header" style="top: 0 !important;">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;gap:8px;">
-      
+
       <!-- Brand Logo Left in Glass Pill + Active Page Badge -->
       <div style="display:flex;align-items:center;gap:8px;">
         <a href="/index.html" class="brand-logo-pill" style="padding:3px 10px;">
@@ -183,24 +184,31 @@
       <!-- Header Actions Right: Install App, Notification, Cart, 3-Line Menu -->
       <div class="header-actions" style="display:flex;align-items:center;gap:6px;">
         <!-- Install App Button (PWA) -->
-        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn" title="Install Aarogyam App" style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:5px 10px;border-radius:20px;font-weight:900;font-size:0.72rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+        <button type="button" onclick="window.triggerPwaInstall()" class="btn-pwa-install" id="header-pwa-install-btn"
+          title="Install Aarogyam App"
+          style="background:#0f172a;color:#fde047;border:1.5px solid rgba(255,255,255,0.4);padding:5px 10px;border-radius:20px;font-weight:900;font-size:0.72rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
           <span>📲</span> <span>Install</span>
         </button>
 
         <!-- Notification Bell Icon -->
-        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:32px;height:32px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+        <button type="button" class="user-notif-bell-btn" title="Notifications" aria-label="Notifications"
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:32px;height:32px;border-radius:50%;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
           <i class="fa-regular fa-bell" style="font-size:0.9rem;"></i>
-          <span class="user-notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.65rem;font-weight:800;padding:1px 4px;border-radius:10px;">0</span>
+          <span class="user-notif-badge"
+            style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:0.65rem;font-weight:800;padding:1px 4px;border-radius:10px;">0</span>
         </button>
 
         <!-- Shopping Cart Icon -->
-        <a href="/ebooks/cart.html" title="Shopping Cart" style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+        <a href="/ebooks/cart.html" title="Shopping Cart"
+          style="background:#ffffff;border:1.5px solid #cbd5e1;color:#0f172a;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
           <i class="fa-solid fa-cart-shopping" style="font-size:0.9rem;"></i>
-          <span class="cart-count" id="cartCount" style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.65rem;font-weight:900;padding:1px 5px;border-radius:10px;">0</span>
+          <span class="cart-count" id="cartCount"
+            style="position:absolute;top:-2px;right:-2px;background:#ff671f;color:#fff;font-size:0.65rem;font-weight:900;padding:1px 5px;border-radius:10px;">0</span>
         </a>
 
         <!-- 3-Line Menu Trigger Button (Desktop Left Drawer / Mobile Right Drawer) -->
-        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu" style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+        <button type="button" class="menu-button" onclick="window.openUniversalDrawer()" title="Open Menu"
+          style="background:#0f172a;border:1.5px solid rgba(255,255,255,0.4);color:#ffffff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 2px 8px rgba(0,0,0,0.25);">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
@@ -215,17 +223,22 @@
          HOT-SELLING MEGA DEAL OF THE DAY (AMAZON / FLIPKART STYLE)
          Directly connected to Admin Panel active bundle
          ============================================================== -->
-    <div id="library-top-mega-deal-slot" class="aarogyam-mega-deal-slot" style="max-width: 1200px; margin: 12px auto 16px auto; padding: 0 10px; box-sizing: border-box;">
-      <div class="aarogyam-mega-combo-container" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; box-sizing: border-box;">
-        
+    <div id="library-top-mega-deal-slot" class="aarogyam-mega-deal-slot"
+      style="max-width: 1200px; margin: 12px auto 16px auto; padding: 0 10px; box-sizing: border-box;">
+      <div class="aarogyam-mega-combo-container"
+        style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; box-sizing: border-box;">
+
         <!-- CARD 1: 5-IN-1 MEGA COMBO -->
-        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=BUNDLE_KISAN_5IN1'" style="cursor:pointer; background: linear-gradient(135deg, #052816 0%, #064e3b 45%, #021a10 100%); border: 2px solid #facc15; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
+        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=BUNDLE_KISAN_5IN1'"
+          style="cursor:pointer; background: linear-gradient(135deg, #052816 0%, #064e3b 45%, #021a10 100%); border: 2px solid #facc15; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
           <div style="flex: 1; min-width: 170px;">
             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-              <span style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
+              <span
+                style="background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
                 🔥 5-इन-1 कॉम्बो
               </span>
-              <span style="background: rgba(250,204,21,0.2); color: #fde047; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(250,204,21,0.4);">
+              <span
+                style="background: rgba(250,204,21,0.2); color: #fde047; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(250,204,21,0.4);">
                 ⚡ 94% छूट
               </span>
             </div>
@@ -241,20 +254,24 @@
               <div style="font-size: 1.45rem; font-weight: 900; color: #facc15; line-height: 1;">₹199</div>
               <div style="font-size: 0.74rem; color: #94a3b8; text-decoration: line-through;">₹3,395</div>
             </div>
-            <a href="/bundle.html?id=BUNDLE_KISAN_5IN1" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(245,158,11,0.4); white-space: nowrap;">
+            <a href="/bundle.html?id=BUNDLE_KISAN_5IN1"
+              style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(245,158,11,0.4); white-space: nowrap;">
               कॉम्बो देखें →
             </a>
           </div>
         </div>
 
         <!-- CARD 2: 4-IN-1 KISAN MASTER BUNDLE -->
-        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=BUNDLE_KISAN_4IN1'" style="cursor:pointer; background: linear-gradient(135deg, #091a24 0%, #0f2d3d 50%, #03151f 100%); border: 2px solid #38bdf8; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
+        <div class="clean-combo-card" onclick="window.location.href='/bundle.html?id=BUNDLE_KISAN_4IN1'"
+          style="cursor:pointer; background: linear-gradient(135deg, #091a24 0%, #0f2d3d 50%, #03151f 100%); border: 2px solid #38bdf8; border-radius: 16px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box; transition: transform 0.2s ease;">
           <div style="flex: 1; min-width: 170px;">
             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-              <span style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
+              <span
+                style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 12px;">
                 ⚡ 4-इन-1 कॉम्बो
               </span>
-              <span style="background: rgba(56,189,248,0.2); color: #7dd3fc; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4);">
+              <span
+                style="background: rgba(56,189,248,0.2); color: #7dd3fc; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(56,189,248,0.4);">
                 ⚡ 83% छूट
               </span>
             </div>
@@ -270,7 +287,8 @@
               <div style="font-size: 1.45rem; font-weight: 900; color: #38bdf8; line-height: 1;">₹199</div>
               <div style="font-size: 0.74rem; color: #94a3b8; text-decoration: line-through;">₹1,196</div>
             </div>
-            <a href="/bundle.html?id=BUNDLE_KISAN_4IN1" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(56,189,248,0.4); white-space: nowrap;">
+            <a href="/bundle.html?id=BUNDLE_KISAN_4IN1"
+              style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #000; font-weight: 900; font-size: 0.82rem; padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 10px rgba(56,189,248,0.4); white-space: nowrap;">
               कॉम्बो देखें →
             </a>
           </div>
@@ -374,7 +392,8 @@
       <!-- Interactive Clickable Stats Counter Row (Dark Tiranga Animated Theme) -->
       <div class="lib-kpi-stats-grid">
         <!-- KPI 1: Available Books (Orange) -->
-        <div class="lib-kpi-stat-card kpi-tiranga-orange" onclick="window.switchTabAndScroll('available')" title="उपलब्ध मुख्य पुस्तकें देखें (Click to view)">
+        <div class="lib-kpi-stat-card kpi-tiranga-orange" onclick="window.switchTabAndScroll('available')"
+          title="उपलब्ध मुख्य पुस्तकें देखें (Click to view)">
           <span class="lib-kpi-badge-pill orange-pill">🔥 मुख्य स्टोर</span>
           <div class="lib-kpi-icon-centered">🛒</div>
           <strong id="kpiAvailableCount" class="lib-kpi-num color-orange">0</strong>
@@ -382,7 +401,8 @@
         </div>
 
         <!-- KPI 2: Purchased Books (Green) -->
-        <div class="lib-kpi-stat-card kpi-tiranga-green" onclick="window.switchTabAndScroll('purchased')" title="मेरी खरीदी गई पुस्तकें (Click to view)">
+        <div class="lib-kpi-stat-card kpi-tiranga-green" onclick="window.switchTabAndScroll('purchased')"
+          title="मेरी खरीदी गई पुस्तकें (Click to view)">
           <span class="lib-kpi-badge-pill green-pill">✓ अनलॉक बुक्स</span>
           <div class="lib-kpi-icon-centered">📚</div>
           <strong id="kpiPurchasedCount" class="lib-kpi-num color-green">0</strong>
@@ -390,7 +410,8 @@
         </div>
 
         <!-- KPI 3: Bonus Books (Gold) -->
-        <div class="lib-kpi-stat-card kpi-tiranga-gold" onclick="window.switchTabAndScroll('bonus')" title="फ्री बोनस पुस्तकें (Click to view)">
+        <div class="lib-kpi-stat-card kpi-tiranga-gold" onclick="window.switchTabAndScroll('bonus')"
+          title="फ्री बोनस पुस्तकें (Click to view)">
           <span class="lib-kpi-badge-pill gold-pill">🎁 100% FREE</span>
           <div class="lib-kpi-icon-centered">🎁</div>
           <strong id="kpiBonusCount" class="lib-kpi-num color-gold">0</strong>
@@ -398,7 +419,8 @@
         </div>
 
         <!-- KPI 4: Live Weather Center (Cyan/Emerald) -->
-        <div class="lib-kpi-stat-card kpi-tiranga-weather" onclick="window.scrollToWeatherSection()" title="लाइव मौसम केंद्र देखें (Click to view)">
+        <div class="lib-kpi-stat-card kpi-tiranga-weather" onclick="window.scrollToWeatherSection()"
+          title="लाइव मौसम केंद्र देखें (Click to view)">
           <span class="lib-kpi-badge-pill weather-pill">📍 लाइव मौसम</span>
           <div class="lib-kpi-icon-centered">🌤️</div>
           <strong id="kpiWeatherValue" class="lib-kpi-num color-weather">लाइव</strong>
@@ -406,7 +428,8 @@
         </div>
 
         <!-- KPI 5: Install App (Green) -->
-        <div class="lib-kpi-stat-card kpi-tiranga-install" onclick="window.openAppInstallGuideModal()" title="Aarogyam India ऐप इंस्टॉल करें (Click to install)">
+        <div class="lib-kpi-stat-card kpi-tiranga-install" onclick="window.openAppInstallGuideModal()"
+          title="Aarogyam India ऐप इंस्टॉल करें (Click to install)">
           <span class="lib-kpi-badge-pill install-pill">⚡ 0% मेमोरी</span>
           <div class="lib-kpi-icon-centered">📲</div>
           <strong id="kpiInstallAppValue" class="lib-kpi-num color-install">इंस्टॉल</strong>
@@ -414,10 +437,12 @@
         </div>
 
         <!-- KPI 6: Aarogyam Tube (Rose/Red with Logo) -->
-        <div class="lib-kpi-stat-card kpi-tiranga-tube" onclick="window.scrollToTubeSection()" title="Aarogyam Tube कृषि वीडियो हब (Click to view)">
+        <div class="lib-kpi-stat-card kpi-tiranga-tube" onclick="window.scrollToTubeSection()"
+          title="Aarogyam Tube कृषि वीडियो हब (Click to view)">
           <span class="lib-kpi-badge-pill tube-pill">🎬 100+ वीडियो</span>
           <div class="lib-kpi-icon-centered">
-            <img src="/images/logo/aarogyamtube-logo.png" alt="AarogyamTube Logo" style="height: 32px; width: auto; max-width: 90%; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));">
+            <img src="/images/logo/aarogyamtube-logo.png" alt="AarogyamTube Logo"
+              style="height: 32px; width: auto; max-width: 90%; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));">
           </div>
           <strong id="kpiTubeCount" class="lib-kpi-num color-tube">100+</strong>
           <span class="lib-kpi-label">आरोग्यम ट्यूब (Tube)</span>
@@ -443,7 +468,8 @@
 
     <!-- 4.1 PWA Digital Locker Install Banner Card with Cross & Guide Modal -->
     <div id="library-pwa-card" class="library-pwa-banner-card" style="display: none;">
-      <button type="button" class="pwa-card-dismiss-btn" onclick="window.dismissLibraryPwaCard()" title="कार्ड बंद करें">&times;</button>
+      <button type="button" class="pwa-card-dismiss-btn" onclick="window.dismissLibraryPwaCard()"
+        title="कार्ड बंद करें">&times;</button>
       <div class="pwa-card-body">
         <div class="pwa-card-left">
           <div class="pwa-card-title-row">
@@ -452,11 +478,13 @@
             <span class="pwa-free-tag">⚡ 0% मेमोरी खर्च</span>
           </div>
           <p class="pwa-card-text">
-            📲 <strong>1-क्लिक में इंस्टॉल करें:</strong> बिना फोन मेमोरी भरे कभी भी ऑफलाइन ई-बुक्स पढ़ें, ज़ूम करें व ऑडियो सुनें।
+            📲 <strong>1-क्लिक में इंस्टॉल करें:</strong> बिना फोन मेमोरी भरे कभी भी ऑफलाइन ई-बुक्स पढ़ें, ज़ूम करें व
+            ऑडियो सुनें।
           </p>
         </div>
         <div class="pwa-card-actions">
-          <button type="button" id="library-pwa-install-btn" class="btn-pwa-install-action" onclick="window.triggerPwaInstall()">
+          <button type="button" id="library-pwa-install-btn" class="btn-pwa-install-action"
+            onclick="window.triggerPwaInstall()">
             <span>📲</span> <span>Install App Now</span>
           </button>
           <button type="button" class="btn-pwa-guide-action" onclick="window.openAppInstallGuideModal()">
@@ -469,8 +497,9 @@
     <!-- App Installation Guide Modal (Matching Screenshot 1) -->
     <div id="appInstallGuideModal" class="app-install-modal-overlay" style="display: none;">
       <div class="app-install-modal-card">
-        <button type="button" class="app-install-modal-close-btn" onclick="window.closeAppInstallGuideModal()" title="बंद करें">&times;</button>
-        
+        <button type="button" class="app-install-modal-close-btn" onclick="window.closeAppInstallGuideModal()"
+          title="बंद करें">&times;</button>
+
         <!-- Modal Header -->
         <div class="app-modal-mono-header">
           <div class="app-modal-logo-wrap">
@@ -479,18 +508,21 @@
           <div class="app-modal-header-text">
             <span class="app-modal-badge">🌟 सर्वश्रेष्ठ किसान अनुभव</span>
             <h3 class="app-modal-title">📱 Aarogyam App अपने फोन में इंस्टॉल करें</h3>
-            <p class="app-modal-subtitle">फोन मेमोरी भरे बिना 1-क्लिक में कभी भी ई-बुक पढ़ें, ज़ूम करें और लाइव ऑडियो सुनें!</p>
+            <p class="app-modal-subtitle">फोन मेमोरी भरे बिना 1-क्लिक में कभी भी ई-बुक पढ़ें, ज़ूम करें और लाइव ऑडियो
+              सुनें!</p>
           </div>
         </div>
 
         <!-- Audio Guidance Live Player Box in Modal -->
         <div class="app-modal-audio-box">
           <div style="display: flex; align-items: center; gap: 14px;">
-            <button type="button" id="btnAppInstallAudioPlay" class="app-modal-audio-btn" title="ऑडियो गाइडेंस सुनें" onclick="window.toggleAppInstallAudio()">
+            <button type="button" id="btnAppInstallAudioPlay" class="app-modal-audio-btn" title="ऑडियो गाइडेंस सुनें"
+              onclick="window.toggleAppInstallAudio()">
               <i class="fa-solid fa-volume-high" id="appInstallAudioIcon"></i>
             </button>
             <div style="flex: 1; min-width: 0;">
-              <div style="font-size: 0.92rem; font-weight: 800; color: #facc15; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
+              <div
+                style="font-size: 0.92rem; font-weight: 800; color: #facc15; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
                 <span>🎧 ऑडियो गाइडेंस: 30 सेकंड में जानें ऐप कैसे चलाएं</span>
                 <div class="sound-waves-indicator" id="appInstallSoundWaves">
                   <span class="sound-bar"></span>
@@ -500,14 +532,18 @@
                   <span class="sound-bar"></span>
                 </div>
               </div>
-              <div id="appInstallAudioStatus" style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">गाइडेंस चल रही है... (रोकने के लिए दोबारा क्लिक करें)</div>
+              <div id="appInstallAudioStatus" style="font-size: 0.78rem; color: #a7f3d0; margin-top: 2px;">गाइडेंस चल
+                रही है... (रोकने के लिए दोबारा क्लिक करें)</div>
             </div>
           </div>
 
           <!-- Transcript script -->
-          <div style="margin-top: 10px; background: rgba(0,0,0,0.35); border: 1px dashed rgba(52,211,153,0.35); border-radius: 8px; padding: 10px 14px; font-size: 0.8rem; color: #cbd5e1; line-height: 1.45;">
-            <div style="font-size: 0.72rem; color: #fde047; font-weight: 800; margin-bottom: 4px;">📜 ऑडियो स्क्रिप्ट सारांश:</div>
-            <span>"Aarogyam App इंस्टॉल करें और बिना फोन मेमोरी भरे कभी भी किताबें पढ़ें, ज़ूम करें और ऑडियो सुनें। ऐप जोड़ने के लिए नीचे दिए गए हरे बटन 'फोन होम स्क्रीन पर ऐप जोड़ें' पर क्लिक करें!"</span>
+          <div
+            style="margin-top: 10px; background: rgba(0,0,0,0.35); border: 1px dashed rgba(52,211,153,0.35); border-radius: 8px; padding: 10px 14px; font-size: 0.8rem; color: #cbd5e1; line-height: 1.45;">
+            <div style="font-size: 0.72rem; color: #fde047; font-weight: 800; margin-bottom: 4px;">📜 ऑडियो स्क्रिप्ट
+              सारांश:</div>
+            <span>"Aarogyam App इंस्टॉल करें और बिना फोन मेमोरी भरे कभी भी किताबें पढ़ें, ज़ूम करें और ऑडियो सुनें। ऐप
+              जोड़ने के लिए नीचे दिए गए हरे बटन 'फोन होम स्क्रीन पर ऐप जोड़ें' पर क्लिक करें!"</span>
           </div>
         </div>
 
@@ -525,7 +561,8 @@
             <div class="app-modal-step-num">2</div>
             <div class="app-modal-step-content">
               <strong>"Add to Home screen" चुनें</strong>
-              <span>मेन्यू में <strong>"होम स्क्रीन में जोड़ें"</strong> या <strong>"Install App"</strong> पर क्लिक करें।</span>
+              <span>मेन्यू में <strong>"होम स्क्रीन में जोड़ें"</strong> या <strong>"Install App"</strong> पर क्लिक
+                करें।</span>
             </div>
           </div>
 
@@ -533,7 +570,8 @@
             <div class="app-modal-step-num">3</div>
             <div class="app-modal-step-content">
               <strong>1-क्लिक ऑफलाइन एक्सेस</strong>
-              <span>ऐप आपके फोन में जुड़ जाएगी — कभी भी बिना मेमोरी भरे <strong>पढ़ें, ज़ूम करें और सुनें</strong>!</span>
+              <span>ऐप आपके फोन में जुड़ जाएगी — कभी भी बिना मेमोरी भरे <strong>पढ़ें, ज़ूम करें और
+                  सुनें</strong>!</span>
             </div>
           </div>
         </div>
@@ -549,11 +587,16 @@
 
     <!-- 5. Category Pill Tabs (Animated Glassmorphic Look) -->
     <div class="category-tabs">
-      <button class="tab-btn active" id="tabBtn-purchased" onclick="switchTab('purchased')"><span class="tab-icon">📚</span> <span>मेरी पुस्तकें (MY BOOKS)</span></button>
-      <button class="tab-btn" id="tabBtn-available" onclick="switchTab('available')"><span class="tab-icon">🛒</span> <span>उपलब्ध बुक्स (AVAILABLE)</span></button>
-      <button class="tab-btn" id="tabBtn-bonus" onclick="switchTab('bonus')"><span class="tab-icon">🎁</span> <span>फ्री बोनस (BONUS)</span></button>
-      <button class="tab-btn" id="tabBtn-demo" onclick="switchTab('demo')"><span class="tab-icon">📖</span> <span>डेमो बुक्स (DEMO)</span></button>
-      <button class="tab-btn" id="tabBtn-coming" onclick="switchTab('coming')"><span class="tab-icon">⏳</span> <span>आने वाली बुक्स (COMING SOON)</span></button>
+      <button class="tab-btn active" id="tabBtn-purchased" onclick="switchTab('purchased')"><span
+          class="tab-icon">📚</span> <span>मेरी पुस्तकें (MY BOOKS)</span></button>
+      <button class="tab-btn" id="tabBtn-available" onclick="switchTab('available')"><span class="tab-icon">🛒</span>
+        <span>उपलब्ध बुक्स (AVAILABLE)</span></button>
+      <button class="tab-btn" id="tabBtn-bonus" onclick="switchTab('bonus')"><span class="tab-icon">🎁</span> <span>फ्री
+          बोनस (BONUS)</span></button>
+      <button class="tab-btn" id="tabBtn-demo" onclick="switchTab('demo')"><span class="tab-icon">📖</span> <span>डेमो
+          बुक्स (DEMO)</span></button>
+      <button class="tab-btn" id="tabBtn-coming" onclick="switchTab('coming')"><span class="tab-icon">⏳</span> <span>आने
+          वाली बुक्स (COMING SOON)</span></button>
     </div>
 
     <!-- 6. Main Container & Sections -->
@@ -642,8 +685,10 @@
           </div>
 
           <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-            <input type="number" step="0.5" id="leadKhet" class="modal-input" placeholder="खेती / जमीन (एकड़ में)" style="margin-bottom: 0;">
-            <input type="text" id="leadPashu" class="modal-input" placeholder="पशु विवरण (उदा. 2 गाय, 3 भैंस)" style="margin-bottom: 0;">
+            <input type="number" step="0.5" id="leadKhet" class="modal-input" placeholder="खेती / जमीन (एकड़ में)"
+              style="margin-bottom: 0;">
+            <input type="text" id="leadPashu" class="modal-input" placeholder="पशु विवरण (उदा. 2 गाय, 3 भैंस)"
+              style="margin-bottom: 0;">
           </div>
 
           <input type="text" id="leadCity" class="modal-input" placeholder="शहर / जिला (City / District)">
@@ -661,67 +706,85 @@
 
 
     <!-- Weather Section inside Library Main with GPS & Know More -->
-    <div class="welcome-card-soft weather-library-card" id="weatherSectionCard" style="background: linear-gradient(135deg, #041812 0%, #064e3b 50%, #065f46 100%); color: #fff; border-radius: 18px; padding: 24px; margin: 20px auto; max-width: 1200px; box-shadow: 0 10px 30px rgba(6,78,59,0.25); border: 1.5px solid rgba(52,211,153,0.3); position: relative; overflow: hidden;">
-      
+    <div class="welcome-card-soft weather-library-card" id="weatherSectionCard"
+      style="background: linear-gradient(135deg, #041812 0%, #064e3b 50%, #065f46 100%); color: #fff; border-radius: 18px; padding: 24px; margin: 20px auto; max-width: 1200px; box-shadow: 0 10px 30px rgba(6,78,59,0.25); border: 1.5px solid rgba(52,211,153,0.3); position: relative; overflow: hidden;">
+
       <!-- Top Title & Search/GPS Actions Row -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <h2 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: #ffffff;">🌤️ Aarogyam India लाइव मौसम केंद्र</h2>
-            <span style="background: #10b981; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:12px;">LIVE 24×7</span>
+            <h2 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: #ffffff;">🌤️ Aarogyam India लाइव मौसम
+              केंद्र</h2>
+            <span
+              style="background: #10b981; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:12px;">LIVE
+              24×7</span>
           </div>
-          <p style="font-size: 0.88rem; color: #a7f3d0; margin: 4px 0 0 0;">अपने खेत, गांव या जिले का लाइव तापमान, बारिश की संभावना व मौसम हाल</p>
+          <p style="font-size: 0.88rem; color: #a7f3d0; margin: 4px 0 0 0;">अपने खेत, गांव या जिले का लाइव तापमान, बारिश
+            की संभावना व मौसम हाल</p>
         </div>
 
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; max-width: 480px;">
           <!-- GPS Button -->
-          <button type="button" id="weatherGpsBtn" onclick="window.detectUserLiveLocationWeather()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 9px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(16,185,129,0.35); flex-shrink: 0;" title="GPS से अपना लाइव स्थान पता करें">
+          <button type="button" id="weatherGpsBtn" onclick="window.detectUserLiveLocationWeather()"
+            style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 9px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(16,185,129,0.35); flex-shrink: 0;"
+            title="GPS से अपना लाइव स्थान पता करें">
             <i class="fa-solid fa-location-crosshairs"></i> <span>📍 मेरा GPS स्थान</span>
           </button>
 
           <!-- City Search -->
           <div style="display: flex; gap: 6px; flex: 1; min-width: 200px;">
-            <input type="text" id="citySearchInput" placeholder="शहर / जिला लिखें (उदा. Rewa)..." style="flex: 1; padding: 9px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; font-size: 0.86rem; background: rgba(255,255,255,0.12); color: #fff;">
-            <button id="citySearchBtn" onclick="window.searchCityWeather()" style="background: #0f172a; color: #fde047; border: 1px solid rgba(255,255,255,0.3); padding: 9px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">खोजें</button>
+            <input type="text" id="citySearchInput" placeholder="शहर / जिला लिखें (उदा. Rewa)..."
+              style="flex: 1; padding: 9px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; font-size: 0.86rem; background: rgba(255,255,255,0.12); color: #fff;">
+            <button id="citySearchBtn" onclick="window.searchCityWeather()"
+              style="background: #0f172a; color: #fde047; border: 1px solid rgba(255,255,255,0.3); padding: 9px 14px; border-radius: 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer;">खोजें</button>
           </div>
         </div>
       </div>
 
       <!-- Live Weather Stats Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 20px; background: rgba(0, 0, 0, 0.25); padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(8px);">
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 20px; background: rgba(0, 0, 0, 0.25); padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(8px);">
         <!-- Location & Icon -->
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div id="weatherIconWrap" style="width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 1.8rem;">
+          <div id="weatherIconWrap"
+            style="width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 1.8rem;">
             <span id="weatherIconEmoji">⛅</span>
           </div>
           <div>
-            <h3 id="displayCityName" style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #fff;">रीवा (Rewa)</h3>
+            <h3 id="displayCityName" style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #fff;">रीवा (Rewa)
+            </h3>
             <p id="displayCountry" style="font-size: 0.78rem; margin: 2px 0 0 0; color: #a7f3d0;">मध्य प्रदेश • Live</p>
           </div>
         </div>
 
         <!-- Temperature -->
         <div style="text-align: center; border-left: 1px dashed rgba(255,255,255,0.15); padding-left: 10px;">
-          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">तापमान (Temperature)</div>
+          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">तापमान
+            (Temperature)</div>
           <div id="displayTemp" style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-top: 2px;">--°C</div>
         </div>
 
         <!-- Condition -->
         <div style="text-align: center; border-left: 1px dashed rgba(255,255,255,0.15); padding-left: 10px;">
-          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">मौसम स्थिति</div>
-          <div id="displayCondition" style="font-size: 0.95rem; font-weight: 800; margin-top: 4px; color: #e0e7ff;">साफ मौसम</div>
+          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">मौसम स्थिति
+          </div>
+          <div id="displayCondition" style="font-size: 0.95rem; font-weight: 800; margin-top: 4px; color: #e0e7ff;">साफ
+            मौसम</div>
         </div>
 
         <!-- Rain & Humidity -->
         <div style="text-align: center; border-left: 1px dashed rgba(255,255,255,0.15); padding-left: 10px;">
-          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">बारिश / हवा</div>
-          <div id="displayRainWind" style="font-size: 0.92rem; font-weight: 800; margin-top: 4px; color: #67e8f9;">नमी: 45% • 12 km/h</div>
+          <div style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">बारिश / हवा
+          </div>
+          <div id="displayRainWind" style="font-size: 0.92rem; font-weight: 800; margin-top: 4px; color: #67e8f9;">नमी:
+            45% • 12 km/h</div>
         </div>
       </div>
 
       <!-- Know More 7-Day Forecast Button Row -->
       <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
-        <a href="/weather.html" class="weather-know-more-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 0.86rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(245,158,11,0.4); transition: transform 0.2s;">
+        <a href="/weather.html" class="weather-know-more-link"
+          style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 30px; font-weight: 800; font-size: 0.86rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(245,158,11,0.4); transition: transform 0.2s;">
           <span>📅 7 दिनों का मौसम पूर्वानुमान देखें (Know More)</span>
           <i class="fa-solid fa-arrow-right"></i>
         </a>
@@ -729,66 +792,82 @@
     </div>
 
     <!-- Mandi Quick Access KPI Card (Properly inside library-main) -->
-    <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'" style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; margin: 0 auto 16px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
-        
-        <!-- Background Watermark Icon -->
-        <div style="position: absolute; right: -10px; bottom: -15px; font-size: 4.5rem; opacity: 0.1; pointer-events: none;">
-            <i class="fa-solid fa-seedling"></i>
-        </div>
+    <div class="mandi-kpi-access-card" onclick="window.location.href='/mandi.html'"
+      style="background: linear-gradient(135deg, #064e3b, #047857); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; margin: 0 auto 16px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
 
-        <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
-            <div style="width: 48px; height: 48px; min-width: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #facc15;">
-                <i class="fa-solid fa-seedling"></i>
-            </div>
-            <div style="min-width: 0;">
-                <h3 style="margin: 0 0 2px 0; font-size: 1.1rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम</h3>
-                <p style="margin: 0; font-size: 0.82rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
-            </div>
-        </div>
+      <!-- Background Watermark Icon -->
+      <div
+        style="position: absolute; right: -10px; bottom: -15px; font-size: 4.5rem; opacity: 0.1; pointer-events: none;">
+        <i class="fa-solid fa-seedling"></i>
+      </div>
 
-        <div style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
-            <i class="fa-solid fa-arrow-right"></i>
+      <div style="display: flex; align-items: center; gap: 15px; z-index: 1; flex: 1; min-width: 0;">
+        <div
+          style="width: 48px; height: 48px; min-width: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #facc15;">
+          <i class="fa-solid fa-seedling"></i>
         </div>
+        <div style="min-width: 0;">
+          <h3 style="margin: 0 0 2px 0; font-size: 1.1rem; font-weight: 700; color: #ffffff;">🌾 कृषि मंडी भाव व मौसम
+          </h3>
+          <p style="margin: 0; font-size: 0.82rem; color: #a7f3d0;">लाइव थोक बाजार मूल्य और मौसम की जानकारी देखें</p>
+        </div>
+      </div>
+
+      <div
+        style="z-index: 1; background: #10B981; color: #fff; width: 36px; height: 36px; min-width: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); margin-left: 10px;">
+        <i class="fa-solid fa-arrow-right"></i>
+      </div>
     </div>
 
     <!-- Aarogyam Tube Video Hub Preview KPI Box -->
-    <div class="tube-kpi-access-card" onclick="window.location.href='/tube.html'" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); border: 1.5px solid rgba(165, 180, 252, 0.35); border-radius: 16px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 10px 30px rgba(49, 46, 129, 0.25); transition: all 0.3s ease; margin: 0 auto 25px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
-        <!-- Background Watermark Icon -->
-        <div style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.12; pointer-events: none; color: #f43f5e;">
-            <i class="fa-solid fa-play"></i>
-        </div>
+    <div class="tube-kpi-access-card" onclick="window.location.href='/tube.html'"
+      style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); border: 1.5px solid rgba(165, 180, 252, 0.35); border-radius: 16px; padding: 18px 24px; color: #fff; cursor: pointer; box-shadow: 0 10px 30px rgba(49, 46, 129, 0.25); transition: all 0.3s ease; margin: 0 auto 25px auto; max-width: 1200px; width: 100%; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; box-sizing: border-box;">
+      <!-- Background Watermark Icon -->
+      <div
+        style="position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.12; pointer-events: none; color: #f43f5e;">
+        <i class="fa-solid fa-play"></i>
+      </div>
 
-        <div style="display: flex; align-items: center; gap: 16px; z-index: 1; flex: 1; min-width: 0;">
-            <div style="width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, #ef4444, #e11d48); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #ffffff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);">
-                <i class="fa-solid fa-play"></i>
-            </div>
-            <div style="min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #ffffff;">📺 Aarogyam Tube — प्रैक्टिकल कृषि वीडियो हब</h3>
-                    <span style="background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 900; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">100+ VIDEOS</span>
-                </div>
-                <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #c7d2fe; line-height: 1.35;">फसल सुरक्षा, जैविक स्प्रे, सब्जी उत्पादन व आधुनिक कृषि तकनीकों के वीडियो सीधे देखें</p>
-            </div>
+      <div style="display: flex; align-items: center; gap: 16px; z-index: 1; flex: 1; min-width: 0;">
+        <div
+          style="width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, #ef4444, #e11d48); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #ffffff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);">
+          <i class="fa-solid fa-play"></i>
         </div>
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #ffffff;">📺 Aarogyam Tube — प्रैक्टिकल
+              कृषि वीडियो हब</h3>
+            <span
+              style="background: #ef4444; color: #fff; font-size: 0.68rem; font-weight: 900; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">100+
+              VIDEOS</span>
+          </div>
+          <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #c7d2fe; line-height: 1.35;">फसल सुरक्षा, जैविक
+            स्प्रे, सब्जी उत्पादन व आधुनिक कृषि तकनीकों के वीडियो सीधे देखें</p>
+        </div>
+      </div>
 
-        <div style="z-index: 1; background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 8px 14px; border-radius: 25px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(239,68,68,0.35); flex-shrink: 0; margin-left: 10px;">
-            <span>🎬 वीडियो देखें</span> <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
-        </div>
+      <div
+        style="z-index: 1; background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; padding: 8px 14px; border-radius: 25px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(239,68,68,0.35); flex-shrink: 0; margin-left: 10px;">
+        <span>🎬 वीडियो देखें</span> <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
+      </div>
     </div>
   </main>
 
   <!-- =========================================
        15. MODERN DARK FOOTER
   ========================================== -->
-  <footer class="footer" style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 40px;">
+  <footer class="footer"
+    style="background: #090d16; color: #cbd5e1; padding: 60px 0 30px 0; border-top: 1.5px solid #1e293b; margin-top: 40px;">
     <div class="container">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
-        
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 35px; margin-bottom: 40px;">
+
         <!-- About Column -->
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
             <img src="/images/logo/logo.png" alt="Aarogyam Logo" style="height:42px;width:auto;" />
-            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span style="color:#38bdf8;">INDIA</span></span>
+            <span style="font-size:1.2rem;font-weight:900;color:#ffffff;font-family:'Outfit',sans-serif;">AAROGYAM <span
+                style="color:#38bdf8;">INDIA</span></span>
           </div>
           <p style="font-size:0.85rem;color:#94a3b8;line-height:1.55;">
             Aarogyam India - भारत का सम्पूर्ण डिजिटल कृषि, स्वास्थ्य, पशु पोषण और डायरेक्ट सेलिंग ज्ञान मंच।
@@ -825,14 +904,16 @@
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📍 रीवा, मध्य प्रदेश (भारत)</p>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:6px;">📞 +91 79744 22572</p>
           <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:14px;">✉ info@aarogyamindia.in</p>
-          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 सहायता')" class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;">
+          <button type="button" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 सहायता')"
+            class="ai-expert-red-btn" style="margin:0;padding:8px 16px;font-size:0.82rem;">
             <i class="fa-brands fa-whatsapp"></i> <span>24×7 AI एक्सपर्ट</span>
           </button>
         </div>
 
       </div>
 
-      <div style="border-top:1.5px solid #1e293b;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:0.82rem;color:#94a3b8;">
+      <div
+        style="border-top:1.5px solid #1e293b;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:0.82rem;color:#94a3b8;">
         <div>
           © 2026 Aarogyam India. All Rights Reserved. | Designed for Farmers & Families.
         </div>
@@ -856,7 +937,7 @@
   <script src="/js/supabase.js"></script>
   <script src="/session.js"></script>
   <script src="/js/user-notifications.js?v=20260926_v16"></script>
-  <script src="/js/aarogyam-promotion-gateway.js?v=20261106_v2" defer></script>
+  <script src="/js/aarogyam-promotion-gateway.js?v=20261106_v9_avnish_clean" defer></script>
   <script src="/js/global-guest-modal.js?v=1.2"></script>
   <script src="/js/recent-purchase-toast.js"></script>
   <script src="/js/my-library.js?v=20261104_v99_clean"></script>

@@ -11,6 +11,76 @@ export async function initPromotionsPage() {
   if (!content) return;
 
   content.innerHTML = `
+    <style>
+      .admin-section {
+        margin: 0 !important;
+        padding: 16px 14px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+      }
+      #promo-grid-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .promo-form-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .promo-top-header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      @media (max-width: 960px) {
+        #promo-grid-layout {
+          grid-template-columns: 1fr !important;
+          gap: 16px !important;
+          width: 100% !important;
+        }
+        .promo-form-two-col {
+          grid-template-columns: 1fr !important;
+          gap: 10px !important;
+          width: 100% !important;
+        }
+        .promo-top-header-actions {
+          width: 100%;
+          flex-direction: column;
+        }
+        .promo-top-header-actions button {
+          width: 100% !important;
+          justify-content: center !important;
+        }
+        .admin-card {
+          padding: 14px 12px !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        .admin-input, select.admin-input, textarea.admin-input {
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+        #prev-aura {
+          filter: none !important;
+          animation: none !important;
+          opacity: 0.3 !important;
+        }
+        #prev-img {
+          animation: none !important;
+          filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)) !important;
+        }
+      }
+    </style>
     <div class="admin-section">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
         <div>
@@ -19,7 +89,7 @@ export async function initPromotionsPage() {
             त्योहारों, राष्ट्रीय पर्वों, AarogyamTube, ई-बुक्स, कॉम्बो और स्वास्थ्य सप्ताहों के लिए 3D फ्लोटिंग एनिमेटेड पॉप-अप।
           </p>
         </div>
-        <div style="display:flex;gap:10px;">
+        <div class="promo-top-header-actions">
           <button id="btn-create-promo" class="admin-button" style="background:linear-gradient(135deg, #10b981, #059669);color:#ffffff;font-weight:700;">
             + नया प्रमोशन जोड़ें
           </button>
@@ -33,7 +103,7 @@ export async function initPromotionsPage() {
       <div id="promo-sync-status" style="display:none;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:0.92rem;font-weight:600;"></div>
 
       <!-- Main Layout: 2 Columns (List & Editor) -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;" id="promo-grid-layout">
+      <div id="promo-grid-layout">
         <!-- Left: Campaigns List -->
         <div class="admin-card" style="padding:20px;">
           <h3 style="margin-top:0;margin-bottom:14px;font-size:1.15rem;display:flex;align-items:center;justify-content:space-between;">
@@ -84,7 +154,7 @@ export async function initPromotionsPage() {
             </div>
 
             <!-- Title & Subtitle -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="promo-form-two-col">
               <div>
                 <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">शीर्षक (Title):</label>
                 <input type="text" id="edit-promo-title" class="admin-input" style="width:100%;" placeholder="जैसे: शुभ धनतेरस एवं दीपावली" required>
@@ -101,7 +171,7 @@ export async function initPromotionsPage() {
             </div>
 
             <!-- Image & Animation Preset -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="promo-form-two-col">
               <div>
                 <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">एनीमेशन प्रीसेट (Visual Style):</label>
                 <select id="edit-promo-preset" class="admin-input" style="width:100%;">
@@ -126,7 +196,7 @@ export async function initPromotionsPage() {
             </div>
 
             <!-- Target URL & CTA Text -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="promo-form-two-col">
               <div>
                 <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">बटन टेक्स्ट (Button Text):</label>
                 <input type="text" id="edit-promo-cta-text" class="admin-input" style="width:100%;" placeholder="जैसे: 📖 ई-बुक्स देखें">
@@ -138,7 +208,7 @@ export async function initPromotionsPage() {
             </div>
 
             <!-- Target Pages & Dates -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="promo-form-two-col">
               <div>
                 <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">शुरू होने की तिथि (Start):</label>
                 <input type="datetime-local" id="edit-promo-start" class="admin-input" style="width:100%;">
@@ -157,6 +227,7 @@ export async function initPromotionsPage() {
                 <label><input type="checkbox" id="page-target-home"> होम पेज</label>
                 <label><input type="checkbox" id="page-target-library"> माय लाइब्रेरी</label>
                 <label><input type="checkbox" id="page-target-tube"> AarogyamTube</label>
+                <label><input type="checkbox" id="page-target-profile"> माय प्रोफाइल</label>
                 <span style="color:#10b981;font-size:0.8rem;display:flex;align-items:center;gap:4px;">🛡️ बुक लैंडिंग पेज सुरक्षित (संविधान नियम: नो प्रमोशन)</span>
               </div>
             </div>
@@ -205,11 +276,28 @@ export async function initPromotionsPage() {
               <textarea id="edit-promo-share-tmpl" class="admin-input" rows="5" style="width:100%;font-size:0.86rem;line-height:1.45;font-family:inherit;padding:8px 10px;" placeholder="व्हाट्सएप संदेश यहाँ लिखें..."></textarea>
 
               <!-- Live WhatsApp Chat Bubble Preview -->
-              <div style="margin-top:10px;background:#e5ddd5;border-radius:10px;padding:12px;position:relative;">
-                <div style="font-size:0.74rem;font-weight:800;color:#075e54;margin-bottom:6px;display:flex;align-items:center;gap:4px;">
-                  <i class="fa-brands fa-whatsapp"></i> व्हाट्सएप चैट प्रीव्यू (WhatsApp Chat Preview):
+              <div style="margin-top:12px;background:#e5ddd5;border-radius:12px;padding:12px;position:relative;border:1px solid #d1d5db;">
+                <div style="font-size:0.76rem;font-weight:800;color:#075e54;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+                  <span style="display:flex;align-items:center;gap:6px;">
+                    <i class="fa-brands fa-whatsapp" style="font-size:1.1rem;color:#25d366;"></i> 
+                    <span>व्हाट्सएप चैट प्रीव्यू (WhatsApp Chat Preview):</span>
+                  </span>
+                  <span style="font-size:0.70rem;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:700;">📸 फोटो + संदेश</span>
                 </div>
-                <div id="wa-preview-bubble" style="background:#dcf8c6;border-radius:8px 8px 0 8px;padding:8px 12px;font-size:0.83rem;color:#111827;line-height:1.45;box-shadow:0 1px 3px rgba(0,0,0,0.2);white-space:pre-wrap;word-break:break-word;">
+                <div id="wa-preview-bubble" style="background:#dcf8c6;border-radius:10px 10px 0 10px;padding:6px;font-size:0.83rem;color:#111827;line-height:1.45;box-shadow:0 1px 3px rgba(0,0,0,0.2);max-width:340px;margin-left:auto;">
+                  <div id="wa-preview-img-wrap" style="border-radius:8px;overflow:hidden;margin-bottom:6px;background:#0f172a;text-align:center;max-height:220px;">
+                    <img id="wa-preview-img" src="" alt="WhatsApp Promo Image" style="width:100%;height:auto;max-height:220px;object-fit:cover;display:block;" onerror="this.parentElement.style.display='none'">
+                  </div>
+                  <div id="wa-preview-text" style="padding:2px 6px;white-space:pre-wrap;word-break:break-word;"></div>
+                  <div style="text-align:right;font-size:0.65rem;color:#6b7280;margin-top:4px;padding-right:4px;display:flex;align-items:center;justify-content:flex-end;gap:3px;">
+                    <span>10:30 AM</span>
+                    <span style="color:#38bdf8;font-weight:900;">✓✓</span>
+                  </div>
+                </div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:8px;">
+                  <button type="button" id="btn-test-wa-share" class="admin-button" style="background:#22c55e;color:#ffffff;font-size:0.78rem;font-weight:800;padding:6px 14px;border-radius:18px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(34,197,94,0.4);border:none;cursor:pointer;">
+                    <i class="fa-brands fa-whatsapp"></i> <span>📲 टेस्ट व्हाट्सएप भेजकर देखें</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -260,7 +348,7 @@ export async function initPromotionsPage() {
                 <button id="prev-cta" style="background:linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:11px 18px;border-radius:12px;font-weight:800;font-size:0.92rem;box-shadow:0 4px 15px rgba(234, 88, 12, 0.45);cursor:default;">
                   🎁 उत्सव उपहार व ई-बुक्स देखें
                 </button>
-                <button id="prev-share" style="background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:11px 18px;border-radius:12px;font-weight:700;font-size:0.88rem;box-shadow:0 4px 15px rgba(22, 163, 74, 0.4);cursor:default;">
+                <button type="button" id="prev-share" style="background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:11px 18px;border-radius:12px;font-weight:700;font-size:0.88rem;box-shadow:0 4px 15px rgba(22, 163, 74, 0.4);cursor:pointer;" title="व्हाट्सएप पर शेयर टेस्ट करें">
                   📲 WhatsApp पर शुभकामनाएँ शेयर करें
                 </button>
               </div>
@@ -438,6 +526,8 @@ export async function initPromotionsPage() {
     document.getElementById('page-target-home').checked = targets.includes('home');
     document.getElementById('page-target-library').checked = targets.includes('library');
     document.getElementById('page-target-tube').checked = targets.includes('tube');
+    const profEl = document.getElementById('page-target-profile');
+    if (profEl) profEl.checked = targets.includes('profile');
 
     // Indicator
     const ind = document.getElementById('editor-active-indicator');
@@ -617,17 +707,99 @@ export async function initPromotionsPage() {
       badgeEl.style.background = 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)';
     }
 
-    // Update WhatsApp Chat Preview Bubble
+    // Update WhatsApp Chat Preview Bubble (Photo + Caption)
+    const imgUrlVal = document.getElementById('edit-promo-image-url')?.value.trim() || '';
+    const waImg = document.getElementById('wa-preview-img');
+    const waImgWrap = document.getElementById('wa-preview-img-wrap');
+    if (waImg && waImgWrap) {
+      if (imgUrlVal) {
+        waImg.src = imgUrlVal;
+        waImgWrap.style.display = 'block';
+      } else {
+        waImgWrap.style.display = 'none';
+      }
+    }
     const tmplInput = document.getElementById('edit-promo-share-tmpl');
-    const waBubble = document.getElementById('wa-preview-bubble');
-    if (tmplInput && waBubble) {
+    const waText = document.getElementById('wa-preview-text');
+    if (tmplInput && waText) {
       let previewText = tmplInput.value || 'आरोग्यम की ओर से हार्दिक शुभकामनाएँ! {link}';
-      previewText = previewText.replace(/{sender_name}/g, 'रामेश्वर पटेल');
-      previewText = previewText.replace(/{user_name}/g, 'रामेश्वर पटेल');
-      previewText = previewText.replace(/{link}/g, 'https://aarogyamindia.com/?ref=AI000004');
-      waBubble.textContent = previewText;
+      previewText = previewText.replace(/{sender_name}/g, 'श्री अवनीश कुमार मिश्रा');
+      previewText = previewText.replace(/{user_name}/g, 'श्री अवनीश कुमार मिश्रा');
+      previewText = previewText.replace(/{festival_title}/g, document.getElementById('edit-promo-title')?.value || 'उत्सव');
+      previewText = previewText.replace(/{link}/g, 'https://aarogyamindia.online/ebooks/ebook.html?ref=AI000004');
+      waText.textContent = previewText;
     }
   }
+
+  // Universal WhatsApp Share Execution for Admin Test
+  async function executeAdminTestShare() {
+    const title = document.getElementById('edit-promo-title')?.value.trim() || 'शुभकामना संदेश';
+    const tmpl = document.getElementById('edit-promo-share-tmpl')?.value.trim() || 'आरोग्यम की ओर से हार्दिक शुभकामनाएँ! {link}';
+    const imgUrl = document.getElementById('edit-promo-image-url')?.value.trim() || '';
+    const origin = window.location.origin || 'https://aarogyamindia.online';
+    const fullImgUrl = imgUrl ? (imgUrl.startsWith('http') ? imgUrl : (origin + imgUrl)) : '';
+
+    let msg = tmpl.replace(/{sender_name}/g, 'श्री अवनीश कुमार मिश्रा')
+                  .replace(/{user_name}/g, 'श्री अवनीश कुमार मिश्रा')
+                  .replace(/{festival_title}/g, title)
+                  .replace(/{link}/g, `${origin}/ebooks/ebook.html?ref=AI000004`);
+
+    let nativeShared = false;
+    if (navigator.share && fullImgUrl) {
+      try {
+        const file = await convertUrlToJpegFile(fullImgUrl, 'aarogyam-promo');
+        if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: title,
+            text: msg
+          });
+          nativeShared = true;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+        console.warn('Native share failed:', err);
+      }
+    }
+
+    if (!nativeShared) {
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  function convertUrlToJpegFile(url, filename) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width || 800;
+          canvas.height = img.naturalHeight || img.height || 600;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], `${filename}.jpg`, { type: 'image/jpeg' }));
+            } else {
+              resolve(null);
+            }
+          }, 'image/jpeg', 0.92);
+        } catch (_) {
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  // Bind Test WhatsApp Share Buttons
+  document.getElementById('btn-test-wa-share')?.addEventListener('click', executeAdminTestShare);
+  document.getElementById('prev-share')?.addEventListener('click', executeAdminTestShare);
 
   // Input listeners for preview
   ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-preset', 'edit-promo-share-tmpl'].forEach(id => {
@@ -661,6 +833,8 @@ export async function initPromotionsPage() {
     if (document.getElementById('page-target-home').checked) targets.push('home');
     if (document.getElementById('page-target-library').checked) targets.push('library');
     if (document.getElementById('page-target-tube').checked) targets.push('tube');
+    const profEl = document.getElementById('page-target-profile');
+    if (profEl && profEl.checked) targets.push('profile');
 
     const updatedItem = {
       id: id,
