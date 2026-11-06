@@ -115,7 +115,7 @@
                 if (!shareId) {
                     shareId = localStorage.getItem('user_share_id') || localStorage.getItem('user_referral_code') || null;
                 }
-                const savedName = localStorage.getItem('user_name');
+                const savedName = localStorage.getItem('user_name') || localStorage.getItem('aim_user_name');
                 if (savedName && savedName.trim()) {
                     fullName = savedName.trim();
                 }
@@ -125,7 +125,7 @@
                     shareId = null; // Purge illegal phone number referral
                 }
 
-                if (localStorage.getItem('user_id') || localStorage.getItem('profile_id')) {
+                if (localStorage.getItem('user_id') || localStorage.getItem('profile_id') || localStorage.getItem('aarogyam_user_registered')) {
                     isRegistered = true;
                 }
             } catch (e) {}
@@ -137,19 +137,74 @@
             };
         },
 
-        // 4. Trigger Auth Modal if Not Registered (Constitutional Manas Compliance)
-        promptRegistrationForShare: function () {
-            // Check if global Sakhi auth modal is available
+        // 3.5 Pure Web Audio API Sound Chime (0 KB Egress - Crystal Clear Bell Chord)
+        playChimeSound: function () {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                const now = ctx.currentTime;
+                // High-fidelity musical bell chime (C6 - G6 - C7 progression)
+                const freqs = [1046.5, 1567.98, 2093.0];
+                freqs.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+                    gain.gain.setValueAtTime(0.15 / (idx + 1), now + idx * 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.55);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.04);
+                    osc.stop(now + idx * 0.04 + 0.6);
+                });
+            } catch (e) {}
+        },
+
+        // 3.6 Floating Toast Notification
+        showToast: function (msg, bg = '#10b981') {
+            const old = document.getElementById('agy-promo-toast');
+            if (old) old.remove();
+            const toast = document.createElement('div');
+            toast.id = 'agy-promo-toast';
+            toast.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;padding:12px 24px;border-radius:30px;font-size:0.92rem;font-weight:800;z-index:9999999;box-shadow:0 8px 30px rgba(0,0,0,0.5);display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;pointer-events:none;animation:agyToastPop 0.3s ease;`;
+            toast.innerHTML = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.4s, transform 0.4s';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(12px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 3200);
+        },
+
+        // 4. Trigger Auth Modal if Not Registered (Uses existing universal registration system)
+        promptRegistrationForShare: function (onSuccess) {
+            // 1. Universal Guest Auth Modal (Full 2-field fast registration)
+            if (typeof window.openGuestLoginModal === 'function') {
+                window.openGuestLoginModal((userObj) => {
+                    this.playChimeSound();
+                    if (typeof onSuccess === 'function') onSuccess(userObj);
+                }, { 
+                    force: true, 
+                    title: '🎁 शुभकामना शेयर करने हेतु 1-मिनट पंजीकरण', 
+                    subtitle: 'अपना नाम व नंबर दर्ज करें और अपना आधिकारिक शेयर आईडी प्राप्त करें' 
+                });
+                return;
+            }
+
+            // 2. Sakhi Auth Modal
             if (typeof window.openSakhiAuthModal === 'function') {
                 window.openSakhiAuthModal();
                 return;
             }
+
+            // 3. Unified Auth Modal
             if (typeof window.openUnifiedAuthModal === 'function') {
                 window.openUnifiedAuthModal();
-                return;
-            }
-            if (typeof window.AarogyamAuthModal === 'object' && typeof window.AarogyamAuthModal.open === 'function') {
-                window.AarogyamAuthModal.open();
                 return;
             }
 
@@ -162,12 +217,15 @@
             }
         },
 
-        // 5. Handle WhatsApp Share
+        // 5. Handle WhatsApp Share (Awards +1 Point & Plays Chime Sound)
         handleShare: function (promo) {
             const user = this.getUserInfo();
 
             if (!user.isRegistered || !user.shareId) {
-                this.promptRegistrationForShare();
+                this.promptRegistrationForShare((newUser) => {
+                    // Re-trigger share with new registered profile!
+                    this.handleShare(promo);
+                });
                 return;
             }
 
@@ -175,12 +233,39 @@
                 const origin = window.location.origin || 'https://aarogyamindia.com';
                 const shareTarget = promo.target_url ? (origin + promo.target_url) : origin;
                 const sep = shareTarget.includes('?') ? '&' : '?';
-                const verifiedShareUrl = `${shareTarget}${sep}ref=${encodeURIComponent(user.shareId)}`;
+                // Attach share_id and sender's full name for recipient personalization
+                const verifiedShareUrl = `${shareTarget}${sep}ref=${encodeURIComponent(user.shareId)}&from=${encodeURIComponent(user.name)}&promo=${encodeURIComponent(promo.id)}`;
 
-                let tmpl = promo.share_message_template || '✨ आरोग्यम इंडिया की ओर से हार्दिक शुभकामनाएँ! {link}';
-                tmpl = tmpl.replace('{user_name}', user.name);
-                tmpl = tmpl.replace('{link}', verifiedShareUrl);
+                let tmpl = promo.share_message_template || 
+`🪔 *{sender_name} जी की तरफ से सप्रेम बधाई और उपहार!* 🪔
 
+आरोग्यम इंडिया की ओर से आपके व आपके पूरे परिवार को पावन पर्व की मंगलमय शुभकामनाएँ। 
+स्वास्थ्य, दीर्घायु और समृद्धि का यह विशेष संदेश केवल आपके लिए भेजा गया है।
+
+🎁 *{sender_name}* जी द्वारा भेजा गया उपहार व *5 पॉइंट्स* प्राप्त करने के लिए नीचे दिए गए लिंक पर क्लिक करें:
+👉 {link}
+
+_(नोट: यह 5 पॉइंट्स उपहार केवल नए सदस्यों के लिए मान्य है)_`;
+
+                tmpl = tmpl.replace(/{sender_name}/g, user.name);
+                tmpl = tmpl.replace(/{user_name}/g, user.name);
+                tmpl = tmpl.replace(/{festival_title}/g, promo.title || 'उत्सव');
+                tmpl = tmpl.replace(/{link}/g, verifiedShareUrl);
+
+                // Play Audio Chime
+                this.playChimeSound();
+
+                // Credit +1 Share Point to User Wallet (No Capping as requested)
+                try {
+                    if (window.AarogyamWallet && typeof window.AarogyamWallet.creditPoints === 'function') {
+                        window.AarogyamWallet.creditPoints(1, `🪔 ${promo.title || 'उत्सव'} शुभकामना शेयर`, 'earn_share');
+                    }
+                } catch (e) {}
+
+                // Show celebratory toast
+                this.showToast('🎉 <strong>+1 पॉइंट</strong> आपके वॉलेट में जुड़ा! 🪙');
+
+                // Open WhatsApp
                 const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(tmpl)}`;
                 window.open(waUrl, '_blank', 'noopener,noreferrer');
             } catch (err) {
@@ -299,12 +384,30 @@
             this.activePromo = promo;
             const user = this.getUserInfo();
 
-            // Personalize greeting
-            const greetingName = user.name && user.name !== 'प्रिय पाठक' ? user.name : 'स्वास्थ्य साधक';
+            // Check if user came from a personal WhatsApp share link (?from=...&ref=...)
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromSender = urlParams.get('from');
+            const urlRef = urlParams.get('ref') || urlParams.get('share_id');
+            if (urlRef) {
+                try {
+                    localStorage.setItem('AOI_REFERRER_ID', urlRef.trim());
+                    localStorage.setItem('user_referral_code', urlRef.trim());
+                } catch (e) {}
+            }
 
-            // Clean up any existing instance
+            const decodedSender = fromSender ? decodeURIComponent(fromSender).trim() : '';
+            const isGiftRecipient = Boolean(decodedSender);
+
+            // Hide minimised widget if open
+            const minGift = document.getElementById('agy-floating-gift-box');
+            if (minGift) minGift.style.display = 'none';
+
+            // Clean up any existing modal instance
             const prev = document.getElementById('agy-promo-root');
             if (prev) prev.remove();
+
+            // Personalize greeting
+            const greetingName = user.name && user.name !== 'प्रिय पाठक' ? user.name : 'स्वास्थ्य साधक';
 
             // Aura color style based on preset
             let auraGradient = 'radial-gradient(circle, rgba(245,158,11,0.55) 0%, rgba(220,38,38,0.2) 60%, rgba(0,0,0,0) 80%)';
@@ -363,7 +466,7 @@
                     #agy-promo-root.active .agy-promo-card-wrapper {
                         transform: scale(1) translateY(0);
                     }
-                    /* 3D Prominent Center Floating Image Stage (Much Bigger & Center Stage) */
+                    /* 3D Prominent Center Floating Image Stage */
                     .agy-promo-floating-stage {
                         position: relative;
                         width: 100%;
@@ -565,10 +668,14 @@
                     <div class="agy-promo-card">
                         <!-- Sleek Text Patti -->
                         <div class="agy-promo-text-patti">
-                            <span class="agy-promo-badge">${promo.badge || '✨ विशेष उत्सव'}</span>
+                            <span class="agy-promo-badge">${isGiftRecipient ? '🎁 सप्रेम उत्सव उपहार' : (promo.badge || '✨ विशेष उत्सव')}</span>
 
                             <div class="agy-promo-greeting">
-                                प्रिय <strong>${greetingName}</strong> जी,
+                                ${isGiftRecipient ? `
+                                    ✨ <strong style="color:#fde047;font-size:1.02rem;">${decodedSender} जी</strong> की तरफ से सप्रेम बधाई और उपहार!
+                                ` : `
+                                    प्रिय <strong>${greetingName}</strong> जी,
+                                `}
                             </div>
 
                             <h3 class="agy-promo-title">${promo.title}</h3>
@@ -577,16 +684,22 @@
 
                         <!-- 2 Action Buttons Stacked Directly Below -->
                         <div class="agy-promo-actions">
-                            <a href="${promo.target_url || '/'}" class="agy-promo-cta-btn" id="agyPromoCtaBtn">
-                                <span>🎁 ${promo.cta_text ? promo.cta_text.replace(/^[🎁📖🎬🌿🔥\s]+/, '') : 'उत्सव उपहार व ई-बुक्स देखें'}</span>
-                            </a>
+                            ${(isGiftRecipient && !user.isRegistered) ? `
+                                <button type="button" class="agy-promo-cta-btn" id="agyPromoClaimBtn">
+                                    <span>🎁 अपना उपहार व 5 पॉइंट्स ओपन करें</span>
+                                </button>
+                            ` : `
+                                <a href="${promo.target_url || '/'}" class="agy-promo-cta-btn" id="agyPromoCtaBtn">
+                                    <span>🎁 ${promo.cta_text ? promo.cta_text.replace(/^[🎁📖🎬🌿🔥\s]+/, '') : 'उत्सव उपहार व ई-बुक्स देखें'}</span>
+                                </a>
+                            `}
 
                             ${promo.share_enabled ? `
                                 <button type="button" class="agy-promo-share-btn" id="agyPromoShareBtn">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.058-1.745-.392-1.378-.561-2.261-1.95-2.33-2.04-.069-.092-.556-.739-.556-1.409 0-.671.352-1.002.477-1.139.124-.138.272-.172.363-.172.091 0 .182.002.261.006.084.004.196-.032.307.234.114.272.389.948.423 1.017.034.069.057.15.011.24-.045.09-.068.147-.136.225-.068.079-.144.175-.205.235-.069.068-.141.141-.06.28.081.139.362.597.777.967.535.477.986.624 1.125.694.14.069.222.059.304-.035.083-.095.352-.41.446-.55.093-.14.188-.117.315-.07.128.046.81.382.949.452.14.069.233.104.267.162.034.059.034.343-.11.748z"/>
                                     </svg>
-                                    <span>📲 WhatsApp पर शुभकामनाएँ शेयर करें</span>
+                                    <span>📲 WhatsApp पर शुभकामनाएँ शेयर करें (+1 Point)</span>
                                 </button>
                             ` : ''}
                         </div>
@@ -605,13 +718,14 @@
             const canvas = document.getElementById('agy-promo-canvas');
             const stopParticles = this.startParticleEngine(canvas, promo.animation_preset);
 
-            // Dismiss function
+            // Dismiss function (Minimises to Floating Gift Box)
             const dismiss = () => {
                 root.classList.remove('active');
                 this.markDismissed(promo.id);
                 stopParticles();
                 setTimeout(() => {
                     root.remove();
+                    this.renderMinimisedFloatingGift(promo);
                 }, 380);
             };
 
@@ -641,6 +755,25 @@
             };
             window.addEventListener('keydown', onKeyDown);
 
+            // Claim Gift Button (For Unregistered Recipient)
+            const claimBtn = document.getElementById('agyPromoClaimBtn');
+            if (claimBtn) {
+                claimBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.promptRegistrationForShare((newUser) => {
+                        this.playChimeSound();
+                        try {
+                            if (window.AarogyamWallet && typeof window.AarogyamWallet.creditPoints === 'function') {
+                                window.AarogyamWallet.creditPoints(5, '🎁 स्वागत उपहार (5 पॉइंट्स)', 'welcome_bonus');
+                            }
+                        } catch(e) {}
+                        this.showToast('🎉 बधाई! <strong>5 पॉइंट्स</strong> आपके वॉलेट में क्रेडिट हो गए हैं! 🪙');
+                        // Re-render modal to show registered view
+                        this.renderPromotion(promo);
+                    });
+                });
+            }
+
             // Share Button
             const shareBtn = document.getElementById('agyPromoShareBtn');
             if (shareBtn) {
@@ -657,6 +790,109 @@
                     this.markDismissed(promo.id);
                 });
             }
+        },
+
+        // 8. Minimised Floating Gift Box Widget (Bottom-Left)
+        renderMinimisedFloatingGift: function (promo) {
+            // Safety check: Do not show on book landing pages
+            if (this.isBookLandingPage()) return;
+
+            const existing = document.getElementById('agy-floating-gift-box');
+            if (existing) {
+                existing.style.display = 'flex';
+                return;
+            }
+
+            const box = document.createElement('div');
+            box.id = 'agy-floating-gift-box';
+            box.innerHTML = `
+                <style>
+                    #agy-floating-gift-box {
+                        position: fixed;
+                        bottom: 82px;
+                        left: 18px;
+                        z-index: 99998;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 8px 14px 8px 10px;
+                        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+                        border: 1.5px solid rgba(255, 255, 255, 0.4);
+                        border-radius: 50px;
+                        color: #ffffff;
+                        cursor: pointer;
+                        box-shadow: 0 6px 24px rgba(234, 88, 12, 0.55), 0 0 12px rgba(245, 158, 11, 0.35);
+                        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
+                        animation: agyGiftFloat 3.6s ease-in-out infinite alternate;
+                        font-family: system-ui, -apple-system, sans-serif;
+                        user-select: none;
+                    }
+                    #agy-floating-gift-box:hover {
+                        transform: scale(1.08) translateY(-3px);
+                        box-shadow: 0 10px 30px rgba(234, 88, 12, 0.75);
+                    }
+                    .agy-floating-gift-pulse {
+                        position: absolute;
+                        inset: -5px;
+                        border-radius: 50px;
+                        border: 2px solid rgba(245, 158, 11, 0.75);
+                        animation: agyGiftPulseRing 2s ease-out infinite;
+                        pointer-events: none;
+                    }
+                    .agy-floating-gift-icon {
+                        font-size: 1.5rem;
+                        filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+                        animation: agyGiftWiggle 2.5s ease-in-out infinite;
+                    }
+                    .agy-floating-gift-text {
+                        display: flex;
+                        flex-direction: column;
+                        line-height: 1.15;
+                        text-align: left;
+                    }
+                    .agy-fgt-main {
+                        font-size: 0.82rem;
+                        font-weight: 900;
+                        color: #ffffff;
+                        letter-spacing: 0.3px;
+                    }
+                    .agy-fgt-sub {
+                        font-size: 0.68rem;
+                        color: #fef08a;
+                        font-weight: 700;
+                    }
+                    @keyframes agyGiftFloat {
+                        0% { transform: translateY(0px); }
+                        100% { transform: translateY(-7px); }
+                    }
+                    @keyframes agyGiftWiggle {
+                        0%, 100% { transform: rotate(0deg); }
+                        20% { transform: rotate(-12deg) scale(1.1); }
+                        40% { transform: rotate(12deg) scale(1.1); }
+                        60% { transform: rotate(-6deg); }
+                        80% { transform: rotate(6deg); }
+                    }
+                    @keyframes agyGiftPulseRing {
+                        0% { transform: scale(0.95); opacity: 1; }
+                        100% { transform: scale(1.22); opacity: 0; }
+                    }
+                </style>
+                <div class="agy-floating-gift-pulse"></div>
+                <div class="agy-floating-gift-icon">🎁</div>
+                <div class="agy-floating-gift-text">
+                    <span class="agy-fgt-main">उत्सव उपहार</span>
+                    <span class="agy-fgt-sub">पॉइंट्स कमाएँ</span>
+                </div>
+            `;
+
+            box.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                box.style.display = 'none';
+                this.renderPromotion(promo);
+            });
+
+            document.body.appendChild(box);
         },
 
         // 8. Bootstrap Engine

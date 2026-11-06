@@ -161,16 +161,57 @@ export async function initPromotionsPage() {
               </div>
             </div>
 
-            <!-- WhatsApp Share Options -->
-            <div style="background:rgba(37,211,102,0.06);padding:12px;border-radius:10px;border:1px solid rgba(37,211,102,0.3);">
-              <label style="font-size:0.88rem;font-weight:700;color:#15803d;display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                <input type="checkbox" id="edit-promo-share-enabled" checked> 
-                📲 WhatsApp शुभकामना शेयर बटन सक्रिय रखें
-              </label>
-              <p style="margin:0 0 6px 0;font-size:0.78rem;color:var(--admin-muted);">
-                *Aarogyam Manas सुरक्षा: शेयर बटन केवल रजिस्टर्ड प्रोफाइल ID के साथ काम करेगा (No Phone Number Leak).
+            <!-- WhatsApp Share Options & Message Builder -->
+            <div style="background:rgba(37,211,102,0.06);padding:14px;border-radius:12px;border:1px solid rgba(37,211,102,0.35);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <label style="font-size:0.92rem;font-weight:800;color:#15803d;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input type="checkbox" id="edit-promo-share-enabled" checked style="width:16px;height:16px;"> 
+                  📲 WhatsApp शुभकामना संदेश बिल्डर (Message Builder)
+                </label>
+                <span style="font-size:0.75rem;background:#dcfce7;color:#166534;font-weight:700;padding:2px 8px;border-radius:12px;">+1 Point per share</span>
+              </div>
+              <p style="margin:0 0 10px 0;font-size:0.78rem;color:var(--admin-muted);">
+                *Aarogyam Manas सुरक्षा: शेयर बटन में यूजर का आधिकारिक <code>share_id</code> लगेगा। नो फोन नंबर लीक।
               </p>
-              <input type="text" id="edit-promo-share-tmpl" class="admin-input" style="width:100%;font-size:0.85rem;" placeholder="आरोग्यम की ओर से हार्दिक शुभकामनाएँ! {link}">
+
+              <!-- Emoji Toolbar -->
+              <div style="margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:0.78rem;font-weight:700;color:var(--admin-muted);">इमोजी जोड़ें:</span>
+                <div id="wa-emoji-bar" style="display:inline-flex;gap:4px;flex-wrap:wrap;">
+                  <button type="button" class="wa-quick-tag" data-insert="🪔">🪔</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🎁">🎁</button>
+                  <button type="button" class="wa-quick-tag" data-insert="✨">✨</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🌸">🌸</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🎉">🎉</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🇮🇳">🇮🇳</button>
+                  <button type="button" class="wa-quick-tag" data-insert="⚡">⚡</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🩺">🩺</button>
+                  <button type="button" class="wa-quick-tag" data-insert="📚">📚</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🪙">🪙</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🌿">🌿</button>
+                  <button type="button" class="wa-quick-tag" data-insert="🙏">🙏</button>
+                </div>
+              </div>
+
+              <!-- Variable Pills -->
+              <div style="margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:0.78rem;font-weight:700;color:var(--admin-muted);">टैग्स डालें:</span>
+                <button type="button" class="wa-quick-tag" data-insert="{sender_name}" style="background:#e0f2fe;color:#0369a1;border-color:#bae6fd;">+ {sender_name}</button>
+                <button type="button" class="wa-quick-tag" data-insert="{link}" style="background:#fef3c7;color:#b45309;border-color:#fde68a;">+ {link}</button>
+                <button type="button" class="wa-quick-tag" data-insert="5 पॉइंट्स" style="background:#dcfce7;color:#15803d;border-color:#bbf7d0;">+ 5 पॉइंट्स</button>
+              </div>
+
+              <!-- Message Textarea -->
+              <textarea id="edit-promo-share-tmpl" class="admin-input" rows="5" style="width:100%;font-size:0.86rem;line-height:1.45;font-family:inherit;padding:8px 10px;" placeholder="व्हाट्सएप संदेश यहाँ लिखें..."></textarea>
+
+              <!-- Live WhatsApp Chat Bubble Preview -->
+              <div style="margin-top:10px;background:#e5ddd5;border-radius:10px;padding:12px;position:relative;">
+                <div style="font-size:0.74rem;font-weight:800;color:#075e54;margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+                  <i class="fa-brands fa-whatsapp"></i> व्हाट्सएप चैट प्रीव्यू (WhatsApp Chat Preview):
+                </div>
+                <div id="wa-preview-bubble" style="background:#dcf8c6;border-radius:8px 8px 0 8px;padding:8px 12px;font-size:0.83rem;color:#111827;line-height:1.45;box-shadow:0 1px 3px rgba(0,0,0,0.2);white-space:pre-wrap;word-break:break-word;">
+                </div>
+              </div>
             </div>
 
             <!-- Save Form Buttons -->
@@ -575,11 +616,38 @@ export async function initPromotionsPage() {
     } else {
       badgeEl.style.background = 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)';
     }
+
+    // Update WhatsApp Chat Preview Bubble
+    const tmplInput = document.getElementById('edit-promo-share-tmpl');
+    const waBubble = document.getElementById('wa-preview-bubble');
+    if (tmplInput && waBubble) {
+      let previewText = tmplInput.value || 'आरोग्यम की ओर से हार्दिक शुभकामनाएँ! {link}';
+      previewText = previewText.replace(/{sender_name}/g, 'रामेश्वर पटेल');
+      previewText = previewText.replace(/{user_name}/g, 'रामेश्वर पटेल');
+      previewText = previewText.replace(/{link}/g, 'https://aarogyamindia.com/?ref=AI000004');
+      waBubble.textContent = previewText;
+    }
   }
 
   // Input listeners for preview
-  ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-preset'].forEach(id => {
+  ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-preset', 'edit-promo-share-tmpl'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', () => updatePreview());
+  });
+
+  // WhatsApp Message Builder: Quick Tags & Emojis insertion
+  document.querySelectorAll('.wa-quick-tag').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.getAttribute('data-insert');
+      const textarea = document.getElementById('edit-promo-share-tmpl');
+      if (!textarea || !tag) return;
+      const start = textarea.selectionStart || 0;
+      const end = textarea.selectionEnd || 0;
+      const val = textarea.value;
+      textarea.value = val.substring(0, start) + tag + val.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+      textarea.focus();
+      updatePreview();
+    });
   });
 
   // --- HARVEST CURRENT FORM INTO IN-MEMORY ARRAY ---

@@ -549,6 +549,33 @@
             if (!insErr && newReg) {
               finalUserId = newReg.id;
               if (newReg.share_id) officialShareId = newReg.share_id;
+
+              // 🎁 Welcome Gift: +5 Points to newly registered user
+              try {
+                if (window.AarogyamWallet && typeof window.AarogyamWallet.creditPoints === 'function') {
+                  window.AarogyamWallet.creditPoints(5, '🎁 स्वागत उपहार (5 पॉइंट्स)', 'welcome_bonus');
+                }
+              } catch (_) {}
+
+              // Play Audio Chime Sound
+              try {
+                if (window.AarogyamPromotionGateway && typeof window.AarogyamPromotionGateway.playChimeSound === 'function') {
+                  window.AarogyamPromotionGateway.playChimeSound();
+                }
+              } catch (_) {}
+
+              // 👥 Sponsor Reward: +5 Points to the referring friend/sponsor
+              if (sponsorProfileId && db) {
+                try {
+                  await db.from('wallet_transactions').insert([{
+                    profile_id: sponsorProfileId,
+                    type: 'credit',
+                    amount: 5,
+                    title: `👥 नए मित्र (${officialName}) के जुड़ने पर 5 पॉइंट्स`,
+                    created_at: new Date().toISOString()
+                  }]);
+                } catch (_) {}
+              }
             }
 
             // Log referral
