@@ -203,7 +203,38 @@ export async function initPromotionsPage() {
               </div>
               <div>
                 <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">बटन लिंक (Target URL):</label>
-                <input type="text" id="edit-promo-target-url" class="admin-input" style="width:100%;" placeholder="/ebooks/index.html">
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input type="text" id="edit-promo-target-url" class="admin-input" style="flex:1;" placeholder="/ebooks/index.html">
+                  <select id="promo-page-picker" class="admin-input" style="min-width:160px;max-width:200px;font-size:0.82rem;cursor:pointer;" title="किसी भी पेज का लिंक चुनें">
+                    <option value="">📄 पेज चुनें...</option>
+                    <optgroup label="🏠 मुख्य पेज">
+                      <option value="/">होम पेज (index.html)</option>
+                      <option value="/ebooks/ebook.html">📚 ई-बुक स्टोर</option>
+                      <option value="/ebooks/my-library.html">📖 मेरी लाइब्रेरी</option>
+                      <option value="/tube.html">🎬 AarogyamTube</option>
+                      <option value="/pages/profile.html">👤 प्रोफाइल / वॉलेट</option>
+                      <option value="/bundle.html">🎁 बंडल ऑफर</option>
+                    </optgroup>
+                    <optgroup label="🌾 कृषि पेज">
+                      <option value="/ebooks/agriculture.html">🌱 कृषि ई-बुक्स</option>
+                      <option value="/aarogyam-sakhi.html">🤖 सखी AI</option>
+                      <option value="/krishi-panchang.html">📅 कृषि पंचांग</option>
+                    </optgroup>
+                    <optgroup label="🩺 स्वास्थ्य पेज">
+                      <option value="/health-joint-care.html">🦵 जोड़ों का दर्द</option>
+                      <option value="/health-diabetes.html">🩸 मधुमेह (शुगर)</option>
+                    </optgroup>
+                    <optgroup label="🏢 अन्य पेज">
+                      <option value="/mission.html">🇮🇳 आरोग्यम मिशन</option>
+                      <option value="/ebooks/share-rewards.html">💰 शेयर & कमाई</option>
+                      <option value="/admin/index.html">⚙️ एडमिन पैनल</option>
+                    </optgroup>
+                    <optgroup label="🔗 बाहरी लिंक">
+                      <option value="https://wa.me/917974422572">📱 WhatsApp सम्पर्क</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div style="font-size:0.72rem;color:#64748b;margin-top:3px;">ऊपर ड्रॉपडाउन से पेज चुनें या सीधे URL टाइप करें</div>
               </div>
             </div>
 
@@ -800,6 +831,16 @@ export async function initPromotionsPage() {
   // Bind Test WhatsApp Share Buttons
   document.getElementById('btn-test-wa-share')?.addEventListener('click', executeAdminTestShare);
   document.getElementById('prev-share')?.addEventListener('click', executeAdminTestShare);
+
+  // Page Picker Dropdown → Target URL input auto-fill
+  document.getElementById('promo-page-picker')?.addEventListener('change', function () {
+    const val = this.value;
+    if (val) {
+      document.getElementById('edit-promo-target-url').value = val;
+      this.value = ''; // Reset dropdown back to placeholder after selection
+      updatePreview();
+    }
+  });
 
   // Input listeners for preview
   ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-preset', 'edit-promo-share-tmpl'].forEach(id => {
