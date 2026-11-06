@@ -524,7 +524,7 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
-    // ACTION: SAVE / PUBLISH BOOK CATALOG & LANDING PAGE
+    // ACTION: SAVE / PUBLISH BOOK CATALOG & LANDING PAGE (1-Click Atomic Commit)
     // -------------------------------------------------------------
     if (!payload || !payload.pageData || !payload.pageData.id) {
       return sendJson(res, 400, { success: false, error: 'Invalid payload: pageData and Book ID are required.' });
@@ -534,6 +534,7 @@ module.exports = async function handler(req, res) {
     const pageData = payload.pageData;
     const bookData = payload.bookData || {};
     const uploadedFiles = Array.isArray(payload.uploadedFiles) ? payload.uploadedFiles : [];
+    const incomingTree = Array.isArray(payload.tree) ? payload.tree : [];
 
     // SAFE MERGE PROTECTION FOR BK001 & BK002: Core integrity preserved while allowing content/price/media updates
     if (bookId === 'BK001' || bookId === 'BK002') {
@@ -551,28 +552,42 @@ module.exports = async function handler(req, res) {
       pageData.google_analytics_id = 'disabled';
     }
 
+    // 1. Get HEAD commit sha on target branch
+    const refRes = await githubRequest(`git/ref/heads/${GITHUB_BRANCH}`, 'GET', token);
+    const latestCommitSha = refRes.data?.object?.sha;
+    if (!latestCommitSha) throw new Error(`Could not fetch HEAD for branch ${GITHUB_BRANCH}`);
+
+    const treeItems = [...incomingTree];
     const commitLog = [];
 
-    // 1. UPLOAD ANY EMBEDDED MEDIA FILES
-    for (const f of uploadedFiles) {
-      if (!f || !f.path || !f.base64) continue;
-      
-      const cleanPath = String(f.path).replace(/^\/+/, '');
-      const rawBase64 = f.base64.replace(/^data:[^;]+;base64,/, '');
-      const byteSize = Buffer.from(rawBase64, 'base64').length;
+    // 2. CREATE BLOBS FOR ANY EMBEDDED MEDIA FILES (if not already created in frontend)
+    if (uploadedFiles.length > 0) {
+      for (const f of uploadedFiles) {
+        if (!f || !f.path || !f.base64) continue;
+        
+        const cleanPath = String(f.path).replace(/^\/+/, '');
+        const rawBase64 = f.base64.replace(/^data:[^;]+;base64,/, '');
+        const byteSize = Buffer.from(rawBase64, 'base64').length;
 
-      if (byteSize > MAX_FILE_SIZE_BYTES) {
-        return sendJson(res, 400, {
-          success: false,
-          error: `File ${cleanPath} exceeds GitHub 25MB limit (${(byteSize / (1024 * 1024)).toFixed(1)} MB). Please split the PDF into Part 1 / Part 2 or compress below 25MB.`
+        if (byteSize > MAX_FILE_SIZE_BYTES) {
+          return sendJson(res, 400, {
+            success: false,
+            error: `File ${cleanPath} exceeds GitHub 25MB limit (${(byteSize / (1024 * 1024)).toFixed(1)} MB). Please split the PDF into Part 1 / Part 2 or compress below 25MB.`
+          });
+        }
+
+        const blobSha = await createBlob(rawBase64, token);
+        treeItems.push({
+          path: cleanPath,
+          mode: '100644',
+          type: 'blob',
+          sha: blobSha
         });
+        commitLog.push(cleanPath);
       }
-
-      await commitFile(cleanPath, rawBase64, `Upload ${cleanPath} for ${bookId}`, token);
-      commitLog.push(cleanPath);
     }
 
-    // 2. TARGETED UPDATE OF data/universal-book-landing-pages.json
+    // 3. TARGETED UPDATE OF data/universal-book-landing-pages.json
     const landingFile = await getFileContent('data/universal-book-landing-pages.json', token);
     let landingJson = { bookLandingPages: [] };
     if (landingFile && landingFile.content) {
@@ -594,10 +609,16 @@ module.exports = async function handler(req, res) {
     }
 
     const updatedLandingBase64 = Buffer.from(JSON.stringify(landingJson, null, 2), 'utf8').toString('base64');
-    await commitFile('data/universal-book-landing-pages.json', updatedLandingBase64, `Publish landing page ${bookId} [Auto-Sync]`, token);
+    const landingBlobSha = await createBlob(updatedLandingBase64, token);
+    treeItems.push({
+      path: 'data/universal-book-landing-pages.json',
+      mode: '100644',
+      type: 'blob',
+      sha: landingBlobSha
+    });
     commitLog.push('data/universal-book-landing-pages.json');
 
-    // 3. TARGETED UPDATE OF data/books.json
+    // 4. TARGETED UPDATE OF data/books.json
     const booksFile = await getFileContent('data/books.json', token);
     let booksJson = { books: [] };
     if (booksFile && booksFile.content) {
@@ -619,13 +640,51 @@ module.exports = async function handler(req, res) {
     }
 
     const updatedBooksBase64 = Buffer.from(JSON.stringify(booksJson, null, 2), 'utf8').toString('base64');
-    await commitFile('data/books.json', updatedBooksBase64, `Update catalog for book ${bookId} [Auto-Sync]`, token);
+    const booksBlobSha = await createBlob(updatedBooksBase64, token);
+    treeItems.push({
+      path: 'data/books.json',
+      mode: '100644',
+      type: 'blob',
+      sha: booksBlobSha
+    });
     commitLog.push('data/books.json');
+
+    // 5. CREATE 1 ATOMIC GIT TREE FOR ALL ASSETS + CONFIGS TOGETHER
+    const treeRes = await githubRequest('git/trees', 'POST', token, {
+      base_tree: latestCommitSha,
+      tree: treeItems.map(item => ({
+        path: String(item.path).replace(/^\/+/, ''),
+        mode: item.mode || '100644',
+        type: 'blob',
+        sha: item.sha
+      }))
+    });
+    const newTreeSha = treeRes.data?.sha;
+
+    // 6. CREATE 1 SINGLE ATOMIC GIT COMMIT
+    const assetCount = treeItems.length - 2;
+    const commitMsg = assetCount > 0
+      ? `Publish landing page & ${assetCount} assets for ${bookId} [1-Click Atomic Sync]`
+      : `Publish landing page ${bookId} [Auto-Sync]`;
+
+    const commitRes = await githubRequest('git/commits', 'POST', token, {
+      message: commitMsg,
+      tree: newTreeSha,
+      parents: [latestCommitSha]
+    });
+    const newCommitSha = commitRes.data?.sha;
+
+    // 7. ATOMICALLY UPDATE TARGET BRANCH HEAD IN ONE STEP
+    await githubRequest(`git/refs/heads/${GITHUB_BRANCH}`, 'PATCH', token, {
+      sha: newCommitSha,
+      force: false
+    });
 
     return sendJson(res, 200, {
       success: true,
-      message: `Book ${bookId} published to GitHub repository. Vercel auto-deployment triggered.`,
+      message: `Book ${bookId} and all assets published to GitHub repository in 1 atomic commit. Vercel auto-deployment triggered.`,
       bookId: bookId,
+      commitSha: newCommitSha,
       updatedFiles: commitLog
     });
 

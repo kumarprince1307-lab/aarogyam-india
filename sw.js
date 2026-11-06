@@ -148,7 +148,9 @@ self.addEventListener('fetch', (event) => {
     url.pathname.endsWith('.js') ||
     url.pathname.includes('site-pages-config') ||
     url.pathname.includes('universal-book-landing') ||
-    url.searchParams.has('v')
+    url.searchParams.has('v') ||
+    url.searchParams.has('book_updated') ||
+    url.searchParams.has('t')
   ) {
     event.respondWith(
       fetch(request)
@@ -188,7 +190,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Media (Images, WebP, MP3 Previews, Fonts): Cache First with Background Update
+  // Media (Images, WebP, MP3 Previews, Fonts): Stale-While-Revalidate with Auto-Refresh & Version-Aware Network-First
   if (
     url.pathname.startsWith('/images/') ||
     url.pathname.startsWith('/audio/') ||
@@ -197,17 +199,30 @@ self.addEventListener('fetch', (event) => {
   ) {
     event.respondWith(
       caches.open(MEDIA_CACHE).then((mediaCache) => {
-        return mediaCache.match(request).then((cachedMedia) => {
-          if (cachedMedia) return cachedMedia;
+        // Versioned media query (?book_updated=... or ?v=... or ?t=...): Fetch Network-First so edits update instantly worldwide
+        if (url.searchParams.has('book_updated') || url.searchParams.has('v') || url.searchParams.has('t')) {
+          return fetch(request)
+            .then((networkMedia) => {
+              if (networkMedia && networkMedia.status === 200) {
+                mediaCache.put(request, networkMedia.clone());
+              }
+              return networkMedia;
+            })
+            .catch(async () => {
+              return (await mediaCache.match(request)) || new Response('', { status: 408, statusText: 'Media Offline' });
+            });
+        }
 
-          return fetch(request).then((networkMedia) => {
+        // Standard unversioned media: Stale-While-Revalidate (0ms cached render + background fetch for auto-refresh)
+        return mediaCache.match(request).then((cachedMedia) => {
+          const fetchPromise = fetch(request).then((networkMedia) => {
             if (networkMedia && networkMedia.status === 200) {
               mediaCache.put(request, networkMedia.clone());
             }
             return networkMedia;
-          }).catch(() => {
-            return new Response('', { status: 408, statusText: 'Media Offline' });
-          });
+          }).catch(() => cachedMedia);
+
+          return cachedMedia || fetchPromise;
         });
       })
     );

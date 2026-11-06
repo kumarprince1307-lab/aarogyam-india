@@ -2732,7 +2732,8 @@ Instant Download & Lifetime Access
   });
 
   document.getElementById('btn_add_review_item')?.addEventListener('click', () => {
-    currentReviews.push({ name: 'संतुष्ट पाठक', location: 'भारत', rating: 5, gender: 'male', comment: 'बहुत ही उपयोगी व व्यावहारिक पुस्तक है।' });
+    if (typeof syncReviewsFromDOM === 'function') syncReviewsFromDOM();
+    currentReviews.push({ name: '', location: 'भारत', rating: 5, gender: 'male', comment: '' });
     renderReviewsInBuilder();
   });
 
@@ -2763,7 +2764,8 @@ Instant Download & Lifetime Access
   });
 
   document.getElementById('btn_add_faq_item')?.addEventListener('click', () => {
-    currentFaqs.push({ q: 'नया प्रश्न', a: 'नया उत्तर' });
+    if (typeof syncFaqsFromDOM === 'function') syncFaqsFromDOM();
+    currentFaqs.push({ q: '', a: '' });
     renderFaqsInBuilder();
   });
 
@@ -6242,6 +6244,27 @@ Instant Download & Lifetime Access
     }).join('');
   }
 
+  function syncReviewsFromDOM() {
+    const wrap = document.getElementById('blp_reviews_list_wrap');
+    if (!wrap) return;
+    const cards = wrap.querySelectorAll('.blp-review-card');
+    cards.forEach(card => {
+      const idx = parseInt(card.getAttribute('data-review-idx'), 10);
+      if (!isNaN(idx) && currentReviews[idx]) {
+        const nameEl = card.querySelector('.blp-review-name');
+        const locEl = card.querySelector('.blp-review-location');
+        const genderEl = card.querySelector('.blp-review-gender');
+        const ratingEl = card.querySelector('.blp-review-rating');
+        const commentEl = card.querySelector('.blp-review-comment');
+        if (nameEl) currentReviews[idx].name = nameEl.value;
+        if (locEl) currentReviews[idx].location = locEl.value;
+        if (genderEl) currentReviews[idx].gender = genderEl.value;
+        if (ratingEl) currentReviews[idx].rating = parseInt(ratingEl.value, 10) || 5;
+        if (commentEl) currentReviews[idx].comment = commentEl.value;
+      }
+    });
+  }
+
   function renderReviewsInBuilder() {
     const wrap = document.getElementById('blp_reviews_list_wrap');
     if (!wrap) return;
@@ -6250,21 +6273,22 @@ Instant Download & Lifetime Access
       return;
     }
     wrap.innerHTML = currentReviews.map((r, idx) => `
-      <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:8px;">
+      <div class="blp-review-card" data-review-idx="${idx}" style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:8px;">
         <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:8px;align-items:center;margin-bottom:6px;">
-          <input type="text" placeholder="ग्राहक का नाम" value="${escapeHtml(r.name)}" onchange="window.updateReviewField(${idx}, 'name', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;" />
-          <input type="text" placeholder="स्थान" value="${escapeHtml(r.location || '')}" onchange="window.updateReviewField(${idx}, 'location', this.value)" class="admin-input" style="padding:4px 8px;font-size:0.82rem;" />
-          <select onchange="window.updateReviewField(${idx}, 'gender', this.value)" class="admin-select" style="padding:4px 8px;font-size:0.8rem;font-weight:700;">
+          <input type="text" placeholder="ग्राहक का नाम" value="${escapeHtml(r.name || '')}" oninput="window.updateReviewField(${idx}, 'name', this.value)" onchange="window.updateReviewField(${idx}, 'name', this.value)" class="admin-input blp-review-name" style="padding:4px 8px;font-size:0.82rem;font-weight:700;" />
+          <input type="text" placeholder="स्थान" value="${escapeHtml(r.location || '')}" oninput="window.updateReviewField(${idx}, 'location', this.value)" onchange="window.updateReviewField(${idx}, 'location', this.value)" class="admin-input blp-review-location" style="padding:4px 8px;font-size:0.82rem;" />
+          <select onchange="window.updateReviewField(${idx}, 'gender', this.value)" class="admin-select blp-review-gender" style="padding:4px 8px;font-size:0.8rem;font-weight:700;">
             <option value="male" ${r.gender === 'male' ? 'selected' : ''}>👨 Male Avatar</option>
             <option value="female" ${r.gender === 'female' ? 'selected' : ''}>👩 Female Avatar</option>
           </select>
-          <select onchange="window.updateReviewField(${idx}, 'rating', parseInt(this.value,10))" class="admin-select" style="padding:4px 8px;font-size:0.8rem;font-weight:700;">
+          <select onchange="window.updateReviewField(${idx}, 'rating', parseInt(this.value,10))" class="admin-select blp-review-rating" style="padding:4px 8px;font-size:0.8rem;font-weight:700;">
             <option value="5" ${r.rating === 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5)</option>
             <option value="4" ${r.rating === 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4)</option>
+            <option value="3" ${r.rating === 3 ? 'selected' : ''}>⭐⭐⭐ (3)</option>
           </select>
-          <button type="button" onclick="window.removeReviewItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;">&times;</button>
+          <button type="button" onclick="window.removeReviewItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;" title="यह रिव्यू हटाएं">&times;</button>
         </div>
-        <textarea placeholder="रिव्यू संदेश" onchange="window.updateReviewField(${idx}, 'comment', this.value)" class="admin-textarea" rows="2" style="width:100%;padding:4px 8px;font-size:0.82rem;">${escapeHtml(r.comment)}</textarea>
+        <textarea placeholder="रिव्यू संदेश" oninput="window.updateReviewField(${idx}, 'comment', this.value)" onchange="window.updateReviewField(${idx}, 'comment', this.value)" class="admin-textarea blp-review-comment" rows="2" style="width:100%;padding:4px 8px;font-size:0.82rem;">${escapeHtml(r.comment || '')}</textarea>
       </div>
     `).join('');
   }
@@ -6437,6 +6461,21 @@ Instant Download & Lifetime Access
     `).join('');
   }
 
+  function syncFaqsFromDOM() {
+    const wrap = document.getElementById('blp_faqs_list_wrap');
+    if (!wrap) return;
+    const cards = wrap.querySelectorAll('.blp-faq-card');
+    cards.forEach(card => {
+      const idx = parseInt(card.getAttribute('data-faq-idx'), 10);
+      if (!isNaN(idx) && currentFaqs[idx]) {
+        const qEl = card.querySelector('.blp-faq-q');
+        const aEl = card.querySelector('.blp-faq-a');
+        if (qEl) currentFaqs[idx].q = qEl.value;
+        if (aEl) currentFaqs[idx].a = aEl.value;
+      }
+    });
+  }
+
   function renderFaqsInBuilder() {
     const wrap = document.getElementById('blp_faqs_list_wrap');
     if (!wrap) return;
@@ -6445,12 +6484,12 @@ Instant Download & Lifetime Access
       return;
     }
     wrap.innerHTML = currentFaqs.map((f, idx) => `
-      <div style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:6px;">
+      <div class="blp-faq-card" data-faq-idx="${idx}" style="background:var(--admin-surface, #1e293b);border:1px solid var(--admin-border);border-radius:8px;padding:10px;margin-bottom:6px;">
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
-          <input type="text" placeholder="प्रश्न" value="${escapeHtml(f.q)}" onchange="window.updateFaqField(${idx}, 'q', this.value)" class="admin-input" style="width:100%;padding:4px 8px;font-size:0.85rem;font-weight:700;" />
-          <button type="button" onclick="window.removeFaqItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;">&times;</button>
+          <input type="text" placeholder="प्रश्न" value="${escapeHtml(f.q || '')}" oninput="window.updateFaqField(${idx}, 'q', this.value)" onchange="window.updateFaqField(${idx}, 'q', this.value)" class="admin-input blp-faq-q" style="width:100%;padding:4px 8px;font-size:0.85rem;font-weight:700;" />
+          <button type="button" onclick="window.removeFaqItem(${idx})" class="admin-button small-button" style="background:#ef4444;color:#fff;padding:3px 8px;" title="यह FAQ हटाएं">&times;</button>
         </div>
-        <textarea placeholder="उत्तर" onchange="window.updateFaqField(${idx}, 'a', this.value)" class="admin-textarea" rows="2" style="width:100%;padding:4px 8px;font-size:0.82rem;">${escapeHtml(f.a)}</textarea>
+        <textarea placeholder="उत्तर" oninput="window.updateFaqField(${idx}, 'a', this.value)" onchange="window.updateFaqField(${idx}, 'a', this.value)" class="admin-textarea blp-faq-a" rows="2" style="width:100%;padding:4px 8px;font-size:0.82rem;">${escapeHtml(f.a || '')}</textarea>
       </div>
     `).join('');
   }
@@ -6890,7 +6929,12 @@ Instant Download & Lifetime Access
 
   window.removeVideoItem = (idx) => { currentVideos.splice(idx, 1); renderVideosInBuilder(); };
   window.updateReviewField = (idx, field, val) => { if (currentReviews[idx]) currentReviews[idx][field] = val; };
-  window.removeReviewItem = (idx) => { currentReviews.splice(idx, 1); renderReviewsInBuilder(); };
+  window.removeReviewItem = (idx) => {
+    if (typeof syncReviewsFromDOM === 'function') syncReviewsFromDOM();
+    currentReviews.splice(idx, 1);
+    renderReviewsInBuilder();
+    showToast('🗑️ रिव्यू हटा दिया गया', 'info');
+  };
   window.uploadOgImage = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -6989,7 +7033,12 @@ Instant Download & Lifetime Access
   window.updateTocPointField = (idx, val) => { currentTocPoints[idx] = val; };
   window.removeTocPointItem = (idx) => { currentTocPoints.splice(idx, 1); renderTocPointsInBuilder(); };
   window.updateFaqField = (idx, field, val) => { if (currentFaqs[idx]) currentFaqs[idx][field] = val; };
-  window.removeFaqItem = (idx) => { currentFaqs.splice(idx, 1); renderFaqsInBuilder(); };
+  window.removeFaqItem = (idx) => {
+    if (typeof syncFaqsFromDOM === 'function') syncFaqsFromDOM();
+    currentFaqs.splice(idx, 1);
+    renderFaqsInBuilder();
+    showToast('🗑️ FAQ हटा दिया गया', 'info');
+  };
   window.updateSuggestedBookField = (idx, field, val) => { if (currentSuggestedBooks[idx]) currentSuggestedBooks[idx][field] = val; };
   window.removeSuggestedBookItem = (idx) => { currentSuggestedBooks.splice(idx, 1); renderSuggestedBooksInBuilder(); };
 
@@ -7059,7 +7108,7 @@ Instant Download & Lifetime Access
       return;
     }
 
-    currentReviews = reviews.map(r => ({
+    const newReviews = reviews.map(r => ({
       name: r.name || 'किसान मित्र',
       location: r.location || r.role || 'सत्यापित पाठक',
       rating: r.rating || 5,
@@ -7067,8 +7116,20 @@ Instant Download & Lifetime Access
       comment: r.comment || r.text || ''
     }));
 
+    if (typeof syncReviewsFromDOM === 'function') syncReviewsFromDOM();
+    if (currentReviews.length > 0) {
+      const shouldAppend = confirm(`मौजूदा लिस्ट में ${currentReviews.length} रिव्यू पहले से हैं।\n\nक्या आप ${newReviews.length} नए रिव्यू को जोड़ना (Append) चाहते हैं?\n\n[OK = जोड़ें (Append)]\n[Cancel = पुरानी लिस्ट बदलकर नए रखें (Replace)]`);
+      if (shouldAppend) {
+        currentReviews.push(...newReviews);
+      } else {
+        currentReviews = newReviews;
+      }
+    } else {
+      currentReviews = newReviews;
+    }
+
     renderReviewsInBuilder();
-    showToast(`✅ ${currentReviews.length} रिव्यू '${cleanTarget}' से इम्पोर्ट हो गए!`, 'success');
+    showToast(`✅ ${currentReviews.length} रिव्यू लोड हो गए!`, 'success');
   };
 
   window.importFaqsFromSelectedBook = async function() {
@@ -7126,13 +7187,25 @@ Instant Download & Lifetime Access
       ];
     }
 
-    currentFaqs = faqs.map(f => ({
+    const newFaqs = faqs.map(f => ({
       q: f.question || f.q || '',
       a: f.answer || f.a || ''
     }));
 
+    if (typeof syncFaqsFromDOM === 'function') syncFaqsFromDOM();
+    if (currentFaqs.length > 0) {
+      const shouldAppend = confirm(`मौजूदा लिस्ट में ${currentFaqs.length} FAQs पहले से हैं।\n\nक्या आप ${newFaqs.length} नए FAQs को जोड़ना (Append) चाहते हैं?\n\n[OK = जोड़ें (Append)]\n[Cancel = पुरानी लिस्ट बदलकर नए रखें (Replace)]`);
+      if (shouldAppend) {
+        currentFaqs.push(...newFaqs);
+      } else {
+        currentFaqs = newFaqs;
+      }
+    } else {
+      currentFaqs = newFaqs;
+    }
+
     renderFaqsInBuilder();
-    showToast(`✅ ${currentFaqs.length} FAQs '${cleanTarget}' से इम्पोर्ट हो गए!`, 'success');
+    showToast(`✅ ${currentFaqs.length} FAQs लोड हो गए!`, 'success');
   };
 
   window.toggleLiveStatus = function(bId) {
@@ -8316,6 +8389,8 @@ Instant Download & Lifetime Access
   }
 
   async function saveBookLandingPage() {
+    if (typeof syncReviewsFromDOM === 'function') syncReviewsFromDOM();
+    if (typeof syncFaqsFromDOM === 'function') syncFaqsFromDOM();
     const bId = (document.getElementById('blp_input_book_id')?.value || '').trim().toUpperCase();
     const category = document.getElementById('blp_category_select')?.value || 'Agriculture';
     const title = (document.getElementById('blp_hero_title')?.value || '').trim();
@@ -8683,8 +8758,12 @@ Instant Download & Lifetime Access
       bonus_points: currentBonusPoints,
       table_of_contents: currentTocPoints,
       videos: currentVideos,
-      testimonials: (currentReviews && currentReviews.length > 0) ? currentReviews : (existingPage?.testimonials || []),
-      faqs: (currentFaqs && currentFaqs.length > 0) ? currentFaqs : (existingPage?.faqs || []),
+      testimonials: Array.isArray(currentReviews)
+        ? currentReviews.filter(r => r && ((r.name && r.name.trim()) || (r.comment && r.comment.trim())))
+        : [],
+      faqs: Array.isArray(currentFaqs)
+        ? currentFaqs.filter(f => f && ((f.q && f.q.trim()) || (f.a && f.a.trim())))
+        : [],
       final_buy: {
         title: (document.getElementById('blp_final_buy_title')?.value || '').trim() || title,
         description: (document.getElementById('blp_final_buy_desc')?.value || '').trim() || (document.getElementById('blp_hero_subtitle')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || '').trim(),
@@ -8801,24 +8880,45 @@ Instant Download & Lifetime Access
     const isLocalEditor = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
 
     try {
-      // Step 1: Upload any media files (Cover, Banner, Demo pages, Section Banners, PDFs) directly to Git as assets
+      // Step 1: Process any media files (Cover, Banner, Demo pages, Section Banners, PDFs)
+      // In Production: We create Git Blobs directly (0 git commits, 0 Vercel builds triggered)
+      const tree = [];
       if (uploadedFiles.length > 0) {
         for (let i = 0; i < uploadedFiles.length; i++) {
           const fileItem = uploadedFiles[i];
           const fileName = fileItem.path.split('/').pop();
           if (saveButtonEl) {
-            saveButtonEl.innerHTML = `⏳ Git अपलोड (${i + 1}/${uploadedFiles.length}): ${fileName}...`;
+            saveButtonEl.innerHTML = `⏳ प्रोसेस मीडिया (${i + 1}/${uploadedFiles.length}): ${fileName}...`;
           }
-          const upRes = await syncAssetToGitHub(fileItem.path, fileItem.base64);
-          if (!upRes.success) {
-            throw new Error(`Asset upload failed for ${fileItem.path}: ${upRes.error || 'Unknown error'}`);
+          if (isLocalEditor) {
+            await syncAssetToGitHub(fileItem.path, fileItem.base64);
+          } else {
+            const blobRes = await fetch(apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'create_blob',
+                base64: fileItem.base64
+              })
+            });
+            const blobData = await blobRes.json().catch(() => ({}));
+            if (blobRes.ok && blobData.success && blobData.sha) {
+              tree.push({
+                path: fileItem.path,
+                mode: '100644',
+                type: 'blob',
+                sha: blobData.sha
+              });
+            } else {
+              throw new Error(`Media process failed for ${fileName}: ${blobData.error || 'Unknown error'}`);
+            }
           }
         }
       }
 
-      // Step 2: Unified Triple-Sync: 1) Local 5505 Disk Sync, 2) PHP Server Sync, 3) Auto-Sync API
+      // Step 2: Unified Triple-Sync: 1) Local 5505 Disk Sync, 2) PHP Server Sync, 3) Auto-Sync API (1 Atomic Commit)
       if (saveButtonEl) {
-        saveButtonEl.innerHTML = `⏳ JSON कैटलॉग व डिस्क पर सुरक्षित हो रहा है...`;
+        saveButtonEl.innerHTML = `⏳ 1-क्लिक Git पब्लिश हो रहा है...`;
       }
 
       // 2A. Direct Local Disk Save (Port 5505) if on localhost
@@ -8870,7 +8970,7 @@ Instant Download & Lifetime Access
         throw new Error('Local disk sync failed. Your edits are still open; please retry.');
       }
 
-      // Production publishes only after the repository API confirms the save.
+      // Production publishes everything in 1 SINGLE ATOMIC COMMIT
       if (!isLocalEditor) {
         const syncRes = await fetch(apiUrl, {
           method: 'POST',
@@ -8879,6 +8979,7 @@ Instant Download & Lifetime Access
             action: 'save',
             pageData,
             bookData: newBookObj,
+            tree: tree,
             uploadedFiles: []
           })
         });
@@ -8886,6 +8987,7 @@ Instant Download & Lifetime Access
         const syncData = await syncRes.json().catch(() => ({}));
         if (syncRes.ok && syncData.success) {
           syncSuccess = true;
+          console.log('[Book Landing AutoSync] 1-Click Atomic Publish success:', syncData);
         } else {
           throw new Error(syncData.error || `GitHub sync failed: HTTP ${syncRes.status}`);
         }
