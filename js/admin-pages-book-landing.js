@@ -2481,18 +2481,30 @@ Instant Download & Lifetime Access
     }
   };
 
-  window.uploadSectionBannerFile = function(secKey, event) {
+  window.uploadSectionBannerFile = async function(secKey, event) {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (re) => {
-        const dataUrl = re.target.result;
-        const input = document.getElementById(`blp_sec_banner_${secKey}`);
-        if (input) input.value = dataUrl;
-        window.setSectionBannerUrl(secKey, dataUrl);
-        showToast(`📸 ${file.name} बैनर लोड हो गया!`, 'info');
-      };
-      reader.readAsDataURL(file);
+      showToast(`⏳ ${file.name} बैनर प्रोसेस हो रहा है...`, 'info');
+      try {
+        const dataUrl = await compressImageFile(file, 1400, 0.82);
+        if (dataUrl) {
+          const input = document.getElementById(`blp_sec_banner_${secKey}`);
+          if (input) input.value = dataUrl;
+          window.setSectionBannerUrl(secKey, dataUrl);
+          showToast(`📸 ${file.name} बैनर (अनुकूलित WebP) लोड हो गया!`, 'success');
+        }
+      } catch (err) {
+        console.error('Section banner compression error:', err);
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          const dataUrl = re.target.result;
+          const input = document.getElementById(`blp_sec_banner_${secKey}`);
+          if (input) input.value = dataUrl;
+          window.setSectionBannerUrl(secKey, dataUrl);
+          showToast(`📸 ${file.name} बैनर लोड हो गया!`, 'info');
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -6899,23 +6911,24 @@ Instant Download & Lifetime Access
     reader.readAsDataURL(file);
   };
 
-  window.uploadDemoImage = (e) => {
+  window.uploadDemoImage = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    showToast(`⏳ ${files.length} डेमो पेजेस लोड हो रहे हैं...`, 'info');
+    showToast(`⏳ ${files.length} डेमो पेजेस प्रोसेस हो रहे हैं...`, 'info');
     let loaded = 0;
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (re) => {
-        currentDemoImages.push(re.target.result);
-        loaded++;
-        if (loaded === files.length) {
-          renderDemoImagesInBuilder();
-          showToast(`✅ ${loaded} डेमो पेजेस सफलतापूर्वक जुड़ गए!`, 'success');
+    for (const file of files) {
+      try {
+        const dataUrl = await compressImageFile(file, 1200, 0.82);
+        if (dataUrl) {
+          currentDemoImages.push(dataUrl);
+          loaded++;
         }
-      };
-      reader.readAsDataURL(file);
-    });
+      } catch (err) {
+        console.error('Demo page compression error:', err);
+      }
+    }
+    renderDemoImagesInBuilder();
+    showToast(`✅ ${loaded} डेमो पेजेस (अनुकूलित WebP) सफलतापूर्वक जुड़ गए!`, 'success');
   };
 
   window.selectDemoFromExistingBook = () => {
@@ -8252,27 +8265,18 @@ Instant Download & Lifetime Access
     });
   }
 
-  function compressImageFile(file, maxWidth = 800, quality = 0.78) {
+  function compressImageFile(input, maxWidth = 1200, quality = 0.82) {
     return new Promise((resolve) => {
-      if (!file || !file.type || !file.type.startsWith('image/')) {
-        if (file) {
-          const r = new FileReader();
-          r.onload = () => resolve(r.result);
-          r.onerror = () => resolve(null);
-          r.readAsDataURL(file);
-        } else {
-          resolve(null);
-        }
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (e) => {
+      if (!input) return resolve(null);
+
+      const processDataUrl = (dataUrl) => {
+        if (!dataUrl || typeof dataUrl !== 'string') return resolve(dataUrl);
         const img = new Image();
         img.onload = () => {
           try {
             const canvas = document.createElement('canvas');
-            let w = img.width;
-            let h = img.height;
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
             if (w > maxWidth) {
               h = Math.round((h * maxWidth) / w);
               w = maxWidth;
@@ -8283,17 +8287,31 @@ Instant Download & Lifetime Access
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, w, h);
-            const dataUrl = canvas.toDataURL('image/webp', quality);
-            resolve(dataUrl);
+            const webpUrl = canvas.toDataURL('image/webp', quality);
+            resolve(webpUrl);
           } catch (err) {
-            resolve(e.target.result);
+            console.warn('[compressImageFile] Canvas compression error:', err);
+            resolve(dataUrl);
           }
         };
-        img.onerror = () => resolve(e.target.result);
-        img.src = e.target.result;
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
       };
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
+
+      if (typeof input === 'string') {
+        if (input.startsWith('data:image/')) {
+          processDataUrl(input);
+        } else {
+          resolve(input);
+        }
+      } else if (input instanceof Blob || input instanceof File) {
+        const reader = new FileReader();
+        reader.onload = (e) => processDataUrl(e.target.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(input);
+      } else {
+        resolve(null);
+      }
     });
   }
 
@@ -8409,8 +8427,9 @@ Instant Download & Lifetime Access
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
       uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     } else if (coverUrlInput && coverUrlInput.startsWith('data:image/')) {
+      const b64 = await compressImageFile(coverUrlInput, 1200, 0.85);
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
-      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: coverUrlInput });
+      uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     }
 
     // 2. Banner Image (File or Data URL with auto-compression)
@@ -8425,19 +8444,22 @@ Instant Download & Lifetime Access
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
       uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     } else if (bannerUrlInput && bannerUrlInput.startsWith('data:image/')) {
+      const b64 = await compressImageFile(bannerUrlInput, 1600, 0.85);
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
-      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: bannerUrlInput });
+      uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     }
 
-    // 3. Section Banners
-    Object.keys(cleanSectionBanners).forEach((secKey) => {
+    // 3. Section Banners (Auto-compressed to ultra-crisp WebP)
+    const secKeys = Object.keys(cleanSectionBanners);
+    for (const secKey of secKeys) {
       const sUrl = cleanSectionBanners[secKey];
       if (sUrl && sUrl.startsWith('data:image/')) {
         const sPath = `images/banners/${bId.toLowerCase()}-${secKey}-banner.webp`;
-        uploadedFiles.push({ path: sPath, base64: sUrl });
+        const b64 = await compressImageFile(sUrl, 1400, 0.82);
+        uploadedFiles.push({ path: sPath, base64: b64 });
         cleanSectionBanners[secKey] = `/${sPath}`;
       }
-    });
+    }
 
     // 4. Main Paid PDF
     let finalMainPdfPath = (document.getElementById('blp_main_pdf_url')?.value || '').trim();
@@ -8465,13 +8487,14 @@ Instant Download & Lifetime Access
       uploadedFiles.push({ path: `uploads/books/${bId}_free.pdf`, base64: b64 });
     }
 
-    // 6. Demo Images (Strict Deduplication - No duplicate URLs)
+    // 6. Demo Images (Strict Deduplication & Auto-compression to genuine WebP)
     const rawDemoList = [];
     for (let i = 0; i < currentDemoImages.length; i++) {
       const dImg = currentDemoImages[i];
       if (typeof dImg === 'string' && dImg.startsWith('data:image/')) {
         const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.webp`;
-        uploadedFiles.push({ path: dPath, base64: dImg });
+        const b64 = await compressImageFile(dImg, 1200, 0.82);
+        uploadedFiles.push({ path: dPath, base64: b64 });
         rawDemoList.push(`/${dPath}`);
       } else if (typeof dImg === 'string' && dImg.trim()) {
         rawDemoList.push(dImg.trim());
@@ -8479,11 +8502,12 @@ Instant Download & Lifetime Access
     }
     const cleanedDemoImages = Array.from(new Set(rawDemoList));
 
-    // 7. OG Social Image
+    // 7. OG Social Image (Auto-compressed to WebP)
     let finalOgImg = (document.getElementById('blp_og_image')?.value || '').trim();
     if (finalOgImg.startsWith('data:image/')) {
       const ogPath = `images/books/${bId.toLowerCase()}-og.webp`;
-      uploadedFiles.push({ path: ogPath, base64: finalOgImg });
+      const b64 = await compressImageFile(finalOgImg, 1200, 0.82);
+      uploadedFiles.push({ path: ogPath, base64: b64 });
       finalOgImg = `/${ogPath}`;
     } else if (!finalOgImg) {
       finalOgImg = finalCoverPath;
