@@ -167,6 +167,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Auto-Play Audio Guidance on load / first touch
         setupDownloadAudioAutoplay();
 
+        // 🚀 Preload and resolve book assets & exact page count in background
+        // so when user clicks Download button, it starts INSTANTLY with 0ms delay!
+        preloadBookDownloadAssets(state.bookId, state.bookData);
+
     } catch (err) {
         console.error('Initialization Error:', err);
         showError('त्रुटि हुई', err.message);
@@ -865,26 +869,28 @@ window.triggerDownloadTier = async function(tier = 'fast') {
 
     let isDelivered = false;
 
-    // ⚡ 3. SMART DETECTION: Check if a pre-compiled static PDF actually exists on disk
-    let staticPdfUrl = null;
-    const candidates = [
-        configuredPdf,
-        `/pdf/full/${cleanId}.pdf`,
-        `/uploads/books/${cleanId}_main.pdf`
-    ].filter(Boolean);
+    // ⚡ 3. INSTANT STATIC DELIVERY (Cached or Parallel Check)
+    let staticPdfUrl = window.cachedDownloadInfo?.staticPdfUrl;
+    if (staticPdfUrl === undefined) {
+        const candidates = [
+            configuredPdf,
+            `/pdf/full/${cleanId}.pdf`,
+            `/uploads/books/${cleanId}_main.pdf`
+        ].filter(Boolean);
 
-    for (const c of candidates) {
-        try {
-            const headRes = await fetch(c, { method: 'HEAD' });
-            if (headRes.ok) {
-                const ct = (headRes.headers.get('content-type') || '').toLowerCase();
-                // Ensure it's a real file and not an HTML fallback
-                if (!ct.includes('text/html')) {
-                    staticPdfUrl = c;
-                    break;
+        for (const c of candidates) {
+            try {
+                const headRes = await fetch(c, { method: 'HEAD' });
+                if (headRes.ok) {
+                    const ct = (headRes.headers.get('content-type') || '').toLowerCase();
+                    // Ensure it's a real file and not an HTML fallback
+                    if (!ct.includes('text/html')) {
+                        staticPdfUrl = c;
+                        break;
+                    }
                 }
-            }
-        } catch (_) {}
+            } catch (_) {}
+        }
     }
 
     if (staticPdfUrl) {
@@ -910,10 +916,10 @@ window.triggerDownloadTier = async function(tier = 'fast') {
         }
     }
 
-    // ⚡ 4. ADVANCED ZERO-FILE FALLBACK: Assemble PDF from WebP images with Live Progress Bar!
+    // ⚡ 4. ADVANCED ZERO-FILE FALLBACK: Assemble PDF from WebP images (Starts in 0ms!)
     if (!isDelivered) {
+        showDlProgress(0, 1, 'PDF तैयार हो रही है...');
         try {
-            showDlProgress(0, 1, 'PDF तैयार हो रही है...');
             const success = await assembleDownloadPdf(cleanId, cleanTitle, tier);
             if (success) {
                 isDelivered = true;
@@ -1272,6 +1278,109 @@ function loadScript(src) {
     });
 }
 
+window.cachedDownloadInfo = null;
+
+async function fastResolvePageCount(folder, hintCount = 0) {
+    hintCount = parseInt(hintCount, 10) || 0;
+
+    // 1. If hintCount is declared, test hintCount and nearby pages (diff 1 to 5)
+    if (hintCount > 0) {
+        try {
+            const r = await fetch(`${folder}/${hintCount}.webp`, { method: 'HEAD' });
+            if (r.ok) return hintCount;
+        } catch(_) {}
+
+        for (let diff = 1; diff <= 5; diff++) {
+            const testP = hintCount - diff;
+            if (testP <= 0) break;
+            try {
+                const r = await fetch(`${folder}/${testP}.webp`, { method: 'HEAD' });
+                if (r.ok) return testP;
+            } catch(_) {}
+        }
+    }
+
+    // 2. Ultra-fast binary search (only ~6 to 8 requests max instead of 100+!)
+    try {
+        const r1 = await fetch(`${folder}/1.webp`, { method: 'HEAD' });
+        if (!r1.ok) return 0;
+    } catch(_) { return 0; }
+
+    let low = 1;
+    let high = 250;
+    let maxFound = 1;
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        try {
+            const res = await fetch(`${folder}/${mid}.webp`, { method: 'HEAD' });
+            if (res.ok) {
+                maxFound = Math.max(maxFound, mid);
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        } catch(_) {
+            high = mid - 1;
+        }
+    }
+    return maxFound;
+}
+
+async function preloadBookDownloadAssets(bookId, bookData) {
+    if (!bookId) return;
+    const cleanId = String(bookId).toUpperCase().trim();
+    const configuredPdf = (bookData?.mainPdf || bookData?.pdf_url || '').trim();
+
+    // Check static PDF candidates in parallel
+    let staticPdfUrl = null;
+    const candidates = [
+        configuredPdf,
+        `/pdf/full/${cleanId}.pdf`,
+        `/uploads/books/${cleanId}_main.pdf`
+    ].filter(Boolean);
+
+    await Promise.all(candidates.map(async (c) => {
+        if (staticPdfUrl) return;
+        try {
+            const headRes = await fetch(c, { method: 'HEAD' });
+            if (headRes.ok) {
+                const ct = (headRes.headers.get('content-type') || '').toLowerCase();
+                if (!ct.includes('text/html')) {
+                    if (!staticPdfUrl) staticPdfUrl = c;
+                }
+            }
+        } catch (_) {}
+    }));
+
+    // Find working image folder
+    const folderCandidates = [
+        `/images/books/${cleanId}`,
+        `/images/books/${cleanId.toLowerCase()}`,
+        `../images/books/${cleanId}`,
+        `../images/books/${cleanId.toLowerCase()}`
+    ];
+    let workingFolder = `/images/books/${cleanId}`;
+    for (const folder of folderCandidates) {
+        try {
+            const res = await fetch(`${folder}/1.webp`, { method: 'HEAD' });
+            if (res.ok) { workingFolder = folder; break; }
+        } catch (_) {}
+    }
+
+    // Fast-resolve exact page count in background
+    const declaredPages = parseInt(bookData?.totalPages || 0, 10);
+    const resolvedPages = await fastResolvePageCount(workingFolder, declaredPages);
+
+    window.cachedDownloadInfo = {
+        cleanId,
+        staticPdfUrl,
+        workingFolder,
+        totalPages: resolvedPages
+    };
+    console.log('⚡ [Download Engine Preload Complete]:', window.cachedDownloadInfo);
+}
+
 async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
     if (!window.jspdf || !window.jspdf.jsPDF) {
         showDlProgress(0, 1, 'PDF लाइब्रेरी लोड हो रही है...');
@@ -1283,50 +1392,30 @@ async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
     }
     const { jsPDF } = window.jspdf;
 
-    const candidateFolders = [
-        `/images/books/${bookId}`,
-        `/images/books/${bookId.toUpperCase()}`,
-        `/images/books/${bookId.toLowerCase()}`,
-        `../images/books/${bookId}`,
-        `../images/books/${bookId.toUpperCase()}`,
-        `../images/books/${bookId.toLowerCase()}`
-    ];
-    let workingFolder = null;
+    let workingFolder = window.cachedDownloadInfo?.workingFolder;
+    let totalPages = window.cachedDownloadInfo?.totalPages || 0;
 
-    // Find first working folder
-    for (const folder of candidateFolders) {
-        try {
-            const res = await fetch(`${folder}/1.webp`, { method: 'HEAD' });
-            if (res.ok) { workingFolder = folder; break; }
-        } catch(e) {}
-    }
-
-    if (!workingFolder) {
-        hideDlProgress();
-        return false;
-    }
-
-    // Determine total pages quickly
-    let totalPages = parseInt(state.bookData?.totalPages || state.bookLandingData?.totalPages || window.currentBookData?.totalPages, 10) || 0;
-
-    // Verify last page if known
-    if (totalPages > 0) {
-        try {
-            const checkLast = await fetch(`${workingFolder}/${totalPages}.webp`, { method: 'HEAD' });
-            if (!checkLast.ok) totalPages = 0;
-        } catch(e) { totalPages = 0; }
-    }
-
-    // Fallback: search total pages
-    if (totalPages === 0) {
-        showDlProgress(0, 1, 'पेज गिने जा रहे हैं...');
-        for (let p = 1; p <= 300; p++) {
+    if (!workingFolder || totalPages === 0) {
+        const candidateFolders = [
+            `/images/books/${bookId}`,
+            `/images/books/${bookId.toUpperCase()}`,
+            `/images/books/${bookId.toLowerCase()}`,
+            `../images/books/${bookId}`
+        ];
+        for (const folder of candidateFolders) {
             try {
-                const res = await fetch(`${workingFolder}/${p}.webp`, { method: 'HEAD' });
-                if (res.ok) totalPages = p;
-                else break;
-            } catch(e) { break; }
+                const res = await fetch(`${folder}/1.webp`, { method: 'HEAD' });
+                if (res.ok) { workingFolder = folder; break; }
+            } catch(e) {}
         }
+
+        if (!workingFolder) {
+            hideDlProgress();
+            return false;
+        }
+
+        const hintPages = parseInt(state.bookData?.totalPages || window.currentBookData?.totalPages, 10) || 0;
+        totalPages = await fastResolvePageCount(workingFolder, hintPages);
     }
 
     if (totalPages === 0) {
@@ -1339,8 +1428,10 @@ async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
     const pdfH = doc.internal.pageSize.getHeight();
 
     // Scale canvas according to tier
-    const maxDimension = tier === 'fast' ? 900 : 1600;
-    const compressionQuality = tier === 'fast' ? 0.68 : 0.88;
+    const maxDimension = tier === 'fast' ? 800 : 1400;
+    const compressionQuality = tier === 'fast' ? 0.65 : 0.85;
+
+    showDlProgress(0, totalPages, `पेज 1 / ${totalPages} तैयार हो रहा है...`);
 
     for (let i = 1; i <= totalPages; i++) {
         showDlProgress(i, totalPages, `पेज ${i} / ${totalPages} तैयार हो रहे हैं...`);
@@ -1369,7 +1460,7 @@ async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
             console.warn(`Page ${i} skip:`, e);
         }
 
-        if (i % 6 === 0) await new Promise(r => setTimeout(r, 20));
+        if (i % 6 === 0) await new Promise(r => setTimeout(r, 10));
     }
 
     showDlProgress(totalPages, totalPages, 'PDF सुरक्षित की जा रही है...');

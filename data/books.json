@@ -2248,7 +2248,9 @@
         "रोग और कीट प्रबंधन",
         "ऑडियो बुक और AI सखी सहायता"
       ],
-      "totalPages": 70,
+      "totalPages": 69,
+      "hasWebpPages": true,
+      "pageImagesPath": "images/books/BK020",
       "author": "Dada Avnish Mishra",
       "language": "Hindi",
       "version": "2026",
