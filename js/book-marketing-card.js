@@ -340,6 +340,14 @@
     window.openShareDrawer(bId, title, price);
   };
 
+  function versionBookCover(url, timestamp) {
+    if (!url || typeof url !== 'string') return url || '';
+    if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+    const ver = timestamp ? new Date(timestamp).getTime() : Math.floor(Date.now() / 30000);
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}t=${ver}`;
+  }
+
   // -------------------------------------------------------------
   // 4. UNIVERSAL MARKETING BOOK CARD RENDERER
   // -------------------------------------------------------------
@@ -349,7 +357,8 @@
     const title = book.heading || book.name || book.title || 'Aarogyam India eBook';
     const subtitle = book.subtitle || book.description || 'बीज उपचार से लेकर कटाई तक सम्पूर्ण प्रैक्टिकल गाइड।';
     const category = book.category || 'Agriculture';
-    const cover = book.cover || book.thumbnail || book.image || '/images/books/kharif-master-guide-2026-cover.webp';
+    const rawCover = book.cover || book.thumbnail || book.image || '/images/books/kharif-master-guide-2026-cover.webp';
+    const cover = versionBookCover(rawCover, book.updated_at);
     const mrp = parseInt(book.mrp || 299, 10);
     const offerPrice = parseInt(book.offerPrice || book.price || 99, 10);
     const discountPercent = Math.max(10, Math.round(((mrp - offerPrice) / mrp) * 100));
@@ -829,7 +838,11 @@
     const cardsHtml = activeBundles.map(bundle => {
       const id = bundle.id || '';
       const title = bundle.title || 'महाबचत किसान कॉम्बो';
-      const subtitle = bundle.subtitle || '';
+      let subtitle = bundle.subtitle || '';
+      // Ensure "11 सब्जी" is never shown if BK015 is not in bundle!
+      if (!bundle.bookIds?.includes('BK015') && !bundle.bookIds?.includes('bk015')) {
+        subtitle = subtitle.replace(/11\s*सब्जी\s*(?:खेती)?\s*\+?\s*/gi, '').replace(/\+\s*11\s*सब्जी/gi, '').trim();
+      }
       const badge = bundle.badge || 'विशेष कॉम्बो';
       const mrp = Number(bundle.mrp || 1196);
       const offerPrice = Number(bundle.offerPrice || bundle.price || 199);

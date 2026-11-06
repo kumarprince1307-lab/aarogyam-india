@@ -75,7 +75,7 @@
   // --- 1. DATA LOADERS ---
   async function fetchCatalogBooks() {
     try {
-      const resp = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
+      const resp = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 15000));
       if (resp.ok) {
         const data = await resp.json();
         let list = data.books || data || [];
@@ -97,7 +97,7 @@
 
   async function fetchLandingPages() {
     try {
-      const resp = await fetch('/data/universal-book-landing-pages.json?v=' + Math.floor(Date.now() / 300000));
+      const resp = await fetch('/data/universal-book-landing-pages.json?v=' + Math.floor(Date.now() / 15000));
       if (resp.ok) {
         const data = await resp.json();
         let pages = data.bookLandingPages || data || [];
@@ -1371,10 +1371,14 @@
           .filter(Boolean);
       }
 
+      const rawCover = lp?.hero?.cover_image || b?.cover || b?.thumbnail || `/images/books/${bId.toLowerCase()}-cover.webp`;
+      const updateTime = lp?.updated_at || b?.updated_at || bundle.updated_at || '';
+      const versionedCover = versionBookImg(rawCover, updateTime);
+
       return {
         id: bId,
         title: lp?.hero?.title || b?.heading || b?.name || b?.title || bId,
-        cover: lp?.hero?.cover_image || b?.cover || b?.thumbnail || `/images/books/${bId.toLowerCase()}-cover.webp`,
+        cover: versionedCover,
         mrp: mrp,
         regularOffer: regularOffer,
         totalPages: b?.totalPages || 120,
@@ -1382,6 +1386,14 @@
         keyPoints: keyPoints
       };
     });
+  }
+
+  function versionBookImg(url, timestamp) {
+    if (!url || typeof url !== 'string') return url || '';
+    if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+    const ver = timestamp ? new Date(timestamp).getTime() : Math.floor(Date.now() / 30000);
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}t=${ver}`;
   }
 
   function renderBundleNotFound() {
