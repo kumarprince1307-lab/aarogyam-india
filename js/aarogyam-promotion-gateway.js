@@ -52,11 +52,28 @@
         },
 
         // 2. Frequency & Session Capping
-        isDismissedRecently: function (promo) {
+        isDismissedRecently: function (promo, globalUpdatedAt) {
             try {
+                // If preview or test query parameter is present, bypass dismissal
+                const search = (window.location.search || '').toLowerCase();
+                if (search.includes('promo=') || search.includes('test_promo') || search.includes('preview')) {
+                    return false;
+                }
+
                 const key = 'AI_PROM_DISMISSED_' + promo.id;
                 const dismissedAt = parseInt(localStorage.getItem(key) || '0', 10);
                 if (!dismissedAt) return false;
+
+                // If promo or catalog was updated AFTER user dismissed it, RESET DISMISSAL so they see the fresh update!
+                const promoUpdated = promo.updated_at ? new Date(promo.updated_at).getTime() : 0;
+                const globalUpdated = globalUpdatedAt ? new Date(globalUpdatedAt).getTime() : 0;
+                const latestUpdate = Math.max(promoUpdated, globalUpdated);
+
+                if (latestUpdate > dismissedAt) {
+                    localStorage.removeItem(key);
+                    sessionStorage.removeItem(key);
+                    return false;
+                }
 
                 const elapsedMs = Date.now() - dismissedAt;
 
@@ -513,7 +530,7 @@
                     <!-- 3D Floating Stage -->
                     <div class="agy-promo-floating-stage">
                         <div class="agy-promo-aura-halo"></div>
-                        <img src="${promo.image_url || '/images/logo/logo.png'}" alt="Festival Promotion" class="agy-promo-float-img" onerror="this.src='/images/logo/logo.png'" />
+                        <img src="${promo.image_url || '/images/logo/logo.png'}" alt="Festival Promotion" class="agy-promo-float-img" onerror="if(this.src && !this.src.includes('/images/logo/logo.png'))this.src='/images/logo/logo.png';" />
                     </div>
 
                     <!-- Inner Card -->
@@ -646,16 +663,16 @@
                     if (!this.shouldDisplayOnPage(p.target_pages)) return false;
 
                     // Frequency dismissal check
-                    if (this.isDismissedRecently(p)) return false;
+                    if (this.isDismissedRecently(p, data.updated_at)) return false;
 
                     return true;
                 });
 
                 if (eligible) {
-                    // Slight delay for smooth page entrance (1.2s after DOM load)
+                    // Quick smooth entrance (300ms after DOM ready)
                     setTimeout(() => {
                         this.renderPromotion(eligible);
-                    }, 1200);
+                    }, 300);
                 }
             } catch (err) {
                 console.warn("Promotions gateway note:", err);

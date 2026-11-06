@@ -135,6 +135,15 @@
 
         // 1. Initialize Engine on DOM Ready
         init: async function () {
+            // 🚀 Universal 3D Floating Promotion & Festival Gateway MUST ALWAYS RUN!
+            if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
+                const promoScript = document.createElement('script');
+                promoScript.id = 'agy-promo-gateway-script';
+                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261106_v2';
+                promoScript.defer = true;
+                document.head.appendChild(promoScript);
+            }
+
             // Strict Landing Page Filter: Zero overhead and zero icons on landing pages
             if (this.isLandingPage()) {
                 document.querySelectorAll('.user-notif-bell-btn').forEach(b => b.remove());
@@ -154,15 +163,6 @@
             }
             this.initWebPushPrompt();
             this.renderFestivalBanner();
-
-            // 🚀 Universal 3D Floating Promotion & Festival Gateway
-            if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
-                const promoScript = document.createElement('script');
-                promoScript.id = 'agy-promo-gateway-script';
-                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261106_v1';
-                promoScript.defer = true;
-                document.head.appendChild(promoScript);
-            }
         },
 
         // 2. Resolve Current User

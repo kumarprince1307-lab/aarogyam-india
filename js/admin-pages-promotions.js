@@ -187,12 +187,25 @@ export async function initPromotionsPage() {
 
           <!-- Live Interactive Preview Box -->
           <div style="margin-top:24px;border-top:1px solid var(--admin-border);padding-top:16px;">
+            <style>
+              @keyframes agyAdminLevitate {
+                0% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-8px) rotate(1deg); }
+                100% { transform: translateY(2px) rotate(-1deg); }
+              }
+              @keyframes agyAdminAuraPulse {
+                0% { opacity: 0.55; transform: scale(0.92); }
+                50% { opacity: 0.95; transform: scale(1.1); }
+                100% { opacity: 0.6; transform: scale(0.95); }
+              }
+            </style>
             <div style="font-size:0.86rem;font-weight:700;color:var(--admin-muted);text-transform:uppercase;margin-bottom:10px;">
               👁️ लाइव प्रीव्यू (यूजर की स्क्रीन पर ऐसा दिखेगा):
             </div>
-            <div id="promo-live-preview-box" style="background:#0f172a;border-radius:18px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,0.15);box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-              <div style="width:100px;height:100px;margin:0 auto 10px auto;border-radius:12px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                <img id="prev-img" src="/images/logo/logo.png" style="max-width:85px;max-height:85px;object-fit:contain;">
+            <div id="promo-live-preview-box" style="background:#0f172a;border-radius:18px;padding:24px 20px 20px 20px;text-align:center;border:1px solid rgba(255,255,255,0.15);box-shadow:0 10px 25px rgba(0,0,0,0.5);position:relative;">
+              <div style="position:relative;width:130px;height:130px;margin:0 auto 12px auto;display:flex;align-items:center;justify-content:center;">
+                <div id="prev-aura" style="position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle, rgba(245,158,11,0.55) 0%, rgba(220,38,38,0.2) 60%, rgba(0,0,0,0) 80%);animation:agyAdminAuraPulse 3.5s ease-in-out infinite alternate;filter:blur(8px);pointer-events:none;"></div>
+                <img id="prev-img" src="/images/logo/logo.png" style="max-width:120px;max-height:120px;object-fit:contain;animation:agyAdminLevitate 4.5s ease-in-out infinite alternate;filter:drop-shadow(0 10px 20px rgba(0,0,0,0.55));position:relative;z-index:2;border-radius:10px;">
               </div>
               <span id="prev-badge" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.72rem;font-weight:800;background:#f59e0b;color:#fff;margin-bottom:6px;">✨ पावन पर्व</span>
               <div style="font-size:0.82rem;color:#cbd5e1;margin-bottom:4px;">प्रिय <strong>रामेश्वर पटेल</strong> जी,</div>
@@ -513,11 +526,11 @@ export async function initPromotionsPage() {
   });
 
   // --- LIVE PREVIEW UPDATER ---
-  function updatePreview() {
+  function updatePreview(customImgSrc = null) {
     const title = document.getElementById('edit-promo-title').value || 'अभियान शीर्षक';
     const sub = document.getElementById('edit-promo-subtitle').value || 'अभियान संदेश विवरण';
     const badge = document.getElementById('edit-promo-badge').value || '✨ विशेष उत्सव';
-    const img = document.getElementById('edit-promo-image-url').value || '/images/logo/logo.png';
+    const img = customImgSrc || document.getElementById('edit-promo-image-url').value || '/images/logo/logo.png';
     const cta = document.getElementById('edit-promo-cta-text').value || 'आगे बढ़ें →';
     const preset = document.getElementById('edit-promo-preset').value;
 
@@ -529,7 +542,19 @@ export async function initPromotionsPage() {
     const prevImgEl = document.getElementById('prev-img');
     if (prevImgEl) {
       prevImgEl.src = img;
-      prevImgEl.onerror = () => { prevImgEl.src = '/images/logo/logo.png'; };
+    }
+
+    const auraEl = document.getElementById('prev-aura');
+    if (auraEl) {
+      if (preset === 'tricolor_patriotic') {
+        auraEl.style.background = 'radial-gradient(circle, rgba(255,153,51,0.6) 0%, rgba(255,255,255,0.4) 40%, rgba(19,136,8,0.5) 70%, rgba(0,0,0,0) 90%)';
+      } else if (preset === 'neon_tube_flow') {
+        auraEl.style.background = 'radial-gradient(circle, rgba(6,182,212,0.7) 0%, rgba(239,68,68,0.4) 50%, rgba(0,0,0,0) 80%)';
+      } else if (preset === 'holi_gulal_petals') {
+        auraEl.style.background = 'radial-gradient(circle, rgba(236,72,153,0.7) 0%, rgba(168,85,247,0.4) 50%, rgba(0,0,0,0) 80%)';
+      } else {
+        auraEl.style.background = 'radial-gradient(circle, rgba(245,158,11,0.6) 0%, rgba(220,38,38,0.3) 60%, rgba(0,0,0,0) 80%)';
+      }
     }
 
     const badgeEl = document.getElementById('prev-badge');
@@ -544,17 +569,14 @@ export async function initPromotionsPage() {
 
   // Input listeners for preview
   ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-preset'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', updatePreview);
+    document.getElementById(id)?.addEventListener('input', () => updatePreview());
   });
 
-  // --- APPLY FORM CHANGES TO IN-MEMORY ARRAY ---
-  document.getElementById('btn-apply-promo-edit')?.addEventListener('click', () => {
-    const id = document.getElementById('edit-promo-id').value;
+  // --- HARVEST CURRENT FORM INTO IN-MEMORY ARRAY ---
+  function harvestCurrentForm() {
+    const id = document.getElementById('edit-promo-id').value || ('PROM_' + Date.now());
     const title = document.getElementById('edit-promo-title').value.trim();
-    if (!title) {
-      alert('कृपया शीर्षक अवश्य दर्ज करें।');
-      return;
-    }
+    if (!title) return null;
 
     const targets = [];
     if (document.getElementById('page-target-all').checked) targets.push('all');
@@ -579,7 +601,8 @@ export async function initPromotionsPage() {
       target_pages: targets.length > 0 ? targets : ['all'],
       share_enabled: document.getElementById('edit-promo-share-enabled').checked,
       share_message_template: document.getElementById('edit-promo-share-tmpl').value.trim() || 'आरोग्यम की ओर से हार्दिक शुभकामनाएँ! {link}',
-      frequency_mode: 'once_per_day'
+      frequency_mode: 'once_per_day',
+      updated_at: new Date().toISOString()
     };
 
     if (currentEditingIndex >= 0 && currentEditingIndex < promotionsData.promotions.length) {
@@ -590,6 +613,16 @@ export async function initPromotionsPage() {
     }
 
     renderPromotionsList();
+    return updatedItem;
+  }
+
+  // --- APPLY FORM CHANGES TO IN-MEMORY ARRAY ---
+  document.getElementById('btn-apply-promo-edit')?.addEventListener('click', () => {
+    const res = harvestCurrentForm();
+    if (!res) {
+      alert('कृपया शीर्षक अवश्य दर्ज करें।');
+      return;
+    }
     showToast('✓ अभियान अपडेट हो गया है! अब ऊपर "Save & Publish World Wide" दबाएँ।', '#10b981');
   });
 
@@ -627,9 +660,18 @@ export async function initPromotionsPage() {
       showToast('इमेज कंप्रेस और तैयार हो रही है...', '#3b82f6');
       const compressedWebP = await compressToWebp(file, 800, 800, 0.90);
       
+      // 1. INSTANT LOCAL 0MS VISUAL PREVIEW (No network delay, no 404!)
+      updatePreview(compressedWebP);
+
       // Save locally or upload asset
       const fileName = `promo-${Date.now()}.webp`;
       const savePath = `/images/banners/${fileName}`;
+
+      document.getElementById('edit-promo-image-url').value = savePath;
+      if (currentEditingIndex >= 0 && promotionsData.promotions[currentEditingIndex]) {
+        promotionsData.promotions[currentEditingIndex].image_url = savePath;
+      }
+      renderPromotionsList();
 
       // Upload via backend API
       const syncUrl = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') 
@@ -647,14 +689,9 @@ export async function initPromotionsPage() {
       });
 
       if (res.ok) {
-        document.getElementById('edit-promo-image-url').value = savePath;
-        updatePreview();
-        showToast('✓ इमेज सफलतापूर्वक अपलोड हो गई!', '#10b981');
+        showToast('✓ इमेज सफलतापूर्वक सर्वर पर अपलोड हो गई!', '#10b981');
       } else {
-        // Fallback to data URL for preview
-        document.getElementById('edit-promo-image-url').value = compressedWebP;
-        updatePreview();
-        showToast('इमेज लोड हो गई।', '#10b981');
+        showToast('इमेज प्रीव्यू तैयार है।', '#10b981');
       }
     } catch (err) {
       console.error("Image upload error:", err);
@@ -692,6 +729,9 @@ export async function initPromotionsPage() {
 
   // --- SAVE & PUBLISH WORLD WIDE (GIT / VERCEL SYNC) ---
   document.getElementById('btn-save-all-promos')?.addEventListener('click', async () => {
+    // 1. Automatically harvest current form fields so admin changes are never lost!
+    harvestCurrentForm();
+
     const btn = document.getElementById('btn-save-all-promos');
     const origText = btn.innerHTML;
     btn.disabled = true;
