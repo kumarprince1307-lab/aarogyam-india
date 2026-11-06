@@ -5638,7 +5638,7 @@
     },
     {
       "id": "BK020",
-      "updated_at": "2026-11-06T05:13:41.642Z",
+      "updated_at": "2026-11-06T05:18:35.463Z",
       "admin_edited": true,
       "slug": "bk020",
       "book_type": "paid",
@@ -5703,7 +5703,8 @@
         "sec_preview": "/images/banners/bk020-sec_preview-banner.webp",
         "sec_ai_support": "/images/banners/bk020-sec_ai_support-banner.webp",
         "sec_specs_toc": "/images/banners/bk020-sec_specs_toc-banner.webp",
-        "sec_final_buy": "/images/banners/bk020-sec_final_buy-banner.webp"
+        "sec_final_buy": "/images/banners/bk020-sec_final_buy-banner.webp",
+        "sec_audio": "/images/banners/bk020-sec_audio-banner.webp"
       },
       "og_title": "सरसों खेती गाइड 2026 | सम्पूर्ण जानकारी | PDF + ऑडियो बुक सिर्फ ₹99",
       "og_description": "सरसों की खेती कैसे करें? जानें उन्नत किस्में, बीज चयन, बुवाई, खाद, सिंचाई, रोग एवं कीट नियंत्रण, कटाई, भंडारण और प्रति एकड़ लागत व मुनाफे की जानकारी। 50 पेज की हिंदी सरसों खेती गाइड के साथ PDF, ऑडियो बुक, मोबाइल ऐप और Aarogyam Sakhi AI सहायता। MRP ₹299, विशेष ऑफर सिर्फ ₹99।सरसों की खेती, सरसों खेती गाइड, सरसों की खेती कैसे करें, सरसों की उन्नत किस्में, सरसों की बुवाई, सरसों में खाद प्रबंधन, सरसों में सिंचाई, सरसों के रोग, सरसों के कीट, सरसों में माहू नियंत्रण, सरसों की पैदावार कैसे बढ़ाएं, सरसों की खेती का खर्च, सरसों की खेती में मुनाफा, mustard farming, mustard farming guide in Hindi, mustard crop management, mustard disease control, mustard cultivation PDF",
@@ -5747,7 +5748,8 @@
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk020-sec_audio-banner.webp"
       },
       "mainPdf": "",
       "main_pdf": "",

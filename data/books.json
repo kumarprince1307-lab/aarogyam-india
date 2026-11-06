@@ -2213,7 +2213,8 @@
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk020-sec_audio-banner.webp"
       },
       "features": [
         "70 पेज की सम्पूर्ण गाइड",
@@ -2228,7 +2229,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK020",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-06T05:13:41.642Z",
+      "updated_at": "2026-11-06T05:18:35.463Z",
       "admin_edited": true
     }
   ]
