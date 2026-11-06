@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-06T14:30:00.000Z",
+  "updated_at": "2026-11-06T09:09:11.172Z",
   "version": "1.0",
   "active_campaign_id": "PROM_DHANTERAS_DIWALI_2026",
   "promotions": [
@@ -12,7 +12,9 @@
       "badge": "✨ पावन पर्व शुभकामना",
       "animation_preset": "golden_diya_sparkles",
       "image_url": "/images/banners/aarogyamtube-default-thumb.svg",
-      "target_pages": ["all"],
+      "target_pages": [
+        "all"
+      ],
       "target_url": "/ebooks/index.html",
       "cta_text": "🎁 उत्सव उपहार व ई-बुक्स देखें",
       "start_date": "2026-11-01T00:00:00",
@@ -31,7 +33,9 @@
       "badge": "🇮🇳 राष्ट्र को समर्पित",
       "animation_preset": "tricolor_patriotic",
       "image_url": "/images/logo/logo.png",
-      "target_pages": ["all"],
+      "target_pages": [
+        "all"
+      ],
       "target_url": "/mission.html",
       "cta_text": "🇮🇳 आरोग्यम मिशन से जुड़ें",
       "start_date": "2027-01-20T00:00:00",
@@ -50,7 +54,10 @@
       "badge": "🔥 TRENDING ON AAROGYAMTUBE",
       "animation_preset": "neon_tube_flow",
       "image_url": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
-      "target_pages": ["home", "library"],
+      "target_pages": [
+        "home",
+        "library"
+      ],
       "target_url": "/tube.html?v=VID_S612726",
       "cta_text": "🎬 अभी पूरा वीडियो देखें →",
       "start_date": "2026-11-01T00:00:00",
@@ -69,7 +76,9 @@
       "badge": "🌿 HEALTH AWARENESS WEEK",
       "animation_preset": "golden_diya_sparkles",
       "image_url": "/images/logo/logo.png",
-      "target_pages": ["all"],
+      "target_pages": [
+        "all"
+      ],
       "target_url": "/health-joint-care.html",
       "cta_text": "🌿 सम्पूर्ण उपाय व गाइड पढ़ें",
       "start_date": "2026-11-01T00:00:00",
