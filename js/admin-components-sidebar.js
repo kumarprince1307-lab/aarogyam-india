@@ -72,6 +72,7 @@ const MENU = [
     { label: 'All Notifications', href: 'notifications.html', route: 'notifications' }, 
     { label: '📢 VIP Outreach & Offers (स्मार्ट आउटरीच)', href: 'reports.html', route: 'reports' } 
   ] },
+  { label: '🎉 Promotions (प्रमोशन व उत्सव)', href: 'promotions.html', icon: '🎉', route: 'promotions' },
 
   { label: 'Admin App', href: 'admin-app.html', icon: '📱', route: 'admin-app' },
   { label: 'Settings', href: 'settings.html', icon: '⚙️', route: 'settings' },

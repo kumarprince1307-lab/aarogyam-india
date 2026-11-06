@@ -25,6 +25,7 @@ const ROUTES = {
   'downloads': () => import('./admin-pages-downloads.js').then(m => m.initDownloads()),
   'reports': () => import('./admin-pages-reports.js?v=21.0').then(m => (m.initReports ? m.initReports() : m.renderReports(document.getElementById('page-content')))),
   'notifications': () => import('./admin-pages-notifications.js').then(m => m.initNotifications()),
+  'promotions': () => import('./admin-pages-promotions.js?v=20261106_v1').then(m => m.initPromotionsPage()),
   'broadcast': () => import('./admin-pages-reports.js?v=21.0').then(m => (m.initReports ? m.initReports() : m.renderReports(document.getElementById('page-content')))),
   'google-leads': () => import('./admin-pages-google-leads.js?v=1.0').then(m => m.initGoogleLeads()),
   'auto-whatsapp': () => import('./admin-pages-auto-whatsapp.js?v=1.0').then(m => m.initAutoWhatsapp()),
@@ -72,6 +73,10 @@ const ROUTE_ALIASES = {
   'leads': 'google-leads',
   'auto-wa': 'auto-whatsapp',
   'whatsapp-bot': 'auto-whatsapp',
+  'festival': 'promotions',
+  'festivals': 'promotions',
+  'promotion': 'promotions',
+  'announcements': 'promotions',
   'sakhi-ai': 'sakhi-ai-hub',
   'sakhi': 'sakhi-ai-hub',
   'help': 'support'

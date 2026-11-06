@@ -524,6 +524,25 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
+    // ACTION: SAVE UNIVERSAL PROMOTIONS & FESTIVAL CONFIG (data/universal-promotions.json)
+    // -------------------------------------------------------------
+    if (action === 'save_promotions' || action === 'save_universal_promotions') {
+      const promotionsData = payload.promotionsData || {
+        updated_at: new Date().toISOString(),
+        version: "1.0",
+        promotions: Array.isArray(payload.promotions) ? payload.promotions : []
+      };
+      const updatedPromosBase64 = Buffer.from(JSON.stringify(promotionsData, null, 2), 'utf8').toString('base64');
+      await commitFile('data/universal-promotions.json', updatedPromosBase64, 'Update Universal Promotions & Festival Campaigns [Auto-Sync]', token);
+
+      return sendJson(res, 200, {
+        success: true,
+        message: 'Universal Promotions & Festival Campaigns successfully published to GitHub repository.',
+        updatedFiles: ['data/universal-promotions.json']
+      });
+    }
+
+    // -------------------------------------------------------------
     // ACTION: SAVE / PUBLISH BOOK CATALOG & LANDING PAGE (1-Click Atomic Commit)
     // -------------------------------------------------------------
     if (!payload || !payload.pageData || !payload.pageData.id) {

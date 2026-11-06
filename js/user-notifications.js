@@ -154,6 +154,15 @@
             }
             this.initWebPushPrompt();
             this.renderFestivalBanner();
+
+            // 🚀 Universal 3D Floating Promotion & Festival Gateway
+            if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
+                const promoScript = document.createElement('script');
+                promoScript.id = 'agy-promo-gateway-script';
+                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261106_v1';
+                promoScript.defer = true;
+                document.head.appendChild(promoScript);
+            }
         },
 
         // 2. Resolve Current User
