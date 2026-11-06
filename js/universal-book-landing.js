@@ -623,33 +623,35 @@ if (typeof window !== 'undefined') {
 
     const cacheKey = `AOI_CACHE_${cleanUrl.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
+    const maxStaleTime = isBookConfig ? 5000 : 90000;
     // 1. High-speed Stale-While-Revalidate (SWR): 0ms instant mobile load from cache
     try {
       const cached = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
       if (cached) {
         const item = JSON.parse(cached);
         if (item && item.data) {
-          // If cached data is available, return immediately for instant render!
-          // Revalidate in background if older than 90 seconds
-          if (Date.now() - item.time > 90000) {
-            const bucket = Math.floor(Date.now() / 120000);
-            fetch(`${primaryPath}?v=${bucket}`).then(r => r.ok ? r.json() : null).then(fresh => {
-              if (fresh) {
-                try {
-                  const payload = JSON.stringify({ data: fresh, time: Date.now() });
-                  sessionStorage.setItem(cacheKey, payload);
-                  localStorage.setItem(cacheKey, payload);
-                } catch(e) {}
-              }
-            }).catch(() => {});
+          // If cached data is fresh enough, return immediately for instant render!
+          if (Date.now() - item.time < maxStaleTime) {
+            return item.data;
           }
-          return item.data;
+          // Revalidate in background if older
+          const bucket = isBookConfig ? Math.floor(Date.now() / 10000) : Math.floor(Date.now() / 120000);
+          fetch(`${primaryPath}?v=${bucket}`).then(r => r.ok ? r.json() : null).then(fresh => {
+            if (fresh) {
+              try {
+                const payload = JSON.stringify({ data: fresh, time: Date.now() });
+                sessionStorage.setItem(cacheKey, payload);
+                localStorage.setItem(cacheKey, payload);
+              } catch(e) {}
+            }
+          }).catch(() => {});
+          if (!isBookConfig) return item.data;
         }
       }
     } catch (e) {}
 
-    // 2. High-speed CDN/Browser caching with 2-minute time bucket (allows single-roundtrip gzip/brotli)
-    const cacheBucket = Math.floor(Date.now() / 120000);
+    // 2. High-speed CDN/Browser caching with dynamic time bucket
+    const cacheBucket = isBookConfig ? Math.floor(Date.now() / 10000) : Math.floor(Date.now() / 120000);
     const candidates = [
       `${primaryPath}?v=${cacheBucket}`,
       `${fallbackPath}?v=${cacheBucket}`,

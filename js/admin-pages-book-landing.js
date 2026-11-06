@@ -2486,12 +2486,12 @@ Instant Download & Lifetime Access
     if (file) {
       showToast(`⏳ ${file.name} बैनर प्रोसेस हो रहा है...`, 'info');
       try {
-        const dataUrl = await compressImageFile(file, 1400, 0.82);
+        const dataUrl = await compressImageFile(file, 2000, 0.90);
         if (dataUrl) {
           const input = document.getElementById(`blp_sec_banner_${secKey}`);
           if (input) input.value = dataUrl;
           window.setSectionBannerUrl(secKey, dataUrl);
-          showToast(`📸 ${file.name} बैनर (अनुकूलित WebP) लोड हो गया!`, 'success');
+          showToast(`📸 ${file.name} बैनर (HD WebP) लोड हो गया!`, 'success');
         }
       } catch (err) {
         console.error('Section banner compression error:', err);
@@ -6354,9 +6354,9 @@ Instant Download & Lifetime Access
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;">
         ${currentDemoImages.map((img, idx) => `
-          <div style="position:relative;width:68px;height:90px;border-radius:6px;overflow:hidden;border:1.5px solid var(--admin-border);box-shadow:0 2px 6px rgba(0,0,0,0.2);">
-            <img src="${escapeHtml(versionBookImagePreview(img))}" style="width:100%;height:100%;object-fit:cover;" />
-            <button type="button" onclick="window.removeDemoImage(${idx})" style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+          <div style="position:relative;width:80px;height:90px;border-radius:6px;overflow:hidden;border:1.5px solid var(--admin-border);box-shadow:0 2px 6px rgba(0,0,0,0.2);background:#0f172a;display:flex;align-items:center;justify-content:center;">
+            <img src="${escapeHtml(versionBookImagePreview(img))}" style="max-width:100%;max-height:100%;object-fit:contain;" />
+            <button type="button" onclick="window.removeDemoImage(${idx})" style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">&times;</button>
           </div>
         `).join('')}
       </div>
@@ -6962,7 +6962,7 @@ Instant Download & Lifetime Access
     let loaded = 0;
     for (const file of files) {
       try {
-        const dataUrl = await compressImageFile(file, 1200, 0.82);
+        const dataUrl = await compressImageFile(file, 2400, 2400, 0.92);
         if (dataUrl) {
           currentDemoImages.push(dataUrl);
           loaded++;
@@ -6972,7 +6972,7 @@ Instant Download & Lifetime Access
       }
     }
     renderDemoImagesInBuilder();
-    showToast(`✅ ${loaded} डेमो पेजेस (अनुकूलित WebP) सफलतापूर्वक जुड़ गए!`, 'success');
+    showToast(`✅ ${loaded} डेमो पेजेस (HD WebP) सफलतापूर्वक जुड़ गए!`, 'success');
   };
 
   window.selectDemoFromExistingBook = () => {
@@ -8338,21 +8338,29 @@ Instant Download & Lifetime Access
     });
   }
 
-  function compressImageFile(input, maxWidth = 1200, quality = 0.82) {
+  function compressImageFile(input, maxWidth = 2400, maxHeight = 2400, quality = 0.92) {
     return new Promise((resolve) => {
       if (!input) return resolve(null);
 
+      // If input is already an optimized WebP base64, return immediately to prevent lossy re-compression!
+      if (typeof input === 'string' && input.startsWith('data:image/webp;base64,')) {
+        return resolve(input);
+      }
+
       const processDataUrl = (dataUrl) => {
         if (!dataUrl || typeof dataUrl !== 'string') return resolve(dataUrl);
+        if (dataUrl.startsWith('data:image/webp;base64,')) return resolve(dataUrl);
+
         const img = new Image();
         img.onload = () => {
           try {
             const canvas = document.createElement('canvas');
             let w = img.naturalWidth || img.width;
             let h = img.naturalHeight || img.height;
-            if (w > maxWidth) {
-              h = Math.round((h * maxWidth) / w);
-              w = maxWidth;
+            if (w > maxWidth || h > maxHeight) {
+              const ratio = Math.min(maxWidth / w, maxHeight / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
             }
             canvas.width = w;
             canvas.height = h;
@@ -8498,11 +8506,11 @@ Instant Download & Lifetime Access
         showToast(`❌ कवर इमेज 25MB से बड़ी है (${(cFile.size/(1024*1024)).toFixed(1)}MB)।`, 'error');
         return;
       }
-      const b64 = await compressImageFile(cFile, 1200, 0.85);
+      const b64 = await compressImageFile(cFile, 2000, 2400, 0.92);
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
       uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     } else if (coverUrlInput && coverUrlInput.startsWith('data:image/')) {
-      const b64 = await compressImageFile(coverUrlInput, 1200, 0.85);
+      const b64 = await compressImageFile(coverUrlInput, 2000, 2400, 0.92);
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
       uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     }
@@ -8515,11 +8523,11 @@ Instant Download & Lifetime Access
         showToast(`❌ बैनर इमेज 25MB से बड़ी है (${(bFile.size/(1024*1024)).toFixed(1)}MB)।`, 'error');
         return;
       }
-      const b64 = await compressImageFile(bFile, 1600, 0.85);
+      const b64 = await compressImageFile(bFile, 2400, 2400, 0.92);
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
       uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     } else if (bannerUrlInput && bannerUrlInput.startsWith('data:image/')) {
-      const b64 = await compressImageFile(bannerUrlInput, 1600, 0.85);
+      const b64 = await compressImageFile(bannerUrlInput, 2400, 2400, 0.92);
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
       uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     }
@@ -8530,7 +8538,7 @@ Instant Download & Lifetime Access
       const sUrl = cleanSectionBanners[secKey];
       if (sUrl && sUrl.startsWith('data:image/')) {
         const sPath = `images/banners/${bId.toLowerCase()}-${secKey}-banner.webp`;
-        const b64 = await compressImageFile(sUrl, 1400, 0.82);
+        const b64 = await compressImageFile(sUrl, 2400, 2400, 0.92);
         uploadedFiles.push({ path: sPath, base64: b64 });
         cleanSectionBanners[secKey] = `/${sPath}`;
       }
@@ -8568,7 +8576,7 @@ Instant Download & Lifetime Access
       const dImg = currentDemoImages[i];
       if (typeof dImg === 'string' && dImg.startsWith('data:image/')) {
         const dPath = `images/books/${bId.toLowerCase()}-preview-${i + 1}.webp`;
-        const b64 = await compressImageFile(dImg, 1200, 0.82);
+        const b64 = await compressImageFile(dImg, 2400, 2400, 0.92);
         uploadedFiles.push({ path: dPath, base64: b64 });
         rawDemoList.push(`/${dPath}`);
       } else if (typeof dImg === 'string' && dImg.trim()) {
@@ -8581,7 +8589,7 @@ Instant Download & Lifetime Access
     let finalOgImg = (document.getElementById('blp_og_image')?.value || '').trim();
     if (finalOgImg.startsWith('data:image/')) {
       const ogPath = `images/books/${bId.toLowerCase()}-og.webp`;
-      const b64 = await compressImageFile(finalOgImg, 1200, 0.82);
+      const b64 = await compressImageFile(finalOgImg, 1600, 1200, 0.90);
       uploadedFiles.push({ path: ogPath, base64: b64 });
       finalOgImg = `/${ogPath}`;
     } else if (!finalOgImg) {
