@@ -486,7 +486,7 @@ async function checkUserLogin() {
         }
 
         const userData = data[0];
-        // Clean previous user purchases, session caches, and sponsor cache before logging into new account
+        // Clean previous user purchases, session caches, sponsor cache, and wallet vault before logging into new account
         localStorage.removeItem('AI_PURCHASES');
         localStorage.removeItem('purchases');
         localStorage.removeItem('user_purchases');
@@ -495,6 +495,9 @@ async function checkUserLogin() {
         localStorage.removeItem('aarogyam_upline_phone');
         localStorage.removeItem('aim_last_sponsor_id');
         localStorage.removeItem('AOI_REFERRER_ID');
+        // ⚠️ Clear wallet vault so new user gets a fresh wallet — not the previous user's cached data
+        localStorage.removeItem('AOI_WALLET_VAULT_V1');
+        localStorage.removeItem('AOI_WALLET_BALANCE');
         try { sessionStorage.clear(); } catch(e) {}
 
         SessionManager.save({
@@ -577,6 +580,9 @@ function logoutUser() {
     localStorage.removeItem('AAROGYAM_SMART_CASHFLOW');
     localStorage.removeItem('AI_PHONEBOOK_CACHE');
     localStorage.removeItem('AI_DIARY_TODAY_COUNTS');
+    // ⚠️ Clear wallet vault on logout so next user gets a fresh wallet
+    localStorage.removeItem('AOI_WALLET_VAULT_V1');
+    localStorage.removeItem('AOI_WALLET_BALANCE');
     try {
         for (let i = localStorage.length - 1; i >= 0; i--) {
             const k = localStorage.key(i);

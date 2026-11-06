@@ -76,8 +76,13 @@ if (typeof window !== 'undefined') {
         if (raw) vault = JSON.parse(raw);
       } catch (e) {}
 
-      // If no valid vault or user changed, compute fresh
-      if (!vault || (user.mobile && vault.mobile && vault.mobile !== user.mobile)) {
+      // If no valid vault, or current user's mobile doesn't match vault's mobile → compute fresh
+      // ⚠️ FIX: Also recompute if vault has no mobile stored (stale/corrupt cache) OR user has no mobile yet
+      const vaultMobile = vault ? (vault.mobile || '') : '';
+      const userMobile = user.mobile || '';
+      const mobileMatch = vaultMobile && userMobile && (vaultMobile === userMobile);
+
+      if (!vault || !mobileMatch) {
         vault = this.computeZeroEgressWallet(user);
       } else {
         // Recalculate if expired or if purchases were updated

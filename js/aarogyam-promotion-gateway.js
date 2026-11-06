@@ -902,8 +902,16 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                             this.promptRegistrationForShare((newUser) => {
                                 this.playChimeSound();
                                 try {
-                                    if (window.AarogyamWallet && typeof window.AarogyamWallet.creditPoints === 'function') {
-                                        window.AarogyamWallet.creditPoints(5, '🎁 स्वागत उपहार (5 पॉइंट्स)', 'welcome_bonus');
+                                    if (window.AarogyamWallet) {
+                                        // ⚠️ CRITICAL: Clear stale wallet vault so welcome bonus goes to NEW user, not previous one
+                                        localStorage.removeItem('AOI_WALLET_VAULT_V1');
+                                        localStorage.removeItem('AOI_WALLET_BALANCE');
+                                        // Re-initialize wallet for the newly registered user
+                                        window.AarogyamWallet.state = null;
+                                        window.AarogyamWallet.init();
+                                        if (typeof window.AarogyamWallet.creditPoints === 'function') {
+                                            window.AarogyamWallet.creditPoints(5, '🎁 स्वागत उपहार (5 पॉइंट्स)', 'welcome_bonus');
+                                        }
                                     }
                                 } catch (e) { }
                                 this.showToast('🎉 बधाई! <strong>5 पॉइंट्स</strong> आपके वॉलेट में क्रेडिट हो गए हैं! 🪙');
