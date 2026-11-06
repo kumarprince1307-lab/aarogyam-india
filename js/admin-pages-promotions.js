@@ -757,7 +757,11 @@ export async function initPromotionsPage() {
       previewText = previewText.replace(/{sender_name}/g, 'श्री अवनीश कुमार मिश्रा');
       previewText = previewText.replace(/{user_name}/g, 'श्री अवनीश कुमार मिश्रा');
       previewText = previewText.replace(/{festival_title}/g, document.getElementById('edit-promo-title')?.value || 'उत्सव');
-      previewText = previewText.replace(/{link}/g, 'https://aarogyamindia.online/ebooks/ebook.html?ref=AI000004');
+      // Live target URL in preview (uses whatever admin has typed/selected)
+      const targetUrlVal = document.getElementById('edit-promo-target-url')?.value.trim() || '/ebooks/ebook.html';
+      const previewBase = window.location.origin || 'https://aarogyamindia.online';
+      const liveLink = targetUrlVal.startsWith('http') ? targetUrlVal + '?ref=AI000004' : previewBase + targetUrlVal + '?ref=AI000004';
+      previewText = previewText.replace(/{link}/g, liveLink);
       waText.textContent = previewText;
     }
   }
