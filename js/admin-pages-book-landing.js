@@ -2486,7 +2486,7 @@ Instant Download & Lifetime Access
     if (file) {
       showToast(`⏳ ${file.name} बैनर प्रोसेस हो रहा है...`, 'info');
       try {
-        const dataUrl = await compressImageFile(file, 2000, 0.90);
+        const dataUrl = await compressImageFile(file, 2400, 2400, 0.92);
         if (dataUrl) {
           const input = document.getElementById(`blp_sec_banner_${secKey}`);
           if (input) input.value = dataUrl;
@@ -8341,6 +8341,17 @@ Instant Download & Lifetime Access
   function compressImageFile(input, maxWidth = 2400, maxHeight = 2400, quality = 0.92) {
     return new Promise((resolve) => {
       if (!input) return resolve(null);
+
+      // Defense: If 2nd or 3rd arg is passed as quality float <= 1 (e.g. compressImageFile(f, 2000, 0.85))
+      if (typeof maxHeight === 'number' && maxHeight <= 1 && maxHeight > 0) {
+        quality = maxHeight;
+        maxHeight = (typeof maxWidth === 'number' && maxWidth > 1) ? maxWidth : 2400;
+      }
+      if (typeof maxWidth === 'number' && maxWidth <= 1 && maxWidth > 0) {
+        quality = maxWidth;
+        maxWidth = 2400;
+        maxHeight = 2400;
+      }
 
       // If input is already an optimized WebP base64, return immediately to prevent lossy re-compression!
       if (typeof input === 'string' && input.startsWith('data:image/webp;base64,')) {
