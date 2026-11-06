@@ -253,7 +253,7 @@
       "bundleFloatingAudioPill": true
     },
     "status": "active",
-    "updated_at": "2026-11-06T03:30:07.443Z"
+    "updated_at": "2026-11-06T03:30:08.679Z"
   },
   {
     "id": "BUNDLE_KISAN_4IN1",
@@ -262,7 +262,7 @@
     "subtitle": "धान, सोयाबीन, मक्का, सब्जी व संपूर्ण फसल डॉक्टर मास्टर गाइड्स का एक संपूर्ण संग्रह!",
     "description": "बीज उपचार से लेकर कटाई तक सम्पूर्ण वैज्ञानिक एवं Practical समाधान। सभी प्रमुख फसलों, कीट-रोग नियंत्रण व आधुनिक कृषि तकनीकों का एक संपूर्ण डिजिटल संग्रह भारी कॉम्बो छूट पर।",
     "badge": "त्योहार स्पेशल / 83% की महाबचत",
-    "themeColor": "#10b981",
+    "buyBtnText": "🛒 पूरा कॉम्बो ₹199 में अभी खरीदें",
     "bannerImage": "/images/banners/farmer-community-banner.jpeg",
     "bookIds": [
       "BK001",
@@ -270,9 +270,13 @@
       "BK016",
       "BK019"
     ],
-    "mrp": 1196,
+    "mrp": 1396,
     "offerPrice": 199,
-    "buyBtnText": "🛒 पूरा कॉम्बो ₹199 में अभी खरीदें",
+    "timerConfig": {
+      "enabled": true,
+      "badgeText": "⚡ महाबचत कॉम्बो ऑफर: यह स्पेशल डिस्काउंट केवल अगले:",
+      "durationMinutes": 15
+    },
     "heroKpis": [
       "4 संपूर्ण ई-बुक्स",
       "450+ रंगीन पेज",
@@ -290,11 +294,112 @@
     "audioAutoPlay": false,
     "audioUrl": "",
     "audioScript": "",
+    "bookCustomDetails": {
+      "BK001": {
+        "subtitle": "खरीफ फसल मास्टर गाइड 2026",
+        "shortDesc": "फसलों के सम्पूर्ण कीट, रोग नियंत्रण व पैदावार बढ़ाने की व्यावहारिक वैज्ञानिक जानकारी।",
+        "showPoints": true,
+        "keyPoints": []
+      },
+      "BK002": {
+        "subtitle": "खेती का डॉक्टर",
+        "shortDesc": "फसलों के सम्पूर्ण कीट, रोग नियंत्रण व पैदावार बढ़ाने की व्यावहारिक वैज्ञानिक जानकारी।",
+        "showPoints": true,
+        "keyPoints": []
+      },
+      "BK016": {
+        "subtitle": "कृषि दवा सलाहकार गाइड",
+        "shortDesc": "फसलों के सम्पूर्ण कीट, रोग नियंत्रण व पैदावार बढ़ाने की व्यावहारिक वैज्ञानिक जानकारी।",
+        "showPoints": true,
+        "keyPoints": []
+      },
+      "BK019": {
+        "subtitle": "चना की खेती — संपूर्ण मार्गदर्शिका",
+        "shortDesc": "फसलों के सम्पूर्ण कीट, रोग नियंत्रण व पैदावार बढ़ाने की व्यावहारिक वैज्ञानिक जानकारी।",
+        "showPoints": true,
+        "keyPoints": []
+      }
+    },
     "demoImages": [
       "/images/books/kharif-master-guide-2026-preview-01.webp",
       "/images/books/kharif-master-guide-2026-preview-02.webp"
     ],
+    "whyBuyFeatures": [
+      {
+        "icon": "📚",
+        "title": "5 मास्टर गाइड्स एक साथ",
+        "desc": "1 किताब के सामान्य मूल्य में पाएं रबी, खरीफ व सब्जियों का संपूर्ण कृषि समाधान।"
+      },
+      {
+        "icon": "🎯",
+        "title": "दवा डायरेक्टरी व स्प्रे चार्ट",
+        "desc": "दुकानदार के भरोसे नहीं, खुद बनें अपनी फसलों के विशेषज्ञ कृषि डॉक्टर।"
+      },
+      {
+        "icon": "⚡",
+        "title": "लाइफटाइम डिजिटल एक्सेस",
+        "desc": "पेमेंट होते ही तुरंत अपनी डिजिटल लाइब्रेरी में पढ़ें व ऑफलाइन सेव करें।"
+      },
+      {
+        "icon": "💰",
+        "title": "92% की सीधी महाबचत",
+        "desc": "कुल MRP ₹3,395 के स्थान पर मात्र ₹199 में पूरा 5-इन-1 कॉम्बो प्राप्त करें।"
+      }
+    ],
+    "reviews": [],
+    "faqs": [],
+    "finalCta": {
+      "heading": "अपनी संपूर्ण कृषि डिजिटल लाइब्रेरी अभी शुरू करें!",
+      "desc": "सीमित समय का विशेष कॉम्बो ऑफर उपलब्ध है। अभी सभी मास्टर गाइड्स प्राप्त करें।",
+      "buttonText": "🛒 पूरा कॉम्बो ₹199 में अभी खरीदें"
+    },
+    "ogImage": "",
+    "ogTitle": "",
+    "seoKeywords": "Agriculture eBook Bundle, Farming Combo",
+    "metaPixelId": "1671873500553134",
+    "gaId": "G-2BWPJVQWPK",
+    "whatsappShareText": "",
+    "popupEnabled": true,
+    "popupDelaySeconds": 15,
+    "popupTitle": "महाबचत 4-इन-1 किसान मास्टर बंडल (Legacy)",
+    "popupSubtitle": "धान, सोयाबीन, मक्का, सब्जी व संपूर्ण फसल डॉक्टर मास्टर गाइड्स का एक संपूर्ण संग्रह!",
+    "popupCtaText": "🛒 पूरा कॉम्बो ₹199 में अनलॉक करें",
+    "popupTargets": [
+      "home",
+      "library",
+      "books",
+      "tube",
+      "health"
+    ],
+    "sectionOrder": [
+      "sec-top-ribbon",
+      "sec-hero",
+      "sec-bundle-video",
+      "sec-offer-timer",
+      "sec-trust-bar",
+      "sec-included-books",
+      "sec-sample-book",
+      "sec-why-bundle",
+      "sec-reviews",
+      "sec-faqs",
+      "sec-final-cta",
+      "bundleFloatingAudioPill"
+    ],
+    "sectionVisibility": {
+      "sec-top-ribbon": true,
+      "sec-hero": true,
+      "sec-bundle-video": true,
+      "sec-offer-timer": true,
+      "sec-trust-bar": true,
+      "sec-included-books": true,
+      "sec-sample-book": true,
+      "sec-why-bundle": true,
+      "sec-reviews": true,
+      "sec-faqs": true,
+      "sec-final-cta": true,
+      "bundleFloatingAudioPill": true
+    },
     "status": "active",
-    "updated_at": "2026-11-05T05:41:31.298Z"
+    "updated_at": "2026-11-06T03:32:33.615Z"
   }
 ]
