@@ -485,14 +485,16 @@
       width: 100%;
       aspect-ratio: 9/16;
       position: relative;
-      background: #000;
+      background: #0b1120;
       overflow: hidden;
+      border-radius: 12px 12px 0 0;
     }
 
     .at-short-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       transition: transform 0.3s ease;
     }
 
@@ -4539,12 +4541,14 @@
         }
 
         grid.innerHTML = shortsList.map((r, idx) => {
-          const thumb = r.thumbnail || DEFAULT_AAROGYAMTUBE_THUMB;
+          const ytId = r.youtube_id || extractYoutubeVideoId(r.video_url || r.youtube_url) || '';
+          // Native YouTube Shorts 9:16 vertical thumbnail (oar2.jpg) eliminates letterboxing and black bars!
+          const thumb = r.thumbnail_vertical || (ytId ? `https://i.ytimg.com/vi/${ytId}/oar2.jpg` : (r.thumbnail || DEFAULT_AAROGYAMTUBE_THUMB));
 
           return `
             <div class="at-short-card" onclick="window.openReelPlayer(${idx})">
               <div class="at-short-thumb-wrap">
-                <img src="${thumb}" alt="${r.title}" class="at-short-img" onerror="this.onerror=null; this.src='${DEFAULT_AAROGYAMTUBE_THUMB}'">
+                <img src="${thumb}" alt="${r.title}" class="at-short-img" onerror="if(this.src && !this.src.includes('hqdefault.jpg') && '${ytId}'){this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg';}else{this.onerror=null;this.src='${DEFAULT_AAROGYAMTUBE_THUMB}';}">
                 <span class="at-short-badge">⚡ Shorts</span>
                 <span class="at-short-time">⏱️ ${r.duration || '0:58'}</span>
                 <div class="at-short-play-overlay">

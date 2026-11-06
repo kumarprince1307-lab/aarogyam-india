@@ -153,11 +153,11 @@ export async function initPromotionsPage() {
             <div>
               <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:6px;">दिखाने के पेज (Target Pages):</label>
               <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:0.88rem;">
-                <label><input type="checkbox" id="page-target-all" checked> सभी पेज (All Platform)</label>
+                <label><input type="checkbox" id="page-target-all" checked> सामान्य सभी पेज (All Platform)</label>
                 <label><input type="checkbox" id="page-target-home"> होम पेज</label>
                 <label><input type="checkbox" id="page-target-library"> माय लाइब्रेरी</label>
-                <label><input type="checkbox" id="page-target-landing"> बुक लैंडिंग पेज</label>
                 <label><input type="checkbox" id="page-target-tube"> AarogyamTube</label>
+                <span style="color:#10b981;font-size:0.8rem;display:flex;align-items:center;gap:4px;">🛡️ बुक लैंडिंग पेज सुरक्षित (संविधान नियम: नो प्रमोशन)</span>
               </div>
             </div>
 
@@ -202,18 +202,27 @@ export async function initPromotionsPage() {
             <div style="font-size:0.86rem;font-weight:700;color:var(--admin-muted);text-transform:uppercase;margin-bottom:10px;">
               👁️ लाइव प्रीव्यू (यूजर की स्क्रीन पर ऐसा दिखेगा):
             </div>
-            <div id="promo-live-preview-box" style="background:#0f172a;border-radius:18px;padding:24px 20px 20px 20px;text-align:center;border:1px solid rgba(255,255,255,0.15);box-shadow:0 10px 25px rgba(0,0,0,0.5);position:relative;">
-              <div style="position:relative;width:130px;height:130px;margin:0 auto 12px auto;display:flex;align-items:center;justify-content:center;">
-                <div id="prev-aura" style="position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle, rgba(245,158,11,0.55) 0%, rgba(220,38,38,0.2) 60%, rgba(0,0,0,0) 80%);animation:agyAdminAuraPulse 3.5s ease-in-out infinite alternate;filter:blur(8px);pointer-events:none;"></div>
-                <img id="prev-img" src="/images/logo/logo.png" style="max-width:120px;max-height:120px;object-fit:contain;animation:agyAdminLevitate 4.5s ease-in-out infinite alternate;filter:drop-shadow(0 10px 20px rgba(0,0,0,0.55));position:relative;z-index:2;border-radius:10px;">
+            <div id="promo-live-preview-box" style="background:transparent;border:none;box-shadow:none;padding:12px 10px;text-align:center;position:relative;">
+              <div style="position:relative;width:100%;margin:0 auto 12px auto;display:flex;align-items:center;justify-content:center;">
+                <div id="prev-aura" style="position:absolute;width:90%;height:140px;border-radius:50%;background:radial-gradient(circle, rgba(245,158,11,0.55) 0%, rgba(220,38,38,0.2) 60%, rgba(0,0,0,0) 80%);animation:agyAdminAuraPulse 3.5s ease-in-out infinite alternate;filter:blur(12px);pointer-events:none;"></div>
+                <img id="prev-img" src="/images/logo/logo.png" style="width:92%;max-width:320px;max-height:180px;object-fit:contain;animation:agyAdminLevitate 4.5s ease-in-out infinite alternate;filter:drop-shadow(0 14px 28px rgba(0,0,0,0.7));position:relative;z-index:2;border-radius:16px;">
               </div>
-              <span id="prev-badge" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.72rem;font-weight:800;background:#f59e0b;color:#fff;margin-bottom:6px;">✨ पावन पर्व</span>
-              <div style="font-size:0.82rem;color:#cbd5e1;margin-bottom:4px;">प्रिय <strong>रामेश्वर पटेल</strong> जी,</div>
-              <h4 id="prev-title" style="margin:0 0 6px 0;font-size:1.1rem;color:#fff;">शुभ धनतेरस एवं दीपावली</h4>
-              <p id="prev-sub" style="margin:0 0 14px 0;font-size:0.82rem;color:#94a3b8;line-height:1.4;">मां लक्ष्मी व भगवान धन्वंतरि आपके परिवार को उत्तम स्वास्थ्य और समृद्धि प्रदान करें।</p>
-              <button id="prev-cta" style="background:#10b981;color:#fff;border:none;padding:8px 18px;border-radius:10px;font-weight:700;font-size:0.88rem;cursor:default;">
-                📖 ई-बुक्स देखें
-              </button>
+              
+              <div style="background:rgba(0, 0, 0, 0.35);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:10px 18px;margin:0 auto 14px auto;display:inline-block;max-width:92%;">
+                <span id="prev-badge" style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;background:#f59e0b;color:#fff;margin-bottom:6px;">✨ पावन पर्व</span>
+                <div style="font-size:0.85rem;color:#cbd5e1;margin-bottom:4px;">प्रिय <strong>रामेश्वर पटेल</strong> जी,</div>
+                <h4 id="prev-title" style="margin:0 0 6px 0;font-size:1.15rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.85);">शुभ धनतेरस एवं दीपावली</h4>
+                <p id="prev-sub" style="margin:0;font-size:0.84rem;color:#e2e8f0;line-height:1.45;text-shadow:0 2px 6px rgba(0,0,0,0.8);">मां लक्ष्मी व भगवान धन्वंतरि आपके परिवार को उत्तम स्वास्थ्य और समृद्धि प्रदान करें।</p>
+              </div>
+              
+              <div style="display:flex;flex-direction:column;gap:8px;max-width:360px;margin:0 auto;">
+                <button id="prev-cta" style="background:linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:11px 18px;border-radius:12px;font-weight:800;font-size:0.92rem;box-shadow:0 4px 15px rgba(234, 88, 12, 0.45);cursor:default;">
+                  🎁 उत्सव उपहार व ई-बुक्स देखें
+                </button>
+                <button id="prev-share" style="background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:11px 18px;border-radius:12px;font-weight:700;font-size:0.88rem;box-shadow:0 4px 15px rgba(22, 163, 74, 0.4);cursor:default;">
+                  📲 WhatsApp पर शुभकामनाएँ शेयर करें
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -387,7 +396,6 @@ export async function initPromotionsPage() {
     document.getElementById('page-target-all').checked = targets.includes('all');
     document.getElementById('page-target-home').checked = targets.includes('home');
     document.getElementById('page-target-library').checked = targets.includes('library');
-    document.getElementById('page-target-landing').checked = targets.includes('book_landing');
     document.getElementById('page-target-tube').checked = targets.includes('tube');
 
     // Indicator
@@ -467,7 +475,9 @@ export async function initPromotionsPage() {
         document.getElementById('edit-promo-subtitle').value = vid.description ? vid.description.slice(0, 120) + '...' : 'AarogyamTube पर अभी पूरा वीडियो देखें।';
         document.getElementById('edit-promo-badge').value = '🔥 AAROGYAMTUBE VIDEO';
         document.getElementById('edit-promo-preset').value = 'neon_tube_flow';
-        document.getElementById('edit-promo-image-url').value = vid.thumbnail || `https://img.youtube.com/vi/${vid.youtube_id}/hqdefault.jpg`;
+        const ytId = vid.youtube_id || '';
+        const thumbUrl = (vid.format === 'short_reel' && ytId) ? `https://i.ytimg.com/vi/${ytId}/oar2.jpg` : (vid.thumbnail || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
+        document.getElementById('edit-promo-image-url').value = thumbUrl;
         document.getElementById('edit-promo-cta-text').value = '🎬 वीडियो अभी देखें →';
         document.getElementById('edit-promo-target-url').value = `/tube.html?v=${vid.id}`;
       }
@@ -582,7 +592,6 @@ export async function initPromotionsPage() {
     if (document.getElementById('page-target-all').checked) targets.push('all');
     if (document.getElementById('page-target-home').checked) targets.push('home');
     if (document.getElementById('page-target-library').checked) targets.push('library');
-    if (document.getElementById('page-target-landing').checked) targets.push('book_landing');
     if (document.getElementById('page-target-tube').checked) targets.push('tube');
 
     const updatedItem = {

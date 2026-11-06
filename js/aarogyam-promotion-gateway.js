@@ -26,7 +26,10 @@
                 const path = (window.location.pathname || '').toLowerCase();
                 const search = (window.location.search || '').toLowerCase();
 
-                // Never display in admin pages or active payment checkout
+                // STRICT AAROGYAM MANAS RULE: Never display on Book Landing Pages, Reader, Admin, or Checkout!
+                if (path.includes('book-landing') || search.includes('id=bk') || path.includes('/ebooks/book-landing') || path.includes('reader')) {
+                    return false;
+                }
                 if (path.includes('/admin') || path.endsWith('admin.html')) return false;
                 if (path.includes('payment-') || path.includes('checkout-success') || path.includes('order-confirmation')) return false;
 
@@ -37,12 +40,10 @@
                 // Check specific targets
                 const isHome = (path === '/' || path.endsWith('index.html') || path === '');
                 const isLibrary = path.includes('my-library') || path.includes('library.html');
-                const isLanding = path.includes('book-landing') || path.includes('landing') || search.includes('id=bk');
                 const isTube = path.includes('tube.html');
 
                 if (targetPages.includes('home') && isHome) return true;
                 if (targetPages.includes('library') && isLibrary) return true;
-                if (targetPages.includes('book_landing') && isLanding) return true;
                 if (targetPages.includes('tube') && isTube) return true;
 
                 return false;
@@ -325,13 +326,13 @@
                         left: 0;
                         width: 100vw;
                         height: 100vh;
-                        z-index: 999998;
+                        z-index: 999999;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        background: rgba(10, 15, 29, 0.78);
-                        backdrop-filter: blur(8px);
-                        -webkit-backdrop-filter: blur(8px);
+                        background: rgba(6, 10, 20, 0.82);
+                        backdrop-filter: blur(10px);
+                        -webkit-backdrop-filter: blur(10px);
                         opacity: 0;
                         transition: opacity 0.35s ease;
                         padding: 16px;
@@ -353,7 +354,7 @@
                     .agy-promo-card-wrapper {
                         position: relative;
                         z-index: 2;
-                        max-width: 440px;
+                        max-width: 460px;
                         width: 100%;
                         text-align: center;
                         transform: scale(0.92) translateY(12px);
@@ -362,12 +363,11 @@
                     #agy-promo-root.active .agy-promo-card-wrapper {
                         transform: scale(1) translateY(0);
                     }
-                    /* 3D Floating Image Levitation */
+                    /* 3D Prominent Center Floating Image Stage (Much Bigger & Center Stage) */
                     .agy-promo-floating-stage {
                         position: relative;
-                        width: 160px;
-                        height: 160px;
-                        margin: 0 auto -30px auto;
+                        width: 100%;
+                        margin: 0 auto -22px auto;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -375,188 +375,218 @@
                     }
                     .agy-promo-aura-halo {
                         position: absolute;
-                        width: 190px;
-                        height: 190px;
+                        width: 92%;
+                        height: 180px;
                         border-radius: 50%;
                         background: ${auraGradient};
                         animation: agyAuraPulse 3.5s ease-in-out infinite alternate;
                         pointer-events: none;
-                        filter: blur(8px);
+                        filter: blur(14px);
                     }
                     .agy-promo-float-img {
                         position: relative;
-                        max-width: 140px;
-                        max-height: 140px;
-                        width: auto;
+                        width: 94%;
+                        max-width: 380px;
+                        max-height: 240px;
                         height: auto;
                         object-fit: contain;
-                        filter: drop-shadow(0 12px 24px rgba(0,0,0,0.45));
+                        filter: drop-shadow(0 14px 32px rgba(0,0,0,0.7));
                         animation: agyLevitate 4.5s ease-in-out infinite alternate;
-                        border-radius: 12px;
+                        border-radius: 18px;
                     }
                     @keyframes agyLevitate {
                         0% { transform: translateY(0px) rotate(0deg); }
-                        50% { transform: translateY(-10px) rotate(1.2deg); }
-                        100% { transform: translateY(2px) rotate(-1.2deg); }
+                        50% { transform: translateY(-8px) rotate(0.8deg); }
+                        100% { transform: translateY(2px) rotate(-0.8deg); }
                     }
                     @keyframes agyAuraPulse {
                         0% { opacity: 0.55; transform: scale(0.92); }
-                        50% { opacity: 0.95; transform: scale(1.1); }
+                        50% { opacity: 0.95; transform: scale(1.08); }
                         100% { opacity: 0.6; transform: scale(0.95); }
                     }
-                    /* Inner Card Body */
+                    /* Transparent Glassmorphic Animated Patti (Strip) - NO BLACK SQUARE BOX */
                     .agy-promo-card {
-                        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-                        border: 1.5px solid rgba(255, 255, 255, 0.16);
-                        border-radius: 24px;
-                        padding: 42px 24px 24px 24px;
-                        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+                        background: transparent !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
                         color: #ffffff;
                         position: relative;
+                    }
+                    /* Sleek Text Strip - Hugs text tightly, transparent backdrop, NOT a square box! */
+                    .agy-promo-text-patti {
+                        display: inline-block;
+                        width: auto;
+                        max-width: 92%;
+                        margin: 4px auto 14px auto;
+                        padding: 10px 18px;
+                        background: rgba(0, 0, 0, 0.35);
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.12);
+                        border-radius: 20px;
+                        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+                        animation: agyPattiPulse 4s ease-in-out infinite alternate;
+                    }
+                    @keyframes agyPattiPulse {
+                        0% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(245, 158, 11, 0.1); }
+                        100% { box-shadow: 0 6px 25px rgba(0, 0, 0, 0.55), 0 0 25px rgba(245, 158, 11, 0.3); }
                     }
                     .agy-promo-badge {
                         display: inline-block;
                         padding: 4px 12px;
                         border-radius: 20px;
-                        font-size: 0.76rem;
+                        font-size: 0.78rem;
                         font-weight: 800;
                         letter-spacing: 0.5px;
                         text-transform: uppercase;
                         background: linear-gradient(135deg, #d97706, #f59e0b);
                         color: #ffffff;
-                        margin-bottom: 12px;
-                        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+                        margin-bottom: 8px;
+                        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45);
                     }
                     .agy-promo-greeting {
-                        font-size: 0.92rem;
+                        font-size: 0.94rem;
                         color: #cbd5e1;
-                        margin-bottom: 6px;
+                        margin-bottom: 4px;
+                        text-shadow: 0 2px 6px rgba(0,0,0,0.8);
                     }
                     .agy-promo-greeting strong {
-                        color: #f8fafc;
-                        font-weight: 700;
+                        color: #fef08a;
+                        font-weight: 800;
                     }
                     .agy-promo-title {
-                        font-size: 1.28rem;
+                        font-size: 1.3rem;
                         font-weight: 800;
                         line-height: 1.35;
-                        margin: 0 0 8px 0;
+                        margin: 0 0 6px 0;
                         color: #ffffff;
-                        background: linear-gradient(180deg, #ffffff 60%, #e2e8f0 100%);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
+                        text-shadow: 0 2px 10px rgba(0,0,0,0.9);
                     }
                     .agy-promo-subtitle {
                         font-size: 0.88rem;
                         line-height: 1.5;
-                        color: #94a3b8;
-                        margin: 0 0 20px 0;
+                        color: #e2e8f0;
+                        margin: 0;
+                        text-shadow: 0 2px 8px rgba(0,0,0,0.85);
                     }
-                    /* Action Buttons */
+                    /* Action Buttons (Stacked Vertically, 390px max-width) */
                     .agy-promo-actions {
                         display: flex;
                         flex-direction: column;
                         gap: 10px;
+                        width: 96%;
+                        max-width: 390px;
+                        margin: 0 auto;
                     }
+                    /* Box 1: Gift Box (Orange / Golden) */
                     .agy-promo-cta-btn {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        gap: 8px;
-                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                        gap: 10px;
+                        background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
                         color: #ffffff;
-                        font-size: 0.96rem;
-                        font-weight: 700;
+                        font-size: 1rem;
+                        font-weight: 800;
                         padding: 13px 20px;
                         border-radius: 14px;
                         text-decoration: none;
                         transition: transform 0.2s, box-shadow 0.2s;
-                        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-                        border: none;
+                        box-shadow: 0 4px 18px rgba(234, 88, 12, 0.55);
+                        border: 1px solid rgba(255, 255, 255, 0.25);
                         cursor: pointer;
                     }
                     .agy-promo-cta-btn:hover {
                         transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.55);
+                        box-shadow: 0 6px 25px rgba(234, 88, 12, 0.75);
                     }
+                    /* Box 2: WhatsApp Share (Green) */
                     .agy-promo-share-btn {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        gap: 8px;
-                        background: rgba(37, 211, 102, 0.15);
-                        border: 1px solid rgba(37, 211, 102, 0.4);
-                        color: #25d366;
-                        font-size: 0.88rem;
+                        gap: 10px;
+                        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+                        color: #ffffff;
+                        font-size: 0.94rem;
                         font-weight: 700;
-                        padding: 11px 18px;
+                        padding: 12px 18px;
                         border-radius: 14px;
                         cursor: pointer;
-                        transition: background 0.2s, transform 0.2s;
+                        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        box-shadow: 0 4px 16px rgba(22, 163, 74, 0.45);
                     }
                     .agy-promo-share-btn:hover {
-                        background: rgba(37, 211, 102, 0.25);
-                        transform: translateY(-1px);
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 22px rgba(22, 163, 74, 0.65);
                     }
                     /* Close Cross Button */
                     .agy-promo-close-btn {
                         position: absolute;
-                        top: 12px;
-                        right: 12px;
-                        width: 34px;
-                        height: 34px;
+                        top: -12px;
+                        right: 0px;
+                        width: 36px;
+                        height: 36px;
                         border-radius: 50%;
-                        background: rgba(255, 255, 255, 0.1);
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        color: #cbd5e1;
+                        background: rgba(0, 0, 0, 0.65);
+                        border: 1.5px solid rgba(255, 255, 255, 0.35);
+                        color: #ffffff;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         cursor: pointer;
-                        font-size: 1.1rem;
-                        transition: background 0.2s, color 0.2s, transform 0.2s;
-                        z-index: 10;
+                        font-size: 1.15rem;
+                        transition: background 0.2s, transform 0.2s;
+                        z-index: 25;
+                        box-shadow: 0 4px 14px rgba(0,0,0,0.6);
                     }
                     .agy-promo-close-btn:hover {
-                        background: rgba(255, 255, 255, 0.25);
-                        color: #ffffff;
-                        transform: scale(1.08);
+                        background: rgba(239, 68, 68, 0.85);
+                        transform: scale(1.1);
                     }
                 </style>
 
                 <canvas id="agy-promo-canvas"></canvas>
 
                 <div class="agy-promo-card-wrapper">
-                    <!-- 3D Floating Stage -->
+                    <!-- Top Floating Close Button -->
+                    <button class="agy-promo-close-btn" id="agyPromoCloseBtn" title="बंद करें (Close)" aria-label="Close">✕</button>
+
+                    <!-- 3D Center Floating Image Stage -->
                     <div class="agy-promo-floating-stage">
                         <div class="agy-promo-aura-halo"></div>
                         <img src="${promo.image_url || '/images/logo/logo.png'}" alt="Festival Promotion" class="agy-promo-float-img" onerror="if(this.src && !this.src.includes('/images/logo/logo.png'))this.src='/images/logo/logo.png';" />
                     </div>
 
-                    <!-- Inner Card -->
+                    <!-- Inner Transparent Container (No Black Box!) -->
                     <div class="agy-promo-card">
-                        <button class="agy-promo-close-btn" id="agyPromoCloseBtn" title="बंद करें (Close)" aria-label="Close">✕</button>
+                        <!-- Sleek Text Patti -->
+                        <div class="agy-promo-text-patti">
+                            <span class="agy-promo-badge">${promo.badge || '✨ विशेष उत्सव'}</span>
 
-                        <span class="agy-promo-badge">${promo.badge || '✨ विशेष उत्सव'}</span>
+                            <div class="agy-promo-greeting">
+                                प्रिय <strong>${greetingName}</strong> जी,
+                            </div>
 
-                        <div class="agy-promo-greeting">
-                            प्रिय <strong>${greetingName}</strong> जी,
+                            <h3 class="agy-promo-title">${promo.title}</h3>
+                            <p class="agy-promo-subtitle">${promo.subtitle}</p>
                         </div>
 
-                        <h3 class="agy-promo-title">${promo.title}</h3>
-                        <p class="agy-promo-subtitle">${promo.subtitle}</p>
-
+                        <!-- 2 Action Buttons Stacked Directly Below -->
                         <div class="agy-promo-actions">
                             <a href="${promo.target_url || '/'}" class="agy-promo-cta-btn" id="agyPromoCtaBtn">
-                                <span>${promo.cta_text || 'आगे बढ़ें →'}</span>
+                                <span>🎁 ${promo.cta_text ? promo.cta_text.replace(/^[🎁📖🎬🌿🔥\s]+/, '') : 'उत्सव उपहार व ई-बुक्स देखें'}</span>
                             </a>
 
                             ${promo.share_enabled ? `
                                 <button type="button" class="agy-promo-share-btn" id="agyPromoShareBtn">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.634.058-1.745-.392-1.378-.561-2.261-1.95-2.33-2.04-.069-.092-.556-.739-.556-1.409 0-.671.352-1.002.477-1.139.124-.138.272-.172.363-.172.091 0 .182.002.261.006.084.004.196-.032.307.234.114.272.389.948.423 1.017.034.069.057.15.011.24-.045.09-.068.147-.136.225-.068.079-.144.175-.205.235-.069.068-.141.141-.06.28.081.139.362.597.777.967.535.477.986.624 1.125.694.14.069.222.059.304-.035.083-.095.352-.41.446-.55.093-.14.188-.117.315-.07.128.046.81.382.949.452.14.069.233.104.267.162.034.059.034.343-.11.748z"/>
                                     </svg>
-                                    <span>WhatsApp पर शुभकामनाएँ शेयर करें</span>
+                                    <span>📲 WhatsApp पर शुभकामनाएँ शेयर करें</span>
                                 </button>
                             ` : ''}
                         </div>
