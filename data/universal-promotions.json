@@ -1,29 +1,28 @@
 {
-  "updated_at": "2026-11-06T15:29:00.000Z",
+  "updated_at": "2026-11-06T12:22:55.126Z",
   "version": "1.0",
   "active_campaign_id": "PROM_DHANTERAS_DIWALI_2026",
   "promotions": [
     {
       "id": "PROM_DHANTERAS_DIWALI_2026",
       "type": "cultural_festival",
-      "category_label": "🪔 शुभ धनतेरस व दीपावली महोत्सव",
       "title": "शुभ धनतेरस एवं दीपावली की हार्दिक शुभकामनाएँ",
       "subtitle": "मां लक्ष्मी व भगवान धन्वंतरि आपके परिवार को उत्तम स्वास्थ्य, दीर्घायु और समृद्धि प्रदान करें।",
       "badge": "✨ पावन पर्व शुभकामना",
       "animation_preset": "golden_diya_sparkles",
       "image_url": "/images/banners/promo-1793956072160.webp",
-      "updated_at": "2026-11-06T14:48:00.000Z",
+      "cta_text": "🎁 उत्सव उपहार व ई-बुक्स देखें",
+      "target_url": "/ebooks/index.html",
+      "start_date": "2026-11-01T00:00",
+      "end_date": "2026-11-15T23:59",
+      "is_active": true,
       "target_pages": [
         "all"
       ],
-      "target_url": "/ebooks/index.html",
-      "cta_text": "🎁 उत्सव उपहार व ई-बुक्स देखें",
-      "start_date": "2026-11-01T00:00:00",
-      "end_date": "2026-11-15T23:59:59",
-      "is_active": true,
       "share_enabled": true,
       "share_message_template": "🪔 *{sender_name} जी की तरफ से सप्रेम बधाई और उपहार!* 🪔\n\nआरोग्यम इंडिया की ओर से आपके व आपके पूरे परिवार को पावन पर्व की मंगलमय शुभकामनाएँ।\n\n🎁 *{sender_name}* जी द्वारा भेजा गया उपहार व *5 पॉइंट्स* प्राप्त करने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n👉 {link}\n\n_(नोट: यह 5 पॉइंट्स उपहार केवल नए सदस्यों के लिए मान्य है)_",
-      "frequency_mode": "once_per_day"
+      "frequency_mode": "once_per_day",
+      "updated_at": "2026-11-06T12:22:55.123Z"
     },
     {
       "id": "PROM_TIRANGA_NATIONAL",
