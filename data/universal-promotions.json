@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-06T14:35:15.446Z",
+  "updated_at": "2026-11-06T14:55:59.331Z",
   "version": "1.0",
   "active_campaign_id": "PROM_DHANTERAS_DIWALI_2026",
   "promotions": [
@@ -12,7 +12,7 @@
       "animation_preset": "golden_diya_sparkles",
       "image_url": "/images/banners/promo-1793956072160.webp",
       "cta_text": "🎁 उत्सव उपहार व ई-बुक्स देखें",
-      "target_url": "/index.html",
+      "target_url": "/",
       "start_date": "2026-11-01T00:00",
       "end_date": "2026-11-15T23:59",
       "is_active": true,
@@ -22,7 +22,7 @@
       "share_enabled": true,
       "share_message_template": "🪔 *{sender_name} जी की तरफ से सप्रेम बधाई और उपहार!* 🪔\n\nआरोग्यम इंडिया की ओर से आपके व आपके पूरे परिवार को पावन पर्व की मंगलमय शुभकामनाएँ।\n\n🎁 *{sender_name}* जी द्वारा भेजा गया उपहार व *5 पॉइंट्स* प्राप्त करने के लिए नीचे दिए गए लिंक पर क्लिक करें:\n👉 {link}\n\n_(नोट: यह 5 पॉइंट्स उपहार केवल नए सदस्यों के लिए मान्य है)_",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-06T14:35:15.444Z"
+      "updated_at": "2026-11-06T14:55:59.330Z"
     },
     {
       "id": "PROM_TIRANGA_NATIONAL",
