@@ -1,6 +1,319 @@
 {
   "sitePages": [
     {
+      "id": "page_index",
+      "slug": "index",
+      "name": "मुख्य पृष्ठ",
+      "url": "/index.html",
+      "category": "eBooks",
+      "status": "active",
+      "theme_primary": "#15803d",
+      "theme_dark": "#003400",
+      "ticker_text": "",
+      "audio_title": "",
+      "audio_script": "",
+      "audio_url": "",
+      "og_title": "",
+      "og_image": "",
+      "og_description": "",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
+      "hero_slides": [],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [],
+      "marketing_cards": [],
+      "videos": [],
+      "reviews_heading": "",
+      "reviews_badge": "",
+      "reviews": [
+        {
+          "name": "रामेश्वर पटेल",
+          "location": "उज्जैन, मध्य प्रदेश",
+          "rating": 5,
+          "comment": "खरीफ मास्टर गाइड बहुत ही उपयोगी है। स्प्रे साइंस चार्ट से मेरी फसल बच गई।"
+        },
+        {
+          "name": "सुरेश कुमार यादव",
+          "location": "करनाल, हरियाणा",
+          "rating": 5,
+          "comment": "WhatsApp AI डॉक्टर सहायता से जब भी सवाल पूछा तुरंत उत्तर मिला। बहुत बढ़िया मंच!"
+        }
+      ],
+      "faqs_heading": "",
+      "faqs_badge": "",
+      "faqs": [
+        {
+          "q": "ई-बुक खरीदने के बाद कैसे मिलेगी?",
+          "a": "भुगतान होते ही आपको तुरंत PDF डाउनलोड लिंक मिलेगा और पुस्तक आपकी \"मेरी लाइब्रेरी\" में आजीवन सुरक्षित रहेगी।"
+        },
+        {
+          "q": "क्या मैं मोबाइल पर पढ़ सकता हूँ?",
+          "a": "हाँ, सभी पुस्तकें मोबाइल और टैबलेट के लिए पूरी तरह ऑप्टिमाइज़्ड हैं।"
+        }
+      ],
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [
+        {
+          "id": "DIS001",
+          "name": "मधुमेह / डायबिटीज",
+          "badge": "ब्लड शुगर नियंत्रण",
+          "color": "#3b82f6",
+          "icon": "🩸",
+          "image": "/images/banners/health-diabetes.jpg",
+          "symptoms": [
+            "बार-बार पेशाब आना",
+            "थकान व कमजोरी",
+            "शुगर असंतुलन"
+          ],
+          "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+          "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+        },
+        {
+          "id": "DIS002",
+          "name": "जोड़ों का दर्द व गठिया",
+          "badge": "जोड़ों का दर्द राहत",
+          "color": "#8b5cf6",
+          "icon": "🦴",
+          "image": "/images/banners/health-joint-care.jpg",
+          "symptoms": [
+            "घुटनों व जोड़ों में दर्द",
+            "चलने में तकलीफ",
+            "सूजन व जकड़न"
+          ],
+          "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+          "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+        },
+        {
+          "id": "DIS003",
+          "name": "महिला स्वास्थ्य / PCOD",
+          "badge": "हार्मोनल संतुलन",
+          "color": "#ec4899",
+          "icon": "🌸",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "अनियमित माहवारी",
+            "हार्मोनल असंतुलन",
+            "कमजोरी"
+          ],
+          "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+          "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+        },
+        {
+          "id": "DIS004",
+          "name": "बाल झड़ना व डैंड्रफ",
+          "badge": "हेयर फॉल कंट्रोल",
+          "color": "#6366f1",
+          "icon": "💇",
+          "image": "/images/banners/health-hair-care.jpg",
+          "symptoms": [
+            "तेजी से बाल झड़ना",
+            "रूसी व डैंड्रफ",
+            "सिर में खुजली"
+          ],
+          "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+          "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+        },
+        {
+          "id": "DIS005",
+          "name": "त्वचा रोग व ग्लो",
+          "badge": "ग्लोइंग स्किन",
+          "color": "#06b6d4",
+          "icon": "✨",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कील-मुंहासे (पिंपल्स)",
+            "दाद व खुजली",
+            "झाइयां"
+          ],
+          "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+          "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+        },
+        {
+          "id": "DIS006",
+          "name": "मोटापा व वजन नियंत्रण",
+          "badge": "नेचुरल फैट बर्न",
+          "color": "#f59e0b",
+          "icon": "⚖️",
+          "image": "/images/banners/health-weight-loss.jpg",
+          "symptoms": [
+            "पेट की जिद्दी चर्बी",
+            "सांस फूलना",
+            "धीमा मेटाबॉलिज्म"
+          ],
+          "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+          "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+        },
+        {
+          "id": "DIS007",
+          "name": "बच्चों का पोषण व दिमाग",
+          "badge": "स्मार्ट किड्स",
+          "color": "#10b981",
+          "icon": "👶",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कमजोर याददाश्त",
+            "भूख न लगना",
+            "धीमी शारीरिक लंबाई"
+          ],
+          "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+          "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+        },
+        {
+          "id": "DIS008",
+          "name": "नेचुरल होम केयर",
+          "badge": "टॉक्सिन फ्री",
+          "color": "#84cc16",
+          "icon": "🏡",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "केमिकल युक्त फिनाइल व डिटर्जेंट",
+            "बच्चों व बुजुर्गों को एलर्जी"
+          ],
+          "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+          "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        }
+      ],
+      "crops": [
+        {
+          "id": "CROP001",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP002",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ / रबी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP003",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP004",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ व जायद",
+          "image": "/images/banners/hero-banner-1.jpeg",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP005",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ / जायद",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP006",
+          "name": "सब्जियां, मिर्च व टमाटर",
+          "season": "बारहमासी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+        }
+      ],
+      "pashu_cards": [
+        {
+          "id": "PASHU001",
+          "name": "गाय - दुग्ध वृद्धि व पोषण",
+          "category": "गाय पालन (Cow Care)",
+          "icon": "🐄",
+          "badge": "1-2L दूध वृद्धि",
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+        },
+        {
+          "id": "PASHU002",
+          "name": "भैंस - FAT% व SNF वृद्धि",
+          "category": "भैंस पालन (Buffalo Care)",
+          "icon": "🐃",
+          "badge": "FAT 8% तक",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+        },
+        {
+          "id": "PASHU003",
+          "name": "बकरी पालन - वजन वृद्धि",
+          "category": "बकरी पालन (Goat Farming)",
+          "icon": "🐐",
+          "badge": "उच्च मुनाफा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+        },
+        {
+          "id": "PASHU004",
+          "name": "पशुओं में थनैला व पाचन रोग",
+          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+        }
+      ],
+      "products": [],
+      "page_kpi_sections": [],
+      "clinical_breakdown": null,
+      "admin_edited": 1794005638366,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "",
+        "prompt": ""
+      }
+    },
+    {
       "id": "page_netsurf_pathfinder",
       "slug": "netsurf-pathfinder",
       "name": "🚀 नेट्सर्फ Q3 पाथफाइंडर (TeamFest)",
@@ -5967,28 +6280,29 @@
       "name": "दंत व मसूड़े सुरक्षा (Dental & Oral Care)",
       "url": "/health/dental-care.html",
       "category": "Healthcare Sub-page",
-      "status": "published",
-      "theme_primary": "#0d9488",
-      "theme_dark": "#134e4a",
+      "status": "active",
+      "theme_primary": "#0805c7",
+      "theme_dark": "#00007b",
       "ticker_text": "🦷 35,000+ परिवारों ने केमिकल-मुक्त हर्बल दंत सुरक्षा अपनाई | पायरिया, झनझनाहट व छालों से स्थायी मुक्ति | 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय!",
       "audio_title": "दंत सुरक्षा व फ्लोराइड सच",
-      "audio_script": "नमस्ते, आरोग्यम दंत सुरक्षा मंच में आपका स्वागत है। जानें मार्केट के टूथपेस्ट का फ्लोराइड सच और पायरिया व सेंसिटिविटी का आयुर्वेदिक समाधान।",
+      "audio_script": "सावधान! जिस टूथपेस्ट से आप अपने दिन की शुरुआत कर रहे हैं, क्या वह सच में सुरक्षित है?\nक्या ठंडा पानी पीते ही या गर्म चाय लेते समय आपके दांतों में करंट जैसी तेज झनझनाहट होती है?\nब्रश करते समय मसूड़ों से खून आना, सांसों की दुर्गंध और मुंह के दर्दनाक छाले कोई आम समस्या नहीं हैं।\nमार्केट के टूथपेस्ट में मौजूद फ्लोराइड और झाग बनाने वाला केमिकल एसएलएस आपके दांतों के सुरक्षा कवच यानी इनेमल को धीरे-धीरे घिस रहा है।\nदांतों पर केमिकल का प्रहार तुरंत बंद कीजिए और आयुर्वेद का प्राकृतिक सुरक्षा चक्र चुनिए।\nनीम, बबूल, लौंग और कपूर से समृद्ध नेट्सर्फ हर्बल डेंटल पेस्ट खुली हुई नसों को सील कर पायरिया और सेंसिटिविटी को जड़ से शांत करता है।\nआज ही हानिकारक फ्लोराइड को कहें ना, और अपने पूरे परिवार के लिए अपनाएं सुरक्षित, मजबूत और चमकदार मुस्कान।",
       "audio_url": "",
       "og_title": "🦷 क्या आपका टूथपेस्ट आपके दांतों को धीरे-धीरे सड़ा रहा है? फ्लोराइड का कड़वा सच",
-      "og_image": "/images/banners/health-banner.jpeg",
-      "og_description": "मार्केट के केमिकल टूथपेस्ट, पायरिया, मुंह के छाले और दांतों में झनझनाहट (Sensitivity) का स्थायी आयुर्वेदिक समाधान व दंत पोषण गाइड।",
-      "share_message": "दांतों में ठंडा-गर्म लगना, पायरिया व मार्केट टूथपेस्ट के फ्लोराइड नुकसान से बचने की संपूर्ण गाइड देखें: https://aarogyamindia.online/health/dental-care.html",
+      "og_image": "/images/banners/og_image-dental-paste-051239-w9ca.webp",
+      "og_description": "kya aapke danto me thanda-garm pani lagta hai ya brush karte samay masudo se khoon aata hai?\nmarket ke chemical foaming paste me maujood fluoride aur SLS chemicals danto ke enamel ko ghis kar pyorrhea aur tooth sensitivity ko tezi se badha rahe hain.\naarogyam danta suraksha manch par janiye chemical toothpaste ka kadwa sach aur fluoride toxicity se bachne ke certified ayurvedic niyam.\nneem, laung, babool, mulethi aur kapoor se yukta netsurf herbal dental paste se payein pyorrhea, masudo ki sujan aur saanso ki durgandh se 100% prakritik mukti.\ndanto ki shuruati sadan, cavity aur bar-bar hone wale dardnak muh ke chhalo ko jad se shant karne ke gharelu nuskhe.\nmasudo ko bajra jaisa majboot banane ke liye 24-ghante ka oral diet chart, oil pulling (til tel kulla) vidhi aur dant malish guide.\naaj hi fluoride-free herbal oral care apnayein aur pure parivar ke danto ko de bina kisi chemical side effect ka sampoorn suraksha chakra.",
+      "share_message": "🦷 *सावधान! क्या आपका टूथपेस्ट आपके दांतों को धीरे-धीरे सड़ा रहा है?* 🛑\n\n❄️ ठंडा-गर्म पानी पीते ही तेज झनझनाहट (Sensitivity)?\n🩸 ब्रश करते समय मसूड़ों से खून व पायरिया?\n🤢 सांसों की असहनीय बदबू और बार-बार मुंह के छाले?\n\n⚠️ *असली वजह:* मार्केट के टूथपेस्ट में मौजूद जहरीला फ्लोराइड और SLS केमिकल, जो दांतों के इनेमल को घिस रहा है!\n\n🌿 *100% आयुर्वेदिक समाधान:*\n✅ नीम, लौंग, बबूल और कपूर की प्राकृतिक शक्ति\n✅ 100% फ्लोराइड-मुक्त और केमिकल-रहित सुरक्षा चक्र\n✅ 24-घंटे का ओरल डाइट चार्ट और ऑयल पुलिंग विधि\n\n👇 *पूरी रिपोर्ट और फ्री गाइड अभी देखें:*\n👉 https://aarogyamindia.online/health/dental-care.html",
       "floating_banner": {
-        "title": "हर्बल दंत सुरक्षा",
-        "subtitle": "केमिकल-मुक्त पेस्ट",
+        "enabled": false,
         "image": "/images/banners/health-banner.jpeg",
-        "link": "#sec-products"
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
       },
       "fb_pixel": true,
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/hero_slide-watermarked_img_3790-669729-aynj.webp",
           "tag": "🦷 100% FLUORIDE-FREE HERBAL DENTAL",
           "title": "मार्केट के फ्लोराइड टूथपेस्ट का खतरनाक सच व पायरिया मुक्ति",
           "subtitle": "केमिकल फोमिंग पेस्ट से इनेमल घिसना, ठंडा-गर्म लगना और मसूड़ों से खून आना बंद करें। नीम, बबूल, लौंग व कपूर का प्राकृतिक सुरक्षा चक्र।",
@@ -5996,10 +6310,10 @@
           "cta_link": "https://wa.me/917974422572?text=नमस्ते, मुझे दंत व मसूड़े समस्या परामर्श चाहिए",
           "cta_secondary_text": "🔬 फ्लोराइड का सच पढ़ें ↓",
           "cta_secondary_link": "#sec-scientific-breakdown",
-          "banner_mode": "card"
+          "banner_mode": "full"
         },
         {
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/hero_slide-watermarked_img_3184-746483-9ld7.webp",
           "tag": "🌿 AYURVEDIC ORAL DETOX",
           "title": "मुंह के छाले, दुर्गंध व सेंसिटिविटी का डाइट चार्ट",
           "subtitle": "ऑयल पुलिंग (तिल तेल कुल्ला), मुलेठी, फिटकरी व त्रिफला से मुंह के बैक्टीरिया और एसिडिटी को जड़ से शांत करें।",
@@ -6007,7 +6321,17 @@
           "cta_link": "#sec-diet",
           "cta_secondary_text": "📦 हर्बल पेस्ट देखें",
           "cta_secondary_link": "#sec-products",
-          "banner_mode": "card"
+          "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/hero_slide-watermarked_img_5576-820306-l6pp.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -6179,8 +6503,8 @@
             "id": "CB_DENTAL_1",
             "title": "❓ मार्केट के टूथपेस्ट का नुकसान व कारण",
             "badge": "हानिकारक केमिकल",
-            "color": "#0f766e",
-            "image": "/images/banners/health-banner.jpeg",
+            "color": "#f6b604",
+            "image": "/images/banners/cb_card-watermarked_img_7250-093701-wlfi.webp",
             "points": [
               "फ्लोराइड टॉक्सिसिटी (Dental Fluorosis): मार्केट के 90% टूथपेस्ट में सोडियम मोनोफ्लोरोफॉस्फेट होता है, जो बच्चों के पेट में जाकर हड्डियों व दांतों को खोखला करता है।",
               "एसएलएस (SLS Foaming Agent): जो केमिकल डिटर्जेंट शैम्पू में झाग बनाता है, वही टूथपेस्ट में मुंह की आंतरिक परत (Oral Mucosa) को छीलकर बार-बार छाले पैदा करता है।",
@@ -6199,7 +6523,7 @@
             "id": "CB_DENTAL_2",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
             "badge": "लक्षण पहचानें",
-            "color": "#0d9488",
+            "color": "#f4013e",
             "image": "/images/banners/health-banner.jpeg",
             "points": [
               "ठंडा-गर्म संवेदनशीलता (Tooth Sensitivity): ठंडा पानी पीते ही या गर्म चाय पीते समय दांतों में तेज करंट जैसी झनझनाहट।",
@@ -6220,7 +6544,7 @@
             "title": "🚨 साइड इफेक्ट्स व भारत का डेटा (Risks)",
             "badge": "गंभीर खतरे",
             "color": "#dc2626",
-            "image": "/images/banners/health-banner.jpeg",
+            "image": "/images/banners/cb_card-983df908-d598-47f9-b-382489-x81m.webp",
             "points": [
               "दांत गिरने की नौबत: पायरिया को अनदेखा करने से मसूड़ों की पकड़ खत्म हो जाती है और 35-40 की उम्र में दांत हिलकर गिरने लगते हैं।",
               "रूट कैनाल व महंगे इलाज: कीड़ा नसों (Pulp) तक पहुंचकर असहनीय दर्द और हजारों रुपयों के महंगे डेंटल ऑपरेशन पर मजबूर करता है।",
@@ -6236,7 +6560,7 @@
           }
         ]
       },
-      "admin_edited": 1791696253046,
+      "admin_edited": 1794005638156,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
