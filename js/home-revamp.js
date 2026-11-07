@@ -17,18 +17,16 @@ if (typeof window !== 'undefined') {
 'use strict';
 
 (function () {
-  // Global Safe AI Consultation WhatsApp Redirection Helper
-  window.consultAiExpert = function (topic, details) {
-    let text = `नमस्ते Aarogyam India AI एक्सपर्ट! मुझे "${topic || 'कृषि व स्वास्थ्य'}" के बारे में उचित सलाह व समाधान चाहिए।`;
-    if (details) {
-      text += `\nविवरण: ${details}`;
-    }
-    if (typeof window.getPersonalizedWhatsAppUrl === 'function') {
-      window.location.href = window.getPersonalizedWhatsAppUrl(text);
-    } else {
-      window.location.href = `https://wa.me/917974422572?text=${encodeURIComponent(text)}`;
-    }
-  };
+  // Global Safe AI Consultation WhatsApp Redirection Helper (Preserves Upline Consultant Flow)
+  if (!window.consultAiExpert) {
+    window.consultAiExpert = function (topic, details) {
+      if (typeof window.getPersonalizedWhatsAppUrl === 'function') {
+        window.location.href = window.getPersonalizedWhatsAppUrl(topic, details);
+      } else {
+        window.location.href = `https://wa.me/917974422572?text=${encodeURIComponent('नमस्ते! मुझे ' + (topic || 'परामर्श') + ' चाहिए।')}`;
+      }
+    };
+  }
 
   // Universal KPI Card Audio Player (Hindi Speech Synthesis)
   window.playKpiCardAudio = function (event, title, text) {

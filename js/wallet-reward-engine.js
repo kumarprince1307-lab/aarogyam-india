@@ -55,7 +55,8 @@ if (typeof window !== 'undefined') {
           '{}'
         );
         const mobile = u.mobile || u.phone || localStorage.getItem('aim_user_mobile') || '';
-        const shareId = u.share_id || u.referral_code || localStorage.getItem('user_share_id') || '';
+        // ⚠️ Never use sponsor's referral_code as user's own share_id
+        const shareId = u.share_id || localStorage.getItem('user_share_id') || '';
         return {
           id: u.id || null,
           full_name: u.full_name || u.name || 'किसान साथी',
@@ -145,8 +146,8 @@ if (typeof window !== 'undefined') {
       } catch (e) {}
 
       // Special Baseline for Master Partner / Top Sponsor 7974422572 (AI000004):
-      // 346 Registered Members, ₹14,873 Total Verified Business -> 10% = 1,487 Share Points!
-      const isMasterUser = (user.mobile === '7974422572' || user.share_id === 'AI000004');
+      // ⚠️ STRICT: Only mobile 7974422572 can ever receive this master baseline
+      const isMasterUser = (user.mobile === '7974422572');
       if (isMasterUser) {
         if (referralSpentTotal < 14873) referralSpentTotal = 14873;
         if (referredBuyersCount < 346) referredBuyersCount = 346;
@@ -156,9 +157,32 @@ if (typeof window !== 'undefined') {
       const earnedSelf = Math.round(selfSpentTotal * REWARD_PERCENT_SELF);
       const earnedReferral = Math.round(referralSpentTotal * REWARD_PERCENT_REFERRAL);
       const initialSpent = 0;
-      const initialBalance = earnedSelf + earnedReferral;
 
       const ledgerEntries = [];
+
+      // Preserve previously earned bonus points (e.g., 10-share challenge, welcome bonus)
+      let bonusEarned = 0;
+      try {
+        const prevRaw = localStorage.getItem(WALLET_STORAGE_KEY) || (user.mobile ? localStorage.getItem(`AOI_WALLET_VAULT_${user.mobile}`) : null);
+        if (prevRaw) {
+          const prevVault = JSON.parse(prevRaw);
+          if (Array.isArray(prevVault.ledger)) {
+            prevVault.ledger.forEach(entry => {
+              if (entry.type === 'earn_share_goal' || entry.type === 'earn_welcome' || (entry.type === 'credit' && entry.points > 0)) {
+                const entryExp = entry.expires_at ? new Date(entry.expires_at).getTime() : (new Date(entry.timestamp).getTime() + EXPIRY_MS);
+                if (Date.now() < entryExp) {
+                  bonusEarned += (Number(entry.points) || 0);
+                  ledgerEntries.push(entry);
+                }
+              }
+            });
+          }
+        }
+      } catch (e) {}
+
+      const totalEarnedCalc = earnedSelf + earnedReferral + bonusEarned;
+      const initialBalance = totalEarnedCalc;
+
       if (earnedSelf > 0) {
         ledgerEntries.push({
           id: 'earn_self_init',
@@ -166,6 +190,7 @@ if (typeof window !== 'undefined') {
           title: `🛍️ सेल्फ ई-बुक खरीद (₹${selfSpentTotal}) पर 10% शेयर रिवॉर्ड`,
           points: earnedSelf,
           timestamp: new Date().toISOString(),
+          expires_at: defaultExpiresAt,
           status: 'credited'
         });
       }
@@ -179,6 +204,7 @@ if (typeof window !== 'undefined') {
           title: refTitle,
           points: earnedReferral,
           timestamp: new Date().toISOString(),
+          expires_at: defaultExpiresAt,
           status: 'credited'
         });
       }
@@ -188,11 +214,11 @@ if (typeof window !== 'undefined') {
         mobile: user.mobile,
         share_id: user.share_id,
         self_spent_total: selfSpentTotal,
-        earned_self: earnedSelf,
+        earned_self: earnedSelf + bonusEarned,
         referral_spent_total: referralSpentTotal,
         referred_buyers_count: referredBuyersCount,
         earned_referral: earnedReferral,
-        total_earned: earnedSelf + earnedReferral,
+        total_earned: totalEarnedCalc,
         total_spent: initialSpent,
         balance: Math.max(0, initialBalance - initialSpent),
         created_at: new Date(now).toISOString(),
@@ -271,8 +297,8 @@ if (typeof window !== 'undefined') {
           if (amt > 0) currentSelfSpent += amt;
         });
 
-        // Baseline master check for 7974422572
-        const isMaster = (user.mobile === '7974422572' || user.share_id === 'AI000004');
+        // Baseline master check for 7974422572 (Strictly mobile 7974422572 only)
+        const isMaster = (user.mobile === '7974422572');
         if (isMaster) {
           if ((vault.referral_spent_total || 0) < 14873) {
             vault.referral_spent_total = 14873;
@@ -333,6 +359,13 @@ if (typeof window !== 'undefined') {
         const user = this.getCurrentUser();
         const db = window.dbClient || window.supabase;
         if (!db || !user.id) return;
+
+        // 10-Minute Cache Guard: Do not re-query Supabase if already checked in last 10 minutes (0 KB Egress)
+        const now = Date.now();
+        if (this._lastRemoteSync && (now - this._lastRemoteSync < 10 * 60 * 1000)) {
+          return;
+        }
+        this._lastRemoteSync = now;
 
         // 1. Fetch wallet from Supabase `wallets` table
         const { data: remoteWallet } = await db.from('wallets').select('*').eq('profile_id', user.id).maybeSingle();
@@ -396,6 +429,10 @@ if (typeof window !== 'undefined') {
     // PASSBOOK MODAL — Full Credit/Debit History (Bottom Sheet)
     // Call: window.AarogyamWallet.showPassbookModal()
     // ====================================================================
+    renderPassbookModal() {
+      return this.showPassbookModal();
+    }
+
     showPassbookModal() {
       const old = document.getElementById('aoi-wallet-passbook-modal');
       if (old) { old.remove(); return; }
@@ -439,50 +476,96 @@ if (typeof window !== 'undefined') {
 
       const sheet = document.createElement('div');
       sheet.id = 'aoi-passbook-sheet';
-      sheet.style.cssText = 'background:linear-gradient(180deg,#0f1e35 0%,#0a1120 100%);border-top:2px solid #1e40af;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,0.7);font-family:Outfit,system-ui,sans-serif;color:#f8fafc;overflow:hidden;';
+      sheet.style.cssText = 'background:linear-gradient(180deg,#0f1e35 0%,#0a1120 100%);border-top:2px solid #1e40af;border-radius:24px 24px 0 0;width:95%;max-width:680px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -12px 50px rgba(0,0,0,0.85);font-family:Outfit,system-ui,sans-serif;color:#f8fafc;overflow:hidden;';
 
       sheet.innerHTML =
-        '<div style="padding:16px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">' +
+        '<div style="padding:18px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">' +
           '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
-            '<div style="display:flex;align-items:center;gap:10px;">' +
-              '<div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(59,130,246,0.4);">&#x1FA99;</div>' +
-              '<div><div style="font-size:1.05rem;font-weight:900;">Wallet Passbook</div><div style="font-size:0.73rem;color:#94a3b8;">Share & Earn — Ledger History</div></div>' +
+            '<div style="display:flex;align-items:center;gap:12px;">' +
+              '<div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 14px rgba(59,130,246,0.45);">&#x1FA99;</div>' +
+              '<div><div style="font-size:1.15rem;font-weight:900;">वॉलेट पासबुक (Wallet Passbook)</div><div style="font-size:0.76rem;color:#94a3b8;">शेयर और अर्न — खाता लेजर विवरण</div></div>' +
             '</div>' +
-            '<button id="aoi-pb-close" type="button" style="background:rgba(255,255,255,0.08);border:none;color:#cbd5e1;width:34px;height:34px;border-radius:10px;font-size:1.1rem;cursor:pointer;">&times;</button>' +
-          '</div>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-            '<div style="flex:1;min-width:100px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:8px 12px;">' +
-              '<div style="font-size:0.7rem;color:#86efac;font-weight:700;">Available Balance</div>' +
-              '<div style="font-size:1.3rem;font-weight:900;color:#4ade80;">Rs.' + balance + '</div>' +
-            '</div>' +
-            '<div style="flex:1;min-width:100px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:10px;padding:8px 12px;">' +
-              '<div style="font-size:0.7rem;color:#a5b4fc;font-weight:700;">Total Earned</div>' +
-              '<div style="font-size:1.3rem;font-weight:900;color:#818cf8;">Rs.' + (vault ? (vault.total_earned || 0) : 0) + '</div>' +
-            '</div>' +
-            '<div style="flex:1;min-width:100px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:8px 12px;">' +
-              '<div style="font-size:0.7rem;color:#fca5a5;font-weight:700;">Total Used</div>' +
-              '<div style="font-size:1.3rem;font-weight:900;color:#f87171;">Rs.' + (vault ? (vault.total_spent || 0) : 0) + '</div>' +
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<button id="aoi-pb-guide-btn" type="button" style="background:#dc2626;color:#ffffff;border:none;padding:6px 12px;border-radius:10px;font-weight:800;font-size:0.75rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 3px 10px rgba(220,38,38,0.35);">🔴 इस पॉइंट्स का उपयोग कैसे करें?</button>' +
+              '<button id="aoi-pb-close" type="button" style="background:rgba(255,255,255,0.08);border:none;color:#cbd5e1;width:34px;height:34px;border-radius:10px;font-size:1.1rem;cursor:pointer;">&times;</button>' +
             '</div>' +
           '</div>' +
-          '<div style="margin-top:8px;font-size:0.76rem;color:' + expiryColor + ';font-weight:700;">Validity: ' + expiryText + '  (' + ledger.length + ' transactions)</div>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+            '<div style="flex:1;min-width:110px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:10px 14px;">' +
+              '<div style="font-size:0.72rem;color:#86efac;font-weight:700;">कुल उपलब्ध बैलेंस</div>' +
+              '<div style="font-size:1.45rem;font-weight:900;color:#4ade80;">Rs.' + balance + '</div>' +
+            '</div>' +
+            '<div style="flex:1;min-width:110px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:12px;padding:10px 14px;">' +
+              '<div style="font-size:0.72rem;color:#a5b4fc;font-weight:700;">कुल कमाई (Earned)</div>' +
+              '<div style="font-size:1.45rem;font-weight:900;color:#818cf8;">Rs.' + (vault ? (vault.total_earned || 0) : 0) + '</div>' +
+            '</div>' +
+            '<div style="flex:1;min-width:110px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:10px 14px;">' +
+              '<div style="font-size:0.72rem;color:#fca5a5;font-weight:700;">कुल उपयोग (Used)</div>' +
+              '<div style="font-size:1.45rem;font-weight:900;color:#f87171;">Rs.' + (vault ? (vault.total_spent || 0) : 0) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="margin-top:10px;font-size:0.80rem;color:' + expiryColor + ';font-weight:700;">⏳ वैधता: ' + expiryText + ' (' + ledger.length + ' लेन-देन)</div>' +
         '</div>' +
-        '<div style="overflow-y:auto;flex:1;padding:4px 0;">' +
+        '<div id="aoi-pb-scroll-area" style="overflow-y:auto;flex:1;padding:4px 0;">' +
           '<table style="width:100%;border-collapse:collapse;">' +
             '<thead><tr style="background:rgba(255,255,255,0.04);">' +
-              '<th style="padding:8px 12px;text-align:left;font-size:0.72rem;color:#64748b;font-weight:700;">Details</th>' +
-              '<th style="padding:8px 12px;text-align:center;font-size:0.72rem;color:#64748b;font-weight:700;">Date</th>' +
-              '<th style="padding:8px 12px;text-align:right;font-size:0.72rem;color:#64748b;font-weight:700;">Amount</th>' +
+              '<th style="padding:10px 14px;text-align:left;font-size:0.75rem;color:#94a3b8;font-weight:800;">विवरण</th>' +
+              '<th style="padding:10px 14px;text-align:center;font-size:0.75rem;color:#94a3b8;font-weight:800;">दिनांक</th>' +
+              '<th style="padding:10px 14px;text-align:right;font-size:0.75rem;color:#94a3b8;font-weight:800;">पॉइंट्स राशि</th>' +
             '</tr></thead>' +
             '<tbody>' + ledgerRows + '</tbody>' +
           '</table>' +
+          '<div id="aoi-pb-tutorial-section" style="margin:18px 14px;padding:16px;background:rgba(30,58,138,0.22);border:1.5px solid #2563eb;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.3);">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">' +
+              '<span style="font-size:1.3rem;">💡</span>' +
+              '<h4 style="margin:0;font-size:1.02rem;font-weight:900;color:#60a5fa;">पॉइंट्स का उपयोग व और ज्यादा कमाने की संपूर्ण गाइड</h4>' +
+            '</div>' +
+            '<div style="display:flex;flex-direction:column;gap:9px;font-size:0.84rem;color:#cbd5e1;line-height:1.5;">' +
+              '<div style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border-left:4px solid #22c55e;">' +
+                '🪙 <strong>1 शेयर पॉइंट = ₹1 नकद मूल्य:</strong> आपके वॉलेट का हर 1 पॉइंट सीधे ₹1 के बराबर है।' +
+              '</div>' +
+              '<div style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border-left:4px solid #3b82f6;">' +
+                '🛍️ <strong>20% सीधी छूट:</strong> किसी भी ई-बुक या ऑर्डर पर कुल कीमत का 20% तक आप सीधे अपने वॉलेट पॉइंट्स से कम करवा सकते हैं।' +
+              '</div>' +
+              '<div style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border-left:4px solid #eab308;">' +
+                '🎯 <strong>10 शेयर लक्ष्य:</strong> उत्सव शुभकामना संदेश को 10 किसान साथियों को शेयर करें और बोनस पॉइंट्स अनलॉक करें!' +
+              '</div>' +
+              '<div style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border-left:4px solid #ec4899;">' +
+                '👥 <strong>लाइफटाइम रेफरल कमाई:</strong> आपके द्वारा भेजे गए लिंक से जब भी कोई साथी पुस्तक खरीदेगा, तो आपको 10% लाइफटाइम शेयर पॉइंट्स तुरंत मिलेंगे!' +
+              '</div>' +
+              '<div style="background:rgba(0,0,0,0.3);padding:10px 14px;border-radius:10px;border-left:4px solid #f97316;">' +
+                '⏳ <strong>90 दिनों की रिवर्स वैधता:</strong> पॉइंट्स 90 दिनों तक सुरक्षित रहते हैं। नए पॉइंट्स जुड़ते ही 90 दिनों का टाइमर फिर से रीसेट हो जाता है।' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
-        '<div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;">' +
-          '<div style="font-size:0.73rem;color:#475569;">Next purchase pe 20% tak discount payen</div>' +
-          '<a href="/ebooks/ebook.html" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-decoration:none;padding:8px 16px;border-radius:10px;font-weight:800;font-size:0.78rem;">Books Dekhein</a>' +
+        '<div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(10,17,32,0.95);">' +
+          '<div style="font-size:0.76rem;color:#94a3b8;">किसी भी पुस्तक की खरीद पर 20% वॉलेट छूट मान्य</div>' +
+          '<a href="/ebooks/ebook.html" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-decoration:none;padding:10px 20px;border-radius:12px;font-weight:900;font-size:0.84rem;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(22,163,74,0.35);">📚 पुस्तकें देखें व छूट लें</a>' +
         '</div>';
 
       modal.appendChild(sheet);
       document.body.appendChild(modal);
+
+      document.getElementById('aoi-pb-close').onclick = () => modal.remove();
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+      // Red Button smooth scroll to tutorial guide
+      const guideBtn = document.getElementById('aoi-pb-guide-btn');
+      if (guideBtn) {
+        guideBtn.onclick = (e) => {
+          e.preventDefault();
+          const target = document.getElementById('aoi-pb-tutorial-section');
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.style.transition = 'background 0.5s ease';
+            target.style.background = 'rgba(220,38,38,0.25)';
+            setTimeout(() => {
+              target.style.background = 'rgba(30,58,138,0.22)';
+            }, 1200);
+          }
+        };
+      }
 
       document.getElementById('aoi-pb-close').onclick = () => modal.remove();
       modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
@@ -513,8 +596,44 @@ if (typeof window !== 'undefined') {
 
     getBalance() {
       if (!this.state) this.init();
+      if (!this.state) return 0;
       if (this.state.is_expired) return 0;
-      return Number(this.state.balance) || 0;
+
+      // FIFO Batch-wise 90-Day Expiry Engine
+      // Points in each credit batch expire 90 days from their own earning timestamp.
+      // Older batches are spent first against debits (FIFO).
+      let totalDebited = Number(this.state.total_spent) || 0;
+      let activeBalance = 0;
+
+      if (Array.isArray(this.state.ledger) && this.state.ledger.length > 0) {
+        // Chronological order (oldest first)
+        const creditBatches = this.state.ledger.filter(e => (Number(e.points) > 0)).slice().reverse();
+        creditBatches.forEach(batch => {
+          let batchPts = Number(batch.points) || 0;
+          const expTime = batch.expires_at ? new Date(batch.expires_at).getTime() : (new Date(batch.timestamp || 0).getTime() + EXPIRY_MS);
+
+          // Satisfy previous debits against oldest batches
+          if (totalDebited > 0) {
+            if (totalDebited >= batchPts) {
+              totalDebited -= batchPts;
+              batchPts = 0;
+            } else {
+              batchPts -= totalDebited;
+              totalDebited = 0;
+            }
+          }
+
+          // If batch has remaining points and is not expired, add to active balance
+          if (batchPts > 0 && Date.now() < expTime) {
+            activeBalance += batchPts;
+          }
+        });
+      } else {
+        activeBalance = Number(this.state.balance) || 0;
+      }
+
+      this.state.balance = Math.max(0, activeBalance);
+      return this.state.balance;
     }
 
     // Maximum 20% wallet deduction allowed on any book purchase
@@ -529,10 +648,11 @@ if (typeof window !== 'undefined') {
     // Deduct points on book purchase
     deductPoints(pointsToDeduct, bookTitle, orderId) {
       const pts = Math.round(Number(pointsToDeduct) || 0);
-      if (pts <= 0 || !this.state) return false;
-      if (this.state.balance < pts) return false;
+      if (pts <= 0) return false;
+      if (!this.state) this.init();
+      const currentBal = this.getBalance();
+      if (currentBal < pts) return false;
 
-      this.state.balance -= pts;
       this.state.total_spent = (this.state.total_spent || 0) + pts;
       this.state.ledger = this.state.ledger || [];
       this.state.ledger.unshift({
@@ -545,26 +665,29 @@ if (typeof window !== 'undefined') {
         status: 'debited'
       });
 
+      this.getBalance(); // Re-calculates state.balance with FIFO deduction
       this.saveLocal(this.state);
       this.syncSupabaseWalletAsync(this.state, 'debit', pts, `📖 वॉलेट डिस्काउंट: ${bookTitle || 'eBook'}`, orderId);
       return true;
     }
 
-    // Credit reward points (e.g. 10% on fresh purchase or 1st level referral)
+    // Credit reward points (e.g. 10% on fresh purchase, 10-share challenge, welcome gift)
     creditPoints(pointsToCredit, title, type = 'earn_self') {
       const pts = Math.round(Number(pointsToCredit) || 0);
-      if (pts <= 0 || !this.state) return;
+      if (pts <= 0) return;
+      if (!this.state) this.init();
+      if (!this.state) return;
 
-      this.state.balance = (this.state.balance || 0) + pts;
       this.state.total_earned = (this.state.total_earned || 0) + pts;
-      if (type === 'earn_self') {
+      if (type === 'earn_self' || type === 'earn_share_goal' || type === 'earn_welcome') {
         this.state.earned_self = (this.state.earned_self || 0) + pts;
       } else {
         this.state.earned_referral = (this.state.earned_referral || 0) + pts;
       }
-      // Reset 90-day timer upon new points credit
-      this.state.expires_at = new Date(Date.now() + EXPIRY_MS).toISOString();
       this.state.is_expired = false;
+
+      const batchExpiresAt = new Date(Date.now() + EXPIRY_MS).toISOString();
+      this.state.expires_at = batchExpiresAt;
 
       this.state.ledger = this.state.ledger || [];
       this.state.ledger.unshift({
@@ -573,9 +696,11 @@ if (typeof window !== 'undefined') {
         title: title || '🎁 शेयर रिवॉर्ड पॉइंट्स',
         points: pts,
         timestamp: new Date().toISOString(),
+        expires_at: batchExpiresAt,
         status: 'credited'
       });
 
+      this.getBalance(); // Re-calculates active balance using FIFO batches
       this.saveLocal(this.state);
       this.syncSupabaseWalletAsync(this.state, 'credit', pts, title || '🎁 शेयर रिवॉर्ड पॉइंट्स', null);
     }
@@ -729,5 +854,21 @@ if (typeof window !== 'undefined') {
   window.AarogyamWallet.bindPassbookClick('walletBalance');
   window.AarogyamWallet.bindPassbookClick('shareEarnBalance');
   window.AarogyamWallet.bindPassbookClick('[data-wallet-balance]');
+  window.AarogyamWallet.bindPassbookClick('.aoi-open-passbook');
+  window.AarogyamWallet.bindPassbookClick('[data-open-passbook]');
+  window.AarogyamWallet.bindPassbookClick('#promoWalletBadge');
+  window.AarogyamWallet.bindPassbookClick('.promo-wallet-badge');
+
+  // Universal event delegation for any point KPI or passbook trigger across the whole document
+  if (typeof document !== 'undefined') {
+    document.addEventListener('click', function (e) {
+      const target = e.target.closest('.aoi-open-passbook, [data-open-passbook], [data-wallet-balance], #promoWalletBadge, .promo-wallet-badge, #walletBalanceDisplay, #walletBalance, #shareEarnBalance');
+      if (target) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.AarogyamWallet.showPassbookModal();
+      }
+    });
+  }
 
 })(window);

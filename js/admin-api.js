@@ -5,7 +5,8 @@
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Intelligent Admin Persistent Cache (SessionStorage backed - Zero Auto Egress on page refresh / tab switch)
-const ADMIN_CACHE_TTL = 30 * 60 * 1000; // 30 minutes auto-TTL or until admin clicks Sync / Refresh
+// 6-Hour Bounded Window (maximum 4 times query window per 24 hours, or only when manual refresh is clicked)
+const ADMIN_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours auto-TTL or until admin clicks Sync / Refresh
 
 const _adminMemoryCache = {
   _map: new Map(),
@@ -53,6 +54,10 @@ const _adminMemoryCache = {
 
 export function clearAdminCache() {
   _adminMemoryCache.clear();
+  if (typeof window !== 'undefined') {
+    delete window._adminUsersAggCache;
+    delete window._adminDashboardAggCache;
+  }
 }
 
 if (typeof window !== 'undefined') {
@@ -933,27 +938,32 @@ export async function fetchUsers(params = {}) {
     const profileIds = validProfiles.map(p => p.id).filter(Boolean);
     const shareIds = validProfiles.map(p => p.share_id || p.referral_code).filter(Boolean);
 
-    // Step 2: Fetch only essential aggregate columns in parallel to minimize egress
-    const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes, sakhiInsightsRes, referralsRes, walletsRes, walletTxnsRes] = await Promise.all([
-        db.from('purchases').select('profile_id, amount, download_count').or('payment_status.eq.success,payment_status.is.null'),
-        // Fetch all share logs (shares, clicks, visits, registrations) without case restriction
-        db.from('share_logs').select('share_token, referral_code, event_type, created_at, asset_type, asset_title, landing_url').limit(5000),
-        db.from('profiles').select('id, referred_by, referral_code, share_id'), // Fetch all referral relationships
-        profileIds.length > 0 ? db.from('download_logs').select('profile_id').in('profile_id', profileIds.slice(0, 500)) : Promise.resolve({ data: [] }),
-        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, created_at'),
+    // Step 2: Fetch only essential aggregate columns in parallel to minimize egress (with 10-Minute Cache)
+    const CACHE_KEY = '_adminUsersAggCache';
+    const CACHE_TTL = 10 * 60 * 1000; // 10 Minutes TTL
+    let aggData = window[CACHE_KEY];
+
+    if (!aggData || (Date.now() - aggData.ts > CACHE_TTL)) {
+      const [purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes, sakhiInsightsRes, referralsRes, walletsRes, walletTxnsRes] = await Promise.all([
+        db.from('purchases').select('profile_id, amount, download_count').or('payment_status.eq.success,payment_status.is.null').limit(1500),
+        // Fetch only essential tokens & events without heavy URLs/descriptions to save 80% egress
+        db.from('share_logs').select('share_token, referral_code, event_type, created_at').limit(1500),
+        db.from('profiles').select('id, referred_by, referral_code, share_id').limit(2000), // Fetch all referral relationships
+        profileIds.length > 0 ? db.from('download_logs').select('profile_id').in('profile_id', profileIds.slice(0, 300)) : Promise.resolve({ data: [] }),
+        db.from('surveys').select('id, profile_id, name, mobile, state, district, occupation, created_at').limit(1000),
         (async () => {
           try {
-            return await db.from('sakhi_user_insights').select('profile_id, user_key, user_name, mobile, interaction_count, primary_domain, last_query_topic, recommended_ebook');
+            return await db.from('sakhi_user_insights').select('profile_id, user_name, mobile, interaction_count, primary_domain').limit(500);
           } catch (_) {
             return { data: [] };
           }
         })(),
         // Referrals table for tracking friend registrations & joins
-        db.from('referrals').select('id, referred_by, referral_code, status, joined_at, reward_amount').limit(5000),
+        db.from('referrals').select('id, referred_by, referral_code, status, joined_at, reward_amount').limit(1500),
         // Wallets table
         (async () => {
           try {
-            return await db.from('wallets').select('profile_id, balance, total_earned, total_spent, expires_at').limit(3000);
+            return await db.from('wallets').select('profile_id, balance, total_earned, total_spent, expires_at').limit(1000);
           } catch (_) {
             return { data: [] };
           }
@@ -961,12 +971,29 @@ export async function fetchUsers(params = {}) {
         // Wallet Transactions ledger
         (async () => {
           try {
-            return await db.from('wallet_transactions').select('id, profile_id, type, amount, title, order_id, created_at').order('created_at', { ascending: false }).limit(5000);
+            return await db.from('wallet_transactions').select('id, profile_id, type, amount, created_at').order('created_at', { ascending: false }).limit(1000);
           } catch (_) {
             return { data: [] };
           }
         })()
-    ]);
+      ]);
+
+      aggData = {
+        ts: Date.now(),
+        purchasesRes,
+        shareLogsRes,
+        allProfileRelationsRes,
+        downloadLogsRes,
+        surveysRes,
+        sakhiInsightsRes,
+        referralsRes,
+        walletsRes,
+        walletTxnsRes
+      };
+      window[CACHE_KEY] = aggData;
+    }
+
+    const { purchasesRes, shareLogsRes, allProfileRelationsRes, downloadLogsRes, surveysRes, sakhiInsightsRes, referralsRes, walletsRes, walletTxnsRes } = aggData;
 
     if (purchasesRes.error) console.error('Error fetching purchases for user aggregation:', purchasesRes.error.message);
     if (shareLogsRes.error) console.error('Error fetching share logs for user aggregation:', shareLogsRes.error.message);

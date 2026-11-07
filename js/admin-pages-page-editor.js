@@ -136,10 +136,31 @@ export async function initPageEditor() {
     });
 
     const assets = Array.from(assetsByPath, ([path, base64]) => ({ path, base64 }));
+    let bundleAssets = assets;
+
+    // Check payload size to guarantee we never exceed Vercel/server 4MB payload limits
+    const initialPayload = { action: 'save_site_pages_bundle', sitePages, assets };
+    const initialSize = new Blob([JSON.stringify(initialPayload)]).size;
+
+    if (initialSize > 3.2 * 1024 * 1024 && assets.length > 0) {
+      console.log(`[Admin Page Editor] Bundle size (${Math.round(initialSize/1024)} KB) exceeds 3.2 MB threshold. Uploading ${assets.length} assets individually to prevent 4MB server reject...`);
+      showToast(`⏳ बड़े इमेज बंडल (${assets.length} इमेजें) को सुरक्षित रूप से अपलोड किया जा रहा है...`, 'info');
+
+      for (const asset of assets) {
+        try {
+          await syncAssetToGitHub(asset.path, asset.base64);
+        } catch (uploadErr) {
+          console.warn(`[Admin Page Editor] Individual asset upload notice for ${asset.path}:`, uploadErr);
+        }
+      }
+      // Assets are already uploaded safely to GitHub, so only commit sitePages config in the bundle
+      bundleAssets = [];
+    }
+
     const payload = {
       action: 'save_site_pages_bundle',
       sitePages,
-      assets
+      assets: bundleAssets
     };
     const requestBody = JSON.stringify(payload);
     const localPayload = { ...payload, action: 'save_pages_bundle' };

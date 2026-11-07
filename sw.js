@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v57.0';
+const STATIC_CACHE = 'aarogyam-public-static-v58.0';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v34.0';
+const PAGES_CACHE = 'aarogyam-public-pages-v35.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v3.0';
 const OFFLINE_URL = '/offline.html';
 
@@ -147,6 +147,7 @@ self.addEventListener('fetch', (event) => {
     url.pathname.endsWith('.css') ||
     url.pathname.endsWith('.js') ||
     url.pathname.includes('site-pages-config') ||
+    url.pathname.includes('universal-promotions') ||
     url.pathname.includes('universal-book-landing') ||
     url.searchParams.has('v') ||
     url.searchParams.has('book_updated') ||

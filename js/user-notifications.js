@@ -135,11 +135,18 @@
 
         // 1. Initialize Engine on DOM Ready
         init: async function () {
-            // 🚀 Universal 3D Floating Promotion & Festival Gateway MUST ALWAYS RUN!
+            // 🚀 Universal Wallet Reward Engine & 3D Floating Promotion Gateway MUST ALWAYS RUN!
+            if (!window.AarogyamWallet && !document.getElementById('aoi-wallet-reward-engine-script')) {
+                const walletScript = document.createElement('script');
+                walletScript.id = 'aoi-wallet-reward-engine-script';
+                walletScript.src = '/js/wallet-reward-engine.js?v=20261107_v4_fifo';
+                walletScript.defer = true;
+                document.head.appendChild(walletScript);
+            }
             if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
                 const promoScript = document.createElement('script');
                 promoScript.id = 'agy-promo-gateway-script';
-                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261106_v9_avnish_clean';
+                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261107_v13_record_share';
                 promoScript.defer = true;
                 document.head.appendChild(promoScript);
             }

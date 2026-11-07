@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ====================================================================
  * AAROGYAM INDIA - UNIVERSAL RESPONSIVE ACCORDION DRAWER & SHARE ENGINE
  * Version: 17.0 (Zero Lag, Instant Accordion Toggle, Exact Verified Routes)
@@ -21,10 +21,26 @@
     } catch (e) {}
     if (savedUser.share_id && /^AI\d{4,8}$/i.test(savedUser.share_id)) return savedUser.share_id;
     if (savedUser.referral_code && /^AI\d{4,8}$/i.test(savedUser.referral_code)) return savedUser.referral_code;
-    const cleanMob = (savedUser.mobile || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+
+    // Check specific storage keys
+    const regShare = localStorage.getItem('user_share_id') || localStorage.getItem('aim_user_share_id') || localStorage.getItem('aarogyam_user_share_id');
+    if (regShare && /^AI\d{4,8}$/i.test(regShare)) return regShare;
+
+    // Derive AI-code from stored mobile (Strict: Never raw 10 digits)
+    const cleanMob = (savedUser.mobile || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || '').replace(/\D/g, '').slice(-10);
     if (cleanMob.length === 10) {
       return 'AI' + cleanMob.slice(-6);
     }
+
+    // Check URL parameters & referrer caches
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlRef = params.get('ref') || params.get('share_id');
+      if (urlRef && /^AI\d{4,8}$/i.test(urlRef)) return urlRef;
+      const cachedRef = localStorage.getItem('AOI_REFERRER_ID');
+      if (cachedRef && /^AI\d{4,8}$/i.test(cachedRef)) return cachedRef;
+    } catch(e) {}
+
     return 'AI000004';
   };
 
@@ -37,25 +53,120 @@
     const shareId = window.getUserShareId();
     urlObj.searchParams.set('share_id', shareId);
     urlObj.searchParams.set('ref', shareId);
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+      const name = u.full_name || u.name || localStorage.getItem('aim_user_name') || localStorage.getItem('user_name');
+      if (name && name !== 'प्रिय पाठक' && name !== 'स्वास्थ्य साधक') {
+        urlObj.searchParams.set('from', name.trim());
+      }
+    } catch (e) {}
     return urlObj.toString();
   };
 
   // -------------------------------------------------------------
-  // 3. PERSONALIZED WHATSAPP URL GENERATOR
+  // 3. AI CONSULTATION & UPLINE PRODUCT CONSULTANT ROUTING ENGINE
   // -------------------------------------------------------------
-  window.getPersonalizedWhatsAppUrl = function (topic) {
+  window.consultAiExpert = function (topic, details) {
+    // 1. Guest Gate: Check if user is registered / has profile
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    let savedUser = {};
+    try {
+      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+    } catch (e) {}
+
+    const userMobile = (savedUser.mobile || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || '').replace(/\D/g, '').slice(-10);
+    const userName = savedUser.full_name || savedUser.name || localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
+
+    const needsAuth = !isLogged && (!userMobile || !userName || userName === 'प्रिय पाठक' || userName === 'स्वास्थ्य साधक');
+
+    if (needsAuth) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          window.consultAiExpert(topic, details);
+        }, {
+          force: true,
+          title: '🩺 AI डॉक्टर व विशेषज्ञ परामर्श',
+          subtitle: 'उचित सलाह व समाधान हेतु अपना नाम व WhatsApp नंबर दर्ज करें'
+        });
+        return;
+      }
+    }
+
+    // 2. Identify Consultant (Upline / Sponsor or Master Product Consultant)
+    let consultantPhone = '7974422572';
+    let consultantName = 'आरोग्यम प्रोडक्ट कंसलटेंट जी';
+
+    try {
+      const sponsorMob = localStorage.getItem('AOI_SPONSOR_MOBILE') || 
+                         localStorage.getItem('aim_sponsor_mobile') || 
+                         localStorage.getItem('AOI_REFERRER_MOBILE') ||
+                         savedUser.referred_by_mobile ||
+                         savedUser.sponsor_mobile;
+      if (sponsorMob && /^\d{10}$/.test(String(sponsorMob).replace(/\D/g, '').slice(-10))) {
+        consultantPhone = String(sponsorMob).replace(/\D/g, '').slice(-10);
+      }
+      const sponsorName = localStorage.getItem('AOI_SPONSOR_NAME') || localStorage.getItem('aim_sponsor_name') || savedUser.referred_by_name;
+      if (sponsorName && sponsorName.trim()) {
+        consultantName = sponsorName.trim() + ' जी';
+      }
+    } catch (e) {}
+
+    // 3. User Details & Share ID
+    const displayName = userName || 'स्वास्थ्य साधक';
+    const displayMobile = userMobile ? ` (मोबाइल: ${userMobile})` : '';
+    const shareId = window.getUserShareId();
+
+    const pageTitle = (document.title || 'आरोग्यम स्वास्थ्य हब').split('|')[0].trim();
+    const topicTitle = topic || pageTitle;
+    const cleanDetails = details ? `\n• मुख्य समस्या / लक्षण: ${details.replace(/<[^>]+>/g, '').trim()}` : '';
+    const currentUrl = window.location.href.split('?')[0];
+    const shareLink = `${currentUrl}?ref=${encodeURIComponent(shareId)}`;
+
+    // 4. Build Complete Structured WhatsApp Message
+    const waMessage = 
+`नमस्ते ${consultantName},
+
+मेरा नाम: ${displayName}${displayMobile}
+विषय: ${pageTitle}
+परामर्श: ${topicTitle}${cleanDetails}
+
+मुझे इस समस्या के आयुर्वेदिक समाधान, परहेज, डाइट व प्रमाणित उत्पादों के बारे में आपसे परामर्श चाहिए। कृपया मेरा मार्गदर्शन करें।
+
+🔗 पेज लिंक: ${shareLink}`;
+
+    const waUrl = `https://api.whatsapp.com/send?phone=91${consultantPhone}&text=${encodeURIComponent(waMessage)}`;
+    window.open(waUrl, '_blank');
+  };
+
+  window.getPersonalizedWhatsAppUrl = function (topic, details) {
     let savedUser = {};
     try {
       savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('aarogyam_user') || localStorage.getItem('CURRENT_USER') || '{}');
     } catch (e) {}
 
-    const userName = savedUser.full_name || savedUser.name || savedUser.fullName || 'Valued User';
-    const userPhone = savedUser.mobile || savedUser.phone || '';
-    const userMeta = userPhone ? ` (Mobile: ${userPhone})` : '';
-    const cleanTopic = topic || 'Aarogyam India Services & Consultation';
-    
-    const message = `Hello Aarogyam, my name is ${userName}${userMeta}. I would like expert AI consultation regarding "${cleanTopic}".`;
-    return `https://api.whatsapp.com/send?phone=917974422572&text=${encodeURIComponent(message)}`;
+    const userName = savedUser.full_name || savedUser.name || localStorage.getItem('aim_user_name') || 'स्वास्थ्य साधक';
+    const userPhone = savedUser.mobile || localStorage.getItem('aim_user_mobile') || '';
+    const userMeta = userPhone ? ` (मोबाइल: ${userPhone})` : '';
+    const cleanTopic = topic || (document.title || 'आरोग्यम स्वास्थ्य हब').split('|')[0].trim();
+    const shareId = window.getUserShareId();
+    const shareLink = `${window.location.href.split('?')[0]}?ref=${encodeURIComponent(shareId)}`;
+
+    let consultantPhone = '7974422572';
+    let consultantName = 'आरोग्यम प्रोडक्ट कंसलटेंट जी';
+    try {
+      const sponsorMob = localStorage.getItem('AOI_SPONSOR_MOBILE') || localStorage.getItem('aim_sponsor_mobile');
+      if (sponsorMob && /^\d{10}$/.test(String(sponsorMob).replace(/\D/g, '').slice(-10))) {
+        consultantPhone = String(sponsorMob).replace(/\D/g, '').slice(-10);
+      }
+      const sponsorName = localStorage.getItem('AOI_SPONSOR_NAME') || localStorage.getItem('aim_sponsor_name');
+      if (sponsorName && sponsorName.trim()) consultantName = sponsorName.trim() + ' जी';
+    } catch(e) {}
+
+    const message = `नमस्ते ${consultantName},\n\nमेरा नाम: ${userName}${userMeta}\nविषय: ${cleanTopic}\n${details ? 'विवरण: ' + details + '\n' : ''}\nमुझे इस विषय पर उचित सलाह व उत्पाद मार्गदर्शन चाहिए।\nपेज लिंक: ${shareLink}`;
+    return `https://api.whatsapp.com/send?phone=91${consultantPhone}&text=${encodeURIComponent(message)}`;
   };
 
   // -------------------------------------------------------------
@@ -166,6 +277,13 @@
           },
           body: JSON.stringify({ p_share_token: sId })
         }).catch(() => {});
+      }
+
+      // Connect WhatsApp share action with 10-Share Goal Challenge & Audio Chime
+      if (platform && platform.startsWith('whatsapp')) {
+        if (window.AarogyamPromotionGateway && typeof window.AarogyamPromotionGateway.recordShareAction === 'function') {
+          window.AarogyamPromotionGateway.recordShareAction();
+        }
       }
     } catch (e) {}
   };
@@ -1255,8 +1373,8 @@
           <i class="fa-solid fa-share-nodes"></i>
         </button>
 
-        <!-- 4. Green Official WhatsApp Contact Button (Direct WhatsApp Helpdesk) -->
-        <a href="https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20Aarogyam%20India!%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F" target="_blank" rel="noopener noreferrer" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp सहायता" aria-label="WhatsApp Contact" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+        <!-- 4. Green Official WhatsApp Contact Button (Direct WhatsApp Helpdesk & Upline Consultant) -->
+        <a href="javascript:void(0)" onclick="if(window.consultAiExpert){window.consultAiExpert(document.title);}else{window.open('https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20Aarogyam%20India!%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F','_blank');} return false;" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp सहायता व परामर्श" aria-label="WhatsApp Contact" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
           <i class="fa-brands fa-whatsapp"></i>
         </a>
       </div>

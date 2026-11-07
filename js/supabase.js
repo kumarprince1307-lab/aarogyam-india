@@ -331,13 +331,28 @@ function createLoginSession(profile) {
     const cleanPhone = String(profile.mobile || '').replace(/\D/g, '').slice(-10);
     const officialName = String(profile.full_name || profile.name || '').trim();
 
+    // ⚠️ Clear previous user wallet vault & purchases if phone changed
+    try {
+        const prevPhone = String(localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+        if (cleanPhone && prevPhone && cleanPhone !== prevPhone) {
+            localStorage.removeItem('AOI_WALLET_VAULT_V1');
+            localStorage.removeItem('AOI_WALLET_BALANCE');
+            localStorage.removeItem('AI_PURCHASES');
+            localStorage.removeItem('purchases');
+            localStorage.removeItem('user_purchases');
+        }
+    } catch (e) {}
+
+    // Never assign referrer's code as user's own share_id
+    const userShareId = profile.share_id || (cleanPhone === '7974422572' ? 'AI000004' : ('AI' + Math.floor(100000 + Math.random() * 900000)));
+
     const session = {
         id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('SES_' + Date.now()),
         userId: profile.id,
         user_id: profile.id,
         name: officialName,
         mobile: cleanPhone,
-        share_id: profile.share_id || profile.referral_code || 'AI000004',
+        share_id: userShareId,
         loginTime: new Date().toISOString(),
         active: true
     };
@@ -351,6 +366,9 @@ function createLoginSession(profile) {
             localStorage.setItem("aarogyam_user_phone", cleanPhone);
             localStorage.setItem("SAKHI_USER_PHONE", cleanPhone);
         }
+        if (userShareId) {
+            localStorage.setItem("user_share_id", userShareId);
+        }
         if (officialName) {
             localStorage.setItem("aarogyam_user_name", officialName);
             localStorage.setItem("aim_user_name", officialName);
@@ -358,6 +376,11 @@ function createLoginSession(profile) {
         }
         if (typeof window.updateUniversalDrawerProfile === 'function') {
             window.updateUniversalDrawerProfile();
+        }
+        // Re-initialize wallet for this user session
+        if (window.AarogyamWallet) {
+            window.AarogyamWallet.state = null;
+            window.AarogyamWallet.init();
         }
     } catch (e) {
         console.warn("Storage save notice:", e);
