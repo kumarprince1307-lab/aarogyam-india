@@ -4402,7 +4402,7 @@
           }
 
           if (Array.isArray(allRecordings) && allRecordings.length > 0) {
-            const topVideos = allRecordings.slice(0, 25);
+            const topVideos = allRecordings;
             const videoSchemas = topVideos.map((v, idx) => {
               const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url || '') || '';
               const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : `${origin}/images/banners/agriculture-hero-banner-1.webp`);

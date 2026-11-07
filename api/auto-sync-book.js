@@ -607,15 +607,63 @@ module.exports = async function handler(req, res) {
 
     if (action === 'save_webinar_recordings') {
       const recordings = Array.isArray(payload.recordings) ? payload.recordings : [];
-      const recordingsData = { recordings: recordings };
+      const recordingsData = { 
+        recordings: recordings,
+        channels: payload.channels || [],
+        master_categories: payload.master_categories || [],
+        playlists: payload.playlists || []
+      };
       const updatedRecsBase64 = Buffer.from(JSON.stringify(recordingsData, null, 2), 'utf8').toString('base64');
       await commitFile('data/webinar-recordings.json', updatedRecsBase64, `Update AarogyamTube Videos & Recordings (${recordings.length} items) [Auto-Sync]`, token);
 
+      // 100% Autonomous Google Video SEO Schema Sync into tube.html
+      try {
+        const tubeFile = await getFileContent('tube.html', token);
+        if (tubeFile && tubeFile.content) {
+          let html = tubeFile.content;
+          const schema = recordings.map((v, idx) => {
+            const ytId = v.youtube_id || (v.video_url && v.video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=))([\w-]{11})/)?.[1]) || '';
+            const title = (v.title || `AarogyamTube Video #${idx + 1}`).replace(/"/g, "'");
+            const desc = (v.desc || v.title || 'AarogyamTube Video Guide').replace(/"/g, "'");
+            const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : 'https://aarogyamindia.online/images/banners/agriculture-hero-banner-1.webp');
+            const uploadDate = v.created_at || '2026-01-15T09:00:00+05:30';
+            const embedUrl = ytId ? `https://www.youtube-nocookie.com/embed/${ytId}` : 'https://aarogyamindia.online/tube.html';
+            const contentUrl = `https://aarogyamindia.online/tube.html?vid=${v.id || ytId}`;
+
+            return {
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              "name": title,
+              "description": desc,
+              "thumbnailUrl": [thumb],
+              "uploadDate": uploadDate,
+              "embedUrl": embedUrl,
+              "contentUrl": contentUrl
+            };
+          });
+
+          const startTag = '<script type="application/ld+json" id="aarogyam-tube-schema">';
+          const endTag = '</script>';
+          const sIdx = html.indexOf(startTag);
+          if (sIdx !== -1) {
+            const eIdx = html.indexOf(endTag, sIdx);
+            if (eIdx !== -1) {
+              const newBlock = `${startTag}\n${JSON.stringify(schema, null, 2)}\n  ${endTag}`;
+              html = html.substring(0, sIdx) + newBlock + html.substring(eIdx + endTag.length);
+              const updatedTubeBase64 = Buffer.from(html, 'utf8').toString('base64');
+              await commitFile('tube.html', updatedTubeBase64, `Auto-Sync Google Video SEO Schema for AarogyamTube (${recordings.length} videos)`, token);
+            }
+          }
+        }
+      } catch (seoErr) {
+        console.warn('Auto-sync tube schema notice:', seoErr.message);
+      }
+
       return sendJson(res, 200, {
         success: true,
-        message: 'AarogyamTube videos and recordings successfully published to GitHub.',
+        message: 'AarogyamTube videos, recordings and Google Video SEO Schema successfully published to GitHub.',
         total: recordings.length,
-        updatedFiles: ['data/webinar-recordings.json']
+        updatedFiles: ['data/webinar-recordings.json', 'tube.html']
       });
     }
 
