@@ -305,7 +305,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1794070304289,
+      "admin_edited": 1794085777525,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -6959,39 +6959,40 @@
       "name": "थायरॉइड व मेटाबॉलिज्म केयर (Thyroid & Metabolism Care)",
       "url": "/health/thyroid-care.html",
       "category": "Healthcare Sub-page",
-      "status": "published",
+      "status": "active",
       "theme_primary": "#7c3aed",
-      "theme_dark": "#4c1d95",
+      "theme_dark": "#3000a1",
       "ticker_text": "🦋 25,000+ महिलाओं व पुरुषों ने TSH लेवल सामान्य किया | वजन व थकान से मुक्ति | 24×7 WhatsApp AI डॉक्टर परामर्श सक्रिय!",
       "audio_title": "थायरॉइड व लिवर कनेक्शन सच",
-      "audio_script": "नमस्ते, आरोग्यम थायरॉइड केयर मंच में आपका स्वागत है। जानें TSH असंतुलन, लिवर-थायरॉइड कनेक्शन और हॉर्मोन संतुलन का आयुर्वेदिक समाधान।",
+      "audio_script": "नमस्ते! क्या आप भी रोज थायरॉइड की गोली खा रहे हैं, फिर भी वजन और थकान कम नहीं हो रही? याद रखें, T-4 हॉर्मोन को सक्रिय T-3 में बदलने का 80% काम आपका लिवर करता है! आज ही जानें लिवर और थायरॉइड का यह अनदेखा सच और अपनाएं प्राकृतिक समाधान।",
       "audio_url": "",
       "og_title": "🦋 क्या गोली खाने के बाद भी थायरॉइड ठीक नहीं हो रहा? लिवर-थायरॉइड का अनदेखा सच",
-      "og_image": "/images/banners/health_card-2-585308-wpfz.webp",
-      "og_description": "शरीर में 80% T4 को सक्रिय T3 में बदलने का काम लिवर करता है! थायरॉइड, अचानक वजन बढ़ना, बाल झड़ना व थकान का संपूर्ण आयुर्वेदिक व वैज्ञानिक डाइट चार्ट।",
-      "share_message": "थायरॉइड, अचानक वजन बढ़ना व लिवर-थायरॉइड कनेक्शन का संपूर्ण आयुर्वेदिक समाधान देखें: {url}",
+      "og_image": "/images/banners/og_image-db52865a-a474-403d-a-435457-np7g.webp",
+      "og_description": "क्या रोज सुबह खाली पेट थायरॉइड की गोली खाने के बाद भी आपका वजन और थकान कम नहीं हो रही? 🦋 जानिए लिवर और थायरॉइड का यह छिपा हुआ वैज्ञानिक सच (शरीर में 80% निष्क्रिय T4 को सक्रिय T3 में बदलने का काम लिवर करता है)। TSH लेवल को प्राकृतिक रूप से सामान्य करने, मेटाबॉलिज्म तेज करने और हॉर्मोन संतुलन के लिए असरदार आयुर्वेदिक डाइट चार्ट व समाधान। | Thyroid-Liver Axis, T4 to T3 Conversion, Hypothyroidism Diet, Natural TSH Balance & Metabolism Booster",
+      "share_message": "क्या आपका भी TSH असंतुलन, तेजी से बढ़ता वजन और दिनभर की भारी थकान आपका पीछा नहीं छोड़ रही? 🦋😩\n\nरोज सुबह खाली पेट डॉक्टर की दी हुई थायरॉइड की गोली खा-खाकर थक चुके हैं, फिर भी आराम नहीं मिल रहा? 💊🛑\n\nजानें इसका सबसे बड़ा और छिपा हुआ सच—जब तक आपका लिवर सुस्त है, दुनिया की कोई भी दवा आपका थायरॉइड ठीक नहीं कर सकती! क्योंकि शरीर में 80% निष्क्रिय T4 हॉर्मोन को सक्रिय T3 में बदलने का काम आपका लिवर ही करता है। 🫀✨\n\nअब घबराइए मत! हजारों लोगों ने सही आयुर्वेदिक डाइट, लिवर डिटॉक्स और प्राकृतिक समाधान अपनाकर अपनी थायरॉइड की दवा की खुराक आधी की है और अपना TSH लेवल बिल्कुल सामान्य किया है। 💪🌿\n\nआज ही अपनी सेहत की कमान अपने हाथ में लें और नेचुरल तरीके से खुद को स्वस्थ बनाएं: 👇",
       "floating_banner": {
-        "title": "थायरॉइड बैलेंस किट",
-        "subtitle": "हॉर्मोनल संतुलन",
+        "enabled": false,
         "image": "/images/banners/health_card-2-585308-wpfz.webp",
-        "link": "#sec-products"
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
       },
       "fb_pixel": true,
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/health_card-2-585308-wpfz.webp",
+          "image": "/images/banners/hero_slide-4bf26fba-d93a-4f71-8-992825-jom9.webp",
           "tag": "🦋 THYROID-LIVER AXIS REVEALED",
           "title": "थायरॉइड की गोली खाने के बाद भी ठीक क्यों नहीं हो रहे? लिवर-थायरॉइड का सच",
           "subtitle": "शरीर में 80% निष्क्रिय T4 को सक्रिय T3 में बदलने का काम आपका लिवर करता है! TSH असंतुलन, अचानक वजन बढ़ना व थकान का संपूर्ण आयुर्वेदिक समाधान।",
           "cta_text": "AI डॉक्टर से मुफ़्त सलाह लें",
-          "cta_link": "https://wa.me/917974422572?text=नमस्ते, मुझे थायरॉइड व हॉर्मोनल असंतुलन परामर्श चाहिए",
+          "cta_link": "https://wa.me/+917974422572?text=नमस्ते, मुझे थायरॉइड व हॉर्मोनल असंतुलन परामर्श चाहिए",
           "cta_secondary_text": "🔬 लिवर-थायरॉइड सच पढ़ें ↓",
           "cta_secondary_link": "#sec-scientific-breakdown",
           "banner_mode": "card"
         },
         {
-          "image": "/images/banners/health-banner.jpeg",
+          "image": "/images/banners/hero_slide-6240b25e-c79b-42ec-9-092400-p1j5.webp",
           "tag": "🥗 HORMONE BALANCING DIET",
           "title": "थायरॉइड रिवर्सल डाइट चार्ट व प्राणायाम प्रोटोकॉल",
           "subtitle": "साबुत धनिया बीज का पानी, कद्दू के बीज (जिंक-सेलेनियम), उज्जयी प्राणायाम और अश्वगंधा से हॉर्मोन असंतुलन को प्राकृतिक रूप से ठीक करें।",
@@ -7000,6 +7001,28 @@
           "cta_secondary_text": "📦 थायरॉइड किट देखें",
           "cta_secondary_link": "#sec-products",
           "banner_mode": "card"
+        },
+        {
+          "image": "/images/banners/hero_slide-34268eac-dbda-4cc1-a-398595-xo9g.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1bbf8290-bda0-45c4-b-495079-2bct.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -7172,7 +7195,7 @@
             "title": "❓ थायरॉइड क्या है और क्यों होता है?",
             "badge": "हॉर्मोन विज्ञान",
             "color": "#7c3aed",
-            "image": "/images/banners/health_card-2-585308-wpfz.webp",
+            "image": "/images/banners/cb_card-9d2c76fb-1e65-46ea-9-565279-udy0.webp",
             "points": [
               "शरीर का स्पीडोमीटर: गले में तितली के आकार की ग्रंथि जो शरीर की कैलोरी बर्निंग, दिल की धड़कन व तापमान नियंत्रित करती है।",
               "हाइपोथायरॉइडिज्म (Underactive): T3 व T4 कम होना और TSH बढ़ना - शरीर धीमा पड़ जाता है, तेजी से वजन बढ़ता है और ठंड लगती है।",
@@ -7192,7 +7215,7 @@
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
             "badge": "लक्षण पहचानें",
             "color": "#6d28d9",
-            "image": "/images/banners/health_card-2-585308-wpfz.webp",
+            "image": "/images/banners/cb_card-167b6cc1-6f59-40ca-8-630419-mck3.webp",
             "points": [
               "अचानक वजन बढ़ना: कम खाने पर भी पेट, चेहरे और बाहों पर तेजी से सूजन व चर्बी चढ़ना।",
               "अत्यधिक बाल झड़ना: कंघी करते समय बालों का गुच्छों में टूटना और त्वचा का अत्यधिक रूखा होना।",
@@ -7212,7 +7235,7 @@
             "title": "🚨 साइड इफेक्ट्स व भारत का डेटा (Risks)",
             "badge": "गंभीर खतरे",
             "color": "#dc2626",
-            "image": "/images/banners/health_card-2-585308-wpfz.webp",
+            "image": "/images/banners/cb_card-f97a623e-2029-4a35-b-766390-w3ii.webp",
             "points": [
               "भारत में आंकड़े: भारत में 4.2 करोड़ से अधिक लोग थायरॉइड से पीड़ित हैं, जिनमें हर 8 में से 1 महिला इसकी शिकार है।",
               "हार्ट फेलियर व कोलेस्ट्रॉल: अनकंट्रोल्ड हाइपोथायरॉइडिज्म से बैड कोलेस्ट्रॉल (LDL) बहुत बढ़ जाता है, जिससे हार्ट अटैक का खतरा 2 गुना हो जाता है।",
@@ -7228,7 +7251,7 @@
           }
         ]
       },
-      "admin_edited": 1791696253047,
+      "admin_edited": 1794085777214,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
@@ -7254,7 +7277,7 @@
         }
       },
       "whatsapp_support": {
-        "number": "917974422572",
+        "number": "+917974422572",
         "prompt": "नमस्ते, मुझे थायरॉइड व हॉर्मोनल असंतुलन के बारे में परामर्श चाहिए।"
       }
     },
