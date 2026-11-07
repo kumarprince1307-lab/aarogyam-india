@@ -993,18 +993,42 @@
       background: #0b1120;
       overflow: hidden;
       border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Ambient Frosted Blur Backdrop: fills 9:16 card behind 16:9 thumbnails without stretching the main image */
+    .at-short-bg-blur {
+      position: absolute;
+      top: -15%;
+      left: -15%;
+      width: 130%;
+      height: 130%;
+      object-fit: cover;
+      filter: blur(16px) brightness(0.45);
+      transform: scale(1.08);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .at-short-img {
+      position: relative;
+      z-index: 1;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain; /* Keeps 16:9 full thumbnail crisp, completely sharp, uncropped */
       object-position: center;
       transition: transform 0.3s ease;
     }
 
+    /* True 9:16 vertical shorts fill the frame seamlessly */
+    .at-short-img.is-vertical {
+      object-fit: cover;
+    }
+
     .at-short-card:hover .at-short-img {
-      transform: scale(1.05);
+      transform: scale(1.04);
     }
 
     .at-short-badge {
@@ -5276,13 +5300,18 @@
 
         grid.innerHTML = shortsList.map((r, idx) => {
           const ytId = r.youtube_id || extractYoutubeVideoId(r.video_url || r.youtube_url) || '';
-          // Native YouTube Shorts 9:16 vertical thumbnail (oar2.jpg) eliminates letterboxing and black bars!
-          const thumb = r.thumbnail_vertical || (ytId ? `https://i.ytimg.com/vi/${ytId}/oar2.jpg` : (r.thumbnail || DEFAULT_AAROGYAMTUBE_THUMB));
+          const isLandscape = (r.format === 'both' || r.format === 'full_video');
+          // For vertical shorts, use native Shorts 9:16 vertical thumbnail if available; for landscape videos, use crisp hqdefault
+          const thumb = r.thumbnail_vertical || (!isLandscape && ytId ? `https://i.ytimg.com/vi/${ytId}/oar2.jpg` : (r.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB)));
+          const cleanThumb = r.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : DEFAULT_AAROGYAMTUBE_THUMB);
 
           return `
             <div class="at-short-card" onclick="window.openReelPlayer(${idx})">
               <div class="at-short-thumb-wrap">
-                <img src="${thumb}" alt="${r.title}" class="at-short-img" onerror="if(this.src && !this.src.includes('hqdefault.jpg') && '${ytId}'){this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg';}else{this.onerror=null;this.src='${DEFAULT_AAROGYAMTUBE_THUMB}';}">
+                <img src="${cleanThumb}" class="at-short-bg-blur" alt="" aria-hidden="true" onerror="this.style.display='none'">
+                <img src="${thumb}" alt="${r.title}" class="at-short-img${!isLandscape && r.thumbnail_vertical ? ' is-vertical' : ''}"
+                  onload="if(this.naturalHeight > this.naturalWidth) this.classList.add('is-vertical');"
+                  onerror="if(this.src && !this.src.includes('hqdefault.jpg') && '${ytId}'){this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg';}else{this.onerror=null;this.src='${DEFAULT_AAROGYAMTUBE_THUMB}';}">
                 <span class="at-short-badge">⚡ Shorts</span>
                 <span class="at-short-time">⏱️ ${r.duration || '0:58'}</span>
                 <div class="at-short-play-overlay">
