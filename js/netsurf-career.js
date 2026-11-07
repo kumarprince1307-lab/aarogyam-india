@@ -81,6 +81,7 @@
       btn.addEventListener('click', () => {
         if (typeof window.triggerViralPageShare === 'function') {
           window.triggerViralPageShare({
+            usePageCms: true,
             title: 'नेटसर्फ डायरेक्ट सेलिंग करियर - Aarogyam India',
             text: 'नेटसर्फ डायरेक्ट सेलिंग बिज़नेस और ₹8,19,250 क्लोजिंग प्लान देखें:',
             url: window.location.href

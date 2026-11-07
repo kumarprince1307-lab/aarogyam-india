@@ -13,7 +13,7 @@
  * - Farmer Testimonials & Reviews Customizer
  * - FAQ Accordion Manager
  * - 24x7 WhatsApp AI Doctor Support & Universal Social Share System
- * - 1-Click LocalStorage Sync & JSON Export (site-pages-config.json)
+ * - Atomic page JSON + image publishing and JSON export
  * ====================================================================
  */
 
@@ -91,6 +91,122 @@ export async function initPageEditor() {
       await new Promise(r => setTimeout(r, 400 * attempt));
     }
     return { success: false, error: 'Upload failed after 3 attempts' };
+  }
+
+  const pendingPageEditorAssets = new Map();
+
+  function stagePageEditorAsset(path, dataUrl) {
+    const cleanPath = String(path || '').replace(/^\/+/, '');
+    if (!cleanPath || !/^data:image\/webp;base64,/i.test(String(dataUrl || ''))) {
+      throw new Error('इमेज WebP में convert नहीं हुई। कृपया दूसरी इमेज या समर्थित ब्राउज़र से कोशिश करें।');
+    }
+    pendingPageEditorAssets.set(cleanPath, dataUrl);
+  }
+
+  async function publishPageEditorBundle(sitePages) {
+    const assetsByPath = new Map();
+    const referencedImages = new Set();
+    let offlineUploads = {};
+    try {
+      offlineUploads = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+    } catch (err) {
+      console.warn('[Admin Page Editor] Could not read cached image uploads:', err);
+    }
+    function collectImagePaths(value, key = '') {
+      if (Array.isArray(value)) {
+        value.forEach(item => collectImagePaths(item, key));
+      } else if (value && typeof value === 'object') {
+        Object.entries(value).forEach(([childKey, childValue]) => collectImagePaths(childValue, childKey));
+      } else if (typeof value === 'string' && ['image', 'og_image', 'url'].includes(key)) {
+        const cleanPath = value.replace(/^\/+/, '');
+        if (cleanPath.startsWith('images/') && cleanPath.toLowerCase().endsWith('.webp')) {
+          referencedImages.add(cleanPath);
+        }
+      }
+    }
+    collectImagePaths(sitePages);
+    pendingPageEditorAssets.forEach((dataUrl, path) => {
+      if (referencedImages.has(path)) assetsByPath.set(path, dataUrl);
+    });
+    referencedImages.forEach(path => {
+      const cached = offlineUploads['/' + path] || offlineUploads[path];
+      if (cached && String(cached).startsWith('data:') && !assetsByPath.has(path)) {
+        assetsByPath.set(path, cached);
+      }
+    });
+
+    const assets = Array.from(assetsByPath, ([path, base64]) => ({ path, base64 }));
+    const payload = {
+      action: 'save_site_pages_bundle',
+      sitePages,
+      assets
+    };
+    const requestBody = JSON.stringify(payload);
+    const localPayload = { ...payload, action: 'save_pages_bundle' };
+    const localRequestBody = JSON.stringify(localPayload);
+    if (Math.max(new Blob([requestBody]).size, new Blob([localRequestBody]).size) > 4 * 1024 * 1024) {
+      throw new Error('पेज और इमेजों का कुल आकार 4 MB से बड़ा है। कम इमेजें चुनकर अलग-अलग Save करें।');
+    }
+
+    if (['localhost', '127.0.0.1', ''].includes(window.location.hostname)) {
+      try {
+        const localRes = await fetch('http://127.0.0.1:5505', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: localRequestBody
+        });
+        const localData = await localRes.json().catch(() => ({}));
+        if (localRes.ok && localData.success && localData.gitPush?.success) {
+          clearPublishedPageEditorAssets(assets);
+          return { ...localData, localDisk: true };
+        }
+      } catch (err) {
+        console.warn('[Admin Page Editor] Local bundle sync unavailable; using hosted publisher:', err);
+      }
+    }
+
+    const response = await fetch(getAutoSyncApiUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: requestBody
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || `Publish failed (HTTP ${response.status})`);
+    }
+
+    clearPublishedPageEditorAssets(assets);
+    return result;
+  }
+
+  function clearPublishedPageEditorAssets(assets) {
+    assets.forEach(({ path, base64 }) => {
+      if (pendingPageEditorAssets.get(path) === base64) pendingPageEditorAssets.delete(path);
+    });
+    try {
+      const offlineUploads = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+      assets.forEach(({ path }) => {
+        delete offlineUploads['/' + path];
+        delete offlineUploads[path];
+      });
+      localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offlineUploads));
+    } catch (err) {
+      console.warn('[Admin Page Editor] Could not clear published image previews:', err);
+    }
+  }
+
+  function stripPageEditorImagePreviews(obj) {
+    const clone = JSON.parse(JSON.stringify(obj));
+    function walk(value) {
+      if (Array.isArray(value)) {
+        value.forEach(walk);
+      } else if (value && typeof value === 'object') {
+        delete value.image_preview;
+        Object.values(value).forEach(walk);
+      }
+    }
+    walk(clone);
+    return clone;
   }
 
   function getPreviewImgSrc(item, field = 'image', fallback = '') {
@@ -281,25 +397,11 @@ export async function initPageEditor() {
         }
       }
 
-      showToast(`⚡ HD WebP तैयार (${sizeKb} KB) | सर्वर व GitHub पर सिंक हो रही है...`, 'info');
-
-      const syncRes = await syncAssetToGitHub(generatedPath, dataUrl);
-      if (syncRes.success) {
-        showToast(`✅ इमेज GitHub पर सफलतापूर्वक सिंक हो गई! (${sizeKb} KB HD WebP)`, 'success');
-      } else {
-        const _errMsg = syncRes.error || '';
-        const _isTokenErr = _errMsg.includes('401') || _errMsg.includes('403') ||
-          _errMsg.toLowerCase().includes('token') || _errMsg.toLowerCase().includes('bad credential');
-        if (_isTokenErr) {
-          showToast(`❌ GitHub Token expire हो गया! Vercel में GITHUB_TOKEN update करें। (इमेज सिर्फ इस browser में दिखेगी)`, 'error');
-        } else {
-          console.warn('[Admin] GitHub sync info (local preview active):', syncRes.error);
-          showToast(`✅ इमेज तैयार (${sizeKb} KB) | प्रीव्यू सक्रिय! (GitHub sync pending)`, 'success');
-        }
-      }
+      stagePageEditorAsset(generatedPath, dataUrl);
+      showToast(`✅ HD WebP तैयार (${sizeKb} KB)। इमेज और पेज बदलाव एक साथ प्रकाशित करने के लिए Save दबाएँ।`, 'success');
     } catch (err) {
       console.error('[Admin] Upload error:', err);
-      showToast('⚠️ अपलोड तैयार: स्थानीय प्रीव्यू सक्रिय', 'info');
+      showToast(`❌ इमेज publish के लिए तैयार नहीं हुई: ${err.message}`, 'error');
     }
   };
 
@@ -6060,16 +6162,11 @@ export async function initPageEditor() {
   syncPagesGithubBtn?.addEventListener('click', async () => {
     showToast('⏳ साइट कॉन्फ़िगरेशन GitHub पर पुश हो रहा है...', 'info');
     try {
-      const configStr = JSON.stringify({ sitePages: allPages }, null, 2);
-      const base64Data = btoa(unescape(encodeURIComponent(configStr)));
-      const syncRes = await syncAssetToGitHub('data/site-pages-config.json', base64Data);
-      if (syncRes.success) {
-        showToast('✅ data/site-pages-config.json GitHub पर सफलतापूर्वक पुश हो गया!', 'success');
-      } else {
-        showToast('✅ कॉन्फ़िगरेशन स्थानीय रूप से सुरक्षित हो गया (लोकल सर्वर सेफ)', 'success');
-      }
+      const result = await publishPageEditorBundle(stripPageEditorImagePreviews(allPages));
+      showToast(`✅ पेज कॉन्फ़िगरेशन${result.localDisk ? ' और नई इमेज' : ' व नई इमेजें'} एक Git commit में प्रकाशित हुए।`, 'success');
     } catch (e) {
-      showToast('✅ कॉन्फ़िगरेशन स्थानीय रूप से सुरक्षित हो गया', 'success');
+      console.error('[Admin Page Editor] Publish failed:', e);
+      showToast(`❌ GitHub publish नहीं हुआ: ${e.message}. लोकल बदलाव सुरक्षित हैं; फिर Save/Publish करें।`, 'error');
     }
   });
 
@@ -8479,8 +8576,8 @@ export async function initPageEditor() {
         currentNsLadder[idx].image_preview = dataUrl;
         renderNsLadderInBuilder();
       }
-      await syncAssetToGitHub(generatedPath, dataUrl);
-      showToast('✅ स्टेप इमेज सुरक्षित हो गई!', 'success');
+      stagePageEditorAsset(generatedPath, dataUrl);
+      showToast('✅ स्टेप इमेज तैयार। इसे प्रकाशित करने के लिए पेज Save करें।', 'success');
     } catch (err) {
       showToast('❌ एरर: ' + err.message, 'error');
     }
@@ -9350,7 +9447,7 @@ export async function initPageEditor() {
     updateContextualSections('eBooks');
   }
 
-  function savePageConfig() {
+  async function savePageConfig() {
     let slug = (document.getElementById('pe_input_slug')?.value || '').trim();
     let name = (document.getElementById('pe_input_name')?.value || '').trim();
     let url = (document.getElementById('pe_input_url')?.value || '').trim();
@@ -9578,12 +9675,10 @@ export async function initPageEditor() {
     closePageDrawer();
     resetPageForm();
     renderPagesTable();
-    showToast(`✅ पेज '${name}' सम्पूर्ण कॉन्फ़िगरेशन के साथ सुरक्षित हो गया!`, 'success');
+    showToast(`⏳ '${name}' और नई इमेजें एक साथ प्रकाशित हो रही हैं...`, 'info');
 
-    // Universal Triple-Sync: 1) PHP API (Direct Server File Write + Git), 2) GitHub Contents API, 3) LocalStorage
     try {
       const cleanAllPages = stripImagePreviews(allPages);
-      const configStr = JSON.stringify({ sitePages: cleanAllPages }, null, 2);
       // Keep master products catalog synced if products on this page were edited
       if (Array.isArray(currentProducts) && currentProducts.length > 0 && Array.isArray(masterProducts) && masterProducts.length > 0) {
         let masterModified = false;
@@ -9629,40 +9724,11 @@ export async function initPageEditor() {
         }
       }
 
-      // Call dedicated PHP save API (matches Universal Book Landing flow)
-      fetch('/api/save_site_pages.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'save_site_pages', sitePages: cleanAllPages })
-      }).then(r => r.json()).then(phpRes => {
-        if (phpRes && phpRes.success) {
-          console.log('[Admin Save] PHP API success:', phpRes);
-          showToast('⚡ सर्वर JSON व गिट पर तुरंत लाइव सुरक्षित हो गया!', 'success');
-        }
-      }).catch(() => {
-        fetch('/api/save_book_landing.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'save_site_pages', sitePages: cleanAllPages })
-        }).catch(() => null);
-      });
-
-      // Call GitHub Contents API (Serverless / Cloud Sync)
-      syncAssetToGitHub('data/site-pages-config.json', base64Data).then(res => {
-        if (res.success) {
-          if (res.localDisk) {
-            showToast('💾 स्थानीय डिस्क पर site-pages-config.json तुरंत सुरक्षित हो गया!', 'success');
-          } else {
-            showToast('🚀 GitHub व लाइव वेबसाइट पर डेटा सिंक हो गया!', 'success');
-          }
-        } else {
-          console.warn('[Admin Save] GitHub sync warning:', res);
-        }
-      }).catch(err => {
-        console.warn('[Admin Save] GitHub sync fetch error:', err);
-      });
+      const result = await publishPageEditorBundle(cleanAllPages);
+      showToast(`✅ पेज '${name}' और ${result.updatedFiles?.length || 0} फ़ाइलें एक Git commit में प्रकाशित हुईं।`, 'success');
     } catch (e) {
-      console.warn('[Admin Save] Serialization error:', e);
+      console.error('[Admin Save] Publish failed:', e);
+      showToast(`❌ बदलाव publish नहीं हुए: ${e.message}. इस browser में draft सुरक्षित है; फिर Save/Publish करें।`, 'error');
     }
   }
 
@@ -9712,13 +9778,8 @@ export async function initPageEditor() {
         window.previewCbCardImage(cardIdx, dataUrl);
       }
 
-      showToast(`⚡ HD WebP तैयार (${sizeKb} KB) | सर्वर व GitHub पर सिंक हो रही है...`, 'info');
-      const syncRes = await syncAssetToGitHub(generatedPath, dataUrl);
-      if (syncRes && syncRes.success) {
-        showToast(`✅ फोटो सफलतापूर्वक अपलोड व सिंक हो गई! (${sizeKb} KB)`, 'success');
-      } else {
-        showToast(`✅ फोटो तैयार (${sizeKb} KB) | स्थानीय प्रीव्यू सक्रिय!`, 'success');
-      }
+      stagePageEditorAsset(generatedPath, dataUrl);
+      showToast(`✅ फोटो तैयार (${sizeKb} KB)। इसे प्रकाशित करने के लिए पेज Save करें।`, 'success');
     } catch (e) {
       console.error('[Admin] Clinical Breakdown Card Image error:', e);
       showToast('❌ एरर: ' + (e?.message || 'Upload error'), 'error');
@@ -9795,8 +9856,8 @@ export async function initPageEditor() {
         renderDietImagesInBuilder();
       }
 
-      await syncAssetToGitHub(generatedPath, dataUrl);
-      showToast('✅ डाइट फोटो सुरक्षित हो गई!', 'success');
+      stagePageEditorAsset(generatedPath, dataUrl);
+      showToast('✅ डाइट फोटो तैयार। इसे प्रकाशित करने के लिए पेज Save करें।', 'success');
     } catch (err) {
       showToast('❌ एरर: ' + err.message, 'error');
     }
@@ -9869,8 +9930,8 @@ export async function initPageEditor() {
         renderExerciseImagesInBuilder();
       }
 
-      await syncAssetToGitHub(generatedPath, dataUrl);
-      showToast('✅ व्यायाम फोटो सुरक्षित हो गई!', 'success');
+      stagePageEditorAsset(generatedPath, dataUrl);
+      showToast('✅ व्यायाम फोटो तैयार। इसे प्रकाशित करने के लिए पेज Save करें।', 'success');
     } catch (err) {
       showToast('❌ एरर: ' + err.message, 'error');
     }

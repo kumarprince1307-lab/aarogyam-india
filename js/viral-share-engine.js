@@ -139,13 +139,14 @@
 
     // Pull CMS custom share message and OG title (Single Source of Truth)
     const activeCms = window.AAROGYAM_ACTIVE_PAGE_CMS;
+    const usePageCms = options.usePageCms === true;
     if (activeCms) {
-      if (activeCms.share_message && !options.text) {
+      if (activeCms.share_message && (!options.text || usePageCms)) {
         text = activeCms.share_message;
-      } else if (activeCms.og_description && !options.text) {
+      } else if (activeCms.og_description && (!options.text || usePageCms)) {
         text = activeCms.og_description;
       }
-      if (activeCms.og_title && !options.title) {
+      if (activeCms.og_title && (!options.title || usePageCms)) {
         title = activeCms.og_title;
       }
     } else {
@@ -154,15 +155,20 @@
         const curPath = window.location.pathname.toLowerCase();
         const match = allPages.find(p => p && p.url && curPath.endsWith(p.url.toLowerCase()));
         if (match) {
-          if (match.share_message && !options.text) text = match.share_message;
-          else if (match.og_description && !options.text) text = match.og_description;
-          if (match.og_title && !options.title) title = match.og_title;
+          if (match.share_message && (!options.text || usePageCms)) text = match.share_message;
+          else if (match.og_description && (!options.text || usePageCms)) text = match.og_description;
+          if (match.og_title && (!options.title || usePageCms)) title = match.og_title;
         }
       } catch (e) {}
     }
 
+    const cmsDescription = activeCms?.og_description || ogDesc || '';
+    const expandedText = (text || '')
+      .replace(/\{title\}/g, title || '')
+      .replace(/\{description\}|\{desc\}/g, cmsDescription)
+      .replace(/\{url\}/g, shareUrl);
     const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '').trim();
-    const cleanText = (text || '').replace(/<[^>]+>/g, '').trim();
+    const cleanText = expandedText.replace(/<[^>]+>/g, '').trim();
     const isAgri = window.location.pathname.includes('agriculture') || window.location.pathname.includes('crop');
     const headerPrefix = isAgri ? '🌾' : '✨';
     const fullShareMessage = (cleanText && cleanText.includes('http'))

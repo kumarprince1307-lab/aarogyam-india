@@ -8,17 +8,35 @@ import http.server
 import json
 import base64
 import os
+import pathlib
 import sys
 import subprocess
+import tempfile
 
 PORT = 5505
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def git_commit_and_push(commit_msg="Update website via Admin Studio"):
+def git_commit_and_push(commit_msg="Update website via Admin Studio", paths=None):
     """Directly stages, commits, pulls, and pushes changes to GitHub main branch."""
     try:
-        # 1. Stage all changes
-        subprocess.run(['git', 'add', '-A'], cwd=BASE_DIR, capture_output=True, check=True)
+        # 1. Stage only the requested files when publishing a page bundle.
+        if paths:
+            allowed_paths = {os.path.normpath(item).replace('\\', '/') for item in paths}
+            staged_res = subprocess.run(
+                ['git', 'diff', '--staged', '--name-only'],
+                cwd=BASE_DIR,
+                capture_output=True,
+                text=True
+            )
+            pre_staged = {item.strip().replace('\\', '/') for item in staged_res.stdout.splitlines() if item.strip()}
+            if not pre_staged.issubset(allowed_paths):
+                return {
+                    "success": False,
+                    "error": "Unrelated staged changes exist; refusing to include them in the page publish."
+                }
+            subprocess.run(['git', 'add', '-A', '--', *sorted(allowed_paths)], cwd=BASE_DIR, capture_output=True, check=True)
+        else:
+            subprocess.run(['git', 'add', '-A'], cwd=BASE_DIR, capture_output=True, check=True)
 
         # 2. Check if there are any staged changes
         diff_res = subprocess.run(['git', 'diff', '--staged', '--name-only'], cwd=BASE_DIR, capture_output=True, text=True)
@@ -162,6 +180,122 @@ class LocalSyncHandler(http.server.BaseHTTPRequestHandler):
                 git_res = git_commit_and_push(commit_msg)
                 self._send_cors_headers(200 if git_res.get('success') else 500)
                 self.wfile.write(json.dumps(git_res).encode('utf-8'))
+                return
+
+            if action == 'save_pages_bundle':
+                if len(json.dumps(data, ensure_ascii=False).encode('utf-8')) > 4 * 1024 * 1024:
+                    self._send_cors_headers(413)
+                    self.wfile.write(json.dumps({"success": False, "error": "Page and image bundle exceeds the 4 MB publish limit"}).encode('utf-8'))
+                    return
+                site_pages = data.get('sitePages')
+                assets = data.get('assets', [])
+                if not isinstance(site_pages, list) or not site_pages:
+                    self._send_cors_headers(400)
+                    self.wfile.write(json.dumps({"success": False, "error": "sitePages must be a non-empty list"}).encode('utf-8'))
+                    return
+                if not isinstance(assets, list):
+                    self._send_cors_headers(400)
+                    self.wfile.write(json.dumps({"success": False, "error": "assets must be a list"}).encode('utf-8'))
+                    return
+
+                pending_files = {
+                    'data/site-pages-config.json': json.dumps(
+                        {"sitePages": site_pages},
+                        ensure_ascii=False,
+                        indent=2
+                    ).encode('utf-8')
+                }
+                total_bytes = 0
+                for asset in assets:
+                    if not isinstance(asset, dict):
+                        self._send_cors_headers(400)
+                        self.wfile.write(json.dumps({"success": False, "error": "Invalid asset entry"}).encode('utf-8'))
+                        return
+                    asset_path = str(asset.get('path', '')).replace('\\', '/').lstrip('/')
+                    normalized = os.path.normpath(asset_path).replace('\\', '/')
+                    encoded = str(asset.get('base64', ''))
+                    if (
+                        not asset_path.startswith('images/') or
+                        normalized != asset_path or
+                        not asset_path.lower().endswith('.webp') or
+                        not encoded
+                    ):
+                        self._send_cors_headers(400)
+                        self.wfile.write(json.dumps({"success": False, "error": f"Invalid page image path or data: {asset_path or '(empty)'}"}).encode('utf-8'))
+                        return
+                    try:
+                        if ',' in encoded:
+                            encoded = encoded.split(',', 1)[1]
+                        image_bytes = base64.b64decode(encoded, validate=True)
+                    except Exception:
+                        self._send_cors_headers(400)
+                        self.wfile.write(json.dumps({"success": False, "error": f"Invalid base64 image data: {asset_path}"}).encode('utf-8'))
+                        return
+                    total_bytes += len(image_bytes)
+                    is_webp = len(image_bytes) >= 12 and image_bytes[:4] == b'RIFF' and image_bytes[8:12] == b'WEBP'
+                    if not is_webp or len(image_bytes) > 25 * 1024 * 1024 or total_bytes > 20 * 1024 * 1024:
+                        self._send_cors_headers(400)
+                        self.wfile.write(json.dumps({"success": False, "error": f"Invalid WebP image or image bundle exceeds size limit: {asset_path}"}).encode('utf-8'))
+                        return
+                    pending_files[asset_path] = image_bytes
+
+                changed_paths = list(pending_files.keys())
+                page_html_paths = set()
+                for page in site_pages:
+                    if not isinstance(page, dict):
+                        continue
+                    page_url = str(page.get('url') or '')
+                    if page_url == '/' or page.get('id') == 'page_home':
+                        html_path = 'index.html'
+                    elif page_url.endswith('.html'):
+                        html_path = page_url.lstrip('/').replace('\\', '/')
+                    else:
+                        continue
+                    normalized_html_path = os.path.normpath(html_path).replace('\\', '/')
+                    if normalized_html_path == html_path and not html_path.startswith('../'):
+                        full_html_path = os.path.abspath(os.path.join(BASE_DIR, html_path))
+                        if os.path.commonpath([BASE_DIR, full_html_path]) == BASE_DIR and os.path.isfile(full_html_path):
+                            page_html_paths.add(html_path)
+
+                html_snapshots = {}
+                for html_path in page_html_paths:
+                    with open(os.path.join(BASE_DIR, html_path), 'rb') as html_file:
+                        html_snapshots[html_path] = html_file.read()
+
+                try:
+                    for rel_path, file_bytes in pending_files.items():
+                        target = os.path.abspath(os.path.join(BASE_DIR, rel_path))
+                        if os.path.commonpath([BASE_DIR, target]) != BASE_DIR:
+                            raise ValueError(f"Path traversal prohibited: {rel_path}")
+                        os.makedirs(os.path.dirname(target), exist_ok=True)
+                        with tempfile.NamedTemporaryFile(dir=os.path.dirname(target), delete=False) as temp_file:
+                            temp_file.write(file_bytes)
+                            temp_path = temp_file.name
+                        os.replace(temp_path, target)
+
+                    sync_og_to_html_files(site_pages)
+                    changed_paths.extend(
+                        sorted(
+                            html_path for html_path in page_html_paths
+                            if pathlib.Path(BASE_DIR, html_path).read_bytes() != html_snapshots[html_path]
+                        )
+                    )
+                    git_push_info = git_commit_and_push(
+                        "Publish site pages and images [Atomic Page Editor Sync]",
+                        changed_paths
+                    )
+                except Exception as bundle_error:
+                    self._send_cors_headers(500)
+                    self.wfile.write(json.dumps({"success": False, "error": str(bundle_error)}).encode('utf-8'))
+                    return
+
+                success = bool(git_push_info and git_push_info.get('success'))
+                self._send_cors_headers(200 if success else 500)
+                self.wfile.write(json.dumps({
+                    "success": success,
+                    "updatedFiles": changed_paths,
+                    "gitPush": git_push_info
+                }).encode('utf-8'))
                 return
 
             rel_path = data.get('path', '').replace('\\', '/').lstrip('/')

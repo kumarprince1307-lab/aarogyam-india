@@ -152,25 +152,26 @@
             allPages = localParsed;
           } else {
             const isPreviewMode = window.location.search.includes('admin_preview=1') || window.location.search.includes('cms_draft=1');
-            localParsed.forEach(lp => {
-              if (lp && (lp.admin_edited || isPreviewMode)) {
-                const sIdx = allPages.findIndex(sp => sp.id === lp.id || sp.slug === lp.slug);
-                if (sIdx >= 0) {
-                  allPages[sIdx] = Object.assign({}, allPages[sIdx], lp);
-                } else {
-                  allPages.push(lp);
+            if (isPreviewMode) {
+              localParsed.forEach(lp => {
+                if (lp) {
+                  const sIdx = allPages.findIndex(sp => sp.id === lp.id || sp.slug === lp.slug);
+                  if (sIdx >= 0) {
+                    allPages[sIdx] = Object.assign({}, allPages[sIdx], lp);
+                  } else {
+                    allPages.push(lp);
+                  }
                 }
-              }
-            });
+              });
+            }
           }
         }
       }
-      // Only refresh localStorage if server data is loaded and local has no unsaved admin edits
+      // Public pages should keep the shared server config as their local cache.
       if (serverConfigLoaded && allPages.length > 0) {
         try {
-          const existingLocal = JSON.parse(localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG') || '[]');
-          const hasUnsavedLocalEdits = Array.isArray(existingLocal) && existingLocal.some(p => p && p.admin_edited);
-          if (!hasUnsavedLocalEdits) {
+          const isPreviewMode = window.location.search.includes('admin_preview=1') || window.location.search.includes('cms_draft=1');
+          if (!isPreviewMode) {
             localStorage.setItem('AAROGYAM_SITE_PAGES_CONFIG', JSON.stringify(allPages));
           }
         } catch (lErr) {
@@ -530,10 +531,11 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
           ${pageConfig.kpi_cards.map(c => {
             const hasImg = c.image && typeof c.image === 'string' && c.image.trim().length > 0;
+            const imageSrc = hasImg ? resolveAssetSrc(c, 'image') : '';
             return `
             <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s ease;">
               <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(37,99,235,0.08); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; overflow: hidden;">
-                ${hasImg ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title || 'KPI')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.parentElement.innerHTML='<i class=\\\'fa-solid ${escapeHtml(c.icon || 'fa-check')}\\\'></i>'">` : `<i class="fa-solid ${escapeHtml(c.icon || 'fa-check')}"></i>`}
+                ${hasImg ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(c.title || 'KPI')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.parentElement.innerHTML='<i class=\\\'fa-solid ${escapeHtml(c.icon || 'fa-check')}\\\'></i>'">` : `<i class="fa-solid ${escapeHtml(c.icon || 'fa-check')}"></i>`}
               </div>
               <div style="flex:1;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
@@ -582,6 +584,7 @@
           ${pageConfig.page_kpi_sections.map(sec => {
             const items = Array.isArray(sec.items) ? sec.items : (sec.items ? String(sec.items).split('\n').filter(Boolean) : []);
             const hasImg = sec.image && typeof sec.image === 'string' && sec.image.trim().length > 0;
+            const imageSrc = hasImg ? resolveAssetSrc(sec, 'image') : '';
             return `
               <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 22px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
@@ -591,7 +594,7 @@
                 <div style="display: grid; grid-template-columns: ${hasImg ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr'}; gap: 20px; align-items: start;">
                   ${hasImg ? `
                     <div style="width: 100%; border-radius: 12px; overflow: hidden; background: #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); max-height: 260px;">
-                      <img src="${escapeHtml(sec.image)}" alt="${escapeHtml(sec.title || 'KPI Image')}" style="width: 100%; height: 100%; max-height: 260px; object-fit: cover; display: block; cursor: pointer;" onclick="window.open('${escapeHtml(sec.image)}', '_blank')" onerror="this.parentElement.style.display='none'">
+                      <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(sec.title || 'KPI Image')}" style="width: 100%; height: 100%; max-height: 260px; object-fit: cover; display: block; cursor: pointer;" onclick="window.open('${escapeHtml(imageSrc)}', '_blank')" onerror="this.parentElement.style.display='none'">
                     </div>
                   ` : ''}
                   <div style="display: flex; flex-direction: column; gap: 10px;">

@@ -228,6 +228,102 @@ module.exports = async function handler(req, res) {
     const action = payload.action || 'save';
 
     // -------------------------------------------------------------
+    // ACTION: SAVE PAGE CONFIG & ITS NEW IMAGES IN ONE GIT COMMIT
+    // -------------------------------------------------------------
+    if (action === 'save_site_pages_bundle') {
+      if (Buffer.byteLength(JSON.stringify(payload), 'utf8') > 4 * 1024 * 1024) {
+        return sendJson(res, 413, { success: false, error: 'Page and image bundle exceeds the 4 MB publish limit. Save fewer images at a time.' });
+      }
+      if (!Array.isArray(payload.sitePages) || payload.sitePages.length === 0) {
+        return sendJson(res, 400, { success: false, error: 'sitePages must be a non-empty array.' });
+      }
+
+      const assets = Array.isArray(payload.assets) ? payload.assets : [];
+      const files = new Map();
+      let totalBytes = 0;
+
+      for (const asset of assets) {
+        const filePath = String(asset?.path || '').replace(/^\/+/, '');
+        const rawBase64 = String(asset?.base64 || '').replace(/^data:[^;]+;base64,/, '');
+        const normalizedPath = path.posix.normalize(filePath);
+        if (
+          !filePath ||
+          filePath.includes('\\') ||
+          normalizedPath !== filePath ||
+          !filePath.startsWith('images/') ||
+          !filePath.toLowerCase().endsWith('.webp') ||
+          !rawBase64
+        ) {
+          return sendJson(res, 400, { success: false, error: `Invalid page image path or data: ${filePath || '(empty)'}` });
+        }
+
+        const imageBytes = Buffer.from(rawBase64, 'base64');
+        const isWebp = imageBytes.length >= 12 &&
+          imageBytes.toString('ascii', 0, 4) === 'RIFF' &&
+          imageBytes.toString('ascii', 8, 12) === 'WEBP';
+        if (!isWebp || imageBytes.length > MAX_FILE_SIZE_BYTES) {
+          return sendJson(res, 400, { success: false, error: `Invalid or oversized image: ${filePath}` });
+        }
+        totalBytes += imageBytes.length;
+        files.set(filePath, rawBase64);
+      }
+
+      if (totalBytes > 20 * 1024 * 1024) {
+        return sendJson(res, 400, { success: false, error: 'The page image bundle exceeds the 20 MB publish limit.' });
+      }
+
+      const configBase64 = Buffer.from(JSON.stringify({ sitePages: payload.sitePages }, null, 2), 'utf8').toString('base64');
+      files.set('data/site-pages-config.json', configBase64);
+
+      const treeItems = await Promise.all(Array.from(files, async ([filePath, base64Content]) => ({
+        path: filePath,
+        mode: '100644',
+        type: 'blob',
+        sha: await createBlob(base64Content, token)
+      })));
+
+      let newCommitSha = '';
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const refRes = await githubRequest(`git/ref/heads/${GITHUB_BRANCH}`, 'GET', token);
+        const latestCommitSha = refRes.data?.object?.sha;
+        if (!latestCommitSha) throw new Error(`Could not fetch HEAD for branch ${GITHUB_BRANCH}`);
+
+        const treeRes = await githubRequest('git/trees', 'POST', token, {
+          base_tree: latestCommitSha,
+          tree: treeItems
+        });
+        const newTreeSha = treeRes.data?.sha;
+        if (!newTreeSha) throw new Error('GitHub did not return a tree SHA for the page bundle.');
+
+        const commitRes = await githubRequest('git/commits', 'POST', token, {
+          message: `Publish site pages and ${assets.length} page images [Atomic Page Editor Sync]`,
+          tree: newTreeSha,
+          parents: [latestCommitSha]
+        });
+        newCommitSha = commitRes.data?.sha;
+        if (!newCommitSha) throw new Error('GitHub did not return a commit SHA for the page bundle.');
+
+        try {
+          await githubRequest(`git/refs/heads/${GITHUB_BRANCH}`, 'PATCH', token, {
+            sha: newCommitSha,
+            force: false
+          });
+          break;
+        } catch (err) {
+          if (attempt === 3 || !/fast forward|reference update/i.test(err.message || '')) throw err;
+        }
+      }
+
+      return sendJson(res, 200, {
+        success: true,
+        message: 'Page configuration and uploaded images were published in one Git commit.',
+        commitSha: newCommitSha,
+        totalImages: assets.length,
+        updatedFiles: Array.from(files.keys())
+      });
+    }
+
+    // -------------------------------------------------------------
     // ACTION: CREATE BLOB (Parallel Conflict-Free Fast Blob Upload)
     // -------------------------------------------------------------
     if (action === 'create_blob' || action === 'upload_blob') {
