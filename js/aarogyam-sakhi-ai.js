@@ -1814,7 +1814,7 @@ if (typeof document !== 'undefined') {
       return 'nuskhe';
     }
 
-    // Beauty, Dermatology, Haircare, Lips
+    // Beauty, Dermatology, Haircare, Lips, Parlour & Facials
     const beautyTokens = [
       'सुंदर', 'त्वचा', 'चेहरा', 'चेहरे', 'skin', 'झुर्रियां', 'झुरिया', 'jhuria', 'jhuriyan', 'jhurriya', 'wrinkle', 'wrinkles',
       'chahre', 'chahra', 'chehra', 'chehre', 'ग्लो', 'glow', 'चमक', 'chamak', 'झाइयाँ', 'झाइयां',
@@ -1822,11 +1822,21 @@ if (typeof document !== 'undefined') {
       'चेहरे का ग्लो', 'फेस ग्लो', 'बाल', 'बालों', 'hair', 'डैंड्रफ', 'dandruff',
       'गंजापन', 'गंजा', 'हेयरफॉल', 'कंडीशनर', 'फेसपैक', 'फेसवाश', 'फेस वॉश', 'रंगत',
       'उबटन', 'जायफल', 'बेसन', 'मुल्तानी मिट्टी', 'मलाई', 'स्क्रब', 'हर्ब्स एंड मोर',
-      'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों', 'बॉडी लोशन', 'body lotion'
+      'फेयरनेस', 'होठ', 'होंठ', 'होठों', 'lips', 'टैनिंग', 'detan', 'घमौरियों', 'बॉडी लोशन', 'body lotion',
+      'पार्लर', 'parlar', 'parlour', 'parlor', 'ब्यूटी पार्लर', 'beauty parlour', 'फेशियल', 'facial', 'facial kit', 'फेशियल किट', 'क्लींजर', 'cleanser', 'मसाज क्रीम', 'विटामिन थेरेपी'
     ];
     const isHbToken = q.includes('हीमोग्लोबिन') || q.includes('hemoglobin') || q.includes('hb') || q.includes('रक्ताल्पता') || q.includes('खून की कमी');
     if (!beauty_rejected && !isHbToken && beautyTokens.some(t => q.includes(t))) {
       return 'beauty';
+    }
+
+    // Instant Injury, Trauma, Animal Kick, Sprain & First-Aid Guard (Redirects to Health/Pain Relief)
+    const injuryTokens = [
+      'लात', 'लात मारी', 'लात मार', 'lat mari', 'chot lag', 'चोट', 'मोच', 'खिंचाव', 'नस चढ़ गई',
+      'सूजन', 'झटका लग गया', 'गिर गया', 'पैर मुड़ गया', 'दर्द निवारक जेल', 'पेन जेल', 'मस्कुलर पेन'
+    ];
+    if (injuryTokens.some(t => q.includes(t))) {
+      return 'health';
     }
 
     // Veterinary & Dairy (Pashu Palan)
@@ -16210,7 +16220,7 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
       twoParts: /(?:दो\s*हिस्सों\s*में|दो\s*भागों\s*में|2\s*हिस्से|2\s*भाग)/i.test(q),
       oppositeFactCheck: /(?:क्या\s*यह\s*उल्टा\s*दावा\s*सही\s*है|उल्टा\s*दावा)/i.test(q),
       directSimple: /(?:सरल\s*हिंदी\s*में\s*सीधे\s*बताओ|सीधे\s*सीधे\s*बताओ|सीधे\s*बताओ|कम\s*शब्दों\s*में)/i.test(q),
-      dualQuery: /(?:एक\s*साथ\s*इन\s*दोनों\s*का\s*जवाब|साथ\s*में\s*यह\s*भी)/i.test(q),
+      dualQuery: /(?:एक\s*साथ\s*इन\s*दोनों\s*का\s*जवाब|साथ\s*में\s*यह\s*भी|और\s*साथ\s*ही|और\s*साथ\s*में|और\s*(?:मेरी|मेरे|मुझे|हमारा|हमारे)\b|तथा\s*(?:मेरी|मेरे|मुझे)\b)/i.test(q) || (/(?:और|तथा|aur)\b/i.test(q) && (q.includes('?') || /(?:क्या\s*करें|कैसे|दवा|उपाय|बताओ|बताएं|चाहिए)/i.test(q)) && q.split(/(?:और\s*साथ\s*ही|और\s*साथ\s*में|और\s*(?:मेरी|मेरे|मुझे|हमारा|हमारे)|तथा|\bऔर\b|\baur\b)/i).length >= 2),
       villageContext: /(?:मेरे\s*गांव|परिवार\s*की\s*स्थिति)/i.test(q),
       noGuessing: /(?:बिना\s*अनुमान|सही\s*बात\s*बताओ)/i.test(q)
     };
@@ -16278,7 +16288,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
   }
 
   function resolveDirectBenchmarkAnswer(subQ) {
-    const sq = normalizeQueryText(subQ);
+    if (!subQ || subQ.trim().length < 2) return '';
+    const sq = normalizeQueryText(subQ).toLowerCase();
     if (sq.includes('धान') && (sq.includes('खरीफ') || sq.includes('रबी'))) {
       return `धान मुख्य रूप से **खरीफ (वर्षा ऋतु)** की फसल है। इसकी बुवाई जून-जुलाई में और कटाई अक्टूबर-नवंबर में होती है।`;
     }
@@ -16306,27 +16317,46 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     if (sq.includes('पीले धब्बे') || sq.includes('पीला रतुआ')) {
       return `गेहूं में पीले धब्बे मुख्य रूप से **पीला रतुआ (फंगस)** या **जिंक की कमी** से होते हैं। जैविक उपचार हेतु बायोफिट शेथ (30ml) + रैप-अप (30ml) + Bio-99 का स्प्रे करें।`;
     }
+
+    // Dynamic Master 200 QA Bank Lookup
+    const bank = (sakhiMaster200QABank && sakhiMaster200QABank.length > 0)
+      ? sakhiMaster200QABank
+      : (window.sakhiMaster200QABank || []);
+    if (bank && bank.length > 0) {
+      for (const item of bank) {
+        if (item.keywords && Array.isArray(item.keywords)) {
+          const matchCount = item.keywords.filter(kw => sq.includes(kw.toLowerCase())).length;
+          if (matchCount >= 2 || (item.keywords.length <= 4 && matchCount >= 1 && sq.includes(item.keywords[0].toLowerCase()))) {
+            return item.answer;
+          }
+        }
+      }
+    }
+
     return `इस विषय की संपूर्ण वैज्ञानिक जानकारी आरोग्यम सखी AI ज्ञानकोष में उपलब्ध है।`;
   }
 
   function handleDualQueryResolver(rawQ, directives) {
     if (!directives.dualQuery) return false;
-    const q = rawQ;
-    const parts = q.split(/(?:साथ\s*में\s*यह\s*भी\s*:\s*|साथ\s*में\s*:\s*|aur\s*sath\s*me\s*:\s*)/i);
+    const q = (rawQ || '').trim();
+    if (!q || q.length < 12) return false;
+
+    const splitRegex = /(?:साथ\s*में\s*यह\s*भी\s*:\s*|साथ\s*में\s*:\s*|aur\s*sath\s*me\s*:\s*|और\s*साथ\s*ही|और\s*साथ\s*में|और\s*(?:मेरी|मेरे|मुझे|हमारा|हमारे)|तथा\s*(?:मेरी|मेरे|मुझे)|\bऔर\b|\baur\b|\bतथा\b)/i;
+    const parts = q.split(splitRegex);
     if (parts.length >= 2) {
       let q1 = parts[0].replace(/^एक\s*साथ\s*इन\s*दोनों\s*का\s*जवाब\s*अलग[- ]अलग\s*दो\s*:\s*/i, '').trim();
-      let q2 = parts[1].trim();
-      if (q1 && q2) {
-        let title = '📋 दोनों सवालों के अलग-अलग स्पष्ट उत्तर';
+      let q2 = parts.slice(1).join(' ').trim();
+      if (q1.length >= 5 && q2.length >= 5) {
         let q1Ans = resolveDirectBenchmarkAnswer(q1);
         let q2Ans = resolveDirectBenchmarkAnswer(q2);
 
-        let bodyText = `📌 **1. पहले सवाल का उत्तर:**\n• *प्रश्न:* "${escapeHtml(q1)}"\n\n${q1Ans}\n\n━━━━━━━━━━━━━━━━━━━━\n\n📌 **2. दूसरे सवाल का उत्तर:**\n• *प्रश्न:* "${escapeHtml(q2)}"\n\n${q2Ans}`;
+        let title = '📋 दोनों सवालों के अलग-अलग स्पष्ट समाधान';
+        let bodyText = `📌 **1. पहले सवाल का समाधान:**\n• *प्रश्न:* "${escapeHtml(q1)}"\n\n${q1Ans}\n\n━━━━━━━━━━━━━━━━━━━━\n\n📌 **2. दूसरे सवाल का समाधान:**\n• *प्रश्न:* "${escapeHtml(q2)}"\n\n${q2Ans}`;
 
         renderCrispSpecialBox(title, bodyText, [
-          { text: '🌾 कृषि व फसल डॉक्टर', query: 'खेती व फसल डॉक्टर' },
-          { text: '🐄 पशु दूध व फैट वृद्धि', query: 'गाय भैंस का दूध और फैट बढ़ाने का उपाय' },
-          { text: '🩺 स्वास्थ्य व डाइट परामर्श', query: 'स्वास्थ्य व रोग परामर्श' }
+          { text: '🌾 कृषि व फसल डॉक्टर', query: q1 },
+          { text: '🐄 पशु दूध व फैट वृद्धि', query: q2 },
+          { text: '💬 अवनीश दादा से WhatsApp पर पूछें', query: 'अवनीश दादा से बात कराओ' }
         ], 'omni', 'dual_query_composite');
         return true;
       }

@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-10-10T09:50:04.459Z",
-  "total_products": 41,
+  "updated_at": "2026-11-07T18:40:22.368Z",
+  "total_products": 43,
   "categories": [
     {
       "id": "agri",
@@ -1098,6 +1098,56 @@
       ],
       "dose": "1 एकड़ फसल अवशेष या 5 टन गोबर खाद हेतु 1 लीटर बायोफिट कल्चर + 1 लीटर शेत + 250ml बायो-99 प्रति 200 लीटर पानी (2 किलो गुड़ व 2 किलो बेसन के साथ)।",
       "is_active": true
+    },
+    {
+      "id": "ns_herbs_facial_kit",
+      "name": "Herbs & More Vitamin Therapy Professional Facial Kit",
+      "category": "herbs_more",
+      "category_label": "सौंदर्य व पर्सनल केयर (Herbs & More)",
+      "subcategory": "facial_care",
+      "subcategory_label": "✨ प्रोफेशनल फेशियल व स्किन ग्लो (Salon & Parlour Kit)",
+      "badge": "🌟 Best Seller Parlour Kit",
+      "mrp": 1400,
+      "discount_pct": 15,
+      "discounted_price": 1190,
+      "image": "/images/banners/health_card-4-712608-nwnz.webp",
+      "description": "5-स्टेप प्रोफेशनल पार्लर व ब्राइडल फेशियल किट (क्लींजर, स्क्रब, मसाज जेल, मसाज क्रीम व फेस पैक)। चेहरे की टैनिंग, झाइयां, काले धब्बे हटाकर शीशे जैसा निखार व नेचुरल ग्लो देता है। 100% पैराबेन, सल्फेट व केमिकल ब्लीच फ्री।",
+      "ingredients": "विटामिन E, विटामिन B3 (नियासिनामाइड), अखरोट स्क्रब कण, बादाम तेल, एलोवेरा, पपीता एक्सट्रैक्ट व मुल्तानी मिट्टी।",
+      "dose": "1. क्लींजिंग लोशन से चेहरा साफ करें, 2. स्क्रब से 2-3 मिनट मसाज कर धोएं, 3. मसाज जेल व 4. मसाज क्रीम से 10-15 मिनट अपवर्ड मसाज करें, 5. फेस पैक लगाकर 15 मिनट बाद धो लें।",
+      "precautions": "आंखों के सीधे संपर्क से बचाएं। ठंडी व सूखी जगह पर रखें। केवल बाहरी उपयोग के लिए।",
+      "pack_size": "5 In 1 Salon Kit",
+      "problem_tags": [
+        "skin_glow",
+        "pigmentation",
+        "tanning",
+        "bridal_facial",
+        "parlour_kit"
+      ]
+    },
+    {
+      "id": "ns_naturamore_pain_gel",
+      "name": "Naturamore Muscular Pain Relief & Instant Injury Care Gel",
+      "category": "health",
+      "category_label": "स्वास्थ्य व वेलनेस (Naturamore)",
+      "subcategory": "pain_relief",
+      "subcategory_label": "🩹 चोट, मोच, खिंचाव व दर्द निवारक",
+      "badge": "⚡ Instant Relief",
+      "mrp": 250,
+      "discount_pct": 10,
+      "discounted_price": 225,
+      "image": "/images/products/product-7-436589-2buf.webp",
+      "description": "अचानक लगी चोट, मोच (Sprain), खिंचाव, नस चढ़ना, सूजन, कमर-गर्दन का झटका या जानवर (गाय/बैल/बकरी) की लात लगने से हुए अंदरूनी दर्द में तुरंत राहत देने वाला हर्बल जेल।",
+      "ingredients": "गंधपुरा तेल (Wintergreen), नीलगिरी (Eucalyptus), पुदीना सत्व (Menthol), कपूर व लौंग का तेल।",
+      "dose": "प्रभावित जगह पर हल्के हाथ से 2-3 मिनट लगाएं। ज्यादा रगड़ें नहीं। दिन में 2 से 3 बार लगाएं।",
+      "precautions": "कटे या खुले घाव पर न लगाएं। आंखों से दूर रखें। केवल बाहरी उपयोग के लिए।",
+      "pack_size": "50 gm Tube",
+      "problem_tags": [
+        "injury",
+        "sprain",
+        "pain_relief",
+        "swelling",
+        "animal_kick"
+      ]
     }
   ]
 }
