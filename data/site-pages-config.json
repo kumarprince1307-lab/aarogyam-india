@@ -6322,6 +6322,26 @@
           "cta_secondary_text": "📦 हर्बल पेस्ट देखें",
           "cta_secondary_link": "#sec-products",
           "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
+        },
+        {
+          "image": "/images/banners/kharif-master-guide-2026-hero-banner.webp",
+          "tag": "🌾 नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "📚 अभी देखें",
+          "cta_link": "/ebooks/ebook.html",
+          "cta_secondary_text": "🛒 लाइव कार्ट",
+          "cta_secondary_link": "/ebooks/cart.html"
         }
       ],
       "sections_order": [
@@ -6361,6 +6381,17 @@
           "youtube_id": "X5TqPsn7GG0",
           "thumbnail": "https://img.youtube.com/vi/X5TqPsn7GG0/hqdefault.jpg",
           "duration": "45:00",
+          "target_page": "all",
+          "ratio": "16:9"
+        },
+        {
+          "video_id": "VID_937650",
+          "title": "Herbal Dental Paste Live Demo | पायरिया, सेंसिटिविटी व मसूड़ों की समस्याओं का लाइव रिजल्ट",
+          "desc": "नेट्सर्फ हर्बल डेंटल पेस्ट का लाइव डेमो और शानदार रिजल्ट! \n\n100% फ्लोराइड-मुक्त, एसएलएस-फ्री आयुर्वे",
+          "url": "/tube.html?vid=VID_937650",
+          "youtube_id": "GfSZCRTTBwM",
+          "thumbnail": "https://img.youtube.com/vi/GfSZCRTTBwM/hqdefault.jpg",
+          "duration": "3:17",
           "target_page": "all",
           "ratio": "16:9"
         }
@@ -6562,7 +6593,7 @@
           }
         ]
       },
-      "admin_edited": 1794047129607,
+      "admin_edited": 1794047997070,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
