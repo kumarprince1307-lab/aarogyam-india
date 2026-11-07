@@ -396,6 +396,7 @@ export async function initPromotionsPage() {
   let liveBundles = [];
   let liveTubeVideos = [];
   let currentEditingIndex = 0;
+  let currentUploadedPreviewUrl = null;
 
   // --- LOAD DATA ---
   async function loadInitialData() {
@@ -533,6 +534,7 @@ export async function initPromotionsPage() {
   // --- POPULATE EDITOR ---
   function populateEditor(index) {
     currentEditingIndex = index;
+    currentUploadedPreviewUrl = null;
     const item = promotionsData.promotions[index];
     if (!item) return;
 
@@ -702,7 +704,7 @@ export async function initPromotionsPage() {
     const title = document.getElementById('edit-promo-title').value || 'अभियान शीर्षक';
     const sub = document.getElementById('edit-promo-subtitle').value || 'अभियान संदेश विवरण';
     const badge = document.getElementById('edit-promo-badge').value || '✨ विशेष उत्सव';
-    const img = customImgSrc || document.getElementById('edit-promo-image-url').value || '/images/logo/logo.png';
+    const img = customImgSrc || currentUploadedPreviewUrl || document.getElementById('edit-promo-image-url').value || '/images/logo/logo.png';
     const cta = document.getElementById('edit-promo-cta-text').value || 'आगे बढ़ें →';
     const preset = document.getElementById('edit-promo-preset').value;
 
@@ -714,6 +716,13 @@ export async function initPromotionsPage() {
     const prevImgEl = document.getElementById('prev-img');
     if (prevImgEl) {
       prevImgEl.src = img;
+      prevImgEl.onerror = () => {
+        if (currentUploadedPreviewUrl) {
+          prevImgEl.src = currentUploadedPreviewUrl;
+        } else {
+          prevImgEl.src = '/images/logo/logo.png';
+        }
+      };
     }
 
     const auraEl = document.getElementById('prev-aura');
@@ -743,8 +752,16 @@ export async function initPromotionsPage() {
     const waImg = document.getElementById('wa-preview-img');
     const waImgWrap = document.getElementById('wa-preview-img-wrap');
     if (waImg && waImgWrap) {
-      if (imgUrlVal) {
-        waImg.src = imgUrlVal;
+      const waSrc = customImgSrc || currentUploadedPreviewUrl || imgUrlVal;
+      if (waSrc) {
+        waImg.src = waSrc;
+        waImg.onerror = () => {
+          if (currentUploadedPreviewUrl) {
+            waImg.src = currentUploadedPreviewUrl;
+          } else {
+            waImgWrap.style.display = 'none';
+          }
+        };
         waImgWrap.style.display = 'block';
       } else {
         waImgWrap.style.display = 'none';
@@ -957,6 +974,7 @@ export async function initPromotionsPage() {
       const compressedWebP = await compressToWebp(file, 800, 800, 0.90);
       
       // 1. INSTANT LOCAL 0MS VISUAL PREVIEW (No network delay, no 404!)
+      currentUploadedPreviewUrl = compressedWebP;
       updatePreview(compressedWebP);
 
       // Save locally or upload asset

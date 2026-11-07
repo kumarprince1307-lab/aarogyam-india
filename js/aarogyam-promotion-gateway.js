@@ -90,9 +90,10 @@
             }
         },
 
-        // 24-Hour Sweet Spot Frequency (Full 3D popup only once per 24 hours)
-        shouldShowFullPopupToday: function (promoId) {
+        // 24-Hour Sweet Spot Frequency (Full 3D popup only once per 24 hours unless updated)
+        shouldShowFullPopupToday: function (promo) {
             try {
+                const promoId = typeof promo === 'object' ? promo.id : promo;
                 const search = (window.location.search || '').toLowerCase();
                 if (search.includes('promo=') || search.includes('test_promo') || search.includes('preview')) {
                     return true;
@@ -100,6 +101,12 @@
                 const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
                 const lastShownAt = parseInt(localStorage.getItem(key) || '0', 10);
                 if (!lastShownAt) return true;
+
+                // If admin freshly updated the campaign or changed the banner, always show live!
+                if (promo && typeof promo === 'object' && promo.updated_at) {
+                    const promoUpdated = new Date(promo.updated_at).getTime();
+                    if (promoUpdated > lastShownAt) return true;
+                }
 
                 const elapsedMs = Date.now() - lastShownAt;
                 return elapsedMs >= (24 * 60 * 60 * 1000);
@@ -705,6 +712,8 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        overflow-y: auto;
+                        -webkit-overflow-scrolling: touch;
                         background: rgba(6, 10, 20, 0.82);
                         backdrop-filter: blur(10px);
                         -webkit-backdrop-filter: blur(10px);
@@ -716,6 +725,15 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     }
                     #agy-promo-root.active {
                         opacity: 1;
+                    }
+                    @media (max-width: 600px) {
+                        #agy-promo-root {
+                            align-items: flex-start;
+                            padding: 12px 10px 28px 10px;
+                        }
+                        .agy-promo-card-wrapper {
+                            margin: auto 0;
+                        }
                     }
                     #agy-promo-canvas {
                         position: absolute;
@@ -1353,7 +1371,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                 });
 
                 if (eligible) {
-                    const canShowToday = this.shouldShowFullPopupToday(eligible.id);
+                    const canShowToday = this.shouldShowFullPopupToday(eligible);
                     const isMinimized = this.isMinimizedOnPage(eligible.id);
 
                     if (canShowToday && !isMinimized) {

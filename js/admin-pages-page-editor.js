@@ -7844,7 +7844,7 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-bottom:8px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">कार्ड इमेज (WebP 10-15 KB)</label>
-              <input type="text" value="${safeImg}" onchange="window.updateHealthCardField(${idx}, 'image', this.value); if (currentHealthDiseases[${idx}]) delete currentHealthDiseases[${idx}].image_preview; window.renderHealthCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
+              <input type="text" value="${escapeHtml(item.image || '')}" onchange="window.updateHealthCardField(${idx}, 'image', this.value); window.renderHealthCardsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;" />
               <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
                 <input type="file" id="health_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'health_card', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('health_file_${idx}').click()" class="admin-button small-button" style="background:#dc2626; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">
@@ -7853,7 +7853,7 @@ export async function initPageEditor() {
               </div>
               ${(item.image_preview || item.image) ? `
                 <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-                  <img src="${safeImg}" alt="Preview" style="height:44px; width:65px; border-radius:6px; object-fit:cover; border:1.5px solid ${safeColor}; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+                  <img src="${escapeHtml(item.image_preview || item.image || '')}" alt="Preview" style="height:44px; width:65px; border-radius:6px; object-fit:cover; border:1.5px solid ${safeColor}; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
                   <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${item.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव कार्ड'}</span>
                 </div>
               ` : ''}
@@ -8168,11 +8168,11 @@ export async function initPageEditor() {
         <div style="display:flex; gap:6px; margin-top:4px; align-items:center;">
           <input type="file" id="kpi_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_card', ${idx}, 'image')">
           <button type="button" onclick="document.getElementById('kpi_file_${idx}').click()" class="admin-button small-button" style="background:#16a34a; color:#fff; padding:3px 8px; font-size:0.7rem; font-weight:800;">📁 KPI बैनर इमेज (WebP)</button>
-          <input type="text" value="${safeImg}" onchange="window.updateKpiCard(${idx}, 'image', this.value); if (currentKpiCards[${idx}]) delete currentKpiCards[${idx}].image_preview; window.renderKpiCardsInBuilder();" class="admin-input" placeholder="/images/kpi/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
+          <input type="text" value="${escapeHtml(card.image || '')}" onchange="window.updateKpiCard(${idx}, 'image', this.value); window.renderKpiCardsInBuilder();" class="admin-input" placeholder="/images/kpi/..." style="flex:1; padding:3px 6px; font-size:0.7rem;" />
         </div>
         ${(card.image_preview || card.image) ? `
           <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <img src="${safeImg}" alt="KPI Preview" style="height:38px; width:60px; border-radius:4px; object-fit:cover; border:1px solid #16a34a; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+            <img src="${escapeHtml(card.image_preview || card.image || '')}" alt="KPI Preview" style="height:38px; width:60px; border-radius:4px; object-fit:cover; border:1px solid #16a34a; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
             <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${card.image_preview ? '✓ नया अपलोड (WebP)' : '✓ KPI बैनर'}</span>
           </div>
         ` : ''}
@@ -8833,14 +8833,14 @@ export async function initPageEditor() {
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
             <div>
               <label style="font-size:0.72rem; color:var(--admin-muted); display:block;">बैनर इमेज (WebP — auto: images/kpi/)</label>
-              <input type="text" value="${safeImg}" onchange="window.updatePageKpiSection(${idx}, 'image', this.value); if (currentPageKpiSections[${idx}]) delete currentPageKpiSections[${idx}].image_preview; window.renderPageKpiSectionsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;"/>
+              <input type="text" value="${escapeHtml(sec.image || '')}" onchange="window.updatePageKpiSection(${idx}, 'image', this.value); window.renderPageKpiSectionsInBuilder();" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.8rem;"/>
               <div style="display:flex; gap:6px; margin-top:4px;">
                 <input type="file" id="kpi_sec_file_${idx}" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(event, 'kpi_section', ${idx}, 'image')">
                 <button type="button" onclick="document.getElementById('kpi_sec_file_${idx}').click()" class="admin-button small-button" style="background:#0284c7; color:#fff; padding:3px 8px; font-size:0.72rem; font-weight:800;">📁 बैनर अपलोड (WebP)</button>
               </div>
               ${(sec.image_preview || sec.image) ? `
                 <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-                  <img src="${safeImg}" alt="Preview" style="height:40px; width:65px; border-radius:4px; object-fit:cover; border:1px solid #0284c7; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
+                  <img src="${escapeHtml(sec.image_preview || sec.image || '')}" alt="Preview" style="height:40px; width:65px; border-radius:4px; object-fit:cover; border:1px solid #0284c7; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
                   <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${sec.image_preview ? '✓ नया अपलोड' : '✓ सेक्शन'}</span>
                 </div>
               ` : ''}
