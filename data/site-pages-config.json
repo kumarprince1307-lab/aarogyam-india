@@ -6310,7 +6310,7 @@
           "cta_link": "https://wa.me/917974422572?text=नमस्ते, मुझे दंत व मसूड़े समस्या परामर्श चाहिए",
           "cta_secondary_text": "🔬 फ्लोराइड का सच पढ़ें ↓",
           "cta_secondary_link": "#sec-scientific-breakdown",
-          "banner_mode": "card"
+          "banner_mode": "full"
         },
         {
           "image": "/images/banners/hero_slide-watermarked_img_3184-746483-9ld7.webp",
@@ -6562,7 +6562,7 @@
           }
         ]
       },
-      "admin_edited": 1794047087800,
+      "admin_edited": 1794047129607,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
