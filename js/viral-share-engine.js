@@ -163,12 +163,21 @@
     }
 
     const cmsDescription = activeCms?.og_description || ogDesc || '';
-    const expandedText = (text || '')
+    let processedText = (text || '')
       .replace(/\{title\}/g, title || '')
       .replace(/\{description\}|\{desc\}/g, cmsDescription)
-      .replace(/\{url\}/g, shareUrl);
+      .replace(/\{url\}|\{link\}/gi, shareUrl);
+
+    // 🔒 SMART ATTRIBUTION INJECTION: If any bare internal domain URLs exist without ref/share_id, auto-inject
+    const domainRegex = /(https?:\/\/(?:www\.)?aarogyamindia\.(?:online|org)[^\s"'>]*)/gi;
+    if (domainRegex.test(processedText)) {
+      processedText = processedText.replace(domainRegex, (matchedUrl) => {
+        return buildShareableUrl(matchedUrl);
+      });
+    }
+
     const cleanTitle = (title || 'Aarogyam India').replace(/<[^>]+>/g, '').trim();
-    const cleanText = expandedText.replace(/<[^>]+>/g, '').trim();
+    let cleanText = processedText.replace(/<[^>]+>/g, '').trim();
     const isAgri = window.location.pathname.includes('agriculture') || window.location.pathname.includes('crop');
     const headerPrefix = isAgri ? '🌾' : '✨';
     const fullShareMessage = (cleanText && cleanText.includes('http'))
@@ -179,7 +188,7 @@
     if (typeof window.openUniversalShareModal === 'function') {
       window.openUniversalShareModal({
         title: cleanTitle,
-        text: cleanText,
+        text: fullShareMessage,
         url: shareUrl
       });
       return;

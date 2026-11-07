@@ -348,10 +348,18 @@
     // 2. If card-specific, video-specific or disease-specific text was passed, use it directly!
     if (!fullShareText) {
       if (customText && customText.length > 5) {
-        if (customText.includes('http')) {
-          fullShareText = customText;
+        // 🔒 AUTO-INJECT ATTRIBUTION: Replace {url} or bare internal domain links with referralUrl
+        let processed = customText.replace(/\{url\}|\{link\}/gi, referralUrl);
+        const domainRegex = /(https?:\/\/(?:www\.)?aarogyamindia\.(?:online|org)[^\s"'>]*)/gi;
+        if (domainRegex.test(processed)) {
+          processed = processed.replace(domainRegex, (matchedUrl) => {
+            return window.generateReferralShareUrl ? window.generateReferralShareUrl(matchedUrl) : matchedUrl;
+          });
+        }
+        if (processed.includes('http')) {
+          fullShareText = processed;
         } else {
-          fullShareText = `${customText}\n\n👉 यहाँ से पूरा विवरण देखें:\n${referralUrl}`;
+          fullShareText = `${processed}\n\n👉 यहाँ से पूरा विवरण देखें:\n${referralUrl}`;
         }
       } else if (curPath.includes('weather')) {
         fullShareText = `⛅ *आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी*\n\n👉 अपने क्षेत्र का 7-दिवसीय मौसम, सटीक वर्षा रडार व स्प्रे निर्णय मीटर अभी देखें:\n${referralUrl}\n\n_Aarogyam India — किसानों की सुरक्षा व आत्मनिर्भरता का डिजिटल मंच_`;
