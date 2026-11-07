@@ -33,6 +33,45 @@
     return match ? match[1] : '';
   }
 
+  // Google Video SEO: Automatic Schema.org VideoObject Structured Data Injector
+  function injectVideoSchema(videos) {
+    if (!Array.isArray(videos) || videos.length === 0) return;
+    try {
+      const existing = document.getElementById('aarogyam-video-ld-json');
+      if (existing) existing.remove();
+
+      const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+      const schemaList = videos.map(item => {
+        const ytId = extractYouTubeId(item.youtube_url || item.video_url || '', item.youtube_id || '');
+        const thumb = item.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : `${origin}/images/banners/agriculture-hero-banner-1.webp`);
+        const title = item.title || 'आरोग्यम विशेष वीडियो';
+        const desc = item.description || `${title} - Aarogyam India एवं AarogyamTube पर विशेष वीडियो डेमो व समाधान`;
+        const uploadDate = item.created_at || item.upload_date || '2026-01-15T09:00:00+05:30';
+        const embedUrl = ytId ? `https://www.youtube.com/embed/${ytId}` : `${origin}/tube.html`;
+        const contentUrl = ytId ? `https://www.youtube.com/watch?v=${ytId}` : `${origin}/tube.html`;
+
+        return {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": title,
+          "description": desc,
+          "thumbnailUrl": [thumb],
+          "uploadDate": uploadDate,
+          "embedUrl": embedUrl,
+          "contentUrl": contentUrl
+        };
+      });
+
+      const script = document.createElement('script');
+      script.id = 'aarogyam-video-ld-json';
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(schemaList.length === 1 ? schemaList[0] : schemaList);
+      document.head.appendChild(script);
+    } catch (e) {
+      console.warn("Video Schema injection notice:", e);
+    }
+  }
+
   function renderVideoModal(videoTitle, youtubeId, vidId) {
     let modal = document.getElementById('universal-video-modal-overlay');
     if (!modal) {
@@ -156,6 +195,9 @@
         container.style.display = 'none';
         return;
       }
+
+      // Inject Schema.org VideoObject for Googlebot Rich Video Snippets SEO
+      injectVideoSchema(matching);
 
       container.innerHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%;">

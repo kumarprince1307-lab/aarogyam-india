@@ -17,15 +17,9 @@
 
   const SakhiVision = {};
 
-  // Gemini API Configuration (Base64 safe payload for secret scanning compliance)
-  const DEFAULT_GEMINI_KEY = atob('QVEuQWI4Uk42SWVCNkN0N3V0MERrUzJHRkVHOEMxR3p1YUJPdFdMZEEwekZnaUt1LWJORVE=');
-
+  // Gemini API Configuration (Zero Client-Side Key Exposure via /api/sakhi-chat)
   SakhiVision.getGeminiApiKey = function() {
-    try {
-      return localStorage.getItem('SAKHI_GEMINI_API_KEY') || DEFAULT_GEMINI_KEY;
-    } catch(e) {
-      return DEFAULT_GEMINI_KEY;
-    }
+    return 'cloaked_server_side';
   };
 
   SakhiVision.isGeminiActive = function() {
@@ -174,38 +168,30 @@
 
     const modelsToAttempt = [primaryModel, fallbackModel];
 
-    for (const model of modelsToAttempt) {
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+    try {
+      const response = await fetch('/api/sakhi-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload, models: modelsToAttempt })
+      });
 
-        if (!response.ok) {
-          const errStatus = response.status;
-          console.warn(`Gemini Vision [${model}] status:`, errStatus);
-          
-          // 429 Quota Exhausted or Rate Limit -> Do NOT loop, drop to resilient local analysis
-          if (errStatus === 429) {
-            console.warn('Gemini 429 Rate/Daily quota reached. Falling back gracefully to offline local engine.');
-            return false;
-          }
-          // Only attempt fallback model on 503 (server unavailable) or 404 (endpoint change)
-          if (errStatus === 503 || errStatus === 404) {
-            continue;
-          }
+      if (!response.ok) {
+        const errStatus = response.status;
+        console.warn(`Gemini Vision proxy status:`, errStatus);
+        if (errStatus === 429) {
+          console.warn('Gemini 429 Rate/Daily quota reached. Falling back gracefully to offline local engine.');
           return false;
         }
+        return false;
+      }
 
-        const data = await response.json();
-        const candidate = data.candidates?.[0];
-        const botText = candidate?.content?.parts?.[0]?.text;
+      const data = await response.json();
+      const candidate = data.candidates?.[0];
+      const botText = candidate?.content?.parts?.[0]?.text;
 
-        if (!botText || !botText.trim()) {
-          continue;
-        }
+      if (!botText || !botText.trim()) {
+        return false;
+      }
 
         // Record tokens consumed
         const totalTokens = data.usageMetadata?.totalTokenCount || 450;
@@ -235,11 +221,10 @@
         });
         return true;
       } catch(err) {
-        console.warn(`Gemini Vision [${model}] fetch error:`, err);
+        console.warn('Gemini Vision proxy error:', err);
       }
-    }
-    return false;
-  };
+      return false;
+    };
 
   /**
    * Main Entrypoint for Image Analysis:

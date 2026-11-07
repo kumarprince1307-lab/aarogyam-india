@@ -439,9 +439,7 @@
   }
 
   // 9. GEMINI 3-TIER TEXT QUERY FALLBACK ENGINE (Constitutional Architecture)
-  // Respects SAKHI_GEMINI_MASTER_SWITCH (Admin Switch) & Zero-Egress Rules
-  const DEFAULT_GEMINI_KEY = atob('QVEuQWI4Uk42SWVCNkN0N3V0MERrUzJHRkVHOEMxR3p1YUJPdFdMZEEwekZnaUt1LWJORVE=');
-
+  // Calls Secure Serverless Endpoint /api/sakhi-chat (Zero-Egress & Zero API Key Exposure)
   function isGeminiMasterActive() {
     try {
       if (typeof localStorage !== 'undefined') {
@@ -449,15 +447,6 @@
       }
     } catch (_) { }
     return true;
-  }
-
-  function getGeminiApiKey() {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        return localStorage.getItem('SAKHI_GEMINI_API_KEY') || DEFAULT_GEMINI_KEY;
-      }
-    } catch (_) { }
-    return DEFAULT_GEMINI_KEY;
   }
 
   function recordGeminiTokens(count) {
@@ -478,11 +467,8 @@
     const q = (rawQ || cleanQ || '').trim();
     if (!q || q.length < 3) return null;
 
-    const apiKey = getGeminiApiKey();
-    if (!apiKey) return null;
-
     // Fast, lightweight and responsive Google Gemini model cascade
-    const models = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
 
     // Dynamic Persona & Salutation Guide based on actual user profile (SAKHI_MANAS.md Protocol)
     let userSalutationRule = 'शुरुआत आत्मीय व सम्मानजनक अभिवादन से करें (जैसे "राम-राम जी!", "नमस्ते जी!")। कभी भी "भाई/बहन" स्लैश न लगाएं।';
@@ -526,51 +512,46 @@
       }
     };
 
-    for (const model of models) {
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-        
-        let controller = null;
-        let timeoutId = null;
-        if (typeof AbortController !== 'undefined') {
-          controller = new AbortController();
-          timeoutId = setTimeout(() => controller.abort(), 14000);
-        }
-
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          signal: controller ? controller.signal : undefined
-        });
-
-        if (timeoutId) clearTimeout(timeoutId);
-
-        if (!res.ok) {
-          console.warn(`[Gemini Text Fallback] Model ${model} HTTP status ${res.status}`);
-          if (res.status === 429) {
-            // Rate limit or quota exhausted: exit gracefully
-            return null;
-          }
-          continue; // Try next fallback model
-        }
-
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text && text.trim()) {
-          const tokens = data.usageMetadata?.totalTokenCount || 350;
-          recordGeminiTokens(tokens);
-          return {
-            source: '🧠 सखी AI (Google Gemini Live)',
-            summary: text.trim()
-          };
-        }
-      } catch (err) {
-        console.warn(`[Gemini Text Fallback] Error with model ${model}:`, err.message || err);
+    try {
+      let controller = null;
+      let timeoutId = null;
+      if (typeof AbortController !== 'undefined') {
+        controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 16000);
       }
-    }
 
+      const res = await fetch('/api/sakhi-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload, models }),
+        signal: controller ? controller.signal : undefined
+      });
+
+      if (timeoutId) clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        console.warn(`[Gemini Text Proxy] HTTP status ${res.status}`);
+        return null;
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text && text.trim()) {
+        const tokens = data.usageMetadata?.totalTokenCount || 350;
+        recordGeminiTokens(tokens);
+        return {
+          source: '🧠 सखी AI (Google Gemini Live)',
+          summary: text.trim()
+        };
+      }
+    } catch (e) {
+      console.warn('Gemini proxy error:', e);
+    }
     return null;
+  }
+
+  function getGeminiApiKey() {
+    return 'cloaked_server_side';
   }
 
   // Export to Global Window under SAKHI_MANAS.md Protocol

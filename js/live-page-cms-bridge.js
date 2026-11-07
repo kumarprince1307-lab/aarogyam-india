@@ -1514,6 +1514,89 @@
     `).join('');
   }
 
+  // Universal Upline & Product Consultant WhatsApp Routing Engine for Problem Cards
+  window.consultProblemCardExpert = function (cardTitle, cardSummary) {
+    // 1. Guest Registration Gate: Must have registered profile
+    const isLogged = (window.isUserLoggedIn && typeof window.isUserLoggedIn === 'function')
+      ? window.isUserLoggedIn()
+      : ((window.V1_SESSION && typeof window.V1_SESSION.isLoggedIn === 'function') ? window.V1_SESSION.isLoggedIn() : false);
+
+    let savedUser = {};
+    try {
+      savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+    } catch (e) {}
+
+    const userMobile = (savedUser.mobile || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || '').replace(/\D/g, '').slice(-10);
+    const userName = savedUser.full_name || savedUser.name || localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
+
+    const needsAuth = !isLogged && (!userMobile || !userName || userName === 'प्रिय पाठक' || userName === 'स्वास्थ्य साधक');
+
+    if (needsAuth) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => {
+          window.consultProblemCardExpert(cardTitle, cardSummary);
+        }, {
+          force: true,
+          title: '🩺 प्रोडक्ट कंसलटेंट व AI परामर्श',
+          subtitle: 'उचित सलाह व समाधान हेतु अपना नाम व WhatsApp नंबर दर्ज करें'
+        });
+        return;
+      }
+    }
+
+    // 2. Identify Upline / Sponsor Consultant Phone & Name
+    let consultantPhone = '7974422572';
+    let consultantName = 'आरोग्यम प्रोडक्ट कंसलटेंट जी';
+
+    try {
+      const sponsorMob = localStorage.getItem('AOI_SPONSOR_MOBILE') || 
+                         localStorage.getItem('aim_sponsor_mobile') || 
+                         localStorage.getItem('AOI_REFERRER_MOBILE') ||
+                         savedUser.referred_by_mobile ||
+                         savedUser.sponsor_mobile;
+      if (sponsorMob && /^\d{10}$/.test(String(sponsorMob).replace(/\D/g, '').slice(-10))) {
+        consultantPhone = String(sponsorMob).replace(/\D/g, '').slice(-10);
+      }
+      const sponsorName = localStorage.getItem('AOI_SPONSOR_NAME') || localStorage.getItem('aim_sponsor_name') || savedUser.referred_by_name;
+      if (sponsorName && sponsorName.trim()) {
+        consultantName = sponsorName.trim() + ' जी';
+      }
+    } catch (e) {}
+
+    // 3. User Details & Pure Share ID
+    const displayName = userName || 'स्वास्थ्य साधक';
+    const displayMobile = userMobile ? ` (मोबाइल: ${userMobile})` : '';
+    let shareId = '';
+    if (typeof window.getUserShareId === 'function') {
+      try { shareId = window.getUserShareId(); } catch (e) {}
+    }
+    if (!shareId && window.V1_SESSION && typeof window.V1_SESSION.getUserShareId === 'function') {
+      try { shareId = window.V1_SESSION.getUserShareId(); } catch (e) {}
+    }
+    if (!shareId) shareId = localStorage.getItem('user_share_id') || 'AI000072';
+
+    const pageTitle = (document.title || 'आरोग्यम स्वास्थ्य हब').split('|')[0].trim();
+    const cleanCardTitle = (cardTitle || pageTitle).trim();
+    const cleanSummary = cardSummary ? `\n• मुख्य लक्षण / विवरण: ${cardSummary.replace(/<[^>]+>/g, '').trim()}` : '';
+    const currentUrl = window.location.href.split('?')[0];
+    const shareLink = `${currentUrl}?ref=${encodeURIComponent(shareId)}`;
+
+    // 4. Construct Complete Structured WhatsApp Message
+    const waMessage = 
+`नमस्ते ${consultantName},
+
+👤 मेरा नाम: ${displayName}${displayMobile}
+📑 विषय: ${pageTitle}
+❓ परामर्श अनुरोध: ${cleanCardTitle}${cleanSummary}
+
+मुझे इस समस्या के आयुर्वेदिक समाधान, परहेज, डाइट व प्रमाणित उत्पादों के बारे में आपसे परामर्श चाहिए। कृपया मेरा मार्गदर्शन करें।
+
+🔗 पेज लिंक: ${shareLink}`;
+
+    const waUrl = `https://api.whatsapp.com/send?phone=91${consultantPhone}&text=${encodeURIComponent(waMessage)}`;
+    window.open(waUrl, '_blank');
+  };
+
   function renderDynamicClinicalBreakdown(pageConfig) {
     if (!pageConfig || !pageConfig.clinical_breakdown) return;
     const cb = pageConfig.clinical_breakdown;
@@ -1576,7 +1659,7 @@
         }
       }
 
-      const waBtnText = c.whatsapp_btn?.text || 'सलाह लें';
+      const waBtnText = c.whatsapp_btn?.text || '💬 प्रोडक्ट कंसलटेंट से सलाह लें';
 
       return `
         <div class="problem-box" style="padding:0; overflow:hidden; border-top:4px solid ${color}; border-radius:18px; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.06); border:1px solid #e2e8f0; display:flex; flex-direction:column; justify-content:space-between;">
@@ -1599,7 +1682,7 @@
             <a href="${catalogTarget}" style="background:#f1f5f9; color:#0f172a; font-size:0.8rem; font-weight:800; padding:8px 12px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
               ${catalogBtnText}
             </a>
-            <button type="button" onclick="window.consultAiExpert ? window.consultAiExpert('${escapeHtml(title)}', '${escapeHtml(points[0] || title)}') : (window.open('https://wa.me/917974422572?text=' + encodeURIComponent('नमस्ते! मुझे ' + '${escapeHtml(title)}' + ' के बारे में सलाह चाहिए।'), '_blank'))" style="flex:1; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+            <button type="button" onclick="if(window.consultProblemCardExpert){window.consultProblemCardExpert('${escapeHtml(title).replace(/'/g, "\\'")}', '${escapeHtml(points[0] || '').replace(/'/g, "\\'")}');}else if(window.consultAiExpert){window.consultAiExpert('${escapeHtml(title).replace(/'/g, "\\'")}', '${escapeHtml(points[0] || '').replace(/'/g, "\\'")}');}" style="flex:1; padding:8px 12px; font-size:0.82rem; border-radius:10px; background:#dc2626; color:#fff; border:none; cursor:pointer; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
               <i class="fa-brands fa-whatsapp"></i> <span>${escapeHtml(waBtnText)}</span>
             </button>
           </div>
@@ -1755,6 +1838,37 @@
                            document.querySelector('#sec-videos div[style*="grid"]');
     if (!videoContainer) return;
     videoContainer.dataset.cmsLoaded = '1';
+
+    // Inject Schema.org VideoObject for Googlebot Rich Video Snippets SEO
+    try {
+      const existing = document.getElementById('aarogyam-video-ld-json');
+      if (existing) existing.remove();
+      const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+      const schemaList = pageConfig.videos.map(v => {
+        const ytUrl = v.youtube_url || v.url || '';
+        const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([\w-]{10,12})/);
+        const ytId = ytMatch ? ytMatch[1] : (v.youtube_id || '');
+        const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : `${origin}/images/banners/health-banner.jpeg`);
+        const title = v.title || 'आरोग्यम विशेष वीडियो';
+        const desc = v.description || `${title} - Aarogyam India एवं AarogyamTube पर विशेष वीडियो गाइड व समाधान`;
+        const uploadDate = v.created_at || '2026-01-15T09:00:00+05:30';
+        return {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "name": title,
+          "description": desc,
+          "thumbnailUrl": [thumb],
+          "uploadDate": uploadDate,
+          "embedUrl": ytId ? `https://www.youtube.com/embed/${ytId}` : `${origin}/tube.html`,
+          "contentUrl": ytId ? `https://www.youtube.com/watch?v=${ytId}` : `${origin}/tube.html`
+        };
+      });
+      const script = document.createElement('script');
+      script.id = 'aarogyam-video-ld-json';
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(schemaList.length === 1 ? schemaList[0] : schemaList);
+      document.head.appendChild(script);
+    } catch (_) {}
 
     videoContainer.innerHTML = `
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%;">

@@ -3155,8 +3155,8 @@ async function initGeminiControlCenter() {
     };
   }
 
-  // Load Saved API Key
-  const currentKey = localStorage.getItem('SAKHI_GEMINI_API_KEY') || atob('QVEuQWI4Uk42SWVCNkN0N3V0MERrUzJHRkVHOEMxR3p1YUJPdFdMZEEwekZnaUt1LWJORVE=');
+  // Load Saved API Key / Vercel Serverless Shield Indicator
+  const currentKey = localStorage.getItem('SAKHI_GEMINI_API_KEY') || 'VERCEL_SHIELD_ACTIVE';
   if (keyInput) keyInput.value = currentKey;
 
   // Toggle key visibility
@@ -3185,59 +3185,53 @@ async function initGeminiControlCenter() {
     };
   }
 
-  // Test API Key Live Ping
+  // Test API Key Live Ping (Tests Vercel Serverless /api/sakhi-chat Shield)
   if (testKeyBtn && keyInput) {
     testKeyBtn.onclick = async () => {
-      const key = keyInput.value.trim() || currentKey;
-      if (!key) {
-        if (testMsg) {
-          testMsg.style.display = 'block';
-          testMsg.style.color = '#f87171';
-          testMsg.textContent = '❌ कृपया पहले जेमिनी API टोकन दर्ज करें।';
-        }
-        return;
-      }
       if (testMsg) {
         testMsg.style.display = 'block';
         testMsg.style.color = '#38bdf8';
-        testMsg.textContent = '⏳ गूगल जेमिनी सर्वर से संपर्क किया जा रहा है...';
+        testMsg.textContent = '⏳ Vercel शील्ड के ज़रिए गूगल जेमिनी से संपर्क किया जा रहा है...';
       }
       const t0 = performance.now();
-      const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest'];
       let lastErr = null;
       let matchedModel = null;
       let latency = 0;
 
-      for (const m of modelsToTry) {
-        try {
-          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(key)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: 'नमस्ते सखी' }] }],
-              generationConfig: { maxOutputTokens: 10 }
-            })
-          });
-          latency = Math.round(performance.now() - t0);
-          if (resp.ok) {
-            matchedModel = m;
-            break;
-          } else {
-            const errData = await resp.json().catch(() => ({}));
-            lastErr = `${resp.status}: ${errData.error?.message || 'मॉडल अनुपलब्ध'}`;
-            if (resp.status !== 404) {
-              break; // Not a 404, stop trying fallbacks (e.g. invalid key or quota)
-            }
-          }
-        } catch (e) {
-          lastErr = e.message;
+      try {
+        const resp = await fetch('/api/sakhi-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: 'नमस्ते सखी' }] }],
+            generationConfig: { maxOutputTokens: 10 }
+          })
+        });
+        latency = Math.round(performance.now() - t0);
+        if (resp.ok) {
+          const resData = await resp.json().catch(() => ({}));
+          matchedModel = resData._meta?.modelUsed || 'gemini-flash';
+        } else {
+          const errData = await resp.json().catch(() => ({}));
+          lastErr = `${resp.status}: ${errData.error?.message || 'सर्वरलेस प्रॉक्सी त्रुटि'}`;
         }
+      } catch (e) {
+        lastErr = e.message;
       }
 
       if (matchedModel) {
         if (testMsg) {
           testMsg.style.color = '#4ade80';
-          testMsg.textContent = `✅ जेमिनी API टोकन 100% सक्रिय है! (${matchedModel}, लेटेंसी: ${latency}ms)`;
+          testMsg.textContent = `✅ Vercel जेमिनी शील्ड 100% सक्रिय है! (मॉडल: ${matchedModel}, लेटेंसी: ${latency}ms)`;
+        }
+      } else {
+        if (testMsg) {
+          testMsg.style.color = '#f87171';
+          testMsg.textContent = `❌ त्रुटि: ${lastErr || 'कनेक्शन विफल'}`;
+        }
+      }
+    };
+  }
         }
       } else {
         if (testMsg) {
