@@ -305,7 +305,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1794070304289,
+      "admin_edited": 1794083722051,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -6887,7 +6887,7 @@
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
             "badge": "प्रारंभिक लक्षण",
             "color": "#d97706",
-            "image": "/images/banners/og_image-health-og-676433-sb3k.webp",
+            "image": "/images/banners/cb_card-3bb887b0-abe3-43d4-a-577016-l2og.webp",
             "points": [
               "पेट के दाहिने हिस्से में भारीपन: पसलियों के ठीक नीचे लगातार हल्का दर्द या खिंचाव महसूस होना।",
               "लगातार थकान व कमजोरी: पूरी नींद के बाद भी ऊर्जा की कमी और दिनभर सुस्ती छाई रहना।",
@@ -6907,7 +6907,7 @@
             "title": "🚨 भारत में लिवर फेलियर का डेटा व खतरे (Risks)",
             "badge": "गंभीर खतरे",
             "color": "#dc2626",
-            "image": "/images/banners/og_image-health-og-676433-sb3k.webp",
+            "image": "/images/banners/cb_card-5d91e44a-e1d3-479d-9-657410-4uwj.webp",
             "points": [
               "डरावने आंकड़े: AIIMS व ICMR के अनुसार भारत में 38% वयस्क और 25% बच्चे नॉन-अल्कोहलिक फैटी लिवर (NAFLD) से ग्रस्त हैं।",
               "लिवर सिरोसिस (Liver Cirrhosis): समय पर इलाज न होने से लिवर सिकुड़कर पत्थर जैसा सख्त हो जाता है, जिसे रिवर्स करना असंभव हो जाता है।",
@@ -6923,7 +6923,7 @@
           }
         ]
       },
-      "admin_edited": 1794070303808,
+      "admin_edited": 1794083721732,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
