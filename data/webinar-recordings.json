@@ -18,9 +18,9 @@
       "access_tier": "all",
       "pinned": false,
       "priority": 50,
-      "order_type": "normal",
+      "order_type": "pinned",
       "status": "active",
-      "created_at": "2026-11-07T14:28:33.482Z"
+      "created_at": "2026-11-07T14:30:22.418Z"
     },
     {
       "id": "VID_S137292",
