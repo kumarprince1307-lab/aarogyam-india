@@ -97,8 +97,8 @@ export async function initPageEditor() {
 
   function stagePageEditorAsset(path, dataUrl) {
     const cleanPath = String(path || '').replace(/^\/+/, '');
-    if (!cleanPath || !/^data:image\/webp;base64,/i.test(String(dataUrl || ''))) {
-      throw new Error('इमेज WebP में convert नहीं हुई। कृपया दूसरी इमेज या समर्थित ब्राउज़र से कोशिश करें।');
+    if (!cleanPath || !/^data:image\/(webp|png|jpeg|jpg);base64,/i.test(String(dataUrl || ''))) {
+      throw new Error('इमेज डेटा अमान्य है। कृपया दूसरी इमेज या समर्थित ब्राउज़र से कोशिश करें।');
     }
     pendingPageEditorAssets.set(cleanPath, dataUrl);
   }
