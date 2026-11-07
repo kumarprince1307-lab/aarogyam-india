@@ -106,3 +106,29 @@
 
 5. **Decoy Confusion Signatures:**
    - रिवर्स-इंजीनियरिंग रोकने हेतु कोड में भ्रामक सिग्नेचर (`_0x_virtualShardingKernel`) शामिल हैं ताकि हैकर्स सिस्टम की आंतरिक कार्यप्रणाली को न समझ सकें।
+
+## XII. VERCEL SERVERLESS API CLOAKING DOCTRINE (API कीज़ का पूर्ण गुप्तिकरण)
+1. **Zero Client-Side Key Exposure:**
+   - गूगल जेमिनी (Google Gemini API) या किसी भी सशुल्क AI सर्विस की मुख्य API Key को कभी भी फ्रंटएंड जावास्क्रिप्ट या लोकलस्टोरेज में हार्डकोड नहीं किया जाएगा।
+   - सभी AI कॉल्स अनिवार्य रूप से Vercel Serverless Function (`/api/sakhi-chat`) के माध्यम से सर्वर-साइड रूट होंगी।
+2. **Environment Variable Protection:**
+   - मुख्य सीक्रेट्स केवल Vercel के एनवायरनमेंट वेरिएबल्स (`process.env.GEMINI_API_KEY`) में सुरक्षित रहेंगे, जहाँ से कोई भी वेब ब्राउज़र, स्क्रेपर या बॉट इन्हें कभी पढ़ या चुरा नहीं सकता।
+3. **Model Cascade & Rate Limit Shield:**
+   - सर्वरलेस प्रॉक्सी में स्वतः मॉडल कैस्केड (`gemini-2.5-flash` -> `gemini-1.5-flash` -> `gemini-flash-latest`) सक्रिय रहेगा ताकि किसी एक मॉडल पर कोटा समाप्त होने पर सेवा बाधित न हो।
+
+## XIII. SUPABASE RLS MASTER DEFENSE DOCTRINE (डेटाबेस सुरक्षा व RLS नियम)
+1. **Row Level Security (RLS) सक्रियता:**
+   - सुपाबेस की सभी संवेदनशील टेबल्स (`profiles`, `purchases`, `wallets`, `wallet_transactions`, `share_logs`) पर RLS (Row Level Security) 100% अनिवार्य रूप से सक्रिय रहेगी।
+   - कोई भी बाहरी व्यक्ति या हैकर पूरी डेटाबेस टेबल (`SELECT * FROM profiles`) का बल्क डेटा एक साथ कभी डाउनलोड या स्क्रैप नहीं कर सकेगा।
+2. **एडमिन व यूजर अनइंटरप्टेड एक्सेस (Admin Safe Access):**
+   - आरएलएस पॉलिसी इस प्रकार निर्धारित रहेगी कि वैध पब्लिशेबल की (`anon, authenticated`) के माध्यम से एडमिन पैनल और आम यूज़र्स के ज़रूरी ऑपरेशंस (पंजीकरण, खरीद दर्ज करना, वॉलेट पासबुक) कभी अवरुद्ध न हों।
+3. **पब्लिक कैटलॉग सुरक्षा:**
+   - किताबें (`books`), लैंडिंग पेज (`landing_pages`), और उत्पाद पृष्ठ आम जनता के लिए केवल रीड-ओनली (SELECT) रहेंगे; कोई भी बाहरी व्यक्ति डेटाबेस में छेड़छाड़ नहीं कर सकता।
+
+## XIV. GOOGLE VIDEO SEO & SCHEMA.ORG PROTOCOL (गूगल वीडियो रिच स्निपेट्स)
+1. **Dynamic VideoObject Injection:**
+   - जब भी किसी पेज पर AarogyamTube या यूट्यूब वीडियो रेंडर होगा, सिस्टम पृष्ठभूमि में स्वतः Schema.org मान्य `<script type="application/ld+json">` टैग `<head>` में इंजेक्ट करेगा।
+2. **शर्तें व मानक फ़ील्ड्स:**
+   - प्रत्येक वीडियो स्कीमा में `name`, `description`, `thumbnailUrl`, `uploadDate`, `embedUrl` और `contentUrl` अनिवार्य रूप से शामिल रहेंगे ताकि Googlebot इसे तुरंत इंडेक्स करके गूगल सर्च और गूगल वीडियो में वीडियो थंबनेल रिजल्ट्स दिखा सके।
+3. **जीरो परफॉर्मेंस पेनल्टी (0ms Impact):**
+   - यह स्कीमा पूर्णतः अदृश्य रहेगा और वेबसाइट की लोडिंग स्पीड, वीडियो प्लेयर या यूजर इंटरफेस पर 0% भार डालेगा।
