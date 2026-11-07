@@ -1,6 +1,28 @@
 {
   "recordings": [
     {
+      "id": "VID_078925",
+      "format": "both",
+      "platform": "youtube",
+      "channel_id": "CH_AAROGYAM_MAIN",
+      "title": "🔥 हाउसवाइफ से ₹70 लाख की कमाई तक का सफर | Mrs. Nipaben Viramgama | Aarogyam India",
+      "description": "क्या एक हाउसवाइफ घर बैठे लाखों रुपये कमा सकती हैं? बिल्कुल!\nमिलिए Mrs. Nipaben Viramgama से, जिन्होंने अपनी मेहनत और सही अवसर के जरिए ₹70 लाख की कमाई का सफर तय किया।",
+      "subject": "Crop Protection",
+      "category": "Crop Protection",
+      "video_url": "https://youtu.be/yxkZkqZtbNE?si=UnpPDz8ZSEVA6EaB",
+      "youtube_url": "https://youtu.be/yxkZkqZtbNE?si=UnpPDz8ZSEVA6EaB",
+      "youtube_id": "yxkZkqZtbNE",
+      "thumbnail": "https://img.youtube.com/vi/yxkZkqZtbNE/hqdefault.jpg",
+      "duration": "45:00",
+      "speaker": "आरोग्यम कृषि विशेषज्ञ",
+      "access_tier": "all",
+      "pinned": false,
+      "priority": 50,
+      "order_type": "pinned",
+      "status": "active",
+      "created_at": "2026-11-07T14:34:38.925Z"
+    },
+    {
       "id": "VID_S137292",
       "format": "short_reel",
       "platform": "youtube",
