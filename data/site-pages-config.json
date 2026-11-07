@@ -305,7 +305,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1794040713158,
+      "admin_edited": 1794044874540,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -6321,7 +6321,7 @@
           "cta_link": "#sec-diet",
           "cta_secondary_text": "📦 हर्बल पेस्ट देखें",
           "cta_secondary_link": "#sec-products",
-          "banner_mode": "card"
+          "banner_mode": "full"
         }
       ],
       "sections_order": [
@@ -6550,7 +6550,7 @@
           }
         ]
       },
-      "admin_edited": 1794044874426,
+      "admin_edited": 1794045653675,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
