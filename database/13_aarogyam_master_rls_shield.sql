@@ -59,3 +59,4 @@ CREATE POLICY "checkout_logs_insert" ON public.checkout_logs FOR INSERT TO anon,
 ALTER TABLE IF EXISTS public.sakhi_chat_audit_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "sakhi_logs_insert" ON public.sakhi_chat_audit_logs;
 CREATE POLICY "sakhi_logs_insert" ON public.sakhi_chat_audit_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
+
