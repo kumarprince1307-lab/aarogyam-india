@@ -305,7 +305,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1794085806540,
+      "admin_edited": 1794085950370,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -7182,6 +7182,18 @@
           "dose": "1 चम्मच (10-15 ग्राम) दिन में 2 बार गुनगुने दूध या पानी में घोलकर पिएं।",
           "image": "/images/products/product--------------------009008-7r2u.webp",
           "description": "शतावरी, अश्वगंधा, जिंक, सेलेनियम, फोलिक एसिड और 13 आवश्यक विटामिन्स। थायरॉइड हॉर्मोन संतुलन, बालों का झड़ना रोकने, मेटाबॉलिज्म गति तेज करने और PCOD से राहत में अत्यंत लाभकारी।"
+        },
+        {
+          "title": "Nutriliver 30 NOS",
+          "name": "Nutriliver 30 NOS",
+          "description": "लिवर की कोशिकाओं की मरम्मत, फैटी लिवर से राहत और शरीर से हानिकारक टॉक्सिन्स बाहर निकालने हेतु सर्वोत्तम लिवर सुरक्षा टॉनिक।",
+          "image": "/images/products/product-nutriliver-30-nos-446989-trp1.webp",
+          "mrp": 450,
+          "price": 450,
+          "discount_pct": 20,
+          "dose": "1 कैप्सूल दिन में 2 बार भोजन के बाद पानी से लें।",
+          "badge": "✨ New Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -7251,7 +7263,7 @@
           }
         ]
       },
-      "admin_edited": 1794085806223,
+      "admin_edited": 1794085950071,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
