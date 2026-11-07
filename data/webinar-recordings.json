@@ -1,48 +1,26 @@
 {
   "recordings": [
     {
-      "id": "VID_937650",
-      "format": "both",
+      "id": "VID_S137292",
+      "format": "short_reel",
       "platform": "youtube",
       "channel_id": "CH_AAROGYAM_MAIN",
-      "title": "Herbal Dental Paste Live Demo | पायरिया, सेंसिटिविटी व मसूड़ों की समस्याओं का लाइव रिजल्ट",
-      "description": "नेट्सर्फ हर्बल डेंटल पेस्ट का लाइव डेमो और शानदार रिजल्ट! \n\n100% फ्लोराइड-मुक्त, एसएलएस-फ्री आयुर्वेदिक फॉर्मूला (लोध्र, नीम, लौंग व एलोवेरा)। दांतों में ठंडा-गर्म लगना, मसूड़ों से खून आना और पायरिया की समस्या में तुरंत असरदार।\n\nऑर्डर व जानकारी के लिए संपर्क करें: 7974422572 / 7049294111\nवेबसाइट: https://aarogyamindia.online",
-      "subject": "Health care",
-      "category": "Health care",
-      "video_url": "https://youtu.be/GfSZCRTTBwM?si=0YS-7sKiRu4Ro3gE",
-      "youtube_url": "https://youtu.be/GfSZCRTTBwM?si=0YS-7sKiRu4Ro3gE",
-      "youtube_id": "GfSZCRTTBwM",
-      "thumbnail": "https://img.youtube.com/vi/GfSZCRTTBwM/hqdefault.jpg",
-      "duration": "3:17",
-      "speaker": "आरोग्यम",
-      "access_tier": "all",
-      "pinned": false,
-      "priority": 50,
-      "order_type": "normal",
-      "status": "active",
-      "created_at": "2026-11-07T10:22:17.650Z"
-    },
-    {
-      "id": "VID_414905",
-      "format": "both",
-      "platform": "youtube",
-      "channel_id": "CH_AAROGYAM_MAIN",
-      "title": "Herbal_Dental_Paste | Result netsurf product |",
-      "description": "🌿 पायरिया, सेंसिटिविटी (ठंडा-गर्म लगना) और मसूड़ों से खून आने की समस्या में नेट्सर्फ हर्बल डेंटल पेस्ट का शानदार रिजल्ट! \n\n100% फ्लोराइड-फ्री व केमिकल-रहित आयुर्वेदिक फॉर्मूला—नीम, लौंग, लोध्र और एलोवेरा के साथ। दांतों और मसूड़ों को दें कुदरती मजबूती।\n\n👉 अधिक जानकारी व ऑर्डर के लिए WhatsApp/Call करें: 7974422572 / 7049294111\n🔗 विजिट करें: https://aarogyamindia.online\n\n#HerbalDentalPaste #Netsurf #Pyorrhea #ToothSensitivity #AarogyamIndia #AyurvedicCare",
+      "title": "🤖 आपकी अपनी FREE AI सखी 😍 खेती, मौसम, स्वास्थ्य सबका जवाब | Aarogyam India #Shorts",
+      "description": "Sakhi",
       "subject": "Crop Protection",
       "category": "Crop Protection",
-      "video_url": "https://youtu.be/X5TqPsn7GG0?si=zZ6nElKX8Pnsd7Tq",
-      "youtube_url": "https://youtu.be/X5TqPsn7GG0?si=zZ6nElKX8Pnsd7Tq",
-      "youtube_id": "X5TqPsn7GG0",
-      "thumbnail": "https://img.youtube.com/vi/X5TqPsn7GG0/hqdefault.jpg",
-      "duration": "45:00",
+      "video_url": "https://youtube.com/shorts/DgplS98r43E?si=G2UHUNP6Qri-UEtm",
+      "youtube_url": "https://youtube.com/shorts/DgplS98r43E?si=G2UHUNP6Qri-UEtm",
+      "youtube_id": "DgplS98r43E",
+      "thumbnail": "https://img.youtube.com/vi/DgplS98r43E/hqdefault.jpg",
+      "duration": "0:58",
       "speaker": "आरोग्यम कृषि विशेषज्ञ",
       "access_tier": "all",
       "pinned": false,
-      "priority": 50,
-      "order_type": "normal",
+      "priority": 10,
+      "order_type": "pinned",
       "status": "active",
-      "created_at": "2026-11-07T10:13:34.906Z"
+      "created_at": "2026-11-07T14:02:17.292Z"
     },
     {
       "id": "VID_S612726",
@@ -800,6 +778,40 @@
       "access_tier": "all",
       "status": "active",
       "created_at": "2026-09-01T11:10:37.883Z"
+    }
+  ],
+  "channels": [
+    {
+      "id": "CH_AAROGYAM_MAIN",
+      "name": "Aarogyam India Official",
+      "handle": "@AAROGYAMINDIA",
+      "url": "https://www.youtube.com/@AAROGYAMINDIA",
+      "subscribe_url": "https://www.youtube.com/@AAROGYAMINDIA?sub_confirmation=1",
+      "avatar": "/images/logo/logo.png",
+      "is_default": true
+    }
+  ],
+  "master_categories": [
+    "Crop Protection",
+    "Organic Farming",
+    "Irrigation Tech",
+    "Dairy & Animal Husbandry",
+    "Biofit Products Training",
+    "Shorts & Reels"
+  ],
+  "playlists": [
+    {
+      "id": "PL_ORGANIC_2026",
+      "title": "🌾 संपूर्ण जैविक खेती व पशु पोषण मास्टरक्लास",
+      "description": "प्राकृतिक एवं जैविक खेती से 3X मुनाफा, दुग्ध उत्पादन और Biofit ट्रेनिंग की संपूर्ण वीडियो श्रृंखला।",
+      "cover": "https://img.youtube.com/vi/2JYn-bcDLuU/hqdefault.jpg",
+      "video_ids": [
+        "VID_712495",
+        "VID_513998",
+        "VID_378682",
+        "VID_M10001",
+        "VID_S238828"
+      ]
     }
   ]
 }
