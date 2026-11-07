@@ -90,6 +90,134 @@
             }
         },
 
+        // 2. Versioned Campaign Identification, Frequency & Lifecycle Management
+        getPromoVersionKey: function (promo) {
+            if (!promo) return 'utsav_v0';
+            const id = promo.id || 'utsav';
+            let vStamp = '0';
+            if (promo.updated_at) {
+                vStamp = new Date(promo.updated_at).getTime() || '0';
+            } else if (promo.start_date) {
+                vStamp = new Date(promo.start_date).getTime() || '0';
+            }
+            // Hash of core display fields guarantees any text or banner replacement produces a fresh revision
+            const str = (promo.title || '') + '|' + (promo.image_url || '') + '|' + (promo.subtitle || '');
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            return `${id}_v${vStamp}_${Math.abs(hash)}`;
+        },
+
+        getShareChallengeKey: function (promo, phone) {
+            const vKey = this.getPromoVersionKey(promo);
+            return `AOI_SHARE_CHALLENGE_${vKey}_${phone || 'guest'}`;
+        },
+
+        isCampaignUpdated: function (promo) {
+            if (!promo || !promo.id) return false;
+            try {
+                const lastVersionKey = 'AI_PROMO_LAST_VERSION_' + promo.id;
+                const savedVersion = localStorage.getItem(lastVersionKey);
+                const currentVersion = this.getPromoVersionKey(promo);
+                return !savedVersion || savedVersion !== currentVersion;
+            } catch (e) {
+                return false;
+            }
+        },
+
+        clearMinimizedFlags: function (promoId) {
+            try {
+                const pageId = this.getPageIdentifier();
+                sessionStorage.removeItem('AI_PROMO_MINIMIZED_' + promoId + '_' + pageId);
+                for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                    const k = sessionStorage.key(i);
+                    if (k && k.startsWith('AI_PROMO_MINIMIZED_' + promoId)) {
+                        sessionStorage.removeItem(k);
+                    }
+                }
+            } catch (e) { }
+        },
+
+        getPriorityScore: function (promo) {
+            if (!promo) return 0;
+            const priorityMap = {
+                'cultural_festival': 100,
+                'national_festival': 80,
+                'health_campaign': 60,
+                'tube_video': 40
+            };
+            return priorityMap[promo.type] || 20;
+        },
+
+        // Zero-Egress Stale Promotion Purge (Cleans expired TTL and deleted promotions from client memory)
+        cleanStalePromotions: function (allPromotions) {
+            try {
+                if (!Array.isArray(allPromotions)) return;
+                const now = Date.now();
+                const activeIds = new Set();
+                const activeVersionKeys = new Set();
+
+                allPromotions.forEach(p => {
+                    if (!p || !p.id) return;
+                    let isTimeValid = true;
+                    if (p.start_date && new Date(p.start_date).getTime() > now) isTimeValid = false;
+                    if (p.end_date && new Date(p.end_date).getTime() < now) isTimeValid = false;
+
+                    if (p.is_active && isTimeValid) {
+                        activeIds.add(p.id);
+                        activeVersionKeys.add(this.getPromoVersionKey(p));
+                    }
+                });
+
+                // 1. Purge obsolete keys from localStorage
+                const localKeysToPurge = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (!k) continue;
+
+                    if (k.startsWith('AOI_SHARE_CHALLENGE_')) {
+                        const matchesActiveVersion = Array.from(activeVersionKeys).some(vKey => k.includes(vKey));
+                        if (!matchesActiveVersion) {
+                            localKeysToPurge.push(k);
+                        }
+                    } else if (k.startsWith('AI_PROMO_DAILY_SHOWN_')) {
+                        const pid = k.replace('AI_PROMO_DAILY_SHOWN_', '');
+                        if (!activeIds.has(pid)) {
+                            localKeysToPurge.push(k);
+                        }
+                    } else if (k.startsWith('AI_PROMO_LAST_VERSION_')) {
+                        const pid = k.replace('AI_PROMO_LAST_VERSION_', '');
+                        if (!activeIds.has(pid)) {
+                            localKeysToPurge.push(k);
+                        }
+                    }
+                }
+                localKeysToPurge.forEach(k => {
+                    try { localStorage.removeItem(k); } catch (e) { }
+                });
+
+                // 2. Purge obsolete keys from sessionStorage
+                const sessionKeysToPurge = [];
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const sk = sessionStorage.key(i);
+                    if (!sk) continue;
+                    if (sk.startsWith('AI_PROMO_MINIMIZED_')) {
+                        const matchesActiveId = Array.from(activeIds).some(pid => sk.includes(pid));
+                        if (!matchesActiveId) {
+                            sessionKeysToPurge.push(sk);
+                        }
+                    }
+                }
+                sessionKeysToPurge.forEach(sk => {
+                    try { sessionStorage.removeItem(sk); } catch (e) { }
+                });
+            } catch (e) {
+                console.warn("Stale promo purge note:", e);
+            }
+        },
+
         // 24-Hour Sweet Spot Frequency (Full 3D popup only once per 24 hours unless updated)
         shouldShowFullPopupToday: function (promo) {
             try {
@@ -98,14 +226,23 @@
                 if (search.includes('promo=') || search.includes('test_promo') || search.includes('preview')) {
                     return true;
                 }
+
+                // If admin freshly updated the campaign or changed the banner, always show live and unminimize!
+                if (promo && typeof promo === 'object' && this.isCampaignUpdated(promo)) {
+                    this.clearMinimizedFlags(promoId);
+                    return true;
+                }
+
                 const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
                 const lastShownAt = parseInt(localStorage.getItem(key) || '0', 10);
                 if (!lastShownAt) return true;
 
-                // If admin freshly updated the campaign or changed the banner, always show live!
                 if (promo && typeof promo === 'object' && promo.updated_at) {
                     const promoUpdated = new Date(promo.updated_at).getTime();
-                    if (promoUpdated > lastShownAt) return true;
+                    if (promoUpdated > lastShownAt) {
+                        this.clearMinimizedFlags(promoId);
+                        return true;
+                    }
                 }
 
                 const elapsedMs = Date.now() - lastShownAt;
@@ -115,10 +252,15 @@
             }
         },
 
-        markFullPopupShownToday: function (promoId) {
+        markFullPopupShownToday: function (promo) {
             try {
+                const promoId = typeof promo === 'object' ? promo.id : promo;
                 const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
                 localStorage.setItem(key, String(Date.now()));
+                if (typeof promo === 'object') {
+                    const lastVersionKey = 'AI_PROMO_LAST_VERSION_' + promoId;
+                    localStorage.setItem(lastVersionKey, this.getPromoVersionKey(promo));
+                }
             } catch (e) { }
         },
 
@@ -138,9 +280,10 @@
             } catch (e) { }
         },
 
-        markDismissed: function (promoId) {
+        markDismissed: function (promo) {
+            const promoId = typeof promo === 'object' ? promo.id : promo;
             this.setMinimizedOnPage(promoId);
-            this.markFullPopupShownToday(promoId);
+            this.markFullPopupShownToday(promo);
         },
 
         // 3. User Identity & Constitutional Profile Check
@@ -323,7 +466,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                 this.playChimeSound();
 
                 // 🎯 10-Share Challenge Counter Logic (Only completes & credits at 10 shares)
-                const shareKey = `AOI_SHARE_CHALLENGE_${promo.id || 'utsav'}_${user.phone || 'guest'}`;
+                const shareKey = this.getShareChallengeKey(promo, user.phone);
                 const totalGoal = 10;
                 let currentShares = parseInt(localStorage.getItem(shareKey) || '0', 10);
 
@@ -426,7 +569,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
             try {
                 const promo = this.activePromotion || { id: 'utsav' };
                 const user = this.getUserInfo();
-                const shareKey = `AOI_SHARE_CHALLENGE_${promo.id || 'utsav'}_${user.phone || 'guest'}`;
+                const shareKey = this.getShareChallengeKey(promo, user.phone);
                 const totalGoal = 10;
                 let currentShares = parseInt(localStorage.getItem(shareKey) || '0', 10);
 
@@ -673,8 +816,8 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
             const greetingName = user.name && user.name !== 'प्रिय पाठक' ? user.name : 'स्वास्थ्य साधक';
 
             // 🎯 10-Share Challenge & Wallet State Calculation (Persists across campaign duration)
-            const shareKey = `AOI_SHARE_CHALLENGE_${promo.id || 'utsav'}_${user.phone || 'guest'}`;
-            const guestKey = `AOI_SHARE_CHALLENGE_${promo.id || 'utsav'}_guest`;
+            const shareKey = this.getShareChallengeKey(promo, user.phone);
+            const guestKey = this.getShareChallengeKey(promo, 'guest');
             const totalGoal = 10;
             let currentShares = parseInt(localStorage.getItem(shareKey) || '0', 10);
             if (user.phone && currentShares === 0) {
@@ -1348,10 +1491,13 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                 const data = await resp.json();
                 if (!data || !Array.isArray(data.promotions)) return;
 
+                // 1. Purge stale promotions & expired TTL from client storage immediately
+                this.cleanStalePromotions(data.promotions);
+
                 const now = new Date().getTime();
 
-                // Find first eligible active promotion
-                const eligible = data.promotions.find(p => {
+                // 2. Filter all active, time-valid, page-eligible promotions
+                const eligibleList = data.promotions.filter(p => {
                     if (!p.is_active) return false;
 
                     // Date range checks
@@ -1370,13 +1516,23 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     return true;
                 });
 
+                // 3. Multi-Promotion Priority Resolver (cultural_festival > national_festival > health_campaign > tube_video)
+                eligibleList.sort((a, b) => this.getPriorityScore(b) - this.getPriorityScore(a));
+
+                const eligible = eligibleList[0] || null;
+
                 if (eligible) {
+                    // Check if campaign was updated by admin - if so, auto un-minimize!
+                    if (this.isCampaignUpdated(eligible)) {
+                        this.clearMinimizedFlags(eligible.id);
+                    }
+
                     const canShowToday = this.shouldShowFullPopupToday(eligible);
                     const isMinimized = this.isMinimizedOnPage(eligible.id);
 
                     if (canShowToday && !isMinimized) {
-                        // 1st visit today: show full popup & register daily impression
-                        this.markFullPopupShownToday(eligible.id);
+                        // 1st visit today or freshly updated campaign: show full popup & register impression
+                        this.markFullPopupShownToday(eligible);
                         setTimeout(() => {
                             this.renderPromotion(eligible);
                         }, 300);
@@ -1390,7 +1546,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     // Time khatm hone ke baad: Na popup rahega, na gift box bachega
                     const oldBox = document.getElementById('agy-floating-gift-box');
                     if (oldBox) oldBox.remove();
-                    const oldPopup = document.getElementById('agy-promotion-overlay');
+                    const oldPopup = document.getElementById('agy-promo-root') || document.getElementById('agy-promotion-overlay');
                     if (oldPopup) oldPopup.remove();
                 }
             } catch (err) {
