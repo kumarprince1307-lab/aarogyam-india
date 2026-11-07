@@ -26,6 +26,23 @@
   <meta name="twitter:description" content="1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स और संपूर्ण मास्टरक्लास लाइब्रेरी।">
   <meta name="twitter:image" content="https://aarogyamindia.online/images/banners/agriculture-hero-banner-1.webp">
 
+  <!-- Google Video SEO Schema (Schema.org VideoObject for Google Rich Results) -->
+  <script type="application/ld+json" id="aarogyam-tube-schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "AarogyamTube — कृषि रील्स, शॉर्ट्स एवं विशेषज्ञ मास्टरक्लास वीडियो",
+    "description": "AarogyamTube पर 1-मिनट के प्रैक्टिकल कृषि शॉर्ट्स, जैविक खेती, पशुपालन एवं स्वास्थ्य विशेषज्ञों द्वारा रिकॉर्ड की गई संपूर्ण मास्टरक्लास लाइब्रेरी देखें।",
+    "thumbnailUrl": [
+      "https://aarogyamindia.online/images/banners/agriculture-hero-banner-1.webp",
+      "https://img.youtube.com/vi/X5TqPsn7GG0/hqdefault.jpg"
+    ],
+    "uploadDate": "2026-01-01T08:00:00+05:30",
+    "embedUrl": "https://www.youtube-nocookie.com/embed/X5TqPsn7GG0",
+    "contentUrl": "https://aarogyamindia.online/tube.html"
+  }
+  </script>
+
   <link rel="manifest" href="/manifest.json?v=1.1">
   <meta name="theme-color" content="#0b1120" id="meta_theme_color">
   <meta name="mobile-web-app-capable" content="yes">
@@ -3889,6 +3906,72 @@
         } catch (e) { }
 
         updateLiveTicker();
+        updateAarogyamTubeSeoSchema();
+      }
+
+      // Google Video SEO: Automatic Schema.org VideoObject Generator for Entire AarogyamTube Library
+      function updateAarogyamTubeSeoSchema(activeVid) {
+        try {
+          const origin = window.location.origin || 'https://aarogyamindia.online';
+          let scriptEl = document.getElementById('aarogyam-tube-schema');
+          if (!scriptEl) {
+            scriptEl = document.createElement('script');
+            scriptEl.id = 'aarogyam-tube-schema';
+            scriptEl.type = 'application/ld+json';
+            document.head.appendChild(scriptEl);
+          }
+
+          if (activeVid) {
+            const ytId = activeVid.youtube_id || extractYoutubeVideoId(activeVid.video_url || '') || '';
+            const thumb = activeVid.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : `${origin}/images/banners/agriculture-hero-banner-1.webp`);
+            const title = activeVid.title || 'AarogyamTube विशेष वीडियो';
+            const desc = activeVid.desc || activeVid.description || `${title} - AarogyamTube पर संपूर्ण वीडियो गाइड व डेमो देखें।`;
+            const uploadDate = activeVid.created_at || '2026-01-15T09:00:00+05:30';
+            const vidUrl = `${origin}/tube.html?vid=${encodeURIComponent(activeVid.id || ytId)}`;
+            const embedUrl = ytId ? `https://www.youtube-nocookie.com/embed/${ytId}` : vidUrl;
+
+            const schema = {
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              "name": title,
+              "description": desc,
+              "thumbnailUrl": [thumb],
+              "uploadDate": uploadDate,
+              "embedUrl": embedUrl,
+              "contentUrl": vidUrl
+            };
+            scriptEl.textContent = JSON.stringify(schema, null, 2);
+            return;
+          }
+
+          if (Array.isArray(allRecordings) && allRecordings.length > 0) {
+            const topVideos = allRecordings.slice(0, 25);
+            const videoSchemas = topVideos.map((v, idx) => {
+              const ytId = v.youtube_id || extractYoutubeVideoId(v.video_url || '') || '';
+              const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : `${origin}/images/banners/agriculture-hero-banner-1.webp`);
+              const title = v.title || `AarogyamTube वीडियो #${idx + 1}`;
+              const desc = v.desc || v.description || `${title} - AarogyamTube कृषि व स्वास्थ्य वीडियो गाइड`;
+              const uploadDate = v.created_at || '2026-01-15T09:00:00+05:30';
+              const vidUrl = `${origin}/tube.html?vid=${encodeURIComponent(v.id || ytId)}`;
+              const embedUrl = ytId ? `https://www.youtube-nocookie.com/embed/${ytId}` : vidUrl;
+
+              return {
+                "@context": "https://schema.org",
+                "@type": "VideoObject",
+                "name": title,
+                "description": desc,
+                "thumbnailUrl": [thumb],
+                "uploadDate": uploadDate,
+                "embedUrl": embedUrl,
+                "contentUrl": vidUrl
+              };
+            });
+
+            scriptEl.textContent = JSON.stringify(videoSchemas.length === 1 ? videoSchemas[0] : videoSchemas, null, 2);
+          }
+        } catch (e) {
+          console.warn('AarogyamTube SEO Schema error:', e);
+        }
       }
 
       // -------------------------------------------------------------
@@ -5632,6 +5715,7 @@
           allRecordings.unshift(match);
         }
         if (match) {
+          updateAarogyamTubeSeoSchema(match);
           if (match.format === 'short_reel' || match.id.startsWith('VID_S')) {
             const idx = activeReelsList.findIndex(x => x.id === match.id);
             window.openReelPlayer(idx !== -1 ? idx : 0);
