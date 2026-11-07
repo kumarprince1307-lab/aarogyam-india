@@ -116,6 +116,7 @@
     if (!recordings || !recordings.length) return;
 
     containers.forEach(container => {
+      if (container.dataset.cmsLoaded === '1') return; // Preserves CMS custom configured videos
       const pageTarget = (container.getAttribute('data-page-target') || '').toLowerCase().trim();
       const catTarget = (container.getAttribute('data-video-category') || '').toLowerCase().trim();
       const maxCount = parseInt(container.getAttribute('data-max-videos') || '4', 10);

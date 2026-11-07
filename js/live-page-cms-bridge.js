@@ -1754,6 +1754,7 @@
                            document.querySelector('#sec-videos .universal-video-showcase') ||
                            document.querySelector('#sec-videos div[style*="grid"]');
     if (!videoContainer) return;
+    videoContainer.dataset.cmsLoaded = '1';
 
     videoContainer.innerHTML = `
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%;">
@@ -1764,8 +1765,11 @@
           const thumb = v.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '/images/banners/health-banner.jpeg');
           const title = v.title || 'आरोग्यम विशेष वीडियो';
           const dur = v.duration || 'मास्टरक्लास';
+          const clickAction = ytId
+            ? `window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')`
+            : `window.location.href='${escapeHtml(v.url || '/tube.html')}'`;
           return `
-            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" onclick="window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')">
+            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" onclick="${clickAction}">
               <div style="position:relative; width:100%; padding-bottom:56.25%; background:#0f172a; overflow:hidden;">
                 <img src="${thumb}" alt="${escapeHtml(title)}" loading="lazy" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.92;" onerror="this.src='/images/banners/health-banner.jpeg'" />
                 <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
@@ -1899,55 +1903,60 @@
     } catch (e) {}
   }
 
+  function applyActivePageCms(pageConfig) {
+    if (!pageConfig) return;
+    window.AAROGYAM_ACTIVE_PAGE_CMS = pageConfig;
+    
+    applyPageThemeAndMeta(pageConfig);
+    renderDynamicTicker(pageConfig);
+    renderDynamicHeroSlides(pageConfig);
+    applySectionReorderingAndVisibility(pageConfig);
+    renderDynamicKpiBadges(pageConfig);
+    renderDynamicPageKpiSections(pageConfig);
+    renderDynamicHealthDomainMatrix(pageConfig);
+    renderDynamicProducts(pageConfig);
+    renderDynamicClinicalBreakdown(pageConfig);
+    renderDynamicDietExercise(pageConfig);
+    renderDynamicStepLadder(pageConfig);
+    renderDynamicNetsurfPlan(pageConfig);
+    renderDynamicReviews(pageConfig);
+    renderDynamicFaqs(pageConfig);
+    renderDynamicVideos(pageConfig);
+    renderFloatingBanner(pageConfig);
+    applyWhatsAppSupport(pageConfig);
+    syncAudioNarration(pageConfig);
+
+    const curPath = (window.location.pathname || '').toLowerCase();
+    const isHome = curPath === '/' || curPath === '' || curPath.endsWith('/index.html') || curPath.endsWith('index.html');
+    if (isHome && typeof window.startHomeRevampEngine === 'function') {
+      window.startHomeRevampEngine();
+    }
+  }
+
   async function initLiveCmsBridge() {
     try {
       // Ensure page is scrollable (prevent any modal/drawer scroll freeze)
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
 
-      // Instant 0ms cached hydration (Eliminates flash-of-unstyled/old content)
+      // 1. Instant 0ms cached hydration for the FULL page (Eliminates 10-15s lag completely!)
       try {
         const cachedStr = localStorage.getItem('AAROGYAM_SITE_PAGES_CONFIG');
         if (cachedStr) {
           const cachedPages = JSON.parse(cachedStr);
           const cachedMatch = getPageMatch(cachedPages);
           if (cachedMatch) {
-            window.AAROGYAM_ACTIVE_PAGE_CMS = cachedMatch;
-            renderDynamicHeroSlides(cachedMatch);
+            applyActivePageCms(cachedMatch);
           }
         }
       } catch(cErr) {}
 
+      // 2. Background fresh sync from server (Updates seamlessly without lag)
       const allPages = await loadConfigData();
       await loadMasterCatalogForSync();
       const pageConfig = getPageMatch(allPages);
       if (pageConfig) {
-        window.AAROGYAM_ACTIVE_PAGE_CMS = pageConfig;
-        
-        applyPageThemeAndMeta(pageConfig);
-        renderDynamicTicker(pageConfig);
-        renderDynamicHeroSlides(pageConfig);
-        applySectionReorderingAndVisibility(pageConfig);
-        renderDynamicKpiBadges(pageConfig);
-        renderDynamicPageKpiSections(pageConfig);
-        renderDynamicHealthDomainMatrix(pageConfig);
-        renderDynamicProducts(pageConfig);
-        renderDynamicClinicalBreakdown(pageConfig);
-        renderDynamicDietExercise(pageConfig);
-        renderDynamicStepLadder(pageConfig);
-        renderDynamicNetsurfPlan(pageConfig);
-        renderDynamicReviews(pageConfig);
-        renderDynamicFaqs(pageConfig);
-        renderDynamicVideos(pageConfig);
-        renderFloatingBanner(pageConfig);
-        applyWhatsAppSupport(pageConfig);
-        syncAudioNarration(pageConfig);
-
-        const curPath = (window.location.pathname || '').toLowerCase();
-        const isHome = curPath === '/' || curPath === '' || curPath.endsWith('/index.html') || curPath.endsWith('index.html');
-        if (isHome && typeof window.startHomeRevampEngine === 'function') {
-          window.startHomeRevampEngine();
-        }
+        applyActivePageCms(pageConfig);
       }
 
       // Ensure review button exists even on static pages

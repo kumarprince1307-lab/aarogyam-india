@@ -204,16 +204,7 @@ export async function initPageEditor() {
     assets.forEach(({ path, base64 }) => {
       if (pendingPageEditorAssets.get(path) === base64) pendingPageEditorAssets.delete(path);
     });
-    try {
-      const offlineUploads = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
-      assets.forEach(({ path }) => {
-        delete offlineUploads['/' + path];
-        delete offlineUploads[path];
-      });
-      localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offlineUploads));
-    } catch (err) {
-      console.warn('[Admin Page Editor] Could not clear published image previews:', err);
-    }
+    // Retain AI_OFFLINE_UPLOADS in local storage as reliable cache until CDN deployment finishes
   }
 
   function stripPageEditorImagePreviews(obj) {
@@ -4613,6 +4604,17 @@ export async function initPageEditor() {
       const j = await res.json();
       availableTubeRecordings = j.recordings || [];
     }
+    // Also include any recordings saved locally in admin
+    try {
+      const localTube = JSON.parse(localStorage.getItem('AAROGYAM_TUBE_RECORDINGS') || localStorage.getItem('AAROGYAM_WEBINAR_RECORDINGS') || '[]');
+      if (Array.isArray(localTube) && localTube.length > 0) {
+        localTube.forEach(lt => {
+          if (!availableTubeRecordings.some(x => x.id === lt.id)) {
+            availableTubeRecordings.unshift(lt);
+          }
+        });
+      }
+    } catch(e2) {}
   } catch (e) {}
 
   // Merge custom books
@@ -7491,14 +7493,15 @@ export async function initPageEditor() {
 
   document.getElementById('btn_add_hero_slide')?.addEventListener('click', () => {
     currentSlides.push({
-      image: '/images/banners/kharif-master-guide-2026-hero-banner.webp',
-      tag: '🌾 नया स्पेशल ऑफर',
+      image: '/images/banners/health-banner.jpeg',
+      banner_mode: 'full',
+      tag: '✨ नया स्पेशल ऑफर',
       title: 'नया बैनर शीर्षक यहाँ लिखें',
       subtitle: 'बैनर का आकर्षक विवरण और लाभ यहाँ लिखें',
-      cta_text: '📚 अभी देखें',
-      cta_link: '/ebooks/ebook.html',
-      cta_secondary_text: '🛒 लाइव कार्ट',
-      cta_secondary_link: '/ebooks/cart.html'
+      cta_text: 'अभी देखें',
+      cta_link: '#sec-products',
+      cta_secondary_text: '',
+      cta_secondary_link: ''
     });
     renderHeroSlidesInBuilder();
   });
@@ -7571,15 +7574,16 @@ export async function initPageEditor() {
 
   document.getElementById('btn_add_page_video')?.addEventListener('click', () => {
     const firstRec = availableTubeRecordings[0] || {};
+    const curSlug = (document.getElementById('pe_input_slug')?.value || (typeof editingPageId !== 'undefined' && editingPageId ? editingPageId.replace(/^page_/, '') : '') || 'all').trim();
     currentVideos.push({
-      video_id: firstRec.id || 'VID_S432998',
+      video_id: firstRec.id || '',
       title: firstRec.title || '🎬 AarogyamTube विशेष वीडियो',
-      desc: firstRec.description?.substring(0, 100) || 'वैज्ञानिक कृषि व पशु पोषण गाइड',
+      desc: firstRec.description?.substring(0, 100) || '',
       url: firstRec.id ? `/tube.html?vid=${firstRec.id}` : '/tube.html',
       youtube_id: firstRec.youtube_id || '',
       thumbnail: firstRec.thumbnail || '',
       duration: firstRec.duration || '',
-      target_page: 'all',
+      target_page: curSlug || 'all',
       ratio: firstRec.format === 'short_reel' ? '9:16' : '16:9'
     });
     renderVideosInBuilder();
@@ -7742,7 +7746,7 @@ export async function initPageEditor() {
             </div>
             ${(slide.image_preview || slide.image) ? `
               <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-                <img src="${escapeHtml(slide.image_preview || slide.image)}" alt="Preview" style="height:55px; max-width:140px; border-radius:6px; object-fit:cover; border:2px solid #3b82f6; display:block;" onerror="this.src='/images/banners/agriculture-banner.jpeg'" />
+                <img src="${escapeHtml(getPreviewImgSrc(slide, 'image', '/images/banners/health-banner.jpeg'))}" alt="Preview" style="height:55px; max-width:140px; border-radius:6px; object-fit:cover; border:2px solid #3b82f6; display:block;" onerror="this.src='/images/banners/health-banner.jpeg'" />
                 <span style="font-size:0.72rem; color:#86efac; font-weight:700;">${slide.image_preview ? '✓ नया अपलोड (HD Preview)' : '✓ एक्टिव बैनर'}</span>
               </div>
             ` : ''}
@@ -7750,7 +7754,7 @@ export async function initPageEditor() {
           <div>
             <label style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; display: block;">🖼️ बैनर डिस्प्ले मोड (Banner Size / Layout)</label>
             <select onchange="window.updateHeroSlideField(${idx}, 'banner_mode', this.value); window.renderHeroSlidesInBuilder();" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; border-color: #38bdf8;">
-              <option value="full" ${slide.banner_mode === 'full' || (!slide.subtitle && !slide.tag) ? 'selected' : ''}>🖼️ फुल चौड़ा पैनोरमिक बैनर (Full Width - 100% पूरा दिखेगा)</option>
+              <option value="full" ${(slide.banner_mode === 'full' || !slide.banner_mode) ? 'selected' : ''}>🖼️ फुल चौड़ा पैनोरमिक बैनर (Full Width - 100% पूरा दिखेगा)</option>
               <option value="card" ${slide.banner_mode === 'card' ? 'selected' : ''}>🎴 3D कार्ड + टेक्स्ट (Card with Title, Text & Floating Box)</option>
             </select>
           </div>
@@ -8268,21 +8272,17 @@ export async function initPageEditor() {
     const wrap = document.getElementById('pe_videos_container');
     if (!wrap) return;
 
+    // Dynamically generate Target Page list from all registered site pages
+    const dynamicPageOptions = (Array.isArray(allPages) && allPages.length > 0)
+      ? allPages.map(p => {
+          const rawSlug = (p.slug || p.id.replace(/^page_/, '')).trim();
+          return { id: rawSlug, label: `📄 ${p.name || rawSlug} (${rawSlug})` };
+        })
+      : [];
+
     const pageTargetOptions = [
       { id: 'all', label: '🌐 सभी पेजेस पर (All Pages)' },
-      { id: 'home-page', label: '🏠 मुख्य पृष्ठ (Home Page)' },
-      { id: 'ebook-store', label: '📚 ई-बुक स्टोर (eBook Store)' },
-      { id: 'agriculture', label: '🌱 कृषि हब (Agriculture)' },
-      { id: 'cattle-care', label: '🐄 पशु पालन हब (Cattle Care)' },
-      { id: 'health-hub', label: '❤️ स्वास्थ्य केंद्र (Health Hub)' },
-      { id: 'diabetes', label: '🩸 मधुमेह (Diabetes)' },
-      { id: 'weight-loss', label: '🔥 मोटापा व फैट लॉस (Weight Loss)' },
-      { id: 'joint-care', label: '🦴 जोड़ों का दर्द (Joint Care)' },
-      { id: 'womens-care', label: '🌸 महिला स्वास्थ्य (PCOD/PCOS)' },
-      { id: 'hair-care', label: '💇‍♀️ हेयर केयर (Hair Care)' },
-      { id: 'skin-care', label: '🌺 स्किन केयर (Skin Care)' },
-      { id: 'kids-care', label: '🧸 किड्स केयर (Kids Nutrition)' },
-      { id: 'home-care', label: '🏡 होम केयर (Home Care)' }
+      ...dynamicPageOptions
     ];
 
     wrap.innerHTML = currentVideos.map((v, idx) => `
