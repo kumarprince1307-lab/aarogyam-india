@@ -52,14 +52,8 @@
     const urlObj = new URL(base, window.location.origin);
     const shareId = window.getUserShareId();
     urlObj.searchParams.set('share_id', shareId);
-    urlObj.searchParams.set('ref', shareId);
-    try {
-      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-      const name = u.full_name || u.name || localStorage.getItem('aim_user_name') || localStorage.getItem('user_name');
-      if (name && name !== 'प्रिय पाठक' && name !== 'स्वास्थ्य साधक') {
-        urlObj.searchParams.set('from', name.trim());
-      }
-    } catch (e) {}
+    urlObj.searchParams.delete('from');
+    urlObj.searchParams.delete('ref');
     return urlObj.toString();
   };
 
