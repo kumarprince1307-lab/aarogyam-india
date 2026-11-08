@@ -26,7 +26,13 @@
             try {
                 const path = (window.location.pathname || '').toLowerCase();
                 const search = (window.location.search || '').toLowerCase();
-                return (path.includes('book-landing') || search.includes('id=bk') || path.includes('/ebooks/book-landing') || path.includes('reader'));
+                return (
+                    path.includes('book-landing') ||
+                    path.includes('bundle') ||
+                    search.includes('id=bk') ||
+                    path.includes('/ebooks/book-landing') ||
+                    path.includes('reader')
+                );
             } catch (e) {
                 return false;
             }
@@ -51,8 +57,9 @@
             try {
                 const path = (window.location.pathname || '').toLowerCase();
 
-                // STRICT AAROGYAM MANAS RULE: Never display on Book Landing Pages, Reader, Admin, or Checkout!
+                // STRICT AAROGYAM MANAS RULE: Never display on Book Landing Pages, Bundles, Reader, Admin, or Checkout!
                 if (this.isBookLandingPage()) return false;
+                if (path.includes('bundle') || path.endsWith('bundle.html')) return false;
                 if (path.includes('/admin') || path.endsWith('admin.html')) return false;
                 if (path.includes('payment-') || path.includes('checkout-success') || path.includes('order-confirmation')) return false;
 

@@ -856,7 +856,7 @@ function bindBundleHubEvents() {
   document.getElementById('fileUploadBanner')?.addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const dataUri = await compressImageToWebp(file, 1200, 0.85);
+      const dataUri = await compressImageToWebp(file, 900, 0.75);
       const input = document.getElementById('bFormBannerImage');
       const prev = document.getElementById('bannerLivePreview');
       if (input) input.value = dataUri;
@@ -868,7 +868,7 @@ function bindBundleHubEvents() {
   document.getElementById('fileUploadOg')?.addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const dataUri = await compressImageToWebp(file, 1000, 0.85);
+      const dataUri = await compressImageToWebp(file, 900, 0.75);
       const input = document.getElementById('bFormOgImage');
       const prev = document.getElementById('ogLivePreview');
       if (input) input.value = dataUri;
@@ -880,7 +880,7 @@ function bindBundleHubEvents() {
   document.getElementById('fileUploadDemoPage')?.addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      const dataUri = await compressImageToWebp(file, 1000, 0.85);
+      const dataUri = await compressImageToWebp(file, 800, 0.75);
       const input = document.getElementById('bFormAddDemoUrl');
       if (input) input.value = dataUri;
       showToast('डेमो पेज फोटो तैयार! "इमेज जोड़ें" दबाएं।', 'info');
@@ -1304,12 +1304,14 @@ async function openAarogyamTubePicker() {
   const modal = document.getElementById('aarogyamTubePickerModal');
   if (modal) {
     modal.style.display = 'flex';
-    if (!_aarogyamTubeVideos || _aarogyamTubeVideos.length === 0) {
-      const grid = document.getElementById('tubePickerGrid');
-      if (grid) grid.innerHTML = '<div style="color:#38bdf8; text-align:center; padding:30px; grid-column:1/-1;">⏳ आरोग्यम ट्यूब वीडियो लोड हो रहे हैं...</div>';
+    const grid = document.getElementById('tubePickerGrid');
+    if (grid) grid.innerHTML = '<div style="color:#38bdf8; text-align:center; padding:30px; grid-column:1/-1;">⏳ आरोग्यम ट्यूब वीडियो लोड हो रहे हैं...</div>';
+    try {
       _aarogyamTubeVideos = await fetchAarogyamTubeVideos();
+      renderAarogyamTubeGrid(_aarogyamTubeVideos);
+    } catch (e) {
+      if (grid) grid.innerHTML = '<div style="color:#ef4444; text-align:center; padding:20px; grid-column:1/-1;">वीडियो लोड करने में त्रुटि आई।</div>';
     }
-    renderAarogyamTubeGrid(_aarogyamTubeVideos);
   }
 }
 
@@ -1477,12 +1479,12 @@ function renderVideosList() {
     const ytId = extractYouTubeId(v.url || '');
     const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : '';
     return `
-      <div style="background:#020617; border:1px solid #334155; border-radius:8px; padding:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <div id="videoRow_${i}" style="background:#020617; border:1px solid #334155; border-radius:8px; padding:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
         <span style="color:#ec4899; font-weight:900; font-size:0.82rem;">#${i + 1}</span>
-        ${thumb ? `<img src="${thumb}" alt="Thumb" style="width:52px; height:34px; object-fit:cover; border-radius:4px; border:1px solid #334155;" />` : ''}
-        <input type="text" placeholder="वीडियो लिंक (URL)" value="${escapeHtml(v.url || '')}" onchange="window.updateVideoItem(${i}, 'url', this.value)" class="admin-input" style="flex:2; min-width:200px; font-size:0.8rem;" />
-        <input type="text" placeholder="शीर्षक (Title)" value="${escapeHtml(v.title || '')}" onchange="window.updateVideoItem(${i}, 'title', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
-        <input type="text" placeholder="उप-शीर्षक (Subtitle)" value="${escapeHtml(v.subtitle || '')}" onchange="window.updateVideoItem(${i}, 'subtitle', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
+        <img class="video-thumb-preview" src="${thumb}" alt="Thumb" style="width:52px; height:34px; object-fit:cover; border-radius:4px; border:1px solid #334155; ${thumb ? '' : 'display:none;'}" onerror="this.style.display='none';" />
+        <input type="text" placeholder="वीडियो लिंक (YouTube / Shorts URL)" value="${escapeHtml(v.url || '')}" oninput="window.updateVideoItem(${i}, 'url', this.value)" onchange="window.updateVideoItem(${i}, 'url', this.value)" class="admin-input" style="flex:2; min-width:200px; font-size:0.8rem;" />
+        <input type="text" placeholder="शीर्षक (Title)" value="${escapeHtml(v.title || '')}" oninput="window.updateVideoItem(${i}, 'title', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
+        <input type="text" placeholder="उप-शीर्षक (Subtitle)" value="${escapeHtml(v.subtitle || '')}" oninput="window.updateVideoItem(${i}, 'subtitle', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
         <button type="button" onclick="window.removeVideoItem(${i})" class="admin-button small-button" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; cursor:pointer;" title="हटाएं">✕</button>
       </div>
     `;
@@ -1490,7 +1492,24 @@ function renderVideosList() {
 }
 
 window.updateVideoItem = function (idx, key, val) {
-  if (_currentVideos[idx]) _currentVideos[idx][key] = val;
+  if (_currentVideos[idx]) {
+    _currentVideos[idx][key] = val;
+    if (key === 'url') {
+      const ytId = extractYouTubeId(val);
+      const row = document.getElementById(`videoRow_${idx}`);
+      if (row) {
+        const img = row.querySelector('.video-thumb-preview');
+        if (img) {
+          if (ytId) {
+            img.src = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+            img.style.display = 'block';
+          } else {
+            img.style.display = 'none';
+          }
+        }
+      }
+    }
+  }
 };
 window.removeVideoItem = function (idx) {
   _currentVideos.splice(idx, 1);
@@ -1926,14 +1945,39 @@ async function handleSaveBundle() {
   };
 
   // 1. Update in local array in-place without duplicates
-  let localBundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
-  const existIdx = localBundles.findIndex(b => b.id.toLowerCase() === bundleObj.id.toLowerCase());
+  let localBundles = [];
+  try {
+    localBundles = JSON.parse(localStorage.getItem('AAROGYAM_BUNDLE_LANDING_PAGES') || '[]');
+  } catch (_) { localBundles = []; }
+
+  const existIdx = localBundles.findIndex(b => String(b.id || '').toLowerCase() === String(bundleObj.id || '').toLowerCase());
   if (existIdx >= 0) {
     localBundles[existIdx] = bundleObj;
   } else {
     localBundles.unshift(bundleObj);
   }
-  localStorage.setItem('AAROGYAM_BUNDLE_LANDING_PAGES', JSON.stringify(localBundles));
+
+  // Safe localStorage persistence (never fail if quota exceeded)
+  try {
+    localStorage.setItem('AAROGYAM_BUNDLE_LANDING_PAGES', JSON.stringify(localBundles));
+  } catch (quotaErr) {
+    console.warn('[LocalStorage Quota Exceeded] Trimming heavy Base64 previews for local cache:', quotaErr);
+    try {
+      const lightweightBundles = localBundles.map(b => {
+        const copy = Object.assign({}, b);
+        if (copy.bannerImage && copy.bannerImage.startsWith('data:')) {
+          copy.bannerImage = '/images/banners/aarogyamtube-default-thumb.svg';
+        }
+        if (Array.isArray(copy.demoImages)) {
+          copy.demoImages = copy.demoImages.map(img => (typeof img === 'string' && img.startsWith('data:')) ? '' : img).filter(Boolean);
+        }
+        return copy;
+      });
+      localStorage.setItem('AAROGYAM_BUNDLE_LANDING_PAGES', JSON.stringify(lightweightBundles));
+    } catch (_) {
+      try { localStorage.removeItem('AAROGYAM_BUNDLE_LANDING_PAGES'); } catch (_) {}
+    }
+  }
 
   // 2. Triple-Sync to Git (PHP + Vercel GitHub Auto-Sync + Port 5505 + Supabase)
   await syncBundlesToAllBackends(localBundles);
