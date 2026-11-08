@@ -1552,7 +1552,7 @@
   function injectSakhiPillDirectly() {
     if (document.getElementById('sakhiFloatingPill')) return;
     const path = (window.location.pathname || '').toLowerCase();
-    if (path.includes('aarogyam-sakhi.html') || path.includes('tube')) return;
+    if (path.includes('aarogyam-sakhi.html') || path.includes('tube') || isBookLandingPage()) return;
 
     let pillLabel = 'आरोग्यम सखी AI';
     if (path.includes('hair') || path.includes('skin') || path.includes('beauty')) {
@@ -1618,7 +1618,7 @@
 
   function ensureAarogyamSakhiLoaded() {
     const path = (window.location.pathname || '').toLowerCase();
-    if (path.includes('aarogyam-sakhi.html') || path.includes('tube')) return;
+    if (path.includes('aarogyam-sakhi.html') || path.includes('tube') || isBookLandingPage()) return;
 
     if (!document.querySelector('link[href*="aarogyam-sakhi-ai.css"]')) {
       const link = document.createElement('link');
@@ -1660,7 +1660,7 @@
     purgeBookLandingDrawerNav();
     checkPwaInstallState();
     const path = (window.location.pathname || '').toLowerCase();
-    if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html')) {
+    if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html') && !isBookLandingPage()) {
       ensureAarogyamSakhiLoaded();
       injectSakhiPillDirectly();
     }
@@ -1675,7 +1675,7 @@
     purgeBookLandingDrawerNav();
     checkPwaInstallState();
     const path = (window.location.pathname || '').toLowerCase();
-    if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html')) {
+    if (!path.includes('tube') && !path.includes('aarogyam-sakhi.html') && !isBookLandingPage()) {
       injectSakhiPillDirectly();
     }
   });

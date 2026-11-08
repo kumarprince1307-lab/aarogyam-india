@@ -67,6 +67,9 @@ function fetchLandingPageFromSupabase(lpId) {
 }
 
 // Master Landing Page Runtime Switch (Set true to enable, false for Egress Safe Mode)
+const fs = require('fs');
+const path = require('path');
+
 const LANDING_PAGES_ENABLED = false; // Egress Safe Mode: Direct CDN Redirect
 
 module.exports = async function handler(req, res) {
@@ -77,13 +80,58 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const { id, bundle } = req.query || {};
+
+  // 0. Handle Book Bundle image requests dynamically from data/book-bundles.json
+  if (bundle) {
+    try {
+      const pathsToTry = [
+        path.join(process.cwd(), 'data', 'book-bundles.json'),
+        path.join(__dirname, '..', 'data', 'book-bundles.json')
+      ];
+      let bundles = null;
+      for (const p of pathsToTry) {
+        if (fs.existsSync(p)) {
+          bundles = JSON.parse(fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, '').trim());
+          if (bundles) break;
+        }
+      }
+      if (bundles) {
+        const cleanKey = String(bundle).trim().toLowerCase();
+        const list = Array.isArray(bundles) ? bundles : (bundles.bundles || []);
+        const b = cleanKey && cleanKey !== 'default'
+          ? list.find(x => (x.id && x.id.toLowerCase() === cleanKey) || (x.slug && x.slug.toLowerCase() === cleanKey))
+          : list[0];
+        if (b) {
+          const rawImage = b.ogImage || b.bannerImage;
+          if (rawImage && rawImage.startsWith('data:image/')) {
+            const parts = rawImage.split(';base64,');
+            const mimeType = parts[0].replace('data:', '') || 'image/webp';
+            const base64Data = parts[1];
+            if (base64Data) {
+              const imgBuffer = Buffer.from(base64Data, 'base64');
+              res.setHeader('Content-Type', mimeType);
+              res.setHeader('Content-Length', imgBuffer.length);
+              res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+              return res.status(200).send(imgBuffer);
+            }
+          } else if (rawImage && (rawImage.startsWith('http://') || rawImage.startsWith('https://'))) {
+            res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
+            return res.redirect(302, rawImage);
+          } else if (rawImage && rawImage.startsWith('/')) {
+            return res.redirect(302, `https://aarogyamindia.online${rawImage}`);
+          }
+        }
+      }
+    } catch (_) {}
+    return res.redirect(302, 'https://aarogyamindia.online/images/banners/bundle-kisan-5in1-og.jpg');
+  }
+
   // 1. If Landing Pages are temporarily OFF, immediately serve the fallback banner with ZERO DB query
   if (!LANDING_PAGES_ENABLED) {
     res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400');
     return res.redirect(302, DEFAULT_FALLBACK_IMAGE);
   }
-
-  const { id } = req.query || {};
 
   if (!id) {
     return res.redirect(302, DEFAULT_FALLBACK_IMAGE);

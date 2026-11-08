@@ -65,6 +65,51 @@ function getBookLandingPageData(bId) {
   return null;
 }
 
+function getBookBundleData(targetKey) {
+  try {
+    const pathsToTry = [
+      path.join(process.cwd(), 'data', 'book-bundles.json'),
+      path.join(__dirname, '..', 'data', 'book-bundles.json')
+    ];
+    let json = null;
+    for (const p of pathsToTry) {
+      if (fs.existsSync(p)) {
+        json = readJsonSafely(p);
+        if (json) break;
+      }
+    }
+    if (json) {
+      const list = Array.isArray(json) ? json : (json.bundles || []);
+      const cleanKey = String(targetKey || '').trim().toLowerCase();
+      const found = cleanKey && cleanKey !== 'default'
+        ? list.find(b => (b.id && b.id.toLowerCase() === cleanKey) || (b.slug && b.slug.toLowerCase() === cleanKey))
+        : list[0];
+
+      if (found) {
+        let ogImg = `${HOST_ORIGIN}/images/banners/bundle-kisan-5in1-og.jpg`;
+        if (found.ogImage && !found.ogImage.startsWith('data:')) {
+          ogImg = found.ogImage.startsWith('http') ? found.ogImage : `${HOST_ORIGIN}${found.ogImage}`;
+        } else if (found.bannerImage && !found.bannerImage.startsWith('data:')) {
+          ogImg = found.bannerImage.startsWith('http') ? found.bannerImage : `${HOST_ORIGIN}${found.bannerImage}`;
+        } else if (found.id) {
+          ogImg = `${HOST_ORIGIN}/api/image?bundle=${encodeURIComponent(found.id)}`;
+        }
+        return {
+          id: found.id,
+          slug: found.slug,
+          destUrl: `${HOST_ORIGIN}/bundle.html?id=${encodeURIComponent(found.id)}`,
+          og_title: found.ogTitle || found.title || 'आरोग्यम महाबचत ई-बुक कॉम्बो बंडल',
+          og_description: found.ogDescription || found.subtitle || found.description || 'सम्पूर्ण कृषि, फसल सुरक्षा व वैज्ञानिक खेती मास्टर गाइड्स एक साथ विशेष कॉम्बो छूट पर!',
+          og_image: ogImg
+        };
+      }
+    }
+  } catch (e) {
+    console.error('[SafeJSON] getBookBundleData error:', e);
+  }
+  return null;
+}
+
 const SITE_PAGES_FALLBACK_MAP = {
   'index': {
     id: 'page_home',
@@ -677,6 +722,7 @@ module.exports = async function handler(req, res) {
   }
 
   const query = req.query || {};
+  const queryBundle = (query.bundle || query.bundle_id || '').trim();
   const lpId = (query.id || query.lp || query.book || query.book_id || '').trim();
   const queryShareId = (query.share_id || query.ref || '').trim();
   const queryYt = (query.yt || query.v || query.video || '').trim();
@@ -685,6 +731,68 @@ module.exports = async function handler(req, res) {
   const queryDesc = (query.desc || query.msg || query.message || '').trim();
   const queryCat = (query.cat || query.category || '').trim();
   const queryPage = (query.page || query.p || '').trim();
+
+  // 00. Check if request is for a Book Bundle (Dynamic Combo Landing Page)
+  const bundleKey = queryBundle || (lpId && lpId.toUpperCase().startsWith('BUNDLE_') ? lpId : '');
+  if (bundleKey) {
+    const bundleData = getBookBundleData(bundleKey);
+    if (bundleData) {
+      const finalTitle = bundleData.og_title;
+      const finalDesc = bundleData.og_description;
+      const finalOgImage = bundleData.og_image;
+      const destUrl = queryShareId 
+        ? `${bundleData.destUrl}&ref=${encodeURIComponent(queryShareId)}` 
+        : bundleData.destUrl;
+
+      const userAgent = req.headers['user-agent'] || '';
+      const isBot = isBotScraper(userAgent);
+
+      if (!isBot) {
+        return res.redirect(302, destUrl);
+      }
+
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400');
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+      const isWebp = finalOgImage.toLowerCase().endsWith('.webp');
+      const isPng = finalOgImage.toLowerCase().endsWith('.png');
+      const imgMime = isWebp ? 'image/webp' : (isPng ? 'image/png' : 'image/jpeg');
+
+      const html = `<!DOCTYPE html>
+<html lang="hi" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(finalTitle)}</title>
+
+  <!-- Open Graph / WhatsApp & Facebook Crawlers -->
+  <meta property="fb:app_id" content="966242223397117">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aarogyam India">
+  <meta property="og:title" content="${escapeHtml(finalTitle)}">
+  <meta property="og:description" content="${escapeHtml(finalDesc)}">
+  <meta property="og:image" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:secure_url" content="${escapeHtml(finalOgImage)}">
+  <meta property="og:image:type" content="${imgMime}">
+  <meta property="og:image:width" content="900">
+  <meta property="og:image:height" content="506">
+  <meta property="og:image:alt" content="${escapeHtml(finalTitle)}">
+  <meta property="og:url" content="${escapeHtml(destUrl)}">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeHtml(finalTitle)}">
+  <meta name="twitter:description" content="${escapeHtml(finalDesc)}">
+  <meta name="twitter:image" content="${escapeHtml(finalOgImage)}">
+</head>
+<body>
+  <script>window.location.replace('${destUrl}');</script>
+  <p><a href="${destUrl}">यहाँ क्लिक करें यदि आप स्वतः रीडायरेक्ट नहीं होते हैं।</a></p>
+</body>
+</html>`;
+      return res.status(200).send(html);
+    }
+  }
 
   // 0. Check if request is for a Site Page (Homepage, Pashu-Palan, Netsurf, Health, etc.)
   if (queryPage) {

@@ -281,6 +281,9 @@
 
     // Facebook Pixel ViewContent Tracking
     if (typeof fbq === 'function') {
+      if (bundle.metaPixelId && bundle.metaPixelId !== '1671873500553134') {
+        try { fbq('init', bundle.metaPixelId); } catch (_) {}
+      }
       fbq('track', 'ViewContent', {
         content_name: bundle.title,
         content_ids: bundle.bookIds,
@@ -1140,6 +1143,11 @@
     const audioScript = bundle.audioScript;
 
     if (!audioUrl && !audioScript) {
+      audioPill.style.display = 'none';
+      return;
+    }
+
+    if (bundle.videoAutoPlay) {
       audioPill.style.display = 'none';
       return;
     }

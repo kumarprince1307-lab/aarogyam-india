@@ -915,35 +915,40 @@ body.bundle-landing-page .header.header-tiranga-animated {
 /* Precision Mobile Tuning for Small Screens (e.g. 360px Android & FB WebView) */
 @media (max-width: 420px) {
   .mobile-sticky-bar.bundle-mobile-sticky-bar .mobile-sticky-bar-inner {
-    gap: 6px !important;
-    padding: 0 2px !important;
+    gap: 4px !important;
+    padding: 0 4px !important;
   }
   .bundle-mobile-sticky-bar .sticky-bundle-multi-stack {
-    width: 38px !important;
-    height: 46px !important;
+    width: 34px !important;
+    height: 42px !important;
   }
   .bundle-mobile-sticky-bar .sticky-multi-thumb {
-    width: 32px !important;
-    height: 42px !important;
+    width: 28px !important;
+    height: 38px !important;
+  }
+  .bundle-mobile-sticky-bar .mobile-book-price {
+    min-width: 48px !important;
+    text-align: center !important;
   }
   .bundle-mobile-sticky-bar .mobile-book-price .old-price {
-    font-size: 11px !important;
+    font-size: 10px !important;
   }
   .bundle-mobile-sticky-bar .mobile-book-price .offer-price {
-    font-size: 18px !important;
+    font-size: 16px !important;
   }
   .bundle-mobile-sticky-bar .sticky-buy-btn {
-    font-size: 0.86rem !important;
-    padding: 0 8px !important;
-    height: 42px !important;
+    font-size: 0.82rem !important;
+    padding: 0 6px !important;
+    height: 40px !important;
     white-space: nowrap !important;
     min-width: 0 !important;
-    letter-spacing: -0.2px !important;
+    letter-spacing: -0.3px !important;
+    gap: 4px !important;
   }
   .bundle-mobile-sticky-bar .sticky-share-btn {
-    width: 38px !important;
-    height: 42px !important;
-    font-size: 1rem !important;
+    width: 36px !important;
+    height: 40px !important;
+    font-size: 0.95rem !important;
   }
 }
 

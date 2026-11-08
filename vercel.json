@@ -81,6 +81,94 @@
   ],
   "redirects": [
     {
+      "source": "/bundle.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "id"
+        }
+      ],
+      "destination": "/api/share?bundle=:id",
+      "permanent": false
+    },
+    {
+      "source": "/bundle.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "bundle"
+        }
+      ],
+      "destination": "/api/share?bundle=:bundle",
+      "permanent": false
+    },
+    {
+      "source": "/bundle.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "slug"
+        }
+      ],
+      "destination": "/api/share?bundle=:slug",
+      "permanent": false
+    },
+    {
+      "source": "/bundle.html",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?bundle=default",
+      "permanent": false
+    },
+    {
+      "source": "/bundle",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        },
+        {
+          "type": "query",
+          "key": "id"
+        }
+      ],
+      "destination": "/api/share?bundle=:id",
+      "permanent": false
+    },
+    {
+      "source": "/bundle",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*([fF]acebook|[fF]acebot|[tT]witterbot|[wW]hats[aA]pp|[tT]elegram[bB]ot|[lL]inked[iI]n[bB]ot|[pP]interest|[sS]lackbot|[dD]iscordbot).*"
+        }
+      ],
+      "destination": "/api/share?bundle=default",
+      "permanent": false
+    },
+    {
       "source": "/ebooks/book-landing.html",
       "has": [
         {

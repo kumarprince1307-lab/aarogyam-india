@@ -3232,15 +3232,6 @@ async function initGeminiControlCenter() {
       }
     };
   }
-        }
-      } else {
-        if (testMsg) {
-          testMsg.style.color = '#f87171';
-          testMsg.textContent = `❌ API कनेक्शन विफल: ${lastErr || 'अमान्य टोकन या कोटा त्रुटि'}`;
-        }
-      }
-    };
-  }
 
   // Load Global Quota Settings
   try {
