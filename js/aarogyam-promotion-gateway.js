@@ -20,8 +20,7 @@
         activePromo: null,
         canvasAnimFrame: null,
 
-        // 1. Target Page Matching
-        // 1. Target Page Matching & Expiry Time Check
+        // 1. Target Page Matching & Strict Landing Page Shield
         isBookLandingPage: function () {
             try {
                 const path = (window.location.pathname || '').toLowerCase();
@@ -29,8 +28,15 @@
                 return (
                     path.includes('book-landing') ||
                     path.includes('bundle') ||
+                    path.endsWith('bundle.html') ||
                     search.includes('id=bk') ||
+                    search.includes('id=bundle') ||
                     path.includes('/ebooks/book-landing') ||
+                    path.includes('demo-kharif') ||
+                    path.includes('kheti-dr') ||
+                    path.includes('checkout') ||
+                    path.includes('payment') ||
+                    path.includes('order') ||
                     path.includes('reader')
                 );
             } catch (e) {
@@ -125,10 +131,9 @@
         isCampaignUpdated: function (promo) {
             if (!promo || !promo.id) return false;
             try {
-                const lastVersionKey = 'AI_PROMO_LAST_VERSION_' + promo.id;
-                const savedVersion = localStorage.getItem(lastVersionKey);
+                const seenVersion = localStorage.getItem('AI_PROMO_SEEN_' + promo.id) || localStorage.getItem('AI_PROMO_LAST_VERSION_' + promo.id);
                 const currentVersion = this.getPromoVersionKey(promo);
-                return !savedVersion || savedVersion !== currentVersion;
+                return !seenVersion || seenVersion !== currentVersion;
             } catch (e) {
                 return false;
             }
@@ -178,25 +183,20 @@
                     }
                 });
 
-                // 1. Purge obsolete keys from localStorage
+                // 1. Purge obsolete keys from localStorage (ONLY for deleted/inactive campaigns)
                 const localKeysToPurge = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const k = localStorage.key(i);
                     if (!k) continue;
 
-                    if (k.startsWith('AOI_SHARE_CHALLENGE_')) {
-                        const matchesActiveVersion = Array.from(activeVersionKeys).some(vKey => k.includes(vKey));
-                        if (!matchesActiveVersion) {
-                            localKeysToPurge.push(k);
-                        }
-                    } else if (k.startsWith('AI_PROMO_DAILY_SHOWN_')) {
-                        const pid = k.replace('AI_PROMO_DAILY_SHOWN_', '');
-                        if (!activeIds.has(pid)) {
-                            localKeysToPurge.push(k);
-                        }
-                    } else if (k.startsWith('AI_PROMO_LAST_VERSION_')) {
-                        const pid = k.replace('AI_PROMO_LAST_VERSION_', '');
-                        if (!activeIds.has(pid)) {
+                    if (
+                        k.startsWith('AOI_SHARE_CHALLENGE_') ||
+                        k.startsWith('AI_PROMO_SEEN_') ||
+                        k.startsWith('AI_PROMO_DAILY_SHOWN_') ||
+                        k.startsWith('AI_PROMO_LAST_VERSION_')
+                    ) {
+                        const matchesActive = Array.from(activeIds).some(pid => k.includes(pid));
+                        if (!matchesActive) {
                             localKeysToPurge.push(k);
                         }
                     }
@@ -225,57 +225,48 @@
             }
         },
 
-        // 24-Hour Sweet Spot Frequency (Full 3D popup only once per 24 hours unless updated)
+        // Strict Aarogyam Manas Rule: Ek Baar Aayega (Full popup displays ONCE per promo version)
+        // Re-triggers ONLY when Admin deletes & creates new, or changes/updates existing promo!
         shouldShowFullPopupToday: function (promo) {
             try {
-                const promoId = typeof promo === 'object' ? promo.id : promo;
+                if (!promo) return false;
                 const search = (window.location.search || '').toLowerCase();
-                if (search.includes('promo=') || search.includes('test_promo') || search.includes('preview')) {
+                if (search.includes('test_promo=1') || search.includes('promo_preview=1')) {
                     return true;
                 }
 
-                // If admin freshly updated the campaign or changed the banner, always show live and unminimize!
-                if (promo && typeof promo === 'object' && this.isCampaignUpdated(promo)) {
-                    this.clearMinimizedFlags(promoId);
-                    return true;
-                }
-
+                const promoId = typeof promo === 'object' ? promo.id : promo;
                 const vKey = typeof promo === 'object' ? this.getPromoVersionKey(promo) : promoId;
-                const vDailyKey = 'AI_PROMO_DAILY_SHOWN_' + vKey;
-                const lastShownVersionAt = parseInt(localStorage.getItem(vDailyKey) || '0', 10);
-                if (!lastShownVersionAt) return true;
 
-                const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
-                const lastShownAt = parseInt(localStorage.getItem(key) || '0', 10);
-                if (!lastShownAt) return true;
+                // Check if this EXACT version has already been seen by the user
+                const seenVersion = localStorage.getItem('AI_PROMO_SEEN_' + promoId);
+                const isExactVersionSeen = localStorage.getItem('AI_PROMO_SEEN_VER_' + vKey);
 
-                if (promo && typeof promo === 'object' && promo.updated_at) {
-                    const promoUpdated = new Date(promo.updated_at).getTime();
-                    if (promoUpdated > lastShownAt) {
-                        this.clearMinimizedFlags(promoId);
-                        return true;
-                    }
+                // If user has already seen this promotion and its version hasn't changed:
+                // Return false -> NEVER popup repeatedly on session or reloads!
+                if (seenVersion === vKey || isExactVersionSeen === '1') {
+                    return false;
                 }
 
-                const elapsedMs = Date.now() - Math.max(lastShownAt, lastShownVersionAt);
-                return elapsedMs >= (24 * 60 * 60 * 1000);
-            } catch (e) {
+                // If never seen or freshly updated by admin (vKey changed):
+                this.clearMinimizedFlags(promoId);
                 return true;
+            } catch (e) {
+                return false;
             }
         },
 
         markFullPopupShownToday: function (promo) {
             try {
+                if (!promo) return;
                 const promoId = typeof promo === 'object' ? promo.id : promo;
-                const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
+                const vKey = typeof promo === 'object' ? this.getPromoVersionKey(promo) : promoId;
                 const nowStr = String(Date.now());
-                localStorage.setItem(key, nowStr);
-                if (typeof promo === 'object') {
-                    const vKey = this.getPromoVersionKey(promo);
-                    localStorage.setItem('AI_PROMO_DAILY_SHOWN_' + vKey, nowStr);
-                    const lastVersionKey = 'AI_PROMO_LAST_VERSION_' + promoId;
-                    localStorage.setItem(lastVersionKey, vKey);
-                }
+                localStorage.setItem('AI_PROMO_SEEN_' + promoId, vKey);
+                localStorage.setItem('AI_PROMO_SEEN_VER_' + vKey, '1');
+                localStorage.setItem('AI_PROMO_LAST_VERSION_' + promoId, vKey);
+                localStorage.setItem('AI_PROMO_DAILY_SHOWN_' + promoId, nowStr);
+                localStorage.setItem('AI_PROMO_DAILY_SHOWN_' + vKey, nowStr);
             } catch (e) { }
         },
 
@@ -452,11 +443,22 @@
             }
 
             try {
-                const origin = window.location.origin || 'https://aarogyamindia.com';
+                const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
                 const shareTarget = promo.target_url ? (origin + promo.target_url) : origin;
-                const sep = shareTarget.includes('?') ? '&' : '?';
-                // Attach share_id and sender's full name for recipient personalization
-                const verifiedShareUrl = `${shareTarget}${sep}ref=${encodeURIComponent(user.shareId)}&from=${encodeURIComponent(user.name)}&promo=${encodeURIComponent(promo.id)}`;
+                
+                // Pure Share ID only - Strict Aarogyam Manas Rule (Rule 3: No sender name or 'from' in link)
+                let verifiedShareUrl = shareTarget;
+                try {
+                    const urlObj = new URL(shareTarget, origin);
+                    urlObj.searchParams.set('share_id', user.shareId);
+                    urlObj.searchParams.delete('from');
+                    urlObj.searchParams.delete('name');
+                    urlObj.searchParams.delete('promo');
+                    verifiedShareUrl = urlObj.toString();
+                } catch (_) {
+                    const sep = shareTarget.includes('?') ? '&' : '?';
+                    verifiedShareUrl = `${shareTarget}${sep}share_id=${encodeURIComponent(user.shareId)}`;
+                }
 
                 let tmpl = promo.share_message_template ||
                     `🪔 *{sender_name} जी की तरफ से सप्रेम बधाई और उपहार!* 🪔
@@ -1494,6 +1496,16 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
         init: async function () {
             if (this.initialized) return;
             this.initialized = true;
+
+            // STRICT AAROGYAM MANAS RULE (Rule 6, line 62):
+            // Zero-Promotion on Book & Bundle Landing Pages, Checkout, and Payment Funnels
+            if (this.isBookLandingPage()) {
+                const oldBox = document.getElementById('agy-floating-gift-box');
+                if (oldBox) oldBox.remove();
+                const oldPopup = document.getElementById('agy-promo-root') || document.getElementById('agy-promotion-overlay');
+                if (oldPopup) oldPopup.remove();
+                return;
+            }
 
             try {
                 // Fetch dynamic promotions JSON (15s cache buster)

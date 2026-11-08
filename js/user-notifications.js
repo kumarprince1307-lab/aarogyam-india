@@ -28,6 +28,7 @@
                 // Strict single-product book marketing landing pages and checkout funnels
                 const landingSubstrings = [
                     'landing',
+                    'bundle',
                     'checkout',
                     'payment-',
                     'demo-',
@@ -146,7 +147,7 @@
             if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
                 const promoScript = document.createElement('script');
                 promoScript.id = 'agy-promo-gateway-script';
-                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261107_v13_record_share';
+                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261108_v14_pure_share_once';
                 promoScript.defer = true;
                 document.head.appendChild(promoScript);
             }

@@ -1418,8 +1418,8 @@
     let userShareId = 'AI000004';
     try {
       const userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-      if (userObj && (userObj.share_id || userObj.ref_code || userObj.phone)) {
-        userShareId = userObj.share_id || userObj.ref_code || userObj.phone;
+      if (userObj && (userObj.share_id || userObj.ref_code)) {
+        userShareId = userObj.share_id || userObj.ref_code;
       }
     } catch (_) { }
 

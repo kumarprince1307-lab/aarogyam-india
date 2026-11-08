@@ -7,9 +7,21 @@
 (function () {
   'use strict';
 
-  // Do not show popup on checkout, payment or admin pages or bundle page itself
-  const path = window.location.pathname.toLowerCase();
-  if (path.includes('checkout') || path.includes('payment') || path.includes('admin') || path.includes('bundle.html')) {
+  // Do not show popup on checkout, payment, admin, bundle or book landing pages
+  const path = (window.location.pathname || '').toLowerCase();
+  const search = (window.location.search || '').toLowerCase();
+  if (
+    path.includes('checkout') ||
+    path.includes('payment') ||
+    path.includes('order') ||
+    path.includes('admin') ||
+    path.includes('bundle') ||
+    path.includes('book-landing') ||
+    path.includes('demo-kharif') ||
+    path.includes('kheti-dr') ||
+    search.includes('id=bundle') ||
+    search.includes('id=bk')
+  ) {
     return;
   }
 
