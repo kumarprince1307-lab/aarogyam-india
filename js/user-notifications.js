@@ -147,7 +147,7 @@
             if (!window.AarogyamPromotionGateway && !document.getElementById('agy-promo-gateway-script')) {
                 const promoScript = document.createElement('script');
                 promoScript.id = 'agy-promo-gateway-script';
-                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261108_v14_pure_share_once';
+                promoScript.src = '/js/aarogyam-promotion-gateway.js?v=20261108_v21_pure_share_once';
                 promoScript.defer = true;
                 document.head.appendChild(promoScript);
             }

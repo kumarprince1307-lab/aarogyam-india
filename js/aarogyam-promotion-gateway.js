@@ -238,13 +238,24 @@
                 const promoId = typeof promo === 'object' ? promo.id : promo;
                 const vKey = typeof promo === 'object' ? this.getPromoVersionKey(promo) : promoId;
 
-                // Check if this EXACT version has already been seen by the user
+                // Check if this EXACT version or promo has already been seen by the user
                 const seenVersion = localStorage.getItem('AI_PROMO_SEEN_' + promoId);
                 const isExactVersionSeen = localStorage.getItem('AI_PROMO_SEEN_VER_' + vKey);
+                const lastVersion = localStorage.getItem('AI_PROMO_LAST_VERSION_' + promoId);
+                const legacyDailyShown = localStorage.getItem('AI_PROMO_DAILY_SHOWN_' + promoId);
+
+                // Check if admin has updated/changed the promo since it was last shown
+                const isUpdated = this.isCampaignUpdated(promo);
 
                 // If user has already seen this promotion and its version hasn't changed:
-                // Return false -> NEVER popup repeatedly on session or reloads!
+                // Return false -> NEVER popup repeatedly on session, reloads or navigation!
                 if (seenVersion === vKey || isExactVersionSeen === '1') {
+                    return false;
+                }
+
+                // Backward-compatibility: if shown previously and not updated by admin, do not popup!
+                if (!isUpdated && (lastVersion || legacyDailyShown)) {
+                    this.markFullPopupShownToday(promo);
                     return false;
                 }
 
