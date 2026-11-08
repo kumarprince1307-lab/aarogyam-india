@@ -254,7 +254,7 @@ export async function renderBookBundlesPage() {
 
     <!-- VIEW 2: DYNAMIC BUNDLE BUILDER FORM -->
     <div id="bundleBuilderView" style="display: none;">
-      <form id="bundleBuilderForm" class="admin-card" style="padding: 24px; background: #0f172a; border: 1.5px solid #38bdf8; border-radius: 14px;">
+      <form id="bundleBuilderForm" novalidate class="admin-card" style="padding: 24px; background: #0f172a; border: 1.5px solid #38bdf8; border-radius: 14px;">
         
         <!-- SECTION 1: BASIC INFO & HERO BANNER WITH LIVE PREVIEW -->
         <h3 style="color:#38bdf8; margin:0 0 16px 0; border-bottom:1px solid #334155; padding-bottom:8px; display:flex; align-items:center; gap:8px;">
@@ -936,12 +936,33 @@ function bindBundleHubEvents() {
     });
   }
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await handleSaveBundle();
-    showList();
-    await loadAndRenderBundles();
-  });
+  const handleFormSave = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const btnSave = document.getElementById('btnSaveBundle');
+    if (btnSave) {
+      btnSave.disabled = true;
+      btnSave.textContent = '⏳ सुरक्षित हो रहा है...';
+    }
+    try {
+      await handleSaveBundle();
+      showList();
+      await loadAndRenderBundles();
+    } catch (err) {
+      console.error('[Save Bundle Error]', err);
+      alert('बंडल सुरक्षित करने में समस्या आई: ' + (err.message || err));
+    } finally {
+      if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.textContent = '💾 बंडल ऑफर सुरक्षित करें (Publish Bundle)';
+      }
+    }
+  };
+
+  form?.addEventListener('submit', handleFormSave);
+  document.getElementById('btnSaveBundle')?.addEventListener('click', handleFormSave);
 }
 
 // --- DATA LOGIC & RENDERING ---
@@ -1262,6 +1283,12 @@ window.removeHeroKpi = function (idx) {
 };
 
 // --- AAROGYAMTUBE INTEGRATION ---
+function extractYouTubeId(url) {
+  if (!url) return '';
+  const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
 async function fetchAarogyamTubeVideos() {
   try {
     const resp = await fetch('/data/webinar-recordings.json?v=' + Date.now());
@@ -1273,10 +1300,15 @@ async function fetchAarogyamTubeVideos() {
   return [];
 }
 
-function openAarogyamTubePicker() {
+async function openAarogyamTubePicker() {
   const modal = document.getElementById('aarogyamTubePickerModal');
   if (modal) {
     modal.style.display = 'flex';
+    if (!_aarogyamTubeVideos || _aarogyamTubeVideos.length === 0) {
+      const grid = document.getElementById('tubePickerGrid');
+      if (grid) grid.innerHTML = '<div style="color:#38bdf8; text-align:center; padding:30px; grid-column:1/-1;">⏳ आरोग्यम ट्यूब वीडियो लोड हो रहे हैं...</div>';
+      _aarogyamTubeVideos = await fetchAarogyamTubeVideos();
+    }
     renderAarogyamTubeGrid(_aarogyamTubeVideos);
   }
 }
@@ -1295,22 +1327,31 @@ function renderAarogyamTubeGrid(list) {
     return;
   }
 
-  grid.innerHTML = list.slice(0, 40).map(v => {
-    const thumb = v.thumbnail || `https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg` || '/images/banners/aarogyamtube-default-thumb.svg';
-    const vUrl = v.video_url || v.youtube_url || `https://www.youtube.com/watch?v=${v.youtube_id}`;
+  grid.innerHTML = list.slice(0, 60).map(v => {
+    const rawUrl = v.video_url || v.youtube_url || (v.youtube_id ? `https://www.youtube.com/watch?v=${v.youtube_id}` : '');
+    const ytId = extractYouTubeId(rawUrl) || v.youtube_id || '';
+    const cleanWatchUrl = ytId ? `https://www.youtube.com/watch?v=${ytId}` : rawUrl;
+    const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : (v.thumbnail || '/images/banners/aarogyamtube-default-thumb.svg');
+    const isShort = rawUrl.includes('/shorts/') || v.format === 'short' || v.format === 'shorts';
+    const displayCategory = v.subject || v.category || 'AarogyamTube';
 
     return `
-      <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; overflow:hidden; display:flex; flex-direction:column;">
-        <img src="${thumb}" alt="Thumb" style="width:100%; height:110px; object-fit:cover;" onerror="this.src='/images/banners/aarogyamtube-default-thumb.svg';" />
-        <div style="padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+      <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+        <div style="position:relative; width:100%; height:115px; background:#020617; overflow:hidden;">
+          <img src="${thumb}" alt="Thumb" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.src='/images/banners/aarogyamtube-default-thumb.svg';" />
+          <span style="position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.82); color:#f8fafc; font-size:0.65rem; font-weight:800; padding:2px 6px; border-radius:4px;">
+            ${isShort ? '📱 SHORTS' : (v.duration || 'VIDEO')}
+          </span>
+        </div>
+        <div style="padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
           <div>
-            <span style="font-size:0.68rem; color:#38bdf8; font-weight:800; text-transform:uppercase;">${v.subject || v.category || 'AarogyamTube'}</span>
-            <h5 style="margin:4px 0 8px 0; color:#fff; font-size:0.8rem; line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+            <span style="font-size:0.65rem; color:#38bdf8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">${escapeHtml(displayCategory)}</span>
+            <h5 style="margin:4px 0 0 0; color:#fff; font-size:0.8rem; font-weight:700; line-height:1.35; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
               ${escapeHtml(v.title || '')}
             </h5>
           </div>
-          <button type="button" onclick="window.pickTubeVideo('${encodeURIComponent(vUrl)}', '${encodeURIComponent(v.title || '')}', '${encodeURIComponent(v.speaker || v.subject || '')}')" class="admin-button small-button" style="background:#10b981; color:#fff; width:100%; border:none; padding:6px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-            ➕ यह वीडियो जोड़ें
+          <button type="button" onclick="window.pickTubeVideo('${encodeURIComponent(cleanWatchUrl)}', '${encodeURIComponent(v.title || '')}', '${encodeURIComponent(v.speaker || v.subject || '')}')" class="admin-button small-button" style="background:#10b981; color:#fff; width:100%; border:none; padding:7px 10px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <span>➕</span> <span>यह वीडियो जोड़ें</span>
           </button>
         </div>
       </div>
@@ -1432,15 +1473,20 @@ function renderVideosList() {
     return;
   }
 
-  container.innerHTML = _currentVideos.map((v, i) => `
-    <div style="background:#020617; border:1px solid #334155; border-radius:8px; padding:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-      <span style="color:#ec4899; font-weight:900; font-size:0.82rem;">#${i + 1}</span>
-      <input type="url" placeholder="वीडियो लिंक (URL)" value="${escapeHtml(v.url || '')}" onchange="window.updateVideoItem(${i}, 'url', this.value)" class="admin-input" style="flex:2; min-width:200px; font-size:0.8rem;" />
-      <input type="text" placeholder="शीर्षक (Title)" value="${escapeHtml(v.title || '')}" onchange="window.updateVideoItem(${i}, 'title', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
-      <input type="text" placeholder="उप-शीर्षक (Subtitle)" value="${escapeHtml(v.subtitle || '')}" onchange="window.updateVideoItem(${i}, 'subtitle', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
-      <button type="button" onclick="window.removeVideoItem(${i})" class="admin-button small-button" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; cursor:pointer;" title="हटाएं">✕</button>
-    </div>
-  `).join('');
+  container.innerHTML = _currentVideos.map((v, i) => {
+    const ytId = extractYouTubeId(v.url || '');
+    const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : '';
+    return `
+      <div style="background:#020617; border:1px solid #334155; border-radius:8px; padding:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <span style="color:#ec4899; font-weight:900; font-size:0.82rem;">#${i + 1}</span>
+        ${thumb ? `<img src="${thumb}" alt="Thumb" style="width:52px; height:34px; object-fit:cover; border-radius:4px; border:1px solid #334155;" />` : ''}
+        <input type="text" placeholder="वीडियो लिंक (URL)" value="${escapeHtml(v.url || '')}" onchange="window.updateVideoItem(${i}, 'url', this.value)" class="admin-input" style="flex:2; min-width:200px; font-size:0.8rem;" />
+        <input type="text" placeholder="शीर्षक (Title)" value="${escapeHtml(v.title || '')}" onchange="window.updateVideoItem(${i}, 'title', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
+        <input type="text" placeholder="उप-शीर्षक (Subtitle)" value="${escapeHtml(v.subtitle || '')}" onchange="window.updateVideoItem(${i}, 'subtitle', this.value)" class="admin-input" style="flex:1.5; min-width:160px; font-size:0.8rem;" />
+        <button type="button" onclick="window.removeVideoItem(${i})" class="admin-button small-button" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:800; cursor:pointer;" title="हटाएं">✕</button>
+      </div>
+    `;
+  }).join('');
 }
 
 window.updateVideoItem = function (idx, key, val) {
@@ -1745,21 +1791,35 @@ window.moveSectionOrder = function (idx, dir) {
 
 // --- SAVE / EDIT / DELETE CONTROLLERS ---
 async function handleSaveBundle() {
-  const id = document.getElementById('bFormId').value.trim();
-  const slug = document.getElementById('bFormSlug').value.trim();
-  const title = document.getElementById('bFormTitle').value.trim();
-  const subtitle = document.getElementById('bFormSubtitle').value.trim();
-  const description = document.getElementById('bFormDescription').value.trim();
-  const badge = document.getElementById('bFormBadge').value.trim();
-  const buyBtnText = document.getElementById('bFormBuyBtnText').value.trim();
-  const bannerImage = document.getElementById('bFormBannerImage').value.trim();
+  const idEl = document.getElementById('bFormId');
+  const id = idEl ? idEl.value.trim() : '';
+  const titleEl = document.getElementById('bFormTitle');
+  const title = titleEl ? titleEl.value.trim() : '';
+  const slug = (document.getElementById('bFormSlug')?.value.trim()) || (id ? id.toLowerCase().replace(/[^a-z0-9_-]/g, '-') : `bundle-${Date.now()}`);
 
-  const mrp = Number(document.getElementById('bFormMrp').value || 1196);
-  const offerPrice = Number(document.getElementById('bFormOfferPrice').value || 199);
+  if (!id) {
+    alert('कृपया बंडल ID अवश्य दर्ज करें!');
+    if (idEl) idEl.focus();
+    return;
+  }
+  if (!title) {
+    alert('कृपया बंडल का शीर्षक (Title) अवश्य दर्ज करें!');
+    if (titleEl) titleEl.focus();
+    return;
+  }
+
+  const subtitle = document.getElementById('bFormSubtitle')?.value.trim() || '';
+  const description = document.getElementById('bFormDescription')?.value.trim() || '';
+  const badge = document.getElementById('bFormBadge')?.value.trim() || '';
+  const buyBtnText = document.getElementById('bFormBuyBtnText')?.value.trim() || '';
+  const bannerImage = document.getElementById('bFormBannerImage')?.value.trim() || '';
+
+  const mrp = Number(document.getElementById('bFormMrp')?.value || 1196);
+  const offerPrice = Number(document.getElementById('bFormOfferPrice')?.value || 199);
 
   // Top Countdown Timer Config
   const timerConfig = {
-    enabled: document.getElementById('bFormTimerEnabled').checked,
+    enabled: Boolean(document.getElementById('bFormTimerEnabled')?.checked),
     badgeText: document.getElementById('bFormTimerBadge')?.value.trim() || '⚡ महाबचत कॉम्बो ऑफर: यह स्पेशल डिस्काउंट केवल अगले:',
     durationMinutes: Number(document.getElementById('bFormTimerMinutes')?.value || 15)
   };
@@ -1793,22 +1853,22 @@ async function handleSaveBundle() {
   });
 
   // Media
-  const videoAutoPlay = document.getElementById('bFormVideoAutoPlay').checked;
-  const audioAutoPlay = document.getElementById('bFormAudioAutoPlay').checked;
+  const videoAutoPlay = Boolean(document.getElementById('bFormVideoAutoPlay')?.checked);
+  const audioAutoPlay = Boolean(document.getElementById('bFormAudioAutoPlay')?.checked);
   const audioUrl = document.getElementById('bFormAudioUrl')?.value.trim() || '';
   const audioScript = document.getElementById('bFormAudioScript')?.value.trim() || '';
 
   // Marketing
-  const ogImage = document.getElementById('bFormOgImage').value.trim();
-  const ogTitle = document.getElementById('bFormOgTitle').value.trim();
-  const seoKeywords = document.getElementById('bFormSeoKeywords').value.trim();
-  const metaPixelId = document.getElementById('bFormPixelId').value.trim();
-  const gaId = document.getElementById('bFormGaId').value.trim();
-  const waText = document.getElementById('bFormWaText').value.trim();
+  const ogImage = document.getElementById('bFormOgImage')?.value.trim() || '';
+  const ogTitle = document.getElementById('bFormOgTitle')?.value.trim() || '';
+  const seoKeywords = document.getElementById('bFormSeoKeywords')?.value.trim() || '';
+  const metaPixelId = document.getElementById('bFormPixelId')?.value.trim() || '';
+  const gaId = document.getElementById('bFormGaId')?.value.trim() || '';
+  const waText = document.getElementById('bFormWaText')?.value.trim() || '';
 
   // Promotions & Popup
-  const popupEnabled = document.getElementById('bFormPopupEnabled').checked;
-  const popupDelaySeconds = Number(document.getElementById('bFormPopupDelay').value || 15);
+  const popupEnabled = Boolean(document.getElementById('bFormPopupEnabled')?.checked);
+  const popupDelaySeconds = Number(document.getElementById('bFormPopupDelay')?.value || 15);
   const popupTitle = document.getElementById('bFormPopupTitle')?.value.trim() || title;
   const popupSubtitle = document.getElementById('bFormPopupSubtitle')?.value.trim() || subtitle;
   const popupCtaText = document.getElementById('bFormPopupCtaText')?.value.trim() || `🛒 पूरा कॉम्बो ₹${offerPrice} में अनलॉक करें`;

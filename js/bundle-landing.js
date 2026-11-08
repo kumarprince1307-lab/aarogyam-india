@@ -648,15 +648,18 @@
     updateVideoSlidePosition();
   }
 
+  function extractYouTubeId(url) {
+    if (!url) return '';
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : '';
+  }
+
   function getEmbedUrl(url, autoplay) {
     if (!url) return '';
-    let autoParam = autoplay ? '&autoplay=1&mute=1' : '';
-    if (url.includes('youtube.com/watch?v=')) {
-      const vidId = url.split('v=')[1]?.split('&')[0];
-      return `https://www.youtube.com/embed/${vidId}?rel=0${autoParam}`;
-    } else if (url.includes('youtu.be/')) {
-      const vidId = url.split('youtu.be/')[1]?.split('?')[0];
-      return `https://www.youtube.com/embed/${vidId}?rel=0${autoParam}`;
+    const autoParam = autoplay ? '?autoplay=1&mute=1' : '?rel=0';
+    const ytId = extractYouTubeId(url);
+    if (ytId) {
+      return `https://www.youtube.com/embed/${ytId}${autoParam}`;
     }
     return url;
   }
