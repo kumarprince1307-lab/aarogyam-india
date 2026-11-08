@@ -16,7 +16,7 @@
 
   <!-- OPEN GRAPH / SOCIAL META -->
   <meta property="fb:app_id" content="966242223397117">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   <meta property="og:site_name" content="Aarogyam India">
   <meta property="og:title" id="og-title-meta" content="आरोग्यम महाबचत ई-बुक कॉम्बो बंडल">
   <meta property="og:description" id="og-desc-meta"
@@ -28,10 +28,10 @@
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" id="og-url-meta" content="">
+  <meta property="og:url" id="og-url-meta" content="https://aarogyamindia.online/bundle.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" id="twitter-title-meta" content="Aarogyam India Mega Combo Bundle">
-  <meta name="twitter:description" id="twitter-desc-meta" content="सम्पूर्ण कृषि ई-बुक कॉम्बो बंडल">
+  <meta name="twitter:title" id="twitter-title-meta" content="आरोग्यम महाबचत ई-बुक कॉम्बो बंडल">
+  <meta name="twitter:description" id="twitter-desc-meta" content="सम्पूर्ण कृषि, फसल सुरक्षा व वैज्ञानिक खेती मास्टर गाइड्स एक साथ विशेष कॉम्बो छूट पर!">
   <meta name="twitter:image" id="twitter-image-meta"
     content="https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg">
 
@@ -40,11 +40,13 @@
   <link rel="apple-touch-icon" href="/images/logo/fevicon.png">
   <link rel="manifest" href="/manifest.json?v=1.1">
 
-  <!-- Performance Preconnects -->
+  <!-- Performance Preconnects & High-Speed Preloads for Sub-1s Load Time -->
   <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin>
   <link rel="dns-prefetch" href="https://checkout.razorpay.com">
   <link rel="preconnect" href="https://connect.facebook.net" crossorigin>
   <link rel="dns-prefetch" href="https://connect.facebook.net">
+  <link rel="preload" href="/data/book-bundles.json" as="fetch" crossorigin>
+  <link rel="preload" href="/data/books.json" as="fetch" crossorigin>
 
   <!-- CORE AAROGYAM LANDING PAGE STYLESHEETS -->
   <link rel="stylesheet" href="/css/style.css?v=1.1">
@@ -52,8 +54,7 @@
   <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261103">
   <link rel="stylesheet" href="/css/home-revamp.css?v=20261103">
   <link rel="stylesheet" href="/css/book-landing.css?v=42.0">
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261029_v17_orchard">
-  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261105_v16_coverflow_fix">
+  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261108_v20_fb_shorts_fix">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -691,16 +692,15 @@
     <i class="fa-solid fa-mobile-screen-button"></i> <span>Install App</span>
   </a>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/js/supabase.js"></script>
-  <script src="/session.js"></script>
-  <script src="/js/universal-preview-gallery-lightbox.js?v=20261104"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261101_v32_bahi_khata"></script>
-  <script src="/js/public-pwa.js?v=1.2"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261106_v50_identity_saved" defer></script>
+  <!-- High Performance Scripts (Non-blocking & Fast Execution) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="/js/supabase.js" defer></script>
+  <script src="/session.js" defer></script>
+  <script src="/js/universal-preview-gallery-lightbox.js?v=20261104" defer></script>
+  <script src="/js/universal-nav-drawer.js?v=20261101_v32_bahi_khata" defer></script>
+  <script src="/js/public-pwa.js?v=1.2" defer></script>
   <script src="/js/wallet-reward-engine.js?v=20261107_v3_passbook" defer></script>
-  <script src="/js/bundle-landing.js?v=20261108_v18_youtube_fix"></script>
+  <script src="/js/bundle-landing.js?v=20261108_v20_fb_shorts_fix"></script>
 
 </body>
 

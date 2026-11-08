@@ -34,22 +34,25 @@
     const urlParams = new URLSearchParams(window.location.search);
     const bundleId = urlParams.get('id') || urlParams.get('bundle') || urlParams.get('slug');
 
-    // 1. Fetch live catalogs (Books & Landing Pages)
-    allCatalogBooks = await fetchCatalogBooks();
-    allLandingPages = await fetchLandingPages();
-
-    // 2. Fetch Bundle Configuration
-    currentBundle = await loadBundleConfig(bundleId);
+    // 1. Fetch live catalogs & Bundle Configuration in PARALLEL (Zero Waterfall, Instant Load < 1s)
+    const [books, lps, bundle] = await Promise.all([
+      fetchCatalogBooks(),
+      fetchLandingPages(),
+      loadBundleConfig(bundleId)
+    ]);
+    allCatalogBooks = books || [];
+    allLandingPages = lps || [];
+    currentBundle = bundle;
 
     if (!currentBundle) {
       renderBundleNotFound();
       return;
     }
 
-    // 3. Inject Dynamic SEO, Open Graph & Facebook Pixel
+    // 2. Inject Dynamic SEO, Open Graph & Facebook Pixel
     injectMarketingMeta(currentBundle);
 
-    // 4. Render Bundle UI Elements
+    // 3. Render Bundle UI Elements
     renderBundleHero(currentBundle);
     renderVideoSection(currentBundle);
     renderIncludedBooks(currentBundle);
@@ -62,13 +65,13 @@
     renderStickyBar(currentBundle);
     initBundleAudio(currentBundle);
 
-    // 5. Setup Countdown Timer
+    // 4. Setup Countdown Timer
     setupCountdownTimer(currentBundle);
 
-    // 6. Section Visibility & Order Controls (Drag/Drop Reorder & On/Off)
+    // 5. Section Visibility & Order Controls (Drag/Drop Reorder & On/Off)
     applySectionControls(currentBundle);
 
-    // 7. Bind Global Click Handlers
+    // 6. Bind Global Click Handlers
     bindActionButtons(currentBundle);
   }
 
@@ -241,18 +244,34 @@
     };
   }
 
-  // --- 2. DYNAMIC SEO & SOCIAL SHARING META ---
+  // --- 2. DYNAMIC SEO & SOCIAL SHARING META (MATCHED OG & TWITTER TAGS) ---
   function injectMarketingMeta(bundle) {
-    if (bundle.title) {
-      document.title = `${bundle.title} — आरोग्यम इंडिया`;
-      const seoTitle = document.getElementById('page-seo-title');
-      if (seoTitle) seoTitle.textContent = `${bundle.title} — आरोग्यम इंडिया`;
-    }
+    const finalTitle = (bundle.ogTitle || bundle.title || "आरोग्यम महाबचत ई-बुक कॉम्बो बंडल").trim();
+    const finalDesc = (bundle.ogDescription || bundle.subtitle || "सम्पूर्ण कृषि, फसल सुरक्षा व वैज्ञानिक खेती मास्टर गाइड्स एक साथ विशेष कॉम्बो छूट पर!").trim();
+    const finalImg = bundle.ogImage || "https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg";
+
+    document.title = `${finalTitle} — Aarogyam India`;
+    const seoTitle = document.getElementById('page-seo-title');
+    if (seoTitle) seoTitle.textContent = `${finalTitle} — Aarogyam India`;
+
+    const seoDesc = document.getElementById('page-seo-desc');
+    if (seoDesc) seoDesc.content = finalDesc;
+
+    // Both og:title and twitter:title MUST match identically for Facebook Ads / OpenGraph Scraper
     const ogTitle = document.getElementById('og-title-meta');
-    if (ogTitle) ogTitle.content = bundle.ogTitle || bundle.title;
+    if (ogTitle) ogTitle.content = finalTitle;
+    const twTitle = document.getElementById('twitter-title-meta');
+    if (twTitle) twTitle.content = finalTitle;
+
+    const ogDesc = document.getElementById('og-desc-meta');
+    if (ogDesc) ogDesc.content = finalDesc;
+    const twDesc = document.getElementById('twitter-desc-meta');
+    if (twDesc) twDesc.content = finalDesc;
 
     const ogImg = document.getElementById('og-image-meta');
-    if (ogImg && bundle.ogImage) ogImg.content = bundle.ogImage;
+    if (ogImg) ogImg.content = finalImg;
+    const twImg = document.getElementById('twitter-image-meta');
+    if (twImg) twImg.content = finalImg;
 
     const ogUrl = document.getElementById('og-url-meta');
     if (ogUrl) ogUrl.content = window.location.href;
@@ -322,8 +341,14 @@
     if (featWrap) {
       if (Array.isArray(bundle.heroKpis) && bundle.heroKpis.length > 0) {
         featWrap.innerHTML = bundle.heroKpis.map(k => {
-          const icon = typeof k === 'object' ? (k.icon || '⚡') : '⚡';
-          const val = typeof k === 'object' ? (k.value || k.label || '') : k;
+          let val = typeof k === 'object' ? (k.value || k.label || '') : String(k || '');
+          let icon = typeof k === 'object' ? (k.icon || '') : '';
+          const match = val.match(/^([\p{Emoji}\u200d\uFE0F]+)\s*(.*)$/u);
+          if (match) {
+            if (!icon) icon = match[1];
+            val = match[2];
+          }
+          if (!icon) icon = '⚡';
           return `
             <div class="hero-feature">
               <span>${icon}</span>
@@ -593,11 +618,19 @@
     if (titleEl) titleEl.textContent = bundle.videoTitle || "🎥 सम्पूर्ण कॉम्बो बंडल वीडियो झलक";
     if (subEl) subEl.textContent = bundle.videoSubtitle || "जानिए कैसे यह संग्रह आपकी समस्याओं का त्वरित समाधान करेगा:";
 
-    // Render video slides
+    // Render video slides with automatic 9:16 Vertical Shorts & 16:9 Landscape support
     container.innerHTML = _bundleVideos.map((v, idx) => {
-      const vUrl = v.url || v.videoUrl;
+      const vUrl = v.url || v.videoUrl || '';
       const isDirect = /\.(mp4|webm|ogg)($|\?)/i.test(vUrl);
-      const isAutoPlay = idx === 0 && Boolean(bundle.videoAutoPlay);
+      const isAutoPlay = idx === 0 && Boolean(bundle.videoAutoPlay !== false);
+      const isVertical = Boolean(
+        vUrl.includes('/shorts/') ||
+        v.isVertical ||
+        v.aspectRatio === '9:16' ||
+        v.format === 'short_reel' ||
+        v.format === 'short' ||
+        v.format === 'shorts'
+      );
 
       let mediaHtml = '';
       if (isDirect) {
@@ -607,28 +640,49 @@
             controls 
             playsinline 
             ${isAutoPlay ? 'autoplay muted' : ''} 
-            style="width:100%;height:100%;max-height:420px;border-radius:12px;background:#000;display:block;margin:0 auto;object-fit:contain;">
+            style="width:100%;height:100%;max-height:${isVertical ? '560px' : '420px'};border-radius:12px;background:#000;display:block;margin:0 auto;object-fit:contain;">
           </video>
         `;
       } else {
         const embedUrl = getEmbedUrl(vUrl, isAutoPlay);
-        mediaHtml = `
-          <div style="position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;">
-            <iframe 
-              src="${embedUrl}" 
-              style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:12px;" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen>
-            </iframe>
+        const unmutePillHtml = (idx === 0 && isAutoPlay) ? `
+          <div class="video-unmute-overlay" onclick="window.unmuteBundleVideo(this)" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#fff; padding:6px 14px; border-radius:24px; font-weight:800; font-size:0.8rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:6px; box-shadow:0 6px 18px rgba(0,0,0,0.6); pointer-events:auto;">
+            <span>🔊</span> <span>आवाज़ चालू करें</span>
           </div>
-        `;
+        ` : '';
+
+        if (isVertical) {
+          mediaHtml = `
+            <div class="bundle-vertical-video-frame">
+              <iframe 
+                src="${embedUrl}" 
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px;" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+              ${unmutePillHtml}
+            </div>
+          `;
+        } else {
+          mediaHtml = `
+            <div style="position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;box-shadow:0 8px 24px rgba(0,0,0,0.35);">
+              <iframe 
+                src="${embedUrl}" 
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:12px;" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+              ${unmutePillHtml}
+            </div>
+          `;
+        }
       }
 
       return `
-        <div class="bundle-video-slide" data-index="${idx}">
+        <div class="bundle-video-slide ${isVertical ? 'is-vertical-slide' : ''}" data-index="${idx}">
           ${mediaHtml}
-          ${v.title ? `<div style="margin-top:8px;font-weight:800;color:#0f172a;font-size:0.92rem;text-align:center;">${escapeHtml(v.title)}</div>` : ''}
-          ${v.subtitle ? `<div style="font-size:0.8rem;color:#64748b;text-align:center;">${escapeHtml(v.subtitle)}</div>` : ''}
+          ${v.title ? `<div style="margin-top:10px;font-weight:800;color:#0f172a;font-size:0.95rem;text-align:center;">${escapeHtml(v.title)}</div>` : ''}
+          ${v.subtitle ? `<div style="font-size:0.82rem;color:#64748b;text-align:center;">${escapeHtml(v.subtitle)}</div>` : ''}
         </div>
       `;
     }).join('');
@@ -646,6 +700,55 @@
 
     _activeVideoIdx = 0;
     updateVideoSlidePosition();
+
+    if (bundle.videoAutoPlay !== false) {
+      setupFirstGestureVideoUnmute();
+    }
+  }
+
+  // --- SMART SOUND UNMUTE ENGINE (FACEBOOK & MOBILE BROWSER COMPATIBLE) ---
+  window.unmuteBundleVideo = function (btnEl) {
+    const iframes = document.querySelectorAll('.bundle-vertical-video-frame iframe, .bundle-video-slide iframe');
+    iframes.forEach(iframe => {
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(JSON.stringify({
+          event: 'command',
+          func: 'unMute',
+          args: []
+        }), '*');
+        iframe.contentWindow.postMessage(JSON.stringify({
+          event: 'command',
+          func: 'setVolume',
+          args: [100]
+        }), '*');
+      }
+    });
+
+    const directVideos = document.querySelectorAll('.bundle-video-slide video');
+    directVideos.forEach(v => {
+      v.muted = false;
+      v.volume = 1.0;
+      v.play().catch(() => {});
+    });
+
+    if (btnEl) btnEl.style.display = 'none';
+    const allOverlays = document.querySelectorAll('.video-unmute-overlay');
+    allOverlays.forEach(el => el.style.display = 'none');
+  };
+
+  let _hasUnmutedBundleVideo = false;
+  function setupFirstGestureVideoUnmute() {
+    const triggerUnmute = () => {
+      if (_hasUnmutedBundleVideo) return;
+      _hasUnmutedBundleVideo = true;
+      window.unmuteBundleVideo();
+      ['touchstart', 'click', 'scroll'].forEach(evt => {
+        window.removeEventListener(evt, triggerUnmute, { passive: true });
+      });
+    };
+    ['touchstart', 'click', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, triggerUnmute, { passive: true, once: true });
+    });
   }
 
   function extractYouTubeId(url) {
@@ -656,9 +759,11 @@
 
   function getEmbedUrl(url, autoplay) {
     if (!url) return '';
-    const autoParam = autoplay ? '?autoplay=1&mute=1' : '?rel=0';
     const ytId = extractYouTubeId(url);
     if (ytId) {
+      const autoParam = autoplay 
+        ? '?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0' 
+        : '?playsinline=1&rel=0';
       return `https://www.youtube.com/embed/${ytId}${autoParam}`;
     }
     return url;

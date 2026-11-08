@@ -1332,9 +1332,11 @@ function renderAarogyamTubeGrid(list) {
   grid.innerHTML = list.slice(0, 60).map(v => {
     const rawUrl = v.video_url || v.youtube_url || (v.youtube_id ? `https://www.youtube.com/watch?v=${v.youtube_id}` : '');
     const ytId = extractYouTubeId(rawUrl) || v.youtube_id || '';
-    const cleanWatchUrl = ytId ? `https://www.youtube.com/watch?v=${ytId}` : rawUrl;
+    const isShort = rawUrl.includes('/shorts/') || v.format === 'short' || v.format === 'shorts' || v.format === 'short_reel';
+    const cleanWatchUrl = isShort && ytId 
+      ? `https://youtube.com/shorts/${ytId}` 
+      : (ytId ? `https://www.youtube.com/watch?v=${ytId}` : rawUrl);
     const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : (v.thumbnail || '/images/banners/aarogyamtube-default-thumb.svg');
-    const isShort = rawUrl.includes('/shorts/') || v.format === 'short' || v.format === 'shorts';
     const displayCategory = v.subject || v.category || 'AarogyamTube';
 
     return `
@@ -1342,7 +1344,7 @@ function renderAarogyamTubeGrid(list) {
         <div style="position:relative; width:100%; height:115px; background:#020617; overflow:hidden;">
           <img src="${thumb}" alt="Thumb" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.src='/images/banners/aarogyamtube-default-thumb.svg';" />
           <span style="position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.82); color:#f8fafc; font-size:0.65rem; font-weight:800; padding:2px 6px; border-radius:4px;">
-            ${isShort ? '📱 SHORTS' : (v.duration || 'VIDEO')}
+            ${isShort ? '📱 SHORTS (9:16)' : (v.duration || 'VIDEO')}
           </span>
         </div>
         <div style="padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
@@ -1352,7 +1354,7 @@ function renderAarogyamTubeGrid(list) {
               ${escapeHtml(v.title || '')}
             </h5>
           </div>
-          <button type="button" onclick="window.pickTubeVideo('${encodeURIComponent(cleanWatchUrl)}', '${encodeURIComponent(v.title || '')}', '${encodeURIComponent(v.speaker || v.subject || '')}')" class="admin-button small-button" style="background:#10b981; color:#fff; width:100%; border:none; padding:7px 10px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <button type="button" onclick="window.pickTubeVideo('${encodeURIComponent(cleanWatchUrl)}', '${encodeURIComponent(v.title || '')}', '${encodeURIComponent(v.speaker || v.subject || '')}', '${isShort ? '9:16' : '16:9'}')" class="admin-button small-button" style="background:#10b981; color:#fff; width:100%; border:none; padding:7px 10px; border-radius:6px; font-weight:800; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
             <span>➕</span> <span>यह वीडियो जोड़ें</span>
           </button>
         </div>
@@ -1361,15 +1363,19 @@ function renderAarogyamTubeGrid(list) {
   }).join('');
 }
 
-window.pickTubeVideo = function (encUrl, encTitle, encSub) {
+window.pickTubeVideo = function (encUrl, encTitle, encSub, encRatio) {
   const url = decodeURIComponent(encUrl);
   const title = decodeURIComponent(encTitle);
   const sub = decodeURIComponent(encSub);
+  const ratio = encRatio ? decodeURIComponent(encRatio) : (url.includes('/shorts/') ? '9:16' : '16:9');
+  const isVert = ratio === '9:16';
 
   _currentVideos.push({
     url: url,
     title: title,
-    subtitle: sub || "आरोग्यम ट्यूब विशेष वीडियो"
+    subtitle: sub || "आरोग्यम ट्यूब विशेष वीडियो",
+    isVertical: isVert,
+    aspectRatio: ratio
   });
 
   renderVideosList();

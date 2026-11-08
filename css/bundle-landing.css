@@ -28,19 +28,33 @@ body.bundle-landing-page {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
   letter-spacing: 0.3px;
   position: sticky !important;
   top: 0 !important;
   margin: 0 !important;
-  z-index: 100000 !important;
+  z-index: 99998 !important;
   box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
 }
 
 body.bundle-landing-page .header.header-tiranga-animated {
-  top: 36px !important;
   margin: 0 !important;
-  z-index: 99999 !important;
+  z-index: 99990 !important;
+}
+
+@media (min-width: 769px) {
+  body.bundle-landing-page .header.header-tiranga-animated {
+    position: sticky !important;
+    top: 38px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body.bundle-landing-page .header.header-tiranga-animated {
+    position: relative !important;
+    top: 0 !important;
+  }
 }
 
 .bundle-timer-badge {
@@ -646,10 +660,6 @@ body.bundle-landing-page .header.header-tiranga-animated {
    ========================================================================== */
 .bundle-floating-audio-pill {
   position: fixed !important;
-  top: 86px !important;
-  right: 14px !important;
-  left: auto !important;
-  bottom: auto !important;
   max-width: 230px !important;
   z-index: 1000002 !important;
   background: rgba(15, 23, 42, 0.95) !important;
@@ -664,6 +674,26 @@ body.bundle-landing-page .header.header-tiranga-animated {
   gap: 8px !important;
   cursor: pointer;
   transition: transform 0.2s ease;
+}
+
+@media (min-width: 769px) {
+  .bundle-floating-audio-pill {
+    top: 96px !important;
+    right: 18px !important;
+    left: auto !important;
+    bottom: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .bundle-floating-audio-pill {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 12px !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 99995 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), 0 0 10px rgba(251, 191, 36, 0.35) !important;
+  }
 }
 
 .bundle-floating-audio-pill:hover {
@@ -849,14 +879,15 @@ body.bundle-landing-page .header.header-tiranga-animated {
 
 .bundle-mobile-sticky-bar .sticky-buy-btn {
   flex: 1 1 auto !important;
-  min-width: 130px !important;
+  min-width: 120px !important;
   height: 44px !important;
   background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
   color: #ffffff !important;
   border-radius: 8px !important;
   border: 1px solid #ffffff !important;
   font-weight: 900 !important;
-  font-size: 0.96rem !important;
+  font-size: 0.94rem !important;
+  white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -879,6 +910,41 @@ body.bundle-landing-page .header.header-tiranga-animated {
   flex-shrink: 0 !important;
   cursor: pointer !important;
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35) !important;
+}
+
+/* Precision Mobile Tuning for Small Screens (e.g. 360px Android & FB WebView) */
+@media (max-width: 420px) {
+  .mobile-sticky-bar.bundle-mobile-sticky-bar .mobile-sticky-bar-inner {
+    gap: 6px !important;
+    padding: 0 2px !important;
+  }
+  .bundle-mobile-sticky-bar .sticky-bundle-multi-stack {
+    width: 38px !important;
+    height: 46px !important;
+  }
+  .bundle-mobile-sticky-bar .sticky-multi-thumb {
+    width: 32px !important;
+    height: 42px !important;
+  }
+  .bundle-mobile-sticky-bar .mobile-book-price .old-price {
+    font-size: 11px !important;
+  }
+  .bundle-mobile-sticky-bar .mobile-book-price .offer-price {
+    font-size: 18px !important;
+  }
+  .bundle-mobile-sticky-bar .sticky-buy-btn {
+    font-size: 0.86rem !important;
+    padding: 0 8px !important;
+    height: 42px !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+    letter-spacing: -0.2px !important;
+  }
+  .bundle-mobile-sticky-bar .sticky-share-btn {
+    width: 38px !important;
+    height: 42px !important;
+    font-size: 1rem !important;
+  }
 }
 
 /* ==========================================================================
@@ -916,6 +982,29 @@ body.bundle-landing-page .header.header-tiranga-animated {
   border: 2px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+}
+
+/* 9:16 Vertical Video / Shorts Slide Enhancements */
+.bundle-video-slide.is-vertical-slide {
+  max-width: 360px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.bundle-vertical-video-frame {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 340px !important;
+  margin: 0 auto !important;
+  aspect-ratio: 9 / 16 !important;
+  height: 560px !important;
+  max-height: 75vh !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  background: #000 !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
+  border: 2.5px solid #334155 !important;
 }
 
 .bundle-video-slide-header {

@@ -14,7 +14,7 @@ const ROUTES = {
   'all-surveys': () => import('./admin-pages-surveys.js').then(m => m.initAllSurveys()),
   'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=31.4').then(m => m.initAllLandingPages()),
   'book-landing-pages': () => import('./admin-pages-book-landing.js?v=42.0').then(m => m.initBookLandingPages()),
-  'book-bundles': () => import('./admin-pages-book-bundle.js?v=20261108_v30').then(m => (m.renderBookBundlesPage ? m.renderBookBundlesPage() : m.initBookBundles())),
+  'book-bundles': () => import('./admin-pages-book-bundle.js?v=20261108_v31_autopick').then(m => (m.renderBookBundlesPage ? m.renderBookBundlesPage() : m.initBookBundles())),
   'book-audio-studio': () => import('./admin-pages-book-audio-studio.js?v=3.4').then(m => m.initBookAudioStudio()),
   'page-editor': () => import('./admin-pages-page-editor.js?v=38.1').then(m => m.initPageEditor()),
   'product-landing-pages': () => import('./admin-pages-product-landing.js').then(m => m.initProductLandingPages()),
