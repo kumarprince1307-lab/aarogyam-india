@@ -233,6 +233,11 @@
                     return true;
                 }
 
+                const vKey = typeof promo === 'object' ? this.getPromoVersionKey(promo) : promoId;
+                const vDailyKey = 'AI_PROMO_DAILY_SHOWN_' + vKey;
+                const lastShownVersionAt = parseInt(localStorage.getItem(vDailyKey) || '0', 10);
+                if (!lastShownVersionAt) return true;
+
                 const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
                 const lastShownAt = parseInt(localStorage.getItem(key) || '0', 10);
                 if (!lastShownAt) return true;
@@ -245,7 +250,7 @@
                     }
                 }
 
-                const elapsedMs = Date.now() - lastShownAt;
+                const elapsedMs = Date.now() - Math.max(lastShownAt, lastShownVersionAt);
                 return elapsedMs >= (24 * 60 * 60 * 1000);
             } catch (e) {
                 return true;
@@ -256,10 +261,13 @@
             try {
                 const promoId = typeof promo === 'object' ? promo.id : promo;
                 const key = 'AI_PROMO_DAILY_SHOWN_' + promoId;
-                localStorage.setItem(key, String(Date.now()));
+                const nowStr = String(Date.now());
+                localStorage.setItem(key, nowStr);
                 if (typeof promo === 'object') {
+                    const vKey = this.getPromoVersionKey(promo);
+                    localStorage.setItem('AI_PROMO_DAILY_SHOWN_' + vKey, nowStr);
                     const lastVersionKey = 'AI_PROMO_LAST_VERSION_' + promoId;
-                    localStorage.setItem(lastVersionKey, this.getPromoVersionKey(promo));
+                    localStorage.setItem(lastVersionKey, vKey);
                 }
             } catch (e) { }
         },
@@ -1253,19 +1261,17 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                 });
             }
 
-            // Click or Touch anywhere outside card dismisses and minimizes
+            // Click anywhere outside card dismisses and minimizes (with grace delay to prevent accidental touch drops)
+            let allowBackdropDismiss = false;
+            setTimeout(() => { allowBackdropDismiss = true; }, 500);
+
             root.addEventListener('click', (e) => {
+                if (!allowBackdropDismiss) return;
                 const cardWrapper = root.querySelector('.agy-promo-card-wrapper');
                 if (cardWrapper && !cardWrapper.contains(e.target)) {
                     dismiss();
                 }
             });
-            root.addEventListener('touchend', (e) => {
-                const cardWrapper = root.querySelector('.agy-promo-card-wrapper');
-                if (cardWrapper && !cardWrapper.contains(e.target)) {
-                    dismiss();
-                }
-            }, { passive: true });
 
             // ESC key dismisses
             const onKeyDown = (e) => {
