@@ -169,6 +169,27 @@
     return null;
   }
 
+  // Shared Universal Platform Exit Helper (Facebook / Google / Webview / Referrer Safe Exit)
+  function exitToExternalPlatform() {
+    try { window.close(); } catch (_) {}
+
+    const ref = document.referrer || '';
+    if (ref && !ref.includes(window.location.host)) {
+      window.location.replace(ref);
+      return;
+    }
+
+    if (window.history.length > 2) {
+      window.history.go(-2);
+    } else if (window.history.length > 1) {
+      window.history.back();
+    }
+
+    setTimeout(() => {
+      window.location.replace(ref || '/index.html');
+    }, 250);
+  }
+
   // 7. Inject Gateway Modal (100% Single-Screen Mobile Fit, Ultra-Crisp High Contrast)
   function renderGatewayModal(config) {
     if (document.getElementById('adsLeadGatewayOverlay')) return;
@@ -190,8 +211,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
-      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      padding: 10px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: none;
@@ -205,13 +226,13 @@
       <div id="adsLeadGatewayCard" style="
         background: #ffffff;
         border: 2px solid #cbd5e1;
-        border-radius: 12px;
-        width: 94%;
-        max-width: 440px;
+        border-radius: 14px;
+        width: 95%;
+        max-width: 450px;
         min-width: 280px;
         margin: auto;
         color: #000000;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
         overflow-y: auto;
         overflow-x: hidden;
         scrollbar-width: none !important;
@@ -244,27 +265,28 @@
             display: inline-block;
             transform-origin: center;
           }
-          /* Sleek High-Contrast Dark Input Boxes (15px/16px responsive, Large font for farmers) */
+          /* Sleek High-Contrast Dark Input Boxes (16px responsive, Large font for farmers) */
           .ads-input-dark {
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
-            padding: 7px 10px;
+            padding: 10px 12px;
             background: #0f172a !important;
-            border: 1.5px solid #475569;
-            border-radius: 6px;
+            border: 2px solid #475569;
+            border-radius: 8px;
             color: #ffffff !important;
-            font-size: 15px !important;
+            font-size: 16px !important;
             font-weight: 800;
             outline: none;
             touch-action: manipulation;
             transition: border-color 0.15s ease;
+            min-height: 46px;
           }
           .ads-input-dark::placeholder {
             color: #94a3b8 !important;
             font-weight: 600;
             opacity: 1;
-            font-size: 0.90rem;
+            font-size: 0.92rem;
           }
           .ads-input-dark:focus {
             border-color: #0284c7 !important;
@@ -290,20 +312,20 @@
         </style>
 
         <!-- Top Header Strip (Green Free Banner) -->
-        <div style="background: #047857; padding: 4px 8px; text-align: center;">
-          <span style="font-size: 0.72rem; font-weight: 900; color: #ffffff; letter-spacing: 0.3px;">
+        <div style="background: #047857; padding: 7px 12px; text-align: center;">
+          <span style="font-size: 0.86rem; font-weight: 900; color: #ffffff; letter-spacing: 0.3px;">
             🎁 100% मुफ़्त एक्सेस (FREE) • कोई शुल्क नहीं
           </span>
         </div>
 
-        <div style="padding: 10px 12px; position: relative;">
+        <div style="padding: 14px 16px; position: relative;">
           <!-- Exit Confirmation Overlay (Zero Blur, Sharp Text, True Exit Outside Page) -->
           <div id="adsGateExitConfirm" style="
             display: none;
             position: absolute;
             inset: 0;
             background: #090e1a;
-            border-radius: 10px;
+            border-radius: 12px;
             z-index: 99;
             padding: 24px 18px;
             flex-direction: column;
@@ -323,6 +345,7 @@
             <button type="button" id="btnAdsGateStay" class="ads-btn-sharp-green" style="
               width: 100%;
               padding: 13px 14px;
+              min-height: 48px;
               border-radius: 8px;
               font-size: 1.05rem;
               font-weight: 900;
@@ -347,63 +370,74 @@
           </div>
 
           <!-- Compact Hero Card -->
-          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 4px 6px;">
-            <img src="${coverImage}" alt="Cover" style="width: 36px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px 8px;">
+            <img src="${coverImage}" alt="Cover" style="width: 44px; height: 58px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
             <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 1px;">
-                <span style="background: #dcfce7; color: #166534; font-size: 0.60rem; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #86efac; text-transform: uppercase;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                <span style="background: #dcfce7; color: #166534; font-size: 0.66rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; text-transform: uppercase;">
                   मुफ़्त ई-बुक
                 </span>
-                <span style="font-size: 0.64rem; font-weight: 800; color: #0284c7;">Aarogyam India</span>
+                <span style="font-size: 0.72rem; font-weight: 800; color: #0284c7;">Aarogyam India</span>
               </div>
-              <h4 style="margin: 0; font-size: 0.86rem; font-weight: 900; color: #000000 !important; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <h4 style="margin: 0; font-size: 0.94rem; font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 ${title}
               </h4>
             </div>
           </div>
 
           <!-- Black Box + White Text + Blinking Green Book Banner (Large Font for Farmers, NO Shadow) -->
-          <div style="background: #000000; border: 1.5px solid #334155; border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 5px;">
-            <span class="ads-blinking-book" style="font-size: 1.15rem; line-height: 1;">📗</span>
-            <div style="font-size: 0.88rem; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center;">
+          <div style="background: #000000; border: 1.5px solid #334155; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span class="ads-blinking-book" style="font-size: 1.25rem; line-height: 1;">📗</span>
+            <div style="font-size: 0.92rem; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center;">
               कृपया विवरण दर्ज करके मुफ़्त झलक अनलॉक करें:
             </div>
           </div>
 
           <!-- Alert Box -->
-          <div id="adsGateAlert" style="display: none; padding: 4px 6px; border-radius: 5px; font-size: 0.76rem; font-weight: 800; margin-bottom: 5px;"></div>
+          <div id="adsGateAlert" style="display: none; padding: 6px 8px; border-radius: 6px; font-size: 0.80rem; font-weight: 800; margin-bottom: 6px;"></div>
 
           <form id="adsLeadGatewayForm" autocomplete="on">
             <!-- 1. Name Input (Dark Box + Bold White Text) -->
-            <div style="margin-bottom: 5px;">
-              <label style="display: block; font-size: 0.82rem; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
+            <div style="margin-bottom: 6px;">
+              <label style="display: block; font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
                 👤 आपका शुभ नाम (Full Name) <span style="color:#dc2626;">*</span>
               </label>
               <input type="text" id="adsGateName" name="name" autocomplete="name" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" />
             </div>
 
             <!-- 2. WhatsApp Mobile Number (No separate +91, auto-sanitizes spaces & +91, auto-detects wrong numbers) -->
-            <div style="margin-bottom: 4px;">
-              <label style="display: block; font-size: 0.82rem; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
+            <div style="margin-bottom: 6px;">
+              <label style="display: block; font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
                 📱 WhatsApp मोबाइल नंबर <span style="color:#dc2626;">*</span>
               </label>
               <div style="position: relative;">
-                <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel" inputmode="numeric" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर दर्ज करें" class="ads-input-dark" style="padding-right: 34px;" />
-                <span id="adsMobileStatusIcon" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; display: none;"></span>
+                <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel" inputmode="numeric" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर दर्ज करें" class="ads-input-dark" style="padding-right: 36px;" />
+                <span id="adsMobileStatusIcon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 1.15rem; pointer-events: none; display: none;"></span>
               </div>
-              <div id="adsMobileValidationHint" style="display: none; font-size: 0.72rem; font-weight: 800; margin-top: 2px; margin-bottom: 3px; line-height: 1.2;"></div>
+              <div id="adsMobileValidationHint" style="display: none; font-size: 0.74rem; font-weight: 800; margin-top: 3px; margin-bottom: 3px; line-height: 1.2;"></div>
+            </div>
+
+            <!-- 3. Email Input (Optional / वैकल्पिक) -->
+            <div style="margin-bottom: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <label for="adsGateEmail" style="font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin: 0;">
+                  📧 ईमेल (Email ID)
+                </label>
+                <span style="font-size: 0.70rem; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
+              </div>
+              <input type="email" id="adsGateEmail" name="email" autocomplete="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" />
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
-            <div style="margin-bottom: 5px; background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: 4px 6px;">
-              <p style="margin: 0; font-size: 0.74rem; color: #000000 !important; line-height: 1.3; font-weight: 800;">
-                <span style="color: #dc2626; font-size: 0.85rem; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। भविष्य में आपकी आधिकारिक रेफरल लिंक इसी से जुड़ेगी।
+            <div style="margin-bottom: 6px; background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 6px; padding: 5px 8px;">
+              <p style="margin: 0; font-size: 0.76rem; color: #000000 !important; line-height: 1.35; font-weight: 800;">
+                <span style="color: #dc2626; font-size: 0.88rem; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। भविष्य में आपकी आधिकारिक रेफरल लिंक इसी से जुड़ेगी।
               </p>
             </div>
 
-            <!-- 3. Profession / Role Dropdown (Decent, Clean, Fits inside mobile perfectly) -->
-            <div style="margin-bottom: 7px;">
-              <label style="display: block; font-size: 0.82rem; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
+            <!-- 4. Profession / Role Dropdown (Decent, Clean, Fits inside mobile perfectly) -->
+            <div style="margin-bottom: 8px;">
+              <label style="display: block; font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
                 💼 आप क्या करते हैं? (Role / Profession) <span style="color:#dc2626;">*</span>
               </label>
               <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important;">
@@ -419,9 +453,10 @@
             <!-- Submit Button (Dark Solid Emerald Green + Big Bold White Text) -->
             <button type="submit" id="btnSubmitAdsGate" class="ads-btn-sharp-green" style="
               width: 100%;
-              padding: 9px 12px;
-              border-radius: 7px;
-              font-size: 0.98rem;
+              padding: 12px 14px;
+              min-height: 48px;
+              border-radius: 8px;
+              font-size: 1.05rem;
               font-weight: 900;
               letter-spacing: 0.2px;
               cursor: pointer;
@@ -430,14 +465,14 @@
               justify-content: center;
               gap: 6px;
             ">
-              <span id="adsGateBtnIcon" style="font-size: 1.05rem;">👉</span>
+              <span id="adsGateBtnIcon" style="font-size: 1.15rem;">👉</span>
               <span id="adsGateBtnLabel" style="font-weight: 900; color: #ffffff !important;">मुफ़्त झलक देखें और सम्पूर्ण समाधान पाएँ →</span>
             </button>
           </form>
 
           <!-- Micro Trust Strip (Black Bold Text) -->
-          <div style="margin-top: 4px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 3px;">
-            <span style="font-size: 0.66rem; color: #000000 !important; font-weight: 900; display: inline-flex; align-items: center; gap: 4px;">
+          <div style="margin-top: 6px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 5px;">
+            <span style="font-size: 0.70rem; color: #000000 !important; font-weight: 900; display: inline-flex; align-items: center; gap: 4px;">
               <span>🔒 100% सुरक्षित डेटा</span> • <span>कोई शुल्क नहीं</span> • <span>50,000+ किसान व साथी</span>
             </span>
           </div>
@@ -450,6 +485,7 @@
 
     const nameInput = document.getElementById('adsGateName');
     const mobileInput = document.getElementById('adsGateMobile');
+    const emailInput = document.getElementById('adsGateEmail');
     const statusIcon = document.getElementById('adsMobileStatusIcon');
     const hintEl = document.getElementById('adsMobileValidationHint');
     const profSelect = document.getElementById('adsGateProfession');
@@ -543,6 +579,7 @@
       const urlP = new URLSearchParams(window.location.search);
       const urlName = urlP.get('name') || urlP.get('u') || urlP.get('user_name') || '';
       const urlMobile = urlP.get('mobile') || urlP.get('phone') || urlP.get('m') || '';
+      const urlEmail = urlP.get('email') || urlP.get('mail') || '';
 
       const cachedName = urlName ||
                          localStorage.getItem('aim_user_name') ||
@@ -558,19 +595,26 @@
                            localStorage.getItem('SAKHI_USER_PHONE') ||
                            getSafeCookie('aim_user_mobile') || '';
 
+      const cachedEmail = urlEmail ||
+                          localStorage.getItem('aim_user_email') ||
+                          localStorage.getItem('user_email') ||
+                          getSafeCookie('aim_user_email') || '';
+
       const cachedProf = localStorage.getItem('AI_USER_PROFESSION') ||
                          localStorage.getItem('AI_USER_OCCUPATION') || '';
 
       let finalN = cachedName;
       let finalM = cachedMobile;
+      let finalE = cachedEmail;
       let finalP = cachedProf;
 
-      if (!finalN || !finalM) {
+      if (!finalN || !finalM || !finalE) {
         const uStr = localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER');
         if (uStr) {
           const u = JSON.parse(uStr);
           if (!finalN) finalN = u.name || u.full_name || '';
           if (!finalM) finalM = u.mobile || u.phone || '';
+          if (!finalE) finalE = u.email || '';
           if (!finalP) finalP = u.profession || u.occupation || '';
         }
       }
@@ -582,6 +626,9 @@
         mobileInput.value = cleanIndianMobile(finalM);
         handleMobileInput();
       }
+      if (finalE && emailInput && !emailInput.value) {
+        emailInput.value = finalE.trim();
+      }
       if (finalP && profSelect) {
         for (let opt of profSelect.options) {
           if (opt.text.includes(finalP) || opt.value === finalP) {
@@ -592,38 +639,10 @@
       }
     } catch (_) {}
 
-    // Back-Button Interception (Exit-Intent Squeeze Dialog & True Exit Outside)
+    // Back-Button Interception for Gateway Modal (Exit-Intent Squeeze Dialog & True Exit Outside)
     try {
       window.history.pushState({ adsGatewayModal: true }, '');
       let exitPromptShown = false;
-
-      function exitPageCompletely() {
-        window.removeEventListener('popstate', onPopState);
-        if (overlay && overlay.parentNode) overlay.remove();
-        document.body.style.overflow = '';
-
-        // 1. Try closing window/tab (works in webview / direct popup)
-        try { window.close(); } catch (_) {}
-
-        // 2. If referrer is external (Facebook, Google, Instagram, etc.), go back to referrer
-        const ref = document.referrer || '';
-        if (ref && !ref.includes(window.location.host)) {
-          window.location.replace(ref);
-          return;
-        }
-
-        // 3. If history has previous pages, go back
-        if (window.history.length > 2) {
-          window.history.go(-2);
-        } else if (window.history.length > 1) {
-          window.history.back();
-        }
-
-        // 4. Reliable fallback: If still on same page after 300ms, navigate away to home
-        setTimeout(() => {
-          window.location.replace(ref || '/index.html');
-        }, 300);
-      }
 
       const onPopState = function () {
         if (!document.body.contains(overlay)) {
@@ -636,7 +655,10 @@
           try { window.history.pushState({ adsExitShown: true }, ''); } catch (_) {}
         } else {
           // Exit prompt already shown and user pressed Back again -> completely leave page!
-          exitPageCompletely();
+          window.removeEventListener('popstate', onPopState);
+          if (overlay && overlay.parentNode) overlay.remove();
+          document.body.style.overflow = '';
+          exitToExternalPlatform();
         }
       };
       window.addEventListener('popstate', onPopState);
@@ -649,7 +671,10 @@
       });
 
       btnLeave?.addEventListener('click', () => {
-        exitPageCompletely();
+        window.removeEventListener('popstate', onPopState);
+        if (overlay && overlay.parentNode) overlay.remove();
+        document.body.style.overflow = '';
+        exitToExternalPlatform();
       });
     } catch (_) {}
 
@@ -671,6 +696,7 @@
   async function handleGatewaySubmit(config) {
     const nameInput = document.getElementById('adsGateName');
     const mobileInput = document.getElementById('adsGateMobile');
+    const emailInput = document.getElementById('adsGateEmail');
     const profSelect = document.getElementById('adsGateProfession');
     const alertBox = document.getElementById('adsGateAlert');
     const submitBtn = document.getElementById('btnSubmitAdsGate');
@@ -679,6 +705,7 @@
     const enteredName = (nameInput?.value || '').trim();
     const rawMobile = mobileInput?.value || '';
     const cleanMobile = cleanIndianMobile(rawMobile);
+    const enteredEmail = (emailInput?.value || '').trim();
     const profession = profSelect?.value || 'farmer';
     const professionText = profSelect?.options[profSelect.selectedIndex]?.text || profession;
 
@@ -725,6 +752,7 @@
       full_name: enteredName,
       mobile: cleanMobile,
       phone: cleanMobile,
+      email: enteredEmail,
       share_id: userShareId,
       profession: profession,
       occupation: professionText,
@@ -746,6 +774,11 @@
       localStorage.setItem('farmer_mobile', cleanMobile);
       localStorage.setItem('SAKHI_USER_NAME', enteredName);
       localStorage.setItem('SAKHI_USER_PHONE', cleanMobile);
+      if (enteredEmail) {
+        localStorage.setItem('aim_user_email', enteredEmail);
+        localStorage.setItem('user_email', enteredEmail);
+        document.cookie = "aim_user_email=" + encodeURIComponent(enteredEmail) + "; max-age=31536000; path=/; SameSite=Lax";
+      }
       localStorage.setItem('AI_USER_PROFESSION', professionText);
       localStorage.setItem('AI_USER_OCCUPATION', professionText);
       localStorage.setItem('AI_USER_LOGGED_IN', 'true');
@@ -758,6 +791,7 @@
         name: enteredName,
         mobile: cleanMobile,
         phone: cleanMobile,
+        email: enteredEmail,
         loggedIn: true,
         active: true,
         loginTime: new Date().toISOString(),
@@ -779,7 +813,7 @@
     } catch (_) {}
 
     // --- STEP B: AUTO-POPULATE & LOCK CHECKOUT INPUTS ---
-    prefillCheckoutFields(enteredName, cleanMobile);
+    prefillCheckoutFields(enteredName, cleanMobile, enteredEmail);
 
     // --- STEP C: SMOOTH CARD DISMISSAL (INSTANT ACCESS FOR FARMER) ---
     const card = document.getElementById('adsLeadGatewayCard');
@@ -795,12 +829,16 @@
       if (overlay) overlay.remove();
       document.body.style.overflow = '';
 
-      prefillCheckoutFields(enteredName, cleanMobile);
+      prefillCheckoutFields(enteredName, cleanMobile, enteredEmail);
+
+      // 🛡️ ACTIVATE LANDING PAGE EXIT SHIELD NOW!
+      initLandingPageExitShield(config);
 
       window.dispatchEvent(new CustomEvent('ads-gateway:unlocked', {
         detail: {
           name: enteredName,
           mobile: cleanMobile,
+          email: enteredEmail,
           profession: professionText,
           source: sourceLockedString
         }
@@ -815,7 +853,7 @@
       try {
         const { data: existingProfile } = await db
           .from('profiles')
-          .select('id, full_name, mobile, share_id, occupation')
+          .select('id, full_name, mobile, email, share_id, occupation')
           .eq('mobile', cleanMobile)
           .limit(1)
           .maybeSingle();
@@ -824,31 +862,41 @@
         let officialShareId = userShareId;
 
         if (existingProfile) {
-          officialName = (enteredName && enteredName.trim().length >= 2) ? enteredName.trim() : (existingProfile.full_name || enteredName);
+          // 🏛️ AAROGYAM CONSTITUTION RULE:
+          // रजिस्ट्रेशन के बाद यूजर का नाम व मोबाइल नंबर पब्लिक फॉर्म से अपडेट नहीं होगा।
+          // नाम और नंबर केवल एडमिन एडिट कर सकता है। बाकी डेटा (Email, Profession, Source) अपडेट हो सकता है।
+          officialName = existingProfile.full_name || enteredName;
           if (existingProfile.share_id) officialShareId = existingProfile.share_id;
+
+          const updatePayload = {
+            occupation: professionText,
+            source: sourceLockedString,
+            updated_at: new Date().toISOString()
+          };
+          // नाम व मोबाइल कभी अपडेट नहीं होंगे - केवल ईमेल (यदि नया है) व अन्य विवरण अपडेट होंगे
+          if (enteredEmail) updatePayload.email = enteredEmail;
 
           await db
             .from('profiles')
-            .update({
-              full_name: officialName,
-              occupation: professionText,
-              source: sourceLockedString,
-              updated_at: new Date().toISOString()
-            })
+            .update(updatePayload)
             .eq('id', existingProfile.id);
         } else {
+          // नया यूजर रजिस्ट्रेशन
+          const insertPayload = {
+            full_name: enteredName,
+            mobile: cleanMobile,
+            share_id: userShareId,
+            referral_code: sponsorShareId,
+            occupation: professionText,
+            registration_source: sourceLockedString,
+            source: sourceLockedString,
+            created_at: new Date().toISOString()
+          };
+          if (enteredEmail) insertPayload.email = enteredEmail;
+
           await db
             .from('profiles')
-            .insert({
-              full_name: enteredName,
-              mobile: cleanMobile,
-              share_id: userShareId,
-              referral_code: sponsorShareId,
-              occupation: professionText,
-              registration_source: sourceLockedString,
-              source: sourceLockedString,
-              created_at: new Date().toISOString()
-            });
+            .insert(insertPayload);
         }
 
         // Heal local storage with authoritative Supabase data if needed
@@ -871,8 +919,8 @@
   }
 
   // 9. Auto-prefill any checkout or order forms on the page
-  function prefillCheckoutFields(name, mobile) {
-    if (!name && !mobile) return;
+  function prefillCheckoutFields(name, mobile, email) {
+    if (!name && !mobile && !email) return;
     try {
       const nameSelectors = [
         '#billing_name', '#cust_name', '#order_name', '#name', '#customerName', '#modalName',
@@ -882,34 +930,176 @@
         '#billing_phone', '#cust_phone', '#order_phone', '#mobile', '#phone', '#customerMobile', '#modalMobile',
         'input[name="phone"]', 'input[name="mobile"]', 'input[name="billing_phone"]'
       ];
+      const emailSelectors = [
+        '#billing_email', '#cust_email', '#order_email', '#email', '#customerEmail', '#modalEmail',
+        'input[name="email"]', 'input[name="billing_email"]', 'input[name="cust_email"]'
+      ];
 
-      nameSelectors.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el) {
-          el.value = name;
-          el.dispatchEvent(new Event('input', { bubbles: true }));
-          el.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      });
+      if (name) {
+        nameSelectors.forEach(sel => {
+          const el = document.querySelector(sel);
+          if (el) {
+            el.value = name;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      }
 
-      phoneSelectors.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el) {
-          el.value = mobile;
-          el.dispatchEvent(new Event('input', { bubbles: true }));
-          el.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      });
+      if (mobile) {
+        phoneSelectors.forEach(sel => {
+          const el = document.querySelector(sel);
+          if (el) {
+            el.value = mobile;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      }
+
+      if (email) {
+        emailSelectors.forEach(sel => {
+          const el = document.querySelector(sel);
+          if (el) {
+            el.value = email;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      }
     } catch (_) {}
   }
 
-  // 10. Public Initializer API
+  // 10. Landing Page Exit-Intent Confirmation Shield (Retention Safeguard)
+  // Handles: Link Click ➔ Gateway Form ➔ Logged In on Landing Page ➔ User clicks Back ➔ Confirmation Offer Modal ➔ Second Back ➔ Exit to Facebook
+  function initLandingPageExitShield(config = {}) {
+    if (window._landingExitShieldActive) return;
+    window._landingExitShieldActive = true;
+
+    try {
+      // Push history state so Back press on landing page triggers popstate
+      window.history.pushState({ landingPageActive: true }, '');
+      let landingExitShown = false;
+
+      function getOrCreateLandingExitModal() {
+        let modalWrap = document.getElementById('adsLandingExitModal');
+        if (modalWrap) return modalWrap;
+
+        modalWrap = document.createElement('div');
+        modalWrap.id = 'adsLandingExitModal';
+        modalWrap.style.cssText = `
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.88);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          z-index: 9999999;
+          align-items: center;
+          justify-content: center;
+          padding: 14px;
+          box-sizing: border-box;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        `;
+
+        const title = config.title || 'महाबचत किसान 5-इन-1 मास्टर कॉम्बो';
+
+        modalWrap.innerHTML = `
+          <div style="
+            background: #090e1a;
+            border: 2px solid #1e3a8a;
+            border-radius: 14px;
+            width: 95%;
+            max-width: 440px;
+            padding: 26px 20px;
+            text-align: center;
+            color: #ffffff;
+            box-sizing: border-box;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.95);
+            animation: adsGatePop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          ">
+            <div style="font-size: 3.5rem; margin-bottom: 12px; line-height: 1;">🎁</div>
+            <h3 style="color: #ffffff; font-size: 1.32rem; font-weight: 900; margin: 0 0 10px 0; line-height: 1.35; letter-spacing: 0.2px;">
+              रुकिए! क्या आप यह विशेष कॉम्बो ऑफर छोड़ना चाहते हैं?
+            </h3>
+            <p style="color: #f1f5f9; font-size: 1.02rem; font-weight: 700; margin: 0 0 22px 0; line-height: 1.48;">
+              आज <strong>${title}</strong> 80% भारी छूट के साथ केवल ₹199 में उपलब्ध है। यह अवसर दोबारा नहीं मिलेगा!
+            </p>
+            <button type="button" id="btnLandingExitStay" class="ads-btn-sharp-green" style="
+              width: 100%;
+              padding: 14px 16px;
+              min-height: 50px;
+              border-radius: 8px;
+              font-size: 1.10rem;
+              font-weight: 900;
+              cursor: pointer;
+              margin-bottom: 14px;
+              box-shadow: 0 4px 14px rgba(4, 120, 87, 0.45);
+            ">
+              👉 हाँ, मुझे ऑफर देखना है (पेज पर रहें)
+            </button>
+            <button type="button" id="btnLandingExitLeave" style="
+              background: transparent;
+              border: none;
+              color: #fca5a5;
+              font-size: 0.94rem;
+              font-weight: 800;
+              cursor: pointer;
+              text-decoration: underline;
+              padding: 8px 12px;
+            ">
+              नहीं, मुझे बाहर निकलना है (पेज से बाहर निकलें ✕)
+            </button>
+          </div>
+        `;
+
+        document.body.appendChild(modalWrap);
+
+        const btnStay = modalWrap.querySelector('#btnLandingExitStay');
+        const btnLeave = modalWrap.querySelector('#btnLandingExitLeave');
+
+        btnStay?.addEventListener('click', () => {
+          modalWrap.style.display = 'none';
+          landingExitShown = false;
+          document.body.style.overflow = '';
+          try { window.history.pushState({ landingPageActive: true }, ''); } catch (_) {}
+        });
+
+        btnLeave?.addEventListener('click', () => {
+          exitToExternalPlatform();
+        });
+
+        return modalWrap;
+      }
+
+      window.addEventListener('popstate', (e) => {
+        // If Gateway modal is currently on screen, let Gateway modal handle its own popstate
+        if (document.getElementById('adsLeadGatewayOverlay')) return;
+
+        const exitModal = getOrCreateLandingExitModal();
+        if (!landingExitShown) {
+          landingExitShown = true;
+          exitModal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+          try { window.history.pushState({ landingExitPrompt: true }, ''); } catch (_) {}
+        } else {
+          // User already saw the landing exit prompt and pressed Back again -> leave page!
+          exitToExternalPlatform();
+        }
+      });
+
+    } catch (_) {}
+  }
+
+  // 11. Public Initializer API
   window.initAdsLeadGateway = function (config = {}) {
-    // If user is already registered in this browser, bypass smoothly
+    // If user is already registered in this browser, bypass gateway but activate landing page exit shield!
     if (isUserRegistered()) {
       const cachedName = localStorage.getItem('aim_user_name') || '';
       const cachedMob = localStorage.getItem('aim_user_mobile') || '';
-      if (cachedName && cachedMob) prefillCheckoutFields(cachedName, cachedMob);
+      const cachedMail = localStorage.getItem('aim_user_email') || '';
+      if (cachedName && cachedMob) prefillCheckoutFields(cachedName, cachedMob, cachedMail);
+      initLandingPageExitShield(config);
       return;
     }
 
@@ -928,12 +1118,14 @@
     document.addEventListener('DOMContentLoaded', () => {
       const n = localStorage.getItem('aim_user_name');
       const m = localStorage.getItem('aim_user_mobile');
-      if (n && m) prefillCheckoutFields(n, m);
+      const e = localStorage.getItem('aim_user_email') || localStorage.getItem('user_email');
+      if (n && m) prefillCheckoutFields(n, m, e);
     });
   } else {
     const n = localStorage.getItem('aim_user_name');
     const m = localStorage.getItem('aim_user_mobile');
-    if (n && m) prefillCheckoutFields(n, m);
+    const e = localStorage.getItem('aim_user_email') || localStorage.getItem('user_email');
+    if (n && m) prefillCheckoutFields(n, m, e);
   }
 
 })();

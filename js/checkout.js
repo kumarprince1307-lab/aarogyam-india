@@ -1635,6 +1635,8 @@ function autoFillUserData() {
     const qName = urlParams.get('name') || urlParams.get('customerName') || urlParams.get('billing_name') || '';
     const qMobile = (urlParams.get('mobile') || urlParams.get('phone') || urlParams.get('customerMobile') || '').replace(/\D/g, '').slice(-10);
 
+    const qEmail = urlParams.get('email') || urlParams.get('mail') || '';
+
     // 2. Read stored user, 1-year cookies and all local storage fallbacks
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
     
@@ -1646,7 +1648,7 @@ function autoFillUserData() {
                       (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || 
                        localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('farmer_mobile') || 
                        getCheckoutCookie('aim_user_mobile') || "").replace(/\D/g, '').slice(-10);
-    const emailVal = storedUser.email || localStorage.getItem('user_email') || "";
+    const emailVal = qEmail || storedUser.email || localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || getCheckoutCookie('aim_user_email') || "";
 
     if (custMobEl && !custMobEl.readOnly) {
         if (nameVal && custNameEl && !custNameEl.value) {
@@ -1657,7 +1659,10 @@ function autoFillUserData() {
             custMobEl.value = mobileVal;
             custMobEl.dispatchEvent(new Event('input', { bubbles: true }));
         }
-        if (emailVal && custEmailEl && !custEmailEl.value) custEmailEl.value = emailVal;
+        if (emailVal && custEmailEl && !custEmailEl.value) {
+            custEmailEl.value = emailVal;
+            custEmailEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
 
         if (typeof getCurrentUser === "function") {
             const user = getCurrentUser();
@@ -1670,7 +1675,10 @@ function autoFillUserData() {
                     custMobEl.value = user.mobile;
                     custMobEl.dispatchEvent(new Event('input', { bubbles: true }));
                 }
-                if (user.email && custEmailEl && !custEmailEl.value) custEmailEl.value = user.email;
+                if (user.email && custEmailEl && !custEmailEl.value) {
+                    custEmailEl.value = user.email;
+                    custEmailEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
             }
         }
     }

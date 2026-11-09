@@ -1418,7 +1418,8 @@
 
     const uName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
     const uMob = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
-    const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}`;
+    const uEmail = localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || '';
+    const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}${uEmail ? `&email=${encodeURIComponent(uEmail)}` : ''}`;
 
     // Redirect to checkout with multi-book bundle parameter and customer prefill
     window.location.href = `/ebooks/checkout.html?bundle=${encodeURIComponent(currentBundle.id)}&books=${encodeURIComponent(bookParams)}&price=${finalPrice}&title=${encodeURIComponent(currentBundle.title)}${userQueryParams}`;
