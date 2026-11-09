@@ -211,8 +211,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
-      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      padding: 6px;
+      padding-bottom: max(6px, env(safe-area-inset-bottom));
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: none;
@@ -226,20 +226,22 @@
       <div id="adsLeadGatewayCard" style="
         background: #ffffff;
         border: 2px solid #cbd5e1;
-        border-radius: 14px;
+        border-radius: 12px;
         width: 95%;
-        max-width: 450px;
+        max-width: 430px;
         min-width: 280px;
         margin: auto;
         color: #000000;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+        max-height: calc(100dvh - 12px);
+        max-height: calc(100vh - 12px);
         overflow-y: auto;
         overflow-x: hidden;
         scrollbar-width: none !important;
         -ms-overflow-style: none !important;
         -webkit-overflow-scrolling: touch;
         box-sizing: border-box;
-        animation: adsGatePop 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: adsGatePop 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       ">
         <style>
           #adsLeadGatewayOverlay * {
@@ -252,46 +254,61 @@
             height: 0 !important;
           }
           @keyframes adsGatePop {
-            0% { opacity: 0; transform: scale(0.96) translateY(8px); }
+            0% { opacity: 0; transform: scale(0.96) translateY(6px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
           }
-          /* Blinking Green Book Animation (NO Drop-Shadow, Zero Blur) */
+          /* Blinking Green Book Animation (Zero Blur) */
           @keyframes bookPulseBlink {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.18); }
+            50% { opacity: 0.35; transform: scale(1.18); }
           }
           .ads-blinking-book {
             animation: bookPulseBlink 0.9s infinite ease-in-out;
             display: inline-block;
             transform-origin: center;
           }
-          /* Sleek High-Contrast Dark Input Boxes (16px responsive, Large font for farmers) */
+          /* Sleek High-Contrast Dark Input Boxes (Legible, Bold & Sharp) */
           .ads-input-dark {
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
-            padding: 10px 12px;
+            padding: 7px 12px;
             background: #0f172a !important;
-            border: 2px solid #475569;
-            border-radius: 8px;
+            border: 1.5px solid #475569;
+            border-radius: 7px;
             color: #ffffff !important;
             font-size: 16px !important;
             font-weight: 800;
             outline: none;
             touch-action: manipulation;
             transition: border-color 0.15s ease;
-            min-height: 46px;
+            height: 42px;
+            min-height: 42px;
+            line-height: normal;
           }
           .ads-input-dark::placeholder {
             color: #94a3b8 !important;
             font-weight: 600;
             opacity: 1;
-            font-size: 0.92rem;
+            font-size: 14px;
           }
           .ads-input-dark:focus {
             border-color: #0284c7 !important;
           }
-          /* Razor-Sharp Emerald Button (NO Text-Shadow, Solid White) */
+          /* Chrome / Facebook In-App Browser Autofill Override (Crisp White Text on Dark Box) */
+          .ads-input-dark:-webkit-autofill,
+          .ads-input-dark:-webkit-autofill:hover,
+          .ads-input-dark:-webkit-autofill:focus,
+          .ads-input-dark:-webkit-autofill:active {
+            -webkit-text-fill-color: #ffffff !important;
+            -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+            box-shadow: 0 0 0px 1000px #0f172a inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+            line-height: normal !important;
+          }
+          /* Razor-Sharp Emerald Button (Solid White, No Text-Shadow) */
           .ads-btn-sharp-green {
             background: #046a38 !important;
             border: 2px solid #02381f !important;
@@ -311,46 +328,46 @@
           }
         </style>
 
-        <!-- Top Header Strip (Green Free Banner) -->
-        <div style="background: #047857; padding: 7px 12px; text-align: center;">
-          <span style="font-size: 0.86rem; font-weight: 900; color: #ffffff; letter-spacing: 0.3px;">
+        <!-- Top Header Strip (Green Free Banner, Single Crisp Line) -->
+        <div style="background: #047857; padding: 5px 8px; text-align: center; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
+          <span style="font-size: 13px; font-weight: 900; color: #ffffff; letter-spacing: 0.2px;">
             🎁 100% मुफ़्त एक्सेस (FREE) • कोई शुल्क नहीं
           </span>
         </div>
 
-        <div style="padding: 14px 16px; position: relative;">
+        <div style="padding: 10px 14px; position: relative;">
           <!-- Exit Confirmation Overlay (Zero Blur, Sharp Text, True Exit Outside Page) -->
           <div id="adsGateExitConfirm" style="
             display: none;
             position: absolute;
             inset: 0;
             background: #090e1a;
-            border-radius: 12px;
+            border-radius: 10px;
             z-index: 99;
-            padding: 24px 18px;
+            padding: 18px 16px;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             box-sizing: border-box;
-            animation: adsGatePop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: adsGatePop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           ">
-            <div style="font-size: 3.2rem; margin-bottom: 12px; line-height: 1; animation: bookPulseBlink 0.9s infinite ease-in-out;">🎁</div>
-            <h3 style="color: #ffffff; font-size: 1.30rem; font-weight: 900; margin: 0 0 10px 0; line-height: 1.32; letter-spacing: 0.2px;">
+            <div style="font-size: 2.8rem; margin-bottom: 8px; line-height: 1; animation: bookPulseBlink 0.9s infinite ease-in-out;">🎁</div>
+            <h3 style="color: #ffffff; font-size: 1.20rem; font-weight: 900; margin: 0 0 8px 0; line-height: 1.30; letter-spacing: 0.2px;">
               रुकिए! क्या आप मुफ़्त झलक नहीं देखना चाहते?
             </h3>
-            <p style="color: #f1f5f9; font-size: 0.96rem; font-weight: 700; margin: 0 0 20px 0; line-height: 1.45;">
+            <p style="color: #f1f5f9; font-size: 0.92rem; font-weight: 700; margin: 0 0 16px 0; line-height: 1.40;">
               यह मुफ़्त झलक केवल आज के लिए है। बस अपना विवरण दर्ज करें और पुस्तक का संपूर्ण विवरण व समाधान मुफ़्त में देखें!
             </p>
             <button type="button" id="btnAdsGateStay" class="ads-btn-sharp-green" style="
               width: 100%;
-              padding: 13px 14px;
-              min-height: 48px;
+              padding: 12px 14px;
+              min-height: 46px;
               border-radius: 8px;
-              font-size: 1.05rem;
+              font-size: 1.02rem;
               font-weight: 900;
               cursor: pointer;
-              margin-bottom: 14px;
+              margin-bottom: 10px;
               box-shadow: 0 4px 12px rgba(4, 120, 87, 0.4);
             ">
               👉 हाँ, मुझे मुफ़्त झलक देखनी है (फॉर्म भरें)
@@ -359,88 +376,88 @@
               background: transparent;
               border: none;
               color: #fca5a5;
-              font-size: 0.90rem;
+              font-size: 0.88rem;
               font-weight: 800;
               cursor: pointer;
               text-decoration: underline;
-              padding: 6px 12px;
+              padding: 4px 8px;
             ">
               नहीं, मुझे मुफ़्त समाधान नहीं चाहिए (पेज से बाहर निकलें ✕)
             </button>
           </div>
 
           <!-- Compact Hero Card -->
-          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px 8px;">
-            <img src="${coverImage}" alt="Cover" style="width: 44px; height: 58px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+          <div style="display: flex; gap: 9px; align-items: center; margin-bottom: 6px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 5px 8px;">
+            <img src="${coverImage}" alt="Cover" style="width: 36px; height: 50px; object-fit: cover; border-radius: 4px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-                <span style="background: #dcfce7; color: #166534; font-size: 0.66rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; text-transform: uppercase;">
+                <span style="background: #dcfce7; color: #166534; font-size: 10.5px; font-weight: 900; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; text-transform: uppercase;">
                   मुफ़्त ई-बुक
                 </span>
-                <span style="font-size: 0.72rem; font-weight: 800; color: #0284c7;">Aarogyam India</span>
+                <span style="font-size: 12px; font-weight: 800; color: #0284c7;">Aarogyam India</span>
               </div>
-              <h4 style="margin: 0; font-size: 0.94rem; font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <h4 style="margin: 0; font-size: 13.5px; font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 ${title}
               </h4>
             </div>
           </div>
 
-          <!-- Black Box + White Text + Blinking Green Book Banner (Large Font for Farmers, NO Shadow) -->
-          <div style="background: #000000; border: 1.5px solid #334155; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <span class="ads-blinking-book" style="font-size: 1.25rem; line-height: 1;">📗</span>
-            <div style="font-size: 0.92rem; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center;">
+          <!-- Black Box + White Text + Blinking Green Book Banner (Crisp Single Line) -->
+          <div style="background: #000000; border: 1.5px solid #334155; border-radius: 7px; padding: 6px 10px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
+            <span class="ads-blinking-book" style="font-size: 15px; line-height: 1;">📗</span>
+            <div style="font-size: 13px; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center;">
               कृपया विवरण दर्ज करके मुफ़्त झलक अनलॉक करें:
             </div>
           </div>
 
           <!-- Alert Box -->
-          <div id="adsGateAlert" style="display: none; padding: 6px 8px; border-radius: 6px; font-size: 0.80rem; font-weight: 800; margin-bottom: 6px;"></div>
+          <div id="adsGateAlert" style="display: none; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-bottom: 5px;"></div>
 
           <form id="adsLeadGatewayForm" autocomplete="on">
             <!-- 1. Name Input (Dark Box + Bold White Text) -->
-            <div style="margin-bottom: 6px;">
-              <label style="display: block; font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
+            <div style="margin-bottom: 5px;">
+              <label for="adsGateName" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
                 👤 आपका शुभ नाम (Full Name) <span style="color:#dc2626;">*</span>
               </label>
               <input type="text" id="adsGateName" name="name" autocomplete="name" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" />
             </div>
 
-            <!-- 2. WhatsApp Mobile Number (No separate +91, auto-sanitizes spaces & +91, auto-detects wrong numbers) -->
-            <div style="margin-bottom: 6px;">
-              <label style="display: block; font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
+            <!-- 2. WhatsApp Mobile Number -->
+            <div style="margin-bottom: 5px;">
+              <label for="adsGateMobile" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
                 📱 WhatsApp मोबाइल नंबर <span style="color:#dc2626;">*</span>
               </label>
               <div style="position: relative;">
                 <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel" inputmode="numeric" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर दर्ज करें" class="ads-input-dark" style="padding-right: 36px;" />
                 <span id="adsMobileStatusIcon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 1.15rem; pointer-events: none; display: none;"></span>
               </div>
-              <div id="adsMobileValidationHint" style="display: none; font-size: 0.74rem; font-weight: 800; margin-top: 3px; margin-bottom: 3px; line-height: 1.2;"></div>
+              <div id="adsMobileValidationHint" style="display: none; font-size: 12px; font-weight: 800; margin-top: 2px; margin-bottom: 2px; line-height: 1.2;"></div>
             </div>
 
             <!-- 3. Email Input (Optional / वैकल्पिक) -->
-            <div style="margin-bottom: 6px;">
+            <div style="margin-bottom: 5px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                <label for="adsGateEmail" style="font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin: 0;">
+                <label for="adsGateEmail" style="font-size: 13px; font-weight: 900; color: #000000 !important; margin: 0;">
                   📧 ईमेल (Email ID)
                 </label>
-                <span style="font-size: 0.70rem; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
+                <span style="font-size: 11px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
               </div>
-              <input type="email" id="adsGateEmail" name="email" autocomplete="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" />
+              <input type="email" id="adsGateEmail" name="email" autocomplete="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: 40px; min-height: 40px; font-size: 15px !important;" />
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
-            <div style="margin-bottom: 6px; background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 6px; padding: 5px 8px;">
-              <p style="margin: 0; font-size: 0.76rem; color: #000000 !important; line-height: 1.35; font-weight: 800;">
-                <span style="color: #dc2626; font-size: 0.88rem; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। भविष्य में आपकी आधिकारिक रेफरल लिंक इसी से जुड़ेगी।
+            <div style="margin-bottom: 5px; background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 6px; padding: 4px 8px;">
+              <p style="margin: 0; font-size: 11.5px; color: #000000 !important; line-height: 1.30; font-weight: 800;">
+                <span style="color: #dc2626; font-size: 12px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। भविष्य में आपकी आधिकारिक रेफरल लिंक इसी से जुड़ेगी।
               </p>
             </div>
 
-            <!-- 4. Profession / Role Dropdown (Decent, Clean, Fits inside mobile perfectly) -->
-            <div style="margin-bottom: 8px;">
-              <label style="display: block; font-size: 0.88rem; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
+            <!-- 4. Profession / Role Dropdown -->
+            <div style="margin-bottom: 6px;">
+              <label for="adsGateProfession" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
                 💼 आप क्या करते हैं? (Role / Profession) <span style="color:#dc2626;">*</span>
               </label>
-              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important;">
+              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important; height: 40px; min-height: 40px; font-size: 14.5px !important;">
                 <option value="farmer">🌾 किसान भाई (Farmer)</option>
                 <option value="netsurf">💼 नेट्सर्फ डायरेक्ट सेलर (Netsurf)</option>
                 <option value="dealer">💊 कृषि दवा विक्रेता (Dealer)</option>
@@ -453,10 +470,10 @@
             <!-- Submit Button (Dark Solid Emerald Green + Big Bold White Text) -->
             <button type="submit" id="btnSubmitAdsGate" class="ads-btn-sharp-green" style="
               width: 100%;
-              padding: 12px 14px;
-              min-height: 48px;
+              padding: 10px 14px;
+              min-height: 46px;
               border-radius: 8px;
-              font-size: 1.05rem;
+              font-size: 15.5px;
               font-weight: 900;
               letter-spacing: 0.2px;
               cursor: pointer;
@@ -464,15 +481,17 @@
               align-items: center;
               justify-content: center;
               gap: 6px;
+              margin-top: 2px;
+              margin-bottom: 4px;
             ">
-              <span id="adsGateBtnIcon" style="font-size: 1.15rem;">👉</span>
-              <span id="adsGateBtnLabel" style="font-weight: 900; color: #ffffff !important;">मुफ़्त झलक देखें और सम्पूर्ण समाधान पाएँ →</span>
+              <span id="adsGateBtnIcon" style="font-size: 17px;">👉</span>
+              <span id="adsGateBtnLabel" style="font-weight: 900; color: #ffffff !important; white-space: nowrap;">मुफ़्त झलक देखें और सम्पूर्ण समाधान पाएँ →</span>
             </button>
           </form>
 
-          <!-- Micro Trust Strip (Black Bold Text) -->
-          <div style="margin-top: 6px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 5px;">
-            <span style="font-size: 0.70rem; color: #000000 !important; font-weight: 900; display: inline-flex; align-items: center; gap: 4px;">
+          <!-- Micro Trust Strip (Single Clean Line, Never Wraps) -->
+          <div style="text-align: center; border-top: 1px solid #f1f5f9; padding-top: 4px; margin-top: 3px; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
+            <span style="font-size: 11.5px; color: #000000 !important; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
               <span>🔒 100% सुरक्षित डेटा</span> • <span>कोई शुल्क नहीं</span> • <span>50,000+ किसान व साथी</span>
             </span>
           </div>
@@ -639,42 +658,65 @@
       }
     } catch (_) {}
 
-    // Back-Button Interception for Gateway Modal (Exit-Intent Squeeze Dialog & True Exit Outside)
+    // Bulletproof Facebook In-App Browser Back-Trap (Exit-Intent Squeeze Dialog & True External Exit)
     try {
-      window.history.pushState({ adsGatewayModal: true }, '');
+      const baseUrl = window.location.href.split('#')[0];
       let exitPromptShown = false;
 
-      const onPopState = function () {
-        if (!document.body.contains(overlay)) {
-          window.removeEventListener('popstate', onPopState);
-          return;
-        }
+      function armFacebookTrap() {
+        try {
+          if (!window.location.hash.includes('view')) {
+            window.history.replaceState({ fbgate: 'base' }, '', baseUrl + '#main');
+            window.history.pushState({ fbgate: 'form' }, '', baseUrl + '#view');
+          }
+        } catch (_) {}
+      }
+
+      armFacebookTrap();
+
+      // Android WebViews require user touch to recognize navigation stack entries
+      window.addEventListener('touchstart', armFacebookTrap, { passive: true, once: true });
+      window.addEventListener('mousedown', armFacebookTrap, { passive: true, once: true });
+
+      function handleBackEvent() {
+        if (!document.body.contains(overlay)) return;
+
         if (!exitPromptShown) {
           exitPromptShown = true;
           if (exitModal) exitModal.style.display = 'flex';
-          try { window.history.pushState({ adsExitShown: true }, ''); } catch (_) {}
+          try {
+            window.history.pushState({ fbgate: 'confirm' }, '', baseUrl + '#view');
+          } catch (_) {}
         } else {
-          // Exit prompt already shown and user pressed Back again -> completely leave page!
-          window.removeEventListener('popstate', onPopState);
-          if (overlay && overlay.parentNode) overlay.remove();
-          document.body.style.overflow = '';
-          exitToExternalPlatform();
+          // User already saw the exit prompt and pressed Back again -> completely leave page to Facebook!
+          cleanupAndExit();
         }
-      };
-      window.addEventListener('popstate', onPopState);
+      }
+
+      window.addEventListener('popstate', handleBackEvent);
+      window.addEventListener('hashchange', () => {
+        if (document.body.contains(overlay) && !window.location.hash.includes('view')) {
+          handleBackEvent();
+        }
+      });
+
+      function cleanupAndExit() {
+        window.removeEventListener('popstate', handleBackEvent);
+        if (overlay && overlay.parentNode) overlay.remove();
+        document.body.style.overflow = '';
+        exitToExternalPlatform();
+      }
 
       btnStay?.addEventListener('click', () => {
         if (exitModal) exitModal.style.display = 'none';
         exitPromptShown = false;
+        armFacebookTrap();
         if (!mobileInput?.value) mobileInput?.focus();
         else if (!nameInput?.value) nameInput?.focus();
       });
 
       btnLeave?.addEventListener('click', () => {
-        window.removeEventListener('popstate', onPopState);
-        if (overlay && overlay.parentNode) overlay.remove();
-        document.body.style.overflow = '';
-        exitToExternalPlatform();
+        cleanupAndExit();
       });
     } catch (_) {}
 
@@ -977,9 +1019,21 @@
     window._landingExitShieldActive = true;
 
     try {
-      // Push history state so Back press on landing page triggers popstate
-      window.history.pushState({ landingPageActive: true }, '');
+      const baseUrl = window.location.href.split('#')[0];
       let landingExitShown = false;
+
+      function armLandingTrap() {
+        try {
+          if (!window.location.hash.includes('lp_view')) {
+            window.history.replaceState({ fblp: 'base' }, '', baseUrl + '#lp_main');
+            window.history.pushState({ fblp: 'page' }, '', baseUrl + '#lp_view');
+          }
+        } catch (_) {}
+      }
+
+      armLandingTrap();
+      window.addEventListener('touchstart', armLandingTrap, { passive: true, once: true });
+      window.addEventListener('mousedown', armLandingTrap, { passive: true, once: true });
 
       function getOrCreateLandingExitModal() {
         let modalWrap = document.getElementById('adsLandingExitModal');
@@ -1062,7 +1116,7 @@
           modalWrap.style.display = 'none';
           landingExitShown = false;
           document.body.style.overflow = '';
-          try { window.history.pushState({ landingPageActive: true }, ''); } catch (_) {}
+          armLandingTrap();
         });
 
         btnLeave?.addEventListener('click', () => {
@@ -1072,8 +1126,7 @@
         return modalWrap;
       }
 
-      window.addEventListener('popstate', (e) => {
-        // If Gateway modal is currently on screen, let Gateway modal handle its own popstate
+      function handleLandingBack() {
         if (document.getElementById('adsLeadGatewayOverlay')) return;
 
         const exitModal = getOrCreateLandingExitModal();
@@ -1081,10 +1134,19 @@
           landingExitShown = true;
           exitModal.style.display = 'flex';
           document.body.style.overflow = 'hidden';
-          try { window.history.pushState({ landingExitPrompt: true }, ''); } catch (_) {}
+          try {
+            window.history.pushState({ fblp: 'confirm' }, '', baseUrl + '#lp_view');
+          } catch (_) {}
         } else {
-          // User already saw the landing exit prompt and pressed Back again -> leave page!
+          // User already saw the landing exit prompt and pressed Back again -> leave page to Facebook!
           exitToExternalPlatform();
+        }
+      }
+
+      window.addEventListener('popstate', handleLandingBack);
+      window.addEventListener('hashchange', () => {
+        if (!window.location.hash.includes('lp_view')) {
+          handleLandingBack();
         }
       });
 
