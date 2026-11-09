@@ -328,14 +328,14 @@
           }
         </style>
 
-        <!-- Top Header Strip (Green Free Banner, Single Crisp Line) -->
+        <!-- Top Header Strip (Green Free Banner, Clean & Short) -->
         <div style="background: #047857; padding: 5px 8px; text-align: center; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
-          <span style="font-size: 13px; font-weight: 900; color: #ffffff; letter-spacing: 0.2px;">
-            🎁 100% मुफ़्त एक्सेस (FREE) • कोई शुल्क नहीं
+          <span style="font-size: 13px; font-weight: 900; color: #ffffff; letter-spacing: 0.3px;">
+            🎁 100% मुफ़्त एक्सेस (FREE)
           </span>
         </div>
 
-        <div style="padding: 10px 14px; position: relative;">
+        <div style="padding: 8px 12px; position: relative;">
           <!-- Exit Confirmation Overlay (Zero Blur, Sharp Text, True Exit Outside Page) -->
           <div id="adsGateExitConfirm" style="
             display: none;
@@ -344,7 +344,7 @@
             background: #090e1a;
             border-radius: 10px;
             z-index: 99;
-            padding: 18px 16px;
+            padding: 16px 14px;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -353,18 +353,18 @@
             animation: adsGatePop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           ">
             <div style="font-size: 2.8rem; margin-bottom: 8px; line-height: 1; animation: bookPulseBlink 0.9s infinite ease-in-out;">🎁</div>
-            <h3 style="color: #ffffff; font-size: 1.20rem; font-weight: 900; margin: 0 0 8px 0; line-height: 1.30; letter-spacing: 0.2px;">
+            <h3 style="color: #ffffff; font-size: 1.15rem; font-weight: 900; margin: 0 0 8px 0; line-height: 1.30; letter-spacing: 0.2px;">
               रुकिए! क्या आप मुफ़्त झलक नहीं देखना चाहते?
             </h3>
-            <p style="color: #f1f5f9; font-size: 0.92rem; font-weight: 700; margin: 0 0 16px 0; line-height: 1.40;">
+            <p style="color: #f1f5f9; font-size: 0.88rem; font-weight: 700; margin: 0 0 14px 0; line-height: 1.40;">
               यह मुफ़्त झलक केवल आज के लिए है। बस अपना विवरण दर्ज करें और पुस्तक का संपूर्ण विवरण व समाधान मुफ़्त में देखें!
             </p>
             <button type="button" id="btnAdsGateStay" class="ads-btn-sharp-green" style="
               width: 100%;
-              padding: 12px 14px;
-              min-height: 46px;
-              border-radius: 8px;
-              font-size: 1.02rem;
+              padding: 11px 12px;
+              min-height: 44px;
+              border-radius: 7px;
+              font-size: 0.98rem;
               font-weight: 900;
               cursor: pointer;
               margin-bottom: 10px;
@@ -376,7 +376,7 @@
               background: transparent;
               border: none;
               color: #fca5a5;
-              font-size: 0.88rem;
+              font-size: 0.85rem;
               font-weight: 800;
               cursor: pointer;
               text-decoration: underline;
@@ -387,77 +387,77 @@
           </div>
 
           <!-- Compact Hero Card -->
-          <div style="display: flex; gap: 9px; align-items: center; margin-bottom: 6px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 5px 8px;">
-            <img src="${coverImage}" alt="Cover" style="width: 36px; height: 50px; object-fit: cover; border-radius: 4px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 5px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 5px 8px;">
+            <img src="${coverImage}" alt="Cover" style="width: 34px; height: 46px; object-fit: cover; border-radius: 4px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
             <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
-                <span style="background: #dcfce7; color: #166534; font-size: 10.5px; font-weight: 900; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; text-transform: uppercase;">
+              <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px;">
+                <span style="background: #dcfce7; color: #166534; font-size: 10px; font-weight: 900; padding: 1px 5px; border-radius: 3px; border: 1px solid #86efac; text-transform: uppercase;">
                   मुफ़्त ई-बुक
                 </span>
-                <span style="font-size: 12px; font-weight: 800; color: #0284c7;">Aarogyam India</span>
+                <span style="font-size: 11.5px; font-weight: 800; color: #0284c7;">Aarogyam India</span>
               </div>
-              <h4 style="margin: 0; font-size: 13.5px; font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <h4 style="margin: 0; font-size: 13px; font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 ${title}
               </h4>
             </div>
           </div>
 
           <!-- Black Box + White Text + Blinking Green Book Banner (Crisp Single Line) -->
-          <div style="background: #000000; border: 1.5px solid #334155; border-radius: 7px; padding: 6px 10px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
-            <span class="ads-blinking-book" style="font-size: 15px; line-height: 1;">📗</span>
-            <div style="font-size: 13px; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center;">
+          <div style="background: #000000; border: 1.5px solid #334155; border-radius: 7px; padding: 5px 8px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
+            <span class="ads-blinking-book" style="font-size: 14px; line-height: 1;">📗</span>
+            <div style="font-size: 12.5px; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center;">
               कृपया विवरण दर्ज करके मुफ़्त झलक अनलॉक करें:
             </div>
           </div>
 
           <!-- Alert Box -->
-          <div id="adsGateAlert" style="display: none; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-bottom: 5px;"></div>
+          <div id="adsGateAlert" style="display: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 800; margin-bottom: 4px;"></div>
 
           <form id="adsLeadGatewayForm" autocomplete="on">
             <!-- 1. Name Input (Dark Box + Bold White Text) -->
-            <div style="margin-bottom: 5px;">
-              <label for="adsGateName" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
+            <div style="margin-bottom: 4px;">
+              <label for="adsGateName" style="display: block; font-size: 12.5px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 👤 आपका शुभ नाम (Full Name) <span style="color:#dc2626;">*</span>
               </label>
-              <input type="text" id="adsGateName" name="name" autocomplete="name" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" />
+              <input type="text" id="adsGateName" name="name" autocomplete="name" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" style="height: 38px; min-height: 38px; font-size: 15px !important; padding: 6px 10px;" />
             </div>
 
             <!-- 2. WhatsApp Mobile Number -->
-            <div style="margin-bottom: 5px;">
-              <label for="adsGateMobile" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
+            <div style="margin-bottom: 4px;">
+              <label for="adsGateMobile" style="display: block; font-size: 12.5px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 📱 WhatsApp मोबाइल नंबर <span style="color:#dc2626;">*</span>
               </label>
               <div style="position: relative;">
-                <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel" inputmode="numeric" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर दर्ज करें" class="ads-input-dark" style="padding-right: 36px;" />
-                <span id="adsMobileStatusIcon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 1.15rem; pointer-events: none; display: none;"></span>
+                <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel" inputmode="numeric" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर दर्ज करें" class="ads-input-dark" style="height: 38px; min-height: 38px; font-size: 15px !important; padding: 6px 36px 6px 10px;" />
+                <span id="adsMobileStatusIcon" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 1.10rem; pointer-events: none; display: none;"></span>
               </div>
-              <div id="adsMobileValidationHint" style="display: none; font-size: 12px; font-weight: 800; margin-top: 2px; margin-bottom: 2px; line-height: 1.2;"></div>
+              <div id="adsMobileValidationHint" style="display: none; font-size: 11px; font-weight: 800; margin-top: 1px; margin-bottom: 2px; line-height: 1.2;"></div>
             </div>
 
             <!-- 3. Email Input (Optional / वैकल्पिक) -->
-            <div style="margin-bottom: 5px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                <label for="adsGateEmail" style="font-size: 13px; font-weight: 900; color: #000000 !important; margin: 0;">
+            <div style="margin-bottom: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <label for="adsGateEmail" style="font-size: 12.5px; font-weight: 900; color: #000000 !important; margin: 0;">
                   📧 ईमेल (Email ID)
                 </label>
-                <span style="font-size: 11px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
+                <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
               </div>
-              <input type="email" id="adsGateEmail" name="email" autocomplete="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: 40px; min-height: 40px; font-size: 15px !important;" />
+              <input type="email" id="adsGateEmail" name="email" autocomplete="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: 36px; min-height: 36px; font-size: 14px !important; padding: 5px 10px;" />
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
-            <div style="margin-bottom: 5px; background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 6px; padding: 4px 8px;">
-              <p style="margin: 0; font-size: 11.5px; color: #000000 !important; line-height: 1.30; font-weight: 800;">
-                <span style="color: #dc2626; font-size: 12px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। भविष्य में आपकी आधिकारिक रेफरल लिंक इसी से जुड़ेगी।
+            <div style="margin-bottom: 4px; background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: 3px 6px;">
+              <p style="margin: 0; font-size: 10.5px; color: #000000 !important; line-height: 1.25; font-weight: 800;">
+                <span style="color: #dc2626; font-size: 11px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। रेफरल लिंक इसी से जुड़ेगी।
               </p>
             </div>
 
             <!-- 4. Profession / Role Dropdown -->
-            <div style="margin-bottom: 6px;">
-              <label for="adsGateProfession" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 3px;">
+            <div style="margin-bottom: 5px;">
+              <label for="adsGateProfession" style="display: block; font-size: 12.5px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 💼 आप क्या करते हैं? (Role / Profession) <span style="color:#dc2626;">*</span>
               </label>
-              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important; height: 40px; min-height: 40px; font-size: 14.5px !important;">
+              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important; height: 38px; min-height: 38px; font-size: 13.5px !important; padding: 5px 8px;">
                 <option value="farmer">🌾 किसान भाई (Farmer)</option>
                 <option value="netsurf">💼 नेट्सर्फ डायरेक्ट सेलर (Netsurf)</option>
                 <option value="dealer">💊 कृषि दवा विक्रेता (Dealer)</option>
@@ -470,10 +470,10 @@
             <!-- Submit Button (Dark Solid Emerald Green + Big Bold White Text) -->
             <button type="submit" id="btnSubmitAdsGate" class="ads-btn-sharp-green" style="
               width: 100%;
-              padding: 10px 14px;
-              min-height: 46px;
-              border-radius: 8px;
-              font-size: 15.5px;
+              padding: 9px 12px;
+              min-height: 44px;
+              border-radius: 7px;
+              font-size: 15px;
               font-weight: 900;
               letter-spacing: 0.2px;
               cursor: pointer;
@@ -481,18 +481,18 @@
               align-items: center;
               justify-content: center;
               gap: 6px;
-              margin-top: 2px;
-              margin-bottom: 4px;
+              margin-top: 1px;
+              margin-bottom: 3px;
             ">
-              <span id="adsGateBtnIcon" style="font-size: 17px;">👉</span>
+              <span id="adsGateBtnIcon" style="font-size: 16px;">👉</span>
               <span id="adsGateBtnLabel" style="font-weight: 900; color: #ffffff !important; white-space: nowrap;">मुफ़्त झलक देखें और सम्पूर्ण समाधान पाएँ →</span>
             </button>
           </form>
 
           <!-- Micro Trust Strip (Single Clean Line, Never Wraps) -->
-          <div style="text-align: center; border-top: 1px solid #f1f5f9; padding-top: 4px; margin-top: 3px; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
-            <span style="font-size: 11.5px; color: #000000 !important; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
-              <span>🔒 100% सुरक्षित डेटा</span> • <span>कोई शुल्क नहीं</span> • <span>50,000+ किसान व साथी</span>
+          <div style="text-align: center; border-top: 1px solid #f1f5f9; padding-top: 3px; margin-top: 2px; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis;">
+            <span style="font-size: 11px; color: #000000 !important; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+              <span>🔒 100% सुरक्षित</span> • <span>कोई शुल्क नहीं</span> • <span>50,000+ किसान साथी</span>
             </span>
           </div>
         </div>
