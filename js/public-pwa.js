@@ -26,7 +26,8 @@ if (document.readyState === 'loading') {
   initPublicPwa();
 }
 
-export function initPublicPwa() {
+function initPublicPwa() {
+  window.initPublicPwa = initPublicPwa;
   registerPublicServiceWorker();
   initInstallPromptCapture();
   initNetworkStatusListener();
@@ -335,7 +336,8 @@ function initInstallPromptCapture() {
   });
 }
 
-export async function syncAppInstallToSupabase() {
+async function syncAppInstallToSupabase() {
+  if (typeof window !== 'undefined') window.syncAppInstallToSupabase = syncAppInstallToSupabase;
   try {
     if (typeof window === 'undefined') return;
 
@@ -404,7 +406,8 @@ export async function syncAppInstallToSupabase() {
   }
 }
 
-export function bindInstallButtons() {
+function bindInstallButtons() {
+  if (typeof window !== 'undefined') window.bindInstallButtons = bindInstallButtons;
   ensureMobileMenuInstallButton();
 
   const desktopBtn = document.getElementById('desktop-pwa-install-btn');
@@ -421,7 +424,8 @@ export function bindInstallButtons() {
   updateAllInstallButtons();
 }
 
-export function updateAllInstallButtons() {
+function updateAllInstallButtons() {
+  if (typeof window !== 'undefined') window.updateAllInstallButtons = updateAllInstallButtons;
   isStandalone = checkIsStandalone();
   const desktopBtn = document.getElementById('desktop-pwa-install-btn');
   const mobileBtn = document.getElementById('mobile-pwa-install-btn');

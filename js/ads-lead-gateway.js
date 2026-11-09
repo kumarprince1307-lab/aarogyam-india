@@ -76,7 +76,7 @@
       if (/Firefox/i.test(ua)) {
         return 'Firefox';
       }
-    } catch (_) {}
+    } catch (_) { }
     return 'Browser';
   }
 
@@ -105,7 +105,7 @@
         return config.title.replace(/[|•].*$/, '').trim();
       }
       if (document.title) return document.title.replace(/[|•].*$/, '').trim();
-    } catch (_) {}
+    } catch (_) { }
     return 'आरोग्यम लैंडिंग पेज';
   }
 
@@ -121,10 +121,10 @@
       // If user passed or already logged in with verified 10-digit mobile, never block again!
       if (sessionStorage.getItem('ads_gateway_passed') === 'true') return true;
 
-      const m = localStorage.getItem('aim_user_mobile') || 
-                localStorage.getItem('user_phone') || 
-                localStorage.getItem('aarogyam_user_phone') ||
-                getSafeCookie('aim_user_mobile');
+      const m = localStorage.getItem('aim_user_mobile') ||
+        localStorage.getItem('user_phone') ||
+        localStorage.getItem('aarogyam_user_phone') ||
+        getSafeCookie('aim_user_mobile');
       const cleanM = cleanIndianMobile(m);
       if (cleanM && cleanM.length === 10) {
         sessionStorage.setItem('ads_gateway_passed', 'true');
@@ -155,7 +155,7 @@
       if (ref && /^AI\d{4,8}[A-Z]?$/i.test(ref.trim())) return ref.trim().toUpperCase();
       const cached = localStorage.getItem('AI_SPONSOR_SHARE_ID') || localStorage.getItem('ref');
       if (cached && /^AI\d{4,8}[A-Z]?$/i.test(cached.trim())) return cached.trim().toUpperCase();
-    } catch (_) {}
+    } catch (_) { }
     return 'AI000004';
   }
 
@@ -165,13 +165,13 @@
       if (window.supabaseClient) return window.supabaseClient;
       if (window._supabase) return window._supabase;
       if (typeof window.getSupabaseClient === 'function') return window.getSupabaseClient();
-    } catch (_) {}
+    } catch (_) { }
     return null;
   }
 
   // Shared Universal Platform Exit Helper (Facebook / Google / Webview / Referrer Safe Exit)
   function exitToExternalPlatform() {
-    try { window.close(); } catch (_) {}
+    try { window.close(); } catch (_) { }
 
     const ref = document.referrer || '';
     if (ref && !ref.includes(window.location.host)) {
@@ -184,7 +184,7 @@
       return;
     }
 
-    try { window.close(); } catch (_) {}
+    try { window.close(); } catch (_) { }
   }
 
   // 7. Inject Gateway Modal (100% Single-Screen Mobile Fit, Ultra-Crisp High Contrast)
@@ -194,8 +194,8 @@
     const title = config.title || 'आरोग्यम इंडिया — विशेष समाधान';
     const subtitle = config.subtitle || 'अपनी फसल के समस्त कीट-रोग पहचानें और 100% सटीक समाधान पाएं!';
     const isBundlePage = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle') || ((config.title || '').includes('5-इन-1') || (config.title || '').includes('कॉम्बो'));
-    const defaultCover = isBundlePage 
-      ? '/images/banners/bundle-kisan-5in1-banner.webp' 
+    const defaultCover = isBundlePage
+      ? '/images/banners/bundle-kisan-5in1-banner.webp'
       : '/images/books/kharif-master-guide-2026-cover.webp';
     let coverImage = config.coverImage || config.cover || defaultCover;
     if (coverImage.includes('farmer-community-banner') || !coverImage) {
@@ -512,7 +512,7 @@
             ">
               <span id="adsGateBtnIcon" style="font-size: 16px; flex-shrink: 0;">👉</span>
               <span id="adsGateBtnLabel" style="font-size: clamp(15px, 4vw, 17px); font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.2; letter-spacing: 0.5px;">
-                Submit
+                FREE SUBMIT
               </span>
             </button>
           </form>
@@ -686,7 +686,7 @@
           let c = ca[i].trim();
           if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
         }
-      } catch (_) {}
+      } catch (_) { }
       return '';
     }
 
@@ -698,26 +698,26 @@
       const urlEmail = urlP.get('email') || urlP.get('mail') || '';
 
       const cachedName = urlName ||
-                         localStorage.getItem('aim_user_name') ||
-                         localStorage.getItem('user_name') ||
-                         localStorage.getItem('aarogyam_user_name') ||
-                         localStorage.getItem('SAKHI_USER_NAME') ||
-                         getSafeCookie('aim_user_name') || '';
+        localStorage.getItem('aim_user_name') ||
+        localStorage.getItem('user_name') ||
+        localStorage.getItem('aarogyam_user_name') ||
+        localStorage.getItem('SAKHI_USER_NAME') ||
+        getSafeCookie('aim_user_name') || '';
 
       const cachedMobile = urlMobile ||
-                           localStorage.getItem('aim_user_mobile') ||
-                           localStorage.getItem('user_phone') ||
-                           localStorage.getItem('aarogyam_user_phone') ||
-                           localStorage.getItem('SAKHI_USER_PHONE') ||
-                           getSafeCookie('aim_user_mobile') || '';
+        localStorage.getItem('aim_user_mobile') ||
+        localStorage.getItem('user_phone') ||
+        localStorage.getItem('aarogyam_user_phone') ||
+        localStorage.getItem('SAKHI_USER_PHONE') ||
+        getSafeCookie('aim_user_mobile') || '';
 
       const cachedEmail = urlEmail ||
-                          localStorage.getItem('aim_user_email') ||
-                          localStorage.getItem('user_email') ||
-                          getSafeCookie('aim_user_email') || '';
+        localStorage.getItem('aim_user_email') ||
+        localStorage.getItem('user_email') ||
+        getSafeCookie('aim_user_email') || '';
 
       const cachedProf = localStorage.getItem('AI_USER_PROFESSION') ||
-                         localStorage.getItem('AI_USER_OCCUPATION') || '';
+        localStorage.getItem('AI_USER_OCCUPATION') || '';
 
       let finalN = cachedName;
       let finalM = cachedMobile;
@@ -737,12 +737,12 @@
 
       if (finalN && nameInput && !nameInput.value) {
         nameInput.value = finalN.trim();
-        try { nameInput.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) {}
+        try { nameInput.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) { }
       }
       if (finalM && mobileInput && !mobileInput.value) {
         mobileInput.value = cleanIndianMobile(finalM);
         handleMobileInput();
-        try { mobileInput.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) {}
+        try { mobileInput.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) { }
       }
       if (finalE && emailInput && !emailInput.value) {
         emailInput.value = finalE.trim();
@@ -755,7 +755,7 @@
           }
         }
       }
-    } catch (_) {}
+    } catch (_) { }
 
     // Pinned Page History Back Flow (Real Screen Transition, No Fragile Overlay)
     try {
@@ -793,7 +793,7 @@
         showFormScreen();
         try {
           window.history.pushState({ agView: 'form' }, '', cleanUrl + '#ads-form');
-        } catch (_) {}
+        } catch (_) { }
         if (!mobileInput?.value) mobileInput?.focus();
         else if (!nameInput?.value) nameInput?.focus();
       });
@@ -804,7 +804,7 @@
         document.body.style.overflow = '';
         exitToExternalPlatform();
       });
-    } catch (_) {}
+    } catch (_) { }
 
     // Auto-focus field ONLY on desktop with mouse.
     // On touch/mobile devices, NEVER programmatically auto-focus on modal open
@@ -943,7 +943,7 @@
       }
       window.dispatchEvent(new CustomEvent('ai:user-logged-in', { detail: userObj }));
       window.dispatchEvent(new CustomEvent('auth:login-success', { detail: userObj }));
-    } catch (_) {}
+    } catch (_) { }
 
     // --- STEP B: AUTO-POPULATE & LOCK CHECKOUT INPUTS ---
     prefillCheckoutFields(enteredName, cleanMobile, enteredEmail);
@@ -1101,7 +1101,7 @@
           }
         });
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // 10. Landing Page Exit-Intent Confirmation Shield (Retention Safeguard)
@@ -1199,7 +1199,7 @@
           document.body.style.overflow = '';
           try {
             window.history.pushState({ lpView: 'page' }, '', cleanUrl + '#offer');
-          } catch (_) {}
+          } catch (_) { }
         });
 
         btnLeave?.addEventListener('click', () => {
@@ -1230,7 +1230,7 @@
         }
       });
 
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // 11. Public Initializer API
