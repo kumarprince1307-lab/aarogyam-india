@@ -47,16 +47,35 @@ DROP POLICY IF EXISTS "product_lp_read_access" ON public.product_landing_pages;
 CREATE POLICY "product_lp_read_access" ON public.product_landing_pages FOR SELECT TO anon, authenticated USING (true);
 
 
--- 5. LOGS & TELEMETRY (लॉग्स व शेयरिंग डेटा - सिर्फ सुरक्षित इंसर्ट)
+-- 5. LOGS & TELEMETRY (लॉग्स व शेयरिंग डेटा - एडमिन पैनल व पब्लिक दोनों के लिए पूर्ण एक्सेस)
 ALTER TABLE IF EXISTS public.share_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "share_logs_insert" ON public.share_logs;
-CREATE POLICY "share_logs_insert" ON public.share_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "share_logs_select" ON public.share_logs;
+DROP POLICY IF EXISTS "share_logs_all_access" ON public.share_logs;
+CREATE POLICY "share_logs_all_access" ON public.share_logs FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 ALTER TABLE IF EXISTS public.checkout_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "checkout_logs_insert" ON public.checkout_logs;
-CREATE POLICY "checkout_logs_insert" ON public.checkout_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "checkout_logs_select" ON public.checkout_logs;
+DROP POLICY IF EXISTS "checkout_logs_all_access" ON public.checkout_logs;
+CREATE POLICY "checkout_logs_all_access" ON public.checkout_logs FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 
 ALTER TABLE IF EXISTS public.sakhi_chat_audit_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "sakhi_logs_insert" ON public.sakhi_chat_audit_logs;
-CREATE POLICY "sakhi_logs_insert" ON public.sakhi_chat_audit_logs FOR INSERT TO anon, authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "sakhi_chat_audit_logs_all" ON public.sakhi_chat_audit_logs;
+CREATE POLICY "sakhi_chat_audit_logs_all" ON public.sakhi_chat_audit_logs FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+-- 6. SURVEYS & LEADS (सर्वे व लीड्स - एडमिन पैनल देखने के लिए)
+ALTER TABLE IF EXISTS public.surveys ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admin only read surveys" ON public.surveys;
+DROP POLICY IF EXISTS "Public insert surveys" ON public.surveys;
+DROP POLICY IF EXISTS "Public read surveys" ON public.surveys;
+DROP POLICY IF EXISTS "surveys_all_access" ON public.surveys;
+CREATE POLICY "surveys_all_access" ON public.surveys FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.product_leads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admin only read product_leads" ON public.product_leads;
+DROP POLICY IF EXISTS "Public insert product_leads" ON public.product_leads;
+DROP POLICY IF EXISTS "product_leads_all_access" ON public.product_leads;
+CREATE POLICY "product_leads_all_access" ON public.product_leads FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
 

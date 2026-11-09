@@ -17,7 +17,7 @@ const _adminMemoryCache = {
     }
     try {
       if (typeof sessionStorage !== 'undefined') {
-        const raw = sessionStorage.getItem('AI_ADM_' + key);
+        const raw = sessionStorage.getItem('AI_ADM_V2_' + key);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed && (Date.now() - (parsed.ts || 0) < ADMIN_CACHE_TTL)) {
@@ -33,7 +33,7 @@ const _adminMemoryCache = {
     this._map.set(key, item);
     try {
       if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem('AI_ADM_' + key, JSON.stringify(item));
+        sessionStorage.setItem('AI_ADM_V2_' + key, JSON.stringify(item));
       }
     } catch (e) {}
   },
@@ -246,7 +246,23 @@ export async function fetchCheckoutSummary(params = {}) {
 
         const successLogs = data.filter(log => log.status === 'success');
         const potentialFollowupLogs = data.filter(log => ['initiated', 'dropped', 'failed'].includes(log.status));
-        summary.success = successLogs.length;
+
+        // Sync with actual successful purchases so success is accurate even if checkout_logs had telemetry latency
+        try {
+            const { count: realPurchasesCount } = await db
+                .from('purchases')
+                .select('id', { count: 'exact', head: true })
+                .or('payment_status.eq.success,payment_status.is.null')
+                .gte('purchase_date', startDate.toISOString())
+                .lt('purchase_date', endDate.toISOString());
+            if (typeof realPurchasesCount === 'number' && realPurchasesCount > successLogs.length) {
+                summary.success = realPurchasesCount;
+            } else {
+                summary.success = successLogs.length;
+            }
+        } catch (_) {
+            summary.success = successLogs.length;
+        }
 
         if (potentialFollowupLogs.length === 0) {
             const totalUniqueAttempts = new Set(successLogs.map(l => l.profile_id)).size;
@@ -472,9 +488,13 @@ export async function fetchDashboardData(params = {}) {
     const defaultStartDate = new Date(new Date().setDate(defaultEndDate.getDate() - 30));
 
     const endDateForFilter = params.endDate ? new Date(params.endDate) : defaultEndDate;
-    // To make the 'lt' operator inclusive of the end date, we set the time to the end of the day or go to the next day.
     const apiEndDate = new Date(endDateForFilter);
-    apiEndDate.setHours(23, 59, 59, 999);
+    // If endDate is already at midnight (00:00:00) of next day for a strict range (e.g. yesterday), leave it intact
+    if (params.endDate && apiEndDate.getHours() === 0 && apiEndDate.getMinutes() === 0 && apiEndDate.getSeconds() === 0) {
+      // Clean boundary already provided
+    } else {
+      apiEndDate.setHours(23, 59, 59, 999);
+    }
 
     const startDateForFilter = params.startDate ? new Date(params.startDate) : defaultStartDate;
     startDateForFilter.setHours(0, 0, 0, 0);
@@ -1092,7 +1112,10 @@ export async function fetchUsers(params = {}) {
         const profileId = purchase.profile_id;
         if (!profileId) return acc;
         if (!acc[profileId]) acc[profileId] = { totalPurchases: 0, totalSpent: 0, totalDownloads: 0 };
-        acc[profileId].totalPurchases += 1;
+        // Support bundle purchases with comma-separated book IDs (e.g. 5-in-1 combo)
+        const bIds = String(purchase.book_id || '').split(',').map(x => x.trim()).filter(Boolean);
+        const bookCount = bIds.length > 0 ? bIds.length : 1;
+        acc[profileId].totalPurchases += bookCount;
         acc[profileId].totalSpent += purchase.amount || 0;
         acc[profileId].totalDownloads += (purchase.download_count || 0);
         return acc;
@@ -1695,7 +1718,10 @@ export async function fetchUserDetails(userId) {
       referredBy: referredByProfile,
       directReferrals: directReferralsList,
       totalDownloads: downloadCount || 0,
-      downloadLimit: successfulPurchases.length * 3, // Assuming 3 downloads per purchase
+      downloadLimit: (successfulPurchases || []).reduce((sum, p) => {
+        const bIds = String(p.book_id || '').split(',').map(x => x.trim()).filter(Boolean);
+        return sum + ((bIds.length > 0 ? bIds.length : 1) * 3);
+      }, 0),
       purchases: (purchases || []).map(p => ({
           id: p.id,
           order: p.order_id || p.payment_id || 'N/A',

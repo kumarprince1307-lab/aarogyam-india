@@ -17,25 +17,30 @@ body.bundle-landing-page {
   padding-bottom: 80px !important; /* Space for sticky buy bar */
 }
 
-/* 1. TOP NOTICE / COUNTDOWN RIBBON */
+/* 1. TOP NOTICE / COUNTDOWN RIBBON (COMPACT SLIM, CENTERED, 2X TIMER DIGITS) */
 .bundle-top-ribbon {
   background: linear-gradient(90deg, #991b1b, #dc2626, #b91c1c);
   color: #fff;
-  padding: 8px 12px;
+  padding: 4px 10px !important;
   text-align: center;
-  font-size: 0.85rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  letter-spacing: 0.3px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
   position: sticky !important;
   top: 0 !important;
   margin: 0 !important;
   z-index: 99998 !important;
-  box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
+}
+
+.ribbon-title-text {
+  font-size: 0.84rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.3px;
+  line-height: 1.15;
 }
 
 body.bundle-landing-page .header.header-tiranga-animated {
@@ -46,7 +51,7 @@ body.bundle-landing-page .header.header-tiranga-animated {
 @media (min-width: 769px) {
   body.bundle-landing-page .header.header-tiranga-animated {
     position: sticky !important;
-    top: 38px !important;
+    top: 50px !important;
   }
 }
 
@@ -58,22 +63,31 @@ body.bundle-landing-page .header.header-tiranga-animated {
 }
 
 .bundle-timer-badge {
-  background: rgba(0, 0, 0, 0.35);
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-family: monospace;
-  font-size: 0.95rem;
-  font-weight: 900;
-  color: #fef08a;
-  border: 1px solid rgba(254, 240, 138, 0.4);
+  background: rgba(0, 0, 0, 0.5) !important;
+  padding: 2px 14px !important;
+  border-radius: 6px !important;
+  font-family: 'Courier New', Courier, monospace, sans-serif !important;
+  font-size: 1.45rem !important; /* Dugna (2x) Timer Digits */
+  font-weight: 900 !important;
+  color: #fef08a !important;
+  letter-spacing: 2px !important;
+  border: 1.5px solid rgba(254, 240, 138, 0.6) !important;
+  line-height: 1.15 !important;
+  display: inline-block !important;
 }
 
-/* 2. 3D BOOK FAN STACK FOR HERO (NO TOP CLIPPING, LARGER SIZE, SYMMETRICAL FAN) */
+/* 2. 3D BOOK FAN STACK FOR HERO (BALANCED TOP SPACING, NO CLIPPING & NO HEADER TOUCH) */
 .hero-book,
 .book-hero,
 .hero-container {
   overflow: visible !important;
-  padding-top: 35px !important;
+  padding-top: 0px !important;
+}
+
+.book-hero {
+  padding-top: 26px !important; /* Gentle breathing space so header & book never touch */
+  padding-bottom: 25px !important;
+  min-height: auto !important;
 }
 
 .bundle-fan-stack-container {
@@ -84,9 +98,10 @@ body.bundle-landing-page .header.header-tiranga-animated {
   width: 100%;
   max-width: 540px;
   margin: 0 auto;
-  padding-top: 35px !important;
-  padding-bottom: 20px !important;
+  padding-top: 10px !important;
+  padding-bottom: 0px !important;
   overflow: visible !important;
+  min-height: unset !important;
 }
 
 .bundle-fan-stack {
@@ -95,9 +110,10 @@ body.bundle-landing-page .header.header-tiranga-animated {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 440px !important;
+  height: 330px !important;
   perspective: 1200px;
-  margin-bottom: 14px;
+  margin-top: 0px !important;
+  margin-bottom: 6px !important;
   overflow: visible !important;
 }
 
@@ -119,16 +135,32 @@ body.bundle-landing-page .header.header-tiranga-animated {
 }
 
 .bundle-fan-hint {
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 700;
-  text-align: center;
-  background: #f1f5f9;
-  padding: 4px 14px;
-  border-radius: 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: none !important; /* Removed as requested */
+}
+
+/* 2B. RED BADGE FOR HERO OFFER TAG (CRISP, SHARP, ZERO BLURRY SHADOW) */
+.bundle-landing-page .hero-tag,
+#hero-tag {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  border: 1.5px solid #ef4444 !important;
+  font-weight: 900 !important;
+  border-radius: 20px !important;
+  padding: 6px 16px !important;
+  margin-top: 0px !important;
+  margin-bottom: 10px !important;
+  display: inline-block !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.3px !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bundle-landing-page .hero-details {
+  padding-top: 0px !important;
+  margin-top: 0px !important;
 }
 
 /* 3. INCLUDED BOOKS SHOWCASE IN DAYLIGHT THEME */
@@ -495,20 +527,44 @@ body.bundle-landing-page .header.header-tiranga-animated {
     display: none !important;
   }
 
-  /* Make Hero Stack fit mobile screen (Larger & Unclipped) */
-  .bundle-fan-stack-container {
-    max-width: 100% !important;
-    overflow: visible !important;
+  /* Slim Header on Mobile */
+  body.bundle-landing-page header.header,
+  body.bundle-landing-page .header-tiranga-animated {
+    padding: 2px 0 !important;
+  }
+
+  body.bundle-landing-page header.header > .container,
+  body.bundle-landing-page .header-tiranga-animated > .container {
+    padding: 3px 10px !important;
+  }
+
+  body.bundle-landing-page .brand-logo-pill {
+    padding: 2px 6px !important;
+  }
+
+  body.bundle-landing-page .brand-logo-pill img {
+    height: 28px !important;
+  }
+
+  /* Make Hero Stack fit mobile screen (Clean distinct space below header, zero touching, no scattering) */
+  .book-hero {
+    padding-top: 24px !important; /* Definite clean space: center book never touches header! */
+    padding-bottom: 15px !important;
   }
 
   .bundle-fan-stack-container {
-    padding-top: 25px !important;
+    max-width: 100% !important;
+    padding-top: 8px !important;
+    padding-bottom: 0px !important;
+    min-height: unset !important;
     overflow: visible !important;
   }
 
   .bundle-fan-stack {
-    height: 380px !important;
+    height: 295px !important;
     overflow: visible !important;
+    margin-top: 0px !important;
+    margin-bottom: 4px !important;
   }
 
   .bundle-fan-book-item,
@@ -516,37 +572,39 @@ body.bundle-landing-page .header.header-tiranga-animated {
     position: absolute !important;
     width: 185px !important;
     height: 265px !important;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease, opacity 0.4s ease !important;
   }
   .bundle-fan-book-item.fan-slot-far-left,
   .bundle-fan-book.fan-slot-far-left {
-    transform: translateX(-85px) translateY(10px) rotate(-12deg) scale(0.86) !important;
+    transform: translateX(-68px) translateY(5px) rotate(-8deg) scale(0.90) !important;
     z-index: 1 !important;
-    opacity: 0.8 !important;
+    opacity: 0.82 !important;
   }
   .bundle-fan-book-item.fan-slot-left,
   .bundle-fan-book.fan-slot-left {
-    transform: translateX(-42px) translateY(5px) rotate(-6deg) scale(0.94) !important;
+    transform: translateX(-34px) translateY(2px) rotate(-4deg) scale(0.96) !important;
     z-index: 4 !important;
-    opacity: 0.92 !important;
+    opacity: 0.94 !important;
   }
   .bundle-fan-book-item.fan-slot-center,
   .bundle-fan-book.fan-slot-center {
-    transform: translateX(0px) translateY(-10px) rotate(0deg) scale(1.08) !important;
+    transform: translateX(0px) translateY(0px) rotate(0deg) scale(1.05) !important;
     z-index: 10 !important;
     opacity: 1 !important;
     border-color: #22c55e !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45) !important;
   }
   .bundle-fan-book-item.fan-slot-right,
   .bundle-fan-book.fan-slot-right {
-    transform: translateX(42px) translateY(5px) rotate(6deg) scale(0.94) !important;
+    transform: translateX(34px) translateY(2px) rotate(4deg) scale(0.96) !important;
     z-index: 4 !important;
-    opacity: 0.92 !important;
+    opacity: 0.94 !important;
   }
   .bundle-fan-book-item.fan-slot-far-right,
   .bundle-fan-book.fan-slot-far-right {
-    transform: translateX(85px) translateY(10px) rotate(12deg) scale(0.86) !important;
+    transform: translateX(68px) translateY(5px) rotate(8deg) scale(0.90) !important;
     z-index: 1 !important;
-    opacity: 0.8 !important;
+    opacity: 0.82 !important;
   }
 
   .bundle-calc-card {
@@ -899,7 +957,7 @@ body.bundle-landing-page .header.header-tiranga-animated {
 .bundle-mobile-sticky-bar .sticky-share-btn {
   width: 44px !important;
   height: 44px !important;
-  background: #16a34a !important;
+  background: #1e3a8a !important; /* Dark Blue */
   color: #ffffff !important;
   border-radius: 8px !important;
   border: none !important;
@@ -909,7 +967,7 @@ body.bundle-landing-page .header.header-tiranga-animated {
   font-size: 1.1rem !important;
   flex-shrink: 0 !important;
   cursor: pointer !important;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35) !important;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4) !important;
 }
 
 /* Precision Mobile Tuning for Small Screens (e.g. 360px Android & FB WebView) */
@@ -1351,10 +1409,11 @@ body.bundle-landing-page .header.header-tiranga-animated {
 
 @media (max-width: 640px) {
   .bundle-fan-stack-container {
-    min-height: 380px;
+    min-height: unset !important;
+    padding-top: 4px !important;
   }
   .bundle-fan-stack {
-    height: 300px;
+    height: 290px !important;
   }
   .bundle-fan-book-item,
   .bundle-fan-book {

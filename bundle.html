@@ -54,7 +54,7 @@
   <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261109_v2">
   <link rel="stylesheet" href="/css/home-revamp.css?v=20261103">
   <link rel="stylesheet" href="/css/book-landing.css?v=42.0">
-  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261108_v22_fb_full_fix">
+  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261110_v23_smooth_fix">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -83,13 +83,13 @@
 
   <!-- 1. TOP NOTICE / COUNTDOWN RIBBON -->
   <div class="bundle-top-ribbon" id="sec-top-ribbon">
-    <span>⚡ <strong id="ribbonBadge">महाबचत कॉम्बो ऑफर</strong>: यह स्पेशल डिस्काउंट केवल अगले:</span>
-    <span class="bundle-timer-badge" id="bundleCountdown">02:45:10</span>
+    <div class="ribbon-title-text" id="ribbonBadge">⚡ महाबचत कॉम्बो ऑफर</div>
+    <span class="bundle-timer-badge" id="bundleCountdown">00:14:59</span>
   </div>
 
   <!-- 2. ANIMATED INDIAN TIRANGA WAVING HEADER (SAME AS MAIN PAGES, NO CART) -->
   <header class="header header-tiranga-animated" id="header">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:8px;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;gap:8px;">
 
       <div style="display:flex;align-items:center;gap:8px;">
         <a href="/index.html" class="brand-logo-pill">
@@ -134,7 +134,7 @@
       <span class="bar bar-3"></span>
       <span class="bar bar-4"></span>
     </div>
-    <span class="bundle-audio-label" id="bundleAudioPillLabel">🎙️ कॉम्बो ऑडियो झलक</span>
+    <span class="bundle-audio-label" id="bundleAudioPillLabel">🎙️ Audio</span>
     <button type="button" class="bundle-audio-toggle-btn" id="bundleAudioPillToggleBtn"
       onclick="event.stopPropagation(); window.toggleBundleAudio();" title="प्ले / पॉज़ करें">▶️</button>
     <button type="button" class="bundle-audio-compress-btn" id="bundleAudioCompressBtn"
@@ -155,10 +155,21 @@
       <div class="hero-book">
         <div class="bundle-fan-stack-container">
           <div class="bundle-fan-stack" id="bundleFanStack">
-            <!-- Dynamically populated with 3D layered books -->
-          </div>
-          <div class="bundle-fan-hint">
-            <span>👆 किसी भी किताब पर क्लिक करके अंदर का पेज देखें</span>
+            <div class="bundle-fan-book-item bundle-fan-book fan-slot-far-left" data-book-idx="0" data-book-id="BK017" title="गेहूँ की खेती - क्लिक करके अंदर देखें">
+              <img src="/images/books/bk017-cover.webp" alt="गेहूँ की खेती" class="bundle-fan-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+            </div>
+            <div class="bundle-fan-book-item bundle-fan-book fan-slot-left" data-book-idx="1" data-book-id="BK016" title="कृषि दवा सलाहकार गाइड - क्लिक करके अंदर देखें">
+              <img src="/images/books/bk016-cover.webp" alt="कृषि दवा सलाहकार गाइड" class="bundle-fan-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+            </div>
+            <div class="bundle-fan-book-item bundle-fan-book fan-slot-center" data-book-idx="2" data-book-id="BK002" title="खेती का डॉक्टर - क्लिक करके अंदर देखें">
+              <img src="/images/books/fasal-ka-doctor-cover.webp" alt="खेती का डॉक्टर" class="bundle-fan-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+            </div>
+            <div class="bundle-fan-book-item bundle-fan-book fan-slot-right" data-book-idx="3" data-book-id="BK019" title="चना की खेती - क्लिक करके अंदर देखें">
+              <img src="/images/books/bk019-cover.webp" alt="चना की खेती" class="bundle-fan-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+            </div>
+            <div class="bundle-fan-book-item bundle-fan-book fan-slot-far-right" data-book-idx="4" data-book-id="BK020" title="सरसों खेती गाइड - क्लिक करके अंदर देखें">
+              <img src="/images/books/bk020-cover.webp" alt="सरसों खेती गाइड" class="bundle-fan-book-cover" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+            </div>
           </div>
         </div>
       </div>
@@ -166,15 +177,15 @@
       <!-- RIGHT: BUNDLE DETAILS -->
       <div class="hero-details">
         <span id="hero-tag" class="hero-tag">
-          🌾 महाबचत कॉम्बो बंडल ऑफर
+          🌾 धमाका कॉम्बो / 94% की महाबचत
         </span>
 
         <h1 id="hero-title" class="hero-title hero-title-black-box">
-          महाबचत 4-इन-1 किसान मास्टर बंडल
+          महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो
         </h1>
 
         <div id="hero-subtitle" class="hero-subtitle hero-subtitle-white-box">
-          1 मुख्य किताब खरीदें और 3 विशेष ई-बुक्स भारी कॉम्बो छूट पर पाएं!
+          खेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह!
         </div>
 
         <div class="hero-rating hero-rating-red-box">
@@ -184,21 +195,20 @@
         </div>
 
         <div id="hero-desc" class="hero-description hero-desc-black-box">
-          सम्पूर्ण वैज्ञानिक एवं Practical समाधान। सभी प्रमुख फसलों, कीट-रोग नियंत्रण, सब्जी उत्पादन व आधुनिक कृषि
-          तकनीकों का एक संपूर्ण डिजिटल संग्रह।
+          बीज उपचार से लेकर कटाई तक सम्पूर्ण व्यावहारिक व वैज्ञानिक समाधान। 5 प्रमुख कृषि मार्गदर्शिकाओं का ऐसा संग्रह जो आपकी खेती की लागत को आधा और पैदावार को दोगुना करने में मदद करेगा।
         </div>
 
         <div class="hero-price-box">
-          <span id="hero-old-price" class="old-price">₹1196</span>
-          <span id="hero-new-price" class="new-price">₹199</span>
-          <span id="hero-offer-badge" class="offer-badge">बचत ₹997 (83% छूट)</span>
+          <span id="hero-old-price" class="old-price">₹1695</span>
+          <span id="hero-new-price" class="new-price">₹149</span>
+          <span id="hero-offer-badge" class="offer-badge">बचत ₹1546 (91% छूट)</span>
         </div>
 
         <!-- HERO ACTION BUTTONS -->
         <div class="hero-action-buttons">
           <button type="button" id="hero-buy-btn" class="buy-btn"
             style="background:#dc2626 !important;color:#ffffff !important;border:2px solid #ffffff !important;cursor:pointer;">
-            <i class="fa-solid fa-cart-shopping"></i> पूरा कॉम्बो ₹199 में अभी खरीदें
+            <i class="fa-solid fa-cart-shopping"></i> पूरा 5-इन-1 कॉम्बो मात्र ₹149 में अनलॉक करें
           </button>
           <button type="button" id="hero-share-btn" onclick="window.handleUniversalBookShare(event)"
             class="share-now-btn" style="cursor:pointer;">
@@ -625,17 +635,18 @@
       </div>
 
       <div class="mobile-book-price">
-        <span class="old-price" id="stickyOldPrice">₹1196</span>
-        <span class="offer-price" id="stickyNewPrice">₹199</span>
+        <span class="old-price" id="stickyOldPrice">₹1695</span>
+        <span class="offer-price" id="stickyNewPrice">₹149</span>
       </div>
 
       <button type="button" class="buy-btn sticky-buy-btn" id="sticky-buy-btn" onclick="window.initiateBundleCheckout()"
         style="cursor:pointer;">
-        <i class="fa-solid fa-cart-shopping"></i> पूरा कॉम्बो खरीदें
+        <i class="fa-solid fa-cart-shopping"></i> BUY NOW
       </button>
 
       <button type="button" class="sticky-share-btn" id="sticky-share-btn"
-        onclick="window.handleUniversalBookShare(event)" title="शेयर करें">
+        onclick="window.handleUniversalBookShare(event)" title="शेयर करें"
+        style="background: #1e3a8a !important; color: #ffffff !important;">
         <i class="fa-solid fa-share-nodes"></i>
       </button>
     </div>
@@ -696,12 +707,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="/js/supabase.js" defer></script>
   <script src="/session.js" defer></script>
-  <script src="/js/ads-lead-gateway.js?v=20261109_v22_full_mobile_fit" defer></script>
+  <script src="/js/ads-lead-gateway.js?v=20261109_v23_autofill_fix" defer></script>
   <script src="/js/universal-preview-gallery-lightbox.js?v=20261104" defer></script>
   <script src="/js/universal-nav-drawer.js?v=20261109_v2" defer></script>
   <script src="/js/public-pwa.js?v=1.2" defer></script>
   <script src="/js/wallet-reward-engine.js?v=20261107_v3_passbook" defer></script>
-  <script src="/js/bundle-landing.js?v=20261109_v2"></script>
+  <script src="/js/bundle-landing.js?v=20261110_v23_smooth_fix" defer></script>
 
 </body>
 

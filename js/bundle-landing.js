@@ -34,14 +34,12 @@
     const urlParams = new URLSearchParams(window.location.search);
     const bundleId = urlParams.get('id') || urlParams.get('bundle') || urlParams.get('slug');
 
-    // 1. Fetch live catalogs & Bundle Configuration in PARALLEL (Zero Waterfall, Instant Load < 1s)
-    const [books, lps, bundle] = await Promise.all([
+    // 1. Fetch live catalogs & Bundle Configuration in PARALLEL (Sub-100ms Instant Load)
+    const [books, bundle] = await Promise.all([
       fetchCatalogBooks(),
-      fetchLandingPages(),
       loadBundleConfig(bundleId)
     ]);
     allCatalogBooks = books || [];
-    allLandingPages = lps || [];
     currentBundle = bundle;
 
     if (!currentBundle) {
@@ -56,21 +54,20 @@
     try {
       if (typeof window.initAdsLeadGateway === 'function') {
         window.initAdsLeadGateway({
-          title: currentBundle.heading || currentBundle.title || 'महाबचत किसान मेगा कॉम्बो बंडल',
-          subtitle: currentBundle.subTitle || currentBundle.subtitle || '5 उपयोगी कृषि व फसल डॉक्टर मास्टर गाइड्स अब एक साथ!',
+          title: currentBundle.heading || currentBundle.title || 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो',
+          subtitle: currentBundle.subTitle || currentBundle.subtitle || 'खेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह!',
           coverImage: currentBundle.bannerImage || currentBundle.ogImage || '/images/banners/farmer-community-banner.jpeg',
-          badgeText: '🎁 महाबचत कॉम्बो बंडल — आरोग्यम इंडिया',
+          badgeText: '🎁 100% मुफ़्त एक्सेस (FREE)',
           ads_mode_enabled: Boolean(currentBundle.ads_mode_enabled || currentBundle.ads_gateway_enabled)
         });
       }
-    } catch (_) {}
+    } catch (_) { }
 
-    // 3. Render Bundle UI Elements
+    // 3. Render Bundle UI Elements Instantly
     renderBundleHero(currentBundle);
     renderVideoSection(currentBundle);
     renderIncludedBooks(currentBundle);
     renderCalculationStack(currentBundle);
-    renderDemoGallery(currentBundle);
     renderWhyBuySection(currentBundle);
     renderReviews(currentBundle);
     renderFaqs(currentBundle);
@@ -86,6 +83,12 @@
 
     // 6. Bind Global Click Handlers
     bindActionButtons(currentBundle);
+
+    // 7. Non-blocking Background Fetch for heavy preview gallery
+    fetchLandingPages().then(lps => {
+      allLandingPages = lps || [];
+      renderDemoGallery(currentBundle);
+    }).catch(() => { });
   }
 
   // --- 1. DATA LOADERS ---
@@ -134,10 +137,10 @@
   }
 
   async function loadBundleConfig(targetKey) {
-    // 1. Load from data/book-bundles.json (Server Git Master)
+    // 1. Load from data/book-bundles.json (Server Git Master, cached 1 min)
     let masterBundles = [];
     try {
-      const resp = await fetch('/data/book-bundles.json?v=' + Date.now());
+      const resp = await fetch('/data/book-bundles.json?v=' + Math.floor(Date.now() / 60000));
       if (resp.ok) {
         const data = await resp.json();
         masterBundles = Array.isArray(data) ? data : (data.bundles || []);
@@ -174,11 +177,14 @@
       if (active) return active;
     }
 
-    // 2. Check Supabase site_configs table
+    // 2. Check Supabase site_configs table with aggressive 500ms timeout so it never hangs
     try {
       const db = window.dbClient || window.supabase;
       if (db) {
-        const { data } = await db.from('site_configs').select('value').eq('key', 'AAROGYAM_BUNDLE_LANDING_PAGES').maybeSingle();
+        const sbQuery = db.from('site_configs').select('value').eq('key', 'AAROGYAM_BUNDLE_LANDING_PAGES').maybeSingle();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 500));
+        const res = await Promise.race([sbQuery, timeoutPromise]);
+        const data = res?.data;
         if (data && data.value) {
           const bundles = Array.isArray(data.value) ? data.value : JSON.parse(data.value || '[]');
           if (targetKey) {
@@ -295,7 +301,7 @@
     // Facebook Pixel ViewContent Tracking
     if (typeof fbq === 'function') {
       if (bundle.metaPixelId && bundle.metaPixelId !== '1671873500553134') {
-        try { fbq('init', bundle.metaPixelId); } catch (_) {}
+        try { fbq('init', bundle.metaPixelId); } catch (_) { }
       }
       fbq('track', 'ViewContent', {
         content_name: bundle.title,
@@ -326,8 +332,8 @@
     if (titleEl) titleEl.textContent = bundle.title;
     if (subEl) subEl.textContent = bundle.subtitle;
     if (descEl && bundle.description) descEl.textContent = bundle.description;
-    if (tagEl) tagEl.textContent = `🌾 ${bundle.badge || 'महाबचत कॉम्बो ऑफर'}`;
-    if (ribbonBadge) ribbonBadge.textContent = bundle.badge || 'महाबचत कॉम्बो ऑफर';
+    if (tagEl) tagEl.textContent = `🌾 ${bundle.badge || 'धमाका कॉम्बो / 94% की महाबचत'}`;
+    if (ribbonBadge) ribbonBadge.textContent = '⚡ महाबचत कॉम्बो ऑफर';
 
     if (bannerImg && bundle.bannerImage) {
       bannerImg.src = bundle.bannerImage;
@@ -457,7 +463,7 @@
     stopAutoSlide();
     _fanAutoSlideTimer = setInterval(() => {
       rotateFanStack(1);
-    }, 2000);
+    }, 5000);
   }
 
   function stopAutoSlide() {
@@ -508,37 +514,8 @@
     }).join('');
 
     if (hintEl) {
-      hintEl.innerHTML = `
-        <div class="fan-controls-row">
-          <button type="button" class="fan-arrow-btn prev" title="पिछली किताब">◀</button>
-          <div class="fan-dots" id="fanDotsContainer">
-            ${_fanBooks.map((_, i) => `<span class="fan-dot ${i === _fanCenterIdx ? 'active' : ''}" data-idx="${i}"></span>`).join('')}
-          </div>
-          <button type="button" class="fan-arrow-btn next" title="अगली किताब">▶</button>
-        </div>
-        <div class="fan-hint-text">
-          <span>👆 स्वाइप करें या टैप करें • बीच वाली किताब पर क्लिक कर अंदर का पेज देखें</span>
-        </div>
-      `;
-
-      hintEl.querySelector('.fan-arrow-btn.prev')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        rotateFanStack(-1);
-        resetAutoSlide();
-      });
-      hintEl.querySelector('.fan-arrow-btn.next')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        rotateFanStack(1);
-        resetAutoSlide();
-      });
-      hintEl.querySelectorAll('.fan-dot').forEach((dot) => {
-        dot.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const targetIdx = parseInt(dot.getAttribute('data-idx'), 10);
-          setFanCenterIndex(targetIdx);
-          resetAutoSlide();
-        });
-      });
+      hintEl.style.display = 'none';
+      hintEl.innerHTML = '';
     }
 
     const bookItems = stackEl.querySelectorAll('.bundle-fan-book-item');
@@ -601,56 +578,56 @@
 
   // --- 4. RENDER MULTI-VIDEO HORIZONTAL CAROUSEL ---
   let _activeVideoIdx = 0;
-  let _bundleVideos = [];
+let _bundleVideos = [];
 
-  function renderVideoSection(bundle) {
-    const videoSec = document.getElementById('sec-bundle-video');
-    const container = document.getElementById('bundleVideoPlayerContainer');
-    const titleEl = document.getElementById('bundleVideoTitle');
-    const subEl = document.getElementById('bundleVideoSubtitle');
-    const dotsEl = document.getElementById('bundleVideosDots');
+function renderVideoSection(bundle) {
+  const videoSec = document.getElementById('sec-bundle-video');
+  const container = document.getElementById('bundleVideoPlayerContainer');
+  const titleEl = document.getElementById('bundleVideoTitle');
+  const subEl = document.getElementById('bundleVideoSubtitle');
+  const dotsEl = document.getElementById('bundleVideosDots');
 
-    if (!videoSec || !container) return;
+  if (!videoSec || !container) return;
 
-    // Collect videos
-    if (Array.isArray(bundle.videos) && bundle.videos.length > 0) {
-      _bundleVideos = bundle.videos.filter(v => v && (v.url || v.videoUrl));
-    } else if (bundle.videoUrl) {
-      _bundleVideos = [{
-        url: bundle.videoUrl,
-        title: bundle.videoTitle || "सम्पूर्ण कॉम्बो बंडल वीडियो झलक",
-        subtitle: bundle.videoSubtitle || ""
-      }];
-    } else {
-      _bundleVideos = [];
-    }
+  // Collect videos
+  if (Array.isArray(bundle.videos) && bundle.videos.length > 0) {
+    _bundleVideos = bundle.videos.filter(v => v && (v.url || v.videoUrl));
+  } else if (bundle.videoUrl) {
+    _bundleVideos = [{
+      url: bundle.videoUrl,
+      title: bundle.videoTitle || "सम्पूर्ण कॉम्बो बंडल वीडियो झलक",
+      subtitle: bundle.videoSubtitle || ""
+    }];
+  } else {
+    _bundleVideos = [];
+  }
 
-    if (_bundleVideos.length === 0) {
-      videoSec.style.display = 'none';
-      return;
-    }
+  if (_bundleVideos.length === 0) {
+    videoSec.style.display = 'none';
+    return;
+  }
 
-    videoSec.style.display = 'block';
-    if (titleEl) titleEl.textContent = bundle.videoTitle || "🎥 सम्पूर्ण कॉम्बो बंडल वीडियो झलक";
-    if (subEl) subEl.textContent = bundle.videoSubtitle || "जानिए कैसे यह संग्रह आपकी समस्याओं का त्वरित समाधान करेगा:";
+  videoSec.style.display = 'block';
+  if (titleEl) titleEl.textContent = bundle.videoTitle || "🎥 सम्पूर्ण कॉम्बो बंडल वीडियो झलक";
+  if (subEl) subEl.textContent = bundle.videoSubtitle || "जानिए कैसे यह संग्रह आपकी समस्याओं का त्वरित समाधान करेगा:";
 
-    // Render video slides with automatic 9:16 Vertical Shorts & 16:9 Landscape support
-    container.innerHTML = _bundleVideos.map((v, idx) => {
-      const vUrl = v.url || v.videoUrl || '';
-      const isDirect = /\.(mp4|webm|ogg)($|\?)/i.test(vUrl);
-      const isAutoPlay = idx === 0 && Boolean(bundle.videoAutoPlay !== false);
-      const isVertical = Boolean(
-        vUrl.includes('/shorts/') ||
-        v.isVertical ||
-        v.aspectRatio === '9:16' ||
-        v.format === 'short_reel' ||
-        v.format === 'short' ||
-        v.format === 'shorts'
-      );
+  // Render video slides with automatic 9:16 Vertical Shorts & 16:9 Landscape support
+  container.innerHTML = _bundleVideos.map((v, idx) => {
+    const vUrl = v.url || v.videoUrl || '';
+    const isDirect = /\.(mp4|webm|ogg)($|\?)/i.test(vUrl);
+    const isAutoPlay = idx === 0 && Boolean(bundle.videoAutoPlay !== false);
+    const isVertical = Boolean(
+      vUrl.includes('/shorts/') ||
+      v.isVertical ||
+      v.aspectRatio === '9:16' ||
+      v.format === 'short_reel' ||
+      v.format === 'short' ||
+      v.format === 'shorts'
+    );
 
-      let mediaHtml = '';
-      if (isDirect) {
-        mediaHtml = `
+    let mediaHtml = '';
+    if (isDirect) {
+      mediaHtml = `
           <video 
             src="${vUrl}" 
             controls 
@@ -659,16 +636,16 @@
             style="width:100%;height:100%;max-height:${isVertical ? '560px' : '420px'};border-radius:12px;background:#000;display:block;margin:0 auto;object-fit:contain;">
           </video>
         `;
-      } else {
-        const embedUrl = getEmbedUrl(vUrl, isAutoPlay);
-        const unmutePillHtml = (idx === 0 && isAutoPlay) ? `
+    } else {
+      const embedUrl = getEmbedUrl(vUrl, isAutoPlay);
+      const unmutePillHtml = (idx === 0 && isAutoPlay) ? `
           <div class="video-unmute-overlay" onclick="window.unmuteBundleVideo(this)" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#fff; padding:6px 14px; border-radius:24px; font-weight:800; font-size:0.8rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:6px; box-shadow:0 6px 18px rgba(0,0,0,0.6); pointer-events:auto;">
             <span>🔊</span> <span>आवाज़ चालू करें</span>
           </div>
         ` : '';
 
-        if (isVertical) {
-          mediaHtml = `
+      if (isVertical) {
+        mediaHtml = `
             <div class="bundle-vertical-video-frame">
               <iframe 
                 src="${embedUrl}" 
@@ -679,8 +656,8 @@
               ${unmutePillHtml}
             </div>
           `;
-        } else {
-          mediaHtml = `
+      } else {
+        mediaHtml = `
             <div style="position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;box-shadow:0 8px 24px rgba(0,0,0,0.35);">
               <iframe 
                 src="${embedUrl}" 
@@ -691,141 +668,141 @@
               ${unmutePillHtml}
             </div>
           `;
-        }
       }
+    }
 
-      return `
+    return `
         <div class="bundle-video-slide ${isVertical ? 'is-vertical-slide' : ''}" data-index="${idx}">
           ${mediaHtml}
           ${v.title ? `<div style="margin-top:10px;font-weight:800;color:#0f172a;font-size:0.95rem;text-align:center;">${escapeHtml(v.title)}</div>` : ''}
           ${v.subtitle ? `<div style="font-size:0.82rem;color:#64748b;text-align:center;">${escapeHtml(v.subtitle)}</div>` : ''}
         </div>
       `;
-    }).join('');
+  }).join('');
 
-    // Render dots if more than 1 video
-    if (dotsEl) {
-      if (_bundleVideos.length > 1) {
-        dotsEl.innerHTML = _bundleVideos.map((_, i) => `
+  // Render dots if more than 1 video
+  if (dotsEl) {
+    if (_bundleVideos.length > 1) {
+      dotsEl.innerHTML = _bundleVideos.map((_, i) => `
           <span class="bundle-video-dot ${i === 0 ? 'active' : ''}" onclick="window.goToBundleVideo(${i})"></span>
         `).join('');
-      } else {
-        dotsEl.innerHTML = '';
-      }
-    }
-
-    _activeVideoIdx = 0;
-    updateVideoSlidePosition();
-
-    if (bundle.videoAutoPlay !== false) {
-      setupFirstGestureVideoUnmute();
+    } else {
+      dotsEl.innerHTML = '';
     }
   }
 
-  // --- SMART SOUND UNMUTE ENGINE (FACEBOOK & MOBILE BROWSER COMPATIBLE) ---
-  window.unmuteBundleVideo = function (btnEl) {
-    const iframes = document.querySelectorAll('.bundle-vertical-video-frame iframe, .bundle-video-slide iframe');
-    iframes.forEach(iframe => {
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage(JSON.stringify({
-          event: 'command',
-          func: 'unMute',
-          args: []
-        }), '*');
-        iframe.contentWindow.postMessage(JSON.stringify({
-          event: 'command',
-          func: 'setVolume',
-          args: [100]
-        }), '*');
-      }
-    });
+  _activeVideoIdx = 0;
+  updateVideoSlidePosition();
 
-    const directVideos = document.querySelectorAll('.bundle-video-slide video');
-    directVideos.forEach(v => {
-      v.muted = false;
-      v.volume = 1.0;
-      v.play().catch(() => {});
-    });
+  if (bundle.videoAutoPlay !== false) {
+    setupFirstGestureVideoUnmute();
+  }
+}
 
-    if (btnEl) btnEl.style.display = 'none';
-    const allOverlays = document.querySelectorAll('.video-unmute-overlay');
-    allOverlays.forEach(el => el.style.display = 'none');
-  };
+// --- SMART SOUND UNMUTE ENGINE (FACEBOOK & MOBILE BROWSER COMPATIBLE) ---
+window.unmuteBundleVideo = function (btnEl) {
+  const iframes = document.querySelectorAll('.bundle-vertical-video-frame iframe, .bundle-video-slide iframe');
+  iframes.forEach(iframe => {
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: 'unMute',
+        args: []
+      }), '*');
+      iframe.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: 'setVolume',
+        args: [100]
+      }), '*');
+    }
+  });
 
-  let _hasUnmutedBundleVideo = false;
-  function setupFirstGestureVideoUnmute() {
-    const triggerUnmute = () => {
-      if (_hasUnmutedBundleVideo) return;
-      _hasUnmutedBundleVideo = true;
-      window.unmuteBundleVideo();
-      ['touchstart', 'click', 'scroll'].forEach(evt => {
-        window.removeEventListener(evt, triggerUnmute, { passive: true });
-      });
-    };
+  const directVideos = document.querySelectorAll('.bundle-video-slide video');
+  directVideos.forEach(v => {
+    v.muted = false;
+    v.volume = 1.0;
+    v.play().catch(() => { });
+  });
+
+  if (btnEl) btnEl.style.display = 'none';
+  const allOverlays = document.querySelectorAll('.video-unmute-overlay');
+  allOverlays.forEach(el => el.style.display = 'none');
+};
+
+let _hasUnmutedBundleVideo = false;
+function setupFirstGestureVideoUnmute() {
+  const triggerUnmute = () => {
+    if (_hasUnmutedBundleVideo) return;
+    _hasUnmutedBundleVideo = true;
+    window.unmuteBundleVideo();
     ['touchstart', 'click', 'scroll'].forEach(evt => {
-      window.addEventListener(evt, triggerUnmute, { passive: true, once: true });
+      window.removeEventListener(evt, triggerUnmute, { passive: true });
+    });
+  };
+  ['touchstart', 'click', 'scroll'].forEach(evt => {
+    window.addEventListener(evt, triggerUnmute, { passive: true, once: true });
+  });
+}
+
+function extractYouTubeId(url) {
+  if (!url) return '';
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
+function getEmbedUrl(url, autoplay) {
+  if (!url) return '';
+  const ytId = extractYouTubeId(url);
+  if (ytId) {
+    const autoParam = autoplay
+      ? '?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0'
+      : '?playsinline=1&rel=0';
+    return `https://www.youtube.com/embed/${ytId}${autoParam}`;
+  }
+  return url;
+}
+
+window.slideBundleVideos = function (dir) {
+  if (!_bundleVideos || _bundleVideos.length <= 1) return;
+  _activeVideoIdx += dir;
+  if (_activeVideoIdx < 0) _activeVideoIdx = _bundleVideos.length - 1;
+  if (_activeVideoIdx >= _bundleVideos.length) _activeVideoIdx = 0;
+  updateVideoSlidePosition();
+};
+
+window.goToBundleVideo = function (idx) {
+  if (idx < 0 || idx >= _bundleVideos.length) return;
+  _activeVideoIdx = idx;
+  updateVideoSlidePosition();
+};
+
+function updateVideoSlidePosition() {
+  const container = document.getElementById('bundleVideoPlayerContainer');
+  if (!container) return;
+  const slides = container.querySelectorAll('.bundle-video-slide');
+  if (slides.length > _activeVideoIdx && slides[_activeVideoIdx]) {
+    const targetSlide = slides[_activeVideoIdx];
+    container.scrollTo({
+      left: targetSlide.offsetLeft - container.offsetLeft,
+      behavior: 'smooth'
     });
   }
+  // Update dots
+  const dots = document.querySelectorAll('.bundle-video-dot');
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle('active', idx === _activeVideoIdx);
+  });
+}
 
-  function extractYouTubeId(url) {
-    if (!url) return '';
-    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
-    return m ? m[1] : '';
-  }
+// --- 5. RENDER INCLUDED BOOKS (INDIVIDUAL PRICES, NO "100% FREE", CLEAN BULLETS) ---
+function renderIncludedBooks(bundle) {
+  const grid = document.getElementById('bundleBooksGrid');
+  if (!grid) return;
 
-  function getEmbedUrl(url, autoplay) {
-    if (!url) return '';
-    const ytId = extractYouTubeId(url);
-    if (ytId) {
-      const autoParam = autoplay 
-        ? '?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0' 
-        : '?playsinline=1&rel=0';
-      return `https://www.youtube.com/embed/${ytId}${autoParam}`;
-    }
-    return url;
-  }
+  const resolvedBooks = getResolvedBundleBooks(bundle);
 
-  window.slideBundleVideos = function (dir) {
-    if (!_bundleVideos || _bundleVideos.length <= 1) return;
-    _activeVideoIdx += dir;
-    if (_activeVideoIdx < 0) _activeVideoIdx = _bundleVideos.length - 1;
-    if (_activeVideoIdx >= _bundleVideos.length) _activeVideoIdx = 0;
-    updateVideoSlidePosition();
-  };
-
-  window.goToBundleVideo = function (idx) {
-    if (idx < 0 || idx >= _bundleVideos.length) return;
-    _activeVideoIdx = idx;
-    updateVideoSlidePosition();
-  };
-
-  function updateVideoSlidePosition() {
-    const container = document.getElementById('bundleVideoPlayerContainer');
-    if (!container) return;
-    const slides = container.querySelectorAll('.bundle-video-slide');
-    if (slides.length > _activeVideoIdx && slides[_activeVideoIdx]) {
-      const targetSlide = slides[_activeVideoIdx];
-      container.scrollTo({
-        left: targetSlide.offsetLeft - container.offsetLeft,
-        behavior: 'smooth'
-      });
-    }
-    // Update dots
-    const dots = document.querySelectorAll('.bundle-video-dot');
-    dots.forEach((dot, idx) => {
-      dot.classList.toggle('active', idx === _activeVideoIdx);
-    });
-  }
-
-  // --- 5. RENDER INCLUDED BOOKS (INDIVIDUAL PRICES, NO "100% FREE", CLEAN BULLETS) ---
-  function renderIncludedBooks(bundle) {
-    const grid = document.getElementById('bundleBooksGrid');
-    if (!grid) return;
-
-    const resolvedBooks = getResolvedBundleBooks(bundle);
-
-    grid.innerHTML = resolvedBooks.map(b => {
-      return `
+  grid.innerHTML = resolvedBooks.map(b => {
+    return `
         <div class="bundle-book-card">
           <div class="bundle-card-img-wrap" onclick="window.openBabyBrowser('${b.id}')" title="किताब का पूरा पेज देखने के लिए टैप करें" style="cursor:pointer;position:relative;flex-shrink:0;">
             <img src="${b.cover}" alt="${escapeHtml(b.title)}" class="bundle-card-thumb" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
@@ -869,87 +846,87 @@
           </div>
         </div>
       `;
-    }).join('');
-  }
+  }).join('');
+}
 
-  // --- 6. RENDER GRAND TOTAL CALCULATION STACK ---
-  function renderCalculationStack(bundle) {
-    const resolvedBooks = getResolvedBundleBooks(bundle);
+// --- 6. RENDER GRAND TOTAL CALCULATION STACK ---
+function renderCalculationStack(bundle) {
+  const resolvedBooks = getResolvedBundleBooks(bundle);
 
-    let totalMrp = bundle.mrp || 0;
-    let totalRegular = 0;
+  let totalMrp = bundle.mrp || 0;
+  let totalRegular = 0;
 
-    resolvedBooks.forEach(b => {
-      if (!bundle.mrp) totalMrp += (b.mrp || 299);
-      totalRegular += (b.regularOffer || 99);
-    });
+  resolvedBooks.forEach(b => {
+    if (!bundle.mrp) totalMrp += (b.mrp || 299);
+    totalRegular += (b.regularOffer || 99);
+  });
 
-    const finalOffer = bundle.offerPrice || 199;
-    const savings = Math.max(0, totalMrp - finalOffer);
-    const savingsPct = Math.round((savings / totalMrp) * 100);
+  const finalOffer = bundle.offerPrice || 199;
+  const savings = Math.max(0, totalMrp - finalOffer);
+  const savingsPct = Math.round((savings / totalMrp) * 100);
 
-    const calcTotalMrp = document.getElementById('calcTotalMrp');
-    const calcTotalRegular = document.getElementById('calcTotalRegular');
-    const calcFinalPrice = document.getElementById('calcFinalPrice');
-    const calcSavingsAmount = document.getElementById('calcSavingsAmount');
-    const calcBuyBtn = document.getElementById('bundleCalcBuyBtn');
+  const calcTotalMrp = document.getElementById('calcTotalMrp');
+  const calcTotalRegular = document.getElementById('calcTotalRegular');
+  const calcFinalPrice = document.getElementById('calcFinalPrice');
+  const calcSavingsAmount = document.getElementById('calcSavingsAmount');
+  const calcBuyBtn = document.getElementById('bundleCalcBuyBtn');
 
-    if (calcTotalMrp) calcTotalMrp.textContent = `₹${totalMrp}`;
-    if (calcTotalRegular) calcTotalRegular.textContent = `₹${totalRegular}`;
-    if (calcFinalPrice) calcFinalPrice.textContent = `₹${finalOffer}`;
-    if (calcSavingsAmount) calcSavingsAmount.textContent = `₹${savings} (${savingsPct}% की महाबचत)`;
-    if (calcBuyBtn) calcBuyBtn.textContent = `🛒 पूरा कॉम्बो ₹${finalOffer} में अभी अनलॉक करें`;
+  if (calcTotalMrp) calcTotalMrp.textContent = `₹${totalMrp}`;
+  if (calcTotalRegular) calcTotalRegular.textContent = `₹${totalRegular}`;
+  if (calcFinalPrice) calcFinalPrice.textContent = `₹${finalOffer}`;
+  if (calcSavingsAmount) calcSavingsAmount.textContent = `₹${savings} (${savingsPct}% की महाबचत)`;
+  if (calcBuyBtn) calcBuyBtn.textContent = `🛒 पूरा कॉम्बो ₹${finalOffer} में अभी अनलॉक करें`;
 
-    const finalBuyBtn = document.getElementById('final-buy-btn');
-    if (finalBuyBtn) finalBuyBtn.textContent = `🛒 पूरा कॉम्बो ₹${finalOffer} में अभी खरीदें`;
-  }
+  const finalBuyBtn = document.getElementById('final-buy-btn');
+  if (finalBuyBtn) finalBuyBtn.textContent = `🛒 पूरा कॉम्बो ₹${finalOffer} में अभी खरीदें`;
+}
 
-  // --- 7. RENDER PINCH-TO-ZOOM DEMO PAGES GALLERY ---
-  function renderDemoGallery(bundle) {
-    const grid = document.getElementById('preview-gallery-grid');
-    if (!grid) return;
+// --- 7. RENDER PINCH-TO-ZOOM DEMO PAGES GALLERY ---
+function renderDemoGallery(bundle) {
+  const grid = document.getElementById('preview-gallery-grid');
+  if (!grid) return;
 
-    let demoList = [];
+  let demoList = [];
 
-    // Check if custom demo images were set in Admin
-    if (Array.isArray(bundle.demoImages) && bundle.demoImages.length > 0) {
-      demoList = bundle.demoImages.map(img => ({
-        img: img,
-        title: bundle.title || 'सैंपल पृष्ठ'
-      }));
-    } else {
-      // Auto-extract 2 demo images from each included book
-      (bundle.bookIds || []).forEach(bId => {
-        const lp = allLandingPages.find(p => (p.id || '').toUpperCase() === String(bId).toUpperCase());
-        const cb = allCatalogBooks.find(b => (b.id || '').toUpperCase() === String(bId).toUpperCase());
-        const bookTitle = lp?.hero?.title || cb?.heading || cb?.name || bId;
-        let images = lp?.demo_images || lp?.preview_images || cb?.demoImages || [];
-        if (!images || images.length === 0) {
-          images = [
-            `/images/books/${bId.toLowerCase()}-cover.webp`
-          ];
-        }
-        images.slice(0, 2).forEach((img, i) => {
-          demoList.push({
-            img: img,
-            title: `${bookTitle} (पेज #${i + 1})`
-          });
+  // Check if custom demo images were set in Admin
+  if (Array.isArray(bundle.demoImages) && bundle.demoImages.length > 0) {
+    demoList = bundle.demoImages.map(img => ({
+      img: img,
+      title: bundle.title || 'सैंपल पृष्ठ'
+    }));
+  } else {
+    // Auto-extract 2 demo images from each included book
+    (bundle.bookIds || []).forEach(bId => {
+      const lp = allLandingPages.find(p => (p.id || '').toUpperCase() === String(bId).toUpperCase());
+      const cb = allCatalogBooks.find(b => (b.id || '').toUpperCase() === String(bId).toUpperCase());
+      const bookTitle = lp?.hero?.title || cb?.heading || cb?.name || bId;
+      let images = lp?.demo_images || lp?.preview_images || cb?.demoImages || [];
+      if (!images || images.length === 0) {
+        images = [
+          `/images/books/${bId.toLowerCase()}-cover.webp`
+        ];
+      }
+      images.slice(0, 2).forEach((img, i) => {
+        demoList.push({
+          img: img,
+          title: `${bookTitle} (पेज #${i + 1})`
         });
       });
-    }
+    });
+  }
 
-    if (demoList.length === 0) {
-      demoList = [
-        { img: "/images/books/kharif-master-guide-2026-preview-01.webp", title: "खरीफ गाइड सैंपल #1" },
-        { img: "/images/books/kharif-master-guide-2026-preview-02.webp", title: "खरीफ गाइड सैंपल #2" },
-        { img: "/images/books/kheti-dr-demo-1.webp", title: "खेती डॉक्टर सैंपल #1" },
-        { img: "/images/books/kheti-dr-demo-2.webp", title: "खेती डॉक्टर सैंपल #2" }
-      ];
-    }
+  if (demoList.length === 0) {
+    demoList = [
+      { img: "/images/books/kharif-master-guide-2026-preview-01.webp", title: "खरीफ गाइड सैंपल #1" },
+      { img: "/images/books/kharif-master-guide-2026-preview-02.webp", title: "खरीफ गाइड सैंपल #2" },
+      { img: "/images/books/kheti-dr-demo-1.webp", title: "खेती डॉक्टर सैंपल #1" },
+      { img: "/images/books/kheti-dr-demo-2.webp", title: "खेती डॉक्टर सैंपल #2" }
+    ];
+  }
 
-    window.bundleDemoImages = demoList.map(x => x.img);
+  window.bundleDemoImages = demoList.map(x => x.img);
 
-    grid.innerHTML = demoList.map((item, idx) => `
+  grid.innerHTML = demoList.map((item, idx) => `
       <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.06);text-align:center;cursor:zoom-in;" onclick="window.openUniversalGalleryLightbox ? window.openUniversalGalleryLightbox(${idx}, window.bundleDemoImages) : (window.openPinchZoomLightbox && window.openPinchZoomLightbox('${item.img}'))">
         <div style="font-size:0.75rem;font-weight:800;color:#64748b;padding:6px 8px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
           ${escapeHtml(item.title)}
@@ -962,69 +939,69 @@
         />
       </div>
     `).join('');
-  }
+}
 
-  // --- 8. RENDER WHY BUY COMBO SECTION ---
-  function renderWhyBuySection(bundle) {
-    const titleEl = document.getElementById('why-title');
-    const descEl = document.getElementById('why-desc');
-    const grid = document.getElementById('whyCardsGrid');
+// --- 8. RENDER WHY BUY COMBO SECTION ---
+function renderWhyBuySection(bundle) {
+  const titleEl = document.getElementById('why-title');
+  const descEl = document.getElementById('why-desc');
+  const grid = document.getElementById('whyCardsGrid');
 
-    if (titleEl && bundle.whyBuyTitle) titleEl.textContent = bundle.whyBuyTitle;
-    if (descEl && bundle.whyBuyDesc) descEl.textContent = bundle.whyBuyDesc;
+  if (titleEl && bundle.whyBuyTitle) titleEl.textContent = bundle.whyBuyTitle;
+  if (descEl && bundle.whyBuyDesc) descEl.textContent = bundle.whyBuyDesc;
 
-    if (grid && Array.isArray(bundle.whyBuyFeatures) && bundle.whyBuyFeatures.length > 0) {
-      grid.innerHTML = bundle.whyBuyFeatures.map((item, idx) => `
+  if (grid && Array.isArray(bundle.whyBuyFeatures) && bundle.whyBuyFeatures.length > 0) {
+    grid.innerHTML = bundle.whyBuyFeatures.map((item, idx) => `
         <div class="why-card">
           <div class="why-icon" style="font-size: 26px; margin-bottom: 10px;">${escapeHtml(item.icon || '✨')}</div>
           <h3>${idx + 1}. ${escapeHtml(item.title || '')}</h3>
           <p>${escapeHtml(item.desc || '')}</p>
         </div>
       `).join('');
-    }
+  }
+}
+
+// --- 9. RENDER REVIEWS ---
+function renderReviews(bundle) {
+  const reviewsGrid = document.getElementById('bundleReviewsGrid');
+  if (!reviewsGrid) return;
+
+  let collectedReviews = [];
+  if (Array.isArray(bundle.reviews) && bundle.reviews.length > 0) {
+    collectedReviews = bundle.reviews;
+  } else {
+    (bundle.bookIds || []).forEach(bId => {
+      const lp = allLandingPages.find(p => (p.id || '').toUpperCase() === String(bId).toUpperCase());
+      if (lp && Array.isArray(lp.reviews) && lp.reviews.length > 0) {
+        collectedReviews.push(...lp.reviews);
+      }
+    });
   }
 
-  // --- 9. RENDER REVIEWS ---
-  function renderReviews(bundle) {
-    const reviewsGrid = document.getElementById('bundleReviewsGrid');
-    if (!reviewsGrid) return;
+  if (collectedReviews.length === 0) {
+    collectedReviews = [
+      {
+        name: "राजेश पाटीदार (उज्जैन, म.प्र.)",
+        rating: 5,
+        text: "मैंने यह कॉम्बो बंडल खरीदा। धान, सोयाबीन और सब्जी डॉक्टर की सभी किताबें एक ही जगह मिल गईं। फोटो देखकर कीट व दवा समझना बहुत आसान है। बहुत ही उपयोगी बंडल!",
+        verified: true
+      },
+      {
+        name: "सुरेश कुमार शर्मा (सीकर, राजस्थान)",
+        rating: 5,
+        text: "एक-एक किताब लेने की जगह यह कॉम्बो पैक लिया। सीधे ₹1000 की बचत हुई और फोन में सारी ई-बुक्स तुरंत आ गईं। ऑडियो भी बहुत स्पष्ट है।",
+        verified: true
+      },
+      {
+        name: "महेंद्र सिंह धाकड़ (कोटा, राजस्थान)",
+        rating: 5,
+        text: "कृषि विज्ञान केंद्र के वैज्ञानिकों द्वारा लिखी यह किताबें हर किसान के पास होनी चाहिए। खाद प्रबंधन और रोग पहचान से फसल में काफी सुधार हुआ।",
+        verified: true
+      }
+    ];
+  }
 
-    let collectedReviews = [];
-    if (Array.isArray(bundle.reviews) && bundle.reviews.length > 0) {
-      collectedReviews = bundle.reviews;
-    } else {
-      (bundle.bookIds || []).forEach(bId => {
-        const lp = allLandingPages.find(p => (p.id || '').toUpperCase() === String(bId).toUpperCase());
-        if (lp && Array.isArray(lp.reviews) && lp.reviews.length > 0) {
-          collectedReviews.push(...lp.reviews);
-        }
-      });
-    }
-
-    if (collectedReviews.length === 0) {
-      collectedReviews = [
-        {
-          name: "राजेश पाटीदार (उज्जैन, म.प्र.)",
-          rating: 5,
-          text: "मैंने यह कॉम्बो बंडल खरीदा। धान, सोयाबीन और सब्जी डॉक्टर की सभी किताबें एक ही जगह मिल गईं। फोटो देखकर कीट व दवा समझना बहुत आसान है। बहुत ही उपयोगी बंडल!",
-          verified: true
-        },
-        {
-          name: "सुरेश कुमार शर्मा (सीकर, राजस्थान)",
-          rating: 5,
-          text: "एक-एक किताब लेने की जगह यह कॉम्बो पैक लिया। सीधे ₹1000 की बचत हुई और फोन में सारी ई-बुक्स तुरंत आ गईं। ऑडियो भी बहुत स्पष्ट है।",
-          verified: true
-        },
-        {
-          name: "महेंद्र सिंह धाकड़ (कोटा, राजस्थान)",
-          rating: 5,
-          text: "कृषि विज्ञान केंद्र के वैज्ञानिकों द्वारा लिखी यह किताबें हर किसान के पास होनी चाहिए। खाद प्रबंधन और रोग पहचान से फसल में काफी सुधार हुआ।",
-          verified: true
-        }
-      ];
-    }
-
-    reviewsGrid.innerHTML = collectedReviews.slice(0, 8).map(r => `
+  reviewsGrid.innerHTML = collectedReviews.slice(0, 8).map(r => `
       <div style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="font-weight:800;color:#0f172a;font-size:0.96rem;">${escapeHtml(r.name || 'किसान साथी')}</div>
@@ -1036,502 +1013,507 @@
         </div>
       </div>
     `).join('');
-  }
+}
 
-  // --- 10. RENDER FAQS ---
-  function renderFaqs(bundle) {
-    const accordion = document.getElementById('bundleFaqAccordion');
-    if (!accordion) return;
+// --- 10. RENDER FAQS ---
+function renderFaqs(bundle) {
+  const accordion = document.getElementById('bundleFaqAccordion');
+  if (!accordion) return;
 
-    if (Array.isArray(bundle.faqs) && bundle.faqs.length > 0) {
-      accordion.innerHTML = bundle.faqs.map((f, idx) => `
+  if (Array.isArray(bundle.faqs) && bundle.faqs.length > 0) {
+    accordion.innerHTML = bundle.faqs.map((f, idx) => `
         <details class="faq-item" style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:12px;" ${idx === 0 ? 'open' : ''}>
           <summary style="font-weight:800;color:#0f172a;cursor:pointer;font-size:1.02rem;">${idx + 1}. ${escapeHtml(f.q || f.question || '')}</summary>
           <p style="margin-top:10px;font-size:0.92rem;color:#334155;line-height:1.6;">${escapeHtml(f.a || f.answer || '')}</p>
         </details>
       `).join('');
-    }
   }
+}
 
-  // --- 11. RENDER FINAL BUY SECTION ---
-  function renderFinalCta(bundle) {
-    const finalBuyBtn = document.getElementById('final-buy-btn');
-    const finalOffer = bundle.offerPrice || 199;
+// --- 11. RENDER FINAL BUY SECTION ---
+function renderFinalCta(bundle) {
+  const finalBuyBtn = document.getElementById('final-buy-btn');
+  const finalOffer = bundle.offerPrice || 199;
 
-    if (finalBuyBtn) {
-      const btnText = bundle.finalCta?.buttonText || bundle.buyBtnText || `🛒 पूरा कॉम्बो ₹${finalOffer} में अभी खरीदें`;
-      finalBuyBtn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> ${escapeHtml(btnText.replace(/^🛒\s*/, ''))}`;
-    }
+  if (finalBuyBtn) {
+    const btnText = bundle.finalCta?.buttonText || bundle.buyBtnText || `🛒 पूरा कॉम्बो ₹${finalOffer} में अभी खरीदें`;
+    finalBuyBtn.innerHTML = `<i class="fa-solid fa-cart-shopping"></i> ${escapeHtml(btnText.replace(/^🛒\s*/, ''))}`;
   }
+}
 
-  // --- 12. RENDER STICKY BAR ---
-  function renderStickyBar(bundle) {
-    const resolvedBooks = getResolvedBundleBooks(bundle);
-    const thumb1 = document.getElementById('sticky-thumb-1');
-    const thumb2 = document.getElementById('sticky-thumb-2');
-    const oldPrice = document.getElementById('stickyOldPrice');
-    const newPrice = document.getElementById('stickyNewPrice');
+// --- 12. RENDER STICKY BAR ---
+function renderStickyBar(bundle) {
+  const resolvedBooks = getResolvedBundleBooks(bundle);
+  const thumb1 = document.getElementById('sticky-thumb-1');
+  const thumb2 = document.getElementById('sticky-thumb-2');
+  const oldPrice = document.getElementById('stickyOldPrice');
+  const newPrice = document.getElementById('stickyNewPrice');
 
-    if (thumb1 && resolvedBooks[0]) thumb1.src = resolvedBooks[0].cover;
-    if (thumb2 && resolvedBooks[1]) thumb2.src = resolvedBooks[1].cover;
-    else if (thumb2 && resolvedBooks[0]) thumb2.src = resolvedBooks[0].cover;
+  if (thumb1 && resolvedBooks[0]) thumb1.src = resolvedBooks[0].cover;
+  if (thumb2 && resolvedBooks[1]) thumb2.src = resolvedBooks[1].cover;
+  else if (thumb2 && resolvedBooks[0]) thumb2.src = resolvedBooks[0].cover;
 
-    let totalMrp = bundle.mrp || 0;
-    resolvedBooks.forEach(b => {
-      if (!bundle.mrp) totalMrp += (b.mrp || 299);
-    });
+  let totalMrp = bundle.mrp || 0;
+  resolvedBooks.forEach(b => {
+    if (!bundle.mrp) totalMrp += (b.mrp || 299);
+  });
 
-    const finalOffer = bundle.offerPrice || 199;
-    if (oldPrice) oldPrice.textContent = `₹${totalMrp}`;
-    if (newPrice) newPrice.textContent = `₹${finalOffer}`;
+  const finalOffer = bundle.offerPrice || 199;
+  if (oldPrice) oldPrice.textContent = `₹${totalMrp}`;
+  if (newPrice) newPrice.textContent = `₹${finalOffer}`;
 
-    // Update Baby Browser Buy button
-    const babyBuyText = document.getElementById('babyBrowserBuyText');
+  // Update Baby Browser Buy button
+  const babyBuyText = document.getElementById('babyBrowserBuyText');
+  if (babyBuyText) {
+    babyBuyText.textContent = `🛒 पूरा कॉम्बो ₹${finalOffer} में खरीदें`;
+  }
+}
+
+// --- 13. BABY BROWSER CONTROLLER (ACTUAL BOOK LANDING PAGE) ---
+window.openBabyBrowser = function (bookId) {
+  const backdrop = document.getElementById('babyBrowserBackdrop');
+  const iframe = document.getElementById('babyBrowserIframe');
+  const babyBuyText = document.getElementById('babyBrowserBuyText');
+
+  if (currentBundle) {
+    const resolvedBooks = getResolvedBundleBooks(currentBundle);
+    const targetBook = resolvedBooks.find(x => String(x.id).toUpperCase() === String(bookId).toUpperCase()) || resolvedBooks[0];
+    const singleOffer = targetBook ? (targetBook.regularOffer || 99) : 99;
+    const comboOffer = currentBundle.offerPrice || 199;
+
+    const singleNotice = document.getElementById('babySingleNoticePrice');
+    const comboNotice = document.getElementById('babyComboNoticePrice');
+    if (singleNotice) singleNotice.textContent = `₹${singleOffer}`;
+    if (comboNotice) comboNotice.textContent = `₹${comboOffer}`;
+
     if (babyBuyText) {
-      babyBuyText.textContent = `🛒 पूरा कॉम्बो ₹${finalOffer} में खरीदें`;
+      babyBuyText.textContent = `🛒 पूरा कॉम्बो ₹${comboOffer} में खरीदें`;
     }
   }
 
-  // --- 13. BABY BROWSER CONTROLLER (ACTUAL BOOK LANDING PAGE) ---
-  window.openBabyBrowser = function (bookId) {
-    const backdrop = document.getElementById('babyBrowserBackdrop');
-    const iframe = document.getElementById('babyBrowserIframe');
-    const babyBuyText = document.getElementById('babyBrowserBuyText');
-
-    if (currentBundle) {
-      const resolvedBooks = getResolvedBundleBooks(currentBundle);
-      const targetBook = resolvedBooks.find(x => String(x.id).toUpperCase() === String(bookId).toUpperCase()) || resolvedBooks[0];
-      const singleOffer = targetBook ? (targetBook.regularOffer || 99) : 99;
-      const comboOffer = currentBundle.offerPrice || 199;
-
-      const singleNotice = document.getElementById('babySingleNoticePrice');
-      const comboNotice = document.getElementById('babyComboNoticePrice');
-      if (singleNotice) singleNotice.textContent = `₹${singleOffer}`;
-      if (comboNotice) comboNotice.textContent = `₹${comboOffer}`;
-
-      if (babyBuyText) {
-        babyBuyText.textContent = `🛒 पूरा कॉम्बो ₹${comboOffer} में खरीदें`;
-      }
-    }
-
-    if (iframe) {
-      iframe.src = `/ebooks/book-landing.html?id=${encodeURIComponent(bookId)}&bundle_preview=1`;
-    }
-
-    if (backdrop) {
-      backdrop.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-  };
-
-  window.closeBabyBrowser = function () {
-    const backdrop = document.getElementById('babyBrowserBackdrop');
-    const iframe = document.getElementById('babyBrowserIframe');
-
-    if (backdrop) {
-      backdrop.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    // Clear iframe after transition to stop any media playing inside
-    setTimeout(() => {
-      if (iframe && (!backdrop || !backdrop.classList.contains('open'))) {
-        iframe.src = 'about:blank';
-      }
-    }, 300);
-  };
-
-  // --- 14. AUDIO NARRATION SYSTEM WITH AUTO-PLAY & HINDI TTS / MP3 SUPPORT ---
-  let _bundleAudio = null;
-  let _audioPlaying = false;
-  let _speechUtterance = null;
-
-  function initBundleAudio(bundle) {
-    _bundleAudio = document.getElementById('bundleNarrationAudio');
-    const audioPill = document.getElementById('bundleFloatingAudioPill');
-    const audioLabel = document.getElementById('bundleAudioPillLabel');
-    if (!audioPill) return;
-
-    const audioUrl = bundle.audioUrl;
-    const audioScript = bundle.audioScript;
-
-    if (!audioUrl && !audioScript) {
-      audioPill.style.display = 'none';
-      return;
-    }
-
-    if (bundle.videoAutoPlay) {
-      audioPill.style.display = 'none';
-      return;
-    }
-
-    audioPill.style.display = 'inline-flex';
-    if (audioLabel) audioLabel.textContent = bundle.audioTitle || '🎙️ कॉम्बो ऑडियो झलक';
-    scheduleAudioPillAutoShrink(4000);
-
-    if (bundle.audioAutoPlay && !bundle.videoAutoPlay) {
-      const attemptAuto = () => {
-        playNarration(bundle);
-      };
-
-      try {
-        attemptAuto();
-      } catch (_) { }
-
-      // Unlock on first tap if browser blocked autoplay
-      const unlockAudio = () => {
-        if (!_audioPlaying) playNarration(bundle);
-        document.removeEventListener('click', unlockAudio);
-        document.removeEventListener('touchstart', unlockAudio);
-      };
-      document.addEventListener('click', unlockAudio, { once: true });
-      document.addEventListener('touchstart', unlockAudio, { once: true });
-    }
+  if (iframe) {
+    iframe.src = `/ebooks/book-landing.html?id=${encodeURIComponent(bookId)}&bundle_preview=1`;
   }
 
-  function playNarration(bundle) {
-    if (!bundle) bundle = currentBundle;
-    if (!bundle) return;
+  if (backdrop) {
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+};
 
-    if (bundle.audioUrl && _bundleAudio) {
-      _bundleAudio.src = bundle.audioUrl;
-      _bundleAudio.play().then(() => {
-        setAudioState(true);
-      }).catch(() => {
-        if (bundle.audioScript && 'speechSynthesis' in window) {
-          playSpeechScript(bundle.audioScript);
-        }
-      });
-      _bundleAudio.onended = () => setAudioState(false);
-      _bundleAudio.onpause = () => setAudioState(false);
-      _bundleAudio.onplay = () => setAudioState(true);
-      return;
-    }
+window.closeBabyBrowser = function () {
+  const backdrop = document.getElementById('babyBrowserBackdrop');
+  const iframe = document.getElementById('babyBrowserIframe');
 
-    if (bundle.audioScript && 'speechSynthesis' in window) {
-      playSpeechScript(bundle.audioScript);
-    }
+  if (backdrop) {
+    backdrop.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
-  function playSpeechScript(text) {
-    if (!('speechSynthesis' in window)) return;
+  // Clear iframe after transition to stop any media playing inside
+  setTimeout(() => {
+    if (iframe && (!backdrop || !backdrop.classList.contains('open'))) {
+      iframe.src = 'about:blank';
+    }
+  }, 300);
+};
+
+// --- 14. AUDIO NARRATION SYSTEM WITH AUTO-PLAY & HINDI TTS / MP3 SUPPORT ---
+let _bundleAudio = null;
+let _audioPlaying = false;
+let _speechUtterance = null;
+
+function initBundleAudio(bundle) {
+  _bundleAudio = document.getElementById('bundleNarrationAudio');
+  const audioPill = document.getElementById('bundleFloatingAudioPill');
+  const audioLabel = document.getElementById('bundleAudioPillLabel');
+  if (!audioPill) return;
+
+  const audioUrl = bundle.audioUrl;
+  const audioScript = bundle.audioScript;
+
+  if (!audioUrl && !audioScript) {
+    audioPill.style.display = 'none';
+    return;
+  }
+
+  if (bundle.videoAutoPlay) {
+    audioPill.style.display = 'none';
+    return;
+  }
+
+  audioPill.style.display = 'inline-flex';
+  if (audioLabel) audioLabel.textContent = '🎙️ Audio';
+  scheduleAudioPillAutoShrink(4000);
+
+  if (bundle.audioAutoPlay && !bundle.videoAutoPlay) {
+    const attemptAuto = () => {
+      playNarration(bundle);
+    };
+
     try {
-      window.speechSynthesis.cancel();
-      _speechUtterance = new SpeechSynthesisUtterance(text);
-      _speechUtterance.lang = 'hi-IN';
-      _speechUtterance.rate = 0.95;
-      _speechUtterance.pitch = 1.0;
+      attemptAuto();
+    } catch (_) { }
 
-      const voices = window.speechSynthesis.getVoices();
-      const hiVoice = voices.find(v => v.lang && (v.lang.startsWith('hi') || v.name.includes('Hindi')));
-      if (hiVoice) _speechUtterance.voice = hiVoice;
-
-      _speechUtterance.onstart = () => setAudioState(true);
-      _speechUtterance.onend = () => setAudioState(false);
-      _speechUtterance.onerror = () => setAudioState(false);
-
-      window.speechSynthesis.speak(_speechUtterance);
-    } catch (_) {
-      setAudioState(false);
-    }
+    // Unlock on first tap if browser blocked autoplay
+    const unlockAudio = () => {
+      if (!_audioPlaying) playNarration(bundle);
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true });
   }
+}
 
-  function setAudioState(isPlaying) {
-    _audioPlaying = isPlaying;
-    const pill = document.getElementById('bundleFloatingAudioPill');
-    const toggleBtn = document.getElementById('bundleAudioPillToggleBtn');
-    if (!pill) return;
-    if (isPlaying) {
-      pill.classList.add('playing');
-      if (toggleBtn) toggleBtn.textContent = '⏸️';
-    } else {
-      pill.classList.remove('playing');
-      if (toggleBtn) toggleBtn.textContent = '▶️';
-    }
-  }
+function playNarration(bundle) {
+  if (!bundle) bundle = currentBundle;
+  if (!bundle) return;
 
-  window.toggleBundleAudio = function () {
-    if (_audioPlaying) {
-      if (_bundleAudio && !_bundleAudio.paused) {
-        _bundleAudio.pause();
+  if (bundle.audioUrl && _bundleAudio) {
+    _bundleAudio.src = bundle.audioUrl;
+    _bundleAudio.play().then(() => {
+      setAudioState(true);
+    }).catch(() => {
+      if (bundle.audioScript && 'speechSynthesis' in window) {
+        playSpeechScript(bundle.audioScript);
       }
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      setAudioState(false);
-    } else {
-      playNarration(currentBundle);
-    }
-  };
-
-  let _audioAutoShrinkTimer = null;
-
-  function scheduleAudioPillAutoShrink(delayMs = 4000) {
-    if (_audioAutoShrinkTimer) clearTimeout(_audioAutoShrinkTimer);
-    _audioAutoShrinkTimer = setTimeout(() => {
-      compressAudioPill();
-    }, delayMs);
+    });
+    _bundleAudio.onended = () => setAudioState(false);
+    _bundleAudio.onpause = () => setAudioState(false);
+    _bundleAudio.onplay = () => setAudioState(true);
+    return;
   }
 
-  function compressAudioPill() {
-    const pill = document.getElementById('bundleFloatingAudioPill');
-    if (pill && !pill.classList.contains('compressed')) {
-      pill.classList.add('compressed');
-      const cBtn = document.getElementById('bundleAudioCompressBtn');
-      if (cBtn) cBtn.textContent = '🗖';
-    }
+  if (bundle.audioScript && 'speechSynthesis' in window) {
+    playSpeechScript(bundle.audioScript);
   }
+}
 
-  function expandAudioPill() {
-    const pill = document.getElementById('bundleFloatingAudioPill');
-    if (pill) {
-      pill.classList.remove('compressed');
-      const cBtn = document.getElementById('bundleAudioCompressBtn');
-      if (cBtn) cBtn.textContent = '🗕';
-      scheduleAudioPillAutoShrink(4000);
-    }
+function playSpeechScript(text) {
+  if (!('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    _speechUtterance = new SpeechSynthesisUtterance(text);
+    _speechUtterance.lang = 'hi-IN';
+    _speechUtterance.rate = 0.95;
+    _speechUtterance.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    const hiVoice = voices.find(v => v.lang && (v.lang.startsWith('hi') || v.name.includes('Hindi')));
+    if (hiVoice) _speechUtterance.voice = hiVoice;
+
+    _speechUtterance.onstart = () => setAudioState(true);
+    _speechUtterance.onend = () => setAudioState(false);
+    _speechUtterance.onerror = () => setAudioState(false);
+
+    window.speechSynthesis.speak(_speechUtterance);
+  } catch (_) {
+    setAudioState(false);
   }
+}
 
-  window.closeBundleAudioPill = function () {
-    if (_bundleAudio) {
+function setAudioState(isPlaying) {
+  _audioPlaying = isPlaying;
+  const pill = document.getElementById('bundleFloatingAudioPill');
+  const toggleBtn = document.getElementById('bundleAudioPillToggleBtn');
+  if (!pill) return;
+  if (isPlaying) {
+    pill.classList.add('playing');
+    if (toggleBtn) toggleBtn.textContent = '⏸️';
+  } else {
+    pill.classList.remove('playing');
+    if (toggleBtn) toggleBtn.textContent = '▶️';
+  }
+}
+
+window.toggleBundleAudio = function () {
+  if (_audioPlaying) {
+    if (_bundleAudio && !_bundleAudio.paused) {
       _bundleAudio.pause();
-      _bundleAudio.currentTime = 0;
     }
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     setAudioState(false);
-    if (_audioAutoShrinkTimer) clearTimeout(_audioAutoShrinkTimer);
-    const pill = document.getElementById('bundleFloatingAudioPill');
-    if (pill) {
-      pill.style.display = 'none';
-      try { sessionStorage.setItem('AIM_BUNDLE_AUDIO_CLOSED', 'true'); } catch (_) { }
+  } else {
+    playNarration(currentBundle);
+  }
+};
+
+let _audioAutoShrinkTimer = null;
+
+function scheduleAudioPillAutoShrink(delayMs = 4000) {
+  if (_audioAutoShrinkTimer) clearTimeout(_audioAutoShrinkTimer);
+  _audioAutoShrinkTimer = setTimeout(() => {
+    compressAudioPill();
+  }, delayMs);
+}
+
+function compressAudioPill() {
+  const pill = document.getElementById('bundleFloatingAudioPill');
+  if (pill && !pill.classList.contains('compressed')) {
+    pill.classList.add('compressed');
+    const cBtn = document.getElementById('bundleAudioCompressBtn');
+    if (cBtn) cBtn.textContent = '🗖';
+  }
+}
+
+function expandAudioPill() {
+  const pill = document.getElementById('bundleFloatingAudioPill');
+  if (pill) {
+    pill.classList.remove('compressed');
+    const cBtn = document.getElementById('bundleAudioCompressBtn');
+    if (cBtn) cBtn.textContent = '🗕';
+    scheduleAudioPillAutoShrink(4000);
+  }
+}
+
+window.closeBundleAudioPill = function () {
+  if (_bundleAudio) {
+    _bundleAudio.pause();
+    _bundleAudio.currentTime = 0;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  setAudioState(false);
+  if (_audioAutoShrinkTimer) clearTimeout(_audioAutoShrinkTimer);
+  const pill = document.getElementById('bundleFloatingAudioPill');
+  if (pill) {
+    pill.style.display = 'none';
+    try { sessionStorage.setItem('AIM_BUNDLE_AUDIO_CLOSED', 'true'); } catch (_) { }
+  }
+};
+window.stopBundleAudio = window.closeBundleAudioPill;
+
+window.toggleCompressAudioPill = function () {
+  const pill = document.getElementById('bundleFloatingAudioPill');
+  if (!pill) return;
+  if (pill.classList.contains('compressed')) {
+    expandAudioPill();
+  } else {
+    compressAudioPill();
+  }
+};
+
+window.onAudioPillClick = function (e) {
+  const pill = document.getElementById('bundleFloatingAudioPill');
+  if (pill && pill.classList.contains('compressed')) {
+    expandAudioPill();
+    return;
+  }
+  window.toggleBundleAudio();
+};
+
+// --- 15. SECTION CONTROLS (ON/OFF VISIBILITY & DYNAMIC REORDERING) ---
+function applySectionControls(bundle) {
+  if (!bundle) return;
+
+  // 1. Visibility Check
+  const vis = bundle.sectionVisibility || {};
+  Object.keys(vis).forEach(secId => {
+    const el = document.getElementById(secId);
+    if (el) {
+      if (vis[secId] === false) {
+        el.style.setProperty('display', 'none', 'important');
+      } else {
+        el.style.removeProperty('display');
+      }
     }
-  };
-  window.stopBundleAudio = window.closeBundleAudioPill;
+  });
 
-  window.toggleCompressAudioPill = function () {
-    const pill = document.getElementById('bundleFloatingAudioPill');
-    if (!pill) return;
-    if (pill.classList.contains('compressed')) {
-      expandAudioPill();
-    } else {
-      compressAudioPill();
-    }
-  };
-
-  window.onAudioPillClick = function (e) {
-    const pill = document.getElementById('bundleFloatingAudioPill');
-    if (pill && pill.classList.contains('compressed')) {
-      expandAudioPill();
-      return;
-    }
-    window.toggleBundleAudio();
-  };
-
-  // --- 15. SECTION CONTROLS (ON/OFF VISIBILITY & DYNAMIC REORDERING) ---
-  function applySectionControls(bundle) {
-    if (!bundle) return;
-
-    // 1. Visibility Check
-    const vis = bundle.sectionVisibility || {};
-    Object.keys(vis).forEach(secId => {
-      const el = document.getElementById(secId);
-      if (el) {
-        if (vis[secId] === false) {
-          el.style.setProperty('display', 'none', 'important');
-        } else {
-          el.style.removeProperty('display');
+  // 2. Section Reordering
+  if (Array.isArray(bundle.sectionOrder) && bundle.sectionOrder.length > 0) {
+    const headerEl = document.getElementById('header') || document.querySelector('header');
+    const footerEl = document.querySelector('footer.site-footer') || document.querySelector('footer');
+    if (footerEl && footerEl.parentNode) {
+      bundle.sectionOrder.forEach(secId => {
+        const secEl = document.getElementById(secId);
+        if (!secEl) return;
+        if (secId === 'sec-top-ribbon' && headerEl && headerEl.parentNode) {
+          headerEl.parentNode.insertBefore(secEl, headerEl);
+        } else if (secEl !== footerEl && secEl.parentNode === footerEl.parentNode) {
+          footerEl.parentNode.insertBefore(secEl, footerEl);
         }
-      }
-    });
-
-    // 2. Section Reordering
-    if (Array.isArray(bundle.sectionOrder) && bundle.sectionOrder.length > 0) {
-      const headerEl = document.getElementById('header') || document.querySelector('header');
-      const footerEl = document.querySelector('footer.site-footer') || document.querySelector('footer');
-      if (footerEl && footerEl.parentNode) {
-        bundle.sectionOrder.forEach(secId => {
-          const secEl = document.getElementById(secId);
-          if (!secEl) return;
-          if (secId === 'sec-top-ribbon' && headerEl && headerEl.parentNode) {
-            headerEl.parentNode.insertBefore(secEl, headerEl);
-          } else if (secEl !== footerEl && secEl.parentNode === footerEl.parentNode) {
-            footerEl.parentNode.insertBefore(secEl, footerEl);
-          }
-        });
-      }
-    }
-  }
-
-  // --- 16. COUNTDOWN TIMER ENGINE ---
-  function setupCountdownTimer(bundle) {
-    const ribbon = document.getElementById('sec-top-ribbon');
-    const timerBadge = document.getElementById('ribbonBadge');
-    const timerEl = document.getElementById('bundleCountdown');
-    const clockMin = document.getElementById('ubl-clock-minutes');
-    const clockSec = document.getElementById('ubl-clock-seconds');
-
-    if (bundle && bundle.timerConfig) {
-      if (bundle.timerConfig.enabled === false && ribbon) {
-        ribbon.style.display = 'none';
-        return;
-      }
-      if (timerBadge && bundle.timerConfig.badgeText) {
-        timerBadge.textContent = bundle.timerConfig.badgeText;
-      }
-    }
-
-    let durationMinutes = (bundle?.timerConfig?.durationMinutes) || 15;
-    let seconds = durationMinutes * 60;
-    setInterval(() => {
-      if (seconds <= 0) {
-        seconds = durationMinutes * 60;
-      }
-      seconds--;
-      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-      const s = String(seconds % 60).padStart(2, '0');
-      if (timerEl) timerEl.textContent = `00:${m}:${s}`;
-      if (clockMin) clockMin.textContent = m;
-      if (clockSec) clockSec.textContent = s;
-    }, 1000);
-  }
-
-  // --- 17. MULTI-BOOK CHECKOUT INITIATION ---
-  window.initiateBundleCheckout = function () {
-    if (!currentBundle) return;
-    const finalPrice = currentBundle.offerPrice || 199;
-    const bookParams = (currentBundle.bookIds || []).join(',');
-
-    // Track Facebook Pixel InitiateCheckout
-    if (typeof fbq === 'function') {
-      fbq('track', 'InitiateCheckout', {
-        content_name: currentBundle.title,
-        content_ids: currentBundle.bookIds,
-        value: finalPrice,
-        currency: 'INR'
       });
     }
+  }
+}
 
-    // Close Baby browser if open
-    window.closeBabyBrowser();
+// --- 16. COUNTDOWN TIMER ENGINE ---
+function setupCountdownTimer(bundle) {
+  const ribbon = document.getElementById('sec-top-ribbon');
+  const timerBadge = document.getElementById('ribbonBadge');
+  const timerEl = document.getElementById('bundleCountdown');
+  const clockMin = document.getElementById('ubl-clock-minutes');
+  const clockSec = document.getElementById('ubl-clock-seconds');
 
-    const uName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
-    const uMob = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
-    const uEmail = localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || '';
-    const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}${uEmail ? `&email=${encodeURIComponent(uEmail)}` : ''}`;
-
-    // Redirect to checkout with multi-book bundle parameter and customer prefill
-    window.location.href = `/ebooks/checkout.html?bundle=${encodeURIComponent(currentBundle.id)}&books=${encodeURIComponent(bookParams)}&price=${finalPrice}&title=${encodeURIComponent(currentBundle.title)}${userQueryParams}`;
-  };
-
-  // --- 18. OFFICIAL UNIVERSAL SHARE INTEGRATION ---
-  window.handleUniversalBookShare = function (event) {
-    if (event) {
-      if (typeof event.stopPropagation === 'function') event.stopPropagation();
-      if (typeof event.preventDefault === 'function') event.preventDefault();
-    }
-    if (!currentBundle) return;
-
-    let userShareId = 'AI000004';
-    try {
-      const userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-      if (userObj && (userObj.share_id || userObj.ref_code)) {
-        userShareId = userObj.share_id || userObj.ref_code;
-      }
-    } catch (_) { }
-
-    const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
-    const shareUrl = `${origin}/bundle.html?id=${encodeURIComponent(currentBundle.id)}&share_id=${encodeURIComponent(userShareId)}`;
-
-    let shareText = (currentBundle.whatsappShareText || '').replace('{LINK}', shareUrl);
-    if (!shareText) {
-      shareText = `🌾 *AAROGYAM INDIA — ${currentBundle.title}* 📚\n━━━━━━━━━━━━━━━━━━━━\n${currentBundle.subtitle}\n💰 कॉम्बो ऑफर: मात्र *₹${currentBundle.offerPrice || 199}*!\n\n👇 *सम्पूर्ण बंडल अभी यहाँ से अनलॉक करें:*\n${shareUrl}`;
-    }
-
-    if (typeof window.openUniversalShareModal === 'function') {
-      window.openUniversalShareModal({
-        title: currentBundle.title,
-        url: shareUrl,
-        text: shareText
-      });
+  if (bundle && bundle.timerConfig) {
+    if (bundle.timerConfig.enabled === false && ribbon) {
+      ribbon.style.display = 'none';
       return;
     }
-
-    if (navigator.share) {
-      navigator.share({
-        title: currentBundle.title,
-        text: shareText
-      }).catch(() => {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-      });
-    } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+    if (timerBadge) {
+      timerBadge.textContent = '⚡ महाबचत कॉम्बो ऑफर';
     }
-  };
+  }
 
-  // --- 19. HELPERS & BINDINGS ---
-  function bindActionButtons() {
-    const buyButtons = ['hero-buy-btn', 'bundleCalcBuyBtn', 'final-buy-btn', 'sticky-buy-btn'];
-    buyButtons.forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn) {
-        btn.onclick = () => window.initiateBundleCheckout();
-      }
+  let durationMinutes = (bundle?.timerConfig?.durationMinutes) || 15;
+  let seconds = durationMinutes * 60;
+  setInterval(() => {
+    if (seconds <= 0) {
+      seconds = durationMinutes * 60;
+    }
+    seconds--;
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    if (timerEl) timerEl.textContent = `00:${m}:${s}`;
+    if (clockMin) clockMin.textContent = m;
+    if (clockSec) clockSec.textContent = s;
+  }, 1000);
+}
+
+// --- 17. MULTI-BOOK CHECKOUT INITIATION ---
+window.initiateBundleCheckout = function () {
+  if (!currentBundle) return;
+  const finalPrice = currentBundle.offerPrice || 199;
+  const bookParams = (currentBundle.bookIds || []).join(',');
+
+  // Track Facebook Pixel InitiateCheckout
+  if (typeof fbq === 'function') {
+    fbq('track', 'InitiateCheckout', {
+      content_name: currentBundle.title,
+      content_ids: currentBundle.bookIds,
+      value: finalPrice,
+      currency: 'INR'
     });
   }
 
-  function getResolvedBundleBooks(bundle) {
-    return (bundle.bookIds || []).map(bId => {
-      const b = allCatalogBooks.find(item => (item.id || '').toUpperCase() === String(bId).toUpperCase());
-      const lp = allLandingPages.find(item => (item.id || '').toUpperCase() === String(bId).toUpperCase());
+  // Close Baby browser if open
+  window.closeBabyBrowser();
 
-      const mrp = lp?.hero?.mrp || b?.mrp || 299;
-      const regularOffer = lp?.hero?.offer_price || b?.offerPrice || 99;
+  const uName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
+  const uMob = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+  const uEmail = localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || '';
 
-      const customConfig = bundle.bookCustomDetails && (bundle.bookCustomDetails[bId] || bundle.bookCustomDetails[String(bId).toUpperCase()]);
+  // Preserve Facebook / Ads Lead Source
+  const urlP = new URLSearchParams(window.location.search);
+  const resolvedSource = urlP.get('utm_source') || urlP.get('source') || localStorage.getItem('aim_lead_source') || localStorage.getItem('AI_PROFILE_SOURCE') || (window.location.search.includes('fbclid') ? 'Facebook' : '');
 
-      let desc = customConfig?.shortDesc || customConfig?.desc || customConfig?.subtitle || lp?.hero?.description || b?.description || b?.shortDesc || '';
-      if (!desc && lp?.meta?.description) desc = lp.meta.description;
-      if (!desc) {
-        desc = `फसलों के सम्पूर्ण कीट, रोग नियंत्रण, खाद-उर्वरक प्रबंधन व पैदावार बढ़ाने की व्यावहारिक वैज्ञानिक जानकारी।`;
-      }
+  const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}${uEmail ? `&email=${encodeURIComponent(uEmail)}` : ''}${resolvedSource ? `&source=${encodeURIComponent(resolvedSource)}` : ''}`;
 
-      // ONLY include keyPoints if admin specifically configured them (no [object Object] fallback)
-      let keyPoints = [];
-      if (customConfig && Array.isArray(customConfig.keyPoints) && customConfig.keyPoints.length > 0) {
-        keyPoints = customConfig.keyPoints
-          .map(p => typeof p === 'string' ? p.trim() : (p.text || p.title || ''))
-          .filter(Boolean);
-      }
+  // Redirect to checkout with multi-book bundle parameter and customer prefill
+  window.location.href = `/ebooks/checkout.html?bundle=${encodeURIComponent(currentBundle.id)}&books=${encodeURIComponent(bookParams)}&price=${finalPrice}&title=${encodeURIComponent(currentBundle.title)}${userQueryParams}`;
+};
 
-      const rawCover = lp?.hero?.cover_image || b?.cover || b?.thumbnail || `/images/books/${bId.toLowerCase()}-cover.webp`;
-      const updateTime = lp?.updated_at || b?.updated_at || bundle.updated_at || '';
-      const versionedCover = versionBookImg(rawCover, updateTime);
+// --- 18. OFFICIAL UNIVERSAL SHARE INTEGRATION ---
+window.handleUniversalBookShare = function (event) {
+  if (event) {
+    if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    if (typeof event.preventDefault === 'function') event.preventDefault();
+  }
+  if (!currentBundle) return;
 
-      return {
-        id: bId,
-        title: lp?.hero?.title || b?.heading || b?.name || b?.title || bId,
-        cover: versionedCover,
-        mrp: mrp,
-        regularOffer: regularOffer,
-        totalPages: b?.totalPages || 120,
-        desc: desc,
-        keyPoints: keyPoints
-      };
+  let userShareId = 'AI000004';
+  try {
+    const userObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+    if (userObj && (userObj.share_id || userObj.ref_code)) {
+      userShareId = userObj.share_id || userObj.ref_code;
+    }
+  } catch (_) { }
+
+  const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
+  const shareUrl = `${origin}/bundle.html?id=${encodeURIComponent(currentBundle.id)}&share_id=${encodeURIComponent(userShareId)}`;
+
+  let shareText = (currentBundle.whatsappShareText || '').replace('{LINK}', shareUrl);
+  if (!shareText) {
+    shareText = `🌾 *AAROGYAM INDIA — ${currentBundle.title}* 📚\n━━━━━━━━━━━━━━━━━━━━\n${currentBundle.subtitle}\n💰 कॉम्बो ऑफर: मात्र *₹${currentBundle.offerPrice || 199}*!\n\n👇 *सम्पूर्ण बंडल अभी यहाँ से अनलॉक करें:*\n${shareUrl}`;
+  }
+
+  if (typeof window.openUniversalShareModal === 'function') {
+    window.openUniversalShareModal({
+      title: currentBundle.title,
+      url: shareUrl,
+      text: shareText
     });
+    return;
   }
 
-  function versionBookImg(url, timestamp) {
-    if (!url || typeof url !== 'string') return url || '';
-    if (url.startsWith('data:') || url.startsWith('blob:')) return url;
-    const ver = timestamp ? new Date(timestamp).getTime() : Math.floor(Date.now() / 30000);
-    const sep = url.includes('?') ? '&' : '?';
-    return `${url}${sep}t=${ver}`;
+  if (navigator.share) {
+    navigator.share({
+      title: currentBundle.title,
+      text: shareText
+    }).catch(() => {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+    });
+  } else {
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
   }
+};
 
-  function renderBundleNotFound() {
-    document.body.innerHTML = `
+// --- 19. HELPERS & BINDINGS ---
+function bindActionButtons() {
+  const buyButtons = ['hero-buy-btn', 'bundleCalcBuyBtn', 'final-buy-btn', 'sticky-buy-btn'];
+  buyButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.onclick = () => window.initiateBundleCheckout();
+    }
+  });
+}
+
+function getResolvedBundleBooks(bundle) {
+  return (bundle.bookIds || []).map(bId => {
+    const b = allCatalogBooks.find(item => (item.id || '').toUpperCase() === String(bId).toUpperCase());
+    const lp = allLandingPages.find(item => (item.id || '').toUpperCase() === String(bId).toUpperCase());
+
+    const mrp = lp?.hero?.mrp || b?.mrp || 299;
+    const regularOffer = lp?.hero?.offer_price || b?.offerPrice || 99;
+
+    const customConfig = bundle.bookCustomDetails && (bundle.bookCustomDetails[bId] || bundle.bookCustomDetails[String(bId).toUpperCase()]);
+
+    let desc = customConfig?.shortDesc || customConfig?.desc || customConfig?.subtitle || lp?.hero?.description || b?.description || b?.shortDesc || '';
+    if (!desc && lp?.meta?.description) desc = lp.meta.description;
+    if (!desc) {
+      desc = `फसलों के सम्पूर्ण कीट, रोग नियंत्रण, खाद-उर्वरक प्रबंधन व पैदावार बढ़ाने की व्यावहारिक वैज्ञानिक जानकारी।`;
+    }
+
+    // ONLY include keyPoints if admin specifically configured them (no [object Object] fallback)
+    let keyPoints = [];
+    if (customConfig && Array.isArray(customConfig.keyPoints) && customConfig.keyPoints.length > 0) {
+      keyPoints = customConfig.keyPoints
+        .map(p => typeof p === 'string' ? p.trim() : (p.text || p.title || ''))
+        .filter(Boolean);
+    }
+
+    const rawCover = lp?.hero?.cover_image || b?.cover || b?.thumbnail || `/images/books/${bId.toLowerCase()}-cover.webp`;
+    const updateTime = lp?.updated_at || b?.updated_at || bundle.updated_at || '';
+    const versionedCover = versionBookImg(rawCover, updateTime);
+
+    return {
+      id: bId,
+      title: lp?.hero?.title || b?.heading || b?.name || b?.title || bId,
+      cover: versionedCover,
+      mrp: mrp,
+      regularOffer: regularOffer,
+      totalPages: b?.totalPages || 120,
+      desc: desc,
+      keyPoints: keyPoints
+    };
+  });
+}
+
+function versionBookImg(url, timestamp) {
+  if (!url || typeof url !== 'string') return url || '';
+  if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+  const ver = timestamp ? new Date(timestamp).getTime() : Math.floor(Date.now() / 30000);
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}t=${ver}`;
+}
+
+function renderBundleNotFound() {
+  document.body.innerHTML = `
       <div style="text-align:center;padding:60px 20px;color:#0f172a;font-family:sans-serif;">
         <div style="font-size:48px;margin-bottom:12px;">🔍</div>
         <h2>कॉम्बो बंडल उपलब्ध नहीं है।</h2>
@@ -1539,12 +1521,12 @@
         <a href="/index.html" style="background:#16a34a;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:800;display:inline-block;">होमपेज पर जाएं</a>
       </div>
     `;
-  }
+}
 
-  function escapeHtml(str) {
-    return String(str || '').replace(/[&<>"']/g, m => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[m]));
-  }
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[m]));
+}
 
-})();
+}) ();

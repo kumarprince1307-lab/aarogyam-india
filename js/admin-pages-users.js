@@ -619,7 +619,9 @@ export async function initUsers() {
           newPurchases.forEach(pur => {
             const u = masterUsersList.find(x => x.id === pur.profile_id);
             if (u) {
-              u.totalPurchases = (u.totalPurchases || 0) + 1;
+              const bIds = String(pur.book_id || '').split(',').map(x => x.trim()).filter(Boolean);
+              const count = bIds.length > 0 ? bIds.length : 1;
+              u.totalPurchases = (u.totalPurchases || 0) + count;
               u.totalSpent = (u.totalSpent || 0) + (Number(pur.amount) || 0);
               u.downloadLimit = (u.totalPurchases || 0) * 3;
               changeCount++;

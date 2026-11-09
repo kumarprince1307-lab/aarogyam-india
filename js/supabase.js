@@ -195,6 +195,32 @@ const MASTER_ACCOUNT = {
     MOBILE: "7974422572"
 };
 
+function resolveFallbackSource(rawSource) {
+    try {
+        if (typeof window.resolveRegistrationSource === 'function') {
+            return window.resolveRegistrationSource(rawSource);
+        }
+        if (rawSource && rawSource.includes(' | ') && !rawSource.toLowerCase().includes('direct') && !rawSource.toLowerCase().includes('checkout')) {
+            return rawSource;
+        }
+        const ua = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : '';
+        const search = (typeof window !== 'undefined' && window.location.search) ? window.location.search : '';
+        const ref = (typeof document !== 'undefined' && document.referrer) ? document.referrer : '';
+        let browser = 'Browser';
+        if (/FBAN|FBAV/i.test(ua) || search.includes('fbclid') || ref.includes('facebook.com') || ref.includes('fb.com')) browser = 'Facebook';
+        else if (/Instagram/i.test(ua) || ref.includes('instagram.com')) browser = 'Instagram';
+        else if (/WhatsApp/i.test(ua)) browser = 'WhatsApp';
+        else if (typeof window !== 'undefined' && ((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone)) browser = 'PWA App';
+        else if (/Chrome/i.test(ua)) browser = 'Chrome';
+        else if (/Safari/i.test(ua)) browser = 'Safari';
+
+        let page = (typeof document !== 'undefined' && document.title) ? document.title.replace(/[|•].*$/, '').trim() : 'वेबसाइट';
+        return `${browser} | ${page}`;
+    } catch (_) {
+        return rawSource || 'Browser | वेबसाइट';
+    }
+}
+
 async function createUserProfile(userData) {
     try {
         const attribution = resolveProfileAttribution(userData);
@@ -283,7 +309,7 @@ async function createUserProfile(userData) {
                 referral_code: sponsorShareCode,          
                 referral_mobile: referralCodeMobile,     
                 referred_by: referrerProfileId,
-                registration_source: attribution.source || userData.source || "direct",
+                registration_source: resolveFallbackSource(attribution.source || userData.source || "direct"),
                 profile_complete: false,
                 is_active: false
             }])
@@ -809,23 +835,20 @@ async function sendDirectCheckoutLog(statusValue) {
 
         console.log(`📤 Sending checkout log [${uId}, ${bId}, ${statusValue}] to Supabase...`);
 
-        const { data, error } = await activeDb
+        const { error } = await activeDb
             .from("checkout_logs")
             .insert([{
                 profile_id: uId,
                 book_id: bId,
                 status: statusValue 
-            }])
-            .select();
+            }]);
 
         if (error) {
             console.error(`❌ Failed to save [${statusValue}] log:`, error.message);
             return null;
         } else {
-            console.log(`✅ SUCCESS: Checkout log status [${statusValue}] saved successfully!`, data);
-            if (data && data.length > 0) {
-                return data[0].order_id;
-            }
+            console.log(`✅ SUCCESS: Checkout log status [${statusValue}] saved successfully!`);
+            return 'ORD_' + Date.now();
         }
     } catch (err) {
         console.error("❌ Direct log exception:", err);
@@ -965,23 +988,28 @@ async function savePurchase() {
         const activeDb = window.dbClient || window.supabase;
         if (!activeDb) return;
 
-        const purchasePayload = {
-            profile_id: window.currentPurchase.profileId,
-            book_id: window.currentPurchase.bookId,
-            payment_id: window.currentPurchase.paymentId,
-            amount: window.currentPurchase.amount,
-            order_id: window.currentPurchase.orderId,            
-            invoice_number: window.currentPurchase.invoice_number, 
-            download_count: 0, 
-            payment_status: PAYMENT.STATUS_SUCCESS 
-        };
+        const rawBookId = String(window.currentPurchase.bookId || '');
+        const bookList = rawBookId.includes(',') 
+            ? rawBookId.split(',').map(x => x.trim()).filter(Boolean)
+            : [rawBookId];
 
-        console.log("📤 Saving purchase to Supabase with Order ID & Invoice:", purchasePayload);
+        const purchaseRows = bookList.map((bId, idx) => ({
+            profile_id: window.currentPurchase.profileId,
+            book_id: bId,
+            payment_id: window.currentPurchase.paymentId,
+            amount: Math.round(((window.currentPurchase.amount || 0) / bookList.length) * 100) / 100,
+            order_id: window.currentPurchase.orderId,            
+            invoice_number: bookList.length > 1 ? `${window.currentPurchase.invoice_number}-${bId}` : window.currentPurchase.invoice_number, 
+            download_count: 0, 
+            max_downloads: 3,
+            payment_status: PAYMENT.STATUS_SUCCESS 
+        }));
+
+        console.log("📤 Saving purchase(s) to Supabase:", purchaseRows);
 
         const { data, error } = await activeDb
             .from("purchases")
-            .insert([purchasePayload])
-            .select();
+            .insert(purchaseRows);
 
         if (error) {
             console.error("❌ Save Purchase DB Error:", error.message);

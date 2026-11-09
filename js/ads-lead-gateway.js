@@ -201,14 +201,15 @@
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.90);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       z-index: 9999999;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0;
+      padding: 8px;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: none;
@@ -223,11 +224,10 @@
         background: #ffffff;
         color: #000000;
         box-sizing: border-box;
-        overflow-y: auto;
-        overflow-x: hidden;
-        scrollbar-width: none !important;
-        -ms-overflow-style: none !important;
-        -webkit-overflow-scrolling: touch;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
         animation: adsGatePop 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       ">
         <style>
@@ -259,13 +259,15 @@
           @media (min-width: 521px) {
             #adsLeadGatewayOverlay {
               padding: 12px;
+              align-items: center;
+              justify-content: center;
             }
             #adsLeadGatewayCard {
               width: 95%;
-              max-width: 440px;
+              max-width: 435px;
               min-width: 320px;
               margin: auto;
-              border: 2px solid #cbd5e1;
+              border: 1.5px solid #cbd5e1;
               border-radius: 12px;
               box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
               max-height: calc(100vh - 24px);
@@ -274,26 +276,27 @@
             }
           }
 
-          /* Mobile Screen-Fit Architecture (100% Full-Height Clean Sheet, Zero Black Empty Space) */
+          /* Mobile Screen-Fit Architecture (Centered Crisp Modal, Never Edge-Clipped) */
           @media (max-width: 520px) {
             #adsLeadGatewayOverlay {
-              padding: 0 !important;
-              align-items: stretch !important;
-              justify-content: stretch !important;
+              padding: 6px !important;
+              padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
+              align-items: center !important;
+              justify-content: center !important;
             }
             #adsLeadGatewayCard {
-              width: 100% !important;
-              max-width: 100% !important;
-              min-height: 100dvh !important;
-              min-height: 100vh !important;
-              height: 100dvh !important;
-              height: 100vh !important;
-              margin: 0 !important;
-              border-radius: 0 !important;
-              border: none !important;
-              box-shadow: none !important;
+              width: 96% !important;
+              max-width: 420px !important;
+              min-width: 280px !important;
+              margin: auto !important;
+              border: 1.5px solid #cbd5e1 !important;
+              border-radius: 12px !important;
+              box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
+              max-height: calc(100dvh - 12px) !important;
+              max-height: calc(100vh - 12px) !important;
               display: flex !important;
               flex-direction: column !important;
+              overflow: hidden !important;
             }
           }
 
@@ -307,10 +310,12 @@
             border: 1.5px solid #475569;
             border-radius: 7px;
             color: #ffffff !important;
+            caret-color: #38bdf8 !important;
             font-size: clamp(14px, 3.8vw, 16px) !important;
             font-weight: 800;
             outline: none;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
             transition: border-color 0.15s ease;
             height: clamp(40px, 5.2vh, 44px);
             min-height: 40px;
@@ -333,6 +338,7 @@
             -webkit-text-fill-color: #ffffff !important;
             -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
             box-shadow: 0 0 0px 1000px #0f172a inset !important;
+            caret-color: #ffffff !important;
             transition: background-color 5000s ease-in-out 0s;
             font-weight: 800 !important;
             font-size: 15px !important;
@@ -406,13 +412,13 @@
           </div>
 
           <!-- Form Fields Group -->
-          <form id="adsLeadGatewayForm" autocomplete="on" style="flex: 1; display: flex; flex-direction: column; justify-content: space-around; min-height: 0;">
+          <form id="adsLeadGatewayForm" method="post" action="javascript:void(0);" autocomplete="on" style="flex: 1; display: flex; flex-direction: column; justify-content: space-around; min-height: 0;">
             <!-- 1. Name Input (Dark Box + Bold White Text) -->
             <div style="margin-bottom: clamp(4px, 1vh, 7px);">
               <label for="adsGateName" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 👤 आपका शुभ नाम (Full Name) <span style="color:#dc2626;">*</span>
               </label>
-              <input type="text" id="adsGateName" name="name" autocomplete="name" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" />
+              <input type="text" id="adsGateName" name="name" autocomplete="name" autocapitalize="words" spellcheck="false" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" />
             </div>
 
             <!-- 2. WhatsApp Mobile Number -->
@@ -421,7 +427,7 @@
                 📱 WhatsApp मोबाइल नंबर <span style="color:#dc2626;">*</span>
               </label>
               <div style="position: relative;">
-                <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel" inputmode="numeric" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर दर्ज करें" class="ads-input-dark" style="padding-right: 36px;" />
+                <input type="tel" id="adsGateMobile" name="tel" autocomplete="tel tel-national" inputmode="tel" required maxlength="15" placeholder="10 अंकों का WhatsApp नंबर" class="ads-input-dark" style="padding-right: 36px;" />
                 <span id="adsMobileStatusIcon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 1.15rem; pointer-events: none; display: none;"></span>
               </div>
               <div id="adsMobileValidationHint" style="display: none; font-size: 11px; font-weight: 800; margin-top: 1px; margin-bottom: 2px; line-height: 1.2;"></div>
@@ -435,7 +441,7 @@
                 </label>
                 <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
               </div>
-              <input type="email" id="adsGateEmail" name="email" autocomplete="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: clamp(38px, 4.8vh, 42px); min-height: 38px; font-size: 14px !important;" />
+              <input type="email" id="adsGateEmail" name="email" autocomplete="email" inputmode="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: clamp(38px, 4.8vh, 42px); min-height: 38px; font-size: 14px !important;" />
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
@@ -575,8 +581,8 @@
       else if (cleaned.startsWith('0') && cleaned.length > 10) cleaned = cleaned.slice(1);
       cleaned = cleaned.replace(/\D/g, '').slice(0, 10);
 
-      // Auto update input if raw had spaces, dashes or +91
-      if (mobileInput.value !== cleaned && cleaned.length > 0) {
+      // Only update mobileInput.value when 10 full digits or spaces/+91 entered, avoiding typing interruptions
+      if (cleaned.length === 10 && mobileInput.value !== cleaned) {
         mobileInput.value = cleaned;
       }
 
@@ -630,6 +636,15 @@
     }
 
     mobileInput?.addEventListener('input', handleMobileInput);
+    mobileInput?.addEventListener('change', handleMobileInput);
+    mobileInput?.addEventListener('blur', () => {
+      let raw = mobileInput.value || '';
+      let cleaned = cleanIndianMobile(raw);
+      if (cleaned && mobileInput.value !== cleaned) {
+        mobileInput.value = cleaned;
+      }
+      handleMobileInput();
+    });
     mobileInput?.addEventListener('paste', () => setTimeout(handleMobileInput, 20));
 
     // Helper: Read Cookie Safely
@@ -693,10 +708,12 @@
 
       if (finalN && nameInput && !nameInput.value) {
         nameInput.value = finalN.trim();
+        try { nameInput.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) {}
       }
       if (finalM && mobileInput && !mobileInput.value) {
         mobileInput.value = cleanIndianMobile(finalM);
         handleMobileInput();
+        try { mobileInput.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) {}
       }
       if (finalE && emailInput && !emailInput.value) {
         emailInput.value = finalE.trim();
@@ -760,11 +777,16 @@
       });
     } catch (_) {}
 
-    // Auto-focus field
-    setTimeout(() => {
-      if (!nameInput?.value) nameInput?.focus();
-      else if (!mobileInput?.value) mobileInput?.focus();
-    }, 150);
+    // Auto-focus field ONLY on desktop with mouse.
+    // On touch/mobile devices, NEVER programmatically auto-focus on modal open
+    // because programmatic focus suppresses Android Gboard & Chrome native autofill memory chips!
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 600);
+    if (!isTouchDevice) {
+      setTimeout(() => {
+        if (!nameInput?.value) nameInput?.focus();
+        else if (!mobileInput?.value) mobileInput?.focus();
+      }, 150);
+    }
 
     // Form Submit Handler
     const form = document.getElementById('adsLeadGatewayForm');
@@ -823,10 +845,10 @@
     const userShareId = (cleanMobile === '7974422572' || cleanMobile.endsWith('7974422572')) ? 'AI000004' : ('AI' + cleanMobile.slice(-6));
 
     // Browser + Page Locking: Exactly as User Requested!
-    // Example: "Facebook | बुक बंडल 5-इन-1 (🌾 किसान भाई)" or "Chrome | खेती का डॉक्टर"
+    // Example: "Facebook | बुक बंडल 5-इन-1" or "Chrome | खेती का डॉक्टर"
     const browserApp = detectBrowserApp();
     const pageName = getCleanPageName(config);
-    const sourceLockedString = `${browserApp} | ${pageName} (${professionText})`;
+    const sourceLockedString = `${browserApp} | ${pageName}`;
 
     // --- STEP A: INSTANT LOCAL SESSION & COOKIE WRITING (ZERO LAG) ---
     const userObj = {
@@ -952,9 +974,11 @@
 
           const updatePayload = {
             occupation: professionText,
-            source: sourceLockedString,
             updated_at: new Date().toISOString()
           };
+          if (!existingProfile.registration_source || existingProfile.registration_source === 'direct' || existingProfile.registration_source === 'checkout' || existingProfile.registration_source === 'Facebook') {
+            updatePayload.registration_source = sourceLockedString;
+          }
           // नाम व मोबाइल कभी अपडेट नहीं होंगे - केवल ईमेल (यदि नया है) व अन्य विवरण अपडेट होंगे
           if (enteredEmail) updatePayload.email = enteredEmail;
 
@@ -971,7 +995,6 @@
             referral_code: sponsorShareId,
             occupation: professionText,
             registration_source: sourceLockedString,
-            source: sourceLockedString,
             created_at: new Date().toISOString()
           };
           if (enteredEmail) insertPayload.email = enteredEmail;

@@ -22,6 +22,72 @@ document.addEventListener("DOMContentLoaded", () => {
     syncCheckoutShareContext();
 });
 
+// Browser & Page Source Resolver for Profiles & Checkout
+function resolveRegistrationSource(rawSource) {
+    try {
+        if (rawSource && rawSource.includes(' | ') && !rawSource.toLowerCase().includes('checkout') && !rawSource.toLowerCase().includes('direct')) {
+            return rawSource;
+        }
+
+        const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+        const search = window.location.search || '';
+        const ref = document.referrer || '';
+        const params = new URLSearchParams(search);
+
+        // 1. Detect Browser / Platform
+        let browser = 'Browser';
+        if (/FBAN|FBAV/i.test(ua) || search.includes('fbclid') || ref.includes('facebook.com') || ref.includes('fb.com') || /utm_source=fb|utm_source=facebook/i.test(search) || (rawSource && /facebook|fb/i.test(rawSource))) {
+            browser = 'Facebook';
+        } else if (/Instagram/i.test(ua) || ref.includes('instagram.com') || /utm_source=ig|utm_source=instagram/i.test(search) || (rawSource && /instagram/i.test(rawSource))) {
+            browser = 'Instagram';
+        } else if (/WhatsApp/i.test(ua) || /utm_source=wa|utm_source=whatsapp/i.test(search) || (rawSource && /whatsapp/i.test(rawSource))) {
+            browser = 'WhatsApp';
+        } else if ((window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone || (rawSource && /pwa/i.test(rawSource))) {
+            browser = 'PWA App';
+        } else if (/Edg/i.test(ua)) {
+            browser = 'Edge';
+        } else if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) {
+            browser = 'Chrome';
+        } else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) {
+            browser = 'Safari';
+        } else if (/Firefox/i.test(ua)) {
+            browser = 'Firefox';
+        }
+
+        // 2. Detect Page / Product
+        let page = '';
+        const bId = (params.get('id') || params.get('bundle') || params.get('book') || (window.currentCheckoutBook ? window.currentCheckoutBook.id : '') || '').toUpperCase();
+        const path = (window.location.pathname || '').toLowerCase();
+
+        if (bId.includes('5IN1') || bId.includes('BK017,BK016') || bId.includes('KISAN') || path.includes('bundle')) {
+            page = 'बुक बंडल 5-इन-1';
+        } else if (bId.includes('BK002') || path.includes('kheti-dr')) {
+            page = 'खेती का डॉक्टर';
+        } else if (bId.includes('BK017') || path.includes('gehu')) {
+            page = 'गेहूँ की खेती';
+        } else if (bId.includes('BK019') || path.includes('chana')) {
+            page = 'चना की खेती';
+        } else if (bId.includes('BK020') || path.includes('sarson')) {
+            page = 'सरसों की खेती';
+        } else if (bId.includes('BK015') || path.includes('sabji')) {
+            page = '11 सब्जी मास्टर गाइड';
+        } else if (bId.includes('BK001') || path.includes('kharif')) {
+            page = 'खरीफ मास्टर गाइड';
+        } else if (window.currentCheckoutBook && window.currentCheckoutBook.title) {
+            page = window.currentCheckoutBook.title.replace(/[|•].*$/, '').trim();
+        } else if (document.title) {
+            page = document.title.replace(/[|•].*$/, '').trim();
+        } else {
+            page = 'चेकआउट';
+        }
+
+        return `${browser} | ${page}`;
+    } catch (_) {
+        return rawSource || 'Browser | चेकआउट';
+    }
+}
+window.resolveRegistrationSource = resolveRegistrationSource;
+
 function syncCheckoutShareContext() {
     const params = new URLSearchParams(window.location.search);
     
@@ -34,7 +100,8 @@ function syncCheckoutShareContext() {
     const referralMobileParam = params.get('referral_mobile') || params.get('referral');
 
     // सेशन या URL से सही सोर्स और लैंडिंग पेज उठाना
-    const sourceVal = params.get("source") || params.get("utm_source") || session.registration_source || "checkout";
+    const rawDetectedSource = params.get("source") || params.get("utm_source") || localStorage.getItem('aim_lead_source') || localStorage.getItem('AI_PROFILE_SOURCE') || (document.referrer.includes('facebook') || window.location.search.includes('fbclid') ? 'Facebook' : null) || session.registration_source || "checkout";
+    const sourceVal = resolveRegistrationSource(rawDetectedSource);
     const landingUrlVal = session.landing_page || window.location.href || null;
 
     const shareContext = {
@@ -1841,6 +1908,24 @@ async function logCheckoutActivity(profileId, bookId, status) {
             currentUuid = window.V1_SESSION.getUserId();
         }
 
+        if (!currentUuid || typeof currentUuid !== 'string' || currentUuid.startsWith('UID_')) {
+            const uObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+            if (uObj && uObj.id && !String(uObj.id).startsWith('UID_')) {
+                currentUuid = uObj.id;
+            }
+        }
+
+        if (!currentUuid || typeof currentUuid !== 'string' || currentUuid.startsWith('UID_')) {
+            const mobInput = document.getElementById('customerMobile');
+            const cleanM = mobInput ? mobInput.value.replace(/\D/g, '').slice(-10) : '';
+            if (cleanM && typeof isMobileRegistered === 'function') {
+                try {
+                    const reg = await isMobileRegistered(cleanM);
+                    if (reg && reg.id) currentUuid = reg.id;
+                } catch (_) {}
+            }
+        }
+
         if (!currentUuid) return;
 
         const targetBookId = bookId || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
@@ -1943,7 +2028,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         const finalUuid = window.currentReferrerData.uuid || null;
         const finalReferralMobile = window.currentReferrerData.mobile || null;
         const finalReferralCode = window.currentReferrerData.shareId || enteredReferral;
-        const sourceVal = shareContextData.source || "checkout";
+        const sourceVal = resolveRegistrationSource(shareContextData.source || session.registration_source || "checkout");
         const landingPageVal = shareContextData.landing_url || window.location.pathname;
 
         if (typeof registerUser === "function") {
@@ -2175,7 +2260,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
                         if (db && (activeUserId || userObj.id)) {
                             await db.from('profiles').update({
-                                is_active: true
+                                is_active: true,
+                                registration_source: resolveRegistrationSource(sourceVal)
                             }).eq('id', activeUserId || userObj.id).catch(err => console.warn('Supabase profile activate error:', err));
                         }
 

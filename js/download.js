@@ -85,11 +85,15 @@ const getDownloadSessionManager = () => {
 // --- GLOBAL STATE ---
 let state = {
     bookId: null,
+    bundleBooks: [],
     bookData: null,
     userData: null,
     purchaseData: null,
     maxAllowedDownloads: 3
 };
+
+window.bookDownloadCountsMap = window.bookDownloadCountsMap || {};
+window.allBooksCatalog = window.allBooksCatalog || [];
 
 // Clean title helper: removes BK001, BK002, BK015 etc.
 function cleanBookTitle(rawTitle) {
@@ -116,8 +120,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const urlParams = new URLSearchParams(window.location.search);
-        state.bookId = urlParams.get('book') || urlParams.get('id');
-        if (!state.bookId) throw new Error('URL में ई-बुक कोड (Book ID) नहीं मिला।');
+        let rawBookParam = urlParams.get('book') || urlParams.get('id') || '';
+
+        // Check if comma-separated bundle or alias
+        let initialBundle = [];
+        if (rawBookParam.includes(',')) {
+            initialBundle = rawBookParam.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+            state.bookId = initialBundle[0];
+            state.bundleBooks = initialBundle;
+        } else if (rawBookParam.toUpperCase() === '5IN1' || rawBookParam.toUpperCase() === 'BUNDLE' || rawBookParam.toUpperCase() === 'COMBO') {
+            initialBundle = ['BK017', 'BK016', 'BK002', 'BK019', 'BK020'];
+            state.bookId = 'BK017';
+            state.bundleBooks = initialBundle;
+        } else {
+            state.bookId = rawBookParam ? rawBookParam.toUpperCase() : 'BK017';
+        }
 
         const sessionManager = getDownloadSessionManager();
         if (!sessionManager.isLoggedIn()) {
@@ -128,19 +145,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!user.id) user.id = 'local_usr_' + (user.mobile || Date.now());
         state.userData = user;
 
+        // Fetch book catalog in parallel for bundle selector
+        fetchAllBooksCatalog();
+
+        // Load download logs from Supabase for this user (for separate book limits)
+        if (user.id && !String(user.id).startsWith('local_usr_')) {
+            await loadUserDownloadLogs(user.id);
+        }
+
         const [bookData, purchaseData] = await Promise.all([
             fetchBookData(state.bookId),
             fetchPurchaseRecord(user.id, state.bookId),
         ]);
 
-        if (!bookData) throw new Error('ई-बुक की जानकारी लोड नहीं हो सकी।');
-        
-        state.bookData = bookData;
-        window.currentBookData = bookData;
-        state.maxAllowedDownloads = bookData.downloadLimit || 3;
-        window.maxAllowedDownloads = state.maxAllowedDownloads;
-
-        if (!purchaseData) {
+        if (purchaseData) {
+            state.purchaseData = purchaseData;
+            if (purchaseData.book_id && purchaseData.book_id.includes(',')) {
+                const pBooks = purchaseData.book_id.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+                state.bundleBooks = Array.from(new Set([...(state.bundleBooks || []), ...pBooks]));
+            }
+        } else {
             state.purchaseData = {
                 id: 'local_purchase_' + state.bookId,
                 profile_id: user.id,
@@ -148,13 +172,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 download_count: 0,
                 purchase_date: new Date().toISOString()
             };
-        } else {
-            state.purchaseData = purchaseData;
         }
+
+        // If user profile resolved during purchase fetch, reload logs
+        if (state.userData?.id && !String(state.userData.id).startsWith('local_usr_')) {
+            await loadUserDownloadLogs(state.userData.id);
+        }
+
+        if (!bookData) throw new Error('ई-बुक की जानकारी लोड नहीं हो सकी।');
         
+        state.bookData = bookData;
+        window.currentBookData = bookData;
+        state.maxAllowedDownloads = bookData.downloadLimit || 3;
+        window.maxAllowedDownloads = state.maxAllowedDownloads;
         window.currentPurchase = state.purchaseData;
 
         populateUI();
+        renderBundleBooksSelector();
         renderBusinessFunnel();
 
         if (loadingState) loadingState.style.display = 'none';
@@ -301,6 +335,15 @@ async function fetchPurchaseRecord(userId, bookId) {
                             .limit(1)
                             .maybeSingle();
                         if (pData) return pData;
+                        // Fallback for combo bundle purchases with comma-separated IDs
+                        const { data: comboPurchases } = await client
+                            .from('purchases')
+                            .select(purchaseFields)
+                            .eq('profile_id', profData.id)
+                            .ilike('book_id', `%${cleanId}%`)
+                            .limit(1)
+                            .maybeSingle();
+                        if (comboPurchases) return comboPurchases;
                     }
                 }
             }
@@ -317,6 +360,15 @@ async function fetchPurchaseRecord(userId, bookId) {
                     .maybeSingle();
                     
                 if (!error && data) return data;
+                // Fallback for combo bundle purchases with comma-separated IDs
+                const { data: comboData } = await client
+                    .from('purchases')
+                    .select(purchaseFields)
+                    .eq('profile_id', userId)
+                    .ilike('book_id', `%${cleanId}%`)
+                    .limit(1)
+                    .maybeSingle();
+                if (comboData) return comboData;
             }
         } catch(e) {
             console.warn('Supabase purchase fetch warning:', e);
@@ -326,7 +378,10 @@ async function fetchPurchaseRecord(userId, bookId) {
     // 2. Check local purchases cache
     try {
         const localPurchases = JSON.parse(localStorage.getItem('aarogyam_purchases') || localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
-        const found = localPurchases.find(p => (p.book_id || '').toUpperCase().trim() === cleanId);
+        const found = localPurchases.find(p => {
+            const rawB = (p.book_id || '').toUpperCase().trim();
+            return rawB === cleanId || rawB.split(',').map(x => x.trim()).includes(cleanId);
+        });
         if (found) return found;
     } catch(e) {}
 
@@ -334,7 +389,54 @@ async function fetchPurchaseRecord(userId, bookId) {
 }
 
 
-// Persistent User & Book Download Counter Helpers
+// Load all books catalog for top bundle selector
+async function fetchAllBooksCatalog() {
+    if (window.allBooksCatalog && window.allBooksCatalog.length > 0) return window.allBooksCatalog;
+    try {
+        const response = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
+        if (response.ok) {
+            const data = await response.json();
+            const list = Array.isArray(data.books) ? data.books : (Array.isArray(data) ? data : []);
+            window.allBooksCatalog = list;
+            return list;
+        }
+    } catch (_) {}
+    return [];
+}
+
+// Load real download logs per book from Supabase for this user
+async function loadUserDownloadLogs(profileId) {
+    if (!profileId || String(profileId).startsWith('local_usr_')) return;
+    const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
+    if (!client) return;
+
+    try {
+        const { data, error } = await client
+            .from('download_logs')
+            .select('book_id, download_number')
+            .eq('profile_id', profileId);
+
+        if (!error && Array.isArray(data)) {
+            const counts = {};
+            data.forEach(log => {
+                const bId = String(log.book_id || '').toUpperCase().trim();
+                if (bId) {
+                    counts[bId] = (counts[bId] || 0) + 1;
+                }
+            });
+            window.bookDownloadCountsMap = counts;
+
+            const uKey = getUserStorageKey();
+            Object.entries(counts).forEach(([bId, cnt]) => {
+                localStorage.setItem(`AIM_DL_COUNT_${uKey}_${bId}`, String(cnt));
+            });
+        }
+    } catch (e) {
+        console.warn('download_logs query notice:', e);
+    }
+}
+
+// Persistent User & Book Download Counter Helpers (Per-Book Isolated Limits)
 function getUserStorageKey() {
     const user = state.userData || {};
     return (user.mobile || user.id || user.full_name || 'verified_user')
@@ -345,62 +447,50 @@ function getBookStorageKey() {
     return (state.bookId || 'BK001').toUpperCase().trim();
 }
 
-function getPersistentDownloadCount() {
-    // 1. Primary Source of Truth: Real Database Purchase Record
-    if (state.purchaseData && typeof state.purchaseData.download_count === 'number') {
-        return state.purchaseData.download_count;
+function getPersistentDownloadCount(targetBookId) {
+    const bKey = (targetBookId || state.bookId || 'BK001').toUpperCase().trim();
+    const uKey = getUserStorageKey();
+
+    // 1. Check live in-memory logs map from Supabase download_logs
+    if (window.bookDownloadCountsMap && typeof window.bookDownloadCountsMap[bKey] === 'number') {
+        return window.bookDownloadCountsMap[bKey];
     }
 
-    const uKey = getUserStorageKey();
-    const bKey = getBookStorageKey();
-    
-    // 2. Check user-specific key
-    let val = localStorage.getItem(`AIM_DL_COUNT_${uKey}_${bKey}`);
-    if (val !== null && !isNaN(parseInt(val, 10))) return parseInt(val, 10);
+    // 2. Check user + specific book storage key
+    const val = localStorage.getItem(`AIM_DL_COUNT_${uKey}_${bKey}`);
+    if (val !== null && !isNaN(parseInt(val, 10))) {
+        return parseInt(val, 10);
+    }
 
-    // Clean up generic book key so it NEVER blocks new users
-    try {
-        localStorage.removeItem(`AIM_DL_COUNT_${bKey}`);
-    } catch(e) {}
-
-    // 3. Check localStorage purchases list
-    try {
-        const purchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || localStorage.getItem('aarogyam_purchases') || '[]');
-        const match = purchases.find(p => (p.book_id || '').toUpperCase().trim() === bKey);
-        if (match && typeof match.download_count === 'number') {
-            return match.download_count;
+    // 3. Fallback for single book non-bundle purchases
+    if (!state.bundleBooks || state.bundleBooks.length <= 1) {
+        if (state.purchaseData && typeof state.purchaseData.download_count === 'number' && state.purchaseData.book_id === bKey) {
+            return state.purchaseData.download_count;
         }
-    } catch (e) {}
+    }
 
     return 0;
 }
 
-function savePersistentDownloadCount(count) {
+function savePersistentDownloadCount(count, targetBookId) {
+    const bKey = (targetBookId || state.bookId || 'BK001').toUpperCase().trim();
     const uKey = getUserStorageKey();
-    const bKey = getBookStorageKey();
 
-    // 1. Save user-specific key
+    // 1. Save isolated user + specific book key
     localStorage.setItem(`AIM_DL_COUNT_${uKey}_${bKey}`, String(count));
-    
-    // Clean up generic book key
-    try {
-        localStorage.removeItem(`AIM_DL_COUNT_${bKey}`);
-    } catch(e) {}
+    window.bookDownloadCountsMap = window.bookDownloadCountsMap || {};
+    window.bookDownloadCountsMap[bKey] = count;
 
-    // 2. Update in-memory state
-    if (state.purchaseData) {
-        state.purchaseData.download_count = count;
-    }
-
-    // 3. Update in local purchases cache
+    // 2. Update local purchases cache
     try {
         const keys = ['AI_PURCHASES', 'purchases', 'aarogyam_purchases'];
         keys.forEach(k => {
             const list = JSON.parse(localStorage.getItem(k) || '[]');
             let updated = false;
             list.forEach(p => {
-                if ((p.book_id || '').toUpperCase().trim() === bKey) {
-                    p.download_count = count;
+                const pId = String(p.book_id || '').toUpperCase().trim();
+                if (pId === bKey || pId.includes(bKey)) {
+                    p[`download_count_${bKey}`] = count;
                     updated = true;
                 }
             });
@@ -410,6 +500,97 @@ function savePersistentDownloadCount(count) {
         });
     } catch (e) {}
 }
+
+// Render Interactive Top Bundle Books Carousel / Chips
+function renderBundleBooksSelector() {
+    const section = document.getElementById('bundleSelectorSection');
+    const grid = document.getElementById('bundleBooksGrid');
+    if (!section || !grid) return;
+
+    let bundleList = [];
+    if (Array.isArray(state.bundleBooks) && state.bundleBooks.length > 0) {
+        bundleList = state.bundleBooks;
+    } else if (state.purchaseData?.book_id && state.purchaseData.book_id.includes(',')) {
+        bundleList = state.purchaseData.book_id.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+    }
+
+    try {
+        const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+        localPurchases.forEach(p => {
+            const raw = String(p.book_id || '').toUpperCase().trim();
+            if (raw.includes(',')) {
+                raw.split(',').forEach(id => {
+                    const clean = id.trim();
+                    if (clean && !bundleList.includes(clean)) bundleList.push(clean);
+                });
+            } else if (raw && !bundleList.includes(raw) && raw !== '5IN1') {
+                bundleList.push(raw);
+            }
+        });
+    } catch (_) {}
+
+    bundleList = Array.from(new Set(bundleList.filter(Boolean)));
+
+    if (bundleList.length <= 1) {
+        section.style.display = 'none';
+        return;
+    }
+
+    state.bundleBooks = bundleList;
+    section.style.display = 'block';
+
+    const allBooksList = (window.allBooksCatalog && Array.isArray(window.allBooksCatalog)) ? window.allBooksCatalog : [];
+
+    grid.innerHTML = bundleList.map((bId) => {
+        const isActive = (bId === state.bookId);
+        const matched = allBooksList.find(b => (b.id && b.id.toUpperCase() === bId) || (b.book_id && b.book_id.toUpperCase() === bId)) || {};
+        const title = cleanBookTitle(matched.name || matched.heading || matched.title || bId);
+        const cover = matched.cover || matched.cover_image || `/images/books/${bId.toLowerCase()}-cover.webp`;
+        const used = getPersistentDownloadCount(bId);
+        const max = 3;
+        
+        return `
+            <div class="bundle-book-chip ${isActive ? 'active' : ''}" onclick="window.selectBundleBook('${bId}')" title="${title} को अनलॉक व डाउनलोड करें">
+                ${isActive ? '<span class="bundle-book-active-tag">✓ चयनित</span>' : ''}
+                <img src="${cover}" alt="${title}" class="bundle-book-thumb" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'" />
+                <div class="bundle-book-meta">
+                    <div class="bundle-book-title">${title}</div>
+                    <div class="bundle-book-status">
+                        <span>📥</span> <span>${used}/${max} डाउनलोड</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+window.selectBundleBook = async function(bookId) {
+    if (!bookId) return;
+    const cleanId = bookId.toUpperCase().trim();
+    if (state.bookId === cleanId) {
+        window.scrollToSection('downloadCard');
+        return;
+    }
+
+    state.bookId = cleanId;
+
+    try {
+        const bookData = await fetchBookData(cleanId);
+        if (bookData) {
+            state.bookData = bookData;
+            window.currentBookData = bookData;
+            state.maxAllowedDownloads = bookData.downloadLimit || 3;
+            window.maxAllowedDownloads = state.maxAllowedDownloads;
+        }
+    } catch (_) {}
+
+    populateUI();
+    renderBundleBooksSelector();
+    renderBusinessFunnel();
+
+    window.scrollToSection('downloadCard');
+    preloadBookDownloadAssets(cleanId, state.bookData);
+};
 
 function updateDownloadButtonCountBadges(used, max) {
     const fastSpeedTag = document.querySelector('#downloadFastBtn .action-btn-badge, #downloadFastBtn .speed-tag');
@@ -939,7 +1120,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
         let newCount = used;
         if (!isWithinGrace) {
             newCount = used + 1;
-            savePersistentDownloadCount(newCount);
+            savePersistentDownloadCount(newCount, state.bookId);
             sessionStorage.setItem(graceKey, String(Date.now()));
 
             const downloadsUsedEl = document.getElementById('downloadsUsed');
@@ -948,6 +1129,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
             if (downloadsRemainingEl) downloadsRemainingEl.textContent = Math.max(0, max - newCount);
 
             updateDownloadButtonCountBadges(newCount, max);
+            renderBundleBooksSelector();
 
             if (newCount >= max) {
                 const readyBox = document.getElementById('statusReady');
@@ -965,12 +1147,6 @@ window.triggerDownloadTier = async function(tier = 'fast') {
             const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
             if (client) {
                 try {
-                    if (state.purchaseData?.id && !String(state.purchaseData.id).startsWith('local_')) {
-                        await client.from('purchases').update({ download_count: newCount }).eq('id', state.purchaseData.id);
-                    } else if (state.userData?.id) {
-                        await client.from('purchases').update({ download_count: newCount }).eq('profile_id', state.userData.id).eq('book_id', state.bookId);
-                    }
-
                     const activeProfileId = state.purchaseData?.profile_id || (state.userData?.id && !String(state.userData.id).startsWith('local_') ? state.userData.id : null);
                     if (activeProfileId) {
                         await client.from('download_logs').insert([{
@@ -983,6 +1159,15 @@ window.triggerDownloadTier = async function(tier = 'fast') {
                             download_status: 'success',
                             downloaded_at: new Date().toISOString()
                         }]);
+                    }
+
+                    // Update total downloads on purchase record
+                    if (state.purchaseData?.id && !String(state.purchaseData.id).startsWith('local_')) {
+                        const allCounts = Object.values(window.bookDownloadCountsMap || {});
+                        const sum = allCounts.reduce((a, b) => a + (Number(b) || 0), 0);
+                        await client.from('purchases').update({ download_count: Math.max(newCount, sum) }).eq('id', state.purchaseData.id);
+                    } else if (state.userData?.id) {
+                        await client.from('purchases').update({ download_count: newCount }).eq('profile_id', state.userData.id).ilike('book_id', `%${state.bookId}%`);
                     }
                 } catch (err) {
                     console.warn('DB logging note:', err);

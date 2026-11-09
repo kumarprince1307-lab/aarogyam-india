@@ -795,10 +795,13 @@ async function renderLibrarySections(booksArray) {
     const activePurchasedBookIds = new Set();
     userPurchases.forEach(p => {
         if (!p) return;
-        const bId = String(p.book_id || p.id || '').toUpperCase().trim();
-        if (bId) {
-            activePurchasedBookIds.add(bId);
-            activePurchasedBookIds.add(bId.replace(/^DEMO-?/i, ''));
+        const rawBId = String(p.book_id || p.id || '').toUpperCase().trim();
+        if (rawBId) {
+            // Expand comma-separated bundle IDs if present
+            rawBId.split(',').map(x => x.trim()).filter(Boolean).forEach(bId => {
+                activePurchasedBookIds.add(bId);
+                activePurchasedBookIds.add(bId.replace(/^DEMO-?/i, ''));
+            });
         }
     });
 
