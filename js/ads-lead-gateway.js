@@ -194,11 +194,9 @@
     const title = config.title || 'आरोग्यम इंडिया — विशेष समाधान';
     const subtitle = config.subtitle || 'अपनी फसल के समस्त कीट-रोग पहचानें और 100% सटीक समाधान पाएं!';
     const isBundlePage = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle') || ((config.title || '').includes('5-इन-1') || (config.title || '').includes('कॉम्बो'));
-    const defaultCover = isBundlePage
-      ? '/images/banners/bundle-kisan-5in1-banner.webp'
-      : '/images/books/kharif-master-guide-2026-cover.webp';
+    const defaultCover = '/images/banners/bundle-kisan-5in1-banner.webp';
     let coverImage = config.coverImage || config.cover || defaultCover;
-    if (coverImage.includes('farmer-community-banner') || !coverImage) {
+    if (isBundlePage || (config.title && (config.title.includes('5-इन-1') || config.title.includes('कॉम्बो'))) || coverImage.startsWith('data:image') || coverImage.includes('farmer-community-banner') || !coverImage) {
       coverImage = '/images/banners/bundle-kisan-5in1-banner.webp';
     }
     const badgeText = config.badgeText || '🌾 आरोग्यम इंडिया विशेष समाधान (Aarogyam India)';
@@ -211,16 +209,18 @@
       width: 100vw;
       height: 100dvh;
       height: 100vh;
-      background: rgba(15, 23, 42, 0.90);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       z-index: 9999999;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0;
+      padding: 10px;
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
       margin: 0;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       scrollbar-width: none;
       -ms-overflow-style: none;
       box-sizing: border-box;
@@ -229,10 +229,19 @@
 
     overlay.innerHTML = `
       <div id="adsLeadGatewayCard" style="
+        width: 95%;
+        max-width: 425px;
+        min-width: 280px;
+        margin: auto;
         background: #ffffff;
         color: #000000;
         box-sizing: border-box;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
         animation: adsGatePop 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       ">
         <style>
@@ -291,61 +300,68 @@
             }
           }
 
-          /* Mobile Screen-Fit Architecture (100% Full-Screen Clean Sheet, Zero Black Empty Void, Zero Scrollbar Track) */
+          /* Mobile Screen-Fit Architecture: Full-Screen Native App Look, Zero Blank Gap */
           @media (max-width: 520px) {
             #adsLeadGatewayOverlay {
               padding: 0 !important;
               margin: 0 !important;
               align-items: stretch !important;
               justify-content: stretch !important;
-              overflow: hidden !important;
+              overflow-y: auto !important;
+              background: #ffffff !important;
             }
             #adsLeadGatewayCard {
               width: 100vw !important;
               max-width: 100vw !important;
               min-width: 100vw !important;
-              height: 100dvh !important;
-              height: 100vh !important;
               min-height: 100dvh !important;
+              min-height: 100vh !important;
               margin: 0 !important;
-              border-radius: 0 !important;
               border: none !important;
+              border-radius: 0 !important;
               box-shadow: none !important;
               display: flex !important;
               flex-direction: column !important;
-              overflow: hidden !important;
+              overflow-y: auto !important;
+              -webkit-overflow-scrolling: touch !important;
             }
             #adsGateFormScreen {
               flex: 1 !important;
               display: flex !important;
               flex-direction: column !important;
-              justify-content: space-between !important;
-              padding: clamp(8px, 1.8vh, 14px) clamp(12px, 3.8vw, 18px) !important;
-              padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
-              overflow-y: auto !important;
-              -webkit-overflow-scrolling: touch !important;
+              justify-content: flex-start !important;
+              padding: 12px 16px !important;
+              padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+              gap: 8px !important;
+            }
+            .ads-input-dark {
+              height: 46px !important;
+              min-height: 44px !important;
+              font-size: 16px !important;
+              padding: 10px 14px !important;
+              border-radius: 8px !important;
             }
           }
 
-          /* Sleek High-Contrast Dark Input Boxes (Clean, Responsive & Scales With Screen) */
+          /* Sleek High-Contrast Dark Input Boxes (Clean, Responsive & Tight Fit) */
           .ads-input-dark {
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
-            padding: clamp(8px, 1.4vh, 12px) 14px;
+            padding: 8px 12px;
             background: #0f172a !important;
             border: 1.5px solid #475569;
-            border-radius: 8px;
+            border-radius: 7px;
             color: #ffffff !important;
             caret-color: #38bdf8 !important;
-            font-size: clamp(14px, 4vw, 16.5px) !important;
+            font-size: 15px !important;
             font-weight: 800;
             outline: none;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             transition: border-color 0.15s ease;
-            height: clamp(40px, 5.4vh, 48px);
-            min-height: 38px;
+            height: 42px;
+            min-height: 40px;
             line-height: normal;
           }
           .ads-input-dark::placeholder {
@@ -398,13 +414,12 @@
           </span>
         </div>
 
-        <!-- SCREEN 1: FORM PAGE VIEW (Clean & Responsive Full-Height Screen) -->
+        <!-- SCREEN 1: FORM PAGE VIEW (Compact & Elegant Card View) -->
         <div id="adsGateFormScreen" style="
-          flex: 1;
           display: flex;
           flex-direction: column;
-          padding: clamp(10px, 2vh, 16px) clamp(12px, 3.5vw, 18px);
-          padding-bottom: max(10px, env(safe-area-inset-bottom));
+          padding: 10px 14px;
+          padding-bottom: 12px;
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
           box-sizing: border-box;
@@ -412,8 +427,8 @@
           <!-- Top Info Group -->
           <div>
             <!-- Compact Hero Card -->
-            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: clamp(4px, 1vh, 7px); background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: clamp(4px, 1vh, 6px) clamp(6px, 1.8vw, 10px);">
-              <img src="${coverImage}" alt="Cover" style="width: 48px; height: 60px; object-fit: contain; border-radius: 5px; flex-shrink: 0; border: 1.5px solid #cbd5e1; background: #000000;" onerror="this.src='/images/banners/bundle-kisan-5in1-banner.webp';" />
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 6px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 6px 10px;">
+              <img src="${coverImage}" alt="Cover" style="width: 52px; height: 66px; object-fit: contain; border-radius: 5px; flex-shrink: 0; border: 1.5px solid #cbd5e1; background: #000000;" onerror="this.onerror=null; this.src='/images/banners/bundle-kisan-5in1-banner.jpg';" />
               <div style="flex: 1; min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px;">
                   <span style="background: #dcfce7; color: #166534; font-size: 10.5px; font-weight: 900; padding: 1px 6px; border-radius: 3px; border: 1px solid #86efac; text-transform: uppercase;">
@@ -421,16 +436,16 @@
                   </span>
                   <span style="font-size: 12px; font-weight: 800; color: #0284c7;">Aarogyam India</span>
                 </div>
-                <h4 style="margin: 0; font-size: clamp(12.5px, 3.5vw, 14px); font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <h4 style="margin: 0; font-size: 13.5px; font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   ${title}
                 </h4>
               </div>
             </div>
 
             <!-- Black Box + White Text + Blinking Green Book Banner (Responsive Box) -->
-            <div style="background: #000000; border: 1.5px solid #334155; border-radius: 7px; padding: clamp(5px, 1.2vh, 7px) clamp(8px, 2.2vw, 12px); margin-bottom: clamp(4px, 1.1vh, 8px); display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box;">
+            <div style="background: #000000; border: 1.5px solid #334155; border-radius: 7px; padding: 6px 10px; margin-bottom: 7px; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box;">
               <span class="ads-blinking-book" style="font-size: 13px; line-height: 1; flex-shrink: 0;">📗</span>
-              <div style="font-size: clamp(11.5px, 3.2vw, 13px); font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center; line-height: 1.25;">
+              <div style="font-size: 12.5px; font-weight: 900; color: #ffffff !important; letter-spacing: 0.2px; text-align: center; line-height: 1.25;">
                 विवरण दर्ज करके मुफ़्त झलक अनलॉक करें:
               </div>
             </div>
@@ -440,10 +455,10 @@
           </div>
 
           <!-- Form Fields Group -->
-          <form id="adsLeadGatewayForm" method="post" action="javascript:void(0);" autocomplete="on" style="display: flex; flex-direction: column; gap: clamp(6px, 1.2vh, 8px); margin-top: 2px;">
+          <form id="adsLeadGatewayForm" method="post" action="javascript:void(0);" autocomplete="on" style="display: flex; flex-direction: column; gap: 8px; margin: 0;">
             <!-- 1. Name Input (Dark Box + Bold White Text) -->
             <div>
-              <label for="adsGateName" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
+              <label for="adsGateName" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 👤 आपका शुभ नाम (Full Name) <span style="color:#dc2626;">*</span>
               </label>
               <input type="text" id="adsGateName" name="name" autocomplete="name" autocapitalize="words" spellcheck="false" required placeholder="उदा. रमेश कुमार" class="ads-input-dark" />
@@ -451,7 +466,7 @@
 
             <!-- 2. WhatsApp Mobile Number -->
             <div>
-              <label for="adsGateMobile" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
+              <label for="adsGateMobile" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 📱 WhatsApp मोबाइल नंबर <span style="color:#dc2626;">*</span>
               </label>
               <div style="position: relative;">
@@ -464,27 +479,27 @@
             <!-- 3. Email Input (Optional / वैकल्पिक) -->
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                <label for="adsGateEmail" style="font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin: 0;">
+                <label for="adsGateEmail" style="font-size: 13px; font-weight: 900; color: #000000 !important; margin: 0;">
                   📧 ईमेल (Email ID)
                 </label>
                 <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
               </div>
-              <input type="email" id="adsGateEmail" name="email" autocomplete="email" inputmode="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: clamp(38px, 4.8vh, 42px); min-height: 38px; font-size: 14px !important;" />
+              <input type="email" id="adsGateEmail" name="email" autocomplete="email" inputmode="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: 40px; min-height: 38px; font-size: 14.5px !important;" />
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
-            <div style="background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: clamp(3px, 0.8vh, 5px) 6px;">
-              <p style="margin: 0; font-size: clamp(10.5px, 2.8vw, 11.5px); color: #000000 !important; line-height: 1.25; font-weight: 800;">
+            <div style="background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: 4px 7px;">
+              <p style="margin: 0; font-size: 11px; color: #000000 !important; line-height: 1.25; font-weight: 800;">
                 <span style="color: #dc2626; font-size: 11px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। रेफरल लिंक इसी से जुड़ेगी।
               </p>
             </div>
 
             <!-- 4. Profession / Role Dropdown -->
             <div>
-              <label for="adsGateProfession" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
+              <label for="adsGateProfession" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 💼 आप क्या करते हैं? (Role / Profession) <span style="color:#dc2626;">*</span>
               </label>
-              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important; height: clamp(38px, 4.8vh, 42px); min-height: 38px; font-size: 13.5px !important; padding: 5px 8px;">
+              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important; height: 40px; min-height: 38px; font-size: 14px !important; padding: 5px 8px;">
                 <option value="farmer">🌾 किसान भाई (Farmer)</option>
                 <option value="netsurf">💼 नेट्सर्फ डायरेक्ट सेलर (Netsurf)</option>
                 <option value="dealer">💊 कृषि दवा विक्रेता (Dealer)</option>
@@ -498,28 +513,28 @@
             <button type="submit" id="btnSubmitAdsGate" class="ads-btn-sharp-green" style="
               width: 100%;
               box-sizing: border-box;
-              padding: clamp(10px, 1.8vh, 12px) 14px;
-              min-height: clamp(44px, 5.5vh, 48px);
-              border-radius: 7px;
+              padding: 12px 14px;
+              min-height: 48px;
+              border-radius: 8px;
               cursor: pointer;
               display: flex;
               align-items: center;
               justify-content: center;
               gap: 8px;
-              margin-top: clamp(8px, 1.5vh, 12px);
+              margin-top: 8px;
               margin-bottom: 4px;
               flex-shrink: 0;
             ">
-              <span id="adsGateBtnIcon" style="font-size: 16px; flex-shrink: 0;">👉</span>
-              <span id="adsGateBtnLabel" style="font-size: clamp(15px, 4vw, 17px); font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.2; letter-spacing: 0.5px;">
+              <span id="adsGateBtnIcon" style="font-size: 17px; flex-shrink: 0;">👉</span>
+              <span id="adsGateBtnLabel" style="font-size: 17px; font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.2; letter-spacing: 0.5px;">
                 FREE SUBMIT
               </span>
             </button>
           </form>
 
           <!-- Micro Trust Strip (Clean Responsive Line) -->
-          <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: clamp(6px, 1.2vh, 8px); margin-top: 4px; padding-bottom: 4px; flex-shrink: 0;">
-            <span style="font-size: clamp(10.5px, 2.8vw, 11.5px); color: #000000 !important; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;">
+          <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 6px; margin-top: 4px; padding-bottom: 2px; flex-shrink: 0;">
+            <span style="font-size: 11px; color: #000000 !important; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;">
               <span>🔒 100% सुरक्षित डेटा</span> • <span>कोई शुल्क नहीं</span> • <span>50,000+ साथी</span>
             </span>
           </div>
