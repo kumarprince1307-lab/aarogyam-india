@@ -287,6 +287,13 @@ export async function renderBookBundlesPage() {
             <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">खरीदें बटन टेक्स्ट (CTA Text):</label>
             <input type="text" id="bFormBuyBtnText" class="admin-input" placeholder="🛒 पूरा कॉम्बो ₹199 में अभी खरीदें" style="width:100%; box-sizing:border-box;" />
           </div>
+          <div>
+            <label style="display:block; font-size:0.82rem; font-weight:800; color:#ec4899; margin-bottom:5px;">🎯 ऐड मोड लीड गेटवे (Ads Mode):</label>
+            <select id="bFormAdsModeEnabled" class="admin-select" style="width:100%; box-sizing:border-box; padding:8px 10px; font-weight:800; border:1.5px solid #ec4899; background:#0f172a; color:#ec4899;">
+              <option value="false">⚪ सामान्य मोड (Direct Landing Page)</option>
+              <option value="true">🎯 ऐड मोड चालू (Front Squeeze Card Active)</option>
+            </select>
+          </div>
           <div style="grid-column: 1 / -1;">
             <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">बंडल विस्तृत विवरण (Full Description):</label>
             <textarea id="bFormDescription" class="admin-input" rows="2" style="width:100%; box-sizing:border-box;" placeholder="बीज उपचार से लेकर कटाई तक सम्पूर्ण वैज्ञानिक एवं Practical समाधान।"></textarea>
@@ -1916,6 +1923,8 @@ async function handleSaveBundle() {
     badge,
     buyBtnText: buyBtnText || `🛒 पूरा कॉम्बो ₹${offerPrice} में अभी खरीदें`,
     bannerImage,
+    ads_mode_enabled: document.getElementById('bFormAdsModeEnabled')?.value === 'true',
+    ads_gateway_enabled: document.getElementById('bFormAdsModeEnabled')?.value === 'true',
     bookIds,
     mrp,
     offerPrice,
@@ -2023,6 +2032,7 @@ window.editBundle = function (bundleId) {
   setVal('bFormDescription', bundle.description);
   setVal('bFormBadge', bundle.badge);
   setVal('bFormBuyBtnText', bundle.buyBtnText || `🛒 पूरा कॉम्बो ₹${bundle.offerPrice || 199} में अभी खरीदें`);
+  setVal('bFormAdsModeEnabled', (bundle.ads_mode_enabled || bundle.ads_gateway_enabled) ? 'true' : 'false');
   setVal('bFormBannerImage', bundle.bannerImage);
 
   const prevBanner = document.getElementById('bannerLivePreview');
@@ -2216,6 +2226,7 @@ function resetBundleForm() {
   document.getElementById('bFormPixelId').value = '1671873500553134';
   document.getElementById('bFormGaId').value = 'G-2BWPJVQWPK';
   document.getElementById('bFormOfferPrice').value = '199';
+  setVal('bFormAdsModeEnabled', 'false');
 
   const cbs = document.querySelectorAll('input[name="bundleBooks"]');
   cbs.forEach((cb, i) => {

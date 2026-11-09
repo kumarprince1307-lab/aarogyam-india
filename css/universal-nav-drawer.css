@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ====================================================================
  * AAROGYAM INDIA - ULTRA FAST 60FPS DRAWER & ACCORDION SYSTEM
  * Version: 18.0 (Zero Lag, High Floating Stack, Ultra Smooth Accordions)
@@ -32,8 +32,10 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 320px;
-  max-width: 88vw;
+  left: 0;
+  right: auto;
+  width: 340px;
+  max-width: 90vw;
   height: 100vh;
   height: 100dvh;
   background: #080f1e;
@@ -44,10 +46,14 @@
   flex-direction: column;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
+  transform: translate3d(-100%, 0, 0);
+  border-right: 1.5px solid #1e40af;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease;
   pointer-events: none;
   visibility: hidden;
@@ -55,35 +61,28 @@
 }
 
 #universal-drawer-card::-webkit-scrollbar {
-  width: 5px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 #universal-drawer-card::-webkit-scrollbar-track {
-  background: #080f1e;
+  display: none !important;
 }
 
 #universal-drawer-card::-webkit-scrollbar-thumb {
-  background: #1e3a8a;
-  border-radius: 4px;
+  display: none !important;
 }
 
-/* DESKTOP (Width >= 768px): Slides in from LEFT */
-@media (min-width: 768px) {
+/* MOBILE & FACEBOOK IN-APP BROWSER (Fully Responsive Full-Width / Fluid Fit) */
+@media (max-width: 480px) {
   #universal-drawer-card {
-    left: 0;
-    right: auto;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
     transform: translate3d(-100%, 0, 0);
-    border-right: 1.5px solid #1e40af;
-  }
-}
-
-/* MOBILE (Width < 768px): Slides in from RIGHT */
-@media (max-width: 767px) {
-  #universal-drawer-card {
-    right: 0;
-    left: auto;
-    transform: translate3d(100%, 0, 0);
-    border-left: 1.5px solid #1e40af;
   }
 }
 

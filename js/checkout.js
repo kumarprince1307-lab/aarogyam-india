@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let referrerDisplay = document.getElementById("referrerDisplayName");
 
 document.addEventListener("DOMContentLoaded", () => {
+    autoFillUserData();
     loadBook();
     syncCheckoutShareContext();
 });
@@ -1613,23 +1614,63 @@ async function checkOfferAlreadyPurchased(mobile, userName, targetBookId, bookTi
 
 function autoFillUserData() {
     const custMobEl = document.getElementById("customerMobile");
-    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    const custNameEl = document.getElementById("customerName");
+    const custEmailEl = document.getElementById("customerEmail");
+
+    // Helper: Read Cookie safely
+    function getCheckoutCookie(cname) {
+        try {
+            const name = cname + "=";
+            const ca = decodeURIComponent(document.cookie).split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i].trim();
+                if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
+            }
+        } catch (_) {}
+        return '';
+    }
+
+    // 1. Read URL query parameters (e.g. from bundle landing checkout redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const qName = urlParams.get('name') || urlParams.get('customerName') || urlParams.get('billing_name') || '';
+    const qMobile = (urlParams.get('mobile') || urlParams.get('phone') || urlParams.get('customerMobile') || '').replace(/\D/g, '').slice(-10);
+
+    // 2. Read stored user, 1-year cookies and all local storage fallbacks
+    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
     
-    const nameVal = storedUser.full_name || storedUser.name || "";
-    const mobileVal = storedUser.mobile || "";
-    const emailVal = storedUser.email || "";
+    const nameVal = qName || storedUser.full_name || storedUser.name || 
+                    localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || 
+                    localStorage.getItem('aarogyam_user_name') || localStorage.getItem('farmer_name') || 
+                    getCheckoutCookie('aim_user_name') || "";
+    const mobileVal = qMobile || storedUser.mobile || storedUser.phone || 
+                      (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || 
+                       localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('farmer_mobile') || 
+                       getCheckoutCookie('aim_user_mobile') || "").replace(/\D/g, '').slice(-10);
+    const emailVal = storedUser.email || localStorage.getItem('user_email') || "";
 
     if (custMobEl && !custMobEl.readOnly) {
-        if (nameVal && document.getElementById("customerName")) document.getElementById("customerName").value = nameVal;
-        if (mobileVal && custMobEl) custMobEl.value = mobileVal;
-        if (emailVal && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = emailVal;
+        if (nameVal && custNameEl && !custNameEl.value) {
+            custNameEl.value = nameVal;
+            custNameEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (mobileVal && custMobEl && !custMobEl.value) {
+            custMobEl.value = mobileVal;
+            custMobEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (emailVal && custEmailEl && !custEmailEl.value) custEmailEl.value = emailVal;
 
         if (typeof getCurrentUser === "function") {
             const user = getCurrentUser();
             if (user) {
-                if (user.full_name && document.getElementById("customerName")) document.getElementById("customerName").value = user.full_name;
-                if (user.mobile && custMobEl) custMobEl.value = user.mobile;
-                if (user.email && document.getElementById("customerEmail")) document.getElementById("customerEmail").value = user.email;
+                if (user.full_name && custNameEl && !custNameEl.value) {
+                    custNameEl.value = user.full_name;
+                    custNameEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                if (user.mobile && custMobEl && !custMobEl.value) {
+                    custMobEl.value = user.mobile;
+                    custMobEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+                if (user.email && custEmailEl && !custEmailEl.value) custEmailEl.value = user.email;
             }
         }
     }

@@ -1619,6 +1619,13 @@ Instant Download & Lifetime Access
               </select>
             </div>
             <div>
+              <label class="admin-label" style="font-weight: 800; color: #ec4899;">🎯 ऐड मोड लीड गेटवे (Ads Mode):</label>
+              <select id="blp_ads_mode_enabled" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800; border: 1.5px solid #ec4899;">
+                <option value="false">⚪ सामान्य मोड (Direct Landing Page)</option>
+                <option value="true">🎯 ऐड मोड चालू (Front Squeeze Card Active)</option>
+              </select>
+            </div>
+            <div>
               <label class="admin-label" style="font-weight: 700;">Sticky Button Text:</label>
               <input type="text" id="blp_sticky_btn_text" class="admin-input" placeholder="खरीदें (Buy Now)" value="खरीदें" style="width: 100%; padding: 8px 12px;" />
             </div>
@@ -8153,6 +8160,7 @@ Instant Download & Lifetime Access
       setVal('blp_wa_prompt', page.whatsapp_prompt || '');
       setVal('blp_whatsapp_share_msg', page.whatsapp_share_message || page.whatsapp_share_text || '');
       setVal('blp_status', page.status || 'active');
+      setVal('blp_ads_mode_enabled', (page.ads_mode_enabled || page.ads_gateway_enabled) ? 'true' : 'false');
       setVal('blp_sticky_btn_text', page.sticky_button_text || 'खरीदें');
 
       // AI Support fields
@@ -8698,6 +8706,8 @@ Instant Download & Lifetime Access
       theme_dark: selectedThemeDark,
       cover_effect: coverEffect,
       sticky_button_text: document.getElementById('blp_sticky_btn_text')?.value || 'खरीदें',
+      ads_mode_enabled: document.getElementById('blp_ads_mode_enabled')?.value === 'true',
+      ads_gateway_enabled: document.getElementById('blp_ads_mode_enabled')?.value === 'true',
       sections_order: currentSectionsOrder,
       hidden_sections: currentHiddenSections,
       section_banners: cleanSectionBanners,

@@ -467,6 +467,18 @@ if (typeof window !== 'undefined') {
     try { renderBookBundleCarousel(); } catch(e) { console.warn('renderBookDetails error:', e); }
     try { renderFinalBuySection(); } catch(e) { console.warn('renderFinalBuySection error:', e); }
     try { initLandingPageAutoplay(); } catch(e) { console.warn('initLandingPageAutoplay error:', e); }
+    try {
+      if (typeof window.initAdsLeadGateway === 'function') {
+        const hero = currentLandingData?.hero || {};
+        window.initAdsLeadGateway({
+          title: hero.heading || currentBookData?.heading || currentBookData?.title || 'आरोग्यम डिजिटल ई-बुक गाइड',
+          subtitle: hero.sub_heading || currentBookData?.subtitle || 'रोग व कीट पहचान एवं 100% सटीक वैज्ञानिक समाधान!',
+          coverImage: hero.cover_image || currentBookData?.cover || currentBookData?.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
+          badgeText: '🌾 विशेष कृषि समाधान — आरोग्यम इंडिया',
+          ads_mode_enabled: Boolean(currentLandingData?.ads_mode_enabled || currentLandingData?.ads_gateway_enabled)
+        });
+      }
+    } catch(e) { console.warn('initAdsLeadGateway error:', e); }
     try { enforceHiddenSections(); } catch(e) { console.warn('enforceHiddenSections error:', e); }
     try { window.updateAuthStatusUI(); } catch(e) { console.warn('updateAuthStatusUI error:', e); }
   }

@@ -52,6 +52,19 @@
     // 2. Inject Dynamic SEO, Open Graph & Facebook Pixel
     injectMarketingMeta(currentBundle);
 
+    // 2B. Check & Initialize Ads Lead Squeeze Gateway (Ads Mode)
+    try {
+      if (typeof window.initAdsLeadGateway === 'function') {
+        window.initAdsLeadGateway({
+          title: currentBundle.heading || currentBundle.title || 'महाबचत किसान मेगा कॉम्बो बंडल',
+          subtitle: currentBundle.subTitle || currentBundle.subtitle || '5 उपयोगी कृषि व फसल डॉक्टर मास्टर गाइड्स अब एक साथ!',
+          coverImage: currentBundle.bannerImage || currentBundle.ogImage || '/images/banners/farmer-community-banner.jpeg',
+          badgeText: '🎁 महाबचत कॉम्बो बंडल — आरोग्यम इंडिया',
+          ads_mode_enabled: Boolean(currentBundle.ads_mode_enabled || currentBundle.ads_gateway_enabled)
+        });
+      }
+    } catch (_) {}
+
     // 3. Render Bundle UI Elements
     renderBundleHero(currentBundle);
     renderVideoSection(currentBundle);
@@ -1403,8 +1416,12 @@
     // Close Baby browser if open
     window.closeBabyBrowser();
 
-    // Redirect to checkout with multi-book bundle parameter
-    window.location.href = `/ebooks/checkout.html?bundle=${encodeURIComponent(currentBundle.id)}&books=${encodeURIComponent(bookParams)}&price=${finalPrice}&title=${encodeURIComponent(currentBundle.title)}`;
+    const uName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
+    const uMob = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+    const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}`;
+
+    // Redirect to checkout with multi-book bundle parameter and customer prefill
+    window.location.href = `/ebooks/checkout.html?bundle=${encodeURIComponent(currentBundle.id)}&books=${encodeURIComponent(bookParams)}&price=${finalPrice}&title=${encodeURIComponent(currentBundle.title)}${userQueryParams}`;
   };
 
   // --- 18. OFFICIAL UNIVERSAL SHARE INTEGRATION ---

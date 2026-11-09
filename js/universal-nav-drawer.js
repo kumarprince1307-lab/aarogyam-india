@@ -582,14 +582,26 @@
   // 7. INJECT UNIVERSAL RESPONSIVE DRAWER & STICKY FLOATING STACK
   // -------------------------------------------------------------
   function generateDrawerProfileHeaderHtml() {
+    function getDrawerCookie(cname) {
+      try {
+        const name = cname + "=";
+        const ca = decodeURIComponent(document.cookie).split(';');
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i].trim();
+          if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
+        }
+      } catch (_) {}
+      return '';
+    }
+
     let savedUser = {};
     try {
       savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || localStorage.getItem('AI_SESSION') || '{}');
     } catch (e) {}
 
-    const userPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('SAKHI_USER_PHONE') || savedUser.mobile || savedUser.phone || '').replace(/\D/g, '').slice(-10);
+    const userPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('SAKHI_USER_PHONE') || getDrawerCookie('aim_user_mobile') || savedUser.mobile || savedUser.phone || '').replace(/\D/g, '').slice(-10);
     const isLogged = typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : (userPhone.length === 10);
-    let userName = localStorage.getItem('aim_user_name') || localStorage.getItem('aarogyam_user_name') || localStorage.getItem('SAKHI_USER_NAME') || savedUser.full_name || savedUser.name || savedUser.fullName || '';
+    let userName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || localStorage.getItem('aarogyam_user_name') || localStorage.getItem('SAKHI_USER_NAME') || getDrawerCookie('aim_user_name') || savedUser.full_name || savedUser.name || savedUser.fullName || '';
     if (!userName || userName.toLowerCase() === 'null' || userName.toLowerCase() === 'undefined' || userName.toLowerCase().includes('guest')) {
       userName = isLogged ? 'किसान साथी' : 'Guest User';
     }
