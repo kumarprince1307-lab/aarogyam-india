@@ -193,7 +193,14 @@
 
     const title = config.title || 'आरोग्यम इंडिया — विशेष समाधान';
     const subtitle = config.subtitle || 'अपनी फसल के समस्त कीट-रोग पहचानें और 100% सटीक समाधान पाएं!';
-    const coverImage = config.coverImage || config.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+    const isBundlePage = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle') || ((config.title || '').includes('5-इन-1') || (config.title || '').includes('कॉम्बो'));
+    const defaultCover = isBundlePage 
+      ? '/images/banners/bundle-kisan-5in1-banner.webp' 
+      : '/images/books/kharif-master-guide-2026-cover.webp';
+    let coverImage = config.coverImage || config.cover || defaultCover;
+    if (coverImage.includes('farmer-community-banner') || !coverImage) {
+      coverImage = '/images/banners/bundle-kisan-5in1-banner.webp';
+    }
     const badgeText = config.badgeText || '🌾 आरोग्यम इंडिया विशेष समाधान (Aarogyam India)';
 
     const overlay = document.createElement('div');
@@ -201,6 +208,9 @@
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      height: 100vh;
       background: rgba(15, 23, 42, 0.90);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
@@ -208,13 +218,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
-      overflow-y: auto;
-      overflow-x: hidden;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
       scrollbar-width: none;
       -ms-overflow-style: none;
-      -webkit-overflow-scrolling: touch;
       box-sizing: border-box;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     `;
@@ -224,9 +232,6 @@
         background: #ffffff;
         color: #000000;
         box-sizing: border-box;
-        border: 1.5px solid #cbd5e1;
-        border-radius: 12px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
         overflow: hidden;
         animation: adsGatePop 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       ">
@@ -235,11 +240,21 @@
             text-shadow: none !important;
             box-sizing: border-box;
           }
+          #adsLeadGatewayOverlay,
+          #adsLeadGatewayCard,
+          #adsGateFormScreen,
+          #adsLeadGatewayForm {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+          }
           #adsLeadGatewayOverlay::-webkit-scrollbar,
-          #adsLeadGatewayCard::-webkit-scrollbar {
+          #adsLeadGatewayCard::-webkit-scrollbar,
+          #adsGateFormScreen::-webkit-scrollbar,
+          #adsLeadGatewayForm::-webkit-scrollbar {
             display: none !important;
             width: 0 !important;
             height: 0 !important;
+            background: transparent !important;
           }
           @keyframes adsGatePop {
             0% { opacity: 0; transform: scale(0.96) translateY(6px); }
@@ -258,13 +273,13 @@
           /* Desktop / Tablet Modal Card (Clean & Centered) */
           @media (min-width: 521px) {
             #adsLeadGatewayOverlay {
-              padding: 12px;
+              padding: 16px;
               align-items: center;
               justify-content: center;
             }
             #adsLeadGatewayCard {
               width: 95%;
-              max-width: 435px;
+              max-width: 440px;
               min-width: 320px;
               margin: auto;
               border: 1.5px solid #cbd5e1;
@@ -276,49 +291,61 @@
             }
           }
 
-          /* Mobile Screen-Fit Architecture (Centered Crisp Modal, Never Edge-Clipped) */
+          /* Mobile Screen-Fit Architecture (100% Full-Screen Clean Sheet, Zero Black Empty Void, Zero Scrollbar Track) */
           @media (max-width: 520px) {
             #adsLeadGatewayOverlay {
-              padding: 6px !important;
-              padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
-              align-items: center !important;
-              justify-content: center !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              align-items: stretch !important;
+              justify-content: stretch !important;
+              overflow: hidden !important;
             }
             #adsLeadGatewayCard {
-              width: 96% !important;
-              max-width: 420px !important;
-              min-width: 280px !important;
-              margin: auto !important;
-              border: 1.5px solid #cbd5e1 !important;
-              border-radius: 12px !important;
-              box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45) !important;
-              max-height: calc(100dvh - 12px) !important;
-              max-height: calc(100vh - 12px) !important;
+              width: 100vw !important;
+              max-width: 100vw !important;
+              min-width: 100vw !important;
+              height: 100dvh !important;
+              height: 100vh !important;
+              min-height: 100dvh !important;
+              margin: 0 !important;
+              border-radius: 0 !important;
+              border: none !important;
+              box-shadow: none !important;
               display: flex !important;
               flex-direction: column !important;
               overflow: hidden !important;
             }
+            #adsGateFormScreen {
+              flex: 1 !important;
+              display: flex !important;
+              flex-direction: column !important;
+              justify-content: space-between !important;
+              padding: clamp(8px, 1.8vh, 14px) clamp(12px, 3.8vw, 18px) !important;
+              padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+              overflow-y: auto !important;
+              -webkit-overflow-scrolling: touch !important;
+            }
           }
 
-          /* Sleek High-Contrast Dark Input Boxes (Clean, Sharp & Fits Mobile Screen) */
+          /* Sleek High-Contrast Dark Input Boxes (Clean, Responsive & Scales With Screen) */
           .ads-input-dark {
             width: 100% !important;
             max-width: 100% !important;
             box-sizing: border-box !important;
-            padding: 8px 12px;
+            padding: clamp(8px, 1.4vh, 12px) 14px;
             background: #0f172a !important;
             border: 1.5px solid #475569;
-            border-radius: 7px;
+            border-radius: 8px;
             color: #ffffff !important;
             caret-color: #38bdf8 !important;
-            font-size: clamp(14px, 3.8vw, 16px) !important;
+            font-size: clamp(14px, 4vw, 16.5px) !important;
             font-weight: 800;
             outline: none;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             transition: border-color 0.15s ease;
-            height: clamp(40px, 5.2vh, 44px);
-            min-height: 40px;
+            height: clamp(40px, 5.4vh, 48px);
+            min-height: 38px;
             line-height: normal;
           }
           .ads-input-dark::placeholder {
@@ -376,24 +403,25 @@
           flex: 1;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
           padding: clamp(10px, 2vh, 16px) clamp(12px, 3.5vw, 18px);
+          padding-bottom: max(10px, env(safe-area-inset-bottom));
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
+          box-sizing: border-box;
         ">
           <!-- Top Info Group -->
           <div>
             <!-- Compact Hero Card -->
-            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: clamp(4px, 1vh, 7px); background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: clamp(4px, 1vh, 6px) clamp(6px, 1.8vw, 10px);">
-              <img src="${coverImage}" alt="Cover" style="width: 34px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; border: 1px solid #cbd5e1;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: clamp(4px, 1vh, 7px); background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: clamp(4px, 1vh, 6px) clamp(6px, 1.8vw, 10px);">
+              <img src="${coverImage}" alt="Cover" style="width: 48px; height: 60px; object-fit: contain; border-radius: 5px; flex-shrink: 0; border: 1.5px solid #cbd5e1; background: #000000;" onerror="this.src='/images/banners/bundle-kisan-5in1-banner.webp';" />
               <div style="flex: 1; min-width: 0;">
                 <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px;">
-                  <span style="background: #dcfce7; color: #166534; font-size: 10px; font-weight: 900; padding: 1px 5px; border-radius: 3px; border: 1px solid #86efac; text-transform: uppercase;">
+                  <span style="background: #dcfce7; color: #166534; font-size: 10.5px; font-weight: 900; padding: 1px 6px; border-radius: 3px; border: 1px solid #86efac; text-transform: uppercase;">
                     मुफ़्त ई-बुक
                   </span>
-                  <span style="font-size: 11.5px; font-weight: 800; color: #0284c7;">Aarogyam India</span>
+                  <span style="font-size: 12px; font-weight: 800; color: #0284c7;">Aarogyam India</span>
                 </div>
-                <h4 style="margin: 0; font-size: clamp(12.5px, 3.4vw, 13.5px); font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <h4 style="margin: 0; font-size: clamp(12.5px, 3.5vw, 14px); font-weight: 900; color: #000000 !important; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   ${title}
                 </h4>
               </div>
@@ -412,9 +440,9 @@
           </div>
 
           <!-- Form Fields Group -->
-          <form id="adsLeadGatewayForm" method="post" action="javascript:void(0);" autocomplete="on" style="flex: 1; display: flex; flex-direction: column; justify-content: space-around; min-height: 0;">
+          <form id="adsLeadGatewayForm" method="post" action="javascript:void(0);" autocomplete="on" style="display: flex; flex-direction: column; gap: clamp(6px, 1.2vh, 8px); margin-top: 2px;">
             <!-- 1. Name Input (Dark Box + Bold White Text) -->
-            <div style="margin-bottom: clamp(4px, 1vh, 7px);">
+            <div>
               <label for="adsGateName" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 👤 आपका शुभ नाम (Full Name) <span style="color:#dc2626;">*</span>
               </label>
@@ -422,7 +450,7 @@
             </div>
 
             <!-- 2. WhatsApp Mobile Number -->
-            <div style="margin-bottom: clamp(4px, 1vh, 7px);">
+            <div>
               <label for="adsGateMobile" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 📱 WhatsApp मोबाइल नंबर <span style="color:#dc2626;">*</span>
               </label>
@@ -434,7 +462,7 @@
             </div>
 
             <!-- 3. Email Input (Optional / वैकल्पिक) -->
-            <div style="margin-bottom: clamp(4px, 1vh, 7px);">
+            <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                 <label for="adsGateEmail" style="font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin: 0;">
                   📧 ईमेल (Email ID)
@@ -445,14 +473,14 @@
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
-            <div style="margin-bottom: clamp(4px, 1vh, 7px); background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: clamp(3px, 0.8vh, 5px) 6px;">
+            <div style="background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: clamp(3px, 0.8vh, 5px) 6px;">
               <p style="margin: 0; font-size: clamp(10.5px, 2.8vw, 11.5px); color: #000000 !important; line-height: 1.25; font-weight: 800;">
                 <span style="color: #dc2626; font-size: 11px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। रेफरल लिंक इसी से जुड़ेगी।
               </p>
             </div>
 
             <!-- 4. Profession / Role Dropdown -->
-            <div style="margin-bottom: clamp(4px, 1vh, 7px);">
+            <div>
               <label for="adsGateProfession" style="display: block; font-size: clamp(12px, 3.2vw, 13.5px); font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 💼 आप क्या करते हैं? (Role / Profession) <span style="color:#dc2626;">*</span>
               </label>
@@ -466,30 +494,31 @@
               </select>
             </div>
 
-            <!-- Submit Button (Dark Solid Emerald Green + Big Bold White Text, Never Clips) -->
+            <!-- Submit Button (Dark Solid Emerald Green + Bold White Text, Never Clips) -->
             <button type="submit" id="btnSubmitAdsGate" class="ads-btn-sharp-green" style="
               width: 100%;
               box-sizing: border-box;
-              padding: clamp(9px, 1.8vh, 12px) 8px;
-              min-height: clamp(44px, 5.8vh, 48px);
+              padding: clamp(10px, 1.8vh, 12px) 14px;
+              min-height: clamp(44px, 5.5vh, 48px);
               border-radius: 7px;
               cursor: pointer;
               display: flex;
               align-items: center;
               justify-content: center;
-              gap: 6px;
-              margin-top: clamp(2px, 0.8vh, 6px);
-              margin-bottom: 2px;
+              gap: 8px;
+              margin-top: clamp(8px, 1.5vh, 12px);
+              margin-bottom: 4px;
+              flex-shrink: 0;
             ">
               <span id="adsGateBtnIcon" style="font-size: 16px; flex-shrink: 0;">👉</span>
-              <span id="adsGateBtnLabel" style="font-size: clamp(13px, 3.8vw, 15px); font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.25; white-space: normal !important; word-break: keep-all;">
-                मुफ़्त झलक देखें और समाधान पाएँ →
+              <span id="adsGateBtnLabel" style="font-size: clamp(15px, 4vw, 17px); font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.2; letter-spacing: 0.5px;">
+                Submit
               </span>
             </button>
           </form>
 
           <!-- Micro Trust Strip (Clean Responsive Line) -->
-          <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: clamp(4px, 1vh, 6px); margin-top: clamp(2px, 0.8vh, 4px); flex-shrink: 0;">
+          <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: clamp(6px, 1.2vh, 8px); margin-top: 4px; padding-bottom: 4px; flex-shrink: 0;">
             <span style="font-size: clamp(10.5px, 2.8vw, 11.5px); color: #000000 !important; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;">
               <span>🔒 100% सुरक्षित डेटा</span> • <span>कोई शुल्क नहीं</span> • <span>50,000+ साथी</span>
             </span>

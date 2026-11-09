@@ -56,7 +56,7 @@
         window.initAdsLeadGateway({
           title: currentBundle.heading || currentBundle.title || 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो',
           subtitle: currentBundle.subTitle || currentBundle.subtitle || 'खेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह!',
-          coverImage: currentBundle.bannerImage || currentBundle.ogImage || '/images/banners/farmer-community-banner.jpeg',
+          coverImage: currentBundle.bannerImage || currentBundle.ogImage || '/images/banners/bundle-kisan-5in1-banner.webp',
           badgeText: '🎁 100% मुफ़्त एक्सेस (FREE)',
           ads_mode_enabled: Boolean(currentBundle.ads_mode_enabled || currentBundle.ads_gateway_enabled)
         });
