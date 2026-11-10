@@ -245,21 +245,15 @@
         animation: adsGatePop 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       ">
         <style>
+          #adsLeadGatewayOverlay,
           #adsLeadGatewayOverlay * {
             text-shadow: none !important;
-            box-sizing: border-box;
-          }
-          #adsLeadGatewayOverlay,
-          #adsLeadGatewayCard,
-          #adsGateFormScreen,
-          #adsLeadGatewayForm {
+            box-sizing: border-box !important;
             scrollbar-width: none !important;
             -ms-overflow-style: none !important;
           }
           #adsLeadGatewayOverlay::-webkit-scrollbar,
-          #adsLeadGatewayCard::-webkit-scrollbar,
-          #adsGateFormScreen::-webkit-scrollbar,
-          #adsLeadGatewayForm::-webkit-scrollbar {
+          #adsLeadGatewayOverlay *::-webkit-scrollbar {
             display: none !important;
             width: 0 !important;
             height: 0 !important;
@@ -279,41 +273,52 @@
             transform-origin: center;
           }
 
-          /* Desktop / Tablet Modal Card (Clean & Centered) */
-          @media (min-width: 521px) {
+          /* Desktop / Laptop View (Centered Card Modal) */
+          @media (min-width: 769px) {
             #adsLeadGatewayOverlay {
-              padding: 16px;
-              align-items: center;
-              justify-content: center;
+              padding: 16px !important;
+              align-items: center !important;
+              justify-content: center !important;
+              background: rgba(15, 23, 42, 0.88) !important;
+              overflow-y: auto !important;
             }
             #adsLeadGatewayCard {
-              width: 95%;
-              max-width: 440px;
-              min-width: 320px;
-              margin: auto;
-              border: 1.5px solid #cbd5e1;
-              border-radius: 12px;
-              box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
-              max-height: calc(100vh - 24px);
-              display: flex;
-              flex-direction: column;
+              width: 95% !important;
+              max-width: 440px !important;
+              min-width: 320px !important;
+              margin: auto !important;
+              border: 1.5px solid #cbd5e1 !important;
+              border-radius: 12px !important;
+              box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45) !important;
+              max-height: calc(100vh - 24px) !important;
+              display: flex !important;
+              flex-direction: column !important;
+              overflow-y: auto !important;
+              background: #ffffff !important;
+            }
+            #adsGateFormScreen {
+              padding: 12px 16px !important;
+              gap: 8px !important;
             }
           }
 
-          /* Mobile Screen-Fit Architecture: Full-Screen Native App Look, Zero Blank Gap */
-          @media (max-width: 520px) {
+          /* Mobile / Android / Facebook Browser / PWA / Webview (Full-Screen Fit, No Gaps, Big Touch Fields) */
+          @media (max-width: 768px) {
             #adsLeadGatewayOverlay {
               padding: 0 !important;
               margin: 0 !important;
               align-items: stretch !important;
-              justify-content: stretch !important;
+              justify-content: flex-start !important;
               overflow-y: auto !important;
+              overflow-x: hidden !important;
               background: #ffffff !important;
+              width: 100% !important;
+              height: 100% !important;
             }
             #adsLeadGatewayCard {
-              width: 100vw !important;
-              max-width: 100vw !important;
-              min-width: 100vw !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              min-width: 100% !important;
               min-height: 100dvh !important;
               min-height: 100vh !important;
               margin: 0 !important;
@@ -322,24 +327,85 @@
               box-shadow: none !important;
               display: flex !important;
               flex-direction: column !important;
-              overflow-y: auto !important;
-              -webkit-overflow-scrolling: touch !important;
+              overflow: visible !important;
+              background: #ffffff !important;
             }
             #adsGateFormScreen {
               flex: 1 !important;
               display: flex !important;
               flex-direction: column !important;
               justify-content: flex-start !important;
-              padding: 12px 16px !important;
-              padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-              gap: 8px !important;
+              padding: 10px 14px 20px 14px !important;
+              padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+              gap: 10px !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+              overflow: visible !important;
             }
-            .ads-input-dark {
-              height: 46px !important;
-              min-height: 44px !important;
+            #adsLeadGatewayForm {
+              width: 100% !important;
+              max-width: 100% !important;
+              box-sizing: border-box !important;
+              gap: 10px !important;
+            }
+            #adsLeadGatewayForm > div {
+              width: 100% !important;
+              max-width: 100% !important;
+              box-sizing: border-box !important;
+            }
+            .ads-input-dark,
+            #adsLeadGatewayForm input.ads-input-dark,
+            #adsLeadGatewayForm select.ads-input-dark {
+              width: 100% !important;
+              max-width: 100% !important;
+              height: 48px !important;
+              min-height: 48px !important;
               font-size: 16px !important;
+              font-weight: 700 !important;
               padding: 10px 14px !important;
               border-radius: 8px !important;
+              border: 1.5px solid #475569 !important;
+              background: #0f172a !important;
+              color: #ffffff !important;
+              box-sizing: border-box !important;
+            }
+            #adsLeadGatewayForm select#adsGateProfession {
+              color: #38bdf8 !important;
+              font-size: 15.5px !important;
+              padding-right: 32px !important;
+            }
+            #adsGateMobile {
+              padding-right: 44px !important;
+            }
+            #adsMobileStatusIcon {
+              right: 12px !important;
+              font-size: 20px !important;
+            }
+            #adsLeadGatewayForm label {
+              font-size: 14px !important;
+              font-weight: 800 !important;
+              color: #000000 !important;
+              margin-bottom: 4px !important;
+              display: block !important;
+            }
+            #btnSubmitAdsGate {
+              width: 100% !important;
+              max-width: 100% !important;
+              min-height: 52px !important;
+              font-size: 18px !important;
+              font-weight: 900 !important;
+              border-radius: 8px !important;
+              margin-top: 10px !important;
+              margin-bottom: 6px !important;
+              box-sizing: border-box !important;
+            }
+            #adsGateBtnIcon {
+              font-size: 20px !important;
+            }
+            #adsGateBtnLabel {
+              font-size: 18px !important;
+              font-weight: 900 !important;
+              letter-spacing: 0.5px !important;
             }
           }
 
@@ -484,13 +550,13 @@
                 </label>
                 <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; border: 1px solid #e2e8f0;">वैकल्पिक (Optional)</span>
               </div>
-              <input type="email" id="adsGateEmail" name="email" autocomplete="email" inputmode="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" style="height: 40px; min-height: 38px; font-size: 14.5px !important;" />
+              <input type="email" id="adsGateEmail" name="email" autocomplete="email" inputmode="email" placeholder="उदा. kisan@gmail.com" class="ads-input-dark" />
             </div>
 
             <!-- Warning Note (Red Box + Black Bold Text) -->
-            <div style="background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 5px; padding: 4px 7px;">
-              <p style="margin: 0; font-size: 11px; color: #000000 !important; line-height: 1.25; font-weight: 800;">
-                <span style="color: #dc2626; font-size: 11px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। रेफरल लिंक इसी से जुड़ेगी।
+            <div style="background: #fee2e2; border: 1.5px solid #ef4444; border-radius: 6px; padding: 5px 8px; box-sizing: border-box;">
+              <p style="margin: 0; font-size: 11.5px; color: #000000 !important; line-height: 1.25; font-weight: 800;">
+                <span style="color: #dc2626; font-size: 11.5px; vertical-align: -1px;">⚠️</span> <strong style="color: #000000 !important;">नोट:</strong> कृपया सही WhatsApp नंबर ही दर्ज करें। रेफरल लिंक इसी से जुड़ेगी।
               </p>
             </div>
 
@@ -499,7 +565,7 @@
               <label for="adsGateProfession" style="display: block; font-size: 13px; font-weight: 900; color: #000000 !important; margin-bottom: 2px;">
                 💼 आप क्या करते हैं? (Role / Profession) <span style="color:#dc2626;">*</span>
               </label>
-              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important; height: 40px; min-height: 38px; font-size: 14px !important; padding: 5px 8px;">
+              <select id="adsGateProfession" name="profession" required class="ads-input-dark" style="cursor: pointer; color: #38bdf8 !important;">
                 <option value="farmer">🌾 किसान भाई (Farmer)</option>
                 <option value="netsurf">💼 नेट्सर्फ डायरेक्ट सेलर (Netsurf)</option>
                 <option value="dealer">💊 कृषि दवा विक्रेता (Dealer)</option>
@@ -514,7 +580,7 @@
               width: 100%;
               box-sizing: border-box;
               padding: 12px 14px;
-              min-height: 48px;
+              min-height: 50px;
               border-radius: 8px;
               cursor: pointer;
               display: flex;
@@ -525,8 +591,8 @@
               margin-bottom: 4px;
               flex-shrink: 0;
             ">
-              <span id="adsGateBtnIcon" style="font-size: 17px; flex-shrink: 0;">👉</span>
-              <span id="adsGateBtnLabel" style="font-size: 17px; font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.2; letter-spacing: 0.5px;">
+              <span id="adsGateBtnIcon" style="font-size: 19px; flex-shrink: 0;">👉</span>
+              <span id="adsGateBtnLabel" style="font-size: 18px; font-weight: 900; color: #ffffff !important; text-align: center; line-height: 1.2; letter-spacing: 0.5px;">
                 FREE SUBMIT
               </span>
             </button>
