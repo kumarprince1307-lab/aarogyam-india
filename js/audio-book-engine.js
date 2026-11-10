@@ -583,17 +583,24 @@ class ProAudioBookEngine {
         // 2. Direct page text or recorded audio playback
         let pageText = '';
         let pageAudio = '';
+        let isApprovedLive = true;
 
         if (pageEntry) {
-            if (typeof pageEntry === 'string') pageText = pageEntry;
-            else if (typeof pageEntry === 'object') {
-                pageText = pageEntry.text || '';
-                pageAudio = pageEntry.audio || '';
+            if (typeof pageEntry === 'string') {
+                pageText = pageEntry;
+            } else if (typeof pageEntry === 'object') {
+                // 🛡️ Audio Quality Control: If admin has not approved/marked this page live, do not play draft audio
+                if (pageEntry.is_live === false || pageEntry.approved === false) {
+                    isApprovedLive = false;
+                } else {
+                    pageText = pageEntry.text || '';
+                    pageAudio = pageEntry.audio || '';
+                }
             }
         }
 
-        // Case A: Real Admin Recorded Audio exists
-        if (pageAudio && pageAudio.trim().length > 0) {
+        // Case A: Real Admin Recorded Audio exists (and approved)
+        if (isApprovedLive && pageAudio && pageAudio.trim().length > 0) {
             this.isPageRecordedAudio = true;
             this.updateNarratorDisplay();
             this.updateStatusDisplay(`🎙️ पृष्ठ ${currentPage} - रिकॉर्डेड आवाज़ चल रही है`);

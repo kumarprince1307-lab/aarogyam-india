@@ -58,7 +58,8 @@
           subtitle: currentBundle.subTitle || currentBundle.subtitle || 'खेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह!',
           coverImage: currentBundle.bannerImage || currentBundle.ogImage || '/images/banners/bundle-kisan-5in1-banner.webp',
           badgeText: '🎁 100% मुफ़्त एक्सेस (FREE)',
-          ads_mode_enabled: Boolean(currentBundle.ads_mode_enabled || currentBundle.ads_gateway_enabled)
+          ads_mode_enabled: currentBundle.ads_mode_enabled === false ? false : Boolean(currentBundle.ads_mode_enabled || currentBundle.ads_gateway_enabled),
+          ads_gateway_enabled: currentBundle.ads_gateway_enabled === false ? false : Boolean(currentBundle.ads_gateway_enabled)
         });
       }
     } catch (_) { }

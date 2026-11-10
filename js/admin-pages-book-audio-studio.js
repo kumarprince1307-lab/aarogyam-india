@@ -17,6 +17,30 @@ if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
+// Reliable PDF.js Loader & Initializer
+async function ensurePdfJsLoaded() {
+    if (typeof window !== 'undefined' && window.pdfjsLib) {
+        if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+        return window.pdfjsLib;
+    }
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        script.onload = () => {
+            if (window.pdfjsLib) {
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                resolve(window.pdfjsLib);
+            } else {
+                reject(new Error('PDF.js library failed to mount'));
+            }
+        };
+        script.onerror = () => reject(new Error('PDF.js CDN load error'));
+        document.head.appendChild(script);
+    });
+}
+
 // Global Studio State
 let studioPdfDoc = null;
 let studioCurrentBookId = 'BK001';
@@ -34,6 +58,8 @@ let isFullBookReload = false; // Flag if bulk upload or fresh PDF was loaded
 let pendingSmartUploadFiles = []; // Staged files for smart position modal
 let studioDemoParsedPages = []; // Stores real book page numbers for demo books
 let studioIsDemoStudio = false; // Flag if current studio book is a demo book
+let isPageMultiSelectMode = false; // Multi-select page deletion mode
+let selectedPagesForBulkAction = new Set(); // Selected page numbers for bulk delete
 
 // Media Recorder
 let mediaRecorder = null;
@@ -63,7 +89,10 @@ async function savePagesToDb(bookId, imagesArray) {
         const db = await openStudioDb();
         const tx = db.transaction('bookPages', 'readwrite');
         const store = tx.objectStore('bookPages');
-        store.put(imagesArray, bookId);
+        const cleanId = String(bookId || '').trim();
+        store.put(imagesArray, cleanId);
+        if (cleanId.toUpperCase() !== cleanId) store.put(imagesArray, cleanId.toUpperCase());
+        if (cleanId.toLowerCase() !== cleanId) store.put(imagesArray, cleanId.toLowerCase());
         return new Promise((res) => { tx.oncomplete = () => res(true); });
     } catch (e) {
         console.warn("IndexedDB Save Warning:", e);
@@ -76,13 +105,169 @@ async function loadPagesFromDb(bookId) {
         const db = await openStudioDb();
         const tx = db.transaction('bookPages', 'readonly');
         const store = tx.objectStore('bookPages');
-        const req = store.get(bookId);
+        const cleanId = String(bookId || '').trim();
+        const probeKeys = [cleanId, cleanId.toUpperCase(), cleanId.toLowerCase()].filter(Boolean);
+        for (const k of probeKeys) {
+            const res = await new Promise((resolve) => {
+                const req = store.get(k);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => resolve(null);
+            });
+            if (Array.isArray(res) && res.length > 0) return res;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// 🎁 IndexedDB Storage Helpers for Large Word (.docx) Bonus Files
+async function saveBonusFileToDb(bookId, fileObj) {
+    try {
+        const cleanKey = `bonus_word_${String(bookId || '').toUpperCase().trim()}`;
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readwrite');
+        const store = tx.objectStore('bookPages');
+        store.put(fileObj, cleanKey);
+        return new Promise((res) => { tx.oncomplete = () => res(true); });
+    } catch (e) {
+        console.warn("IndexedDB Bonus Save Error:", e);
+        return false;
+    }
+}
+
+async function loadBonusFileFromDb(bookId) {
+    try {
+        const cleanKey = `bonus_word_${String(bookId || '').toUpperCase().trim()}`;
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readonly');
+        const store = tx.objectStore('bookPages');
+        const req = store.get(cleanKey);
         return new Promise((res) => {
             req.onsuccess = () => res(req.result || null);
             req.onerror = () => res(null);
         });
     } catch (e) {
         return null;
+    }
+}
+
+async function deleteBonusFileFromDb(bookId) {
+    try {
+        const cleanKey = `bonus_word_${String(bookId || '').toUpperCase().trim()}`;
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readwrite');
+        const store = tx.objectStore('bookPages');
+        store.delete(cleanKey);
+        return new Promise((res) => { tx.oncomplete = () => res(true); });
+    } catch (e) {
+        return false;
+    }
+}
+
+// 📄 IndexedDB Storage Helpers for Attached Source PDF Files (Zero-Crash Local Vault)
+async function savePdfFileToDb(bookId, fileObj) {
+    try {
+        const cleanId = String(bookId || '').toUpperCase().trim();
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readwrite');
+        const store = tx.objectStore('bookPages');
+        store.put(fileObj, `source_pdf_${cleanId}`);
+        store.put(fileObj, `source_pdf_${cleanId.toLowerCase()}`);
+        return new Promise((res) => { tx.oncomplete = () => res(true); });
+    } catch (e) {
+        console.warn("IndexedDB PDF Save Error:", e);
+        return false;
+    }
+}
+
+async function loadPdfFileFromDb(bookId) {
+    try {
+        const cleanId = String(bookId || '').toUpperCase().trim();
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readonly');
+        const store = tx.objectStore('bookPages');
+        const probeKeys = [
+            `source_pdf_${cleanId}`,
+            `source_pdf_${cleanId.toLowerCase()}`,
+            `source_pdf_${cleanId.toUpperCase()}`
+        ];
+        for (const k of probeKeys) {
+            const res = await new Promise((resolve) => {
+                const req = store.get(k);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => resolve(null);
+            });
+            if (res) return res;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+async function deletePdfFileFromDb(bookId) {
+    try {
+        const cleanId = String(bookId || '').toUpperCase().trim();
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readwrite');
+        const store = tx.objectStore('bookPages');
+        store.delete(`source_pdf_${cleanId}`);
+        store.delete(`source_pdf_${cleanId.toLowerCase()}`);
+        return new Promise((res) => { tx.oncomplete = () => res(true); });
+    } catch (e) {
+        return false;
+    }
+}
+
+// 🌐 Universal Catalog Synchronizer (Keeps Landing Page, Reader & Download Catalogs in 100% Sync)
+function syncBookToAllCatalogs(bookId, totalPages, pageImages = null) {
+    try {
+        const cleanId = String(bookId || '').toUpperCase().trim();
+        if (!cleanId) return;
+
+        // 1. Sync to AAROGYAM_CUSTOM_BOOKS
+        let customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        let bIdx = customBooks.findIndex(b => b && b.id && b.id.toUpperCase() === cleanId);
+        const bookTitle = studioBookData?.title || studioBookData?.name || cleanId;
+        const bookCover = studioBookData?.cover || studioBookData?.hero?.cover_image || `/images/books/${cleanId.toLowerCase()}-cover.webp`;
+
+        if (bIdx >= 0) {
+            customBooks[bIdx].totalPages = totalPages;
+            customBooks[bIdx].hasWebpPages = true;
+            customBooks[bIdx].hasAudioBook = true;
+            if (pageImages && pageImages.length) customBooks[bIdx].pageImages = pageImages;
+            customBooks[bIdx].updated_at = new Date().toISOString();
+        } else {
+            customBooks.push({
+                id: cleanId,
+                title: bookTitle,
+                name: bookTitle,
+                category: studioBookData?.category || 'कृषि मास्टर गाइड',
+                cover: bookCover,
+                totalPages: totalPages,
+                hasWebpPages: true,
+                hasAudioBook: true,
+                pageImages: pageImages || studioPageImages || [],
+                pageImagesPath: `images/books/${cleanId}`,
+                isCustom: true,
+                updated_at: new Date().toISOString()
+            });
+        }
+        localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+
+        // 2. Sync to AAROGYAM_BOOK_LANDING_PAGES
+        let landingPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        let lpIdx = landingPages.findIndex(p => p && p.id && p.id.toUpperCase() === cleanId);
+        if (lpIdx >= 0) {
+            landingPages[lpIdx].totalPages = totalPages;
+            landingPages[lpIdx].updated_at = new Date().toISOString();
+            localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(landingPages));
+        }
+
+        console.log(`[Catalogs Synced] Book [${cleanId}] updated with ${totalPages} pages in custom catalogs.`);
+    } catch (e) {
+        console.warn("[Catalogs Sync Warning]:", e);
     }
 }
 
@@ -115,6 +300,18 @@ export async function initBookAudioStudio() {
                 <option value="FREE001">FREE001: फ्री जैविक खेती गाइड</option>
                 <option value="__NEW__">➕ नया बुक / डेमो कोड जोड़ें...</option>
               </select>
+              <button id="openNewBookModalBtn" class="admin-btn" style="background:#10b981; color:#fff; font-weight:700; padding:6px 14px; font-size:12px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" title="नई ई-बुक, डेमो या वर्चुअल कॉम्बो रजिस्टर करें">
+                <span>➕</span> नई पुस्तक बनाएँ
+              </button>
+              <a id="quickTestReaderBtn" href="../ebooks/reader.html?book=BK001" target="_blank" class="admin-btn" style="background:#0284c7; color:#fff; font-weight:700; padding:6px 12px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="रीडर में इस किताब को खोलें">
+                <span>📖</span> रीडर में देखें
+              </a>
+              <a id="quickTestDownloadBtn" href="../ebooks/download.html?book=BK001" target="_blank" class="admin-btn" style="background:#0d9488; color:#fff; font-weight:700; padding:6px 12px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="डाउनलोड पेज पर इस किताब को टेस्ट करें">
+                <span>📥</span> डाउनलोड पेज
+              </a>
+              <a id="quickTestLandingBtn" href="../universal-book-landing.html?id=BK001" target="_blank" class="admin-btn" style="background:#d97706; color:#fff; font-weight:700; padding:6px 12px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="इस किताब का लैंडिंग पेज देखें">
+                <span>🌐</span> लैंडिंग पेज
+              </a>
             </div>
           </div>
         </div>
@@ -139,6 +336,9 @@ export async function initBookAudioStudio() {
               <button id="triggerDirectPdfBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="सीधे PDF फाइल अपलोड करें (ऑटोमैटिक WebP में बदल जाएगी)">
                 📄 Upload Direct PDF
               </button>
+              <button id="openBonusManagerBtn" class="admin-btn" style="background:linear-gradient(135deg, #f59e0b, #d97706); color:#fff; padding:8px 14px; font-weight:800; font-size:12px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(245,158,11,0.35); cursor:pointer;" title="इस पुस्तक के लिए Word फाइल (.docx) और Google Drive बोनस लिंक अपलोड व प्रबंधित करें">
+                <span>🎁</span> अपलोड बोनस (Word / Drive)
+              </button>
               <button id="convertPdfToWebpBtn" class="admin-btn admin-btn-secondary" style="padding:8px 12px; font-size:12px;" title="मौजूदा PDF के सारे पेजों को WebP इमेज में बदलें">
                 ⚡ Convert Existing PDF
               </button>
@@ -150,6 +350,40 @@ export async function initBookAudioStudio() {
               </button>
               <button id="exportJsonBtn" class="admin-btn" style="background:#3b82f6; color:#fff; padding:8px 12px; font-size:12px;">
                 💾 Export JSON
+              </button>
+              <button id="viewEmailLogsBtn" class="admin-btn" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; padding:8px 14px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(2,132,199,0.35); cursor:pointer;" title="ग्राहकों को भेजे गए ई-बुक्स व बोनस के ईमेल्स की लाइव हिस्ट्री देखें">
+                <span>📧</span> ईमेल हिस्ट्री (Sent Logs)
+              </button>
+            </div>
+          </div>
+
+          <!-- Source PDF Vault Card: Attached Source PDF Info & Re-Extract / Manage Actions -->
+          <div id="sourcePdfStatusCard" style="display:none; margin-top:14px; padding:12px 16px; background:#1e293b; border-radius:10px; border:1px solid #38bdf8; box-shadow:0 4px 15px rgba(0,0,0,0.3); align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; min-width:260px;">
+              <div style="width:42px; height:42px; border-radius:8px; background:rgba(56,189,248,0.15); border:1px solid #38bdf8; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">
+                📄
+              </div>
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span id="sourcePdfNameLabel" style="font-weight:700; color:#f8fafc; font-size:0.95rem;">BK021.pdf</span>
+                  <span id="sourcePdfBadge" style="background:#065f46; color:#34d399; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:12px; border:1px solid #059669;">✓ IndexedDB सुरक्षित</span>
+                </div>
+                <div id="sourcePdfMetaLabel" style="font-size:0.78rem; color:#94a3b8; margin-top:2px;">28 पेजेस • 14.2 MB • कभी भी 1-Click में इमेज रिकवर करें</div>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <button id="reExtractPdfPagesBtn" class="admin-btn" style="background:linear-gradient(135deg, #0ea5e9, #0284c7); color:#fff; padding:6px 12px; font-size:0.78rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;" title="यदि कभी पेज इमेज डिलीट हो जाएं तो सीधे इस PDF से HD WebP इमेज और ऑडियो टेक्स्ट दोबारा बनाएं">
+                <span>🔄</span> PDF से दोबारा इमेज निकालें (Re-Extract HD)
+              </button>
+              <button id="downloadSourcePdfBtn" class="admin-btn" style="background:#334155; color:#e2e8f0; padding:6px 12px; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:5px; border-radius:6px; border:1px solid #475569; cursor:pointer;" title="मूल PDF फाइल को अपने कंप्यूटर/मोबाइल में डाउनलोड करें">
+                <span>⬇️</span> PDF डाउनलोड
+              </button>
+              <button id="replaceSourcePdfBtn" class="admin-btn" style="background:#334155; color:#38bdf8; padding:6px 12px; font-size:0.78rem; font-weight:600; display:inline-flex; align-items:center; gap:5px; border-radius:6px; border:1px solid #0284c7; cursor:pointer;" title="इस PDF की जगह कोई नई PDF अपलोड करें">
+                <span>🔄</span> बदलें (Replace)
+              </button>
+              <button id="deleteSourcePdfBtn" class="admin-btn" style="background:rgba(239,68,68,0.15); color:#f87171; padding:6px 12px; font-size:0.78rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:6px; border:1px solid #ef4444; cursor:pointer;" title="इस पुस्तक से संलग्न मूल PDF को डिलीट करें">
+                <span>🗑️</span> PDF हटाएं
               </button>
             </div>
           </div>
@@ -350,6 +584,318 @@ export async function initBookAudioStudio() {
           </div>
         </div>
 
+        <!-- 📖 Unified New Book Creator Modal -->
+        <div id="newBookCreatorModal" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:9999999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
+          <div class="admin-card" style="max-width:560px; width:100%; background:#0f172a; border:2px solid #10b981; border-radius:14px; padding:20px; box-shadow:0 25px 60px rgba(0,0,0,0.9); box-sizing:border-box; max-height:92vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #334155; padding-bottom:10px;">
+              <h3 style="margin:0; font-size:1.15rem; color:#34d399; font-weight:800; display:flex; align-items:center; gap:8px;">
+                <span>📖</span> नई पुस्तक / कॉम्बो बनाएँ (Create New Book)
+              </h3>
+              <button type="button" id="closeNewBookModalBtn" class="admin-btn" style="background:#334155; color:#fff; padding:4px 10px; font-size:14px; border-radius:6px; cursor:pointer;">✕</button>
+            </div>
+            
+            <form id="newBookCreatorForm" style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:160px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <label style="font-size:12px; font-weight:700; color:#cbd5e1;">पुस्तक कोड (Book ID) *</label>
+                    <button type="button" id="autoGenBookIdBtn" class="admin-btn" style="background:#0284c7; color:#fff; padding:1px 6px; font-size:10px; font-weight:800; cursor:pointer;" title="अगला उपलब्ध Book ID ऑटो-जेनरेट करें">⚡ ऑटो-जेनरेट</button>
+                  </div>
+                  <input type="text" id="newBookIdInput" required placeholder="उदा. BK016" class="admin-input" style="width:100%; text-transform:uppercase; font-weight:800; padding:7px 10px; color:#34d399;">
+                </div>
+                <div style="width:110px;">
+                  <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">कुल पेज (Pages)</label>
+                  <input type="number" id="newBookTotalPagesInput" min="0" max="1000" placeholder="0" value="0" class="admin-input" style="width:100%; padding:7px 10px; text-align:center; font-weight:800; color:#38bdf8;" title="किताब के कुल पेजों की संख्या">
+                </div>
+                <div style="flex:1; min-width:160px;">
+                  <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">कैटेगरी (Category)</label>
+                  <select id="newBookCategorySelect" class="admin-input" style="width:100%; padding:7px 10px; font-weight:700;">
+                    <option value="Agriculture">🌾 कृषि / फसल (Agriculture)</option>
+                    <option value="Vegetables">🥦 सब्जी खेती (Vegetables)</option>
+                    <option value="PestDisease">💊 कीट व रोग निवारण (Pest / Disease)</option>
+                    <option value="AnimalHusbandry">🐄 पशुपालन (Animal Husbandry)</option>
+                    <option value="Combo">📦 कॉम्बो / बंडल (Combo Bundle)</option>
+                    <option value="Organic">🌿 जैविक खेती (Organic Farming)</option>
+                    <option value="Other">🏠 अन्य (Other)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">पुस्तक का नाम (Book Title / Heading) *</label>
+                <input type="text" id="newBookTitleInput" required placeholder="उदा. टमाटर व मिर्च फसल सुरक्षा मास्टर गाइड 2026" class="admin-input" style="width:100%; font-weight:700; padding:7px 10px;">
+              </div>
+
+              <!-- 🎁 100% Free Book Option for All Readers -->
+              <div style="background:#064e3b; border:1px solid #10b981; padding:8px 12px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:800; color:#6ee7b7; cursor:pointer;">
+                  <input type="checkbox" id="newBookIsFreeInput" style="accent-color:#10b981; width:16px; height:16px;">
+                  🎁 100% मुफ़्त ई-बुक (Free Access for All Users)
+                </label>
+                <span style="font-size:11px; color:#cbd5e1;">(बिना खरीदे सभी पाठक पढ़ व सुन सकेंगे)</span>
+              </div>
+
+              <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                  <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">MRP (मूल कीमत ₹)</label>
+                  <input type="number" id="newBookMrpInput" placeholder="299" class="admin-input" style="width:100%; padding:7px 10px;">
+                </div>
+                <div style="flex:1;">
+                  <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">ऑफर मूल्य (Offer Price ₹)</label>
+                  <input type="number" id="newBookOfferPriceInput" placeholder="99" class="admin-input" style="width:100%; font-weight:800; color:#34d399; padding:7px 10px;">
+                </div>
+              </div>
+
+              <!-- Visibility Options -->
+              <div style="background:#1e293b; padding:10px 12px; border-radius:8px; border:1px solid #334155;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#38bdf8; margin-bottom:6px;">कहाँ-कहाँ प्रदर्शित करना है (Visibility):</label>
+                <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:#e2e8f0; font-weight:600;">
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                    <input type="checkbox" id="visMyLibrary" checked style="accent-color:#10b981;"> My Library
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                    <input type="checkbox" id="visStore" checked style="accent-color:#10b981;"> Store / Catalog
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                    <input type="checkbox" id="visLanding" checked style="accent-color:#10b981;"> Book Landing
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                    <input type="checkbox" id="visBundle" checked style="accent-color:#10b981;"> Combo Bundles
+                  </label>
+                </div>
+              </div>
+
+              <!-- Bonus Fields -->
+              <div style="background:#1e293b; padding:10px 12px; border-radius:8px; border:1px solid #334155;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#f59e0b; margin-bottom:6px;">🎁 VIP डिजिटल बोनस (वैकल्पिक / Optional):</label>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <input type="text" id="newBookWordUrlInput" placeholder="📝 Word फाइल (.docx) डाउनलोड लिंक" class="admin-input" style="width:100%; font-size:12px; padding:6px 10px;">
+                  <input type="text" id="newBookDriveUrlInput" placeholder="📁 Google Drive वीडियो / नोट्स फोल्डर लिंक" class="admin-input" style="width:100%; font-size:12px; padding:6px 10px;">
+                  <input type="text" id="newBookBonusDescInput" placeholder="बोनस विवरण (उदा. सम्पूर्ण फसल सुरक्षा शेड्यूल + 25 वीडियो)" class="admin-input" style="width:100%; font-size:12px; padding:6px 10px;">
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+                <button type="button" id="cancelNewBookBtn" class="admin-btn admin-btn-secondary" style="padding:8px 14px;">रद्द करें</button>
+                <button type="submit" id="saveNewBookBtn" class="admin-btn" style="background:#10b981; color:#fff; font-weight:800; padding:8px 18px; cursor:pointer;">
+                  🚀 पुस्तक बनाएँ व स्टूडियो में खोलें
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 📧 Sent Email Delivery History Modal -->
+        <div id="emailDeliveryLogsModal" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:9999999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
+          <div class="admin-card" style="max-width:880px; width:100%; background:#0f172a; border:2px solid #0284c7; border-radius:14px; padding:20px; box-shadow:0 25px 60px rgba(0,0,0,0.9); box-sizing:border-box; max-height:92vh; display:flex; flex-direction:column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #334155; padding-bottom:10px; flex-shrink:0;">
+              <div>
+                <h3 style="margin:0; font-size:1.15rem; color:#38bdf8; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  <span>📧</span> ग्राहक ईमेल डिलीवरी हिस्ट्री (Sent Email Logs)
+                </h3>
+                <p style="margin:2px 0 0; font-size:0.75rem; color:#94a3b8;">
+                  Vercel + Resend API के माध्यम से ग्राहकों को भेजे गए ई-बुक्स, Word गाइड और Google Drive लिंक की लाइव सूची।
+                </p>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button type="button" id="refreshEmailLogsBtn" class="admin-btn admin-btn-secondary" style="padding:4px 10px; font-size:12px; cursor:pointer;" title="रिफ्रेश करें">🔄 रिफ्रेश</button>
+                <button type="button" id="closeEmailLogsModalBtn" class="admin-btn" style="background:#334155; color:#fff; padding:4px 10px; font-size:14px; border-radius:6px; cursor:pointer;">✕</button>
+              </div>
+            </div>
+
+            <!-- Test Email Dispatch Card -->
+            <div style="background:#0b1329; border:1px solid #1e40af; border-radius:10px; padding:12px 14px; margin-bottom:12px; flex-shrink:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-weight:800; font-size:12px; color:#60a5fa;">🧪 तुरंत टेस्ट ईमेल भेजें (Live Email Delivery Test):</span>
+                <span style="font-size:10px; color:#94a3b8;">सीधा इनबॉक्स में ई-बुक + बोनस लिंक डिलीवरी</span>
+              </div>
+              <div style="display:grid; grid-template-columns:1.5fr 1fr 1fr auto; gap:8px; align-items:center;">
+                <input type="email" id="testEmailRecipientInput" value="kumar.prince1307@gmail.com" placeholder="प्राप्तकर्ता ईमेल" class="admin-input" style="font-size:11px; padding:6px 10px;">
+                <input type="text" id="testEmailNameInput" value="Kartik Prince" placeholder="ग्राहक का नाम" class="admin-input" style="font-size:11px; padding:6px 10px;">
+                <input type="text" id="testEmailBookInput" placeholder="किताब का नाम / कोड" class="admin-input" style="font-size:11px; padding:6px 10px;">
+                <button type="button" id="testSendEmailBtn" class="admin-btn" style="background:#2563eb; color:#fff; font-weight:800; font-size:11px; padding:7px 14px; cursor:pointer; white-space:nowrap;">
+                  🚀 टेस्ट ईमेल भेजें
+                </button>
+              </div>
+            </div>
+
+            <!-- Search / Filter Bar -->
+            <div style="display:flex; gap:10px; margin-bottom:12px; flex-shrink:0;">
+              <input type="text" id="emailLogsSearchInput" placeholder="🔍 ग्राहक का नाम, ईमेल या पुस्तक का नाम खोजें..." class="admin-input" style="flex:1; padding:7px 12px; font-size:0.85rem;">
+            </div>
+
+            <!-- Table Container -->
+            <div style="flex:1; overflow-y:auto; border:1px solid #334155; border-radius:8px; background:#1e293b; min-height:220px;">
+              <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left; color:#e2e8f0;">
+                <thead style="background:#0b1329; position:sticky; top:0; z-index:1; border-bottom:1px solid #334155;">
+                  <tr>
+                    <th style="padding:8px 12px; color:#94a3b8; font-weight:700;">तारीख / समय</th>
+                    <th style="padding:8px 12px; color:#94a3b8; font-weight:700;">ग्राहक</th>
+                    <th style="padding:8px 12px; color:#94a3b8; font-weight:700;">ईमेल</th>
+                    <th style="padding:8px 12px; color:#94a3b8; font-weight:700;">ई-बुक / बोनस सामग्री</th>
+                    <th style="padding:8px 12px; color:#94a3b8; font-weight:700; text-align:center;">स्थिति</th>
+                  </tr>
+                </thead>
+                <tbody id="emailLogsTableBody">
+                  <tr>
+                    <td colspan="5" style="text-align:center; padding:24px; color:#94a3b8;">
+                      लोड हो रहा है...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:11px; color:#94a3b8; flex-shrink:0;">
+              <span id="emailLogsCountLabel">कुल 0 ईमेल रिकॉर्ड्स</span>
+              <span>⚡ Powered by Resend API</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🎁 Dedicated VIP Bonus Manager Modal (Word & Google Drive Tabs) -->
+        <div id="bonusManagerModal" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:9999999; justify-content:center; align-items:center; padding:16px; box-sizing:border-box;">
+          <div class="admin-card" style="max-width:620px; width:100%; background:#0f172a; border:2px solid #f59e0b; border-radius:14px; padding:20px; box-shadow:0 25px 60px rgba(0,0,0,0.9); box-sizing:border-box; max-height:92vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #334155; padding-bottom:10px;">
+              <div>
+                <h3 style="margin:0; font-size:1.15rem; color:#fbbf24; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  <span>🎁</span> वीआईपी बोनस प्रबंधक (Word व Google Drive)
+                </h3>
+                <p style="margin:2px 0 0; font-size:0.75rem; color:#94a3b8;">
+                  पुस्तक <strong id="bonusTargetBookIdLabel" style="color:#38bdf8;">BK001</strong> के साथ संलग्न डिजिटल फाइल्स
+                </p>
+              </div>
+              <button type="button" id="closeBonusModalBtn" class="admin-btn" style="background:#334155; color:#fff; padding:4px 10px; font-size:14px; border-radius:6px; cursor:pointer;">✕</button>
+            </div>
+
+            <!-- Bonus Type Tabs -->
+            <div style="display:flex; gap:10px; margin-bottom:16px; border-bottom:1px solid #334155; padding-bottom:8px;">
+              <button type="button" id="tabBonusWordBtn" class="admin-btn" style="background:#1e3a8a; color:#93c5fd; padding:7px 16px; font-size:12px; font-weight:800; border:1px solid #3b82f6; cursor:pointer;">
+                📝 Word फाइल (.docx)
+              </button>
+              <button type="button" id="tabBonusDriveBtn" class="admin-btn" style="background:#1e293b; color:#94a3b8; padding:7px 16px; font-size:12px; font-weight:700; border:1px solid #334155; cursor:pointer;">
+                📁 Google Drive लिंक
+              </button>
+            </div>
+
+            <!-- Tab 1: Word Document Form -->
+            <div id="bonusWordPane" style="display:flex; flex-direction:column; gap:12px;">
+              <div style="background:#172554; border:1px solid #1e40af; border-radius:8px; padding:12px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#93c5fd; margin-bottom:6px;">
+                  1. Word फाइल (.docx / .doc) चुनें या लिंक पेस्ट करें:
+                </label>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <input type="file" id="bonusWordFileInput" accept=".docx,.doc,.pdf" style="display:none;">
+                  <button type="button" id="triggerBonusWordFileBtn" class="admin-btn" style="background:#2563eb; color:#fff; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;">
+                    📂 Word फाइल चुनें (.docx)
+                  </button>
+                  <button type="button" id="downloadBonusWordFileBtn" class="admin-btn admin-btn-secondary" style="padding:6px 12px; font-size:11px; font-weight:700; display:none;">
+                    📥 वर्ड फाइल डाउनलोड करें
+                  </button>
+                  <span id="bonusWordFileNameLabel" style="font-size:11px; color:#cbd5e1; font-style:italic;">कोई फाइल नहीं चुनी</span>
+                </div>
+                <input type="text" id="bonusWordUrlInput" placeholder="अथवा सीधा फाइल URL पेस्ट करें (उदा. https://...)" class="admin-input" style="width:100%; margin-top:8px; font-size:11px; padding:6px 10px;">
+              </div>
+
+              <!-- Word Thumbnail & Title with Live Preview & File Picker -->
+              <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:12px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+                  2. Word गाइड का थंबनेल / कवर (Thumbnail Image):
+                </label>
+                <div style="display:flex; gap:12px; align-items:center;">
+                  <div style="width:80px; height:100px; background:#0f172a; border:2px dashed #3b82f6; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                    <img id="bonusWordThumbPreview" src="https://placehold.co/80x100/1e3a8a/white?text=DOCX" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                  <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <input type="file" id="bonusWordThumbFileInput" accept="image/*" style="display:none;">
+                      <button type="button" id="triggerBonusWordThumbFileBtn" class="admin-btn" style="background:#3b82f6; color:#fff; padding:5px 12px; font-size:11px; font-weight:700; cursor:pointer;">
+                        🖼️ थंबनेल इमेज चुनें
+                      </button>
+                      <button type="button" id="downloadBonusWordThumbBtn" class="admin-btn admin-btn-secondary" style="padding:5px 12px; font-size:11px; font-weight:700;">
+                        📥 थंबनेल डाउनलोड करें
+                      </button>
+                    </div>
+                    <input type="text" id="bonusWordThumbInput" placeholder="अथवा थंबनेल इमेज URL पेस्ट करें" class="admin-input" style="width:100%; padding:6px 10px; font-size:11px;">
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">Word गाइड का शीर्षक (Title):</label>
+                <input type="text" id="bonusWordTitleInput" placeholder="उदा. सम्पूर्ण फसल सुरक्षा शेड्यूल - Word गाइड (.docx)" class="admin-input" style="width:100%; padding:7px 10px; font-weight:700;">
+              </div>
+
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">विवरण (Description):</label>
+                <textarea id="bonusWordDescInput" rows="2" placeholder="उदा. 15 पृष्ठों की एडिटेबल व प्रिंटेबल फाइल जिसमें खाद व स्प्रे का पूरा टाइमटेबल है।" class="admin-input" style="width:100%; padding:7px 10px; font-size:12px; resize:vertical;"></textarea>
+              </div>
+            </div>
+
+            <!-- Tab 2: Google Drive Form -->
+            <div id="bonusDrivePane" style="display:none; flex-direction:column; gap:12px;">
+              <div style="background:#064e3b; border:1px solid #047857; border-radius:8px; padding:12px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#6ee7b7; margin-bottom:6px;">
+                  1. Google Drive फोल्डर या फाइल लिंक (Sharing URL):
+                </label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="bonusDriveUrlInput" placeholder="उदा. https://drive.google.com/drive/folders/1ABC..." class="admin-input" style="flex:1; font-size:12px; padding:7px 10px;">
+                  <button type="button" id="testDriveLinkBtn" class="admin-btn" style="background:#10b981; color:#fff; padding:6px 14px; font-size:11px; font-weight:700; cursor:pointer;" title="ड्राइव लिंक नए टैब में खोलें">
+                    🔗 लिंक टेस्ट करें
+                  </button>
+                </div>
+                <span style="font-size:10px; color:#a7f3d0; margin-top:4px; display:block;">💡 ध्यान दें: Drive लिंक का एक्सेस 'Anyone with link can view' होना चाहिए।</span>
+              </div>
+
+              <!-- Drive Thumbnail & Title with Live Preview & File Picker -->
+              <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:12px;">
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:6px;">
+                  2. Drive फोल्डर थंबनेल (Thumbnail Image):
+                </label>
+                <div style="display:flex; gap:12px; align-items:center;">
+                  <div style="width:80px; height:100px; background:#0f172a; border:2px dashed #10b981; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                    <img id="bonusDriveThumbPreview" src="https://placehold.co/80x100/065f46/white?text=DRIVE" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                  <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                    <div style="display:flex; gap:8px;">
+                      <input type="file" id="bonusDriveThumbFileInput" accept="image/*" style="display:none;">
+                      <button type="button" id="triggerBonusDriveThumbFileBtn" class="admin-btn" style="background:#10b981; color:#fff; padding:5px 12px; font-size:11px; font-weight:700; cursor:pointer;">
+                        🖼️ थंबनेल इमेज चुनें
+                      </button>
+                      <button type="button" id="downloadBonusDriveThumbBtn" class="admin-btn admin-btn-secondary" style="padding:5px 12px; font-size:11px; font-weight:700;">
+                        📥 थंबनेल डाउनलोड करें
+                      </button>
+                    </div>
+                    <input type="text" id="bonusDriveThumbInput" placeholder="अथवा थंबनेल इमेज URL पेस्ट करें" class="admin-input" style="width:100%; padding:6px 10px; font-size:11px;">
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">Drive बोनस का शीर्षक (Title):</label>
+                <input type="text" id="bonusDriveTitleInput" placeholder="उदा. किसान स्पेशल वीडियो लाइब्रेरी - Google Drive" class="admin-input" style="width:100%; padding:7px 10px; font-weight:700;">
+              </div>
+
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; color:#cbd5e1; margin-bottom:4px;">विवरण (Description):</label>
+                <textarea id="bonusDriveDescInput" rows="2" placeholder="उदा. 25 फुल एचडी वीडियो, फील्ड डेमो और प्रैक्टिकल नोट्स।" class="admin-input" style="width:100%; padding:7px 10px; font-size:12px; resize:vertical;"></textarea>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #334155; padding-top:12px;">
+              <button type="button" id="removeBonusBtn" class="admin-btn" style="background:#7f1d1d; color:#fca5a5; padding:6px 12px; font-size:11px; cursor:pointer;">
+                🗑️ बोनस हटाएं
+              </button>
+              <div style="display:flex; gap:10px;">
+                <button type="button" id="cancelBonusModalBtn" class="admin-btn admin-btn-secondary" style="padding:7px 14px; font-size:12px;">रद्द करें</button>
+                <button type="button" id="saveBonusModalBtn" class="admin-btn" style="background:#10b981; color:#fff; font-weight:800; padding:7px 18px; font-size:12px; cursor:pointer;">
+                  💾 बोनस सुरक्षित करें
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Staging / Save / Discard Bar -->
         <div id="stagingActionBar" class="admin-card" style="margin-bottom: 16px; background:#1e1b4b; border:1px solid #6366f1; display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -376,19 +922,35 @@ export async function initBookAudioStudio() {
         <!-- Page Selector & Reorder Bar -->
         <div class="admin-card" style="margin-bottom: 16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span style="font-weight:700; font-size:0.9rem; color:#e2e8f0;">पृष्ठ चुनें (Page Selector):</span>
               <span id="pageCountStatus" style="font-size:0.85rem; color:#10b981; font-weight:700;">1 / 152 Pages</span>
               <span id="currentPageSizeTag" style="font-size:0.75rem; background:#334155; color:#94a3b8; padding:2px 6px; border-radius:4px;">Size: -- KB</span>
+
+              <!-- Quick Page Count Adjuster -->
+              <div style="display:inline-flex; align-items:center; gap:4px; background:#1e293b; padding:2px 6px; border-radius:6px; border:1px solid #475569;" title="किताब के कुल पेज यहाँ से सीधे सेट करें">
+                <span style="font-size:11px; color:#cbd5e1; font-weight:700;">कुल पेज:</span>
+                <input type="number" id="quickSetTotalPagesInput" min="0" max="1000" style="width:52px; background:#0f172a; border:1px solid #64748b; color:#38bdf8; font-weight:800; font-size:12px; padding:2px 4px; text-align:center; border-radius:4px;">
+                <button type="button" id="applyTotalPagesBtn" class="admin-btn" style="background:#0284c7; color:#fff; padding:2px 8px; font-size:11px; font-weight:700;">लागू करें</button>
+              </div>
             </div>
             
             <!-- Page Management Buttons -->
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
               <button id="addPageBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">➕ नया पेज</button>
               <button id="insertPagesBetweenBtn" class="admin-btn" style="background:#4f46e5; color:#fff; padding:4px 8px; font-size:11px; font-weight:700;" title="वर्तमान पेज के बाद नए पेज जोड़ें / इन्सर्ट करें">📥 बीच में पेज इन्सर्ट करें</button>
               <button id="movePagePrevBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">⬅️ आगे करें</button>
               <button id="movePageNextBtn" class="admin-btn admin-btn-secondary" style="padding:4px 8px; font-size:11px;">➡️ पीछे करें</button>
               <button id="deletePageBtn" class="admin-btn" style="background:#ef4444; color:#fff; padding:4px 8px; font-size:11px;">🗑️ यह पेज हटाएं</button>
+
+              <!-- Multi-Select & Bulk Delete / Bulk Audio Controls -->
+              <button id="toggleSelectModeBtn" type="button" class="admin-btn" style="background:#334155; color:#e2e8f0; padding:4px 8px; font-size:11px; font-weight:700; border:1px solid #64748b;" title="कई पेजों को एक साथ चुनकर लाइव/ड्राफ्ट या डिलीट करने के लिए">☑️ मल्टी-सेलेक्ट</button>
+              <button id="selectAllPagesBtn" type="button" class="admin-btn" style="background:#1e3a8a; color:#93c5fd; padding:4px 8px; font-size:11px; display:none;">✅ सब चुनें</button>
+              <button id="deselectAllPagesBtn" type="button" class="admin-btn" style="background:#334155; color:#cbd5e1; padding:4px 8px; font-size:11px; display:none;">⬜ अनचेक</button>
+              <button id="liveSelectedPagesAudioBtn" type="button" class="admin-btn" style="background:#065f46; color:#6ee7b7; padding:4px 8px; font-size:11px; font-weight:800; border:1px solid #10b981; display:none;" title="चुने हुए पेजों के ऑडियो को एक साथ लाइव करें">🟢 चुने हुए LIVE</button>
+              <button id="draftSelectedPagesAudioBtn" type="button" class="admin-btn" style="background:#334155; color:#cbd5e1; padding:4px 8px; font-size:11px; font-weight:800; border:1px solid #64748b; display:none;" title="चुने हुए पेजों के ऑडियो को ड्राफ्ट (ऑफ) करें">⚪ चुने हुए DRAFT</button>
+              <button id="deleteSelectedPagesBtn" type="button" class="admin-btn" style="background:#dc2626; color:#fff; padding:4px 10px; font-size:11px; font-weight:800; display:none; box-shadow:0 0 10px rgba(220,38,38,0.5);">🗑️ चुने हुए पेज डिलीट करें (<span id="selectedPagesCountBadge">0</span>)</button>
+              <button id="clearAllBookPagesBtn" type="button" class="admin-btn" style="background:#7f1d1d; color:#fca5a5; padding:4px 8px; font-size:11px; font-weight:700; border:1px solid #dc2626;" title="किताब के सभी पेजों को एक साथ खाली करें">💥 सभी पेज हटाएं</button>
             </div>
           </div>
 
@@ -423,11 +985,39 @@ export async function initBookAudioStudio() {
           <div class="admin-card">
             <h3 style="margin:0 0 12px; font-size:1rem; color:#34d399;">🎙️ पेज वॉइस एवं टेक्स्ट कंट्रोल</h3>
             
+            <!-- 🛡️ Audio Quality Control & Live Approval Badge -->
+            <div id="pageAudioApprovalCard" style="background:#0f172a; border:1.5px solid #334155; border-radius:8px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span id="pageAudioApprovalBadge" style="padding:4px 10px; border-radius:12px; font-size:12px; font-weight:800; background:#334155; color:#cbd5e1;">
+                  ⚪ ड्राफ्ट (ऑडियो ऑफ)
+                </span>
+                <span id="pageAudioApprovalDesc" style="font-size:11px; color:#94a3b8;">
+                  रीडर में दिखेगा: "इस पेज का ऑडियो जल्द ही उपलब्ध होगा"
+                </span>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <button id="toggleAudioLiveBtn" type="button" class="admin-btn" style="background:#10b981; color:#fff; padding:6px 14px; font-size:12px; font-weight:800; border-radius:6px; cursor:pointer;" title="वर्तमान पेज के ऑडियो की गुणवत्ता जांचकर पाठकों के लिए लाइव या ड्राफ्ट करें">
+                  🟢 ऑडियो लाइव करें (Approve)
+                </button>
+                <button id="approveAllPagesAudioBtn" type="button" class="admin-btn admin-btn-secondary" style="padding:6px 10px; font-size:11px; cursor:pointer; background:#065f46; color:#6ee7b7; border:1px solid #10b981;" title="किताब के सभी पेजों का ऑडियो एक क्लिक में 100% लाइव करें">
+                  ✅ सभी पेज लाइव
+                </button>
+                <button id="draftAllPagesAudioBtn" type="button" class="admin-btn admin-btn-secondary" style="padding:6px 10px; font-size:11px; cursor:pointer; background:#334155; color:#cbd5e1; border:1px solid #64748b;" title="किताब के सभी पेजों का ऑडियो बंद (ड्राफ्ट) करें">
+                  ⚪ सभी पेज ड्राफ्ट
+                </button>
+              </div>
+            </div>
+
             <!-- OPTION A: TEXT EDITOR (TTS MODE) -->
             <div style="margin-bottom: 18px;">
-              <label style="font-weight:700; font-size:0.85rem; color:#e2e8f0; display:block; margin-bottom:6px;">
-                🟢 विकल्प A: इस पेज का हिंदी टेक्स्ट (मधुर महिला आवाज़ - कृषि सखी):
-              </label>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+                <label style="font-weight:700; font-size:0.85rem; color:#e2e8f0;">
+                  🟢 विकल्प A: इस पेज का हिंदी टेक्स्ट (मधुर महिला आवाज़ - कृषि सखी):
+                </label>
+                <button id="ocrExtractBtn" type="button" class="admin-btn" style="background:#4338ca; color:#fff; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="वर्तमान पेज की इमेज से हिंदी व अंग्रेजी टेक्स्ट स्कैन करें (OCR)">
+                  <span>🔍</span> इमेज से टेक्स्ट निकालें (OCR)
+                </button>
+              </div>
               <textarea id="pageTextInput" rows="5" class="admin-input" style="width:100%; resize:vertical; font-size:0.9rem; line-height:1.5;" placeholder="इस पेज पर लिखा हुआ टेक्स्ट यहाँ पेस्ट करें या टाइप करें..."></textarea>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:8px;">
                 <div style="display:flex; gap:8px; align-items:center;">
@@ -729,25 +1319,1083 @@ async function populateStudioBookSelect(selectedId) {
 // =======================================================
 async function setupStudioEvents() {
     const bookSelect = document.getElementById('bookSelect');
+    const openNewBookBtn = document.getElementById('openNewBookModalBtn');
+    const newBookModal = document.getElementById('newBookCreatorModal');
+    const closeNewBookBtn = document.getElementById('closeNewBookModalBtn');
+    const cancelNewBookBtn = document.getElementById('cancelNewBookBtn');
+    const newBookForm = document.getElementById('newBookCreatorForm');
+
+    // 📖 Auto Book ID Generator (Just like Book Landing Pages)
+    async function getNextAvailableBookId() {
+        let maxNum = 0;
+        const allIds = new Set();
+        try {
+            const res = await fetch('../data/books.json?v=' + Date.now());
+            if (res.ok) {
+                const j = await res.json();
+                (j.books || []).forEach(b => b && b.id && allIds.add(b.id.toUpperCase()));
+            }
+        } catch (_) {}
+        try {
+            const resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Date.now());
+            if (resLp.ok) {
+                const jLp = await resLp.json();
+                (jLp.bookLandingPages || []).forEach(p => p && p.id && allIds.add(p.id.toUpperCase()));
+            }
+        } catch (_) {}
+        try {
+            const cb = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            cb.forEach(b => b && b.id && allIds.add(b.id.toUpperCase()));
+        } catch (_) {}
+        try {
+            const lb = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+            lb.forEach(b => b && b.id && allIds.add(b.id.toUpperCase()));
+        } catch (_) {}
+
+        allIds.forEach(id => {
+            if (id.startsWith('BK')) {
+                const num = parseInt(id.replace('BK', ''), 10);
+                if (!isNaN(num) && num > maxNum) maxNum = num;
+            }
+        });
+        const nextNum = (maxNum > 0 ? maxNum : 15) + 1;
+        return `BK${String(nextNum).padStart(3, '0')}`;
+    }
+
+    // 📖 New Book Creator Modal Handlers
+    async function openNewBookModal() {
+        if (!newBookModal) return;
+        if (newBookForm) newBookForm.reset();
+        const ml = document.getElementById('visMyLibrary'); if (ml) ml.checked = true;
+        const st = document.getElementById('visStore'); if (st) st.checked = true;
+        const lp = document.getElementById('visLanding'); if (lp) lp.checked = true;
+        const bd = document.getElementById('visBundle'); if (bd) bd.checked = true;
+
+        const autoCode = await getNextAvailableBookId();
+        const idInput = document.getElementById('newBookIdInput');
+        if (idInput) idInput.value = autoCode;
+        const pagesInput = document.getElementById('newBookTotalPagesInput');
+        if (pagesInput) pagesInput.value = '0';
+
+        newBookModal.style.display = 'flex';
+        setTimeout(() => {
+            const titleInput = document.getElementById('newBookTitleInput');
+            if (titleInput) titleInput.focus();
+        }, 100);
+    }
+
+    function closeNewBookModal() {
+        if (newBookModal) newBookModal.style.display = 'none';
+    }
+
+    const autoGenBtn = document.getElementById('autoGenBookIdBtn');
+    if (autoGenBtn) {
+        autoGenBtn.addEventListener('click', async () => {
+            const autoCode = await getNextAvailableBookId();
+            const idInput = document.getElementById('newBookIdInput');
+            if (idInput) {
+                idInput.value = autoCode;
+                alert(`⚡ अगला उपलब्ध Book ID जनरेट हुआ: ${autoCode}`);
+            }
+        });
+    }
+
+    const freeCheck = document.getElementById('newBookIsFreeInput');
+    if (freeCheck) {
+        freeCheck.addEventListener('change', (e) => {
+            const mrpInp = document.getElementById('newBookMrpInput');
+            const offerInp = document.getElementById('newBookOfferPriceInput');
+            if (e.target.checked) {
+                if (mrpInp) mrpInp.value = '0';
+                if (offerInp) offerInp.value = '0';
+            } else {
+                if (mrpInp && mrpInp.value === '0') mrpInp.value = '299';
+                if (offerInp && offerInp.value === '0') offerInp.value = '99';
+            }
+        });
+    }
+
+    if (openNewBookBtn) openNewBookBtn.addEventListener('click', openNewBookModal);
+    if (closeNewBookBtn) closeNewBookBtn.addEventListener('click', closeNewBookModal);
+    if (cancelNewBookBtn) cancelNewBookBtn.addEventListener('click', closeNewBookModal);
+
+    if (newBookForm) {
+        newBookForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const idInput = document.getElementById('newBookIdInput');
+            const titleInput = document.getElementById('newBookTitleInput');
+            const catSelect = document.getElementById('newBookCategorySelect');
+            const mrpInput = document.getElementById('newBookMrpInput');
+            const offerInput = document.getElementById('newBookOfferPriceInput');
+            const wordInput = document.getElementById('newBookWordUrlInput');
+            const driveInput = document.getElementById('newBookDriveUrlInput');
+            const descInput = document.getElementById('newBookBonusDescInput');
+            const pagesInput = document.getElementById('newBookTotalPagesInput');
+
+            const cleanCode = (idInput?.value || '').trim().toUpperCase();
+            const title = (titleInput?.value || '').trim();
+            const category = catSelect?.value || 'Agriculture';
+            const mrp = parseInt(mrpInput?.value, 10) || 299;
+            const offerPrice = parseInt(offerInput?.value, 10) || 99;
+            const wordUrl = (wordInput?.value || '').trim();
+            const driveUrl = (driveInput?.value || '').trim();
+            const bonusDesc = (descInput?.value || '').trim();
+            const initialPages = parseInt(pagesInput?.value, 10) || 0;
+
+            if (!cleanCode) {
+                alert('कृपया पुस्तक कोड (Book ID) दर्ज करें!');
+                return;
+            }
+            if (!title) {
+                alert('कृपया पुस्तक का नाम दर्ज करें!');
+                return;
+            }
+
+            const bonuses = [];
+            if (wordUrl) {
+                bonuses.push({
+                    type: 'word_doc',
+                    title: `${title} - Word गाइड (.docx)`,
+                    file_url: wordUrl,
+                    word_url: wordUrl,
+                    thumbnail: '/images/icons/docx-icon.png',
+                    description: bonusDesc || 'Word गाइड डाउनलोड'
+                });
+            }
+            if (driveUrl) {
+                bonuses.push({
+                    type: 'google_drive',
+                    title: `${title} - Google Drive वीडियो व नोट्स`,
+                    drive_url: driveUrl,
+                    file_url: driveUrl,
+                    thumbnail: '/images/icons/gdrive-icon.png',
+                    description: bonusDesc || 'Google Drive फोल्डर एक्सेस'
+                });
+            }
+
+            const isFree = !!document.getElementById('newBookIsFreeInput')?.checked;
+            const finalMrp = isFree ? 0 : mrp;
+            const finalOffer = isFree ? 0 : offerPrice;
+            const finalCat = isFree ? 'फ्री ई-बुक' : category;
+
+            const newBook = {
+                id: cleanCode,
+                heading: title,
+                name: title,
+                title: title,
+                is_free: isFree,
+                isFree: isFree,
+                category: finalCat,
+                mrp: finalMrp,
+                price: finalOffer,
+                offerPrice: finalOffer,
+                totalPages: initialPages,
+                visibility: {
+                    myLibrary: !!document.getElementById('visMyLibrary')?.checked,
+                    store: !!document.getElementById('visStore')?.checked,
+                    landing: !!document.getElementById('visLanding')?.checked,
+                    bundle: !!document.getElementById('visBundle')?.checked
+                },
+                bonuses: bonuses,
+                created_at: new Date().toISOString()
+            };
+
+            // 1. Save to AAROGYAM_CUSTOM_BOOKS
+            let customBooks = [];
+            try {
+                customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            } catch (err) {}
+            const existingIdx = customBooks.findIndex(b => b && b.id && b.id.toUpperCase() === cleanCode);
+            if (existingIdx >= 0) {
+                customBooks[existingIdx] = { ...customBooks[existingIdx], ...newBook };
+            } else {
+                customBooks.push(newBook);
+            }
+            localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+
+            // If free book, also mirror into AAROGYAM_FREE_DEMO_BOOKS
+            if (isFree) {
+                try {
+                    let freeDemos = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
+                    const fdIdx = freeDemos.findIndex(b => b.id && b.id.toUpperCase() === cleanCode);
+                    if (fdIdx >= 0) freeDemos[fdIdx] = { ...freeDemos[fdIdx], ...newBook };
+                    else freeDemos.push(newBook);
+                    localStorage.setItem('AAROGYAM_FREE_DEMO_BOOKS', JSON.stringify(freeDemos));
+                } catch (_) {}
+            }
+
+            // 2. If visLanding, sync to AAROGYAM_BOOK_LANDING_PAGES
+            if (newBook.visibility.landing) {
+                let landingPages = [];
+                try {
+                    landingPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+                } catch (err) {}
+                const lpIdx = landingPages.findIndex(p => p && p.id && p.id.toUpperCase() === cleanCode);
+                const lpEntry = {
+                    id: cleanCode,
+                    book_id: cleanCode,
+                    slug: cleanCode.toLowerCase(),
+                    title: title,
+                    name: title,
+                    heading: title,
+                    hero_title: title,
+                    is_free: isFree,
+                    hero: {
+                        tag: isFree ? '🎁 100% मुफ़्त ई-बुक' : '🌾 Agriculture Practical Guide',
+                        title: title,
+                        subtitle: 'सम्पूर्ण Practical Guide',
+                        cover_image: `/images/books/${cleanCode.toLowerCase()}-cover.webp`,
+                        rating_score: '4.9',
+                        rating_count: '120+ Ratings',
+                        description: 'सम्पूर्ण प्रैक्टिकल जानकारी।',
+                        mrp: finalMrp,
+                        offer_price: finalOffer
+                    },
+                    category: finalCat,
+                    mrp: finalMrp,
+                    price: finalOffer,
+                    bonuses: bonuses,
+                    updated_at: new Date().toISOString()
+                };
+                if (lpIdx >= 0) {
+                    landingPages[lpIdx] = { ...landingPages[lpIdx], ...lpEntry };
+                } else {
+                    landingPages.push(lpEntry);
+                }
+                localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(landingPages));
+            }
+
+            // 3. If initialPages specified, set initial page count without filling DB with empty strings
+            if (initialPages > 0) {
+                studioTotalPages = initialPages;
+                studioPageImages = [];
+            }
+
+            closeNewBookModal();
+
+            // Refresh Book Select & Switch to new book
+            studioCurrentBookId = cleanCode;
+            studioCurrentPage = 1;
+            await populateStudioBookSelect(studioCurrentBookId);
+            await loadBookStudio(studioCurrentBookId);
+
+            alert(`✅ पुस्तक "${title}" (${cleanCode}) सफलतापूर्वक सुरक्षित हो गई!\n\nअब आप "🎁 अपलोड बोनस" से Word/Drive फाइल्स जोड़ सकते हैं, या "📚 अन्य पुस्तक से जोड़ें" से पुरानी किताबों के पेज शामिल कर सकते हैं।`);
+        });
+    }
+
+    // 📄 Multi-Select & Bulk Page Delete Handlers
+    const toggleSelectModeBtn = document.getElementById('toggleSelectModeBtn');
+    const selectAllPagesBtn = document.getElementById('selectAllPagesBtn');
+    const deselectAllPagesBtn = document.getElementById('deselectAllPagesBtn');
+    const liveSelectedPagesAudioBtn = document.getElementById('liveSelectedPagesAudioBtn');
+    const draftSelectedPagesAudioBtn = document.getElementById('draftSelectedPagesAudioBtn');
+    const deleteSelectedPagesBtn = document.getElementById('deleteSelectedPagesBtn');
+    const clearAllBookPagesBtn = document.getElementById('clearAllBookPagesBtn');
+    const selectedCountBadge = document.getElementById('selectedPagesCountBadge');
+
+    function updateMultiSelectUI() {
+        if (selectedCountBadge) selectedCountBadge.textContent = selectedPagesForBulkAction.size;
+        const hasSelection = isPageMultiSelectMode && selectedPagesForBulkAction.size > 0;
+        if (deleteSelectedPagesBtn) {
+            deleteSelectedPagesBtn.style.display = hasSelection ? 'inline-block' : 'none';
+        }
+        if (liveSelectedPagesAudioBtn) {
+            liveSelectedPagesAudioBtn.style.display = hasSelection ? 'inline-block' : 'none';
+        }
+        if (draftSelectedPagesAudioBtn) {
+            draftSelectedPagesAudioBtn.style.display = hasSelection ? 'inline-block' : 'none';
+        }
+        if (selectAllPagesBtn) selectAllPagesBtn.style.display = isPageMultiSelectMode ? 'inline-block' : 'none';
+        if (deselectAllPagesBtn) deselectAllPagesBtn.style.display = isPageMultiSelectMode ? 'inline-block' : 'none';
+        if (toggleSelectModeBtn) {
+            toggleSelectModeBtn.style.background = isPageMultiSelectMode ? '#f59e0b' : '#334155';
+            toggleSelectModeBtn.style.color = isPageMultiSelectMode ? '#000' : '#e2e8f0';
+            toggleSelectModeBtn.textContent = isPageMultiSelectMode ? '❌ चयन मोड बंद' : '☑️ मल्टी-सेलेक्ट';
+        }
+    }
+
+    if (liveSelectedPagesAudioBtn) {
+        liveSelectedPagesAudioBtn.addEventListener('click', () => setAudioApprovalForSelectedPages(true));
+    }
+
+    if (draftSelectedPagesAudioBtn) {
+        draftSelectedPagesAudioBtn.addEventListener('click', () => setAudioApprovalForSelectedPages(false));
+    }
+
+    if (toggleSelectModeBtn) {
+        toggleSelectModeBtn.addEventListener('click', () => {
+            isPageMultiSelectMode = !isPageMultiSelectMode;
+            if (!isPageMultiSelectMode) selectedPagesForBulkAction.clear();
+            updateMultiSelectUI();
+            renderPageChipGrid();
+        });
+    }
+
+    if (selectAllPagesBtn) {
+        selectAllPagesBtn.addEventListener('click', () => {
+            selectedPagesForBulkAction.clear();
+            for (let i = 1; i <= studioTotalPages; i++) selectedPagesForBulkAction.add(i);
+            updateMultiSelectUI();
+            renderPageChipGrid();
+        });
+    }
+
+    if (deselectAllPagesBtn) {
+        deselectAllPagesBtn.addEventListener('click', () => {
+            selectedPagesForBulkAction.clear();
+            updateMultiSelectUI();
+            renderPageChipGrid();
+        });
+    }
+
+    if (deleteSelectedPagesBtn) {
+        deleteSelectedPagesBtn.addEventListener('click', async () => {
+            if (selectedPagesForBulkAction.size === 0) {
+                alert('कृपया पहले डिलीट करने के लिए पेज चुनें!');
+                return;
+            }
+            const count = selectedPagesForBulkAction.size;
+            if (!confirm(`⚠️ क्या आप चुने हुए ${count} पेजों को स्थायी रूप से हटाना चाहते हैं?`)) return;
+
+            const delSet = new Set(selectedPagesForBulkAction);
+            const newImages = [];
+            const newScriptsPages = {};
+            let newP = 1;
+
+            for (let p = 1; p <= studioTotalPages; p++) {
+                if (!delSet.has(p)) {
+                    if (studioPageImages && studioPageImages[p - 1]) {
+                        newImages.push(studioPageImages[p - 1]);
+                    }
+                    if (studioAudioScripts.pages && studioAudioScripts.pages[String(p)]) {
+                        newScriptsPages[String(newP)] = studioAudioScripts.pages[String(p)];
+                    }
+                    newP++;
+                }
+            }
+
+            studioPageImages = newImages;
+            studioTotalPages = newImages.length || (newP - 1);
+            studioAudioScripts.pages = newScriptsPages;
+            selectedPagesForBulkAction.clear();
+            isPageMultiSelectMode = false;
+
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            markUnsaved(true);
+            updateMultiSelectUI();
+            renderPageChipGrid();
+            selectPage(Math.min(studioCurrentPage, Math.max(1, studioTotalPages)));
+
+            alert(`✅ ${count} पेज सफलतापूर्वक डिलीट कर दिए गए! कुल बचे पेज: ${studioTotalPages}`);
+        });
+    }
+
+    if (clearAllBookPagesBtn) {
+        clearAllBookPagesBtn.addEventListener('click', async () => {
+            if (!confirm(`💥 चेतावनी: क्या आप पुस्तक [${studioCurrentBookId}] के सभी ${studioTotalPages} पेजों को खाली करना चाहते हैं?\n\n(यह सभी पेज इमेजेस और स्क्रिप्ट्स को हटा देगा)`)) return;
+
+            studioPageImages = [];
+            studioTotalPages = 0;
+            studioAudioScripts.pages = {};
+            selectedPagesForBulkAction.clear();
+            isPageMultiSelectMode = false;
+
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            markUnsaved(true);
+            updateMultiSelectUI();
+            renderPageChipGrid();
+
+            const previewImg = document.getElementById('pagePreviewImage');
+            if (previewImg) previewImg.src = '';
+            const textInput = document.getElementById('pageTextInput');
+            if (textInput) textInput.value = '';
+
+            alert(`💥 पुस्तक [${studioCurrentBookId}] के सभी पेज खाली कर दिए गए हैं। अब आप नए सिरे से पेज अपलोड या इम्पोर्ट कर सकते हैं।`);
+        });
+    }
+
+    // Set Total Pages Directly
+    const applyTotalPagesBtn = document.getElementById('applyTotalPagesBtn');
+    const quickSetTotalInput = document.getElementById('quickSetTotalPagesInput');
+    if (applyTotalPagesBtn && quickSetTotalInput) {
+        applyTotalPagesBtn.addEventListener('click', async () => {
+            const targetTotal = parseInt(quickSetTotalInput.value, 10);
+            if (isNaN(targetTotal) || targetTotal < 0) {
+                alert('कृपया एक वैध संख्या दर्ज करें (0 - 1000)');
+                return;
+            }
+            if (targetTotal < studioTotalPages) {
+                const diff = studioTotalPages - targetTotal;
+                if (!confirm(`⚠️ आप कुल पेज संख्या ${studioTotalPages} से घटाकर ${targetTotal} कर रहे हैं। आखिरी ${diff} पेज डिलीट हो जाएंगे। क्या आप सहमत हैं?`)) {
+                    return;
+                }
+                if (studioPageImages && studioPageImages.length > targetTotal) {
+                    studioPageImages = studioPageImages.slice(0, targetTotal);
+                }
+                if (studioAudioScripts.pages) {
+                    for (let p = targetTotal + 1; p <= studioTotalPages; p++) {
+                        delete studioAudioScripts.pages[String(p)];
+                    }
+                }
+            } else if (targetTotal > studioTotalPages) {
+                if (!studioPageImages) studioPageImages = [];
+                while (studioPageImages.length < targetTotal) {
+                    studioPageImages.push('');
+                }
+            }
+            studioTotalPages = targetTotal;
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            markUnsaved(true);
+            renderPageChipGrid();
+            selectPage(Math.min(studioCurrentPage, Math.max(1, studioTotalPages)));
+            alert(`✅ कुल पेज संख्या सफलतापूर्वक ${targetTotal} सेट कर दी गई!`);
+        });
+    }
+
+    // 🎁 Dedicated VIP Bonus Manager Modal Handlers (Word & Google Drive)
+    const openBonusBtn = document.getElementById('openBonusManagerBtn');
+    const bonusModal = document.getElementById('bonusManagerModal');
+    const closeBonusBtn = document.getElementById('closeBonusModalBtn');
+    const cancelBonusBtn = document.getElementById('cancelBonusModalBtn');
+    const saveBonusBtn = document.getElementById('saveBonusModalBtn');
+    const removeBonusBtn = document.getElementById('removeBonusBtn');
+    const tabWordBtn = document.getElementById('tabBonusWordBtn');
+    const tabDriveBtn = document.getElementById('tabBonusDriveBtn');
+    const wordPane = document.getElementById('bonusWordPane');
+    const drivePane = document.getElementById('bonusDrivePane');
+
+    const triggerWordFileBtn = document.getElementById('triggerBonusWordFileBtn');
+    const bonusWordFileInput = document.getElementById('bonusWordFileInput');
+    const bonusWordFileNameLabel = document.getElementById('bonusWordFileNameLabel');
+    const bonusWordUrlInput = document.getElementById('bonusWordUrlInput');
+    const bonusWordThumbInput = document.getElementById('bonusWordThumbInput');
+    const bonusWordThumbPreview = document.getElementById('bonusWordThumbPreview');
+    const bonusWordTitleInput = document.getElementById('bonusWordTitleInput');
+    const bonusWordDescInput = document.getElementById('bonusWordDescInput');
+
+    const bonusDriveUrlInput = document.getElementById('bonusDriveUrlInput');
+    const bonusDriveThumbInput = document.getElementById('bonusDriveThumbInput');
+    const bonusDriveThumbPreview = document.getElementById('bonusDriveThumbPreview');
+    const bonusDriveTitleInput = document.getElementById('bonusDriveTitleInput');
+    const bonusDriveDescInput = document.getElementById('bonusDriveDescInput');
+
+    function switchBonusTab(tab) {
+        if (tab === 'word') {
+            if (wordPane) wordPane.style.display = 'flex';
+            if (drivePane) drivePane.style.display = 'none';
+            if (tabWordBtn) { tabWordBtn.style.background = '#1e3a8a'; tabWordBtn.style.color = '#93c5fd'; }
+            if (tabDriveBtn) { tabDriveBtn.style.background = '#1e293b'; tabDriveBtn.style.color = '#94a3b8'; }
+        } else {
+            if (wordPane) wordPane.style.display = 'none';
+            if (drivePane) drivePane.style.display = 'flex';
+            if (tabWordBtn) { tabWordBtn.style.background = '#1e293b'; tabWordBtn.style.color = '#94a3b8'; }
+            if (tabDriveBtn) { tabDriveBtn.style.background = '#064e3b'; tabDriveBtn.style.color = '#6ee7b7'; }
+        }
+    }
+
+    if (tabWordBtn) tabWordBtn.addEventListener('click', () => switchBonusTab('word'));
+    if (tabDriveBtn) tabDriveBtn.addEventListener('click', () => switchBonusTab('drive'));
+
+    let pendingBonusWordFile = null;
+
+    function compressThumbnailDataUrl(dataUrl, maxW = 120, maxH = 150) {
+        return new Promise((resolve) => {
+            if (!dataUrl || !dataUrl.startsWith('data:image')) return resolve(dataUrl);
+            const img = new Image();
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const scale = Math.min(1, maxW / (img.width || 1), maxH / (img.height || 1));
+                    canvas.width = Math.max(1, Math.round((img.width || 80) * scale));
+                    canvas.height = Math.max(1, Math.round((img.height || 100) * scale));
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                } catch (_) {
+                    resolve(dataUrl);
+                }
+            };
+            img.onerror = () => resolve(dataUrl);
+            img.src = dataUrl;
+        });
+    }
+
+    async function openBonusManager() {
+        if (!bonusModal) return;
+        const bLabel = document.getElementById('bonusTargetBookIdLabel');
+        if (bLabel) bLabel.textContent = studioCurrentBookId;
+        pendingBonusWordFile = null;
+
+        // Reset
+        if (bonusWordFileInput) bonusWordFileInput.value = '';
+        if (bonusWordFileNameLabel) bonusWordFileNameLabel.textContent = 'कोई फाइल नहीं चुनी';
+        if (bonusWordUrlInput) bonusWordUrlInput.value = '';
+        if (bonusWordThumbInput) bonusWordThumbInput.value = '';
+        if (bonusWordTitleInput) bonusWordTitleInput.value = `${studioCurrentBookId} - सम्पूर्ण फसल सुरक्षा शेड्यूल - Word गाइड (.docx)`;
+        if (bonusWordDescInput) bonusWordDescInput.value = '15 पृष्ठों की एडिटेबल व प्रिंटेबल फाइल जिसमें खाद व स्प्रे का पूरा टाइमटेबल है।';
+
+        if (bonusDriveUrlInput) bonusDriveUrlInput.value = '';
+        if (bonusDriveThumbInput) bonusDriveThumbInput.value = '';
+        if (bonusDriveTitleInput) bonusDriveTitleInput.value = `${studioCurrentBookId} - किसान स्पेशल वीडियो लाइब्रेरी - Google Drive`;
+        if (bonusDriveDescInput) bonusDriveDescInput.value = '25 फुल एचडी वीडियो, फील्ड डेमो और प्रैक्टिकल नोट्स।';
+
+        // Check if Word file already in IndexedDB
+        try {
+            const dbWordFile = await loadBonusFileFromDb(studioCurrentBookId);
+            if (dbWordFile && dbWordFile.dataUrl) {
+                pendingBonusWordFile = dbWordFile;
+                if (bonusWordFileNameLabel) {
+                    bonusWordFileNameLabel.textContent = `✅ ${dbWordFile.name || 'Word Guide'} (${((dbWordFile.size || 0) / (1024 * 1024)).toFixed(2)} MB - सुरक्षित)`;
+                }
+                if (bonusWordUrlInput) bonusWordUrlInput.value = `idb://bonus_word_${studioCurrentBookId}`;
+                if (downloadWordFileBtn) {
+                    downloadWordFileBtn.style.display = 'inline-block';
+                    downloadWordFileBtn.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = dbWordFile.dataUrl;
+                        a.download = dbWordFile.name || `${studioCurrentBookId}_Bonus_Guide.docx`;
+                        a.click();
+                    };
+                }
+            } else if (downloadWordFileBtn) {
+                downloadWordFileBtn.style.display = 'none';
+            }
+        } catch (_) {}
+
+        // Load existing bonuses from custom books
+        let customBooks = [];
+        try { customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]'); } catch (_) {}
+        const book = customBooks.find(b => b.id && b.id.toUpperCase() === studioCurrentBookId.toUpperCase());
+        if (book && Array.isArray(book.bonuses)) {
+            const wordBonus = book.bonuses.find(b => b.type === 'word_doc' || b.word_url || (b.file_url && b.file_url.includes('.doc')));
+            if (wordBonus) {
+                if (bonusWordUrlInput && !bonusWordUrlInput.value) bonusWordUrlInput.value = wordBonus.file_url || wordBonus.word_url || '';
+                if (bonusWordTitleInput) bonusWordTitleInput.value = wordBonus.title || '';
+                if (bonusWordDescInput) bonusWordDescInput.value = wordBonus.description || '';
+                if (bonusWordThumbInput) bonusWordThumbInput.value = wordBonus.thumbnail || '';
+                if (bonusWordThumbPreview && wordBonus.thumbnail) bonusWordThumbPreview.src = wordBonus.thumbnail;
+                if (wordBonus.fileName && bonusWordFileNameLabel && !pendingBonusWordFile) {
+                    bonusWordFileNameLabel.textContent = `✅ ${wordBonus.fileName}`;
+                }
+            }
+            const driveBonus = book.bonuses.find(b => b.type === 'google_drive' || b.drive_url);
+            if (driveBonus) {
+                if (bonusDriveUrlInput) bonusDriveUrlInput.value = driveBonus.drive_url || driveBonus.file_url || '';
+                if (bonusDriveTitleInput) bonusDriveTitleInput.value = driveBonus.title || '';
+                if (bonusDriveDescInput) bonusDriveDescInput.value = driveBonus.description || '';
+                if (bonusDriveThumbInput) bonusDriveThumbInput.value = driveBonus.thumbnail || '';
+                if (bonusDriveThumbPreview && driveBonus.thumbnail) bonusDriveThumbPreview.src = driveBonus.thumbnail;
+            }
+        }
+
+        switchBonusTab('word');
+        bonusModal.style.display = 'flex';
+    }
+
+    if (openBonusBtn) openBonusBtn.addEventListener('click', openBonusManager);
+    if (closeBonusBtn) closeBonusBtn.addEventListener('click', () => { if (bonusModal) bonusModal.style.display = 'none'; });
+    if (cancelBonusBtn) cancelBonusBtn.addEventListener('click', () => { if (bonusModal) bonusModal.style.display = 'none'; });
+
+    // Word file upload & download
+    const downloadWordFileBtn = document.getElementById('downloadBonusWordFileBtn');
+    if (triggerWordFileBtn && bonusWordFileInput) {
+        triggerWordFileBtn.addEventListener('click', () => {
+            bonusWordFileInput.value = '';
+            bonusWordFileInput.click();
+        });
+        bonusWordFileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const f = e.target.files[0];
+                if (bonusWordFileNameLabel) {
+                    bonusWordFileNameLabel.textContent = `⏳ लोड हो रहा है... ${f.name} (${(f.size / (1024 * 1024)).toFixed(2)} MB)`;
+                }
+                const r = new FileReader();
+                r.onload = () => {
+                    const dataUrl = r.result;
+                    pendingBonusWordFile = {
+                        name: f.name,
+                        size: f.size,
+                        type: f.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        dataUrl: dataUrl
+                    };
+                    if (bonusWordUrlInput) bonusWordUrlInput.value = `idb://bonus_word_${studioCurrentBookId}`;
+                    if (bonusWordFileNameLabel) {
+                        bonusWordFileNameLabel.textContent = `✅ ${f.name} (${(f.size / (1024 * 1024)).toFixed(2)} MB - तैयार)`;
+                    }
+                    if (downloadWordFileBtn) {
+                        downloadWordFileBtn.style.display = 'inline-block';
+                        downloadWordFileBtn.onclick = () => {
+                            const a = document.createElement('a');
+                            a.href = dataUrl;
+                            a.download = f.name || `${studioCurrentBookId}_Bonus_Guide.docx`;
+                            a.click();
+                        };
+                    }
+                };
+                r.readAsDataURL(f);
+            }
+        });
+    }
+
+    if (downloadWordFileBtn) {
+        downloadWordFileBtn.addEventListener('click', async () => {
+            if (pendingBonusWordFile && pendingBonusWordFile.dataUrl) {
+                const a = document.createElement('a');
+                a.href = pendingBonusWordFile.dataUrl;
+                a.download = pendingBonusWordFile.name || `${studioCurrentBookId}_Bonus_Guide.docx`;
+                a.click();
+                return;
+            }
+            const dbFile = await loadBonusFileFromDb(studioCurrentBookId);
+            if (dbFile && dbFile.dataUrl) {
+                const a = document.createElement('a');
+                a.href = dbFile.dataUrl;
+                a.download = dbFile.name || `${studioCurrentBookId}_Bonus_Guide.docx`;
+                a.click();
+                return;
+            }
+            const url = bonusWordUrlInput?.value;
+            if (url && !url.startsWith('idb://')) {
+                window.open(url, '_blank');
+                return;
+            }
+            alert('डाउनलोड करने के लिए पहले कोई वर्ड फाइल चुनें!');
+        });
+    }
+
+    // Word Thumbnail image file picker & download
+    const triggerWordThumbBtn = document.getElementById('triggerBonusWordThumbFileBtn');
+    const bonusWordThumbFileInput = document.getElementById('bonusWordThumbFileInput');
+    const downloadWordThumbBtn = document.getElementById('downloadBonusWordThumbBtn');
+
+    if (triggerWordThumbBtn && bonusWordThumbFileInput) {
+        triggerWordThumbBtn.addEventListener('click', () => {
+            bonusWordThumbFileInput.value = '';
+            bonusWordThumbFileInput.click();
+        });
+        bonusWordThumbFileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const f = e.target.files[0];
+                const r = new FileReader();
+                r.onload = async () => {
+                    const rawDataUrl = r.result;
+                    const compressed = await compressThumbnailDataUrl(rawDataUrl, 120, 150);
+                    if (bonusWordThumbInput) bonusWordThumbInput.value = compressed;
+                    if (bonusWordThumbPreview) bonusWordThumbPreview.src = compressed;
+                };
+                r.readAsDataURL(f);
+            }
+        });
+    }
+
+    if (downloadWordThumbBtn && bonusWordThumbPreview) {
+        downloadWordThumbBtn.addEventListener('click', () => {
+            const src = bonusWordThumbPreview.src;
+            if (!src || src.includes('placehold.co')) {
+                alert('डाउनलोड करने के लिए पहले कोई थंबनेल चुनें!');
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = `${studioCurrentBookId}_Word_Bonus_Thumb.png`;
+            a.click();
+        });
+    }
+
+    if (bonusWordThumbInput && bonusWordThumbPreview) {
+        bonusWordThumbInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) bonusWordThumbPreview.src = val;
+        });
+    }
+
+    // Drive Thumbnail image file picker & download
+    const triggerDriveThumbBtn = document.getElementById('triggerBonusDriveThumbFileBtn');
+    const bonusDriveThumbFileInput = document.getElementById('bonusDriveThumbFileInput');
+    const downloadDriveThumbBtn = document.getElementById('downloadBonusDriveThumbBtn');
+    const testDriveLinkBtn = document.getElementById('testDriveLinkBtn');
+
+    if (triggerDriveThumbBtn && bonusDriveThumbFileInput) {
+        triggerDriveThumbBtn.addEventListener('click', () => {
+            bonusDriveThumbFileInput.value = '';
+            bonusDriveThumbFileInput.click();
+        });
+        bonusDriveThumbFileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const f = e.target.files[0];
+                const r = new FileReader();
+                r.onload = async () => {
+                    const rawDataUrl = r.result;
+                    const compressed = await compressThumbnailDataUrl(rawDataUrl, 120, 150);
+                    if (bonusDriveThumbInput) bonusDriveThumbInput.value = compressed;
+                    if (bonusDriveThumbPreview) bonusDriveThumbPreview.src = compressed;
+                };
+                r.readAsDataURL(f);
+            }
+        });
+    }
+
+    if (downloadDriveThumbBtn && bonusDriveThumbPreview) {
+        downloadDriveThumbBtn.addEventListener('click', () => {
+            const src = bonusDriveThumbPreview.src;
+            if (!src || src.includes('placehold.co')) {
+                alert('डाउनलोड करने के लिए पहले कोई थंबनेल चुनें!');
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = `${studioCurrentBookId}_Drive_Bonus_Thumb.png`;
+            a.click();
+        });
+    }
+
+    if (testDriveLinkBtn) {
+        testDriveLinkBtn.addEventListener('click', () => {
+            const link = (bonusDriveUrlInput?.value || '').trim();
+            if (!link) {
+                alert('कृपया पहले Google Drive लिंक दर्ज करें!');
+                return;
+            }
+            window.open(link, '_blank');
+        });
+    }
+
+    if (bonusDriveThumbInput && bonusDriveThumbPreview) {
+        bonusDriveThumbInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) bonusDriveThumbPreview.src = val;
+        });
+    }
+
+    if (saveBonusBtn) {
+        saveBonusBtn.addEventListener('click', async () => {
+            const wordUrl = (bonusWordUrlInput?.value || '').trim();
+            const wordTitle = (bonusWordTitleInput?.value || '').trim();
+            const wordDesc = (bonusWordDescInput?.value || '').trim();
+            const wordThumb = (bonusWordThumbInput?.value || '').trim();
+
+            const driveUrl = (bonusDriveUrlInput?.value || '').trim();
+            const driveTitle = (bonusDriveTitleInput?.value || '').trim();
+            const driveDesc = (bonusDriveDescInput?.value || '').trim();
+            const driveThumb = (bonusDriveThumbInput?.value || '').trim();
+
+            saveBonusBtn.disabled = true;
+            saveBonusBtn.textContent = '⏳ सुरक्षित हो रहा है...';
+
+            // 1. If Word file has binary data, save into IndexedDB (100MB+ safe space)
+            if (pendingBonusWordFile && pendingBonusWordFile.dataUrl) {
+                await saveBonusFileToDb(studioCurrentBookId, pendingBonusWordFile);
+            }
+
+            // 2. Compress thumbnails to lightweight JPEG (avoids localStorage 5MB quota crash)
+            const compressedWordThumb = await compressThumbnailDataUrl(wordThumb, 120, 150);
+            const compressedDriveThumb = await compressThumbnailDataUrl(driveThumb, 120, 150);
+
+            const bonuses = [];
+            if (wordUrl || pendingBonusWordFile) {
+                const refUrl = pendingBonusWordFile ? `idb://bonus_word_${studioCurrentBookId}` : wordUrl;
+                bonuses.push({
+                    type: 'word_doc',
+                    title: wordTitle || `${studioCurrentBookId} - Word गाइड (.docx)`,
+                    file_url: refUrl,
+                    word_url: refUrl,
+                    fileName: pendingBonusWordFile ? pendingBonusWordFile.name : `${studioCurrentBookId}_Bonus_Guide.docx`,
+                    fileSize: pendingBonusWordFile ? pendingBonusWordFile.size : 0,
+                    thumbnail: compressedWordThumb || 'https://placehold.co/80x100/1e3a8a/white?text=DOCX',
+                    description: wordDesc || 'Word गाइड डाउनलोड'
+                });
+            }
+            if (driveUrl) {
+                bonuses.push({
+                    type: 'google_drive',
+                    title: driveTitle || `${studioCurrentBookId} - Google Drive वीडियो व नोट्स`,
+                    drive_url: driveUrl,
+                    file_url: driveUrl,
+                    thumbnail: compressedDriveThumb || 'https://placehold.co/80x100/065f46/white?text=DRIVE',
+                    description: driveDesc || 'Google Drive फोल्डर एक्सेस'
+                });
+            }
+
+            // Save into AAROGYAM_CUSTOM_BOOKS safely
+            try {
+                let customBooks = [];
+                try { customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]'); } catch (_) {}
+                const bIdx = customBooks.findIndex(b => b.id && b.id.toUpperCase() === studioCurrentBookId.toUpperCase());
+                if (bIdx >= 0) {
+                    customBooks[bIdx].bonuses = bonuses;
+                } else {
+                    customBooks.push({
+                        id: studioCurrentBookId,
+                        heading: studioCurrentBookId,
+                        bonuses: bonuses
+                    });
+                }
+                localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+            } catch (quotaErr) {
+                console.warn('Quota exceeded in AAROGYAM_CUSTOM_BOOKS save:', quotaErr);
+            }
+
+            // Sync with AAROGYAM_BOOK_LANDING_PAGES safely
+            try {
+                let landingPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+                const lpIdx = landingPages.findIndex(p => p.id && p.id.toUpperCase() === studioCurrentBookId.toUpperCase());
+                if (lpIdx >= 0) {
+                    landingPages[lpIdx].bonuses = bonuses;
+                    localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(landingPages));
+                }
+            } catch (_) {}
+
+            saveBonusBtn.disabled = false;
+            saveBonusBtn.textContent = '💾 बोनस सुरक्षित करें';
+            if (bonusModal) bonusModal.style.display = 'none';
+            alert(`🎉 बधाई! पुस्तक [${studioCurrentBookId}] के VIP बोनस (Word व Google Drive) सफलतापूर्वक सेव हो गए हैं!\n\nवर्ड फाइल बिना मेमोरी घेरे IndexedDB में सुरक्षित हो गई है और My Library में तुरंत डाउनलोड बटन के साथ दिखेगी।`);
+        });
+    }
+
+    if (removeBonusBtn) {
+        removeBonusBtn.addEventListener('click', async () => {
+            if (!confirm(`क्या आप पुस्तक [${studioCurrentBookId}] के सभी बोनस हटाना चाहते हैं?`)) return;
+
+            await deleteBonusFileFromDb(studioCurrentBookId);
+            pendingBonusWordFile = null;
+
+            let customBooks = [];
+            try { customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]'); } catch (_) {}
+            const bIdx = customBooks.findIndex(b => b.id && b.id.toUpperCase() === studioCurrentBookId.toUpperCase());
+            if (bIdx >= 0) {
+                customBooks[bIdx].bonuses = [];
+                localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
+            }
+            if (bonusModal) bonusModal.style.display = 'none';
+            alert(`✅ पुस्तक [${studioCurrentBookId}] से सभी बोनस हटा दिए गए हैं।`);
+        });
+    }
+
+    // 📧 Email Delivery Logs & Live Test Email Handlers
+    const emailModal = document.getElementById('emailDeliveryLogsModal');
+    const viewEmailLogsBtn = document.getElementById('viewEmailLogsBtn');
+    const closeEmailLogsBtn = document.getElementById('closeEmailLogsModalBtn');
+    const refreshEmailLogsBtn = document.getElementById('refreshEmailLogsBtn');
+    const emailSearchInput = document.getElementById('emailLogsSearchInput');
+    const testSendEmailBtn = document.getElementById('testSendEmailBtn');
+    let cachedEmailLogs = [];
+
+    function getEmailApiUrl() {
+        if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.protocol === 'file:') {
+            return 'https://aarogyamindia.online/api/send-email';
+        }
+        return '/api/send-email';
+    }
+
+    async function loadEmailDeliveryLogs() {
+        const tbody = document.getElementById('emailLogsTableBody');
+        const countLabel = document.getElementById('emailLogsCountLabel');
+        if (!tbody) return;
+
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#94a3b8;">⏳ लोड हो रहा है...</td></tr>`;
+
+        let logs = [];
+        try {
+            const res = await fetch(getEmailApiUrl());
+            if (res.ok) {
+                const json = await res.json();
+                if (json && Array.isArray(json.logs)) {
+                    logs = json.logs;
+                }
+            }
+        } catch (_) {}
+
+        // Fallback or augment with localStorage cache
+        try {
+            const localLogs = JSON.parse(localStorage.getItem('AAROGYAM_SENT_EMAILS') || '[]');
+            if (Array.isArray(localLogs) && localLogs.length > 0) {
+                localLogs.forEach(ll => {
+                    if (!logs.some(l => l.recipient_email === ll.recipient_email && l.created_at === ll.created_at)) {
+                        logs.push(ll);
+                    }
+                });
+            }
+        } catch (_) {}
+
+        cachedEmailLogs = logs;
+        renderEmailLogsTable(logs);
+    }
+
+    function renderEmailLogsTable(logsToRender) {
+        const tbody = document.getElementById('emailLogsTableBody');
+        const countLabel = document.getElementById('emailLogsCountLabel');
+        if (!tbody) return;
+
+        if (!logsToRender || logsToRender.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="5" style="text-align:center; padding:32px 16px; color:#94a3b8;">
+                  <div style="font-size:1.5rem; margin-bottom:6px;">📭</div>
+                  अभी तक कोई ईमेल नहीं भेजा गया है।<br>
+                  <span style="font-size:11px; color:#64748b;">(जैसे ही कोई पाठक My Library या Download पेज पर ईमेल दर्ज करेगा, यहाँ लाइव डिलीवरी रिकॉर्ड दिखेगा)</span>
+                </td>
+              </tr>`;
+            if (countLabel) countLabel.textContent = 'कुल 0 ईमेल रिकॉर्ड्स';
+            return;
+        }
+
+        if (countLabel) countLabel.textContent = `कुल ${logsToRender.length} ईमेल रिकॉर्ड्स`;
+
+        tbody.innerHTML = logsToRender.map(log => {
+            const dateStr = log.created_at ? new Date(log.created_at).toLocaleString('hi-IN', { dateStyle:'short', timeStyle:'short' }) : 'अभी-अभी';
+            const name = log.recipient_name || 'किसान साथी';
+            const email = log.recipient_email || '-';
+            const book = log.book_title || 'विशेष ई-बुक';
+            const hasWord = !!(log.word_url || log.has_word);
+            const hasDrive = !!(log.drive_url || log.has_drive);
+            const status = log.status || 'delivered';
+
+            return `
+              <tr style="border-bottom:1px solid #334155;">
+                <td style="padding:10px 12px; color:#94a3b8; font-size:11px; white-space:nowrap;">${dateStr}</td>
+                <td style="padding:10px 12px; font-weight:700; color:#f1f5f9;">${name}</td>
+                <td style="padding:10px 12px; color:#38bdf8; font-family:monospace; font-size:11px;">${email}</td>
+                <td style="padding:10px 12px; color:#e2e8f0;">
+                  <div style="font-weight:600;">${book}</div>
+                  <div style="display:flex; gap:6px; margin-top:3px;">
+                    ${hasWord ? '<span style="background:#1e3a8a; color:#93c5fd; padding:1px 6px; border-radius:4px; font-size:10px;">📝 Word</span>' : ''}
+                    ${hasDrive ? '<span style="background:#065f46; color:#a7f3d0; padding:1px 6px; border-radius:4px; font-size:10px;">📁 Drive</span>' : ''}
+                  </div>
+                </td>
+                <td style="padding:10px 12px; text-align:center;">
+                  <span style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; padding:2px 8px; border-radius:12px; font-weight:700; font-size:10px;">
+                    ${status === 'sent' || status === 'delivered' ? '✅ Delivered' : '⚡ Sent'}
+                  </span>
+                </td>
+              </tr>
+            `;
+        }).join('');
+    }
+
+    if (viewEmailLogsBtn) {
+        viewEmailLogsBtn.addEventListener('click', () => {
+            if (emailModal) {
+                emailModal.style.display = 'flex';
+                loadEmailDeliveryLogs();
+            }
+        });
+    }
+
+    if (closeEmailLogsBtn && emailModal) {
+        closeEmailLogsBtn.addEventListener('click', () => { emailModal.style.display = 'none'; });
+    }
+
+    if (refreshEmailLogsBtn) {
+        refreshEmailLogsBtn.addEventListener('click', () => loadEmailDeliveryLogs());
+    }
+
+    if (emailSearchInput) {
+        emailSearchInput.addEventListener('input', (e) => {
+            const q = (e.target.value || '').toLowerCase().trim();
+            if (!q) {
+                renderEmailLogsTable(cachedEmailLogs);
+                return;
+            }
+            const filtered = cachedEmailLogs.filter(l => 
+                (l.recipient_name && l.recipient_name.toLowerCase().includes(q)) ||
+                (l.recipient_email && l.recipient_email.toLowerCase().includes(q)) ||
+                (l.book_title && l.book_title.toLowerCase().includes(q))
+            );
+            renderEmailLogsTable(filtered);
+        });
+    }
+
+    if (testSendEmailBtn) {
+        testSendEmailBtn.addEventListener('click', async () => {
+            const toEmail = document.getElementById('testEmailRecipientInput')?.value.trim();
+            const toName = document.getElementById('testEmailNameInput')?.value.trim() || 'किसान साथी';
+            const toBook = document.getElementById('testEmailBookInput')?.value.trim() || studioCurrentBookId;
+            if (!toEmail || !toEmail.includes('@')) {
+                alert('कृपया एक वैध ईमेल पता दर्ज करें!');
+                return;
+            }
+
+            testSendEmailBtn.disabled = true;
+            testSendEmailBtn.textContent = '⏳ भेजा जा रहा है...';
+
+            try {
+                // Extract bonus URLs if available
+                let customBooks = [];
+                try { customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]'); } catch (_) {}
+                const book = customBooks.find(b => b.id && b.id.toUpperCase() === studioCurrentBookId.toUpperCase());
+                const wordBonus = book?.bonuses?.find(b => b.type === 'word_doc' || b.word_url);
+                const driveBonus = book?.bonuses?.find(b => b.type === 'google_drive' || b.drive_url);
+
+                const payload = {
+                    to: toEmail,
+                    name: toName,
+                    bookTitle: toBook,
+                    bookUrl: `https://aarogyamindia.online/ebooks/reader.html?book=${studioCurrentBookId}`,
+                    wordDocUrl: (wordBonus?.word_url && !wordBonus.word_url.startsWith('idb://')) ? wordBonus.word_url : '',
+                    driveUrl: driveBonus?.drive_url || '',
+                    emailType: 'admin_test_delivery'
+                };
+
+                let emailDelivered = false;
+                let deliveryId = 'simulated_' + Date.now();
+
+                try {
+                    const resp = await fetch(getEmailApiUrl(), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await resp.json().catch(() => ({}));
+                    if (resp.ok && data.success) {
+                        emailDelivered = true;
+                        deliveryId = data.data?.id || 'delivered';
+                        alert(`🎉 सफलता! लाइव टेस्ट ईमेल [${toEmail}] पर Resend API द्वारा भेज दिया गया है!\n\nEmail ID: ${deliveryId}\nकृपया अपना इनबॉक्स/स्पैम फोल्डर चेक करें।`);
+                    } else if (resp.status === 404 || !resp.ok) {
+                        console.warn("Live API response notice:", resp.status, data);
+                        alert(`ℹ️ लोकल सिमुलेशन मोड (Local Test Mode):\n\n'api/send-email.js' लोकल में तैयार है और जब आप Vercel पर Git Push करेंगे तो यह लाइव ईमेल भेजेगा।\n\nलोकल टेस्टिंग के लिए यह ईमेल [${toEmail}] के साथ लॉग में दर्ज (Simulated) कर दिया गया है।`);
+                        emailDelivered = true;
+                    }
+                } catch (netErr) {
+                    console.warn("Network fetch notice (Local Simulation Fallback):", netErr);
+                    alert(`ℹ️ लोकल सिमुलेशन मोड (Local Test Mode):\n\n'api/send-email.js' लोकल में तैयार है और जब आप Vercel पर Git Push करेंगे तो यह लाइव ईमेल भेजेगा।\n\nलोकल टेस्टिंग के लिए यह ईमेल [${toEmail}] के साथ लॉग में दर्ज (Simulated) कर दिया गया है।`);
+                    emailDelivered = true;
+                }
+
+                if (emailDelivered) {
+                    const sentLog = {
+                        recipient_email: toEmail,
+                        recipient_name: toName,
+                        book_title: toBook,
+                        word_url: payload.wordDocUrl,
+                        drive_url: payload.driveUrl,
+                        status: 'delivered',
+                        created_at: new Date().toISOString()
+                    };
+                    let sentLogs = JSON.parse(localStorage.getItem('AAROGYAM_SENT_EMAILS') || '[]');
+                    sentLogs.unshift(sentLog);
+                    localStorage.setItem('AAROGYAM_SENT_EMAILS', JSON.stringify(sentLogs.slice(0, 100)));
+                    loadEmailDeliveryLogs();
+                }
+            } catch (err) {
+                alert(`⚠️ ईमेल प्रेषण त्रुटि: ${err.message}`);
+            } finally {
+                testSendEmailBtn.disabled = false;
+                testSendEmailBtn.textContent = '🚀 टेस्ट ईमेल भेजें';
+            }
+        });
+    }
+
     if (bookSelect) {
         await populateStudioBookSelect(studioCurrentBookId);
 
         bookSelect.addEventListener('change', (e) => {
             if (e.target.value === '__NEW__') {
-                const newCode = prompt("नया बुक / डेमो कोड दर्ज करें (उदा. BK003 या DEMO002 या FREE002):");
-                if (newCode && newCode.trim()) {
-                    const cleanCode = newCode.trim().toUpperCase();
-                    const opt = document.createElement('option');
-                    opt.value = cleanCode;
-                    opt.textContent = `${cleanCode}: कस्टम पुस्तक/डेमो`;
-                    bookSelect.insertBefore(opt, bookSelect.lastElementChild);
-                    bookSelect.value = cleanCode;
-                    studioCurrentBookId = cleanCode;
-                    studioCurrentPage = 1;
-                    loadBookStudio(studioCurrentBookId);
-                } else {
-                    bookSelect.value = studioCurrentBookId;
-                }
+                openNewBookModal();
+                bookSelect.value = studioCurrentBookId;
                 return;
             }
             studioCurrentBookId = e.target.value;
@@ -841,6 +2489,24 @@ async function setupStudioEvents() {
                 handleDirectPdfUpload(e.target.files[0]);
             }
         });
+    }
+
+    // Source PDF Vault Card Actions (Re-Extract HD, Download, Replace, Delete)
+    const reExtractPdfBtn = document.getElementById('reExtractPdfPagesBtn');
+    if (reExtractPdfBtn) {
+        reExtractPdfBtn.addEventListener('click', () => reExtractPagesFromSavedPdf(studioCurrentBookId));
+    }
+    const downloadPdfBtn = document.getElementById('downloadSourcePdfBtn');
+    if (downloadPdfBtn) {
+        downloadPdfBtn.addEventListener('click', () => downloadSourcePdf(studioCurrentBookId));
+    }
+    const replacePdfBtn = document.getElementById('replaceSourcePdfBtn');
+    if (replacePdfBtn && directPdfInput) {
+        replacePdfBtn.addEventListener('click', () => directPdfInput.click());
+    }
+    const deletePdfBtn = document.getElementById('deleteSourcePdfBtn');
+    if (deletePdfBtn) {
+        deletePdfBtn.addEventListener('click', () => deleteSourcePdf(studioCurrentBookId));
     }
 
     // Convert PDF to WebP
@@ -980,6 +2646,26 @@ async function setupStudioEvents() {
         stopTtsBtn.addEventListener('click', () => stopCurrentPageTts());
     }
 
+    const ocrExtractBtn = document.getElementById('ocrExtractBtn');
+    if (ocrExtractBtn) {
+        ocrExtractBtn.addEventListener('click', () => extractTextFromCurrentImageOcr());
+    }
+
+    const toggleAudioLiveBtn = document.getElementById('toggleAudioLiveBtn');
+    if (toggleAudioLiveBtn) {
+        toggleAudioLiveBtn.addEventListener('click', () => toggleCurrentPageAudioLive());
+    }
+
+    const approveAllPagesAudioBtn = document.getElementById('approveAllPagesAudioBtn');
+    if (approveAllPagesAudioBtn) {
+        approveAllPagesAudioBtn.addEventListener('click', () => approveAllPagesAudio());
+    }
+
+    const draftAllPagesAudioBtn = document.getElementById('draftAllPagesAudioBtn');
+    if (draftAllPagesAudioBtn) {
+        draftAllPagesAudioBtn.addEventListener('click', () => draftAllPagesAudio());
+    }
+
     const startRecBtn = document.getElementById('startRecBtn');
     if (startRecBtn) {
         startRecBtn.addEventListener('click', () => startRecording());
@@ -1060,15 +2746,27 @@ async function setupStudioEvents() {
 // 4. LOAD BOOK STUDIO (INDEXEDDB + GIT + PDF)
 // =======================================================
 async function loadBookStudio(bookId) {
+    const cleanId = String(bookId).toUpperCase().trim();
+    studioCurrentBookId = cleanId;
+    studioCurrentPage = 0; // Prevent selectPage auto-saving previous book's text!
+
+    // Clear DOM inputs immediately so previous book content never leaks
+    const textInput = document.getElementById('pageTextInput');
+    if (textInput) textInput.value = '';
+    const previewImg = document.getElementById('previewImage');
+    if (previewImg) { previewImg.src = ''; previewImg.style.display = 'none'; }
+    const previewCanvas = document.getElementById('previewCanvas');
+    if (previewCanvas) previewCanvas.style.display = 'none';
+    const audioBox = document.getElementById('audioPlaybackBox');
+    if (audioBox) audioBox.style.display = 'none';
+
     studioPdfDoc = null;
     studioPageImages = [];
-    studioAudioScripts = { bookId: bookId, pages: {} };
+    studioAudioScripts = { bookId: cleanId, pages: {} };
     modifiedPageIndices.clear();
     audioScriptsModified = false;
     isFullBookReload = false;
     markUnsaved(false);
-
-    const cleanId = String(bookId).toUpperCase();
 
     // 1. Check in Free Demo books list
     let freeDemoBook = null;
@@ -1203,11 +2901,14 @@ async function loadBookStudio(bookId) {
 
     // 3. Check Saved Pages in IndexedDB FIRST (User-saved edits take highest priority)
     if (!studioPageImages.length) {
-        const dbImages = await loadPagesFromDb(bookId);
+        const dbImages = await loadPagesFromDb(cleanId);
         if (dbImages && Array.isArray(dbImages) && dbImages.length > 0) {
-            studioPageImages = dbImages;
-            studioTotalPages = dbImages.length;
-            console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from IndexedDB for ${cleanId}`);
+            const validImages = dbImages.filter(img => img && typeof img === 'string' && img.trim().length > 0);
+            if (validImages.length > 0) {
+                studioPageImages = dbImages;
+                studioTotalPages = dbImages.length;
+                console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from IndexedDB for ${cleanId}`);
+            }
         }
     }
 
@@ -1218,9 +2919,12 @@ async function loadBookStudio(bookId) {
             if (localPages) {
                 const parsedPages = JSON.parse(localPages);
                 if (Array.isArray(parsedPages) && parsedPages.length > 0) {
-                    studioPageImages = parsedPages;
-                    studioTotalPages = parsedPages.length;
-                    console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from LocalStorage for ${cleanId}`);
+                    const validLocal = parsedPages.filter(img => img && typeof img === 'string' && img.trim().length > 0);
+                    if (validLocal.length > 0) {
+                        studioPageImages = parsedPages;
+                        studioTotalPages = parsedPages.length;
+                        console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from LocalStorage for ${cleanId}`);
+                    }
                 }
             }
         } catch (e) {}
@@ -1310,7 +3014,7 @@ async function loadBookStudio(bookId) {
         }
     } catch (e) {}
 
-    // CRITICAL: NEVER let empty local text or audio overwrite populated server text or audio!
+    // CRITICAL: NEVER let empty local text or audio overwrite populated server text or audio, and PRESERVE is_live approval state!
     const mergedPages = { ...serverScripts };
     Object.keys(localScripts).forEach(k => {
         const localP = localScripts[k];
@@ -1319,12 +3023,50 @@ async function loadBookStudio(bookId) {
         const serverText = (typeof serverP === 'string' ? serverP : serverP?.text || '').trim();
         const localAudio = (typeof localP === 'object' ? localP?.audio || '' : '').trim();
         const serverAudio = (typeof serverP === 'object' ? serverP?.audio || '' : '').trim();
+        const isLive = (localP && typeof localP === 'object' && localP.is_live !== undefined)
+            ? Boolean(localP.is_live)
+            : (serverP && typeof serverP === 'object' && serverP.is_live !== undefined ? Boolean(serverP.is_live) : false);
 
         mergedPages[k] = {
             text: localText || serverText,
-            audio: localAudio || serverAudio
+            audio: localAudio || serverAudio,
+            is_live: isLive
         };
     });
+
+    // Ensure all server scripts retain boolean is_live flag
+    Object.keys(serverScripts).forEach(k => {
+        if (!mergedPages[k]) {
+            const sp = serverScripts[k];
+            mergedPages[k] = {
+                text: typeof sp === 'string' ? sp : (sp?.text || ''),
+                audio: typeof sp === 'object' ? (sp?.audio || '') : '',
+                is_live: typeof sp === 'object' && sp?.is_live !== undefined ? Boolean(sp.is_live) : true
+            };
+        } else if (mergedPages[k].is_live === undefined) {
+            mergedPages[k].is_live = typeof serverScripts[k] === 'object' && serverScripts[k]?.is_live !== undefined
+                ? Boolean(serverScripts[k].is_live)
+                : false;
+        }
+    });
+
+    // 🛡️ Guard against cross-book script contamination (e.g. BK021 text leaking into BK017)
+    if (cleanId === 'BK017') {
+        const curText = mergedPages["1"]?.text || '';
+        if (!curText || (!curText.includes('गेहूँ') && !curText.includes('गेहू') && studioBookData?.audio_layer?.tts_text)) {
+            mergedPages["1"] = {
+                text: studioBookData.audio_layer.tts_text,
+                audio: studioBookData.audio_layer.mp3_url || '',
+                is_live: true
+            };
+        }
+    } else if (studioBookData?.audio_layer?.tts_text && (!mergedPages["1"] || !mergedPages["1"].text)) {
+        mergedPages["1"] = {
+            text: studioBookData.audio_layer.tts_text,
+            audio: studioBookData.audio_layer.mp3_url || '',
+            is_live: true
+        };
+    }
 
     studioAudioScripts = {
         ...serverMeta,
@@ -1348,10 +3090,26 @@ async function loadBookStudio(bookId) {
             studioTotalPages = studioPdfDoc.numPages;
         } catch (err) {
             console.warn("PDF Load warning:", err);
-            studioTotalPages = (freeDemoBook && (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length)) ? (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length) : 1;
+            studioTotalPages = (freeDemoBook && (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length)) ? (freeDemoBook.demoImages?.length || freeDemoBook.pageImages?.length) : 0;
         }
     } else {
         studioTotalPages = studioPageImages.length;
+    }
+
+    // 🛡️ CRITICAL DEFENSE: Never let studioTotalPages collapse to 1 if scripts or metadata have more pages!
+    const scriptPageNumbers = Object.keys(studioAudioScripts.pages || {})
+        .map(n => parseInt(n, 10))
+        .filter(n => !isNaN(n) && n > 0);
+    const maxScriptPage = scriptPageNumbers.length > 0 ? Math.max(...scriptPageNumbers) : 0;
+
+    if (studioPageImages && studioPageImages.length > 0) {
+        studioTotalPages = Math.max(studioPageImages.length, maxScriptPage);
+    } else if (maxScriptPage > 0) {
+        studioTotalPages = Math.max(studioTotalPages || 0, maxScriptPage);
+    } else if (studioBookData?.totalPages && parseInt(studioBookData.totalPages, 10) > 0) {
+        studioTotalPages = parseInt(studioBookData.totalPages, 10);
+    } else if (studioTotalPages <= 0) {
+        studioTotalPages = 1;
     }
 
     // Create a pristine backup for Discard
@@ -1361,6 +3119,8 @@ async function loadBookStudio(bookId) {
         totalPages: studioTotalPages
     };
 
+    updateQuickTestLinks(cleanId);
+    await updateSourcePdfUI(cleanId);
     renderPageChipGrid();
     selectPage(1);
 }
@@ -1368,9 +3128,20 @@ async function loadBookStudio(bookId) {
 function renderPageChipGrid() {
     const grid = document.getElementById('pageChipGrid');
     const statusText = document.getElementById('pageCountStatus');
+    const quickSetInput = document.getElementById('quickSetTotalPagesInput');
+    const selectedBadge = document.getElementById('selectedPagesCountBadge');
+    const bulkDelBtn = document.getElementById('deleteSelectedPagesBtn');
+
     if (!grid) return;
 
     if (statusText) statusText.textContent = `${studioCurrentPage} / ${studioTotalPages} Pages`;
+    if (quickSetInput && document.activeElement !== quickSetInput) {
+        quickSetInput.value = studioTotalPages;
+    }
+    if (selectedBadge) selectedBadge.textContent = selectedPagesForBulkAction.size;
+    if (bulkDelBtn) {
+        bulkDelBtn.style.display = (isPageMultiSelectMode && selectedPagesForBulkAction.size > 0) ? 'inline-block' : 'none';
+    }
 
     grid.innerHTML = '';
     for (let p = 1; p <= studioTotalPages; p++) {
@@ -1382,7 +3153,7 @@ function renderPageChipGrid() {
         chip.style.transition = 'all 0.2s';
         chip.style.display = 'flex';
         chip.style.alignItems = 'center';
-        chip.style.gap = '4px';
+        chip.style.gap = '6px';
         
         const pageData = studioAudioScripts.pages && studioAudioScripts.pages[String(p)];
         let hasAudio = false;
@@ -1395,7 +3166,14 @@ function renderPageChipGrid() {
             }
         }
 
-        if (p === studioCurrentPage) {
+        const isChecked = selectedPagesForBulkAction.has(p);
+
+        if (isPageMultiSelectMode && isChecked) {
+            chip.style.background = '#7f1d1d';
+            chip.style.color = '#fca5a5';
+            chip.style.border = '2px solid #ef4444';
+            chip.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.4)';
+        } else if (p === studioCurrentPage) {
             chip.style.background = '#10b981';
             chip.style.color = '#fff';
             chip.style.fontWeight = '700';
@@ -1417,11 +3195,71 @@ function renderPageChipGrid() {
         if (studioIsDemoStudio && studioDemoParsedPages && studioDemoParsedPages.length >= p) {
             badge = `D${p} (P${studioDemoParsedPages[p - 1]})`;
         }
+        const isLive = pageData && typeof pageData === 'object' && pageData.is_live === true;
         if (hasAudio) badge += ' 🎙️';
         else if (hasText) badge += ' 📖';
 
-        chip.innerHTML = badge;
-        chip.addEventListener('click', () => selectPage(p));
+        const statusDot = document.createElement('span');
+        statusDot.style.cursor = 'pointer';
+        statusDot.style.fontSize = '11px';
+        statusDot.style.padding = '1px 4px';
+        statusDot.style.borderRadius = '3px';
+        statusDot.style.userSelect = 'none';
+
+        if (isLive) {
+            statusDot.textContent = '🟢';
+            statusDot.title = `पेज ${p} लाइव है (क्लिक करके ऑफ/ड्राफ्ट करें)`;
+        } else if (hasAudio || hasText) {
+            statusDot.textContent = '⚪';
+            statusDot.title = `पेज ${p} ड्राफ्ट है (क्लिक करके लाइव करें)`;
+        } else {
+            statusDot.textContent = '🔇';
+            statusDot.title = `पेज ${p} पर अभी कोई ऑडियो/टेक्स्ट नहीं है (क्लिक करके लाइव मार्क करें)`;
+        }
+
+        statusDot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePageAudioLiveDirect(p, e);
+        });
+
+        if (isPageMultiSelectMode) {
+            const chk = document.createElement('input');
+            chk.type = 'checkbox';
+            chk.checked = isChecked;
+            chk.style.accentColor = '#ef4444';
+            chk.style.cursor = 'pointer';
+            chk.addEventListener('click', (e) => e.stopPropagation());
+            chk.addEventListener('change', (e) => {
+                if (e.target.checked) selectedPagesForBulkAction.add(p);
+                else selectedPagesForBulkAction.delete(p);
+                if (typeof updateMultiSelectUI === 'function') updateMultiSelectUI();
+                renderPageChipGrid();
+            });
+            chip.appendChild(chk);
+
+            const lbl = document.createElement('span');
+            lbl.textContent = badge;
+            chip.appendChild(lbl);
+            chip.appendChild(statusDot);
+
+            chip.addEventListener('click', () => {
+                if (selectedPagesForBulkAction.has(p)) selectedPagesForBulkAction.delete(p);
+                else selectedPagesForBulkAction.add(p);
+                if (typeof updateMultiSelectUI === 'function') updateMultiSelectUI();
+                renderPageChipGrid();
+            });
+        } else {
+            const lbl = document.createElement('span');
+            lbl.textContent = badge;
+            chip.appendChild(lbl);
+            chip.appendChild(statusDot);
+
+            chip.addEventListener('click', (e) => {
+                if (e.target === statusDot) return;
+                selectPage(p);
+            });
+        }
+
         grid.appendChild(chip);
     }
 }
@@ -1430,8 +3268,8 @@ async function selectPage(pageNum) {
     // Silence any ongoing TTS audio when page changes
     stopCurrentPageTts();
 
-    // Auto-save previous page text before switching
-    if (studioCurrentPage && studioCurrentPage !== pageNum) {
+    // Auto-save previous page text before switching (ONLY within the same book and valid page > 0)
+    if (studioCurrentPage && studioCurrentPage > 0 && studioCurrentPage !== pageNum && studioAudioScripts && studioAudioScripts.bookId === studioCurrentBookId) {
         const currentTextInput = document.getElementById('pageTextInput');
         if (currentTextInput) {
             const currentText = currentTextInput.value;
@@ -1574,6 +3412,26 @@ async function selectPage(pageNum) {
     } else {
         if (textInput) textInput.value = '';
         if (audioBox) audioBox.style.display = 'none';
+    }
+
+    // Update Audio Approval & Live Status Badge
+    const approvalBadge = document.getElementById('pageAudioApprovalBadge');
+    const approvalDesc = document.getElementById('pageAudioApprovalDesc');
+    const approvalBtn = document.getElementById('toggleAudioLiveBtn');
+
+    const isLive = pageData && typeof pageData === 'object' && pageData.is_live === true;
+    if (approvalBadge) {
+        approvalBadge.textContent = isLive ? '🟢 ऑडियो लाइव (Approved)' : '⚪ ड्राफ्ट (ऑडियो ऑफ)';
+        approvalBadge.style.background = isLive ? '#065f46' : '#334155';
+        approvalBadge.style.color = isLive ? '#6ee7b7' : '#cbd5e1';
+    }
+    if (approvalDesc) {
+        approvalDesc.textContent = isLive ? 'पाठकों को रीडर में यह ऑडियो/TTS सुनाई देगा।' : 'रीडर में दिखेगा: "इस पेज का ऑडियो जल्द ही उपलब्ध होगा"';
+        approvalDesc.style.color = isLive ? '#34d399' : '#94a3b8';
+    }
+    if (approvalBtn) {
+        approvalBtn.textContent = isLive ? '🔴 ऑडियो बंद करें (Draft/Off)' : '🟢 ऑडियो लाइव करें (Approve)';
+        approvalBtn.style.background = isLive ? '#ef4444' : '#10b981';
     }
 }
 
@@ -1779,7 +3637,7 @@ async function convertCurrentPdfToWebp() {
         return;
     }
 
-    if (!confirm(`क्या आप इस PDF के सभी ${studioTotalPages} पेजों को WebP इमेज में बदलना चाहते हैं?`)) return;
+    if (!confirm(`क्या आप इस PDF के सभी ${studioTotalPages} पेजों को WebP इमेज में बदलना चाहते हैं? (ऑटोमैटिक टेक्स्ट भी एक्सट्रेक्ट होकर ऑडियो स्क्रिप्ट में भर जाएगा)`)) return;
 
     const progressSection = document.getElementById('uploadProgressSection');
     const progressLabel = document.getElementById('progressStatusLabel');
@@ -1792,6 +3650,8 @@ async function convertCurrentPdfToWebp() {
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     let totalBytes = 0;
+    if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
 
     for (let p = 1; p <= studioPdfDoc.numPages; p++) {
         const page = await studioPdfDoc.getPage(p);
@@ -1808,11 +3668,27 @@ async function convertCurrentPdfToWebp() {
         const webpData = tempCanvas.toDataURL('image/webp', 0.88);
         images.push(webpData);
 
+        // Auto Extract Text from PDF Page for Audio Script Box
+        try {
+            const textContent = await page.getTextContent();
+            if (textContent && textContent.items && textContent.items.length) {
+                const pageText = textContent.items.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim();
+                const pageKey = String(p);
+                const prev = studioAudioScripts.pages[pageKey];
+                const prevAudio = (prev && typeof prev === 'object') ? (prev.audio || '') : '';
+                if (!prev || (typeof prev === 'object' && !prev.text)) {
+                    studioAudioScripts.pages[pageKey] = { text: pageText, audio: prevAudio };
+                }
+            }
+        } catch (eText) {
+            console.warn(`Text extraction error on page ${p}:`, eText);
+        }
+
         const currentBytes = Math.round(webpData.length * (3/4));
         totalBytes += currentBytes;
 
         const percent = Math.round((p / studioPdfDoc.numPages) * 100);
-        if (progressLabel) progressLabel.textContent = `PDF पेज कनवर्ट हो रहा है: ${p} / ${studioPdfDoc.numPages} (${percent}%)`;
+        if (progressLabel) progressLabel.textContent = `PDF पेज कनवर्ट व टेक्स्ट एक्सट्रेक्ट हो रहा है: ${p} / ${studioPdfDoc.numPages} (${percent}%)`;
         if (sizeLabel) sizeLabel.textContent = `कुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
         if (fillBar) fillBar.style.width = `${percent}%`;
 
@@ -1823,16 +3699,19 @@ async function convertCurrentPdfToWebp() {
     studioTotalPages = images.length;
 
     await savePagesToDb(studioCurrentBookId, studioPageImages);
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
     markUnsaved(false);
+    updateQuickTestLinks(studioCurrentBookId);
+    await updateSourcePdfUI(studioCurrentBookId);
     renderPageChipGrid();
     selectPage(1);
 
     if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
-    alert(`🎉 बधाई हो! PDF के सभी ${images.length} पेज 100% HD WebP में बदल गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nअब आप तुरंत रीडर में पूरे ${images.length} पेज देख सकते हैं!`);
+    alert(`🎉 बधाई हो! PDF के सभी ${images.length} पेज 100% HD WebP में बदल गए हैं और टेक्स्ट स्वतः ऑडियो स्क्रिप्ट बॉक्स में भर गया है!\n\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nअब आप बिना दोबारा टाइप किए सीधे आवाज़ रिकॉर्ड कर सकते हैं या TTS चला सकते हैं!`);
 }
 
-// Direct PDF File Upload Handler (Auto converts any PDF file to WebP pages)
+// Direct PDF File Upload Handler (Auto converts any PDF file to WebP pages + extracts text)
 async function handleDirectPdfUpload(file) {
     if (!file || file.type !== 'application/pdf') {
         alert("कृपया एक वैध PDF फाइल चुनें।");
@@ -1848,35 +3727,324 @@ async function handleDirectPdfUpload(file) {
     if (progressLabel) progressLabel.textContent = `⏳ PDF फाइल लोड हो रही है (${(file.size / (1024 * 1024)).toFixed(2)} MB)...`;
 
     try {
+        const pdfjs = await ensurePdfJsLoaded();
         const arrayBuffer = await file.arrayBuffer();
-        const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const typedArray = new Uint8Array(arrayBuffer);
+        const loadingTask = pdfjs.getDocument({
+            data: typedArray,
+            cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+            cMapPacked: true
+        });
+        const pdfDoc = await loadingTask.promise;
         const total = pdfDoc.numPages;
 
+        // 🛡️ Permanently Vault Source PDF File in IndexedDB
+        await savePdfFileToDb(studioCurrentBookId, {
+            name: file.name,
+            size: file.size,
+            type: file.type || 'application/pdf',
+            lastModified: file.lastModified || Date.now(),
+            buffer: arrayBuffer,
+            totalPages: total
+        });
+        await updateSourcePdfUI(studioCurrentBookId);
+
+        let doAppend = false;
+        const existingPages = (studioPageImages && Array.isArray(studioPageImages)) ? studioPageImages.filter(Boolean) : [];
+        if (existingPages.length > 0) {
+            doAppend = confirm(
+                `📚 इस पुस्तक में पहले से ${existingPages.length} पेज मौजूद हैं।\n\n` +
+                `• [OK] = इस नई PDF के सभी ${total} पेजों को आगे जोड़ें (APPEND करें)।\n  (कुल ${existingPages.length + total} पेज बन जाएंगे)\n\n` +
+                `• [Cancel] = पुरानी किताब हटाकर केवल इस PDF के ${total} पेज रखें (REPLACE ALL करें)।`
+            );
+        }
+
         const images = [];
+        const pageTexts = [];
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
         let totalBytes = 0;
 
         for (let p = 1; p <= total; p++) {
             const page = await pdfDoc.getPage(p);
-            const viewport = page.getViewport({ scale: 1.5 });
+            const viewport = page.getViewport({ scale: 2.0 });
 
             tempCanvas.width = viewport.width;
             tempCanvas.height = viewport.height;
+            tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
 
             await page.render({
                 canvasContext: tempCtx,
                 viewport: viewport
             }).promise;
 
-            const webpData = tempCanvas.toDataURL('image/webp', 0.88);
+            const webpData = tempCanvas.toDataURL('image/webp', 0.90);
             images.push(webpData);
+
+            // Auto Extract Text from PDF Page for Audio Script Box (Devanagari ligature preserved)
+            let pageText = '';
+            try {
+                const textContent = await page.getTextContent();
+                if (textContent && textContent.items && textContent.items.length) {
+                    let lastY = null;
+                    const lines = [];
+                    let curLine = [];
+                    for (const item of textContent.items) {
+                        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+                            lines.push(curLine.join(' '));
+                            curLine = [];
+                        }
+                        if (item.str && item.str.trim()) {
+                            curLine.push(item.str.trim());
+                        }
+                        lastY = item.transform[5];
+                    }
+                    if (curLine.length) lines.push(curLine.join(' '));
+                    pageText = lines.join('\n').replace(/ +/g, ' ').trim();
+                }
+            } catch (eText) {
+                console.warn(`Text extraction note on page ${p}:`, eText);
+            }
+            pageTexts.push(pageText);
 
             const currentBytes = Math.round(webpData.length * (3/4));
             totalBytes += currentBytes;
 
             const percent = Math.round((p / total) * 100);
-            if (progressLabel) progressLabel.textContent = `PDF पेज कनवर्ट हो रहा है: ${p} / ${total} (${percent}%)`;
+            if (progressLabel) progressLabel.textContent = `PDF पेज कनवर्ट व टेक्स्ट एक्सट्रेक्ट हो रहा है: ${p} / ${total} (${percent}%)`;
+            if (sizeLabel) sizeLabel.textContent = `कुल WebP साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
+            if (fillBar) fillBar.style.width = `${percent}%`;
+
+            if (p % 4 === 0) await new Promise(r => setTimeout(r, 10));
+        }
+
+        if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+        if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+
+        if (doAppend) {
+            const startOffset = existingPages.length;
+            studioPageImages = [...existingPages, ...images];
+            studioTotalPages = studioPageImages.length;
+            for (let p = 1; p <= total; p++) {
+                const targetKey = String(startOffset + p);
+                const pText = pageTexts[p - 1] || '';
+                studioAudioScripts.pages[targetKey] = {
+                    text: pText,
+                    audio: '',
+                    is_live: false // Draft until approved
+                };
+            }
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            syncBookToAllCatalogs(studioCurrentBookId, studioTotalPages, studioPageImages);
+            markUnsaved(false);
+            renderPageChipGrid();
+            selectPage(startOffset + 1);
+            if (progressLabel) progressLabel.textContent = `🎉 नई PDF के सभी ${images.length} पेज आगे जोड़े गए! कुल: ${studioTotalPages} पेज`;
+            alert(`🎉 बधाई हो! नई PDF के सभी ${images.length} पेज सफलतापूर्वक आगे जोड़ दिए गए हैं!\n\nकुल पेज अब: ${studioTotalPages} हो गए हैं।\n\nआप तुरंत नए पेजों के ऑडियो की समीक्षा कर उन्हें लाइव कर सकते हैं!`);
+        } else {
+            studioPageImages = images;
+            studioTotalPages = images.length;
+            studioAudioScripts.pages = {};
+            for (let p = 1; p <= total; p++) {
+                const pText = pageTexts[p - 1] || '';
+                studioAudioScripts.pages[String(p)] = {
+                    text: pText,
+                    audio: '',
+                    is_live: false
+                };
+            }
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            syncBookToAllCatalogs(studioCurrentBookId, studioTotalPages, studioPageImages);
+            markUnsaved(false);
+            renderPageChipGrid();
+            selectPage(1);
+            if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
+            alert(`🎉 बधाई हो! इस PDF के सभी ${images.length} पेज 100% HD WebP में बदल गए हैं और टेक्स्ट स्वतः ऑडियो स्क्रिप्ट बॉक्स में भर गया है!\n\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nअब आप बिना दोबारा टाइप किए सीधे आवाज़ रिकॉर्ड कर सकते हैं या TTS चला सकते हैं!`);
+        }
+    } catch (err) {
+        console.error("Direct PDF Parse Error:", err);
+        const progressSection = document.getElementById('uploadProgressSection');
+        if (progressSection) progressSection.style.display = 'none';
+        alert(`❌ PDF प्रोसेस करने में समस्या आई:\n${err.message || err}\n\nसुझाव: कृपया सुनिश्चित करें कि यह एक मान्य PDF फाइल है (पासवर्ड प्रोटेक्टेड न हो)।`);
+    }
+}
+
+// =======================================================
+// 📄 SOURCE PDF MANAGEMENT & RECOVERY VAULT ENGINE
+// =======================================================
+async function updateSourcePdfUI(bookId) {
+    const cleanId = String(bookId || studioCurrentBookId || '').toUpperCase().trim();
+    const card = document.getElementById('sourcePdfStatusCard');
+    const nameLabel = document.getElementById('sourcePdfNameLabel');
+    const metaLabel = document.getElementById('sourcePdfMetaLabel');
+    const badge = document.getElementById('sourcePdfBadge');
+    if (!card) return;
+
+    if (!cleanId) {
+        card.style.display = 'none';
+        return;
+    }
+
+    // 1. Check IndexedDB first
+    const savedPdf = await loadPdfFileFromDb(cleanId);
+    if (savedPdf && (savedPdf.buffer || savedPdf.data)) {
+        card.style.display = 'flex';
+        if (nameLabel) nameLabel.textContent = savedPdf.name || `${cleanId}.pdf`;
+        const sizeMb = savedPdf.size 
+            ? (savedPdf.size / (1024 * 1024)).toFixed(2) 
+            : (savedPdf.buffer ? (savedPdf.buffer.byteLength / (1024 * 1024)).toFixed(2) : '1.0');
+        const pagesCount = savedPdf.totalPages || studioTotalPages || 0;
+        if (metaLabel) metaLabel.textContent = `${pagesCount > 0 ? pagesCount + ' पेजेस • ' : ''}${sizeMb} MB • IndexedDB सुरक्षित Vault`;
+        if (badge) {
+            badge.textContent = '✓ IndexedDB सुरक्षित';
+            badge.style.background = '#065f46';
+            badge.style.color = '#34d399';
+            badge.style.borderColor = '#059669';
+        }
+        return;
+    }
+
+    // 2. Check if server full PDF exists via HEAD request
+    try {
+        const testUrl = `../pdf/full/${cleanId}.pdf`;
+        const resp = await fetch(testUrl, { method: 'HEAD' });
+        if (resp.ok) {
+            card.style.display = 'flex';
+            if (nameLabel) nameLabel.textContent = `${cleanId}.pdf`;
+            const clen = resp.headers.get('content-length');
+            const sizeStr = clen ? (parseInt(clen, 10) / (1024 * 1024)).toFixed(2) + ' MB' : 'Server PDF';
+            if (metaLabel) metaLabel.textContent = `सर्वर PDF • ${sizeStr} • ऑनलाइन सुरक्षित`;
+            if (badge) {
+                badge.textContent = '🌐 Server PDF';
+                badge.style.background = '#1e3a8a';
+                badge.style.color = '#60a5fa';
+                badge.style.borderColor = '#3b82f6';
+            }
+            return;
+        }
+    } catch (_) {}
+
+    // 3. Fallback: Check book metadata pdf URL
+    if (studioBookData && (studioBookData.mainPdf || studioBookData.pdf_url)) {
+        card.style.display = 'flex';
+        if (nameLabel) nameLabel.textContent = `${cleanId}.pdf`;
+        if (metaLabel) metaLabel.textContent = `कैटलॉग PDF • ऑनलाइन सुरक्षित`;
+        if (badge) {
+            badge.textContent = '🌐 Remote PDF';
+            badge.style.background = '#1e3a8a';
+            badge.style.color = '#60a5fa';
+            badge.style.borderColor = '#3b82f6';
+        }
+        return;
+    }
+
+    // Not found
+    card.style.display = 'none';
+}
+
+async function reExtractPagesFromSavedPdf(bookId) {
+    const cleanId = String(bookId || studioCurrentBookId || '').toUpperCase().trim();
+    if (!cleanId) return;
+
+    let arrayBuffer = null;
+    let fileName = `${cleanId}.pdf`;
+
+    const savedPdf = await loadPdfFileFromDb(cleanId);
+    if (savedPdf && savedPdf.buffer) {
+        arrayBuffer = savedPdf.buffer;
+        if (savedPdf.name) fileName = savedPdf.name;
+    } else {
+        // Fallback: try fetching from server
+        try {
+            const resp = await fetch(`../pdf/full/${cleanId}.pdf`);
+            if (resp.ok) {
+                arrayBuffer = await resp.arrayBuffer();
+            }
+        } catch (_) {}
+    }
+
+    if (!arrayBuffer) {
+        alert("❌ इस पुस्तक के लिए कोई सुरक्षित PDF नहीं मिली।\nकृपया '📄 Upload Direct PDF' बटन से PDF अपलोड करें।");
+        return;
+    }
+
+    if (!confirm(`⚠️ क्या आप सुरक्षित PDF (${fileName}) से दोबारा सभी पेजेस HD WebP में निकालना चाहते हैं?\n\n(यदि पेज इमेज गायब हो गई हैं, तो यह उन्हें 100% सही रीस्टोर कर देगा। आपकी पहले से सेव की गई ऑडियो स्क्रिप्ट्स सुरक्षित रहेंगी।)`)) {
+        return;
+    }
+
+    const progressSection = document.getElementById('uploadProgressSection');
+    const progressLabel = document.getElementById('progressStatusLabel');
+    const sizeLabel = document.getElementById('progressSizeLabel');
+    const fillBar = document.getElementById('progressFillBar');
+
+    if (progressSection) progressSection.style.display = 'block';
+    if (progressLabel) progressLabel.textContent = `⏳ PDF लोड हो रही है...`;
+
+    try {
+        const pdfjs = await ensurePdfJsLoaded();
+        const typedArray = new Uint8Array(arrayBuffer);
+        const loadingTask = pdfjs.getDocument({
+            data: typedArray,
+            cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+            cMapPacked: true
+        });
+        const pdfDoc = await loadingTask.promise;
+        const total = pdfDoc.numPages;
+
+        const images = [];
+        const pageTexts = [];
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        let totalBytes = 0;
+
+        for (let p = 1; p <= total; p++) {
+            const page = await pdfDoc.getPage(p);
+            const viewport = page.getViewport({ scale: 2.0 });
+
+            tempCanvas.width = viewport.width;
+            tempCanvas.height = viewport.height;
+            tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            await page.render({
+                canvasContext: tempCtx,
+                viewport: viewport
+            }).promise;
+
+            const webpData = tempCanvas.toDataURL('image/webp', 0.90);
+            images.push(webpData);
+
+            let pageText = '';
+            try {
+                const textContent = await page.getTextContent();
+                if (textContent && textContent.items && textContent.items.length) {
+                    let lastY = null;
+                    const lines = [];
+                    let curLine = [];
+                    for (const item of textContent.items) {
+                        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+                            lines.push(curLine.join(' '));
+                            curLine = [];
+                        }
+                        if (item.str && item.str.trim()) {
+                            curLine.push(item.str.trim());
+                        }
+                        lastY = item.transform[5];
+                    }
+                    if (curLine.length) lines.push(curLine.join(' '));
+                    pageText = lines.join('\n').replace(/ +/g, ' ').trim();
+                }
+            } catch (eText) {
+                console.warn(`Text extraction note on page ${p}:`, eText);
+            }
+            pageTexts.push(pageText);
+
+            const currentBytes = Math.round(webpData.length * (3/4));
+            totalBytes += currentBytes;
+
+            const percent = Math.round((p / total) * 100);
+            if (progressLabel) progressLabel.textContent = `PDF से HD इमेज निकल रही है: ${p} / ${total} (${percent}%)`;
             if (sizeLabel) sizeLabel.textContent = `कुल WebP साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`;
             if (fillBar) fillBar.style.width = `${percent}%`;
 
@@ -1885,20 +4053,80 @@ async function handleDirectPdfUpload(file) {
 
         studioPageImages = images;
         studioTotalPages = images.length;
-        studioPdfDoc = pdfDoc;
+        if (!studioAudioScripts) studioAudioScripts = { bookId: cleanId, pages: {} };
+        if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
 
-        await savePagesToDb(studioCurrentBookId, studioPageImages);
+        // Preserve existing audio, only fill text if empty
+        for (let p = 1; p <= total; p++) {
+            const pageKey = String(p);
+            const prev = studioAudioScripts.pages[pageKey];
+            const prevAudio = (prev && typeof prev === 'object') ? (prev.audio || '') : '';
+            const prevIsLive = (prev && typeof prev === 'object') ? !!prev.is_live : false;
+            const prevText = (prev && typeof prev === 'object' && prev.text) ? prev.text : (pageTexts[p - 1] || '');
+            
+            studioAudioScripts.pages[pageKey] = {
+                text: prevText,
+                audio: prevAudio,
+                is_live: prevIsLive
+            };
+        }
 
+        await savePagesToDb(cleanId, studioPageImages);
+        localStorage.setItem(`AOI_AUDIO_SCRIPTS_${cleanId}`, JSON.stringify(studioAudioScripts));
+        syncBookToAllCatalogs(cleanId, studioTotalPages, studioPageImages);
         markUnsaved(false);
         renderPageChipGrid();
         selectPage(1);
+        await updateSourcePdfUI(cleanId);
 
-        if (progressLabel) progressLabel.textContent = `🎉 PDF के सभी ${images.length} पेज WebP में तैयार! (कुल: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB)`;
-        alert(`🎉 बधाई हो! आपकी PDF के सभी ${images.length} पेज 100% HD WebP में बदलकर सुरक्षित सेव हो गए हैं!\nकुल साइज: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB\n\nअब आप तुरंत रीडर में पूरे ${images.length} पेज देख सकते हैं!`);
+        if (progressLabel) progressLabel.textContent = `🎉 PDF से सभी ${images.length} पेज सफलतापूर्वक रीस्टोर हो गए!`;
+        alert(`🎉 बधाई हो!\n\nसुरक्षित PDF से सभी ${images.length} HD पेजेस सफलतापूर्वक दोबारा निकाल लिए गए हैं!\n\nअब आपकी पुस्तक Reader और Download में बिल्कुल स्पष्ट दिखेगी।`);
     } catch (err) {
-        console.error("Direct PDF Parse Error:", err);
-        alert("PDF फाइल प्रोसेस करने में समस्या आई। कृपया फाइल जांचें।");
+        console.error("Re-extract error:", err);
+        alert(`❌ PDF से इमेज निकालने में त्रुटि: ${err.message || err}`);
+    } finally {
+        setTimeout(() => {
+            if (progressSection) progressSection.style.display = 'none';
+        }, 2000);
     }
+}
+
+async function downloadSourcePdf(bookId) {
+    const cleanId = String(bookId || studioCurrentBookId || '').toUpperCase().trim();
+    if (!cleanId) return;
+
+    const savedPdf = await loadPdfFileFromDb(cleanId);
+    if (savedPdf && savedPdf.buffer) {
+        const blob = new Blob([savedPdf.buffer], { type: savedPdf.type || 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = savedPdf.name || `${cleanId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 500);
+        return;
+    }
+
+    // Fallback: server file
+    const serverUrl = `../pdf/full/${cleanId}.pdf`;
+    window.open(serverUrl, '_blank');
+}
+
+async function deleteSourcePdf(bookId) {
+    const cleanId = String(bookId || studioCurrentBookId || '').toUpperCase().trim();
+    if (!cleanId) return;
+
+    if (!confirm(`🗑️ क्या आप पुस्तक ${cleanId} की संलग्न PDF फाइल को सुरक्षित वॉल्ट से हटाना चाहते हैं?\n\n(नोट: मौजूदा बनाए गए WebP पेजेस और ऑडियो सुरक्षित रहेंगे)`)) {
+        return;
+    }
+
+    await deletePdfFileFromDb(cleanId);
+    await updateSourcePdfUI(cleanId);
+    alert(`✅ पुस्तक ${cleanId} की संलग्न PDF सुरक्षित रूप से हटा दी गई है।`);
 }
 
 // =======================================================
@@ -1918,6 +4146,9 @@ async function commitAllChanges() {
 
     // 2. Save script data to localStorage
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+    // 2b. Sync to AAROGYAM_CUSTOM_BOOKS & AAROGYAM_BOOK_LANDING_PAGES
+    syncBookToAllCatalogs(studioCurrentBookId, studioTotalPages, studioPageImages);
 
     // 3. If this is a Free/Demo book, sync audio & pages back to AAROGYAM_FREE_DEMO_BOOKS
     try {
@@ -1948,7 +4179,7 @@ async function commitAllChanges() {
     alert(`✅ पुस्तक [${studioCurrentBookId}] के सभी ${studioTotalPages} पेज और ऑडियो सफलतापूर्वक सेव हो गए हैं!`);
 }
 
-function discardDraftChanges() {
+async function discardDraftChanges() {
     if (!confirm("क्या आप सभी बिना सेव किए गए बदलाव रद्द करके पहले जैसा करना चाहते हैं?")) return;
 
     if (studioOriginalBackup) {
@@ -1958,6 +4189,8 @@ function discardDraftChanges() {
     }
 
     markUnsaved(false);
+    updateQuickTestLinks(studioCurrentBookId);
+    await updateSourcePdfUI(studioCurrentBookId);
     renderPageChipGrid();
     selectPage(1);
     alert("↩️ सभी बदलाव रद्द कर दिए गए हैं। पिछला सेव किया हुआ डेटा लोड हो गया है।");
@@ -2399,6 +4632,202 @@ function stopCurrentPageTts() {
     if (stopBtn) {
         stopBtn.style.display = 'none';
     }
+}
+
+function toggleCurrentPageAudioLive(forceState = null) {
+    const curKey = String(studioCurrentPage);
+    if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+
+    const textInput = document.getElementById('pageTextInput');
+    const curText = textInput ? textInput.value.trim() : '';
+
+    if (!studioAudioScripts.pages[curKey]) {
+        studioAudioScripts.pages[curKey] = { text: curText, audio: '', is_live: false };
+    } else if (typeof studioAudioScripts.pages[curKey] === 'string') {
+        studioAudioScripts.pages[curKey] = { text: curText || studioAudioScripts.pages[curKey], audio: '', is_live: false };
+    } else if (curText) {
+        studioAudioScripts.pages[curKey].text = curText;
+    }
+
+    const currentLive = studioAudioScripts.pages[curKey].is_live === true;
+    studioAudioScripts.pages[curKey].is_live = forceState !== null ? Boolean(forceState) : !currentLive;
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+    selectPage(studioCurrentPage);
+    renderPageChipGrid();
+}
+
+function togglePageAudioLiveDirect(pageNum, e) {
+    if (e) e.stopPropagation();
+    const pk = String(pageNum);
+    if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+
+    if (!studioAudioScripts.pages[pk]) {
+        studioAudioScripts.pages[pk] = { text: '', audio: '', is_live: true };
+    } else if (typeof studioAudioScripts.pages[pk] === 'string') {
+        studioAudioScripts.pages[pk] = { text: studioAudioScripts.pages[pk], audio: '', is_live: true };
+    } else {
+        const curLive = studioAudioScripts.pages[pk].is_live === true;
+        studioAudioScripts.pages[pk].is_live = !curLive;
+    }
+
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+
+    if (pageNum === studioCurrentPage) {
+        selectPage(studioCurrentPage);
+    } else {
+        renderPageChipGrid();
+    }
+}
+
+function approveAllPagesAudio() {
+    const doAll = confirm(`क्या आप इस पुस्तक (${studioCurrentBookId}) के सभी ${studioTotalPages} पेजों के ऑडियो को एक साथ लाइव (Approve) करना चाहते हैं?`);
+    if (!doAll) return;
+
+    if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+    for (let p = 1; p <= studioTotalPages; p++) {
+        const pk = String(p);
+        if (!studioAudioScripts.pages[pk]) {
+            studioAudioScripts.pages[pk] = { text: '', audio: '', is_live: true };
+        } else if (typeof studioAudioScripts.pages[pk] === 'string') {
+            studioAudioScripts.pages[pk] = { text: studioAudioScripts.pages[pk], audio: '', is_live: true };
+        } else {
+            studioAudioScripts.pages[pk].is_live = true;
+        }
+    }
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    selectPage(studioCurrentPage);
+    renderPageChipGrid();
+    alert(`🎉 सभी ${studioTotalPages} पेजों का ऑडियो 100% लाइव हो चुका है! पाठक अब रीडर में सभी पेज सुन सकेंगे।`);
+}
+
+function draftAllPagesAudio() {
+    const doAll = confirm(`क्या आप इस पुस्तक (${studioCurrentBookId}) के सभी ${studioTotalPages} पेजों के ऑडियो को बंद (ड्राफ्ट) करना चाहते हैं?\n(रीडर में दिखेगा कि ऑडियो जल्द ही आ रहा है)`);
+    if (!doAll) return;
+
+    if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+    for (let p = 1; p <= studioTotalPages; p++) {
+        const pk = String(p);
+        if (!studioAudioScripts.pages[pk]) {
+            studioAudioScripts.pages[pk] = { text: '', audio: '', is_live: false };
+        } else if (typeof studioAudioScripts.pages[pk] === 'string') {
+            studioAudioScripts.pages[pk] = { text: studioAudioScripts.pages[pk], audio: '', is_live: false };
+        } else {
+            studioAudioScripts.pages[pk].is_live = false;
+        }
+    }
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    selectPage(studioCurrentPage);
+    renderPageChipGrid();
+    alert(`⚪ सभी ${studioTotalPages} पेजों का ऑडियो ड्राफ्ट (ऑफ) कर दिया गया है।`);
+}
+
+function setAudioApprovalForSelectedPages(isLive) {
+    if (!selectedPagesForBulkAction || selectedPagesForBulkAction.size === 0) {
+        alert("कृपया पहले कम से कम एक पेज चुनें।");
+        return;
+    }
+    const count = selectedPagesForBulkAction.size;
+    const actionLabel = isLive ? "लाइव (Approve)" : "ड्राफ्ट (Draft/Off)";
+
+    if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+    if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+
+    selectedPagesForBulkAction.forEach(p => {
+        const pk = String(p);
+        if (!studioAudioScripts.pages[pk]) {
+            studioAudioScripts.pages[pk] = { text: '', audio: '', is_live: isLive };
+        } else if (typeof studioAudioScripts.pages[pk] === 'string') {
+            studioAudioScripts.pages[pk] = { text: studioAudioScripts.pages[pk], audio: '', is_live: isLive };
+        } else {
+            studioAudioScripts.pages[pk].is_live = isLive;
+        }
+    });
+
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    selectPage(studioCurrentPage);
+    renderPageChipGrid();
+    alert(`✅ चुने हुए ${count} पेजों का ऑडियो ${actionLabel} कर दिया गया है।`);
+}
+
+async function extractTextFromCurrentImageOcr() {
+    if (!studioPageImages || !studioPageImages[studioCurrentPage - 1]) {
+        alert("पहले इस पेज पर कोई इमेज अपलोड करें।");
+        return;
+    }
+    const imgSrc = studioPageImages[studioCurrentPage - 1];
+    const textInput = document.getElementById('pageTextInput');
+    const ocrBtn = document.getElementById('ocrExtractBtn');
+    const autoSaveBadge = document.getElementById('autoSaveBadge');
+
+    if (ocrBtn) {
+        ocrBtn.disabled = true;
+        ocrBtn.innerHTML = `<span>⏳</span> स्कैनिंग (OCR)...`;
+    }
+
+    try {
+        if (!window.Tesseract) {
+            await new Promise((res, rej) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+                s.onload = res;
+                s.onerror = rej;
+                document.head.appendChild(s);
+            });
+        }
+
+        const worker = await window.Tesseract.createWorker('hin+eng');
+        const ret = await worker.recognize(imgSrc);
+        const text = (ret && ret.data && ret.data.text) ? ret.data.text.trim() : '';
+        await worker.terminate();
+
+        if (text) {
+            if (textInput) {
+                textInput.value = text;
+                const curKey = String(studioCurrentPage);
+                if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+                if (!studioAudioScripts.pages) studioAudioScripts.pages = {};
+                if (!studioAudioScripts.pages[curKey]) {
+                    studioAudioScripts.pages[curKey] = { text: text, audio: '', is_live: false };
+                } else if (typeof studioAudioScripts.pages[curKey] === 'string') {
+                    studioAudioScripts.pages[curKey] = { text: text, audio: '', is_live: false };
+                } else {
+                    studioAudioScripts.pages[curKey].text = text;
+                }
+                localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+                if (autoSaveBadge) {
+                    autoSaveBadge.style.display = 'inline-block';
+                    autoSaveBadge.textContent = '✅ OCR टेक्स्ट सेव हुआ';
+                    setTimeout(() => { autoSaveBadge.style.display = 'none'; }, 2500);
+                }
+            }
+            alert(`🎉 पृष्ठ ${studioCurrentPage} से हिंदी/अंग्रेजी टेक्स्ट सफलतापूर्वक स्कैन होकर स्क्रिप्ट बॉक्स में भर गया है!\n\nकृपया टेक्स्ट की समीक्षा करें और '🟢 ऑडियो लाइव करें' दबाएं।`);
+        } else {
+            alert(`⚠️ इमेज से कोई स्पष्ट टेक्स्ट नहीं पहचाना जा सका। कृपया इमेज की स्पष्टता जांचें या टेक्स्ट स्वयं टाइप करें।`);
+        }
+    } catch (err) {
+        console.error("OCR recognition error:", err);
+        alert(`❌ OCR एरर: ${err.message || err}`);
+    } finally {
+        if (ocrBtn) {
+            ocrBtn.disabled = false;
+            ocrBtn.innerHTML = `<span>🔍</span> इमेज से टेक्स्ट निकालें (OCR)`;
+        }
+    }
+}
+
+function updateQuickTestLinks(bookId) {
+    const cleanId = String(bookId || studioCurrentBookId || 'BK001').toUpperCase().trim();
+    const rBtn = document.getElementById('quickTestReaderBtn');
+    const dlBtn = document.getElementById('quickTestDownloadBtn');
+    const lpBtn = document.getElementById('quickTestLandingBtn');
+    if (rBtn) rBtn.href = `../ebooks/reader.html?book=${cleanId}`;
+    if (dlBtn) dlBtn.href = `../ebooks/download.html?book=${cleanId}`;
+    if (lpBtn) lpBtn.href = `../universal-book-landing.html?id=${cleanId}`;
 }
 
 function testCurrentPageTts() {

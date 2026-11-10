@@ -407,6 +407,19 @@ export async function initPromotionsPage() {
         promotionsData = await pRes.json();
       }
 
+      // Check localStorage for recent mobile or local edits
+      try {
+        const localPromoStr = localStorage.getItem('AAROGYAM_UNIVERSAL_PROMOTIONS');
+        if (localPromoStr) {
+          const localPromo = JSON.parse(localPromoStr);
+          if (localPromo && Array.isArray(localPromo.promotions) && localPromo.promotions.length > 0) {
+            if (!promotionsData || !promotionsData.promotions || new Date(localPromo.updated_at || 0) >= new Date(promotionsData.updated_at || 0)) {
+              promotionsData = localPromo;
+            }
+          }
+        }
+      } catch (_) {}
+
       // 2. Books
       const bRes = await fetch('/data/books.json?v=' + Date.now()).catch(() => null);
       if (bRes && bRes.ok) {
@@ -1053,11 +1066,22 @@ export async function initPromotionsPage() {
 
     promotionsData.updated_at = new Date().toISOString();
 
-    let success = false;
+    // 0. Save immediately to LocalStorage (100% Zero-Loss on Mobile & Desktop)
+    try {
+      localStorage.setItem('AAROGYAM_UNIVERSAL_PROMOTIONS', JSON.stringify(promotionsData));
+    } catch (_) {}
+
+    let success = true; // LocalStorage guarantees local live status
     let errMsg = '';
 
     // 1. Port 5505 (Local disk sync if running locally)
-    const isLocal = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
+    const isLocal = (
+      window.location.hostname === '127.0.0.1' || 
+      window.location.hostname === 'localhost' ||
+      window.location.hostname.startsWith('192.168.') ||
+      window.location.hostname.startsWith('10.') ||
+      window.location.hostname.endsWith('.local')
+    );
     if (isLocal) {
       try {
         const localRes = await fetch('http://127.0.0.1:5505', {

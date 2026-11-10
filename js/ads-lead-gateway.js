@@ -1331,6 +1331,18 @@
 
   // 11. Public Initializer API & Instant Auto-Boot
   window.initAdsLeadGateway = function (config = {}) {
+    // If admin explicitly turned off Ads Mode on this bundle/landing page, respect it 100%!
+    const explicitlyDisabled = config.ads_mode_enabled === false || config.ads_gateway_enabled === false;
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceAd = urlParams.get('ad') === '1' || urlParams.get('ads') === '1' || urlParams.get('lead') === '1';
+
+    if (explicitlyDisabled && !forceAd) {
+      // Remove any modal spawned by auto-boot
+      const existingModal = document.getElementById('adsLeadGatewayModal');
+      if (existingModal) existingModal.remove();
+      return;
+    }
+
     // If user is already registered in this browser, bypass gateway but activate landing page exit shield!
     if (isUserRegistered()) {
       const cachedName = localStorage.getItem('aim_user_name') || '';
@@ -1341,26 +1353,21 @@
       return;
     }
 
-    // Check if Ads Mode is active
-    const urlParams = new URLSearchParams(window.location.search);
-    const forceAd = urlParams.get('ad') === '1' || urlParams.get('ads') === '1' || urlParams.get('lead') === '1';
     const hasAdSource = urlParams.has('utm_source') || urlParams.has('fbclid') || urlParams.has('gclid') || (urlParams.get('source') || '').toLowerCase().includes('fb');
-    const isBundle = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle');
-    const isAdsEnabled = forceAd || hasAdSource || isBundle || config.ads_mode_enabled === true || config.ads_gateway_enabled === true;
+    const isAdsEnabled = forceAd || (hasAdSource && !explicitlyDisabled) || config.ads_mode_enabled === true || config.ads_gateway_enabled === true;
 
     if (isAdsEnabled) {
       renderGatewayModal(config);
     }
   };
 
-  // Instant Auto-Boot for 0ms delay: Opens gateway IMMEDIATELY without waiting for landing page scripts
+  // Instant Auto-Boot for 0ms delay: ONLY when explicit ad params (forceAd or tracking) are present
   try {
     const urlParams = new URLSearchParams(window.location.search);
     const forceAd = urlParams.get('ad') === '1' || urlParams.get('ads') === '1' || urlParams.get('lead') === '1';
     const hasAdSource = urlParams.has('utm_source') || urlParams.has('fbclid') || urlParams.has('gclid') || (urlParams.get('source') || '').toLowerCase().includes('fb');
-    const isBundle = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle');
 
-    if (!isUserRegistered() && (forceAd || hasAdSource || isBundle)) {
+    if (!isUserRegistered() && (forceAd || hasAdSource)) {
       if (document.body) {
         renderGatewayModal();
       } else {

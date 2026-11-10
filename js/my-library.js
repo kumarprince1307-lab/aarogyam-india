@@ -1,10 +1,60 @@
 
 // Audio/TTS Unsupported Banner (Completely Disabled - Zero Intrusive Popups)
 function showAarogyamTtsUnsupportedBanner() {
-  return; // Silent no-op as per user instruction
+    return; // Silent no-op as per user instruction
 }
 if (typeof window !== 'undefined') {
-  window.showAarogyamTtsUnsupportedBanner = showAarogyamTtsUnsupportedBanner;
+    window.showAarogyamTtsUnsupportedBanner = showAarogyamTtsUnsupportedBanner;
+
+    // 🎁 Universal Word (.docx) Bonus Downloader from IndexedDB / Storage / URL
+    window.downloadWordBonusFile = function(bookId, fileName, fileUrl) {
+        if (fileUrl && fileUrl.startsWith('idb://')) {
+            try {
+                const req = indexedDB.open('AoiStudioDB', 1);
+                req.onsuccess = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('bookPages')) {
+                        alert('फाइल प्राप्त नहीं हो सकी।');
+                        return;
+                    }
+                    const tx = db.transaction('bookPages', 'readonly');
+                    const store = tx.objectStore('bookPages');
+                    const cleanKey = `bonus_word_${String(bookId).toUpperCase()}`;
+                    const getReq = store.get(cleanKey);
+                    getReq.onsuccess = () => {
+                        const fileObj = getReq.result;
+                        if (fileObj && fileObj.dataUrl) {
+                            const a = document.createElement('a');
+                            a.href = fileObj.dataUrl;
+                            a.download = fileObj.name || fileName || `${bookId}_Bonus_Guide.docx`;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 1000);
+                        } else {
+                            alert('यह वर्ड फाइल इस ब्राउज़र में नहीं मिली। कृपया Admin Audio Studio से पुनः सेव करें।');
+                        }
+                    };
+                };
+                return;
+            } catch (err) {
+                console.error('IDB download error:', err);
+            }
+        }
+
+        if (fileUrl && (fileUrl.startsWith('data:') || fileUrl.startsWith('blob:'))) {
+            const a = document.createElement('a');
+            a.href = fileUrl;
+            a.download = fileName || `${bookId}_Bonus_Guide.docx`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 1000);
+            return;
+        }
+
+        if (fileUrl) {
+            window.open(fileUrl, '_blank');
+        }
+    };
 }
 
 // =========================================================================
@@ -36,9 +86,9 @@ function logoutUser() {
         'AOI_READ_PROGRESS', 'AI_WISHLIST', 'aim_profile_completed', 'ai_profile_completed'
     ];
     keysToRemove.forEach(k => {
-        try { localStorage.removeItem(k); } catch(e) {}
+        try { localStorage.removeItem(k); } catch (e) { }
     });
-    try { sessionStorage.clear(); } catch(e) {}
+    try { sessionStorage.clear(); } catch (e) { }
     try {
         for (let i = localStorage.length - 1; i >= 0; i--) {
             const k = localStorage.key(i);
@@ -46,15 +96,15 @@ function logoutUser() {
                 localStorage.removeItem(k);
             }
         }
-    } catch(e) {}
-    
+    } catch (e) { }
+
     alert('आप सफलतापूर्वक लॉग आउट हो चुके हैं। (Logged out successfully)');
     window.location.href = window.location.pathname;
 }
 window.logoutUser = logoutUser;
 
 // Navigation & KPI Scroll Action Helpers
-window.switchTabAndScroll = function(category) {
+window.switchTabAndScroll = function (category) {
     if (category === 'purchased' || category === 'mybooks') {
         switchTab('purchased');
     } else if (category === 'available') {
@@ -72,7 +122,7 @@ window.switchTabAndScroll = function(category) {
     }
 };
 
-window.scrollToWeatherSection = function() {
+window.scrollToWeatherSection = function () {
     const wCard = document.getElementById('weatherSectionCard');
     if (wCard) {
         wCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -81,7 +131,7 @@ window.scrollToWeatherSection = function() {
     }
 };
 
-window.triggerAppInstallFlow = function() {
+window.triggerAppInstallFlow = function () {
     if (typeof window.triggerPwaInstall === 'function') {
         window.triggerPwaInstall();
     } else {
@@ -96,7 +146,7 @@ window.triggerAppInstallFlow = function() {
     }
 };
 
-window.scrollToTubeSection = function() {
+window.scrollToTubeSection = function () {
     const tubeCard = document.querySelector('.tube-kpi-access-card');
     if (tubeCard) {
         tubeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -108,7 +158,7 @@ window.scrollToTubeSection = function() {
 // 3. Category Tabs Switching Logic
 function switchTab(category, evt) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
+
     // Activate target tab button by ID or by current event safely
     const activeBtn = document.getElementById('tabBtn-' + category);
     const eventObj = evt || (typeof window !== 'undefined' && window.event ? window.event : null);
@@ -149,9 +199,9 @@ function startDailyTimer() {
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        timerElement.textContent = 
-            String(hours).padStart(2, '0') + ':' + 
-            String(minutes).padStart(2, '0') + ':' + 
+        timerElement.textContent =
+            String(hours).padStart(2, '0') + ':' +
+            String(minutes).padStart(2, '0') + ':' +
             String(seconds).padStart(2, '0');
     }
 
@@ -164,7 +214,7 @@ function calculateProfileProgress() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
     let score = 0;
     const isProfileMarkedDone = localStorage.getItem('ai_profile_completed') === 'true';
-    
+
     if (storedUser.full_name || storedUser.name) score++;
     if (storedUser.mobile) score++;
     if (storedUser.email) score++;
@@ -176,7 +226,7 @@ function calculateProfileProgress() {
     if (storedUser.occupation) score++;
     if (storedUser.interest) score++;
     if (storedUser.netsurf_id && String(storedUser.netsurf_id).trim()) score++;
-    
+
     const hasCoreFields = Boolean((storedUser.full_name || storedUser.name) && storedUser.mobile && (storedUser.state || storedUser.State || storedUser.district || storedUser.city));
     let percentage = Math.min(100, Math.round((score / 11) * 100));
     if (isProfileMarkedDone || (hasCoreFields && score >= 4)) {
@@ -225,45 +275,45 @@ function calculateProfileProgress() {
 
 function initUserData() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-    
+
     // Auto-sync active status & purchases from Supabase immediately on page load
     const checkMob = (storedUser.mobile || storedUser.phone || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
     if (checkMob && checkMob.length === 10) {
-      (async () => {
-        try {
-          const db = getLibrarySupabaseClient();
-          if (db) {
-            // 1. Check profile active status
-            const { data: p } = await db.from('profiles').select('id, full_name, is_active, is_subscriber').or(`mobile.eq.${checkMob},mobile.eq.+91${checkMob},mobile.eq.91${checkMob}`).limit(1).maybeSingle();
-            let isUserActive = false;
-            let pId = p?.id || storedUser.id;
+        (async () => {
+            try {
+                const db = getLibrarySupabaseClient();
+                if (db) {
+                    // 1. Check profile active status
+                    const { data: p } = await db.from('profiles').select('id, full_name, is_active, is_subscriber').or(`mobile.eq.${checkMob},mobile.eq.+91${checkMob},mobile.eq.91${checkMob}`).limit(1).maybeSingle();
+                    let isUserActive = false;
+                    let pId = p?.id || storedUser.id;
 
-            if (p && (p.is_active || p.is_subscriber)) {
-              isUserActive = true;
-            }
+                    if (p && (p.is_active || p.is_subscriber)) {
+                        isUserActive = true;
+                    }
 
-            // 2. Also check purchases table directly
-            if (pId) {
-              const { data: purs } = await db.from('purchases').select('id, book_id').eq('profile_id', pId);
-              if (Array.isArray(purs) && purs.length > 0) {
-                isUserActive = true;
-              }
-            }
+                    // 2. Also check purchases table directly
+                    if (pId) {
+                        const { data: purs } = await db.from('purchases').select('id, book_id').eq('profile_id', pId);
+                        if (Array.isArray(purs) && purs.length > 0) {
+                            isUserActive = true;
+                        }
+                    }
 
-            if (isUserActive) {
-              storedUser.is_active = true;
-              storedUser.is_subscriber = true;
-              if (p?.full_name && !storedUser.full_name) storedUser.full_name = p.full_name;
-              localStorage.setItem('user_is_active', 'true');
-              localStorage.setItem('user_is_subscriber', 'true');
-              localStorage.setItem('AI_USER', JSON.stringify(storedUser));
-              updateSubscriptionTimerAndStatus(storedUser);
-            }
-          }
-        } catch (_) {}
-      })();
+                    if (isUserActive) {
+                        storedUser.is_active = true;
+                        storedUser.is_subscriber = true;
+                        if (p?.full_name && !storedUser.full_name) storedUser.full_name = p.full_name;
+                        localStorage.setItem('user_is_active', 'true');
+                        localStorage.setItem('user_is_subscriber', 'true');
+                        localStorage.setItem('AI_USER', JSON.stringify(storedUser));
+                        updateSubscriptionTimerAndStatus(storedUser);
+                    }
+                }
+            } catch (_) { }
+        })();
     }
-    
+
     const userName = storedUser.full_name || storedUser.name || "प्रिय पाठक";
     const userMobile = storedUser.mobile || "";
     const userEmail = storedUser.email || "";
@@ -315,7 +365,7 @@ function updateSubscriptionTimerAndStatus(storedUser) {
         if ((Array.isArray(localPurchases) && localPurchases.length > 0) || (Array.isArray(myBookIds) && myBookIds.length > 0)) {
             hasPurchases = true;
         }
-    } catch (_) {}
+    } catch (_) { }
 
     const isFlagActive = localStorage.getItem("user_is_active") === "true" || localStorage.getItem("user_is_subscriber") === "true";
     const isActive = Boolean(storedUser.is_active === true || storedUser.is_active === "true" || storedUser.is_subscriber === true || storedUser.status === "active" || isFlagActive || hasPurchases || localStorage.getItem("user_is_active") === "true");
@@ -323,7 +373,7 @@ function updateSubscriptionTimerAndStatus(storedUser) {
     // Auto-sync back to storedUser if active via purchases/flags
     if (isActive && !storedUser.is_active) {
         storedUser.is_active = true;
-        try { localStorage.setItem("AI_USER", JSON.stringify(storedUser)); } catch (_) {}
+        try { localStorage.setItem("AI_USER", JSON.stringify(storedUser)); } catch (_) { }
     }
     const badgeEl = document.getElementById('userStatusBadge');
     const badgeText = document.getElementById('userStatusText');
@@ -373,24 +423,27 @@ function updateSubscriptionTimerAndStatus(storedUser) {
 // 6. स्मार्ट चेक: यदि यूजर लॉग-इन नहीं है तो ऑटो-पॉपअप नहीं खुलेगा
 function checkAndOpenProfileModal() {
     const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+    const userMobile = storedUser.mobile || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile');
+    const userEmail = storedUser.email || localStorage.getItem('aim_user_email') || localStorage.getItem('user_email');
     
-    if (!storedUser.id && !storedUser.mobile) {
+    if (!storedUser.id && !userMobile) {
         return;
     }
 
-    // अगर यूजर की प्रोफाइल 100% पूरी है तो सीधे रिटर्न करें
-    const is100Complete = storedUser.full_name && storedUser.mobile && storedUser.email && storedUser.gender && storedUser.dob && (storedUser.state || storedUser.State) && (storedUser.city || storedUser.district) && storedUser.address && storedUser.occupation && storedUser.interest && storedUser.netsurf_id;
+    // अगर ईमेल मौजूद है और प्रोफाइल आवश्यक रूप से पूरी है तो नहीं दिखाएँ
+    const is100Complete = userEmail && storedUser.full_name && (storedUser.state || storedUser.State);
     if (is100Complete) {
-        return; 
+        return;
     }
 
-    // अगर प्रोफाइल अधूरी है तो 1.5 सेकंड बाद पॉपअप खोलें
-    const hasSeenModal = sessionStorage.getItem('aim_profile_prompted_session');
-    if (!hasSeenModal) {
+    // अगर ईमेल या प्रोफाइल अधूरी है तो रोज़ाना 1 बार पॉपअप खोलें (Daily Date-Locked)
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const lastPromptDate = localStorage.getItem('aim_profile_prompt_date');
+    if (lastPromptDate !== todayStr) {
         setTimeout(() => {
             openLeadModal();
-            sessionStorage.setItem('aim_profile_prompted_session', 'true');
-        }, 1200);
+            localStorage.setItem('aim_profile_prompt_date', todayStr);
+        }, 1500);
     }
 }
 
@@ -416,7 +469,7 @@ async function submitLeadForm(event) {
     event.preventDefault();
     const fullName = document.getElementById('leadName').value.trim();
     const mobile = document.getElementById('leadPhone').value.trim();
-    
+
     const netsurfIdElem = document.getElementById('leadNetsurfId');
     const netsurfId = netsurfIdElem && netsurfIdElem.value.trim() !== '' ? netsurfIdElem.value.trim() : null;
 
@@ -467,7 +520,7 @@ async function submitLeadForm(event) {
         email: email,
         gender: gender,
         dob: dob,
-        State: state, 
+        State: state,
         district: city,
         address: address,
         occupation: occupation,
@@ -495,7 +548,24 @@ async function submitLeadForm(event) {
             localStorage.setItem('AI_USER', JSON.stringify(updatedUser));
             if (typeof ProfileStorage !== 'undefined') ProfileStorage.save(updatedUser);
 
-            alert('🎉 बधाई हो! आपकी प्रोफाइल जानकारी (NetSurf ID सहित) सफलतापूर्वक सहेज ली गई है।');
+            if (email && email.includes('@')) {
+                localStorage.setItem('aim_user_email', email);
+                try {
+                    fetch('/api/send-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            to: email,
+                            name: fullName || currentUser.full_name || 'किसान साथी',
+                            bookTitle: 'आरोग्यम इंडिया सम्पूर्ण किसान लाइब्रेरी',
+                            bookUrl: 'https://aarogyamindia.online/my-library.html',
+                            emailType: 'profile_email_update'
+                        })
+                    }).catch(() => { });
+                } catch (_) { }
+            }
+
+            alert('🎉 बधाई हो! आपकी प्रोफाइल जानकारी व ईमेल सफलतापूर्वक सुरक्षित कर ली गई है।');
             closeLeadModal();
             initUserData();
             calculateProfileProgress();
@@ -549,7 +619,7 @@ function getLibrarySupabaseClient() {
                 "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU"
             );
             return window.dbClient;
-        } catch (e) {}
+        } catch (e) { }
     }
     if (typeof db !== 'undefined' && db && typeof db.from === 'function') return db;
     return null;
@@ -560,7 +630,7 @@ async function loadLibraryData() {
     try {
         let jsonBooks = [];
         const cacheTime = Date.now();
-        
+
         try {
             const res = await fetch('/data/books.json?v=' + cacheTime);
             if (res.ok) {
@@ -605,7 +675,7 @@ async function loadLibraryData() {
                     }
                 });
             }
-        } catch (e) {}
+        } catch (e) { }
 
         try {
             const freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
@@ -618,7 +688,7 @@ async function loadLibraryData() {
                     }
                 });
             }
-        } catch (e) {}
+        } catch (e) { }
 
         // Overlay Admin Book Landing Pages
         try {
@@ -650,7 +720,7 @@ async function loadLibraryData() {
                     }
                 });
             }
-        } catch(e) {}
+        } catch (e) { }
 
         const finalBooks = Array.from(bookMap.values());
         await renderLibrarySections(finalBooks);
@@ -705,7 +775,7 @@ async function renderLibrarySections(booksArray) {
                         fromCache = true;
                     }
                 }
-            } catch(e) {}
+            } catch (e) { }
 
             if (!fromCache) {
                 let profileIds = [];
@@ -738,7 +808,7 @@ async function renderLibrarySections(booksArray) {
                                 if (pList[0].is_active) localUser.is_active = true;
                                 if (pList[0].is_subscriber) localUser.is_subscriber = true;
                             }
-                            try { localStorage.setItem('AI_USER', JSON.stringify(localUser)); } catch (_) {}
+                            try { localStorage.setItem('AI_USER', JSON.stringify(localUser)); } catch (_) { }
                             updateSubscriptionTimerAndStatus(localUser);
                         }
                     } catch (pe) {
@@ -778,11 +848,11 @@ async function renderLibrarySections(booksArray) {
                         if (userPurchases && userPurchases.length > 0) {
                             localUser.is_active = true;
                             localStorage.setItem('user_is_active', 'true');
-                            try { localStorage.setItem('AI_USER', JSON.stringify(localUser)); } catch (_) {}
+                            try { localStorage.setItem('AI_USER', JSON.stringify(localUser)); } catch (_) { }
                             updateSubscriptionTimerAndStatus(localUser);
                         }
                         // Save to session cache for 15 minutes
-                        try { sessionStorage.setItem(libCacheKey, JSON.stringify({ data: userPurchases, _ts: Date.now() })); } catch(e) {}
+                        try { sessionStorage.setItem(libCacheKey, JSON.stringify({ data: userPurchases, _ts: Date.now() })); } catch (e) { }
                     }
                 }
             }
@@ -848,7 +918,7 @@ async function renderLibrarySections(booksArray) {
             purchasedCount++;
             const card = document.createElement('div');
             card.className = 'book-card';
-            
+
             // Reading progress calculation
             let progressPercent = 0;
             try {
@@ -857,7 +927,7 @@ async function renderLibrarySections(booksArray) {
                 if (pInfo && pInfo.total > 0) {
                     progressPercent = Math.min(100, Math.round((pInfo.current / pInfo.total) * 100));
                 }
-            } catch(e) {}
+            } catch (e) { }
 
             card.innerHTML = `
                 <div style="position:relative;cursor:pointer;" onclick="window.location.href='/ebooks/reader.html?book=${bookId}'" title="क्लिक करके सीधे पढ़ें">
@@ -888,7 +958,7 @@ async function renderLibrarySections(booksArray) {
             // Check if purchased book has specific bonus books in Landing Pages, JSON, or Studio Free/Bonus Books
             let bonusList = [];
             if (book.bonusBooks && Array.isArray(book.bonusBooks) && book.bonusBooks.length > 0) {
-                bonusList = book.bonusBooks.map((f, i) => ({ title: `${bookName} — VIP बोनस #${i+1}`, file_url: f, image: bookCover, id: `${rawId}_BONUS_${i+1}` }));
+                bonusList = book.bonusBooks.map((f, i) => ({ title: `${bookName} — VIP बोनस #${i + 1}`, file_url: f, image: bookCover, id: `${rawId}_BONUS_${i + 1}` }));
             }
             if (book.bonuses && Array.isArray(book.bonuses) && book.bonuses.length > 0) {
                 bonusList = [...bonusList, ...book.bonuses];
@@ -915,7 +985,7 @@ async function renderLibrarySections(booksArray) {
                         }
                     });
                 }
-            } catch(e) {}
+            } catch (e) { }
 
             if (bonusList.length > 0 && bonusGrid) {
                 bonusList.forEach((bn, bIdx) => {
@@ -927,12 +997,16 @@ async function renderLibrarySections(booksArray) {
                         bonusCard.className = 'book-card';
                         bonusCard.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;';
                         const bImg = bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp';
-                        const bTitle = bn.title || `${bookName} — बोनस #${bIdx+1}`;
+                        const bTitle = bn.title || `${bookName} — बोनस #${bIdx + 1}`;
                         const bId = bn.id || `${bookId}&demo=1`;
                         const bReaderUrl = `/ebooks/reader.html?book=${encodeURIComponent(bId)}&demo=1`;
                         const bHasAudio = Boolean(bn.hasAudioBook || hasAudioBook);
                         const bPdf = bn.demoPdf || bn.file_url || '';
                         const bVideos = Array.isArray(bn.videos) ? bn.videos : [];
+
+                        const bDesc = bn.description || `आपकी ${bookName} खरीद के साथ मुफ़्त अनलॉक।`;
+                        const bWordUrl = bn.word_url || bn.doc_url || (bn.type === 'word_doc' ? (bn.file_url || bn.url) : '');
+                        const bDriveUrl = bn.drive_url || (bn.type === 'google_drive' ? (bn.drive_url || bn.url) : '');
 
                         bonusCard.innerHTML = `
                             <div>
@@ -941,10 +1015,18 @@ async function renderLibrarySections(booksArray) {
                                 </div>
                                 <span style="background:#16a34a;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px;">🎁 100% FREE VIP BONUS</span>
                                 <h4 style="color:#065f46;margin:0 0 6px 0;font-size:0.95rem;">${bTitle}</h4>
-                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;">आपकी ${bookName} खरीद के साथ मुफ़्त अनलॉक।</p>
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;line-height:1.4;">${bDesc}</p>
                             </div>
                             <div class="book-btn-group" style="display:flex;gap:6px;flex-wrap:wrap;">
-                                <a href="${bReaderUrl}" class="btn-read" style="flex:1;min-width:80px;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Bonus</a>
+                                ${(!bWordUrl && !bDriveUrl) ? `
+                                    <a href="${bReaderUrl}" class="btn-read" style="flex:1;min-width:80px;text-align:center;background:#10b981;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;">📖 Read Bonus</a>
+                                ` : ''}
+                                ${bWordUrl ? `
+                                    <button type="button" onclick='window.downloadWordBonusFile("${rawId}", "${bn.fileName || (bTitle + '.docx')}", "${bWordUrl}")' class="btn-word" style="flex:1;min-width:85px;text-align:center;background:#2563eb;color:#fff;padding:8px;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="Word फाइल डाउनलोड करें">📝 Word (.docx)</button>
+                                ` : ''}
+                                ${bDriveUrl ? `
+                                    <a href="${bDriveUrl}" target="_blank" rel="noopener noreferrer" class="btn-drive" style="flex:1;min-width:85px;text-align:center;background:#059669;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="Google Drive फोल्डर खोलें">📁 Google Drive</a>
+                                ` : ''}
                                 ${bHasAudio ? `<a href="${bReaderUrl}&audio=1" class="btn-audio" style="flex:1;min-width:75px;padding:8px;background:linear-gradient(135deg, #7c3aed, #6366f1);color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="ऑडियो सुनें">🎧 ऑडियो</a>` : ''}
                                 ${bVideos.length > 0 ? `<button type="button" onclick='window.openBookVideoModal("${bTitle}", ${JSON.stringify(bVideos)})' class="btn-video" style="flex:1;min-width:75px;padding:8px;background:#ef4444;color:#fff;text-align:center;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="वीडियो देखें">🎬 वीडियो</button>` : ''}
                                 ${bPdf ? `<a href="${bPdf}" download target="_blank" class="btn-buy" style="flex:1;min-width:75px;padding:8px;background:#E86A17;color:#fff;text-align:center;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="बोनस PDF डाउनलोड करें">📥 PDF</a>` : ''}
@@ -1082,6 +1164,54 @@ async function renderLibrarySections(booksArray) {
             if (comingSoonGrid) comingSoonGrid.appendChild(comingCard);
         }
     });
+
+    // 🎁 Check Custom Books & Attached Bonuses (e.g., BK021, Word Guides, Drive Links)
+    try {
+        const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        if (Array.isArray(customBooks)) {
+            customBooks.forEach(cb => {
+                if (cb && Array.isArray(cb.bonuses) && cb.bonuses.length > 0) {
+                    const cbId = (cb.id || '').toUpperCase().trim();
+                    const cbTitle = cb.heading || cb.title || cb.name || cbId || 'विशेष ई-बुक';
+                    cb.bonuses.forEach((bn, bIdx) => {
+                        const bnKey = bn.id || `${cbId}_cb_bonus_${bIdx}`;
+                        if (!seenBonusIds.has(bnKey)) {
+                            seenBonusIds.add(bnKey);
+                            bonusCount++;
+                            const bonusCard = document.createElement('div');
+                            bonusCard.className = 'book-card';
+                            bonusCard.style.cssText = 'background:#fff;border-radius:12px;padding:14px;border:1.5px solid #10b981;box-shadow:0 4px 12px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;';
+                            const bImg = bn.thumbnail || bn.image || bn.cover || '/images/books/kharif-master-guide-2026-cover.webp';
+                            const bTitle = bn.title || `${cbTitle} — VIP बोनस #${bIdx + 1}`;
+                            const bDesc = bn.description || `${cbTitle} के साथ संलग्न विशेष VIP डिजिटल बोनस सामग्री।`;
+                            const bWordUrl = bn.word_url || bn.doc_url || (bn.type === 'word_doc' ? (bn.file_url || bn.url) : '');
+                            const bDriveUrl = bn.drive_url || (bn.type === 'google_drive' ? (bn.drive_url || bn.url) : '');
+
+                            bonusCard.innerHTML = `
+                                <div>
+                                    <div style="text-align:center;margin-bottom:8px;">
+                                        <img src="${bImg}" style="width:70px;height:95px;object-fit:cover;border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.12);cursor:pointer;" onclick="openImageZoom('${bImg}')" />
+                                    </div>
+                                    <span style="background:#16a34a;color:#fff;font-size:0.68rem;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:4px;">🎁 100% FREE VIP BONUS</span>
+                                    <h4 style="color:#065f46;margin:0 0 6px 0;font-size:0.95rem;">${bTitle}</h4>
+                                    <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;line-height:1.4;">${bDesc}</p>
+                                </div>
+                                <div class="book-btn-group" style="display:flex;gap:6px;flex-wrap:wrap;">
+                                    ${bWordUrl ? `
+                                        <button type="button" onclick='window.downloadWordBonusFile("${cbId}", "${bn.fileName || (bTitle + '.docx')}", "${bWordUrl}")' class="btn-word" style="flex:1;min-width:85px;text-align:center;background:#2563eb;color:#fff;padding:8px;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:0.82rem;" title="Word (.docx) फाइल डाउनलोड करें">📝 Word (.docx)</button>
+                                    ` : ''}
+                                    ${bDriveUrl ? `
+                                        <a href="${bDriveUrl}" target="_blank" rel="noopener noreferrer" class="btn-drive" style="flex:1;min-width:85px;text-align:center;background:#059669;color:#fff;padding:8px;border-radius:8px;font-weight:700;text-decoration:none;font-size:0.82rem;" title="Google Drive फोल्डर खोलें">📁 Google Drive</a>
+                                    ` : ''}
+                                </div>
+                            `;
+                            if (bonusGrid) bonusGrid.appendChild(bonusCard);
+                        }
+                    });
+                }
+            });
+        }
+    } catch (_) {}
 
     // Default General Bonus Cards: fallback if no studio bonus books exist and user has purchases
     if (bonusGrid && bonusCount === 0 && purchasedCount > 0) {
@@ -1265,7 +1395,7 @@ async function loadJsPdfLibrary() {
                 document.head.appendChild(s);
             });
             if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
-        } catch(e) {}
+        } catch (e) { }
     }
     throw new Error('jsPDF library load failed from all CDNs');
 }
@@ -1288,7 +1418,7 @@ function convertBlobToJpegDataUrl(blob) {
                 const jpeg = canvas.toDataURL('image/jpeg', 0.85);
                 URL.revokeObjectURL(objUrl);
                 resolve(jpeg);
-            } catch(e) {
+            } catch (e) {
                 URL.revokeObjectURL(objUrl);
                 resolve(null);
             }
@@ -1309,7 +1439,7 @@ async function assembleClientPdfFromImages(cleanId, cleanTitle, hintTotalPages =
         // ── Step A: Resolve page image URLs
         showPdfProgress(0, 1, 'पेज लिस्ट तैयार की जा रही है...');
         let totalPages = hintTotalPages > 0 ? hintTotalPages : 0;
-        
+
         // If no hint, probe count
         if (totalPages <= 0) {
             for (let n = 1; n <= 300; n++) {
@@ -1319,7 +1449,7 @@ async function assembleClientPdfFromImages(cleanId, cleanTitle, hintTotalPages =
                     try {
                         const r = await fetch(u, { method: 'HEAD' }).catch(() => ({ ok: false }));
                         if (r.ok) { found = true; break; }
-                    } catch(e) {}
+                    } catch (e) { }
                 }
                 if (found) { totalPages = n; }
                 else { break; }
@@ -1378,14 +1508,14 @@ async function assembleClientPdfFromImages(cleanId, cleanTitle, hintTotalPages =
         hidePdfProgress();
         return true;
 
-    } catch(e) {
+    } catch (e) {
         console.error('PDF Assembly error:', e);
         hidePdfProgress();
         return false;
     }
 }
 
-window.downloadBookPdf = function(bookId, bookTitle, directPdfPath, totalPagesHint = 0) {
+window.downloadBookPdf = function (bookId, bookTitle, directPdfPath, totalPagesHint = 0) {
     const cleanId = (bookId || '').toUpperCase().trim();
     if (!cleanId) return;
     window.location.href = `/ebooks/download.html?book=${encodeURIComponent(cleanId)}`;
@@ -1394,7 +1524,7 @@ window.downloadBookPdf = function(bookId, bookTitle, directPdfPath, totalPagesHi
 // =========================================================================
 // 13. INTERACTIVE TAB HELPERS & AUDIO FILTER
 // =========================================================================
-window.filterOrSwitchAudioBooks = function() {
+window.filterOrSwitchAudioBooks = function () {
     if (typeof switchTab === 'function') switchTab('purchased');
     setTimeout(() => {
         const audioButtons = document.querySelectorAll('#purchasedBooksGrid .btn-audio, #availableBooksGrid .btn-audio');
@@ -1406,7 +1536,7 @@ window.filterOrSwitchAudioBooks = function() {
     }, 100);
 };
 
-window.dismissLibraryPwaCard = function() {
+window.dismissLibraryPwaCard = function () {
     const card = document.getElementById('library-pwa-card');
     if (card) {
         card.style.display = 'none';
@@ -1444,7 +1574,7 @@ const WMO_ICONS = {
     95: { desc: 'गरज-चमक बारिश (Thunderstorm)', icon: '⚡⛈️' }
 };
 
-window.fetchAndRenderLibraryWeather = async function(lat, lon, cityName, stateName) {
+window.fetchAndRenderLibraryWeather = async function (lat, lon, cityName, stateName) {
     try {
         const tempEl = document.getElementById('displayTemp');
         const cityEl = document.getElementById('displayCityName');
@@ -1473,7 +1603,7 @@ window.fetchAndRenderLibraryWeather = async function(lat, lon, cityName, stateNa
         if (condEl) condEl.textContent = wInfo.desc;
         if (iconEmojiEl) iconEmojiEl.textContent = wInfo.icon;
         if (rainWindEl) rainWindEl.textContent = `नमी: ${humidity}% • हवा: ${wind} km/h • बारिश: ${rainChance}%`;
-    } catch(e) {
+    } catch (e) {
         console.warn('Weather fetch warning:', e);
     }
 };
@@ -1481,14 +1611,14 @@ window.fetchAndRenderLibraryWeather = async function(lat, lon, cityName, stateNa
 // =========================================================================
 // 14. WEATHER GPS & LOCATION ENGINE (NO-FAIL SMART GEOLOCATION)
 // =========================================================================
-window.detectUserLiveLocationWeather = function() {
+window.detectUserLiveLocationWeather = function () {
     const gpsBtn = document.getElementById('weatherGpsBtn');
     if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>स्थान खोज रहे हैं...</span>';
 
     // Smart Fallback via IP Geolocation (Zero Permission Needed, 100% Reliable on Mobile / PWA)
     async function fallbackToIpWeather() {
         let lat = null, lon = null, cityName = 'आपका क्षेत्र', stateName = 'लाइव मौसम';
-        
+
         try {
             // Source 1: ipapi.co
             const r1 = await fetch('https://ipapi.co/json/');
@@ -1501,7 +1631,7 @@ window.detectUserLiveLocationWeather = function() {
                     stateName = d1.region || 'भारत';
                 }
             }
-        } catch(e) {}
+        } catch (e) { }
 
         if (!lat) {
             try {
@@ -1516,7 +1646,7 @@ window.detectUserLiveLocationWeather = function() {
                         stateName = d2.location.principalSubdivision || 'भारत';
                     }
                 }
-            } catch(e) {}
+            } catch (e) { }
         }
 
         // Final Default: Rewa
@@ -1550,7 +1680,7 @@ window.detectUserLiveLocationWeather = function() {
                     if (geoData.locality || geoData.city) cityName = geoData.locality || geoData.city;
                     if (geoData.principalSubdivision) stateName = geoData.principalSubdivision;
                 }
-            } catch(e) {}
+            } catch (e) { }
 
             await window.fetchAndRenderLibraryWeather(lat, lon, cityName, stateName);
             if (gpsBtn) gpsBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>📍 ' + cityName + '</span>';
@@ -1563,7 +1693,7 @@ window.detectUserLiveLocationWeather = function() {
     );
 };
 
-window.searchCityWeather = function() {
+window.searchCityWeather = function () {
     const input = document.getElementById('citySearchInput');
     if (!input || !input.value.trim()) return;
     const q = input.value.trim().toLowerCase();
@@ -1631,13 +1761,13 @@ function initLibraryAudioGuide() {
                 silentKeepAliveAudio.loop = true;
                 silentKeepAliveAudio.volume = 0.01;
             }
-            silentKeepAliveAudio.play().catch(() => {});
-        } catch(e) {}
+            silentKeepAliveAudio.play().catch(() => { });
+        } catch (e) { }
     }
 
     function stopSilentKeepAlive() {
         if (silentKeepAliveAudio) {
-            try { silentKeepAliveAudio.pause(); } catch(e) {}
+            try { silentKeepAliveAudio.pause(); } catch (e) { }
         }
     }
 
@@ -1651,12 +1781,12 @@ function initLibraryAudioGuide() {
                     wakeLockObj.addEventListener('release', () => { wakeLockObj = null; });
                 }
             }
-        } catch(e) {}
+        } catch (e) { }
     }
 
     function releaseWakeLock() {
         if (wakeLockObj) {
-            try { wakeLockObj.release(); } catch(e) {}
+            try { wakeLockObj.release(); } catch (e) { }
             wakeLockObj = null;
         }
     }
@@ -1683,12 +1813,12 @@ function initLibraryAudioGuide() {
                     if (typeof ms.setActionHandler === 'function') {
                         ms.setActionHandler(actionName, fn);
                     }
-                } catch(err) {}
+                } catch (err) { }
             };
             bindAction('play', () => { if (typeof toggleGuide === 'function') toggleGuide(); });
             bindAction('pause', () => { if (typeof toggleGuide === 'function') toggleGuide(); });
             bindAction('stop', () => { if (typeof toggleGuide === 'function') toggleGuide(); });
-        } catch(e) {}
+        } catch (e) { }
     }
 
     function getHindiSpeechText() {
@@ -1759,7 +1889,7 @@ function initLibraryAudioGuide() {
                 try {
                     synth.pause();
                     synth.resume();
-                } catch(e) {}
+                } catch (e) { }
             } else {
                 clearKeepAlive();
             }
@@ -1793,7 +1923,7 @@ function initLibraryAudioGuide() {
             const voices = synth.getVoices ? synth.getVoices() : [];
             const hindiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
             if (hindiVoice) currentUtterance.voice = hindiVoice;
-        } catch(e) {}
+        } catch (e) { }
 
         currentUtterance.onstart = () => {
             isPlaying = true;
@@ -1815,7 +1945,7 @@ function initLibraryAudioGuide() {
 
         try {
             synth.speak(currentUtterance);
-        } catch(err) {
+        } catch (err) {
             console.warn('Synth speak error:', err);
             stopGuide();
         }
@@ -1828,12 +1958,12 @@ function initLibraryAudioGuide() {
         if (synth) {
             try {
                 synth.cancel();
-            } catch(e) {}
+            } catch (e) { }
         }
         if (typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis) {
             try {
                 window.speechSynthesis.cancel();
-            } catch(e) {}
+            } catch (e) { }
         }
 
         if (currentUtterance) {
@@ -1863,7 +1993,7 @@ function initLibraryAudioGuide() {
     }
 
     // Expose Single Master Handler globally
-    window.toggleLibraryAudioGuide = function(e) {
+    window.toggleLibraryAudioGuide = function (e) {
         if (e) {
             if (typeof e.preventDefault === 'function') e.preventDefault();
             if (typeof e.stopPropagation === 'function') e.stopPropagation();
@@ -1904,14 +2034,14 @@ function initLibraryAudioGuide() {
     }
 
     if (synth && synth.onvoiceschanged !== undefined) {
-        synth.onvoiceschanged = () => {};
+        synth.onvoiceschanged = () => { };
     }
 
     // Auto-attempt playback on load with fallback on first touch/click
     setTimeout(() => {
         try {
             if (!isPlaying) speakGuide();
-        } catch(e) {}
+        } catch (e) { }
     }, 600);
 
     const triggerAutoAudioOnFirstGesture = () => {
@@ -1931,7 +2061,7 @@ let appInstallUtterance = null;
 
 const APP_INSTALL_AUDIO_SCRIPT = 'Aarogyam App इंस्टॉल करें और बिना फोन मेमोरी भरे कभी भी किताबें पढ़ें, ज़ूम करें और ऑडियो सुनें। प्रिंट निकालने के लिए नीचे नीले बॉक्स में Full HD चुनें (3 बार मान्य)! ऐप इंस्टॉल करने के लिए नीचे दिए गए हरे बटन "फोन होम स्क्रीन पर ऐप जोड़ें" पर क्लिक करें!';
 
-window.toggleAppInstallAudio = function() {
+window.toggleAppInstallAudio = function () {
     const statusEl = document.getElementById('appInstallAudioStatus');
     const iconEl = document.getElementById('appInstallAudioIcon');
     const waves = document.getElementById('appInstallSoundWaves');
@@ -1986,19 +2116,19 @@ window.toggleAppInstallAudio = function() {
     window.speechSynthesis.speak(appInstallUtterance);
 };
 
-window.openAppInstallGuideModal = function() {
+window.openAppInstallGuideModal = function () {
     const modal = document.getElementById('appInstallGuideModal');
     if (modal) {
         modal.style.display = 'flex';
         setTimeout(() => {
             try {
                 if (!isAppInstallAudioPlaying) window.toggleAppInstallAudio();
-            } catch(e) {}
+            } catch (e) { }
         }, 400);
     }
 };
 
-window.closeAppInstallGuideModal = function() {
+window.closeAppInstallGuideModal = function () {
     const modal = document.getElementById('appInstallGuideModal');
     if (modal) {
         modal.style.display = 'none';
@@ -2009,7 +2139,7 @@ window.closeAppInstallGuideModal = function() {
     }
 };
 
-window.triggerAppInstallFromModal = function() {
+window.triggerAppInstallFromModal = function () {
     if (typeof window.triggerPwaInstall === 'function') {
         window.triggerPwaInstall();
     } else {
@@ -2031,5 +2161,5 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }, 300);
         }
-    } catch(e) {}
+    } catch (e) { }
 });

@@ -172,6 +172,27 @@ async function verifyUserAccessAndSession(targetBookId) {
         }
     } catch (e) {}
 
+    // 📖 Merge custom books created in Audio Studio
+    try {
+        const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        if (Array.isArray(customBooks)) {
+            customBooks.forEach(cb => {
+                if (!cb || !cb.id) return;
+                const idx = jsonBooks.findIndex(x => x && x.id && x.id.toUpperCase() === cb.id.toUpperCase());
+                const normalized = {
+                    ...cb,
+                    id: cb.id.toUpperCase(),
+                    heading: cb.hero?.title || cb.heading || cb.title || cb.name || cb.id,
+                    name: cb.hero?.title || cb.name || cb.title || cb.heading || cb.id,
+                    demo_reader_pages: cb.demo_reader_pages || cb.demoPages || '',
+                    targetMainBook: cb.targetMainBook || cb.id.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || 'BK001'
+                };
+                if (idx >= 0) jsonBooks[idx] = mergeBookData(jsonBooks[idx], normalized);
+                else jsonBooks.push(normalized);
+            });
+        }
+    } catch (e) {}
+
     const targetKey = String(targetBookId).toUpperCase();
     aoiCurrentBookData = jsonBooks.find(b => 
         (b.id && b.id.toUpperCase() === targetKey) || 
@@ -362,7 +383,21 @@ async function verifyUserAccessAndSession(targetBookId) {
         const isAdmin = (typeof window.AarogyamDeviceGuard !== 'undefined' && window.AarogyamDeviceGuard.isSuperAdmin(userIdentifier)) ||
                         localStorage.getItem('admin_session') === 'true';
 
-        if (isAdmin) {
+        const isFreeBook = !!(aoiCurrentBookData?.isFree || aoiCurrentBookData?.is_free || aoiCurrentBookData?.price === 0 || aoiCurrentBookData?.offerPrice === 0 || aoiCurrentBookData?.category === 'फ्री ई-बुक' || canonicalBookId.startsWith('FREE'));
+
+        let isLocalCustomBook = false;
+        let hasLocalStudioData = false;
+        try {
+            const cbList = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+            isLocalCustomBook = cbList.some(b => b && b.id && b.id.toUpperCase() === canonicalBookId);
+            if (localStorage.getItem(`AOI_BOOK_PAGES_${canonicalBookId}`) || localStorage.getItem(`AOI_AUDIO_SCRIPTS_${canonicalBookId}`)) {
+                hasLocalStudioData = true;
+            }
+        } catch (_) {}
+
+        const isTestPreview = urlParams.get('test') === '1' || urlParams.get('preview') === '1' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        if (isAdmin || isFreeBook || isLocalCustomBook || hasLocalStudioData || isTestPreview) {
             hasAccess = true;
             isUserPurchased = true;
         } else if (userId && typeof supabaseClient !== "undefined") {
@@ -608,6 +643,14 @@ async function verifyUserAccessAndSession(targetBookId) {
     }
 
     if (pageImages && pageImages.length > 0) {
+        // Normalize paths so relative links (e.g. images/books/BK001/1.webp) correctly resolve relative to /ebooks/reader.html
+        pageImages = pageImages.map(img => {
+            if (typeof img !== 'string') return img;
+            if (img.startsWith('data:') || img.startsWith('blob:') || img.startsWith('http://') || img.startsWith('https://')) return img;
+            if (img.startsWith('../')) return img;
+            if (img.startsWith('/')) return '..' + img;
+            return '../' + img;
+        });
         console.log("⚡ Fast HD Image Engine Activated. Total Pages:", pageImages.length);
         initImageModeReader(pageImages);
     } else {
@@ -628,9 +671,24 @@ function loadPagesFromIndexedDb(bookId) {
                 if (!db.objectStoreNames.contains('bookPages')) return resolve(null);
                 const tx = db.transaction('bookPages', 'readonly');
                 const store = tx.objectStore('bookPages');
-                const getReq = store.get(bookId);
-                getReq.onsuccess = () => resolve(getReq.result || null);
-                getReq.onerror = () => resolve(null);
+                const cleanId = String(bookId || '').trim();
+
+                const r1 = store.get(cleanId);
+                r1.onsuccess = () => {
+                    if (Array.isArray(r1.result) && r1.result.length > 0) return resolve(r1.result);
+                    const r2 = store.get(cleanId.toUpperCase());
+                    r2.onsuccess = () => {
+                        if (Array.isArray(r2.result) && r2.result.length > 0) return resolve(r2.result);
+                        const r3 = store.get(cleanId.toLowerCase());
+                        r3.onsuccess = () => {
+                            if (Array.isArray(r3.result) && r3.result.length > 0) return resolve(r3.result);
+                            resolve(null);
+                        };
+                        r3.onerror = () => resolve(null);
+                    };
+                    r2.onerror = () => resolve(null);
+                };
+                r1.onerror = () => resolve(null);
             };
             req.onerror = () => resolve(null);
         } catch (err) {

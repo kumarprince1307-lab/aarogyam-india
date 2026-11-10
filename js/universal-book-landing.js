@@ -849,11 +849,20 @@ if (typeof window !== 'undefined') {
     } else {
       // Auto-synthesize new book object from landing data so it never falls back to BK001
       const hero = currentLandingData.hero || {};
+      const resolvedTitle = hero.title || 
+                            currentLandingData.hero_title || 
+                            currentLandingData.title || 
+                            currentLandingData.name || 
+                            currentLandingData.heading || 
+                            'ई-बुक प्रैक्टिकल गाइड';
+      if (!hero.title) hero.title = resolvedTitle;
+      currentLandingData.hero = hero;
+
       currentBookData = {
         id: landingId,
         slug: landingSlug,
-        heading: hero.title || 'ई-बुक प्रैक्टिकल गाइड',
-        name: hero.title || 'ई-बुक प्रैक्टिकल गाइड',
+        heading: resolvedTitle,
+        name: resolvedTitle,
         category: currentLandingData.category || 'Agriculture',
         language: 'Hindi',
         author: 'Aarogyam India',
@@ -1022,7 +1031,7 @@ if (typeof window !== 'undefined') {
       if (metaTheme) metaTheme.setAttribute('content', l.theme_primary);
     }
 
-    const title = hero.title || b.heading || b.name || 'Aarogyam India eBook';
+    const title = hero.title || l.hero_title || l.title || b.heading || b.name || 'Aarogyam India eBook';
     const subtitle = hero.subtitle || (isAdminManagedBook ? '' : 'सम्पूर्ण Practical Guide');
     const desc = hero.description || b.description || (isAdminManagedBook ? '' : 'बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।');
     const mrp = hero.mrp || b.mrp || 299;
@@ -3092,7 +3101,7 @@ if (typeof window !== 'undefined') {
     const l = currentLandingData || {};
     const b = currentBookData || {};
     const hero = l.hero || {};
-    const title = hero.title || b.heading || b.name || 'Aarogyam India eBook';
+    const title = hero.title || l.hero_title || l.title || b.heading || b.name || 'Aarogyam India eBook';
 
     // 1. Facebook Meta Pixel (Built-In ID: 1671873500553134)
     const isFbEnabled = l.facebook_pixel_id !== 'disabled' && l.facebook_pixel_enabled !== false;

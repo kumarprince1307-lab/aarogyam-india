@@ -1521,10 +1521,32 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
             try {
                 // Fetch dynamic promotions JSON (15s cache buster)
                 const cacheBust = Math.floor(Date.now() / 15000);
-                const resp = await fetch('/data/universal-promotions.json?v=' + cacheBust);
-                if (!resp.ok) return;
+                let data = null;
+                try {
+                    const resp = await fetch('/data/universal-promotions.json?v=' + cacheBust);
+                    if (resp.ok) data = await resp.json();
+                } catch (_) {}
 
-                const data = await resp.json();
+                // Merge with localStorage overrides (Admin local/mobile updates go live instantly!)
+                try {
+                    const localPromoStr = localStorage.getItem('AAROGYAM_UNIVERSAL_PROMOTIONS');
+                    if (localPromoStr) {
+                        const localPromo = JSON.parse(localPromoStr);
+                        if (localPromo && Array.isArray(localPromo.promotions) && localPromo.promotions.length > 0) {
+                            if (!data || !data.promotions || new Date(localPromo.updated_at || 0) >= new Date(data.updated_at || 0)) {
+                                data = localPromo;
+                            } else {
+                                const serverIds = new Set((data.promotions || []).map(p => p.id));
+                                localPromo.promotions.forEach(lp => {
+                                    if (lp && lp.is_active && !serverIds.has(lp.id)) {
+                                        data.promotions.push(lp);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                } catch (_) {}
+
                 if (!data || !Array.isArray(data.promotions)) return;
 
                 // 1. Purge stale promotions & expired TTL from client storage immediately
