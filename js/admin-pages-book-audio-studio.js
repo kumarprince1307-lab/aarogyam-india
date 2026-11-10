@@ -4987,18 +4987,6 @@ function draftAllPagesAudio() {
     renderPageChipGrid();
     alert(`⚪ सभी ${studioTotalPages} पेजों का ऑडियो ड्राफ्ट (ऑफ) कर दिया गया है।`);
 }
-            studioAudioScripts.pages[pk] = { text: studioAudioScripts.pages[pk], audio: '', is_live: false };
-        } else {
-            studioAudioScripts.pages[pk].is_live = false;
-        }
-    }
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
-    audioScriptsModified = true;
-    markUnsaved(true);
-    selectPage(studioCurrentPage);
-    renderPageChipGrid();
-    alert(`⚪ सभी ${studioTotalPages} पेजों का ऑडियो ड्राफ्ट (ऑफ) कर दिया गया है।`);
-}
 
 function setAudioApprovalForSelectedPages(isLive) {
     if (!selectedPagesForBulkAction || selectedPagesForBulkAction.size === 0) {

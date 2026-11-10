@@ -414,22 +414,33 @@ export async function initPromotionsPage() {
       } catch (_) {}
 
       // 2. Books
-      const bRes = await fetch('/data/books.json?v=' + Date.now()).catch(() => null);
+      let bRes = await fetch('/data/books.json?v=' + Date.now()).catch(() => null);
+      if (!bRes || !bRes.ok) {
+        bRes = await fetch('../data/books.json?v=' + Date.now()).catch(() => null);
+      }
       if (bRes && bRes.ok) {
-        liveBooks = await bRes.json();
+        const bData = await bRes.json();
+        liveBooks = Array.isArray(bData) ? bData : (bData.books || []);
       }
 
       // 3. Bundles
-      const bundleRes = await fetch('/data/book-bundles.json?v=' + Date.now()).catch(() => null);
+      let bundleRes = await fetch('/data/book-bundles.json?v=' + Date.now()).catch(() => null);
+      if (!bundleRes || !bundleRes.ok) {
+        bundleRes = await fetch('../data/book-bundles.json?v=' + Date.now()).catch(() => null);
+      }
       if (bundleRes && bundleRes.ok) {
-        liveBundles = await bundleRes.json();
+        const bdData = await bundleRes.json();
+        liveBundles = Array.isArray(bdData) ? bdData : (bdData.bundles || bdData || []);
       }
 
       // 4. Tube Videos
-      const tRes = await fetch('/data/webinar-recordings.json?v=' + Date.now()).catch(() => null);
+      let tRes = await fetch('/data/webinar-recordings.json?v=' + Date.now()).catch(() => null);
+      if (!tRes || !tRes.ok) {
+        tRes = await fetch('../data/webinar-recordings.json?v=' + Date.now()).catch(() => null);
+      }
       if (tRes && tRes.ok) {
         const tData = await tRes.json();
-        liveTubeVideos = tData.recordings || [];
+        liveTubeVideos = Array.isArray(tData) ? tData : (tData.recordings || []);
       }
 
       renderPromotionsList();
@@ -658,19 +669,23 @@ export async function initPromotionsPage() {
     } else if (type === 'book_launch') {
       box.style.display = 'block';
       label.textContent = '📚 लाइव पुस्तक चुनें:';
-      liveBooks.forEach(b => {
+      (liveBooks || []).forEach(b => {
         const opt = document.createElement('option');
         opt.value = b.id;
-        opt.textContent = `${b.title} [${b.id}] - ₹${b.price}`;
+        const bTitle = b.heading || b.name || b.shortTitle || b.title || b.id;
+        const bPrice = b.offerPrice || b.price || 99;
+        opt.textContent = `${bTitle} [${b.id}] - ₹${bPrice}`;
         select.appendChild(opt);
       });
     } else if (type === 'bundle_offer') {
       box.style.display = 'block';
       label.textContent = '🎁 कॉम्बो बंडल चुनें:';
-      liveBundles.forEach(bd => {
+      (liveBundles || []).forEach(bd => {
         const opt = document.createElement('option');
         opt.value = bd.id;
-        opt.textContent = `${bd.title || bd.name} - ₹${bd.price}`;
+        const bdTitle = bd.title || bd.name || bd.id;
+        const bdPrice = bd.offerPrice || bd.price || 149;
+        opt.textContent = `${bdTitle} - ₹${bdPrice}`;
         select.appendChild(opt);
       });
     } else if (type === 'health_campaign') {
@@ -699,7 +714,7 @@ export async function initPromotionsPage() {
     if (!val) return;
 
     if (type === 'tube_video') {
-      const vid = liveTubeVideos.find(v => v.id === val);
+      const vid = (liveTubeVideos || []).find(v => v.id === val);
       if (vid) {
         document.getElementById('edit-promo-title').value = vid.title;
         document.getElementById('edit-promo-subtitle').value = vid.description ? vid.description.slice(0, 120) + '...' : 'AarogyamTube पर अभी पूरा वीडियो देखें।';
@@ -712,25 +727,31 @@ export async function initPromotionsPage() {
         document.getElementById('edit-promo-target-url').value = `/tube.html?v=${vid.id}`;
       }
     } else if (type === 'book_launch') {
-      const bk = liveBooks.find(b => b.id === val);
+      const bk = (liveBooks || []).find(b => b.id === val);
       if (bk) {
-        document.getElementById('edit-promo-title').value = bk.title;
+        const bTitle = bk.heading || bk.name || bk.shortTitle || bk.title || bk.id;
+        const bPrice = bk.offerPrice || bk.price || 99;
+        const bCover = bk.cover || bk.thumbnail || bk.cover_image || `/images/books/${bk.id.toLowerCase()}-cover.webp`;
+        document.getElementById('edit-promo-title').value = bTitle;
         document.getElementById('edit-promo-subtitle').value = bk.subtitle || 'आधुनिक व प्रामाणिक डिजिटल ई-बुक अब उपलब्ध है।';
         document.getElementById('edit-promo-badge').value = '📖 नई ई-बुक विमोचन';
         document.getElementById('edit-promo-preset').value = 'golden_diya_sparkles';
-        document.getElementById('edit-promo-image-url').value = bk.cover_image || `/images/books/${bk.id.toLowerCase()}-cover.webp`;
-        document.getElementById('edit-promo-cta-text').value = `📖 ₹${bk.price} में अभी पढ़ें →`;
+        document.getElementById('edit-promo-image-url').value = bCover;
+        document.getElementById('edit-promo-cta-text').value = `📖 ₹${bPrice} में अभी पढ़ें →`;
         document.getElementById('edit-promo-target-url').value = `/ebooks/book-landing.html?id=${bk.id}`;
       }
     } else if (type === 'bundle_offer') {
-      const bd = liveBundles.find(b => b.id === val);
+      const bd = (liveBundles || []).find(b => b.id === val);
       if (bd) {
-        document.getElementById('edit-promo-title').value = bd.title || 'मेगा कॉम्बो बंडल विशेष ऑफर';
+        const bdTitle = bd.title || bd.name || 'मेगा कॉम्बो बंडल विशेष ऑफर';
+        const bdPrice = bd.offerPrice || bd.price || 149;
+        const bdCover = bd.cover_image || bd.bannerImage || '/images/books/kharif-master-guide-2026-cover.webp';
+        document.getElementById('edit-promo-title').value = bdTitle;
         document.getElementById('edit-promo-subtitle').value = bd.subtitle || 'सभी विशेष ई-बुक्स का सम्पूर्ण संग्रह भारी छूट पर उपलब्ध।';
-        document.getElementById('edit-promo-badge').value = '🎁 कॉम्बो महाबचत';
+        document.getElementById('edit-promo-badge').value = bd.badge || '🎁 कॉम्बो महाबचत';
         document.getElementById('edit-promo-preset').value = 'golden_diya_sparkles';
-        document.getElementById('edit-promo-image-url').value = bd.cover_image || '/images/books/kharif-master-guide-2026-cover.webp';
-        document.getElementById('edit-promo-cta-text').value = `🎁 ₹${bd.price} में बंडल प्राप्त करें →`;
+        document.getElementById('edit-promo-image-url').value = bdCover;
+        document.getElementById('edit-promo-cta-text').value = `🎁 ₹${bdPrice} में बंडल प्राप्त करें →`;
         document.getElementById('edit-promo-target-url').value = `/bundle.html?id=${bd.id}`;
       }
     } else if (type === 'health_campaign') {
