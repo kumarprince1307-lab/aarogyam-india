@@ -1,28 +1,28 @@
 {
-  "updated_at": "2026-11-10T19:21:43.130Z",
+  "updated_at": "2026-11-10T19:31:59.234Z",
   "version": "1.2",
   "active_campaign_id": "PROM_TUBE_FEATURED",
   "promotions": [
     {
       "id": "PROM_HEALTH_JOINT_CARE",
-      "type": "health_campaign",
-      "title": "जोड़ों के दर्द व गठिया से प्राकृतिक मुक्ति सप्ताह",
-      "subtitle": "बिना साइड-इफेक्ट प्राकृतिक आहार, तेल मालिश और जीवनशैली से पाएं घुटनों व कमर दर्द से स्थायी राहत।",
-      "badge": "🌿 HEALTH AWARENESS WEEK",
-      "animation_preset": "golden_diya_sparkles",
-      "image_url": "/images/logo/logo.png",
-      "cta_text": "🌿 सम्पूर्ण उपाय व गाइड पढ़ें",
-      "target_url": "/health-joint-care.html",
+      "type": "bundle_offer",
+      "title": "महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो",
+      "subtitle": "खेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह! 10  logo ko share kare 10 rs ki gift paye",
+      "badge": "🎁 कॉम्बो महाबचत",
+      "animation_preset": "achiever_confetti",
+      "image_url": "/images/banners/promo-1794338984876.webp",
+      "cta_text": "🎁 ₹ 149 में बंडल प्राप्त करें →",
+      "target_url": "/bundle.html?id=BUNDLE_KISAN_5IN1",
       "start_date": "2026-11-01T00:00",
       "end_date": "2026-12-31T23:59",
-      "is_active": false,
+      "is_active": true,
       "target_pages": [
         "all"
       ],
       "share_enabled": true,
-      "share_message_template": "🌿 जोड़ों के दर्द व गठिया से मुक्ति के प्राकृतिक उपाय जानने के लिए आरोग्यम की यह विशेष गाइड पढ़ें: {link}",
+      "share_message_template": "🌾 किसान भाइयों के लिए शानदार महाबचत ऑफर!\n\nखेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह! 10  logo ko share kare 10 rs ki gift paye \n{sender_name}\n{link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T19:21:43.127Z"
+      "updated_at": "2026-11-10T19:31:59.233Z"
     }
   ]
 }
