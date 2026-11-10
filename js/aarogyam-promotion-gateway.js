@@ -59,6 +59,22 @@
             return true;
         },
 
+        // Universal Target URL Sanitizer (Auto-corrects bundle landing & relative paths)
+        normalizeTargetUrl: function (url) {
+            if (!url) return '/';
+            let clean = String(url).trim();
+            if (clean.includes('bundle-landing.html')) {
+                clean = clean.replace(/(\/ebooks\/)?bundle-landing\.html/, '/bundle.html');
+            }
+            if (clean.includes('BUNDLE_AGRI_5')) {
+                clean = clean.replace('BUNDLE_AGRI_5', 'BUNDLE_KISAN_5IN1');
+            }
+            if (!clean.startsWith('http://') && !clean.startsWith('https://') && !clean.startsWith('/')) {
+                clean = '/' + clean;
+            }
+            return clean;
+        },
+
         shouldDisplayOnPage: function (targetPages) {
             try {
                 const path = (window.location.pathname || '').toLowerCase();
@@ -455,7 +471,8 @@
 
             try {
                 const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'https://aarogyamindia.online';
-                const shareTarget = promo.target_url ? (origin + promo.target_url) : origin;
+                const cleanTarget = this.normalizeTargetUrl(promo.target_url);
+                const shareTarget = cleanTarget.startsWith('http') ? cleanTarget : (origin + cleanTarget);
                 
                 // Pure Share ID only - Strict Aarogyam Manas Rule (Rule 3: No sender name or 'from' in link)
                 let verifiedShareUrl = shareTarget;
@@ -1175,7 +1192,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     <!-- 3D Center Floating Image Stage (Clickable to Target URL) -->
                     <div class="agy-promo-floating-stage">
                         <div class="agy-promo-aura-halo"></div>
-                        <a href="${promo.target_url || '/'}" style="display:block; text-decoration:none; cursor:pointer;" title="विवरण देखें">
+                        <a href="${this.normalizeTargetUrl(promo.target_url)}" style="display:block; text-decoration:none; cursor:pointer;" title="विवरण देखें">
                             <img src="${promo.image_url || '/images/logo/logo.png'}" alt="Festival Promotion" class="agy-promo-float-img" onerror="if(this.src && !this.src.includes('/images/logo/logo.png'))this.src='/images/logo/logo.png';" />
                         </a>
                     </div>
@@ -1200,11 +1217,11 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
 
                         <!-- Direct Action Buttons Row (Book Landing Page & Tube Video) -->
                         <div style="display:flex; gap:8px; width:100%; margin-top:8px; margin-bottom:6px; flex-wrap:wrap; box-sizing:border-box;">
-                            <a href="${promo.target_url || '/'}" class="admin-btn" style="flex:1; min-width:140px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:800; font-size:0.86rem; padding:9px 12px; border-radius:8px; text-decoration:none; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+                            <a href="${this.normalizeTargetUrl(promo.target_url)}" class="admin-btn" style="flex:1; min-width:140px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:800; font-size:0.86rem; padding:9px 12px; border-radius:8px; text-decoration:none; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
                                 <span>👉</span> ${promo.cta_text || 'पुस्तक देखें व अनलॉक करें →'}
                             </a>
                             ${(promo.type === 'tube_video' || (promo.target_url && promo.target_url.includes('tube.html')) || (promo.image_url && promo.image_url.includes('ytimg.com'))) ? `
-                            <a href="${promo.target_url && promo.target_url.includes('tube.html') ? promo.target_url : ('/tube.html' + (promo.video_id ? '?v=' + promo.video_id : ''))}" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; font-weight:800; font-size:0.82rem; padding:9px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 4px 12px rgba(239,68,68,0.35);" title="AarogyamTube पर वीडियो देखें">
+                            <a href="${promo.target_url && promo.target_url.includes('tube.html') ? this.normalizeTargetUrl(promo.target_url) : ('/tube.html' + (promo.video_id ? '?v=' + promo.video_id : ''))}" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; font-weight:800; font-size:0.82rem; padding:9px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 4px 12px rgba(239,68,68,0.35);" title="AarogyamTube पर वीडियो देखें">
                                 <span>🎬</span> वीडियो देखें
                             </a>
                             ` : ''}

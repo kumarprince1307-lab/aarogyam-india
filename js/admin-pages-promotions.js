@@ -195,46 +195,36 @@ export async function initPromotionsPage() {
               </div>
             </div>
 
-            <!-- Target URL & CTA Text -->
-            <div class="promo-form-two-col">
-              <div>
-                <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">बटन टेक्स्ट (Button Text):</label>
-                <input type="text" id="edit-promo-cta-text" class="admin-input" style="width:100%;" placeholder="जैसे: 📖 ई-बुक्स देखें">
-              </div>
-              <div>
-                <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">बटन लिंक (Target URL):</label>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input type="text" id="edit-promo-target-url" class="admin-input" style="flex:1;" placeholder="/ebooks/index.html">
-                  <select id="promo-page-picker" class="admin-input" style="min-width:160px;max-width:200px;font-size:0.82rem;cursor:pointer;" title="किसी भी पेज का लिंक चुनें">
-                    <option value="">📄 पेज चुनें...</option>
-                    <optgroup label="🏠 मुख्य पेज">
-                      <option value="/">होम पेज (index.html)</option>
-                      <option value="/ebooks/ebook.html">📚 ई-बुक स्टोर</option>
-                      <option value="/ebooks/my-library.html">📖 मेरी लाइब्रेरी</option>
-                      <option value="/tube.html">🎬 AarogyamTube</option>
-                      <option value="/pages/profile.html">👤 प्रोफाइल / वॉलेट</option>
-                      <option value="/bundle.html">🎁 बंडल ऑफर</option>
-                    </optgroup>
-                    <optgroup label="🌾 कृषि पेज">
-                      <option value="/ebooks/agriculture.html">🌱 कृषि ई-बुक्स</option>
-                      <option value="/aarogyam-sakhi.html">🤖 सखी AI</option>
-                      <option value="/krishi-panchang.html">📅 कृषि पंचांग</option>
-                    </optgroup>
-                    <optgroup label="🩺 स्वास्थ्य पेज">
-                      <option value="/health-joint-care.html">🦵 जोड़ों का दर्द</option>
-                      <option value="/health-diabetes.html">🩸 मधुमेह (शुगर)</option>
-                    </optgroup>
-                    <optgroup label="🏢 अन्य पेज">
-                      <option value="/mission.html">🇮🇳 आरोग्यम मिशन</option>
-                      <option value="/ebooks/share-rewards.html">💰 शेयर & कमाई</option>
-                      <option value="/admin/index.html">⚙️ एडमिन पैनल</option>
-                    </optgroup>
-                    <optgroup label="🔗 बाहरी लिंक">
-                      <option value="https://wa.me/917974422572">📱 WhatsApp सम्पर्क</option>
-                    </optgroup>
+            <!-- CTA Button Text -->
+            <div style="margin-bottom:12px;">
+              <label style="font-size:0.86rem;font-weight:700;display:block;margin-bottom:4px;">बटन टेक्स्ट (CTA Button Text):</label>
+              <input type="text" id="edit-promo-cta-text" class="admin-input" style="width:100%;" placeholder="जैसे: 📖 कॉम्बो ऑफर देखें व अनलॉक करें →">
+            </div>
+
+            <!-- Dedicated Landing Page Link Box (Wide, High Visibility & Foolproof) -->
+            <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px;margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+                <label style="font-size:0.88rem;font-weight:800;color:#166534;display:flex;align-items:center;gap:6px;">
+                  <span>🌐</span> लैंडिंग पेज लिंक (Target Landing Page URL / Web Page Link):
+                </label>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <select id="promo-page-picker" class="admin-input" style="font-size:0.82rem;padding:5px 8px;cursor:pointer;background:#ffffff;border:1.5px solid #16a34a;color:#15803d;font-weight:700;border-radius:6px;" title="वेबसाइट के किसी भी पेज का लिंक ऑटो-भरें">
+                    <option value="">⚡ लिस्ट से पेज चुनें...</option>
+                    <option value="/">🏠 होम पेज</option>
+                    <option value="/tube.html">🎬 AarogyamTube</option>
+                    <option value="/bundle.html?id=BUNDLE_KISAN_5IN1">🎁 5-इन-1 महाबचत कॉम्बो</option>
+                    <option value="/ebooks/my-library.html">📖 मेरी लाइब्रेरी</option>
+                    <option value="/ebooks/ebook.html">📚 ई-बुक स्टोर</option>
                   </select>
+                  <button type="button" id="btn-test-target-link" style="background:#16a34a;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.80rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 4px rgba(22,163,74,0.3);" title="यह लिंक नए टैब में खोलकर तुरंत टेस्ट करें">
+                    🔗 खोलकर देखें
+                  </button>
                 </div>
-                <div style="font-size:0.72rem;color:#64748b;margin-top:3px;">ऊपर ड्रॉपडाउन से पेज चुनें या सीधे URL टाइप करें</div>
+              </div>
+              <input type="text" id="edit-promo-target-url" class="admin-input" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:0.92rem;font-weight:600;padding:8px 10px;border:1.5px solid #16a34a;border-radius:6px;background:#ffffff;color:#0f172a;" placeholder="/bundle.html?id=BUNDLE_KISAN_5IN1">
+              <div style="margin-top:5px;font-size:0.75rem;color:#166534;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
+                <span>👉 <strong>यहाँ लिंक टाइप करें या पेस्ट करें</strong> (जैसे: <code>/bundle.html?id=BUNDLE_KISAN_5IN1</code> या <code>/ebooks/book-landing.html?id=BK001</code> या कोई भी वेब लिंक)</span>
+                <span id="target-url-status" style="font-weight:700;color:#15803d;"></span>
               </div>
             </div>
 
@@ -443,12 +433,72 @@ export async function initPromotionsPage() {
       }
 
       renderPromotionsList();
+      populatePagePicker();
       if (promotionsData.promotions.length > 0) {
         populateEditor(0);
       }
     } catch (err) {
       console.error("Promotions init error:", err);
     }
+  }
+
+  // --- POPULATE PAGE PICKER (Auto-fill dropdown with all live books, bundles & videos) ---
+  function populatePagePicker() {
+    const picker = document.getElementById('promo-page-picker');
+    if (!picker) return;
+
+    let html = '<option value="">⚡ लिस्ट से पेज चुनें...</option>';
+
+    // 1. Main Pages
+    html += '<optgroup label="🏠 मुख्य वेबसाइट पेज">';
+    html += '<option value="/">🏠 होम पेज (index.html)</option>';
+    html += '<option value="/tube.html">🎬 AarogyamTube</option>';
+    html += '<option value="/bundle.html?id=BUNDLE_KISAN_5IN1">🎁 5-इन-1 महाबचत कॉम्बो बंडल</option>';
+    html += '<option value="/ebooks/my-library.html">📖 मेरी लाइब्रेरी</option>';
+    html += '<option value="/ebooks/ebook.html">📚 ई-बुक स्टोर</option>';
+    html += '<option value="/pages/profile.html">👤 प्रोफाइल / वॉलेट</option>';
+    html += '</optgroup>';
+
+    // 2. Combo Bundles
+    if (liveBundles && liveBundles.length > 0) {
+      html += '<optgroup label="🎁 कॉम्बो बंडल्स">';
+      liveBundles.forEach(bd => {
+        html += `<option value="/bundle.html?id=${bd.id}">🎁 ${bd.title || bd.name} (₹${bd.offerPrice || bd.price || 149})</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    // 3. Books
+    if (liveBooks && liveBooks.length > 0) {
+      html += '<optgroup label="📚 सभी लाइव ई-बुक्स लैंडिंग पेज">';
+      liveBooks.forEach(b => {
+        const title = (b.title || b.heading || b.name || b.id).slice(0, 45);
+        html += `<option value="/ebooks/book-landing.html?id=${b.id}">📖 ${b.id} - ${title} (₹${b.price || b.offerPrice || 99})</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    // 4. Tube Videos
+    if (liveTubeVideos && liveTubeVideos.length > 0) {
+      html += '<optgroup label="🎬 AarogyamTube वीडियो">';
+      liveTubeVideos.forEach(v => {
+        html += `<option value="/tube.html?v=${v.id}">🎬 ${v.title.slice(0, 45)}...</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    // 5. Health Campaigns
+    html += '<optgroup label="🩺 स्वास्थ्य गाइड्स">';
+    html += '<option value="/health-joint-care.html">🦵 जोड़ों का दर्द व गठिया</option>';
+    html += '<option value="/health-diabetes.html">🩸 मधुमेह (शुगर)</option>';
+    html += '</optgroup>';
+
+    // 6. External Links
+    html += '<optgroup label="🔗 बाहरी लिंक">';
+    html += '<option value="https://wa.me/917974422572">📱 WhatsApp सम्पर्क</option>';
+    html += '</optgroup>';
+
+    picker.innerHTML = html;
   }
 
   // --- RENDER LIST ---
@@ -871,16 +921,45 @@ export async function initPromotionsPage() {
 
   // Page Picker Dropdown → Target URL input auto-fill
   document.getElementById('promo-page-picker')?.addEventListener('change', function () {
-    const val = this.value;
+    let val = this.value;
     if (val) {
+      if (val.includes('bundle-landing.html')) {
+        val = val.replace(/(\/ebooks\/)?bundle-landing\.html/, '/bundle.html');
+      }
+      if (val.includes('BUNDLE_AGRI_5')) {
+        val = val.replace('BUNDLE_AGRI_5', 'BUNDLE_KISAN_5IN1');
+      }
       document.getElementById('edit-promo-target-url').value = val;
-      this.value = ''; // Reset dropdown back to placeholder after selection
       updatePreview();
+      const st = document.getElementById('target-url-status');
+      if (st) {
+        st.textContent = '✓ लिंक सेट हो गया';
+        setTimeout(() => { if (st) st.textContent = ''; }, 3000);
+      }
     }
   });
 
+  // Test Target Link Button
+  document.getElementById('btn-test-target-link')?.addEventListener('click', () => {
+    let url = document.getElementById('edit-promo-target-url')?.value.trim();
+    if (!url) {
+      alert("कृपया पहले 'लैंडिंग पेज लिंक' बॉक्स में लिंक दर्ज करें या ऊपर ड्रॉपडाउन से कोई पेज चुनें।");
+      return;
+    }
+    // Auto-normalize
+    if (url.includes('bundle-landing.html')) {
+      url = url.replace(/(\/ebooks\/)?bundle-landing\.html/, '/bundle.html');
+      document.getElementById('edit-promo-target-url').value = url;
+    }
+    if (url.includes('BUNDLE_AGRI_5')) {
+      url = url.replace('BUNDLE_AGRI_5', 'BUNDLE_KISAN_5IN1');
+      document.getElementById('edit-promo-target-url').value = url;
+    }
+    window.open(url, '_blank');
+  });
+
   // Input listeners for preview
-  ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-preset', 'edit-promo-share-tmpl'].forEach(id => {
+  ['edit-promo-title', 'edit-promo-subtitle', 'edit-promo-badge', 'edit-promo-image-url', 'edit-promo-cta-text', 'edit-promo-target-url', 'edit-promo-preset', 'edit-promo-share-tmpl'].forEach(id => {
     document.getElementById(id)?.addEventListener('input', () => updatePreview());
   });
 
@@ -914,6 +993,17 @@ export async function initPromotionsPage() {
     const profEl = document.getElementById('page-target-profile');
     if (profEl && profEl.checked) targets.push('profile');
 
+    let targetUrl = document.getElementById('edit-promo-target-url').value.trim() || '/';
+    if (targetUrl.includes('bundle-landing.html')) {
+      targetUrl = targetUrl.replace(/(\/ebooks\/)?bundle-landing\.html/, '/bundle.html');
+    }
+    if (targetUrl.includes('BUNDLE_AGRI_5')) {
+      targetUrl = targetUrl.replace('BUNDLE_AGRI_5', 'BUNDLE_KISAN_5IN1');
+    }
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://') && !targetUrl.startsWith('/')) {
+      targetUrl = '/' + targetUrl;
+    }
+
     const updatedItem = {
       id: id,
       type: document.getElementById('edit-promo-type').value,
@@ -923,7 +1013,7 @@ export async function initPromotionsPage() {
       animation_preset: document.getElementById('edit-promo-preset').value,
       image_url: document.getElementById('edit-promo-image-url').value.trim() || '/images/logo/logo.png',
       cta_text: document.getElementById('edit-promo-cta-text').value.trim() || 'आगे बढ़ें →',
-      target_url: document.getElementById('edit-promo-target-url').value.trim() || '/',
+      target_url: targetUrl,
       start_date: document.getElementById('edit-promo-start').value || new Date().toISOString(),
       end_date: document.getElementById('edit-promo-end').value || new Date(Date.now() + 30*86400000).toISOString(),
       is_active: document.getElementById('edit-promo-is-active').checked,

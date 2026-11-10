@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-10T22:20:00.000Z",
+  "updated_at": "2026-11-10T22:45:00.000Z",
   "version": "1.2",
   "active_campaign_id": "PROM_TUBE_FEATURED",
   "promotions": [
@@ -14,7 +14,7 @@
       "video_id": "EbdpqfJDN4c",
       "video_url": "https://www.youtube.com/watch?v=EbdpqfJDN4c",
       "cta_text": "📖 कॉम्बो ऑफर देखें व अनलॉक करें →",
-      "target_url": "/ebooks/bundle-landing.html?id=BUNDLE_AGRI_5",
+      "target_url": "/bundle.html?id=BUNDLE_KISAN_5IN1",
       "start_date": "2026-11-01T00:00",
       "end_date": "2026-12-31T23:59",
       "is_active": true,
@@ -24,7 +24,7 @@
       "share_enabled": true,
       "share_message_template": "🌾 किसान भाइयों के लिए महाबचत! ₹495 की 5 कृषि ई-बुक्स अब सिर्फ ₹149 में। यहाँ देखें: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T22:20:00.000Z"
+      "updated_at": "2026-11-10T22:45:00.000Z"
     },
     {
       "id": "PROM_HEALTH_JOINT_CARE",
