@@ -8,8 +8,8 @@
     "badge": "धमाका कॉम्बो / 94% की महाबचत",
     "buyBtnText": "🛒 पूरा 5-इन-1 कॉम्बो मात्र ₹149 में अनलॉक करें",
     "bannerImage": "/images/banners/aarogyamtube-default-thumb.svg",
-    "ads_mode_enabled": true,
-    "ads_gateway_enabled": true,
+    "ads_mode_enabled": false,
+    "ads_gateway_enabled": false,
     "bookIds": [
       "BK017",
       "BK016",
@@ -252,7 +252,7 @@
       "bundleFloatingAudioPill": true
     },
     "status": "active",
-    "updated_at": "2026-11-10T01:19:29.155Z"
+    "updated_at": "2026-11-10T10:07:17.121Z"
   },
   {
     "id": "BUNDLE_KISAN_4IN1",
