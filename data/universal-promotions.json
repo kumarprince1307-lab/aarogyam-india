@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-10T15:06:52.699Z",
+  "updated_at": "2026-11-10T15:10:07.961Z",
   "version": "1.1",
   "active_campaign_id": "PROM_TUBE_FEATURED",
   "promotions": [
@@ -22,7 +22,7 @@
       "share_enabled": true,
       "share_message_template": "🌿 जोड़ों के दर्द व गठिया से मुक्ति के प्राकृतिक उपाय जानने के लिए आरोग्यम की यह विशेष गाइड पढ़ें: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T15:06:52.698Z"
+      "updated_at": "2026-11-10T15:10:07.961Z"
     },
     {
       "id": "PROM_HEALTH_JOINT_CARE",
