@@ -47,6 +47,7 @@
   <link rel="dns-prefetch" href="https://connect.facebook.net">
   <link rel="preload" href="/data/book-bundles.json" as="fetch" crossorigin>
   <link rel="preload" href="/data/books.json" as="fetch" crossorigin>
+  <link rel="preload" href="/js/ads-lead-gateway.js?v=20261110_v28_instant" as="script">
 
   <!-- CORE AAROGYAM LANDING PAGE STYLESHEETS -->
   <link rel="stylesheet" href="/css/style.css?v=1.1">
@@ -54,7 +55,7 @@
   <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261109_v2">
   <link rel="stylesheet" href="/css/home-revamp.css?v=20261103">
   <link rel="stylesheet" href="/css/book-landing.css?v=42.0">
-  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261110_v27_mobile_fit">
+  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261110_v28_instant">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -80,6 +81,9 @@
 </head>
 
 <body class="book-landing-page bundle-landing-page" data-page-type="book-bundle">
+
+  <!-- ⚡ INSTANT LEAD GATEWAY: Opens instantly on link click before any landing page section paints -->
+  <script src="/js/ads-lead-gateway.js?v=20261110_v28_instant"></script>
 
   <!-- 1. TOP NOTICE / COUNTDOWN RIBBON -->
   <div class="bundle-top-ribbon" id="sec-top-ribbon">
@@ -707,12 +711,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="/js/supabase.js" defer></script>
   <script src="/session.js" defer></script>
-  <script src="/js/ads-lead-gateway.js?v=20261110_v27_mobile_fit" defer></script>
   <script src="/js/universal-preview-gallery-lightbox.js?v=20261104" defer></script>
   <script src="/js/universal-nav-drawer.js?v=20261109_v2" defer></script>
-  <script src="/js/public-pwa.js?v=20261110_v27_mobile_fit" defer></script>
+  <script src="/js/public-pwa.js?v=20261110_v28_instant" defer></script>
   <script src="/js/wallet-reward-engine.js?v=20261107_v3_passbook" defer></script>
-  <script src="/js/bundle-landing.js?v=20261110_v27_mobile_fit" defer></script>
+  <script src="/js/bundle-landing.js?v=20261110_v28_instant" defer></script>
 
 </body>
 

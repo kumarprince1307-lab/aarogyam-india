@@ -335,9 +335,9 @@
               display: flex !important;
               flex-direction: column !important;
               justify-content: flex-start !important;
-              padding: 10px 14px 20px 14px !important;
-              padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
-              gap: 10px !important;
+              padding: 12px 14px 24px 14px !important;
+              padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+              gap: 12px !important;
               width: 100% !important;
               box-sizing: border-box !important;
               overflow: visible !important;
@@ -346,7 +346,7 @@
               width: 100% !important;
               max-width: 100% !important;
               box-sizing: border-box !important;
-              gap: 10px !important;
+              gap: 12px !important;
             }
             #adsLeadGatewayForm > div {
               width: 100% !important;
@@ -358,12 +358,12 @@
             #adsLeadGatewayForm select.ads-input-dark {
               width: 100% !important;
               max-width: 100% !important;
-              height: 48px !important;
-              min-height: 48px !important;
-              font-size: 16px !important;
+              height: 50px !important;
+              min-height: 50px !important;
+              font-size: 16.5px !important;
               font-weight: 700 !important;
-              padding: 10px 14px !important;
-              border-radius: 8px !important;
+              padding: 11px 15px !important;
+              border-radius: 9px !important;
               border: 1.5px solid #475569 !important;
               background: #0f172a !important;
               color: #ffffff !important;
@@ -371,7 +371,7 @@
             }
             #adsLeadGatewayForm select#adsGateProfession {
               color: #38bdf8 !important;
-              font-size: 15.5px !important;
+              font-size: 16px !important;
               padding-right: 32px !important;
             }
             #adsGateMobile {
@@ -382,28 +382,28 @@
               font-size: 20px !important;
             }
             #adsLeadGatewayForm label {
-              font-size: 14px !important;
+              font-size: 14.5px !important;
               font-weight: 800 !important;
               color: #000000 !important;
-              margin-bottom: 4px !important;
+              margin-bottom: 5px !important;
               display: block !important;
             }
             #btnSubmitAdsGate {
               width: 100% !important;
               max-width: 100% !important;
-              min-height: 52px !important;
-              font-size: 18px !important;
+              min-height: 54px !important;
+              font-size: 19px !important;
               font-weight: 900 !important;
-              border-radius: 8px !important;
-              margin-top: 10px !important;
-              margin-bottom: 6px !important;
+              border-radius: 9px !important;
+              margin-top: 12px !important;
+              margin-bottom: 8px !important;
               box-sizing: border-box !important;
             }
             #adsGateBtnIcon {
-              font-size: 20px !important;
+              font-size: 21px !important;
             }
             #adsGateBtnLabel {
-              font-size: 18px !important;
+              font-size: 19px !important;
               font-weight: 900 !important;
               letter-spacing: 0.5px !important;
             }
@@ -474,7 +474,7 @@
         </style>
 
         <!-- Top Header Strip (Green Free Banner, Clean & Short) -->
-        <div style="background: #047857; padding: clamp(6px, 1.4vh, 9px) 10px; text-align: center; flex-shrink: 0;">
+        <div id="adsGateHeaderStrip" style="background: #047857; padding: clamp(6px, 1.4vh, 9px) 10px; text-align: center; flex-shrink: 0;">
           <span style="font-size: clamp(12px, 3.4vw, 14px); font-weight: 900; color: #ffffff; letter-spacing: 0.3px;">
             🎁 100% मुफ़्त एक्सेस (FREE)
           </span>
@@ -606,53 +606,64 @@
           </div>
         </div>
 
-        <!-- SCREEN 2: CONFIRMATION PAGE VIEW (Real Page Screen, Not a Popup!) -->
+        <!-- SCREEN 2: CONFIRMATION PAGE VIEW (Real Full-Screen Retention Page, Not Cut Off!) -->
         <div id="adsGateConfirmScreen" style="
           display: none;
-          flex: 1;
+          position: fixed;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          min-height: 100dvh;
+          min-height: 100vh;
+          z-index: 99999999;
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          padding: 24px 18px;
+          padding: 24px 20px max(28px, env(safe-area-inset-bottom)) 20px;
           text-align: center;
           box-sizing: border-box;
           background: #090e1a;
           color: #ffffff;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
           animation: adsGatePop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         ">
-          <div style="font-size: 3.2rem; margin-bottom: 12px; line-height: 1; animation: bookPulseBlink 0.9s infinite ease-in-out;">🎁</div>
-          <h3 style="color: #ffffff; font-size: clamp(1.18rem, 4.2vw, 1.35rem); font-weight: 900; margin: 0 0 10px 0; line-height: 1.30; letter-spacing: 0.2px;">
-            रुकिए! क्या आप मुफ़्त झलक नहीं देखना चाहते?
-          </h3>
-          <p style="color: #f1f5f9; font-size: clamp(0.90rem, 3.2vw, 1.00rem); font-weight: 700; margin: 0 0 22px 0; line-height: 1.45;">
-            यह मुफ़्त झलक केवल आज के लिए है। बस अपना विवरण दर्ज करें और पुस्तक का संपूर्ण विवरण व समाधान मुफ़्त में देखें!
-          </p>
-          <button type="button" id="btnAdsGateStay" class="ads-btn-sharp-green" style="
-            width: 100%;
-            box-sizing: border-box;
-            padding: 13px 14px;
-            min-height: 48px;
-            border-radius: 8px;
-            font-size: clamp(14px, 3.8vw, 16px);
-            font-weight: 900;
-            cursor: pointer;
-            margin-bottom: 14px;
-            box-shadow: 0 4px 14px rgba(4, 120, 87, 0.45);
-          ">
-            👉 हाँ, मुझे मुफ़्त झलक देखनी है (फॉर्म भरें)
-          </button>
-          <button type="button" id="btnAdsGateLeave" style="
-            background: transparent;
-            border: none;
-            color: #fca5a5;
-            font-size: clamp(12.5px, 3.2vw, 14px);
-            font-weight: 800;
-            cursor: pointer;
-            text-decoration: underline;
-            padding: 8px 12px;
-          ">
-            नहीं, मुझे मुफ़्त समाधान नहीं चाहिए (पेज से बाहर निकलें ✕)
-          </button>
+          <div style="width: 100%; max-width: 420px; margin: auto; display: flex; flex-direction: column; align-items: center; box-sizing: border-box;">
+            <div style="font-size: 3.4rem; margin-bottom: 12px; line-height: 1; animation: bookPulseBlink 0.9s infinite ease-in-out;">🎁</div>
+            <h3 style="color: #ffffff; font-size: clamp(1.22rem, 4.6vw, 1.40rem); font-weight: 900; margin: 0 0 12px 0; line-height: 1.34; letter-spacing: 0.2px;">
+              रुकिए! क्या आप मुफ़्त झलक नहीं देखना चाहते?
+            </h3>
+            <p style="color: #f1f5f9; font-size: clamp(0.96rem, 3.6vw, 1.08rem); font-weight: 700; margin: 0 0 24px 0; line-height: 1.48;">
+              यह मुफ़्त झलक केवल आज के लिए है। बस अपना विवरण दर्ज करें और पुस्तक का संपूर्ण विवरण व समाधान मुफ़्त में देखें!
+            </p>
+            <button type="button" id="btnAdsGateStay" class="ads-btn-sharp-green" style="
+              width: 100%;
+              box-sizing: border-box;
+              padding: 14px 16px;
+              min-height: 52px;
+              border-radius: 9px;
+              font-size: clamp(15px, 4vw, 17px);
+              font-weight: 900;
+              cursor: pointer;
+              margin-bottom: 16px;
+              box-shadow: 0 4px 14px rgba(4, 120, 87, 0.45);
+            ">
+              👉 हाँ, मुझे मुफ़्त झलक देखनी है (फॉर्म भरें)
+            </button>
+            <button type="button" id="btnAdsGateLeave" style="
+              background: transparent;
+              border: none;
+              color: #fca5a5;
+              font-size: clamp(13px, 3.4vw, 14.5px);
+              font-weight: 800;
+              cursor: pointer;
+              text-decoration: underline;
+              padding: 10px 14px;
+              line-height: 1.35;
+            ">
+              नहीं, मुझे मुफ़्त समाधान नहीं चाहिए (पेज से बाहर निकलें ✕)
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -674,11 +685,15 @@
     function showFormScreen() {
       if (formScreen) formScreen.style.display = 'flex';
       if (confirmScreen) confirmScreen.style.display = 'none';
+      const headerStrip = document.getElementById('adsGateHeaderStrip');
+      if (headerStrip) headerStrip.style.display = '';
     }
 
     function showConfirmScreen() {
       if (formScreen) formScreen.style.display = 'none';
       if (confirmScreen) confirmScreen.style.display = 'flex';
+      const headerStrip = document.getElementById('adsGateHeaderStrip');
+      if (headerStrip) headerStrip.style.display = 'none';
     }
 
     // Live Mobile Sanitizer & Validator (Auto-removes spaces and +91, detects fake/wrong numbers)
@@ -1314,7 +1329,7 @@
     } catch (_) { }
   }
 
-  // 11. Public Initializer API
+  // 11. Public Initializer API & Instant Auto-Boot
   window.initAdsLeadGateway = function (config = {}) {
     // If user is already registered in this browser, bypass gateway but activate landing page exit shield!
     if (isUserRegistered()) {
@@ -1329,12 +1344,30 @@
     // Check if Ads Mode is active
     const urlParams = new URLSearchParams(window.location.search);
     const forceAd = urlParams.get('ad') === '1' || urlParams.get('ads') === '1' || urlParams.get('lead') === '1';
-    const isAdsEnabled = forceAd || config.ads_mode_enabled === true || config.ads_gateway_enabled === true;
+    const hasAdSource = urlParams.has('utm_source') || urlParams.has('fbclid') || urlParams.has('gclid') || (urlParams.get('source') || '').toLowerCase().includes('fb');
+    const isBundle = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle');
+    const isAdsEnabled = forceAd || hasAdSource || isBundle || config.ads_mode_enabled === true || config.ads_gateway_enabled === true;
 
     if (isAdsEnabled) {
       renderGatewayModal(config);
     }
   };
+
+  // Instant Auto-Boot for 0ms delay: Opens gateway IMMEDIATELY without waiting for landing page scripts
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceAd = urlParams.get('ad') === '1' || urlParams.get('ads') === '1' || urlParams.get('lead') === '1';
+    const hasAdSource = urlParams.has('utm_source') || urlParams.has('fbclid') || urlParams.has('gclid') || (urlParams.get('source') || '').toLowerCase().includes('fb');
+    const isBundle = (window.location.pathname || '').includes('bundle') || (window.location.search || '').includes('bundle');
+
+    if (!isUserRegistered() && (forceAd || hasAdSource || isBundle)) {
+      if (document.body) {
+        renderGatewayModal();
+      } else {
+        document.addEventListener('DOMContentLoaded', () => renderGatewayModal(), { once: true });
+      }
+    }
+  } catch (_) { }
 
   // Auto-prefill on DOM ready if user is known
   if (document.readyState === 'loading') {
