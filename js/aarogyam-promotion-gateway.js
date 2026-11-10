@@ -1172,10 +1172,12 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     <!-- Top Floating Close Button -->
                     <button class="agy-promo-close-btn" id="agyPromoCloseBtn" title="बंद करें (Close)" aria-label="Close">✕</button>
 
-                    <!-- 3D Center Floating Image Stage -->
+                    <!-- 3D Center Floating Image Stage (Clickable to Target URL) -->
                     <div class="agy-promo-floating-stage">
                         <div class="agy-promo-aura-halo"></div>
-                        <img src="${promo.image_url || '/images/logo/logo.png'}" alt="Festival Promotion" class="agy-promo-float-img" onerror="if(this.src && !this.src.includes('/images/logo/logo.png'))this.src='/images/logo/logo.png';" />
+                        <a href="${promo.target_url || '/'}" style="display:block; text-decoration:none; cursor:pointer;" title="विवरण देखें">
+                            <img src="${promo.image_url || '/images/logo/logo.png'}" alt="Festival Promotion" class="agy-promo-float-img" onerror="if(this.src && !this.src.includes('/images/logo/logo.png'))this.src='/images/logo/logo.png';" />
+                        </a>
                     </div>
 
                     <!-- Inner Transparent Container (No Black Box!) -->
@@ -1194,6 +1196,18 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
 
                             <h3 class="agy-promo-title">${promo.title}</h3>
                             <p class="agy-promo-subtitle">${promo.subtitle}</p>
+                        </div>
+
+                        <!-- Direct Action Buttons Row (Book Landing Page & Tube Video) -->
+                        <div style="display:flex; gap:8px; width:100%; margin-top:8px; margin-bottom:6px; flex-wrap:wrap; box-sizing:border-box;">
+                            <a href="${promo.target_url || '/'}" class="admin-btn" style="flex:1; min-width:140px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:800; font-size:0.86rem; padding:9px 12px; border-radius:8px; text-decoration:none; text-align:center; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 4px 12px rgba(16,185,129,0.35);">
+                                <span>👉</span> ${promo.cta_text || 'पुस्तक देखें व अनलॉक करें →'}
+                            </a>
+                            ${(promo.type === 'tube_video' || (promo.target_url && promo.target_url.includes('tube.html')) || (promo.image_url && promo.image_url.includes('ytimg.com'))) ? `
+                            <a href="${promo.target_url && promo.target_url.includes('tube.html') ? promo.target_url : ('/tube.html' + (promo.video_id ? '?v=' + promo.video_id : ''))}" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; font-weight:800; font-size:0.82rem; padding:9px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 4px 12px rgba(239,68,68,0.35);" title="AarogyamTube पर वीडियो देखें">
+                                <span>🎬</span> वीडियो देखें
+                            </a>
+                            ` : ''}
                         </div>
 
                         <!-- Progress Bar & Responsive 1-Line Dual Buttons -->

@@ -165,7 +165,7 @@ async function deleteBonusFileFromDb(bookId) {
     }
 }
 
-// 📄 IndexedDB Storage Helpers for Attached Source PDF Files (Zero-Crash Local Vault)
+// 📄 IndexedDB Storage Helpers for Attached Source PDF Files (Multi-PDF & Zero-Crash Vault)
 async function savePdfFileToDb(bookId, fileObj) {
     try {
         const cleanId = String(bookId || '').toUpperCase().trim();
@@ -174,10 +174,47 @@ async function savePdfFileToDb(bookId, fileObj) {
         const store = tx.objectStore('bookPages');
         store.put(fileObj, `source_pdf_${cleanId}`);
         store.put(fileObj, `source_pdf_${cleanId.toLowerCase()}`);
+
+        // Also add to multi-PDF list for this book
+        const listReq = store.get(`source_pdfs_list_${cleanId}`);
+        listReq.onsuccess = () => {
+            let list = listReq.result;
+            if (!Array.isArray(list)) list = [];
+            const idx = list.findIndex(p => p && p.name === fileObj.name);
+            if (idx >= 0) list[idx] = fileObj;
+            else list.push(fileObj);
+            try {
+                const tx2 = db.transaction('bookPages', 'readwrite');
+                tx2.objectStore('bookPages').put(list, `source_pdfs_list_${cleanId}`);
+            } catch (_) {}
+        };
+
         return new Promise((res) => { tx.oncomplete = () => res(true); });
     } catch (e) {
         console.warn("IndexedDB PDF Save Error:", e);
         return false;
+    }
+}
+
+async function loadAllPdfFilesFromDb(bookId) {
+    try {
+        const cleanId = String(bookId || '').toUpperCase().trim();
+        const db = await openStudioDb();
+        const tx = db.transaction('bookPages', 'readonly');
+        const store = tx.objectStore('bookPages');
+        const res = await new Promise((resolve) => {
+            const req = store.get(`source_pdfs_list_${cleanId}`);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        });
+        if (Array.isArray(res) && res.length > 0) return res;
+
+        // Fallback to single PDF
+        const single = await loadPdfFileFromDb(cleanId);
+        if (single) return [single];
+        return [];
+    } catch (e) {
+        return [];
     }
 }
 
@@ -2734,12 +2771,12 @@ async function setupStudioEvents() {
 
     const executeImportBtn = document.getElementById('executeImportBtn');
     if (executeImportBtn) {
-        executeImportBtn.addEventListener('click', () => executeImportPages());
+        executeImportBtn.onclick = () => executeImportPages();
     }
 
     const quickImportBtn = document.getElementById('quickImportBtn');
     if (quickImportBtn) {
-        quickImportBtn.addEventListener('click', () => executeImportPages());
+        quickImportBtn.onclick = () => executeImportPages();
     }
 }
 
@@ -3147,11 +3184,13 @@ function renderPageChipGrid() {
     grid.innerHTML = '';
     for (let p = 1; p <= studioTotalPages; p++) {
         const chip = document.createElement('div');
+        chip.className = 'studio-page-chip';
+        chip.dataset.page = p;
         chip.style.padding = '5px 10px';
         chip.style.borderRadius = '6px';
         chip.style.fontSize = '12px';
         chip.style.cursor = 'pointer';
-        chip.style.transition = 'all 0.2s';
+        chip.style.transition = 'background 0.15s, border 0.15s';
         chip.style.display = 'flex';
         chip.style.alignItems = 'center';
         chip.style.gap = '6px';
@@ -3265,6 +3304,46 @@ function renderPageChipGrid() {
     }
 }
 
+function updateActiveChipHighlight(activeNum) {
+    const chips = document.querySelectorAll('.studio-page-chip');
+    chips.forEach(chip => {
+        const p = parseInt(chip.dataset.page, 10);
+        if (p === activeNum) {
+            chip.style.background = '#10b981';
+            chip.style.color = '#fff';
+            chip.style.fontWeight = '700';
+            chip.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.6)';
+            chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        } else if (!selectedPagesForBulkAction.has(p)) {
+            const pageData = studioAudioScripts.pages && studioAudioScripts.pages[String(p)];
+            let hasAudio = false;
+            let hasText = false;
+            if (pageData) {
+                if (typeof pageData === 'string' && pageData.trim().length > 0) hasText = true;
+                if (typeof pageData === 'object') {
+                    if (pageData.audio && pageData.audio.trim().length > 0) hasAudio = true;
+                    if (pageData.text && pageData.text.trim().length > 0) hasText = true;
+                }
+            }
+            if (hasAudio) {
+                chip.style.background = '#1e3a8a';
+                chip.style.color = '#93c5fd';
+                chip.style.border = '1px solid #3b82f6';
+            } else if (hasText) {
+                chip.style.background = '#064e3b';
+                chip.style.color = '#6ee7b7';
+                chip.style.border = '1px solid #10b981';
+            } else {
+                chip.style.background = '#334155';
+                chip.style.color = '#cbd5e1';
+                chip.style.border = 'none';
+            }
+            chip.style.fontWeight = 'normal';
+            chip.style.boxShadow = 'none';
+        }
+    });
+}
+
 async function selectPage(pageNum) {
     // Silence any ongoing TTS audio when page changes
     stopCurrentPageTts();
@@ -3288,7 +3367,9 @@ async function selectPage(pageNum) {
     }
 
     studioCurrentPage = pageNum;
-    renderPageChipGrid();
+    const statusText = document.getElementById('pageCountStatus');
+    if (statusText) statusText.textContent = `${studioCurrentPage} / ${studioTotalPages} Pages`;
+    updateActiveChipHighlight(pageNum);
 
     const pageTag = document.getElementById('previewPageNumberTag');
     if (pageTag) {
@@ -3888,18 +3969,23 @@ async function updateSourcePdfUI(bookId) {
         return;
     }
 
-    // 1. Check IndexedDB first
-    const savedPdf = await loadPdfFileFromDb(cleanId);
-    if (savedPdf && (savedPdf.buffer || savedPdf.data)) {
+    // 1. Check IndexedDB first (All saved PDFs for this book)
+    const pdfList = await loadAllPdfFilesFromDb(cleanId);
+    if (pdfList && pdfList.length > 0) {
         card.style.display = 'flex';
-        if (nameLabel) nameLabel.textContent = savedPdf.name || `${cleanId}.pdf`;
-        const sizeMb = savedPdf.size 
-            ? (savedPdf.size / (1024 * 1024)).toFixed(2) 
-            : (savedPdf.buffer ? (savedPdf.buffer.byteLength / (1024 * 1024)).toFixed(2) : '1.0');
-        const pagesCount = savedPdf.totalPages || studioTotalPages || 0;
-        if (metaLabel) metaLabel.textContent = `${pagesCount > 0 ? pagesCount + ' पेजेस • ' : ''}${sizeMb} MB • IndexedDB सुरक्षित Vault`;
+        const latest = pdfList[pdfList.length - 1];
+        const totalPdfs = pdfList.length;
+        if (nameLabel) {
+            nameLabel.textContent = totalPdfs > 1 
+                ? `${latest.name || cleanId + '.pdf'} (+${totalPdfs - 1} अन्य PDF)`
+                : (latest.name || `${cleanId}.pdf`);
+        }
+        let totalBytes = pdfList.reduce((acc, p) => acc + (p.size || (p.buffer ? p.buffer.byteLength : 0)), 0);
+        const sizeMb = (totalBytes / (1024 * 1024)).toFixed(2);
+        const pagesCount = latest.totalPages || studioTotalPages || 0;
+        if (metaLabel) metaLabel.textContent = `${totalPdfs > 1 ? `${totalPdfs} संलग्न PDF • ` : ''}${pagesCount > 0 ? pagesCount + ' पेजेस • ' : ''}${sizeMb} MB • IndexedDB सुरक्षित Vault`;
         if (badge) {
-            badge.textContent = '✓ IndexedDB सुरक्षित';
+            badge.textContent = totalPdfs > 1 ? `✓ IndexedDB (${totalPdfs} PDF सुरक्षित)` : '✓ IndexedDB सुरक्षित';
             badge.style.background = '#065f46';
             badge.style.color = '#34d399';
             badge.style.borderColor = '#059669';
@@ -4221,22 +4307,30 @@ async function syncStudioToGitHub() {
     const total = studioPageImages.length;
     
     // -------------------------------------------------------------
-    // SMART DELTA DETERMINATION: What actually needs to be synced?
+    // SMART ZERO-REDUNDANCY DELTA ENGINE (Prevents duplicate git commits)
     // -------------------------------------------------------------
-    let pagesToUpload = [];
-    let isDeltaAudioOnly = false;
-    let isDeltaSinglePage = false;
-
+    let rawCandidates = [];
     if (isFullBookReload || (modifiedPageIndices.size === 0 && !audioScriptsModified)) {
-        // Full book upload (First time or bulk re-upload)
-        pagesToUpload = Array.from({ length: total }, (_, i) => i);
-    } else if (modifiedPageIndices.size === 0 && audioScriptsModified) {
-        // Audio or Text changed ONLY (ZERO image changes)
+        rawCandidates = Array.from({ length: total }, (_, i) => i);
+    } else if (modifiedPageIndices.size > 0) {
+        rawCandidates = Array.from(modifiedPageIndices).sort((a, b) => a - b);
+    }
+
+    // Filter: ONLY upload pages that are actual new Base64 strings.
+    // If an image already points to a Git/server file (../images/books/...), DO NOT re-commit it!
+    pagesToUpload = rawCandidates.filter(idx => {
+        const img = studioPageImages[idx];
+        if (!img) return false;
+        if (typeof img === 'string' && (img.startsWith('../') || img.startsWith('/images/') || img.startsWith('http'))) {
+            return false; // Already saved on GitHub!
+        }
+        return typeof img === 'string' && img.startsWith('data:image/');
+    });
+
+    if (pagesToUpload.length === 0) {
         isDeltaAudioOnly = true;
-    } else {
-        // Specific pages were replaced/added
-        pagesToUpload = Array.from(modifiedPageIndices).sort((a, b) => a - b);
-        if (pagesToUpload.length === 1) isDeltaSinglePage = true;
+    } else if (pagesToUpload.length === 1) {
+        isDeltaSinglePage = true;
     }
 
     // Confirm dialog text customized to what actually changed
@@ -5677,26 +5771,30 @@ function convertImgUrlToWebpDataUrl(url) {
     });
 }
 
+let isImportRunning = false;
 async function executeImportPages() {
+    if (isImportRunning) return;
     const checkboxes = Array.from(document.querySelectorAll('.import-page-cb:checked'));
     if (!checkboxes.length) {
         alert("कृपया कम से कम 1 पेज चुनें जिसे आप इस पुस्तक में जोड़ना चाहते हैं।");
         return;
     }
 
-    const sourceBookSelect = document.getElementById('importSourceBookSelect');
-    const sourceBookId = sourceBookSelect ? sourceBookSelect.value : 'BK001';
-    const placementSelect = document.getElementById('importPlacementSelect');
-    const placement = placementSelect ? placementSelect.value : 'END';
-    const includeAudio = document.getElementById('importIncludeAudioCheck')?.checked ?? true;
-
-    const selectedPages = checkboxes.map(cb => parseInt(cb.dataset.page, 10)).sort((a, b) => a - b);
-
+    isImportRunning = true;
     const executeBtn = document.getElementById('executeImportBtn');
     if (executeBtn) {
         executeBtn.disabled = true;
         executeBtn.innerHTML = `<span>⏳</span> पेजेस इंपोर्ट हो रहे हैं...`;
     }
+
+    try {
+        const sourceBookSelect = document.getElementById('importSourceBookSelect');
+        const sourceBookId = sourceBookSelect ? sourceBookSelect.value : 'BK001';
+        let placement = document.getElementById('importPlacementSelect')?.value || 'END';
+        const includeAudio = document.getElementById('importIncludeAudioCheck')?.checked ?? true;
+
+        // 🛡️ DEDUPLICATION: Strict Set deduplication guarantees 0 duplicate pages
+        const selectedPages = [...new Set(checkboxes.map(cb => parseInt(cb.dataset.page, 10)).filter(n => !isNaN(n) && n > 0))].sort((a, b) => a - b);
 
     const importedImages = [];
     const importedScripts = [];
@@ -5801,19 +5899,25 @@ async function executeImportPages() {
     isFullBookReload = true;
     markUnsaved(true);
 
-    if (executeBtn) {
-        executeBtn.disabled = false;
-        executeBtn.innerHTML = `<span>✨</span> <span id="executeImportBtnText">0 पेजेस और ऑडियो इंपोर्ट करें</span>`;
-    }
-
-    // Close Modal
+    // Close Modal & Reset Checkboxes
     const modal = document.getElementById('importPagesModal');
     if (modal) modal.style.display = 'none';
+    setAllImportCheckboxes(false);
 
     renderPageChipGrid();
     const newFocusPage = (placement === 'BEGINNING') ? 1 : ((placement === 'AFTER_CURRENT') ? studioCurrentPage + 1 : (currentImages.length > 0 ? currentImages.length + 1 : 1));
     selectPage(newFocusPage);
 
     alert(`🎉 बधाई! पुस्तक [${sourceBookId}] से ${selectedPages.length} पेजेस और उनका ऑडियो [${studioCurrentBookId}] में सफलतापूर्वक जुड़ गए हैं!\n\n💡 स्वतंत्र संपादन (Independent Editing):\nअब आप किसी भी पेज पर जाकर उसकी आवाज़ दोबारा रिकॉर्ड कर सकते हैं या नया टेक्स्ट लिख सकते हैं। इससे मूल पुस्तक (${sourceBookId}) में कोई छेड़छाड़ नहीं होगी!\n\nसारे बदलाव फाइनल करने के लिए "🚀 1-Click Push to Git" बटन दबाएं।`);
+    } catch(err) {
+        console.error("Execute import error:", err);
+        alert(`❌ पेजेस जोड़ने में समस्या आई: ${err.message || err}`);
+    } finally {
+        isImportRunning = false;
+        if (executeBtn) {
+            executeBtn.disabled = false;
+            executeBtn.innerHTML = `<span>✨</span> <span id="executeImportBtnText">0 पेजेस और ऑडियो इंपोर्ट करें</span>`;
+        }
+    }
 }
 
