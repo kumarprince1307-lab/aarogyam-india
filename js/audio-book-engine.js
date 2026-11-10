@@ -122,6 +122,7 @@ class ProAudioBookEngine {
         this.bgm = new SoothingBgmEngine();
         this.autoNextPage = true;
         this.pageScripts = {};
+        this.sourceBooksCache = {};
         this.metadata = {};
         this.userName = "किसान मित्र";
         this.welcomePlayed = false;
@@ -543,6 +544,36 @@ class ProAudioBookEngine {
         this.metadata = serverMeta;
         this.pageScripts = { ...serverScripts, ...localScripts };
         this.updateNarratorDisplay();
+
+        // 🛡️ ZERO-DUPLICATION AUTO-UPDATE: Prefetch any referenced source books in background
+        try {
+            const neededSources = new Set();
+            Object.values(this.pageScripts).forEach(entry => {
+                if (entry && typeof entry === 'object' && entry.sourceBook) {
+                    neededSources.add(String(entry.sourceBook).toUpperCase().trim());
+                }
+            });
+            neededSources.forEach(srcId => {
+                if (srcId && srcId !== bookId) this.loadSourceBookScripts(srcId);
+            });
+        } catch (_) {}
+    }
+
+    async loadSourceBookScripts(bookId) {
+        if (!bookId) return null;
+        const cleanId = String(bookId).toUpperCase().trim();
+        if (this.sourceBooksCache[cleanId]) return this.sourceBooksCache[cleanId];
+        try {
+            const cacheVer = Date.now();
+            let res = await fetch(`../data/audio-scripts/${cleanId}.json?v=${cacheVer}`);
+            if (!res.ok) res = await fetch(`/data/audio-scripts/${cleanId}.json?v=${cacheVer}`);
+            if (res.ok) {
+                const data = await res.json();
+                this.sourceBooksCache[cleanId] = data.pages || {};
+                return this.sourceBooksCache[cleanId];
+            }
+        } catch (_) {}
+        return null;
     }
 
     updateNarratorDisplay() {
@@ -589,8 +620,24 @@ class ProAudioBookEngine {
             if (typeof pageEntry === 'string') {
                 pageText = pageEntry;
             } else if (typeof pageEntry === 'object') {
-                // 🛡️ Audio Quality Control: If admin has not approved/marked this page live, do not play draft audio
-                if (pageEntry.is_live === false || pageEntry.approved === false) {
+                // 🛡️ ZERO-DUPLICATION CASCADING AUDIO (Aarogyam Manas Clause XV & XVIII):
+                // If page inherits from a source book, resolve live audio from source book!
+                if (pageEntry.sourceBook && pageEntry.sourcePage) {
+                    const srcBook = String(pageEntry.sourceBook).toUpperCase().trim();
+                    const srcPg = String(pageEntry.sourcePage);
+                    const cachedSrc = this.sourceBooksCache[srcBook];
+                    const srcEntry = cachedSrc && cachedSrc[srcPg];
+                    if (srcEntry) {
+                        const sLive = typeof srcEntry === 'object' ? (srcEntry.is_live !== false && srcEntry.approved !== false) : true;
+                        if (sLive) {
+                            pageText = (typeof srcEntry === 'string' ? srcEntry : (srcEntry.text || pageEntry.text || ''));
+                            pageAudio = (typeof srcEntry === 'object' ? (srcEntry.audio || pageEntry.audio || '') : (pageEntry.audio || ''));
+                        }
+                    } else {
+                        pageText = pageEntry.text || '';
+                        pageAudio = pageEntry.audio || '';
+                    }
+                } else if (pageEntry.is_live === false || pageEntry.approved === false) {
                     isApprovedLive = false;
                 } else {
                     pageText = pageEntry.text || '';

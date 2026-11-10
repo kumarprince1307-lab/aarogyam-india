@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-10T17:30:12.468Z",
+  "updated_at": "2026-11-10T22:20:00.000Z",
   "version": "1.2",
   "active_campaign_id": "PROM_TUBE_FEATURED",
   "promotions": [
@@ -11,6 +11,8 @@
       "badge": "🔥 AAROGYAMTUBE VIDEO",
       "animation_preset": "neon_tube_flow",
       "image_url": "https://i.ytimg.com/vi/EbdpqfJDN4c/oar2.jpg",
+      "video_id": "EbdpqfJDN4c",
+      "video_url": "https://www.youtube.com/watch?v=EbdpqfJDN4c",
       "cta_text": "📖 कॉम्बो ऑफर देखें व अनलॉक करें →",
       "target_url": "/ebooks/bundle-landing.html?id=BUNDLE_AGRI_5",
       "start_date": "2026-11-01T00:00",
@@ -22,7 +24,7 @@
       "share_enabled": true,
       "share_message_template": "🌾 किसान भाइयों के लिए महाबचत! ₹495 की 5 कृषि ई-बुक्स अब सिर्फ ₹149 में। यहाँ देखें: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T17:30:12.464Z"
+      "updated_at": "2026-11-10T22:20:00.000Z"
     },
     {
       "id": "PROM_HEALTH_JOINT_CARE",

@@ -4385,6 +4385,41 @@ async function syncStudioToGitHub() {
             if (sizeLabel) sizeLabel.textContent = `डेटा साइज: < 10 KB`;
             if (fillBar) fillBar.style.width = `60%`;
 
+            // 🛡️ PDF GIT VAULT: Commit all attached Source PDFs for this book to GitHub repository
+            try {
+                const attachedPdfs = await loadAllSourcePdfsFromDb(studioCurrentBookId);
+                if (Array.isArray(attachedPdfs) && attachedPdfs.length > 0) {
+                    for (const pdfItem of attachedPdfs) {
+                        if (pdfItem && pdfItem.buffer) {
+                            const uint8 = new Uint8Array(pdfItem.buffer);
+                            let binaryStr = '';
+                            const len = uint8.byteLength;
+                            const chunkSize = 0x8000;
+                            for (let b = 0; b < len; b += chunkSize) {
+                                binaryStr += String.fromCharCode.apply(null, uint8.subarray(b, Math.min(b + chunkSize, len)));
+                            }
+                            const pdfBase64 = btoa(binaryStr);
+                            const cleanPdfName = (pdfItem.name || 'document.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
+                            const pdfGitPath = `data/source-pdfs/${studioCurrentBookId}/${cleanPdfName}`;
+                            
+                            if (progressLabel) progressLabel.textContent = `📄 PDF [${cleanPdfName}] Git पर सुरक्षित हो रहा है...`;
+                            
+                            await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    action: 'upload_asset',
+                                    path: pdfGitPath,
+                                    base64: pdfBase64
+                                })
+                            });
+                        }
+                    }
+                }
+            } catch (pdfSyncErr) {
+                console.warn("Source PDF Git Sync Warning:", pdfSyncErr);
+            }
+
             const scriptJsonStr = JSON.stringify(studioAudioScripts, null, 2);
             const scriptBase64 = btoa(unescape(encodeURIComponent(scriptJsonStr)));
 
@@ -4397,6 +4432,37 @@ async function syncStudioToGitHub() {
                     base64: scriptBase64
                 })
             });
+
+            // 📚 SYNC TO data/books.json ON GITHUB
+            try {
+                let booksData = null;
+                let resBooks = await fetch('../data/books.json?v=' + Date.now());
+                if (!resBooks.ok) resBooks = await fetch('/data/books.json?v=' + Date.now());
+                if (resBooks.ok) booksData = await resBooks.json();
+                if (booksData && Array.isArray(booksData.books)) {
+                    let existingBIdx = booksData.books.findIndex(b => b && b.id && b.id.toUpperCase() === studioCurrentBookId);
+                    if (existingBIdx >= 0) {
+                        booksData.books[existingBIdx].totalPages = studioTotalPages;
+                        booksData.books[existingBIdx].hasWebpPages = true;
+                        booksData.books[existingBIdx].hasAudioBook = true;
+                        booksData.books[existingBIdx].pageImagesPath = `images/books/${studioCurrentBookId}`;
+                        booksData.books[existingBIdx].updated_at = new Date().toISOString();
+                        
+                        const updatedBooksStr = JSON.stringify(booksData, null, 2);
+                        const updatedBooksBase64 = btoa(unescape(encodeURIComponent(updatedBooksStr)));
+                        
+                        await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'upload_asset',
+                                path: 'data/books.json',
+                                base64: updatedBooksBase64
+                            })
+                        });
+                    }
+                }
+            } catch (_) {}
 
             // Save locally
             await savePagesToDb(studioCurrentBookId, studioPageImages);
@@ -4484,6 +4550,41 @@ async function syncStudioToGitHub() {
             return;
         }
 
+        // 🛡️ PDF GIT VAULT: Commit all attached Source PDFs for this book to GitHub repository
+        try {
+            const attachedPdfs = await loadAllSourcePdfsFromDb(studioCurrentBookId);
+            if (Array.isArray(attachedPdfs) && attachedPdfs.length > 0) {
+                for (const pdfItem of attachedPdfs) {
+                    if (pdfItem && pdfItem.buffer) {
+                        const uint8 = new Uint8Array(pdfItem.buffer);
+                        let binaryStr = '';
+                        const len = uint8.byteLength;
+                        const chunkSize = 0x8000;
+                        for (let b = 0; b < len; b += chunkSize) {
+                            binaryStr += String.fromCharCode.apply(null, uint8.subarray(b, Math.min(b + chunkSize, len)));
+                        }
+                        const pdfBase64 = btoa(binaryStr);
+                        const cleanPdfName = (pdfItem.name || 'document.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
+                        const pdfGitPath = `data/source-pdfs/${studioCurrentBookId}/${cleanPdfName}`;
+                        
+                        if (progressLabel) progressLabel.textContent = `📄 PDF [${cleanPdfName}] Git पर सुरक्षित हो रहा है...`;
+                        
+                        await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'upload_asset',
+                                path: pdfGitPath,
+                                base64: pdfBase64
+                            })
+                        });
+                    }
+                }
+            }
+        } catch (pdfSyncErr) {
+            console.warn("Source PDF Git Sync Warning:", pdfSyncErr);
+        }
+
         // Final Step: Commit data/audio-scripts/{bookId}.json
         if (progressLabel) progressLabel.textContent = `⏳ ऑडियो स्क्रिप्ट Git पर सुरक्षित हो रहा है...`;
         if (fillBar) fillBar.style.width = `95%`;
@@ -4500,6 +4601,63 @@ async function syncStudioToGitHub() {
                 base64: scriptBase64
             })
         });
+
+        // 📚 SYNC TO data/books.json ON GITHUB (Ensures Reader & Download page never show empty)
+        try {
+            let booksData = null;
+            let resBooks = await fetch('../data/books.json?v=' + Date.now());
+            if (!resBooks.ok) resBooks = await fetch('/data/books.json?v=' + Date.now());
+            if (resBooks.ok) booksData = await resBooks.json();
+            if (booksData && Array.isArray(booksData.books)) {
+                let existingBIdx = booksData.books.findIndex(b => b && b.id && b.id.toUpperCase() === studioCurrentBookId);
+                const bookTitle = studioBookData?.title || studioBookData?.name || studioBookData?.heading || studioCurrentBookId;
+                const bookCover = studioBookData?.cover || `/images/books/${studioCurrentBookId.toLowerCase()}-cover.webp`;
+                
+                if (existingBIdx >= 0) {
+                    booksData.books[existingBIdx].totalPages = studioTotalPages;
+                    booksData.books[existingBIdx].hasWebpPages = true;
+                    booksData.books[existingBIdx].hasAudioBook = true;
+                    booksData.books[existingBIdx].pageImagesPath = `images/books/${studioCurrentBookId}`;
+                    booksData.books[existingBIdx].updated_at = new Date().toISOString();
+                } else {
+                    booksData.books.push({
+                        id: studioCurrentBookId,
+                        heading: bookTitle,
+                        name: bookTitle,
+                        title: bookTitle,
+                        category: studioBookData?.category || 'Agriculture',
+                        cover: bookCover,
+                        thumbnail: bookCover,
+                        mrp: studioBookData?.mrp || 299,
+                        price: studioBookData?.price || studioBookData?.offerPrice || 99,
+                        offerPrice: studioBookData?.offerPrice || 99,
+                        totalPages: studioTotalPages,
+                        hasWebpPages: true,
+                        hasAudioBook: true,
+                        pageImagesPath: `images/books/${studioCurrentBookId}`,
+                        bonuses: studioBookData?.bonuses || [],
+                        visibility: studioBookData?.visibility || { myLibrary: true, store: true, landing: true, bundle: true },
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    });
+                }
+                
+                const updatedBooksStr = JSON.stringify(booksData, null, 2);
+                const updatedBooksBase64 = btoa(unescape(encodeURIComponent(updatedBooksStr)));
+                
+                await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'upload_asset',
+                        path: 'data/books.json',
+                        base64: updatedBooksBase64
+                    })
+                });
+            }
+        } catch (bkErr) {
+            console.warn("books.json git update notice:", bkErr);
+        }
 
         // Save locally to IndexedDB & localStorage
         await savePagesToDb(studioCurrentBookId, studioPageImages);
@@ -4749,6 +4907,9 @@ function toggleCurrentPageAudioLive(forceState = null) {
     studioAudioScripts.pages[curKey].is_live = forceState !== null ? Boolean(forceState) : !currentLive;
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
+    audioScriptsModified = true;
+    markUnsaved(true);
+
     selectPage(studioCurrentPage);
     renderPageChipGrid();
 }
@@ -4769,6 +4930,8 @@ function togglePageAudioLiveDirect(pageNum, e) {
     }
 
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+    markUnsaved(true);
 
     if (pageNum === studioCurrentPage) {
         selectPage(studioCurrentPage);
@@ -4794,6 +4957,8 @@ function approveAllPagesAudio() {
         }
     }
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+    markUnsaved(true);
     selectPage(studioCurrentPage);
     renderPageChipGrid();
     alert(`🎉 सभी ${studioTotalPages} पेजों का ऑडियो 100% लाइव हो चुका है! पाठक अब रीडर में सभी पेज सुन सकेंगे।`);
@@ -4816,6 +4981,20 @@ function draftAllPagesAudio() {
         }
     }
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+    markUnsaved(true);
+    selectPage(studioCurrentPage);
+    renderPageChipGrid();
+    alert(`⚪ सभी ${studioTotalPages} पेजों का ऑडियो ड्राफ्ट (ऑफ) कर दिया गया है।`);
+}
+            studioAudioScripts.pages[pk] = { text: studioAudioScripts.pages[pk], audio: '', is_live: false };
+        } else {
+            studioAudioScripts.pages[pk].is_live = false;
+        }
+    }
+    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+    markUnsaved(true);
     selectPage(studioCurrentPage);
     renderPageChipGrid();
     alert(`⚪ सभी ${studioTotalPages} पेजों का ऑडियो ड्राफ्ट (ऑफ) कर दिया गया है।`);
@@ -4844,6 +5023,8 @@ function setAudioApprovalForSelectedPages(isLive) {
     });
 
     localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    audioScriptsModified = true;
+    markUnsaved(true);
     selectPage(studioCurrentPage);
     renderPageChipGrid();
     alert(`✅ चुने हुए ${count} पेजों का ऑडियो ${actionLabel} कर दिया गया है।`);
@@ -5538,6 +5719,7 @@ async function loadSourceBookForImport(sourceBookId) {
     if (totalSrcPages === 0) totalSrcPages = 1;
 
     grid.innerHTML = '';
+    const frag = document.createDocumentFragment();
     for (let p = 1; p <= totalSrcPages; p++) {
         const pageData = (sourceBookScriptsCache.pages && sourceBookScriptsCache.pages[String(p)]) || null;
         let hasAudio = false;
@@ -5576,7 +5758,7 @@ async function loadSourceBookForImport(sourceBookId) {
                 <input type="checkbox" class="import-page-cb" data-page="${p}" style="width:18px; height:18px; accent-color:#10b981; cursor:pointer;">
             </div>
             <div style="width:100%; height:155px; background:#000; border-radius:6px; overflow:hidden; display:flex; justify-content:center; align-items:center; margin-bottom:4px; border:1px solid #1e293b;">
-                <img src="${thumbSrc}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" style="max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;" alt="Pg ${p}">
+                <img src="${thumbSrc}" loading="lazy" decoding="async" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" style="max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;" alt="Pg ${p}">
                 <div style="display:none; color:#64748b; font-size:11px; text-align:center; padding:10px; width:100%; height:100%; align-items:center; justify-content:center;">Pg ${p}</div>
             </div>
             <div style="width:100%; display:flex; gap:3px; flex-wrap:wrap; justify-content:center; margin-bottom:2px;">
@@ -5612,8 +5794,9 @@ async function loadSourceBookForImport(sourceBookId) {
             });
         }
 
-        grid.appendChild(card);
+        frag.appendChild(card);
     }
+    grid.appendChild(frag);
 
     updateImportCountBadge();
 }
@@ -5800,27 +5983,32 @@ async function executeImportPages() {
     const importedScripts = [];
 
     for (let p of selectedPages) {
-        // 1. Get Image
+        // 1. Get Image Path (ZERO MEMORY DOCTRINE - Aarogyam Manas Clause XV & XVIII)
+        // Never convert source book page path to heavy base64 data URLs!
         let imgData = (sourceBookImagesCache.length >= p && sourceBookImagesCache[p - 1])
             ? sourceBookImagesCache[p - 1]
             : `../images/books/${sourceBookId}/${p}.webp`;
 
-        if (!imgData.startsWith('data:image/')) {
-            imgData = await convertImgUrlToWebpDataUrl(imgData);
-        }
         importedImages.push(imgData);
 
-        // 2. Clone Audio / Script Text
-        let scriptClone = { text: '', audio: '' };
+        // 2. Cascading Audio / Script Reference (Points to Source Book for Instant Auto-Updates)
+        let scriptClone = {
+            text: '',
+            audio: '',
+            sourceBook: sourceBookId,
+            sourcePage: p
+        };
         if (includeAudio && sourceBookScriptsCache.pages && sourceBookScriptsCache.pages[String(p)]) {
             const raw = sourceBookScriptsCache.pages[String(p)];
             if (typeof raw === 'string') {
-                scriptClone = { text: raw, audio: '' };
+                scriptClone.text = raw;
             } else if (typeof raw === 'object') {
-                scriptClone = {
-                    text: raw.text || '',
-                    audio: raw.audio || '' // Cloned Opus base64 audio
-                };
+                scriptClone.text = raw.text || '';
+                scriptClone.audio = raw.audio || '';
+                if (raw.sourceBook) {
+                    scriptClone.sourceBook = raw.sourceBook;
+                    scriptClone.sourcePage = raw.sourcePage;
+                }
             }
         }
         importedScripts.push(scriptClone);

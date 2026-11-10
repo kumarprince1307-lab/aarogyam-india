@@ -402,7 +402,10 @@ export async function initPromotionsPage() {
   async function loadInitialData() {
     try {
       // 1. Promotions
-      const pRes = await fetch('/data/universal-promotions.json?v=' + Date.now()).catch(() => null);
+      let pRes = await fetch('/data/universal-promotions.json?v=' + Date.now()).catch(() => null);
+      if (!pRes || !pRes.ok) {
+        pRes = await fetch('../data/universal-promotions.json?v=' + Date.now()).catch(() => null);
+      }
       if (pRes && pRes.ok) {
         promotionsData = await pRes.json();
       }
@@ -966,7 +969,7 @@ export async function initPromotionsPage() {
       target_url: '/ebooks/index.html',
       start_date: new Date().toISOString(),
       end_date: new Date(Date.now() + 15*86400000).toISOString(),
-      is_active: false,
+      is_active: true,
       target_pages: ['all'],
       share_enabled: true,
       share_message_template: 'आरोग्यम की ओर से हार्दिक शुभकामनाएँ! {link}',

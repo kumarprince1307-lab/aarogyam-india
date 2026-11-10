@@ -1533,13 +1533,21 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
             }
 
             try {
-                // Fetch dynamic promotions JSON (15s cache buster)
-                const cacheBust = Math.floor(Date.now() / 15000);
+                // Fetch dynamic promotions JSON (Instant cache buster with relative fallback)
+                const cacheBust = Date.now();
                 let data = null;
                 try {
-                    const resp = await fetch('/data/universal-promotions.json?v=' + cacheBust);
+                    let resp = await fetch('/data/universal-promotions.json?v=' + cacheBust);
+                    if (!resp.ok) {
+                        resp = await fetch('../data/universal-promotions.json?v=' + cacheBust);
+                    }
                     if (resp.ok) data = await resp.json();
-                } catch (_) {}
+                } catch (_) {
+                    try {
+                        const fallbackResp = await fetch('../data/universal-promotions.json?v=' + cacheBust);
+                        if (fallbackResp.ok) data = await fallbackResp.json();
+                    } catch (e2) {}
+                }
 
                 // Merge with localStorage overrides (Admin local/mobile updates go live instantly!)
                 try {
@@ -1547,7 +1555,9 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     if (localPromoStr) {
                         const localPromo = JSON.parse(localPromoStr);
                         if (localPromo && Array.isArray(localPromo.promotions) && localPromo.promotions.length > 0) {
-                            if (!data || !data.promotions || new Date(localPromo.updated_at || 0) >= new Date(data.updated_at || 0)) {
+                            const localTime = new Date(localPromo.updated_at || 0).getTime();
+                            const serverTime = data && data.updated_at ? new Date(data.updated_at).getTime() : 0;
+                            if (!data || !data.promotions || localTime > serverTime) {
                                 data = localPromo;
                             } else {
                                 const serverIds = new Set((data.promotions || []).map(p => p.id));
@@ -1588,8 +1598,20 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     return true;
                 });
 
-                // 3. Multi-Promotion Priority Resolver (cultural_festival > national_festival > health_campaign > tube_video)
-                eligibleList.sort((a, b) => this.getPriorityScore(b) - this.getPriorityScore(a));
+                // 3. Multi-Promotion Priority Resolver:
+                // Rule 1: Explicitly active campaign (active_campaign_id) has highest priority.
+                // Rule 2: Newest updated campaign takes precedence.
+                // Rule 3: Category priority score fallback.
+                eligibleList.sort((a, b) => {
+                    const aIsSelected = (data.active_campaign_id && a.id === data.active_campaign_id) ? 1000 : 0;
+                    const bIsSelected = (data.active_campaign_id && b.id === data.active_campaign_id) ? 1000 : 0;
+                    if (aIsSelected !== bIsSelected) return bIsSelected - aIsSelected;
+
+                    const timeDiff = new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
+                    if (timeDiff !== 0) return timeDiff;
+
+                    return this.getPriorityScore(b) - this.getPriorityScore(a);
+                });
 
                 const eligible = eligibleList[0] || null;
 
