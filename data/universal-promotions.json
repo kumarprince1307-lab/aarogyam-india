@@ -1,18 +1,18 @@
 {
-  "updated_at": "2026-11-10T02:06:28.700Z",
+  "updated_at": "2026-11-10T10:10:29.412Z",
   "version": "1.1",
   "active_campaign_id": "PROM_DIWALI_2026",
   "promotions": [
     {
       "id": "PROM_TIRANGA_NATIONAL",
-      "type": "national_festival",
-      "title": "समृद्ध, स्वस्थ और आत्मनिर्भर भारत का संकल्प",
-      "subtitle": "समस्त देशवासियों को राष्ट्रीय पर्व की हार्दिक बधाई! आइए मिलकर भारत को रोगमुक्त व उन्नत बनाएं।",
-      "badge": "🇮🇳 राष्ट्र को समर्पित",
-      "animation_preset": "tricolor_patriotic",
-      "image_url": "/images/logo/logo.png",
-      "cta_text": "🇮🇳 आरोग्यम मिशन से जुड़ें",
-      "target_url": "/mission.html",
+      "type": "tube_video",
+      "title": "🌾 ₹495 की 5 कृषि किताबें सिर्फ ₹149 में! किसान मेगा कॉम्बो ऑफर | Aarogyam India",
+      "subtitle": "🌾 किसान भाइयों के लिए शानदार महाबचत ऑफर!\n\nक्या आप गेहूँ, चना और सरसों की खेती में बेहतर उत्पादन चाहते हैं? फसल के रोग-क...",
+      "badge": "🔥 AAROGYAMTUBE VIDEO",
+      "animation_preset": "neon_tube_flow",
+      "image_url": "https://i.ytimg.com/vi/EbdpqfJDN4c/oar2.jpg",
+      "cta_text": "🎬 वीडियो अभी देखें →",
+      "target_url": "/aarogyam-sakhi.html",
       "start_date": "2027-01-20T00:00",
       "end_date": "2027-01-28T23:59",
       "is_active": false,
@@ -22,7 +22,7 @@
       "share_enabled": true,
       "share_message_template": "🇮🇳 राष्ट्रीय पर्व की हार्दिक शुभकामनाएँ! स्वस्थ व आत्मनिर्भर भारत के निर्माण में आरोग्यम परिवार से जुड़ें: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T02:06:28.693Z"
+      "updated_at": "2026-11-10T10:10:29.398Z"
     },
     {
       "id": "PROM_TUBE_FEATURED",
