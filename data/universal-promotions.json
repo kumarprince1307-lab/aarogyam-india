@@ -1,28 +1,28 @@
 {
-  "updated_at": "2026-11-10T15:10:07.961Z",
-  "version": "1.1",
+  "updated_at": "2026-11-10T17:30:12.468Z",
+  "version": "1.2",
   "active_campaign_id": "PROM_TUBE_FEATURED",
   "promotions": [
     {
-      "id": "PROM_HEALTH_JOINT_CARE",
+      "id": "PROM_TUBE_FEATURED",
       "type": "tube_video",
       "title": "🌾 ₹495 की 5 कृषि किताबें सिर्फ ₹149 में! किसान मेगा कॉम्बो ऑफर | Aarogyam India",
-      "subtitle": "🌾 किसान भाइयों के लिए शानदार महाबचत ऑफर!\n\nक्या आप गेहूँ, चना और सरसों की खेती में बेहतर उत्पादन चाहते हैं? फसल के रोग-क...",
+      "subtitle": "🌾 किसान भाइयों के लिए शानदार महाबचत ऑफर!\n\nक्या आप गेहूँ, चना और सरसों की खेती में बेहतर उत्पादन चाहते हैं? फसल के रोग-कीट नियंत्रण व खाद का सम्पूर्ण गाइड प्राप्त करें।",
       "badge": "🔥 AAROGYAMTUBE VIDEO",
       "animation_preset": "neon_tube_flow",
       "image_url": "https://i.ytimg.com/vi/EbdpqfJDN4c/oar2.jpg",
-      "cta_text": "🎬 वीडियो अभी देखें →",
-      "target_url": "/",
+      "cta_text": "📖 कॉम्बो ऑफर देखें व अनलॉक करें →",
+      "target_url": "/ebooks/bundle-landing.html?id=BUNDLE_AGRI_5",
       "start_date": "2026-11-01T00:00",
-      "end_date": "2026-11-30T23:59",
-      "is_active": false,
+      "end_date": "2026-12-31T23:59",
+      "is_active": true,
       "target_pages": [
         "all"
       ],
       "share_enabled": true,
-      "share_message_template": "🌿 जोड़ों के दर्द व गठिया से मुक्ति के प्राकृतिक उपाय जानने के लिए आरोग्यम की यह विशेष गाइड पढ़ें: {link}",
+      "share_message_template": "🌾 किसान भाइयों के लिए महाबचत! ₹495 की 5 कृषि ई-बुक्स अब सिर्फ ₹149 में। यहाँ देखें: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T15:10:07.961Z"
+      "updated_at": "2026-11-10T17:30:12.464Z"
     },
     {
       "id": "PROM_HEALTH_JOINT_CARE",
@@ -39,11 +39,12 @@
       "target_url": "/health-joint-care.html",
       "cta_text": "🌿 सम्पूर्ण उपाय व गाइड पढ़ें",
       "start_date": "2026-11-01T00:00:00",
-      "end_date": "2026-11-30T23:59:59",
+      "end_date": "2026-12-31T23:59:59",
       "is_active": false,
       "share_enabled": true,
       "share_message_template": "🌿 जोड़ों के दर्द व गठिया से मुक्ति के प्राकृतिक उपाय जानने के लिए आरोग्यम की यह विशेष गाइड पढ़ें: {link}",
-      "frequency_mode": "once_per_day"
+      "frequency_mode": "once_per_day",
+      "updated_at": "2026-11-10T22:20:00.000Z"
     }
   ]
 }
