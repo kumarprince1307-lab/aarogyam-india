@@ -1332,13 +1332,13 @@
   // 11. Public Initializer API & Instant Auto-Boot
   window.initAdsLeadGateway = function (config = {}) {
     // If admin explicitly turned off Ads Mode on this bundle/landing page, respect it 100%!
-    const explicitlyDisabled = config.ads_mode_enabled === false || config.ads_gateway_enabled === false;
+    const explicitlyDisabled = config.ads_mode_enabled === false || config.ads_gateway_enabled === false || String(config.ads_mode_enabled) === 'false' || String(config.ads_gateway_enabled) === 'false';
     const urlParams = new URLSearchParams(window.location.search);
     const forceAd = urlParams.get('ad') === '1' || urlParams.get('ads') === '1' || urlParams.get('lead') === '1';
 
     if (explicitlyDisabled && !forceAd) {
       // Remove any modal spawned by auto-boot
-      const existingModal = document.getElementById('adsLeadGatewayModal');
+      const existingModal = document.getElementById('adsLeadGatewayOverlay') || document.getElementById('adsLeadGatewayModal');
       if (existingModal) existingModal.remove();
       return;
     }

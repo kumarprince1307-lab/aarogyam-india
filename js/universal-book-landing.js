@@ -475,7 +475,8 @@ if (typeof window !== 'undefined') {
           subtitle: hero.sub_heading || currentBookData?.subtitle || 'रोग व कीट पहचान एवं 100% सटीक वैज्ञानिक समाधान!',
           coverImage: hero.cover_image || currentBookData?.cover || currentBookData?.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
           badgeText: '🌾 विशेष कृषि समाधान — आरोग्यम इंडिया',
-          ads_mode_enabled: Boolean(currentLandingData?.ads_mode_enabled || currentLandingData?.ads_gateway_enabled)
+          ads_mode_enabled: (currentLandingData?.ads_mode_enabled === false || String(currentLandingData?.ads_mode_enabled) === 'false') ? false : Boolean(currentLandingData?.ads_mode_enabled || currentLandingData?.ads_gateway_enabled),
+          ads_gateway_enabled: (currentLandingData?.ads_gateway_enabled === false || String(currentLandingData?.ads_gateway_enabled) === 'false') ? false : Boolean(currentLandingData?.ads_gateway_enabled)
         });
       }
     } catch(e) { console.warn('initAdsLeadGateway error:', e); }

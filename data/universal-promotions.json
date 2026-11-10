@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-11-10T13:15:03.505Z",
+  "updated_at": "2026-11-10T13:28:00.000Z",
   "version": "1.1",
-  "active_campaign_id": "PROM_DIWALI_2026",
+  "active_campaign_id": "PROM_TUBE_FEATURED",
   "promotions": [
     {
       "id": "PROM_TUBE_FEATURED",
@@ -15,7 +15,7 @@
       "target_url": "/tube.html?v=VID_S060475",
       "start_date": "2026-11-10T00:00",
       "end_date": "2026-12-11T23:59",
-      "is_active": false,
+      "is_active": true,
       "target_pages": [
         "all",
         "home",
@@ -24,7 +24,7 @@
       "share_enabled": true,
       "share_message_template": "🎬 आरोग्यम ट्यूब पर यह नया वीडियो अवश्य देखें और अपनी खेती/स्वास्थ्य को उन्नत बनाएं: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T13:15:03.504Z"
+      "updated_at": "2026-11-10T13:28:00.000Z"
     },
     {
       "id": "PROM_HEALTH_JOINT_CARE",
