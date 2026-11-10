@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-10T10:10:29.412Z",
+  "updated_at": "2026-11-10T10:10:34.596Z",
   "version": "1.1",
   "active_campaign_id": "PROM_DIWALI_2026",
   "promotions": [
@@ -22,7 +22,7 @@
       "share_enabled": true,
       "share_message_template": "🇮🇳 राष्ट्रीय पर्व की हार्दिक शुभकामनाएँ! स्वस्थ व आत्मनिर्भर भारत के निर्माण में आरोग्यम परिवार से जुड़ें: {link}",
       "frequency_mode": "once_per_day",
-      "updated_at": "2026-11-10T10:10:29.398Z"
+      "updated_at": "2026-11-10T10:10:34.589Z"
     },
     {
       "id": "PROM_TUBE_FEATURED",
