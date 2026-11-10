@@ -456,7 +456,8 @@ export async function initBookAudioStudio() {
               <div style="flex:1; min-width:200px;">
                 <label style="font-size:0.75rem; font-weight:700; color:#cbd5e1; display:block; margin-bottom:2px;">2. कहाँ जोड़ना है (Placement):</label>
                 <select id="importPlacementSelect" class="admin-input" style="width:100%; padding:5px 8px; font-size:0.85rem; font-weight:700;">
-                  <option value="END">📌 सबसे आखिर में जोड़ें (End of Book)</option>
+                  <option value="REPLACE">🔄 सभी पुराने पेज हटाकर केवल ये नए पेज रखें (Replace All)</option>
+                  <option value="END" selected>📌 सबसे आखिर में जोड़ें (Append to End)</option>
                   <option value="AFTER_CURRENT">📍 वर्तमान पेज के बाद जोड़ें</option>
                   <option value="BEGINNING">🔝 सबसे शुरुआत में जोड़ें (Beginning)</option>
                 </select>
@@ -5742,25 +5743,44 @@ async function executeImportPages() {
     let finalImages = [];
     let finalScripts = [];
 
-    if (placement === 'BEGINNING') {
-        finalImages = [...importedImages, ...currentImages];
-        finalScripts = [...importedScripts, ...currentScripts];
-    } else if (placement === 'AFTER_CURRENT' && currentImages.length > 0) {
-        const insertIdx = Math.min(studioCurrentPage, currentImages.length);
-        finalImages = [
-            ...currentImages.slice(0, insertIdx),
-            ...importedImages,
-            ...currentImages.slice(insertIdx)
-        ];
-        finalScripts = [
-            ...currentScripts.slice(0, insertIdx),
-            ...importedScripts,
-            ...currentScripts.slice(insertIdx)
-        ];
+    if (placement === 'REPLACE') {
+        finalImages = [...importedImages];
+        finalScripts = [...importedScripts];
     } else {
-        // Default: END
-        finalImages = [...currentImages, ...importedImages];
-        finalScripts = [...currentScripts, ...importedScripts];
+        if (currentImages.length > 0 && placement === 'END') {
+            const doAppend = confirm(
+                `📚 इस पुस्तक में पहले से ${currentImages.length} पेज मौजूद हैं!\n\n` +
+                `• [OK] = नए ${importedImages.length} पेजों को आगे जोड़ें (APPEND करें)।\n  (कुल ${currentImages.length + importedImages.length} पेज बन जाएंगे)\n\n` +
+                `• [Cancel] = पुराने सभी पेज हटाकर केवल नए ${importedImages.length} पेज रखें (REPLACE ALL करें)।`
+            );
+            if (!doAppend) {
+                placement = 'REPLACE';
+            }
+        }
+
+        if (placement === 'REPLACE') {
+            finalImages = [...importedImages];
+            finalScripts = [...importedScripts];
+        } else if (placement === 'BEGINNING') {
+            finalImages = [...importedImages, ...currentImages];
+            finalScripts = [...importedScripts, ...currentScripts];
+        } else if (placement === 'AFTER_CURRENT' && currentImages.length > 0) {
+            const insertIdx = Math.min(studioCurrentPage, currentImages.length);
+            finalImages = [
+                ...currentImages.slice(0, insertIdx),
+                ...importedImages,
+                ...currentImages.slice(insertIdx)
+            ];
+            finalScripts = [
+                ...currentScripts.slice(0, insertIdx),
+                ...importedScripts,
+                ...currentScripts.slice(insertIdx)
+            ];
+        } else {
+            // Default: END
+            finalImages = [...currentImages, ...importedImages];
+            finalScripts = [...currentScripts, ...importedScripts];
+        }
     }
 
     // Reconstruct studioPageImages & studioAudioScripts.pages
