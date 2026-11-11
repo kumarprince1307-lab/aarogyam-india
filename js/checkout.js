@@ -185,7 +185,7 @@ async function lookupReferrerName(identifier) {
             mobile: "7974422572",
             shareId: "AI000004"
         };
-        showReferrerGreen(`✔ Master Partner: Aarogyam India (7974422572)`);
+        showReferrerGreen(`✔ Master Partner: Aarogyam India (AI000004)`);
         return;
     }
     
@@ -226,7 +226,7 @@ async function lookupReferrerName(identifier) {
                 mobile: data.mobile,
                 shareId: data.share_id
             };
-            showReferrerGreen(`✔ Referred by: ${data.full_name} (${data.mobile || 'No Mobile'})`);
+            showReferrerGreen(`✔ Referred by: ${data.full_name} (${data.share_id || 'Aarogyam Member'})`);
         } else {
             window.currentReferrerData = { uuid: null, name: null, mobile: null, shareId: null };
             showReferrerRed("✖ Invalid Share ID/Mobile");
@@ -1748,15 +1748,18 @@ function autoFillUserData() {
                     localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || 
                     localStorage.getItem('aarogyam_user_name') || localStorage.getItem('farmer_name') || 
                     getCheckoutCookie('aim_user_name') || "";
-    const mobileVal = qMobile || storedUser.mobile || storedUser.phone || 
+    const rawMobileVal = qMobile || storedUser.mobile || storedUser.phone || 
                       (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || 
                        localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('farmer_mobile') || 
                        getCheckoutCookie('aim_user_mobile') || "").replace(/\D/g, '').slice(-10);
+    // Never prefill master partner helpline 7974422572 as customer mobile
+    const mobileVal = (rawMobileVal === '7974422572') ? '' : rawMobileVal;
+    const customerNameVal = (rawMobileVal === '7974422572') ? '' : nameVal;
     const emailVal = qEmail || storedUser.email || localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || getCheckoutCookie('aim_user_email') || "";
 
     if (custMobEl && !custMobEl.readOnly) {
-        if (nameVal && custNameEl && !custNameEl.value) {
-            custNameEl.value = nameVal;
+        if (customerNameVal && custNameEl && !custNameEl.value) {
+            custNameEl.value = customerNameVal;
             custNameEl.dispatchEvent(new Event('input', { bubbles: true }));
         }
         if (mobileVal && custMobEl && !custMobEl.value) {
@@ -1821,10 +1824,23 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
                 ...(JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]'))
             ];
 
+            // Helper to match book/bundle purchases without falsely blocking combo upgrades
+            function isBookIdMatching(purchasedIdStr, targetIdStr) {
+                if (!purchasedIdStr || !targetIdStr) return false;
+                if (purchasedIdStr === targetIdStr) return true;
+                const targetList = targetIdStr.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+                const purchasedList = purchasedIdStr.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+                // If buying a single book, and it was purchased individually or inside a bundle:
+                if (targetList.length === 1 && purchasedList.includes(targetList[0])) return true;
+                // If buying a bundle, only duplicate if ALL books in the bundle were already purchased:
+                if (targetList.length > 1 && targetList.every(tId => purchasedList.includes(tId))) return true;
+                return false;
+            }
+
             const localMatch = localPurchases.some(p => {
                 const pId = String(p.book_id || p.bookId || '').toUpperCase();
                 const pMob = String(p.mobile || p.customerMobile || '').replace(/\D/g, '').slice(-10);
-                return pMob === cleanMob && (pId === bookId || pId.includes(bookId) || bookId.includes(pId));
+                return pMob === cleanMob && isBookIdMatching(pId, bookId);
             });
 
             if (localMatch) {
@@ -1844,7 +1860,7 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
                         const m = directMobPurchases.find(p => {
                             const pId = String(p.book_id || '').toUpperCase();
                             const st = (p.status || p.payment_status || '').toLowerCase();
-                            return (pId === bookId || pId.includes(bookId)) && st !== 'failed';
+                            return isBookIdMatching(pId, bookId) && st !== 'failed';
                         });
                         if (m) isAlreadyPurchased = true;
                     }
@@ -1863,7 +1879,7 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
                                 const m = profPurchases.find(p => {
                                     const pId = String(p.book_id || '').toUpperCase();
                                     const st = (p.status || p.payment_status || '').toLowerCase();
-                                    return (pId === bookId || pId.includes(bookId)) && st !== 'failed';
+                                    return isBookIdMatching(pId, bookId) && st !== 'failed';
                                 });
                                 if (m) isAlreadyPurchased = true;
                             }
@@ -1918,6 +1934,7 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
         }
         return true;
     } else {
+        try { sessionStorage.removeItem(cacheKey); } catch (_) {}
         if (bannerContainer) bannerContainer.style.display = "none";
         if (payBtn && payBtn.dataset.alreadyPurchased === "true") {
             delete payBtn.dataset.alreadyPurchased;

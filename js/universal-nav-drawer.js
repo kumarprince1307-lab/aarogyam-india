@@ -651,13 +651,21 @@
   function clearAllAuthCookies() {
     const cookiesToClear = [
       'aim_user_mobile', 'aim_user_name', 'user_mobile', 'user_phone', 
-      'farmer_mobile', 'farmer_name', 'aarogyam_user_phone', 'aarogyam_user_name', 'user_share_id'
+      'farmer_mobile', 'farmer_name', 'aarogyam_user_phone', 'aarogyam_user_name', 'user_share_id',
+      'aim_user_email', 'user_email', 'aarogyam_user_registered', 'AI_USER_LOGGED_IN'
     ];
+    const host = window.location.hostname;
+    const parts = host.split('.');
+    const domains = ['', host, '.' + host];
+    if (parts.length > 2) {
+      domains.push('.' + parts.slice(-2).join('.'));
+    }
     cookiesToClear.forEach(name => {
-      document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-      try {
-        document.cookie = `${name}=; Path=/; Domain=${window.location.hostname}; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-      } catch (_) {}
+      domains.forEach(d => {
+        const dAttr = d ? `; Domain=${d}` : '';
+        document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0${dAttr}; SameSite=Lax`;
+        document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0${dAttr};`;
+      });
     });
   }
 
@@ -674,7 +682,17 @@
     keysToRemove.forEach(k => {
       try { localStorage.removeItem(k); } catch (_) {}
     });
-    try { sessionStorage.clear(); } catch (_) {}
+    try {
+      sessionStorage.removeItem('ads_gateway_passed');
+      sessionStorage.removeItem('wb_registered');
+      // Clean up cached duplicate purchase flags so new purchases on same browser aren't blocked
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const k = sessionStorage.key(i);
+        if (k && (k.startsWith('AI_PURCHASED_') || k.startsWith('AI_ADM_'))) {
+          sessionStorage.removeItem(k);
+        }
+      }
+    } catch (_) {}
     clearAllAuthCookies();
   }
 

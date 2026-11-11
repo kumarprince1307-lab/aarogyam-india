@@ -543,7 +543,9 @@ export async function initUsers() {
     const result = await fetchUsers({ forceRefresh });
     if (result.success && Array.isArray(result.data)) {
       masterUsersList = result.data;
-      lastSyncTimestamp = new Date().toISOString();
+      const topUser = masterUsersList[0];
+      const topUserTime = topUser?.createdAt || topUser?.registrationDate;
+      lastSyncTimestamp = topUserTime ? new Date(new Date(topUserTime).getTime() - 1000).toISOString() : new Date(Date.now() - 3600000).toISOString();
       updateSyncBadge();
     } else {
       console.error("fetchUsers failed:", result.error);

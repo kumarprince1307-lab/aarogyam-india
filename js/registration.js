@@ -260,7 +260,7 @@ async function lookupReferrerName(identifier) {
             mobile: "7974422572",
             shareId: "AI000004"
         };
-        showReferrerGreen(`✔ Master Partner: Aarogyam India (7974422572)`);
+        showReferrerGreen(`✔ Master Partner: Aarogyam India (AI000004)`);
         return;
     }
     
