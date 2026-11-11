@@ -556,9 +556,12 @@
     },
     {
       "id": "BK006",
-      "updated_at": "2026-09-23T23:59:59.999Z",
+      "updated_at": "2026-11-11T18:31:51.944Z",
       "admin_edited": true,
       "slug": "bk006",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
       "book_name": "AI वेबसाइट निर्माण गाइड 2026",
       "author": "",
       "language": "Hindi",
@@ -566,6 +569,17 @@
       "version": "2026",
       "category": "Digital AI",
       "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "download_funnel"
+      ],
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
@@ -574,6 +588,8 @@
       "theme_dark": "#3c00ad",
       "cover_effect": "3d_float",
       "sticky_button_text": "⏳ रुचि दर्ज करें (Pre-Interest)",
+      "ads_mode_enabled": false,
+      "ads_gateway_enabled": false,
       "sections_order": [
         "sec_hero",
         "sec_timer",
@@ -684,7 +700,7 @@
         "subtitle": "बिना कोडिंग के AI टूल्स से 10 मिनट में प्रोफेशनल वेबसाइट व ई-कॉमर्स स्टोर बनाएं",
         "description": "ChatGPT, Claude, V0, Canva और आधुनिक AI टूल्स की मदद से वेबसाइट डिजाइन, लैंडिंग पेज और डिजिटल बिजनेस शुरू करने की स्टेप-बाय-स्टेप गाइड।",
         "mrp": 1299,
-        "offer_price": 199,
+        "offer_price": 1,
         "offer_badge": "Special 85% Off",
         "rating_score": "4.9",
         "rating_count": "95+ Ratings",
@@ -746,6 +762,8 @@
       "demo_images": [
         "/images/books/ai-website-guide-cover.webp"
       ],
+      "demo_reader_pages": "",
+      "demoPages": "",
       "suggested_books_list": [],
       "suggested_books": [],
       "table_of_contents": [
@@ -787,9 +805,20 @@
         "description": "बिना कोडिंग के AI टूल्स से 10 मिनट में प्रोफेशनल वेबसाइट व ई-कॉमर्स स्टोर बनाएं",
         "benefits": []
       },
+      "download_funnel": {
+        "audio_enabled": true,
+        "audio_mode": "mp3",
+        "audio_url": "",
+        "audio_narrator": "Female Voice (Aarogyam AI सखी)",
+        "audio_script": "",
+        "funnel_heading": "🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स",
+        "funnel_subheading": "हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित",
+        "funnel_books": [],
+        "farmer_tip": "",
+        "fast_size": "~24 MB",
+        "hd_download_limit": 3
+      },
       "whatsapp_prompt": "नमस्ते, मुझे 'AI वेबसाइट गाइड' के बारे में जानकारी चाहिए।",
-      "is_coming_soon": false,
-      "isComingSoon": false,
       "customer_reviews": [
         {
           "name": "आलोक वर्मा",

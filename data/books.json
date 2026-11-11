@@ -260,7 +260,7 @@
       "category": "Digital AI",
       "language": "Hindi",
       "mrp": 1299,
-      "offerPrice": 199,
+      "offerPrice": 1,
       "cover": "/images/books/ai-website-guide-cover.webp",
       "thumbnail": "/images/books/ai-website-guide-cover.webp",
       "banner": "/images/banners/farmer-community-banner.jpeg",
@@ -333,9 +333,27 @@
       "landingPage": "/ebooks/book-landing.html?id=BK006",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-23T23:59:59.999Z",
+      "updated_at": "2026-11-11T18:31:51.946Z",
       "admin_edited": true,
-      "is_coming_soon": false
+      "is_coming_soon": false,
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
+      "demoImages": [
+        "/images/books/ai-website-guide-cover.webp"
+      ],
+      "demo_images": [
+        "/images/books/ai-website-guide-cover.webp"
+      ],
+      "preview_images": [
+        "/images/books/ai-website-guide-cover.webp"
+      ],
+      "previewImages": [
+        "/images/books/ai-website-guide-cover.webp"
+      ],
+      "demoAvailable": true,
+      "demo_reader_pages": "",
+      "demoPages": ""
     },
     {
       "id": "BK003",
