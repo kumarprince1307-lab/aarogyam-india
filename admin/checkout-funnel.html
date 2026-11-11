@@ -7,16 +7,80 @@
   <title>Admin - Checkout Funnel</title>
   <link rel="stylesheet" href="../css/admin-panel.css">
   <link rel="stylesheet" href="../css/admin-components.css">
+  <style>
+    .funnel-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+    }
+    .funnel-tab-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .funnel-tab-btn.active {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #ffffff;
+      border-color: #22c55e;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+    .funnel-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .funnel-kpi-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    }
+    .funnel-kpi-title {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .funnel-kpi-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .funnel-kpi-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .funnel-progress-wrap {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+  </style>
 </head>
 <body>
   <div id="admin-app" class="admin-app">
     <div id="sidebar-placeholder"></div>
     <main id="main-placeholder" class="admin-main">
       <div id="header-placeholder"></div>
-      <section class="admin-page-heading">
-        <h2>Checkout Funnel</h2>
-        <p>Track all checkout attempts, including successful, failed, and dropped carts.</p>
-      </section>
       
       <div id="checkout-funnel-page">
         <!-- Page content will be rendered here by JS -->
@@ -26,5 +90,6 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="../js/admin-main.js"></script>
+  <script type="module" src="../js/admin-pages-checkout-funnel.js"></script>
 </body>
 </html>

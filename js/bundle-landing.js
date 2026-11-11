@@ -1414,11 +1414,13 @@ window.initiateBundleCheckout = function () {
   const uMob = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
   const uEmail = localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || '';
 
-  // Preserve Facebook / Ads Lead Source
+  // Preserve Facebook / Ads Lead Source & Referral Parameters
   const urlP = new URLSearchParams(window.location.search);
   const resolvedSource = urlP.get('utm_source') || urlP.get('source') || localStorage.getItem('aim_lead_source') || localStorage.getItem('AI_PROFILE_SOURCE') || (window.location.search.includes('fbclid') ? 'Facebook' : '');
+  const resolvedRef = urlP.get('ref') || urlP.get('share_id') || urlP.get('share_token') || localStorage.getItem('aim_referral_id') || localStorage.getItem('session_referral_code') || '';
+  const resolvedRefMob = urlP.get('referral_mobile') || urlP.get('referral') || localStorage.getItem('aim_referral_mobile') || localStorage.getItem('session_referral_mobile') || '';
 
-  const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}${uEmail ? `&email=${encodeURIComponent(uEmail)}` : ''}${resolvedSource ? `&source=${encodeURIComponent(resolvedSource)}` : ''}`;
+  const userQueryParams = `${uMob ? `&mobile=${encodeURIComponent(uMob)}` : ''}${uName ? `&name=${encodeURIComponent(uName)}` : ''}${uEmail ? `&email=${encodeURIComponent(uEmail)}` : ''}${resolvedSource ? `&source=${encodeURIComponent(resolvedSource)}` : ''}${resolvedRef ? `&ref=${encodeURIComponent(resolvedRef)}&share_id=${encodeURIComponent(resolvedRef)}` : ''}${resolvedRefMob ? `&referral_mobile=${encodeURIComponent(resolvedRefMob)}` : ''}`;
 
   // Redirect to checkout with multi-book bundle parameter and customer prefill
   window.location.href = `/ebooks/checkout.html?bundle=${encodeURIComponent(currentBundle.id)}&books=${encodeURIComponent(bookParams)}&price=${finalPrice}&title=${encodeURIComponent(currentBundle.title)}${userQueryParams}`;

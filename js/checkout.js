@@ -96,8 +96,39 @@ function syncCheckoutShareContext() {
 
     const sessionReferralId = session.referral_share_id || (window.V1_SESSION && typeof window.V1_SESSION.getReferralId === 'function' ? window.V1_SESSION.getReferralId() : null);
 
-    const shareTokenFromUrl = params.get('share_token') || params.get('share_id') || params.get('tracking_token');
-    const referralMobileParam = params.get('referral_mobile') || params.get('referral');
+    // 🛡️ Comprehensive Multi-param Referral Detection (?ref=, ?share_id=, ?share_token=, ?tracking_token=, ?sponsor=, ?referral=)
+    const rawRefParam = params.get('ref') || params.get('share_token') || params.get('share_id') || params.get('tracking_token') || params.get('sponsor');
+    let shareTokenFromUrl = null;
+    let referralMobileParam = params.get('referral_mobile') || params.get('referral') || params.get('phone');
+
+    if (rawRefParam) {
+        const cleanRef = String(rawRefParam).trim();
+        if (/^[6-9]\d{9}$/.test(cleanRef)) {
+            if (!referralMobileParam) referralMobileParam = cleanRef;
+        } else if (cleanRef.length >= 3) {
+            shareTokenFromUrl = cleanRef;
+        }
+    }
+
+    // 🛡️ Persist & Retrieve from localStorage (Never allow AI000004 or empty param to erase an existing member's referral)
+    const storedRefId = localStorage.getItem('aim_referral_id') || localStorage.getItem('session_referral_code') || sessionReferralId;
+    const storedRefMob = localStorage.getItem('aim_referral_mobile') || localStorage.getItem('session_referral_mobile');
+
+    if (shareTokenFromUrl && shareTokenFromUrl.toUpperCase() !== 'AI000004') {
+        try {
+            localStorage.setItem('aim_referral_id', shareTokenFromUrl);
+            localStorage.setItem('session_referral_code', shareTokenFromUrl);
+        } catch (_) {}
+    }
+    if (referralMobileParam && referralMobileParam !== '7974422572') {
+        try {
+            localStorage.setItem('aim_referral_mobile', referralMobileParam);
+            localStorage.setItem('session_referral_mobile', referralMobileParam);
+        } catch (_) {}
+    }
+
+    const effectiveShareToken = shareTokenFromUrl || (storedRefId && storedRefId.toUpperCase() !== 'AI000004' ? storedRefId : null) || 'AI000004';
+    const effectiveReferralMob = referralMobileParam || (storedRefMob && storedRefMob !== '7974422572' ? storedRefMob : null);
 
     // सेशन या URL से सही सोर्स और लैंडिंग पेज उठाना
     const rawDetectedSource = params.get("source") || params.get("utm_source") || localStorage.getItem('aim_lead_source') || localStorage.getItem('AI_PROFILE_SOURCE') || (document.referrer.includes('facebook') || window.location.search.includes('fbclid') ? 'Facebook' : null) || session.registration_source || "checkout";
@@ -107,8 +138,8 @@ function syncCheckoutShareContext() {
     const shareContext = {
         source: sourceVal,
         share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
-        share_token: shareTokenFromUrl || sessionReferralId || 'AI000004',
-        referral_mobile: referralMobileParam || null,
+        share_token: (effectiveShareToken && effectiveShareToken !== 'AI000004') ? effectiveShareToken : (effectiveReferralMob ? null : 'AI000004'),
+        referral_mobile: effectiveReferralMob || null,
         asset_type: params.get("asset_type") || null,
         asset_id: params.get("asset_id") || null,
         asset_title: params.get("asset_title") || null,
@@ -2138,6 +2169,16 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 const db = window.dbClient || window.supabase;
                 const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
 
+                let targetFreeProfileId = activeUserId || userObj.id;
+                if (!targetFreeProfileId || typeof targetFreeProfileId !== 'string' || targetFreeProfileId.startsWith('UID_')) {
+                    if (db && mobile) {
+                        try {
+                            const { data: prof } = await db.from('profiles').select('id').eq('mobile', mobile).maybeSingle();
+                            if (prof && prof.id) targetFreeProfileId = prof.id;
+                        } catch (_) {}
+                    }
+                }
+
                 for (const b of booksToUnlock) {
                     const bId = b.id || bookIdToBuy;
                     const newPurchase = {
@@ -2150,18 +2191,19 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                     };
                     localPurchases.push(newPurchase);
                     if (!myPurchasedIds.includes(bId)) myPurchasedIds.push(bId);
+                }
 
-                    if (db) {
-                        await db.from('purchases').insert([{
-                            profile_id: activeUserId || userObj.id,
-                            book_id: bId,
-                            amount: 0,
-                            payment_id: freePaymentId,
-                            order_id: 'FREE_ORD_' + Date.now(),
-                            payment_status: 'success',
-                            purchase_date: new Date().toISOString()
-                        }]).catch(() => {});
-                    }
+                // 🛡️ CONSTITUTIONAL RULE: Insert EXACTLY ONE purchase row in DB for accounting & single-order reporting
+                if (db && targetFreeProfileId) {
+                    await db.from('purchases').insert([{
+                        profile_id: targetFreeProfileId,
+                        book_id: bookIdToBuy,
+                        amount: 0,
+                        payment_id: freePaymentId,
+                        order_id: 'FREE_ORD_' + Date.now(),
+                        payment_status: 'success',
+                        purchase_date: new Date().toISOString()
+                    }]).catch(err => console.warn('Supabase free purchase insert note:', err));
                 }
 
                 localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
@@ -2213,6 +2255,16 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         const db = window.dbClient || window.supabase;
                         const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
 
+                        let targetProfileId = activeUserId || userObj.id;
+                        if (!targetProfileId || typeof targetProfileId !== 'string' || targetProfileId.startsWith('UID_')) {
+                            if (db && mobile) {
+                                try {
+                                    const { data: prof } = await db.from('profiles').select('id').eq('mobile', mobile).maybeSingle();
+                                    if (prof && prof.id) targetProfileId = prof.id;
+                                } catch (_) {}
+                            }
+                        }
+
                         for (const b of booksToUnlock) {
                             const bId = b.id || bookIdToBuy;
                             const bAmt = b.offerPrice || (finalPayablePrice / booksToUnlock.length);
@@ -2227,18 +2279,19 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                             };
                             localPurchases.push(newPurchase);
                             if (!myPurchasedIds.includes(bId)) myPurchasedIds.push(bId);
+                        }
 
-                            if (db) {
-                                await db.from('purchases').insert([{
-                                    profile_id: activeUserId || userObj.id,
-                                    book_id: bId,
-                                    amount: bAmt,
-                                    payment_id: response.razorpay_payment_id,
-                                    order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
-                                    payment_status: 'success',
-                                    purchase_date: new Date().toISOString()
-                                }]).catch(err => console.warn('Supabase purchase insert error:', err));
-                            }
+                        // 🛡️ CONSTITUTIONAL RULE: Insert EXACTLY ONE purchase row in DB for accounting & single-order reporting
+                        if (db && targetProfileId) {
+                            await db.from('purchases').insert([{
+                                profile_id: targetProfileId,
+                                book_id: bookIdToBuy,
+                                amount: finalPayablePrice,
+                                payment_id: response.razorpay_payment_id,
+                                order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
+                                payment_status: 'success',
+                                purchase_date: new Date().toISOString()
+                            }]).catch(err => console.warn('Supabase purchase insert error:', err));
                         }
 
                         localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
@@ -2297,7 +2350,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         console.warn('Local purchase save note:', saveErr);
                     }
 
-                    window.location.href = `/ebooks/payment-success.html?payment_id=${response.razorpay_payment_id}&book_id=${bookIdToBuy}&amount=${finalPayablePrice}`;
+                    window.location.href = `/ebooks/payment-success.html?payment_id=${response.razorpay_payment_id}&book_id=${encodeURIComponent(bookIdToBuy)}&amount=${finalPayablePrice}&order_id=${encodeURIComponent(response.razorpay_order_id || '')}&mobile=${encodeURIComponent(mobile)}`;
                 },
                 "prefill": {
                     "name": name,

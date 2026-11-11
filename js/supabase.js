@@ -54,11 +54,39 @@ function readShareContextFromUrl() {
         else if (rawSource.includes("telegram")) rawSource = "telegram";
     }
 
+    // Comprehensive Referral & Share Identification (Supports ?ref=, ?share_id=, ?share_token=, ?sponsor=, ?referral=)
+    const rawRef = params.get("ref") || params.get("share_id") || params.get("share_token") || params.get("tracking_token") || params.get("sponsor") || null;
+    let shareToken = params.get("share_token") || params.get("share_id") || params.get("tracking_token") || null;
+    let referralMobile = params.get("referral_mobile") || params.get("referral") || params.get("phone") || null;
+
+    if (rawRef) {
+        const cleanRef = String(rawRef).trim();
+        if (/^[6-9]\d{9}$/.test(cleanRef)) {
+            if (!referralMobile) referralMobile = cleanRef;
+        } else if (cleanRef.length >= 3) {
+            if (!shareToken) shareToken = cleanRef;
+        }
+    }
+
+    // Persist genuine non-master referrals immediately so they survive across navigation & app reloads
+    if (shareToken && shareToken.toUpperCase() !== 'AI000004') {
+        try {
+            localStorage.setItem('aim_referral_id', shareToken);
+            localStorage.setItem('session_referral_code', shareToken);
+        } catch (_) {}
+    }
+    if (referralMobile && referralMobile !== '7974422572') {
+        try {
+            localStorage.setItem('aim_referral_mobile', referralMobile);
+            localStorage.setItem('session_referral_mobile', referralMobile);
+        } catch (_) {}
+    }
+
     return {
         source: rawSource || null,
         share_channel: params.get("share_channel") || params.get("channel") || params.get("utm_medium") || null,
-        share_token: params.get("share_token") || params.get("share_id") || params.get("tracking_token") || null,
-        referral_mobile: params.get("referral_mobile") || params.get("referral") || null,
+        share_token: shareToken,
+        referral_mobile: referralMobile,
         asset_type: params.get("asset_type") || null,
         asset_id: params.get("asset_id") || null,
         asset_title: params.get("asset_title") || null,
@@ -71,7 +99,22 @@ function readShareContextFromUrl() {
 function getCurrentShareContext() {
     const urlContext = readShareContextFromUrl();
     const storedContext = readStoredShareContext();
-    return { ...storedContext, ...urlContext };
+    const merged = { ...storedContext, ...urlContext };
+
+    // 🛡️ IMMUTABLE REFERRAL PROTECTION:
+    // If a genuine member's referral is persisted in localStorage, never let it be overwritten by AI000004 or empty fallback!
+    try {
+        const persistedRef = localStorage.getItem('aim_referral_id') || localStorage.getItem('session_referral_code');
+        const persistedMob = localStorage.getItem('aim_referral_mobile') || localStorage.getItem('session_referral_mobile');
+        if (persistedRef && persistedRef.toUpperCase() !== 'AI000004' && (!merged.share_token || merged.share_token === 'AI000004')) {
+            merged.share_token = persistedRef;
+        }
+        if (persistedMob && persistedMob !== '7974422572' && !merged.referral_mobile) {
+            merged.referral_mobile = persistedMob;
+        }
+    } catch (_) {}
+
+    return merged;
 }
 
 function resolveProfileAttribution(userData) {

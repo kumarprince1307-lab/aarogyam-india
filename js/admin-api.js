@@ -732,19 +732,38 @@ export async function fetchAllBooks() {
     try {
         const db = window.dbClient;
         if (!db) throw new Error("Supabase client not available.");
-        // The 'books' table is empty. Fetch distinct book_ids from checkout_logs instead.
+        // Fetch distinct book_ids from checkout_logs
         const { data, error } = await db.from('checkout_logs').select('book_id');
         if (error) throw error;
 
         // Get unique, non-empty book_ids
         const distinctBookIds = [...new Set(data.map(log => log.book_id).filter(id => id))];
         
-        // Format them for the filter dropdown which expects {id, name, title}
-        const bookOptions = distinctBookIds.map(id => ({
-            id: id,
-            name: id, // Use the ID itself as the name
-            title: id
-        }));
+        const KNOWN_TITLES = {
+            'BK001': '🌾 खरीफ फसल मास्टर गाइड',
+            'BK002': '🩺 खेती का डॉक्टर',
+            'BK015': '🥬 11 सब्जी मास्टर गाइड',
+            'BK016': '💊 कृषि दवा सलाहकार गाइड',
+            'BK017': '🌾 गेहूँ की खेती सम्पूर्ण मार्गदर्शिका',
+            'BK019': '🌱 चना की उन्नत खेती मार्गदर्शिका',
+            'BK020': '🌼 सरसों की उन्नत खेती मार्गदर्शिका',
+            'SUB001': '👑 Aarogyam Pro VIP सदस्यता',
+            'BUNDLE_KISAN_5IN1': '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो'
+        };
+
+        // Format them for the filter dropdown with human-friendly names
+        const bookOptions = distinctBookIds.map(id => {
+            let label = KNOWN_TITLES[id];
+            if (!label) {
+                if (id.includes(',')) label = '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो';
+                else label = id;
+            }
+            return {
+                id: id,
+                name: label,
+                title: label
+            };
+        });
 
         return { success: true, data: bookOptions };
     } catch (error) {
@@ -1396,16 +1415,57 @@ export async function fetchPurchases(params = {}) {
         const profilesMap = (profilesRes.data || []).reduce((acc, p) => { acc[p.id] = p; return acc; }, {});
         const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b; return acc; }, {});
 
+        const KNOWN_TITLES = {
+            'BK001': '🌾 खरीफ फसल मास्टर गाइड',
+            'BK002': '🩺 खेती का डॉक्टर',
+            'BK015': '🥬 11 सब्जी मास्टर गाइड',
+            'BK016': '💊 कृषि दवा सलाहकार गाइड',
+            'BK017': '🌾 गेहूँ की खेती सम्पूर्ण मार्गदर्शिका',
+            'BK019': '🌱 चना की उन्नत खेती मार्गदर्शिका',
+            'BK020': '🌼 सरसों की उन्नत खेती मार्गदर्शिका',
+            'SUB001': '👑 Aarogyam Pro VIP सदस्यता',
+            'BUNDLE_KISAN_5IN1': '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो'
+        };
+
+        // 🛡️ Group and deduplicate purchases by payment_id so bundles never split into duplicate orders
+        const groupedPurchasesMap = new Map();
+        for (const p of purchases) {
+            const payKey = p.payment_id || `ORD_${p.profile_id}_${p.purchase_date}`;
+            if (!groupedPurchasesMap.has(payKey)) {
+                groupedPurchasesMap.set(payKey, p);
+            } else {
+                const existing = groupedPurchasesMap.get(payKey);
+                // Prefer bundle row or higher amount row
+                const isExistingBundle = String(existing.book_id || '').includes(',');
+                const isNewBundle = String(p.book_id || '').includes(',');
+                if (isNewBundle && !isExistingBundle) {
+                    groupedPurchasesMap.set(payKey, p);
+                } else if ((p.amount || 0) > (existing.amount || 0)) {
+                    groupedPurchasesMap.set(payKey, p);
+                }
+            }
+        }
+        const consolidatedPurchases = Array.from(groupedPurchasesMap.values());
+
         // 5. Map and enrich the data, matching the format expected by the UI
-        let mappedData = purchases.map(p => {
+        let mappedData = consolidatedPurchases.map(p => {
             const profile = profilesMap[p.profile_id] || {};
             const book = booksMap[p.book_id] || {};
+            const rawBookId = String(p.book_id || '');
+            let bookDisplayTitle = book.title || KNOWN_TITLES[rawBookId];
+            if (!bookDisplayTitle) {
+                if (rawBookId.includes(',')) {
+                    bookDisplayTitle = '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो';
+                } else {
+                    bookDisplayTitle = rawBookId || 'Unknown Book';
+                }
+            }
             return {
                 order: p.payment_id || 'N/A',
                 customer: profile.full_name || 'Unknown User',
                 mobile: profile.mobile || '',
                 book_id: p.book_id || '',
-                book: book.title || p.book_id || 'Unknown Book', // FIX: Use only 'title'
+                book: bookDisplayTitle,
                 amount: `₹${p.amount || 0}`,
                 source: profile.registration_source || 'Direct',
                 status: p.payment_status || 'success',

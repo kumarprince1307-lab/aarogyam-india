@@ -31,6 +31,22 @@ if (typeof window !== 'undefined') {
       ['BK017', 'BK019'].includes(bookId);
   }
 
+  // 🛡️ Safe Checkout URL Builder: Guaranteed Referral & Tracking Preservation
+  window.buildSafeCheckoutUrl = function(bookId) {
+    const p = new URLSearchParams(window.location.search || "");
+    p.set('id', bookId || 'BK001');
+    const storedRef = localStorage.getItem('aim_referral_id') || localStorage.getItem('session_referral_code');
+    const storedRefMob = localStorage.getItem('aim_referral_mobile') || localStorage.getItem('session_referral_mobile');
+    if (storedRef && storedRef.toUpperCase() !== 'AI000004' && !p.get('ref') && !p.get('share_id')) {
+      p.set('ref', storedRef);
+      p.set('share_id', storedRef);
+    }
+    if (storedRefMob && storedRefMob !== '7974422572' && !p.get('referral_mobile') && !p.get('referral')) {
+      p.set('referral_mobile', storedRefMob);
+    }
+    return `checkout.html?${p.toString()}`;
+  };
+
   // 1. User Registration & Session Checker
   window.isUserRegistered = function() {
     try {
@@ -1310,7 +1326,7 @@ if (typeof window !== 'undefined') {
     } else if (isDemoBook) {
       // 🟢 DEMO BOOK FLOW: Direct Read Demo CTA + Distinct Buy Full Book Funnel CTA showing Main Book MRP & Offer
       const targetMain = (l.targetMainBook || b.targetMainBook || rawId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (rawId.includes('BK002') ? 'BK002' : (rawId.includes('BK015') ? 'BK015' : 'BK001'))).toUpperCase();
-      const checkoutUrl = `checkout.html?id=${encodeURIComponent(targetMain)}`;
+      const checkoutUrl = window.buildSafeCheckoutUrl(targetMain);
       const targetMainBook = allBooks.find(mb => mb.id && mb.id.toUpperCase() === targetMain) || 
                              allLandingPages.find(mlp => mlp.id && mlp.id.toUpperCase() === targetMain) || {};
       const mainOffer = targetMainBook.offerPrice || targetMainBook.price || (targetMain.includes('015') ? 99 : 99);
@@ -1372,7 +1388,7 @@ if (typeof window !== 'undefined') {
       setElemText('sticky-book-title', `संपूर्ण ${targetMainBook.name || title} खरीदें`);
       setElemText('sticky-price-val', `₹${mainOffer}`);
     } else {
-      const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+      const checkoutUrl = window.buildSafeCheckoutUrl(b.id || currentBookId);
       const buyBtns = ['hero-buy-btn', 'preview-buy-btn', 'final-buy-btn', 'vip-stack-unlock-btn', 'sticky-buy-btn'];
       buyBtns.forEach(id => {
         const btn = document.getElementById(id);
@@ -1599,7 +1615,7 @@ if (typeof window !== 'undefined') {
       const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
       const isDemo = (bId.startsWith('DEMO') || l.book_type === 'demo' || b.type === 'demo');
       const targetMain = (l.targetMainBook || b.targetMainBook || bId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (bId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
-      const targetCheckout = isDemo ? `checkout.html?id=${encodeURIComponent(targetMain)}` : `checkout.html?id=${encodeURIComponent(bId)}`;
+      const targetCheckout = isDemo ? window.buildSafeCheckoutUrl(targetMain) : window.buildSafeCheckoutUrl(bId);
       previewActionWrap.innerHTML = `
         <a id="preview-buy-btn" href="${targetCheckout}" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;">
           <span>🛒</span> <span>${isDemo ? 'सम्पूर्ण मुख्य पुस्तक खरीदें (Buy Full Book)' : 'Buy Now'}</span>
@@ -1933,7 +1949,7 @@ if (typeof window !== 'undefined') {
 
         if (!isComingSoon) {
           if (isDemo) {
-            finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(targetMainId)}`;
+            finalBuyBtn.href = window.buildSafeCheckoutUrl(targetMainId);
             finalBuyBtn.innerHTML = `🛒 सम्पूर्ण मुख्य पुस्तक खरीदें (₹${offer})`;
             finalBuyBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
             finalBuyBtn.style.color = '#ffffff';
@@ -1946,7 +1962,7 @@ if (typeof window !== 'undefined') {
             finalBuyBtn.style.color = '#ffffff';
             finalBuyBtn.onclick = null;
           } else {
-            finalBuyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+            finalBuyBtn.href = window.buildSafeCheckoutUrl(b.id || currentBookId);
             finalBuyBtn.innerHTML = `🛒 Buy Now`;
             finalBuyBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
             finalBuyBtn.style.color = '#ffffff';
@@ -3045,7 +3061,7 @@ if (typeof window !== 'undefined') {
 
     if (buyBtn) {
       if (isDemo) {
-        buyBtn.href = `checkout.html?id=${encodeURIComponent(targetMainId)}`;
+        buyBtn.href = window.buildSafeCheckoutUrl(targetMainId);
         buyBtn.innerHTML = `<span>🛒 Buy Now</span>`;
         buyBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
         buyBtn.style.color = '#ffffff';
@@ -3055,7 +3071,7 @@ if (typeof window !== 'undefined') {
         buyBtn.innerHTML = `<span>📥 मुफ़्त डाउनलोड</span>`;
         buyBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
       } else {
-        buyBtn.href = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+        buyBtn.href = window.buildSafeCheckoutUrl(b.id || currentBookId);
         buyBtn.innerHTML = `<span>🛒 Buy Now</span>`;
         buyBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
         buyBtn.style.color = '#ffffff';
@@ -3730,7 +3746,7 @@ if (typeof window !== 'undefined') {
       // Update Direct Audio Section Buy Button
       const audioBuyBtn = document.getElementById('ubl-audio-buy-btn');
       if (audioBuyBtn) {
-        const checkoutUrl = `checkout.html?id=${encodeURIComponent(b.id || currentBookId)}`;
+        const checkoutUrl = window.buildSafeCheckoutUrl(b.id || currentBookId);
         audioBuyBtn.href = checkoutUrl;
         const offerPrice = l.hero?.offer_price || b.offerPrice || 99;
         audioBuyBtn.innerHTML = `⚡ अभी ₹${offerPrice} में खरीदें और ऑडियो सुनें`;
