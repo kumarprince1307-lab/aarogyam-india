@@ -125,7 +125,13 @@ async function loadSuccessPage() {
         try {
             const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
             const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
-            const activeDb = window.dbClient || window.supabase;
+            let activeDb = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
+            if (!activeDb && typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+                try {
+                    activeDb = window.supabase.createClient("https://qjhjrzsnrtahmhswxyvb.supabase.co", "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU");
+                    window.dbClient = activeDb;
+                } catch (_) {}
+            }
             const profileId = currentUser.id || null;
 
             // Invalidate session purchase caches so next visit gets fresh data immediately

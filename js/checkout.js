@@ -2057,7 +2057,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
     const payBtn = document.getElementById("payNowBtn");
     payBtn.disabled = true;
-    payBtn.textContent = "Processing...";
+    payBtn.textContent = "खाता सुरक्षित हो रहा है...";
 
     try {
         const shareContextData = syncCheckoutShareContext();
@@ -2076,32 +2076,68 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         localStorage.setItem('AI_USER', JSON.stringify(localUserData));
         localStorage.setItem('AI_PROFILE', JSON.stringify(localUserData));
 
-        // Asynchronous non-blocking registration (runs in parallel with zero UI delay)
-        let regPromise = null;
+        // 🛡️ STEP 1: AWAIT User Profile Registration in Supabase (Solid & Non-Bypassable)
+        let targetProfileId = null;
         if (typeof registerUser === "function") {
-            regPromise = registerUser({
-                fullName: name,
-                mobile: mobile,
-                email: email,
-                referred_by: finalUuid,
-                referralMobile: finalReferralMobile,
-                referralCode: finalReferralCode,
-                source: sourceVal,
-                landing_page: landingPageVal
-            }).then(res => {
-                if (res && res.profile && res.profile.id) {
-                    window.activeCheckoutProfileId = res.profile.id;
+            try {
+                const regRes = await registerUser({
+                    fullName: name,
+                    mobile: mobile,
+                    email: email,
+                    referred_by: finalUuid,
+                    referralMobile: finalReferralMobile,
+                    referralCode: finalReferralCode,
+                    source: sourceVal,
+                    landing_page: landingPageVal
+                });
+                if (regRes && regRes.profile && regRes.profile.id) {
+                    targetProfileId = regRes.profile.id;
                     const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-                    uObj.id = res.profile.id;
+                    uObj.id = targetProfileId;
+                    uObj.full_name = name;
+                    uObj.mobile = mobile;
                     localStorage.setItem('AI_USER', JSON.stringify(uObj));
                     localStorage.setItem('AI_PROFILE', JSON.stringify(uObj));
                 }
-                return res;
-            }).catch(regErr => {
-                console.warn("Background user registration sync note:", regErr);
-                return null;
-            });
+            } catch (regErr) {
+                console.warn("User registration note:", regErr);
+            }
         }
+
+        // 🛡️ Supabase Client Ensure
+        let db = window.dbClient;
+        if (!db && typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+            try {
+                db = window.supabase.createClient("https://qjhjrzsnrtahmhswxyvb.supabase.co", "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU");
+                window.dbClient = db;
+            } catch (_) {}
+        }
+
+        const cleanEnteredMobile = mobile.replace(/\D/g, '').slice(-10);
+        if (!targetProfileId && db && cleanEnteredMobile) {
+            try {
+                const { data: prof } = await db.from('profiles').select('id').eq('mobile', cleanEnteredMobile).maybeSingle();
+                if (prof && prof.id) {
+                    targetProfileId = prof.id;
+                } else {
+                    const { data: newProf } = await db.from('profiles').insert([{
+                        full_name: name,
+                        mobile: cleanEnteredMobile,
+                        share_id: 'AI' + Math.floor(100000 + Math.random() * 900000),
+                        referral_code: finalReferralCode || 'AI000004',
+                        referral_mobile: finalReferralMobile || null,
+                        referred_by: finalUuid || null,
+                        registration_source: sourceVal,
+                        is_active: false
+                    }]).select('id').single();
+                    if (newProf && newProf.id) targetProfileId = newProf.id;
+                }
+            } catch (dbErr) {
+                console.warn("Direct profile ensure note:", dbErr);
+            }
+        }
+
+        window.activeCheckoutProfileId = targetProfileId;
 
         // सीधे JSON से उठाई गई असली बुक आईडी
         const bookIdToBuy = window.currentCheckoutBook.id;
@@ -2265,40 +2301,35 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                             ? window.currentCheckoutBookList 
                             : [{ id: bookIdToBuy, name: bookTitle, offerPrice: finalPayablePrice }];
 
-                        const db = window.dbClient || window.supabase;
-                        const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
-
-                        let targetProfileId = window.activeCheckoutProfileId || activeUserId || userObj.id;
-                        if (!targetProfileId || typeof targetProfileId !== 'string' || targetProfileId.startsWith('UID_')) {
-                            if (regPromise) {
-                                try {
-                                    const regRes = await regPromise;
-                                    if (regRes && regRes.profile && regRes.profile.id) {
-                                        targetProfileId = regRes.profile.id;
-                                    }
-                                } catch (_) {}
-                            }
+                        let db = window.dbClient;
+                        if (!db && typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+                            try {
+                                db = window.supabase.createClient("https://qjhjrzsnrtahmhswxyvb.supabase.co", "sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU");
+                                window.dbClient = db;
+                            } catch (_) {}
                         }
+
+                        const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+                        let targetProfileId = window.activeCheckoutProfileId || activeUserId || userObj.id;
+
                         if (!targetProfileId || typeof targetProfileId !== 'string' || targetProfileId.startsWith('UID_')) {
-                            if (db && mobile) {
+                            if (db && cleanEnteredMobile) {
                                 try {
-                                    const { data: prof } = await db.from('profiles').select('id').eq('mobile', mobile).maybeSingle();
+                                    const { data: prof } = await db.from('profiles').select('id').eq('mobile', cleanEnteredMobile).maybeSingle();
                                     if (prof && prof.id) {
                                         targetProfileId = prof.id;
-                                    } else if (typeof registerUser === "function") {
-                                        const regFallback = await registerUser({
-                                            fullName: name,
-                                            mobile: mobile,
-                                            email: email,
-                                            referred_by: finalUuid,
-                                            referralMobile: finalReferralMobile,
-                                            referralCode: finalReferralCode,
-                                            source: sourceVal,
-                                            landing_page: landingPageVal
-                                        });
-                                        if (regFallback && regFallback.profile && regFallback.profile.id) {
-                                            targetProfileId = regFallback.profile.id;
-                                        }
+                                    } else {
+                                        const { data: newProf } = await db.from('profiles').insert([{
+                                            full_name: name,
+                                            mobile: cleanEnteredMobile,
+                                            share_id: 'AI' + Math.floor(100000 + Math.random() * 900000),
+                                            referral_code: finalReferralCode || 'AI000004',
+                                            referral_mobile: finalReferralMobile || null,
+                                            referred_by: finalUuid || null,
+                                            registration_source: sourceVal,
+                                            is_active: true
+                                        }]).select('id').single();
+                                        if (newProf && newProf.id) targetProfileId = newProf.id;
                                     }
                                 } catch (_) {}
                             }
@@ -2322,15 +2353,21 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
 
                         // 🛡️ CONSTITUTIONAL RULE: Insert EXACTLY ONE purchase row in DB for accounting & single-order reporting
                         if (db && targetProfileId) {
-                            await db.from('purchases').insert([{
-                                profile_id: targetProfileId,
-                                book_id: bookIdToBuy,
-                                amount: finalPayablePrice,
-                                payment_id: response.razorpay_payment_id,
-                                order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
-                                payment_status: 'success',
-                                purchase_date: new Date().toISOString()
-                            }]).catch(err => console.warn('Supabase purchase insert error:', err));
+                            try {
+                                const { data: pData, error: pError } = await db.from('purchases').insert([{
+                                    profile_id: targetProfileId,
+                                    book_id: bookIdToBuy,
+                                    amount: finalPayablePrice,
+                                    payment_id: response.razorpay_payment_id,
+                                    order_id: response.razorpay_order_id || ('ORD_' + Date.now()),
+                                    payment_status: 'success',
+                                    purchase_date: new Date().toISOString()
+                                }]).select();
+                                if (pError) console.error("Supabase purchase insert error:", pError);
+                                else console.log("✅ Supabase purchase confirmed:", pData);
+                            } catch (pEx) {
+                                console.error("Supabase purchase insert exception:", pEx);
+                            }
                         }
 
                         localStorage.setItem('AI_PURCHASES', JSON.stringify(localPurchases));
