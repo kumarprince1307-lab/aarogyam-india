@@ -2,11 +2,11 @@
 
 import { navigateTo } from './admin-router.js';
 import { initAdminLayout } from './admin-main.js';
-import { 
+import {
   fetchTodayPriorityDashboardData,
-  fetchDashboardData, 
-  fetchCheckoutSummary, 
-  fetchUcasDashboardSummary 
+  fetchDashboardData,
+  fetchCheckoutSummary,
+  fetchUcasDashboardSummary
 } from './admin-api.js';
 
 // Top-Level Render Helpers for Full Historical Dashboard
@@ -202,15 +202,15 @@ function renderBirthdaysWidget(birthdays) {
     content = `
       <ul class="admin-activity-list">
         ${birthdays.map(user => {
-          const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
-          let whatsappNumber = sanitizedMobile;
-          if (whatsappNumber.length === 10) {
-            whatsappNumber = '91' + whatsappNumber;
-          }
-          const message = `नमस्ते ${user.full_name} जी! 🎂\nआज आपके जन्मदिन की हार्दिक शुभकामनाएं! 🎉\nआप सदैव स्वस्थ व समृद्ध रहें।`;
-          const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      const sanitizedMobile = String(user.mobile || '').replace(/\D/g, '');
+      let whatsappNumber = sanitizedMobile;
+      if (whatsappNumber.length === 10) {
+        whatsappNumber = '91' + whatsappNumber;
+      }
+      const message = `नमस्ते ${user.full_name} जी! 🎂\nआज आपके जन्मदिन की हार्दिक शुभकामनाएं! 🎉\nआप सदैव स्वस्थ व समृद्ध रहें।`;
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-          return `
+      return `
             <li style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
               <div>
                 <strong>🎂 ${user.full_name}</strong>
@@ -222,7 +222,7 @@ function renderBirthdaysWidget(birthdays) {
               </div>
             </li>
           `;
-        }).join('')}
+    }).join('')}
       </ul>`;
   }
 
@@ -285,11 +285,11 @@ function cleanPhoneForWa(mobile) {
 
 function renderTodayPriorityHub(data) {
   const { todayCount, todayProfiles, todayPurchases, todayDropped } = data;
-  const todayFormatted = new Date().toLocaleDateString('hi-IN', { 
-    weekday: 'long', 
-    day: 'numeric', 
-    month: 'long', 
-    year: 'numeric' 
+  const todayFormatted = new Date().toLocaleDateString('hi-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
   });
 
   return `
@@ -393,9 +393,9 @@ function renderTodayPriorityHub(data) {
               </thead>
               <tbody>
                 ${todayProfiles.map(u => {
-                  const waNumber = cleanPhoneForWa(u.mobile);
-                  const waMsg = encodeURIComponent(`नमस्ते ${u.full_name || 'किसान साथी'} जी! 🙏 आरोग्यम इंडिया में आपका स्वागत है। खेती या फसल संबंधी किसी भी सलाह हेतु सखी AI का उपयोग कर सकते हैं।`);
-                  return `
+    const waNumber = cleanPhoneForWa(u.mobile);
+    const waMsg = encodeURIComponent(`नमस्ते ${u.full_name || 'किसान साथी'} जी! 🙏 आरोग्यम इंडिया में आपका स्वागत है। खेती या फसल संबंधी किसी भी सलाह हेतु सखी AI का उपयोग कर सकते हैं।`);
+    return `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0;">
                       <td style="padding: 8px;"><strong>${u.full_name || 'अज्ञात'}</strong></td>
                       <td style="padding: 8px;">${u.mobile ? `<a href="tel:${u.mobile}" style="color:#38bdf8;text-decoration:none;">${u.mobile}</a>` : '—'}</td>
@@ -406,7 +406,7 @@ function renderTodayPriorityHub(data) {
                       </td>
                     </tr>
                   `;
-                }).join('')}
+  }).join('')}
               </tbody>
             </table>
           </div>
@@ -434,9 +434,9 @@ function renderTodayPriorityHub(data) {
               </thead>
               <tbody>
                 ${todayPurchases.map(p => {
-                  const waNumber = cleanPhoneForWa(p.customer_mobile);
-                  const waMsg = encodeURIComponent(`नमस्ते ${p.customer_name} जी! 🙏 आरोग्यम इंडिया से "${p.book_title}" ई-बुक खरीदने के लिए आपका धन्यवाद! आपकी ई-बुक आपकी डिजिटल लाइब्रेरी में जोड़ दी गई है। कोई सहायता चाहिए तो बताएं।`);
-                  return `
+    const waNumber = cleanPhoneForWa(p.customer_mobile);
+    const waMsg = encodeURIComponent(`नमस्ते ${p.customer_name} जी! 🙏 आरोग्यम इंडिया से "${p.book_title}" ई-बुक खरीदने के लिए आपका धन्यवाद! आपकी ई-बुक आपकी डिजिटल लाइब्रेरी में जोड़ दी गई है। कोई सहायता चाहिए तो बताएं।`);
+    return `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0;">
                       <td style="padding: 8px;"><strong>${p.customer_name}</strong></td>
                       <td style="padding: 8px;">${p.customer_mobile ? `<a href="tel:${p.customer_mobile}" style="color:#38bdf8;text-decoration:none;">${p.customer_mobile}</a>` : '—'}</td>
@@ -448,7 +448,7 @@ function renderTodayPriorityHub(data) {
                       </td>
                     </tr>
                   `;
-                }).join('')}
+  }).join('')}
               </tbody>
             </table>
           </div>
@@ -476,44 +476,44 @@ function renderTodayPriorityHub(data) {
               </thead>
               <tbody>
                 ${todayDropped.map(d => {
-                  const waNumber = cleanPhoneForWa(d.customer_mobile);
-                  const rawBook = String(d.book_id || d.book_title || '').trim();
-                  const isBundle = rawBook.includes(',') || rawBook.toUpperCase().includes('BUNDLE') || rawBook.toUpperCase().includes('COMBO');
-                  
-                  const KNOWN_BOOKS = {
-                    'BK017': { title: 'गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026', desc: 'बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन' },
-                    'BK016': { title: 'कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले', desc: 'सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज' },
-                    'BK002': { title: "'खेती का डॉक्टर' (Pocket Doctor)", desc: '300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान' },
-                    'BK019': { title: 'आधुनिक मक्का व तिलहन उत्पादन तकनीक', desc: 'कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला' },
-                    'BK020': { title: 'प्राकृतिक खेती व जैविक खाद निर्माण गाइड', desc: 'जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि' },
-                    'BK001': { title: 'खरीफ फसल मास्टर गाइड 2026', desc: 'धान, सोयाबीन, मक्का व दलहन का 150+ पेज का संपूर्ण वैज्ञानिक समाधान' },
-                    'BK015': { title: 'सब्जी की उन्नत वैज्ञानिक खेती', desc: '11 प्रमुख सब्जियों की संपूर्ण वैज्ञानिक बुवाई व देखभाल' },
-                    'BK018': { title: 'घर बैठे पैसे कैसे कमाएँ? (Income Guide)', desc: 'व्यावहारिक कमाई के तरीके व आत्मनिर्भर बनने की गाइड' }
-                  };
+    const waNumber = cleanPhoneForWa(d.customer_mobile);
+    const rawBook = String(d.book_id || d.book_title || '').trim();
+    const isBundle = rawBook.includes(',') || rawBook.toUpperCase().includes('BUNDLE') || rawBook.toUpperCase().includes('COMBO');
 
-                  let displayBookTitle = 'ई-बुक';
-                  let waMsgText = '';
+    const KNOWN_BOOKS = {
+      'BK017': { title: 'गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026', desc: 'बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन' },
+      'BK016': { title: 'कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले', desc: 'सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज' },
+      'BK002': { title: "'खेती का डॉक्टर' (Pocket Doctor)", desc: '300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान' },
+      'BK019': { title: 'आधुनिक मक्का व तिलहन उत्पादन तकनीक', desc: 'कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला' },
+      'BK020': { title: 'प्राकृतिक खेती व जैविक खाद निर्माण गाइड', desc: 'जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि' },
+      'BK001': { title: 'खरीफ फसल मास्टर गाइड 2026', desc: 'धान, सोयाबीन, मक्का व दलहन का 150+ पेज का संपूर्ण वैज्ञानिक समाधान' },
+      'BK015': { title: 'सब्जी की उन्नत वैज्ञानिक खेती', desc: '11 प्रमुख सब्जियों की संपूर्ण वैज्ञानिक बुवाई व देखभाल' },
+      'BK018': { title: 'घर बैठे पैसे कैसे कमाएँ? (Income Guide)', desc: 'व्यावहारिक कमाई के तरीके व आत्मनिर्भर बनने की गाइड' }
+    };
 
-                  if (isBundle) {
-                    displayBookTitle = '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो (5 पुस्तकें)';
-                    const ids = rawBook.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-                    const activeIds = ids.length > 0 ? ids : ['BK017', 'BK016', 'BK002', 'BK019', 'BK020'];
-                    let listText = '';
-                    activeIds.forEach((id, idx) => {
-                      const b = KNOWN_BOOKS[id] || { title: id, desc: 'डिजिटल गाइड' };
-                      listText += `${idx + 1}. *${b.title}* — ${b.desc}\n`;
-                    });
+    let displayBookTitle = 'ई-बुक';
+    let waMsgText = '';
 
-                    waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।\n\n📚 *इस कॉम्बो में शामिल हैं ये 5 महत्वपूर्ण पुस्तकें:*\n${listText}\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप मात्र ₹149 सीधे हमारे आधिकारिक UPI (7974422572) पर भेजकर स्क्रीनशॉट दे सकते हैं। हम आपकी 5 पुस्तकें तुरंत सक्रिय (Activate) कर देंगे।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
-                  } else {
-                    const cleanId = rawBook.toUpperCase();
-                    const single = KNOWN_BOOKS[cleanId] || { title: d.book_title || rawBook, desc: 'सम्पूर्ण वैज्ञानिक गाइड' };
-                    displayBookTitle = single.title;
-                    waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *"${single.title}"* ई-बुक प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी समस्या के कारण आपका ऑर्डर अधूरा रह गया।\n\n📖 *पुस्तक विवरण:* ${single.desc}।\n\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप सीधे हमारे आधिकारिक UPI (7974422572) पर भेजकर स्क्रीनशॉट दे सकते हैं, आपकी ई-बुक तुरंत सक्रिय कर दी जाएगी।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
-                  }
+    if (isBundle) {
+      displayBookTitle = '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो (5 पुस्तकें)';
+      const ids = rawBook.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+      const activeIds = ids.length > 0 ? ids : ['BK017', 'BK016', 'BK002', 'BK019', 'BK020'];
+      let listText = '';
+      activeIds.forEach((id, idx) => {
+        const b = KNOWN_BOOKS[id] || { title: id, desc: 'डिजिटल गाइड' };
+        listText += `${idx + 1}. *${b.title}* — ${b.desc}\n`;
+      });
 
-                  const waMsg = encodeURIComponent(waMsgText);
-                  return `
+      waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।\n\n📚 *इस कॉम्बो में शामिल हैं ये 5 महत्वपूर्ण पुस्तकें:*\n${listText}\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप मात्र ₹149 सीधे हमारे आधिकारिक UPI (7049294111) पर भेजकर स्क्रीनशॉट दे सकते हैं। हम आपकी 5 पुस्तकें तुरंत सक्रिय (Activate) कर देंगे।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
+    } else {
+      const cleanId = rawBook.toUpperCase();
+      const single = KNOWN_BOOKS[cleanId] || { title: d.book_title || rawBook, desc: 'सम्पूर्ण वैज्ञानिक गाइड' };
+      displayBookTitle = single.title;
+      waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *"${single.title}"* ई-बुक प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी समस्या के कारण आपका ऑर्डर अधूरा रह गया।\n\n📖 *पुस्तक विवरण:* ${single.desc}।\n\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप सीधे हमारे आधिकारिक UPI (7049294111) पर भेजकर स्क्रीनशॉट दे सकते हैं, आपकी ई-बुक तुरंत सक्रिय कर दी जाएगी।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
+    }
+
+    const waMsg = encodeURIComponent(waMsgText);
+    return `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0;">
                       <td style="padding: 8px;"><strong>${d.customer_name}</strong></td>
                       <td style="padding: 8px;">${d.customer_mobile ? `<a href="tel:${d.customer_mobile}" style="color:#f87171;text-decoration:none;">${d.customer_mobile}</a>` : '—'}</td>
@@ -526,7 +526,7 @@ function renderTodayPriorityHub(data) {
                       </td>
                     </tr>
                   `;
-                }).join('')}
+  }).join('')}
               </tbody>
             </table>
           </div>
@@ -688,16 +688,16 @@ async function loadFullDashboard(container) {
       return;
     }
 
-    const { 
-      shareSummary, 
-      businessKpis, 
-      leadSources, 
-      customerJourney, 
-      bookSales, 
-      recentActivity, 
-      todaysCheckoutSummary, 
-      todaysBirthdays, 
-      sakhiSummary 
+    const {
+      shareSummary,
+      businessKpis,
+      leadSources,
+      customerJourney,
+      bookSales,
+      recentActivity,
+      todaysCheckoutSummary,
+      todaysBirthdays,
+      sakhiSummary
     } = result.data;
 
     const ucasSummary = ucasRes.success ? ucasRes.data : {};
