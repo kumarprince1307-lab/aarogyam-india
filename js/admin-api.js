@@ -242,24 +242,37 @@ export async function fetchCheckoutSummary(params = {}) {
         if (error) throw error;
 
         const summary = { follow_up: 0, initiated: 0, dropped: 0, failed: 0, success: 0, conversion_rate: '0%' };
-        if (!data || data.length === 0) return { success: true, data: summary };
+        if (!data || data.length === 0) {
+            // Even if checkout_logs is empty, check real purchases
+            try {
+                const { data: realPurchases } = await db
+                    .from('purchases')
+                    .select('id, payment_id, amount')
+                    .or('payment_status.eq.success,payment_status.is.null')
+                    .gte('purchase_date', startDate.toISOString())
+                    .lt('purchase_date', endDate.toISOString());
+                const uniquePayments = new Set((realPurchases || []).map(p => p.payment_id || p.id));
+                if (uniquePayments.size > 0) {
+                    summary.success = uniquePayments.size;
+                    summary.conversion_rate = '100%';
+                }
+            } catch (_) {}
+            return { success: true, data: summary };
+        }
 
         const successLogs = data.filter(log => log.status === 'success');
         const potentialFollowupLogs = data.filter(log => ['initiated', 'dropped', 'failed'].includes(log.status));
 
-        // Sync with actual successful purchases so success is accurate even if checkout_logs had telemetry latency
+        // Sync with actual successful purchases (deduplicated by payment_id) so success is 100% accurate
         try {
-            const { count: realPurchasesCount } = await db
+            const { data: realPurchases } = await db
                 .from('purchases')
-                .select('id', { count: 'exact', head: true })
+                .select('id, payment_id, amount')
                 .or('payment_status.eq.success,payment_status.is.null')
                 .gte('purchase_date', startDate.toISOString())
                 .lt('purchase_date', endDate.toISOString());
-            if (typeof realPurchasesCount === 'number' && realPurchasesCount > successLogs.length) {
-                summary.success = realPurchasesCount;
-            } else {
-                summary.success = successLogs.length;
-            }
+            const uniquePayments = new Set((realPurchases || []).map(p => p.payment_id || p.id));
+            summary.success = Math.max(uniquePayments.size, successLogs.length);
         } catch (_) {
             summary.success = successLogs.length;
         }
@@ -306,7 +319,7 @@ export async function fetchCheckoutSummary(params = {}) {
         // --- Final Conversion Rate ---
         const initiatingUserIds = new Set(potentialFollowupLogs.map(l => l.profile_id));
         const successfulUserIds = new Set(successLogs.map(l => l.profile_id));
-        const totalUniqueAttempts = new Set([...initiatingUserIds, ...successfulUserIds]).size;
+        const totalUniqueAttempts = Math.max(new Set([...initiatingUserIds, ...successfulUserIds]).size, summary.success);
         summary.conversion_rate = totalUniqueAttempts > 0 ? ((summary.success / totalUniqueAttempts) * 100).toFixed(1) + '%' : '0%';
 
         return { success: true, data: summary };
