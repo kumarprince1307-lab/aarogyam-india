@@ -19,13 +19,16 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://aarogyamindia.online/images/banners/vip-reader-offer-badge.jpg">
 
-    <!-- Razorpay & Performance Preconnect -->
+    <!-- Razorpay & Performance Preconnect & Preload -->
     <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin>
     <link rel="dns-prefetch" href="https://checkout.razorpay.com">
     <link rel="dns-prefetch" href="https://api.razorpay.com">
+    <link rel="preload" href="https://checkout.razorpay.com/v1/checkout.js" as="script">
+    <link rel="preload" href="/data/books.json" as="fetch" crossorigin>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/checkout.css">
+    <link rel="stylesheet" href="/css/checkout.css?v=20261111_v3">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Meta Pixel Code -->
@@ -50,29 +53,27 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
 <body>
 
     <!-- =========================
-         HEADER (With Back, Title & Sticky Urgency Timer)
+         HEADER (Clean, Fast & Focused - No distraction)
     ========================== -->
-    <header class="checkout-header" style="position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <a href="javascript:history.back()" class="back-btn">
-                    <i class="fa-solid fa-arrow-left"></i> Back
-                </a>
-                <h1 style="font-size: 1.15rem; margin: 0;">Secure Checkout</h1>
+    <header class="checkout-header" style="position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 10px 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.15rem;">🔒</span>
+                <h1 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: #1e293b; letter-spacing: 0.2px;">Secure Checkout</h1>
             </div>
 
             <!-- ⏳ Header Sticky Countdown Timer (Chipka diya gaya hai) -->
-            <div id="checkoutHeaderStickyTimer" style="display: none; align-items: center; gap: 8px; background: #991b1b; color: #fff; padding: 5px 12px; border-radius: 20px; font-weight: 800; font-size: 0.82rem; box-shadow: 0 2px 8px rgba(153,27,27,0.4);">
+            <div id="checkoutHeaderStickyTimer" style="display: none; align-items: center; gap: 6px; background: #991b1b; color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.78rem; box-shadow: 0 2px 6px rgba(153,27,27,0.3);">
                 <span>⏳ समय शेष:</span>
-                <strong id="checkoutTimerClock" style="font-family: monospace; font-size: 0.98rem; background: #0f172a; padding: 2px 8px; border-radius: 4px; color: #f8fafc; letter-spacing: 1px;">--:--</strong>
+                <strong id="checkoutTimerClock" style="font-family: monospace; font-size: 0.92rem; background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #f8fafc; letter-spacing: 1px;">--:--</strong>
             </div>
 
-            <!-- स्मार्ट लॉगिन / प्रोफाइल बटन (ऑफर लिंक में यह ऑटो-हाइड रहेगा) -->
-            <div id="checkoutAuthBtnWrap">
-                <button onclick="handleLoginOrProfileClick()" style="background: #E86A17; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <i class="fa-solid fa-user-gear"></i> लॉगिन / प्रोफाइल
-                </button>
+            <div style="display: flex; align-items: center; gap: 6px; color: #16a34a; font-size: 0.82rem; font-weight: 700;">
+                <i class="fa-solid fa-shield-halved"></i> <span>256-Bit SSL</span>
             </div>
+
+            <!-- Hidden wrapper to maintain JS compatibility without cluttering UI -->
+            <div id="checkoutAuthBtnWrap" style="display: none !important;"></div>
         </div>
     </header>
 
@@ -236,7 +237,7 @@ src="https://www.facebook.com/tr?id=1671873500553134&ev=PageView&noscript=1"
     <script src="/js/supabase.js?v=2.2.0"></script>
     <script src="/session.js?v=2.2.0"></script>
     <script src="/js/wallet-reward-engine.js?v=20261107_v2_passbook_guide"></script>
-    <script src="/js/checkout.js?v=20261109_v2"></script>
+    <script src="/js/checkout.js?v=20261111_v4_fast_pay"></script>
 
     <!-- लॉगिन या प्रोफाइल ट्रिगर करने के लिए स्क्रिप्ट -->
     <script>

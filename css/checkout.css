@@ -13,7 +13,8 @@ body {
     background: #f5f7fb;
     color: #222;
     line-height: 1.5;
-    padding-bottom: 90px; /* ताकि स्टिकी बटन नीचे वाले कंटेंट को छुपाए नहीं */
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); /* Ensure sticky pay button never overlaps inputs */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* ===========================
@@ -191,11 +192,11 @@ input:focus {
     width: 100%;
     margin: 0;
     border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
     z-index: 999;
     background: #ffffff;
     text-align: center;
-    padding: 12px 20px;
+    padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px;
     border-top: 1px solid #e2e8f0;
 }
 
@@ -203,7 +204,11 @@ input:focus {
     margin-bottom: 6px;
     color: #0d9488;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 #payNowBtn {
@@ -211,21 +216,29 @@ input:focus {
     max-width: 900px;
     margin: 0 auto;
     display: block;
-    padding: 14px;
+    padding: 15px;
     border: none;
     border-radius: 12px;
     background: #ff0000;
     color: #fff;
-    font-size: 1.05rem;
-    font-weight: bold;
+    font-size: 1.15rem;
+    font-weight: 800;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
 }
 
 #payNowBtn:hover {
-    background: #1b5e20;
+    background: #dc2626;
     transform: translateY(-1px);
+}
+
+#payNowBtn:active {
+    background: #b91c1c;
+    transform: scale(0.99);
 }
 
 /* ===========================

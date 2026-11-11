@@ -789,6 +789,9 @@ const DEFAULT_BOOK_CATALOG = {
     'BK015': { id: 'BK015', name: 'सब्जी खेती मास्टर गाइड', mrp: 1999, offerPrice: 149, cover: '/images/books/bk015-cover.webp' },
     'BK016': { id: 'BK016', name: 'कृषि दवा डायरेक्टरी', mrp: 499, offerPrice: 99, cover: '/images/books/bk016-cover.webp' },
     'BK017': { id: 'BK017', name: 'गेहूँ की खेती सम्पूर्ण मार्गदर्शिका', mrp: 299, offerPrice: 99, cover: '/images/books/bk017-cover.webp' },
+    'BK019': { id: 'BK019', name: 'चना की उन्नत खेती मार्गदर्शिका 2026', mrp: 299, offerPrice: 99, cover: '/images/books/bk019-cover.webp' },
+    'BK020': { id: 'BK020', name: 'सरसों की उन्नत खेती मार्गदर्शिका 2026', mrp: 299, offerPrice: 99, cover: '/images/books/bk020-cover.webp' },
+    'BUNDLE_KISAN_5IN1': { id: 'BUNDLE_KISAN_5IN1', name: 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो', mrp: 1495, offerPrice: 199, cover: '/images/banners/bundle-kisan-5in1-banner.webp' },
     'SUB001': { id: 'SUB001', name: '👑 Aarogyam Pro VIP सदस्यता', mrp: 2999, offerPrice: 99, cover: '/images/banners/farmer-community-banner.jpeg' }
 };
 
@@ -1023,7 +1026,10 @@ async function loadBook() {
             }
         } catch (e) {}
 
-        if (landingPagesArray.length === 0) {
+        // ⚡ Speed Optimization: Only fetch 466KB landing-pages catalog if book not already resolved in booksArray or DEFAULT_BOOK_CATALOG
+        const needsLpCatalog = fastTargetId && !DEFAULT_BOOK_CATALOG[fastTargetId] && !booksArray.some(b => (b.id || '').toUpperCase() === fastTargetId);
+
+        if (landingPagesArray.length === 0 && needsLpCatalog) {
             try {
                 const response = await fetch("/data/universal-book-landing-pages.json?v=" + cacheTime);
                 if (response.ok) {
@@ -2028,28 +2034,32 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         const finalUuid = window.currentReferrerData.uuid || null;
         const finalReferralMobile = window.currentReferrerData.mobile || null;
         const finalReferralCode = window.currentReferrerData.shareId || enteredReferral;
-        const sourceVal = resolveRegistrationSource(shareContextData.source || session.registration_source || "checkout");
+        const sessionObj = (window.V1_SESSION && typeof window.V1_SESSION.getSession === 'function') 
+            ? (window.V1_SESSION.getSession() || {})
+            : (JSON.parse(localStorage.getItem('AI_USER') || '{}'));
+        const sourceVal = resolveRegistrationSource(shareContextData.source || sessionObj.registration_source || "checkout");
         const landingPageVal = shareContextData.landing_url || window.location.pathname;
 
         if (typeof registerUser === "function") {
-            const regResult = await registerUser({
-                fullName: name,
-                mobile: mobile,
-                email: email,
-                referred_by: finalUuid,
-                referralMobile: finalReferralMobile,
-                referralCode: finalReferralCode,
-                source: sourceVal,
-                landing_page: landingPageVal
-            });
+            try {
+                const regResult = await registerUser({
+                    fullName: name,
+                    mobile: mobile,
+                    email: email,
+                    referred_by: finalUuid,
+                    referralMobile: finalReferralMobile,
+                    referralCode: finalReferralCode,
+                    source: sourceVal,
+                    landing_page: landingPageVal
+                });
 
-            const isAlreadyExists = regResult.message && regResult.message.toLowerCase().includes("already");
+                const isAlreadyExists = regResult && regResult.message && regResult.message.toLowerCase().includes("already");
 
-            if (!regResult.success && !isAlreadyExists) {
-                alert(regResult.message || "User registration failed.");
-                payBtn.disabled = false;
-                payBtn.textContent = "Pay Now";
-                return;
+                if (regResult && !regResult.success && !isAlreadyExists) {
+                    console.warn("User registration note:", regResult.message);
+                }
+            } catch (regErr) {
+                console.warn("User registration background sync note:", regErr);
             }
         }
 
@@ -2184,19 +2194,11 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
             return;
         }
 
-        if (typeof startPayment === "function") {
-            const res = startPayment();
-            if (res && typeof res === 'object' && res.success === false) {
-                payBtn.disabled = false;
-                payBtn.textContent = "Pay Now";
-                await logCheckoutActivity(activeUserId, bookIdToBuy, 'failed');
-                if (res.message) alert(res.message);
-            }
-        } 
-        else if (typeof Razorpay !== "undefined") {
+        // 🚀 FAST DIRECT RAZORPAY LAUNCHER (Bypasses legacy redirects & handles in-app browser app switching)
+        function launchRazorpayCheckout() {
             var options = {
                 "key": window.RAZORPAY_KEY || "rzp_live_TOlsqOqkmxYCWP",
-                "amount": finalPayablePrice * 100, // पैसों में कन्वर्ट करने के लिए 100 से गुणा
+                "amount": finalPayablePrice * 100, // Amount in paise
                 "currency": "INR",
                 "name": "Aarogyam India",
                 "description": bookTitle,
@@ -2273,8 +2275,6 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         }
 
                         // 🪙 Credit 10% Self Purchase Reward Points to Wallet
-                        // NOTE: Credit on original bookPrice (not on wallet-discounted finalPayablePrice)
-                        // so reward is fair regardless of whether wallet discount was applied.
                         if (window.AarogyamWallet && bookPrice > 0) {
                             window.AarogyamWallet.creditPoints(Math.round(bookPrice * 0.10), '🛒 ' + bookTitle + ' kharid par 10% cashback', 'earn_self');
                         }
@@ -2305,7 +2305,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 },
                 "prefill": {
                     "name": name,
-                    "email": email,
+                    "email": email || "",
                     "contact": mobile
                 },
                 "theme": {
@@ -2313,34 +2313,40 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 },
                 "modal": {
                     "ondismiss": async function() {
-                        // ❌ 3. यूजर द्वारा पॉपअप बंद करने पर 'dropped' लॉग दर्ज करें
-                        console.log("⚠️ Payment popup closed by user (Dropped)");
+                        // ❌ यूजर द्वारा पॉपअप बंद करने पर केवल बटन रीसेट करें, कोई जबरन रीडायरेक्ट नहीं
+                        console.log("⚠️ Payment popup closed by user (Dismissed)");
                         await logCheckoutActivity(activeUserId, bookIdToBuy, 'dropped');
                         payBtn.disabled = false;
                         payBtn.textContent = "Pay Now";
                     }
                 }
             };
+
             var rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', async function (response){
-                // ⚠️ 4. पेमेंट फेल होने पर 'failed' लॉग दर्ज करें
                 await logCheckoutActivity(activeUserId, bookIdToBuy, 'failed');
-                alert("Payment Failed: " + response.error.description);
+                alert("Payment Failed: " + (response.error ? response.error.description : "भुगतान पूरा नहीं हो सका"));
                 payBtn.disabled = false;
                 payBtn.textContent = "Pay Now";
             });
             rzp1.open();
-        } else {
-            setTimeout(() => {
-                if (payBtn.textContent === "Processing...") {
-                    payBtn.disabled = false;
-                    payBtn.textContent = "Pay Now";
-                }
-            }, 3000);
+        }
 
-            alert("Error: Payment gateway not loaded properly.");
-            payBtn.disabled = false;
-            payBtn.textContent = "Pay Now";
+        if (typeof Razorpay !== "undefined") {
+            launchRazorpayCheckout();
+        } else {
+            // Dynamically load Razorpay SDK without blocking or crashing
+            const rzpScript = document.createElement("script");
+            rzpScript.src = "https://checkout.razorpay.com/v1/checkout.js";
+            rzpScript.onload = () => {
+                launchRazorpayCheckout();
+            };
+            rzpScript.onerror = () => {
+                alert("पेमेंट गेटवे लोड नहीं हो सका। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।");
+                payBtn.disabled = false;
+                payBtn.textContent = "Pay Now";
+            };
+            document.head.appendChild(rzpScript);
         }
 
     } catch (error) {
