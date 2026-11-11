@@ -1773,7 +1773,7 @@ function autoFillUserData() {
 
         if (typeof getCurrentUser === "function") {
             const user = getCurrentUser();
-            if (user) {
+            if (user && user.mobile !== '7974422572') {
                 if (user.full_name && custNameEl && !custNameEl.value) {
                     custNameEl.value = user.full_name;
                     custNameEl.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1797,9 +1797,9 @@ function autoFillUserData() {
 }
 
 // -------------------------------------------------------------
-// DUPLICATE PURCHASE PREVENTION (Multi-Layer Robust Verification)
+// DUPLICATE PURCHASE PREVENTION (Database-Backed Real-Time Check)
 // -------------------------------------------------------------
-async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCheck = false) {
+async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
     const rawMob = mobileInput || (document.getElementById("customerMobile") ? document.getElementById("customerMobile").value : "");
     const cleanMob = String(rawMob || "").replace(/\D/g, "").slice(-10);
     const rawBookId = bookIdInput || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
@@ -1813,87 +1813,63 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
         return false;
     }
 
-    const cacheKey = `AI_PURCHASED_${cleanMob}_${bookId}`;
-    let isAlreadyPurchased = sessionStorage.getItem(cacheKey) === 'true';
+    let isAlreadyPurchased = false;
 
-    if (!isAlreadyPurchased) {
-        try {
-            // 1. Instant local storage purchases check (0ms) - Strictly bound to entered cleanMob
-            const localPurchases = [
-                ...(JSON.parse(localStorage.getItem('purchases') || '[]')),
-                ...(JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]'))
-            ];
+    // Helper: Exact book-to-book and bundle-to-bundle comparison
+    function isBookIdMatching(purchasedIdStr, targetIdStr) {
+        if (!purchasedIdStr || !targetIdStr) return false;
+        const pClean = String(purchasedIdStr).toUpperCase().trim();
+        const tClean = String(targetIdStr).toUpperCase().trim();
+        if (pClean === tClean) return true;
+        const targetList = tClean.split(',').map(x => x.trim()).filter(Boolean);
+        const purchasedList = pClean.split(',').map(x => x.trim()).filter(Boolean);
+        // Single book purchase: duplicate if target is this single book
+        if (targetList.length === 1 && purchasedList.includes(targetList[0])) return true;
+        // Bundle purchase: only duplicate if previously purchased bundle contains all target books
+        if (targetList.length > 1 && targetList.every(tId => purchasedList.includes(tId))) return true;
+        return false;
+    }
 
-            // Helper to match book/bundle purchases without falsely blocking combo upgrades
-            function isBookIdMatching(purchasedIdStr, targetIdStr) {
-                if (!purchasedIdStr || !targetIdStr) return false;
-                if (purchasedIdStr === targetIdStr) return true;
-                const targetList = targetIdStr.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-                const purchasedList = purchasedIdStr.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-                // If buying a single book, and it was purchased individually or inside a bundle:
-                if (targetList.length === 1 && purchasedList.includes(targetList[0])) return true;
-                // If buying a bundle, only duplicate if ALL books in the bundle were already purchased:
-                if (targetList.length > 1 && targetList.every(tId => purchasedList.includes(tId))) return true;
-                return false;
+    try {
+        const db = window.dbClient || window.supabase;
+        if (db) {
+            // Direct query by mobile in purchases table
+            const { data: purchases } = await db
+                .from('purchases')
+                .select('id, book_id, status, payment_status')
+                .eq('mobile', cleanMob)
+                .limit(20);
+
+            if (purchases && purchases.length > 0) {
+                const match = purchases.find(p => {
+                    const st = (p.status || p.payment_status || '').toLowerCase();
+                    return isBookIdMatching(p.book_id, bookId) && st !== 'failed';
+                });
+                if (match) isAlreadyPurchased = true;
             }
 
-            const localMatch = localPurchases.some(p => {
-                const pId = String(p.book_id || p.bookId || '').toUpperCase();
-                const pMob = String(p.mobile || p.customerMobile || '').replace(/\D/g, '').slice(-10);
-                return pMob === cleanMob && isBookIdMatching(pId, bookId);
-            });
-
-            if (localMatch) {
-                isAlreadyPurchased = true;
-            } else if (!skipRemoteCheck) {
-                // 2. Background remote Supabase lookup (only on input blur/change, never blocks Pay Now click)
-                const db = window.dbClient || window.supabase;
-                if (db) {
-                    // Check by mobile directly
-                    const { data: directMobPurchases } = await db
+            // Also check via profile if not found directly
+            if (!isAlreadyPurchased) {
+                const { data: prof } = await db.from('profiles').select('id').eq('mobile', cleanMob).maybeSingle();
+                if (prof && prof.id) {
+                    const { data: profPurchases } = await db
                         .from('purchases')
                         .select('id, book_id, status, payment_status')
-                        .eq('mobile', cleanMob)
+                        .eq('profile_id', prof.id)
                         .limit(20);
 
-                    if (directMobPurchases && directMobPurchases.length > 0) {
-                        const m = directMobPurchases.find(p => {
-                            const pId = String(p.book_id || '').toUpperCase();
+                    if (profPurchases && profPurchases.length > 0) {
+                        const match = profPurchases.find(p => {
                             const st = (p.status || p.payment_status || '').toLowerCase();
-                            return isBookIdMatching(pId, bookId) && st !== 'failed';
+                            return isBookIdMatching(p.book_id, bookId) && st !== 'failed';
                         });
-                        if (m) isAlreadyPurchased = true;
-                    }
-
-                    // Also check via profiles resolution
-                    if (!isAlreadyPurchased) {
-                        const { data: prof } = await db.from('profiles').select('id').eq('mobile', cleanMob).maybeSingle();
-                        if (prof && prof.id) {
-                            const { data: profPurchases } = await db
-                                .from('purchases')
-                                .select('id, book_id, status, payment_status')
-                                .eq('profile_id', prof.id)
-                                .limit(30);
-
-                            if (profPurchases && profPurchases.length > 0) {
-                                const m = profPurchases.find(p => {
-                                    const pId = String(p.book_id || '').toUpperCase();
-                                    const st = (p.status || p.payment_status || '').toLowerCase();
-                                    return isBookIdMatching(pId, bookId) && st !== 'failed';
-                                });
-                                if (m) isAlreadyPurchased = true;
-                            }
-                        }
+                        if (match) isAlreadyPurchased = true;
                     }
                 }
             }
-
-            if (isAlreadyPurchased) {
-                sessionStorage.setItem(cacheKey, 'true');
-            }
-        } catch(e) {
-            console.warn("Duplicate purchase check error:", e);
         }
+    } catch(e) {
+        console.warn("Database duplicate check error:", e);
     }
 
     if (isAlreadyPurchased) {
@@ -1934,7 +1910,6 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
         }
         return true;
     } else {
-        try { sessionStorage.removeItem(cacheKey); } catch (_) {}
         if (bannerContainer) bannerContainer.style.display = "none";
         if (payBtn && payBtn.dataset.alreadyPurchased === "true") {
             delete payBtn.dataset.alreadyPurchased;
@@ -2052,10 +2027,10 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         return;
     }
 
-    // Check duplicate purchase locally in 0ms (never lags button click)
-    const isAlreadyBought = await checkDuplicateBookPurchase(mobile, window.currentCheckoutBook ? window.currentCheckoutBook.id : null, true);
+    // Check duplicate purchase directly from database (prevents false locks for other numbers on same device)
+    const isAlreadyBought = await checkDuplicateBookPurchase(mobile, window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
     if (isAlreadyBought) {
-        alert("🎉 आप यह पुस्तक पहले ही खरीद चुके हैं!\n\nकृपया अपनी लाइब्रेरी में जाकर इसे पढ़ें या PDF डाउनलोड करें।");
+        alert("🎉 आप यह पुस्तक/बंडल पहले ही खरीद चुके हैं!\n\nकृपया अपनी लाइब्रेरी में जाकर इसे पढ़ें या PDF डाउनलोड करें।");
         return;
     }
 

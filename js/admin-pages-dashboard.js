@@ -477,12 +477,47 @@ function renderTodayPriorityHub(data) {
               <tbody>
                 ${todayDropped.map(d => {
                   const waNumber = cleanPhoneForWa(d.customer_mobile);
-                  const waMsg = encodeURIComponent(`नमस्ते ${d.customer_name} जी! 🙏 आपने आरोग्यम इंडिया पर "${d.book_title}" ई-बुक लेने का प्रयास किया था, क्या पेमेंट या ऑर्डर में कोई समस्या आई? यदि आप चाहें तो मैं आपको स्पेशल डिस्काउंट या डायरेक्ट सहायता दे सकता हूँ।`);
+                  const rawBook = String(d.book_id || d.book_title || '').trim();
+                  const isBundle = rawBook.includes(',') || rawBook.toUpperCase().includes('BUNDLE') || rawBook.toUpperCase().includes('COMBO');
+                  
+                  const KNOWN_BOOKS = {
+                    'BK017': { title: 'गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026', desc: 'बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन' },
+                    'BK016': { title: 'कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले', desc: 'सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज' },
+                    'BK002': { title: "'खेती का डॉक्टर' (Pocket Doctor)", desc: '300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान' },
+                    'BK019': { title: 'आधुनिक मक्का व तिलहन उत्पादन तकनीक', desc: 'कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला' },
+                    'BK020': { title: 'प्राकृतिक खेती व जैविक खाद निर्माण गाइड', desc: 'जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि' },
+                    'BK001': { title: 'खरीफ फसल मास्टर गाइड 2026', desc: 'धान, सोयाबीन, मक्का व दलहन का 150+ पेज का संपूर्ण वैज्ञानिक समाधान' },
+                    'BK015': { title: 'सब्जी की उन्नत वैज्ञानिक खेती', desc: '11 प्रमुख सब्जियों की संपूर्ण वैज्ञानिक बुवाई व देखभाल' },
+                    'BK018': { title: 'घर बैठे पैसे कैसे कमाएँ? (Income Guide)', desc: 'व्यावहारिक कमाई के तरीके व आत्मनिर्भर बनने की गाइड' }
+                  };
+
+                  let displayBookTitle = 'ई-बुक';
+                  let waMsgText = '';
+
+                  if (isBundle) {
+                    displayBookTitle = '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो (5 पुस्तकें)';
+                    const ids = rawBook.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
+                    const activeIds = ids.length > 0 ? ids : ['BK017', 'BK016', 'BK002', 'BK019', 'BK020'];
+                    let listText = '';
+                    activeIds.forEach((id, idx) => {
+                      const b = KNOWN_BOOKS[id] || { title: id, desc: 'डिजिटल गाइड' };
+                      listText += `${idx + 1}. *${b.title}* — ${b.desc}\n`;
+                    });
+
+                    waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।\n\n📚 *इस कॉम्बो में शामिल हैं ये 5 महत्वपूर्ण पुस्तकें:*\n${listText}\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप मात्र ₹149 सीधे हमारे आधिकारिक UPI (7974422572) पर भेजकर स्क्रीनशॉट दे सकते हैं। हम आपकी 5 पुस्तकें तुरंत सक्रिय (Activate) कर देंगे।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
+                  } else {
+                    const cleanId = rawBook.toUpperCase();
+                    const single = KNOWN_BOOKS[cleanId] || { title: d.book_title || rawBook, desc: 'सम्पूर्ण वैज्ञानिक गाइड' };
+                    displayBookTitle = single.title;
+                    waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *"${single.title}"* ई-बुक प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी समस्या के कारण आपका ऑर्डर अधूरा रह गया।\n\n📖 *पुस्तक विवरण:* ${single.desc}।\n\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप सीधे हमारे आधिकारिक UPI (7974422572) पर भेजकर स्क्रीनशॉट दे सकते हैं, आपकी ई-बुक तुरंत सक्रिय कर दी जाएगी।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
+                  }
+
+                  const waMsg = encodeURIComponent(waMsgText);
                   return `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0;">
                       <td style="padding: 8px;"><strong>${d.customer_name}</strong></td>
                       <td style="padding: 8px;">${d.customer_mobile ? `<a href="tel:${d.customer_mobile}" style="color:#f87171;text-decoration:none;">${d.customer_mobile}</a>` : '—'}</td>
-                      <td style="padding: 8px; color: #fde047;">${d.book_title}</td>
+                      <td style="padding: 8px; color: #fde047; font-weight: 700;">${displayBookTitle}</td>
                       <td style="padding: 8px;"><span style="background:rgba(239,68,68,0.15);color:#fca5a5;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;">${d.status}</span></td>
                       <td style="padding: 8px; color: #94a3b8; font-size: 0.78rem;">${formatTime12h(d.created_at)}</td>
                       <td style="padding: 8px; text-align: right; white-space: nowrap;">

@@ -355,19 +355,25 @@ function renderTable(logs) {
                                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
                                 whatsappButtonHTML = `<a href="${whatsappUrl}" target="_blank" class="admin-button small-button" style="background:#25D366;color:#fff;border-color:#22c55e;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;" title="सफलतापूर्वक खरीद का बधाई व स्वागत संदेश भेजें">💬 बधाई संदेश</a>`;
                             } else {
+                                const rawB = String(log.book_id || log.book_name || '').trim();
+                                const isCombo = rawB.includes(',') || rawB.toUpperCase().includes('BUNDLE') || rawB.toUpperCase().includes('COMBO');
+                                let comboListText = '';
+                                if (isCombo) {
+                                    comboListText = `\n📚 *इस कॉम्बो में शामिल हैं ये 5 महत्वपूर्ण पुस्तकें:*\n1. 🌾 *गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026* — बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन\n2. 🧪 *कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले* — सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज\n3. 🩺 *'खेती का डॉक्टर' (Pocket Doctor)* — 300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान\n4. 🌽 *आधुनिक मक्का व तिलहन उत्पादन तकनीक* — कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला\n5. 🌿 *प्राकृतिक खेती व जैविक खाद निर्माण गाइड* — जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि\n`;
+                                }
                                 const followUpMsg = `🙏 नमस्ते ${customerName} जी!
 
 आशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿
 
 हमने देखा कि आप आरोग्यम इंडिया से *"${bookTitle}"* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट, इंटरनेट समस्या या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।
-
+${comboListText}
 ❤️ *हम आपके साथ हैं:*
 यदि ऑनलाइन पेमेंट करने में कोई भी परेशानी या असुविधा आई हो, तो आप सीधे हमारे आधिकारिक UPI नंबर पर भी राशि भेज सकते हैं:
 
 💳 *Google Pay / PhonePe / Paytm / BHIM UPI:*
-👉 UPI No: *7049294111*
+👉 UPI No: *7974422572*
 
-📸 *पेमेंट करने के बाद इसी नंबर पर स्क्रीनशॉट भेजें*, हम तुरंत आपकी ई-बुक सक्रिय (Activate) करवा देंगे।
+📸 *पेमेंट करने के बाद इसी नंबर पर स्क्रीनशॉट भेजें*, हम तुरंत आपकी पुस्तकें सक्रिय (Activate) करवा देंगे।
 
 📲 ऐप इंस्टॉल करें: https://aarogyamindia.online/aarogyam-app.html
 📞 संपर्क: +91 7974422572
