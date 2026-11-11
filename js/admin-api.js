@@ -4,9 +4,9 @@
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Intelligent Admin Persistent Cache (SessionStorage backed - Zero Auto Egress on page refresh / tab switch)
-// 6-Hour Bounded Window (maximum 4 times query window per 24 hours, or only when manual refresh is clicked)
-const ADMIN_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours auto-TTL or until admin clicks Sync / Refresh
+// Intelligent Admin Persistent Cache (SessionStorage backed - Zero Auto Egress on rapid tab switches)
+// 2-Minute Bounded Window (balances zero egress with real-time new customer visibility)
+const ADMIN_CACHE_TTL = 2 * 60 * 1000; // 2 minutes auto-TTL or until admin clicks Sync / Refresh
 
 const _adminMemoryCache = {
   _map: new Map(),
@@ -60,8 +60,14 @@ export function clearAdminCache() {
   }
 }
 
+export function updateCachedUsers(usersList) {
+  if (!Array.isArray(usersList)) return;
+  _adminMemoryCache.set('users_{}', { data: { success: true, data: usersList }, ts: Date.now() });
+}
+
 if (typeof window !== 'undefined') {
   window.clearAdminCache = clearAdminCache;
+  window.updateCachedUsers = updateCachedUsers;
 }
 
 // Mock data for other admin pages (Users, Purchases, Downloads, Reports) - NOT part of Dashboard scope for this task.

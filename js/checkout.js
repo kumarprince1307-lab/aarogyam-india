@@ -1815,18 +1815,17 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCh
 
     if (!isAlreadyPurchased) {
         try {
-            // 1. Instant local storage purchases check (0ms)
+            // 1. Instant local storage purchases check (0ms) - Strictly bound to entered cleanMob
             const localPurchases = [
                 ...(JSON.parse(localStorage.getItem('purchases') || '[]')),
                 ...(JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]'))
             ];
-            const myPurchasedIds = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]').map(x => String(x).toUpperCase());
 
             const localMatch = localPurchases.some(p => {
                 const pId = String(p.book_id || p.bookId || '').toUpperCase();
                 const pMob = String(p.mobile || p.customerMobile || '').replace(/\D/g, '').slice(-10);
-                return (pId === bookId || pId.includes(bookId) || bookId.includes(pId)) && (pMob === cleanMob || !pMob);
-            }) || myPurchasedIds.includes(bookId);
+                return pMob === cleanMob && (pId === bookId || pId.includes(bookId) || bookId.includes(pId));
+            });
 
             if (localMatch) {
                 isAlreadyPurchased = true;
@@ -2002,6 +2001,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const payBtn = document.getElementById("payNowBtn");
                 if (payBtn && payBtn.dataset.alreadyPurchased === "true") {
                     delete payBtn.dataset.alreadyPurchased;
+                    payBtn.disabled = false;
+                    payBtn.style.pointerEvents = "auto";
+                    payBtn.style.opacity = "1";
                     payBtn.style.background = "";
                     payBtn.textContent = "Pay Now";
                 }

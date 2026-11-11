@@ -602,11 +602,11 @@
     const userPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('SAKHI_USER_PHONE') || getDrawerCookie('aim_user_mobile') || savedUser.mobile || savedUser.phone || '').replace(/\D/g, '').slice(-10);
     const isLogged = typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : (userPhone.length === 10);
     let userName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || localStorage.getItem('aarogyam_user_name') || localStorage.getItem('SAKHI_USER_NAME') || getDrawerCookie('aim_user_name') || savedUser.full_name || savedUser.name || savedUser.fullName || '';
-    if (!userName || userName.toLowerCase() === 'null' || userName.toLowerCase() === 'undefined' || userName.toLowerCase().includes('guest')) {
+    if (!isLogged || !userName || userName.toLowerCase() === 'null' || userName.toLowerCase() === 'undefined' || userName.toLowerCase().includes('guest')) {
       userName = isLogged ? 'किसान साथी' : 'Guest User';
     }
-    const userRole = savedUser.isVip ? '👑 Pro VIP Member' : (isLogged ? '🌱 Verified Member' : 'Guest Mode');
-    const shareId = window.getUserShareId();
+    const userRole = isLogged ? (savedUser.isVip ? '👑 Pro VIP Member' : '🌱 Verified Member') : 'Guest Mode';
+    const shareId = isLogged ? window.getUserShareId() : null;
 
     return `
       <button type="button" class="drawer-close-btn" onclick="window.closeUniversalDrawer()" title="Close Menu">&times;</button>
@@ -618,11 +618,12 @@
         <div class="drawer-user-meta">
           <h3 class="drawer-user-name">${userName}</h3>
           <span class="drawer-user-role">${userRole}</span>
-          ${userPhone ? `<div style="font-size:0.78rem;color:#93c5fd;font-weight:700;margin-top:2px;"><i class="fa-solid fa-phone" style="font-size:0.72rem;margin-right:5px;color:#38bdf8;"></i>+91 ${userPhone}</div>` : ''}
+          ${isLogged && userPhone ? `<div style="font-size:0.78rem;color:#93c5fd;font-weight:700;margin-top:2px;"><i class="fa-solid fa-phone" style="font-size:0.72rem;margin-right:5px;color:#38bdf8;"></i>+91 ${userPhone}</div>` : ''}
+          ${isLogged && shareId ? `
           <div style="font-size:0.72rem;color:#34d399;font-weight:800;margin-top:3px;display:inline-flex;align-items:center;gap:5px;background:rgba(52,211,153,0.15);padding:2px 8px;border-radius:6px;border:1px solid rgba(52,211,153,0.35);">
             <span>🎯 Share ID:</span>
             <span style="letter-spacing:0.5px;">${shareId}</span>
-          </div>
+          </div>` : ''}
         </div>
       </div>
 
@@ -647,30 +648,48 @@
     `;
   }
 
+  function clearAllAuthCookies() {
+    const cookiesToClear = [
+      'aim_user_mobile', 'aim_user_name', 'user_mobile', 'user_phone', 
+      'farmer_mobile', 'farmer_name', 'aarogyam_user_phone', 'aarogyam_user_name', 'user_share_id'
+    ];
+    cookiesToClear.forEach(name => {
+      document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      try {
+        document.cookie = `${name}=; Path=/; Domain=${window.location.hostname}; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      } catch (_) {}
+    });
+  }
+
+  function purgeAllStoredUserData() {
+    const keysToRemove = [
+      'aim_user_name', 'aim_user_mobile', 'aarogyam_user_name', 'aarogyam_user_phone',
+      'aarogyam_user_registered', 'aarogyam_user', 'CURRENT_USER', 'aoi_user_session', 'wb_registered',
+      'user_name', 'user_phone', 'user_mobile', 'farmer_mobile', 'farmer_name',
+      'SAKHI_USER_NAME', 'SAKHI_USER_PHONE', 'SAKHI_PERSONA_PROFILE', 'SAKHI_CURRENT_SESSION_ID',
+      'AI_USER', 'AI_PROFILE', 'UCAS_USER', 'AI_SESSION', 'AI_LOGIN_STATUS',
+      'my_purchased_book_ids', 'user_share_id', 'aim_user_share_id', 'aarogyam_user_share_id',
+      'AOI_SPONSOR_MOBILE', 'AOI_SPONSOR_NAME'
+    ];
+    keysToRemove.forEach(k => {
+      try { localStorage.removeItem(k); } catch (_) {}
+    });
+    try { sessionStorage.clear(); } catch (_) {}
+    clearAllAuthCookies();
+  }
+
   window.logoutUniversalUser = function() {
     if (!confirm('क्या आप सचमुच लॉग आउट करना चाहते हैं?')) return;
-    localStorage.removeItem('aim_user_name');
-    localStorage.removeItem('aim_user_mobile');
-    localStorage.removeItem('aarogyam_user_name');
-    localStorage.removeItem('aarogyam_user_phone');
-    localStorage.removeItem('SAKHI_USER_NAME');
-    localStorage.removeItem('SAKHI_USER_PHONE');
-    localStorage.removeItem('AI_USER');
-    localStorage.removeItem('AI_PROFILE');
-    localStorage.removeItem('UCAS_USER');
-    try {
-      const sess = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
-      delete sess.name;
-      delete sess.mobile;
-      delete sess.phone;
-      delete sess.loggedIn;
-      localStorage.setItem('AI_SESSION', JSON.stringify(sess));
-    } catch (e) {}
+    purgeAllStoredUserData();
+    if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
+      try { window.V1_SESSION.logout(); } catch (_) {}
+    }
     window.updateUniversalDrawerProfile();
     window.dispatchEvent(new CustomEvent('ai:user-logged-out'));
     if (typeof window.renderInitialGreeting === 'function') {
       window.renderInitialGreeting();
     }
+    window.location.reload();
   };
 
   window.openUniversalLoginHandler = function() {
@@ -1510,41 +1529,14 @@
     }
   });
 
-  window.logoutUniversalUser = function () {
-    localStorage.removeItem('SAKHI_USER_NAME');
-    localStorage.removeItem('SAKHI_USER_PHONE');
-    localStorage.removeItem('SAKHI_PERSONA_PROFILE');
-    localStorage.removeItem('SAKHI_CURRENT_SESSION_ID');
-    localStorage.removeItem('user_mobile');
-
-    if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
-      window.V1_SESSION.logout();
-      return;
-    }
-    localStorage.removeItem('AI_USER');
-    localStorage.removeItem('AI_PROFILE');
-    localStorage.removeItem('AI_SESSION');
-    localStorage.removeItem('AI_LOGIN_STATUS');
-    localStorage.removeItem('AI_PURCHASES');
-    localStorage.removeItem('purchases');
-    localStorage.removeItem('user_purchases');
-    localStorage.removeItem('aim_purchases');
-    localStorage.removeItem('UCAS_USER');
-    localStorage.removeItem('aim_user_name');
-    localStorage.removeItem('aim_user_mobile');
-    localStorage.removeItem('aarogyam_user_registered');
-    localStorage.removeItem('aarogyam_user_phone');
-    localStorage.removeItem('aarogyam_user_name');
-    localStorage.removeItem('aoi_user_session');
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('user_phone');
-    localStorage.removeItem('aarogyam_user');
-    localStorage.removeItem('CURRENT_USER');
-    localStorage.removeItem('wb_registered');
-    try { sessionStorage.clear(); } catch(e) {}
-    alert('आप सफलतापूर्वक लॉगआउट हो चुके हैं। (Logged out successfully)');
-    window.location.reload();
-  };
+  // Alias for backward compatibility if invoked from bottom scripts
+  if (typeof window.logoutUniversalUser !== 'function') {
+    window.logoutUniversalUser = function () {
+      if (typeof purgeAllStoredUserData === 'function') purgeAllStoredUserData();
+      alert('आप सफलतापूर्वक लॉगआउट हो चुके हैं। (Logged out successfully)');
+      window.location.reload();
+    };
+  }
 
   function showDrawerToast(msg, type = 'info') {
     const toast = document.createElement('div');

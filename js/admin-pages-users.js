@@ -1,7 +1,7 @@
 /* Admin Users Page */
 
 import { initAdminLayout } from './admin-main.js';
-import { fetchUsers, fetchUsersDelta, updateUserStatus, batchUpdateUserStatuses, deleteUserProfile } from './admin-api.js';
+import { fetchUsers, fetchUsersDelta, updateUserStatus, batchUpdateUserStatuses, deleteUserProfile, updateCachedUsers } from './admin-api.js';
 
 let masterUsersList = []; // In-memory master list to eliminate repeated egress
 let currentUsersData = []; // Filtered data for table and CSV export
@@ -551,6 +551,13 @@ export async function initUsers() {
     }
 
     applyFilters();
+
+    // Auto-trigger delta sync in background to fetch any fresh signups without waiting for manual button click
+    if (!forceRefresh && masterUsersList.length > 0) {
+      setTimeout(() => {
+        syncDeltaUsers().catch(e => console.warn("Background delta sync error:", e));
+      }, 500);
+    }
   }
 
   // Delta Sync: Fetches ONLY new records since last sync (Zero egress leak)
@@ -647,6 +654,9 @@ export async function initUsers() {
         applyFilters();
 
         if (changeCount > 0) {
+          if (typeof updateCachedUsers === 'function') {
+            updateCachedUsers(masterUsersList);
+          }
           console.log(`[Admin] ⚡ Delta sync: ${changeCount} updates applied successfully.`);
         }
       } else {
