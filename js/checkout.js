@@ -1738,28 +1738,40 @@ function autoFillUserData() {
     const urlParams = new URLSearchParams(window.location.search);
     const qName = urlParams.get('name') || urlParams.get('customerName') || urlParams.get('billing_name') || '';
     const qMobile = (urlParams.get('mobile') || urlParams.get('phone') || urlParams.get('customerMobile') || '').replace(/\D/g, '').slice(-10);
-
     const qEmail = urlParams.get('email') || urlParams.get('mail') || '';
 
-    // 2. Read stored user, 1-year cookies and all local storage fallbacks
-    const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
-    
-    const nameVal = qName || storedUser.full_name || storedUser.name || 
-                    localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || 
-                    localStorage.getItem('aarogyam_user_name') || localStorage.getItem('farmer_name') || 
-                    getCheckoutCookie('aim_user_name') || "";
-    const rawMobileVal = qMobile || storedUser.mobile || storedUser.phone || 
-                      (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || 
-                       localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('farmer_mobile') || 
-                       getCheckoutCookie('aim_user_mobile') || "").replace(/\D/g, '').slice(-10);
-    // Never prefill master partner helpline 7974422572 as customer mobile
-    const mobileVal = (rawMobileVal === '7974422572') ? '' : rawMobileVal;
-    const customerNameVal = (rawMobileVal === '7974422572') ? '' : nameVal;
-    const emailVal = qEmail || storedUser.email || localStorage.getItem('aim_user_email') || localStorage.getItem('user_email') || getCheckoutCookie('aim_user_email') || "";
+    // Check if user is actively logged in (Session Honoring Rule)
+    const isLogged = (typeof window.isUserLoggedIn === 'function') 
+        ? window.isUserLoggedIn() 
+        : (typeof window.isUserRegistered === 'function' ? window.isUserRegistered() : false);
+
+    let nameVal = qName;
+    let mobileVal = qMobile;
+    let emailVal = qEmail;
+
+    if (isLogged) {
+        // Authenticated user: Honor their active session (including Aarogyam Master 7974422572!)
+        const storedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+        const sess = JSON.parse(localStorage.getItem('AI_SESSION') || '{}');
+        
+        nameVal = nameVal || storedUser.full_name || storedUser.name || sess.name || localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || "";
+        mobileVal = mobileVal || (storedUser.mobile || storedUser.phone || sess.mobile || sess.phone || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || "").replace(/\D/g, '').slice(-10);
+        emailVal = emailVal || storedUser.email || sess.email || localStorage.getItem('aim_user_email') || "";
+
+        if (typeof getCurrentUser === "function") {
+            const user = getCurrentUser();
+            if (user) {
+                if (user.full_name && !nameVal) nameVal = user.full_name;
+                if (user.mobile && !mobileVal) mobileVal = String(user.mobile).replace(/\D/g, '').slice(-10);
+                if (user.email && !emailVal) emailVal = user.email;
+            }
+        }
+    }
+    // If not logged in and no query params, nameVal & mobileVal remain empty strings (Guest Mode is 100% clean)!
 
     if (custMobEl && !custMobEl.readOnly) {
-        if (customerNameVal && custNameEl && !custNameEl.value) {
-            custNameEl.value = customerNameVal;
+        if (nameVal && custNameEl && !custNameEl.value) {
+            custNameEl.value = nameVal;
             custNameEl.dispatchEvent(new Event('input', { bubbles: true }));
         }
         if (mobileVal && custMobEl && !custMobEl.value) {
@@ -1769,24 +1781,6 @@ function autoFillUserData() {
         if (emailVal && custEmailEl && !custEmailEl.value) {
             custEmailEl.value = emailVal;
             custEmailEl.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-
-        if (typeof getCurrentUser === "function") {
-            const user = getCurrentUser();
-            if (user && user.mobile !== '7974422572') {
-                if (user.full_name && custNameEl && !custNameEl.value) {
-                    custNameEl.value = user.full_name;
-                    custNameEl.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                if (user.mobile && custMobEl && !custMobEl.value) {
-                    custMobEl.value = user.mobile;
-                    custMobEl.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-                if (user.email && custEmailEl && !custEmailEl.value) {
-                    custEmailEl.value = user.email;
-                    custEmailEl.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-            }
         }
     }
 
@@ -1833,38 +1827,26 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
     try {
         const db = window.dbClient || window.supabase;
         if (db) {
-            // Direct query by mobile in purchases table
-            const { data: purchases } = await db
-                .from('purchases')
-                .select('id, book_id, status, payment_status')
+            // Step 1: Look up profile_id by mobile in profiles table (SSOT)
+            const { data: prof } = await db
+                .from('profiles')
+                .select('id')
                 .eq('mobile', cleanMob)
-                .limit(20);
+                .maybeSingle();
 
-            if (purchases && purchases.length > 0) {
-                const match = purchases.find(p => {
-                    const st = (p.status || p.payment_status || '').toLowerCase();
-                    return isBookIdMatching(p.book_id, bookId) && st !== 'failed';
-                });
-                if (match) isAlreadyPurchased = true;
-            }
+            if (prof && prof.id) {
+                // Step 2: Query purchases table by profile_id with verified columns: id, book_id, payment_status
+                const { data: profPurchases } = await db
+                    .from('purchases')
+                    .select('id, book_id, payment_status')
+                    .eq('profile_id', prof.id);
 
-            // Also check via profile if not found directly
-            if (!isAlreadyPurchased) {
-                const { data: prof } = await db.from('profiles').select('id').eq('mobile', cleanMob).maybeSingle();
-                if (prof && prof.id) {
-                    const { data: profPurchases } = await db
-                        .from('purchases')
-                        .select('id, book_id, status, payment_status')
-                        .eq('profile_id', prof.id)
-                        .limit(20);
-
-                    if (profPurchases && profPurchases.length > 0) {
-                        const match = profPurchases.find(p => {
-                            const st = (p.status || p.payment_status || '').toLowerCase();
-                            return isBookIdMatching(p.book_id, bookId) && st !== 'failed';
-                        });
-                        if (match) isAlreadyPurchased = true;
-                    }
+                if (profPurchases && profPurchases.length > 0) {
+                    const match = profPurchases.find(p => {
+                        const st = (p.payment_status || '').toLowerCase();
+                        return isBookIdMatching(p.book_id, bookId) && st !== 'failed';
+                    });
+                    if (match) isAlreadyPurchased = true;
                 }
             }
         }
