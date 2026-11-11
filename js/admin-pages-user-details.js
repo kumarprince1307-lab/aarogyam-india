@@ -9,6 +9,7 @@ import {
   addManualPurchase,
   deletePurchase,
   updateUserPermissionAdmin,
+  updateUserProfileAdmin,
   fetchAllUsersAdmin
 } from './admin-api.js';
 
@@ -472,7 +473,7 @@ function renderProfile(detail, ucasData) {
     <div class="admin-section">
       <div class="admin-section-header">
         <div class="admin-section-title">👤 User Profile</div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span class="admin-pill ${detail.status === 'active' ? 'active' : ''}" style="font-weight:800;">${detail.status.toUpperCase()}</span>
           <button 
             class="admin-button small-button admin-status-toggle ${detail.status.toLowerCase()}"
@@ -481,6 +482,19 @@ function renderProfile(detail, ucasData) {
             title="Toggle Status"
           >
             Toggle Status
+          </button>
+          <button 
+            type="button"
+            id="btn-open-edit-profile"
+            class="admin-button small-button"
+            data-user-id="${detail.id}"
+            data-user-name="${(detail.name || '').replace(/"/g, '&quot;')}"
+            data-user-mobile="${sanitizedMobile}"
+            data-user-shareid="${(detail.shareId || detail.referralToken || '').replace(/"/g, '&quot;')}"
+            style="background:#2563eb;color:#fff;border-color:#1d4ed8;font-weight:700;display:inline-flex;align-items:center;gap:4px;"
+            title="नाम, मोबाइल नंबर व शेयर आईडी बदलें"
+          >
+            <span>✏️</span> Edit Profile
           </button>
         </div>
       </div>
@@ -761,6 +775,43 @@ function renderAddPurchaseModalHtml() {
   `;
 }
 
+function renderEditProfileModalHtml() {
+  return `
+    <div id="edit-profile-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 10001; padding: 16px;">
+      <div class="admin-card" style="width: 100%; max-width: 480px; background: var(--admin-surface-2); border: 1px solid var(--admin-border); border-radius: 16px; padding: 24px; box-shadow: var(--admin-shadow); position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
+          <h3 style="margin: 0; font-size: 1.25rem; color: var(--admin-text); display:flex; align-items:center; gap:8px;">
+            <span>✏️</span> Edit User Profile
+          </h3>
+          <button type="button" id="btn-close-edit-profile-modal" style="background: transparent; border: none; font-size: 1.5rem; color: var(--admin-muted); cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        <form id="edit-profile-form" style="display: grid; gap: 16px;">
+          <input type="hidden" id="edit-profile-user-id" />
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-muted); margin-bottom: 6px;">पूरा नाम (Full Name) <span style="color: var(--admin-danger);">*</span></label>
+            <input type="text" id="edit-profile-name" class="admin-input" placeholder="e.g. Ashok Rauth" required style="width: 100%;" />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-muted); margin-bottom: 6px;">मोबाइल नंबर (Mobile) <span style="color: var(--admin-danger);">*</span></label>
+            <input type="tel" id="edit-profile-mobile" class="admin-input" placeholder="10-digit mobile" maxlength="10" required style="width: 100%;" />
+            <small style="color: var(--admin-muted); font-size: 0.75rem; display: block; margin-top: 4px;">10 अंकों का शुद्ध नंबर दर्ज करें</small>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-muted); margin-bottom: 6px;">आधिकारिक शेयर आईडी (Share ID) <span style="color: var(--admin-danger);">*</span></label>
+            <input type="text" id="edit-profile-shareid" class="admin-input" placeholder="e.g. AI809408" required style="width: 100%; text-transform: uppercase;" />
+            <small style="color: var(--admin-muted); font-size: 0.75rem; display: block; margin-top: 4px;">Aarogyam Manas: शेयर आईडी आधिकारिक होनी चाहिए (उदा. AI486205)</small>
+          </div>
+          <div id="edit-profile-form-error" style="display: none; color: var(--admin-danger); font-size: 0.9rem; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 8px;"></div>
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px;">
+            <button type="button" id="btn-cancel-edit-profile-modal" class="admin-button" style="background: var(--admin-surface-strong); border: 1px solid var(--admin-border); color: var(--admin-text);">Cancel</button>
+            <button type="submit" id="btn-submit-edit-profile" class="admin-button" style="background: #2563eb; color: #fff; font-weight: 700;">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
 export async function initUserDetails() {
   initAdminLayout('User Details', 'Inspect an individual customer profile with full UCAS integration.');
 
@@ -790,6 +841,7 @@ export async function initUserDetails() {
     </div>
     <div id="user-details-content"> <div class="admin-loading">Loading user details and UCAS data…</div> </div>
     ${renderAddPurchaseModalHtml()}
+    ${renderEditProfileModalHtml()}
   `;
 
   const container = document.getElementById('user-details-content');
@@ -874,6 +926,66 @@ export async function initUserDetails() {
     }
   });
 
+  // --- Edit Profile Modal Controls & Form Logic ---
+  const editProfileOverlay = document.getElementById('edit-profile-modal-overlay');
+  const editProfileCloseBtn = document.getElementById('btn-close-edit-profile-modal');
+  const editProfileCancelBtn = document.getElementById('btn-cancel-edit-profile-modal');
+  const editProfileForm = document.getElementById('edit-profile-form');
+  const editProfileUserIdInput = document.getElementById('edit-profile-user-id');
+  const editProfileNameInput = document.getElementById('edit-profile-name');
+  const editProfileMobileInput = document.getElementById('edit-profile-mobile');
+  const editProfileShareIdInput = document.getElementById('edit-profile-shareid');
+  const editProfileError = document.getElementById('edit-profile-form-error');
+
+  function closeEditProfileModal() {
+    if (editProfileOverlay) editProfileOverlay.style.display = 'none';
+    if (editProfileError) {
+      editProfileError.style.display = 'none';
+      editProfileError.textContent = '';
+    }
+  }
+
+  editProfileCloseBtn?.addEventListener('click', closeEditProfileModal);
+  editProfileCancelBtn?.addEventListener('click', closeEditProfileModal);
+  editProfileOverlay?.addEventListener('click', (e) => {
+    if (e.target === editProfileOverlay) closeEditProfileModal();
+  });
+
+  editProfileForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById('btn-submit-edit-profile');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+    }
+    if (editProfileError) {
+      editProfileError.style.display = 'none';
+      editProfileError.textContent = '';
+    }
+
+    const uId = editProfileUserIdInput.value.trim();
+    const name = editProfileNameInput.value.trim();
+    const mobile = editProfileMobileInput.value.trim();
+    const shareId = editProfileShareIdInput.value.trim();
+
+    const res = await updateUserProfileAdmin({ userId: uId, name, mobile, shareId });
+    if (res.success) {
+      closeEditProfileModal();
+      alert('✅ यूजर प्रोफाइल (नाम, मोबाइल व शेयर आईडी) सफलतापूर्वक अपडेट की गई!');
+      await loadAndRender();
+    } else {
+      if (editProfileError) {
+        editProfileError.textContent = '❌ ' + (res.error || 'Failed to update user profile.');
+        editProfileError.style.display = 'block';
+      }
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save Changes';
+    }
+  });
+
   async function loadAndRender() {
     container.innerHTML = '<div class="admin-loading">Loading user details & real UCAS records…</div>';
     const [result, ucasRes] = await Promise.all([
@@ -888,6 +1000,17 @@ export async function initUserDetails() {
 
     const ucasData = ucasRes.success ? ucasRes.data : null;
     container.innerHTML = renderProfile(result.data, ucasData);
+
+    // 0. Bind Open "Edit Profile" Button
+    const openEditProfileBtn = document.getElementById('btn-open-edit-profile');
+    openEditProfileBtn?.addEventListener('click', () => {
+      if (editProfileUserIdInput) editProfileUserIdInput.value = openEditProfileBtn.dataset.userId || userId;
+      if (editProfileNameInput) editProfileNameInput.value = openEditProfileBtn.dataset.userName || '';
+      if (editProfileMobileInput) editProfileMobileInput.value = openEditProfileBtn.dataset.userMobile || '';
+      if (editProfileShareIdInput) editProfileShareIdInput.value = openEditProfileBtn.dataset.userShareid || '';
+      if (editProfileError) editProfileError.style.display = 'none';
+      if (editProfileOverlay) editProfileOverlay.style.display = 'flex';
+    });
 
     // 1. Bind Open "Add Purchase" Button
     const openAddPurchaseBtn = document.getElementById('btn-open-add-purchase');

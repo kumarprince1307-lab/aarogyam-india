@@ -2076,9 +2076,10 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         localStorage.setItem('AI_USER', JSON.stringify(localUserData));
         localStorage.setItem('AI_PROFILE', JSON.stringify(localUserData));
 
-        // Asynchronous non-blocking registration (never blocks Razorpay popup launch)
+        // Asynchronous non-blocking registration (runs in parallel with zero UI delay)
+        let regPromise = null;
         if (typeof registerUser === "function") {
-            registerUser({
+            regPromise = registerUser({
                 fullName: name,
                 mobile: mobile,
                 email: email,
@@ -2087,7 +2088,19 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                 referralCode: finalReferralCode,
                 source: sourceVal,
                 landing_page: landingPageVal
-            }).catch(regErr => console.warn("Background user registration sync note:", regErr));
+            }).then(res => {
+                if (res && res.profile && res.profile.id) {
+                    window.activeCheckoutProfileId = res.profile.id;
+                    const uObj = JSON.parse(localStorage.getItem('AI_USER') || '{}');
+                    uObj.id = res.profile.id;
+                    localStorage.setItem('AI_USER', JSON.stringify(uObj));
+                    localStorage.setItem('AI_PROFILE', JSON.stringify(uObj));
+                }
+                return res;
+            }).catch(regErr => {
+                console.warn("Background user registration sync note:", regErr);
+                return null;
+            });
         }
 
         // सीधे JSON से उठाई गई असली बुक आईडी
@@ -2255,12 +2268,38 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         const db = window.dbClient || window.supabase;
                         const userObj = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
 
-                        let targetProfileId = activeUserId || userObj.id;
+                        let targetProfileId = window.activeCheckoutProfileId || activeUserId || userObj.id;
+                        if (!targetProfileId || typeof targetProfileId !== 'string' || targetProfileId.startsWith('UID_')) {
+                            if (regPromise) {
+                                try {
+                                    const regRes = await regPromise;
+                                    if (regRes && regRes.profile && regRes.profile.id) {
+                                        targetProfileId = regRes.profile.id;
+                                    }
+                                } catch (_) {}
+                            }
+                        }
                         if (!targetProfileId || typeof targetProfileId !== 'string' || targetProfileId.startsWith('UID_')) {
                             if (db && mobile) {
                                 try {
                                     const { data: prof } = await db.from('profiles').select('id').eq('mobile', mobile).maybeSingle();
-                                    if (prof && prof.id) targetProfileId = prof.id;
+                                    if (prof && prof.id) {
+                                        targetProfileId = prof.id;
+                                    } else if (typeof registerUser === "function") {
+                                        const regFallback = await registerUser({
+                                            fullName: name,
+                                            mobile: mobile,
+                                            email: email,
+                                            referred_by: finalUuid,
+                                            referralMobile: finalReferralMobile,
+                                            referralCode: finalReferralCode,
+                                            source: sourceVal,
+                                            landing_page: landingPageVal
+                                        });
+                                        if (regFallback && regFallback.profile && regFallback.profile.id) {
+                                            targetProfileId = regFallback.profile.id;
+                                        }
+                                    }
                                 } catch (_) {}
                             }
                         }
@@ -2302,6 +2341,7 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         // Activate Membership in local session
                         const isSub = (bookIdToBuy.includes('SUB') || finalPayablePrice >= 999);
                         userObj.is_active = true;
+                        if (targetProfileId) userObj.id = targetProfileId;
                         if (isSub) userObj.is_subscriber = true;
                         localStorage.setItem('AI_USER', JSON.stringify(userObj));
                         localStorage.setItem('AI_PROFILE', JSON.stringify(userObj));
@@ -2309,11 +2349,11 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
                         localStorage.setItem('user_is_active', 'true');
                         if (isSub) localStorage.setItem('user_is_subscriber', 'true');
 
-                        if (db && (activeUserId || userObj.id)) {
+                        if (db && targetProfileId) {
                             await db.from('profiles').update({
                                 is_active: true,
                                 registration_source: resolveRegistrationSource(sourceVal)
-                            }).eq('id', activeUserId || userObj.id).catch(err => console.warn('Supabase profile activate error:', err));
+                            }).eq('id', targetProfileId).catch(err => console.warn('Supabase profile activate error:', err));
                         }
 
                         markCheckoutOfferPurchased(mobile, bookIdToBuy, finalPayablePrice, response.razorpay_order_id || response.razorpay_payment_id);

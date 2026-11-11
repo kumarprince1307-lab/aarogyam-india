@@ -1838,14 +1838,42 @@ export async function fetchAvailableBooks() {
       } catch (e2) {}
     }
 
-    if (books && books.length > 0) {
+    // 📦 Dynamic bundle fetch from data/book-bundles.json (Zero Hardcoding)
+    let bundles = [];
+    try {
+      const bRes = await fetch('../data/book-bundles.json');
+      if (bRes.ok) bundles = await bRes.json();
+    } catch (e) {
+      try {
+        const bRes2 = await fetch('/data/book-bundles.json');
+        if (bRes2.ok) bundles = await bRes2.json();
+      } catch (e2) {}
+    }
+
+    const bundleItems = (Array.isArray(bundles) ? bundles : []).map(b => {
+      const bookIdsStr = Array.isArray(b.bookIds) ? b.bookIds.join(',') : (b.id || '');
+      const count = Array.isArray(b.bookIds) ? b.bookIds.length : '';
+      return {
+        id: bookIdsStr,
+        bundleId: b.id,
+        title: `📦 ${b.title || b.name || 'Combo Bundle'}` + (count ? ` (${count} बुक्स)` : '') + ` — ₹${b.offerPrice || 149}`,
+        offerPrice: Number(b.offerPrice || 149),
+        isBundle: true
+      };
+    });
+
+    const bookItems = (Array.isArray(books) ? books : []).map(b => ({
+      id: b.id || b.book_id,
+      title: b.heading || b.name || b.shortTitle || b.title || (b.id || b.book_id),
+      offerPrice: Number(b.offerPrice || b.offer_price || b.mrp || 99),
+      isBundle: false
+    }));
+
+    const combined = [...bundleItems, ...bookItems];
+    if (combined && combined.length > 0) {
       return {
         success: true,
-        data: books.map(b => ({
-          id: b.id || b.book_id,
-          title: b.heading || b.name || b.shortTitle || b.title || (b.id || b.book_id),
-          offerPrice: Number(b.offerPrice || b.offer_price || b.mrp || 99)
-        }))
+        data: combined
       };
     }
 
@@ -1996,6 +2024,42 @@ export async function deletePurchase(purchaseId, profileId) {
     return { success: true };
   } catch (error) {
     console.error('Failed to delete purchase:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateUserProfileAdmin({ userId, name, mobile, shareId }) {
+  try {
+    const db = window.dbClient || (typeof getAdminDb === 'function' ? getAdminDb() : null);
+    if (!db) throw new Error("Supabase client not available.");
+    if (!userId) throw new Error("User ID is required.");
+
+    const cleanName = (name || '').trim();
+    const cleanMobile = (mobile || '').replace(/\D/g, '').slice(-10);
+    const cleanShareId = (shareId || '').trim().toUpperCase();
+
+    if (!cleanName) throw new Error("नाम (Name) खाली नहीं हो सकता।");
+    if (!cleanMobile || cleanMobile.length !== 10) throw new Error("10-अंकों का वैध मोबाइल नंबर आवश्यक है।");
+    if (!cleanShareId) throw new Error("शेयर आईडी (Share ID) आवश्यक है।");
+
+    const updatePayload = {
+      full_name: cleanName,
+      mobile: cleanMobile,
+      share_id: cleanShareId,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await db
+      .from('profiles')
+      .update(updatePayload)
+      .eq('id', userId)
+      .select();
+
+    if (error) throw error;
+    clearAdminCache();
+    return { success: true, data };
+  } catch (error) {
+    console.error('Failed to update user profile:', error);
     return { success: false, error: error.message };
   }
 }

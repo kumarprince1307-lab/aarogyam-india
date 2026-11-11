@@ -159,35 +159,41 @@ async function loadSuccessPage() {
                 if (!myPurchasedIds.includes(b.id)) {
                     myPurchasedIds.push(b.id);
                 }
+            }
 
-                // Save to Database if connected
-                let targetProfileId = profileId;
-                if (!targetProfileId && activeDb) {
-                    const mob = currentUser.mobile || storedOrder.mobile || storedOrder.customerMobile || localStorage.getItem('user_mobile');
-                    if (mob) {
-                        const cleanM = String(mob).replace(/\D/g, '').slice(-10);
-                        if (cleanM) {
-                            try {
-                                const { data: prof } = await activeDb.from('profiles').select('id').eq('mobile', cleanM).maybeSingle();
-                                if (prof && prof.id) targetProfileId = prof.id;
-                            } catch (_) {}
-                        }
+            // 🛡️ CONSTITUTIONAL RULE: Bundle Single-Order DB Insert (Never split into 5 individual rows)
+            let targetProfileId = profileId;
+            if (!targetProfileId && activeDb) {
+                const mob = currentUser.mobile || storedOrder.mobile || storedOrder.customerMobile || localStorage.getItem('user_mobile');
+                if (mob) {
+                    const cleanM = String(mob).replace(/\D/g, '').slice(-10);
+                    if (cleanM) {
+                        try {
+                            const { data: prof } = await activeDb.from('profiles').select('id').eq('mobile', cleanM).maybeSingle();
+                            if (prof && prof.id) targetProfileId = prof.id;
+                        } catch (_) {}
                     }
                 }
-                if (activeDb && targetProfileId) {
-                    try {
+            }
+
+            if (activeDb && targetProfileId) {
+                try {
+                    // Check if already inserted by checkout.js (Deduplication)
+                    const { data: existingP } = await activeDb.from('purchases').select('id').eq('payment_id', paymentId).limit(1);
+                    if (!existingP || existingP.length === 0) {
+                        const finalDbBookId = rawBookId || bookIdsToProcess.join(',');
                         await activeDb.from('purchases').insert([{
                             profile_id: targetProfileId,
-                            book_id: b.id,
-                            amount: b.amount,
+                            book_id: finalDbBookId,
+                            amount: Number(amount) || 149,
                             payment_id: paymentId,
                             order_id: orderId,
                             payment_status: 'success',
                             purchase_date: new Date().toISOString()
                         }]);
-                    } catch (dbErr) {
-                        console.warn("DB purchase insert note:", dbErr);
                     }
+                } catch (dbErr) {
+                    console.warn("DB purchase insert note:", dbErr);
                 }
             }
 
