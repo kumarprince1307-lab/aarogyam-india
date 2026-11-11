@@ -1765,7 +1765,7 @@ function autoFillUserData() {
 // -------------------------------------------------------------
 // DUPLICATE PURCHASE PREVENTION (Multi-Layer Robust Verification)
 // -------------------------------------------------------------
-async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
+async function checkDuplicateBookPurchase(mobileInput, bookIdInput, skipRemoteCheck = false) {
     const rawMob = mobileInput || (document.getElementById("customerMobile") ? document.getElementById("customerMobile").value : "");
     const cleanMob = String(rawMob || "").replace(/\D/g, "").slice(-10);
     const rawBookId = bookIdInput || (window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
@@ -1784,7 +1784,7 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
 
     if (!isAlreadyPurchased) {
         try {
-            // 1. Check local storage purchases cache across all known keys
+            // 1. Instant local storage purchases check (0ms)
             const localPurchases = [
                 ...(JSON.parse(localStorage.getItem('purchases') || '[]')),
                 ...(JSON.parse(localStorage.getItem('AI_PURCHASES') || '[]'))
@@ -1799,8 +1799,8 @@ async function checkDuplicateBookPurchase(mobileInput, bookIdInput) {
 
             if (localMatch) {
                 isAlreadyPurchased = true;
-            } else {
-                // 2. Query Supabase using profile_id resolution + direct mobile lookup
+            } else if (!skipRemoteCheck) {
+                // 2. Background remote Supabase lookup (only on input blur/change, never blocks Pay Now click)
                 const db = window.dbClient || window.supabase;
                 if (db) {
                     // Check by mobile directly
@@ -2002,8 +2002,8 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         return;
     }
 
-    // Check duplicate purchase before initiating Razorpay
-    const isAlreadyBought = await checkDuplicateBookPurchase(mobile, window.currentCheckoutBook ? window.currentCheckoutBook.id : null);
+    // Check duplicate purchase locally in 0ms (never lags button click)
+    const isAlreadyBought = await checkDuplicateBookPurchase(mobile, window.currentCheckoutBook ? window.currentCheckoutBook.id : null, true);
     if (isAlreadyBought) {
         alert("🎉 आप यह पुस्तक पहले ही खरीद चुके हैं!\n\nकृपया अपनी लाइब्रेरी में जाकर इसे पढ़ें या PDF डाउनलोड करें।");
         return;
@@ -2040,27 +2040,23 @@ document.getElementById("payNowBtn").addEventListener("click", async function ()
         const sourceVal = resolveRegistrationSource(shareContextData.source || sessionObj.registration_source || "checkout");
         const landingPageVal = shareContextData.landing_url || window.location.pathname;
 
+        // Instant local save (0ms)
+        const localUserData = { full_name: name, mobile: mobile, email: email };
+        localStorage.setItem('AI_USER', JSON.stringify(localUserData));
+        localStorage.setItem('AI_PROFILE', JSON.stringify(localUserData));
+
+        // Asynchronous non-blocking registration (never blocks Razorpay popup launch)
         if (typeof registerUser === "function") {
-            try {
-                const regResult = await registerUser({
-                    fullName: name,
-                    mobile: mobile,
-                    email: email,
-                    referred_by: finalUuid,
-                    referralMobile: finalReferralMobile,
-                    referralCode: finalReferralCode,
-                    source: sourceVal,
-                    landing_page: landingPageVal
-                });
-
-                const isAlreadyExists = regResult && regResult.message && regResult.message.toLowerCase().includes("already");
-
-                if (regResult && !regResult.success && !isAlreadyExists) {
-                    console.warn("User registration note:", regResult.message);
-                }
-            } catch (regErr) {
-                console.warn("User registration background sync note:", regErr);
-            }
+            registerUser({
+                fullName: name,
+                mobile: mobile,
+                email: email,
+                referred_by: finalUuid,
+                referralMobile: finalReferralMobile,
+                referralCode: finalReferralCode,
+                source: sourceVal,
+                landing_page: landingPageVal
+            }).catch(regErr => console.warn("Background user registration sync note:", regErr));
         }
 
         // सीधे JSON से उठाई गई असली बुक आईडी

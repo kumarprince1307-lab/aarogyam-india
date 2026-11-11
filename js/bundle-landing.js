@@ -95,7 +95,11 @@
   // --- 1. DATA LOADERS ---
   async function fetchCatalogBooks() {
     try {
-      const resp = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 15000));
+      const cached = sessionStorage.getItem('AOI_CACHE_CATALOG_BOOKS');
+      if (cached) {
+        return JSON.parse(cached);
+      }
+      const resp = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
       if (resp.ok) {
         const data = await resp.json();
         let list = data.books || data || [];
@@ -109,6 +113,7 @@
             });
           }
         } catch (_) { }
+        try { sessionStorage.setItem('AOI_CACHE_CATALOG_BOOKS', JSON.stringify(list)); } catch (_) {}
         return list;
       }
     } catch (_) { }
@@ -117,7 +122,11 @@
 
   async function fetchLandingPages() {
     try {
-      const resp = await fetch('/data/universal-book-landing-pages.json?v=' + Math.floor(Date.now() / 15000));
+      const cached = sessionStorage.getItem('AOI_CACHE_LANDING_PAGES');
+      if (cached) {
+        return JSON.parse(cached);
+      }
+      const resp = await fetch('/data/universal-book-landing-pages.json?v=' + Math.floor(Date.now() / 300000));
       if (resp.ok) {
         const data = await resp.json();
         let pages = data.bookLandingPages || data || [];
@@ -131,6 +140,7 @@
             });
           }
         } catch (_) { }
+        try { sessionStorage.setItem('AOI_CACHE_LANDING_PAGES', JSON.stringify(pages)); } catch (_) {}
         return pages;
       }
     } catch (_) { }
@@ -138,10 +148,16 @@
   }
 
   async function loadBundleConfig(targetKey) {
-    // 1. Load from data/book-bundles.json (Server Git Master, cached 1 min)
+    const cacheKey = 'AOI_CACHE_BUNDLE_' + (targetKey || 'default').toLowerCase();
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) return JSON.parse(cached);
+    } catch (_) {}
+
+    // 1. Load from data/book-bundles.json (Server Git Master, cached 5 min)
     let masterBundles = [];
     try {
-      const resp = await fetch('/data/book-bundles.json?v=' + Math.floor(Date.now() / 60000));
+      const resp = await fetch('/data/book-bundles.json?v=' + Math.floor(Date.now() / 300000));
       if (resp.ok) {
         const data = await resp.json();
         masterBundles = Array.isArray(data) ? data : (data.bundles || []);

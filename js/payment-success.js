@@ -255,21 +255,21 @@ async function loadSuccessPage() {
                 : `📥 ई-बुक तुरंत डाउनलोड करें / ऐप में खोलें`;
         }
 
-        // Auto-redirect to download.html in 3 seconds (fast & smooth)
-        startRedirectTimer(3, targetDownloadUrl);
+        // Auto-redirect to download.html in 2 seconds (Fast & instant delivery)
+        startRedirectTimer(2, targetDownloadUrl);
 
     } catch (error) {
         console.error("Success Page Load Error:", error);
         // Fallback redirect even on error
-        startRedirectTimer(3, "download.html");
+        startRedirectTimer(2, "download.html");
     }
 }
 
 /* ==========================================
-   AUTOMATIC REDIRECT TIMER TO DOWNLOAD.HTML
+   AUTOMATIC REDIRECT TIMER TO DOWNLOAD.HTML (2 SECONDS FAST)
 ========================================== */
 function startRedirectTimer(durationInSeconds, targetUrl) {
-    let timeLeft = durationInSeconds || 3;
+    let timeLeft = durationInSeconds || 2;
     const timerDisplay = document.getElementById("timerDisplay");
     const destination = targetUrl || "download.html?book=BK001";
 
@@ -287,8 +287,8 @@ function startRedirectTimer(durationInSeconds, targetUrl) {
             timerDisplay.innerHTML = `🚀 आपको अब ई-बुक डाउनलोड हब पर भेजा जा रहा है...`;
             
             setTimeout(() => {
-                window.location.href = destination;
-            }, 400);
+                window.location.replace(destination);
+            }, 200);
         }
     }, 1000);
 }
