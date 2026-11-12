@@ -490,7 +490,7 @@ function renderProfile(detail, ucasData) {
             data-user-id="${detail.id}"
             data-user-name="${(detail.name || '').replace(/"/g, '&quot;')}"
             data-user-mobile="${sanitizedMobile}"
-            data-user-shareid="${(detail.shareId || detail.referralToken || '').replace(/"/g, '&quot;')}"
+            data-user-shareid="${(detail.shareId || '').replace(/"/g, '&quot;')}"
             style="background:#2563eb;color:#fff;border-color:#1d4ed8;font-weight:700;display:inline-flex;align-items:center;gap:4px;"
             title="नाम, मोबाइल नंबर व शेयर आईडी बदलें"
           >
@@ -500,7 +500,7 @@ function renderProfile(detail, ucasData) {
       </div>
       <div class="admin-data-grid">
         <div class="admin-data-card"><h4>User ID</h4><p><code>${detail.id}</code></p></div>
-        <div class="admin-data-card"><h4>Share ID</h4><p><strong style="color:var(--admin-primary);">${detail.shareId || detail.referralToken || 'AI000000'}</strong></p></div>
+        <div class="admin-data-card"><h4>Share ID</h4><p><strong style="color:var(--admin-primary);">${detail.shareId || 'N/A'}</strong></p></div>
         <div class="admin-data-card"><h4>Name</h4><p><strong>${detail.name}</strong></p></div>
         <div class="admin-data-card">
           <h4>Mobile</h4>
@@ -797,9 +797,9 @@ function renderEditProfileModalHtml() {
             <small style="color: var(--admin-muted); font-size: 0.75rem; display: block; margin-top: 4px;">10 अंकों का शुद्ध नंबर दर्ज करें</small>
           </div>
           <div>
-            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-muted); margin-bottom: 6px;">आधिकारिक शेयर आईडी (Share ID) <span style="color: var(--admin-danger);">*</span></label>
-            <input type="text" id="edit-profile-shareid" class="admin-input" placeholder="e.g. AI809408" required style="width: 100%; text-transform: uppercase;" />
-            <small style="color: var(--admin-muted); font-size: 0.75rem; display: block; margin-top: 4px;">Aarogyam Manas: शेयर आईडी आधिकारिक होनी चाहिए (उदा. AI486205)</small>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--admin-muted); margin-bottom: 6px;">आधिकारिक शेयर आईडी (Share ID)</label>
+            <input type="text" id="edit-profile-shareid" class="admin-input" placeholder="e.g. AI809408" style="width: 100%; text-transform: uppercase;" />
+            <small style="color: var(--admin-muted); font-size: 0.75rem; display: block; margin-top: 4px;">विशिष्ट शेयर आईडी (उदा. AI + 6 अंक)। खाली छोड़ने पर स्वतः सुरक्षित रखी जाएगी।</small>
           </div>
           <div id="edit-profile-form-error" style="display: none; color: var(--admin-danger); font-size: 0.9rem; padding: 8px; background: rgba(239,68,68,0.1); border-radius: 8px;"></div>
           <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px;">

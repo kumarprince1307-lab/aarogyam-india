@@ -1032,7 +1032,12 @@ export async function fetchUsers(params = {}) {
 
     const { data: profiles, error: profilesError } = await queryBuilder;
     if (profilesError) console.error("fetchUsers query error:", profilesError.message);
-    let validProfiles = profiles || [];
+    let validProfiles = (profiles || []).filter(p => 
+      p && 
+      p.registration_source !== 'DELETED_BY_ADMIN' && 
+      !String(p.full_name || '').startsWith('[DELETED]') &&
+      !String(p.mobile || '').startsWith('DEL_')
+    );
 
     const profileIds = validProfiles.map(p => p.id).filter(Boolean);
     const shareIds = validProfiles.map(p => p.share_id || p.referral_code).filter(Boolean);
@@ -1419,7 +1424,12 @@ export async function fetchUsersDelta(sinceIsoDate) {
 
     return {
       success: true,
-      newProfiles: newProfilesRes.data || [],
+      newProfiles: (newProfilesRes.data || []).filter(p => 
+        p && 
+        p.registration_source !== 'DELETED_BY_ADMIN' && 
+        !String(p.full_name || '').startsWith('[DELETED]') &&
+        !String(p.mobile || '').startsWith('DEL_')
+      ),
       newPurchases: newPurchasesRes.data || [],
       newSakhi: newSakhiRes.data || []
     };
@@ -1661,7 +1671,7 @@ export async function fetchUserDetails(userId) {
         .select('*')
         .eq('id', actualUuid)
         .maybeSingle();
-      if (!error && data) profile = data;
+      if (!error && data && data.registration_source !== 'DELETED_BY_ADMIN') profile = data;
     }
 
     // 2. If not found or if ID was sakhi_mobile / raw mobile, look up by mobile
@@ -1671,6 +1681,7 @@ export async function fetchUserDetails(userId) {
         .from('profiles')
         .select('*')
         .eq('mobile', cleanM)
+        .neq('registration_source', 'DELETED_BY_ADMIN')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -1828,13 +1839,14 @@ export async function fetchUserDetails(userId) {
       mobile: profile.mobile,
       email: profile.email,
       source: profile.registration_source,
+      shareId: profile.share_id || '',
       joined: joinedDateFormatted,
       joinedDate: joinedDateFormatted,
       joinedTime: joinedTimeFormatted,
       status: profile.is_active ? 'active' : 'inactive',
       appInstalled: profile.app_installed === true || String(profile.registration_source || '').toLowerCase().includes('pwa') || String(profile.registration_source || '').toLowerCase().includes('app'),
       appInstalledAt: profile.app_installed_at ? new Date(profile.app_installed_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : null,
-      referralToken: profile.referral_code || 'N/A',
+      referralToken: profile.referral_code || '',
       referredBy: referredByProfile,
       directReferrals: directReferralsList,
       totalDownloads: downloadCount || 0,
@@ -2091,14 +2103,34 @@ export async function updateUserProfileAdmin({ userId, name, mobile, shareId }) 
     const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(str || ''));
     let targetProfileId = isValidUUID(userId) ? userId : null;
 
-    if (!targetProfileId) {
+    // 1. Fetch current profile from database to compare current values
+    let existingProfile = null;
+    if (targetProfileId) {
+      const { data: p } = await db.from('profiles').select('id, full_name, mobile, share_id').eq('id', targetProfileId).maybeSingle();
+      if (p) existingProfile = p;
+    }
+
+    if (!existingProfile) {
       const cleanM = String(userId || '').replace(/\D/g, '').slice(-10);
       if (cleanM && cleanM.length === 10) {
-        const { data: p } = await db.from('profiles').select('id, share_id').eq('mobile', cleanM).maybeSingle();
-        if (p && p.id) {
+        const { data: p } = await db.from('profiles').select('id, full_name, mobile, share_id').eq('mobile', cleanM).maybeSingle();
+        if (p) {
+          existingProfile = p;
           targetProfileId = p.id;
-          if (!cleanShareId && p.share_id) cleanShareId = p.share_id;
         }
+      }
+    }
+
+    const currentShareId = (existingProfile?.share_id || '').toUpperCase().trim();
+    const currentMobile = (existingProfile?.mobile || '').replace(/\D/g, '').slice(-10);
+
+    // 2. If mobile is being changed, check for conflict with other users
+    if (cleanMobile && cleanMobile !== currentMobile) {
+      let mobQuery = db.from('profiles').select('id, full_name, mobile').eq('mobile', cleanMobile);
+      if (targetProfileId) mobQuery = mobQuery.neq('id', targetProfileId);
+      const { data: mobDupe } = await mobQuery.maybeSingle();
+      if (mobDupe) {
+        throw new Error(`मोबाइल नंबर ${cleanMobile} पहले से सदस्य "${mobDupe.full_name || 'अन्य'}" के खाते में दर्ज है।`);
       }
     }
 
@@ -2107,7 +2139,23 @@ export async function updateUserProfileAdmin({ userId, name, mobile, shareId }) 
       mobile: cleanMobile,
       updated_at: new Date().toISOString()
     };
-    if (cleanShareId) {
+
+    // 3. Share ID update handling:
+    // Only update share_id if it was provided AND is different from user's current share_id
+    if (cleanShareId && cleanShareId !== currentShareId) {
+      // Guard master partner share ID AI000004
+      if (cleanShareId === 'AI000004' && cleanMobile !== '7974422572') {
+        throw new Error("'AI000004' मास्टर पार्टनर का आरक्षित शेयर आईडी है। यह किसी अन्य सदस्य को नहीं दिया जा सकता।");
+      }
+
+      // Check if another profile already holds this share_id
+      let shareQuery = db.from('profiles').select('id, full_name, mobile').eq('share_id', cleanShareId);
+      if (targetProfileId) shareQuery = shareQuery.neq('id', targetProfileId);
+      const { data: shareDupe } = await shareQuery.maybeSingle();
+      if (shareDupe) {
+        throw new Error(`शेयर आईडी "${cleanShareId}" पहले से सदस्य "${shareDupe.full_name || 'अन्य'}" (${shareDupe.mobile || ''}) को आवंटित है। कृपया कोई अन्य शेयर आईडी दर्ज करें।`);
+      }
+
       updatePayload.share_id = cleanShareId;
     }
 
@@ -2132,6 +2180,7 @@ export async function updateUserProfileAdmin({ userId, name, mobile, shareId }) 
     }
 
     clearAdminCache();
+    window['_adminUsersAggCache'] = null;
     return { success: true, data: resData };
   } catch (error) {
     console.error('Failed to update user profile:', error);
@@ -2162,32 +2211,70 @@ export async function updateUserStatus(userId, isActive) {
 
 export async function deleteUserProfile(userId) {
   try {
-    const db = window.dbClient;
+    const db = window.dbClient || (typeof getAdminDb === 'function' ? getAdminDb() : null);
     if (!db) throw new Error("Supabase client not available.");
     if (!userId) throw new Error("User ID is required.");
 
     const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(str || ''));
-    const cleanMob = String(userId).replace(/\D/g, '').slice(-10);
+    let targetProfileId = isValidUUID(userId) ? userId : null;
+    let targetMobile = String(userId).replace(/\D/g, '').slice(-10);
 
-    // 1. If it's a valid UUID, clean all relations and delete profile
-    if (isValidUUID(userId)) {
-      try { await db.from('user_permissions').delete().or(`user_id.eq.${userId},profile_id.eq.${userId}`); } catch (_) {}
-      try { await db.from('checkout_logs').delete().eq('profile_id', userId); } catch (_) {}
-      try { await db.from('purchases').delete().eq('profile_id', userId); } catch (_) {}
-      try { await db.from('interested_users').delete().eq('profile_id', userId); } catch (_) {}
-      try { await db.from('sakhi_chat_audit_logs').delete().eq('user_profile', String(userId)); } catch (_) {}
-      try { await db.from('profiles').delete().eq('id', userId); } catch (_) {}
+    // Resolve UUID and mobile if one is missing
+    if (targetProfileId) {
+      try {
+        const { data: p } = await db.from('profiles').select('id, mobile').eq('id', targetProfileId).maybeSingle();
+        if (p && p.mobile) targetMobile = String(p.mobile).replace(/\D/g, '').slice(-10);
+      } catch (_) {}
+    } else if (targetMobile && targetMobile.length === 10) {
+      try {
+        const { data: p } = await db.from('profiles').select('id, mobile').eq('mobile', targetMobile).maybeSingle();
+        if (p && p.id) targetProfileId = p.id;
+      } catch (_) {}
     }
 
-    // 2. If it's a sakhi lead or mobile number, clean from insights, audit logs, and surveys
-    if (cleanMob && cleanMob.length === 10) {
-      try { await db.from('sakhi_user_insights').delete().eq('mobile', cleanMob); } catch (_) {}
-      try { await db.from('sakhi_chat_audit_logs').delete().eq('user_phone', cleanMob); } catch (_) {}
-      try { await db.from('surveys').delete().eq('phone_number', cleanMob); } catch (_) {}
-      try { await db.from('profiles').delete().eq('mobile', cleanMob); } catch (_) {}
+    // 1. Clean relations where delete permissions are available
+    if (targetProfileId) {
+      try { await db.from('user_permissions').delete().or(`user_id.eq.${targetProfileId},profile_id.eq.${targetProfileId}`); } catch (_) {}
+      try { await db.from('checkout_logs').delete().eq('profile_id', targetProfileId); } catch (_) {}
+      try { await db.from('purchases').delete().eq('profile_id', targetProfileId); } catch (_) {}
+      try { await db.from('interested_users').delete().eq('profile_id', targetProfileId); } catch (_) {}
+      try { await db.from('sakhi_chat_audit_logs').delete().eq('user_profile', String(targetProfileId)); } catch (_) {}
+      try { await db.from('wallets').delete().eq('profile_id', targetProfileId); } catch (_) {}
+      try { await db.from('wallet_transactions').delete().eq('profile_id', targetProfileId); } catch (_) {}
+      try { await db.from('download_logs').delete().eq('profile_id', targetProfileId); } catch (_) {}
+      try { await db.from('profiles').delete().eq('id', targetProfileId); } catch (_) {}
+    }
+
+    if (targetMobile && targetMobile.length === 10) {
+      try { await db.from('sakhi_user_insights').delete().eq('mobile', targetMobile); } catch (_) {}
+      try { await db.from('sakhi_chat_audit_logs').delete().eq('user_phone', targetMobile); } catch (_) {}
+      try { await db.from('surveys').delete().eq('phone_number', targetMobile); } catch (_) {}
+      try { await db.from('surveys').delete().eq('mobile', targetMobile); } catch (_) {}
+      try { await db.from('checkout_logs').delete().eq('customer_phone', targetMobile); } catch (_) {}
+      try { await db.from('profiles').delete().eq('mobile', targetMobile); } catch (_) {}
+    }
+
+    // 2. Perform guaranteed soft-delete on profiles table (handles Supabase RLS restrictions)
+    const ts = Date.now();
+    const softDeletePayload = {
+      is_active: false,
+      registration_source: 'DELETED_BY_ADMIN',
+      full_name: '[DELETED]',
+      mobile: 'DEL_' + ts,
+      share_id: 'DEL_' + ts,
+      referral_code: '',
+      updated_at: new Date().toISOString()
+    };
+
+    if (targetProfileId) {
+      await db.from('profiles').update(softDeletePayload).eq('id', targetProfileId);
+    }
+    if (targetMobile && targetMobile.length === 10) {
+      await db.from('profiles').update(softDeletePayload).eq('mobile', targetMobile);
     }
 
     clearAdminCache();
+    window['_adminUsersAggCache'] = null;
     return { success: true };
   } catch (error) {
     console.error('Failed to delete user profile:', error);
