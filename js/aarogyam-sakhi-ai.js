@@ -3505,12 +3505,25 @@ if (typeof document !== 'undefined') {
   function getContextualChatAdMarkup(userQuery, botHtml, domain) {
     const textToScan = `${userQuery || ''} ${botHtml || ''}`.toLowerCase();
 
+    // 0. BUNDLE_KISAN_5IN1 (5+1 Mega Combo at ₹149) - Featured & Rotated
+    if (/(?:बंडल|कॉम्बो|bundle|combo|5in1|5-in-1|5\+1|सभी\s*किताब|पैकेज|ऑफर)/i.test(textToScan) || (window._sakhiChatAdCounter % 6 === 0)) {
+      return {
+        id: 'BUNDLE_KISAN_5IN1',
+        badge: '🎁 5-इन-1 महाबचत कॉम्बो',
+        title: 'महाबचत 5-इन-1 किसान मास्टर कॉम्बो',
+        desc: 'गेहूँ, चना, सरसों, फसल डॉक्टर व कृषि दवा डायरेक्टरी — 5 प्रमुख किताबों का संपूर्ण संग्रह!',
+        price: '₹149',
+        cover: '/images/books/fasal-ka-doctor-cover.webp',
+        url: '/bundle.html'
+      };
+    }
+
     // 1. Wheat -> BK017
     if (/(?:गेहूँ|गेहूं|wheat|gehu|gehun|कल्ले|फुटाव)/i.test(textToScan)) {
       return {
         id: 'BK017',
         badge: '🌾 ई-बुक सिफारिश',
-        title: 'गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका (BK017)',
+        title: 'गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका',
         desc: 'कल्ले बढ़ाने, पीलापन रोकने व बम्पर 30 क्विंटल पैदावार का वैज्ञानिक फॉर्मूला!',
         price: '₹99',
         cover: '/images/books/bk017-cover.webp',
@@ -3523,7 +3536,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK019',
         badge: '🌱 ई-बुक सिफारिश',
-        title: 'चना की खेती — संपूर्ण मार्गदर्शिका (BK019)',
+        title: 'चना की खेती — संपूर्ण मार्गदर्शिका',
         desc: 'उकठा (विल्ट) रोग से 100% सुरक्षा व चने की अधिक शाखाओं का प्रमाणित फॉर्मूला!',
         price: '₹99',
         cover: '/images/books/bk019-cover.webp',
@@ -3536,7 +3549,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK001',
         badge: '🌾 लोकप्रिय ई-बुक',
-        title: 'खरीफ फसल मास्टर गाइड 2026 (BK001)',
+        title: 'खरीफ फसल मास्टर गाइड 2026',
         desc: 'धान, मक्का व सोयाबीन की 300+ सचित्र वैज्ञानिक उत्पादन गाइड व स्प्रे चार्ट!',
         price: '₹99',
         cover: '/images/books/kharif-master-guide-2026-cover.webp',
@@ -3549,7 +3562,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK015',
         badge: '🥦 सब्जी किसान गाइड',
-        title: 'सब्जी खेती मास्टर — A to Z सम्पूर्ण गाइड (BK015)',
+        title: 'सब्जी खेती मास्टर — A to Z सम्पूर्ण गाइड',
         desc: '11 प्रमुख सब्जियों की वैज्ञानिक खेती, नर्सरी तैयारी व रोग नियंत्रण स्प्रे चार्ट!',
         price: '₹149',
         cover: '/images/books/bk015-cover.webp',
@@ -3562,7 +3575,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK002',
         badge: '🩺 फसल सुरक्षा ई-बुक',
-        title: 'खेती का डॉक्टर — सचित्र फसल सुरक्षा (BK002)',
+        title: 'खेती का डॉक्टर — सचित्र फसल सुरक्षा',
         desc: '300+ सचित्र फसलों के रोग, कीट पहचान व सटीक दवा डोज का पॉकेट डॉक्टर!',
         price: '₹99',
         cover: '/images/books/fasal-ka-doctor-cover.webp',
@@ -3575,7 +3588,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK018',
         badge: '💼 करियर व इनकम गाइड',
-        title: 'घर बैठे पैसे कैसे कमाएँ? Income Guide (BK018)',
+        title: 'घर बैठे पैसे कैसे कमाएँ? Income Guide',
         desc: 'स्मार्टफोन से महीने के ₹30,000 से ₹8.19 लाख कमाने का स्टेप-बाय-स्टेप रोडमैप!',
         price: '₹149',
         cover: '/images/books/bk018-cover.webp',
@@ -3588,7 +3601,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK016',
         badge: '🐄 पशु व कृषि गाइड',
-        title: 'कृषि दवा डायरेक्टरी व पशु पोषण गाइड (BK016)',
+        title: 'कृषि दवा डायरेक्टरी व फसल सुरक्षा गाइड',
         desc: 'पशुओं का दूध-फैट बढ़ाने के वैज्ञानिक उपाय व सम्पूर्ण रोग सुरक्षा तालिका!',
         price: '₹99',
         cover: '/images/books/bk016-cover.webp',
@@ -3601,7 +3614,7 @@ if (typeof document !== 'undefined') {
       return {
         id: 'BK008',
         badge: '🌿 जैविक कृषि गाइड',
-        title: 'जैविक खेती संपूर्ण मार्गदर्शिका (BK008)',
+        title: 'जैविक खेती संपूर्ण मार्गदर्शिका',
         desc: 'रासायनिक खाद मुक्त प्राकृतिक खेती, जीवामृत निर्माण व कम लागत में अधिक लाभ!',
         price: '₹99',
         cover: '/images/books/jaivik-kheti-guide-cover.webp',
@@ -3609,16 +3622,56 @@ if (typeof document !== 'undefined') {
       };
     }
 
-    // Default fallback: BK001
+    // Default fallback: 5+1 Bundle at ₹149 or BK001
     return {
-      id: 'BK001',
-      badge: '🌾 विशेष डिजिटल गाइड',
-      title: 'खरीफ फसल मास्टर गाइड 2026 (BK001)',
-      desc: '300+ सचित्र वैज्ञानिक गाइड, रोग पहचान व सम्पूर्ण स्प्रे कैलेंडर मात्र ₹99 में!',
-      price: '₹99',
-      cover: '/images/books/kharif-master-guide-2026-cover.webp',
-      url: '/ebooks/kharif-master-guide-2026.html'
+      id: 'BUNDLE_KISAN_5IN1',
+      badge: '🎁 5-इन-1 महाबचत कॉम्बो',
+      title: 'महाबचत 5-इन-1 किसान मास्टर कॉम्बो',
+      desc: 'गेहूँ, चना, सरसों, फसल डॉक्टर व कृषि दवा डायरेक्टरी — 5 प्रमुख किताबों का संपूर्ण संग्रह!',
+      price: '₹149',
+      cover: '/images/books/fasal-ka-doctor-cover.webp',
+      url: '/bundle.html'
     };
+  }
+
+  function renderInlinePassbookCardHtml() {
+    let userShares = 0;
+    let userDirect = 0;
+    let userWallet = 0;
+    try {
+      userShares = parseInt(localStorage.getItem('aarogyam_user_shares_count') || localStorage.getItem('aim_user_shares_count') || '0', 10);
+      userDirect = parseInt(localStorage.getItem('aarogyam_user_direct_referrals') || localStorage.getItem('aim_user_direct_referrals') || '0', 10);
+      userWallet = parseInt(localStorage.getItem('aarogyam_user_wallet_balance') || localStorage.getItem('aim_user_wallet_balance') || '0', 10);
+    } catch (_) {}
+
+    return `
+      <div class="sakhi-passbook-card" style="margin-top:12px;background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1.5px solid #86efac;border-left:5px solid #16a34a;border-radius:14px;padding:12px 14px;position:relative;box-shadow:0 4px 16px rgba(22,163,74,0.12);box-sizing:border-box;width:100%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span style="background:#bbf7d0;color:#166534;font-size:0.75rem;font-weight:900;padding:2px 8px;border-radius:6px;border:1px solid #86efac;">🌾 आपका आरोग्यम शेयर व बही-खाता स्थिति</span>
+          <span style="font-size:0.75rem;font-weight:900;color:#ffffff;background:#16a34a;padding:2px 8px;border-radius:6px;">लाइव पासबुक</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;background:rgba(255,255,255,0.85);padding:8px 10px;border-radius:10px;border:1px solid #bbf7d0;margin-bottom:10px;text-align:center;">
+          <div>
+            <div style="font-size:0.68rem;color:#475569;font-weight:700;">🔗 कुल शेयर</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#0f172a;">${userShares}</div>
+          </div>
+          <div>
+            <div style="font-size:0.68rem;color:#475569;font-weight:700;">👥 डायरेक्ट मित्र</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#16a34a;">${userDirect}</div>
+          </div>
+          <div>
+            <div style="font-size:0.68rem;color:#475569;font-weight:700;">💰 वॉलेट बैलेंस</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#2563eb;">₹${userWallet}</div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <button type="button" class="sakhi-quick-pill" onclick="window.sendSakhiSuggestion('अपना शेयर, डायरेक्ट मित्र और वॉलेट बैलेंस कैसे बढ़ाएं?')" style="background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);color:#ffffff;border:none;font-size:0.78rem;font-weight:900;padding:7px 14px;border-radius:20px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(22,163,74,0.3);">
+            <span>👉 अपना शेयर, डायरेक्ट मित्र और वॉलेट बैलेंस कैसे बढ़ाएं?</span>
+          </button>
+        </div>
+        <button type="button" onclick="this.closest('.sakhi-passbook-card').remove();" title="बंद करें" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.85);border:1px solid #bbf7d0;color:#166534;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;cursor:pointer;line-height:1;z-index:2;">✕</button>
+      </div>
+    `;
   }
 
   function renderInlineContextAdHtml(ad) {
@@ -3638,7 +3691,7 @@ if (typeof document !== 'undefined') {
             ${escapeHtml(ad.desc)}
           </div>
           <a href="${ad.url}" target="_blank" class="sakhi-ad-cta-btn" style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#ffffff;font-size:0.74rem;font-weight:900;padding:4px 12px;border-radius:7px;text-decoration:none;box-shadow:0 2px 6px rgba(2,132,199,0.35);">
-            <span>📖 ई-बुक देखें</span> <span style="font-size:0.84rem;">↗</span>
+            <span>📖 पूरी जानकारी देखें</span> <span style="font-size:0.84rem;">↗</span>
           </a>
         </div>
         <button type="button" class="sakhi-ad-dismiss-btn" onclick="this.closest('.sakhi-context-ad-card').remove();" title="बंद करें" style="position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.85);border:1px solid #bae6fd;color:#0369a1;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;cursor:pointer;line-height:1;z-index:2;">✕</button>
@@ -3681,10 +3734,13 @@ if (typeof document !== 'undefined') {
     ensureDateSeparator(wrap, now);
     saveChatLogItem('bot', htmlContent, speechText || '');
 
-    // 📚 CONTEXTUAL INLINE E-BOOK / PRODUCT AD INJECTION (Every 2-3 Bot Messages, Not Saved to History)
+    // 📚 CADENCE: Every 3 Bot Messages -> Book / 5+1 Bundle Ad Card
+    // 🌾 CADENCE: Every 5 Bot Messages -> Passbook / Bahi-Khata Card
     window._sakhiChatAdCounter = (window._sakhiChatAdCounter || 0) + 1;
     let inlineAdHtml = '';
-    if (window._sakhiChatAdCounter % 3 === 2 || window._sakhiChatAdCounter === 2) {
+    if (window._sakhiChatAdCounter % 5 === 0) {
+      inlineAdHtml = renderInlinePassbookCardHtml();
+    } else if (window._sakhiChatAdCounter % 3 === 0) {
       const lastUserQuery = (sessionChatHistory && sessionChatHistory.filter(m => m.role === 'user').slice(-1)[0]?.text) || '';
       const domain = (sakhiConversationState && sakhiConversationState.lastActiveDomain) || 'agri';
       const adObj = getContextualChatAdMarkup(lastUserQuery, htmlContent, domain);
@@ -17559,6 +17615,179 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     return true;
   }
 
+  // 🧪 MULTI-PRODUCT SPRAY CHART & TANK MIX ROUTER (1, 2, or 3 Products Intelligently Combined)
+  function handleMultiProductSprayChartRouter(cleanQ, rawQ, directives) {
+    const q = (cleanQ || '').toLowerCase();
+    const raw = (rawQ || '').toLowerCase();
+    const comb = q + ' ' + raw;
+
+    const hasBio99 = /(?:बायो\s*99|bio\s*99|bio99|स्टिकर|स्प्रेडर)/i.test(comb);
+    const hasLarvicide = /(?:लार्विसाइड|larvicide|इल्ली|सुंडी|लट)/i.test(comb);
+    const hasStimrich = /(?:स्टिमरिच|stimrich|टॉनिक|ग्रोथ|कल्ले)/i.test(comb);
+    const hasSprayChart = /(?:स्प्रे\s*चार्ट|spray\s*chart|स्प्रे\s*शेड्यूल|स्प्रे\s*डोज|डोज\s*बताओ|डोज़\s*बताओ)/i.test(comb);
+
+    // Combination 1: Triple Product (Stimrich + Larvicide + Bio-99) or generic "जैविक कीटनाशक व टॉनिक स्प्रे चार्ट"
+    const isTripleCombo = (hasStimrich && hasLarvicide && hasBio99) || (hasSprayChart && hasStimrich && hasLarvicide) || /(?:कीटनाशक\s*व\s*टॉनिक\s*स्प्रे|टॉनिक\s*और\s*कीटनाशक|तीनों\s*दवा|3\s*दवा)/i.test(comb);
+
+    // Combination 2: Double Product (Larvicide + Bio-99)
+    const isLarvicideBio99 = (hasLarvicide && hasBio99 && !hasStimrich) || /(?:लार्विसाइड.*बायो\s*99|बायो\s*99.*लार्विसाइड)/i.test(comb);
+
+    // Combination 3: Double Product (Stimrich + Bio-99)
+    const isStimrichBio99 = (hasStimrich && hasBio99 && !hasLarvicide) || /(?:स्टिमरिच.*बायो\s*99|बायो\s*99.*स्टिमरिच)/i.test(comb);
+
+    // Combination 4: Generic Spray Chart for crops (जैविक कीटनाशक व टॉनिक स्प्रे चार्ट बताएं)
+    const isGenericSprayChart = hasSprayChart && /(?:फसल|जैविक|कीटनाशक|टॉनिक|दवा)/i.test(comb);
+
+    if (!isTripleCombo && !isLarvicideBio99 && !isStimrichBio99 && !isGenericSprayChart) {
+      return false;
+    }
+
+    sakhiConversationState.lastActiveDomain = 'agri';
+
+    if (isTripleCombo || isGenericSprayChart) {
+      const title = '🌾 महा-स्प्रे चार्ट: टॉनिक (स्टिमरिच) + कीटनाशक (लार्विसाइड) + स्प्रेडर (बायो-99)';
+      const body = `🌾 **फसलों के लिए 100% प्रमाणित जैविक टॉनिक व कीटनाशक संपूर्ण स्प्रे चार्ट:**\n\n` +
+        `यह 3 उत्पादों का महा-मिश्रण (Triple Tank Mix) फसल में एक साथ **बंपर कल्ले, फूल-फल और इल्ली/कीटों का 100% खात्मा** करता है:\n\n` +
+        `📋 **प्रति 15 लीटर स्प्रे पंप की सटीक मात्रा:**\n` +
+        `1. **स्टिमरिच (Biofit Stimrich):** **30 ml** (तेज फुटाव, बंपर शाखाएं व कल्ले बढ़ाने हेतु)\n` +
+        `2. **बायोफिट लार्विसाइड (Biofit Larvicide):** **30 ml** (इल्ली, सुंडी, तना व फल छेदक कीट रोकथाम)\n` +
+        `3. **बायो-99 (Bio-99 100% सिलिकॉन स्प्रेडर):** **5 ml** (दवा को पूरे पत्ते पर फैलाने व चिपकाने हेतु)\n\n` +
+        `🚜 **1 एकड़ की संपूर्ण खुराक (10 पंप / 150 लीटर पानी):**\n` +
+        `• स्टिमरिच: 300 ml | बायोफिट लार्विसाइड: 300 ml | बायो-99: 50 ml\n\n` +
+        `🧪 **घोल बनाने का सख्त वैज्ञानिक क्रम (Mixing Rule):**\n` +
+        `• **नियम 1:** बाल्टी में 15 लीटर पानी लें, पहले स्टिमरिच और लार्विसाइड अच्छी तरह घोलें।\n` +
+        `• **नियम 2:** **बायो-99 हमेशा सबसे अंत में डालें** (ताकि पानी में झाग न बने और दवा पत्तों के आर-पार समा जाए)।\n\n` +
+        `⏰ **छिड़काव का सही समय:** सुबह 10 बजे से पहले या शाम 4 बजे के बाद (तेज धूप में कभी न छिड़कें)।\n\n` +
+        `💡 **अन्नदाता विशेष:** विस्तृत रोग-कीट निदान व संपूर्ण दवा डायरेक्टरी हेतु हमारी **5-इन-1 महाबचत किसान कॉम्बो बंडल** मात्र ₹149 में उपलब्ध है।`;
+
+      renderCrispSpecialBox(title, body, [
+        { text: '📚 5-इन-1 कॉम्बो बंडल देखें (₹149)', url: '/bundle.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🐛 इल्ली रोकथाम के अन्य उपाय', query: 'इल्ली और सुंडी मारने का जैविक उपाय' },
+        { text: '🌱 कल्ले व फुटाव बढ़ाने का तरीका', query: 'गेहूं में अधिक कल्ले और फुटाव कैसे लाएं' }
+      ], 'agri', 'multi_spray_chart_triple');
+      return true;
+    }
+
+    if (isLarvicideBio99) {
+      const title = '🐛 बायोफिट लार्विसाइड + बायो-99 स्प्रे डोज व उपयोग चार्ट';
+      const body = `🐛 **बायोफिट लार्विसाइड और बायो-99 का 100% सटीक स्प्रे फॉर्मूला:**\n\n` +
+        `इल्ली, सुंडी, लट, तना छेदक व फल छेदक के संपूर्ण खात्मे हेतु यह प्रमाणित कॉम्बिनेशन है:\n\n` +
+        `📋 **प्रति 15 लीटर पंप की सही मात्रा:**\n` +
+        `• **बायोफिट लार्विसाइड (Biofit Larvicide):** **30 ml** (2 ml प्रति लीटर पानी)\n` +
+        `• **बायो-99 (Bio-99 सुपर एक्टिवेटर/स्टिकर):** **5 ml** (सिलिकॉन स्प्रेडर)\n\n` +
+        `🚜 **1 एकड़ का पैमाना (150 लीटर पानी / 10 पंप):**\n` +
+        `• लार्विसाइड: 300 ml | बायो-99: 50 ml\n\n` +
+        `🧪 **घोलने की वैज्ञानिक विधि:**\n` +
+        `1. पहले 15L पानी में 30ml लार्विसाइड अच्छी तरह मिलाएँ।\n` +
+        `2. अंत में 5ml बायो-99 डालें। बायो-99 लार्विसाइड को इल्ली के मोमी कवच और पत्तों के नीचे तक तुरंत पहुँचा देता है, जिससे 24 घंटे में कीट नियंत्रण हो जाता है।\n\n` +
+        `⏰ **सर्वोत्तम समय:** शाम 4 से 6 बजे के बीच जब इल्ली बाहर निकलकर खाती है।`;
+
+      renderCrispSpecialBox(title, body, [
+        { text: '📚 5-इन-1 कॉम्बो बंडल देखें (₹149)', url: '/bundle.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🌿 स्टिमरिच टॉनिक डोज बताओ', query: 'स्टिमरिच और बायो 99 का स्प्रे डोज बताओ' },
+        { text: '🌾 आज की कृषि स्प्रे सलाह', query: 'फसलों के लिए जैविक कीटनाशक स्प्रे चार्ट बताएं' }
+      ], 'agri', 'larvicide_bio99_combo');
+      return true;
+    }
+
+    if (isStimrichBio99) {
+      const title = '🌱 स्टिमरिच टॉनिक + बायो-99 बंपर ग्रोथ स्प्रे डोज चार्ट';
+      const body = `🌱 **स्टिमरिच (Stimrich) + बायो-99 (Bio-99) ग्रोथ व कल्ले फुटाव स्प्रे फॉर्मूला:**\n\n` +
+        `फसलों में अधिक कल्ले, सफेद जड़ों का फैलाव, फूलों की संख्या व बंपर पैदावार हेतु:\n\n` +
+        `📋 **प्रति 15 लीटर पंप की सही मात्रा:**\n` +
+        `• **स्टिमरिच (Biofit Stimrich):** **30 ml** (2 ml प्रति लीटर पानी)\n` +
+        `• **बायो-99 (Bio-99 सुपर स्टिकर):** **5 ml**\n\n` +
+        `🚜 **1 एकड़ का पैमाना (10 पंप / 150 लीटर पानी):**\n` +
+        `• स्टिमरिच: 300 ml | बायो-99: 50 ml\n\n` +
+        `🧪 **छिड़काव अवस्था:**\n` +
+        `• पहली सिंचाई के बाद (कल्ले निकलते समय)\n` +
+        `• फूल आने से 8-10 दिन पहले\n` +
+        `• फल/बालियां बनते समय`;
+
+      renderCrispSpecialBox(title, body, [
+        { text: '📚 5-इन-1 कॉम्बो बंडल देखें (₹149)', url: '/bundle.html', isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '🐛 लार्विसाइड + बायो 99 डोज', query: 'बायोफिट लार्विसाइड और बायो 99 का स्प्रे डोज बताओ' },
+        { text: '🌾 गेहूं में अधिक कल्ले कैसे लाएं', query: 'गेहूं में अधिक कल्ले और फुटाव कैसे लाएं' }
+      ], 'agri', 'stimrich_bio99_combo');
+      return true;
+    }
+
+    return false;
+  }
+
+  // 🌾 AAROGYAM SHARE, DIRECT NETWORK & WALLET GROWTH ENGINE
+  function handleShareWalletGrowthAndTeamRouter(cleanQ, rawQ) {
+    const q = (cleanQ || '').toLowerCase();
+    const raw = (rawQ || '').toLowerCase();
+    const comb = q + ' ' + raw;
+
+    const isGrowthOrShareBenefitsQuery = /(?:अपना\s*शेयर.*डायरेक्ट.*वॉलेट|शेयर.*कैसे\s*बढ़ाएं|डायरेक्ट.*कैसे\s*बढ़ाएं|वॉलेट.*कैसे\s*बढ़ाएं|शेयर.*फायदा|शेयर.*पॉइंट्स|10\s*शेयर|share.*point|share.*fayda|wallet.*balance.*badhaye)/i.test(comb);
+    const isTeamOrBahiKhataQuery = /(?:mere\s*kitne\s*log|kitne\s*dost|meri\s*team|mera\s*bahi\s*khata|मेरे\s*कितने\s*लोग|कितने\s*मित्र|मेरी\s*टीम|मेरा\s*बही[- ]खाता|किसने\s*जॉइन\s*किया|kisne\s*join\s*kiya)/i.test(comb);
+
+    if (!isGrowthOrShareBenefitsQuery && !isTeamOrBahiKhataQuery) return false;
+
+    sakhiConversationState.lastActiveDomain = 'business';
+
+    let userShares = 0;
+    let userDirect = 0;
+    let userWallet = 0;
+    let userName = 'आरोग्यम साथी';
+    let userShareId = 'AI000004';
+    try {
+      userShares = parseInt(localStorage.getItem('aarogyam_user_shares_count') || localStorage.getItem('aim_user_shares_count') || '0', 10);
+      userDirect = parseInt(localStorage.getItem('aarogyam_user_direct_referrals') || localStorage.getItem('aim_user_direct_referrals') || '0', 10);
+      userWallet = parseInt(localStorage.getItem('aarogyam_user_wallet_balance') || localStorage.getItem('aim_user_wallet_balance') || '0', 10);
+      userName = localStorage.getItem('aarogyam_user_name') || localStorage.getItem('aim_user_name') || 'आरोग्यम साथी';
+      userShareId = (typeof getAuthoritativeShareId === 'function' ? getAuthoritativeShareId() : null) || localStorage.getItem('aarogyam_user_share_id') || 'AI000004';
+    } catch (_) {}
+
+    const origin = window.location.origin || 'https://aarogyamindia.online';
+    const personalShareLink = `${origin}/index.html?ref=${encodeURIComponent(userShareId)}`;
+    const waShareText = encodeURIComponent(`🌾 *आरोग्यम इंडिया — 24×7 कृषि व स्वास्थ्य सखी AI डॉक्टर*\n\nनमस्ते! अपनी फसलों के रोग, कीट, खाद व संपूर्ण स्प्रे शेड्यूल की मुफ्त सलाह पाने हेतु इस लिंक से जुड़ें:\n👉 ${personalShareLink}\n\n(सलाहकार कोड: ${userShareId})`);
+    const waShareUrl = `https://api.whatsapp.com/send?text=${waShareText}`;
+
+    if (isTeamOrBahiKhataQuery) {
+      const title = '📊 आपका लाइव आरोग्यम टीम व बही-खाता';
+      const body = `🌾 **श्री ${userName} जी — आपका लाइव बही-खाता स्थिति:**\n\n` +
+        `• **आपकी शेयर आईडी (Share ID):** \`${userShareId}\`\n` +
+        `• **🔗 कुल शेयर:** **${userShares}** बार\n` +
+        `• **👥 डायरेक्ट जुड़े मित्र (Direct Network):** **${userDirect}** सदस्य\n` +
+        `• **💰 उपलब्ध वॉलेट बैलेंस:** **₹${userWallet}** (किताबों/उत्पादों पर तुरंत 100% उपयोग योग्य)\n\n` +
+        `💡 **याद रखें:** आपके लिंक से जुड़ा हर साथी आपका 'डायरेक्ट मित्र' है। वे जब भी कोई ई-बुक या उत्पाद खरीदेंगे, आपको **10% सीधा लाइफटाइम कैश रिवॉर्ड** मिलेगा!`;
+
+      renderCrispSpecialBox(title, body, [
+        { text: '📲 WhatsApp पर नए मित्रों को जोड़ें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '👉 शेयर व वॉलेट बैलेंस कैसे बढ़ाएं?', query: 'अपना शेयर, डायरेक्ट मित्र और वॉलेट बैलेंस कैसे बढ़ाएं?' },
+        { text: '📚 5-इन-1 कॉम्बो बंडल (₹149)', url: '/bundle.html', isExternal: true }
+      ], 'business', 'sakhi_team_bahi_khata');
+      return true;
+    }
+
+    if (isGrowthOrShareBenefitsQuery) {
+      const title = '🌱 शेयर, डायरेक्ट मित्र व वॉलेट बैलेंस बढ़ाने का 3-चरणीय फॉर्मूला';
+      const body = `🌾 **आरोग्यम शेयर, डायरेक्ट मित्र एवं वॉलेट बैलेंस बढ़ाने का संपूर्ण वैज्ञानिक फॉर्मूला:**\n\n` +
+        `📌 **नियम 1: शेयर बढ़ाएं और पॉइंट्स पाएं (10 शेयर = 5 पॉइंट्स)**\n` +
+        `• जब भी आप कोई सलाह पर्ची, उत्सव शुभकामना या ई-बुक लिंक WhatsApp पर शेयर करते हैं, तो **प्रति 10 शेयर पर 5 शेयर पॉइंट्स** आपके खाते में जुड़ते हैं।\n` +
+        `• जब कोई नया साथी आपके लिंक पर क्लिक करके पहली बार जुड़ता है, तो आपको **5 वेलकम रिवॉर्ड पॉइंट्स** तुरंत मिलते हैं।\n\n` +
+        `🤝 **नियम 2: डायरेक्ट मित्र जोड़ें और 'आधिकारिक प्रोडक्ट सलाहकार' बनें**\n` +
+        `• जो भी साथी आपके शेयर लिंक से जुड़ता है, वह जीवन भर के लिए आपका **डायरेक्ट मित्र** बन जाता है।\n` +
+        `• आप सिस्टम में उनके **आधिकारिक प्रोडक्ट सलाहकार (Product Advisor)** बन जाते हैं और सखी चैट में भी उन्हें आपका नाम व नंबर मार्गदर्शक के रूप में दिखता है।\n\n` +
+        `💰 **नियम 3: 10% लाइफटाइम कैश रिवॉर्ड व वॉलेट बैलेंस**\n` +
+        `• जब भी आपका कोई डायरेक्ट मित्र **₹149 का महाबचत 5-इन-1 कॉम्बो बंडल** या कोई भी ई-बुक/उत्पाद खरीदेगा, तो उसकी खरीद का **10% सीधा कैश रिवॉर्ड** आपके वॉलेट में जमा होगा।\n` +
+        `• इस वॉलेट बैलेंस का उपयोग करके आप अपनी अगली ई-बुक्स 100% तक मुफ्त में या भारी छूट पर पा सकते हैं!\n\n` +
+        `👉 **अभी शेयर करके शुरुआत करें:** नीचे दिए गए हरे बटन पर टैप करके तुरंत WhatsApp पर शेयर करें!`;
+
+      renderCrispSpecialBox(title, body, [
+        { text: '📲 WhatsApp पर अभी शेयर करें', url: waShareUrl, isExternal: true, style: 'background:#16a34a;color:#fff;font-weight:800;' },
+        { text: '📚 5-इन-1 कॉम्बो बंडल देखें (₹149)', url: '/bundle.html', isExternal: true, style: 'background:#0284c7;color:#fff;font-weight:800;' },
+        { text: '📊 मेरी टीम व बही-खाता दिखाओ', query: 'मेरे कितने लोग जुड़े हैं टीम दिखाओ' }
+      ], 'business', 'sakhi_share_growth_guide');
+      return true;
+    }
+
+    return false;
+  }
+
   function processKnowledgeQuery(query) {
     const rawQ = (query || '').trim();
     const instructionBundle = detectUserInstructionDirectives(rawQ);
@@ -17569,6 +17798,16 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
     // 0. ABSOLUTE TOP PRIORITY: SAFETY, MEDICAL EMERGENCY & PROFANITY GUARDRAIL
     if (handleSafetyGuardrails(cleanQ, rawQ)) {
+      return;
+    }
+
+    // 0.00001 MULTI-PRODUCT SPRAY CHART & TANK MIX ROUTER
+    if (handleMultiProductSprayChartRouter(cleanQ, rawQ, directives)) {
+      return;
+    }
+
+    // 0.00002 SHARE, DIRECT NETWORK & WALLET GROWTH ENGINE
+    if (handleShareWalletGrowthAndTeamRouter(cleanQ, rawQ)) {
       return;
     }
 
