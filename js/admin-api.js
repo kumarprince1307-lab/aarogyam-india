@@ -836,6 +836,47 @@ export async function fetchCheckoutLogs(params = {}) {
 
     let { data: logs, error: logsError } = await queryBuilder;
     if (logsError) throw logsError;
+    logs = logs || [];
+
+    // Also fetch real successful purchases from purchases table so actual sales are 100% visible
+    if (!isFollowup) {
+        try {
+            let purchasesQuery = db.from('purchases')
+                .select('id, profile_id, book_id, amount, purchase_date, payment_status, payment_id')
+                .or('payment_status.eq.success,payment_status.is.null');
+
+            if (params.startDate && params.endDate) {
+                purchasesQuery = purchasesQuery.gte('purchase_date', params.startDate.toISOString())
+                                               .lt('purchase_date', params.endDate.toISOString());
+            }
+            if (params.bookId && params.bookId !== 'all') {
+                purchasesQuery = purchasesQuery.eq('book_id', params.bookId);
+            }
+            purchasesQuery = purchasesQuery.order('purchase_date', { ascending: false }).limit(200);
+
+            const { data: realPurchases } = await purchasesQuery;
+            if (realPurchases && realPurchases.length > 0) {
+                const existingSuccessKeys = new Set(logs.filter(l => l.status === 'success').map(l => `${l.profile_id}_${l.book_id}`));
+                realPurchases.forEach(p => {
+                    const key = `${p.profile_id}_${p.book_id}`;
+                    if (!existingSuccessKeys.has(key)) {
+                        logs.unshift({
+                            id: p.id,
+                            created_at: p.purchase_date,
+                            status: 'success',
+                            book_id: p.book_id,
+                            profile_id: p.profile_id,
+                            amount: p.amount || 0
+                        });
+                        existingSuccessKeys.add(key);
+                    }
+                });
+            }
+        } catch (pErr) {
+            console.warn('purchases fetch note in fetchCheckoutLogs:', pErr);
+        }
+    }
+
     if (!logs || logs.length === 0) return { success: true, data: [] };
 
     // If filtering for 'followup', we need to group and then remove users who have already purchased.
@@ -2042,28 +2083,56 @@ export async function updateUserProfileAdmin({ userId, name, mobile, shareId }) 
 
     const cleanName = (name || '').trim();
     const cleanMobile = (mobile || '').replace(/\D/g, '').slice(-10);
-    const cleanShareId = (shareId || '').trim().toUpperCase();
+    let cleanShareId = (shareId || '').trim().toUpperCase();
 
     if (!cleanName) throw new Error("नाम (Name) खाली नहीं हो सकता।");
     if (!cleanMobile || cleanMobile.length !== 10) throw new Error("10-अंकों का वैध मोबाइल नंबर आवश्यक है।");
-    if (!cleanShareId) throw new Error("शेयर आईडी (Share ID) आवश्यक है।");
+
+    const isValidUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(str || ''));
+    let targetProfileId = isValidUUID(userId) ? userId : null;
+
+    if (!targetProfileId) {
+      const cleanM = String(userId || '').replace(/\D/g, '').slice(-10);
+      if (cleanM && cleanM.length === 10) {
+        const { data: p } = await db.from('profiles').select('id, share_id').eq('mobile', cleanM).maybeSingle();
+        if (p && p.id) {
+          targetProfileId = p.id;
+          if (!cleanShareId && p.share_id) cleanShareId = p.share_id;
+        }
+      }
+    }
 
     const updatePayload = {
       full_name: cleanName,
       mobile: cleanMobile,
-      share_id: cleanShareId,
       updated_at: new Date().toISOString()
     };
+    if (cleanShareId) {
+      updatePayload.share_id = cleanShareId;
+    }
 
-    const { data, error } = await db
-      .from('profiles')
-      .update(updatePayload)
-      .eq('id', userId)
-      .select();
+    let resData;
+    if (targetProfileId) {
+      const { data, error } = await db
+        .from('profiles')
+        .update(updatePayload)
+        .eq('id', targetProfileId)
+        .select();
+      if (error) throw error;
+      resData = data;
+    } else {
+      const cleanM = String(userId || '').replace(/\D/g, '').slice(-10);
+      const { data, error } = await db
+        .from('profiles')
+        .update(updatePayload)
+        .eq('mobile', cleanM)
+        .select();
+      if (error) throw error;
+      resData = data;
+    }
 
-    if (error) throw error;
     clearAdminCache();
-    return { success: true, data };
+    return { success: true, data: resData };
   } catch (error) {
     console.error('Failed to update user profile:', error);
     return { success: false, error: error.message };

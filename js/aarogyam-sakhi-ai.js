@@ -7249,22 +7249,38 @@ if (typeof document !== 'undefined') {
       ]);
     }
 
-    // 5. BACK & LOWER SPINE PAIN (कमर दर्द / साइटिका / रीढ़ की हड्डी)
-    const isBackPain = q.includes('kamar me dard') || q.includes('kamar dard') || q.includes('कमर में दर्द') || q.includes('कमर दर्द') || q.includes('back pain') || q.includes('sciatica') || q.includes('साइटिका') || q.includes('reedh') || q.includes('रीढ़');
+    // 5. BACK & LOWER SPINE PAIN (कमर दर्द / साइटिका / रीढ़ की हड्डी L4-L5 / डिस्क)
+    const isBackPain = /(?:kamar\s*me\s*dard|kamar\s*dard|कमर\s*में\s*दर्द|कमर\s*दर्द|back\s*pain|sciatica|साइटिका|sytika|syitika|saytika|shytica|l4[-\s]*l5|l5[-\s]*s1|slip\s*disc|स्लिप\s*डिस्क|reedh|रीढ़|कमर\s*से\s*पैर|नसों\s*में\s*खिंचाव)/i.test(q);
     if (isBackPain) {
-      const resp = `राम-राम! 🙏 कमर दर्द और साइटिका रीढ़ की मणकों (L4-L5 डिस्क) के दबने या वात दोष बढ़ने से होता है।
+      const resp = `राम-राम! 🙏 कमर दर्द और साइटिका (Sciatica) रीढ़ की हड्डी के मणकों (L4-L5 या L5-S1 डिस्क) के दबने या खिसकने से सायटिक नर्व पर दबाव पड़ने और वात दोष बढ़ने से होता है।
 
-👴 **अवनीश दादा का नुस्खा:**
-• **मेथी-सौंठ का काढ़ा:** 1 चम्मच मेथी और आधा चम्मच सौंठ पाउडर 1 कप पानी में उबालकर पिएं।
-• झुककर भारी वजन न उठाएं, हमेशा सख्त बिस्तर (तख्त या फर्श) पर सोएं।
+🧘 **1. दैनिक कसरत व योगाभ्यास (Kasarat & Exercises — सबसे आवश्यक):**
+• **भुजंगासन (Cobra Stretch):** पेट के बल लेटकर हथेलियों के सहारे नाभि तक का शरीर धीरे-धीरे ऊपर उठाएं (रीढ़ की डिस्क पर खिंचाव कम होता है)। 10-15 सेकंड रोकें।
+• **शलभासन (Locust Pose):** पेट के बल लेटकर एक-एक पैर बिना घुटना मोड़े पीछे से ऊपर उठाएं (कमर व कूल्हे की मांसपेशियों को मजबूती मिलती है)।
+• **मर्कटासन (Spinal Twist):** पीठ के बल लेटकर दोनों घुटनों को मोड़कर दाएं-बाएं झुकाएं (कमर की नसों की जकड़न खुलती है)।
+• **नर्व ग्लाइडिंग (Sciatic Nerve Flossing):** कुर्सी पर बैठकर पैर सीधा करें और पंजे को आगे-पीछे हिलाएं (सायटिक नर्व की सूजन व अकड़न कम होती है)।
+• **नियम:** सख्त तख्त या फर्श पर सोएं। आगे झुककर भारी वजन बिल्कुल न उठाएं।
 
-🌿 **हर्बल पोषण व बाह्य लेप:**
-• **Naturamore Joint Care:** हड़जोड़ व शल्लाकी नसों की सूजन घटाकर हड्डियों को बल देते हैं।
-• **Herbs & More Pain Cream:** कमर पर हल्के हाथ से मालिश कर गर्म तौलिए से भाप दें।`;
+🌿 **2. दर्द निवारक व सूजननाशक आयुर्वेदिक समाधान:**
+• **Naturamore Joint Care Capsules:** 1 कैप्सूल सुबह और 1 शाम भोजन के उपरांत गुनगुने पानी से लें (सलाई गुग्गुल, हड़जोड़ व रास्ना नसों की अंदरूनी सूजन मिटाते हैं)।
+• **Herbs & More Pain Cream:** कमर से लेकर पैर के पिछले हिस्से तक हल्के हाथ से लगाएं और गर्म तौलिए से 10 मिनट भाप/सिकाई लें।
+• **मेथी-सौंठ का काढ़ा:** 1 चम्मच मेथी और आधा चम्मच सौंठ 1 कप पानी में उबालकर सुबह खाली पेट पिएं।
+• **महायोगराज गुग्गुल या त्रयोदशांग गुग्गुल:** 1-1 गोली सुबह-शाम (वातशामक व सायटिका का प्रसिद्ध आयुर्वेदिक योग)।
+• **प्रसारिणी तैलम या निर्गुण्डी तेल:** हल्के हाथ से रीढ़ के दोनों तरफ मालिश करें।
 
-      return renderClinicalHealthCard('कमर दर्द व साइटिका: रीढ़ की सुरक्षा व आयुर्वेदिक उपचार', resp, [
+💊 **3. आपातकालीन एलोपैथी दर्द निवारक व नर्व दवाएं (Medical Reference):**
+• **Pregabalin (75mg) या Gabapentin:** सायटिक नसों की तेज जलन, सुन्नपन व न्यूरोपैथिक दर्द को शांत करने हेतु।
+• **Pregabalin + Methylcobalamin (जैसे Pregeb-M):** नसों की सूजन घटाने व रिपेयर हेतु।
+• **Aceclofenac + Paracetamol (जैसे Zerodol-P) या Etoricoxib (Nucoxia 90mg):** असहनीय तीव्र दर्द व सूजन में अल्पकालिक उपयोग हेतु।
+• **Thiocolchicoside:** कमर की मांसपेशियों की जकड़न (Muscle Spasm) को ढीला करने हेतु।
+
+⚠️ **अति आवश्यक वैधानिक चेतावनी:**
+> एलोपैथी दवाएं (विशेषकर पेनकिलर और नर्व्स की दवाएं) केवल और केवल किसी अधिकृत एमबीबीएस डॉक्टर / न्यूरोलॉजिस्ट या विशेषज्ञ की लिखित पर्ची और सलाह से ही लें। बिना डॉक्टर की सलाह के खुद से पेनकिलर खाने से पेट में अल्सर, एसिडिटी और किडनी पर गंभीर असर पड़ सकता है।`;
+
+      return renderClinicalHealthCard('कमर दर्द व साइटिका: कसरत, आयुर्वेदिक उपचार व सुरक्षा गाइड', resp, [
         { label: "🦴 जॉइंट व स्पाइन केयर का आधिकारिक पेज", url: "/health/joint-care.html" },
-        { label: "🧴 हर्ब्स एंड मोर पेन क्रीम विवरण", query: "पेन क्रीम में क्या सामग्री है?" }
+        { label: "🧴 हर्ब्स एंड मोर पेन क्रीम विवरण", query: "पेन क्रीम में क्या सामग्री है?" },
+        { label: "🧘 साइटिका की कसरत विधि", query: "साइटिका के लिए भुजंगासन और मर्कटासन कैसे करें?" }
       ]);
     }
 
@@ -7304,6 +7320,150 @@ if (typeof document !== 'undefined') {
         { label: "🧍 5. कमर व रीढ़ का दर्द", query: "कमर में दर्द हो रहा है" },
         { label: "💪 6. हाथ व कंधे का दर्द", query: "हाथ में दर्द का उपाय" },
         { label: "🦶 7. एड़ी व पैर का दर्द", query: "एड़ी में दर्द का इलाज" }
+      ]);
+    }
+
+    return false;
+  }
+
+  // ============================================================================
+  // 14.5 ALLOPATHIC MEDICATIONS, ANTIBIOTICS, BP & SUGAR PHARMACOLOGY INTEL ENGINE
+  // (Recognizes Antibiotics, Short Forms, BP & Sugar Medicines with Mandatory Warning)
+  // ============================================================================
+  function handleAllopathicAndClinicalMedicationIntelligence(cleanQ, query) {
+    const q = (cleanQ || '').toLowerCase().trim();
+    const origQ = (query || '').toLowerCase().trim();
+    const combined = q + ' ' + origQ;
+
+    // 1. ANTIBIOTICS & COMMON SHORT FORMS (Az, Azithral, Amox, Augmentin, Cipro, Of-Oz, Cefix, Doxy, Norflox)
+    const isAzithromycin = /(?:\baz\b|az\s*tablet|az\s*500|az\s*250|azee|azithral|azithromycin|एजिथ्रोमाइसिन|अजीथ्रल|अजी|एज़)/i.test(combined);
+    const isAmoxicillin = /(?:\bamox\b|amoxi|amoxicillin|augmentin|amoxyclav|मोक्स|एमोक्सिसिलिन|ऑगमेंटिन)/i.test(combined);
+    const isCiprofloxacin = /(?:\bcipro\b|ciprofloxacin|ciplox|सिप्रो|सिप्रोफ्लोक्सासिन|सिप्लॉक्स)/i.test(combined);
+    const isOfloxOrnidazole = /(?:of[-\s]*oz|oflox|ofloxacin|ornidazole|metrogyl|oflomac|ओफ[-\s]*ओज|मेट्रोजिल|ओफ्लोक्सासिन)/i.test(combined);
+    const isCefixime = /(?:\bcefix\b|cefixime|taxim[-\s]*o|mahacef|सेफिक्सिम|टैक्सिम[-\s]*ओ|महासेफ)/i.test(combined);
+    const isDoxycycline = /(?:\bdoxy\b|doxycycline|डॉक्सी|डॉक्सीसाइक्लिन)/i.test(combined);
+    const isNorfloxacin = /(?:norflox|norflox[-\s]*tz|नॉरफ्लोक्स)/i.test(combined);
+    const isGenericAntibiotic = /(?:antibiotic|एंटीबायोटिक|antibiotech|एंटीबायोटिक्स)/i.test(combined);
+
+    if (isAzithromycin || isAmoxicillin || isCiprofloxacin || isOfloxOrnidazole || isCefixime || isDoxycycline || isNorfloxacin || isGenericAntibiotic) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      let drugName = 'एंटीबायोटिक दवा';
+      let drugDetails = '';
+
+      if (isAzithromycin) {
+        drugName = 'Az / Azithromycin (एजिथ्रोमाइसिन — जैसे Azithral, Azee 500mg)';
+        drugDetails = `• **श्रेणी व प्रकार:** मैक्रोलाइड (Macrolide) ग्रुप का शक्तिशाली एंटीबायोटिक।
+• **मुख्य उपयोग:** गले में खराश/इन्फेक्शन (Pharyngitis/Tonsillitis), छाती व फेफड़ों के संक्रमण (Bronchitis/Pneumonia), कान का दर्द/इन्फेक्शन, नाक-साइनस संक्रमण और टाइफाइड बुखार में।
+• **सामान्य कोर्स:** डॉक्टर द्वारा सामान्यतः 250mg या 500mg दिन में 1 बार, 3 से 5 दिनों के निश्चित कोर्स में दी जाती है।
+• **सेवन सावधानी:** खाली पेट या भोजन के 1 घंटे बाद पर्याप्त पानी से लें। अपच या दस्त लगने पर ताजा छाछ पिएं।`;
+      } else if (isAmoxicillin) {
+        drugName = 'Amox / Amoxicillin & Augmentin (एमोक्सिसिलिन / एमोक्सीक्लेव)';
+        drugDetails = `• **श्रेणी व प्रकार:** पेनिसिलिन ग्रुप का ब्रॉड स्पेक्ट्रम एंटीबायोटिक।
+• **मुख्य उपयोग:** दांतों में मवाद/संक्रमण, कान-गले का इन्फेक्शन, छाती में कफ-बलगम, घाव भरने व यूरिन इन्फेक्शन में।
+• **सामान्य रूप:** 500mg कैप्सूल या क्लेव्युलैनिक एसिड के साथ (Augmentin 625mg)।
+• **सेवन सावधानी:** पेट की जलन से बचने के लिए इसे हमेशा भोजन के तुरंत बाद लिया जाता है।`;
+      } else if (isCiprofloxacin) {
+        drugName = 'Cipro / Ciprofloxacin (सिप्रोफ्लोक्सासिन — जैसे Ciplox 500)';
+        drugDetails = `• **श्रेणी व प्रकार:** फ्लोरोक्विनोलोन ग्रुप का एंटीबायोटिक।
+• **मुख्य उपयोग:** पेशाब मार्ग का संक्रमण (UTI), पेशाब में जलन, पेट के संक्रमण (Diarrhoea), हड्डियों व जोड़ों के गंभीर संक्रमण में।
+• **सेवन सावधानी:** दूध या एंटासिड (गैस की दवा) के साथ न लें, कम से कम 2 घंटे का अंतर रखें।`;
+      } else if (isOfloxOrnidazole) {
+        drugName = 'Of-Oz / Ofloxacin + Ornidazole (जैसे Oflomac-OZ / Metrogyl)';
+        drugDetails = `• **श्रेणी व प्रकार:** एंटी-बैक्टीरियल + एंटी-अमीबिक संयोजन।
+• **मुख्य उपयोग:** पेट में मरोड़ के साथ दस्त, पेचिश (Dysentery), खूनी दस्त व आंतों के इन्फेक्शन में।
+• **सेवन सावधानी:** भोजन के बाद लें। मुंह में कड़वाहट या हल्का जी मिचलाना सामान्य है। ORS का घोल साथ में जरूर पिएं।`;
+      } else if (isCefixime) {
+        drugName = 'Cefix / Cefixime (सेफिक्सिम — जैसे Taxim-O, Mahacef 200)';
+        drugDetails = `• **श्रेणी व प्रकार:** 3rd Generation Cephalosporin एंटीबायोटिक।
+• **मुख्य उपयोग:** टाइफाइड बुखार, निमोनिया, गले व मूत्र मार्ग के इन्फेक्शन में।
+• **सामान्य रूप:** 200mg सुबह-शाम 5 से 7 दिन के कोर्स में डॉक्टर द्वारा निर्धारित।`;
+      } else if (isDoxycycline) {
+        drugName = 'Doxy / Doxycycline (डॉक्सीसाइक्लिन — 100mg)';
+        drugDetails = `• **श्रेणी व प्रकार:** टेट्रासाइक्लिन ग्रुप का एंटीबायोटिक।
+• **मुख्य उपयोग:** छाती के संक्रमण, गंभीर मुंहासे (Acne), त्वचा संक्रमण, स्क्रब टाइफस व टिक इन्फेक्शन में।
+• **सेवन सावधानी:** दवा लेने के बाद तुरंत न लेटें, पर्याप्त 1 पूरा गिलास पानी पिएं।`;
+      } else {
+        drugName = 'एंटीबायोटिक दवाएं (Antibiotic Medications Guide)';
+        drugDetails = `• **कार्यप्रणाली:** एंटीबायोटिक्स शरीर में हानिकारक बैक्टीरिया के विकास को रोकती हैं या उन्हें समाप्त करती हैं।
+• **ध्यान दें:** सर्दी, जुकाम, फ्लू या वायरल बुखार में एंटीबायोटिक काम नहीं करती (क्योंकि वे वायरस से होते हैं)।`;
+      }
+
+      const resp = `नमस्ते! 🙏 **${drugName} का आधिकारिक चिकित्सकीय विवरण:**
+
+${drugDetails}
+
+🌿 **सखी की आयुर्वेदिक व प्रतिरक्षा सहायता:**
+• एंटीबायोटिक कोर्स के दौरान शरीर के अच्छे बैक्टीरिया को बचाने हेतु ताजा छाछ (प्रोबायोटिक्स) पिएं।
+• संक्रमण से जल्द उबरने के लिए **तुलसी-गिलोय का काढ़ा** और **नेचुरामोर इम्यून प्लस** लें।
+
+⚠️ **अति आवश्यक वैधानिक व सुरक्षा चेतावनी:**
+> 1. एंटीबायोटिक दवाएं केवल और केवल किसी अधिकृत एमबीबीएस डॉक्टर की लिखित पर्ची व सही खुराक में ही लें।
+> 2. डॉक्टर द्वारा निर्धारित पूरा कोर्स (3 या 5 दिन) अवश्य पूरा करें; बीच में आराम लगने पर दवा बंद करने से बैक्टीरिया में एंटीबायोटिक रेजिस्टेंस (दवा बेअसर होना) हो जाता है।
+> 3. बिना डॉक्टर की सलाह के खुद से कोई भी एंटीबायोटिक कभी न खरीदें और न ही दूसरों को दें।`;
+
+      return renderClinicalHealthCard(`💊 ${drugName}: उपयोग, खुराक व सुरक्षा नियम`, resp, [
+        { label: "🍵 गिलोय व काढ़ा नुस्खा", query: "गिलोय और तुलसी का काढ़ा कैसे बनाएं?" },
+        { label: "🛡️ रोग प्रतिरोधक क्षमता (Immune Plus)", query: "नेचुरामोर इम्यून प्लस के फायदे" },
+        { label: "📞 विशेषज्ञ डॉक्टर से संपर्क", query: "दादा अवनीश जी से सीधे संपर्क" }
+      ]);
+    }
+
+    // 2. BP (HYPERTENSION) COMMON MEDICINES (Telmisartan, Amlodipine, Atenolol, Metoprolol, Telma)
+    const isBpMed = /(?:telma|telmisartan|telmikind|cresar|amlodipine|amlong|stamlo|atenolol|aten\b|metoprolol|betaloc|met[-\s]*xl|losartan|cardace|ramipril|enalapril|bp\s*ki\s*dawa|बीपी\s*की\s*दवा|हाई\s*बीपी\s*की\s*दवा)/i.test(combined);
+    if (isBpMed) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `नमस्ते! 🙏 **हाई ब्लड प्रेशर (Hypertension) की प्रमुख दवाओं का चिकित्सकीय विवरण:**
+
+💊 **प्रचलित एलोपैथी दवाएं व उनका कार्य:**
+• **Telmisartan (जैसे Telma 40/80, Telmikind):** ARB ग्रुप। यह रक्त वाहिकाओं (Blood Vessels) को रिलैक्स कर चौड़ा करती है, जिससे धमनियों पर रक्त का दबाव कम होता है। यह दिल व किडनी को लंबे समय तक सुरक्षित रखती है।
+• **Amlodipine (जैसे Amlong 5mg, Stamlo):** कैल्शियम चैनल ब्लॉकर। यह दिल की मांसपेशियों और नसों की संकुचन को ढीला कर बीपी नीचे लाती है।
+• **Telma-H / Telmikind-H:** टेल्मिसार्टन + हाइड्रोक्लोरोथियाजाइड (डाइयुरेटिक)। जब एक दवा से बीपी काबू न हो, तो शरीर से अतिरिक्त नमक व पानी बाहर निकालती है।
+• **Atenolol (Aten 25/50) / Metoprolol (Betaloc, Met-XL):** बीटा-ब्लॉकर्स। दिल की तेज धड़कन (Palpitations) व तनाव को धीमा कर सामान्य रखते हैं।
+
+🌿 **आरोग्यम सखी का प्राकृतिक हृदय व बीपी पोषण:**
+• **Naturamore Nutri Heart:** अर्जुन की छाल, लहसुन, गुग्गुल व अलसी युक्त, जो धमनियों से बैड कोलेस्ट्रॉल साफ कर रक्त संचार सुगम बनाता है।
+• **सेंधा नमक नियम:** सफेद समुद्री नमक बंद करें या 1 दिन में मात्र 3 ग्राम तक सीमित रखें।
+• **दैनिक नियम:** सुबह 40 मिनट तेज चाल से टहलें और 10 मिनट अनुलोम-विलोम प्राणायाम करें।
+
+⚠️ **अति आवश्यक वैधानिक व सुरक्षा चेतावनी:**
+> 1. बीपी की दवाएं आजीवन सुरक्षा हेतु होती हैं। एक बार बीपी सामान्य आ जाने पर भी डॉक्टर की अनुमति के बिना दवा कभी बंद न करें (अचानक बंद करने से बीपी अचानक बहुत बढ़ सकता है जिसे Rebound Hypertension कहते हैं)।
+> 2. दवा का समय (सुबह या रात) फिक्स रखें और सप्ताह में 2 बार बीपी की रीडिंग डायरी में नोट करें।`;
+
+      return renderClinicalHealthCard('❤️ ब्लड प्रेशर की दवाएं (Telma, Amlodipine आदि): संपूर्ण जानकारी व सुरक्षा', resp, [
+        { label: "🫀 नेचुरामोर न्यूट्री हार्ट कैप्सूल", query: "न्यूट्री हार्ट में क्या सामग्री है?" },
+        { label: "🥗 बीपी नियंत्रण डाइट चार्ट", query: "बीपी और हृदय सुरक्षा हेतु डाइट चार्ट" },
+        { label: "📞 विशेषज्ञ डॉक्टर से संपर्क", query: "दादा अवनीश जी से सीधे संपर्क" }
+      ]);
+    }
+
+    // 3. DIABETES / SUGAR MEDICINES (Metformin, Glimepiride, Glycomet, Teneligliptin, Galvus, Forxiga)
+    const isSugarMed = /(?:metformin|glycomet|gluconorm|glimepiride|amaryl|zoryl|glimestar|teneligliptin|vildagliptin|galvus|sitagliptin|januvia|dapagliflozin|forxiga|empagliflozin|jardiance|voglibose|volibo|sugar\s*ki\s*dawa|डायबिटीज\s*की\s*दवा|शुगर\s*की\s*दवा)/i.test(combined);
+    if (isSugarMed) {
+      sakhiConversationState.lastActiveDomain = 'health';
+      const resp = `नमस्ते! 🙏 **डायबिटीज व शुगर नियंत्रण (Type-2 Diabetes) की प्रमुख दवाओं का चिकित्सकीय विवरण:**
+
+💊 **प्रचलित एलोपैथी दवाएं व उनका कार्य:**
+• **Metformin (जैसे Glycomet 500/850/1000mg, Gluconorm):** बिगुआनाइड ग्रुप। टाइप-2 शुगर की पहली व सर्वश्रेष्ठ दवा। यह लिवर में शुगर का अतिरिक्त बनना रोकती है और आंतों से ग्लूकोज अवशोषण कम करती है। (इसे हमेशा भोजन के बीच या तुरंत बाद लिया जाता है ताकि पेट खराब न हो)।
+• **Glimepiride (जैसे Amaryl 1mg/2mg, Glimestar, Zoryl):** सल्फोनील्यूरिया ग्रुप। यह पैंक्रियाज (अग्न्याशय) को उत्तेजित कर ज्यादा इंसुलिन निकलवाती है।
+• **Glycomet-GP / Gluconorm-G:** मेटफॉर्मिन + ग्लिमेपिराइड का कंबाइंड फॉर्मूला, जो एक साथ इंसुलिन रेजिस्टेंस और इंसुलिन की कमी दोनों को ठीक करता है।
+• **Teneligliptin / Vildagliptin (Galvus) / Sitagliptin:** DPP-4 इन्हिबिटर्स। भोजन के बाद अचानक शुगर की स्पाइक (PPBS) को रोकते हैं।
+• **Dapagliflozin (Forxiga 10mg) / Empagliflozin (Jardiance):** SGLT-2 इन्हिबिटर्स। यह मूत्र के रास्ते अतिरिक्त 300-400 कैलोरी शुगर बाहर निकाल देते हैं और वजन व दिल/किडनी दोनों को बचाते हैं।
+• **Voglibose (Volibo 0.2/0.3):** आंतों में जटिल कार्बोहाइड्रेट को ग्लूकोज में टूटने से धीमा करती है।
+
+🌿 **आरोग्यम सखी का प्राकृतिक शुगर रिवर्सल व पैंक्रियाज पोषण:**
+• **Naturamore Life Style Plus:** विजयसार, गुड़मार, जामुन गुठली, करेला व कुटकी का 100% मानकीकृत अर्क। यह बीटा सेल्स को पोषण देकर इंसुलिन संवेदनशीलता बढ़ाता है।
+• **घरेलू नुस्खा:** 1 चम्मच मेथी दाना रात को भिगोकर सुबह पानी पिएं व दाने चबाएं।
+• **सख्त नियम:** मीठा, मैदा, आलू, चावल व पैकेज्ड जूस बंद करें। रोज भोजन के 15 मिनट बाद 1000 कदम टहलें।
+
+⚠️ **अति आवश्यक वैधानिक व सुरक्षा चेतावनी:**
+> 1. शुगर की दवाएं बिना डॉक्टर की लिखित सलाह के कभी शुरू या बंद न करें।
+> 2. यदि कभी पसीना आए, घबराहट हो या हाथ कांपें (Hypoglycemia / लो शुगर के लक्षण), तो तुरंत 1 चम्मच चीनी या ग्लूकोज लें और डॉक्टर से संपर्क करें।
+> 3. हर 3 महीने में HbA1c टेस्ट अवश्य करवाएं ताकि 90 दिनों का औसत शुगर स्तर पता रहे।`;
+
+      return renderClinicalHealthCard('🩸 शुगर व डायबिटीज की दवाएं (Metformin, Glycomet आदि): संपूर्ण विश्लेषण', resp, [
+        { label: "🌿 नेचुरामोर लाइफस्टाइल प्लस कैप्सूल", query: "लाइफस्टाइल प्लस में क्या सामग्री है?" },
+        { label: "🥗 90-दिन का शुगर डाइट प्लान", query: "शुगर नियंत्रण हेतु 90-दिन का संपूर्ण डाइट चार्ट बनाओ" },
+        { label: "📞 विशेषज्ञ डॉक्टर से संपर्क", query: "दादा अवनीश जी से सीधे संपर्क" }
       ]);
     }
 
@@ -13392,7 +13552,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     }
 
     // 2. Sundi, Illi, Lat, Gandola, Tana Chhedak (सुंडी, इल्ली, लट, तना छेदक)
-    if (q.includes('sundi') || q.includes('सुंडी') || q.includes('illi') || q.includes('इल्ली') || q.includes('lat') || q.includes('लट') || q.includes('gandola') || q.includes('गंडोला') || q.includes('इल्ला') || q.includes('तना छेदक') || q.includes('छेदक')) {
+    // 🛡️ High-Precision Guard: Must NOT match 'galat' (lat inside galat), and must NOT match when user says 'illi nahi'
+    const hasIlliKeyword = /(?:\billi\b|\bइल्ली\b|\bsundi\b|\bसुंडी\b|\bलट\b|\bgandola\b|\bगंडोला\b|\bइल्ला\b|तना\s*छेदक|फल\s*छेदक)/i.test(q) || (/\blat\b/i.test(q) && !/galat/i.test(q));
+    const isNegatedIlli = /(?:illi|इल्ली|सुंडी|लट).*(?:nahi|नही|नहीं|mat|मत)|(?:nahi|नही|नहीं|mat|मत).*(?:illi|इल्ली|सुंडी|लट)/i.test(q);
+    if (hasIlliKeyword && !isNegatedIlli) {
       sakhiConversationState.lastActiveDomain = 'agri';
       const resp = `🐛 **इल्ली, लट, सुंडी व तना छेदक (Caterpillar/Stem Borer) रोकथाम 100% जैविक सुरक्षा चक्र:**\n\n🛡️ **तुरंत अचूक स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n• **बायोफिट लार्विसाइड (Biofit Larvicide):** 30 ml (इल्ली, सुंडी, लट व फल छेदक का पक्का जैविक खात्मा)\n• **बायो-99 (Bio-99 100% सिलिकॉन स्प्रेडर):** 5 ml (दवा को पत्तियों पर चिपकाने व इल्ली की त्वचा तक पहुँचाने हेतु)\n• **वैकल्पिक नैनो शील्ड:** रैप-अप (Biofit Wrap-up) 30 ml (फंगस व कटे पत्तों के घाव भरने हेतु)\n• **गंभीर रासायनिक आपातकाल:** कोराजन (Coragen 18.5% SC) 6 ml प्रति 15L पंप या एमामेक्टिन बेंजोएट (Emamectin Benzoate 5% SG) 10 ग्राम प्रति पंप।\n\n💡 **स्प्रे का सही समय:** शाम 4 बजे के बाद जब इल्लियां पत्तियों व फलियों पर बाहर आती हैं।\n\n💡 **सलाह:** गंभीर प्रकोप होने पर दवा छिड़काव से पहले विशेषज्ञ सहायता अवश्य लें।`;
       renderCrispSpecialBox('🐛 सुंडी, लट व इल्ली रोकथाम — बायोफिट लार्विसाइड + बायो-99', resp, [
@@ -16731,7 +16894,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
     const origQ = (rawQ || '').toLowerCase();
     const combined = q + ' ' + origQ;
 
-    const isJointPain = (
+    const isNegatedJoint = /(?:jodo|जोड़ों|जोड़|घुटने).*(?:nahi|नही|नहीं)|(?:nahi|नही|नहीं).*(?:jodo|जोड़ों|जोड़|घुटने)/i.test(combined);
+    const hasBackOrSciatica = /(?:kamar|कमर|sciatica|साइटिका|sytika|syitika|saytika|reedh|रीढ़|l4|l5)/i.test(combined);
+
+    const isJointPain = !isNegatedJoint && !hasBackOrSciatica && (
       (combined.includes('घुटने') || combined.includes('घुटनों') || combined.includes('जोड़ों') || combined.includes('जोड') || combined.includes('गठिया') || combined.includes('arthritis') || combined.includes('joint') || combined.includes('ग्रीस')) &&
       (combined.includes('दर्द') || combined.includes('इलाज') || combined.includes('आयुर्वेदिक') || combined.includes('सूजन') || combined.includes('कट-कट') || combined.includes('दवा') || combined.includes('कमजोरी'))
     );
@@ -18021,6 +18187,11 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
         return;
       }
 
+      // 0.0155 ALLOPATHIC MEDICATIONS, ANTIBIOTICS, BP & SUGAR CLINICAL PHARMACOLOGY ROUTER
+      if (typeof handleAllopathicAndClinicalMedicationIntelligence === 'function' && handleAllopathicAndClinicalMedicationIntelligence(cleanQ, rawQ)) {
+        return;
+      }
+
       // 0.016 DEDICATED BP, LOW BP, HBA1C & CARDIO CLINICAL PACING ENGINE
       if (typeof handleBpAndCardioIntelligence === 'function' && handleBpAndCardioIntelligence(cleanQ, rawQ)) {
         return;
@@ -18915,7 +19086,8 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
   function renderLearnedVaultAnswerBox(item) {
     const cleanQTitle = (item.question || '').replace(/[?।!,]+/g, '').trim();
-    const formattedText = `${item.answer}\n\n📜 *संदर्भ स्रोत: ${item.source || 'इंटरनेट संदर्भ'} (लाइव संकलन)*`;
+    const cleanSource = (item.source || 'आरोग्यम सखी AI लाइव ज्ञानकोष').replace(/Google|Gemini/gi, 'आरोग्यम');
+    const formattedText = `${item.answer}\n\n📜 *संदर्भ स्रोत: ${cleanSource}*`;
 
     renderCrispSpecialBox(`📖 ${cleanQTitle}`, formattedText, [
       { text: '🌾 संबंधित कृषि व फसल सलाह लें', query: 'फसलों का संपूर्ण स्प्रे कैलेंडर व खाद प्रबंधन' },

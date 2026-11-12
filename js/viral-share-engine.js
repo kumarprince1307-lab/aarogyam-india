@@ -309,14 +309,24 @@
       }
 
       if (typeof fetch === 'function') {
-        fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/rpc/increment_share_count', {
+        const payload = {
+          event_type: 'share',
+          share_token: shareId,
+          referral_code: shareId,
+          share_channel: platform,
+          asset_title: customTitle || document.title,
+          landing_url: customUrl || window.location.href,
+          created_at: new Date().toISOString()
+        };
+        fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/share_logs', {
           method: 'POST',
           headers: {
             'apikey': 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU',
             'Authorization': 'Bearer sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
           },
-          body: JSON.stringify({ p_share_id: shareId, p_platform: platform, p_page: window.location.pathname })
+          body: JSON.stringify(payload)
         }).catch(() => {});
       }
     } catch (e) {}

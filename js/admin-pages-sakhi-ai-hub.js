@@ -1289,6 +1289,14 @@ function renderPaginationControls(containerId, totalItems, currentPage, pageSize
 }
 
 window.openSakhiDetailDrawer = function(data) {
+  if (typeof data === 'string') {
+    if (window._sakhiDrawerItems && window._sakhiDrawerItems.has(data)) {
+      data = window._sakhiDrawerItems.get(data) || {};
+    } else {
+      data = { title: 'उपयोगकर्ता संवाद विवरण', sawal: data };
+    }
+  }
+  data = data || {};
   window._activeDrawerData = data;
   let backdrop = document.getElementById('sakhiDrawerBackdrop');
   let drawer = document.getElementById('sakhiDetailDrawer');
