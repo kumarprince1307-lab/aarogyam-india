@@ -291,6 +291,8 @@
         localStorage.removeItem('purchases');
         localStorage.removeItem('user_purchases');
         localStorage.removeItem('aim_purchases');
+        localStorage.removeItem('cached_purchases');
+        localStorage.removeItem('my_purchased_book_ids');
         localStorage.removeItem('aim_user_name');
         localStorage.removeItem('aim_user_mobile');
         localStorage.removeItem('aim_profile_completed');
@@ -316,6 +318,32 @@
         localStorage.removeItem('SAKHI_PERSONA_PROFILE');
         localStorage.removeItem('SAKHI_CURRENT_SESSION_ID');
         localStorage.removeItem('user_mobile');
+        localStorage.removeItem('user_share_id');
+        localStorage.removeItem('aim_user_share_id');
+        localStorage.removeItem('aarogyam_user_share_id');
+        localStorage.removeItem('AOI_USER_SHARE_ID');
+        localStorage.removeItem('AOI_SPONSOR_NAME');
+        localStorage.removeItem('AOI_SPONSOR_MOBILE');
+
+        // ⚠️ PURGE ALL WALLET, SHARE & REFERRAL LEDGER DATA (Prevents cross-account contamination)
+        localStorage.removeItem('AOI_WALLET_VAULT_V1');
+        localStorage.removeItem('AOI_WALLET_BALANCE');
+        localStorage.removeItem('AOI_DIRECT_REFERRALS');
+        localStorage.removeItem('AOI_DIRECT_REFERRALS_LEDGER');
+        localStorage.removeItem('AOI_TOTAL_SHARES');
+        localStorage.removeItem('AOI_SHARE_TELEMETRY');
+        localStorage.removeItem('AOI_PASSBOOK_CACHED_MOBILE');
+        localStorage.removeItem('AOI_ACTIVE_SESSION_MOBILE');
+        localStorage.removeItem('aarogyam_user_direct_referrals');
+        localStorage.removeItem('aarogyam_user_shares_count');
+        localStorage.removeItem('aarogyam_user_wallet_balance');
+        localStorage.removeItem('aim_user_direct_referrals');
+        localStorage.removeItem('aim_user_shares_count');
+        localStorage.removeItem('aim_user_wallet_balance');
+        localStorage.removeItem('AOI_WHATSAPP_OFFER_PURCHASES');
+        localStorage.removeItem('sakhi_chat_history');
+        localStorage.removeItem('AAROGYAM_SUPERADMIN_HARDWARE');
+
         localStorage.removeItem('AI_KHATABOOK_ENTRIES');
         localStorage.removeItem('AAROGYAM_SMART_DIARY_ENTRIES');
         localStorage.removeItem('AAROGYAM_SMART_CASHFLOW');
@@ -324,7 +352,17 @@
         try {
             for (let i = localStorage.length - 1; i >= 0; i--) {
                 const k = localStorage.key(i);
-                if (k && (k.startsWith('AI_KHATABOOK_') || k.startsWith('AAROGYAM_SMART_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_') || k.startsWith('aim_') || k.startsWith('ai_'))) {
+                if (k && (
+                    k.startsWith('AI_KHATABOOK_') || 
+                    k.startsWith('AAROGYAM_SMART_') || 
+                    k.startsWith('AI_KB_') || 
+                    k.startsWith('AI_DIARY_') || 
+                    k.startsWith('aim_') || 
+                    k.startsWith('ai_') ||
+                    k.startsWith('AOI_WALLET_VAULT_') ||
+                    k.startsWith('AI_PURCHASED_') ||
+                    k.startsWith('AOI_SHARE_')
+                )) {
                     localStorage.removeItem(k);
                 }
             }

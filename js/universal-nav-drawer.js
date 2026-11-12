@@ -677,11 +677,25 @@
       'SAKHI_USER_NAME', 'SAKHI_USER_PHONE', 'SAKHI_PERSONA_PROFILE', 'SAKHI_CURRENT_SESSION_ID',
       'AI_USER', 'AI_PROFILE', 'UCAS_USER', 'AI_SESSION', 'AI_LOGIN_STATUS',
       'my_purchased_book_ids', 'user_share_id', 'aim_user_share_id', 'aarogyam_user_share_id',
-      'AOI_SPONSOR_MOBILE', 'AOI_SPONSOR_NAME'
+      'AOI_USER_SHARE_ID', 'AOI_REFERRER_ID', 'AOI_SPONSOR_MOBILE', 'AOI_SPONSOR_NAME',
+      'AOI_WALLET_VAULT_V1', 'AOI_WALLET_BALANCE', 'AOI_DIRECT_REFERRALS', 'AOI_DIRECT_REFERRALS_LEDGER',
+      'AOI_TOTAL_SHARES', 'AOI_SHARE_TELEMETRY', 'AOI_PASSBOOK_CACHED_MOBILE', 'AOI_ACTIVE_SESSION_MOBILE',
+      'aarogyam_user_direct_referrals', 'aarogyam_user_shares_count', 'aarogyam_user_wallet_balance',
+      'aim_user_direct_referrals', 'aim_user_shares_count', 'aim_user_wallet_balance',
+      'AOI_WHATSAPP_OFFER_PURCHASES', 'AI_PURCHASES', 'purchases', 'user_purchases', 'aim_purchases', 'cached_purchases',
+      'sakhi_chat_history', 'AAROGYAM_SUPERADMIN_HARDWARE'
     ];
     keysToRemove.forEach(k => {
       try { localStorage.removeItem(k); } catch (_) {}
     });
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('AOI_WALLET_VAULT_') || k.startsWith('AI_PURCHASED_') || k.startsWith('AOI_SHARE_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_'))) {
+          localStorage.removeItem(k);
+        }
+      }
+    } catch (_) {}
     try {
       sessionStorage.removeItem('ads_gateway_passed');
       sessionStorage.removeItem('wb_registered');
