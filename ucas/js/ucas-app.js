@@ -1192,89 +1192,14 @@
   let ucasReferralPage = 1;
   const UCAS_REFERRAL_PAGE_SIZE = 10;
 
-  // 🔒 Sakhi Chat Lead Report Modal & Downloader
-  window.openSakhiChatUnlockModal = function(id, name, phone, topic, domain) {
-    let modal = document.getElementById('sakhiChatUnlockModal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'sakhiChatUnlockModal';
-      modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:99999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
-      document.body.appendChild(modal);
+  // 🏛️ Trigger Server Contribution & Chat Report Modal (₹51, ₹101, निःशुल्क)
+  window.openSakhiChatUnlockModal = function() {
+    if (window.UCAS_APP && typeof window.UCAS_APP.openTeamReportAnudanModal === 'function') {
+      window.UCAS_APP.openTeamReportAnudanModal();
+    } else {
+      const modal = document.getElementById('ucas-team-anudan-modal');
+      if (modal) modal.style.display = 'flex';
     }
-    
-    const waInquiryText = encodeURIComponent(`नमस्ते! मुझे आरोग्यम सखी AI पर अपने डायरेक्ट किसान ${name} (${phone}) की सम्पूर्ण सखी चैट व परामर्श रिपोर्ट डाउनलोड करनी है। कृपया इसे अनलॉक करें।`);
-    const waUnlockUrl = `https://api.whatsapp.com/send?phone=917974422572&text=${waInquiryText}`;
-
-    modal.innerHTML = `
-      <div style="background:#ffffff;border-radius:20px;max-width:460px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,0.35);border:1.5px solid #fed7aa;overflow:hidden;box-sizing:border-box;">
-        <div style="background:linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);padding:16px 20px;border-bottom:1.5px solid #fed7aa;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-weight:900;font-size:1.05rem;color:#9a3412;display:flex;align-items:center;gap:8px;">
-            <span>🌸</span> <span>ग्राहक सखी AI चैट रिपोर्ट अनलॉक करें</span>
-          </div>
-          <button type="button" onclick="document.getElementById('sakhiChatUnlockModal').style.display='none'" style="background:none;border:none;color:#9a3412;font-size:1.2rem;cursor:pointer;font-weight:900;">✕</button>
-        </div>
-
-        <div style="padding:18px 20px;box-sizing:border-box;">
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:14px;">
-            <div style="font-size:0.86rem;font-weight:800;color:#0f172a;">👤 ग्राहक: ${name}</div>
-            <div style="font-size:0.82rem;font-weight:700;color:#475569;margin-top:2px;">📱 मोबाइल: ${phone}</div>
-            <div style="font-size:0.78rem;font-weight:700;color:#d97706;margin-top:2px;">📂 श्रेणी: ${domain}</div>
-            <div style="margin-top:6px;padding:6px 8px;background:#fff;border-radius:8px;border:1px dashed #cbd5e1;font-size:0.76rem;color:#334155;">
-              🔒 <strong>सखी चैट सारांश:</strong> ग्राहक ने सखी AI से फसलों के रोग, जैविक खाद, दवा स्प्रे व सम्पूर्ण खुराक पर सवाल पूछे हैं।
-            </div>
-          </div>
-
-          <p style="font-size:0.84rem;color:#334155;line-height:1.5;margin-bottom:16px;">
-            इस ग्राहक की सम्पूर्ण सखी AI बातचीत, पूछे गए सवाल, रोग व दवा पर्चा विस्तृत PDF/टेक्स्ट रिपोर्ट में डाउनलोड करने हेतु नीचे दिए विकल्प चुनें:
-          </p>
-
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="${waUnlockUrl}" target="_blank" style="background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);color:#ffffff;text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:900;font-size:0.86rem;text-align:center;box-shadow:0 3px 10px rgba(22,163,74,0.3);display:flex;align-items:center;justify-content:center;gap:6px;">
-              <span>💬</span> <span>कस्टमर केयर से तुरंत चैट रिपोर्ट अनलॉक करें (₹29)</span>
-            </a>
-
-            <a href="/bundle.html" target="_blank" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#ffffff;text-decoration:none;padding:10px 16px;border-radius:12px;font-weight:800;font-size:0.82rem;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;">
-              <span>📚</span> <span>5-इन-1 किसान कॉम्बो बंडल लें (₹149 में सभी रिपोर्ट्स अनलॉक)</span>
-            </a>
-
-            <button type="button" onclick="document.getElementById('sakhiChatUnlockModal').style.display='none'" style="background:#f1f5f9;border:1px solid #cbd5e1;color:#475569;padding:9px;border-radius:10px;font-weight:800;font-size:0.8rem;cursor:pointer;">
-              रद्द करें (Cancel)
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-    modal.style.display = 'flex';
-  };
-
-  window.downloadSakhiChatReport = function(id, name, phone, topic, domain) {
-    const reportText = `=====================================================
-🌾 आरोग्यम सखी AI — ग्राहक परामर्श व चैट रिपोर्ट 🌾
-=====================================================
-तारीख: ${new Date().toLocaleDateString('hi-IN')}
-ग्राहक नाम: ${name}
-मोबाइल नंबर: ${phone}
-परामर्श श्रेणी: ${domain}
-मुख्य प्रश्न/विषय: "${topic}"
-
-📋 सखी AI परामर्श सारांश:
-• ग्राहक ने फसलों के रोग, जैविक खाद, दवा स्प्रे व सम्पूर्ण खुराक पर परामर्श प्राप्त किया।
-• अनुशंसित उत्पाद: स्टिमरिच (Biofit Stimrich) + बायोफिट लार्विसाइड + बायो-99।
-• आगामी कदम: ग्राहक से 25% छूट पर नेट्सर्फ उत्पादों के लिए संपर्क करें।
-
-Aarogyam India — भारत का डिजिटल कृषि व स्वास्थ्य मंच
-वेबसाइट: https://aarogyamindia.online
-=====================================================`;
-
-    const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Sakhi_Chat_Report_${phone || 'Farmer'}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   function renderProfileReferralsList(list, page = 1) {
@@ -1479,57 +1404,39 @@ Aarogyam India — भारत का डिजिटल कृषि व स�
                       if (!ins) {
                         return `<span style="color:#94a3b8;font-size:0.74rem;">सामान्य विज़िटर (कोई चैट नहीं)</span>`;
                       }
-                      const dom = ins.primary_domain || 'agri';
-                      let domLabel = '🌾 कृषि व फसल';
-                      let domColor = '#f59e0b';
-                      let domBg = '#fef3c7';
-                      if (dom.includes('health') || dom.includes('sugar')) { domLabel = '🩺 स्वास्थ्य व शुगर'; domColor = '#e11d48'; domBg = '#ffe4e6'; }
-                      else if (dom.includes('business') || dom.includes('netsurf')) { domLabel = '💼 नेट्सर्फ 25% छूट'; domColor = '#059669'; domBg = '#d1fae5'; }
-                      else if (dom.includes('pashu') || dom.includes('dairy')) { domLabel = '🐄 पशुपालन व डेयरी'; domColor = '#0284c7'; domBg = '#e0f2fe'; }
-                      else if (dom.includes('beauty')) { domLabel = '🌸 सौंदर्य व त्वचा'; domColor = '#9333ea'; domBg = '#f3e8ff'; }
 
-                      const topic = ins.last_query_topic || 'फसलों के रोग, स्प्रे व परामर्श';
                       const chats = ins.interaction_count || 1;
-
-                      // Check if report has been unlocked for this lead or if Master Admin
                       const isMasterAdmin = (String(currentUser.mobile || '') === '7974422572' || String(currentUser.share_id || '').toUpperCase() === 'AI000004');
-                      let unlockedReports = [];
-                      try { unlockedReports = JSON.parse(localStorage.getItem('AOI_UNLOCKED_SAKHI_CHATS') || '[]'); } catch(_) {}
-                      const isChatUnlocked = isMasterAdmin || unlockedReports.includes(r.id || r.mobile);
 
-                      const safeName = (r.full_name || 'किसान साथी').replace(/'/g, "\\'");
-                      const safeTopic = topic.replace(/'/g, "\\'");
-
-                      if (isChatUnlocked) {
+                      if (isMasterAdmin) {
+                        const topic = ins.last_query_topic || 'परामर्श प्रश्न';
                         return `
                           <div>
-                            <span style="background:${domBg};color:${domColor};font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:12px;display:inline-block;margin-bottom:3px;">
-                              ${domLabel} (${chats} चैट)
-                            </span>
+                            <div style="font-size:0.72rem;color:#166534;font-weight:800;margin-bottom:2px;">
+                              💬 ${chats} प्रश्न पूछे
+                            </div>
                             <div style="font-size:0.73rem;color:#334155;font-weight:700;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${topic}">
                               "${topic}"
                             </div>
-                            <button type="button" onclick="window.downloadSakhiChatReport('${r.id || ''}', '${safeName}', '${r.mobile || ''}', '${safeTopic}', '${domLabel}')" style="margin-top:3px;background:#ecfdf5;border:1px solid #10b981;color:#047857;font-size:0.68rem;font-weight:800;padding:2px 8px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
-                              <span>📥 चैट रिपोर्ट डाउनलोड</span>
+                            <button type="button" onclick="window.openSakhiChatUnlockModal()" style="margin-top:4px;background:#ecfdf5;border:1px solid #10b981;color:#047857;font-size:0.68rem;font-weight:800;padding:3px 8px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;">
+                              <span>📥 रिपोर्ट डाउनलोड</span>
                             </button>
                           </div>
                         `;
                       }
 
-                      // Blurred view for Active users wanting to unlock Sakhi Chat Details
+                      // Active user view: सवाल की श्रेणी व विषय छिपा/ब्लर रहेगा (सीधे ₹51/₹101/निःशुल्क मोडल खोलने का बटन)
                       return `
-                        <div style="position:relative;min-width:160px;max-width:210px;">
-                          <div style="filter:blur(4.5px);user-select:none;pointer-events:none;-webkit-user-select:none;">
-                            <span style="background:${domBg};color:${domColor};font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:12px;display:inline-block;margin-bottom:2px;">
-                              ${domLabel} (${chats} चैट)
-                            </span>
-                            <div style="font-size:0.73rem;color:#1e293b;font-weight:700;">
-                              "${topic}"
-                            </div>
+                        <div style="min-width:145px;max-width:190px;">
+                          <div style="font-size:0.72rem;color:#64748b;font-weight:800;margin-bottom:2px;">
+                            💬 ${chats} प्रश्न पूछे गए
                           </div>
-                          <div style="margin-top:4px;">
-                            <button type="button" onclick="window.openSakhiChatUnlockModal('${r.id || ''}', '${safeName}', '${r.mobile || ''}', '${safeTopic}', '${domLabel}')" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:none;font-size:0.68rem;font-weight:800;padding:3px 8px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;box-shadow:0 2px 5px rgba(217,119,6,0.3);">
-                              <span>🔒 चैट डाउनलोड अनलॉक करें</span>
+                          <div style="filter:blur(4.5px);user-select:none;pointer-events:none;-webkit-user-select:none;font-size:0.73rem;color:#0f172a;font-weight:700;line-height:1.2;">
+                            फसलों के रोग व सटीक स्प्रे दवा सलाह
+                          </div>
+                          <div style="margin-top:5px;">
+                            <button type="button" onclick="window.openSakhiChatUnlockModal()" style="background:linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);color:#f8fafc;border:1.5px solid #60a5fa;font-size:0.72rem;font-weight:800;padding:4px 10px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(30,58,138,0.35);">
+                              <span>🔒 क्या पूछा? चैट रिपोर्ट देखें</span>
                             </button>
                           </div>
                         </div>
