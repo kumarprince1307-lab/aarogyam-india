@@ -169,16 +169,16 @@ export async function initSakhiAiHub() {
         </div>
       </div>
 
-      <!-- KPI 4: Unanswered Queries Log -->
-      <div class="admin-card sakhi-clickable-card" id="kpiCardUnanswered" style="padding:18px;border-left:4px solid #f59e0b;background:var(--admin-surface,#1e293b);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;" title="क्लिक करें: छूटे हुए सवाल सूची पर जाएं">
+            <!-- KPI 4: Photo Vision & Crop Diagnosis (Zero Extra Egress) -->
+      <div class="admin-card sakhi-clickable-card" id="kpiCardPhotos" style="padding:18px;border-left:4px solid #ec4899;background:var(--admin-surface,#1e293b);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;" title="क्लिक करें: फोटो विज़न व फसल डायग्नोसिस लॉग">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:0.85rem;font-weight:600;color:var(--admin-muted,#94a3b8);">❓ छूटे हुए सवाल (Unanswered)</span>
-          <span style="font-size:1.2rem;">⚡</span>
+          <span style="font-size:0.85rem;font-weight:600;color:var(--admin-muted,#94a3b8);">📷 फोटो विज़न व डायग्नोसिस</span>
+          <span style="font-size:1.2rem;">🔬</span>
         </div>
-        <div style="font-size:2rem;font-weight:900;color:#facc15;margin-top:6px;" id="sakhiKpiUnanswered">--</div>
+        <div style="font-size:2rem;font-weight:900;color:#f472b6;margin-top:6px;" id="sakhiKpiPhotos">0</div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:0.78rem;color:var(--admin-muted,#94a3b8);">
-          <span>ज्ञान संवर्धन हेतु प्रतीक्षारत</span>
-          <span style="color:#facc15;font-weight:700;">👉 लॉग देखें</span>
+          <span>लाइव विज़न AI विश्लेषण</span>
+          <span style="color:#f472b6;font-weight:700;">👉 फोटो गिनती</span>
         </div>
       </div>
     </div>
@@ -638,50 +638,7 @@ export async function initSakhiAiHub() {
 
 
 
-    <!-- Unanswered Questions Log Section -->
-    <div class="admin-card" id="sakhiUnansweredSection" style="padding:22px;margin-bottom:24px;border:1px solid rgba(239,68,68,0.3);background:linear-gradient(135deg,rgba(239,68,68,0.04),transparent);border-radius:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-        <div>
-          <h3 style="font-size:1.25rem;font-weight:800;color:#f87171;display:flex;align-items:center;gap:8px;margin:0;">
-            <span>❓</span> छूटे हुए सवाल (Unanswered Queries Log)
-          </h3>
-          <p style="font-size:0.83rem;color:var(--admin-muted,#94a3b8);margin:4px 0 0 0;">
-            जब कोई उपयोगकर्ता ऐसा प्रश्न पूछता है जिसका उत्तर ज्ञानकोष में नहीं होता, तो वे यहाँ दर्ज होते हैं। आप 1-क्लिक में नया उत्तर जोड़ सकते हैं।
-          </p>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" class="admin-btn admin-btn-primary" style="background:#16a34a;border-color:#16a34a;font-weight:700;" id="sakhiOpenAddIntentBtn">
-            <span>+ नया सवाल व उत्तर जोड़ें</span>
-          </button>
-          <button type="button" class="admin-btn admin-btn-secondary" id="sakhiClearUnansweredBtn">
-            <span>🗑️ लॉग साफ करें</span>
-          </button>
-        </div>
-      </div>
-
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <table style="width:100%;border-collapse:collapse;font-size:0.84rem;color:var(--admin-text,#cbd5e1);min-width:680px;">
-          <thead>
-            <tr style="background:var(--admin-surface-2,#0f172a);border-bottom:1.5px solid var(--admin-border,#334155);text-align:left;">
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);width:45px;">#</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">यूजर का सवाल</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">डोमेन</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">यूजर / फोन</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);text-align:center;">बारम्बारता</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);">समय</th>
-              <th style="padding:10px 12px;color:var(--admin-muted,#94a3b8);text-align:right;">एक्शन</th>
-            </tr>
-          </thead>
-          <tbody id="sakhiUnansweredTableBody">
-            <tr>
-              <td colspan="7" style="text-align:center;padding:24px;color:var(--admin-muted,#64748b);">लॉग लोड हो रहा है...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- 20-Row Pagination Bar -->
-      <div id="sakhiUnansweredPaginationBar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--admin-border,#334155);"></div>
-    </div>
+    
 
     <!-- ========================================================================= -->
     <!-- 🌟 GEMINI 1.5 FLASH AI MASTER CONTROL & DAILY USAGE GRAPH -->
@@ -722,7 +679,7 @@ export async function initSakhiAiHub() {
           </div>
           <form onsubmit="return false;" autocomplete="off" style="margin:0;padding:0;">
             <div style="display:flex;gap:8px;">
-              <input type="password" id="geminiApiKeyInput" value="" placeholder="जेमिनी API टोकन" class="admin-input" autocomplete="new-password" style="flex:1;font-family:monospace;font-size:0.85rem;" />
+              <input type="text" id="geminiApiKeyInput" value="" placeholder="जेमिनी API टोकन" class="admin-input" autocomplete="off" data-lpignore="true" style="flex:1;font-family:monospace;font-size:0.85rem;-webkit-text-security:disc;" />
               <button type="button" id="saveGeminiApiKeyBtn" class="admin-btn admin-btn-primary" style="background:#0284c7;border-color:#0284c7;font-weight:800;">सेव</button>
             </div>
           </form>
@@ -810,59 +767,6 @@ export async function initSakhiAiHub() {
 
     <!-- ========================================================================= -->
     <!-- 🏛️ सखी ऑटो-लर्न डाटा बैंक (SAKHI AUTO-LEARNED QA VAULT) -->
-    <!-- ========================================================================= -->
-    <div class="admin-card" id="sakhi-learned-vault" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:2px solid #10b981;border-radius:14px;box-shadow:0 8px 24px rgba(16,185,129,0.18);">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:18px;border-bottom:1px solid var(--admin-border,#334155);padding-bottom:14px;">
-        <div>
-          <h2 style="font-size:1.35rem;font-weight:900;color:var(--admin-text,#f8fafc);display:flex;align-items:center;gap:10px;margin:0;">
-            <span style="font-size:1.6rem;">🏛️</span> सखी ऑटो-लर्न डाटा बैंक (Auto-Learned QA Vault)
-          </h2>
-          <p style="font-size:0.85rem;color:var(--admin-muted,#94a3b8);margin:5px 0 0 0;">
-            विकिपीडिया व डकडकगो से सखी AI द्वारा स्वचालित रूप से सीखे गए सवाल। 1-क्लिक अप्रूवल, रिजेक्शन व बल्क पर्ज।
-          </p>
-        </div>
-
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <button type="button" class="admin-btn admin-btn-secondary" id="adminExportVaultBtn" style="font-weight:700;">
-            <span>📥 JSON बैकअप</span>
-          </button>
-          <button type="button" class="admin-btn admin-btn-danger" id="adminBulkDenyVaultBtn" style="background:#ef4444;border-color:#ef4444;color:#fff;font-weight:700;">
-            <span>🚫 चुने हुए अस्वीकार करें</span>
-          </button>
-          <button type="button" class="admin-btn admin-btn-primary" id="adminBulkApproveVaultBtn" style="background:#16a34a;border-color:#16a34a;color:#fff;font-weight:700;">
-            <span>✔ चुने हुए स्वीकारें</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Quick Stats & Filter Tabs -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="all" style="background:#3b82f6;color:#fff;font-weight:800;">
-            सभी (<span id="adminVaultTotalCount">0</span>)
-          </button>
-          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="quarantine" style="background:var(--admin-surface-2,#0f172a);color:#facc15;border:1px solid #eab308;font-weight:800;">
-            🟡 क्वारंटीन (<span id="adminVaultQuarantineCount">0</span>)
-          </button>
-          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="approved" style="background:var(--admin-surface-2,#0f172a);color:#4ade80;border:1px solid #22c55e;font-weight:800;">
-            🟢 स्वीकृत (<span id="adminVaultApprovedCount">0</span>)
-          </button>
-          <button type="button" class="admin-btn admin-btn-sm admin-vault-filter-btn" data-filter="denied" style="background:var(--admin-surface-2,#0f172a);color:#f87171;border:1px solid #ef4444;font-weight:800;">
-            🔴 अस्वीकृत (<span id="adminVaultDeniedCount">0</span>)
-          </button>
-        </div>
-
-        <div style="display:flex;gap:8px;align-items:center;">
-          <input type="text" id="adminVaultSearchInput" placeholder="सवाल या उत्तर खोजें..." style="background:var(--admin-surface-2,#0f172a);color:var(--admin-text,#f8fafc);border:1.5px solid var(--admin-border,#334155);padding:6px 12px;border-radius:8px;font-size:0.82rem;min-width:220px;">
-        </div>
-      </div>
-
-      <!-- Vault Items List -->
-      <div id="adminVaultContainer" style="display:flex;flex-direction:column;gap:10px;max-height:480px;overflow-y:auto;padding-right:4px;">
-        <div style="text-align:center;padding:30px;color:var(--admin-muted,#64748b);">डेटा लोड हो रहा है...</div>
-      </div>
-    </div>
-
     <!-- No-Code Intent Creator Modal -->
     <div id="sakhiAddIntentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999999;align-items:center;justify-content:center;padding:16px;">
       <div style="background:var(--admin-surface,#1e293b);border:1.5px solid #3b82f6;border-radius:14px;max-width:550px;width:100%;padding:24px;box-shadow:0 12px 36px rgba(0,0,0,0.6);">
@@ -1149,12 +1053,16 @@ function renderKPIs(list) {
   const totalEl = document.getElementById('sakhiKpiTotalChats');
   const agriEl = document.getElementById('sakhiKpiAgriChats');
   const healthEl = document.getElementById('sakhiKpiHealthChats');
-  const unansweredEl = document.getElementById('sakhiKpiUnanswered');
+    const photosEl = document.getElementById('sakhiKpiPhotos');
 
   if (totalEl) totalEl.textContent = formatCompactNumber(totalChats);
   if (agriEl) agriEl.textContent = formatCompactNumber(agriChats);
   if (healthEl) healthEl.textContent = formatCompactNumber(healthChats);
-  if (unansweredEl) unansweredEl.textContent = formatCompactNumber(window.sakhiUnansweredQueries ? window.sakhiUnansweredQueries.length : 0);
+  if (photosEl) {
+    const list = window.sakhiAuditLogsList || [];
+    const photoCount = list.filter(l => (l.sawal || '').includes('फोटो') || (l.domain || '').includes('photo') || l.has_image).length;
+    photosEl.textContent = formatCompactNumber(photoCount || 0);
+  }
 }
 
 // ----------------------------------------------------
@@ -2572,7 +2480,18 @@ window.renderSakhiAuditTableRows = renderSakhiAuditTableRows;
     const profile = item.user_profile || 'guest';
     const cleanM = String(profile).replace(/\D/g, '').slice(-10);
     const resolvedName = profileNameMap.get(cleanM) || profileNameMap.get(String(profile)) || '';
+    // User daily question count badge
+    let todayUserCount = 1;
+    const itemDay = (item.date_time || '').slice(0, 10);
+    if (itemDay) {
+      todayUserCount = (sakhiAuditLogsList || []).filter(l => {
+        const d = (l.date_time || '').slice(0, 10);
+        const m = String(l.user_profile || '').replace(/\D/g, '').slice(-10);
+        return d === itemDay && (m === cleanM || l.user_profile === item.user_profile);
+      }).length || 1;
+    }
     const userDisplay = resolvedName ? `${resolvedName} (${cleanM || profile})` : profile;
+    const userBadgeHtml = `<div><div style="font-weight:700;color:#f8fafc;">${escapeHtml(resolvedName || userDisplay)}</div><div style="font-size:0.73rem;color:#38bdf8;margin-top:2px;display:inline-flex;align-items:center;gap:3px;background:rgba(56,189,248,0.12);padding:1px 6px;border-radius:6px;border:1px solid rgba(56,189,248,0.25);"><span>💬 आज के सवाल:</span> <strong>${todayUserCount}</strong></div></div>`;
 
     const rawJawab = item.jawab || '';
     let sawal = (item.sawal && item.sawal.trim()) ? item.sawal.trim() : '';
@@ -3167,14 +3086,15 @@ async function initGeminiControlCenter() {
   const currentKey = localStorage.getItem('SAKHI_GEMINI_API_KEY') || 'VERCEL_SHIELD_ACTIVE';
   if (keyInput) keyInput.value = currentKey;
 
-  // Toggle key visibility
+  // Toggle key visibility (Uses CSS text-security to avoid triggering browser password managers)
   if (toggleKeyBtn && keyInput) {
     toggleKeyBtn.onclick = () => {
-      if (keyInput.type === 'password') {
-        keyInput.type = 'text';
+      const isMasked = keyInput.style.webkitTextSecurity !== 'none';
+      if (isMasked) {
+        keyInput.style.webkitTextSecurity = 'none';
         toggleKeyBtn.textContent = '🙈 छुपाएं';
       } else {
-        keyInput.type = 'password';
+        keyInput.style.webkitTextSecurity = 'disc';
         toggleKeyBtn.textContent = '👁️ देखें';
       }
     };

@@ -1668,6 +1668,30 @@ if (typeof document !== 'undefined') {
   function classifyQueryDomain(cleanQuery) {
     const q = (cleanQuery || '').toLowerCase().trim();
 
+    // 0. TOP PRIORITY: PHYSICAL HEALTH & CLINICAL OVERRIDES (Never become business)
+    if (q.includes('jodo ke dard') || q.includes('jodo me dard') || q.includes('जोड़ों के दर्द') || q.includes('जोड़ों में दर्द') ||
+        q.includes('madhumeh') || q.includes('मधुमेह') || q.includes('sugar ka ilaj') || q.includes('शुगर का इलाज') ||
+        q.includes('ghutno me dard') || q.includes('घुटनों में दर्द') || q.includes('diabetic') || q.includes('कमजोरी और वजन')) {
+      return 'health';
+    }
+
+    // 0.1 APP INSTALLATION / PWA GUIDANCE
+    if (q.includes('download kaise karu') || q.includes('डाउनलोड कैसे करूं') || q.includes('app kaise download') || q.includes('install kaise kare')) {
+      return 'system';
+    }
+
+    // 0.2 AGRICULTURAL MICRONUTRIENTS, SPECIAL CROPS & DESI VOCABULARY
+    if (q.includes('हरा कशिश') || q.includes('hara kashish') || q.includes('फेरस सल्फेट') || q.includes('ferrous sulphate') ||
+        q.includes('बकरी की खाद') || q.includes('bakri ki khad') || q.includes('परवल') || q.includes('parwal') ||
+        q.includes('गन्ना') || q.includes('ganne') || q.includes('ganna') || q.includes('sugarcane') || q.includes('कंसुआ') || q.includes('लाल सड़न') || q.includes('पायरिला')) {
+      return 'agri';
+    }
+
+    // 0.3 GENERAL LITERATURE & CULTURE (Ramcharitmanas etc.)
+    if (q.includes('रामचरितमानस') || q.includes('ramcharitmanas') || q.includes('तुलसीदास') || q.includes('किसने लिखा था')) {
+      return 'omni';
+    }
+
     // Special compound & twist overrides
     // 1. Video hub vs Business eBook priority
     if ((q.includes('खेती के वीडियो नहीं') || q.includes('वीडियो नहीं')) && (q.includes('ई-बुक') || q.includes('किताब') || q.includes('कीमत') || q.includes('डाउनलोड'))) {
@@ -3919,10 +3943,63 @@ if (typeof document !== 'undefined') {
     ensureDateSeparator(wrap, now);
     saveChatLogItem('bot', htmlContent, speechText || '');
 
-    // 📚 CADENCE: Every 3 Bot Messages -> Book / 5+1 Bundle Ad Card
-    // 🌾 CADENCE: Every 5 Bot Messages -> Passbook / Bahi-Khata Card
+    // 📚 CADENCE & RED COUNTDOWN ALERT (Active vs Inactive User Engine)
     window._sakhiChatAdCounter = (window._sakhiChatAdCounter || 0) + 1;
     let inlineAdHtml = '';
+
+    // Check if user is Inactive (Free User)
+    let isUserInactive = true;
+    try {
+      const u = (typeof getCurrentSakhiUser === 'function' ? getCurrentSakhiUser() : null) ||
+                (window.UCAS_SESSION && window.UCAS_SESSION.getCurrentUser()) ||
+                (window.AarogyamWallet && window.AarogyamWallet.getCurrentUser()) || {};
+      if (u.is_active === true || u.is_active === 'true') isUserInactive = false;
+      const pur = JSON.parse(localStorage.getItem('AOI_PURCHASED_BOOKS') || '[]');
+      if (pur && pur.length > 0) isUserInactive = false;
+    } catch (_) { isUserInactive = true; }
+
+    // Trigger Red Countdown: After every photo upload OR every 11 queries ONLY for Inactive users!
+    const isPhotoQuery = Boolean(window._sakhiLastQueryWasPhoto);
+    window._sakhiLastQueryWasPhoto = false; // Reset flag
+    const isEvery11Query = (window._sakhiChatAdCounter % 11 === 0);
+
+    if (isUserInactive && (isPhotoQuery || isEvery11Query)) {
+      let remChats = 40;
+      let remImgs = 4;
+      try {
+        const qStats = JSON.parse(localStorage.getItem('SAKHI_DEVICE_QUOTA') || '{}');
+        const usedChats = Number(qStats.chats) || Math.min(window._sakhiChatAdCounter, 45);
+        const usedImgs = Number(qStats.images) || (isPhotoQuery ? 2 : 1);
+        remChats = Math.max(1, 50 - usedChats);
+        remImgs = Math.max(0, 5 - usedImgs);
+      } catch (_) {}
+
+      inlineAdHtml = `
+        <div class="sakhi-floating-wave-alert" style="margin-top:14px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg, rgba(239,68,68,0.08), rgba(220,38,38,0.14));border:1.5px solid #ef4444;box-shadow:0 6px 18px rgba(239,68,68,0.2);animation:sakhiWavePulse 2.8s infinite ease-in-out;">
+          <style>
+            @keyframes sakhiWavePulse {
+              0%, 100% { transform: translateY(0); box-shadow: 0 4px 15px rgba(239,68,68,0.18); }
+              50% { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(239,68,68,0.32); }
+            }
+          </style>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.86rem;font-weight:900;color:#ef4444;">
+              <span style="font-size:1.1rem;">⏳</span>
+              <span>सखी AI दैनिक कोटा अलर्ट</span>
+            </div>
+            <span style="font-size:0.74rem;background:#ef4444;color:#fff;padding:2px 8px;border-radius:10px;font-weight:800;">
+              शेष: ${remChats} सवाल | ${remImgs} फोटो
+            </span>
+          </div>
+          <p style="font-size:0.82rem;color:#b91c1c;margin:0 0 10px 0;line-height:1.45;">
+            💡 <strong>सखी AI लिमिट बढ़ाने के लिए 1 साल का सब्सक्रिप्शन बिल्कुल मुफ़्त!</strong> लाइब्रेरी से कोई भी <strong>1 ई-बुक</strong> लेने पर आईडी तुरंत <strong>एक्टिव + 10% लाइफटाइम कैशबैक</strong>।
+          </p>
+          <a href="/ebook-library.html" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;background:linear-gradient(135deg, #dc2626, #b91c1c);color:#ffffff;text-decoration:none;font-weight:900;font-size:0.86rem;padding:9px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(220,38,38,0.35);transition:transform 0.15s;">
+            <span>📚</span> <span>मेरी लाइब्रेरी / उपलब्ध पुस्तकें चुनें</span> <span>➔</span>
+          </a>
+        </div>
+      `;
+    }
     if (window._sakhiChatAdCounter % 5 === 0) {
       inlineAdHtml = renderInlinePassbookCardHtml();
     } else if (window._sakhiChatAdCounter % 3 === 0) {
@@ -9693,6 +9770,88 @@ ${drugDetails}
   function handleMasterCropAndPestIntelligence(cleanQ, query) {
     const q = (cleanQ || '').toLowerCase().trim();
     const rawQ = query || cleanQ;
+
+    // =========================================================================
+    // 🛡️ AAROGYAM SPECIFIC SPECIALIZED SOLUTIONS (Zero Hallucination / Zero TV-Serial)
+    // =========================================================================
+
+    // 1. HARA KASHISH (हरा कशिश = Ferrous Sulphate FeSO4)
+    if (q.includes('हरा कशिश') || q.includes('hara kashish') || q.includes('फेरस सल्फेट')) {
+      const resp = `🌿 **हरा कशिश (Ferrous Sulphate - $FeSO_4$) — कृषि में उपयोग, महत्व व सही डोज़:**\n\n• **हरा कशिश क्या है?** यह लोहे (Iron - 19%) और सल्फर का एक अत्यंत महत्वपूर्ण सूक्ष्म पोषक तत्व उर्वरक है। जब पौधों में लोहे की कमी से नई पत्तियां पीली पड़ जाती हैं और नसें हरी रहती हैं (Chlorosis), तब हरा कशिश रामबाण का काम करता है।\n\n🎯 **खेत में प्रयोग की 2 अचूक विधियां:**\n1. **पत्तियों पर स्प्रे (Foliar Spray):** 100 लीटर पानी में **500 ग्राम हरा कशिश + 250 ग्राम बुझा हुआ चूना** (ताकि पत्तियां न जलें) मिलाकर छिड़कें। साथ में **Bio-99 (5ml प्रति 15L पंप)** अवश्य मिलाएं।\n2. **जैविक विकल्प:** यदि तुरंत हरापन और फुटाव चाहिए, तो **बायोफिट स्टिमरिच (30ml) + शेत (30ml)** प्रति 15L पंप का स्प्रे करें।\n\n👉 **विशेष लाभ:** गन्ना, धान, मूंगफली और बेल वाली सब्जियों में पीलापन 48 से 72 घंटे में पूरी तरह खत्म होकर गहरा हरापन आ जाता है।`;
+      renderCrispSpecialBox('🌿 हरा कशिश (फेरस सल्फेट) — पीलापन दूर करने का संपूर्ण फॉर्मूला', resp, [
+        { text: '🌾 गेहूं में पीली पत्तियां ठीक करें', query: 'गेहूं में पीली पत्तियां ठीक करने की दवा' },
+        { text: '🌱 स्टिमरिच व बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+      ], 'agri', 'hara_kashish');
+      return true;
+    }
+
+    // 2. GOAT MANURE NUTRIENTS (बकरी की खाद के तत्व)
+    if ((q.includes('बकरी की खाद') || q.includes('bakri ki khad')) && (q.includes('तत्व') || q.includes('पोषण') || q.includes('फायदे') || q.includes('होते हैं') || q.includes('kya hota'))) {
+      const resp = `🐐 **बकरी की खाद (Goat Manure) में पोषक तत्व व वैज्ञानिक विश्लेषण:**\n\n• **पोषक तत्वों की मात्रा (NPK Analysis):** बकरी की खाद गाय/भैंस के गोबर से **दोगुने से तीन गुने तक अधिक शक्तिशाली** होती है:\n  1. **नाइट्रोजन (N):** 2.7% से 3.0% (पौधों की तेज बढ़वार व हरापन)\n  2. **फास्फोरस (P):** 1.4% से 1.8% (जड़ों का फैलाव व कल्ले फुटाव)\n  3. **पोटाश (K):** 2.8% से 3.2% (तने की मजबूती व रोग प्रतिरोधक क्षमता)\n  4. **कार्बनिक पदार्थ (Organic Carbon):** 60%+ (मिट्टी में जीवाणुओं की वृद्धि)\n\n🌾 **खेत में उपयोग का नियम:** 1 एकड़ में केवल 1 से 1.5 टन अच्छी सड़ी हुई बकरी की खाद 3 टन गोबर खाद के बराबर पैदावार देती है। इसे खेत की अंतिम जुताई के समय या बुवाई से 15 दिन पूर्व मिट्टी में मिलाएं।`;
+      renderCrispSpecialBox('🐐 बकरी की खाद — सम्पूर्ण पोषक तत्व व प्रयोग विधि', resp, [
+        { text: '🌱 जैविक खाद व जीवामृत डायरेक्टरी', query: 'जीवामृत और घनजीवामृत बनाने की विधि' },
+        { text: '🧪 शेत (SHET) जैविक बैक्टीरिया खाद', query: 'शेत सॉइल हेल्थ एनहांसमेंट टेक्नोलॉजी' },
+        { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+      ], 'agri', 'goat_manure');
+      return true;
+    }
+
+    // 3. POINTED GOURD TILLERING & WINTER DORMANCY (परवल फुटाव व मौसम प्रबंधन)
+    if (q.includes('परवल') || q.includes('parwal')) {
+      const resp = `🥒 **परवल की फसल में अधिक फुटाव, शाखाएं व मौसम प्रबंधन:**\n\n• **सर्दियों में सुषुप्तावस्था (Winter Dormancy):** नवंबर से जनवरी की ठंड में परवल की लताएं सुस्त हो जाती हैं। इस समय घबराएं नहीं, यह प्राकृतिक डोरमेंसी है।\n\n🎯 **अधिक फुटाव व बंपर फलन हेतु 3-चरणीय कार्य:**\n1. **कटाई-छंटाई (Pruning):** पुरानी, पीली और सूखी लताओं को मुख्य तने से 15-20 सेमी छोड़कर काट दें ताकि नए कल्ले फूटें।\n2. **जड़ों की गुड़ाई व खुराक:** जड़ों के चारों ओर 1 फीट दूर हल्की गुड़ाई करें और प्रति पौधा 2 किलो सड़ी गोबर खाद + 10ml **बायोफिट शेत (SHET)** का घोल डालें।\n3. **बसंत फुटाव स्प्रे (फरवरी-मार्च):** नई कोपलें निकलते ही **स्टिमरिच (30ml) + बायो-99 (5ml)** प्रति 15L पंप का छिड़काव करें। 10 दिन में अनगिनत नई फलदायी शाखाएं निकलेंगी।`;
+      renderCrispSpecialBox('🥒 परवल की उन्नत खेती व कल्ले फुटाव फॉर्मूला', resp, [
+        { text: '🌱 स्टिमरिच टॉनिक का उपयोग', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' },
+        { text: '🛡️ फंगस व जड़ गलन रोकथाम', query: 'सब्जी में फंगस व जड़ गलन की दवा' },
+        { text: '📖 सब्जी खेती मास्टर गाइड', url: '/ebooks/book-landing.html?id=BK015', isExternal: true }
+      ], 'agri', 'parwal_care');
+      return true;
+    }
+
+    // 4. SUGARCANE DOMAIN MASTERY (गन्ना सम्पूर्ण वैज्ञानिक व जैविक ज्ञान बैंक)
+    if (q.includes('गन्ना') || q.includes('ganne') || q.includes('ganna') || q.includes('sugarcane') || q.includes('ईख') || q.includes('पेड़ी') || q.includes('कंसुआ') || q.includes('लाल सड़न') || q.includes('पायरिला')) {
+      
+      // 4A. Red Rot (लाल सड़न / गन्ने का कैंसर)
+      if (q.includes('लाल सड़न') || q.includes('red rot') || q.includes('सड़न') || (q.includes('अंदर से लाल') && q.includes('शराब जैसी बदबू'))) {
+        const resp = `🎋 **गन्ने में लाल सड़न (Red Rot - Colletotrichum falcatum) — पहचान व रोकथाम:**\n\n• **रोग के लक्षण:** गन्ने की तीसरी-चौथी पत्ती पीली पड़कर सूखती है। तने को बीच से चीरने पर अंदर का गूदा लाल दिखता है जिस पर सफेद धारियां होती हैं और गन्ने से सिरके/शराब जैसी खट्टी बदबू आती है। इसे 'गन्ने का कैंसर' कहते हैं।\n\n🛡️ **सटीक जैविक व वैज्ञानिक रोकथाम:**\n1. **रोगग्रस्त पौधे उखाड़ें:** खेत में जहां भी लाल सड़न वाला पौधा दिखे, उसे तुरंत जड़ सहित उखाड़कर खेत से बाहर जला दें और उस गड्ढे में 50 ग्राम बुझा चूना या ब्लीचिंग पाउडर डालें।\n2. **जैविक फंगस नियंत्रण (ड्रिप/नाली):** प्रति एकड़ 1 लीटर **बायोफिट शेत (SHET) + 2 किग्रा ट्राइकोडर्मा विरिडी** को 200 लीटर पानी में मिलाकर सिंचाई के साथ खेत में दें।\n3. **छिड़काव:** **बायोफिट रैप-अप (Wrap Up 35ml) + Bio-99 (5ml)** प्रति 15L पंप 10 दिन के अंतराल पर 2 बार छिड़कें।\n\n⚠️ **भविष्य हेतु सावधानी:** रोगग्रस्त खेत से अगले वर्ष बीज कभी न लें और फसल चक्र अपनाएं।`;
+        renderCrispSpecialBox('🎋 गन्ने का लाल सड़न (Red Rot) सम्पूर्ण रोकथाम फॉर्मूला', resp, [
+          { text: '🌱 गन्ने में कल्ले व फुटाव बढ़ाएं', query: 'गन्ने में कल्ले और फुटाव कैसे बढ़ाएं' },
+          { text: '🧪 शेत (SHET) ड्रिप/सिंचाई उपयोग', query: 'शेत सॉइल हेल्थ एनहांसमेंट टेक्नोलॉजी' },
+          { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+        ], 'agri', 'sugarcane_red_rot');
+        return true;
+      }
+
+      // 4B. Early Shoot Borer / Kansua (कंसुआ / तना छेदक)
+      if (q.includes('कंसुआ') || q.includes('तना छेदक') || q.includes('shoot borer') || q.includes('top borer') || q.includes('गोभ सूख') || q.includes('dead heart') || q.includes('चोटी छेदक')) {
+        const resp = `🐛 **गन्ने में कंसुआ (Early Shoot Borer) व चोटी छेदक की 100% अचूक रोकथाम:**\n\n• **पहचान:** बुवाई के 30 से 60 दिन बाद गन्ने की मुख्य गोभ सूख जाती है (Dead Heart)। खींचने पर गोभ आसानी से निकल आती है और बदबू देती है।\n\n🎯 **3-चरणीय अचूक स्प्रे फॉर्मूला (प्रति 15 लीटर पंप):**\n1. **जैविक कीट संहारक:** **बायोफिट इंटैक्ट (Intact) 35ml + Bio-99 5ml** मिलाकर पौधों की जड़ों और तने को अच्छी तरह भिगोते हुए छिड़कें।\n2. **रासायनिक आपातकालीन विकल्प:** यदि सुंडी बहुत तेज हो तो क्लोरेंट्रानिलिप्रोल (Coragen 18.5% SC) 150ml प्रति 200 लीटर पानी प्रति एकड़ या फिप्रोनिल 0.3% GR 8-10 किग्रा/एकड़ पहली सिंचाई से पूर्व डालें।\n3. **पेड़ी गन्ने में विशेष:** पुरानी पत्तियों (पाती) को जलाएं नहीं, बल्कि शेत का पानी देकर सड़ाएं जिससे कंसुआ के प्यूपा नष्ट हो जाएं।`;
+        renderCrispSpecialBox('🐛 गन्ने में कंसुआ व तना छेदक की रोकथाम', resp, [
+          { text: '🧪 बायोफिट इंटैक्ट कीटनाशक', query: 'इंटैक्ट जैविक कीटनाशक रस चूसक कीट' },
+          { text: '🎋 गन्ने की उन्नत खाद व स्प्रे चार्ट', query: 'गन्ने की फसल का संपूर्ण स्प्रे कैलेंडर' },
+          { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+        ], 'agri', 'sugarcane_borer');
+        return true;
+      }
+
+      // 4C. Seed Set Treatment (बीज शोधन)
+      if (q.includes('बीज') || q.includes('शोधन') || q.includes('ट्रीटमेंट') || q.includes('set treatment') || q.includes('बुवाई') || q.includes('अंकुरण')) {
+        const resp = `🎋 **गन्ना बीज शोधन (Set Treatment) — 95%+ बंपर अंकुरण का फॉर्मूला:**\n\n• **शोधन क्यों आवश्यक है?** गन्ने के टुकड़ों में मिट्टी और फंगस के कारण 30-40% आंखें सड़ जाती हैं। सही उपचार से 95% से अधिक स्वस्थ कल्ले निकलते हैं।\n\n🎯 **100 लीटर पानी का शोधन घोल बनाएं:**\n1. **बायोफिट स्टिमरिच (Stimrich):** 250 ml (अंकुरण गति व शुरुआती जड़ों का जाल)\n2. **बायो-99 (Bio-99):** 100 ml (दवा को गहराई तक पहुंचाने हेतु)\n3. **बायोफिट शेत (SHET) या ट्राइकोडर्मा:** 250 ml (उकठा व लाल सड़न फंगस सुरक्षा)\n\n👉 **विधि:** 2-3 आंख वाले गन्ने के टुकड़ों को इस घोल में 15 मिनट डुबोएं, फिर छाया में 30 मिनट सुखाकर तुरंत खेत में नाली बनाकर बुवाई करें।`;
+        renderCrispSpecialBox('🎋 गन्ना बीज शोधन (Set Treatment) संपूर्ण विधि', resp, [
+          { text: '🌱 कल्ले व फुटाव बढ़ाने का शेड्यूल', query: 'गन्ने में कल्ले और फुटाव कैसे बढ़ाएं' },
+          { text: '🧪 स्टिमरिच + बायो-99 की सही डोज', query: 'स्टिमरिच और बायो-99 की सही डोज क्या है?' }
+        ], 'agri', 'sugarcane_seed');
+        return true;
+      }
+
+      // 4D. General Tillering & Growth (कल्ले, मोटाई व खाद प्रबंधन)
+      const resp = `🎋 **गन्ने में रिकॉर्ड कल्ले, मोटाई व बंपर पैदावार का संपूर्ण शेड्यूल:**\n\n• **1. पहली सिंचाई (बुवाई के 35-40 दिन):** नाली/ड्रिप में प्रति एकड़ **1 लीटर बायोफिट शेत (SHET)** पानी के साथ चलाएं (जड़ों का गहरा विकास व मिट्टी मुलायम)।\n• **2. कल्ले फुटाव अवस्था (50-60 दिन):** **स्टिमरिच 35ml + Bio-99 5ml + 19:19:19 75g** प्रति 15L पंप का छिड़काव करें। इससे प्रति आंख 8 से 12 मोटे कल्ले निकलेंगे।\n• **3. मिट्टी चढ़ाना व मोटाई (90-100 दिन):** प्रति एकड़ 1 बैग डीएपी + 25 किग्रा पोटाश + 250ml **बायोफिट एनपीके (NPK Biofertilizer)** देकर गन्ने पर अच्छी मिट्टी चढ़ाएं।\n• **4. भारी वजन व मिठास (150 दिन):** एनपीके 0:0:50 (75g) + बोरॉन 20g प्रति पंप का छिड़काव करें (ठोस गन्ना, बिना पोलापन)।`;
+      renderCrispSpecialBox('🎋 गन्ने की वैज्ञानिक खेती व कल्ले फुटाव सम्पूर्ण कैलेंडर', resp, [
+        { text: '🐛 कंसुआ व तना छेदक रोकथाम', query: 'गन्ने में कंसुआ और तना छेदक की दवा' },
+        { text: '🎋 लाल सड़न (Red Rot) रोकथाम', query: 'गन्ने में लाल सड़न रोग का इलाज' },
+        { text: '📖 खेती का डॉक्टर ई-बुक', url: '/ebooks/book-landing.html?id=BK002', isExternal: true }
+      ], 'agri', 'sugarcane_schedule');
+      return true;
+    }
 
     // DIRECT BUSINESS INTENT & NEGATION GUARDRAIL:
     // If user says "मैंने चने के लिए नहीं नेट सर्फ प्लान के बारे में पूछा था" or asks pure NetSurf questions,
