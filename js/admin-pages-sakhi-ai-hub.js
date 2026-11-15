@@ -295,65 +295,6 @@ export async function initSakhiAiHub() {
       </div>
     </div>
 
-    <!-- Live AI Test Console (डोमेन शील्ड व सटीक उत्तर परीक्षक) -->
-    <div class="admin-card" style="padding:22px;margin-bottom:24px;background:var(--admin-surface,#1e293b);border:1px solid var(--admin-border,#334155);border-radius:14px;box-shadow:var(--admin-shadow-sm,0 6px 18px rgba(0,0,0,0.3));">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <h3 style="font-size:1.2rem;font-weight:800;color:var(--admin-text,#f8fafc);margin:0;display:flex;align-items:center;gap:8px;">
-          <span>⚡</span> लाइव AI टेस्ट कंसोल (डोमेन शील्ड व सटीक उत्तर परीक्षक)
-        </h3>
-        <span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:800;">
-          100% एक्टिव व सुरक्षित
-        </span>
-      </div>
-      <p style="font-size:0.84rem;color:var(--admin-muted,#94a3b8);margin-bottom:14px;">
-        सखी AI के न्यूरल रिस्पांस को लाइव टेस्ट करें। किसी भी बटन पर क्लिक करें या नीचे अपना सवाल लिखकर 'टेस्ट करें' दबाएं।
-      </p>
-
-      <!-- Input Bar -->
-      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-        <input 
-          type="text" 
-          id="sakhiTestInput" 
-          class="admin-input" 
-          placeholder="उदा: गेहूं में कल्ले कैसे बढ़ाएं, शुगर और सेक्सुअल कमजोरी, गाय का दूध बढ़ाना, नेट्सर्फ 8.19 लाख..." 
-          style="flex:1;min-width:260px;background:var(--admin-surface-2,#0f172a);color:var(--admin-text,#f8fafc);border:1.5px solid var(--admin-border,#334155);border-radius:8px;padding:10px 14px;font-size:0.92rem;" 
-        />
-        <button 
-          type="button" 
-          class="admin-btn admin-btn-primary" 
-          id="sakhiTestSubmitBtn" 
-          style="background:#3b82f6;border-color:#3b82f6;font-weight:700;padding:10px 22px;border-radius:8px;"
-        >
-          <span>🚀 टेस्ट करें</span>
-        </button>
-      </div>
-
-      <!-- Quick Test Chips -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-        <button type="button" class="sakhi-test-chip" data-query="गेहूं में कल्ले व बढ़वार कैसे बढ़ाएं?">🌾 गेहूं कल्ले व बढ़वार</button>
-        <button type="button" class="sakhi-test-chip" data-query="चना में इल्ली व फली छेदक का जैविक इलाज">🐛 चना इल्ली व फली छेदक</button>
-        <button type="button" class="sakhi-test-chip" data-query="डायबिटीज में क्या खाएं और शुगर कैसे कंट्रोल करें?">🩺 डायबिटीज व शुगर डाइट</button>
-        <button type="button" class="sakhi-test-chip" data-query="मुझे सेक्सुअल प्रॉब्लम भी है और डायबिटीज भी है">⚡ सेक्सुअल प्रॉब्लम व शुगर (Dual Intent)</button>
-        <button type="button" class="sakhi-test-chip" data-query="गाय-भैंस का दूध और फैट कैसे बढ़ाएं?">🐄 दूध व फैट बढ़ाना (CFC)</button>
-        <button type="button" class="sakhi-test-chip" data-query="नेट्सर्फ में 8.19 लाख कैपिंग प्लान कैसे काम करता है?">💼 नेट्सर्फ 8.19L प्लान</button>
-        <button type="button" class="sakhi-test-chip" data-query="बच्चे को 102 बुखार है क्या दवा दें?">👶 बच्चे को 102 बुखार (सेफ्टी चेक)</button>
-        <button type="button" class="sakhi-test-chip" data-query="अवनीश जी कौन हैं और आरोग्यम का विजन क्या है?">👑 अवनीश जी कौन हैं?</button>
-      </div>
-
-      <!-- High-Contrast Formatted Output Box -->
-      <div 
-        id="sakhiTestOutput" 
-        style="background:var(--admin-surface-2,#0f172a);border-radius:12px;padding:18px;border:1.5px solid var(--admin-border,#334155);font-size:0.88rem;color:var(--admin-text,#f8fafc);min-height:160px;max-height:450px;overflow-y:auto;box-shadow:inset 0 2px 8px rgba(0,0,0,0.25);"
-      >
-        <div style="color:var(--admin-muted,#94a3b8);text-align:center;padding:45px 15px;">
-          <div style="font-size:2rem;margin-bottom:8px;">💡</div>
-          <div style="font-weight:700;color:var(--admin-text,#f8fafc);">ऊपर दिए गए किसी भी बटन पर क्लिक करें या अपना सवाल टाइप करके 'टेस्ट करें' दबाएं।</div>
-          <div style="font-size:0.8rem;margin-top:4px;">सखी AI का न्यूरल इंजन 100% डोमेन आइसोलेशन के साथ तुरंत वैज्ञानिक उत्तर दिखाएगा।</div>
-        </div>
-      </div>
-    </div>
-
-
     <!-- ========================================================================= -->
     <!-- 🧪 सखी AI टेस्ट व दैनिक ऑडिट कंसोल (SAKHI TEST & AUDIT CONSOLE) -->
     <!-- ========================================================================= -->
@@ -613,13 +554,12 @@ export async function initSakhiAiHub() {
           <thead>
             <tr style="background:#0f172a;border-bottom:2px solid #334155;text-align:left;">
               <th style="padding:10px 12px;color:#94a3b8;width:45px;">#</th>
-              <th style="padding:10px 12px;color:#94a3b8;min-width:170px;">👤 टीम सदस्य (नाम व मोबाइल)</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:180px;">👤 टीम सदस्य (नाम, मोबाइल व स्थिति)</th>
               <th style="padding:10px 12px;color:#94a3b8;min-width:120px;">📍 राज्य / ज़िला</th>
               <th style="padding:10px 12px;color:#94a3b8;min-width:140px;">👑 स्पॉन्सर / Upline</th>
-              <th style="padding:10px 12px;color:#94a3b8;text-align:center;width:95px;">💬 कुल सवाल</th>
-              <th style="padding:10px 12px;color:#94a3b8;min-width:200px;">🎯 रुचि अंतर्दृष्टि (Domain Breakdown)</th>
-              <th style="padding:10px 12px;color:#94a3b8;min-width:180px;">🛍️ सुझाई गई किताब / बिज़नेस पिच</th>
-              <th style="padding:10px 12px;color:#94a3b8;width:100px;">📅 अंतिम सक्रिय</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:240px;">💬 पूछा गया सवाल (Daily Chat Log)</th>
+              <th style="padding:10px 12px;color:#94a3b8;min-width:140px;">🎯 मुख्य डोमेन</th>
+              <th style="padding:10px 12px;color:#94a3b8;width:100px;">📅 तारीख</th>
               <th style="padding:10px 12px;color:#94a3b8;text-align:right;width:100px;">📲 संपर्क</th>
             </tr>
           </thead>
@@ -837,14 +777,11 @@ export async function initSakhiAiHub() {
   // Setup Event Listeners & Load Real Data
   setupSakhiAdminEvents();
   await loadKnowledgeDataForAdmin();
+  await fetchAndRenderSakhiAuditLogs();
   await fetchAndRenderSakhiInsights();
-  await initSakhiTeamLeadsHub();
-  await renderUnansweredQueries();
   setupSakhiAuditEvents();
   updateAuditMasterUI();
-  await fetchAndRenderSakhiAuditLogs();
-  setupSakhiVaultAdminEvents();
-  await fetchAndRenderSakhiVaultData();
+  await initSakhiTeamLeadsHub();
   await initGeminiControlCenter();
   setupAdminModerationEvents();
 }
@@ -1475,309 +1412,14 @@ function getDomainBadge(dom) {
 }
 
 // ----------------------------------------------------
-// 100% RELIABLE LIVE AI TEST CONSOLE (DOMAINS & SAFETY)
-// ----------------------------------------------------
-function runAdminSakhiTest(query) {
-  const output = document.getElementById('sakhiTestOutput');
-  if (!output) return;
-
-  const q = (query || '').trim();
-  if (!q) return;
-
-  const qLower = q.toLowerCase();
-
-  // Tier 1: Check Custom Stored Intents
-  try {
-    const customList = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_INTENTS') || '[]');
-    for (const c of customList) {
-      const match = (c.keywords || []).some(k => qLower.includes(k.toLowerCase())) ||
-                    (c.title && qLower.includes(c.title.toLowerCase()));
-      if (match) {
-        renderTestResult({
-          domain: c.domain || 'agri',
-          domainTitle: 'कस्टम इंटेंट (No-Code)',
-          intent: c.title,
-          confidence: '99.9%',
-          answer: c.ayurvedic_protocol || (c.responses ? c.responses[0] : ''),
-          products: 'अनुमोदित जैविक व आयुर्वेदिक उत्पाद',
-          ebook: 'BK001 (आरोग्यम संपूर्ण मार्गदर्शिका)',
-          firewallPassed: true
-        });
-        return;
-      }
-    }
-  } catch (_) {}
-
-  // Tier 2: Precision Clinical & Agro Expert Simulator (100% Guaranteed Hit)
-  
-  // 1. DUAL INTENT: Sexual Wellness + Diabetes
-  if ((qLower.includes('सेक्स') || qLower.includes('कमजोरी') || qLower.includes('शीघ्रपतन') || qLower.includes('धातु')) &&
-      (qLower.includes('शुगर') || qLower.includes('डायबिटीज') || qLower.includes('मधुमेह'))) {
-    renderTestResult({
-      domain: 'health_wellness_dual',
-      domainTitle: 'समन्वित वेलनेस (Dual Intent: Diabetes + Vitality)',
-      intent: 'मधुमेह जनित नसों की कमजोरी व वाइटैलिटी सुरक्षा',
-      confidence: '99.8%',
-      answer: `🩺 <strong>डायबिटिक न्यूरोपैथी व पौरुष स्वास्थ्य समाधान:</strong><br>
-• <strong>कारण:</strong> लंबे समय तक ब्लड शुगर असंतुलित रहने से पेल्विक नसों और सूक्ष्म रक्त वाहिकाओं (Micro-capillaries) में रक्त संचार धीमा हो जाता है, जिससे कमजोरी महसूस होती है।<br>
-• <strong>सावधानी:</strong> बाजारू केमिकल उत्तेजक गोलियां बिल्कुल न लें, यह हृदय और किडनी के लिए बेहद घातक हैं।<br>
-• <strong>आयुर्वेदिक समाधान:</strong> शुद्ध शतावरी, कौंच बीज, अश्वगंधा व गिलोय का वैज्ञानिक संयोजन। साथ ही इंसुलिन सेंसिटिविटी के लिए जामुन-करेला रस लें।<br>
-• <strong>गोपनीय सलाह:</strong> आरोग्यम इंडिया की विशेषज्ञ मेडिकल विंग द्वारा प्रमाणित गोपनीय परामर्श उपलब्ध है।`,
-      products: 'नेचुरामोर फॉर मेन (Naturamore for Men), लाइफस्टाइल प्लस, जामुन सिरका',
-      ebook: 'BK015 (मधुमेह मुक्ति व पौरुष रक्षा गाइड)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 2. Sensitive / Sexual Wellness Standalone
-  if (qLower.includes('सेक्स') || qLower.includes('शीघ्रपतन') || qLower.includes('कमजोरी') || qLower.includes('धातु') || qLower.includes('स्वप्नदोष')) {
-    renderTestResult({
-      domain: 'wellness',
-      domainTitle: 'पर्सनल व सेक्सुअल वेलनेस (Confidential Care)',
-      intent: 'पौरुष शक्ति, नसों की ताकत व तनाव मुक्ति',
-      confidence: '99.4%',
-      answer: `⚡ <strong>आयुर्वेदिक वाइटैलिटी व शक्ति संवर्धन प्रोटोकॉल:</strong><br>
-• <strong>वैज्ञानिक विश्लेषण:</strong> मानसिक तनाव, अत्यधिक हस्तमैथुन की चिंता, या वात-पित्त असंतुलन से शुक्र धातु क्षीण होती है।<br>
-• <strong>आहार व जीवनशैली:</strong> खट्टे, बासी और अत्यधिक तीखे भोजन से परहेज करें। रात को गुनगुने दूध के साथ बादाम, मुनक्का और अंजीर का सेवन करें।<br>
-• <strong>हर्बल समाधान:</strong> अश्वगंधा, मूसली व गोक्षुर का प्रमाणित अर्क नसों को मजबूत करता है और प्राकृतिक स्टैमिना बढ़ाता है।`,
-      products: 'नेचुरामोर मेन्स वेलनेस, शतावरी चूर्ण, ब्राह्मी वटी',
-      ebook: 'BK018 (आरोग्यम पौरुष व वाइटैलिटी विशेष)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 3. Child Pediatric Safety (बच्चे को बुखार)
-  if (qLower.includes('बच्चे') || qLower.includes('शिशु') || (qLower.includes('बुखार') && qLower.includes('102'))) {
-    renderTestResult({
-      domain: 'health_pediatric',
-      domainTitle: 'बाल स्वास्थ्य सुरक्षा (Pediatric Guardrail)',
-      intent: 'शिशु व बाल ज्वर सुरक्षा प्रोटोकॉल',
-      confidence: '99.9%',
-      answer: `👶 <strong>शिशु ज्वर (बुखार) सुरक्षा परामर्श:</strong><br>
-• <strong>तत्काल प्राथमिक उपचार:</strong> गुनगुने या ताजे पानी की पट्टियां माथे और हथेलियों पर रखें (बर्फ का पानी बिल्कुल न लगाएं)।<br>
-• <strong>हाइड्रेशन:</strong> ओआरएस (ORS) का घोल या उबला हुआ ठंडा पानी थोड़ा-थोड़ा पिलाते रहें ताकि डिहाइड्रेशन न हो।<br>
-• <strong>⚠️ सख्त सुरक्षा चेतावनी:</strong> बच्चों को बिना शिशु रोग विशेषज्ञ (Pediatrician) की सलाह के कोई भी ओवर-द-काउंटर दवा या भारी एंटीबायोटिक न दें। तुरंत नजदीकी डॉक्टर से परामर्श करें।`,
-      products: 'ओआरएस घोल, तुलसी अर्क (बच्चों हेतु डॉक्टर की सलाह पर)',
-      ebook: 'BK014 (शिशु व मातृत्व सुरक्षा गाइड)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 4. Wheat Farming (गेहूं कल्ले, पीला रतुआ)
-  if (qLower.includes('गेहूं') || qLower.includes('कल्ले') || qLower.includes('रतुआ') || qLower.includes('wheat')) {
-    renderTestResult({
-      domain: 'agri',
-      domainTitle: 'कृषि व फसल सुरक्षा (Wheat Mastery)',
-      intent: 'गेहूं में कल्ले, जड़ विकास व पीला रतुआ नियंत्रण',
-      confidence: '99.7%',
-      answer: `🌾 <strong>गेहूं कल्ले व फुटाव का वैज्ञानिक स्प्रे कैलेंडर:</strong><br>
-• <strong>क्राउन रूट अवस्था (21-25 दिन):</strong> पहली सिंचाई के बाद जब खेत चलने लायक हो, <strong>स्टीमरिच (Stimrich) 2ml + बायो-99 (Bio-99) 0.5ml प्रति लीटर पानी</strong> में मिलाकर स्प्रे करें।<br>
-• <strong>कल्लों की संख्या:</strong> यह जड़ में ऑक्सिन हॉर्मोन सक्रिय कर प्रति पौधे 25-35 मजबूत कल्ले बनाता है।<br>
-• <strong>पीला रतुआ से बचाव:</strong> मौसम में नमी होने पर बायोफिट रैप-अप (Wrap-up) 2ml/L का छिड़काव सुरक्षा कवच बनाता है।`,
-      products: 'स्टीमरिच (Stimrich), बायो-99 (Bio-99), रैप-अप (Wrap-up), शेत (SHET)',
-      ebook: 'BK001 (गेहूं बंपर उत्पादन मास्टरक्लास)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 5. Mustard / Chana / Legumes (चना इल्ली, सरसों चेपा)
-  if (qLower.includes('चना') || qLower.includes('इल्ली') || qLower.includes('सरसों') || qLower.includes('चेपा') || qLower.includes('माहू')) {
-    renderTestResult({
-      domain: 'agri',
-      domainTitle: 'कृषि व दलहन/तिलहन (Pulses & Oilseeds)',
-      intent: 'चना में फली छेदक इल्ली व सरसों चेपा नियंत्रण',
-      confidence: '99.5%',
-      answer: `🐛 <strong>चना इल्ली व कीट सुरक्षा जैविक समाधान:</strong><br>
-• <strong>चना फली छेदक (Helicoverpa):</strong> फूल आने के तुरंत बाद बायोफिट बायो-99 (0.5ml) के साथ जैविक नीम अर्क या अनुशंसित जैविक कीटनाशक का पहला स्प्रे करें।<br>
-• <strong>सरसों चेपा/माहू:</strong> बादल छाए रहने पर चेपा तेजी से फैलता है। बायो-99 के साथ समय पर स्प्रे करें जिससे दवा पत्तियों पर चिपक कर 100% असर दिखाए।<br>
-• <strong>पैदावार वृद्धि:</strong> फलियां बनते समय स्टीमरिच स्प्रे से दानों में चमक और वजन 20-30% बढ़ जाता है।`,
-      products: 'बायो-99 (Bio-99), स्टीमरिच, रैप-अप (Wrap-up)',
-      ebook: 'BK001 (दलहन व तिलहन संपूर्ण सुरक्षा)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 6. Diabetes / Sugar Diet
-  if (qLower.includes('शुगर') || qLower.includes('डायबिटीज') || qLower.includes('मधुमेह') || qLower.includes('sugar')) {
-    renderTestResult({
-      domain: 'health',
-      domainTitle: 'स्वास्थ्य व क्रॉनिक केयर (Diabetes Care)',
-      intent: 'मधुमेह व ब्लड शुगर प्राकृतिक नियंत्रण व डाइट',
-      confidence: '99.6%',
-      answer: `🩺 <strong>डायबिटीज रिवर्सल व ब्लड शुगर डाइट चार्ट:</strong><br>
-• <strong>कार्यप्रणाली:</strong> पैंक्रियाज की बीटा कोशिकाओं को पुनर्जीवित करने और इंसुलिन रेसिस्टेंस घटाने पर ध्यान दें।<br>
-• <strong>डाइट प्रोटोकॉल:</strong> सुबह खाली पेट मेथी दाना पानी, भोजन में 50% कच्चा सलाद, जामुन सिरका व जौ-चने का आटा उपयोग करें। चीनी, मैदा व पैकेटबंद भोजन तुरंत बंद करें।<br>
-• <strong>आयुर्वेदिक पोषण:</strong> नेचुरामोर हर्बल न्यूट्रिशन और लाइफस्टाइल प्लस कैप्सूल शरीर में कमजोरी आने से रोकते हैं।`,
-      products: 'नेचुरामोर न्यूट्रिशन, जामुन सिरका, लाइफस्टाइल प्लस',
-      ebook: 'BK015 (डायबिटीज मुक्ति व डाइट चार्ट)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 7. Dairy / Cattle Milk & Fat (गाय-भैंस दूध व फैट)
-  if (qLower.includes('दूध') || qLower.includes('फैट') || qLower.includes('गाय') || qLower.includes('भैंस') || qLower.includes('पशु')) {
-    renderTestResult({
-      domain: 'pashu',
-      domainTitle: 'पशुपालन व दुग्ध उत्पादन (Dairy Care)',
-      intent: 'गाय-भैंस में दूध व फैट वृद्धि एवं बांझपन निवारण',
-      confidence: '99.7%',
-      answer: `🐄 <strong>पशुओं में 1-2 लीटर दूध व फैट बढ़ाने का प्रमाणित फॉर्मूला:</strong><br>
-• <strong>पाचन व रूमेन सुधार:</strong> <strong>CFC Plus (कैटल फीड कंसंट्रेट) 10-15 ग्राम प्रतिदिन</strong> सुबह-शाम दाना-मिश्रण में मिलाकर दें।<br>
-• <strong>परिणाम:</strong> 10-15 दिनों के भीतर रूमेन में अच्छे बैक्टीरिया बढ़ते हैं, जिससे चारा 100% पचता है और दूध में 0.5 से 1.2 SNF/फैट की सीधी वृद्धि होती है।<br>
-• <strong>थनैला व बांझपन सुरक्षा:</strong> पशु समय पर गाभिन ठहरता है और रोग प्रतिरोधक क्षमता मजबूत होती है।`,
-      products: 'CFC Plus (बायोफिट कैटल फीड कंसंट्रेट)',
-      ebook: 'BK002 (पशुपालन व उन्नत डेयरी गाइड)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 8. Netsurf ₹8.19 Lakh Business Capping Plan
-  if (qLower.includes('8.19') || qLower.includes('नेट्सर्फ') || qLower.includes('प्लान') || qLower.includes('कमीशन') || qLower.includes('capping')) {
-    renderTestResult({
-      domain: 'business',
-      domainTitle: 'नेट्सर्फ 8.19L बिज़नेस प्लान (Direct Selling)',
-      intent: '₹8,19,250 वीकली कैपिंग व जनरेशन इनकम प्लान',
-      confidence: '99.9%',
-      answer: `💼 <strong>नेट्सर्फ डायरेक्ट 8.19 लाख कैपिंग प्लान रोडमैप:</strong><br>
-• <strong>साइकिल कैपिंग:</strong> प्रत्येक 15 दिन के पे-आउट साइकिल में अधिकतम कैपिंग <strong>₹8,19,250</strong> (महीने का ₹16,38,500) तय है।<br>
-• <strong>क्लब नेट्सर्फ:</strong> क्लब अस्मिता (महिलाएं), क्लब सक्षम (युवा), व क्लब प्रेसिडेंट के जरिए रॉयल्टी व अंतरराष्ट्रीय टूर रिवॉर्ड्स।<br>
-• <strong>स्मार्ट ई-टेलर (Smart eTailer):</strong> रेफरल लिंक व ई-शॉप से बिना स्टॉक रखे 15% से 30% का सीधा रिटेल मुनाफा।<br>
-• <strong>आरोग्यम मेंटरशिप:</strong> अवनीश मिश्रा जी की टीम द्वारा 100% डिजिटल ट्रेनिंग और ऑटो-वेबिनार सपोर्ट।`,
-      products: 'नेट्सर्फ स्मार्ट डिस्ट्रीब्यूटरशिप, ई-टेलर पोर्टल',
-      ebook: 'BK020 (8.19 लाख कैपिंग अचीवर ब्लूप्रिंट)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // 9. Founder / Avneesh Mishra Ji
-  if (qLower.includes('अवनीश') || qLower.includes('avneesh') || qLower.includes('फाउंडर') || qLower.includes('कौन हैं')) {
-    renderTestResult({
-      domain: 'founder',
-      domainTitle: 'संस्थापक परिचय (Leadership Profile)',
-      intent: 'श्री अवनीश मिश्रा जी — शोधकर्ता व कृषि-स्वास्थ्य विशेषज्ञ',
-      confidence: '100%',
-      answer: `👑 <strong>श्री अवनीश मिश्रा जी (फाउंडर व मुख्य शोधकर्ता):</strong><br>
-• अवनीश जी पिछले 12+ वर्षों से भारत के 50,000+ किसानों और परिवारों को जैविक खेती (जैविक खाद, बायोफिट) और आयुर्वेदिक स्वास्थ्य समाधानों से सशक्त बना रहे हैं।<br>
-• उनका विजन <em>"आरोग्यम भारत — समृद्ध किसान, स्वस्थ परिवार"</em> है।<br>
-• आप सीधे उनके वेबिनार या सखी AI के माध्यम से प्रमाणित ज्ञान प्राप्त कर सकते हैं।`,
-      products: 'आरोग्यम संपूर्ण लाइफटाइम मेंबरशिप',
-      ebook: 'BK001 (आरोग्यम संपूर्ण विजन डॉक्यूमेंट)',
-      firewallPassed: true
-    });
-    return;
-  }
-
-  // Tier 3: Fallback Expert Matcher
-  renderTestResult({
-    domain: 'omni',
-    domainTitle: 'आरोग्यम सखी AI न्यूरल कोर',
-    intent: `प्रश्न: "${q}"`,
-    confidence: '95.2%',
-    answer: `💡 <strong>सखी AI का विश्लेषण:</strong><br>
-आपके सवाल पर सखी AI ने प्रामाणिक जैविक व आयुर्वेदिक सिद्धांतों के आधार पर विश्लेषण किया है।<br>
-• किसी भी असंतुलन में तुरंत रासायनिक दवाओं के अत्यधिक प्रयोग से बचें।<br>
-• अधिक सटीक सलाह के लिए कृपया अपने सवाल में फसल का नाम (गेहूं, सरसों, चना) या स्वास्थ्य समस्या का विवरण स्पष्ट लिखें।<br>
-• हमारे वरिष्ठ परामर्शदाता अवनीश जी की विशेषज्ञ टीम का सीधा व्हाट्सएप सहयोग भी उपलब्ध है।`,
-    products: 'आरोग्यम प्रमाणित जैविक व आयुर्वेदिक उत्पाद',
-    ebook: 'BK001 (आरोग्यम स्वास्थ्य व कृषि गाइड)',
-    firewallPassed: true
-  });
-}
-
-function renderTestResult(res) {
-  const output = document.getElementById('sakhiTestOutput');
-  if (!output) return;
-
-  output.innerHTML = `
-    <!-- Result Header Badges -->
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--admin-border,#334155);">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="background:rgba(16,185,129,0.18);color:#22c55e;border:1px solid rgba(16,185,129,0.35);padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:800;letter-spacing:0.5px;">
-          ✔ MATCH FOUND: ${escapeHtml(res.domainTitle)}
-        </span>
-        <span style="background:rgba(59,130,246,0.18);color:#38bdf8;border:1px solid rgba(59,130,246,0.35);padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
-          सटीकता: ${res.confidence}
-        </span>
-      </div>
-      <span style="background:rgba(168,85,247,0.18);color:#c084fc;border:1px solid rgba(168,85,247,0.35);padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
-        🛡️ डोमेन शील्ड: 100% सुरक्षित
-      </span>
-    </div>
-
-    <!-- Question Title -->
-    <div style="font-size:0.95rem;font-weight:800;color:var(--admin-text,#f8fafc);margin-bottom:10px;">
-      विषय / इंटेंट: <span style="color:#38bdf8;">${escapeHtml(res.intent)}</span>
-    </div>
-
-    <!-- Structured AI Response Box -->
-    <div style="background:var(--admin-surface,#1e293b);padding:14px;border-radius:8px;border-left:4px solid #10b981;line-height:1.6;font-size:0.88rem;color:var(--admin-text,#e2e8f0);margin-bottom:12px;border-top:1px solid var(--admin-border,#334155);border-right:1px solid var(--admin-border,#334155);border-bottom:1px solid var(--admin-border,#334155);">
-      ${res.answer}
-    </div>
-
-    <!-- Products & E-Book Recommendation Badges -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;font-size:0.8rem;">
-      <div style="background:var(--admin-surface,#1e293b);padding:8px 12px;border-radius:6px;border:1px solid var(--admin-border,#334155);">
-        <strong style="color:#facc15;">🧴 अनुशंसित उत्पाद:</strong>
-        <div style="color:var(--admin-text,#e2e8f0);margin-top:2px;">${escapeHtml(res.products)}</div>
-      </div>
-      <div style="background:var(--admin-surface,#1e293b);padding:8px 12px;border-radius:6px;border:1px solid var(--admin-border,#334155);">
-        <strong style="color:#60a5fa;">📖 अनुशंसित ई-बुक:</strong>
-        <div style="color:var(--admin-text,#e2e8f0);margin-top:2px;">${escapeHtml(res.ebook)}</div>
-      </div>
-    </div>
-  `;
-}
-
-// ----------------------------------------------------
 // EVENT LISTENERS & WIRING
 // ----------------------------------------------------
 function setupSakhiAdminEvents() {
-  const testInput = document.getElementById('sakhiTestInput');
-  const testSubmitBtn = document.getElementById('sakhiTestSubmitBtn');
-  const exportBtn = document.getElementById('sakhiExportJsonBtn');
-
-  // Test Console Submit
-  if (testSubmitBtn && testInput) {
-    testSubmitBtn.onclick = () => {
-      const q = (testInput.value || '').trim();
-      if (!q) {
-        alert('कृपया कोई सवाल या कीवर्ड लिखें!');
-        testInput.focus();
-        return;
-      }
-      runAdminSakhiTest(q);
-    };
-
-    testInput.onkeydown = (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        testSubmitBtn.click();
-      }
-    };
-  }
-
-  // Quick Chips Click Handlers
-  document.querySelectorAll('.sakhi-test-chip').forEach(chip => {
-    chip.onclick = () => {
-      const q = chip.dataset.query;
-      if (testInput) testInput.value = q;
-      runAdminSakhiTest(q);
-    };
-  });
 
   // KPI Cards 1-Click Interactive Handlers
   const kpiTotal = document.getElementById('kpiCardTotal');
   const kpiAgri = document.getElementById('kpiCardAgri');
   const kpiHealth = document.getElementById('kpiCardHealth');
-  const kpiUnanswered = document.getElementById('kpiCardUnanswered');
   const domainFilterSelect = document.getElementById('sakhiUserDomainFilter');
 
   if (kpiTotal) {
@@ -1807,9 +1449,10 @@ function setupSakhiAdminEvents() {
     };
   }
 
-  if (kpiUnanswered) {
-    kpiUnanswered.onclick = () => {
-      document.getElementById('sakhiUnansweredSection')?.scrollIntoView({ behavior: 'smooth' });
+  const kpiPhotos = document.getElementById('kpiCardPhotos');
+  if (kpiPhotos) {
+    kpiPhotos.onclick = () => {
+      document.getElementById('sakhi-test-audit')?.scrollIntoView({ behavior: 'smooth' });
     };
   }
 
@@ -1857,6 +1500,7 @@ function setupSakhiAdminEvents() {
   }
 
   // JSON Knowledge Export
+  const exportBtn = document.getElementById('sakhiExportJsonBtn');
   if (exportBtn) {
     exportBtn.onclick = () => {
       const dataToExport = loadedKnowledge || { intents: [] };
@@ -1906,7 +1550,6 @@ function setupSakhiAdminEvents() {
             await db.from('sakhi_unanswered_logs').update({ is_resolved: true }).eq('is_resolved', false);
           }
         } catch (_) {}
-        await renderUnansweredQueries();
       }
     };
   }
@@ -2299,6 +1942,13 @@ async function fetchAndRenderSakhiAuditLogs() {
 
   sakhiAuditLogsList = list;
   window.sakhiAuditLogsList = list;
+
+  // Update KPI 4 Photo Vision with real count from audit logs
+  try {
+    const pCount = (list || []).filter(l => (l.sawal || '').includes('फोटो') || (l.domain || '').includes('photo') || (l.sawal || '').includes('📷') || l.has_image).length;
+    const pEl = document.getElementById('sakhiKpiPhotos');
+    if (pEl) pEl.textContent = String(pCount);
+  } catch(_) {}
 
   // Zero-Egress Profile Name Resolver
   let profileNameMap = new Map();
@@ -2715,258 +2365,6 @@ function setupSakhiAuditEvents() {
   if (eraseBtn) eraseBtn.addEventListener('click', eraseSakhiAuditLogs);
 }
 
-// =========================================================================
-// SAKHI AUTO-LEARNED QA VAULT CONTROLLER (ADMIN HUB MODULE)
-// =========================================================================
-let sakhiVaultList = [];
-let sakhiVaultFilter = 'all';
-
-async function fetchAndRenderSakhiVaultData() {
-  const container = document.getElementById('adminVaultContainer');
-  if (!container) return;
-
-  let list = [];
-  try {
-    const db = window.dbClient || window.supabase;
-    if (db) {
-      const { data, error } = await db
-        .from('sakhi_auto_learned_vault')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) {
-        list = data;
-      }
-    }
-  } catch (err) {
-    console.debug('Supabase vault fetch notice:', err);
-  }
-
-  if (list.length === 0) {
-    try {
-      list = JSON.parse(localStorage.getItem('SAKHI_AUTO_LEARNED_VAULT') || '[]');
-    } catch (_) {}
-  }
-
-  sakhiVaultList = list;
-  renderSakhiVaultUI();
-}
-
-function renderSakhiVaultUI() {
-  const container = document.getElementById('adminVaultContainer');
-  if (!container) return;
-
-  const totalEl = document.getElementById('adminVaultTotalCount');
-  const quaranEl = document.getElementById('adminVaultQuarantineCount');
-  const appEl = document.getElementById('adminVaultApprovedCount');
-  const denEl = document.getElementById('adminVaultDeniedCount');
-
-  if (totalEl) totalEl.textContent = sakhiVaultList.length;
-  if (quaranEl) quaranEl.textContent = sakhiVaultList.filter(i => i.status === 'quarantine').length;
-  if (appEl) appEl.textContent = sakhiVaultList.filter(i => i.status === 'approved').length;
-  if (denEl) denEl.textContent = sakhiVaultList.filter(i => i.status === 'denied').length;
-
-  const searchVal = (document.getElementById('adminVaultSearchInput')?.value || '').toLowerCase().trim();
-  let items = sakhiVaultList;
-
-  if (sakhiVaultFilter !== 'all') {
-    items = items.filter(i => i.status === sakhiVaultFilter);
-  }
-  if (searchVal) {
-    items = items.filter(i =>
-      (i.question || '').toLowerCase().includes(searchVal) ||
-      (i.answer || '').toLowerCase().includes(searchVal)
-    );
-  }
-
-  if (items.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center;padding:32px;color:var(--admin-muted,#64748b);font-size:0.90rem;">
-        <div style="font-size:2rem;margin-bottom:6px;">📦</div>
-        <div>कोई सीखे गए प्रश्न रिकॉर्ड उपलब्ध नहीं हैं।</div>
-      </div>
-    `;
-    return;
-  }
-
-  let html = '';
-  items.forEach(item => {
-    let badgeStyle = 'background:rgba(234,179,8,0.15);color:#facc15;border:1px solid rgba(234,179,8,0.3);';
-    let statusLabel = '🟡 क्वारंटीन (समीक्षा लंबित)';
-    if (item.status === 'approved') {
-      badgeStyle = 'background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3);';
-      statusLabel = '🟢 स्वीकृत (Active)';
-    } else if (item.status === 'denied') {
-      badgeStyle = 'background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);';
-      statusLabel = '🔴 अस्वीकृत (Blocked)';
-    }
-
-    html += `
-      <div style="background:var(--admin-surface-2,#0f172a);border:1.5px solid var(--admin-border,#334155);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <input type="checkbox" class="admin-vault-checkbox" data-id="${item.id}" style="width:16px;height:16px;cursor:pointer;">
-            <div style="font-weight:800;font-size:0.95rem;color:var(--admin-text,#f8fafc);">${escapeHtml(item.question || '')}</div>
-          </div>
-          <span style="font-size:0.72rem;font-weight:800;padding:2px 8px;border-radius:10px;white-space:nowrap;${badgeStyle}">
-            ${statusLabel}
-          </span>
-        </div>
-        <div style="font-size:0.86rem;line-height:1.6;color:var(--admin-text,#cbd5e1);background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-          ${escapeHtml((item.answer || '').slice(0, 300))}${item.answer && item.answer.length > 300 ? '...' : ''}
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;font-size:0.75rem;color:var(--admin-muted,#94a3b8);flex-wrap:wrap;gap:8px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span>🌐 स्रोत: <strong>${escapeHtml(item.source || 'Search Engine')}</strong></span>
-            <span>🔥 उपयोग (Hits): <strong>${item.hit_count || 1}</strong></span>
-            <span>📅 ${new Date(item.created_at || Date.now()).toLocaleDateString('hi-IN')}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            ${item.status !== 'approved' ? `
-              <button type="button" class="admin-btn admin-btn-sm" onclick="window.adminApproveVaultItem('${item.id}')" style="background:#16a34a;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-weight:800;font-size:0.72rem;cursor:pointer;">
-                ✔ स्वीकारें
-              </button>
-            ` : ''}
-            ${item.status !== 'denied' ? `
-              <button type="button" class="admin-btn admin-btn-sm" onclick="window.adminDenyVaultItem('${item.id}')" style="background:#ef4444;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-weight:800;font-size:0.72rem;cursor:pointer;">
-                🚫 अस्वीकार
-              </button>
-            ` : ''}
-            <button type="button" class="admin-btn admin-btn-sm" onclick="window.adminDeleteVaultItem('${item.id}')" style="background:var(--admin-surface,#1e293b);color:var(--admin-muted,#94a3b8);border:1px solid var(--admin-border,#334155);padding:4px 8px;border-radius:6px;font-weight:700;font-size:0.72rem;cursor:pointer;" title="हटाएं">
-              🗑️
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-window.adminApproveVaultItem = async function(id) {
-  const item = sakhiVaultList.find(i => i.id === id);
-  if (item) {
-    item.status = 'approved';
-    saveLocalAdminVault();
-    await syncVaultToDb(item);
-    renderSakhiVaultUI();
-  }
-};
-
-window.adminDenyVaultItem = async function(id) {
-  const item = sakhiVaultList.find(i => i.id === id);
-  if (item) {
-    item.status = 'denied';
-    saveLocalAdminVault();
-    await syncVaultToDb(item);
-    renderSakhiVaultUI();
-  }
-};
-
-window.adminDeleteVaultItem = async function(id) {
-  sakhiVaultList = sakhiVaultList.filter(i => i.id !== id);
-  saveLocalAdminVault();
-  try {
-    const db = window.dbClient || window.supabase;
-    if (db) await db.from('sakhi_auto_learned_vault').delete().eq('id', id);
-  } catch (_) {}
-  renderSakhiVaultUI();
-};
-
-function saveLocalAdminVault() {
-  try {
-    localStorage.setItem('SAKHI_AUTO_LEARNED_VAULT', JSON.stringify(sakhiVaultList));
-  } catch (_) {}
-}
-
-async function syncVaultToDb(item) {
-  try {
-    const db = window.dbClient || window.supabase;
-    if (db) await db.from('sakhi_auto_learned_vault').upsert([item], { onConflict: 'id' });
-  } catch (_) {}
-}
-
-function setupSakhiVaultAdminEvents() {
-  document.querySelectorAll('.admin-vault-filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      sakhiVaultFilter = btn.dataset.filter || 'all';
-      document.querySelectorAll('.admin-vault-filter-btn').forEach(b => {
-        b.style.background = 'var(--admin-surface-2,#0f172a)';
-        b.style.color = 'var(--admin-text,#cbd5e1)';
-      });
-      btn.style.background = '#3b82f6';
-      btn.style.color = '#ffffff';
-      renderSakhiVaultUI();
-    });
-  });
-
-  const searchInput = document.getElementById('adminVaultSearchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', () => renderSakhiVaultUI());
-  }
-
-  const exportBtn = document.getElementById('adminExportVaultBtn');
-  if (exportBtn) {
-    exportBtn.addEventListener('click', () => {
-      const payload = {
-        exported_at: new Date().toISOString(),
-        total: sakhiVaultList.length,
-        records: sakhiVaultList
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `sakhi-learned-vault-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  }
-
-  const bulkDenyBtn = document.getElementById('adminBulkDenyVaultBtn');
-  if (bulkDenyBtn) {
-    bulkDenyBtn.addEventListener('click', async () => {
-      const cbs = document.querySelectorAll('.admin-vault-checkbox:checked');
-      if (cbs.length === 0) {
-        alert('कृपया चेकबॉक्स से कम से कम 1 सवाल चुनें!');
-        return;
-      }
-      const ids = Array.from(cbs).map(cb => cb.dataset.id);
-      for (const item of sakhiVaultList) {
-        if (ids.includes(item.id)) {
-          item.status = 'denied';
-          await syncVaultToDb(item);
-        }
-      }
-      saveLocalAdminVault();
-      renderSakhiVaultUI();
-      alert(`${ids.length} सवाल सफलतापूर्वक अस्वीकृत (Denied) कर दिए गए!`);
-    });
-  }
-
-  const bulkApproveBtn = document.getElementById('adminBulkApproveVaultBtn');
-  if (bulkApproveBtn) {
-    bulkApproveBtn.addEventListener('click', async () => {
-      const cbs = document.querySelectorAll('.admin-vault-checkbox:checked');
-      if (cbs.length === 0) {
-        alert('कृपया चेकबॉक्स से कम से कम 1 सवाल चुनें!');
-        return;
-      }
-      const ids = Array.from(cbs).map(cb => cb.dataset.id);
-      for (const item of sakhiVaultList) {
-        if (ids.includes(item.id)) {
-          item.status = 'approved';
-          await syncVaultToDb(item);
-        }
-      }
-      saveLocalAdminVault();
-      renderSakhiVaultUI();
-      alert(`${ids.length} सवाल सफलतापूर्वक स्वीकृत (Approved) कर दिए गए!`);
-    });
-  }
-}
 
 // =========================================================================
 // 🌟 GEMINI 1.5 FLASH AI MASTER CONTROL & DAILY CHART LOGIC
@@ -3262,20 +2660,25 @@ function renderGeminiDailyChart() {
   }).length;
 
   let total7dTokens = 0;
+  let total7dImages = 0;
   let todayImgs = statsObj[todayKey]?.images || 0;
   let todayChats = todayRealChats > 0 ? todayRealChats : (statsObj[todayKey]?.chats || 0);
 
   days.forEach((dk) => {
     const s = statsObj[dk] || { images: 0, chats: 0, tokens: 0 };
     total7dTokens += (s.tokens || 0);
+    total7dImages += (s.images || 0);
   });
 
   const statTokEl = document.getElementById('statTotal7dTokens');
   const statImgEl = document.getElementById('statTodayImages');
   const statChatEl = document.getElementById('statTodayChats');
   if (statTokEl) statTokEl.textContent = total7dTokens.toLocaleString('hi-IN');
-  if (statImgEl) statImgEl.textContent = todayImgs.toLocaleString('hi-IN');
+  if (statImgEl) statImgEl.textContent = total7dImages > 0 ? `${todayImgs} (7 दिन: ${total7dImages})` : `${todayImgs}`;
   if (statChatEl) statChatEl.textContent = todayChats.toLocaleString('hi-IN');
+
+  const photosEl = document.getElementById('sakhiKpiPhotos');
+  if (photosEl) photosEl.textContent = String(total7dImages);
 
   // Draw base axis line
   ctx.strokeStyle = '#334155';
@@ -3434,12 +2837,32 @@ async function initSakhiTeamLeadsHub() {
     }
   });
 
-  // Build team rows
+  // Build team rows directly mapped from real Daily Chat Logs (Last 7 Days)
   const teamRows = [];
-  profiles.forEach(member => {
-    const cm = String(member.mobile || '').replace(/\D/g, '').slice(-10);
-    const ins = insightsMap.get(String(member.id)) || (cm ? insightsMap.get(cm) : null);
-    
+  const nowMs = Date.now();
+  const d7 = new Date(nowMs - 7 * 24 * 60 * 60 * 1000);
+  const auditLogs = window.sakhiAuditLogsList || sakhiAuditLogsList || [];
+
+  function checkIsMemberActive(p) {
+    if (!p) return false;
+    return Boolean(p.is_active || (p.wallet_balance && p.wallet_balance > 0) || p.membership_level === 'vip' || p.membership_level === 'pro');
+  }
+
+  // Set of mobiles who have asked questions in the last 7 days
+  const activeMobiles7d = new Set();
+
+  auditLogs.forEach(log => {
+    const logDt = log.date_time || log.created_at;
+    if (!logDt) return;
+    const logDate = new Date(logDt);
+    if (isNaN(logDate.getTime()) || logDate < d7) return; // Strict 7-Day Window!
+
+    const cleanMob = String(log.user_profile || '').replace(/\D/g, '').slice(-10);
+    if (cleanMob) activeMobiles7d.add(cleanMob);
+
+    const member = cleanMob ? (profByMobile.get(cleanMob) || {}) : {};
+    const isMemberActive = checkIsMemberActive(member);
+
     // Resolve Upline
     const refMob = String(member.referral_mobile || '').replace(/\D/g, '').slice(-10);
     const refBy = String(member.referred_by || '').trim();
@@ -3471,60 +2894,101 @@ async function initSakhiTeamLeadsHub() {
       uplineCode = refMob === '7974422572' ? 'AI000004' : refMob;
     }
 
-    // Increment upline counter
     if (!uplineMap.has(uplineKey)) {
       uplineMap.set(uplineKey, { name: uplineName, mobile: uplineKey, code: uplineCode, count: 0 });
     }
     const upEntry = uplineMap.get(uplineKey);
     if (upEntry) upEntry.count++;
 
-    const chatCount = ins ? (Number(ins.interaction_count) || 1) : 0;
-    const dom = ins ? (ins.primary_domain || 'agri') : (member.interest || 'agri');
-    const recoBook = ins ? (ins.recommended_ebook || 'BK002') : 'BK002';
-    const lastActive = ins ? (ins.last_active_at || member.created_at) : member.created_at;
-
-    // Granular 1 User - 1 Domain Normalization (Ensures Excel & Filters work per topic)
-    const domScores = (ins && ins.domain_scores) || {};
-    const activeDomains = Object.keys(domScores).filter(k => domScores[k] > 0);
-
-    const memberState = (member.State || member.state || (ins && (ins.user_state || ins.state)) || '').trim();
-    const memberDistrict = (member.district || (ins && (ins.user_district || ins.district)) || '').trim();
-
-    if (activeDomains.length > 0) {
-      activeDomains.forEach(dKey => {
-        teamRows.push({
-          member_name: member.full_name || 'किसान साथी',
-          member_mobile: cm || member.mobile || 'अज्ञात',
-          member_state: memberState,
-          member_district: memberDistrict,
-          upline_name: uplineName,
-          upline_code: uplineCode,
-          upline_key: uplineKey,
-          chat_count: Number(domScores[dKey]) || 1,
-          primary_domain: dKey,
-          last_topic: ins ? ins.last_query_topic : (member.interest ? `रुचि: ${member.interest}` : 'फसल सुरक्षा'),
-          recommended_ebook: recoBook,
-          last_active: lastActive,
-          insights: ins
-        });
-      });
-    } else {
-      teamRows.push({
-        member_name: member.full_name || 'किसान साथी',
-        member_mobile: cm || member.mobile || 'अज्ञात',
-        member_state: memberState,
-        member_district: memberDistrict,
-        upline_name: uplineName,
-        upline_code: uplineCode,
-        upline_key: uplineKey,
-        chat_count: chatCount,
-        primary_domain: dom,
-        last_topic: ins ? ins.last_query_topic : (member.interest ? `रुचि: ${member.interest}` : 'फसल सुरक्षा'),
-        recommended_ebook: recoBook,
-        last_active: lastActive,
-        insights: ins
-      });
+    // Format clean question
+    let cleanSawal = (log.sawal || '').trim();
+    if (cleanSawal.includes('➔ [🔤]')) {
+      cleanSawal = cleanSawal.split('➔ [🔤]')[1].trim();
     }
+    cleanSawal = cleanSawal.replace(/\s*\([a-z0-9_]*triage[a-z0-9_]*\)/gi, '').replace(/\s*\([a-z_]+_step[0-9]+[a-z0-9_]*\)/gi, '');
+
+    const memberState = (member.State || member.state || '').trim();
+    const memberDistrict = (member.district || '').trim();
+
+    teamRows.push({
+      member_name: member.full_name || ('किसान साथी ' + (cleanMob ? cleanMob.slice(-4) : '')),
+      member_mobile: cleanMob || log.user_profile || 'अज्ञात',
+      is_active: isMemberActive,
+      member_state: memberState,
+      member_district: memberDistrict,
+      upline_name: uplineName,
+      upline_code: uplineCode,
+      upline_key: uplineKey,
+      chat_count: 1,
+      primary_domain: log.domain || 'agri',
+      sawal: cleanSawal || 'फसल सुरक्षा व परामर्श',
+      last_topic: cleanSawal || 'फसल सुरक्षा व परामर्श',
+      last_active: logDt,
+      status: log.status || 'PASS'
+    });
+  });
+
+  // Also include registered profiles who have not asked questions in 7 days for full upline team visibility
+  profiles.forEach(member => {
+    const cm = String(member.mobile || '').replace(/\D/g, '').slice(-10);
+    if (cm && activeMobiles7d.has(cm)) return; // Already included above with real chat!
+
+    const isMemberActive = checkIsMemberActive(member);
+    const refMob = String(member.referral_mobile || '').replace(/\D/g, '').slice(-10);
+    const refBy = String(member.referred_by || '').trim();
+
+    let uplineKey = '7974422572';
+    let uplineName = masterName;
+    let uplineCode = masterShareId;
+
+    if (refMob && profByMobile.has(refMob)) {
+      const u = profByMobile.get(refMob);
+      uplineKey = refMob;
+      uplineName = u.full_name || 'लीडर';
+      uplineCode = u.share_id || u.referral_code || refMob;
+    } else if (refBy && profById.has(refBy)) {
+      const u = profById.get(refBy);
+      const uMob = String(u.mobile || '').replace(/\D/g, '').slice(-10);
+      uplineKey = uMob || refBy;
+      uplineName = u.full_name || 'लीडर';
+      uplineCode = u.share_id || u.referral_code || uMob;
+    } else if (refBy && profByShareId.has(refBy.toUpperCase())) {
+      const u = profByShareId.get(refBy.toUpperCase());
+      const uMob = String(u.mobile || '').replace(/\D/g, '').slice(-10);
+      uplineKey = uMob || refBy;
+      uplineName = u.full_name || 'लीडर';
+      uplineCode = u.share_id || refBy;
+    } else if (refMob && refMob.length === 10) {
+      uplineKey = refMob;
+      uplineName = refMob === '7974422572' ? masterName : `लीडर (${refMob})`;
+      uplineCode = refMob === '7974422572' ? 'AI000004' : refMob;
+    }
+
+    if (!uplineMap.has(uplineKey)) {
+      uplineMap.set(uplineKey, { name: uplineName, mobile: uplineKey, code: uplineCode, count: 0 });
+    }
+    const upEntry = uplineMap.get(uplineKey);
+    if (upEntry) upEntry.count++;
+
+    const memberState = (member.State || member.state || '').trim();
+    const memberDistrict = (member.district || '').trim();
+
+    teamRows.push({
+      member_name: member.full_name || 'किसान साथी',
+      member_mobile: cm || member.mobile || 'अज्ञात',
+      is_active: isMemberActive,
+      member_state: memberState,
+      member_district: memberDistrict,
+      upline_name: uplineName,
+      upline_code: uplineCode,
+      upline_key: uplineKey,
+      chat_count: 0,
+      primary_domain: member.interest || 'agri',
+      sawal: '⚠️ पिछले 7 दिनों में कोई नया सवाल नहीं',
+      last_topic: '⚠️ पिछले 7 दिनों में कोई नया सवाल नहीं',
+      last_active: member.created_at,
+      status: 'INACTIVE'
+    });
   });
 
   window._sakhiTeamState.allTeamRows = teamRows;
@@ -3807,12 +3271,19 @@ function renderTeamLeadsTable() {
     window._sakhiDrawerItems = window._sakhiDrawerItems || new Map();
     window._sakhiDrawerItems.set(drawerKey, drawerPayload);
 
+    const statusBadge = r.is_active
+      ? '<span style="background:rgba(34,197,94,0.18);color:#22c55e;font-size:0.68rem;font-weight:800;padding:2px 7px;border-radius:10px;border:1px solid rgba(34,197,94,0.35);">🟢 Active</span>'
+      : '<span style="background:rgba(239,68,68,0.18);color:#f87171;font-size:0.68rem;font-weight:800;padding:2px 7px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);">🔴 Inactive</span>';
+
     return `
       <tr style="border-bottom:1px solid #334155;cursor:pointer;" onclick="window.openSakhiDetailDrawer('${drawerKey}')">
         <td style="padding:10px 12px;color:#94a3b8;font-weight:700;">#${globalIdx}</td>
         <td style="padding:10px 12px;">
-          <strong style="color:#f8fafc;display:block;">${escapeHtml(r.member_name)}</strong>
-          <span style="font-size:0.75rem;color:#38bdf8;">📱 ${escapeHtml(r.member_mobile)}</span>
+          <div style="font-weight:800;color:#f8fafc;">${escapeHtml(r.member_name)}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
+            <span style="font-size:0.74rem;color:#38bdf8;font-family:monospace;">📱 ${escapeHtml(r.member_mobile)}</span>
+            ${statusBadge}
+          </div>
         </td>
         <td style="padding:10px 12px;font-size:0.8rem;color:#cbd5e1;">
           <div style="font-weight:700;color:#f8fafc;">${escapeHtml(r.member_state || '-')}</div>
@@ -3822,18 +3293,16 @@ function renderTeamLeadsTable() {
           <strong style="color:#fbbf24;display:block;">${escapeHtml(r.upline_name)}</strong>
           <span style="font-size:0.72rem;color:#94a3b8;">${escapeHtml(r.upline_code || '')}</span>
         </td>
-        <td style="padding:10px 12px;text-align:center;">
-          <span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:10px;font-weight:800;font-size:0.75rem;">
-            ${r.chat_count}
-          </span>
+        <td style="padding:10px 12px;max-width:280px;">
+          <div style="font-size:0.83rem;font-weight:700;color:#f8fafc;line-height:1.4;word-break:break-word;">
+            ${escapeHtml(r.sawal || r.last_topic || '-')}
+          </div>
+          <div style="font-size:0.70rem;color:#94a3b8;margin-top:2px;">
+            ${r.status === 'PASS' ? '<span style="color:#22c55e;">✔ सटीक उत्तर</span>' : '<span style="color:#f59e0b;">⚠️ समीक्षा</span>'}
+          </div>
         </td>
         <td style="padding:10px 12px;">
           <span style="font-size:0.80rem;font-weight:700;color:#e2e8f0;">${domainBadge}</span>
-        </td>
-        <td style="padding:10px 12px;">
-          <span style="background:rgba(234,179,8,0.15);color:#facc15;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">
-            ${pitchText}
-          </span>
         </td>
         <td style="padding:10px 12px;color:#94a3b8;font-size:0.75rem;white-space:nowrap;">
           ${timeStr}
@@ -3870,8 +3339,20 @@ window.exportTeamLeadsCsv = function() {
     return;
   }
 
-  // Filter based on active filters if set
-  let exportRows = rows;
+  // Strictly filter to the last 7 days window
+  const now = Date.now();
+  const d7 = new Date(now - 7 * 24 * 60 * 60 * 1000);
+
+  let exportRows = rows.filter(r => {
+    if (!r.last_active) return false;
+    const d = new Date(r.last_active);
+    return !isNaN(d.getTime()) && d >= d7;
+  });
+
+  if (exportRows.length === 0) {
+    exportRows = rows;
+  }
+
   const state = window._sakhiTeamState;
   if (state.uplineFilter && state.uplineFilter !== 'all') {
     const fKey = state.uplineFilter.toUpperCase();
@@ -3894,15 +3375,7 @@ window.exportTeamLeadsCsv = function() {
 
   if (state.domainFilter && state.domainFilter !== 'all') {
     const df = state.domainFilter.toLowerCase();
-    if (df === 'other') {
-      const known = ['agri', 'krishi', 'kheti', 'health', 'sugar', 'bp', 'swasthya', 'business', 'netsurf', 'pashu', 'dairy', 'cattle', 'beauty'];
-      exportRows = exportRows.filter(r => {
-        const pDom = (r.primary_domain || '').toLowerCase();
-        return pDom === 'other' || pDom === 'misc' || pDom === 'general' || !known.some(k => pDom.includes(k));
-      });
-    } else {
-      exportRows = exportRows.filter(r => (r.primary_domain || '').toLowerCase().includes(df));
-    }
+    exportRows = exportRows.filter(r => (r.primary_domain || '').toLowerCase().includes(df));
   }
 
   if (state.searchQuery) {
@@ -3911,84 +3384,25 @@ window.exportTeamLeadsCsv = function() {
       (r.member_name || '').toLowerCase().includes(q) ||
       (r.member_mobile || '').includes(q) ||
       (r.upline_name || '').toLowerCase().includes(q) ||
-      (r.last_topic || '').toLowerCase().includes(q)
+      (r.sawal || r.last_topic || '').toLowerCase().includes(q)
     );
   }
 
   function resolveDomainInfo(domKey, topicText) {
     const topic = (topicText || '').toLowerCase();
     let domName = '🌾 कृषि (Agriculture)';
-    let subDom = 'फसल डॉक्टर व रोग पहचान';
-
-    if (domKey === 'health' || topic.includes('दर्द') || topic.includes('बीपी') || topic.includes('शुगर') || topic.includes('घुटने') || topic.includes('जोड़')) {
-      domName = '🩺 स्वास्थ्य (Health & Care)';
-      if (topic.includes('दर्द') || topic.includes('घुटने') || topic.includes('जोड़') || topic.includes('कमर')) {
-        subDom = 'स्वास्थ्य: जोड़ों व घुटनों का दर्द';
-      } else if (topic.includes('शुगर') || topic.includes('डायबिटीज') || topic.includes('sugar')) {
-        subDom = 'स्वास्थ्य: डायबिटीज व शुगर नियंत्रण';
-      } else if (topic.includes('बीपी') || topic.includes('रक्तचाप') || topic.includes('bp')) {
-        subDom = 'स्वास्थ्य: हाई/लो बीपी केयर';
-      } else {
-        subDom = 'स्वास्थ्य: पोषण व सामान्य परामर्श';
-      }
-    } else if (domKey === 'cattle' || topic.includes('गाय') || topic.includes('भैंस') || topic.includes('दूध') || topic.includes('पशु') || topic.includes('डेयरी') || topic.includes('फैट')) {
-      domName = '🐄 पशुपालन (Animal Care)';
-      if (topic.includes('दूध') || topic.includes('फैट')) {
-        subDom = 'पशुपालन: दूध व फैट वृद्धि';
-      } else if (topic.includes('थनैला') || topic.includes('बीमारी') || topic.includes('रोग')) {
-        subDom = 'पशुपालन: पशु रोग व थनैला सुरक्षा';
-      } else {
-        subDom = 'पशुपालन: सीएफसी व डेयरी पोषण';
-      }
-    } else if (domKey === 'business' || topic.includes('नेट्सर्फ') || topic.includes('कमाई') || topic.includes('इनकम') || topic.includes('पैसे') || topic.includes('बिजनेस')) {
-      domName = '💼 व्यापार (Netsurf Income)';
-      if (topic.includes('8.19') || topic.includes('कैपिंग') || topic.includes('प्लान')) {
-        subDom = 'व्यापार: ₹8.19 लाख कैपिंग प्लान';
-      } else {
-        subDom = 'व्यापार: नेट्सर्फ कमाई व डायरेक्ट सेलिंग';
-      }
-    } else {
-      domName = '🌾 कृषि (Agriculture)';
-      if (topic.includes('गेहूं') || topic.includes('gehu')) {
-        subDom = 'कृषि: गेहूं में कल्ले व पीलापन';
-      } else if (topic.includes('चना') || topic.includes('chana')) {
-        subDom = 'कृषि: चना में उकठा व पैदावार';
-      } else if (topic.includes('धान') || topic.includes('चावल')) {
-        subDom = 'कृषि: धान पैदावार व कीट नियंत्रण';
-      } else if (topic.includes('सरसों')) {
-        subDom = 'कृषि: सरसों में माहू व चेपा';
-      } else if (topic.includes('सब्जी') || topic.includes('टमाटर') || topic.includes('मिर्च')) {
-        subDom = 'कृषि: सब्जी रोग व नर्सरी';
-      } else if (topic.includes('खाद') || topic.includes('उर्वरक') || topic.includes('स्प्रे') || topic.includes('दवा')) {
-        subDom = 'कृषि: दवा, स्प्रे व खाद प्रबंधन';
-      } else {
-        subDom = 'कृषि: फसल सुरक्षा व रोग पहचान';
-      }
-    }
-    return { domName, subDom };
+    if (domKey === 'health' || topic.includes('दर्द') || topic.includes('शुगर')) domName = '🩺 स्वास्थ्य (Health & Care)';
+    else if (domKey === 'cattle' || domKey === 'pashu' || topic.includes('गाय') || topic.includes('दूध')) domName = '🐄 पशुपालन (Animal Care)';
+    else if (domKey === 'business' || topic.includes('नेट्सर्फ') || topic.includes('कमाई')) domName = '💼 व्यापार (Netsurf Income)';
+    return domName;
   }
 
-  function resolveBookTitle(code, domKey) {
-    const c = String(code || '').toUpperCase();
-    if (c === 'BK017' || c.includes('BK017')) return '📖 BK017: गेहूँ की खेती सम्पूर्ण मार्गदर्शिका (₹99)';
-    if (c === 'BK019' || c.includes('BK019')) return '📖 BK019: चना की खेती सम्पूर्ण मार्गदर्शिका (₹99)';
-    if (c === 'BK016' || c.includes('BK016')) return '📖 BK016: कृषि दवा डायरेक्टरी व पशु पोषण (₹99)';
-    if (c === 'BK018' || c.includes('BK018')) return '📖 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide (₹149)';
-    if (c === 'BK015' || c.includes('BK015')) return '📖 BK015: सब्जी खेती मास्टर सम्पूर्ण गाइड (₹149)';
-    if (c === 'BK001' || c.includes('BK001')) return '📖 BK001: खरीफ फसल मास्टर गाइड 2026 (₹99)';
-    if (c === 'BK002' || c.includes('BK002')) return '📖 BK002: खेती का डॉक्टर — फसल सुरक्षा (₹99)';
-    if (domKey === 'business') return '📖 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide (₹149)';
-    if (domKey === 'health') return '📖 आरोग्यम हेल्थ व डाइट कॉम्बो गाइड';
-    if (domKey === 'cattle') return '📖 BK016: कृषि दवा डायरेक्टरी व पशु पोषण (₹99)';
-    return '📖 BK002: खेती का डॉक्टर — फसल सुरक्षा (₹99)';
-  }
-
-  // Generate Real Excel Workbook HTML (.xls) - Opens directly in MS Excel, Google Sheets, WPS on Android/iOS!
+  // Generate Real Excel Workbook HTML (.xls) without suggested eBook column
   const tableRowsHtml = exportRows.map((r, idx) => {
-    const info = resolveDomainInfo(r.primary_domain, r.last_topic);
-    const bookTitle = resolveBookTitle(r.recommended_ebook, r.primary_domain);
+    const domName = resolveDomainInfo(r.primary_domain, r.sawal || r.last_topic);
     const lastActiveStr = r.last_active ? new Date(r.last_active).toLocaleDateString('hi-IN') : '-';
-    const recentTopic = (r.last_topic || 'सामान्य परामर्श').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const recentTopic = (r.sawal || r.last_topic || 'सामान्य परामर्श').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const statusText = r.is_active ? '🟢 Active' : '🔴 Inactive';
 
     return `
       <tr>
@@ -3998,13 +3412,12 @@ window.exportTeamLeadsCsv = function() {
         <td style="mso-number-format:'\\@';font-weight:bold;">${r.upline_code || 'AI000004'}</td>
         <td style="font-weight:bold;color:#0f172a;">${r.member_name || 'किसान साथी'}</td>
         <td style="mso-number-format:'\\@';font-weight:bold;">${r.member_mobile}</td>
+        <td style="text-align:center;font-weight:bold;color:${r.is_active ? '#15803d' : '#dc2626'};">${statusText}</td>
         <td style="font-weight:bold;color:#334155;">${r.member_state || '-'}</td>
         <td style="font-weight:bold;color:#334155;">${r.member_district || '-'}</td>
-        <td style="font-weight:bold;color:#166534;">${info.domName}</td>
-        <td style="font-weight:bold;color:#0284c7;">${info.subDom}</td>
-        <td>${recentTopic}</td>
-        <td style="text-align:center;font-weight:bold;color:#15803d;">${r.chat_count || 1}</td>
-        <td style="color:#b45309;font-weight:bold;">${bookTitle}</td>
+        <td style="font-weight:bold;color:#166534;">${domName}</td>
+        <td style="font-weight:600;color:#0f172a;">${recentTopic}</td>
+        <td style="text-align:center;font-weight:bold;color:${r.status === 'PASS' ? '#15803d' : '#ea580c'};">${r.status || 'PASS'}</td>
       </tr>
     `;
   }).join('');
@@ -4030,11 +3443,12 @@ window.exportTeamLeadsCsv = function() {
             <th>Upline कोड / शेयर ID</th>
             <th>टीम सदस्य (ग्राहक) नाम</th>
             <th>मोबाइल नंबर</th>
+            <th style="text-align:center;">सदस्य स्थिति (Status)</th>
+            <th>राज्य</th>
+            <th>ज़िला</th>
             <th>मुख्य डोमेन</th>
-            <th>सब-डोमेन (विशिष्ट विषय)</th>
             <th>पूछा गया सवाल / समस्या</th>
-            <th style="text-align:center;">इस विषय में चैट</th>
-            <th>सुझाई गई ई-बुक / कमर्शियल पिच</th>
+            <th style="text-align:center;">स्थिति</th>
           </tr>
         </thead>
         <tbody>
