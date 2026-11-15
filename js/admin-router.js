@@ -7,7 +7,7 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js?v=20261115_v85_correct_links').then(m => m.initDashboard()),
-  'users': () => import('./admin-pages-users.js?v=20261115_v85_live_calc').then(m => m.initUsers()),
+  'users': () => import('./admin-pages-users.js?v=20261115_v86_compact_box').then(m => m.initUsers()),
   'user-details': () => import('./admin-pages-user-details.js?v=27.5').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
   'all-phonebook': () => import('./admin-pages-phonebook.js').then(m => m.initAllPhonebook()),

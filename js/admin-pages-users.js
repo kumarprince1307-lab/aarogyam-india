@@ -1031,7 +1031,7 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
   modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.85);backdrop-filter:blur(6px);z-index:99999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
   
   modal.innerHTML = `
-    <div style="background:#ffffff;border-radius:20px;max-width:460px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,0.4);border:1.5px solid #38bdf8;box-sizing:border-box;color:#0f172a;max-height:92vh;overflow-y:auto;">
+    <div style="background:#ffffff;border-radius:20px;max-width:440px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,0.4);border:1.5px solid #38bdf8;box-sizing:border-box;color:#0f172a;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;">
         <h3 style="margin:0;font-size:1.15rem;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:8px;">
           <span>⚡</span> सखी AI यूजर क्रेडिट कस्टमाइज़ेशन
@@ -1039,36 +1039,18 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
         <button type="button" onclick="document.getElementById('userCustomQuotaModal').remove()" style="background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;color:#64748b;">&times;</button>
       </div>
 
-      <!-- User Profile Card -->
-      <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:12px;font-size:0.83rem;border:1px solid #e2e8f0;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+      <!-- Single Compact User Box -->
+      <div style="background:#f8fafc;border-radius:12px;padding:11px 13px;margin-bottom:14px;font-size:0.82rem;border:1px solid #e2e8f0;line-height:1.5;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px;">
           <div>👤 <strong>यूजर नाम:</strong> ${name || 'N/A'}</div>
           <div>📱 <strong>मोबाइल:</strong> ${cleanMobile || 'N/A'}</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
           <div>⚡ <strong>सिस्टम स्टेटस:</strong> <span style="font-weight:800;color:${isActiveUser ? '#15803d' : '#ca8a04'};">${(status || 'INACTIVE').toUpperCase()}</span></div>
-          <div>⚖️ <strong>दैनिक बेस कोटा:</strong> <span style="font-weight:700;color:#0369a1;">${baseChats} सवाल | ${baseImages} फोटो</span></div>
+          <div>⚖️ <strong>कुल दैनिक लिमिट:</strong> <span id="modalBoxDailyLimit" style="font-weight:700;color:#0284c7;">${baseChats} सवाल | ${baseImages} फोटो</span></div>
         </div>
-        <div id="modalUserLiveUsageBox" style="padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.79rem;color:#0284c7;font-weight:700;">
-          ⏳ आज का लाइव उपयोग डेटा लोड हो रहा है...
-        </div>
-      </div>
-
-      <!-- Live Calculation Preview Box -->
-      <div id="modalLiveCalculationCard" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:10px 12px;margin-bottom:12px;">
-        <div style="font-weight:900;color:#166534;font-size:0.82rem;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
-          <span>⚡ लाइव क्रेडिट स्थिति (Live Balance Preview):</span>
-          <span id="previewStatusBadge" style="font-size:0.72rem;padding:2px 6px;border-radius:4px;background:#dcfce7;color:#15803d;">गणना सक्रिय</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.78rem;">
-          <div style="background:#ffffff;padding:6px 8px;border-radius:8px;border:1px solid #bbf7d0;">
-            <div style="color:#64748b;">कुल चैट सीमा: <strong id="previewTotalChats" style="color:#0f172a;">${baseChats} सवाल</strong></div>
-            <div style="margin-top:2px;">शेष सवाल: <strong id="previewRemainingChats" style="color:#15803d;">लोड हो रहा है...</strong></div>
-          </div>
-          <div style="background:#ffffff;padding:6px 8px;border-radius:8px;border:1px solid #bbf7d0;">
-            <div style="color:#64748b;">कुल फोटो सीमा: <strong id="previewTotalImages" style="color:#0f172a;">${baseImages} फोटो</strong></div>
-            <div style="margin-top:2px;">शेष फोटो: <strong id="previewRemainingImages" style="color:#15803d;">लोड हो रहा है...</strong></div>
-          </div>
+        <div id="modalUserLiveUsageBox" style="padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.79rem;color:#334155;">
+          📊 <strong>आज का उपयोग:</strong> ⏳ लोड हो रहा है...
         </div>
       </div>
 
@@ -1133,36 +1115,27 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
     const remChats = Math.max(0, totalChatLimit - liveChatsUsed);
     const remImgs = Math.max(0, totalImgLimit - livePhotosUsed);
 
-    const totalChatEl = document.getElementById('previewTotalChats');
-    const remChatEl = document.getElementById('previewRemainingChats');
-    const totalImgEl = document.getElementById('previewTotalImages');
-    const remImgEl = document.getElementById('previewRemainingImages');
-
-    if (totalChatEl) totalChatEl.textContent = `${totalChatLimit} सवाल ${bChat > 0 ? `(+${bChat} बोनस)` : ''}`;
-    if (totalImgEl) totalImgEl.textContent = `${totalImgLimit} फोटो ${bImg > 0 ? `(+${bImg} बोनस)` : ''}`;
-
-    if (remChatEl) {
-      if (isBlk) {
-        remChatEl.innerHTML = `<span style="color:#dc2626;">0 (एक्सेस ब्लॉक 🛑)</span>`;
-      } else if (remChats <= 0) {
-        remChatEl.innerHTML = `<span style="color:#dc2626;font-weight:800;">0 शेष (सीमा समाप्त ⚠️)</span>`;
-      } else {
-        remChatEl.innerHTML = `<span style="color:#16a34a;font-weight:800;">${remChats} सवाल शेष 🟢</span>`;
-      }
+    const limitEl = document.getElementById('modalBoxDailyLimit');
+    if (limitEl) {
+      let chatLabel = `${totalChatLimit} सवाल`;
+      if (bChat > 0) chatLabel += ` (+${bChat})`;
+      let imgLabel = `${totalImgLimit} फोटो`;
+      if (bImg > 0) imgLabel += ` (+${bImg})`;
+      limitEl.textContent = `${chatLabel} | ${imgLabel}`;
     }
 
-    if (remImgEl) {
-      if (isBlk) {
-        remImgEl.innerHTML = `<span style="color:#dc2626;">0 (एक्सेस ब्लॉक 🛑)</span>`;
-      } else if (remImgs <= 0) {
-        remImgEl.innerHTML = `<span style="color:#dc2626;font-weight:800;">0 शेष (सीमा समाप्त ⚠️)</span>`;
-      } else {
-        remImgEl.innerHTML = `<span style="color:#16a34a;font-weight:800;">${remImgs} फोटो शेष 🟢</span>`;
-      }
+    const usageEl = document.getElementById('modalUserLiveUsageBox');
+    if (usageEl) {
+      const chatRemHtml = isBlk ? `<span style="color:#dc2626;font-weight:800;">ब्लॉक 🛑</span>` 
+        : (remChats <= 0 ? `<span style="color:#dc2626;font-weight:800;">0 शेष ⚠️</span>` : `<span style="color:#15803d;font-weight:800;">${remChats} शेष 🟢</span>`);
+      const imgRemHtml = isBlk ? `<span style="color:#dc2626;font-weight:800;">ब्लॉक 🛑</span>` 
+        : (remImgs <= 0 ? `<span style="color:#dc2626;font-weight:800;">0 शेष ⚠️</span>` : `<span style="color:#15803d;font-weight:800;">${remImgs} शेष 🟢</span>`);
+
+      usageEl.innerHTML = `📊 <strong>आज का उपयोग:</strong> 💬 ${liveChatsUsed} सवाल पूछे (${chatRemHtml}) | 📷 ${livePhotosUsed} फोटो (${imgRemHtml})`;
     }
   }
 
-  // Attach live input listeners for instant calculation
+  // Attach live input listeners for instant calculation inside the same box
   ['modalUserBonusImages', 'modalUserBonusChats', 'modalUserCustomImages', 'modalUserCustomChats', 'modalUserBlockGemini'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -1183,11 +1156,6 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
       const aLogs = await aRes.json();
       liveChatsUsed = aLogs.length;
       livePhotosUsed = aLogs.filter(l => (l.sawal || '').includes('फोटो') || (l.sawal || '').includes('📷') || (l.domain || '').includes('photo')).length;
-    }
-
-    const usageEl = document.getElementById('modalUserLiveUsageBox');
-    if (usageEl) {
-      usageEl.innerHTML = `📊 <strong>आज का वास्तविक उपयोग:</strong> 💬 ${liveChatsUsed} सवाल पूछे | 📷 ${livePhotosUsed} फोटो जांची`;
     }
 
     // 2. Fetch server quota & moderation block from sakhi_user_insights
