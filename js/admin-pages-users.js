@@ -1038,7 +1038,7 @@ function openUserWebinarReportDrawer(user) {
 // =========================================================================
 // 🌟 USER-LEVEL SAKHI AI CREDIT & QUOTA MANAGEMENT MODAL
 // =========================================================================
-window.openUserQuotaModal = function(userId, mobile, name, status) {
+window.openUserQuotaModal = async function(userId, mobile, name, status) {
   const existing = document.getElementById('userCustomQuotaModal');
   if (existing) existing.remove();
 
@@ -1049,11 +1049,11 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
   } catch(e) {}
   const uQuota = customMap[cleanMobile] || {};
 
-  const bonusImg = uQuota.bonusImages || 0;
-  const bonusChat = uQuota.bonusChats || 0;
-  const customImg = typeof uQuota.customImages === 'number' ? uQuota.customImages : '';
-  const customChat = typeof uQuota.customChats === 'number' ? uQuota.customChats : '';
-  const isBlocked = Boolean(uQuota.blocked);
+  let bonusImg = uQuota.bonusImages || 0;
+  let bonusChat = uQuota.bonusChats || 0;
+  let customImg = typeof uQuota.customImages === 'number' ? uQuota.customImages : '';
+  let customChat = typeof uQuota.customChats === 'number' ? uQuota.customChats : '';
+  let isBlocked = Boolean(uQuota.blocked);
 
   const modal = document.createElement('div');
   modal.id = 'userCustomQuotaModal';
@@ -1072,6 +1072,9 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
         <div>👤 <strong>यूजर नाम:</strong> ${name || 'N/A'}</div>
         <div>📱 <strong>मोबाइल:</strong> ${cleanMobile || 'N/A'}</div>
         <div>⚡ <strong>सिस्टम स्टेटस:</strong> <span style="font-weight:800;color:${status === 'active' ? '#15803d' : '#ca8a04'};">${(status || 'INACTIVE').toUpperCase()}</span></div>
+        <div id="modalUserLiveUsageBox" style="margin-top:6px;padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.78rem;color:#0284c7;font-weight:700;">
+          ⏳ आज का उपयोग डेटा लोड हो रहा है...
+        </div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
@@ -1122,14 +1125,60 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
 
   document.body.appendChild(modal);
 
-  document.getElementById('modalSaveUserQuotaBtn').onclick = function() {
+  // Asynchronously fetch live usage and Cloud Quota from Supabase
+  let existingScores = {};
+  const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+  try {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    // 1. Fetch real chat and photo counts from audit logs
+    const auditUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_chat_audit_logs?user_profile=like.*${cleanMobile}*&date_time=gte.${todayStr}T00:00:00&select=id,sawal,domain`;
+    const aRes = await fetch(auditUrl, { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' } });
+    let tChats = 0, tPhotos = 0;
+    if (aRes.ok) {
+      const aLogs = await aRes.json();
+      tChats = aLogs.length;
+      tPhotos = aLogs.filter(l => (l.sawal || '').includes('फोटो') || (l.sawal || '').includes('📷') || (l.domain || '').includes('photo')).length;
+    }
+
+    const usageEl = document.getElementById('modalUserLiveUsageBox');
+    if (usageEl) {
+      usageEl.innerHTML = `📊 <strong>आज का वास्तविक उपयोग:</strong> 💬 ${tChats} सवाल पूछे | 📷 ${tPhotos} फोटो जांची`;
+    }
+
+    // 2. Fetch server quota & moderation block from sakhi_user_insights
+    const insUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?mobile=eq.${cleanMobile}&select=is_blocked,block_reason,domain_scores`;
+    const iRes = await fetch(insUrl, { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' } });
+    if (iRes.ok) {
+      const iData = await iRes.json();
+      if (iData && iData[0]) {
+        const row = iData[0];
+        existingScores = row.domain_scores || {};
+        const q = existingScores._quota || {};
+        if (typeof q.bonusImages === 'number') document.getElementById('modalUserBonusImages').value = q.bonusImages;
+        if (typeof q.bonusChats === 'number') document.getElementById('modalUserBonusChats').value = q.bonusChats;
+        if (typeof q.customImages === 'number') document.getElementById('modalUserCustomImages').value = q.customImages;
+        if (typeof q.customChats === 'number') document.getElementById('modalUserCustomChats').value = q.customChats;
+        if (row.is_blocked || q.blocked) {
+          document.getElementById('modalUserBlockGemini').checked = true;
+        }
+      }
+    }
+  } catch(err) {
+    console.debug('Error loading live user quota:', err);
+  }
+
+  document.getElementById('modalSaveUserQuotaBtn').onclick = async function() {
+    const saveBtn = this;
+    saveBtn.disabled = true;
+    saveBtn.textContent = '💾 सहेजा जा रहा है...';
+
     const bImg = Number(document.getElementById('modalUserBonusImages').value) || 0;
     const bChat = Number(document.getElementById('modalUserBonusChats').value) || 0;
     const cImgRaw = document.getElementById('modalUserCustomImages').value.trim();
     const cChatRaw = document.getElementById('modalUserCustomChats').value.trim();
     const blocked = Boolean(document.getElementById('modalUserBlockGemini').checked);
 
-    customMap[cleanMobile] = {
+    const quotaObj = {
       bonusImages: bImg,
       bonusChats: bChat,
       customImages: cImgRaw !== '' ? Number(cImgRaw) : undefined,
@@ -1138,7 +1187,37 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
       updatedAt: new Date().toISOString()
     };
 
+    customMap[cleanMobile] = quotaObj;
     localStorage.setItem('SAKHI_CUSTOM_USER_QUOTAS', JSON.stringify(customMap));
+
+    // Save to Supabase Cloud sakhi_user_insights (Real-Time Zero-Egress Sync)
+    try {
+      const payload = {
+        user_key: cleanMobile,
+        mobile: cleanMobile,
+        user_name: name || ('User ' + cleanMobile.slice(-4)),
+        is_blocked: blocked,
+        block_reason: blocked ? 'एडमिन द्वारा सखी AI एक्सेस ब्लॉक किया गया' : null,
+        domain_scores: {
+          ...existingScores,
+          _quota: quotaObj
+        },
+        updated_at: new Date().toISOString()
+      };
+      await fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights', {
+        method: 'POST',
+        headers: {
+          'apikey': sbKey,
+          'Authorization': `Bearer ${sbKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(payload)
+      });
+    } catch(err) {
+      console.warn('Error saving user quota to Supabase:', err);
+    }
+
     if (window.SakhiModeration) {
       if (blocked && typeof window.SakhiModeration.adminBlockUser === 'function') {
         window.SakhiModeration.adminBlockUser(cleanMobile, 24, 'Admin Users Modal Block');
@@ -1146,7 +1225,8 @@ window.openUserQuotaModal = function(userId, mobile, name, status) {
         window.SakhiModeration.adminUnblockUser(cleanMobile);
       }
     }
-    alert(`✅ ${name} (${cleanMobile}) के सखी AI क्रेडिट सफलतापूर्वक अपडेट किए गए!`);
+
+    alert(`✅ ${name || 'User'} (${cleanMobile}) के सखी AI क्रेडिट व एक्सेस सेटिंग्स क्लाउड डेटाबेस पर सफलतापूर्वक सुरक्षित हो गए!`);
     modal.remove();
   };
 };

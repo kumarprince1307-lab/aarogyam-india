@@ -922,6 +922,36 @@ if (typeof document !== 'undefined') {
               }));
             }
           }
+
+          // Sync Individual User Custom Quota & Moderation Status from Cloud
+          const userPhone = (typeof getUserPhone === 'function' ? getUserPhone() : '').replace(/\D/g, '').slice(-10);
+          if (userPhone && userPhone.length === 10) {
+            const uUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?mobile=eq.${userPhone}&select=is_blocked,block_reason,domain_scores`;
+            const ur = await fetch(uUrl, {
+              headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' }
+            });
+            if (ur.ok) {
+              const uArr = await ur.json();
+              if (Array.isArray(uArr) && uArr[0]) {
+                const uRow = uArr[0];
+                const cMap = JSON.parse(localStorage.getItem('SAKHI_CUSTOM_USER_QUOTAS') || '{}');
+                const qData = uRow.domain_scores?._quota || {};
+                cMap[userPhone] = {
+                  bonusImages: qData.bonusImages || 0,
+                  bonusChats: qData.bonusChats || 0,
+                  customImages: qData.customImages,
+                  customChats: qData.customChats,
+                  blocked: Boolean(uRow.is_blocked || qData.blocked)
+                };
+                localStorage.setItem('SAKHI_CUSTOM_USER_QUOTAS', JSON.stringify(cMap));
+                if (uRow.is_blocked && window.SakhiModeration && typeof window.SakhiModeration.adminBlockUser === 'function') {
+                  window.SakhiModeration.adminBlockUser(userPhone, 24, uRow.block_reason || 'एडमिन द्वारा ब्लॉक');
+                } else if (!uRow.is_blocked && window.SakhiModeration && typeof window.SakhiModeration.adminUnblockUser === 'function') {
+                  window.SakhiModeration.adminUnblockUser(userPhone);
+                }
+              }
+            }
+          }
         } catch (_) { }
       } catch (e) {
         console.debug('[Device Quota Server Sync Notice]:', e?.message);
@@ -3312,6 +3342,14 @@ if (typeof document !== 'undefined') {
         if (raw) log = JSON.parse(raw) || [];
       } catch (e) { }
 
+      // 🛡️ Prevent duplicate consecutive user questions in persistent history
+      if (role === 'user' && !imgMeta) {
+        const cleanContent = typeof content === 'string' ? content.trim() : '';
+        if (log.length > 0 && log[log.length - 1].role === 'user' && (log[log.length - 1].content || '').trim() === cleanContent) {
+          return;
+        }
+      }
+
       let entry;
       if (imgMeta && imgMeta.imgId) {
         // Zero-Egress Image entry: do NOT bloat localStorage with multi-MB base64 data!
@@ -3334,7 +3372,15 @@ if (typeof document !== 'undefined') {
           time: Date.now()
         };
       } else {
-        entry = { role, content, speech, time: Date.now() };
+        // Strip heavy inline ads and waves from stored bot message to ensure zero QuotaExceeded errors
+        let cleanStoredContent = content;
+        if (role === 'bot' && typeof content === 'string') {
+          cleanStoredContent = content
+            .replace(/<div class="sakhi-floating-wave-alert"[\s\S]*?<\/div>\s*<\/div>/g, '')
+            .replace(/<div class="sakhi-care-followup"[\s\S]*?<\/div>/g, '')
+            .trim();
+        }
+        entry = { role, content: cleanStoredContent, speech, time: Date.now() };
       }
       log.push(entry);
 
@@ -3376,10 +3422,30 @@ if (typeof document !== 'undefined') {
         if (!jawab || jawab.length < 25 || fallbackPhrases.some(fp => jawab.includes(fp))) {
           auditStatus = 'FAIL';
         }
-        logToSupabaseAudit(phone, sawal, jawab, sakhiConversationState.lastActiveDomain || 'omni', auditStatus);
+
+        // Determine Answer Source Tag: [Vault], [Gemini AI], or [Wikipedia]
+        let sourceTag = 'Vault';
+        if (sakhiConversationState && sakhiConversationState.lastAnswerSource) {
+          sourceTag = sakhiConversationState.lastAnswerSource;
+        } else if (jawab.includes('Wikipedia') || jawab.includes('विकिपीडिया')) {
+          sourceTag = 'Wikipedia';
+        } else if (jawab.includes('Gemini') || (sakhiConversationState && sakhiConversationState.isGeminiAnswer)) {
+          sourceTag = 'Gemini AI';
+        }
+        const baseDomain = sakhiConversationState.lastActiveDomain || 'omni';
+        const fullDomainWithSource = `${baseDomain} [${sourceTag}]`;
+
+        logToSupabaseAudit(phone, sawal, jawab, fullDomainWithSource, auditStatus);
       }
       if (log.length > 50) log = log.slice(-50);
-      localStorage.setItem(key, JSON.stringify(log));
+      try {
+        localStorage.setItem(key, JSON.stringify(log));
+      } catch (quotaErr) {
+        try {
+          log = log.slice(-20);
+          localStorage.setItem(key, JSON.stringify(log));
+        } catch (_) {}
+      }
     } catch (e) {
       console.warn('saveChatLogItem warning:', e);
     }
@@ -3958,12 +4024,14 @@ if (typeof document !== 'undefined') {
       if (pur && pur.length > 0) isUserInactive = false;
     } catch (_) { isUserInactive = true; }
 
-    // Trigger Red Countdown: After every photo upload OR every 11 queries ONLY for Inactive users!
+    // Trigger Red Countdown: Query 2, Query 4, and then every 4 queries (2, 4, 8, 12, 16...) OR every photo upload ONLY for Inactive users!
     const isPhotoQuery = Boolean(window._sakhiLastQueryWasPhoto);
     window._sakhiLastQueryWasPhoto = false; // Reset flag
-    const isEvery11Query = (window._sakhiChatAdCounter % 11 === 0);
+    const adCount = window._sakhiChatAdCounter;
+    const isCadenceQuery = (adCount === 2 || adCount === 4 || (adCount > 4 && adCount % 4 === 0));
+    const shouldShowAlert = isUserInactive && (isPhotoQuery || isCadenceQuery);
 
-    if (isUserInactive && (isPhotoQuery || isEvery11Query)) {
+    if (shouldShowAlert) {
       let remChats = 40;
       let remImgs = 4;
       try {
@@ -3992,15 +4060,14 @@ if (typeof document !== 'undefined') {
             </span>
           </div>
           <p style="font-size:0.82rem;color:#b91c1c;margin:0 0 10px 0;line-height:1.45;">
-            💡 <strong>सखी AI लिमिट बढ़ाने के लिए 1 साल का सब्सक्रिप्शन बिल्कुल मुफ़्त!</strong> लाइब्रेरी से कोई भी <strong>1 ई-बुक</strong> लेने पर आईडी तुरंत <strong>एक्टिव + 10% लाइफटाइम कैशबैक</strong>।
+            💡 <strong>सखी AI लिमिट बढ़ाने के लिए 1 साल का सब्सक्रिप्शन बिल्कुल मुफ़्त!</strong> लाइब्रेरी से कोई भी <strong>1 ई-बुक</strong> लेने पर आईडी तुरंत <strong>एक्टिव + 10% कैशबैक</strong>।
           </p>
           <a href="/ebook-library.html" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;background:linear-gradient(135deg, #dc2626, #b91c1c);color:#ffffff;text-decoration:none;font-weight:900;font-size:0.86rem;padding:9px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(220,38,38,0.35);transition:transform 0.15s;">
             <span>📚</span> <span>मेरी लाइब्रेरी / उपलब्ध पुस्तकें चुनें</span> <span>➔</span>
           </a>
         </div>
       `;
-    }
-    if (window._sakhiChatAdCounter % 5 === 0) {
+    } else if (window._sakhiChatAdCounter % 5 === 0) {
       inlineAdHtml = renderInlinePassbookCardHtml();
     } else if (window._sakhiChatAdCounter % 3 === 0) {
       const lastUserQuery = (sessionChatHistory && sessionChatHistory.filter(m => m.role === 'user').slice(-1)[0]?.text) || '';

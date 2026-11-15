@@ -7,7 +7,7 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js').then(m => m.initDashboard()),
-  'users': () => import('./admin-pages-users.js?v=27.5').then(m => m.initUsers()),
+  'users': () => import('./admin-pages-users.js?v=20261115_v83_user_credit_live').then(m => m.initUsers()),
   'user-details': () => import('./admin-pages-user-details.js?v=27.5').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
   'all-phonebook': () => import('./admin-pages-phonebook.js').then(m => m.initAllPhonebook()),
@@ -36,7 +36,7 @@ const ROUTES = {
   'landing-page-control': () => import('./admin-pages-landing-page-control.js?v=2.0').then(m => m.initLandingPageControl()),
   'admin-app': () => import('./admin-pages-admin-app.js').then(m => m.initAdminApp()),
   'smart-etailer': () => import('./admin-pages-smart-etailer.js?v=20261031_v38_hybrid_khata').then(m => m.initSmartEtailerAdmin()),
-  'sakhi-ai-hub': () => import('./admin-pages-sakhi-ai-hub.js?v=20261115_v82_sugarcane_hub').then(m => m.initSakhiAiHub()),
+  'sakhi-ai-hub': () => import('./admin-pages-sakhi-ai-hub.js?v=20261115_v83_user_credit_live').then(m => m.initSakhiAiHub()),
   'settings': () => import('./admin-pages-settings.js?v=2.0').then(m => m.initSettings()).catch(() => {}),
   'support': () => renderSupportModule(),
   'crop-doctor': () => renderCropDoctorModule(),

@@ -693,7 +693,7 @@ export async function initSakhiAiHub() {
             <div id="statTotal7dTokens" style="font-size:1.20rem;font-weight:900;color:#38bdf8;margin-top:2px;">0</div>
           </div>
           <div style="text-align:center;">
-            <div style="font-size:0.72rem;color:var(--admin-muted,#94a3b8);font-weight:600;">आज के फोटो विज़न</div>
+            <div style="font-size:0.72rem;color:var(--admin-muted,#94a3b8);font-weight:600;">कुल 7-दिवसीय फोटो विज़न</div>
             <div id="statTodayImages" style="font-size:1.20rem;font-weight:900;color:#ec4899;margin-top:2px;">0</div>
           </div>
           <div style="text-align:center;">
@@ -2197,10 +2197,22 @@ window.renderSakhiAuditTableRows = renderSakhiAuditTableRows;
         <td style="padding:10px 12px;font-size:0.78rem;color:var(--admin-muted,#94a3b8);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(jawab)}">
           ${escapeHtml(jawab.replace(/<[^>]*>/g, '').slice(0, 80))}...
         </td>
-        <td style="padding:10px 12px;text-align:center;">
-          <span style="background:rgba(59,130,246,0.15);color:#38bdf8;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;">
-            ${escapeHtml(domain)}
-          </span>
+        <td style="padding:10px 12px;text-align:center;white-space:nowrap;">
+          ${(() => {
+            let domName = domain;
+            let srcBadge = '<span style="background:rgba(16,185,129,0.18);color:#34d399;padding:1px 5px;border-radius:4px;font-size:0.65rem;font-weight:800;margin-left:3px;">Vault</span>';
+            if (domName.includes('[Vault]')) {
+              srcBadge = '<span style="background:rgba(16,185,129,0.18);color:#34d399;padding:1px 5px;border-radius:4px;font-size:0.65rem;font-weight:800;margin-left:3px;">Vault</span>';
+              domName = domName.replace('[Vault]', '').trim();
+            } else if (domName.includes('[Gemini AI]')) {
+              srcBadge = '<span style="background:rgba(217,70,239,0.18);color:#f472b6;padding:1px 5px;border-radius:4px;font-size:0.65rem;font-weight:800;margin-left:3px;">Gemini</span>';
+              domName = domName.replace('[Gemini AI]', '').trim();
+            } else if (domName.includes('[Wikipedia]')) {
+              srcBadge = '<span style="background:rgba(245,158,11,0.18);color:#fbbf24;padding:1px 5px;border-radius:4px;font-size:0.65rem;font-weight:800;margin-left:3px;">Wiki</span>';
+              domName = domName.replace('[Wikipedia]', '').trim();
+            }
+            return `<span style="background:rgba(59,130,246,0.15);color:#38bdf8;padding:2px 7px;border-radius:8px;font-size:0.72rem;font-weight:700;display:inline-flex;align-items:center;">${escapeHtml(domName)} ${srcBadge}</span>`;
+          })()}
         </td>
         <td style="padding:10px 12px;text-align:center;">
           ${isPass 
@@ -2674,7 +2686,7 @@ function renderGeminiDailyChart() {
   const statImgEl = document.getElementById('statTodayImages');
   const statChatEl = document.getElementById('statTodayChats');
   if (statTokEl) statTokEl.textContent = total7dTokens.toLocaleString('hi-IN');
-  if (statImgEl) statImgEl.textContent = total7dImages > 0 ? `${todayImgs} (7 दिन: ${total7dImages})` : `${todayImgs}`;
+  if (statImgEl) statImgEl.textContent = total7dImages > 0 ? `${total7dImages} (आज: ${todayImgs})` : `${todayImgs}`;
   if (statChatEl) statChatEl.textContent = todayChats.toLocaleString('hi-IN');
 
   const photosEl = document.getElementById('sakhiKpiPhotos');
@@ -2762,7 +2774,7 @@ async function initSakhiTeamLeadsHub() {
     const db = window.dbClient || window.supabase;
     if (db && typeof db.from === 'function') {
       const { data, error } = await db.from('profiles')
-        .select('id, full_name, mobile, referral_code, referred_by, referral_mobile, share_id, created_at, interest, netsurf_id')
+        .select('id, full_name, mobile, referral_code, referred_by, referral_mobile, share_id, created_at, interest, netsurf_id, is_active, wallet_balance, membership_level')
         .limit(2000);
       if (!error && data && data.length > 0) {
         profiles = data;
@@ -2775,7 +2787,7 @@ async function initSakhiTeamLeadsHub() {
   // Fallback REST fetch if DB client returned empty
   if (profiles.length === 0) {
     try {
-      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?select=id,full_name,mobile,referral_code,referred_by,referral_mobile,share_id,created_at,interest,netsurf_id,State,district&limit=2000';
+      const sbUrl = 'https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?select=id,full_name,mobile,referral_code,referred_by,referral_mobile,share_id,created_at,interest,netsurf_id,is_active,wallet_balance,membership_level,State,district&limit=2000';
       const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
       const res = await fetch(sbUrl, { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' } });
       if (res.ok) {
@@ -2845,7 +2857,14 @@ async function initSakhiTeamLeadsHub() {
 
   function checkIsMemberActive(p) {
     if (!p) return false;
-    return Boolean(p.is_active || (p.wallet_balance && p.wallet_balance > 0) || p.membership_level === 'vip' || p.membership_level === 'pro');
+    return Boolean(
+      p.is_active === true ||
+      p.is_active === 'true' ||
+      p.status === 'active' ||
+      (p.wallet_balance && Number(p.wallet_balance) > 0) ||
+      p.membership_level === 'vip' ||
+      p.membership_level === 'pro'
+    );
   }
 
   // Set of mobiles who have asked questions in the last 7 days
@@ -2922,6 +2941,7 @@ async function initSakhiTeamLeadsHub() {
       chat_count: 1,
       primary_domain: log.domain || 'agri',
       sawal: cleanSawal || 'फसल सुरक्षा व परामर्श',
+      jawab: log.jawab || '',
       last_topic: cleanSawal || 'फसल सुरक्षा व परामर्श',
       last_active: logDt,
       status: log.status || 'PASS'
@@ -3264,8 +3284,8 @@ function renderTeamLeadsTable() {
       time: timeStr,
       domain: domainBadge,
       domainBadge: `<span style="background:rgba(56,189,248,0.15);color:#38bdf8;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:800;">${escapeHtml(domainBadge)}</span>`,
-      query: 'कुल सवाल: ' + (r.chat_count || 1) + ' बार सखी AI से संवाद।',
-      answer: 'डाउनलाइन किसान की मुख्य रुचि ' + domainBadge + ' में है। स्पॉन्सर Upline: ' + (r.upline_name || '') + ' (' + (r.upline_code || '') + ')।',
+      query: r.sawal ? escapeHtml(r.sawal) : ('कुल सवाल: ' + (r.chat_count || 1) + ' बार सखी AI से संवाद।'),
+      answer: r.jawab ? escapeHtml(r.jawab) : ('डाउनलाइन किसान की मुख्य रुचि ' + domainBadge + ' में है। स्पॉन्सर Upline: ' + (r.upline_name || '') + ' (' + (r.upline_code || '') + ')।'),
       ebook: pitchText
     };
     window._sakhiDrawerItems = window._sakhiDrawerItems || new Map();
