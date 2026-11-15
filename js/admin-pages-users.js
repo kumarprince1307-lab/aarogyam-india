@@ -175,45 +175,9 @@ function renderUsersTable(users) {
                 const customerName = u.name || 'किसान साथी';
                 let message = '';
                 if (isSub) {
-                    message = `🙏 नमस्ते ${customerName} जी!
-
-🎉 बहुत-बहुत बधाई और स्वागत है! आप आरोग्यम इंडिया के सम्मानित सदस्य हैं।
-
-📖 *1. My Library (ऑनलाइन पढ़ें व ऑडियो सुनें):*
-अपनी ई-बुक्स को कभी भी पढ़ने और ऑडियो सुनने हेतु यहाँ क्लिक करें:
-👉 https://aarogyamindia.online/my-library.html
-
-📲 *2. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
-बिना ब्राउज़र खोले तुरंत उपयोग करने हेतु ऐप इंस्टॉल करें:
-👉 https://aarogyamindia.online/aarogyam-app.html
-
-🌸 *3. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
-फसल के रोग, कीटनाशक स्प्रे चार्ट, पशुपालन या सेहत का कोई भी सवाल या फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
-👉 https://aarogyamindia.online/aarogyam-sakhi.html
-
-🎁 *विशेष ऑफर्स व सहायता हेतु हमसे संपर्क करें:*
-📞 WhatsApp / कॉल: +91 7974422572
-
-आपका शुभचिंतक,  
-*आरोग्यम इंडिया टीम* 🌿`;
+                    message = `🙏 नमस्ते ${customerName} जी!\n\n🎉 बहुत-बहुत बधाई और स्वागत है! आप आरोग्यम इंडिया के सम्मानित एक्टिव सदस्य हैं।\n\nआपके एक्टिव अकाउंट के साथ आपको ये सभी सुविधाएं उपलब्ध हैं:\n\n📖 *1. डिजिटल ई-बुक लाइब्रेरी:*\nअपनी ई-बुक्स पढ़ने व ऑडियो सुनने हेतु:\n👉 https://aarogyamindia.online/my-library.html\n\n🌸 *2. 24x7 आरोग्यम सखी AI:*\nफसलों के रोग, कीट उपचार, खाद प्रबंधन व पशुपालन की तुरंत सलाह हेतु:\n👉 https://aarogyamindia.online/aarogyam-sakhi.html\n\n📊 *3. डिजिटल बही-खाता व मेरी डेयरी:*\nखेती, डेयरी व दैनिक आय-व्यय हिसाब-किताब रखने हेतु:\n👉 https://aarogyamindia.online/aarogyam-app.html\n\n🤝 *4. शेयर करें व कमाएँ (UCAS पार्टनर पोर्टल):*\nअपने रेफरल लिंक से किसान साथियों को जोड़ें व आकर्षक कमीशन पाएं:\n👉 https://aarogyamindia.online/ucas/index.html\n\n📞 *हेल्पलाइन व कस्टमर सपोर्ट:*\n+91 7974422572\n\nआपका शुभचिंतक,\n*आरोग्यम इंडिया टीम* 🌿`;
                 } else {
-                    message = `🙏 नमस्ते ${customerName} जी!
-
-आरोग्यम इंडिया परिवार में आपका हार्दिक स्वागत है 🌿
-
-📲 *1. आरोग्यम इंडिया ऐप सीधे इंस्टॉल करें:*
-खेती, पशुपालन व डिजिटल कृषि पुस्तकों के लिए हमारा ऐप इंस्टॉल करें:
-👉 https://aarogyamindia.online/aarogyam-app.html
-
-🌸 *2. 24x7 निःशुल्क 'आरोग्यम सखी AI' की सुविधा:*
-फसल के रोग, सही जैविक स्प्रे चार्ट, पशुपालन व स्वास्थ्य का कोई भी सवाल पूछें या फोटो भेजकर तुरंत वैज्ञानिक सलाह पाएं:
-👉 https://aarogyamindia.online/aarogyam-sakhi.html
-
-🎁 *विशेष डिस्काउंट व ऑफर्स के लिए हमसे संपर्क करें:*
-📞 WhatsApp / कॉल: +91 7974422572
-
-सप्रेम व आदर सहित,  
-*आरोग्यम इंडिया टीम* 🌾`;
+                    message = `🙏 नमस्ते ${customerName} जी!\n\nआरोग्यम इंडिया परिवार में आपका स्वागत है 🌿\n\nआपकी आईडी वर्तमान में *INACTIVE* है।\n\nआईडी एक्टिवेट करने पर आपको प्राप्त होगी:\n🌾 24x7 सखी AI कृषि व पशु परामर्श\n📚 सम्पूर्ण डिजिटल लाइब्रेरी एक्सेस\n💰 प्रति रेफरल ₹200 तक आजीवन अर्निंग व 10% कैशबैक\n\nक्या आप अपनी आईडी अभी एक्टिवेट करना चाहते हैं?\nकृपया *Yes* या *No* लिखकर रिप्लाई करें।\n\nहेल्पलाइन: +91 7974422572\nआरोग्यम इंडिया टीम 🌾`;
                 }
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
@@ -1043,6 +1007,10 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
   if (existing) existing.remove();
 
   const cleanMobile = String(mobile || '').replace(/\D/g, '').slice(-10);
+  const isActiveUser = String(status || '').toLowerCase() === 'active';
+  const baseChats = isActiveUser ? 500 : 20;
+  const baseImages = isActiveUser ? 15 : 3;
+
   let customMap = {};
   try {
     customMap = JSON.parse(localStorage.getItem('SAKHI_CUSTOM_USER_QUOTAS') || '{}');
@@ -1055,30 +1023,57 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
   let customChat = typeof uQuota.customChats === 'number' ? uQuota.customChats : '';
   let isBlocked = Boolean(uQuota.blocked);
 
+  let liveChatsUsed = 0;
+  let livePhotosUsed = 0;
+
   const modal = document.createElement('div');
   modal.id = 'userCustomQuotaModal';
-  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.8);backdrop-filter:blur(6px);z-index:99999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.85);backdrop-filter:blur(6px);z-index:99999999;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
   
   modal.innerHTML = `
-    <div style="background:#ffffff;border-radius:20px;max-width:440px;width:100%;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,0.4);border:1.5px solid #38bdf8;box-sizing:border-box;color:#0f172a;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;">
+    <div style="background:#ffffff;border-radius:20px;max-width:460px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,0.4);border:1.5px solid #38bdf8;box-sizing:border-box;color:#0f172a;max-height:92vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid #e2e8f0;padding-bottom:10px;">
         <h3 style="margin:0;font-size:1.15rem;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:8px;">
           <span>⚡</span> सखी AI यूजर क्रेडिट कस्टमाइज़ेशन
         </h3>
         <button type="button" onclick="document.getElementById('userCustomQuotaModal').remove()" style="background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;color:#64748b;">&times;</button>
       </div>
 
-      <div style="background:#f8fafc;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:0.84rem;">
-        <div>👤 <strong>यूजर नाम:</strong> ${name || 'N/A'}</div>
-        <div>📱 <strong>मोबाइल:</strong> ${cleanMobile || 'N/A'}</div>
-        <div>⚡ <strong>सिस्टम स्टेटस:</strong> <span style="font-weight:800;color:${status === 'active' ? '#15803d' : '#ca8a04'};">${(status || 'INACTIVE').toUpperCase()}</span></div>
-        <div id="modalUserLiveUsageBox" style="margin-top:6px;padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.78rem;color:#0284c7;font-weight:700;">
-          ⏳ आज का उपयोग डेटा लोड हो रहा है...
+      <!-- User Profile Card -->
+      <div style="background:#f8fafc;border-radius:12px;padding:12px;margin-bottom:12px;font-size:0.83rem;border:1px solid #e2e8f0;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+          <div>👤 <strong>यूजर नाम:</strong> ${name || 'N/A'}</div>
+          <div>📱 <strong>मोबाइल:</strong> ${cleanMobile || 'N/A'}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+          <div>⚡ <strong>सिस्टम स्टेटस:</strong> <span style="font-weight:800;color:${isActiveUser ? '#15803d' : '#ca8a04'};">${(status || 'INACTIVE').toUpperCase()}</span></div>
+          <div>⚖️ <strong>दैनिक बेस कोटा:</strong> <span style="font-weight:700;color:#0369a1;">${baseChats} सवाल | ${baseImages} फोटो</span></div>
+        </div>
+        <div id="modalUserLiveUsageBox" style="padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.79rem;color:#0284c7;font-weight:700;">
+          ⏳ आज का लाइव उपयोग डेटा लोड हो रहा है...
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-        <!-- Bonus Credits -->
+      <!-- Live Calculation Preview Box -->
+      <div id="modalLiveCalculationCard" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:10px 12px;margin-bottom:12px;">
+        <div style="font-weight:900;color:#166534;font-size:0.82rem;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+          <span>⚡ लाइव क्रेडिट स्थिति (Live Balance Preview):</span>
+          <span id="previewStatusBadge" style="font-size:0.72rem;padding:2px 6px;border-radius:4px;background:#dcfce7;color:#15803d;">गणना सक्रिय</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.78rem;">
+          <div style="background:#ffffff;padding:6px 8px;border-radius:8px;border:1px solid #bbf7d0;">
+            <div style="color:#64748b;">कुल चैट सीमा: <strong id="previewTotalChats" style="color:#0f172a;">${baseChats} सवाल</strong></div>
+            <div style="margin-top:2px;">शेष सवाल: <strong id="previewRemainingChats" style="color:#15803d;">लोड हो रहा है...</strong></div>
+          </div>
+          <div style="background:#ffffff;padding:6px 8px;border-radius:8px;border:1px solid #bbf7d0;">
+            <div style="color:#64748b;">कुल फोटो सीमा: <strong id="previewTotalImages" style="color:#0f172a;">${baseImages} फोटो</strong></div>
+            <div style="margin-top:2px;">शेष फोटो: <strong id="previewRemainingImages" style="color:#15803d;">लोड हो रहा है...</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+        <!-- Bonus Credits Inputs -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div>
             <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">🎁 बोनस फोटो (+Images):</label>
@@ -1094,16 +1089,16 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div>
             <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">⚙️ फिक्स फोटो सीमा:</label>
-            <input type="number" id="modalUserCustomImages" placeholder="डिफ़ॉल्ट" value="${customImg}" min="0" max="1000" class="admin-input" style="width:100%;box-sizing:border-box;" />
+            <input type="number" id="modalUserCustomImages" placeholder="डिफ़ॉल्ट (${baseImages})" value="${customImg}" min="0" max="1000" class="admin-input" style="width:100%;box-sizing:border-box;" />
           </div>
           <div>
             <label style="font-size:0.75rem;font-weight:800;color:#334155;display:block;margin-bottom:4px;">⚙️ फिक्स चैट सीमा:</label>
-            <input type="number" id="modalUserCustomChats" placeholder="डिफ़ॉल्ट" value="${customChat}" min="0" max="10000" class="admin-input" style="width:100%;box-sizing:border-box;" />
+            <input type="number" id="modalUserCustomChats" placeholder="डिफ़ॉल्ट (${baseChats})" value="${customChat}" min="0" max="10000" class="admin-input" style="width:100%;box-sizing:border-box;" />
           </div>
         </div>
 
         <!-- Block Gemini API for this user -->
-        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div style="font-size:0.80rem;font-weight:900;color:#b91c1c;">🛑 जेमिनी AI एक्सेस ब्लॉक करें</div>
             <div style="font-size:0.70rem;color:#7f1d1d;">इस यूजर के लिए सखी AI पूरी तरह बंद करें</div>
@@ -1125,6 +1120,57 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
 
   document.body.appendChild(modal);
 
+  function recalcLivePreview() {
+    const bImg = Number(document.getElementById('modalUserBonusImages')?.value) || 0;
+    const bChat = Number(document.getElementById('modalUserBonusChats')?.value) || 0;
+    const cImgRaw = (document.getElementById('modalUserCustomImages')?.value || '').trim();
+    const cChatRaw = (document.getElementById('modalUserCustomChats')?.value || '').trim();
+    const isBlk = Boolean(document.getElementById('modalUserBlockGemini')?.checked);
+
+    const totalChatLimit = (cChatRaw !== '' ? Number(cChatRaw) : baseChats) + bChat;
+    const totalImgLimit = (cImgRaw !== '' ? Number(cImgRaw) : baseImages) + bImg;
+
+    const remChats = Math.max(0, totalChatLimit - liveChatsUsed);
+    const remImgs = Math.max(0, totalImgLimit - livePhotosUsed);
+
+    const totalChatEl = document.getElementById('previewTotalChats');
+    const remChatEl = document.getElementById('previewRemainingChats');
+    const totalImgEl = document.getElementById('previewTotalImages');
+    const remImgEl = document.getElementById('previewRemainingImages');
+
+    if (totalChatEl) totalChatEl.textContent = `${totalChatLimit} सवाल ${bChat > 0 ? `(+${bChat} बोनस)` : ''}`;
+    if (totalImgEl) totalImgEl.textContent = `${totalImgLimit} फोटो ${bImg > 0 ? `(+${bImg} बोनस)` : ''}`;
+
+    if (remChatEl) {
+      if (isBlk) {
+        remChatEl.innerHTML = `<span style="color:#dc2626;">0 (एक्सेस ब्लॉक 🛑)</span>`;
+      } else if (remChats <= 0) {
+        remChatEl.innerHTML = `<span style="color:#dc2626;font-weight:800;">0 शेष (सीमा समाप्त ⚠️)</span>`;
+      } else {
+        remChatEl.innerHTML = `<span style="color:#16a34a;font-weight:800;">${remChats} सवाल शेष 🟢</span>`;
+      }
+    }
+
+    if (remImgEl) {
+      if (isBlk) {
+        remImgEl.innerHTML = `<span style="color:#dc2626;">0 (एक्सेस ब्लॉक 🛑)</span>`;
+      } else if (remImgs <= 0) {
+        remImgEl.innerHTML = `<span style="color:#dc2626;font-weight:800;">0 शेष (सीमा समाप्त ⚠️)</span>`;
+      } else {
+        remImgEl.innerHTML = `<span style="color:#16a34a;font-weight:800;">${remImgs} फोटो शेष 🟢</span>`;
+      }
+    }
+  }
+
+  // Attach live input listeners for instant calculation
+  ['modalUserBonusImages', 'modalUserBonusChats', 'modalUserCustomImages', 'modalUserCustomChats', 'modalUserBlockGemini'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', recalcLivePreview);
+      el.addEventListener('change', recalcLivePreview);
+    }
+  });
+
   // Asynchronously fetch live usage and Cloud Quota from Supabase
   let existingScores = {};
   const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
@@ -1133,16 +1179,15 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
     // 1. Fetch real chat and photo counts from audit logs
     const auditUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_chat_audit_logs?user_profile=like.*${cleanMobile}*&date_time=gte.${todayStr}T00:00:00&select=id,sawal,domain`;
     const aRes = await fetch(auditUrl, { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Accept': 'application/json' } });
-    let tChats = 0, tPhotos = 0;
     if (aRes.ok) {
       const aLogs = await aRes.json();
-      tChats = aLogs.length;
-      tPhotos = aLogs.filter(l => (l.sawal || '').includes('फोटो') || (l.sawal || '').includes('📷') || (l.domain || '').includes('photo')).length;
+      liveChatsUsed = aLogs.length;
+      livePhotosUsed = aLogs.filter(l => (l.sawal || '').includes('फोटो') || (l.sawal || '').includes('📷') || (l.domain || '').includes('photo')).length;
     }
 
     const usageEl = document.getElementById('modalUserLiveUsageBox');
     if (usageEl) {
-      usageEl.innerHTML = `📊 <strong>आज का वास्तविक उपयोग:</strong> 💬 ${tChats} सवाल पूछे | 📷 ${tPhotos} फोटो जांची`;
+      usageEl.innerHTML = `📊 <strong>आज का वास्तविक उपयोग:</strong> 💬 ${liveChatsUsed} सवाल पूछे | 📷 ${livePhotosUsed} फोटो जांची`;
     }
 
     // 2. Fetch server quota & moderation block from sakhi_user_insights
@@ -1163,8 +1208,12 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
         }
       }
     }
+
+    // Recalculate preview once live usage data is loaded
+    recalcLivePreview();
   } catch(err) {
     console.debug('Error loading live user quota:', err);
+    recalcLivePreview();
   }
 
   document.getElementById('modalSaveUserQuotaBtn').onclick = async function() {
@@ -1226,14 +1275,19 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
       }
     }
 
-    alert(`✅ ${name || 'User'} (${cleanMobile}) के सखी AI क्रेडिट व एक्सेस सेटिंग्स क्लाउड डेटाबेस पर सफलतापूर्वक सुरक्षित हो गए!`);
+    // Dispatch global event for instant client updates without page reload
+    try {
+      window.dispatchEvent(new CustomEvent('sakhi_quota_updated', { detail: { mobile: cleanMobile, quota: quotaObj } }));
+    } catch(_) {}
+
+    const finalTotalChat = (cChatRaw !== '' ? Number(cChatRaw) : baseChats) + bChat;
+    const finalRemChat = Math.max(0, finalTotalChat - liveChatsUsed);
+
+    alert(`✅ ${name || 'User'} (${cleanMobile}) के सखी AI क्रेडिट सुरक्षित हो गए!\n\n💬 कुल चैट सीमा: ${finalTotalChat} सवाल ${bChat > 0 ? `(+${bChat} बोनस)` : ''}\n✨ शेष सवाल: ${finalRemChat} सवाल उपलब्ध`);
     modal.remove();
   };
 };
 
-// =========================================================================
-// 1-CLICK DEVICE RESET HELPER (Enables customer login on a new phone)
-// =========================================================================
 window.resetUserDevice = async function(userId, mobile, btnEl) {
   const cleanMob = String(mobile || '').replace(/\D/g, '').slice(-10);
   if (!cleanMob) {

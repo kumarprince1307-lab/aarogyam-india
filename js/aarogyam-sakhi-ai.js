@@ -849,8 +849,8 @@ if (typeof document !== 'undefined') {
     },
 
     getDefaultLimits: function () {
-      let inactiveLimits = { images: 5, chats: 50 };
-      let activeLimits = { images: 15, chats: 200 };
+      let inactiveLimits = { images: 3, chats: 20 };
+      let activeLimits = { images: 15, chats: 500 };
       try {
         const saved = JSON.parse(localStorage.getItem('SAKHI_GLOBAL_QUOTA_CONFIG') || '{}');
         if (saved.inactive) inactiveLimits = Object.assign(inactiveLimits, saved.inactive);
@@ -1006,11 +1006,12 @@ if (typeof document !== 'undefined') {
     },
 
     getUserCustomQuota: function (phone) {
-      const p = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
-      if (!p) return null;
+      const raw = phone || (typeof getUserPhone === 'function' ? getUserPhone() : '');
+      if (!raw) return null;
+      const clean = String(raw).replace(/\D/g, '').slice(-10);
       try {
         const customMap = JSON.parse(localStorage.getItem('SAKHI_CUSTOM_USER_QUOTAS') || '{}');
-        return customMap[p] || null;
+        return customMap[clean] || customMap[raw] || null;
       } catch (e) {
         return null;
       }
@@ -1304,6 +1305,14 @@ if (typeof document !== 'undefined') {
     }
   };
 
+      // Real-time listener for admin quota updates without page refresh
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sakhi_quota_updated', function () {
+        if (SakhiQuotaEngine && typeof SakhiQuotaEngine.updatePlusMenuCreditsUI === 'function') {
+          SakhiQuotaEngine.updatePlusMenuCreditsUI();
+        }
+      });
+    }
   window.SakhiQuotaEngine = SakhiQuotaEngine;
 
   const MASTER_ADMIN_PHONE = '7974422572';

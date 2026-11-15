@@ -283,6 +283,108 @@ function cleanPhoneForWa(mobile) {
   return digits;
 }
 
+const AAROGYAM_BOOKS_CATALOG = {
+  'BK001': {
+    title: 'खरीफ फसल मास्टर गाइड 2026',
+    desc: 'धान, सोयाबीन, मक्का व दलहन का 150+ पेज का संपूर्ण वैज्ञानिक समाधान',
+    url: 'https://aarogyamindia.online/ebooks/kharif-master-guide-2026.html'
+  },
+  'BK002': {
+    title: "'खेती का डॉक्टर' (Pocket Doctor)",
+    desc: '300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान',
+    url: 'https://aarogyamindia.online/ebooks/kheti-dr.html'
+  },
+  'BK015': {
+    title: 'सब्जी की उन्नत वैज्ञानिक खेती',
+    desc: '11 प्रमुख सब्जियों की संपूर्ण वैज्ञानिक बुवाई व देखभाल',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK015'
+  },
+  'BK016': {
+    title: 'कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले',
+    desc: 'सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK016'
+  },
+  'BK017': {
+    title: 'गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026',
+    desc: 'बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK017'
+  },
+  'BK018': {
+    title: 'घर बैठे पैसे कैसे कमाएँ? (Income Guide)',
+    desc: 'व्यावहारिक कमाई के तरीके व आत्मनिर्भर बनने की गाइड',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK018'
+  },
+  'BK019': {
+    title: 'आधुनिक मक्का व तिलहन उत्पादन तकनीक',
+    desc: 'कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK019'
+  },
+  'BK020': {
+    title: 'प्राकृतिक खेती व जैविक खाद निर्माण गाइड',
+    desc: 'जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK020'
+  },
+  'BK021': {
+    title: 'पशुपालन व उन्नत डेयरी प्रबंधन',
+    desc: 'दूध, फैट वृद्धि, पशु आहार व स्वास्थ्य का संपूर्ण गाइड',
+    url: 'https://aarogyamindia.online/ebooks/book-landing.html?id=BK021'
+  }
+};
+
+function resolveBookInfo(rawBook) {
+  const str = String(rawBook || '').trim();
+  const upper = str.toUpperCase();
+  const isCombo = str.includes(',') || upper.includes('COMBO') || upper.includes('BUNDLE') || upper.includes('5-IN-1');
+
+  if (isCombo) {
+    const ids = str.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const resolvedTitles = [];
+    ids.forEach(id => {
+      if (AAROGYAM_BOOKS_CATALOG[id]) {
+        resolvedTitles.push(AAROGYAM_BOOKS_CATALOG[id].title);
+      }
+    });
+    return {
+      isCombo: true,
+      title: '5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)',
+      shortTitle: '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो',
+      landingUrl: 'https://aarogyamindia.online/bundle.html',
+      books: resolvedTitles
+    };
+  }
+
+  const single = AAROGYAM_BOOKS_CATALOG[upper] || AAROGYAM_BOOKS_CATALOG[str];
+  if (single) {
+    return {
+      isCombo: false,
+      title: single.title,
+      shortTitle: single.title,
+      desc: single.desc,
+      landingUrl: single.url
+    };
+  }
+
+  for (const [k, v] of Object.entries(AAROGYAM_BOOKS_CATALOG)) {
+    if (str.includes(k) || (v.title && str.toLowerCase().includes(v.title.toLowerCase()))) {
+      return {
+        isCombo: false,
+        title: v.title,
+        shortTitle: v.title,
+        desc: v.desc,
+        landingUrl: v.url
+      };
+    }
+  }
+
+  return {
+    isCombo: false,
+    title: str || 'आरोग्यम ई-बुक',
+    shortTitle: str || 'आरोग्यम ई-बुक',
+    desc: 'डिजिटल कृषि गाइड',
+    landingUrl: 'https://aarogyamindia.online/my-library.html'
+  };
+}
+
 function renderTodayPriorityHub(data) {
   const { todayCount, todayProfiles, todayPurchases, todayDropped } = data;
   const todayFormatted = new Date().toLocaleDateString('hi-IN', {
@@ -435,12 +537,19 @@ function renderTodayPriorityHub(data) {
               <tbody>
                 ${todayPurchases.map(p => {
     const waNumber = cleanPhoneForWa(p.customer_mobile);
-    const waMsg = encodeURIComponent(`नमस्ते ${p.customer_name} जी! 🙏 आरोग्यम इंडिया से "${p.book_title}" ई-बुक खरीदने के लिए आपका धन्यवाद! आपकी ई-बुक आपकी डिजिटल लाइब्रेरी में जोड़ दी गई है। कोई सहायता चाहिए तो बताएं।`);
+    const bInfo = resolveBookInfo(p.book_title || p.book_id);
+    let waMsgText = '';
+    if (bInfo.isCombo) {
+      waMsgText = `नमस्ते ${p.customer_name || 'किसान साथी'} जी! 🙏\n\nआरोग्यम इंडिया से *5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)* खरीदने के लिए आपका बहुत-बहुत धन्यवाद! 🎉\n\n📖 आपकी सभी 5 ई-बुक्स आपकी डिजिटल लाइब्रेरी में सफलतापूर्वक जोड़ दी गई हैं:\n👉 https://aarogyamindia.online/my-library.html\n\n🔗 कॉम्बो विवरण पेज:\n👉 ${bInfo.landingUrl}\n\nयदि पुस्तकें पढ़ने, डाउनलोड करने या ऑडियो सुनने में कोई सहायता चाहिए तो बेझिझक बताएं।\n\nहार्दिक शुभकामनाएं,\n*आरोग्यम इंडिया टीम* 🌾`;
+    } else {
+      waMsgText = `नमस्ते ${p.customer_name || 'किसान साथी'} जी! 🙏\n\nआरोग्यम इंडिया से *"${bInfo.title}"* ई-बुक खरीदने के लिए आपका बहुत-बहुत धन्यवाद! 🎉\n\n📖 आपकी ई-बुक आपकी डिजिटल लाइब्रेरी में सफलतापूर्वक जोड़ दी गई है:\n👉 https://aarogyamindia.online/my-library.html\n\n🔗 ई-बुक विवरण पेज:\n👉 ${bInfo.landingUrl}\n\nयदि पढ़ने या ऑडियो सुनने में कोई सहायता चाहिए तो बेझिझक बताएं।\n\nहार्दिक शुभकामनाएं,\n*आरोग्यम इंडिया टीम* 🌾`;
+    }
+    const waMsg = encodeURIComponent(waMsgText);
     return `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0;">
                       <td style="padding: 8px;"><strong>${p.customer_name}</strong></td>
                       <td style="padding: 8px;">${p.customer_mobile ? `<a href="tel:${p.customer_mobile}" style="color:#38bdf8;text-decoration:none;">${p.customer_mobile}</a>` : '—'}</td>
-                      <td style="padding: 8px; color: #fef08a;">${p.book_title}</td>
+                      <td style="padding: 8px; color: #fef08a; font-weight: 700;">${bInfo.shortTitle}</td>
                       <td style="padding: 8px; font-weight: 800; color: #4ade80;">₹${p.amount}</td>
                       <td style="padding: 8px; color: #94a3b8; font-size: 0.78rem;">${formatTime12h(p.purchase_date)}</td>
                       <td style="padding: 8px; text-align: right;">
@@ -477,39 +586,13 @@ function renderTodayPriorityHub(data) {
               <tbody>
                 ${todayDropped.map(d => {
     const waNumber = cleanPhoneForWa(d.customer_mobile);
-    const rawBook = String(d.book_id || d.book_title || '').trim();
-    const isBundle = rawBook.includes(',') || rawBook.toUpperCase().includes('BUNDLE') || rawBook.toUpperCase().includes('COMBO');
-
-    const KNOWN_BOOKS = {
-      'BK017': { title: 'गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026', desc: 'बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन' },
-      'BK016': { title: 'कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले', desc: 'सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज' },
-      'BK002': { title: "'खेती का डॉक्टर' (Pocket Doctor)", desc: '300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान' },
-      'BK019': { title: 'आधुनिक मक्का व तिलहन उत्पादन तकनीक', desc: 'कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला' },
-      'BK020': { title: 'प्राकृतिक खेती व जैविक खाद निर्माण गाइड', desc: 'जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि' },
-      'BK001': { title: 'खरीफ फसल मास्टर गाइड 2026', desc: 'धान, सोयाबीन, मक्का व दलहन का 150+ पेज का संपूर्ण वैज्ञानिक समाधान' },
-      'BK015': { title: 'सब्जी की उन्नत वैज्ञानिक खेती', desc: '11 प्रमुख सब्जियों की संपूर्ण वैज्ञानिक बुवाई व देखभाल' },
-      'BK018': { title: 'घर बैठे पैसे कैसे कमाएँ? (Income Guide)', desc: 'व्यावहारिक कमाई के तरीके व आत्मनिर्भर बनने की गाइड' }
-    };
-
-    let displayBookTitle = 'ई-बुक';
+    const bInfo = resolveBookInfo(d.book_id || d.book_title);
     let waMsgText = '';
 
-    if (isBundle) {
-      displayBookTitle = '📚 5-इन-1 सम्पूर्ण किसान कॉम्बो (5 पुस्तकें)';
-      const ids = rawBook.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
-      const activeIds = ids.length > 0 ? ids : ['BK017', 'BK016', 'BK002', 'BK019', 'BK020'];
-      let listText = '';
-      activeIds.forEach((id, idx) => {
-        const b = KNOWN_BOOKS[id] || { title: id, desc: 'डिजिटल गाइड' };
-        listText += `${idx + 1}. *${b.title}* — ${b.desc}\n`;
-      });
-
-      waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।\n\n📚 *इस कॉम्बो में शामिल हैं ये 5 महत्वपूर्ण पुस्तकें:*\n${listText}\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप मात्र ₹149 सीधे हमारे आधिकारिक UPI (7049294111) पर भेजकर स्क्रीनशॉट दे सकते हैं। हम आपकी 5 पुस्तकें तुरंत सक्रिय (Activate) कर देंगे।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
+    if (bInfo.isCombo) {
+      waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *5-इन-1 सम्पूर्ण किसान डिजिटल कॉम्बो (5 पुस्तकें)* प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी रुकावट या व्यस्तता के कारण आपका ऑर्डर अधूरा रह गया।\n\n📚 *इस कॉम्बो में शामिल हैं ये 5 महत्वपूर्ण पुस्तकें:*\n1. *गेहूँ, चना, सरसों व रबी फसलें मास्टर गाइड 2026* — बीज से कटाई तक सम्पूर्ण रबी स्प्रे व खाद प्रबंधन\n2. *कृषि दवा डायरेक्टरी व टेक्निकल फॉर्मूले* — सभी कीटनाशक, फफूंदनाशी के असली टेक्निकल नाम व सही डोज\n3. *'खेती का डॉक्टर' (Pocket Doctor)* — 300+ असली फोटो सहित फसलों के सभी रोग, कीट व पहचान\n4. *आधुनिक मक्का व तिलहन उत्पादन तकनीक* — कम लागत में बंपर पैदावार का संपूर्ण वैज्ञानिक फॉर्मूला\n5. *प्राकृतिक खेती व जैविक खाद निर्माण गाइड* — जीवामृत, घनजीवामृत व जैविक कीटनाशक बनाने की विधि\n\n🔗 *कॉम्बो विवरण व डायरेक्ट ऑर्डर लिंक:*\n👉 ${bInfo.landingUrl}\n\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप मात्र ₹149 सीधे हमारे आधिकारिक UPI (7049294111) पर भेजकर स्क्रीनशॉट दे सकते हैं। हम आपकी 5 पुस्तकें तुरंत सक्रिय (Activate) कर देंगे।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
     } else {
-      const cleanId = rawBook.toUpperCase();
-      const single = KNOWN_BOOKS[cleanId] || { title: d.book_title || rawBook, desc: 'सम्पूर्ण वैज्ञानिक गाइड' };
-      displayBookTitle = single.title;
-      waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *"${single.title}"* ई-बुक प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी समस्या के कारण आपका ऑर्डर अधूरा रह गया।\n\n📖 *पुस्तक विवरण:* ${single.desc}।\n\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप सीधे हमारे आधिकारिक UPI (7049294111) पर भेजकर स्क्रीनशॉट दे सकते हैं, आपकी ई-बुक तुरंत सक्रिय कर दी जाएगी।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
+      waMsgText = `नमस्ते ${d.customer_name || 'किसान साथी'} जी! 🙏\n\nआशा है आप सपरिवार सकुशल व प्रसन्नचित्त होंगे 🌿\n\nहमने देखा कि आप आरोग्यम इंडिया से *"${bInfo.title}"* ई-बुक प्राप्त करने का प्रयास कर रहे थे, लेकिन किसी तकनीकी समस्या के कारण आपका ऑर्डर अधूरा रह गया।\n\n📖 *पुस्तक विवरण:* ${bInfo.desc || 'डिजिटल कृषि मार्गदर्शिका'}।\n\n🔗 *पुस्तक विवरण व डायरेक्ट ऑर्डर लिंक:*\n👉 ${bInfo.landingUrl}\n\n❤️ *हम आपके साथ हैं:*\nयदि ऑनलाइन पेमेंट करने में कोई परेशानी आ रही हो, तो आप सीधे हमारे आधिकारिक UPI (7049294111) पर भेजकर स्क्रीनशॉट दे सकते हैं, आपकी ई-बुक तुरंत सक्रिय कर दी जाएगी।\n\nआपकी आरोग्यम इंडिया टीम 🌾`;
     }
 
     const waMsg = encodeURIComponent(waMsgText);
@@ -517,7 +600,7 @@ function renderTodayPriorityHub(data) {
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0;">
                       <td style="padding: 8px;"><strong>${d.customer_name}</strong></td>
                       <td style="padding: 8px;">${d.customer_mobile ? `<a href="tel:${d.customer_mobile}" style="color:#f87171;text-decoration:none;">${d.customer_mobile}</a>` : '—'}</td>
-                      <td style="padding: 8px; color: #fde047; font-weight: 700;">${displayBookTitle}</td>
+                      <td style="padding: 8px; color: #fde047; font-weight: 700;">${bInfo.shortTitle}</td>
                       <td style="padding: 8px;"><span style="background:rgba(239,68,68,0.15);color:#fca5a5;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;">${d.status}</span></td>
                       <td style="padding: 8px; color: #94a3b8; font-size: 0.78rem;">${formatTime12h(d.created_at)}</td>
                       <td style="padding: 8px; text-align: right; white-space: nowrap;">
