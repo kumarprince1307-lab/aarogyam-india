@@ -2963,8 +2963,17 @@ async function loadBookStudio(bookId) {
         if (dbImages && Array.isArray(dbImages) && dbImages.length > 0) {
             const validImages = dbImages.filter(img => img && typeof img === 'string' && img.trim().length > 0);
             if (validImages.length > 0) {
-                studioPageImages = dbImages;
-                studioTotalPages = dbImages.length;
+                if (repoTotal > 0 || studioBookData?.hasWebpPages) {
+                    studioPageImages = validImages.map((img, idx) => {
+                        if (typeof img === 'string' && img.startsWith('data:image/')) {
+                            return `../images/books/${cleanId}/${idx + 1}.webp`;
+                        }
+                        return img;
+                    });
+                } else {
+                    studioPageImages = validImages;
+                }
+                studioTotalPages = studioPageImages.length;
                 console.log(`[Studio] Loaded ${studioTotalPages} user-saved pages from IndexedDB for ${cleanId}`);
             }
         }
@@ -4345,10 +4354,13 @@ async function syncStudioToGitHub() {
     // SMART ZERO-REDUNDANCY DELTA ENGINE (Prevents duplicate git commits)
     // -------------------------------------------------------------
     let rawCandidates = [];
-    if (isFullBookReload || (modifiedPageIndices.size === 0 && !audioScriptsModified)) {
+    if (isFullBookReload) {
         rawCandidates = Array.from({ length: total }, (_, i) => i);
     } else if (modifiedPageIndices.size > 0) {
         rawCandidates = Array.from(modifiedPageIndices).sort((a, b) => a - b);
+    } else {
+        // Zero images modified in this session!
+        rawCandidates = [];
     }
 
     // Filter: ONLY upload pages that are actual new Base64 strings.

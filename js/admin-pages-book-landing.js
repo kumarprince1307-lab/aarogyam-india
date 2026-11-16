@@ -1224,7 +1224,7 @@ Instant Download & Lifetime Access
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div>
               <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">🏷️ स्टोर मार्केटिंग बैज (Store Badge):</label>
-              <select id="blp_store_badge" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
+              <select id="blp_store_badge_top" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
                 <option value="best_seller">🔥 Best Seller (सर्वाधिक बिकने वाली)</option>
                 <option value="new_arrival">🆕 New Arrival (नई पुस्तक)</option>
                 <option value="trending">⭐ Trending (चर्चित)</option>
@@ -1234,7 +1234,7 @@ Instant Download & Lifetime Access
             </div>
             <div>
               <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">⏳ प्री-लॉन्च / कमिंग सून स्थिति:</label>
-              <select id="blp_is_coming_soon" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
+              <select id="blp_is_coming_soon_top" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
                 <option value="false">🟢 Live / Ready to Buy (तुरंत खरीदने योग्य)</option>
                 <option value="true">⏳ Coming Soon (प्री-लॉन्च / लीड्स मोड)</option>
               </select>
@@ -2973,7 +2973,11 @@ Instant Download & Lifetime Access
       if (stored) {
         const localList = JSON.parse(stored);
         if (Array.isArray(localList)) {
-          localList.forEach(item => {
+          const deletedLpIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]').map(x => String(x).toUpperCase().trim());
+        localList.forEach(item => {
+          if (!item || !item.id) return;
+          const cleanItemId = String(item.id).toUpperCase().trim();
+          if (deletedLpIds.includes(cleanItemId)) return; // 🛡️ Anti-Resurrection Shield
             const idx = allLandingPages.findIndex(x => x.id === item.id);
             if (idx >= 0) {
               if (item.admin_edited && (item.updated_at && new Date(item.updated_at) > new Date(allLandingPages[idx].updated_at || 0))) {
@@ -2988,7 +2992,10 @@ Instant Download & Lifetime Access
     } catch (e) { }
 
     // Auto-merge all catalog books from books.json so every single book appears in table
+    const deletedLpIds2 = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]').map(x => String(x).toUpperCase().trim());
     allBooks.forEach(b => {
+      if (!b || !b.id) return;
+      if (deletedLpIds2.includes(String(b.id).toUpperCase().trim())) return; // 🛡️ Anti-Resurrection Shield
       if (b && b.id) {
         const cleanId = String(b.id).trim().toUpperCase();
         const found = allLandingPages.find(p => p && p.id && String(p.id).trim().toUpperCase() === cleanId);
@@ -7794,7 +7801,7 @@ Instant Download & Lifetime Access
     if (document.getElementById('blp_final_buy_benefits')) document.getElementById('blp_final_buy_benefits').value = '';
     if (document.getElementById('blp_demo_reader_pages')) document.getElementById('blp_demo_reader_pages').value = '';
     if (document.getElementById('blp_store_badge')) document.getElementById('blp_store_badge').value = 'best_seller';
-    if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = 'false';
+    if (document.getElementById('blp_is_coming_soon')) document.getElementById('blp_is_coming_soon').value = 'false'; if (document.getElementById('blp_is_coming_soon_top')) document.getElementById('blp_is_coming_soon_top').value = 'false';
     window.updateSocialSharePreview();
 
     if (document.getElementById('blp_main_pdf_url')) document.getElementById('blp_main_pdf_url').value = '';
@@ -7906,7 +7913,7 @@ Instant Download & Lifetime Access
           const prevImg = document.getElementById('blp_preview_cover_img');
           if (prevImg && bObj.cover) prevImg.src = versionBookImagePreview(bObj.cover);
           const bIsComing = Boolean(bObj.isComingSoon === true || bObj.is_coming_soon === true || bObj.status === 'coming_soon' || bObj.badge === 'coming_soon' || bObj.store_badge === 'coming_soon');
-          setVal('blp_is_coming_soon', bIsComing ? 'true' : 'false');
+          setVal('blp_is_coming_soon', bIsComing ? 'true' : 'false'); setVal('blp_is_coming_soon_top', bIsComing ? 'true' : 'false');
           setVal('blp_store_badge', bObj.badge || bObj.store_badge || (bIsComing ? 'coming_soon' : 'best_seller'));
 
           let bType = bObj.book_type;
@@ -8053,7 +8060,7 @@ Instant Download & Lifetime Access
       }
       setVal('blp_store_badge', page.store_badge || 'best_seller');
       const isPageComingSoon = Boolean(page.is_coming_soon === true || page.is_coming_soon === 'true' || page.isComingSoon === true || page.isComingSoon === 'true' || page.status === 'coming_soon' || page.store_badge === 'coming_soon');
-      setVal('blp_is_coming_soon', isPageComingSoon ? 'true' : 'false');
+      setVal('blp_is_coming_soon', isPageComingSoon ? 'true' : 'false'); setVal('blp_is_coming_soon_top', isPageComingSoon ? 'true' : 'false');
 
       // Download Funnel (Section 19)
       const df = page.download_funnel || {};
@@ -8511,7 +8518,7 @@ Instant Download & Lifetime Access
     }
 
     const storeBadge = document.getElementById('blp_store_badge')?.value || 'best_seller';
-    const isComingSoon = document.getElementById('blp_is_coming_soon')?.value === 'true';
+    const isComingSoon = (document.getElementById('blp_is_coming_soon')?.value === 'true') || (document.getElementById('blp_is_coming_soon_top')?.value === 'true');
 
     // File Upload Packaging & 25MB Limit Check
     const uploadedFiles = [];
@@ -8686,7 +8693,7 @@ Instant Download & Lifetime Access
       book_type: bookType,
       audience: audienceType,
       target_main_books: attachedMainBooks,
-      book_name: (document.getElementById('blp_book_name')?.value || '').trim(),
+      book_name: (document.getElementById('blp_book_name')?.value || document.getElementById('blp_hero_title')?.value || '').trim(),
       author: (document.getElementById('blp_book_author')?.value || '').trim(),
       language: (document.getElementById('blp_book_language')?.value || 'Hindi').trim(),
       totalPages,
