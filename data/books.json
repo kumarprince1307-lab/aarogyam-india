@@ -2654,15 +2654,18 @@
         "Spray Science",
         "Free Bonus PDF"
       ],
-      "totalPages": 0,
+      "totalPages": 57,
       "author": "",
       "language": "Hindi",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK022",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-16T11:24:40.904Z",
-      "admin_edited": true
+      "updated_at": "2026-11-16T11:33:11.985Z",
+      "admin_edited": true,
+      "hasWebpPages": true,
+      "hasAudioBook": true,
+      "pageImagesPath": "images/books/BK022"
     }
   ]
 }
