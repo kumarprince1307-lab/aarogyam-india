@@ -2443,7 +2443,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK023",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-16T14:00:46.810Z",
+      "updated_at": "2026-11-16T14:34:51.370Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2504,7 +2504,9 @@
         "../images/books/BK022/55.webp",
         "../images/books/BK022/56.webp",
         "../images/books/BK022/57.webp"
-      ]
+      ],
+      "title": "अनार मास्टर गाइड (Pomegranate Master Guide)",
+      "bonuses": []
     },
     {
       "id": "BK024",
