@@ -1039,18 +1039,23 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
         <button type="button" onclick="document.getElementById('userCustomQuotaModal').remove()" style="background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;color:#64748b;">&times;</button>
       </div>
 
-      <!-- Single Compact User Box -->
-      <div style="background:#f8fafc;border-radius:12px;padding:11px 13px;margin-bottom:14px;font-size:0.82rem;border:1px solid #e2e8f0;line-height:1.5;">
+      <!-- Single Clean User Box (No extra cards, fits inside box without scrollbar) -->
+      <div style="background:#f8fafc;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;border:1px solid #e2e8f0;line-height:1.55;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px;">
           <div>👤 <strong>यूजर नाम:</strong> ${name || 'N/A'}</div>
           <div>📱 <strong>मोबाइल:</strong> ${cleanMobile || 'N/A'}</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
           <div>⚡ <strong>सिस्टम स्टेटस:</strong> <span style="font-weight:800;color:${isActiveUser ? '#15803d' : '#ca8a04'};">${(status || 'INACTIVE').toUpperCase()}</span></div>
-          <div>⚖️ <strong>कुल दैनिक लिमिट:</strong> <span id="modalBoxDailyLimit" style="font-weight:700;color:#0284c7;">${baseChats} सवाल | ${baseImages} फोटो</span></div>
+          <div>⚖️ <strong>कुल लिमिट:</strong> <span id="modalBoxDailyLimit" style="font-weight:800;color:#0284c7;">${baseChats} सवाल | ${baseImages} फोटो</span></div>
         </div>
-        <div id="modalUserLiveUsageBox" style="padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.79rem;color:#334155;">
-          📊 <strong>आज का उपयोग:</strong> ⏳ लोड हो रहा है...
+        <div style="padding-top:6px;border-top:1px dashed #cbd5e1;font-size:0.80rem;color:#334155;">
+          <div id="modalBoxUsageRow" style="margin-bottom:4px;">
+            📊 <strong>आज का वास्तविक उपयोग:</strong> ⏳ लोड हो रहा है...
+          </div>
+          <div id="modalBoxRemainingRow">
+            💳 <strong>उपलब्ध क्रेडिट (शेष):</strong> ⏳ गणना हो रही है...
+          </div>
         </div>
       </div>
 
@@ -1109,29 +1114,53 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
     const cChatRaw = (document.getElementById('modalUserCustomChats')?.value || '').trim();
     const isBlk = Boolean(document.getElementById('modalUserBlockGemini')?.checked);
 
-    const totalChatLimit = (cChatRaw !== '' ? Number(cChatRaw) : baseChats) + bChat;
-    const totalImgLimit = (cImgRaw !== '' ? Number(cImgRaw) : baseImages) + bImg;
+    const effectiveBaseChats = cChatRaw !== '' ? Number(cChatRaw) : baseChats;
+    const effectiveBaseImgs = cImgRaw !== '' ? Number(cImgRaw) : baseImages;
+
+    const totalChatLimit = effectiveBaseChats + bChat;
+    const totalImgLimit = effectiveBaseImgs + bImg;
 
     const remChats = Math.max(0, totalChatLimit - liveChatsUsed);
     const remImgs = Math.max(0, totalImgLimit - livePhotosUsed);
 
+    // 1. Update कुल लिमिट inside box (highlighting bonus increase)
     const limitEl = document.getElementById('modalBoxDailyLimit');
     if (limitEl) {
       let chatLabel = `${totalChatLimit} सवाल`;
-      if (bChat > 0) chatLabel += ` (+${bChat})`;
+      if (bChat > 0) chatLabel += ` <span style="color:#16a34a;font-weight:800;font-size:0.75rem;">(+${bChat} बोनस)</span>`;
       let imgLabel = `${totalImgLimit} फोटो`;
-      if (bImg > 0) imgLabel += ` (+${bImg})`;
-      limitEl.textContent = `${chatLabel} | ${imgLabel}`;
+      if (bImg > 0) imgLabel += ` <span style="color:#16a34a;font-weight:800;font-size:0.75rem;">(+${bImg} बोनस)</span>`;
+      limitEl.innerHTML = `${chatLabel} | ${imgLabel}`;
     }
 
-    const usageEl = document.getElementById('modalUserLiveUsageBox');
-    if (usageEl) {
-      const chatRemHtml = isBlk ? `<span style="color:#dc2626;font-weight:800;">ब्लॉक 🛑</span>` 
-        : (remChats <= 0 ? `<span style="color:#dc2626;font-weight:800;">0 शेष ⚠️</span>` : `<span style="color:#15803d;font-weight:800;">${remChats} शेष 🟢</span>`);
-      const imgRemHtml = isBlk ? `<span style="color:#dc2626;font-weight:800;">ब्लॉक 🛑</span>` 
-        : (remImgs <= 0 ? `<span style="color:#dc2626;font-weight:800;">0 शेष ⚠️</span>` : `<span style="color:#15803d;font-weight:800;">${remImgs} शेष 🟢</span>`);
+    // 2. Update आज का वास्तविक उपयोग inside box
+    const usageRow = document.getElementById('modalBoxUsageRow');
+    if (usageRow) {
+      usageRow.innerHTML = `📊 <strong>आज का वास्तविक उपयोग:</strong> 💬 ${liveChatsUsed} सवाल पूछे | 📷 ${livePhotosUsed} फोटो जांची`;
+    }
 
-      usageEl.innerHTML = `📊 <strong>आज का उपयोग:</strong> 💬 ${liveChatsUsed} सवाल पूछे (${chatRemHtml}) | 📷 ${livePhotosUsed} फोटो (${imgRemHtml})`;
+    // 3. Update उपलब्ध क्रेडिट (शेष) inside box
+    const remRow = document.getElementById('modalBoxRemainingRow');
+    if (remRow) {
+      let chatRemHtml = '';
+      if (isBlk) {
+        chatRemHtml = `<span style="color:#dc2626;font-weight:800;">ब्लॉक 🛑</span>`;
+      } else if (remChats <= 0) {
+        chatRemHtml = `<span style="color:#dc2626;font-weight:800;">0 सवाल शेष (सीमा समाप्त ⚠️)</span>`;
+      } else {
+        chatRemHtml = `<span style="color:#16a34a;font-weight:800;">${remChats} सवाल शेष 🟢</span>`;
+      }
+
+      let imgRemHtml = '';
+      if (isBlk) {
+        imgRemHtml = `<span style="color:#dc2626;font-weight:800;">ब्लॉक 🛑</span>`;
+      } else if (remImgs <= 0) {
+        imgRemHtml = `<span style="color:#dc2626;font-weight:800;">0 फोटो शेष (सीमा समाप्त ⚠️)</span>`;
+      } else {
+        imgRemHtml = `<span style="color:#16a34a;font-weight:800;">${remImgs} फोटो शेष 🟢</span>`;
+      }
+
+      remRow.innerHTML = `💳 <strong>उपलब्ध क्रेडिट (शेष):</strong> 💬 ${chatRemHtml} | 📷 ${imgRemHtml}`;
     }
   }
 
@@ -1221,7 +1250,7 @@ window.openUserQuotaModal = async function(userId, mobile, name, status) {
         },
         updated_at: new Date().toISOString()
       };
-      await fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights', {
+      await fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/sakhi_user_insights?on_conflict=user_key', {
         method: 'POST',
         headers: {
           'apikey': sbKey,
