@@ -1,0 +1,23 @@
+{
+  "bookId": "BK022",
+  "pages": {
+    "1": {
+      "text": "",
+      "audio": ""
+    },
+    "23": {
+      "text": "",
+      "audio": ""
+    },
+    "48": {
+      "text": "",
+      "audio": ""
+    },
+    "57": {
+      "text": "",
+      "audio": "",
+      "is_live": false
+    }
+  },
+  "totalPages": 57
+}
