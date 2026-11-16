@@ -4290,6 +4290,21 @@ function getAutoSyncApiUrl() {
     return '/api/auto-sync-book';
 }
 
+function safeUtf8ToBase64(str) {
+    try {
+        const bytes = new TextEncoder().encode(str);
+        let bin = '';
+        const len = bytes.byteLength;
+        const chunk = 0x8000;
+        for (let i = 0; i < len; i += chunk) {
+            bin += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, len)));
+        }
+        return btoa(bin);
+    } catch (_) {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
+}
+
 // =======================================================
 // 7. 1-CLICK DIRECT GITHUB API AUTO-SYNC (ZERO-EGRESS)
 // =======================================================
@@ -4318,7 +4333,7 @@ async function syncStudioToGitHub() {
 
     // Filter: ONLY upload pages that are actual new Base64 strings.
     // If an image already points to a Git/server file (../images/books/...), DO NOT re-commit it!
-    pagesToUpload = rawCandidates.filter(idx => {
+    let pagesToUpload = rawCandidates.filter(idx => {
         const img = studioPageImages[idx];
         if (!img) return false;
         if (typeof img === 'string' && (img.startsWith('../') || img.startsWith('/images/') || img.startsWith('http'))) {
@@ -4326,6 +4341,10 @@ async function syncStudioToGitHub() {
         }
         return typeof img === 'string' && img.startsWith('data:image/');
     });
+
+    const isReusedBook = studioPageImages.some(img => typeof img === 'string' && (img.startsWith('../') || img.startsWith('/images/')));
+    let isDeltaAudioOnly = false;
+    let isDeltaSinglePage = false;
 
     if (pagesToUpload.length === 0) {
         isDeltaAudioOnly = true;
@@ -4336,11 +4355,15 @@ async function syncStudioToGitHub() {
     // Confirm dialog text customized to what actually changed
     let confirmMsg = '';
     if (isDeltaAudioOnly) {
-        confirmMsg = `⚡ पुस्तक [${studioCurrentBookId}] में केवल ऑडियो/टेक्स्ट में बदलाव हुआ है।\n\nक्या आप सिर्फ ऑडियो स्क्रिप्ट को Git पर 0.5 सेकंड में लाइव करना चाहते हैं? (152 पेजों को दोबारा अपलोड नहीं किया जाएगा)`;
+        if (isReusedBook) {
+            confirmMsg = `🚀 क्या आप पुस्तक [${studioCurrentBookId}] के कुल ${studioTotalPages} पेजों, ऑडियो और सेटिंग्स को सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?\n\n(Zero-Memory: पेजेस सीधे रिपॉजिटरी से फास्ट-स्ट्रीम होंगे)`;
+        } else {
+            confirmMsg = `⚡ पुस्तक [${studioCurrentBookId}] का नया ऑडियो/टेक्स्ट और कॉन्फ़िगरेशन Git पर लाइव करना चाहते हैं?`;
+        }
     } else if (isDeltaSinglePage) {
         confirmMsg = `🚀 पुस्तक [${studioCurrentBookId}] का केवल पेज ${pagesToUpload[0] + 1} बदला है।\n\nक्या आप सिर्फ इसी 1 पेज और स्क्रिप्ट को Git पर 1 सेकंड में लाइव करना चाहते हैं?`;
     } else {
-        confirmMsg = `🚀 क्या आप पुस्तक [${studioCurrentBookId}] के ${pagesToUpload.length} पेजों और ऑडियो को सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?`;
+        confirmMsg = `🚀 क्या आप पुस्तक [${studioCurrentBookId}] के ${pagesToUpload.length} नए पेजों और कुल ${studioTotalPages} पेजों के कॉन्फ़िगरेशन को सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?`;
     }
 
     if (!confirm(confirmMsg)) return;
@@ -4379,11 +4402,13 @@ async function syncStudioToGitHub() {
     const failedPages = [];
 
     try {
-        // CASE 1: ONLY AUDIO/TEXT CHANGED -> ZERO IMAGE UPLOADS
+        // CASE 1: ZERO NEW IMAGES (Reused/Assembled pages or script changes)
         if (isDeltaAudioOnly) {
-            if (progressLabel) progressLabel.textContent = `⚡ केवल ऑडियो स्क्रिप्ट और टेक्स्ट में बदलाव पाया गया। सिर्फ JSON सिंक हो रहा है...`;
-            if (sizeLabel) sizeLabel.textContent = `डेटा साइज: < 10 KB`;
-            if (fillBar) fillBar.style.width = `60%`;
+            if (progressLabel) progressLabel.textContent = isReusedBook 
+                ? `🚀 पुस्तक [${studioCurrentBookId}] के ${studioTotalPages} पेजों का Zero-Memory कॉन्फ़िगरेशन Git पर सिंक हो रहा है...`
+                : `⚡ केवल ऑडियो स्क्रिप्ट और टेक्स्ट में बदलाव पाया गया। सिर्फ JSON सिंक हो रहा है...`;
+            if (sizeLabel) sizeLabel.textContent = `डेटा साइज: < 25 KB (Superfast)`;
+            if (fillBar) fillBar.style.width = `40%`;
 
             // 🛡️ PDF GIT VAULT: Commit all attached Source PDFs for this book to GitHub repository
             try {
@@ -4420,10 +4445,32 @@ async function syncStudioToGitHub() {
                 console.warn("Source PDF Git Sync Warning:", pdfSyncErr);
             }
 
-            const scriptJsonStr = JSON.stringify(studioAudioScripts, null, 2);
-            const scriptBase64 = btoa(unescape(encodeURIComponent(scriptJsonStr)));
+            // Prepare Audio Scripts Payload
+            if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+            studioAudioScripts.bookId = studioCurrentBookId;
+            studioAudioScripts.totalPages = studioTotalPages;
+            if (isReusedBook) {
+                studioAudioScripts.pageImages = studioPageImages;
+            }
 
-            await fetch(apiUrl, {
+            // Zero-Memory sanitization: keep inherited audio references lean
+            const sanitizedScripts = JSON.parse(JSON.stringify(studioAudioScripts));
+            if (sanitizedScripts.pages) {
+                Object.keys(sanitizedScripts.pages).forEach(k => {
+                    const p = sanitizedScripts.pages[k];
+                    if (p && typeof p === 'object' && p.sourceBook && p.audio && p.audio.startsWith('data:audio/')) {
+                        p.audio = '';
+                    }
+                });
+            }
+
+            if (progressLabel) progressLabel.textContent = `⏳ ऑडियो व पेज स्क्रिप्ट Git पर सुरक्षित हो रहा है...`;
+            if (fillBar) fillBar.style.width = `70%`;
+
+            const scriptJsonStr = JSON.stringify(sanitizedScripts, null, 2);
+            const scriptBase64 = safeUtf8ToBase64(scriptJsonStr);
+
+            const resScript = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -4432,8 +4479,15 @@ async function syncStudioToGitHub() {
                     base64: scriptBase64
                 })
             });
+            const dataScript = await resScript.json().catch(() => ({}));
+            if (!resScript.ok || !dataScript.success) {
+                throw new Error(dataScript.error || `Audio script sync failed: HTTP ${resScript.status}`);
+            }
 
             // 📚 SYNC TO data/books.json ON GITHUB
+            if (progressLabel) progressLabel.textContent = `📚 बुक्स कैटलॉग (books.json) Git पर अपडेट हो रहा है...`;
+            if (fillBar) fillBar.style.width = `90%`;
+
             try {
                 let booksData = null;
                 let resBooks = await fetch('../data/books.json?v=' + Date.now());
@@ -4441,28 +4495,62 @@ async function syncStudioToGitHub() {
                 if (resBooks.ok) booksData = await resBooks.json();
                 if (booksData && Array.isArray(booksData.books)) {
                     let existingBIdx = booksData.books.findIndex(b => b && b.id && b.id.toUpperCase() === studioCurrentBookId);
+                    const bookTitle = studioBookData?.title || studioBookData?.name || studioBookData?.heading || studioCurrentBookId;
+                    const bookCover = studioBookData?.cover || `/images/books/${studioCurrentBookId.toLowerCase()}-cover.webp`;
+
                     if (existingBIdx >= 0) {
                         booksData.books[existingBIdx].totalPages = studioTotalPages;
                         booksData.books[existingBIdx].hasWebpPages = true;
                         booksData.books[existingBIdx].hasAudioBook = true;
+                        if (isReusedBook) {
+                            booksData.books[existingBIdx].pageImages = studioPageImages;
+                        }
                         booksData.books[existingBIdx].pageImagesPath = `images/books/${studioCurrentBookId}`;
                         booksData.books[existingBIdx].updated_at = new Date().toISOString();
-                        
-                        const updatedBooksStr = JSON.stringify(booksData, null, 2);
-                        const updatedBooksBase64 = btoa(unescape(encodeURIComponent(updatedBooksStr)));
-                        
-                        await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                action: 'upload_asset',
-                                path: 'data/books.json',
-                                base64: updatedBooksBase64
-                            })
+                    } else {
+                        booksData.books.push({
+                            id: studioCurrentBookId,
+                            heading: bookTitle,
+                            name: bookTitle,
+                            title: bookTitle,
+                            category: studioBookData?.category || 'Agriculture',
+                            cover: bookCover,
+                            thumbnail: bookCover,
+                            mrp: studioBookData?.mrp || 299,
+                            price: studioBookData?.price || studioBookData?.offerPrice || 99,
+                            offerPrice: studioBookData?.offerPrice || 99,
+                            totalPages: studioTotalPages,
+                            hasWebpPages: true,
+                            hasAudioBook: true,
+                            pageImages: isReusedBook ? studioPageImages : undefined,
+                            pageImagesPath: `images/books/${studioCurrentBookId}`,
+                            bonuses: studioBookData?.bonuses || [],
+                            visibility: studioBookData?.visibility || { myLibrary: true, store: true, landing: true, bundle: true },
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
                         });
                     }
+
+                    const updatedBooksStr = JSON.stringify(booksData, null, 2);
+                    const updatedBooksBase64 = safeUtf8ToBase64(updatedBooksStr);
+
+                    const resBooksCommit = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'upload_asset',
+                            path: 'data/books.json',
+                            base64: updatedBooksBase64
+                        })
+                    });
+                    const dataBooksCommit = await resBooksCommit.json().catch(() => ({}));
+                    if (!resBooksCommit.ok || !dataBooksCommit.success) {
+                        console.warn("books.json push warning:", dataBooksCommit.error || `HTTP ${resBooksCommit.status}`);
+                    }
                 }
-            } catch (_) {}
+            } catch (bkErr) {
+                console.warn("books.json git update notice:", bkErr);
+            }
 
             // Save locally
             await savePagesToDb(studioCurrentBookId, studioPageImages);
@@ -4474,7 +4562,7 @@ async function syncStudioToGitHub() {
             markUnsaved(false);
 
             if (fillBar) fillBar.style.width = `100%`;
-            if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] का नया ऑडियो/टेक्स्ट Git पर 0.5s में लाइव हो गया!`;
+            if (progressLabel) progressLabel.textContent = `🎉 पुस्तक [${studioCurrentBookId}] के ${studioTotalPages} पेज Git पर 100% लाइव हो गए!`;
 
             const modal = document.getElementById('syncSuccessModal');
             if (modal) {
@@ -4485,8 +4573,8 @@ async function syncStudioToGitHub() {
                 const linkEl = document.getElementById('successModalReaderLink');
 
                 if (bIdEl) bIdEl.textContent = studioCurrentBookId;
-                if (pagesEl) pagesEl.textContent = `ऑडियो/टेक्स्ट अपडेट (0 Images Touched)`;
-                if (sizeEl) sizeEl.textContent = `< 10 KB (Superfast)`;
+                if (pagesEl) pagesEl.textContent = isReusedBook ? `${studioTotalPages} Pages (Zero-Memory Stream)` : `ऑडियो/टेक्स्ट अपडेट (0 Images Touched)`;
+                if (sizeEl) sizeEl.textContent = `< 25 KB (Superfast)`;
                 if (pathEl) pathEl.textContent = `data/audio-scripts/${studioCurrentBookId}.json`;
                 if (linkEl) linkEl.href = `../ebooks/reader.html?book=${studioCurrentBookId}`;
 
@@ -4586,13 +4674,20 @@ async function syncStudioToGitHub() {
         }
 
         // Final Step: Commit data/audio-scripts/{bookId}.json
-        if (progressLabel) progressLabel.textContent = `⏳ ऑडियो स्क्रिप्ट Git पर सुरक्षित हो रहा है...`;
+        if (progressLabel) progressLabel.textContent = `⏳ ऑडियो व पेज स्क्रिप्ट Git पर सुरक्षित हो रहा है...`;
         if (fillBar) fillBar.style.width = `95%`;
 
-        const scriptJsonStr = JSON.stringify(studioAudioScripts, null, 2);
-        const scriptBase64 = btoa(unescape(encodeURIComponent(scriptJsonStr)));
+        if (!studioAudioScripts) studioAudioScripts = { bookId: studioCurrentBookId, pages: {} };
+        studioAudioScripts.bookId = studioCurrentBookId;
+        studioAudioScripts.totalPages = studioTotalPages;
+        if (isReusedBook) {
+            studioAudioScripts.pageImages = studioPageImages;
+        }
 
-        await fetch(apiUrl, {
+        const scriptJsonStr = JSON.stringify(studioAudioScripts, null, 2);
+        const scriptBase64 = safeUtf8ToBase64(scriptJsonStr);
+
+        const resScriptFinal = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -4601,6 +4696,10 @@ async function syncStudioToGitHub() {
                 base64: scriptBase64
             })
         });
+        const dataScriptFinal = await resScriptFinal.json().catch(() => ({}));
+        if (!resScriptFinal.ok || !dataScriptFinal.success) {
+            console.warn("audio-script sync warning:", dataScriptFinal.error || `HTTP ${resScriptFinal.status}`);
+        }
 
         // 📚 SYNC TO data/books.json ON GITHUB (Ensures Reader & Download page never show empty)
         try {
@@ -4617,6 +4716,9 @@ async function syncStudioToGitHub() {
                     booksData.books[existingBIdx].totalPages = studioTotalPages;
                     booksData.books[existingBIdx].hasWebpPages = true;
                     booksData.books[existingBIdx].hasAudioBook = true;
+                    if (isReusedBook) {
+                        booksData.books[existingBIdx].pageImages = studioPageImages;
+                    }
                     booksData.books[existingBIdx].pageImagesPath = `images/books/${studioCurrentBookId}`;
                     booksData.books[existingBIdx].updated_at = new Date().toISOString();
                 } else {
@@ -4634,6 +4736,7 @@ async function syncStudioToGitHub() {
                         totalPages: studioTotalPages,
                         hasWebpPages: true,
                         hasAudioBook: true,
+                        pageImages: isReusedBook ? studioPageImages : undefined,
                         pageImagesPath: `images/books/${studioCurrentBookId}`,
                         bonuses: studioBookData?.bonuses || [],
                         visibility: studioBookData?.visibility || { myLibrary: true, store: true, landing: true, bundle: true },
@@ -4643,7 +4746,7 @@ async function syncStudioToGitHub() {
                 }
                 
                 const updatedBooksStr = JSON.stringify(booksData, null, 2);
-                const updatedBooksBase64 = btoa(unescape(encodeURIComponent(updatedBooksStr)));
+                const updatedBooksBase64 = safeUtf8ToBase64(updatedBooksStr);
                 
                 await fetch(apiUrl, {
                     method: 'POST',
@@ -5992,7 +6095,9 @@ async function executeImportPages() {
                 scriptClone.text = raw;
             } else if (typeof raw === 'object') {
                 scriptClone.text = raw.text || '';
-                scriptClone.audio = raw.audio || '';
+                // 🛡️ ZERO-MEMORY AUDIO (Aarogyam Manas Clause XV & XVIII):
+                // Keep audio empty so audio-book-engine cascades it live from sourceBook without duplicate 2MB payloads
+                scriptClone.audio = raw.sourceBook ? (raw.audio || '') : '';
                 if (raw.sourceBook) {
                     scriptClone.sourceBook = raw.sourceBook;
                     scriptClone.sourcePage = raw.sourcePage;
