@@ -1539,16 +1539,34 @@
     },
     {
       "id": "BK003",
-      "updated_at": "2026-09-23T23:59:59.999Z",
+      "updated_at": "2026-11-16T14:26:01.560Z",
       "admin_edited": true,
       "slug": "bk003",
-      "book_name": "अनाज भंडारण गाइड",
+      "book_type": "paid",
+      "audience": "all",
+      "target_main_books": [],
+      "book_name": "",
       "author": "",
       "language": "Hindi",
       "totalPages": 120,
       "version": "2026",
       "category": "Agriculture",
-      "status": "coming_soon",
+      "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "best_seller",
+      "badge": "best_seller",
+      "publish_targets": [
+        "ebook_store",
+        "category_page",
+        "my_library",
+        "home_page",
+        "home_hero",
+        "download_funnel",
+        "free_shelf",
+        "demo_shelf",
+        "coming_soon_shelf"
+      ],
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
@@ -1557,6 +1575,8 @@
       "theme_dark": "#003d00",
       "cover_effect": "3d_float",
       "sticky_button_text": "खरीदें",
+      "ads_mode_enabled": true,
+      "ads_gateway_enabled": true,
       "sections_order": [
         "sec_hero",
         "sec_timer",
@@ -1580,10 +1600,10 @@
       ],
       "hidden_sections": [],
       "section_banners": {},
-      "og_title": "अनाज भंडारण गाइड",
-      "og_description": "अनाज भंडारण गाइड - सम्पूर्ण Practical Guide।",
-      "og_image": "/images/books/anaj-bhandaran-guide-cover.webp",
-      "og_image_landscape": "/images/books/anaj-bhandaran-guide-cover.webp",
+      "og_title": "🧄 लहसुन की वैज्ञानिक खेती — संपूर्ण व्यावहारिक मार्गदर्शिका",
+      "og_description": "🧄 लहसुन की वैज्ञानिक खेती — संपूर्ण व्यावहारिक मार्गदर्शिका - सम्पूर्ण Practical Guide।",
+      "og_image": "/images/books/bk003-cover.webp",
+      "og_image_landscape": "/images/books/bk003-cover.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -1632,13 +1652,27 @@
       "ai_support_title": "",
       "ai_support_cover": "",
       "ai_support_desc": "",
-      "bonuses": [],
-      "bonus_books": [],
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
+      "bonus_books": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ],
       "bonus_points": [
-        "24×7 WhatsApp Priority Support",
+        "24×7 WhatsApp Support",
         "💬 आपका सवाल → हमारी मदद → आसान समाधान",
         "📖 किताब की जानकारी समझने में सहायता",
-        "🌱 फसल संबंधी विशेष स्प्रे फॉर्मूला",
+        "🌱 फसल संबंधी सवाल",
         "📱 Mobile Friendly PDF & Lifetime Access"
       ],
       "timer": {
@@ -1648,15 +1682,15 @@
       },
       "hero": {
         "tag": "🌾 Bestseller Agriculture eBook",
-        "title": "अनाज भंडारण गाइड",
-        "subtitle": "",
+        "title": "🧄 लहसुन की वैज्ञानिक खेती — संपूर्ण व्यावहारिक मार्गदर्शिका",
+        "subtitle": "कंद का आकार मोटा करने के अचूक टॉनिक, थ्रिप्स (Thrips) नियंत्रण और सही समय पर भंडारण (Storage) की रणनीति।",
         "description": "",
         "mrp": 299,
-        "offer_price": 99,
+        "offer_price": 51,
         "offer_badge": "Launch Offer",
         "rating_score": "4.9",
         "rating_count": "120+ Ratings",
-        "cover_image": "/images/books/anaj-bhandaran-guide-cover.webp",
+        "cover_image": "/images/books/bk003-cover.webp",
         "banner_image": "/images/banners/bk003-hero-banner.webp",
         "features": [
           {
@@ -1666,6 +1700,14 @@
           {
             "icon": "fa-camera",
             "text": "300+ फोटो"
+          },
+          {
+            "icon": "fa-flask",
+            "text": "Spray Science"
+          },
+          {
+            "icon": "fa-gift",
+            "text": "Free Bonus PDF"
           }
         ]
       },
@@ -1674,14 +1716,37 @@
         "vip_value": 1999,
         "bonus_value": 199,
         "offer_price": 99,
-        "subscriber_perk": "👑 VIP मेंबर्स के लिए 1 वर्ष का Pro सब्सक्रिप्शन 100% मुफ्त शामिल है।"
+        "subscriber_perk": "👑 Aarogyam Pro VIP मेंबर्स के लिए यह गाइड उनके प्लान में 100% मुफ्त शामिल है।"
       },
       "why_read": {
         "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "",
-        "cards": []
+        "cards": [
+          {
+            "icon": "🌱",
+            "title": "वैज्ञानिक जानकारी",
+            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
+          },
+          {
+            "icon": "📷",
+            "title": "300+ वास्तविक फोटो",
+            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
+          },
+          {
+            "icon": "📘",
+            "title": "Step by Step Guide",
+            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
+          },
+          {
+            "icon": "🎁",
+            "title": "Free Bonus PDF",
+            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
+          }
+        ]
       },
       "demo_images": [],
+      "demo_reader_pages": "",
+      "demoPages": "",
       "suggested_books_list": [],
       "suggested_books": [],
       "table_of_contents": [
@@ -1689,19 +1754,40 @@
         "खेत की तैयारी",
         "बुवाई की वैज्ञानिक विधि",
         "उर्वरक प्रबंधन",
-        "रोग एवं कीट प्रबंधन"
+        "खरपतवार नियंत्रण",
+        "रोग एवं कीट प्रबंधन",
+        "पोषक तत्वों की कमी",
+        "स्प्रे चार्ट",
+        "IPM तकनीक",
+        "अधिक उत्पादन के उपाय",
+        "विशेषज्ञ सुझाव"
       ],
       "videos": [],
       "testimonials": [],
+      "faqs": [],
       "final_buy": {
-        "title": "अनाज भंडारण गाइड",
-        "description": "",
+        "title": "🧄 लहसुन की वैज्ञानिक खेती — संपूर्ण व्यावहारिक मार्गदर्शिका",
+        "description": "कंद का आकार मोटा करने के अचूक टॉनिक, थ्रिप्स (Thrips) नियंत्रण और सही समय पर भंडारण (Storage) की रणनीति।",
         "benefits": []
       },
-      "whatsapp_prompt": "नमस्ते, मुझे 'अनाज भंडारण गाइड' पुस्तक के बारे में और जानकारी चाहिए।",
-      "is_coming_soon": true,
-      "isComingSoon": true,
-      "store_badge": "coming_soon"
+      "download_funnel": {
+        "audio_enabled": true,
+        "audio_mode": "mp3",
+        "audio_url": "",
+        "audio_narrator": "Female Voice (Aarogyam AI सखी)",
+        "audio_script": "",
+        "funnel_heading": "🌾 पाठकों की विशेष पसंद — अन्य लोकप्रिय कृषि मास्टर गाइड्स",
+        "funnel_subheading": "हजारों प्रगतिशील किसानों द्वारा सर्वाधिक सराही गई अन्य संपूर्ण प्रैक्टिकल गाइड्स — ऑडियो सहित",
+        "funnel_books": [
+          "BK001",
+          "BK002",
+          "BK015"
+        ],
+        "farmer_tip": "",
+        "fast_size": "~24 MB",
+        "hd_download_limit": 3
+      },
+      "whatsapp_prompt": "नमस्ते, मुझे '🧄 लहसुन की वैज्ञानिक खेती — संपूर्ण व्यावहारिक मार्गदर्शिका' पुस्तक के बारे में और जानकारी चाहिए।"
     },
     {
       "id": "BK005",
