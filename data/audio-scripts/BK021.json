@@ -1,6 +1,6 @@
 {
   "bookId": "BK021",
-  "totalPages": 55,
+  "totalPages": 168,
   "pageImages": [
     "../images/books/BK015/1.webp",
     "../images/books/BK015/2.webp",
@@ -56,7 +56,120 @@
     "../images/books/BK015/52.webp",
     "../images/books/BK015/53.webp",
     "../images/books/BK015/54.webp",
-    "../images/books/BK015/55.webp"
+    "../images/books/BK015/55.webp",
+    "/images/books/BK021/56.webp",
+    "/images/books/BK021/57.webp",
+    "/images/books/BK021/58.webp",
+    "/images/books/BK021/59.webp",
+    "/images/books/BK021/60.webp",
+    "/images/books/BK021/61.webp",
+    "/images/books/BK021/62.webp",
+    "/images/books/BK021/63.webp",
+    "/images/books/BK021/64.webp",
+    "/images/books/BK021/65.webp",
+    "/images/books/BK021/66.webp",
+    "/images/books/BK021/67.webp",
+    "/images/books/BK021/68.webp",
+    "/images/books/BK021/69.webp",
+    "/images/books/BK021/70.webp",
+    "/images/books/BK021/71.webp",
+    "/images/books/BK021/72.webp",
+    "/images/books/BK021/73.webp",
+    "/images/books/BK021/74.webp",
+    "/images/books/BK021/75.webp",
+    "/images/books/BK021/76.webp",
+    "/images/books/BK021/77.webp",
+    "/images/books/BK021/78.webp",
+    "/images/books/BK021/79.webp",
+    "/images/books/BK021/80.webp",
+    "/images/books/BK021/81.webp",
+    "/images/books/BK021/82.webp",
+    "/images/books/BK021/83.webp",
+    "/images/books/BK021/84.webp",
+    "/images/books/BK021/85.webp",
+    "/images/books/BK021/86.webp",
+    "/images/books/BK021/87.webp",
+    "/images/books/BK021/88.webp",
+    "/images/books/BK021/89.webp",
+    "/images/books/BK021/90.webp",
+    "/images/books/BK021/91.webp",
+    "/images/books/BK021/92.webp",
+    "/images/books/BK021/93.webp",
+    "/images/books/BK021/94.webp",
+    "/images/books/BK021/95.webp",
+    "/images/books/BK021/96.webp",
+    "/images/books/BK021/97.webp",
+    "/images/books/BK021/98.webp",
+    "/images/books/BK021/99.webp",
+    "/images/books/BK021/100.webp",
+    "/images/books/BK021/101.webp",
+    "/images/books/BK021/102.webp",
+    "/images/books/BK021/103.webp",
+    "/images/books/BK021/104.webp",
+    "/images/books/BK021/105.webp",
+    "/images/books/BK021/106.webp",
+    "/images/books/BK021/107.webp",
+    "/images/books/BK021/108.webp",
+    "/images/books/BK021/109.webp",
+    "/images/books/BK021/110.webp",
+    "/images/books/BK021/111.webp",
+    "/images/books/BK021/112.webp",
+    "/images/books/BK021/113.webp",
+    "/images/books/BK021/114.webp",
+    "/images/books/BK021/115.webp",
+    "/images/books/BK021/116.webp",
+    "/images/books/BK021/117.webp",
+    "/images/books/BK021/118.webp",
+    "/images/books/BK021/119.webp",
+    "/images/books/BK021/120.webp",
+    "/images/books/BK021/121.webp",
+    "/images/books/BK021/122.webp",
+    "/images/books/BK021/123.webp",
+    "/images/books/BK021/124.webp",
+    "/images/books/BK021/125.webp",
+    "/images/books/BK021/126.webp",
+    "/images/books/BK021/127.webp",
+    "/images/books/BK021/128.webp",
+    "/images/books/BK021/129.webp",
+    "/images/books/BK021/130.webp",
+    "/images/books/BK021/131.webp",
+    "/images/books/BK021/132.webp",
+    "/images/books/BK021/133.webp",
+    "/images/books/BK021/134.webp",
+    "/images/books/BK021/135.webp",
+    "/images/books/BK021/136.webp",
+    "/images/books/BK021/137.webp",
+    "/images/books/BK021/138.webp",
+    "/images/books/BK021/139.webp",
+    "/images/books/BK021/140.webp",
+    "/images/books/BK021/141.webp",
+    "/images/books/BK021/142.webp",
+    "/images/books/BK021/143.webp",
+    "/images/books/BK021/144.webp",
+    "/images/books/BK021/145.webp",
+    "/images/books/BK021/146.webp",
+    "/images/books/BK021/147.webp",
+    "/images/books/BK021/148.webp",
+    "/images/books/BK021/149.webp",
+    "/images/books/BK021/150.webp",
+    "/images/books/BK021/151.webp",
+    "/images/books/BK021/152.webp",
+    "/images/books/BK021/153.webp",
+    "/images/books/BK021/154.webp",
+    "/images/books/BK021/155.webp",
+    "/images/books/BK021/156.webp",
+    "/images/books/BK021/157.webp",
+    "/images/books/BK021/158.webp",
+    "/images/books/BK021/159.webp",
+    "/images/books/BK021/160.webp",
+    "/images/books/BK021/161.webp",
+    "/images/books/BK021/162.webp",
+    "/images/books/BK021/163.webp",
+    "/images/books/BK021/164.webp",
+    "/images/books/BK021/165.webp",
+    "/images/books/BK021/166.webp",
+    "/images/books/BK021/167.webp",
+    "/images/books/BK021/168.webp"
   ],
   "pages": {
     "1": {
@@ -388,6 +501,458 @@
       "audio": "",
       "sourceBook": "BK015",
       "sourcePage": 55
+    },
+    "56": {
+      "text": "",
+      "audio": ""
+    },
+    "57": {
+      "text": "",
+      "audio": ""
+    },
+    "58": {
+      "text": "",
+      "audio": ""
+    },
+    "59": {
+      "text": "",
+      "audio": ""
+    },
+    "60": {
+      "text": "",
+      "audio": ""
+    },
+    "61": {
+      "text": "",
+      "audio": ""
+    },
+    "62": {
+      "text": "",
+      "audio": ""
+    },
+    "63": {
+      "text": "",
+      "audio": ""
+    },
+    "64": {
+      "text": "",
+      "audio": ""
+    },
+    "65": {
+      "text": "",
+      "audio": ""
+    },
+    "66": {
+      "text": "",
+      "audio": ""
+    },
+    "67": {
+      "text": "",
+      "audio": ""
+    },
+    "68": {
+      "text": "",
+      "audio": ""
+    },
+    "69": {
+      "text": "",
+      "audio": ""
+    },
+    "70": {
+      "text": "",
+      "audio": ""
+    },
+    "71": {
+      "text": "",
+      "audio": ""
+    },
+    "72": {
+      "text": "",
+      "audio": ""
+    },
+    "73": {
+      "text": "",
+      "audio": ""
+    },
+    "74": {
+      "text": "",
+      "audio": ""
+    },
+    "75": {
+      "text": "",
+      "audio": ""
+    },
+    "76": {
+      "text": "",
+      "audio": ""
+    },
+    "77": {
+      "text": "",
+      "audio": ""
+    },
+    "78": {
+      "text": "",
+      "audio": ""
+    },
+    "79": {
+      "text": "",
+      "audio": ""
+    },
+    "80": {
+      "text": "",
+      "audio": ""
+    },
+    "81": {
+      "text": "",
+      "audio": ""
+    },
+    "82": {
+      "text": "",
+      "audio": ""
+    },
+    "83": {
+      "text": "",
+      "audio": ""
+    },
+    "84": {
+      "text": "",
+      "audio": ""
+    },
+    "85": {
+      "text": "",
+      "audio": ""
+    },
+    "86": {
+      "text": "",
+      "audio": ""
+    },
+    "87": {
+      "text": "",
+      "audio": ""
+    },
+    "88": {
+      "text": "",
+      "audio": ""
+    },
+    "89": {
+      "text": "",
+      "audio": ""
+    },
+    "90": {
+      "text": "",
+      "audio": ""
+    },
+    "91": {
+      "text": "",
+      "audio": ""
+    },
+    "92": {
+      "text": "",
+      "audio": ""
+    },
+    "93": {
+      "text": "",
+      "audio": ""
+    },
+    "94": {
+      "text": "",
+      "audio": ""
+    },
+    "95": {
+      "text": "",
+      "audio": ""
+    },
+    "96": {
+      "text": "",
+      "audio": ""
+    },
+    "97": {
+      "text": "",
+      "audio": ""
+    },
+    "98": {
+      "text": "",
+      "audio": ""
+    },
+    "99": {
+      "text": "",
+      "audio": ""
+    },
+    "100": {
+      "text": "",
+      "audio": ""
+    },
+    "101": {
+      "text": "",
+      "audio": ""
+    },
+    "102": {
+      "text": "",
+      "audio": ""
+    },
+    "103": {
+      "text": "",
+      "audio": ""
+    },
+    "104": {
+      "text": "",
+      "audio": ""
+    },
+    "105": {
+      "text": "",
+      "audio": ""
+    },
+    "106": {
+      "text": "",
+      "audio": ""
+    },
+    "107": {
+      "text": "",
+      "audio": ""
+    },
+    "108": {
+      "text": "",
+      "audio": ""
+    },
+    "109": {
+      "text": "",
+      "audio": ""
+    },
+    "110": {
+      "text": "",
+      "audio": ""
+    },
+    "111": {
+      "text": "",
+      "audio": ""
+    },
+    "112": {
+      "text": "",
+      "audio": ""
+    },
+    "113": {
+      "text": "",
+      "audio": ""
+    },
+    "114": {
+      "text": "",
+      "audio": ""
+    },
+    "115": {
+      "text": "",
+      "audio": ""
+    },
+    "116": {
+      "text": "",
+      "audio": ""
+    },
+    "117": {
+      "text": "",
+      "audio": ""
+    },
+    "118": {
+      "text": "",
+      "audio": ""
+    },
+    "119": {
+      "text": "",
+      "audio": ""
+    },
+    "120": {
+      "text": "",
+      "audio": ""
+    },
+    "121": {
+      "text": "",
+      "audio": ""
+    },
+    "122": {
+      "text": "",
+      "audio": ""
+    },
+    "123": {
+      "text": "",
+      "audio": ""
+    },
+    "124": {
+      "text": "",
+      "audio": ""
+    },
+    "125": {
+      "text": "",
+      "audio": ""
+    },
+    "126": {
+      "text": "",
+      "audio": ""
+    },
+    "127": {
+      "text": "",
+      "audio": ""
+    },
+    "128": {
+      "text": "",
+      "audio": ""
+    },
+    "129": {
+      "text": "",
+      "audio": ""
+    },
+    "130": {
+      "text": "",
+      "audio": ""
+    },
+    "131": {
+      "text": "",
+      "audio": ""
+    },
+    "132": {
+      "text": "",
+      "audio": ""
+    },
+    "133": {
+      "text": "",
+      "audio": ""
+    },
+    "134": {
+      "text": "",
+      "audio": ""
+    },
+    "135": {
+      "text": "",
+      "audio": ""
+    },
+    "136": {
+      "text": "",
+      "audio": ""
+    },
+    "137": {
+      "text": "",
+      "audio": ""
+    },
+    "138": {
+      "text": "",
+      "audio": ""
+    },
+    "139": {
+      "text": "",
+      "audio": ""
+    },
+    "140": {
+      "text": "",
+      "audio": ""
+    },
+    "141": {
+      "text": "",
+      "audio": ""
+    },
+    "142": {
+      "text": "",
+      "audio": ""
+    },
+    "143": {
+      "text": "",
+      "audio": ""
+    },
+    "144": {
+      "text": "",
+      "audio": ""
+    },
+    "145": {
+      "text": "",
+      "audio": ""
+    },
+    "146": {
+      "text": "",
+      "audio": ""
+    },
+    "147": {
+      "text": "",
+      "audio": ""
+    },
+    "148": {
+      "text": "",
+      "audio": ""
+    },
+    "149": {
+      "text": "",
+      "audio": ""
+    },
+    "150": {
+      "text": "",
+      "audio": ""
+    },
+    "151": {
+      "text": "",
+      "audio": ""
+    },
+    "152": {
+      "text": "",
+      "audio": ""
+    },
+    "153": {
+      "text": "",
+      "audio": ""
+    },
+    "154": {
+      "text": "",
+      "audio": ""
+    },
+    "155": {
+      "text": "",
+      "audio": ""
+    },
+    "156": {
+      "text": "",
+      "audio": ""
+    },
+    "157": {
+      "text": "",
+      "audio": ""
+    },
+    "158": {
+      "text": "",
+      "audio": ""
+    },
+    "159": {
+      "text": "",
+      "audio": ""
+    },
+    "160": {
+      "text": "",
+      "audio": ""
+    },
+    "161": {
+      "text": "",
+      "audio": ""
+    },
+    "162": {
+      "text": "",
+      "audio": ""
+    },
+    "163": {
+      "text": "",
+      "audio": ""
+    },
+    "164": {
+      "text": "",
+      "audio": ""
+    },
+    "165": {
+      "text": "",
+      "audio": ""
+    },
+    "166": {
+      "text": "",
+      "audio": ""
+    },
+    "167": {
+      "text": "",
+      "audio": ""
+    },
+    "168": {
+      "text": "",
+      "audio": ""
     }
   }
 }
