@@ -5960,7 +5960,7 @@
     },
     {
       "id": "BK021",
-      "updated_at": "2026-11-16T10:48:20.768Z",
+      "updated_at": "2026-11-16T11:20:11.492Z",
       "admin_edited": true,
       "slug": "bk021",
       "book_type": "paid",
@@ -5984,8 +5984,6 @@
         "home_page",
         "home_hero",
         "download_funnel",
-        "free_shelf",
-        "demo_shelf",
         "coming_soon_shelf"
       ],
       "facebook_pixel_id": "1671873500553134",
@@ -5998,7 +5996,27 @@
       "sticky_button_text": "खरीदें",
       "ads_mode_enabled": false,
       "ads_gateway_enabled": false,
-      "sections_order": [],
+      "sections_order": [
+        "sec_hero",
+        "sec_timer",
+        "sec_kpis",
+        "sec_audio",
+        "sec_trust",
+        "sec_why_buy",
+        "sec_vip_stack",
+        "sec_video",
+        "sec_preview",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_ai_support",
+        "sec_specs_toc",
+        "sec_reviews",
+        "sec_faqs",
+        "sec_final_buy",
+        "sec_help",
+        "sec_pdf_main",
+        "sec_pdf_free"
+      ],
       "hidden_sections": [],
       "section_banners": {},
       "og_title": "🌱 सब्जी खेती मास्टर  (PART 2)",
@@ -6016,6 +6034,32 @@
         "mp3_url": "",
         "tts_text": "",
         "story_text": "",
+        "highlights": [
+          {
+            "icon": "🐛",
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
+          },
+          {
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
+          },
+          {
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
+          }
+        ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
         "bgm_enabled": true
       },
