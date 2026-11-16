@@ -2930,7 +2930,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK026",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-16T14:00:46.824Z",
+      "updated_at": "2026-11-16T14:36:21.744Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -3002,7 +3002,9 @@
         "../images/books/BK021/138.webp",
         "../images/books/BK021/139.webp"
       ],
-      "pageImagesPath": "images/books/BK026"
+      "pageImagesPath": "images/books/BK026",
+      "title": "आलू मास्टर गाइड (Potato Master Guide)",
+      "bonuses": []
     },
     {
       "id": "BK027",
