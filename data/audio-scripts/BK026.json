@@ -1,0 +1,536 @@
+{
+  "bookId": "BK026",
+  "totalPages": 66,
+  "pageImages": [
+    "../images/books/BK015/1.webp",
+    "../images/books/BK015/2.webp",
+    "../images/books/BK015/3.webp",
+    "../images/books/BK015/4.webp",
+    "../images/books/BK015/5.webp",
+    "../images/books/BK015/6.webp",
+    "../images/books/BK015/7.webp",
+    "../images/books/BK015/8.webp",
+    "../images/books/BK015/9.webp",
+    "../images/books/BK015/10.webp",
+    "../images/books/BK015/11.webp",
+    "../images/books/BK015/12.webp",
+    "../images/books/BK015/13.webp",
+    "../images/books/BK015/14.webp",
+    "../images/books/BK015/15.webp",
+    "../images/books/BK015/16.webp",
+    "../images/books/BK015/17.webp",
+    "../images/books/BK015/18.webp",
+    "../images/books/BK015/19.webp",
+    "../images/books/BK015/20.webp",
+    "../images/books/BK015/21.webp",
+    "../images/books/BK015/22.webp",
+    "../images/books/BK015/23.webp",
+    "../images/books/BK015/24.webp",
+    "../images/books/BK015/25.webp",
+    "../images/books/BK015/26.webp",
+    "../images/books/BK015/27.webp",
+    "../images/books/BK015/28.webp",
+    "../images/books/BK015/29.webp",
+    "../images/books/BK015/30.webp",
+    "../images/books/BK015/31.webp",
+    "../images/books/BK015/32.webp",
+    "../images/books/BK015/33.webp",
+    "../images/books/BK015/34.webp",
+    "../images/books/BK015/35.webp",
+    "../images/books/BK015/36.webp",
+    "../images/books/BK015/37.webp",
+    "../images/books/BK015/38.webp",
+    "../images/books/BK015/39.webp",
+    "../images/books/BK015/40.webp",
+    "../images/books/BK015/41.webp",
+    "../images/books/BK015/42.webp",
+    "../images/books/BK015/43.webp",
+    "../images/books/BK015/44.webp",
+    "../images/books/BK015/45.webp",
+    "../images/books/BK015/46.webp",
+    "../images/books/BK015/47.webp",
+    "../images/books/BK015/48.webp",
+    "../images/books/BK015/49.webp",
+    "../images/books/BK015/50.webp",
+    "../images/books/BK015/51.webp",
+    "../images/books/BK015/52.webp",
+    "../images/books/BK015/53.webp",
+    "../images/books/BK015/54.webp",
+    "../images/books/BK015/55.webp",
+    "../images/books/BK021/129.webp",
+    "../images/books/BK021/130.webp",
+    "../images/books/BK021/131.webp",
+    "../images/books/BK021/132.webp",
+    "../images/books/BK021/133.webp",
+    "../images/books/BK021/134.webp",
+    "../images/books/BK021/135.webp",
+    "../images/books/BK021/136.webp",
+    "../images/books/BK021/137.webp",
+    "../images/books/BK021/138.webp",
+    "../images/books/BK021/139.webp"
+  ],
+  "pages": {
+    "1": {
+      "sourceBook": "BK015",
+      "sourcePage": 1,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "2": {
+      "sourceBook": "BK015",
+      "sourcePage": 2,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "3": {
+      "sourceBook": "BK015",
+      "sourcePage": 3,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "4": {
+      "sourceBook": "BK015",
+      "sourcePage": 4,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "5": {
+      "sourceBook": "BK015",
+      "sourcePage": 5,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "6": {
+      "sourceBook": "BK015",
+      "sourcePage": 6,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "7": {
+      "sourceBook": "BK015",
+      "sourcePage": 7,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "8": {
+      "sourceBook": "BK015",
+      "sourcePage": 8,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "9": {
+      "sourceBook": "BK015",
+      "sourcePage": 9,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "10": {
+      "sourceBook": "BK015",
+      "sourcePage": 10,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "11": {
+      "sourceBook": "BK015",
+      "sourcePage": 11,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "12": {
+      "sourceBook": "BK015",
+      "sourcePage": 12,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "13": {
+      "sourceBook": "BK015",
+      "sourcePage": 13,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "14": {
+      "sourceBook": "BK015",
+      "sourcePage": 14,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "15": {
+      "sourceBook": "BK015",
+      "sourcePage": 15,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "16": {
+      "sourceBook": "BK015",
+      "sourcePage": 16,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "17": {
+      "sourceBook": "BK015",
+      "sourcePage": 17,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "18": {
+      "sourceBook": "BK015",
+      "sourcePage": 18,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "19": {
+      "sourceBook": "BK015",
+      "sourcePage": 19,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "20": {
+      "sourceBook": "BK015",
+      "sourcePage": 20,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "21": {
+      "sourceBook": "BK015",
+      "sourcePage": 21,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "22": {
+      "sourceBook": "BK015",
+      "sourcePage": 22,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "23": {
+      "sourceBook": "BK015",
+      "sourcePage": 23,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "24": {
+      "sourceBook": "BK015",
+      "sourcePage": 24,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "25": {
+      "sourceBook": "BK015",
+      "sourcePage": 25,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "26": {
+      "sourceBook": "BK015",
+      "sourcePage": 26,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "27": {
+      "sourceBook": "BK015",
+      "sourcePage": 27,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "28": {
+      "sourceBook": "BK015",
+      "sourcePage": 28,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "29": {
+      "sourceBook": "BK015",
+      "sourcePage": 29,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "30": {
+      "sourceBook": "BK015",
+      "sourcePage": 30,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "31": {
+      "sourceBook": "BK015",
+      "sourcePage": 31,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "32": {
+      "sourceBook": "BK015",
+      "sourcePage": 32,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "33": {
+      "sourceBook": "BK015",
+      "sourcePage": 33,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "34": {
+      "sourceBook": "BK015",
+      "sourcePage": 34,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "35": {
+      "sourceBook": "BK015",
+      "sourcePage": 35,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "36": {
+      "sourceBook": "BK015",
+      "sourcePage": 36,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "37": {
+      "sourceBook": "BK015",
+      "sourcePage": 37,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "38": {
+      "sourceBook": "BK015",
+      "sourcePage": 38,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "39": {
+      "sourceBook": "BK015",
+      "sourcePage": 39,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "40": {
+      "sourceBook": "BK015",
+      "sourcePage": 40,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "41": {
+      "sourceBook": "BK015",
+      "sourcePage": 41,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "42": {
+      "sourceBook": "BK015",
+      "sourcePage": 42,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "43": {
+      "sourceBook": "BK015",
+      "sourcePage": 43,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "44": {
+      "sourceBook": "BK015",
+      "sourcePage": 44,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "45": {
+      "sourceBook": "BK015",
+      "sourcePage": 45,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "46": {
+      "sourceBook": "BK015",
+      "sourcePage": 46,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "47": {
+      "sourceBook": "BK015",
+      "sourcePage": 47,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "48": {
+      "sourceBook": "BK015",
+      "sourcePage": 48,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "49": {
+      "sourceBook": "BK015",
+      "sourcePage": 49,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "50": {
+      "sourceBook": "BK015",
+      "sourcePage": 50,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "51": {
+      "sourceBook": "BK015",
+      "sourcePage": 51,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "52": {
+      "sourceBook": "BK015",
+      "sourcePage": 52,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "53": {
+      "sourceBook": "BK015",
+      "sourcePage": 53,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "54": {
+      "sourceBook": "BK015",
+      "sourcePage": 54,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "55": {
+      "sourceBook": "BK015",
+      "sourcePage": 55,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "56": {
+      "sourceBook": "BK021",
+      "sourcePage": 129,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "57": {
+      "sourceBook": "BK021",
+      "sourcePage": 130,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "58": {
+      "sourceBook": "BK021",
+      "sourcePage": 131,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "59": {
+      "sourceBook": "BK021",
+      "sourcePage": 132,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "60": {
+      "sourceBook": "BK021",
+      "sourcePage": 133,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "61": {
+      "sourceBook": "BK021",
+      "sourcePage": 134,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "62": {
+      "sourceBook": "BK021",
+      "sourcePage": 135,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "63": {
+      "sourceBook": "BK021",
+      "sourcePage": 136,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "64": {
+      "sourceBook": "BK021",
+      "sourcePage": 137,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "65": {
+      "sourceBook": "BK021",
+      "sourcePage": 138,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    },
+    "66": {
+      "sourceBook": "BK021",
+      "sourcePage": 139,
+      "text": "",
+      "audio": "",
+      "is_live": true
+    }
+  }
+}

@@ -3,83 +3,123 @@
   "pages": {
     "1": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 1
     },
     "2": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 2
     },
     "3": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 3
     },
     "4": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 4
     },
     "5": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 5
     },
     "6": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 6
     },
     "7": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 7
     },
     "8": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 8
     },
     "9": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 9
     },
     "10": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 10
     },
     "11": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 11
     },
     "12": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 12
     },
     "13": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 13
     },
     "14": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 14
     },
     "15": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 15
     },
     "16": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 16
     },
     "17": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 17
     },
     "18": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 18
     },
     "19": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 19
     },
     "20": {
       "text": "",
-      "audio": ""
+      "audio": "",
+      "sourceBook": "BK022",
+      "sourcePage": 20
     },
     "21": {
       "text": "",
@@ -270,5 +310,69 @@
       "sourcePage": 57
     }
   },
-  "totalPages": 62
+  "totalPages": 62,
+  "pageImages": [
+    "../images/books/BK022/1.webp",
+    "../images/books/BK022/2.webp",
+    "../images/books/BK022/3.webp",
+    "../images/books/BK022/4.webp",
+    "../images/books/BK022/5.webp",
+    "../images/books/BK022/6.webp",
+    "../images/books/BK022/7.webp",
+    "../images/books/BK022/8.webp",
+    "../images/books/BK022/9.webp",
+    "../images/books/BK022/10.webp",
+    "../images/books/BK022/11.webp",
+    "../images/books/BK022/12.webp",
+    "../images/books/BK022/13.webp",
+    "../images/books/BK022/14.webp",
+    "../images/books/BK022/15.webp",
+    "../images/books/BK022/16.webp",
+    "../images/books/BK022/17.webp",
+    "../images/books/BK022/18.webp",
+    "../images/books/BK022/19.webp",
+    "../images/books/BK022/20.webp",
+    "../images/books/BK024/21.webp",
+    "../images/books/BK024/22.webp",
+    "../images/books/BK024/23.webp",
+    "../images/books/BK024/24.webp",
+    "../images/books/BK024/25.webp",
+    "../images/books/BK024/26.webp",
+    "../images/books/BK024/27.webp",
+    "../images/books/BK024/28.webp",
+    "../images/books/BK024/29.webp",
+    "../images/books/BK024/30.webp",
+    "../images/books/BK024/31.webp",
+    "../images/books/BK024/32.webp",
+    "../images/books/BK024/33.webp",
+    "../images/books/BK024/34.webp",
+    "../images/books/BK024/35.webp",
+    "../images/books/BK024/36.webp",
+    "../images/books/BK024/37.webp",
+    "../images/books/BK024/38.webp",
+    "../images/books/BK024/39.webp",
+    "../images/books/BK024/40.webp",
+    "../images/books/BK024/41.webp",
+    "../images/books/BK024/42.webp",
+    "../images/books/BK024/43.webp",
+    "../images/books/BK024/44.webp",
+    "../images/books/BK024/45.webp",
+    "../images/books/BK024/46.webp",
+    "../images/books/BK024/47.webp",
+    "../images/books/BK024/48.webp",
+    "../images/books/BK024/49.webp",
+    "../images/books/BK024/50.webp",
+    "../images/books/BK024/51.webp",
+    "../images/books/BK024/52.webp",
+    "../images/books/BK022/48.webp",
+    "../images/books/BK022/49.webp",
+    "../images/books/BK022/50.webp",
+    "../images/books/BK022/51.webp",
+    "../images/books/BK022/52.webp",
+    "../images/books/BK022/53.webp",
+    "../images/books/BK022/54.webp",
+    "../images/books/BK022/55.webp",
+    "../images/books/BK022/56.webp",
+    "../images/books/BK022/57.webp"
+  ]
 }

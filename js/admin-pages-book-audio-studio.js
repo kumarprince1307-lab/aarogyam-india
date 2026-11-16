@@ -257,6 +257,26 @@ async function deletePdfFileFromDb(bookId) {
     }
 }
 
+// 🛡️ AAROGYAM MANAS CLAUSE XX: FAIL-SAFE STORAGE QUOTA SHIELD
+function safeLocalStorageSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch (err) {
+        console.warn('[Aarogyam Manas Quota Guard] localStorage quota exceeded for ' + key + '. Evicting stale book drafts...', err);
+        try {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('AOI_AUDIO_SCRIPTS_') && !k.endsWith(studioCurrentBookId)) {
+                    localStorage.removeItem(k);
+                }
+            }
+            localStorage.setItem(key, value);
+        } catch (retryErr) {
+            console.warn('[Aarogyam Manas] Safe fallback: preserved in IndexedDB, skipped localStorage for ' + key);
+        }
+    }
+}
+
 // 🌐 Universal Catalog Synchronizer (Keeps Landing Page, Reader & Download Catalogs in 100% Sync)
 function syncBookToAllCatalogs(bookId, totalPages, pageImages = null) {
     try {
@@ -1719,7 +1739,7 @@ async function setupStudioEvents() {
             isPageMultiSelectMode = false;
 
             await savePagesToDb(studioCurrentBookId, studioPageImages);
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
             markUnsaved(true);
             updateMultiSelectUI();
             renderPageChipGrid();
@@ -1740,7 +1760,7 @@ async function setupStudioEvents() {
             isPageMultiSelectMode = false;
 
             await savePagesToDb(studioCurrentBookId, studioPageImages);
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
             markUnsaved(true);
             updateMultiSelectUI();
             renderPageChipGrid();
@@ -1785,7 +1805,7 @@ async function setupStudioEvents() {
             }
             studioTotalPages = targetTotal;
             await savePagesToDb(studioCurrentBookId, studioPageImages);
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
             markUnsaved(true);
             renderPageChipGrid();
             selectPage(Math.min(studioCurrentPage, Math.max(1, studioTotalPages)));
@@ -2636,7 +2656,7 @@ async function setupStudioEvents() {
             } else {
                 studioAudioScripts.pages[pageKey].text = text;
             }
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
             audioScriptsModified = true;
             markUnsaved(true);
             renderPageChipGrid();
@@ -3114,7 +3134,7 @@ async function loadBookStudio(bookId) {
 
     // Cleanse local storage with populated merged scripts
     try {
-        localStorage.setItem(`AOI_AUDIO_SCRIPTS_${cleanId}`, JSON.stringify(studioAudioScripts));
+        safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${cleanId}`, JSON.stringify(studioAudioScripts));
     } catch(e) {}
 
     // 8. Fallback to PDF if no WebP images yet
@@ -3362,7 +3382,7 @@ async function selectPage(pageNum) {
             } else {
                 studioAudioScripts.pages[curKey].text = currentText;
             }
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
         }
     }
 
@@ -3583,7 +3603,7 @@ function shiftAudioScriptsForInsertion(insertAfterIndex, count) {
         }
     });
     studioAudioScripts.pages = newPages;
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
 }
 
@@ -3599,7 +3619,7 @@ function shiftAudioScriptsForDeletion(deletedIndex) {
         }
     });
     studioAudioScripts.pages = newPages;
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
 }
 
@@ -3781,7 +3801,7 @@ async function convertCurrentPdfToWebp() {
     studioTotalPages = images.length;
 
     await savePagesToDb(studioCurrentBookId, studioPageImages);
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
     markUnsaved(false);
     updateQuickTestLinks(studioCurrentBookId);
@@ -3917,7 +3937,7 @@ async function handleDirectPdfUpload(file) {
                 };
             }
             await savePagesToDb(studioCurrentBookId, studioPageImages);
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
             syncBookToAllCatalogs(studioCurrentBookId, studioTotalPages, studioPageImages);
             markUnsaved(false);
             renderPageChipGrid();
@@ -3937,7 +3957,7 @@ async function handleDirectPdfUpload(file) {
                 };
             }
             await savePagesToDb(studioCurrentBookId, studioPageImages);
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
             syncBookToAllCatalogs(studioCurrentBookId, studioTotalPages, studioPageImages);
             markUnsaved(false);
             renderPageChipGrid();
@@ -4159,7 +4179,7 @@ async function reExtractPagesFromSavedPdf(bookId) {
         }
 
         await savePagesToDb(cleanId, studioPageImages);
-        localStorage.setItem(`AOI_AUDIO_SCRIPTS_${cleanId}`, JSON.stringify(studioAudioScripts));
+        safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${cleanId}`, JSON.stringify(studioAudioScripts));
         syncBookToAllCatalogs(cleanId, studioTotalPages, studioPageImages);
         markUnsaved(false);
         renderPageChipGrid();
@@ -4232,7 +4252,7 @@ async function commitAllChanges() {
     }
 
     // 2. Save script data to localStorage
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
     // 2b. Sync to AAROGYAM_CUSTOM_BOOKS & AAROGYAM_BOOK_LANDING_PAGES
     syncBookToAllCatalogs(studioCurrentBookId, studioTotalPages, studioPageImages);
@@ -4342,7 +4362,13 @@ async function syncStudioToGitHub() {
         return typeof img === 'string' && img.startsWith('data:image/');
     });
 
-    const isReusedBook = studioPageImages.some(img => typeof img === 'string' && (img.startsWith('../') || img.startsWith('/images/')));
+    const isReusedBook = studioPageImages.some(img => 
+        typeof img === 'string' && 
+        (img.includes('/images/books/') || img.includes('images/books/')) && 
+        !img.includes(`/images/books/${studioCurrentBookId}/`) &&
+        !img.includes(`images/books/${studioCurrentBookId}/`)
+    ) || Boolean(studioBookData?.isReusedBook);
+
     let isDeltaAudioOnly = false;
     let isDeltaSinglePage = false;
 
@@ -4352,10 +4378,14 @@ async function syncStudioToGitHub() {
         isDeltaSinglePage = true;
     }
 
+    const hasAnyDrafts = Boolean(audioScriptsModified || modifiedPageIndices.size > 0 || isFullBookReload);
+
     // Confirm dialog text customized to what actually changed
     let confirmMsg = '';
     if (isDeltaAudioOnly) {
-        if (isReusedBook) {
+        if (!hasAnyDrafts) {
+            confirmMsg = `✅ पुस्तक [${studioCurrentBookId}] के सभी ${studioTotalPages} पेजेस पहले से ही Git पर 100% सुरक्षित और लाइव हैं!\n\n(0 Duplicate Uploads) कोई नई इमेज नहीं मिली। क्या आप फिर भी सेटिंग्स और ऑडियो स्क्रिप्ट री-वेरीफाई करना चाहते हैं?`;
+        } else if (isReusedBook) {
             confirmMsg = `🚀 क्या आप पुस्तक [${studioCurrentBookId}] के कुल ${studioTotalPages} पेजों, ऑडियो और सेटिंग्स को सीधे GitHub पर 1-Click में लाइव पुश करना चाहते हैं?\n\n(Zero-Memory: पेजेस सीधे रिपॉजिटरी से फास्ट-स्ट्रीम होंगे)`;
         } else {
             confirmMsg = `⚡ पुस्तक [${studioCurrentBookId}] का नया ऑडियो/टेक्स्ट और कॉन्फ़िगरेशन Git पर लाइव करना चाहते हैं?`;
@@ -4552,9 +4582,41 @@ async function syncStudioToGitHub() {
                 console.warn("books.json git update notice:", bkErr);
             }
 
+            // Also keep data/universal-book-landing-pages.json updated in Git
+            try {
+                let lpData = null;
+                let resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Date.now());
+                if (!resLp.ok) resLp = await fetch('/data/universal-book-landing-pages.json?v=' + Date.now());
+                if (resLp.ok) lpData = await resLp.json();
+                if (lpData && Array.isArray(lpData.bookLandingPages)) {
+                    let lpIdx = lpData.bookLandingPages.findIndex(l => l && l.id && l.id.toUpperCase() === studioCurrentBookId);
+                    if (lpIdx >= 0) {
+                        lpData.bookLandingPages[lpIdx].totalPages = studioTotalPages;
+                        if (isReusedBook) {
+                            lpData.bookLandingPages[lpIdx].pageImages = studioPageImages;
+                        }
+                        lpData.bookLandingPages[lpIdx].updated_at = new Date().toISOString();
+
+                        const updatedLpStr = JSON.stringify(lpData, null, 2);
+                        const updatedLpBase64 = safeUtf8ToBase64(updatedLpStr);
+                        await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'upload_asset',
+                                path: 'data/universal-book-landing-pages.json',
+                                base64: updatedLpBase64
+                            })
+                        });
+                    }
+                }
+            } catch (lpErr) {
+                console.warn("universal-book-landing-pages.json git update notice:", lpErr);
+            }
+
             // Save locally
             await savePagesToDb(studioCurrentBookId, studioPageImages);
-            localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+            safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
             modifiedPageIndices.clear();
             audioScriptsModified = false;
@@ -4624,6 +4686,11 @@ async function syncStudioToGitHub() {
                 const approxBytes = Math.round(base64Data.length * (3/4));
                 totalBytes += approxBytes;
 
+                // 🛡️ CRITICAL DELTA DEDUPLICATION FIX:
+                // Once uploaded to GitHub, transform in-memory Base64 to repository relative path
+                studioPageImages[pageIndex] = `../images/books/${studioCurrentBookId}/${pageNum}.webp`;
+                modifiedPageIndices.delete(pageIndex);
+
                 const percent = Math.round((uploadedCount / targetUploadCount) * 90);
                 if (progressLabel) progressLabel.textContent = `🚀 Git पर सिंक हो रहा है: ${uploadedCount} / ${targetUploadCount} पेजेस (${percent}%)`;
                 if (sizeLabel) sizeLabel.textContent = `अपलोड हुआ: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB • पेज: ${pageNum}.webp`;
@@ -4634,9 +4701,14 @@ async function syncStudioToGitHub() {
         }
 
         if (failedPages.length > 0) {
-            alert(`⚠️ कुछ पेजों (${failedPages.join(', ')}) को अपलोड करने में समस्या आई। कृपया दोबारा पुश दबाएं।`);
+            // Persist the pages that succeeded to IndexedDB so they won't be re-uploaded on next try
+            await savePagesToDb(studioCurrentBookId, studioPageImages);
+            alert(`⚠️ कुछ पेजों (${failedPages.join(', ')}) को अपलोड करने में समस्या आई। बाकी पेजेस सुरक्षित हो चुके हैं। कृपया दोबारा पुश दबाएं।`);
             return;
         }
+
+        // Persist clean relative paths to IndexedDB immediately so repeat pushes never re-upload
+        await savePagesToDb(studioCurrentBookId, studioPageImages);
 
         // 🛡️ PDF GIT VAULT: Commit all attached Source PDFs for this book to GitHub repository
         try {
@@ -4762,9 +4834,41 @@ async function syncStudioToGitHub() {
             console.warn("books.json git update notice:", bkErr);
         }
 
+        // Also keep data/universal-book-landing-pages.json updated in Git
+        try {
+            let lpData = null;
+            let resLp = await fetch('../data/universal-book-landing-pages.json?v=' + Date.now());
+            if (!resLp.ok) resLp = await fetch('/data/universal-book-landing-pages.json?v=' + Date.now());
+            if (resLp.ok) lpData = await resLp.json();
+            if (lpData && Array.isArray(lpData.bookLandingPages)) {
+                let lpIdx = lpData.bookLandingPages.findIndex(l => l && l.id && l.id.toUpperCase() === studioCurrentBookId);
+                if (lpIdx >= 0) {
+                    lpData.bookLandingPages[lpIdx].totalPages = studioTotalPages;
+                    if (isReusedBook) {
+                        lpData.bookLandingPages[lpIdx].pageImages = studioPageImages;
+                    }
+                    lpData.bookLandingPages[lpIdx].updated_at = new Date().toISOString();
+
+                    const updatedLpStr = JSON.stringify(lpData, null, 2);
+                    const updatedLpBase64 = safeUtf8ToBase64(updatedLpStr);
+                    await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'upload_asset',
+                            path: 'data/universal-book-landing-pages.json',
+                            base64: updatedLpBase64
+                        })
+                    });
+                }
+            }
+        } catch (lpErr) {
+            console.warn("universal-book-landing-pages.json git update notice:", lpErr);
+        }
+
         // Save locally to IndexedDB & localStorage
         await savePagesToDb(studioCurrentBookId, studioPageImages);
-        localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+        safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
         modifiedPageIndices.clear();
         audioScriptsModified = false;
@@ -4937,7 +5041,7 @@ function saveCurrentPageText() {
         studioAudioScripts.pages[pageKey].text = text;
     }
 
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
     markUnsaved(true);
     renderPageChipGrid();
@@ -5008,7 +5112,7 @@ function toggleCurrentPageAudioLive(forceState = null) {
 
     const currentLive = studioAudioScripts.pages[curKey].is_live === true;
     studioAudioScripts.pages[curKey].is_live = forceState !== null ? Boolean(forceState) : !currentLive;
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
     audioScriptsModified = true;
     markUnsaved(true);
@@ -5032,7 +5136,7 @@ function togglePageAudioLiveDirect(pageNum, e) {
         studioAudioScripts.pages[pk].is_live = !curLive;
     }
 
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
     markUnsaved(true);
 
@@ -5059,7 +5163,7 @@ function approveAllPagesAudio() {
             studioAudioScripts.pages[pk].is_live = true;
         }
     }
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
     markUnsaved(true);
     selectPage(studioCurrentPage);
@@ -5083,7 +5187,7 @@ function draftAllPagesAudio() {
             studioAudioScripts.pages[pk].is_live = false;
         }
     }
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
     markUnsaved(true);
     selectPage(studioCurrentPage);
@@ -5113,7 +5217,7 @@ function setAudioApprovalForSelectedPages(isLive) {
         }
     });
 
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
     audioScriptsModified = true;
     markUnsaved(true);
     selectPage(studioCurrentPage);
@@ -5165,7 +5269,7 @@ async function extractTextFromCurrentImageOcr() {
                 } else {
                     studioAudioScripts.pages[curKey].text = text;
                 }
-                localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+                safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
                 if (autoSaveBadge) {
                     autoSaveBadge.style.display = 'inline-block';
                     autoSaveBadge.textContent = '✅ OCR टेक्स्ट सेव हुआ';
@@ -6076,9 +6180,13 @@ async function executeImportPages() {
     for (let p of selectedPages) {
         // 1. Get Image Path (ZERO MEMORY DOCTRINE - Aarogyam Manas Clause XV & XVIII)
         // Never convert source book page path to heavy base64 data URLs!
-        let imgData = (sourceBookImagesCache.length >= p && sourceBookImagesCache[p - 1])
-            ? sourceBookImagesCache[p - 1]
-            : `../images/books/${sourceBookId}/${p}.webp`;
+        let imgData = '';
+        const cachedImg = (sourceBookImagesCache.length >= p && sourceBookImagesCache[p - 1]);
+        if (typeof cachedImg === 'string' && (cachedImg.startsWith('../') || cachedImg.startsWith('/images/') || cachedImg.startsWith('http'))) {
+            imgData = cachedImg;
+        } else {
+            imgData = `../images/books/${sourceBookId}/${p}.webp`;
+        }
 
         importedImages.push(imgData);
 
@@ -6174,7 +6282,7 @@ async function executeImportPages() {
 
     // Save to target book's IndexedDB & localStorage
     await savePagesToDb(studioCurrentBookId, studioPageImages);
-    localStorage.setItem(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
+    safeLocalStorageSet(`AOI_AUDIO_SCRIPTS_${studioCurrentBookId}`, JSON.stringify(studioAudioScripts));
 
     audioScriptsModified = true;
     isFullBookReload = true;
