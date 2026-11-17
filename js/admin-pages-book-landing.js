@@ -5984,7 +5984,7 @@ Instant Download & Lifetime Access
   // Connect & Open Book Audio Studio directly for main book or demo book
   window.openBookAudioStudio = function (targetBookId) {
     let cleanId = '';
-    const curId = (document.getElementById('blp_input_book_id')?.value || 'BK015').trim().toUpperCase();
+    const curId = (document.getElementById('blp_input_book_id')?.value || document.getElementById('blp_select_existing_book')?.value || (typeof editingBookId !== 'undefined' && editingBookId ? editingBookId : '') || 'BK001').trim().toUpperCase();
     if (!targetBookId) {
       cleanId = curId;
     } else if (targetBookId === 'DEMO') {
@@ -6002,7 +6002,7 @@ Instant Download & Lifetime Access
 
   // Open Live Reader for the currently edited book (Main or Demo)
   window.openLiveReader = function (isDemo = false) {
-    const curId = (document.getElementById('blp_input_book_id')?.value || 'BK015').trim().toUpperCase();
+    const curId = (document.getElementById('blp_input_book_id')?.value || document.getElementById('blp_select_existing_book')?.value || (typeof editingBookId !== 'undefined' && editingBookId ? editingBookId : '') || 'BK001').trim().toUpperCase();
     const url = isDemo ? `/ebooks/reader.html?book=${encodeURIComponent(curId)}&demo=1` : `/ebooks/reader.html?book=${encodeURIComponent(curId)}`;
     window.open(url, '_blank');
   };
@@ -6911,7 +6911,7 @@ Instant Download & Lifetime Access
   };
 
   window.copyGitPdfPath = function (type) {
-    const bId = (document.getElementById('blp_input_book_id')?.value || 'BK015').trim().toUpperCase() || 'BK015';
+    const bId = (document.getElementById('blp_input_book_id')?.value || document.getElementById('blp_select_existing_book')?.value || (typeof editingBookId !== 'undefined' && editingBookId ? editingBookId : '') || 'BK001').trim().toUpperCase();
     const filename = `${bId}_${type === 'main' ? 'main' : 'free'}.pdf`;
     const fullPath = `/uploads/books/${filename}`;
     const gitFolder = `uploads/books/${filename}`;
@@ -6996,7 +6996,19 @@ Instant Download & Lifetime Access
   };
 
   window.selectDemoFromExistingBook = () => {
-    const bId = (document.getElementById('blp_book_id')?.value || 'BK015').trim().toUpperCase();
+    let bId = (document.getElementById('blp_input_book_id')?.value || '').trim().toUpperCase();
+    if (!bId) {
+      bId = (document.getElementById('blp_select_existing_book')?.value || '').trim().toUpperCase();
+    }
+    if (!bId && typeof editingBookId !== 'undefined' && editingBookId) {
+      bId = String(editingBookId).trim().toUpperCase();
+    }
+    if (!bId) {
+      bId = prompt('डेमो पेजेस के लिए पुस्तक ID दर्ज करें (उदा. BK001, BK022):', 'BK001') || '';
+      bId = bId.trim().toUpperCase();
+    }
+    if (!bId) return;
+
     const rangeStr = prompt(`मौजूदा पुस्तक (${bId}) के कौन से पेज डेमो में जोड़ने हैं?\nउदा. 1-10 या 1,2,3,4,5:`, '1-10');
     if (!rangeStr) return;
 
@@ -7020,7 +7032,7 @@ Instant Download & Lifetime Access
         if (!currentDemoImages.includes(url)) currentDemoImages.push(url);
       });
       renderDemoImagesInBuilder();
-      showToast(`✅ Git रिपो से ${pagesToAdd.length} डेमो पेजेस लिंक हो गए! (Zero Duplicate)`, 'success');
+      showToast(`✅ Git रिपो से ${pagesToAdd.length} डेमो पेजेस (${bId}) लिंक हो गए! (Zero Duplicate)`, 'success');
     }
   };
   window.addDemoImageUrl = () => {
@@ -7063,8 +7075,8 @@ Instant Download & Lifetime Access
   window.removeSuggestedBookItem = (idx) => { currentSuggestedBooks.splice(idx, 1); renderSuggestedBooksInBuilder(); };
 
   window.importReviewsFromSelectedBook = async function () {
-    const curId = (document.getElementById('blp_input_book_id')?.value || editingBookId || 'BK001').trim().toUpperCase();
-    const defaultTarget = curId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim() || 'BK015';
+    const curId = (document.getElementById('blp_input_book_id')?.value || document.getElementById('blp_select_existing_book')?.value || (typeof editingBookId !== 'undefined' && editingBookId ? editingBookId : '') || 'BK001').trim().toUpperCase();
+    const defaultTarget = curId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim() || 'BK001';
     const promptId = prompt('किस मुख्य पुस्तक से रिव्यू इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', defaultTarget);
     if (!promptId) return;
     const targetId = promptId.trim().toUpperCase();
@@ -7153,8 +7165,8 @@ Instant Download & Lifetime Access
   };
 
   window.importFaqsFromSelectedBook = async function () {
-    const curId = (document.getElementById('blp_input_book_id')?.value || editingBookId || 'BK001').trim().toUpperCase();
-    const defaultTarget = curId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim() || 'BK015';
+    const curId = (document.getElementById('blp_input_book_id')?.value || document.getElementById('blp_select_existing_book')?.value || (typeof editingBookId !== 'undefined' && editingBookId ? editingBookId : '') || 'BK001').trim().toUpperCase();
+    const defaultTarget = curId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '').trim() || 'BK001';
     const promptId = prompt('किस मुख्य पुस्तक से FAQs इम्पोर्ट करने हैं? (उदा. BK001, BK002, BK015):', defaultTarget);
     if (!promptId) return;
     const targetId = promptId.trim().toUpperCase();
