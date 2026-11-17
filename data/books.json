@@ -2463,7 +2463,7 @@
       "offerPrice": 75,
       "cover": "/images/books/bk024-cover.webp",
       "thumbnail": "/images/books/bk024-cover.webp",
-      "banner": "/images/banners/bk024-hero-banner.webp",
+      "banner": "/images/banners/bk022-hero-banner.webp",
       "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
@@ -2546,7 +2546,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK024",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-16T14:00:46.824Z",
+      "updated_at": "2026-11-17T04:24:33.148Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2614,6 +2614,15 @@
         "../images/books/BK022/55.webp",
         "../images/books/BK022/56.webp",
         "../images/books/BK022/57.webp"
+      ],
+      "title": "अंगूर मास्टर गाइड (Grape Master Guide)",
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
       ]
     },
     {

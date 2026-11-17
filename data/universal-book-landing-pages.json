@@ -6214,13 +6214,13 @@
     },
     {
       "id": "BK024",
-      "updated_at": "2026-11-16T14:00:46.850Z",
+      "updated_at": "2026-11-17T04:24:33.148Z",
       "admin_edited": true,
       "slug": "bk024",
       "book_type": "paid",
       "audience": "all",
       "target_main_books": [],
-      "book_name": "",
+      "book_name": "अंगूर मास्टर गाइड (Grape Master Guide)",
       "author": "",
       "language": "Hindi",
       "totalPages": 62,
@@ -6366,7 +6366,7 @@
         "rating_score": "4.9",
         "rating_count": "120+ Ratings",
         "cover_image": "/images/books/bk024-cover.webp",
-        "banner_image": "/images/banners/bk024-hero-banner.webp",
+        "banner_image": "/images/banners/bk022-hero-banner.webp",
         "features": [
           {
             "icon": "fa-seedling",
