@@ -2912,11 +2912,14 @@ Instant Download & Lifetime Access
       }
     } catch (e) { }
 
-    // Check localStorage custom books
+    // Check localStorage custom books (Strictly respect GitHub books.json - never resurrect deleted books)
     try {
+      const deletedLpIds0 = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]').map(x => String(x).toUpperCase().trim());
+      allBooks = allBooks.filter(b => b && b.id && !deletedLpIds0.includes(String(b.id).toUpperCase().trim()));
       const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       if (Array.isArray(customBooks)) {
         customBooks.forEach(cb => {
+          if (!cb || !cb.id) return;
           const idx = allBooks.findIndex(x => x.id === cb.id);
           if (idx >= 0) {
             const catalogBook = allBooks[idx];
@@ -2927,7 +2930,6 @@ Instant Download & Lifetime Access
               allBooks[idx].totalPages = catalogBook.totalPages;
             }
           }
-          else allBooks.push(cb);
         });
       }
     } catch (e) { }
@@ -2984,7 +2986,11 @@ Instant Download & Lifetime Access
                 allLandingPages[idx] = { ...allLandingPages[idx], ...item };
               }
             } else {
-              allLandingPages.push(item);
+              // Only add if it exists in remote books catalog (prevents multi-device ghost book resurrection)
+              const remoteExists = allBooks.some(b => b && b.id && String(b.id).toUpperCase().trim() === cleanItemId);
+              if (remoteExists) {
+                allLandingPages.push(item);
+              }
             }
           });
         }
