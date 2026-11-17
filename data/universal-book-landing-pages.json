@@ -5667,7 +5667,7 @@
     },
     {
       "id": "BK022",
-      "updated_at": "2026-11-17T15:00:46.399Z",
+      "updated_at": "2026-11-17T15:31:48.102Z",
       "admin_edited": true,
       "slug": "bk022",
       "book_type": "paid",
@@ -5679,11 +5679,11 @@
       "totalPages": 57,
       "version": "2026",
       "category": "Agriculture",
-      "status": "coming_soon",
-      "is_coming_soon": true,
-      "isComingSoon": true,
-      "store_badge": "coming_soon",
-      "badge": "coming_soon",
+      "status": "active",
+      "is_coming_soon": false,
+      "isComingSoon": false,
+      "store_badge": "new_launch",
+      "badge": "new_launch",
       "publish_targets": [
         "ebook_store",
         "category_page",
@@ -5733,7 +5733,8 @@
       "section_banners": {
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
         "sec_preview": "/images/banners/bk022-sec_preview-banner.webp",
-        "sec_final_buy": "/images/banners/bk022-sec_final_buy-banner.webp"
+        "sec_final_buy": "/images/banners/bk022-sec_final_buy-banner.webp",
+        "sec_ai_support": "/images/banners/bk022-sec_ai_support-banner.webp"
       },
       "og_title": "🥭 आम की खेती से बेहतर उत्पादन कैसे पाएँ? | सम्पूर्ण वैज्ञानिक मार्गदर्शिका | सिर्फ ₹75",
       "og_description": "🥭 क्या आपका आम का बाग आपकी मेहनत के अनुसार उत्पादन नहीं दे रहा?\n\nआम की खेती में सही किस्म का चुनाव, फूलों का झड़ना, छोटे फलों का गिरना, कीट-रोग और खाद-पानी का सही प्रबंधन बहुत जरूरी है।\n\nइन्हीं जरूरतों को ध्यान में रखकर तैयार की गई है:\n\n📖 आम की खेती — सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका\nआम की खेती, आम की उन्नत खेती, आम का बाग, आम की किस्में, आम की खेती कैसे करें, HDP Mango Farming, UHDP Mango Farming, Mango Cultivation, Mango Orchard Management, आम में कीट रोग नियंत्रण, आम की खेती की किताब",
@@ -5789,17 +5790,22 @@
       "freePdf": "",
       "free_pdf": "",
       "demoPdf": "",
-      "ai_support_title": "",
+      "ai_support_title": "🌟 Aarogyam Sakhi – आपकी अपनी AI साथी",
       "ai_support_cover": "",
-      "ai_support_desc": "",
+      "ai_support_desc": "भारत की पहली ऐसी AI सखी, जो खेती-किसानी, फसल, पशुपालन और स्वास्थ्य से जुड़ी जानकारी देने में आपकी मदद करती है।\n\nअब सिर्फ सवाल लिखने की जरूरत नहीं! अपनी फसल, खेत, पौधे, कीट-रोग या दवा की फोटो Aarogyam Sakhi को भेजें और अपनी समस्या के अनुसार जानकारी एवं संभावित समाधान प्राप्त करें।\n\nखेती हो, पशुपालन हो या स्वास्थ्य से जुड़ा सामान्य सवाल – Aarogyam Sakhi से पूछिए और आसान भाषा में जानकारी पाइए।",
       "bonuses": [],
       "bonus_books": [],
       "bonus_points": [
-        "24×7 WhatsApp Support",
-        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
-        "📖 किताब की जानकारी समझने में सहायता",
-        "🌱 फसल संबंधी सवाल",
-        "📱 Mobile Friendly PDF & Lifetime Access"
+        "🎁 इस किताब के साथ Aarogyam Sakhi का 1 साल का सपोर्ट बिल्कुल FREE!",
+        "🌾 खेती और फसलों से जुड़ी जानकारी",
+        "📸 फसल, खेत और पौधों की फोटो भेजकर जानकारी प्राप्त करें",
+        "🐛 कीट, रोग और फसल की समस्याओं को समझने में मदद",
+        "💊 दवाओं और कृषि उत्पादों की फोटो भेजकर जानकारी पूछें",
+        "🐄 पशुपालन और पशुओं की समस्याओं पर मार्गदर्शन",
+        "❤️ स्वास्थ्य से जुड़ी सामान्य जानकारी",
+        "💬 आसान भाषा में सवाल-जवाब और मार्गदर्शन",
+        "🎁 किताब के साथ 1 साल का FREE Aarogyam Sakhi Support",
+        "1 साल का FREE Aarogyam Sakhi AI Support"
       ],
       "timer": {
         "enabled": true,
