@@ -2539,7 +2539,7 @@ export async function fetchAdminNotifications(params = {}) {
       db.from('profiles').select('id, full_name, mobile, email, registration_source, created_at').order('created_at', { ascending: false }).limit(40),
       db.from('interested_users').select('id, full_name, mobile, email, interested_book, source, created_at').order('created_at', { ascending: false }).limit(25),
       db.from('books').select('id, title'),
-      db.from('landing_pages').select('id, profile_id, share_id, title, category, status, webinar_data, created_at').order('created_at', { ascending: false }).limit(35)
+      db.from('landing_pages').select('id, profile_id, share_id, title, category, status, created_at').order('created_at', { ascending: false }).limit(35)
     ]);
 
     const booksMap = (booksRes.data || []).reduce((acc, b) => { acc[b.id] = b.title; return acc; }, {});
@@ -3280,7 +3280,7 @@ export async function fetchAllLandingPages(params = {}) {
     let pages = [];
 
     if (db) {
-      const { data, error } = await db.from('landing_pages').select('*').order('created_at', { ascending: false });
+      const { data, error } = await db.from('landing_pages').select('id, profile_id, share_id, title, category, content_type, media_url, thumbnail_url, message, status, response_count, created_at, updated_at, og_title, og_description, og_image_url').order('created_at', { ascending: false });
       if (!error && data) pages = data;
     }
 

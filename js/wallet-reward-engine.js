@@ -360,11 +360,13 @@ if (typeof window !== 'undefined') {
         const db = window.dbClient || window.supabase;
         if (!db || !user.id) return;
 
-        // 10-Minute Cache Guard: Do not re-query Supabase if already checked in last 10 minutes (0 KB Egress)
+        // 10-Minute Cache Guard: Do not re-query Supabase if already checked in last 10 minutes across page navigation (0 KB Egress)
         const now = Date.now();
-        if (this._lastRemoteSync && (now - this._lastRemoteSync < 10 * 60 * 1000)) {
+        const lastSyncStorage = parseInt(localStorage.getItem('AI_WALLET_LAST_REMOTE_SYNC_' + user.id) || '0', 10);
+        if (lastSyncStorage && (now - lastSyncStorage < 10 * 60 * 1000)) {
           return;
         }
+        localStorage.setItem('AI_WALLET_LAST_REMOTE_SYNC_' + user.id, String(now));
         this._lastRemoteSync = now;
 
         // 1. Fetch wallet from Supabase `wallets` table

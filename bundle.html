@@ -55,7 +55,7 @@
   <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261109_v2">
   <link rel="stylesheet" href="/css/home-revamp.css?v=20261103">
   <link rel="stylesheet" href="/css/book-landing.css?v=42.0">
-  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261110_v28_instant">
+  <link rel="stylesheet" href="/css/bundle-landing.css?v=20261117_v29_compact_audio">
 
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -129,22 +129,10 @@
     </div>
   </header>
 
-  <!-- FLOATING BUNDLE AUDIO NARRATION PILL (TOP-LEFT PINNED) -->
+  <!-- FLOATING COMPACT SPEAKER BUTTON (PLAY / STOP ONLY) -->
   <div id="bundleFloatingAudioPill" class="bundle-floating-audio-pill" style="display:none;"
-    onclick="window.onAudioPillClick(event)">
-    <div class="bundle-audio-wave">
-      <span class="bar bar-1"></span>
-      <span class="bar bar-2"></span>
-      <span class="bar bar-3"></span>
-      <span class="bar bar-4"></span>
-    </div>
-    <span class="bundle-audio-label" id="bundleAudioPillLabel">🎙️ Audio</span>
-    <button type="button" class="bundle-audio-toggle-btn" id="bundleAudioPillToggleBtn"
-      onclick="event.stopPropagation(); window.toggleBundleAudio();" title="प्ले / पॉज़ करें">▶️</button>
-    <button type="button" class="bundle-audio-compress-btn" id="bundleAudioCompressBtn"
-      onclick="event.stopPropagation(); window.toggleCompressAudioPill();" title="छोटा / बड़ा करें">🗕</button>
-    <button type="button" class="bundle-audio-close-btn"
-      onclick="event.stopPropagation(); window.closeBundleAudioPill();" title="हमेशा के लिए बंद करें">&times;</button>
+    onclick="window.toggleBundleAudio();" title="ऑडियो सुनें / बंद करें">
+    <span class="bundle-speaker-icon" id="bundleSpeakerIcon">🔇</span>
   </div>
   <audio id="bundleNarrationAudio" preload="auto" playsinline></audio>
 
@@ -713,9 +701,9 @@
   <script src="/session.js" defer></script>
   <script src="/js/universal-preview-gallery-lightbox.js?v=20261104" defer></script>
   <script src="/js/universal-nav-drawer.js?v=20261109_v2" defer></script>
-  <script src="/js/public-pwa.js?v=20261110_v28_instant" defer></script>
+  <script src="/js/public-pwa.js?v=20261117_v29_compact_audio" defer></script>
   <script src="/js/wallet-reward-engine.js?v=20261107_v3_passbook" defer></script>
-  <script src="/js/bundle-landing.js?v=20261110_v28_instant" defer></script>
+  <script src="/js/bundle-landing.js?v=20261117_v29_compact_audio" defer></script>
 
 </body>
 

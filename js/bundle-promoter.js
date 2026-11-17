@@ -75,18 +75,7 @@
     } catch (_) { }
 
     try {
-      const db = window.dbClient || window.supabase;
-      if (db) {
-        const { data } = await db.from('site_configs').select('value').eq('key', 'AAROGYAM_BUNDLE_LANDING_PAGES').maybeSingle();
-        if (data && data.value) {
-          const list = Array.isArray(data.value) ? data.value : JSON.parse(data.value || '[]');
-          return list.find(b => b.status === 'active' && b.popupEnabled !== false) || null;
-        }
-      }
-    } catch (_) { }
-
-    try {
-      const resp = await fetch('/data/book-bundles.json?v=' + Date.now());
+      const resp = await fetch('/data/book-bundles.json?v=' + (Math.floor(Date.now() / 60000)));
       if (resp.ok) {
         const data = await resp.json();
         const list = data.bundles || data || [];

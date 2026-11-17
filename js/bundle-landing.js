@@ -194,33 +194,9 @@
       if (active) return active;
     }
 
-    // 2. Check Supabase site_configs table with aggressive 500ms timeout so it never hangs
+    // 2. Check data/book-bundles.json (100% Zero-Egress via Static CDN/GitHub)
     try {
-      const db = window.dbClient || window.supabase;
-      if (db) {
-        const sbQuery = db.from('site_configs').select('value').eq('key', 'AAROGYAM_BUNDLE_LANDING_PAGES').maybeSingle();
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 500));
-        const res = await Promise.race([sbQuery, timeoutPromise]);
-        const data = res?.data;
-        if (data && data.value) {
-          const bundles = Array.isArray(data.value) ? data.value : JSON.parse(data.value || '[]');
-          if (targetKey) {
-            const match = bundles.find(b =>
-              (b.id && b.id.toLowerCase() === targetKey.toLowerCase()) ||
-              (b.slug && b.slug.toLowerCase() === targetKey.toLowerCase())
-            );
-            if (match) return match;
-          } else {
-            const active = bundles.find(b => b.status === 'active') || bundles[0];
-            if (active) return active;
-          }
-        }
-      }
-    } catch (_) { }
-
-    // 3. Check data/book-bundles.json
-    try {
-      const resp = await fetch('/data/book-bundles.json?v=' + Date.now());
+      const resp = await fetch('/data/book-bundles.json?v=' + (Math.floor(Date.now() / 60000))); // 1-min cache-friendly
       if (resp.ok) {
         const data = await resp.json();
         const bundles = data.bundles || data || [];
@@ -1160,8 +1136,8 @@ function initBundleAudio(bundle) {
   }
 
   audioPill.style.display = 'inline-flex';
-  if (audioLabel) audioLabel.textContent = '🎙️ Audio';
-  scheduleAudioPillAutoShrink(4000);
+  audioPill.classList.add('compressed');
+  setAudioState(false);
 
   if (bundle.audioAutoPlay && !bundle.videoAutoPlay) {
     const attemptAuto = () => {
@@ -1233,14 +1209,14 @@ function playSpeechScript(text) {
 function setAudioState(isPlaying) {
   _audioPlaying = isPlaying;
   const pill = document.getElementById('bundleFloatingAudioPill');
-  const toggleBtn = document.getElementById('bundleAudioPillToggleBtn');
+  const icon = document.getElementById('bundleSpeakerIcon');
   if (!pill) return;
   if (isPlaying) {
     pill.classList.add('playing');
-    if (toggleBtn) toggleBtn.textContent = '⏸️';
+    if (icon) icon.textContent = '🔊';
   } else {
     pill.classList.remove('playing');
-    if (toggleBtn) toggleBtn.textContent = '▶️';
+    if (icon) icon.textContent = '🔇';
   }
 }
 
@@ -1258,33 +1234,10 @@ window.toggleBundleAudio = function () {
   }
 };
 
-let _audioAutoShrinkTimer = null;
-
-function scheduleAudioPillAutoShrink(delayMs = 4000) {
-  if (_audioAutoShrinkTimer) clearTimeout(_audioAutoShrinkTimer);
-  _audioAutoShrinkTimer = setTimeout(() => {
-    compressAudioPill();
-  }, delayMs);
-}
-
-function compressAudioPill() {
-  const pill = document.getElementById('bundleFloatingAudioPill');
-  if (pill && !pill.classList.contains('compressed')) {
-    pill.classList.add('compressed');
-    const cBtn = document.getElementById('bundleAudioCompressBtn');
-    if (cBtn) cBtn.textContent = '🗖';
-  }
-}
-
-function expandAudioPill() {
-  const pill = document.getElementById('bundleFloatingAudioPill');
-  if (pill) {
-    pill.classList.remove('compressed');
-    const cBtn = document.getElementById('bundleAudioCompressBtn');
-    if (cBtn) cBtn.textContent = '🗕';
-    scheduleAudioPillAutoShrink(4000);
-  }
-}
+window.onAudioPillClick = function (e) {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  window.toggleBundleAudio();
+};
 
 window.closeBundleAudioPill = function () {
   if (_bundleAudio) {
@@ -1295,7 +1248,6 @@ window.closeBundleAudioPill = function () {
     window.speechSynthesis.cancel();
   }
   setAudioState(false);
-  if (_audioAutoShrinkTimer) clearTimeout(_audioAutoShrinkTimer);
   const pill = document.getElementById('bundleFloatingAudioPill');
   if (pill) {
     pill.style.display = 'none';
@@ -1303,25 +1255,6 @@ window.closeBundleAudioPill = function () {
   }
 };
 window.stopBundleAudio = window.closeBundleAudioPill;
-
-window.toggleCompressAudioPill = function () {
-  const pill = document.getElementById('bundleFloatingAudioPill');
-  if (!pill) return;
-  if (pill.classList.contains('compressed')) {
-    expandAudioPill();
-  } else {
-    compressAudioPill();
-  }
-};
-
-window.onAudioPillClick = function (e) {
-  const pill = document.getElementById('bundleFloatingAudioPill');
-  if (pill && pill.classList.contains('compressed')) {
-    expandAudioPill();
-    return;
-  }
-  window.toggleBundleAudio();
-};
 
 // --- 15. SECTION CONTROLS (ON/OFF VISIBILITY & DYNAMIC REORDERING) ---
 function applySectionControls(bundle) {

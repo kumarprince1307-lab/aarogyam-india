@@ -718,20 +718,44 @@ body.bundle-landing-page .header.header-tiranga-animated {
    ========================================================================== */
 .bundle-floating-audio-pill {
   position: fixed !important;
-  max-width: 230px !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
   z-index: 1000002 !important;
   background: rgba(15, 23, 42, 0.95) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
   border: 1.5px solid #fbbf24 !important;
-  border-radius: 30px !important;
-  padding: 6px 12px !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), 0 0 10px rgba(251, 191, 36, 0.3) !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden !important;
+}
+
+.bundle-floating-audio-pill:hover {
+  transform: scale(1.08) !important;
+}
+
+.bundle-floating-audio-pill:active {
+  transform: scale(0.95) !important;
+}
+
+.bundle-floating-audio-pill.playing {
+  border-color: #22c55e !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), 0 0 12px rgba(34, 197, 94, 0.6) !important;
+}
+
+.bundle-speaker-icon {
+  font-size: 1.25rem !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  user-select: none !important;
 }
 
 @media (min-width: 769px) {
@@ -750,120 +774,12 @@ body.bundle-landing-page .header.header-tiranga-animated {
     left: auto !important;
     top: auto !important;
     z-index: 99995 !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), 0 0 10px rgba(251, 191, 36, 0.35) !important;
   }
 }
 
-.bundle-floating-audio-pill:hover {
-  transform: scale(1.03);
-}
-
-.bundle-audio-wave {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  height: 14px;
-}
-
-.bundle-audio-wave .bar {
-  width: 3px;
-  background: #fbbf24;
-  border-radius: 2px;
-  height: 4px;
-}
-
-.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-1 { animation: soundBar 0.6s infinite ease-in-out; }
-.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-2 { animation: soundBar 0.8s 0.2s infinite ease-in-out; }
-.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-3 { animation: soundBar 0.5s 0.4s infinite ease-in-out; }
-.bundle-floating-audio-pill.playing .bundle-audio-wave .bar-4 { animation: soundBar 0.7s 0.1s infinite ease-in-out; }
-
-@keyframes soundBar {
-  0%, 100% { height: 4px; }
-  50% { height: 14px; }
-}
-
-.bundle-audio-label {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #f8fafc;
-  white-space: nowrap;
-}
-
-.bundle-audio-toggle-btn {
-  background: none;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  color: #fbbf24;
-  padding: 0;
-}
-
-.bundle-audio-compress-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  font-size: 0.72rem;
-  cursor: pointer;
-  color: #fbbf24;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.bundle-audio-compress-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-.bundle-audio-close-btn {
-  background: rgba(239, 68, 68, 0.85) !important;
-  border: none !important;
-  border-radius: 50% !important;
-  width: 22px !important;
-  height: 22px !important;
-  font-size: 1rem !important;
-  line-height: 1 !important;
-  cursor: pointer !important;
-  color: #ffffff !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 !important;
-  transition: transform 0.2s ease, background 0.2s ease;
-  font-weight: 900 !important;
-}
-
-.bundle-audio-close-btn:hover {
-  background: #dc2626 !important;
-  transform: scale(1.15) !important;
-}
-
-/* COMPRESSED SLEEK FLOATING AUDIO PILL */
-.bundle-floating-audio-pill.compressed {
-  width: 44px !important;
-  height: 44px !important;
-  padding: 0 !important;
-  border-radius: 50% !important;
-  justify-content: center !important;
-  align-items: center !important;
-  cursor: pointer !important;
-  overflow: hidden !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55), 0 0 10px rgba(251, 191, 36, 0.3) !important;
-}
-
-.bundle-floating-audio-pill.compressed .bundle-audio-label,
-.bundle-floating-audio-pill.compressed .bundle-audio-toggle-btn,
-.bundle-floating-audio-pill.compressed .bundle-audio-compress-btn,
-.bundle-floating-audio-pill.compressed .bundle-audio-close-btn {
+/* Ensure install app floating bar is 100% disabled */
+.pwa-floating-install-bar {
   display: none !important;
-}
-
-.bundle-floating-audio-pill.compressed .bundle-audio-wave {
-  display: flex !important;
 }
 
 /* ==========================================================================

@@ -39,7 +39,8 @@ function initPublicPwa() {
 }
 
 function initFloatingInstallBar() {
-  if (isStandalone || document.getElementById('pwa-floating-install-bar') || window.location.pathname.includes('/admin/')) return;
+  // Permanently disabled: no floating install app banner (prevents UI overlap)
+  return;
 
   // Check if dismissed in last 7 days
   try {

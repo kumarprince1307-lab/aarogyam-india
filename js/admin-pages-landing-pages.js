@@ -2238,7 +2238,7 @@ export async function initAllLandingPages() {
       const db = getAdminDb();
       if (db) {
         try {
-          const { data: fullData } = await db.from('landing_pages').select('*').eq('id', pageId).single();
+          const { data: fullData } = await db.from('landing_pages').select('id, profile_id, share_id, title, category, content_type, media_url, thumbnail_url, message, status, og_title, og_description, og_image_url, product_data, mrp, offer_price, buynow_url').eq('id', pageId).single();
           if (fullData) page = { ...page, ...fullData };
         } catch (e) {}
       }
