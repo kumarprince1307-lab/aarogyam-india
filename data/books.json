@@ -2210,32 +2210,36 @@
       "freePdf": "",
       "demoPdf": "",
       "demoImages": [
-        "/images/books/bk022-preview-1.webp",
-        "/images/books/bk022-preview-2.webp",
-        "/images/books/bk022-preview-3.webp",
-        "/images/books/bk022-preview-4.webp",
-        "/images/books/bk022-preview-5.webp"
+        "/images/books/BK022/1.webp",
+        "/images/books/BK022/5.webp",
+        "/images/books/BK022/22.webp",
+        "/images/books/BK022/27.webp",
+        "/images/books/BK022/40.webp",
+        "/images/books/BK022/55.webp"
       ],
       "demo_images": [
-        "/images/books/bk022-preview-1.webp",
-        "/images/books/bk022-preview-2.webp",
-        "/images/books/bk022-preview-3.webp",
-        "/images/books/bk022-preview-4.webp",
-        "/images/books/bk022-preview-5.webp"
+        "/images/books/BK022/1.webp",
+        "/images/books/BK022/5.webp",
+        "/images/books/BK022/22.webp",
+        "/images/books/BK022/27.webp",
+        "/images/books/BK022/40.webp",
+        "/images/books/BK022/55.webp"
       ],
       "preview_images": [
-        "/images/books/bk022-preview-1.webp",
-        "/images/books/bk022-preview-2.webp",
-        "/images/books/bk022-preview-3.webp",
-        "/images/books/bk022-preview-4.webp",
-        "/images/books/bk022-preview-5.webp"
+        "/images/books/BK022/1.webp",
+        "/images/books/BK022/5.webp",
+        "/images/books/BK022/22.webp",
+        "/images/books/BK022/27.webp",
+        "/images/books/BK022/40.webp",
+        "/images/books/BK022/55.webp"
       ],
       "previewImages": [
-        "/images/books/bk022-preview-1.webp",
-        "/images/books/bk022-preview-2.webp",
-        "/images/books/bk022-preview-3.webp",
-        "/images/books/bk022-preview-4.webp",
-        "/images/books/bk022-preview-5.webp"
+        "/images/books/BK022/1.webp",
+        "/images/books/BK022/5.webp",
+        "/images/books/BK022/22.webp",
+        "/images/books/BK022/27.webp",
+        "/images/books/BK022/40.webp",
+        "/images/books/BK022/55.webp"
       ],
       "demoAvailable": true,
       "demo_reader_pages": "",
@@ -2300,7 +2304,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK022",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-17T15:51:19.553Z",
+      "updated_at": "2026-11-17T19:22:41.243Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
