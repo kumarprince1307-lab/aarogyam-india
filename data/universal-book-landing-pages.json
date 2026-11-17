@@ -5667,7 +5667,7 @@
     },
     {
       "id": "BK022",
-      "updated_at": "2026-11-17T04:22:20.078Z",
+      "updated_at": "2026-11-17T05:24:08.010Z",
       "admin_edited": true,
       "slug": "bk022",
       "book_type": "paid",
@@ -5705,29 +5705,14 @@
       "sticky_button_text": "खरीदें",
       "ads_mode_enabled": false,
       "ads_gateway_enabled": false,
-      "sections_order": [
-        "sec_hero",
-        "sec_timer",
-        "sec_kpis",
-        "sec_audio",
-        "sec_trust",
-        "sec_why_buy",
-        "sec_vip_stack",
-        "sec_video",
-        "sec_preview",
-        "sec_suggested",
-        "sec_bonuses",
-        "sec_ai_support",
-        "sec_specs_toc",
-        "sec_reviews",
-        "sec_faqs",
-        "sec_final_buy",
-        "sec_help",
-        "sec_pdf_main",
-        "sec_pdf_free"
-      ],
+      "sections_order": [],
       "hidden_sections": [],
-      "section_banners": {},
+      "section_banners": {
+        "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
+        "sec_preview": "/images/banners/bk022-sec_preview-banner.webp",
+        "sec_ai_support": "/images/banners/bk022-sec_ai_support-banner.webp",
+        "sec_specs_toc": "/images/banners/bk022-sec_specs_toc-banner.webp"
+      },
       "og_title": "आम की खेती (Mango Master Guide):",
       "og_description": "आम की खेती (Mango Master Guide): - सम्पूर्ण Practical Guide।",
       "og_image": "/images/books/bk022-og.webp",
@@ -5743,34 +5728,9 @@
         "mp3_url": "",
         "tts_text": "",
         "story_text": "",
-        "highlights": [
-          {
-            "icon": "🐛",
-            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
-          },
-          {
-            "icon": "🦠",
-            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
-          },
-          {
-            "icon": "🧪",
-            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
-          },
-          {
-            "icon": "💧",
-            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
-          },
-          {
-            "icon": "🌊",
-            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
-          },
-          {
-            "icon": "🌱",
-            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
-          }
-        ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹99 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
-        "bgm_enabled": true
+        "bgm_enabled": true,
+        "banner_image": "/images/banners/bk022-sec_audio-banner.webp"
       },
       "mainPdf": "",
       "main_pdf": "",
@@ -5780,29 +5740,9 @@
       "ai_support_title": "",
       "ai_support_cover": "",
       "ai_support_desc": "",
-      "bonuses": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
-      "bonus_books": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
-      "bonus_points": [
-        "24×7 WhatsApp Support",
-        "💬 आपका सवाल → हमारी मदद → आसान समाधान",
-        "📖 किताब की जानकारी समझने में सहायता",
-        "🌱 फसल संबंधी सवाल",
-        "📱 Mobile Friendly PDF & Lifetime Access"
-      ],
+      "bonuses": [],
+      "bonus_books": [],
+      "bonus_points": [],
       "timer": {
         "enabled": true,
         "minutes": 15,
@@ -5849,47 +5789,15 @@
       "why_read": {
         "title": "यह पुस्तक क्यों खरीदें?",
         "subtitle": "",
-        "cards": [
-          {
-            "icon": "🌱",
-            "title": "वैज्ञानिक जानकारी",
-            "desc": "कृषि विशेषज्ञों द्वारा तैयार प्रमाणित एवं Practical जानकारी।"
-          },
-          {
-            "icon": "📷",
-            "title": "300+ वास्तविक फोटो",
-            "desc": "रोग, कीट एवं पोषक तत्वों की वास्तविक पहचान आसान होगी।"
-          },
-          {
-            "icon": "📘",
-            "title": "Step by Step Guide",
-            "desc": "बीज उपचार से लेकर कटाई तक सम्पूर्ण जानकारी।"
-          },
-          {
-            "icon": "🎁",
-            "title": "Free Bonus PDF",
-            "desc": "इस पुस्तक के साथ विशेष Bonus PDF बिल्कुल निःशुल्क।"
-          }
-        ]
+        "cards": []
       },
+      "preview_banner": "/images/banners/bk022-sec_preview-banner.webp",
       "demo_images": [],
       "demo_reader_pages": "",
       "demoPages": "",
       "suggested_books_list": [],
       "suggested_books": [],
-      "table_of_contents": [
-        "बीज उपचार",
-        "खेत की तैयारी",
-        "बुवाई की वैज्ञानिक विधि",
-        "उर्वरक प्रबंधन",
-        "खरपतवार नियंत्रण",
-        "रोग एवं कीट प्रबंधन",
-        "पोषक तत्वों की कमी",
-        "स्प्रे चार्ट",
-        "IPM तकनीक",
-        "अधिक उत्पादन के उपाय",
-        "विशेषज्ञ सुझाव"
-      ],
+      "table_of_contents": [],
       "videos": [],
       "testimonials": [],
       "faqs": [],
