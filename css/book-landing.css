@@ -1496,6 +1496,12 @@ section{
 
     cursor:pointer;
 
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
 }
 
 .preview-card:hover{
@@ -1513,6 +1519,12 @@ section{
 .preview-card img{
 
     width:100%;
+
+    height:auto;
+
+    max-height:560px;
+
+    object-fit:contain;
 
     display:block;
 

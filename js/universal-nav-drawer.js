@@ -1422,6 +1422,7 @@
       </div>
 
       <!-- Sticky Floating Actions Container on Page (Fixed Right Corner - Strictly Icon-Only) -->
+      ${isBookLanding ? '' : `
       <div class="sticky-float-widget-container" id="universal-sticky-float-widget">
         <!-- 1. Red Sticky Install App Button (Only in Browser mode; auto-hidden if opened in installed standalone app) -->
         <button type="button" onclick="window.triggerPwaInstall()" class="sticky-float-pill sticky-float-install-pill" id="universal-sticky-pwa-install-btn" title="ऐप इंस्टॉल करें (Install App)" aria-label="Install App" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; ${isInstalled ? 'display:none !important;' : 'display:inline-flex;'}; align-items:center; justify-content:center;">
@@ -1443,6 +1444,7 @@
           <i class="fa-brands fa-whatsapp"></i>
         </a>
       </div>
+      `}
 
       ${isBookLanding ? '' : `
       <!-- Universal Sticky Mobile Bottom Navigation Bar (Mobile & Tablet) -->
@@ -1681,6 +1683,8 @@
       }
       const bNav = document.getElementById('universal-mobile-bottom-nav');
       if (bNav) bNav.remove();
+      const fWidget = document.getElementById('universal-sticky-float-widget');
+      if (fWidget) fWidget.remove();
     }
   }
 
