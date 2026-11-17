@@ -1515,12 +1515,12 @@ if (typeof window !== 'undefined') {
     const previewSection = document.getElementById('sec-sample-book');
     const galleryGrid = document.getElementById('preview-gallery-grid');
     let rawDemoList = [];
-    if (Array.isArray(l.demo_images) && l.demo_images.length > 0) {
-      rawDemoList = l.demo_images;
-    } else if (Array.isArray(l.preview_images) && l.preview_images.length > 0) {
+    if (Array.isArray(l.preview_images) && l.preview_images.length > 0) {
       rawDemoList = l.preview_images;
     } else if (Array.isArray(l.previewImages) && l.previewImages.length > 0) {
       rawDemoList = l.previewImages;
+    } else if (Array.isArray(l.demo_images) && l.demo_images.length > 0) {
+      rawDemoList = l.demo_images;
     } else if (Array.isArray(b.demoImages) && b.demoImages.length > 0) {
       rawDemoList = b.demoImages;
     } else if (Array.isArray(b.demo_images) && b.demo_images.length > 0) {
@@ -1529,8 +1529,6 @@ if (typeof window !== 'undefined') {
       rawDemoList = b.preview_images;
     } else if (Array.isArray(b.previewImages) && b.previewImages.length > 0) {
       rawDemoList = b.previewImages;
-    } else if (Array.isArray(b.pageImages) && b.pageImages.length > 0) {
-      rawDemoList = b.pageImages.slice(0, 16);
     }
 
     const bIdUpper = (b.id || currentBookId || 'BK001').toUpperCase();
@@ -1541,9 +1539,10 @@ if (typeof window !== 'undefined') {
       rawDemoList = rawDemoList.filter(img => typeof img === 'string' && !img.includes('kharif') && !img.includes('bk015'));
     }
 
-    // Dynamic Guarantee: If empty, auto-resolve correct book previews
+    // Dynamic Guarantee: ONLY legacy original books (BK001, BK002, BK015) have built-in hardcoded fallbacks
+    // All other books strictly show ONLY what admin has configured (No hardcoded leak!)
     if ((!rawDemoList || rawDemoList.length === 0) && !isAdminManagedBook) {
-      if (bIdUpper.includes('015') || bIdUpper.includes('SABJI')) {
+      if (bIdUpper === 'BK015' || bIdUpper === 'DEMO-BK015') {
         rawDemoList = [
           '/images/books/bk015-preview-1.webp',
           '/images/books/bk015-preview-2.webp',
@@ -1562,7 +1561,7 @@ if (typeof window !== 'undefined') {
           '/images/books/bk015-preview-15.webp',
           '/images/books/bk015-preview-16.webp'
         ];
-      } else if (bIdUpper.includes('002') || bIdUpper.includes('KHETI')) {
+      } else if (bIdUpper === 'BK002' || bIdUpper === 'DEMO-BK002') {
         rawDemoList = [
           '/images/books/kheti-dr-demo-1.webp',
           '/images/books/kheti-dr-demo-2.webp',
@@ -1572,7 +1571,7 @@ if (typeof window !== 'undefined') {
           '/images/books/kheti-dr-demo-6.webp',
           '/images/books/kheti-dr-demo-7.webp'
         ];
-      } else {
+      } else if (bIdUpper === 'BK001' || bIdUpper === 'DEMO-BK001') {
         rawDemoList = [
           '/images/books/kharif-master-guide-2026-preview-01.webp',
           '/images/books/kharif-master-guide-2026-preview-02.webp',
