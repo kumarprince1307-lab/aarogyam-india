@@ -2302,7 +2302,7 @@
       "offerPrice": 75,
       "cover": "/images/books/bk023-cover.webp",
       "thumbnail": "/images/books/bk023-cover.webp",
-      "banner": "/images/banners/bk023-hero-banner.webp",
+      "banner": "/images/banners/bk022-hero-banner.webp",
       "status": "active",
       "publish_targets": [
         "ebook_store",
@@ -2385,7 +2385,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK023",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-16T14:34:51.370Z",
+      "updated_at": "2026-11-17T04:23:25.696Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,

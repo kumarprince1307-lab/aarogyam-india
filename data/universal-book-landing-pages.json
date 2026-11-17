@@ -5919,7 +5919,7 @@
     },
     {
       "id": "BK023",
-      "updated_at": "2026-11-16T14:34:51.370Z",
+      "updated_at": "2026-11-17T04:23:25.695Z",
       "admin_edited": true,
       "slug": "bk023",
       "book_type": "paid",
@@ -6057,7 +6057,7 @@
         "rating_score": "4.9",
         "rating_count": "120+ Ratings",
         "cover_image": "/images/books/bk023-cover.webp",
-        "banner_image": "/images/banners/bk023-hero-banner.webp",
+        "banner_image": "/images/banners/bk022-hero-banner.webp",
         "features": [
           {
             "icon": "fa-seedling",
