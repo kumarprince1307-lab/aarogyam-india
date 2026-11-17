@@ -8368,41 +8368,107 @@ Instant Download & Lifetime Access
         maxHeight = 2400;
       }
 
+      // Helper to verify if a dataUrl contains actual base64 image data (>50 chars payload)
+      const isValidImageDataUrl = (str) => {
+        if (!str || typeof str !== 'string') return false;
+        if (!str.startsWith('data:image/')) return false;
+        const commaIdx = str.indexOf(',');
+        if (commaIdx === -1) return false;
+        return str.slice(commaIdx + 1).trim().length > 50;
+      };
+
       // If input is already an optimized WebP base64, return immediately to prevent lossy re-compression!
-      if (typeof input === 'string' && input.startsWith('data:image/webp;base64,')) {
+      if (typeof input === 'string' && input.startsWith('data:image/webp;base64,') && isValidImageDataUrl(input)) {
         return resolve(input);
       }
 
-      const processDataUrl = (dataUrl) => {
-        if (!dataUrl || typeof dataUrl !== 'string') return resolve(dataUrl);
-        if (dataUrl.startsWith('data:image/webp;base64,')) return resolve(dataUrl);
+      const processDataUrl = (rawSrcDataUrl) => {
+        if (!rawSrcDataUrl || typeof rawSrcDataUrl !== 'string') {
+          return resolve(null);
+        }
+        if (!isValidImageDataUrl(rawSrcDataUrl)) {
+          return resolve(null);
+        }
 
         const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        // 12-second watchdog timer for slow mobile image decoders
+        const timer = setTimeout(() => {
+          console.warn('[compressImageFile] Image decode timed out, using raw source');
+          resolve(rawSrcDataUrl);
+        }, 12000);
+
         img.onload = () => {
+          clearTimeout(timer);
           try {
-            const canvas = document.createElement('canvas');
-            let w = img.naturalWidth || img.width;
-            let h = img.naturalHeight || img.height;
-            if (w > maxWidth || h > maxHeight) {
-              const ratio = Math.min(maxWidth / w, maxHeight / h);
-              w = Math.round(w * ratio);
-              h = Math.round(h * ratio);
+            let w = img.naturalWidth || img.width || 0;
+            let h = img.naturalHeight || img.height || 0;
+            if (w <= 0 || h <= 0) {
+              return resolve(rawSrcDataUrl);
             }
+
+            // Mobile RAM Shield: Downscale high-res mobile camera photos to safe canvas dimensions
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+            const targetMaxWidth = isMobile ? Math.min(maxWidth, 1800) : maxWidth;
+            const targetMaxHeight = isMobile ? Math.min(maxHeight, 1800) : maxHeight;
+
+            if (w > targetMaxWidth || h > targetMaxHeight) {
+              const ratio = Math.min(targetMaxWidth / w, targetMaxHeight / h);
+              w = Math.max(1, Math.round(w * ratio));
+              h = Math.max(1, Math.round(h * ratio));
+            }
+
+            const canvas = document.createElement('canvas');
             canvas.width = w;
             canvas.height = h;
             const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              console.warn('[compressImageFile] Canvas 2D context unavailable, using raw source');
+              return resolve(rawSrcDataUrl);
+            }
+
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, w, h);
-            const webpUrl = canvas.toDataURL('image/webp', quality);
-            resolve(webpUrl);
+
+            // Tier 1: Primary HD WebP export
+            let outputUrl = null;
+            try {
+              outputUrl = canvas.toDataURL('image/webp', quality);
+            } catch (webpErr) {
+              console.warn('[compressImageFile] WebP export error:', webpErr);
+            }
+
+            // Tier 2: Safe JPEG export if WebP failed or returned empty data
+            if (!isValidImageDataUrl(outputUrl)) {
+              try {
+                outputUrl = canvas.toDataURL('image/jpeg', 0.88);
+              } catch (jpegErr) {
+                console.warn('[compressImageFile] JPEG export error:', jpegErr);
+              }
+            }
+
+            // Tier 3: If canvas toDataURL still failed on mobile, fallback to raw source
+            if (!isValidImageDataUrl(outputUrl)) {
+              console.warn('[compressImageFile] Canvas returned empty, falling back to raw source');
+              outputUrl = rawSrcDataUrl;
+            }
+
+            resolve(outputUrl);
           } catch (err) {
-            console.warn('[compressImageFile] Canvas compression error:', err);
-            resolve(dataUrl);
+            console.warn('[compressImageFile] Canvas compression exception, falling back to raw source:', err);
+            resolve(rawSrcDataUrl);
           }
         };
-        img.onerror = () => resolve(dataUrl);
-        img.src = dataUrl;
+
+        img.onerror = (err) => {
+          clearTimeout(timer);
+          console.warn('[compressImageFile] Image load error, using raw source:', err);
+          resolve(rawSrcDataUrl);
+        };
+
+        img.src = rawSrcDataUrl;
       };
 
       if (typeof input === 'string') {
@@ -8413,8 +8479,18 @@ Instant Download & Lifetime Access
         }
       } else if (input instanceof Blob || input instanceof File) {
         const reader = new FileReader();
-        reader.onload = (e) => processDataUrl(e.target.result);
-        reader.onerror = () => resolve(null);
+        reader.onload = (e) => {
+          const res = e.target?.result;
+          if (isValidImageDataUrl(res)) {
+            processDataUrl(res);
+          } else {
+            resolve(null);
+          }
+        };
+        reader.onerror = (err) => {
+          console.error('[compressImageFile] FileReader error:', err);
+          resolve(null);
+        };
         reader.readAsDataURL(input);
       } else {
         resolve(null);
@@ -8524,7 +8600,7 @@ Instant Download & Lifetime Access
     const uploadedFiles = [];
     const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
 
-    // 1. Cover Image (File or Data URL with auto-compression)
+    // 1. Cover Image (File or Data URL with auto-compression & mobile fallback)
     let finalCoverPath = coverUrlInput || `/images/books/${bId.toLowerCase()}-cover.webp`;
     if (coverFileInput?.files?.[0]) {
       const cFile = coverFileInput.files[0];
@@ -8532,16 +8608,23 @@ Instant Download & Lifetime Access
         showToast(`❌ कवर इमेज 25MB से बड़ी है (${(cFile.size / (1024 * 1024)).toFixed(1)}MB)।`, 'error');
         return;
       }
-      const b64 = await compressImageFile(cFile, 2000, 2400, 0.92);
+      let b64 = await compressImageFile(cFile, 2000, 2400, 0.92);
+      if (!b64 && coverUrlInput && coverUrlInput.startsWith('data:image/')) {
+        b64 = await compressImageFile(coverUrlInput, 2000, 2400, 0.92) || coverUrlInput;
+      }
+      if (!b64) {
+        showToast('❌ कवर इमेज प्रोसेस नहीं हो सकी। कृपया दोबारा फ़ाइल चुनें।', 'error');
+        return;
+      }
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
       uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     } else if (coverUrlInput && coverUrlInput.startsWith('data:image/')) {
-      const b64 = await compressImageFile(coverUrlInput, 2000, 2400, 0.92);
+      const b64 = await compressImageFile(coverUrlInput, 2000, 2400, 0.92) || coverUrlInput;
       finalCoverPath = `/images/books/${bId.toLowerCase()}-cover.webp`;
       uploadedFiles.push({ path: `images/books/${bId.toLowerCase()}-cover.webp`, base64: b64 });
     }
 
-    // 2. Banner Image (File or Data URL with auto-compression)
+    // 2. Banner Image (File or Data URL with auto-compression & mobile fallback)
     let finalBannerPath = bannerUrlInput || `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
     if (bannerFileInput?.files?.[0]) {
       const bFile = bannerFileInput.files[0];
@@ -8549,11 +8632,18 @@ Instant Download & Lifetime Access
         showToast(`❌ बैनर इमेज 25MB से बड़ी है (${(bFile.size / (1024 * 1024)).toFixed(1)}MB)।`, 'error');
         return;
       }
-      const b64 = await compressImageFile(bFile, 2400, 2400, 0.92);
+      let b64 = await compressImageFile(bFile, 2400, 2400, 0.92);
+      if (!b64 && bannerUrlInput && bannerUrlInput.startsWith('data:image/')) {
+        b64 = await compressImageFile(bannerUrlInput, 2400, 2400, 0.92) || bannerUrlInput;
+      }
+      if (!b64) {
+        showToast('❌ बैनर इमेज प्रोसेस नहीं हो सकी। कृपया दोबारा फ़ाइल चुनें।', 'error');
+        return;
+      }
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
       uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     } else if (bannerUrlInput && bannerUrlInput.startsWith('data:image/')) {
-      const b64 = await compressImageFile(bannerUrlInput, 2400, 2400, 0.92);
+      const b64 = await compressImageFile(bannerUrlInput, 2400, 2400, 0.92) || bannerUrlInput;
       finalBannerPath = `/images/banners/${bId.toLowerCase()}-hero-banner.webp`;
       uploadedFiles.push({ path: `images/banners/${bId.toLowerCase()}-hero-banner.webp`, base64: b64 });
     }
@@ -8917,6 +9007,16 @@ Instant Download & Lifetime Access
 
     try {
       // Step 1: Process any media files (Cover, Banner, Demo pages, Section Banners, PDFs)
+      // Pre-Flight Asset Integrity Check: Bulletproof verification for Mobile & Desktop
+      for (let f = 0; f < uploadedFiles.length; f++) {
+        const item = uploadedFiles[f];
+        const fName = item.path.split('/').pop();
+        const raw = String(item.base64 || '').replace(/^data:[^;]+;base64,/, '').trim();
+        if (!raw || raw.length < 50) {
+          throw new Error(`फ़ाइल "${fName}" का इमेज डेटा अधूरा (Empty Data) है। कृपया फ़ोटो दोबारा चुनें या हल्की इमेज अपलोड करें।`);
+        }
+      }
+
       // In Production: We create Git Blobs directly (0 git commits, 0 Vercel builds triggered)
       const tree = [];
       if (uploadedFiles.length > 0) {

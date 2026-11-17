@@ -327,7 +327,7 @@ module.exports = async function handler(req, res) {
     // ACTION: CREATE BLOB (Parallel Conflict-Free Fast Blob Upload)
     // -------------------------------------------------------------
     if (action === 'create_blob' || action === 'upload_blob') {
-      const rawBase64 = String(payload.base64 || '').replace(/^data:[^;]+;base64,/, '');
+      const rawBase64 = String(payload.base64 || '').replace(/^data:[^;]+;base64,/, '').trim();
       if (!rawBase64) {
         return sendJson(res, 400, { success: false, error: 'base64 is required for create_blob.' });
       }
