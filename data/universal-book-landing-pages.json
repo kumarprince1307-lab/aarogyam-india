@@ -6614,7 +6614,7 @@
     },
     {
       "id": "BK024",
-      "updated_at": "2026-11-17T19:54:48.700Z",
+      "updated_at": "2026-11-17T20:01:58.245Z",
       "admin_edited": true,
       "slug": "bk024",
       "book_type": "paid",
@@ -6626,28 +6626,25 @@
       "totalPages": 62,
       "version": "2026",
       "category": "Agriculture",
-      "status": "active",
-      "is_coming_soon": false,
-      "isComingSoon": false,
-      "store_badge": "new_launch",
-      "badge": "new_launch",
+      "status": "coming_soon",
+      "is_coming_soon": true,
+      "isComingSoon": true,
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page",
         "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "download_funnel"
       ],
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
       "google_analytics_enabled": true,
-      "theme_primary": "#d97706",
-      "theme_dark": "#993700",
+      "theme_primary": "#2e7d32",
+      "theme_dark": "#003d00",
       "cover_effect": "3d_float",
       "sticky_button_text": "खरीदें",
       "ads_mode_enabled": false,
@@ -6675,14 +6672,15 @@
       ],
       "hidden_sections": [],
       "section_banners": {
+        "sec_final_buy": "/images/banners/bk024-sec_final_buy-banner.webp",
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
         "sec_preview": "/images/banners/bk022-sec_preview-banner.webp",
         "sec_ai_support": "/images/banners/bk022-sec_ai_support-banner.webp"
       },
-      "og_title": "अंगूर मास्टर गाइड (Grape Master Guide)",
-      "og_description": "अंगूर मास्टर गाइड (Grape Master Guide) - सम्पूर्ण Practical Guide।",
-      "og_image": "/images/books/bk024-cover.webp",
-      "og_image_landscape": "/images/books/bk024-cover.webp",
+      "og_title": "अंगूर की खेती – बंपर पैदावार की सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका |  Grape Master Guide",
+      "og_description": "अंगूर की खेती से बेहतर उत्पादन और गुणवत्ता पाने की सम्पूर्ण जानकारी एक ही पुस्तक में। जानें अंगूर की प्रमुख किस्में जैसे थॉम्पसन, फ्लेम, शारद सीडलेस और रेड ग्लोब, बाग की स्थापना, ट्रेलिस (मंडप) प्रणाली, वैज्ञानिक छँटाई, बेल प्रबंधन, खाद एवं पोषण प्रबंधन, ड्रिप सिंचाई, फूल और फल विकास, गुच्छों की थिनिंग, प्रमुख रोग एवं कीट नियंत्रण, अंगूर की तुड़ाई, ग्रेडिंग, पैकिंग, भंडारण और बाजार प्रबंधन। साथ ही पाएं अंगूर की खेती की महीनेवार कार्य योजना, लागत, उत्पादन और मुनाफे का व्यावहारिक विश्लेषण। पुस्तक के साथ 1 साल का FREE Aarogyam Sakhi AI Support। MRP ₹299, विशेष ऑफर सिर्फ ₹75।",
+      "og_image": "/images/books/bk024-og.webp",
+      "og_image_landscape": "/images/books/bk024-og.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🍇 फल खेती मास्टर | अंगूर की विशेष मार्गदर्शिका",
@@ -6753,8 +6751,7 @@
         "💬 आपका सवाल → हमारी मदद → आसान समाधान",
         "📖 किताब की जानकारी समझने में सहायता",
         "🌱 फसल संबंधी सवाल",
-        "📱 Mobile Friendly PDF & Lifetime Access",
-        "✅ नया बोनस पॉइंट"
+        "📱 Mobile Friendly PDF & Lifetime Access"
       ],
       "timer": {
         "enabled": true,
@@ -6848,16 +6845,10 @@
       "testimonials": [],
       "faqs": [],
       "final_buy": {
-        "title": "🍇 BK024: अंगूर मास्टर गाइड (Grape Master Guide)",
+        "title": "अंगूर मास्टर गाइड (Grape Master Guide)",
         "description": "पौधे की रोपाई से लेकर बंपर पैदावार और तुड़ाई तक की सम्पूर्ण मार्गदर्शिका",
-        "benefits": [
-          "🎧 किताब की जानकारी समझने के लिए ऑडियो सुविधा",
-          "📱 मोबाइल पर कभी भी पढ़ने की सुविधा",
-          "⬇️ खरीद के बाद डिजिटल किताब डाउनलोड करें",
-          "🌳 किस्म चयन से लेकर तुड़ाई और बाजार तक की जानकारी",
-          "🐛 कीट-रोग, खाद-पोषण, सिंचाई और फूल-फल प्रबंधन की जानकारी",
-          "💰 बाग की लागत, उत्पादन और संभावित मुनाफे का आकलन"
-        ]
+        "benefits": [],
+        "banner_image": "/images/banners/bk024-sec_final_buy-banner.webp"
       },
       "download_funnel": {
         "audio_enabled": true,
@@ -6876,6 +6867,8 @@
         "fast_size": "~24 MB",
         "hd_download_limit": 3
       },
+      "whatsapp_share_message": "🍇 *अंगूर की खेती – बंपर पैदावार की सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका*\nक्या आप अंगूर की खेती में बेहतर पैदावार, अच्छे आकार के गुच्छे और गुणवत्तायुक्त फल प्राप्त करना चाहते हैं?\nअब अंगूर की खेती की जरूरी जानकारी पाएं एक ही पुस्तक में।\n📘 *इस किताब में जानें:*\n✅ अंगूर की प्रमुख किस्में और सही चुनाव\n✅ बाग की स्थापना और ट्रेलिस प्रणाली\n✅ वैज्ञानिक छँटाई और बेल प्रबंधन\n✅ खाद, पोषण एवं सिंचाई प्रबंधन\n✅ फूल, फल लगाव और गुच्छों की थिनिंग\n✅ प्रमुख रोग एवं कीट नियंत्रण\n✅ तुड़ाई, ग्रेडिंग, पैकिंग और भंडारण\n✅ महीनेवार कार्य योजना और किसान चेकलिस्ट\n✅ खेती की लागत, उत्पादन और मुनाफे का विश्लेषण\n🎁 *खास सुविधा:* किताब के साथ 1 साल का FREE Aarogyam Sakhi AI Support।\n💰 MRP: ₹299\n🔥 विशेष ऑफर: सिर्फ ₹75\n📖 *अंगूर की खेती की पूरी जानकारी के लिए यहाँ क्लिक करें:*",
+      "whatsapp_share_text": "🍇 *अंगूर की खेती – बंपर पैदावार की सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका*\nक्या आप अंगूर की खेती में बेहतर पैदावार, अच्छे आकार के गुच्छे और गुणवत्तायुक्त फल प्राप्त करना चाहते हैं?\nअब अंगूर की खेती की जरूरी जानकारी पाएं एक ही पुस्तक में।\n📘 *इस किताब में जानें:*\n✅ अंगूर की प्रमुख किस्में और सही चुनाव\n✅ बाग की स्थापना और ट्रेलिस प्रणाली\n✅ वैज्ञानिक छँटाई और बेल प्रबंधन\n✅ खाद, पोषण एवं सिंचाई प्रबंधन\n✅ फूल, फल लगाव और गुच्छों की थिनिंग\n✅ प्रमुख रोग एवं कीट नियंत्रण\n✅ तुड़ाई, ग्रेडिंग, पैकिंग और भंडारण\n✅ महीनेवार कार्य योजना और किसान चेकलिस्ट\n✅ खेती की लागत, उत्पादन और मुनाफे का विश्लेषण\n🎁 *खास सुविधा:* किताब के साथ 1 साल का FREE Aarogyam Sakhi AI Support।\n💰 MRP: ₹299\n🔥 विशेष ऑफर: सिर्फ ₹75\n📖 *अंगूर की खेती की पूरी जानकारी के लिए यहाँ क्लिक करें:*",
       "whatsapp_prompt": "नमस्ते, मुझे 'अंगूर मास्टर गाइड (Grape Master Guide)' पुस्तक के बारे में और जानकारी चाहिए।",
       "pageImages": [
         "../images/books/BK022/1.webp",

@@ -2509,22 +2509,19 @@
       "cover": "/images/books/bk024-cover.webp",
       "thumbnail": "/images/books/bk024-cover.webp",
       "banner": "/images/banners/bk022-hero-banner.webp",
-      "status": "active",
+      "status": "coming_soon",
       "publish_targets": [
         "ebook_store",
         "category_page",
         "my_library",
         "home_page",
         "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
+        "download_funnel"
       ],
-      "store_badge": "new_launch",
-      "badge": "new_launch",
-      "isComingSoon": false,
-      "is_coming_soon": false,
+      "store_badge": "coming_soon",
+      "badge": "coming_soon",
+      "isComingSoon": true,
+      "is_coming_soon": true,
       "mainPdf": "",
       "pdf_url": "",
       "freePdf": "",
@@ -2536,8 +2533,8 @@
       "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
-      "og_image": "/images/books/bk024-cover.webp",
-      "og_image_landscape": "/images/books/bk024-cover.webp",
+      "og_image": "/images/books/bk024-og.webp",
+      "og_image_landscape": "/images/books/bk024-og.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🍇 फल खेती मास्टर | अंगूर की विशेष मार्गदर्शिका",
@@ -2592,7 +2589,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK024",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-17T19:54:48.701Z",
+      "updated_at": "2026-11-17T20:01:58.246Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2662,7 +2659,14 @@
         "../images/books/BK022/57.webp"
       ],
       "title": "अंगूर मास्टर गाइड (Grape Master Guide)",
-      "bonuses": []
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     },
     {
       "id": "BK025",
