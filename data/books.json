@@ -479,8 +479,8 @@
       "og_image": "/images/books/bk015-og.webp",
       "og_image_landscape": "/images/books/bk015-og.webp",
       "audio_layer": {
-        "enabled": false,
-        "autoplay": true,
+        "enabled": true,
+        "autoplay": false,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
         "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
         "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
@@ -532,8 +532,19 @@
       "landingPage": "/ebooks/book-landing.html?id=BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-18T08:11:00.975Z",
-      "admin_edited": true
+      "updated_at": "2026-11-18T08:41:48.908Z",
+      "admin_edited": true,
+      "title": "🌱 सब्जी खेती मास्टर  (PART 1)",
+      "hasWebpPages": true,
+      "hasAudioBook": true,
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     },
     {
       "id": "DEMO-BK015",
