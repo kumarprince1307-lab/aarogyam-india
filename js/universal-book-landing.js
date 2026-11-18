@@ -2205,15 +2205,34 @@ if (typeof window !== 'undefined') {
     const isVideoAutoplayAdmin = Boolean(l.video_autoplay || l.videoAutoPlay || l.video?.autoplay || (Array.isArray(l.videos) && l.videos[0]?.autoplay));
     const isAudioAutoplayAdmin = Boolean(l.audio_autoplay !== false && (l.audioAutoPlay !== false) && (l.audio_layer?.autoplay !== false));
     const shouldVideoAutoplay = isVideoAutoplayAdmin || (isAudioAutoplayAdmin && !hasTtsSupport);
-    const hostOrigin = window.location.origin || (window.location.protocol + '//' + window.location.host);
 
+    function getUblEmbedUrl(url, autoplay) {
+      if (!url) return '';
+      const ytId = extractYouTubeId(url);
+      if (ytId) {
+        const autoParam = autoplay
+          ? '?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0'
+          : '?playsinline=1&rel=0';
+        return `https://www.youtube.com/embed/${ytId}${autoParam}`;
+      }
+      return url;
+    }
+
+    // --- EXACT MATCH WITH BUNDLE VIDEO UNMUTE ENGINE ---
     window.unmuteUblLandingVideo = function(btnEl) {
       const iframes = document.querySelectorAll('#sec-book-video iframe');
       iframes.forEach(iframe => {
         if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unMute', args: [] }), '*');
-          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'setVolume', args: [100] }), '*');
-          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*');
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func: 'unMute',
+            args: []
+          }), '*');
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func: 'setVolume',
+            args: [100]
+          }), '*');
         }
       });
       const directVideos = document.querySelectorAll('#sec-book-video video');
@@ -2223,53 +2242,60 @@ if (typeof window !== 'undefined') {
         v.play().catch(() => {});
       });
       if (btnEl) btnEl.style.display = 'none';
-      const allPills = document.querySelectorAll('.ubl-video-unmute-overlay');
-      allPills.forEach(p => { p.style.display = 'none'; });
+      const allOverlays = document.querySelectorAll('.video-unmute-overlay, .ubl-video-unmute-overlay');
+      allOverlays.forEach(el => el.style.display = 'none');
     };
 
-    if (shouldVideoAutoplay) {
-      let _hasUnmuted = false;
-      const autoUnmuteOnGesture = () => {
-        if (_hasUnmuted) return;
-        _hasUnmuted = true;
-        if (typeof window.unmuteUblLandingVideo === 'function') {
-          window.unmuteUblLandingVideo();
-        }
-        ['click', 'touchend'].forEach(evt => window.removeEventListener(evt, autoUnmuteOnGesture));
+    let _hasUnmutedLandingVideo = false;
+    function setupFirstGestureVideoUnmute() {
+      const triggerUnmute = () => {
+        if (_hasUnmutedLandingVideo) return;
+        _hasUnmutedLandingVideo = true;
+        window.unmuteUblLandingVideo();
+        ['touchstart', 'click', 'scroll'].forEach(evt => {
+          window.removeEventListener(evt, triggerUnmute, { passive: true });
+        });
       };
-      // ONLY listen to genuine user activations (click, touchend). NEVER scroll, which blocks browser audio!
-      ['click', 'touchend'].forEach(evt => window.addEventListener(evt, autoUnmuteOnGesture, { once: true, passive: true }));
+      ['touchstart', 'click', 'scroll'].forEach(evt => {
+        window.addEventListener(evt, triggerUnmute, { passive: true, once: true });
+      });
+    }
+
+    if (shouldVideoAutoplay) {
+      setupFirstGestureVideoUnmute();
     }
 
     // If single video, render dedicated centered player
     if (videos.length === 1) {
       const v = videos[0];
-      const ytId = extractYouTubeId(v.url || v.youtube_url);
+      const vUrl = v.url || v.youtube_url || '';
+      const ytId = extractYouTubeId(vUrl);
       if (!ytId) {
         section.style.display = 'none';
         return;
       }
-      const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
+      const isVertical = (vUrl.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const playerClass = isVertical ? 'ubl-video-player-9-16' : 'ubl-video-player-16-9';
-      const autoParam = shouldVideoAutoplay ? '&autoplay=1&mute=1' : '';
+      const embedUrl = getUblEmbedUrl(vUrl, shouldVideoAutoplay);
+      const unmutePillHtml = shouldVideoAutoplay ? `
+        <div class="video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#fff; padding:6px 14px; border-radius:24px; font-weight:800; font-size:0.8rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:6px; box-shadow:0 6px 18px rgba(0,0,0,0.6); pointer-events:auto;">
+          <span>🔊</span> <span>आवाज़ चालू करें</span>
+        </div>
+      ` : '';
 
       grid.innerHTML = `
         <div style="grid-column: 1 / -1; width: 100%;">
           <div class="${playerClass}" style="position: relative;">
             <div class="video-inner">
               <iframe 
-                src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(hostOrigin)}${autoParam}" 
+                src="${embedUrl}" 
                 title="${escapeHtml(v.title || 'Video')}" 
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen>
               </iframe>
             </div>
-            ${shouldVideoAutoplay ? `
-              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:8px 18px; border-radius:24px; font-weight:800; font-size:0.85rem; border:2px solid #fbbf24; cursor:pointer; z-index:20; display:inline-flex; align-items:center; gap:8px; box-shadow:0 6px 20px rgba(0,0,0,0.6); pointer-events:auto;">
-                <span>🔊</span> <span>आवाज़ चालू करें (Tap to Unmute)</span>
-              </div>
-            ` : ''}
+            ${unmutePillHtml}
           </div>
           <div style="text-align: center; margin-top: 14px;">
             <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">${escapeHtml(v.title || '🎥 वीडियो अवलोकन')}</h3>
@@ -2281,28 +2307,30 @@ if (typeof window !== 'undefined') {
     }
 
     grid.innerHTML = videos.map((v, idx) => {
-      const ytId = extractYouTubeId(v.url || v.youtube_url);
+      const vUrl = v.url || v.youtube_url || '';
+      const ytId = extractYouTubeId(vUrl);
       if (!ytId) return '';
-      const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
+      const isVertical = (vUrl.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const frameClass = isVertical ? 'ubl-video-frame-wrap-9-16' : 'ubl-video-frame-wrap-16-9';
       const isCardAutoPlay = (idx === 0 && shouldVideoAutoplay);
-      const autoParam = isCardAutoPlay ? '&autoplay=1&mute=1' : '';
+      const embedUrl = getUblEmbedUrl(vUrl, isCardAutoPlay);
+      const unmutePillHtml = isCardAutoPlay ? `
+        <div class="video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#fff; padding:6px 14px; border-radius:24px; font-weight:800; font-size:0.78rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:5px; box-shadow:0 4px 14px rgba(0,0,0,0.5); pointer-events:auto;">
+          <span>🔊</span> <span>आवाज़ चालू करें</span>
+        </div>
+      ` : '';
 
       return `
         <div class="ubl-video-card">
           <div class="${frameClass}" style="position: relative;">
             <iframe 
-              src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(hostOrigin)}${autoParam}" 
+              src="${embedUrl}" 
               title="${escapeHtml(v.title || 'Video')}" 
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
             </iframe>
-            ${isCardAutoPlay ? `
-              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:7px 16px; border-radius:24px; font-weight:800; font-size:0.8rem; border:2px solid #fbbf24; cursor:pointer; z-index:20; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(0,0,0,0.5); pointer-events:auto;">
-                <span>🔊</span> <span>Tap to Unmute</span>
-              </div>
-            ` : ''}
+            ${unmutePillHtml}
           </div>
           <div class="ubl-video-card-info">
             <h4>${escapeHtml(v.title || '🎥 वीडियो अवलोकन')}</h4>
