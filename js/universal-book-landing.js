@@ -258,6 +258,15 @@ if (typeof window !== 'undefined') {
   };
 
   window.showNoDemoNotification = function() {
+    const previewSec = document.getElementById('sec-sample-book') || document.getElementById('preview-gallery-grid') || document.getElementById('sec-book-preview') || document.getElementById('sec_preview');
+    if (previewSec) {
+      previewSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const origShadow = previewSec.style.boxShadow;
+      previewSec.style.boxShadow = '0 0 35px rgba(22,163,74,0.6)';
+      setTimeout(() => { previewSec.style.boxShadow = origShadow; }, 2200);
+      return;
+    }
+
     let toast = document.getElementById('aoi-no-demo-toast');
     if (!toast) {
       toast = document.createElement('div');
@@ -291,14 +300,6 @@ if (typeof window !== 'undefined') {
         toast.style.transform = 'translateX(-50%) translateY(-20px)';
       }
     }, 4500);
-
-    const previewSec = document.getElementById('sec-book-preview') || document.getElementById('sec_preview') || document.querySelector('.book-preview-gallery') || document.getElementById('preview-gallery');
-    if (previewSec) {
-      previewSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const origShadow = previewSec.style.boxShadow;
-      previewSec.style.boxShadow = '0 0 35px rgba(245,158,11,0.6)';
-      setTimeout(() => { previewSec.style.boxShadow = origShadow; }, 2200);
-    }
   };
 
   window.openDemoReaderWithAuth = function(bookId, demoPages) {
@@ -500,10 +501,24 @@ if (typeof window !== 'undefined') {
     try { window.updateAuthStatusUI(); } catch(e) { console.warn('updateAuthStatusUI error:', e); }
   }
 
-    function initLandingPageAutoplay() {
+  function initLandingPageAutoplay() {
     const l = currentLandingData || {};
     const b = currentBookData || {};
     const audioLayer = l.audio_layer || b.audio_layer || {};
+    const isFbOrInApp = /FBAN|FBAV|Instagram|Line|Twitter|MicroMessenger/i.test(navigator.userAgent || '');
+    const hasTtsSupport = ('speechSynthesis' in window) && !isFbOrInApp;
+
+    const isVideoAutoplayAdmin = Boolean(l.video_autoplay || l.videoAutoPlay || l.video?.autoplay || (Array.isArray(l.videos) && l.videos[0]?.autoplay));
+    const isAudioAutoplayAdmin = Boolean(l.audio_autoplay !== false && (l.audioAutoPlay !== false) && (audioLayer.autoplay !== false));
+
+    // If Video Autoplay is active (either chosen or fallback from missing TTS),
+    // skip Audio Autoplay to avoid overlap and noise clash!
+    if (isVideoAutoplayAdmin || (isAudioAutoplayAdmin && !hasTtsSupport)) {
+      return;
+    }
+
+    if (!isAudioAutoplayAdmin) return;
+
     const hasAudio = audioLayer.enabled !== false && (audioLayer.mp3_url || audioLayer.tts_text || audioLayer.story_text || audioLayer.title || b.hasAudioBook || b.audioNarrationAvailable);
     if (!hasAudio) return;
 
@@ -1618,22 +1633,11 @@ if (typeof window !== 'undefined') {
       }
     }
 
-    // Dynamic Action Buttons in Preview Section
+    // Preview action button removed as per user instruction
     const previewActionWrap = document.querySelector('#sec-sample-book .preview-action');
     if (previewActionWrap) {
-      const demoPages = l.demo_reader_pages || l.demoPages || b.demo_reader_pages || b.demoPages || '';
-      const bId = (currentBookData?.id || currentBookId || 'BK001').toUpperCase();
-      const isDemo = (bId.startsWith('DEMO') || l.book_type === 'demo' || b.type === 'demo');
-      const targetMain = (l.targetMainBook || b.targetMainBook || bId.replace(/^(DEMO_|DEMO-|FREE_|FREE-|BONUS_|BONUS-)/i, '') || (bId.includes('BK002') ? 'BK002' : 'BK001')).toUpperCase();
-      const targetCheckout = isDemo ? window.buildSafeCheckoutUrl(targetMain) : window.buildSafeCheckoutUrl(bId);
-      previewActionWrap.innerHTML = `
-        <a id="preview-buy-btn" href="${targetCheckout}" class="preview-buy-btn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:2px solid #fff;">
-          <span>🛒</span> <span>${isDemo ? 'सम्पूर्ण मुख्य पुस्तक खरीदें (Buy Full Book)' : 'Buy Now'}</span>
-        </a>
-        <button type="button" onclick="window.openDemoReaderWithAuth('${bId}', '${demoPages}')" class="preview-buy-btn" style="background:linear-gradient(135deg,#0284c7,#0369a1);border:1.5px solid #38bdf8;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-left:8px;" title="पूरा सचित्र डेमो रीडर खोलें">
-          <span>📖</span> <span>फुल सचित्र डेमो रीडर खोलें (Open Demo Reader)</span>
-        </button>
-      `;
+      previewActionWrap.style.display = 'none';
+      previewActionWrap.innerHTML = '';
     }
 
     if (previewSection) {
@@ -2196,6 +2200,38 @@ if (typeof window !== 'undefined') {
     if (l.video_title) setElemText('video-section-heading', l.video_title);
     if (l.video_subtitle) setElemText('video-section-subheading', l.video_subtitle);
 
+    const isFbOrInApp = /FBAN|FBAV|Instagram|Line|Twitter|MicroMessenger/i.test(navigator.userAgent || '');
+    const hasTtsSupport = ('speechSynthesis' in window) && !isFbOrInApp;
+    const isVideoAutoplayAdmin = Boolean(l.video_autoplay || l.videoAutoPlay || l.video?.autoplay || (Array.isArray(l.videos) && l.videos[0]?.autoplay));
+    const isAudioAutoplayAdmin = Boolean(l.audio_autoplay !== false && (l.audioAutoPlay !== false) && (l.audio_layer?.autoplay !== false));
+    const shouldVideoAutoplay = isVideoAutoplayAdmin || (isAudioAutoplayAdmin && !hasTtsSupport);
+
+    window.unmuteUblLandingVideo = function(btnEl) {
+      const iframes = document.querySelectorAll('#sec-book-video iframe');
+      iframes.forEach(iframe => {
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unMute', args: [] }), '*');
+          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*');
+        }
+      });
+      const directVideos = document.querySelectorAll('#sec-book-video video');
+      directVideos.forEach(v => {
+        v.muted = false;
+        v.play().catch(() => {});
+      });
+      if (btnEl) btnEl.style.display = 'none';
+      const allPills = document.querySelectorAll('.ubl-video-unmute-overlay');
+      allPills.forEach(p => { p.style.display = 'none'; });
+    };
+
+    if (shouldVideoAutoplay) {
+      const autoUnmuteOnGesture = () => {
+        if (typeof window.unmuteUblLandingVideo === 'function') window.unmuteUblLandingVideo();
+        ['touchstart', 'click'].forEach(evt => window.removeEventListener(evt, autoUnmuteOnGesture));
+      };
+      ['touchstart', 'click'].forEach(evt => window.addEventListener(evt, autoUnmuteOnGesture, { once: true, passive: true }));
+    }
+
     // If single video, render dedicated centered player
     if (videos.length === 1) {
       const v = videos[0];
@@ -2206,19 +2242,25 @@ if (typeof window !== 'undefined') {
       }
       const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const playerClass = isVertical ? 'ubl-video-player-9-16' : 'ubl-video-player-16-9';
+      const autoParam = shouldVideoAutoplay ? '&autoplay=1&mute=1&playsinline=1&enablejsapi=1' : '';
 
       grid.innerHTML = `
         <div style="grid-column: 1 / -1; width: 100%;">
-          <div class="${playerClass}">
+          <div class="${playerClass}" style="position: relative;">
             <div class="video-inner">
               <iframe 
-                src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" 
+                src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1${autoParam}" 
                 title="${escapeHtml(v.title || 'Video')}" 
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen>
               </iframe>
             </div>
+            ${shouldVideoAutoplay ? `
+              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:7px 16px; border-radius:24px; font-weight:800; font-size:0.82rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:6px; box-shadow:0 6px 18px rgba(0,0,0,0.6);">
+                <span>🔊</span> आवाज़ चालू करें (Tap to Unmute)
+              </div>
+            ` : ''}
           </div>
           <div style="text-align: center; margin-top: 14px;">
             <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">${escapeHtml(v.title || '🎥 वीडियो अवलोकन')}</h3>
@@ -2229,22 +2271,29 @@ if (typeof window !== 'undefined') {
       return;
     }
 
-    grid.innerHTML = videos.map(v => {
+    grid.innerHTML = videos.map((v, idx) => {
       const ytId = extractYouTubeId(v.url || v.youtube_url);
       if (!ytId) return '';
       const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const frameClass = isVertical ? 'ubl-video-frame-wrap-9-16' : 'ubl-video-frame-wrap-16-9';
+      const isCardAutoPlay = (idx === 0 && shouldVideoAutoplay);
+      const autoParam = isCardAutoPlay ? '&autoplay=1&mute=1&playsinline=1&enablejsapi=1' : '';
 
       return `
         <div class="ubl-video-card">
-          <div class="${frameClass}">
+          <div class="${frameClass}" style="position: relative;">
             <iframe 
-              src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1" 
+              src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1${autoParam}" 
               title="${escapeHtml(v.title || 'Video')}" 
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
             </iframe>
+            ${isCardAutoPlay ? `
+              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 14px; border-radius:24px; font-weight:800; font-size:0.78rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:5px; box-shadow:0 4px 14px rgba(0,0,0,0.5);">
+                <span>🔊</span> Tap to Unmute
+              </div>
+            ` : ''}
           </div>
           <div class="ubl-video-card-info">
             <h4>${escapeHtml(v.title || '🎥 वीडियो अवलोकन')}</h4>
