@@ -5170,7 +5170,7 @@
     },
     {
       "id": "BK021",
-      "updated_at": "2026-11-16T11:20:11.492Z",
+      "updated_at": "2026-11-18T08:03:08.501Z",
       "admin_edited": true,
       "slug": "bk021",
       "book_type": "paid",
@@ -5233,8 +5233,13 @@
       "og_description": "🌱 सब्जी खेती मास्टर  (PART 2) - सम्पूर्ण Practical Guide।",
       "og_image": "/images/books/bk021-cover.webp",
       "og_image_landscape": "/images/books/bk021-cover.webp",
+      "audio_autoplay": true,
+      "audioAutoPlay": true,
+      "video_autoplay": true,
+      "videoAutoPlay": true,
       "audio_layer": {
         "enabled": true,
+        "autoplay": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
         "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
         "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
@@ -5335,14 +5340,65 @@
       "demo_images": [
         "/images/books/kharif-master-guide-2026-preview-01.webp"
       ],
+      "preview_images": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
+      "previewImages": [
+        "/images/books/kharif-master-guide-2026-preview-01.webp"
+      ],
       "demo_reader_pages": "",
       "demoPages": "",
       "suggested_books_list": [],
       "suggested_books": [],
       "table_of_contents": [],
-      "videos": [],
+      "videos": [
+        {
+          "url": "https://youtube.com/shorts/zry1LfjV_q0?si=BqOPw3nILI0bJG5y",
+          "title": "📱 फसल रील्स व शॉर्ट्स डेमो",
+          "ratio": "9:16",
+          "autoplay": true
+        }
+      ],
       "testimonials": [],
+      "reviews": [],
+      "customer_reviews": [],
       "faqs": [],
+      "kpis": [
+        {
+          "icon": "fa-seedling",
+          "text": "120 पेज की प्रीमियम"
+        },
+        {
+          "icon": "fa-camera",
+          "text": "300+ फोटो"
+        },
+        {
+          "icon": "fa-flask",
+          "text": "Spray Science"
+        },
+        {
+          "icon": "fa-gift",
+          "text": "Free Bonus PDF"
+        }
+      ],
+      "features": [
+        {
+          "icon": "fa-seedling",
+          "text": "120 पेज की प्रीमियम"
+        },
+        {
+          "icon": "fa-camera",
+          "text": "300+ फोटो"
+        },
+        {
+          "icon": "fa-flask",
+          "text": "Spray Science"
+        },
+        {
+          "icon": "fa-gift",
+          "text": "Free Bonus PDF"
+        }
+      ],
       "final_buy": {
         "title": "🌱 सब्जी खेती मास्टर  (PART 2)",
         "description": "",
