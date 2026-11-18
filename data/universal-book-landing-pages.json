@@ -7409,7 +7409,7 @@
     },
     {
       "id": "BK025",
-      "updated_at": "2026-11-18T06:09:54.417Z",
+      "updated_at": "2026-11-18T06:15:11.671Z",
       "admin_edited": true,
       "slug": "bk025",
       "book_type": "paid",
@@ -7477,7 +7477,7 @@
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
         "sec_preview": "/images/banners/bk022-sec_preview-banner.webp",
         "sec_ai_support": "/images/banners/bk022-sec_ai_support-banner.webp",
-        "sec_final_buy": "/images/banners/bk025-sec_final_buy-banner.webp"
+        "sec_final_buy": "/images/books/bk025-og.webp"
       },
       "og_title": "ड्रैगन फ्रूट की खेती – सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका | (Dragon Fruit Master Guide)",
       "og_description": "ड्रैगन फ्रूट की खेती की पूरी जानकारी अब एक ही किताब में पाएं। जानें सफेद गूदे, लाल गूदे और पीले ड्रैगन फ्रूट के प्रकार, उपयुक्त किस्मों का चयन, खेत की तैयारी, पोल और ट्रेलिस सिस्टम, 2×2 मीटर एवं 3×3 मीटर रोपण दूरी, प्रति एकड़ पोल और पौधों की संख्या, स्वस्थ कटिंग से पौध तैयार करना, रोपण एवं बेल प्रशिक्षण, खाद-पोषण और सिंचाई प्रबंधन, फूल एवं परागण, फल सेटिंग, प्रमुख रोग-कीट की पहचान और नियंत्रण, तुड़ाई, ग्रेडिंग, पैकिंग, भंडारण और बाजार प्रबंधन। साथ ही जानें ड्रैगन फ्रूट की खेती की लागत, संभावित उत्पादन और निवेश से पहले बाजार की जाँच कैसे करें। पुस्तक के साथ 1 साल का FREE Aarogyam Sakhi AI Support। MRP ₹299, विशेष ऑफर सिर्फ ₹75।",
@@ -8045,7 +8045,7 @@
           "🐛 कीट-रोग, खाद-पोषण, ड्रिप सिंचाई और फूल-फल प्रबंधन की जानकारी",
           "💰 बाग की लागत, उत्पादन और संभावित मुनाफे का सटीक आकलन"
         ],
-        "banner_image": "/images/banners/bk025-sec_final_buy-banner.webp"
+        "banner_image": "/images/books/bk025-og.webp"
       },
       "download_funnel": {
         "audio_enabled": true,

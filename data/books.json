@@ -2811,7 +2811,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK025",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-18T06:09:54.417Z",
+      "updated_at": "2026-11-18T06:15:11.673Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2875,14 +2875,7 @@
         "../images/books/BK022/57.webp"
       ],
       "title": "ड्रैगन फ्रूट मास्टर गाइड (Dragon Fruit Master Guide)",
-      "bonuses": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ]
+      "bonuses": []
     },
     {
       "id": "BK026",
