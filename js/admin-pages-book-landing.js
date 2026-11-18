@@ -2978,10 +2978,10 @@ Instant Download & Lifetime Access
         const localList = JSON.parse(stored);
         if (Array.isArray(localList)) {
           const deletedLpIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]').map(x => String(x).toUpperCase().trim());
-        localList.forEach(item => {
-          if (!item || !item.id) return;
-          const cleanItemId = String(item.id).toUpperCase().trim();
-          if (deletedLpIds.includes(cleanItemId)) return; // 🛡️ Anti-Resurrection Shield
+          localList.forEach(item => {
+            if (!item || !item.id) return;
+            const cleanItemId = String(item.id).toUpperCase().trim();
+            if (deletedLpIds.includes(cleanItemId)) return; // 🛡️ Anti-Resurrection Shield
             const idx = allLandingPages.findIndex(x => x.id === item.id);
             if (idx >= 0) {
               if (item.admin_edited && (item.updated_at && new Date(item.updated_at) > new Date(allLandingPages[idx].updated_at || 0))) {
@@ -8056,8 +8056,8 @@ Instant Download & Lifetime Access
       // Audio Book Experience Layer
       const audioLayer = page.audio_layer || page.audio || {};
       setChecked('blp_audio_enabled', audioLayer.enabled !== false);
-    setChecked('blp_audio_autoplay', page.audio_autoplay !== false && (audioLayer.autoplay !== false));
-    setChecked('blp_video_autoplay', Boolean(page.video_autoplay === true || page.videoAutoPlay === true || page.video?.autoplay === true || (Array.isArray(page.videos) && page.videos[0]?.autoplay === true)));
+      setChecked('blp_audio_autoplay', page.audio_autoplay !== false && (audioLayer.autoplay !== false));
+      setChecked('blp_video_autoplay', Boolean(page.video_autoplay === true || page.videoAutoPlay === true || page.video?.autoplay === true || (Array.isArray(page.videos) && page.videos[0]?.autoplay === true)));
       setVal('blp_audio_badge_tag', audioLayer.badge_tag || '🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO');
       setVal('blp_audio_main_heading', audioLayer.main_heading || 'अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!');
       setVal('blp_audio_main_subtitle', audioLayer.main_subtitle || '⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।');

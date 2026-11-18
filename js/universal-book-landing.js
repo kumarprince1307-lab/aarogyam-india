@@ -2205,6 +2205,7 @@ if (typeof window !== 'undefined') {
     const isVideoAutoplayAdmin = Boolean(l.video_autoplay || l.videoAutoPlay || l.video?.autoplay || (Array.isArray(l.videos) && l.videos[0]?.autoplay));
     const isAudioAutoplayAdmin = Boolean(l.audio_autoplay !== false && (l.audioAutoPlay !== false) && (l.audio_layer?.autoplay !== false));
     const shouldVideoAutoplay = isVideoAutoplayAdmin || (isAudioAutoplayAdmin && !hasTtsSupport);
+    const hostOrigin = window.location.origin || (window.location.protocol + '//' + window.location.host);
 
     window.unmuteUblLandingVideo = function(btnEl) {
       const iframes = document.querySelectorAll('#sec-book-video iframe');
@@ -2231,10 +2232,13 @@ if (typeof window !== 'undefined') {
       const autoUnmuteOnGesture = () => {
         if (_hasUnmuted) return;
         _hasUnmuted = true;
-        if (typeof window.unmuteUblLandingVideo === 'function') window.unmuteUblLandingVideo();
-        ['touchstart', 'click', 'scroll'].forEach(evt => window.removeEventListener(evt, autoUnmuteOnGesture));
+        if (typeof window.unmuteUblLandingVideo === 'function') {
+          window.unmuteUblLandingVideo();
+        }
+        ['click', 'touchend'].forEach(evt => window.removeEventListener(evt, autoUnmuteOnGesture));
       };
-      ['touchstart', 'click', 'scroll'].forEach(evt => window.addEventListener(evt, autoUnmuteOnGesture, { once: true, passive: true }));
+      // ONLY listen to genuine user activations (click, touchend). NEVER scroll, which blocks browser audio!
+      ['click', 'touchend'].forEach(evt => window.addEventListener(evt, autoUnmuteOnGesture, { once: true, passive: true }));
     }
 
     // If single video, render dedicated centered player
@@ -2254,7 +2258,7 @@ if (typeof window !== 'undefined') {
           <div class="${playerClass}" style="position: relative;">
             <div class="video-inner">
               <iframe 
-                src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1${autoParam}" 
+                src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(hostOrigin)}${autoParam}" 
                 title="${escapeHtml(v.title || 'Video')}" 
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -2262,8 +2266,8 @@ if (typeof window !== 'undefined') {
               </iframe>
             </div>
             ${shouldVideoAutoplay ? `
-              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:7px 16px; border-radius:24px; font-weight:800; font-size:0.82rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:6px; box-shadow:0 6px 18px rgba(0,0,0,0.6);">
-                <span>🔊</span> आवाज़ चालू करें (Tap to Unmute)
+              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:8px 18px; border-radius:24px; font-weight:800; font-size:0.85rem; border:2px solid #fbbf24; cursor:pointer; z-index:20; display:inline-flex; align-items:center; gap:8px; box-shadow:0 6px 20px rgba(0,0,0,0.6); pointer-events:auto;">
+                <span>🔊</span> <span>आवाज़ चालू करें (Tap to Unmute)</span>
               </div>
             ` : ''}
           </div>
@@ -2288,15 +2292,15 @@ if (typeof window !== 'undefined') {
         <div class="ubl-video-card">
           <div class="${frameClass}" style="position: relative;">
             <iframe 
-              src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1${autoParam}" 
+              src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1&origin=${encodeURIComponent(hostOrigin)}${autoParam}" 
               title="${escapeHtml(v.title || 'Video')}" 
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
             </iframe>
             ${isCardAutoPlay ? `
-              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:6px 14px; border-radius:24px; font-weight:800; font-size:0.78rem; border:1.5px solid #fbbf24; cursor:pointer; z-index:10; display:inline-flex; align-items:center; gap:5px; box-shadow:0 4px 14px rgba(0,0,0,0.5);">
-                <span>🔊</span> Tap to Unmute
+              <div class="ubl-video-unmute-overlay" onclick="window.unmuteUblLandingVideo(this)" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.92); color:#ffffff; padding:7px 16px; border-radius:24px; font-weight:800; font-size:0.8rem; border:2px solid #fbbf24; cursor:pointer; z-index:20; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(0,0,0,0.5); pointer-events:auto;">
+                <span>🔊</span> <span>Tap to Unmute</span>
               </div>
             ` : ''}
           </div>
