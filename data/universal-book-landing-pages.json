@@ -5170,7 +5170,7 @@
     },
     {
       "id": "BK021",
-      "updated_at": "2026-11-18T08:03:08.501Z",
+      "updated_at": "2026-11-18T08:06:18.103Z",
       "admin_edited": true,
       "slug": "bk021",
       "book_type": "paid",
@@ -5351,14 +5351,7 @@
       "suggested_books_list": [],
       "suggested_books": [],
       "table_of_contents": [],
-      "videos": [
-        {
-          "url": "https://youtube.com/shorts/zry1LfjV_q0?si=BqOPw3nILI0bJG5y",
-          "title": "📱 फसल रील्स व शॉर्ट्स डेमो",
-          "ratio": "9:16",
-          "autoplay": true
-        }
-      ],
+      "videos": [],
       "testimonials": [],
       "reviews": [],
       "customer_reviews": [],
