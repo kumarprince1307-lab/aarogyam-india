@@ -2061,7 +2061,7 @@
       "offerPrice": 75,
       "cover": "/images/books/bk025-cover.webp",
       "thumbnail": "/images/books/bk025-cover.webp",
-      "banner": "/images/banners/bk022-hero-banner.webp",
+      "banner": "/images/banners/bk025-hero-banner.webp",
       "status": "active",
       "publish_targets": [
         "ebook_store",
@@ -2081,37 +2081,37 @@
       "demoPdf": "",
       "demoImages": [
         "/images/books/BK025/21.webp",
+        "/images/books/BK025/25.webp",
         "/images/books/BK025/31.webp",
         "/images/books/BK025/40.webp",
-        "/images/books/BK025/25.webp",
         "/images/books/BK025/43.webp"
       ],
       "demo_images": [
         "/images/books/BK025/21.webp",
+        "/images/books/BK025/25.webp",
         "/images/books/BK025/31.webp",
         "/images/books/BK025/40.webp",
-        "/images/books/BK025/25.webp",
         "/images/books/BK025/43.webp"
       ],
       "preview_images": [
         "/images/books/BK025/21.webp",
+        "/images/books/BK025/25.webp",
         "/images/books/BK025/31.webp",
         "/images/books/BK025/40.webp",
-        "/images/books/BK025/25.webp",
         "/images/books/BK025/43.webp"
       ],
       "previewImages": [
         "/images/books/BK025/21.webp",
+        "/images/books/BK025/25.webp",
         "/images/books/BK025/31.webp",
         "/images/books/BK025/40.webp",
-        "/images/books/BK025/25.webp",
         "/images/books/BK025/43.webp"
       ],
       "demoAvailable": true,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk025-og.webp",
-      "og_image_landscape": "/images/books/bk025-og.webp",
+      "og_image_landscape": "/images/banners/bk025-hero-banner.webp",
       "audio_layer": {
         "enabled": true,
         "badge_tag": "🐉 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
@@ -2167,14 +2167,14 @@
         "कीट-रोग की सही पहचान",
         "फसल से बेहतर बाजार तक"
       ],
-      "totalPages": 56,
+      "totalPages": 26,
       "author": "",
       "language": "Hindi",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK025",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-18T06:15:11.673Z",
+      "updated_at": "2026-11-18T16:02:07.677031Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,

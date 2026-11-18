@@ -43,11 +43,25 @@
     let customLp = [];
     let freeDemoBooks = [];
     let deletedIds = [];
+    const hardcodedDeleted = ['BK010', 'BK026', 'BK027', 'BK028'];
     try {
       customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
       freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
       deletedIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
+      deletedIds = [...new Set([...(Array.isArray(deletedIds) ? deletedIds : []), ...hardcodedDeleted])].map(x => String(x).toUpperCase().trim());
+      
+      // Clean deleted books from mobile localStorage permanently
+      if (Array.isArray(customBooks)) {
+        const cleaned = customBooks.filter(b => b && b.id && !deletedIds.includes(String(b.id).toUpperCase().trim()));
+        if (cleaned.length !== customBooks.length) localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(cleaned));
+        customBooks = cleaned;
+      }
+      if (Array.isArray(customLp)) {
+        const cleanedLp = customLp.filter(b => b && b.id && !deletedIds.includes(String(b.id).toUpperCase().trim()));
+        if (cleanedLp.length !== customLp.length) localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(cleanedLp));
+        customLp = cleanedLp;
+      }
     } catch (e) {}
 
     // Build unique book map

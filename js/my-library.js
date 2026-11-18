@@ -663,15 +663,33 @@ async function loadLibraryData() {
             }
         });
 
-        // Overlay custom books & studio free/demo books
+        // 🛡️ Authoritative Deleted Book Purge (Prevents deleted books from resurrecting on mobile)
+        const DELETED_BOOK_IDS = new Set(['BK010', 'BK026', 'BK027', 'BK028']);
+        let deletedLpIds = [];
+        try {
+            deletedLpIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
+        } catch (e) { }
+        const allDeletedIds = new Set([...DELETED_BOOK_IDS, ...(Array.isArray(deletedLpIds) ? deletedLpIds : [])].map(x => String(x).toUpperCase().trim()));
+
+        // Overlay custom books & studio free/demo books (Cleaned of deleted items)
         try {
             const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
             if (Array.isArray(customBooks)) {
-                customBooks.forEach(cb => {
+                const cleanedCustom = customBooks.filter(cb => cb && cb.id && !allDeletedIds.has(String(cb.id).toUpperCase().trim()));
+                if (cleanedCustom.length !== customBooks.length) {
+                    localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(cleanedCustom));
+                }
+                cleanedCustom.forEach(cb => {
                     if (cb && cb.id) {
                         const bId = cb.id.toUpperCase().trim();
-                        const existing = bookMap.get(bId) || {};
-                        bookMap.set(bId, { ...existing, ...cb, id: bId });
+                        if (allDeletedIds.has(bId)) return;
+                        const existing = bookMap.get(bId);
+                        // If official book exists in books.json, server data is authoritative!
+                        if (!existing) {
+                            bookMap.set(bId, cb);
+                        } else if (cb.updated_at && existing.updated_at && new Date(cb.updated_at) > new Date(existing.updated_at)) {
+                            bookMap.set(bId, { ...existing, ...cb, id: bId });
+                        }
                     }
                 });
             }
@@ -680,9 +698,18 @@ async function loadLibraryData() {
         try {
             const freeDemoBooks = JSON.parse(localStorage.getItem('AAROGYAM_FREE_DEMO_BOOKS') || '[]');
             if (Array.isArray(freeDemoBooks)) {
-                freeDemoBooks.forEach(fb => {
+                const cleanedDemos = freeDemoBooks.filter(fb => {
+                    if (!fb || !fb.id) return false;
+                    const bId = String(fb.id).toUpperCase().trim();
+                    return !allDeletedIds.has(bId) && !allDeletedIds.has(bId.replace('DEMO-', ''));
+                });
+                if (cleanedDemos.length !== freeDemoBooks.length) {
+                    localStorage.setItem('AAROGYAM_FREE_DEMO_BOOKS', JSON.stringify(cleanedDemos));
+                }
+                cleanedDemos.forEach(fb => {
                     if (fb && fb.id) {
                         const bId = fb.id.toUpperCase().trim();
+                        if (allDeletedIds.has(bId)) return;
                         const existing = bookMap.get(bId) || {};
                         bookMap.set(bId, { ...existing, ...fb, id: bId });
                     }
@@ -690,32 +717,40 @@ async function loadLibraryData() {
             }
         } catch (e) { }
 
-        // Overlay Admin Book Landing Pages
+        // Overlay Admin Book Landing Pages (Cleaned of deleted items)
         try {
             const blpPages = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
             if (Array.isArray(blpPages)) {
-                blpPages.forEach(p => {
+                const cleanedBlp = blpPages.filter(p => p && p.id && !allDeletedIds.has(String(p.id).toUpperCase().trim()));
+                if (cleanedBlp.length !== blpPages.length) {
+                    localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(cleanedBlp));
+                }
+                cleanedBlp.forEach(p => {
                     if (p && p.id) {
                         const bId = p.id.toUpperCase().trim();
+                        if (allDeletedIds.has(bId)) return;
                         const existing = bookMap.get(bId) || {};
                         const isComing = (p.is_coming_soon === true || p.is_coming_soon === 'true' || p.status === 'coming_soon');
+                        // Server books take precedence for cover and core fields unless local is strictly newer
+                        const isServerAuthoritative = Boolean(existing.heading || existing.cover);
+                        const coverImg = isServerAuthoritative ? (existing.cover || existing.cover_image || existing.thumbnail) : (p.hero?.cover_image || existing.cover || existing.thumbnail);
                         bookMap.set(bId, {
                             ...existing,
                             id: bId,
-                            title: p.title || existing.title || existing.heading,
-                            heading: p.title || existing.heading || existing.title,
-                            name: p.title || existing.name || existing.title,
-                            cover: p.hero?.cover_image || existing.cover || existing.thumbnail,
-                            cover_image: p.hero?.cover_image || existing.cover_image,
-                            thumbnail: p.hero?.cover_image || existing.thumbnail,
-                            offerPrice: p.pricing?.offer_price || existing.offerPrice,
-                            mrp: p.pricing?.original_price || existing.mrp,
-                            status: isComing ? 'coming_soon' : (p.status || existing.status || 'active'),
+                            title: existing.title || p.title || existing.heading,
+                            heading: existing.heading || p.title || existing.title,
+                            name: existing.name || p.title || existing.title,
+                            cover: coverImg,
+                            cover_image: coverImg,
+                            thumbnail: coverImg,
+                            offerPrice: existing.offerPrice || p.pricing?.offer_price,
+                            mrp: existing.mrp || p.pricing?.original_price,
+                            status: isComing ? 'coming_soon' : (existing.status || p.status || 'active'),
                             isComingSoon: isComing,
-                            hasAudioBook: Boolean(p.audio_layer?.enabled !== false || existing.hasAudioBook || bId === 'BK015'),
-                            audio_layer: p.audio_layer || existing.audio_layer,
-                            audio_enabled: p.audio_layer?.enabled !== false,
-                            publish_targets: p.publish_targets || existing.publish_targets
+                            hasAudioBook: Boolean(existing.hasAudioBook || p.audio_layer?.enabled !== false || bId === 'BK015'),
+                            audio_layer: existing.audio_layer || p.audio_layer,
+                            audio_enabled: existing.audio_layer ? existing.audio_layer.enabled !== false : (p.audio_layer?.enabled !== false),
+                            publish_targets: existing.publish_targets || p.publish_targets
                         });
                     }
                 });
@@ -901,7 +936,11 @@ async function renderLibrarySections(booksArray) {
 
         const bookId = book.book_id || book.id;
         const bookName = book.title || book.heading || book.name;
-        const bookCover = book.cover_image || book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
+        let bookCover = book.cover_image || book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
+        if (bookCover && !bookCover.includes('?v=')) {
+            const vTime = book.updated_at ? new Date(book.updated_at).getTime() : Date.now();
+            bookCover += (bookCover.includes('?') ? '&' : '?') + 'v=' + vTime;
+        }
         const isComingSoonBook = (book.status === 'coming_soon' || book.isComingSoon === true || book.is_coming_soon === true || book.badge === 'coming_soon' || book.store_badge === 'coming_soon');
         const hasAudioBook = Boolean(book.hasAudioBook || book.has_audio || book.audioUrl || book.audio_layer?.enabled || book.audio_enabled || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK015');
         const isStudioDemo = (book.type === 'demo' || book.isDemo === true || rawId.startsWith('DEMO')) && !rawId.startsWith('BONUS') && !rawId.startsWith('FREE');
@@ -1043,11 +1082,11 @@ async function renderLibrarySections(booksArray) {
             }
         }
 
-        // 2. Available Books (All live active published main books)
-        const isLiveAgri = !isComingSoonBook && !isStudioDemo && !isStudioBonus && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
+        // 2. Available Books (All live active published main books, excluding subscription passes)
+        const isLiveAgri = !isComingSoonBook && !isStudioDemo && !isStudioBonus && !rawId.startsWith('SUB') && book.book_type !== 'subscription' && book.category !== 'VIP Subscription' && (book.status === 'active' || rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015');
         if (isLiveAgri && !seenAvailableIds.has(rawId)) {
             seenAvailableIds.add(rawId);
-            let targetUrl = book.landingPage || (rawId === 'SUB001' ? '/subscription.html' : `/ebooks/book-landing.html?id=${bookId}`);
+            let targetUrl = book.landingPage || `/ebooks/book-landing.html?id=${bookId}`;
 
             if (window.renderUniversalBookMarketingCard && typeof window.renderUniversalBookMarketingCard === 'function') {
                 const tempDiv = document.createElement('div');

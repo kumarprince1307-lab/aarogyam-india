@@ -1122,17 +1122,37 @@ if (typeof window !== 'undefined') {
         jsonLp = rL.bookLandingPages || [];
       } catch (e) { }
 
+      const DELETED_BOOK_IDS = new Set(['BK010', 'BK026', 'BK027', 'BK028']);
+      let deletedLpIds = [];
+      try {
+        deletedLpIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');
+      } catch (e) { }
+      const allDeletedIds = new Set([...DELETED_BOOK_IDS, ...(Array.isArray(deletedLpIds) ? deletedLpIds : [])].map(x => String(x).toUpperCase().trim()));
+
       let customBooks = [];
       let customLp = [];
       try {
         customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
+        if (Array.isArray(customBooks)) {
+          const cleaned = customBooks.filter(b => b && b.id && !allDeletedIds.has(String(b.id).toUpperCase().trim()));
+          if (cleaned.length !== customBooks.length) localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(cleaned));
+          customBooks = cleaned;
+        }
         customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');
+        if (Array.isArray(customLp)) {
+          const cleanedLp = customLp.filter(b => b && b.id && !allDeletedIds.has(String(b.id).toUpperCase().trim()));
+          if (cleanedLp.length !== customLp.length) localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(cleanedLp));
+          customLp = cleanedLp;
+        }
       } catch (e) { }
 
-      const allActive = [...jsonBooks, ...jsonLp, ...customBooks, ...customLp].filter(b => {
+      // Server jsonBooks and jsonLp come LAST so official server data takes priority over stale localStorage!
+      const allActive = [...customBooks, ...customLp, ...jsonLp, ...jsonBooks].filter(b => {
         if (!b || !b.id) return false;
-        const bIdUpper = b.id.toUpperCase();
-        // DEMO BOOK SECURITY RULE: Demo books NEVER appear in Home trays/bestsellers
+        const bIdUpper = b.id.toUpperCase().trim();
+        if (allDeletedIds.has(bIdUpper)) return false;
+        // Subscription passes and demo books NEVER appear in home bestsellers
+        if (bIdUpper.startsWith('SUB') || b.book_type === 'subscription' || b.category === 'VIP Subscription') return false;
         if (bIdUpper.startsWith('DEMO') || b.book_type === 'demo' || b.type === 'demo') return false;
         if (b.publish_targets && Array.isArray(b.publish_targets) && !b.publish_targets.includes('home_page')) return false;
         if (b.status === 'draft' || b.status === 'inactive' || b.isComingSoon || b.is_coming_soon) return false;
@@ -1141,15 +1161,20 @@ if (typeof window !== 'undefined') {
 
       allActive.forEach(b => {
         const hero = b.hero || {};
-        const bId = b.id.toUpperCase();
+        const bId = b.id.toUpperCase().trim();
         const existingIdx = bestsellers.findIndex(x => x.id === bId);
+        let rawImg = hero.cover_image || b.cover || b.thumbnail || (bId === 'BK016' ? '/images/books/bk016-cover.webp' : '/images/books/kharif-master-guide-2026-cover.webp');
+        if (rawImg && !rawImg.includes('?v=')) {
+          const vTime = b.updated_at ? new Date(b.updated_at).getTime() : Date.now();
+          rawImg += (rawImg.includes('?') ? '&' : '?') + 'v=' + vTime;
+        }
         const bookObj = {
           id: bId,
           title: hero.title || b.heading || b.name || bId,
           subtitle: hero.subtitle || b.subtitle || 'सम्पूर्ण प्रैक्टिकल गाइड',
           price: `₹${hero.offer_price || b.offerPrice || 99}`,
           oldPrice: `₹${hero.mrp || b.mrp || 299}`,
-          image: hero.cover_image || b.cover || b.thumbnail || (bId === 'BK016' ? '/images/books/bk016-cover.webp' : '/images/books/kharif-master-guide-2026-cover.webp'),
+          image: rawImg,
           link: `/ebooks/book-landing.html?id=${encodeURIComponent(bId)}`,
           tag: b.store_badge === 'new_arrival' ? '🆕 New Arrival' : (b.store_badge === 'best_seller' ? '⭐ Bestseller' : (bId === 'BK016' ? '🆕 नई डायरेक्टरी' : '⭐ Bestseller'))
         };

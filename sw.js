@@ -9,10 +9,10 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v83.0';
+const STATIC_CACHE = 'aarogyam-public-static-v85.0';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v59.0';
-const MEDIA_CACHE = 'aarogyam-public-media-v3.0';
+const PAGES_CACHE = 'aarogyam-public-pages-v61.0';
+const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
 const OFFLINE_URL = '/offline.html';
 
 
@@ -144,6 +144,7 @@ self.addEventListener('fetch', (event) => {
   // Live catalog, CSS, JS assets & site configurations: Network First with Cache Fallback
   if (
     url.pathname === '/data/books.json' ||
+    url.pathname === '/data/universal-book-landing-pages.json' ||
     url.pathname.endsWith('.css') ||
     url.pathname.endsWith('.js') ||
     url.pathname.includes('site-pages-config') ||
