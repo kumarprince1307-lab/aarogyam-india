@@ -2276,19 +2276,31 @@
       "demoPdf": "",
       "demoImages": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "demo_images": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "preview_images": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "previewImages": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "demoAvailable": true,
       "demo_reader_pages": "",
@@ -2354,7 +2366,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK029",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-18T13:56:44.098Z",
+      "updated_at": "2026-11-18T16:48:19.271Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2418,7 +2430,9 @@
         "../images/books/BK022/56.webp",
         "../images/books/BK022/57.webp"
       ],
-      "pageImagesPath": "images/books/BK029"
+      "pageImagesPath": "images/books/BK029",
+      "title": "चीकू (सपोटा) की खेती मास्टर गाइड",
+      "bonuses": []
     }
   ]
 }

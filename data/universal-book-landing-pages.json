@@ -6527,7 +6527,7 @@
     },
     {
       "id": "BK029",
-      "updated_at": "2026-11-18T13:56:47.509Z",
+      "updated_at": "2026-11-18T16:48:19.269Z",
       "admin_edited": true,
       "slug": "bk029",
       "book_type": "paid",
@@ -6763,15 +6763,24 @@
       "preview_banner": "/images/banners/bk022-sec_preview-banner.webp",
       "demo_images": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "preview_images": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "previewImages": [
         "/images/books/bk029-preview-1.webp",
-        "/images/books/bk029-preview-2.webp"
+        "/images/books/bk029-preview-2.webp",
+        "/images/books/BK029/23.webp",
+        "/images/books/BK029/35.webp",
+        "/images/books/BK029/45.webp"
       ],
       "demo_reader_pages": "",
       "demoPages": "",
