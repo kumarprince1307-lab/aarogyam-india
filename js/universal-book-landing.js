@@ -1016,20 +1016,31 @@ if (typeof window !== 'undefined') {
       'sec_help': 'sec-help-support'
     };
 
-    if (l.hidden_sections && Array.isArray(l.hidden_sections)) {
-      l.hidden_sections.forEach(secKey => {
-        const elId = sectionIdMap[secKey] || secKey;
-        const el = document.getElementById(elId);
-        if (el) el.style.display = 'none';
-      });
-
-      // If sample preview is hidden, also hide jump buttons
-      if (l.hidden_sections.includes('sec_preview')) {
-        const s1 = document.getElementById('hero-sample-btn');
-        if (s1) s1.style.display = 'none';
-        const s2 = document.getElementById('final-sample-btn');
-        if (s2) s2.style.display = 'none';
+    const hiddenList = Array.isArray(l.hidden_sections) ? l.hidden_sections : [];
+    Object.keys(sectionIdMap).forEach(secKey => {
+      const elId = sectionIdMap[secKey];
+      const el = document.getElementById(elId);
+      if (!el) return;
+      if (hiddenList.includes(secKey)) {
+        el.style.display = 'none';
+      } else {
+        if (el.style.display === 'none') {
+          el.style.display = '';
+        }
       }
+    });
+
+    // If sample preview is hidden, also hide jump buttons
+    if (hiddenList.includes('sec_preview')) {
+      const s1 = document.getElementById('hero-sample-btn');
+      if (s1) s1.style.display = 'none';
+      const s2 = document.getElementById('final-sample-btn');
+      if (s2) s2.style.display = 'none';
+    } else {
+      const s1 = document.getElementById('hero-sample-btn');
+      if (s1 && s1.style.display === 'none') s1.style.display = '';
+      const s2 = document.getElementById('final-sample-btn');
+      if (s2 && s2.style.display === 'none') s2.style.display = '';
     }
   }
 
@@ -1626,8 +1637,9 @@ if (typeof window !== 'undefined') {
     }
 
     if (previewSection) {
+      const isHiddenByAdmin = Array.isArray(l.hidden_sections) && l.hidden_sections.includes('sec_preview');
       const hasConfiguredPreview = demoImages.length > 0 || Boolean(l.preview_banner || l.demoPdf || l.demo_pdf || b.demoPdf);
-      previewSection.style.display = isAdminManagedBook && !hasConfiguredPreview ? 'none' : 'block';
+      previewSection.style.display = isHiddenByAdmin ? 'none' : (isAdminManagedBook && !hasConfiguredPreview ? 'none' : 'block');
     }
 
     // 7. Separate AI Support Section (Single Crisp Image, No Duplicates, No Broken Icon)
@@ -1977,26 +1989,7 @@ if (typeof window !== 'undefined') {
     }
   }
 
-  function renderFaqSection() {
-    const faqWrap = document.getElementById('faq-list-wrapper');
-    if (!faqWrap) return;
 
-    const landing = currentLandingData || {};
-    const configuredFaqs = Array.isArray(landing.faqs) ? landing.faqs : [];
-    const faqs = configuredFaqs.length > 0 ? configuredFaqs : [
-      { q: 'यह पुस्तक किसके लिए है?', a: 'यह पुस्तक किसान, कृषि विद्यार्थी, कृषि सलाहकार और कृषि व्यवसाय से जुड़े लोगों के लिए उपयोगी है।' },
-      { q: 'क्या यह Printed Book है?', a: 'नहीं, यह एक Digital PDF eBook है।' }
-    ];
-
-    faqWrap.innerHTML = faqs
-      .filter(faq => faq && typeof faq === 'object')
-      .map(faq => {
-        const question = faq.q || faq.question || '';
-        const answer = faq.a || faq.answer || '';
-        return `<div class="faq-item"><h3>${escapeHtml(question)}</h3><p>${escapeHtml(answer)}</p></div>`;
-      })
-      .join('');
-  }
 
   function renderBookDetails() {
     const landing = currentLandingData || {};
@@ -2051,11 +2044,13 @@ if (typeof window !== 'undefined') {
     let badges = [];
     if (hero.features && Array.isArray(hero.features) && hero.features.length > 0) {
       badges = hero.features;
+    } else if (l.kpis && Array.isArray(l.kpis) && l.kpis.length > 0) {
+      badges = l.kpis;
     } else if (b.features && Array.isArray(b.features) && b.features.length > 0) {
       badges = b.features;
     } else if (l.features && Array.isArray(l.features) && l.features.length > 0) {
       badges = l.features;
-    } else if (!isAdminManagedLanding(l, b)) {
+    } else {
       const isBusinessOrIncome = (b.category === 'Business' || b.category === 'Digital AI' || (b.id && b.id.toUpperCase() === 'BK018') || (l.category === 'Business'));
       if (isBusinessOrIncome) {
         badges = [
@@ -2110,9 +2105,10 @@ if (typeof window !== 'undefined') {
         </div>
       `;
     }).join('');
-    const kpiSection = grid.closest('#sec-kpis');
-    if (kpiSection && isAdminManagedLanding(l, b)) {
-      kpiSection.style.display = badges.length ? '' : 'none';
+    const kpiSection = grid.closest('#sec-kpis-highlights') || document.getElementById('sec-kpis-highlights');
+    const isHiddenByAdmin = Array.isArray(l.hidden_sections) && l.hidden_sections.includes('sec_kpis');
+    if (kpiSection) {
+      kpiSection.style.display = isHiddenByAdmin ? 'none' : (badges.length ? '' : 'none');
     }
   }
 
@@ -2551,10 +2547,15 @@ if (typeof window !== 'undefined') {
 
     const configuredReviews = (Array.isArray(l.reviews) && l.reviews.length > 0) ? l.reviews :
       (Array.isArray(l.testimonials) && l.testimonials.length > 0) ? l.testimonials :
-      (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews : [];
-    const rawReviews = [...approvedAdditions, ...(configuredReviews.length ? configuredReviews : (isAdminManagedBook ? [] : defaultReviews))];
-    const reviewSection = grid.closest('#sec-customer-reviews');
-    if (reviewSection) reviewSection.style.display = rawReviews.length ? '' : 'none';
+      (Array.isArray(l.customer_reviews) && l.customer_reviews.length > 0) ? l.customer_reviews :
+      (Array.isArray(b.reviews) && b.reviews.length > 0) ? b.reviews :
+      (Array.isArray(b.testimonials) && b.testimonials.length > 0) ? b.testimonials : [];
+    const rawReviews = [...approvedAdditions, ...(configuredReviews.length ? configuredReviews : defaultReviews)];
+    const reviewSection = grid.closest('#sec-customer-reviews') || document.getElementById('sec-customer-reviews');
+    const isHiddenByAdmin = Array.isArray(l.hidden_sections) && l.hidden_sections.includes('sec_reviews');
+    if (reviewSection) {
+      reviewSection.style.display = isHiddenByAdmin ? 'none' : (rawReviews.length ? '' : 'none');
+    }
 
     grid.innerHTML = rawReviews.map(r => {
       const avatarHtml = r.photo || r.avatar ? 
@@ -2938,7 +2939,6 @@ if (typeof window !== 'undefined') {
     if (!wrapper) return;
     const l = currentLandingData || {};
     const b = currentBookData || {};
-    const isAdminManagedBook = isAdminManagedLanding(l, b);
 
     const defaultFaqs = [
       { q: "क्या इस पुस्तक को मोबाइल में ऑफलाइन पढ़ सकते हैं?", a: "हाँ, खरीदने के बाद आप इसे अपनी 'My Library' में सुरक्षित ऑफलाइन कभी भी पढ़ सकते हैं।" },
@@ -2949,7 +2949,7 @@ if (typeof window !== 'undefined') {
 
     const faqs = (Array.isArray(l.faqs) && l.faqs.length > 0) ? l.faqs :
                  (Array.isArray(b.faqs) && b.faqs.length > 0) ? b.faqs :
-                   (isAdminManagedBook ? [] : defaultFaqs);
+                   defaultFaqs;
 
     wrapper.innerHTML = faqs.map((f, idx) => `
       <details class="faq-item" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 18px; margin-bottom:10px; box-shadow:0 4px 14px rgba(0,0,0,0.04);" ${idx === 0 ? 'open' : ''}>
@@ -2962,9 +2962,10 @@ if (typeof window !== 'undefined') {
         </p>
       </details>
     `).join('');
-    const faqSection = wrapper.closest('#sec-faq-section');
-    if (faqSection && isAdminManagedBook) {
-      faqSection.style.display = faqs.length ? '' : 'none';
+    const faqSection = wrapper.closest('#sec-faq-section') || document.getElementById('sec-faq-section');
+    const isHiddenByAdmin = Array.isArray(l.hidden_sections) && l.hidden_sections.includes('sec_faqs');
+    if (faqSection) {
+      faqSection.style.display = isHiddenByAdmin ? 'none' : (faqs.length ? '' : 'none');
     }
   }
 

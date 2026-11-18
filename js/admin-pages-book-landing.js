@@ -2706,21 +2706,11 @@ Instant Download & Lifetime Access
   resetOrderBtn?.addEventListener('click', resetSectionsOrder);
 
   bookSelect?.addEventListener('change', (e) => {
-    const bId = e.target.value;
-    const b = allBooks.find(x => x.id === bId);
-    if (!b) return;
-    const landingPage = allLandingPages.find(page => page.id === bId);
-    currentAssetRevision = landingPage?.updated_at || b.updated_at || '';
-
-    document.getElementById('blp_input_book_id').value = b.id;
-    document.getElementById('blp_category_select').value = b.category || 'Agriculture';
-    document.getElementById('blp_hero_title').value = b.heading || b.name || '';
-    document.getElementById('blp_hero_mrp').value = b.mrp || 299;
-    document.getElementById('blp_hero_offer_price').value = b.offerPrice || 99;
-    document.getElementById('blp_cover_url').value = b.cover || b.thumbnail || '';
-    document.getElementById('blp_banner_url').value = b.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp';
-    document.getElementById('blp_preview_cover_img').src = versionBookImagePreview(b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp');
-    document.getElementById('blp_preview_banner_img').src = versionBookImagePreview(b.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp');
+    const bId = (e.target.value || '').trim();
+    if (!bId) return;
+    if (typeof window.editBookLandingPage === 'function') {
+      window.editBookLandingPage(bId);
+    }
   });
 
   document.getElementById('btn_add_kpi_badge_item')?.addEventListener('click', () => {
@@ -7004,12 +6994,14 @@ Instant Download & Lifetime Access
       bId = String(editingBookId).trim().toUpperCase();
     }
     if (!bId) {
-      bId = prompt('डेमो पेजेस के लिए पुस्तक ID दर्ज करें (उदा. BK001, BK022):', 'BK001') || '';
-      bId = bId.trim().toUpperCase();
+      bId = 'BK001';
     }
-    if (!bId) return;
 
-    const rangeStr = prompt(`मौजूदा पुस्तक (${bId}) के कौन से पेज डेमो में जोड़ने हैं?\nउदा. 1-10 या 1,2,3,4,5:`, '1-10');
+    const sourceBookPrompt = prompt(`Git रिपो की किस पुस्तक से डेमो पेज लेने हैं? (उदा. ${bId}, BK001, BK022):`, bId);
+    if (!sourceBookPrompt) return;
+    const cleanSource = sourceBookPrompt.trim().toUpperCase();
+
+    const rangeStr = prompt(`पुस्तक (${cleanSource}) के कौन से पेज डेमो में जोड़ने हैं?\nउदा. 1-10 या 1,2,3,4,5:`, '1-10');
     if (!rangeStr) return;
 
     const pagesToAdd = [];
@@ -7018,12 +7010,12 @@ Instant Download & Lifetime Access
       const start = parts[0] || 1;
       const end = parts[1] || start;
       for (let i = start; i <= end; i++) {
-        pagesToAdd.push(`/images/books/${bId}/${i}.webp`);
+        pagesToAdd.push(`/images/books/${cleanSource}/${i}.webp`);
       }
     } else {
       const parts = rangeStr.split(',').map(x => parseInt(x.trim(), 10)).filter(Boolean);
       parts.forEach(p => {
-        pagesToAdd.push(`/images/books/${bId}/${p}.webp`);
+        pagesToAdd.push(`/images/books/${cleanSource}/${p}.webp`);
       });
     }
 
@@ -7032,7 +7024,7 @@ Instant Download & Lifetime Access
         if (!currentDemoImages.includes(url)) currentDemoImages.push(url);
       });
       renderDemoImagesInBuilder();
-      showToast(`✅ Git रिपो से ${pagesToAdd.length} डेमो पेजेस (${bId}) लिंक हो गए! (Zero Duplicate)`, 'success');
+      showToast(`✅ Git रिपो से ${pagesToAdd.length} डेमो पेजेस (${cleanSource}) लिंक हो गए! (Zero Duplicate)`, 'success');
     }
   };
   window.addDemoImageUrl = () => {
@@ -7091,6 +7083,10 @@ Instant Download & Lifetime Access
         reviews = foundLp.testimonials;
         break;
       }
+      if (foundLp?.reviews && foundLp.reviews.length > 0) {
+        reviews = foundLp.reviews;
+        break;
+      }
       if (foundLp?.customer_reviews && foundLp.customer_reviews.length > 0) {
         reviews = foundLp.customer_reviews;
         break;
@@ -7098,6 +7094,10 @@ Instant Download & Lifetime Access
       const foundB = (allBooks || []).find(b => b && b.id && b.id.toUpperCase() === tid);
       if (foundB?.testimonials && foundB.testimonials.length > 0) {
         reviews = foundB.testimonials;
+        break;
+      }
+      if (foundB?.reviews && foundB.reviews.length > 0) {
+        reviews = foundB.reviews;
         break;
       }
       if (foundB?.customer_reviews && foundB.customer_reviews.length > 0) {
@@ -7123,6 +7123,10 @@ Instant Download & Lifetime Access
               );
               if (found?.testimonials && found.testimonials.length > 0) {
                 reviews = found.testimonials;
+                break;
+              }
+              if (found?.reviews && found.reviews.length > 0) {
+                reviews = found.reviews;
                 break;
               }
               if (found?.customer_reviews && found.customer_reviews.length > 0) {
@@ -8893,6 +8897,8 @@ Instant Download & Lifetime Access
       },
       preview_banner: cleanSectionBanners.sec_preview || undefined,
       demo_images: cleanedDemoImages,
+      preview_images: cleanedDemoImages,
+      previewImages: cleanedDemoImages,
       demo_reader_pages: (document.getElementById('blp_demo_reader_pages')?.value || '').trim(),
       demoPages: (document.getElementById('blp_demo_reader_pages')?.value || '').trim(),
       suggested_books_list: currentSuggestedBooks,
@@ -8905,9 +8911,17 @@ Instant Download & Lifetime Access
       testimonials: Array.isArray(currentReviews)
         ? currentReviews.filter(r => r && ((r.name && r.name.trim()) || (r.comment && r.comment.trim())))
         : [],
+      reviews: Array.isArray(currentReviews)
+        ? currentReviews.filter(r => r && ((r.name && r.name.trim()) || (r.comment && r.comment.trim())))
+        : [],
+      customer_reviews: Array.isArray(currentReviews)
+        ? currentReviews.filter(r => r && ((r.name && r.name.trim()) || (r.comment && r.comment.trim())))
+        : [],
       faqs: Array.isArray(currentFaqs)
         ? currentFaqs.filter(f => f && ((f.q && f.q.trim()) || (f.a && f.a.trim())))
         : [],
+      kpis: currentKpis,
+      features: currentKpis,
       final_buy: {
         title: (document.getElementById('blp_final_buy_title')?.value || '').trim() || title,
         description: (document.getElementById('blp_final_buy_desc')?.value || '').trim() || (document.getElementById('blp_hero_subtitle')?.value || '').trim() || (document.getElementById('blp_hero_desc')?.value || '').trim(),
