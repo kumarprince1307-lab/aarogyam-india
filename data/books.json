@@ -539,6 +539,7 @@
       "og_image_landscape": "/images/banners/bk015-hero-banner.webp",
       "audio_layer": {
         "enabled": true,
+        "autoplay": false,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
         "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",
         "main_subtitle": "⚡ कीट, रोग, पोषण, स्प्रे साइंस व मिट्टी उपचार की पूरी जानकारी — खेत में काम करते समय बस कान में इयरफोन लगाएं और आसानी से सुनें।",
@@ -591,7 +592,7 @@
         "300+ फोटो",
         "Spray Science",
         "Free Bonus PDF",
-        "with Audio "
+        "with Audio"
       ],
       "totalPages": 120,
       "author": "",
@@ -599,7 +600,7 @@
       "landingPage": "/ebooks/book-landing.html?id=DEMO-BK015",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-09-23T23:59:59.999Z",
+      "updated_at": "2026-11-18T08:02:09.887Z",
       "admin_edited": true,
       "demoImages": [
         "/images/books/bk015-preview-1.webp",
