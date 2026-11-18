@@ -168,12 +168,12 @@
     {
       "id": "SUB001",
       "slug": "sub001",
-      "book_type": "paid",
+      "book_type": "subscription",
       "audience": "all",
       "target_main_books": [],
       "heading": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
       "name": "👑 Aarogyam Pro VIP सदस्यता (1 Year All-Access)",
-      "category": "Agriculture",
+      "category": "VIP Subscription",
       "language": "Hindi",
       "mrp": 2999,
       "offerPrice": 99,
@@ -214,7 +214,7 @@
         "/images/books/sub001-preview-3.webp",
         "/images/books/sub001-preview-4.webp"
       ],
-      "demoAvailable": true,
+      "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/sub001-og.webp",
@@ -260,10 +260,10 @@
         "bgm_enabled": true
       },
       "features": [
-        "24×7 सखी AI डिजिटल डॉक्टर",
-        "स्मार्ट डिजिटल बही-खाता",
-        "शेयर & अर्न नकद पॉइंट्स क्लब",
-        "365 दिन 1-Year All-Access"
+        "24×7 सखी AI व्यक्तिगत कृषि डॉक्टर",
+        "स्मार्ट डिजिटल बही-खाता (खर्च-मुनाफा ट्रैकर)",
+        "शेयर & अर्न नकद पॉइंट्स व कैशबैक क्लब",
+        "365 दिन 1-Year All-Access VIP लाइब्रेरी"
       ],
       "totalPages": 365,
       "author": "",
@@ -271,7 +271,7 @@
       "landingPage": "/ebooks/book-landing.html?id=SUB001",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-18T14:44:38.074Z",
+      "updated_at": "2026-11-18T15:19:21.299292Z",
       "admin_edited": true
     },
     {

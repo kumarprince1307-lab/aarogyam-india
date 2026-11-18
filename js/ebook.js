@@ -120,6 +120,8 @@
       if (deletedIds.includes(bIdUpper)) return false;
       // DEMO BOOK SECURITY RULE: Demo books NEVER appear in eBook Store trays/catalog
       if (bIdUpper.startsWith('DEMO') || b.book_type === 'demo' || b.type === 'demo') return false;
+      // VIP SUBSCRIPTION RULE: Subscription passes are not books, never appear in books trays
+      if (bIdUpper.startsWith('SUB') || b.book_type === 'subscription' || b.category === 'VIP Subscription') return false;
       if (b.publish_targets && Array.isArray(b.publish_targets) && !b.publish_targets.includes('ebook_store')) return false;
       if (b.status === 'draft' || b.status === 'inactive') return false;
       return true;

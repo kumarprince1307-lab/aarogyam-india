@@ -722,7 +722,12 @@ async function loadLibraryData() {
             }
         } catch (e) { }
 
-        const finalBooks = Array.from(bookMap.values());
+        // Filter out subscription passes (they are not books)
+        const finalBooks = Array.from(bookMap.values()).filter(b => {
+            const bIdUpper = String(b.id || '').toUpperCase();
+            if (bIdUpper.startsWith('SUB') || b.book_type === 'subscription' || b.category === 'VIP Subscription') return false;
+            return true;
+        });
         await renderLibrarySections(finalBooks);
     } catch (error) {
         console.error('Error loading library books:', error);

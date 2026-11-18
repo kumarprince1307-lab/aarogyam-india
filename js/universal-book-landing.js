@@ -305,6 +305,12 @@ if (typeof window !== 'undefined') {
   window.openDemoReaderWithAuth = function(bookId, demoPages) {
     const rawTarget = (bookId || currentBookData?.id || currentBookId || 'BK001').toUpperCase().trim();
 
+    // 🛡️ VIP Subscriptions do not use PDF reader; smoothly scroll down to preview showcase
+    if (rawTarget.startsWith('SUB') || currentBookData?.book_type === 'subscription') {
+      window.showNoDemoNotification();
+      return;
+    }
+
     // Check if book has a demo available; if not, show message and preview
     if (!window.checkBookDemoAvailability(rawTarget)) {
       window.showNoDemoNotification();
@@ -1445,21 +1451,30 @@ if (typeof window !== 'undefined') {
         }
       }
 
+      const isSub = rawId.startsWith('SUB') || b.book_type === 'subscription';
       const floatingDemoBtn = document.getElementById('floating-free-demo-btn');
       if (floatingDemoBtn) {
-        floatingDemoBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> <span>📖 Free Demo पढ़ें</span>`;
+        floatingDemoBtn.innerHTML = isSub ? `<i class="fa-solid fa-sparkles"></i> <span>✨ VIP प्रिव्यू देखें</span>` : `<i class="fa-solid fa-book-open"></i> <span>📖 Free Demo पढ़ें</span>`;
         floatingDemoBtn.style.display = 'flex';
-        floatingDemoBtn.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(rawId); };
+        floatingDemoBtn.onclick = (e) => { 
+          e.preventDefault(); 
+          if (isSub) window.showNoDemoNotification();
+          else window.openDemoReaderWithAuth(rawId); 
+        };
       }
 
-      // Open Demo Reader directly with active Book ID
+      // Open Demo Reader directly with active Book ID (or smooth scroll for VIP)
       const sampleBtns = ['hero-sample-btn', 'final-sample-btn', 'ubl-audio-sample-btn'];
       sampleBtns.forEach(sId => {
         const sBtn = document.getElementById(sId);
         if (sBtn) {
           sBtn.href = 'javascript:void(0)';
-          sBtn.onclick = (e) => { e.preventDefault(); window.openDemoReaderWithAuth(rawId); };
-          sBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> <span>📖 Free Demo पढ़ें</span>`;
+          sBtn.onclick = (e) => { 
+            e.preventDefault(); 
+            if (isSub) window.showNoDemoNotification();
+            else window.openDemoReaderWithAuth(rawId); 
+          };
+          sBtn.innerHTML = isSub ? `<i class="fa-solid fa-sparkles"></i> <span>✨ VIP फीचर्स प्रिव्यू देखें</span>` : `<i class="fa-solid fa-book-open"></i> <span>📖 Free Demo पढ़ें</span>`;
         }
       });
 
@@ -1641,6 +1656,15 @@ if (typeof window !== 'undefined') {
     }
 
     if (previewSection) {
+      const isSub = bIdUpper.startsWith('SUB') || b.book_type === 'subscription';
+      if (isSub) {
+        const previewTag = previewSection.querySelector('.section-tag');
+        const previewH2 = previewSection.querySelector('h2');
+        const previewP = previewSection.querySelector('p');
+        if (previewTag) previewTag.textContent = '👑 VIP Ecosystem Preview';
+        if (previewH2) previewH2.textContent = 'सखी AI क्या-क्या कर सकती है? (लाइव फीचर्स)';
+        if (previewP) previewP.textContent = 'आरोग्यम सखी AI डिजिटल डॉक्टर और VIP इकोसिस्टम के 4 मुख्य टूल्स (Click/Pinch to Zoom):';
+      }
       const isHiddenByAdmin = Array.isArray(l.hidden_sections) && l.hidden_sections.includes('sec_preview');
       const hasConfiguredPreview = demoImages.length > 0 || Boolean(l.preview_banner || l.demoPdf || l.demo_pdf || b.demoPdf);
       previewSection.style.display = isHiddenByAdmin ? 'none' : (isAdminManagedBook && !hasConfiguredPreview ? 'none' : 'block');
