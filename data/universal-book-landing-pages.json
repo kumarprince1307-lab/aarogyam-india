@@ -921,7 +921,7 @@
       "video_autoplay": true,
       "videoAutoPlay": true,
       "audio_layer": {
-        "enabled": false,
+        "enabled": true,
         "autoplay": true,
         "badge_tag": "🌾 देश की पहली क्रांतिकारी कृषि ऑडियो बुक EBOOK + AUDIO",
         "main_heading": "अब यह सिर्फ ई-बुक नहीं, खेती की समस्याओं की सम्पूर्ण ऑडियो बुक है!",

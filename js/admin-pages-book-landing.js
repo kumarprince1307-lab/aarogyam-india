@@ -621,13 +621,13 @@ export async function initBookLandingPages() {
               </div>
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--admin-text); background: rgba(0,0,0,0.35); padding: 5px 12px; border-radius: 6px; border: 1px solid #f59e0b;">
+              <label title="इस सेक्शन को लैंडिंग पेज पर दिखाना या पूरी तरह छिपाना" style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--admin-text); background: rgba(0,0,0,0.35); padding: 5px 12px; border-radius: 6px; border: 1px solid #f59e0b;">
                 <input type="checkbox" id="blp_audio_enabled" checked style="accent-color: #f59e0b; width: 16px; height: 16px;" />
-                <span>ऑडियो प्लेयर चालू रखें</span>
+                <span>ऑडियो प्लेयर ऑन रखें (सेक्शन दिखाएं)</span>
               </label>
-              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.12); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(56,189,248,0.35);">
+              <label title="पेज लोड होते ही कृषि सखी की आवाज़ अपने-आप शुरू करें" style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.12); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(56,189,248,0.35);">
                 <input type="checkbox" id="blp_audio_autoplay" checked style="accent-color: #38bdf8; width: 16px; height: 16px;" />
-                <span>🔊 ऑडियो ऑटो-प्ले</span>
+                <span>🔊 ऑटो-प्ले (पेज खुलते ही आवाज़ बजे)</span>
               </label>
             </div>
           </div>
@@ -882,9 +882,9 @@ export async function initBookLandingPages() {
               🎥 8. मल्टी-वीडियो मैनेजर (16:9 Landscape & 9:16 Shorts/Reels)
             </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-              <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #fbbf24; cursor: pointer; background: rgba(245,158,11,0.12); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.35);">
+              <label title="पेज लोड होते ही पहला वीडियो बंडल पेज की तरह खुद-ब-खुद चालू हो जाए" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #fbbf24; cursor: pointer; background: rgba(245,158,11,0.12); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(245,158,11,0.35);">
                 <input type="checkbox" id="blp_video_autoplay" style="accent-color: #f59e0b; width: 16px; height: 16px;" />
-                <span>🎬 वीडियो ऑटो-प्ले (बंडल जैसा)</span>
+                <span>🎬 वीडियो ऑटो-प्ले (पेज लोड पर वीडियो खुद चले)</span>
               </label>
               <button type="button" onclick="window.saveBlpSpecificSegment('वीडियो गैलरी')" class="admin-button small-button" style="background:#15803d;color:#fff;border:none;font-weight:700;font-size:0.75rem;padding:5px 12px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">💾 यह सेगमेंट सेव करें</button>
               <button type="button" id="btn_add_video_item" class="admin-button small-button" style="background: #2563eb; color: #fff; font-weight: 700;">

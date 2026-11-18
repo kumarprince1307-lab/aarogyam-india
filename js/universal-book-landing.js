@@ -2211,12 +2211,14 @@ if (typeof window !== 'undefined') {
       iframes.forEach(iframe => {
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unMute', args: [] }), '*');
+          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'setVolume', args: [100] }), '*');
           iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*');
         }
       });
       const directVideos = document.querySelectorAll('#sec-book-video video');
       directVideos.forEach(v => {
         v.muted = false;
+        v.volume = 1.0;
         v.play().catch(() => {});
       });
       if (btnEl) btnEl.style.display = 'none';
@@ -2225,11 +2227,14 @@ if (typeof window !== 'undefined') {
     };
 
     if (shouldVideoAutoplay) {
+      let _hasUnmuted = false;
       const autoUnmuteOnGesture = () => {
+        if (_hasUnmuted) return;
+        _hasUnmuted = true;
         if (typeof window.unmuteUblLandingVideo === 'function') window.unmuteUblLandingVideo();
-        ['touchstart', 'click'].forEach(evt => window.removeEventListener(evt, autoUnmuteOnGesture));
+        ['touchstart', 'click', 'scroll'].forEach(evt => window.removeEventListener(evt, autoUnmuteOnGesture));
       };
-      ['touchstart', 'click'].forEach(evt => window.addEventListener(evt, autoUnmuteOnGesture, { once: true, passive: true }));
+      ['touchstart', 'click', 'scroll'].forEach(evt => window.addEventListener(evt, autoUnmuteOnGesture, { once: true, passive: true }));
     }
 
     // If single video, render dedicated centered player
@@ -2242,14 +2247,14 @@ if (typeof window !== 'undefined') {
       }
       const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const playerClass = isVertical ? 'ubl-video-player-9-16' : 'ubl-video-player-16-9';
-      const autoParam = shouldVideoAutoplay ? '&autoplay=1&mute=1&playsinline=1&enablejsapi=1' : '';
+      const autoParam = shouldVideoAutoplay ? '&autoplay=1&mute=1' : '';
 
       grid.innerHTML = `
         <div style="grid-column: 1 / -1; width: 100%;">
           <div class="${playerClass}" style="position: relative;">
             <div class="video-inner">
               <iframe 
-                src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1${autoParam}" 
+                src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1${autoParam}" 
                 title="${escapeHtml(v.title || 'Video')}" 
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -2277,13 +2282,13 @@ if (typeof window !== 'undefined') {
       const isVertical = (v.url?.includes('shorts') || v.ratio === '9:16' || v.format === '9:16' || v.isShorts);
       const frameClass = isVertical ? 'ubl-video-frame-wrap-9-16' : 'ubl-video-frame-wrap-16-9';
       const isCardAutoPlay = (idx === 0 && shouldVideoAutoplay);
-      const autoParam = isCardAutoPlay ? '&autoplay=1&mute=1&playsinline=1&enablejsapi=1' : '';
+      const autoParam = isCardAutoPlay ? '&autoplay=1&mute=1' : '';
 
       return `
         <div class="ubl-video-card">
           <div class="${frameClass}" style="position: relative;">
             <iframe 
-              src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1${autoParam}" 
+              src="https://www.youtube.com/embed/${ytId}?playsinline=1&enablejsapi=1&rel=0&modestbranding=1${autoParam}" 
               title="${escapeHtml(v.title || 'Video')}" 
               loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
