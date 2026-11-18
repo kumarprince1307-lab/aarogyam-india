@@ -2218,29 +2218,42 @@ if (typeof window !== 'undefined') {
       return url;
     }
 
-    // --- EXACT MATCH WITH BUNDLE VIDEO UNMUTE ENGINE ---
+    // --- BULLETPROOF VIDEO UNMUTE ENGINE (VOLUME 100% GUARANTEED) ---
     window.unmuteUblLandingVideo = function(btnEl) {
-      const iframes = document.querySelectorAll('#sec-book-video iframe');
-      iframes.forEach(iframe => {
-        if (iframe && iframe.contentWindow) {
-          iframe.contentWindow.postMessage(JSON.stringify({
-            event: 'command',
-            func: 'unMute',
-            args: []
-          }), '*');
-          iframe.contentWindow.postMessage(JSON.stringify({
-            event: 'command',
-            func: 'setVolume',
-            args: [100]
-          }), '*');
-        }
-      });
+      const sendCommands = () => {
+        const iframes = document.querySelectorAll('#sec-book-video iframe');
+        iframes.forEach(iframe => {
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage(JSON.stringify({
+              event: 'command',
+              func: 'unMute',
+              args: []
+            }), '*');
+            iframe.contentWindow.postMessage(JSON.stringify({
+              event: 'command',
+              func: 'setVolume',
+              args: [100]
+            }), '*');
+            iframe.contentWindow.postMessage(JSON.stringify({
+              event: 'command',
+              func: 'playVideo',
+              args: []
+            }), '*');
+          }
+        });
+      };
+
+      sendCommands();
+      setTimeout(sendCommands, 250);
+      setTimeout(sendCommands, 600);
+
       const directVideos = document.querySelectorAll('#sec-book-video video');
       directVideos.forEach(v => {
         v.muted = false;
         v.volume = 1.0;
         v.play().catch(() => {});
       });
+
       if (btnEl) btnEl.style.display = 'none';
       const allOverlays = document.querySelectorAll('.video-unmute-overlay, .ubl-video-unmute-overlay');
       allOverlays.forEach(el => el.style.display = 'none');
@@ -2252,11 +2265,12 @@ if (typeof window !== 'undefined') {
         if (_hasUnmutedLandingVideo) return;
         _hasUnmutedLandingVideo = true;
         window.unmuteUblLandingVideo();
-        ['touchstart', 'click', 'scroll'].forEach(evt => {
+        ['touchstart', 'click'].forEach(evt => {
           window.removeEventListener(evt, triggerUnmute, { passive: true });
         });
       };
-      ['touchstart', 'click', 'scroll'].forEach(evt => {
+      // Trigger on genuine touch or click, NOT on premature scroll so button stays until clicked!
+      ['touchstart', 'click'].forEach(evt => {
         window.addEventListener(evt, triggerUnmute, { passive: true, once: true });
       });
     }
