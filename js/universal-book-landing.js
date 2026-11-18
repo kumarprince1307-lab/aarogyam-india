@@ -2211,14 +2211,14 @@ if (typeof window !== 'undefined') {
       const ytId = extractYouTubeId(url);
       if (ytId) {
         const autoParam = autoplay
-          ? '?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0'
-          : '?playsinline=1&rel=0';
+          ? '?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0&loop=0'
+          : '?playsinline=1&rel=0&loop=0';
         return `https://www.youtube.com/embed/${ytId}${autoParam}`;
       }
       return url;
     }
 
-    // --- BULLETPROOF VIDEO UNMUTE ENGINE (VOLUME 100% GUARANTEED) ---
+    // --- BULLETPROOF VIDEO UNMUTE ENGINE (BUNDLE STYLE: ZERO CLICKS REQUIRED, AUTO-FULL SOUND) ---
     window.unmuteUblLandingVideo = function(btnEl) {
       const sendCommands = () => {
         const iframes = document.querySelectorAll('#sec-book-video iframe');
@@ -2244,8 +2244,8 @@ if (typeof window !== 'undefined') {
       };
 
       sendCommands();
-      setTimeout(sendCommands, 250);
-      setTimeout(sendCommands, 600);
+      setTimeout(sendCommands, 200);
+      setTimeout(sendCommands, 500);
 
       const directVideos = document.querySelectorAll('#sec-book-video video');
       directVideos.forEach(v => {
@@ -2259,20 +2259,32 @@ if (typeof window !== 'undefined') {
       allOverlays.forEach(el => el.style.display = 'none');
     };
 
-    let _hasUnmutedLandingVideo = false;
+    let _hasSetupVideoUnmuteListeners = false;
     function setupFirstGestureVideoUnmute() {
+      if (_hasSetupVideoUnmuteListeners) return;
+      _hasSetupVideoUnmuteListeners = true;
+
       const triggerUnmute = () => {
-        if (_hasUnmutedLandingVideo) return;
-        _hasUnmutedLandingVideo = true;
         window.unmuteUblLandingVideo();
-        ['touchstart', 'click'].forEach(evt => {
-          window.removeEventListener(evt, triggerUnmute, { passive: true });
-        });
       };
-      // Trigger on genuine touch or click, NOT on premature scroll so button stays until clicked!
-      ['touchstart', 'click'].forEach(evt => {
-        window.addEventListener(evt, triggerUnmute, { passive: true, once: true });
+
+      // Listen across any touch, click, scroll or tap anywhere so video unmutes seamlessly
+      ['touchstart', 'click', 'scroll', 'pointerdown'].forEach(evt => {
+        window.addEventListener(evt, triggerUnmute, { passive: true });
       });
+
+      // Automatically unmute when video section enters viewport
+      const videoSec = document.getElementById('sec-book-video');
+      if (videoSec && 'IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              window.unmuteUblLandingVideo();
+            }
+          });
+        }, { threshold: 0.1 });
+        obs.observe(videoSec);
+      }
     }
 
     if (shouldVideoAutoplay) {
@@ -2304,7 +2316,7 @@ if (typeof window !== 'undefined') {
               <iframe 
                 src="${embedUrl}" 
                 title="${escapeHtml(v.title || 'Video')}" 
-                loading="lazy"
+                onload="setTimeout(window.unmuteUblLandingVideo, 400)"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen>
               </iframe>
@@ -2340,7 +2352,7 @@ if (typeof window !== 'undefined') {
             <iframe 
               src="${embedUrl}" 
               title="${escapeHtml(v.title || 'Video')}" 
-              loading="lazy"
+              onload="setTimeout(window.unmuteUblLandingVideo, 400)"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
               allowfullscreen>
             </iframe>
