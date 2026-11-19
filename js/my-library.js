@@ -177,6 +177,7 @@ function switchTab(category, evt) {
     const targetSection = document.getElementById('section-' + category);
     if (targetSection) {
         targetSection.style.display = 'block';
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 }
 

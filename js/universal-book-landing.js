@@ -1261,14 +1261,13 @@ if (typeof window !== 'undefined') {
 
     // 3. Header, Checkout Button URLs, Share & Sticky Sync
     const rawId = (b.id || currentBookId || 'BK001').trim().toUpperCase();
-    const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
     let isComingSoon = false;
-    if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon' || l.store_badge === 'coming_soon') {
-      isComingSoon = true;
-    } else if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
+    if (l.status === 'active') {
       isComingSoon = false;
+    } else if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon') {
+      isComingSoon = true;
     } else {
-      isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true || b.store_badge === 'coming_soon');
+      isComingSoon = (b.status === 'coming_soon' || b.isComingSoon === true);
     }
 
     const urlDemoQuery = (urlParams.get('demo') === '1' || urlParams.get('mode') === 'demo');
@@ -1976,14 +1975,13 @@ if (typeof window !== 'undefined') {
       const finalBuyBtn = document.getElementById('final-buy-btn');
       if (finalBuyBtn) {
         finalBuyBtn.style.display = 'inline-flex';
-        const isLiveAgri = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK006' || rawId === 'BK015' || rawId === 'SUB001');
         let isComingSoon = false;
-        if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon' || l.store_badge === 'coming_soon') {
-          isComingSoon = true;
-        } else if (l.is_coming_soon === false || l.is_coming_soon === 'false' || l.status === 'active') {
+        if (l.status === 'active') {
           isComingSoon = false;
+        } else if (l.is_coming_soon === true || l.is_coming_soon === 'true' || l.status === 'coming_soon') {
+          isComingSoon = true;
         } else {
-          isComingSoon = !isLiveAgri && (b.status === 'coming_soon' || b.isComingSoon === true || b.is_coming_soon === true || b.store_badge === 'coming_soon');
+          isComingSoon = (b.status === 'coming_soon' || b.isComingSoon === true);
         }
 
         if (!isComingSoon) {

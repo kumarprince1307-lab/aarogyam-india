@@ -306,6 +306,28 @@
     });
   }
 
+  
+  window.filterAgriCropCategory = function(crop, btnEl) {
+    activeCrop = crop || 'all';
+    const pills = document.querySelectorAll('#agriCategoryPillsTrack .crop-filter-pill, #cropPillsTrack .crop-filter-pill');
+    pills.forEach(p => {
+      p.style.background = '#f1f5f9';
+      p.style.color = '#334155';
+      p.style.border = '1px solid #cbd5e1';
+      p.classList.remove('active');
+    });
+    if (btnEl) {
+      btnEl.style.background = '#15803d';
+      btnEl.style.color = '#ffffff';
+      btnEl.style.border = 'none';
+      btnEl.classList.add('active');
+    }
+    renderAgriBooks();
+    if (typeof filterDiseaseCardsByCrop === 'function') {
+      filterDiseaseCardsByCrop(activeCrop);
+    }
+  };
+
   function renderAgriBooks() {
     const grid = document.getElementById('agri-books-grid');
     if (!grid) return;
@@ -313,16 +335,30 @@
     const keyword = (document.getElementById('agri-search-input')?.value || '').trim().toLowerCase();
     let filtered = [...agriBooks];
 
-    // Filter by Crop
+    // Filter by Scientific Agronomic Crop Categories
     if (activeCrop !== 'all') {
       filtered = filtered.filter(b => {
-        const text = ((b.heading || '') + ' ' + (b.subtitle || '') + ' ' + (b.description || '')).toLowerCase();
-        if (activeCrop === 'paddy') return text.includes('धान') || text.includes('paddy') || text.includes('rice') || b.id === 'BK001';
-        if (activeCrop === 'soybean') return text.includes('सोयाबीन') || text.includes('soybean') || b.id === 'BK001';
-        if (activeCrop === 'cotton') return text.includes('कपास') || text.includes('cotton') || b.id === 'BK001';
-        if (activeCrop === 'maize') return text.includes('मक्का') || text.includes('maize') || b.id === 'BK001';
-        if (activeCrop === 'wheat') return text.includes('गेहूं') || text.includes('wheat') || text.includes('रबी') || b.id === 'BK002';
-        if (activeCrop === 'vegetables') return text.includes('सब्जी') || text.includes('बागवानी') || text.includes('टमाटर') || b.id === 'BK002';
+        const text = ((b.heading || '') + ' ' + (b.subtitle || '') + ' ' + (b.description || '') + ' ' + (b.title || '') + ' ' + (b.name || '')).toLowerCase();
+        const bId = String(b.id || '').toUpperCase();
+
+        if (activeCrop === 'kharif') {
+          return text.includes('खरीफ') || text.includes('धान') || text.includes('मक्का') || text.includes('सोयाबीन') || text.includes('कपास') || bId === 'BK001';
+        }
+        if (activeCrop === 'rabi') {
+          return text.includes('रबी') || text.includes('गेहूं') || text.includes('चना') || text.includes('सरसों') || text.includes('आलू') || text.includes('लहसुन') || bId === 'BK017' || bId === 'BK019' || bId === 'BK020';
+        }
+        if (activeCrop === 'fruits') {
+          return text.includes('फल') || text.includes('बागवानी') || text.includes('केला') || text.includes('अनार') || text.includes('आम') || text.includes('अंगूर') || text.includes('पपीता') || text.includes('चीकू') || text.includes('ड्रैगन') || ['BK022', 'BK023', 'BK024', 'BK025', 'BK026', 'BK028', 'BK029'].includes(bId);
+        }
+        if (activeCrop === 'vegetables') {
+          return text.includes('सब्जी') || text.includes('टमाटर') || text.includes('मिर्च') || text.includes('प्याज') || text.includes('शिमला') || bId === 'BK015' || bId === 'BK021';
+        }
+        if (activeCrop === 'dairy') {
+          return text.includes('पशु') || text.includes('दुग्ध') || text.includes('डेयरी') || text.includes('थनैला') || text.includes('पोषण') || bId === 'BK028';
+        }
+        if (activeCrop === 'doctor') {
+          return text.includes('डॉक्टर') || text.includes('रोग') || text.includes('कीट') || text.includes('दवा') || text.includes('सुरक्षा') || bId === 'BK002' || bId === 'BK016';
+        }
         return true;
       });
     }

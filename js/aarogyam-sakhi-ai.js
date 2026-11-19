@@ -19043,6 +19043,10 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
 
       logUnresolvedQuery(rawQ, cleanQ, targetDomain);
 
+      try {
+        window.dispatchEvent(new CustomEvent('aarogyam_sakhi_query', { detail: { query: cleanQ || rawQ } }));
+      } catch (e) { }
+
       if (!knowledgeData || !knowledgeData.intents) {
         synthesizeDynamicAnswer(query, targetDomain);
         return;

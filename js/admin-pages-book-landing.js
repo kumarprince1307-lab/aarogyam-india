@@ -299,16 +299,19 @@ export async function initBookLandingPages() {
         📚 1. सभी बुक पेजेस व बिल्डर (All Books & Pages)
       </button>
       <button type="button" id="tab-btn-shelves-mgr" onclick="window.switchAdminSubTab('shelves')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); color: var(--admin-text); font-weight: 800;">
-        🏪 2. स्टोर शेल्फ व सेग्मेंट कस्टमाइज़र (Shelves Manager)
+        🏪 2. स्टोर शेल्फ व लैंडिंग विंडोज (Universal Shelves & Windows)
       </button>
       <button type="button" id="tab-btn-coming-soon-leads" onclick="window.switchAdminSubTab('leads')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1px solid var(--admin-border); color: var(--admin-text); font-weight: 800;">
         🔔 3. कमिंग सून इंटरेस्ट लीड्स (Farmer Leads)
       </button>
       <button type="button" id="tab-btn-popups-mgr" onclick="window.switchAdminSubTab('popups')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #3b82f6; color: #38bdf8; font-weight: 800;">
-        🔔 4. सोशल प्रूफ व पॉपअप्स (Social Proof & Popups)
+        🔔 4. सोशल प्रूफ व टोस्ट डिजाइनर (Social Proof & Toasts)
+      </button>
+      <button type="button" id="tab-btn-ai-profile-brain" onclick="window.switchAdminSubTab('ai_profile_brain')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #10b981; color: #34d399; font-weight: 800; box-shadow: 0 2px 10px rgba(16,185,129,0.25);">
+        🧠 5. AI प्रोफाइल ब्रेन & यूजर इंटेंट (AI Profile Brain)
       </button>
       <button type="button" id="tab-btn-ai-studio-mgr" onclick="window.switchAdminSubTab('ai_studio')" class="admin-button" style="background: var(--admin-surface, #1e293b); border: 1.5px solid #ec4899; color: #f472b6; font-weight: 800; box-shadow: 0 2px 10px rgba(236,72,153,0.25);">
-        🚀 5. AI ई-बुक क्रिएटर व 3-टियर असेंबलर (AI Studio)
+        🚀 6. AI ई-बुक क्रिएटर (AI Studio)
       </button>
     </div>
 
@@ -1174,81 +1177,29 @@ Instant Download & Lifetime Access
           </div>
         </div>
 
-        <!-- SECTION 16: MULTI-PAGE PUBLISHING TARGETS & STORE BADGES -->
+        <!-- SECTION 16: PUBLICATION STATUS & VISIBILITY -->
         <div style="background: rgba(147,51,234,0.08); border: 1.5px solid rgba(147,51,234,0.3); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
           <div style="font-weight: 800; color: #a855f7; font-size: 0.95rem; margin-bottom: 6px;">
-            📍 16. मल्टी-पेज पब्लिशिंग टार्गेट्स व स्टोर विजिबिलिटी (Publish to Pages & Badges)
+            📍 16. प्रकाशन स्थिति व कमिंग सून मोड (Publication Status & Mode)
           </div>
-          <p style="font-size: 0.8rem; color: var(--admin-muted); margin-bottom: 12px;">
-            चुनें कि यह पुस्तक लाइव होने के बाद किन-किन पेजों पर और किस मार्केटिंग बैज के साथ दिखेगी:
-          </p>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
-            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
-              <input type="checkbox" id="blp_pub_ebook_store" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
-              <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">🏪 eBook Store</strong>
-                <small style="color: var(--admin-muted); font-size: 0.72rem;">ebooks/ebook.html</small>
-              </div>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
-              <input type="checkbox" id="blp_pub_category_page" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
-              <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">🌾 Category Hub</strong>
-                <small style="color: var(--admin-muted); font-size: 0.72rem;">उदा. agriculture.html</small>
-              </div>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
-              <input type="checkbox" id="blp_pub_my_library" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
-              <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">📖 My Library Store</strong>
-                <small style="color: var(--admin-muted); font-size: 0.72rem;">my-library.html</small>
-              </div>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
-              <input type="checkbox" id="blp_pub_home_page" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
-              <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">🏠 Home Page Grid</strong>
-                <small style="color: var(--admin-muted); font-size: 0.72rem;">index.html</small>
-              </div>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
-              <input type="checkbox" id="blp_pub_home_hero" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
-              <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">🌟 Home Hero Slider</strong>
-                <small style="color: var(--admin-muted); font-size: 0.72rem;">होम मुख्य बैनर / स्लाइडर</small>
-              </div>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 8px; background: var(--admin-surface, #1e293b); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--admin-border); cursor: pointer;">
-              <input type="checkbox" id="blp_pub_download_funnel" checked style="width: 18px; height: 18px; accent-color: #a855f7;" />
-              <div>
-                <strong style="font-size: 0.85rem; display: block; color: #fff;">📥 Download Page Funnel</strong>
-                <small style="color: var(--admin-muted); font-size: 0.72rem;">डाउनलोड फनल क्रॉस-सेल में</small>
-              </div>
-            </label>
+          <div style="background: rgba(168, 85, 247, 0.12); border: 1.5px dashed #a855f7; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.82rem; color: #e9d5ff;">
+            ✨ <strong>यूनिवर्सल शेल्फ मैनेजमेंट:</strong> पुस्तक किस-किस शेल्फ में दिखेगी (Best Sellers, Bundles, New Arrivals, Agriculture, आदि) और किस डिस्प्ले स्टाइल (Horizontal Scroll, Slider, Grid) में आएगी, यह केंद्रीय <strong>"Store Shelves & Windows Manager"</strong> टैब से नियंत्रित होता है।
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div>
-              <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">🏷️ स्टोर मार्केटिंग बैज (Store Badge):</label>
-              <select id="blp_store_badge_top" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
-                <option value="best_seller">🔥 Best Seller (सर्वाधिक बिकने वाली)</option>
-                <option value="new_arrival">🆕 New Arrival (नई पुस्तक)</option>
-                <option value="trending">⭐ Trending (चर्चित)</option>
-                <option value="coming_soon">⏳ Coming Soon (जल्द आ रही है)</option>
-                <option value="special_bundle">🎁 Special Bonus Bundle</option>
+              <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">🟢 लाइव / ऑफलाइन स्टेटस:</label>
+              <select id="blp_status" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 800;">
+                <option value="active">🟢 Live / Online (तुरंत सक्रिय)</option>
+                <option value="draft">⏳ Draft / Offline (अप्रकाशित)</option>
+                <option value="disabled">🔴 Disabled (निष्क्रिय)</option>
               </select>
             </div>
             <div>
-              <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">⏳ प्री-लॉन्च / कमिंग सून स्थिति:</label>
-              <select id="blp_is_coming_soon_top" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
-                <option value="false">🟢 Live / Ready to Buy (तुरंत खरीदने योग्य)</option>
-                <option value="true">⏳ Coming Soon (प्री-लॉन्च / लीड्स मोड)</option>
+              <label class="admin-label" style="font-weight: 700; font-size: 0.78rem;">⏳ कमिंग सून मोड (Pre-Launch):</label>
+              <select id="blp_is_coming_soon" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 800;">
+                <option value="false">🟢 Released / Live Now (तुरंत खरीदने योग्य)</option>
+                <option value="true">⏳ Coming Soon (प्री-लॉन्च / Notify Me Active)</option>
               </select>
             </div>
           </div>
@@ -1553,72 +1504,10 @@ Instant Download & Lifetime Access
             </div>
           </div>
 
-          <!-- DETAILED MULTI-PLACEMENT TRAY -->
-          <div style="background: rgba(0,0,0,0.3); border: 1.5px dashed rgba(167,139,250,0.4); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
-            <div style="font-weight: 800; color: #c4b5fd; font-size: 0.88rem; margin-bottom: 8px;">
-              📍 डिस्प्ले प्लेसमेंट (Multi-Placement Tray — यह पुस्तक वेबसाइट पर कहाँ-कहाँ दिखेगी):
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
-                <input type="checkbox" id="blp_pub_home_hero" checked style="accent-color: #8b5cf6;" />
-                <span>🏠 Home Hero Slider</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
-                <input type="checkbox" id="blp_pub_home_page" checked style="accent-color: #8b5cf6;" />
-                <span>🏠 Home Featured Grid</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
-                <input type="checkbox" id="blp_pub_ebook_store" checked style="accent-color: #8b5cf6;" />
-                <span>🏪 eBook Store Catalog</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
-                <input type="checkbox" id="blp_pub_my_library" checked style="accent-color: #8b5cf6;" />
-                <span>📖 My Library Trays</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
-                <input type="checkbox" id="blp_pub_category_page" checked style="accent-color: #8b5cf6;" />
-                <span>🌾 Category Pages Hub</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--admin-text); cursor: pointer;">
-                <input type="checkbox" id="blp_pub_download_funnel" checked style="accent-color: #8b5cf6;" />
-                <span>📥 Download Funnel Shelf</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: #34d399; cursor: pointer;">
-                <input type="checkbox" id="blp_pub_free_shelf" checked style="accent-color: #10b981;" />
-                <span>🎁 100% Free Bonus Shelf</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: #38bdf8; cursor: pointer;">
-                <input type="checkbox" id="blp_pub_demo_shelf" checked style="accent-color: #0284c7;" />
-                <span>📖 Free Demo & Sample Shelf</span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: #fbbf24; cursor: pointer;">
-                <input type="checkbox" id="blp_pub_coming_soon_shelf" checked style="accent-color: #f59e0b;" />
-                <span>⏳ Coming Soon Pre-Launch</span>
-              </label>
-            </div>
-            <div id="blp_demo_placement_notice" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(220, 38, 38, 0.15); border: 1.5px solid #dc2626; border-radius: 8px; font-size: 0.84rem; color: #fca5a5; font-weight: 700;">
-              🔒 डेमो सुरक्षा नियम लागू: डेमो पुस्तकें केवल 'My Library' में ही सुरक्षित रहेंगी। वेबसाइट की किसी भी ख़रीद ट्रे (Store / Home Grid / Category Pages / Funnel) में नहीं दिखेंगी क्योंकि यह केवल पढ़ने व सुनने हेतु मुफ़्त सैंपल है (खरीदने की वस्तु नहीं है)।
-            </div>
-          </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
             <div>
-              <label class="admin-label" style="font-weight: 700;">लाइव / ऑफलाइन स्टेटस:</label>
-              <select id="blp_status" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800;">
-                <option value="active">🟢 Live / Online</option>
-                <option value="draft">⏳ Draft / Offline</option>
-                <option value="disabled">🔴 Disabled</option>
-              </select>
-            </div>
-            <div>
-              <label class="admin-label" style="font-weight: 700;">कमिंग सून मोड (Coming Soon):</label>
-              <select id="blp_is_coming_soon" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 800;">
-                <option value="false">🟢 Released / Live Now</option>
-                <option value="true">⏳ Coming Soon (Notify Me Active)</option>
-              </select>
-            </div>
-            <div>
-              <label class="admin-label" style="font-weight: 700;">Storefront Badge:</label>
+              <label class="admin-label" style="font-weight: 700;">Storefront Badge (ई-बुक स्टोर बैज):</label>
               <select id="blp_store_badge" class="admin-select" style="width: 100%; padding: 8px 12px; font-weight: 700;">
                 <option value="best_seller">🔥 Bestseller (सर्वाधिक लोकप्रिय)</option>
                 <option value="top_rated">⭐ Top Rated (उत्कृष्ट रेटिंग)</option>
@@ -1790,20 +1679,178 @@ Instant Download & Lifetime Access
       </div>
     </div>
 
-    <!-- SUB-TAB 2: Storefront Shelves & Segment Manager -->
+    <!-- SUB-TAB 2: Universal Store Shelves & Windows Manager -->
     <div id="admin-shelves-subtab-container" class="admin-card" style="display: none; margin-bottom: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
         <div>
-          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #a855f7;">
-            🏪 स्टोरफ्रंट शेल्फ कस्टमाइज़र (Storefront Shelves Manager)
+          <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #a855f7;">
+            🏪 स्टोरफ्रंट शेल्फ, बंडल व लैंडिंग विंडोज मैनेजर (Universal Shelves & Windows)
           </h3>
           <p style="font-size: 0.82rem; color: var(--admin-muted); margin: 3px 0 0 0;">
-            चुनें कि मुख्य स्टोर (ebooks/ebook.html) पर कौन-सी पुस्तक किस शेल्फ में दिखेगी:
+            होम पेज, ई-बुक स्टोर व लैंडिंग पेजों पर दिखने वाले शेल्व्स, स्लाइडर/स्क्रॉल व क्रॉस-सेल खिड़कियां यहीं से 100% डायनामिक मैनेज करें:
           </p>
         </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" onclick="window.toggleAddNewShelfForm()" class="admin-button" style="background: #a855f7; color: #fff; font-weight: 800; box-shadow: 0 4px 12px rgba(168,85,247,0.35);">
+            ➕ नया शेल्फ जोड़ें (Add Shelf)
+          </button>
+          <button type="button" onclick="window.saveAllShelvesConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; box-shadow: 0 4px 12px rgba(22,163,74,0.35);">
+            💾 सभी शेल्व्स सुरक्षित करें (Save All)
+          </button>
+        </div>
       </div>
-      <div id="admin-shelves-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+
+      <!-- INLINE NEW SHELF CREATOR MODAL/FORM (HIDDEN BY DEFAULT) -->
+      <div id="admin-add-custom-shelf-card" style="display: none; background: rgba(0,0,0,0.4); border: 2px solid #a855f7; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; font-size: 1rem; font-weight: 800; color: #c084fc;">
+            ✨ नया स्टोर शेल्फ बनाएं (Create Dynamic Store Shelf)
+          </h4>
+          <button type="button" onclick="window.toggleAddNewShelfForm(false)" style="background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">शेल्फ शीर्षक (Title): *</label>
+            <input type="text" id="new_shelf_title" placeholder="उदा. 🌾 संपूर्ण जैविक खाद व पोषण गाइड्स" class="admin-input" style="width: 100%; padding: 7px 10px; font-weight: 700;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">सब-टाइटल (Subtitle):</label>
+            <input type="text" id="new_shelf_subtitle" placeholder="उदा. वैज्ञानिक जैविक नुस्खे और पोषण चार्ट" class="admin-input" style="width: 100%; padding: 7px 10px;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">मार्केटिंग बैज (Badge):</label>
+            <input type="text" id="new_shelf_badge" placeholder="उदा. ⭐ BESTSELLER / 🆕 NEW 2026" class="admin-input" style="width: 100%; padding: 7px 10px;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">कैटेगरी (Category):</label>
+            <select id="new_shelf_category" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
+              <option value="all">🌍 All Categories (सभी)</option>
+              <option value="Agriculture">🌾 Agriculture (कृषि)</option>
+              <option value="Health">🩺 Health & Wellness (स्वास्थ्य)</option>
+              <option value="Pashupalan">🐄 Animal Husbandry (पशुपालन)</option>
+              <option value="Business">💼 Business & Earning (व्यापार)</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">शेल्फ प्रकार (Type):</label>
+            <select id="new_shelf_type" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
+              <option value="books">📚 Books Shelf (ई-बुक्स शेल्फ)</option>
+              <option value="bundles">📦 Bundles / Mega Combos (कॉम्बो बंडल)</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">डिस्प्ले स्टाइल (Display Style):</label>
+            <select id="new_shelf_display_style" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 700;">
+              <option value="horizontal_scroll">↔️ Horizontal Scroll (लेफ्ट-राइट स्क्रॉल + एरो)</option>
+              <option value="slider">🎠 Slider / Carousel (स्लाइडर)</option>
+              <option value="grid">🔲 Grid View (ग्रिड व्यू)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" onclick="window.submitCreateCustomShelf()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; padding: 7px 20px;">
+            ✔️ शेल्फ बनाएं
+          </button>
+          <button type="button" onclick="window.toggleAddNewShelfForm(false)" class="admin-button small-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+            रद्द करें
+          </button>
+        </div>
+      </div>
+
+      <!-- SHELVES LIST GRID -->
+      <div id="admin-shelves-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;">
         <!-- Rendered dynamically -->
+      </div>
+
+      <!-- LANDING PAGE CROSS-SELL WINDOWS CONFIGURATOR -->
+      <div id="admin-landing-windows-card" style="background: var(--admin-surface-2, #0f172a); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 18px; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h4 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #38bdf8;">
+              🪟 लैंडिंग पेज बॉटम क्रॉस-सेल विंडो (Landing Page Cross-Sell Windows)
+            </h4>
+            <p style="font-size: 0.8rem; color: var(--admin-muted); margin: 3px 0 0 0;">
+              चुनें कि किसी पुस्तक (उदा. ड्रैगन फ्रूट, केला, पपीता) के लैंडिंग पेज के नीचे कौन-सी अन्य पुस्तकें या बंडल क्रॉस-सेल में दिखेंगी:
+            </p>
+          </div>
+          <button type="button" onclick="window.saveLandingWindowConfig()" class="admin-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 6px 16px;">
+            💾 यह विंडो सेव करें
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 14px; margin-bottom: 12px;">
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">लैंडिंग पेज पुस्तक चुनें:</label>
+            <select id="admin_lp_window_select" onchange="window.handleLpWindowSelection(this.value)" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 800; color: #38bdf8;">
+              <option value="default">🌐 Default (अन्य सभी सामान्य पुस्तकें)</option>
+              <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड</option>
+              <option value="BK002">🩺 BK002: खेती का डॉक्टर</option>
+              <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी</option>
+              <option value="BK017">🌾 BK017: गेहूँ की वैज्ञानिक खेती</option>
+              <option value="BK019">🚜 BK019: चना की खेती</option>
+              <option value="BK020">🌼 BK020: सरसों खेती गाइड</option>
+              <option value="BK022">🥭 BK022: आम की खेती (Mango)</option>
+              <option value="BK023">🍎 BK023: अनार मास्टर गाइड</option>
+              <option value="BK026">🍌 BK026: केले की वैज्ञानिक खेती</option>
+              <option value="BK025">🐉 BK025: ड्रैगन फ्रूट फार्मिंग</option>
+              <option value="BK028">🍈 BK028: पपीता की उन्नत बागवानी</option>
+              <option value="BK029">🍈 BK029: चीकू की व्यावसायिक बागवानी</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 700;">बॉटम शेल्फ हेडिंग (Window Title):</label>
+            <input type="text" id="admin_lp_window_title" placeholder="उदा. 🐉 ड्रैगन फ्रूट उत्पादकों की अन्य पसंदीदा गाइड्स व बंडल" class="admin-input" style="width: 100%; padding: 8px 10px; font-weight: 700;" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; margin: 0;">सुझावित पुस्तकें (Recommended Book IDs):</label>
+              <span style="font-size: 0.68rem; color: #38bdf8;">नीचे क्लिक करके जोड़ें</span>
+            </div>
+            <input type="text" id="admin_lp_window_books" placeholder="BK016, BK002, BK029, BK028" class="admin-input" style="width: 100%; padding: 7px 10px; font-weight: 700; font-family: monospace;" />
+            <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;">
+              <button type="button" onclick="window.appendWindowBookId('BK002')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(22,163,74,0.15);border:1px solid #16a34a;color:#86efac;">+ BK002 डॉक्टर</button>
+              <button type="button" onclick="window.appendWindowBookId('BK016')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#7dd3fc;">+ BK016 दवा</button>
+              <button type="button" onclick="window.appendWindowBookId('BK017')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(234,179,8,0.15);border:1px solid #eab308;color:#fef08a;">+ BK017 गेहूं</button>
+              <button type="button" onclick="window.appendWindowBookId('BK019')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(249,115,22,0.15);border:1px solid #f97316;color:#fdba74;">+ BK019 चना</button>
+              <button type="button" onclick="window.appendWindowBookId('BK020')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(234,179,8,0.15);border:1px solid #eab308;color:#fef08a;">+ BK020 सरसों</button>
+              <button type="button" onclick="window.appendWindowBookId('BK022')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(234,179,8,0.15);border:1px solid #eab308;color:#fef08a;">+ BK022 आम</button>
+              <button type="button" onclick="window.appendWindowBookId('BK023')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;">+ BK023 अनार</button>
+              <button type="button" onclick="window.appendWindowBookId('BK026')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(234,179,8,0.15);border:1px solid #eab308;color:#fef08a;">+ BK026 केला</button>
+            </div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; margin: 0;">सुझावित बंडल्स (Bundle IDs):</label>
+              <span style="font-size: 0.68rem; color: #a855f7;">नीचे क्लिक करके जोड़ें</span>
+            </div>
+            <input type="text" id="admin_lp_window_bundles" placeholder="BUN001, BUN002" class="admin-input" style="width: 100%; padding: 7px 10px; font-weight: 700; font-family: monospace;" />
+            <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;">
+              <button type="button" onclick="window.appendWindowBundleId('BUN001')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(245,158,11,0.15);border:1px solid #f59e0b;color:#fde047;">+ BUN001 (5-in-1 किसान कॉम्बो)</button>
+              <button type="button" onclick="window.appendWindowBundleId('BUN002')" class="admin-button small-button" style="font-size:0.68rem;padding:2px 6px;background:rgba(148,163,184,0.15);border:1px solid #94a3b8;color:#cbd5e1;">+ BUN002 (4-in-1 कॉम्बो)</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;margin-top:6px;flex-wrap:wrap;gap:8px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#cbd5e1;cursor:pointer;">
+            <input type="checkbox" id="admin_lp_window_enabled" checked style="accent-color:#10b981;width:16px;height:16px;" />
+            <span style="font-weight:700;">🟢 इस किताब पर बॉटम रेकमेंडेशन विंडो चालू रखें (Active)</span>
+          </label>
+        </div>
+
+        <!-- 4.1 CONFIGURED WINDOWS SUMMARY TABLE -->
+        <div style="margin-top: 16px; border-top: 1px solid var(--admin-border); padding-top: 12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h5 style="margin:0;font-size:0.86rem;font-weight:800;color:#f8fafc;">📋 सक्रिय लैंडिंग पेज क्रॉस-सेल विंडोज (Active Configured Windows)</h5>
+            <span id="admin_lp_windows_count_badge" style="font-size:0.7rem;background:#0284c7;color:#fff;padding:2px 8px;border-radius:10px;font-weight:800;">0 विंडोज़</span>
+          </div>
+          <div id="admin_lp_windows_table_wrap">
+            <!-- Rendered dynamically by window.renderLandingWindowsTable -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2101,60 +2148,372 @@ Instant Download & Lifetime Access
       </div>
     </div>
 
-    <!-- SUB-TAB 5: Social Proof, Toasts & Popups Hub -->
+    <!-- SUB-TAB 4: Multi-Type Social Proof & Toast Designer with Live Preview -->
     <div id="admin-popups-subtab-container" class="admin-card" style="display: none; margin-bottom: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
         <div>
-          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #38bdf8;">
-            🔔 सोशल प्रूफ, टोस्ट्स व पॉपअप मैनेजर (Social Proof & Popups Hub)
+          <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #38bdf8;">
+            🔔 लाइव सोशल प्रूफ व मल्टी-टाइप टोस्ट डिजाइनर (Live Toast Designer & Preview)
           </h3>
           <p style="font-size: 0.82rem; color: var(--admin-muted); margin: 3px 0 0 0;">
-            लाइव खरीदार नोटिफिकेशन ("Rameshwar Patel ने अभी खरीदी..."), डिस्प्ले टाइमिंग व एग्जिट पॉपअप्स को 100% कस्टमाइज़ करें:
+            5 प्रकार के लाइव टोस्ट्स (बुक खरीद, VIP मेंबर, सखी AI सवाल, रोचक कृषि रहस्य, वेबपेज समाधान) व रियल-टाइम लाइव प्रिव्यू:
           </p>
         </div>
-        <button type="button" onclick="window.savePopupsConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; padding: 8px 18px; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
-          💾 सेटिंग्स सुरक्षित करें (Save Popups)
+        <button type="button" onclick="window.saveAllToastsConfig()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; padding: 8px 18px; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
+          💾 सभी टोस्ट्स सुरक्षित करें (Save Toasts)
         </button>
       </div>
 
-      <!-- Controls Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px;">
-        <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px;">
-          <label style="display: flex; align-items: center; gap: 10px; font-weight: 800; color: #fde047; cursor: pointer;">
-            <input type="checkbox" id="adm_popups_toasts_enabled" checked style="width: 18px; height: 18px; accent-color: #16a34a;" />
-            <span>🔔 लाइव खरीदार टोस्ट्स (Social Proof Toasts) चालू रखें</span>
-          </label>
-          <div style="margin-top: 10px;">
-            <label class="admin-label" style="font-size: 0.78rem;">टोस्ट डिस्प्ले अंतराल (सेकंड):</label>
-            <input type="number" id="adm_popups_interval" min="5" max="60" value="10" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+      <!-- GLOBAL TOAST SETTINGS & ANIMATION CONTROLS -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: #fde047; margin-bottom: 12px;">
+          ⚙️ टोस्ट डिस्प्ले व एनिमेशन सेटिंग्स (Global Display & Animation)
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: #34d399; cursor: pointer; margin-bottom: 6px;">
+              <input type="checkbox" id="adm_toast_global_enabled" checked style="width: 18px; height: 18px; accent-color: #10b981;" />
+              <span>🔔 लाइव टोस्ट्स चालू रखें</span>
+            </label>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">अंतराल (Interval Seconds):</label>
+            <input type="number" id="adm_toast_interval" min="5" max="120" value="18" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">दिखने की अवधि (Duration Sec):</label>
+            <input type="number" id="adm_toast_duration" min="3" max="20" value="6" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">स्क्रीन पर स्थिति (Position):</label>
+            <select id="adm_toast_position" onchange="window.updateToastLivePreview()" class="admin-select" style="width: 100%; padding: 6px 10px; font-weight: 700;">
+              <option value="bottom_left">↙️ Bottom Left (निचले बाएं कोने में)</option>
+              <option value="bottom_right">↘️ Bottom Right (निचले दाएं कोने में)</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-label" style="font-size: 0.78rem;">एनिमेशन स्टाइल (Animation):</label>
+            <select id="adm_toast_animation" onchange="window.updateToastLivePreview()" class="admin-select" style="width: 100%; padding: 6px 10px; font-weight: 700;">
+              <option value="slide_up">⬆️ Slide Up (नीचे से ऊपर उठना)</option>
+              <option value="fade">✨ Smooth Fade (धीमे से चमकना)</option>
+              <option value="bounce">🏀 Lively Bounce (उछल कर आना)</option>
+              <option value="glass_glow">💎 Glass Glow (ग्लास नियॉन चमक)</option>
+            </select>
           </div>
         </div>
 
-        <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px;">
-          <label style="display: flex; align-items: center; gap: 10px; font-weight: 800; color: #38bdf8; cursor: pointer;">
-            <input type="checkbox" id="adm_popups_exit_enabled" checked style="width: 18px; height: 18px; accent-color: #2563eb;" />
-            <span>🚪 एग्जिट-इंटेंट डिस्काउंट पॉपअप चालू रखें</span>
+        <!-- 5 TOAST TYPES TOGGLE PILLS -->
+        <div style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; margin-bottom: 8px;">सक्रिय टोस्ट प्रकार (Enabled Types):</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <label style="background: rgba(16,185,129,0.15); border: 1px solid #10b981; border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; color: #34d399; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="adm_type_book_sell" checked /> 🛒 बुक खरीद (Book Purchase)
           </label>
-          <div style="margin-top: 10px;">
-            <label class="admin-label" style="font-size: 0.78rem;">कूपन कोड:</label>
-            <input type="text" id="adm_popups_coupon" value="KISAN10" class="admin-input" style="width: 100%; padding: 6px 10px; font-weight: 700;" />
+          <label style="background: rgba(245,158,11,0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="adm_type_user_sell" checked /> 👑 VIP मेंबर (Member Join)
+          </label>
+          <label style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; color: #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="adm_type_sakhi_ask" checked /> ⚡ सखी AI सवाल (User Query)
+          </label>
+          <label style="background: rgba(168,85,247,0.15); border: 1px solid #a855f7; border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; color: #c084fc; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="adm_type_sakhi_curiosity" checked /> 💡 रोचक सवाल (Curiosity)
+          </label>
+          <label style="background: rgba(20,184,166,0.15); border: 1px solid #14b8a6; border-radius: 6px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; color: #2dd4bf; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="adm_type_webpage" checked /> 🌿 वेबपेज लिंक (Direct Link)
+          </label>
+        </div>
+      </div>
+
+      <!-- TOAST DESIGNER & LIVE PREVIEW WORKBENCH (2 COLUMNS) -->
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; margin-bottom: 22px; align-items: start;">
+        
+        <!-- LEFT: TOAST FORM -->
+        <div style="background: var(--admin-surface-2, #0f172a); border: 1.5px solid var(--admin-border); border-radius: 12px; padding: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #38bdf8;">
+              🎨 टोस्ट कस्टमाइज़र (Toast Editor Form)
+            </h4>
+            <div style="display:flex;gap:6px;">
+              <button type="button" onclick="window.generateRandomFarmerTitle()" class="admin-button small-button" style="background: rgba(16,185,129,0.2); border:1px solid #10b981; color:#34d399; font-weight:700;" title="असली भारतीय किसान नाम भरें">
+                🔄 किसान नाम भरें
+              </button>
+              <button type="button" onclick="window.resetToastFormToNew()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
+                + नया बनाएं
+              </button>
+            </div>
+          </div>
+
+          <!-- 15 READY-MADE TOAST TEMPLATES PICKER -->
+          <div style="background: rgba(56,189,248,0.08); border: 1.5px dashed #38bdf8; border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+            <label class="admin-label" style="font-size: 0.78rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; justify-content: space-between;">
+              <span>⚡ 15 रेडीमेड किसानी संदेश (1-Click Ready Presets):</span>
+              <span style="font-size: 0.7rem; color: #94a3b8;">क्लिक करते ही पूरा फॉर्म भर जाएगा</span>
+            </label>
+            <select id="ed_toast_preset_selector" onchange="window.applyToastPreset(this.value)" class="admin-select" style="width: 100%; padding: 7px 10px; font-weight: 800; color: #fde047; background: #090d16;">
+              <option value="">-- रेडीमेड टेम्पलेट चुनें (Select 1 of 15 Ready Templates) --</option>
+              <option value="p1">1. 🛒 [खरीद] खेती का डॉक्टर ई-बुक खरीद (BK002 - ₹99)</option>
+              <option value="p2">2. 🛒 [खरीद] खरीफ फसल मास्टर गाइड 2026 (BK001 - ₹99)</option>
+              <option value="p3">3. 👑 [VIP] Aarogyam Pro VIP सदस्यता 1-Year (SUB001 - ₹99)</option>
+              <option value="p4">4. 📦 [कॉम्बो] महाबचत 5-इन-1 किसान मास्टर कॉम्बो (BUN001 - ₹149)</option>
+              <option value="p5">5. 🍌 [खरीद] केले की खेती मास्टर गाइड (BK026 - ₹75)</option>
+              <option value="p6">6. 🐄 [खरीद] पशु पोषण व दुग्ध वृद्धि गाइड (BK028 - ₹75)</option>
+              <option value="p7">7. ⚡ [सखी सवाल] गेहूं में पीलापन व खाद समाधान</option>
+              <option value="p8">8. ⚡ [सखी सवाल] कपास व सोयाबीन में रसचूसक कीट</option>
+              <option value="p9">9. ⚡ [सखी सवाल] गाय-भैंस का दूध व फैट वृद्धि</option>
+              <option value="p10">10. ⚡ [सखी सवाल] प्याज में जलेबी रोग व थ्रिप्स का इलाज</option>
+              <option value="p11">11. 💡 [रहस्य] दुधारू पशुओं में मिनरल मिक्चर का कमाल</option>
+              <option value="p12">12. 💡 [रहस्य] कीटनाशक स्प्रे का सर्वोत्तम समय</option>
+              <option value="p13">13. 🌿 [घरेलू नुस्खा] दांत दर्द व मसूड़ों की सूजन</option>
+              <option value="p14">14. 🌿 [घरेलू नुस्खा] जोड़ों का दर्द व यूरिक एसिड</option>
+              <option value="p15">15. 🌾 [मंडी भाव] दैनिक कृषि व मंडी भाव लाइव</option>
+            </select>
+          </div>
+
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem;">टोस्ट का प्रकार (Toast Type):</label>
+              <select id="ed_toast_type" onchange="window.handleToastTypeChange(this.value)" class="admin-select" style="width: 100%; padding: 6px 8px; font-weight: 800; color: #facc15;">
+                <option value="book_sell_toast">🛒 1. हालिया खरीद (Book Purchase)</option>
+                <option value="user_sell_toast">👑 2. VIP मेंबर / रिवॉर्ड (User Join)</option>
+                <option value="sakhi_user_ask_toast">⚡ 3. सखी AI सवाल (Farmer Ask)</option>
+                <option value="sakhi_curiosity_toast">💡 4. क्या आप जानते हैं? (Curiosity + Ans)</option>
+                <option value="webpage_toast">🌿 5. वेबपेज समाधान (Targeted Solution)</option>
+              </select>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <label class="admin-label" style="font-size: 0.76rem;">मार्केटिंग बैज (Badge):</label>
+                <select onchange="window.selectToastBadgePreset(this.value)" class="admin-select" style="padding:2px 4px;font-size:0.7rem;font-weight:700;color:#fbbf24;">
+                  <option value="">-- बैज चुनें --</option>
+                  <option value="🛒 सफल खरीद">🛒 सफल खरीद</option>
+                  <option value="⚡ सखी AI लाइव सवाल">⚡ सखी सवाल</option>
+                  <option value="👑 VIP मेंबर">👑 VIP मेंबर</option>
+                  <option value="💡 कृषि रहस्य">💡 कृषि रहस्य</option>
+                  <option value="🌿 प्राकृतिक उपचार">🌿 प्राकृतिक उपचार</option>
+                  <option value="🌾 खरीफ स्पेशल">🌾 खरीफ स्पेशल</option>
+                  <option value="🐄 दुग्ध क्रांति">🐄 दुग्ध क्रांति</option>
+                </select>
+              </div>
+              <input type="text" id="ed_toast_badge" oninput="window.updateToastLivePreview()" placeholder="उदा. 🛒 सफल खरीद / 💡 कृषि रहस्य" class="admin-input" style="width: 100%; padding: 6px 8px;" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label class="admin-label" style="font-size: 0.76rem;">मुख्य शीर्षक / नाम व शहर (Title):</label>
+            <input type="text" id="ed_toast_title" oninput="window.updateToastLivePreview()" placeholder="उदा. सखाराम पाटिल (नासिक, महाराष्ट्र) या क्या आप जानते हैं?" class="admin-input" style="width: 100%; padding: 7px 10px; font-weight: 800;" />
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label class="admin-label" style="font-size: 0.76rem;">टोस्ट संदेश (Message):</label>
+            <textarea id="ed_toast_message" oninput="window.updateToastLivePreview()" rows="2" placeholder="उदा. ने सखी AI से पूछा: 'प्याज में जलेबी रोग और थ्रिप्स का तुरंत इलाज क्या है?'" class="admin-input" style="width: 100%; padding: 7px 10px; font-size: 0.8rem;"></textarea>
+          </div>
+
+          <!-- CONDITIONAL: CURIOSITY ANSWER BOX -->
+          <div id="ed_toast_curiosity_ans_wrap" style="display: none; margin-bottom: 10px; background: rgba(168,85,247,0.1); border: 1.5px dashed #a855f7; border-radius: 8px; padding: 10px;">
+            <label class="admin-label" style="font-size: 0.76rem; color: #c084fc; font-weight: 800;">💡 सखी द्वारा सिखाया जाने वाला उत्तर (Curiosity Answer):</label>
+            <textarea id="ed_toast_curiosity_answer" oninput="window.updateToastLivePreview()" rows="2" placeholder="उदा. हमेशा सुबह 10 बजे से पहले या शाम 4 बजे के बाद ही कीटनाशक का स्प्रे करें जब स्टोमेटा खुले हों।" class="admin-input" style="width: 100%; padding: 6px 8px; font-size: 0.78rem;"></textarea>
+            <small style="color: var(--admin-muted); font-size: 0.7rem;">यह उत्तर टोस्ट में 'उत्तर देखें' बटन दबाने पर किसान को तुरंत दिखाई देगा।</small>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem;">एक्शन बटन टेक्स्ट:</label>
+              <input type="text" id="ed_toast_action_text" oninput="window.updateToastLivePreview()" placeholder="उदा. 🤖 सखी से पूछें / 📖 विवरण देखें" class="admin-input" style="width: 100%; padding: 6px 8px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem;">एक्शन URL (Link):</label>
+              <input type="text" id="ed_toast_action_url" oninput="window.updateToastLivePreview()" placeholder="/ebooks/book-landing.html?id=BK016" class="admin-input" style="width: 100%; padding: 6px 8px; font-family: monospace;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem;">छवि URL (Thumbnail Image):</label>
+              <input type="text" id="ed_toast_image" oninput="window.updateToastLivePreview()" placeholder="/images/sakhi/aarogyam-sakhi.webp" class="admin-input" style="width: 100%; padding: 6px 8px;" />
+            </div>
+            <div>
+              <label class="admin-label" style="font-size: 0.76rem;">कीमत (वैकल्पिक):</label>
+              <input type="text" id="ed_toast_price" oninput="window.updateToastLivePreview()" placeholder="₹99" class="admin-input" style="width: 100%; padding: 6px 8px;" />
+            </div>
+          </div>
+
+          <!-- AUTOMATIC CLIENT-SIDE KB IMAGE COMPRESSOR -->
+          <div style="margin-bottom: 14px; background: rgba(56,189,248,0.06); border: 1px dashed rgba(56,189,248,0.4); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <label style="background: #0284c7; color: #ffffff; border-radius: 6px; padding: 6px 12px; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(2,132,199,0.3);">
+              <span>📸</span> <span>बीमारी / पुस्तक फोटो अपलोड (ऑटो KB कंप्रेस)</span>
+              <input type="file" id="ed_toast_file_uploader" accept="image/*" style="display: none;" onchange="window.handleToastImageUpload(this)" />
+            </label>
+            <span id="ed_toast_upload_status" style="font-size: 0.74rem; font-weight: 700; color: #38bdf8;">फाइल चुनें (ऑटोमैटिक 20-30KB WebP में कंप्रेस होगी)</span>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button type="button" onclick="window.submitSaveToastItem()" class="admin-button" style="background: #16a34a; color: #fff; font-weight: 800; padding: 7px 18px;">
+              💾 यह टोस्ट सेव करें
+            </button>
+            <button type="button" onclick="window.resetToastFormToNew()" class="admin-button small-button" style="background: transparent; border: 1px solid var(--admin-border); color: var(--admin-muted);">
+              क्लियर
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: LIVE REAL-TIME VISUAL PREVIEW CARD -->
+        <div style="background: var(--admin-surface-2, #0f172a); border: 1.5px solid #a855f7; border-radius: 12px; padding: 18px; position: sticky; top: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid rgba(168,85,247,0.3); padding-bottom: 8px;">
+            <div style="font-weight: 800; font-size: 0.95rem; color: #c084fc; display: flex; align-items: center; gap: 6px;">
+              <span>👁️</span> <span>लाइव टोस्ट प्रिव्यू (Real-Time Preview)</span>
+            </div>
+            <span style="font-size: 0.7rem; background: rgba(16,185,129,0.2); color: #34d399; padding: 2px 8px; border-radius: 12px; font-weight: 800;">
+              ● LIVE
+            </span>
+          </div>
+
+          <p style="font-size: 0.76rem; color: var(--admin-muted); margin-bottom: 16px;">
+            जैसे ही आप बाईं ओर टाइप करेंगे या टोस्ट चुनेंगे, यह प्रिव्यू मोबाइल व डेस्कटॉप जैसा ही लाइव दिखेगा:
+          </p>
+
+          <div id="admin-toast-live-preview-box" style="min-height: 140px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(30,27,75,0.7) 0%, rgba(15,23,42,0.95) 100%); border-radius: 12px; padding: 16px; border: 1px dashed rgba(255,255,255,0.15);">
+            <!-- Rendered in real-time -->
           </div>
         </div>
       </div>
 
-      <!-- Social Proof Items List -->
+      <!-- DUAL ACTION CONTROLLER & MOBILE PUSH DISPATCHER BAR -->
+      <div style="background: radial-gradient(circle at left, rgba(16,185,129,0.15) 0%, rgba(15,23,42,0.95) 100%); border: 2px solid #10b981; border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; box-shadow: 0 4px 20px rgba(16,185,129,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(16,185,129,0.25); padding-bottom: 10px;">
+          <div>
+            <div style="font-weight: 900; font-size: 1.05rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+              <span>📲</span> <span>मोबाइल पुश शेड्यूलर व डुअल एक्शन कंट्रोल (Mobile Push Scheduler)</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 3px;">
+              नीचे सूची में से मनचाहे टोस्ट्स चुनें और 'पुश' दबाएं — ऐप बंद होने पर भी यूजर्स के मोबाइल पर घंटी बजेगी:
+            </div>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button" onclick="window.testInstantMobilePushAlert()" class="admin-button small-button" style="background: rgba(56,189,248,0.2); border: 1.5px solid #38bdf8; color: #38bdf8; font-weight: 800; padding: 6px 14px; border-radius: 8px;" title="अपने डिवाइस पर इस क्षण 1-सेकंड टेस्ट पुश देखें">
+              <span>⚡</span> <span>टेस्ट पुश (1-Sec Live Test)</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+              <span style="font-size: 0.78rem; font-weight: 800; color: #fde047;">⏰ पुश टाइमर:</span>
+              <select id="adm_mobile_push_interval" class="admin-select" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 800; background: #0f172a; color: #ffffff; border: 1px solid #38bdf8; border-radius: 6px;">
+                <option value="now">⚡ NOW (तुरंत अभी भेजें - Instant Push)</option>
+                <option value="1">⏰ हर 1 घंटे (1 Hour Interval)</option>
+                <option value="2">⏰ हर 2 घंटे (2 Hours Interval)</option>
+                <option value="3" selected>⏰ हर 3 घंटे (3 Hours - अनुशंसित)</option>
+                <option value="4">⏰ हर 4 घंटे (4 Hours Interval)</option>
+                <option value="6">⏰ हर 6 घंटे (6 Hours Interval)</option>
+              </select>
+            </div>
+
+            <!-- NOTIFICATION VALIDITY SELECTOR -->
+            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+              <span style="font-size: 0.78rem; font-weight: 800; color: #a7f3d0;">⏳ वैधता:</span>
+              <select id="adm_mobile_push_validity" class="admin-select" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 800; background: #0f172a; color: #ffffff; border: 1px solid #10b981; border-radius: 6px;">
+                <option value="24" selected>24 घंटे (1 दिन)</option>
+                <option value="48">48 घंटे (2 दिन)</option>
+                <option value="72">72 घंटे (3 दिन)</option>
+                <option value="168">7 दिन (1 सप्ताह)</option>
+                <option value="0">असीमित (जब तक न बदलें)</option>
+              </select>
+            </div>
+
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; color: #94a3b8; cursor: pointer; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px;">
+              <input type="checkbox" id="adm_select_all_push_toggle" onchange="window.toggleSelectAllPushToasts(this.checked)" style="accent-color: #10b981; width: 16px; height: 16px;" />
+              <span>सभी चुनें / हटाएं</span>
+            </label>
+          </div>
+
+          <!-- THE ACTION BUTTONS INCLUDING TURN OFF -->
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- BUTTON 1: WEB TOASTS SAVE -->
+            <button type="button" onclick="window.saveAllToastsConfig()" class="admin-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 9px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.3);">
+              💾 1. वेबसाइट टोस्ट्स सुरक्षित करें
+            </button>
+
+            <!-- BUTTON 2: MOBILE PUSH DISPATCH -->
+            <button type="button" onclick="window.dispatchSelectedToastsToMobilePush()" class="admin-button" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-weight: 900; padding: 9px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(22,163,74,0.45); display: inline-flex; align-items: center; gap: 6px;">
+              <span>📲</span> <span>2. चयनित (<span id="adm_selected_push_count">0</span>) टोस्ट्स पुश करें</span>
+            </button>
+
+            <!-- BUTTON 3: TURN OFF / PAUSE PUSH -->
+            <button type="button" id="btn_toggle_push_off" onclick="window.toggleMobilePushPowerOff()" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: 800; padding: 9px 14px; border-radius: 8px;" title="मोबाइल पुश नोटिफिकेशन पूरी तरह बंद करें">
+              <span>⏹️</span> <span>पुश बंद करें</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE TOASTS FEED LIST -->
       <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 10px; padding: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #f8fafc;">
-            👥 लाइव खरीदार सोशल प्रूफ लिस्ट (Live Buyer Testimonials Stream)
+            📋 सक्रिय टोस्ट्स सूची (Active Live Toasts Stream)
           </h4>
-          <button type="button" onclick="window.addSocialProofItem()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 700;">
-            + नया खरीदार जोड़ें
-          </button>
+          <span id="adm_toast_count_badge" style="font-size: 0.75rem; background: #3b82f6; color: #fff; padding: 2px 8px; border-radius: 10px; font-weight: 800;">0 टोस्ट्स</span>
         </div>
-        <div id="adm_social_proof_items_wrap" style="display: flex; flex-direction: column; gap: 10px;">
+        <div id="adm_live_toasts_table_wrap">
           <!-- Rendered dynamically -->
         </div>
+      </div>
+    </div>
+
+    <!-- SUB-TAB 5: AI User Intent & Profile Brain Monitor -->
+    <div id="admin-ai-profile-brain-subtab-container" class="admin-card" style="display: none; margin-bottom: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.4rem;">🧠</span>
+            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #10b981;">
+              AI प्रोफाइल ब्रेन & यूजर इंटेंट इंजन (Zero PII Smart Intent Monitor)
+            </h3>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--admin-muted); margin: 3px 0 0 0;">
+            सखी AI चैट, पेज विज़िट्स और टोस्ट इंटरैक्शन से किसान की रुचि (कृषि, व्यापार, स्वास्थ्य) का रियल-टाइम AI विश्लेषण:
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <span style="background: rgba(16,185,129,0.15); border: 1.5px solid #10b981; color: #34d399; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+            🔒 100% Zero PII Guaranteed (No Phone / Name)
+          </span>
+          <button type="button" onclick="window.renderAiProfileBrainTab()" class="admin-button small-button">
+            🔄 रिफ्रेश
+          </button>
+        </div>
+      </div>
+
+      <!-- INTENT FORMULA VISUALIZATION -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1.5px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+        <div style="font-weight: 800; font-size: 0.95rem; color: #6ee7b7; margin-bottom: 6px;">
+          📐 यूजर इंटेंट स्कोर फॉर्मूला (User Intent Scoring Formula)
+        </div>
+        <div style="font-family: monospace; font-size: 0.95rem; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 8px; color: #34d399; border: 1px dashed rgba(16,185,129,0.4); margin-bottom: 10px;">
+          User Score = (Regular Interest × 0.5) + (Business Interest × 0.3) + (Exploratory / Health × 0.2)
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+          <div style="background: rgba(34,197,94,0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 10px;">
+            <div style="font-size: 0.75rem; color: #86efac; font-weight: 700;">🌾 Regular Interest (50% Weight)</div>
+            <div style="font-size: 0.8rem; color: #fff; margin-top: 4px;">फसल, रोग, कीट, दवा, स्प्रे, बीज, सिंचाई, मंडी भाव</div>
+          </div>
+          <div style="background: rgba(245,158,11,0.1); border: 1px solid #f59e0b; border-radius: 8px; padding: 10px;">
+            <div style="font-size: 0.75rem; color: #fde047; font-weight: 700;">💼 Business Interest (30% Weight)</div>
+            <div style="font-size: 0.8rem; color: #fff; margin-top: 4px;">कमाई, स्वरोजगार, VIP मेंबरशिप, रीसेल, डिजिटल अर्निंग</div>
+          </div>
+          <div style="background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; border-radius: 8px; padding: 10px;">
+            <div style="font-size: 0.75rem; color: #7dd3fc; font-weight: 700;">🩺 Exploratory / Health (20% Weight)</div>
+            <div style="font-size: 0.8rem; color: #fff; margin-top: 4px;">आयुर्वेद, घरेलू नुस्खे, दांत दर्द, पशुपालन, दूध वृद्धि</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE LOCAL CLIENT BRAIN STATUS -->
+      <div id="admin-ai-profile-brain-status-wrap">
+        <!-- Rendered dynamically -->
       </div>
     </div>
 
@@ -3236,18 +3595,25 @@ Instant Download & Lifetime Access
     const shelvesCard = document.getElementById('admin-shelves-subtab-container');
     const leadsCard = document.getElementById('admin-leads-subtab-container');
     const popupsCard = document.getElementById('admin-popups-subtab-container');
+    const profileBrainCard = document.getElementById('admin-ai-profile-brain-subtab-container');
     const aiStudioCard = document.getElementById('admin-ai-studio-subtab-container');
+    const builderCardEl = document.getElementById('admin-book-builder-card');
+    if (builderCardEl && tab !== 'pages') {
+      builderCardEl.style.display = 'none';
+    }
 
     const btnPages = document.getElementById('tab-btn-landing-pages');
     const btnShelves = document.getElementById('tab-btn-shelves-mgr');
     const btnLeads = document.getElementById('tab-btn-coming-soon-leads');
     const btnPopups = document.getElementById('tab-btn-popups-mgr');
+    const btnProfileBrain = document.getElementById('tab-btn-ai-profile-brain');
     const btnAiStudio = document.getElementById('tab-btn-ai-studio-mgr');
 
     if (pagesCard) pagesCard.style.display = tab === 'pages' ? 'block' : 'none';
     if (shelvesCard) shelvesCard.style.display = tab === 'shelves' ? 'block' : 'none';
     if (leadsCard) leadsCard.style.display = tab === 'leads' ? 'block' : 'none';
     if (popupsCard) popupsCard.style.display = tab === 'popups' ? 'block' : 'none';
+    if (profileBrainCard) profileBrainCard.style.display = tab === 'ai_profile_brain' ? 'block' : 'none';
     if (aiStudioCard) aiStudioCard.style.display = tab === 'ai_studio' ? 'block' : 'none';
 
     if (btnPages) {
@@ -3274,6 +3640,12 @@ Instant Download & Lifetime Access
       btnPopups.style.borderColor = '#38bdf8';
     }
 
+    if (btnProfileBrain) {
+      btnProfileBrain.style.background = tab === 'ai_profile_brain' ? '#10b981' : 'var(--admin-surface, #1e293b)';
+      btnProfileBrain.style.color = tab === 'ai_profile_brain' ? '#000' : '#34d399';
+      btnProfileBrain.style.borderColor = '#10b981';
+    }
+
     if (btnAiStudio) {
       btnAiStudio.style.background = tab === 'ai_studio' ? '#ec4899' : 'var(--admin-surface, #1e293b)';
       btnAiStudio.style.color = tab === 'ai_studio' ? '#fff' : '#f472b6';
@@ -3283,181 +3655,1049 @@ Instant Download & Lifetime Access
     if (tab === 'shelves') window.renderStoreShelvesTab();
     if (tab === 'leads') window.renderComingSoonLeadsTab();
     if (tab === 'popups') window.renderPopupsManagerTab();
+    if (tab === 'ai_profile_brain') window.renderAiProfileBrainTab();
     if (tab === 'ai_studio') window.renderAiStudioTab();
   };
 
   // -------------------------------------------------------------
-  // SUB-TAB 5: SOCIAL PROOF TOASTS & POPUPS HUB CONTROLLERS
+  // SUB-TAB 4: MULTI-TYPE TOAST DESIGNER & LIVE PREVIEW CONTROLLER
   // -------------------------------------------------------------
-  let currentPopupsConfig = null;
+  let adminToastsConfig = null;
+  let adminLiveToastsList = [];
+  let currentEditingToastId = null;
 
   window.renderPopupsManagerTab = async function () {
-    const wrap = document.getElementById('adm_social_proof_items_wrap');
-    if (!wrap) return;
+    try {
+      const localData = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+      if (localData) {
+        if (localData.toasts_config) adminToastsConfig = localData.toasts_config;
+        if (Array.isArray(localData.live_toasts) && localData.live_toasts.length >= 20) adminLiveToastsList = localData.live_toasts;
+      }
+    } catch (e) { }
 
-    if (!currentPopupsConfig) {
-      try {
-        const res = await fetch('/data/notifications-popups.json?v=' + Date.now());
-        if (res.ok) {
-          currentPopupsConfig = await res.json();
+    try {
+      const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+      if (res.ok) {
+        const json = await res.json();
+        if (json.toasts_config && (!adminToastsConfig || !adminToastsConfig.interval_seconds || adminToastsConfig.interval_seconds < 25)) {
+          adminToastsConfig = json.toasts_config;
         }
-      } catch (e) { }
-
-      if (!currentPopupsConfig) {
-        try {
-          const stored = localStorage.getItem('AAROGYAM_NOTIFS_POPUPS_CONFIG');
-          if (stored) currentPopupsConfig = JSON.parse(stored);
-        } catch (e) { }
+        if (Array.isArray(json.live_toasts) && json.live_toasts.length > 0 && adminLiveToastsList.length < 20) {
+          adminLiveToastsList = json.live_toasts;
+        }
       }
+    } catch (e) { }
 
-      if (!currentPopupsConfig) {
-        currentPopupsConfig = {
-          social_proof_toasts: {
-            enabled: true,
-            interval_seconds: 10,
-            items: [
-              { name: "रामेश्वर पटेल", city_state: "इंदौर, MP", book_title: "खेती का डॉक्टर E-Book", cover_image: "/images/books/fasal-ka-doctor-cover.webp", time_ago: "2 मिनट पहले", avatar: "👨‍🌾" },
-              { name: "महेश शर्मा", city_state: "जयपुर, राजस्थान", book_title: "खरीफ फसल मास्टर गाइड 2026", cover_image: "/images/books/kharif-master-guide-2026-cover.webp", time_ago: "5 मिनट पहले", avatar: "👨" },
-              { name: "सुनीता देवी", city_state: "वाराणसी, UP", book_title: "सब्जियों की वैज्ञानिक खेती", cover_image: "/images/books/sabji-kheti-guide-cover.webp", time_ago: "9 मिनट पहले", avatar: "👩‍🌾" }
-            ]
-          },
-          exit_popup: {
-            enabled: true,
-            coupon_code: "KISAN10",
-            discount_text: "विशेष किसान छूट - 10% अतिरिक्त बचत!"
-          }
-        };
-      }
+    if (!adminToastsConfig) {
+      adminToastsConfig = {
+        enabled: true,
+        interval_seconds: 30,
+        display_duration_seconds: 6,
+        position: 'bottom_left',
+        animation: 'slide_up',
+        types_enabled: {
+          book_sell_toast: true,
+          user_sell_toast: true,
+          sakhi_user_ask_toast: true,
+          sakhi_curiosity_toast: true,
+          webpage_toast: true
+        }
+      };
     }
 
-    // Set form controls
-    const toastChk = document.getElementById('adm_popups_toasts_enabled');
-    const toastInterval = document.getElementById('adm_popups_interval');
-    const exitChk = document.getElementById('adm_popups_exit_enabled');
-    const exitCoupon = document.getElementById('adm_popups_coupon');
+    const chkEnabled = document.getElementById('adm_toast_global_enabled');
+    const inputInterval = document.getElementById('adm_toast_interval');
+    const inputDuration = document.getElementById('adm_toast_duration');
+    const selectPosition = document.getElementById('adm_toast_position');
+    const selectAnimation = document.getElementById('adm_toast_animation');
 
-    if (toastChk) toastChk.checked = currentPopupsConfig.social_proof_toasts?.enabled !== false;
-    if (toastInterval) toastInterval.value = currentPopupsConfig.social_proof_toasts?.interval_seconds || 10;
-    if (exitChk) exitChk.checked = currentPopupsConfig.exit_popup?.enabled !== false;
-    if (exitCoupon) exitCoupon.value = currentPopupsConfig.exit_popup?.coupon_code || 'KISAN10';
+    if (chkEnabled) chkEnabled.checked = adminToastsConfig.enabled !== false;
+    if (inputInterval) inputInterval.value = adminToastsConfig.interval_seconds || 30;
+    if (inputDuration) inputDuration.value = adminToastsConfig.display_duration_seconds || 6;
+    if (selectPosition) selectPosition.value = adminToastsConfig.position || 'bottom_left';
+    if (selectAnimation) selectAnimation.value = adminToastsConfig.animation || 'slide_up';
 
-    window.renderSocialProofItemsList();
+    const types = adminToastsConfig.types_enabled || {};
+    const tBook = document.getElementById('adm_type_book_sell');
+    const tUser = document.getElementById('adm_type_user_sell');
+    const tSakhi = document.getElementById('adm_type_sakhi_ask');
+    const tCurio = document.getElementById('adm_type_sakhi_curiosity');
+    const tWeb = document.getElementById('adm_type_webpage');
+
+    if (tBook) tBook.checked = types.book_sell_toast !== false;
+    if (tUser) tUser.checked = types.user_sell_toast !== false;
+    if (tSakhi) tSakhi.checked = types.sakhi_user_ask_toast !== false;
+    if (tCurio) tCurio.checked = types.sakhi_curiosity_toast !== false;
+    if (tWeb) tWeb.checked = types.webpage_toast !== false;
+
+    if (!currentEditingToastId && adminLiveToastsList.length > 0) {
+      window.editToastItem(adminLiveToastsList[0].id);
+    } else {
+      window.updateToastLivePreview();
+    }
+    window.renderLiveToastsTable();
   };
 
-  window.renderSocialProofItemsList = function () {
-    const wrap = document.getElementById('adm_social_proof_items_wrap');
-    if (!wrap) return;
+  window.handleToastTypeChange = function (type) {
+    const curioWrap = document.getElementById('ed_toast_curiosity_ans_wrap');
+    if (curioWrap) {
+      curioWrap.style.display = type === 'sakhi_curiosity_toast' ? 'block' : 'none';
+    }
 
-    const items = currentPopupsConfig?.social_proof_toasts?.items || [];
-    if (items.length === 0) {
-      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.85rem;text-align:center;padding:12px;">कोई सोशल प्रूफ आइटम नहीं है। ऊपर दिए बटन से नया जोड़ें।</div>';
+    const badgeInput = document.getElementById('ed_toast_badge');
+    const actionInput = document.getElementById('ed_toast_action_text');
+    if (badgeInput && !badgeInput.value) {
+      if (type === 'book_sell_toast') badgeInput.value = '🛒 सफल खरीद';
+      if (type === 'user_sell_toast') badgeInput.value = '👑 VIP मेंबर';
+      if (type === 'sakhi_user_ask_toast') badgeInput.value = '⚡ सखी AI लाइव सवाल';
+      if (type === 'sakhi_curiosity_toast') badgeInput.value = '💡 कृषि रहस्य';
+      if (type === 'webpage_toast') badgeInput.value = '🌿 प्राकृतिक उपचार';
+    }
+    if (actionInput && !actionInput.value) {
+      if (type === 'book_sell_toast') actionInput.value = '📖 विवरण देखें';
+      if (type === 'user_sell_toast') actionInput.value = '👑 VIP पास लें';
+      if (type === 'sakhi_user_ask_toast') actionInput.value = '🤖 सखी से पूछें';
+      if (type === 'sakhi_curiosity_toast') actionInput.value = '🧪 सही स्प्रे साइंस';
+      if (type === 'webpage_toast') actionInput.value = '👉 घरेलू नुस्खा देखें';
+    }
+    window.updateToastLivePreview();
+  };
+
+  function getToastFormData() {
+    return {
+      id: currentEditingToastId || ('tst_' + Date.now().toString(36)),
+      type: document.getElementById('ed_toast_type')?.value || 'book_sell_toast',
+      title: document.getElementById('ed_toast_title')?.value || 'सखाराम पाटिल (नासिक, महाराष्ट्र)',
+      message: document.getElementById('ed_toast_message')?.value || 'ने सखी AI से पूछा: प्याज में जलेबी रोग और थ्रिप्स का इलाज क्या है?',
+      price: document.getElementById('ed_toast_price')?.value || '',
+      badge: document.getElementById('ed_toast_badge')?.value || '🛒 सफल खरीद',
+      image: document.getElementById('ed_toast_image')?.value || '/images/books/kharif-master-guide-2026-cover.webp',
+      action_text: document.getElementById('ed_toast_action_text')?.value || '📖 विवरण देखें',
+      action_url: document.getElementById('ed_toast_action_url')?.value || '/ebooks/book-landing.html?id=BK016',
+      curiosity_answer: document.getElementById('ed_toast_curiosity_answer')?.value || '',
+      enabled: true
+    };
+  }
+
+  window.updateToastLivePreview = function () {
+    const previewBox = document.getElementById('admin-toast-live-preview-box');
+    if (!previewBox) return;
+    const toastData = getToastFormData();
+
+    if (typeof window.renderLiveToastCardHtml === 'function') {
+      try {
+        previewBox.innerHTML = window.renderLiveToastCardHtml(toastData);
+        return;
+      } catch (e) { }
+    }
+
+    // Bulletproof Standalone Live Preview Card
+    const title = toastData.title || 'सुरेश पाटिल (नासिक, महाराष्ट्र)';
+    const msg = toastData.message || "ने 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा मास्टर गाइड' खरीदी!";
+    const badge = toastData.badge || '🛒 सफल खरीद';
+    const actionText = toastData.action_text || '📖 विवरण देखें';
+    const priceTag = toastData.price ? `<span style="background:rgba(250,204,21,0.2);color:#facc15;font-weight:900;font-size:0.75rem;padding:1px 6px;border-radius:4px;margin-left:6px;">${toastData.price}</span>` : '';
+    const imgUrl = toastData.image || '/images/books/fasal-ka-doctor-cover.webp';
+
+    previewBox.innerHTML = `
+      <div style="background:linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #0f172a 100%);border:2px solid #f59e0b;border-radius:14px;padding:14px;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,0.55);max-width:380px;width:100%;box-sizing:border-box;font-family:inherit;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="background:rgba(245,158,11,0.25);color:#fbbf24;border:1px solid #f59e0b;font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:4px;letter-spacing:0.3px;">${badge}</span>
+          <span style="color:#94a3b8;font-size:0.7rem;font-weight:600;">⚡ 2 मिनट पहले</span>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:72px;height:52px;min-width:72px;background:#090d16;border-radius:8px;border:1.5px solid rgba(255,255,255,0.25);overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.3);flex-shrink:0;">
+            <img src="${imgUrl}" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.src='/images/logo/logo.png';" />
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:800;font-size:0.92rem;color:#f8fafc;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+            <div style="font-size:0.78rem;color:#cbd5e1;line-height:1.35;margin-top:4px;">${msg} ${priceTag}</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);">
+          <span style="font-size:0.7rem;color:#64748b;">Aarogyam Verified</span>
+          <span style="background:#16a34a;color:#fff;font-size:0.78rem;font-weight:800;padding:5px 14px;border-radius:20px;box-shadow:0 2px 8px rgba(22,163,74,0.4);">${actionText} ➔</span>
+        </div>
+      </div>
+    `;
+  };
+
+  window.resetToastFormToNew = function () {
+    currentEditingToastId = null;
+    document.getElementById('ed_toast_type').value = 'book_sell_toast';
+    document.getElementById('ed_toast_title').value = '';
+    document.getElementById('ed_toast_message').value = '';
+    document.getElementById('ed_toast_price').value = '';
+    document.getElementById('ed_toast_badge').value = '🛒 सफल खरीद';
+    document.getElementById('ed_toast_image').value = '/images/books/kharif-master-guide-2026-cover.webp';
+    document.getElementById('ed_toast_action_text').value = '📖 विवरण देखें';
+    document.getElementById('ed_toast_action_url').value = '/ebooks/book-landing.html?id=BK016';
+    document.getElementById('ed_toast_curiosity_answer').value = '';
+    document.getElementById('ed_toast_curiosity_ans_wrap').style.display = 'none';
+    window.updateToastLivePreview();
+  };
+
+  window.editToastItem = function (toastId) {
+    const found = adminLiveToastsList.find(t => t.id === toastId);
+    if (!found) return;
+
+    currentEditingToastId = found.id;
+    document.getElementById('ed_toast_type').value = found.type || 'book_sell_toast';
+    document.getElementById('ed_toast_title').value = found.title || '';
+    document.getElementById('ed_toast_message').value = found.message || '';
+    document.getElementById('ed_toast_price').value = found.price || '';
+    document.getElementById('ed_toast_badge').value = found.badge || '';
+    document.getElementById('ed_toast_image').value = found.image || '';
+    document.getElementById('ed_toast_action_text').value = found.action_text || '';
+    document.getElementById('ed_toast_action_url').value = found.action_url || '';
+    document.getElementById('ed_toast_curiosity_answer').value = found.curiosity_answer || '';
+
+    document.getElementById('ed_toast_curiosity_ans_wrap').style.display = found.type === 'sakhi_curiosity_toast' ? 'block' : 'none';
+    window.updateToastLivePreview();
+  };
+
+  window.submitSaveToastItem = function () {
+    const toastData = getToastFormData();
+    if (!toastData.title || !toastData.message) {
+      alert('⚠️ कृपया शीर्षक और संदेश भरें!');
       return;
     }
 
-    wrap.innerHTML = items.map((item, idx) => `
-      <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px 14px; display: grid; grid-template-columns: 50px 1fr 1fr 1.2fr 100px 50px; gap: 8px; align-items: center;">
-        <div>
-          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">अवतार</label>
-          <input type="text" value="${escapeHtml(item.avatar || '👨‍🌾')}" onchange="window.updateSocialProofField(${idx}, 'avatar', this.value)" class="admin-input" style="padding:4px 6px;text-align:center;font-size:1.1rem;width:100%;" />
-        </div>
-        <div>
-          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">खरीदार का नाम</label>
-          <input type="text" value="${escapeHtml(item.name || '')}" onchange="window.updateSocialProofField(${idx}, 'name', this.value)" placeholder="उदा. रामेश्वर पटेल" class="admin-input" style="padding:4px 8px;font-size:0.82rem;font-weight:700;width:100%;" />
-        </div>
-        <div>
-          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">स्थान (City, State)</label>
-          <input type="text" value="${escapeHtml(item.city_state || '')}" onchange="window.updateSocialProofField(${idx}, 'city_state', this.value)" placeholder="उदा. इंदौर, MP" class="admin-input" style="padding:4px 8px;font-size:0.82rem;width:100%;" />
-        </div>
-        <div>
-          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">पुस्तक का नाम</label>
-          <input type="text" value="${escapeHtml(item.book_title || '')}" onchange="window.updateSocialProofField(${idx}, 'book_title', this.value)" placeholder="उदा. खेती का डॉक्टर" class="admin-input" style="padding:4px 8px;font-size:0.82rem;color:#fde047;font-weight:700;width:100%;" />
-        </div>
-        <div>
-          <label class="admin-label" style="font-size:0.7rem;margin-bottom:2px;">समय (Time)</label>
-          <input type="text" value="${escapeHtml(item.time_ago || '2 मिनट पहले')}" onchange="window.updateSocialProofField(${idx}, 'time_ago', this.value)" placeholder="2 मिनट पहले" class="admin-input" style="padding:4px 6px;font-size:0.75rem;width:100%;" />
-        </div>
-        <div style="text-align:center;padding-top:14px;">
-          <button type="button" onclick="window.removeSocialProofItem(${idx})" class="admin-button small-button" style="background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#fca5a5;padding:4px 8px;" title="हटाएं">
-            🗑️
-          </button>
-        </div>
+    const idx = adminLiveToastsList.findIndex(t => t.id === toastData.id);
+    if (idx >= 0) {
+      adminLiveToastsList[idx] = toastData;
+      showToast('✏️ टोस्ट अपडेट कर दिया गया!', 'info');
+    } else {
+      adminLiveToastsList.unshift(toastData);
+      showToast('✨ नया टोस्ट जोड़ दिया गया!', 'success');
+    }
+
+    window.saveAllToastsConfig();
+    window.renderLiveToastsTable();
+  };
+
+  window.deleteToastItem = async function (toastId) {
+    if (!confirm('क्या आप इस टोस्ट को हटाना चाहते हैं? इसकी इमेज भी मेमोरी और डिस्क से पूरी तरह साफ कर दी जाएगी।')) return;
+    const target = adminLiveToastsList.find(t => t.id === toastId);
+    
+    // 🛡️ ZERO DISK / MEMORY LEAK: Clean up uploaded image file from server disk!
+    if (target && target.image && target.image.includes('/images/uploads/toasts/')) {
+      try {
+        fetch('/api/save_book_landing.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_toast_image',
+            image_path: target.image
+          })
+        }).catch(() => {});
+      } catch (e) { }
+    }
+
+    adminLiveToastsList = adminLiveToastsList.filter(t => t.id !== toastId);
+    window.saveAllToastsConfig();
+    window.renderLiveToastsTable();
+    showToast('🗑️ टोस्ट और उसकी इमेज मेमोरी व डिस्क से पूरी तरह हटा दी गई!', 'info');
+  };
+
+  window.toggleToastItemEnabled = function (toastId, enabled) {
+    const t = adminLiveToastsList.find(x => x.id === toastId);
+    if (t) {
+      t.enabled = enabled;
+      window.saveAllToastsConfig();
+      window.renderLiveToastsTable();
+    }
+  };
+
+
+  // 15 HIGH-CONVERTING READY-MADE TOAST PRESETS
+  const READY_MADE_TOAST_PRESETS = [
+    {
+      id: "p1",
+      name: "1. 🛒 [खरीद] खेती का डॉक्टर ई-बुक खरीद",
+      type: "book_sell_toast",
+      badge: "🛒 सफल खरीद",
+      title: "सुरेश पाटिल (नासिक, महाराष्ट्र)",
+      message: "ने 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा मास्टर गाइड' खरीदी!",
+      price: "₹99",
+      image: "/images/books/fasal-ka-doctor-cover.webp",
+      action_text: "📖 विवरण देखें",
+      action_url: "/ebooks/book-landing.html?id=BK002"
+    },
+    {
+      id: "p2",
+      name: "2. 🛒 [खरीद] खरीफ फसल मास्टर गाइड 2026",
+      type: "book_sell_toast",
+      badge: "🌾 खरीफ स्पेशल",
+      title: "रामकिशन यादव (सीकर, राजस्थान)",
+      message: "ने 'खरीफ फसल मास्टर गाइड 2026' डाउनलोड की!",
+      price: "₹99",
+      image: "/images/books/kharif-master-guide-2026-cover.webp",
+      action_text: "📖 अभी पढ़ें",
+      action_url: "/ebooks/book-landing.html?id=BK001"
+    },
+    {
+      id: "p3",
+      name: "3. 👑 [VIP] Aarogyam Pro VIP सदस्यता (1 Year)",
+      type: "user_sell_toast",
+      badge: "👑 VIP मेंबर",
+      title: "बलविंदर सिंह (लुधियाना, पंजाब)",
+      message: "ने Aarogyam Pro VIP 1-Year All-Access पास एक्टिवेट किया!",
+      price: "₹99/yr",
+      image: "/images/logo/logo.png",
+      action_text: "👑 VIP बनें",
+      action_url: "/ebooks/book-landing.html?id=SUB001"
+    },
+    {
+      id: "p4",
+      name: "4. 📦 [कॉम्बो] महाबचत 5-इन-1 किसान मास्टर कॉम्बो",
+      type: "book_sell_toast",
+      badge: "📦 90% महाबचत",
+      title: "कमलेश कुशवाहा (उज्जैन, MP)",
+      message: "ने 'महाबचत 5-इन-1 किसान मास्टर कॉम्बो (BUN001)' अनलॉक किया!",
+      price: "₹149",
+      image: "/images/banners/kisan-combo-offer.webp",
+      action_text: "📦 कॉम्बो लें",
+      action_url: "/bundle.html?id=BUN001"
+    },
+    {
+      id: "p5",
+      name: "5. 🍌 [खरीद] केले की खेती मास्टर गाइड",
+      type: "book_sell_toast",
+      badge: "🍌 बागवानी गाइड",
+      title: "दिनेश पटेल (आणंद, गुजरात)",
+      message: "ने 'केले की वैज्ञानिक खेती मास्टर गाइड (BK026)' खरीदी!",
+      price: "₹75",
+      image: "/images/books/bk026-cover.webp",
+      action_text: "🍌 विवरण देखें",
+      action_url: "/ebooks/book-landing.html?id=BK026"
+    },
+    {
+      id: "p6",
+      name: "6. 🐄 [खरीद] पशु पोषण व दुग्ध वृद्धि गाइड",
+      type: "book_sell_toast",
+      badge: "🐄 दुग्ध क्रांति",
+      title: "महेंद्र बिश्नोई (सिरसा, हरियाणा)",
+      message: "ने 'पशु पोषण, दुग्ध वृद्धि व थनैला मुक्ति गाइड (BK028)' खरीदी!",
+      price: "₹75",
+      image: "/images/books/bk028-cover.webp",
+      action_text: "🐄 किताब देखें",
+      action_url: "/ebooks/book-landing.html?id=BK028"
+    },
+    {
+      id: "p7",
+      name: "7. ⚡ [सखी सवाल] गेहूं में पीलापन व खाद",
+      type: "sakhi_user_ask_toast",
+      badge: "⚡ सखी AI लाइव सवाल",
+      title: "बलवंत जाट (सीकर, राजस्थान)",
+      message: "ने सखी AI से पूछा: 'गेहूं में पीलापन आ रहा है, कौन सा खाद व स्प्रे डालें?'",
+      image: "/images/sakhi/aarogyam-sakhi.webp",
+      action_text: "🤖 सखी से पूछें",
+      action_url: "/aarogyam-sakhi.html?q=गेहूं+पीलापन+खाद"
+    },
+    {
+      id: "p8",
+      name: "8. ⚡ [सखी सवाल] कपास व सोयाबीन में रसचूसक कीट",
+      type: "sakhi_user_ask_toast",
+      badge: "⚡ सखी AI लाइव सवाल",
+      title: "राजेंद्र देशमुख (अमरावती, महाराष्ट्र)",
+      message: "ने सखी AI से पूछा: 'कपास व सोयाबीन में रसचूसक कीटों का जैविक स्प्रे क्या है?'",
+      image: "/images/sakhi/aarogyam-sakhi.webp",
+      action_text: "🔬 समाधान देखें",
+      action_url: "/aarogyam-sakhi.html?q=कपास+सोयाबीन+कीट+स्प्रे"
+    },
+    {
+      id: "p9",
+      name: "9. ⚡ [सखी सवाल] गाय-भैंस का दूध व फैट वृद्धि",
+      type: "sakhi_user_ask_toast",
+      badge: "🐄 पशु डॉक्टर सवाल",
+      title: "मुकेश वर्मा (वाराणसी, UP)",
+      message: "ने सखी AI से पूछा: 'गाय-भैंस का दूध और फैट बढ़ाने का घरेलू नुस्खा क्या है?'",
+      image: "/images/sakhi/pashupalan-sakhi.webp",
+      action_text: "🥛 नुस्खा देखें",
+      action_url: "/aarogyam-sakhi.html?q=पशु+दूध+फैट+वृद्धि"
+    },
+    {
+      id: "p10",
+      name: "10. ⚡ [सखी सवाल] प्याज में जलेबी रोग व थ्रिप्स",
+      type: "sakhi_user_ask_toast",
+      badge: "🧅 सब्जी डॉक्टर",
+      title: "दत्तात्रेय शिंदे (पुणे, महाराष्ट्र)",
+      message: "ने सखी AI से पूछा: 'प्याज में जलेबी रोग और थ्रिप्स का तुरंत इलाज क्या है?'",
+      image: "/images/sakhi/aarogyam-sakhi.webp",
+      action_text: "🧅 इलाज देखें",
+      action_url: "/aarogyam-sakhi.html?q=प्याज+जलेबी+रोग+थ्रिप्स"
+    },
+    {
+      id: "p11",
+      name: "11. 💡 [रहस्य] दुधारू पशुओं में मिनरल मिक्चर का कमाल",
+      type: "sakhi_curiosity_toast",
+      badge: "💡 पशुपालन ज्ञान",
+      title: "🐄 क्या आप जानते हैं?",
+      message: "दुधारू पशुओं को रोजाना 50g मिनरल मिक्चर देने से 15% फैट और 1 लीटर दूध प्राकृतिक रूप से बढ़ता है!",
+      image: "/images/sakhi/pashupalan-sakhi.webp",
+      action_text: "🥛 डाइट चार्ट देखें",
+      action_url: "/aarogyam-sakhi.html?q=पशु+डाइट+चार्ट",
+      curiosity_answer: "संतुलित आहार में बाईपास फैट, चीलेटेड मिनरल्स और सूखा व हरा चारा 1:3 अनुपात में दें।"
+    },
+    {
+      id: "p12",
+      name: "12. 💡 [रहस्य] कीटनाशक स्प्रे का सर्वोत्तम समय",
+      type: "sakhi_curiosity_toast",
+      badge: "💡 स्प्रे साइंस",
+      title: "🌾 क्या आप जानते हैं?",
+      message: "कीटनाशक का स्प्रे सुबह 10 बजे से पहले या शाम 4 बजे के बाद ही करें जब पौधों के रंध्र (स्टोमेटा) खुले हों!",
+      image: "/images/sakhi/aarogyam-sakhi.webp",
+      action_text: "🌾 स्प्रे नियम देखें",
+      action_url: "/aarogyam-sakhi.html?q=स्प्रे+का+सही+समय",
+      curiosity_answer: "दोपहर की तेज धूप में दवा उड़ जाती है और पत्तियां झुलसने का खतरा 80% बढ़ जाता है।"
+    },
+    {
+      id: "p13",
+      name: "13. 🌿 [घरेलू नुस्खा] दांत दर्द व मसूड़ों की सूजन",
+      type: "webpage_toast",
+      badge: "🌿 प्राकृतिक उपचार",
+      title: "🩺 दांत दर्द व मसूड़ों की सूजन?",
+      message: "लौंग का तेल, बबूल की छाल और फिटकरी के कुल्ले से 5 मिनट में प्राकृतिक दर्द से राहत पाएं।",
+      image: "/images/logo/logo.png",
+      action_text: "👉 नुस्खा देखें",
+      action_url: "/aarogyam-sakhi.html?q=दांत+दर्द+घरेलू+नुस्खा"
+    },
+    {
+      id: "p14",
+      name: "14. 🌿 [घरेलू नुस्खा] जोड़ों का दर्द व यूरिक एसिड",
+      type: "webpage_toast",
+      badge: "🌿 प्राकृतिक उपचार",
+      title: "🩺 जोड़ों का दर्द व गठिया?",
+      message: "मेथी दाना, सोंठ और हरड़ का काढ़ा यूरिक एसिड घटाने और घुटनों के दर्द में रामबाण है।",
+      image: "/images/logo/logo.png",
+      action_text: "👉 उपचार देखें",
+      action_url: "/aarogyam-sakhi.html?q=गठिया+जोड़ों+का+दर्द"
+    },
+    {
+      id: "p15",
+      name: "15. 🌾 [मंडी भाव] दैनिक कृषि व मंडी भाव अपडेट",
+      type: "webpage_toast",
+      badge: "🌾 लाइव मंडी भाव",
+      title: "🌾 आज के प्रमुख मंडी भाव लाइव",
+      message: "सोयाबीन, गेहूं, चना, सरसों और मक्का के आज के ताजा मंडी भाव अपडेट हो गए हैं।",
+      image: "/images/logo/logo.png",
+      action_text: "🌾 भाव देखें",
+      action_url: "/mandi.html"
+    }
+  ];
+
+  const REAL_FARMER_NAMES = [
+    "रामकिशन यादव (सीकर, राजस्थान)",
+    "सुरेश पाटिल (नासिक, महाराष्ट्र)",
+    "बलविंदर सिंह (लुधियाना, पंजाब)",
+    "दिनेश पटेल (आणंद, गुजरात)",
+    "कमलेश कुशवाहा (उज्जैन, MP)",
+    "महेंद्र बिश्नोई (सिरसा, हरियाणा)",
+    "मुकेश वर्मा (वाराणसी, UP)",
+    "सुनील चौधरी (मेरठ, UP)",
+    "राजेंद्र देशमुख (अमरावती, महाराष्ट्र)",
+    "बलवंत जाट (सीकर, राजस्थान)",
+    "दत्तात्रेय शिंदे (पुणे, महाराष्ट्र)",
+    "हरप्रीत मान (बठिंडा, पंजाब)",
+    "ईश्वर सिंह (करनाल, हरियाणा)",
+    "विजय पाटीदार (खरगोन, MP)",
+    "नरेश गुर्जर (अलवर, राजस्थान)"
+  ];
+
+  window.generateRandomFarmerTitle = function () {
+    const rand = REAL_FARMER_NAMES[Math.floor(Math.random() * REAL_FARMER_NAMES.length)];
+    const titleEl = document.getElementById('ed_toast_title');
+    if (titleEl) {
+      titleEl.value = rand;
+      window.updateToastLivePreview();
+    }
+  };
+
+  window.applyToastPreset = function (presetId) {
+    if (!presetId) return;
+    const p = READY_MADE_TOAST_PRESETS.find(x => x.id === presetId);
+    if (!p) return;
+
+    if (document.getElementById('ed_toast_type')) document.getElementById('ed_toast_type').value = p.type;
+    if (document.getElementById('ed_toast_title')) document.getElementById('ed_toast_title').value = p.title;
+    if (document.getElementById('ed_toast_message')) document.getElementById('ed_toast_message').value = p.message;
+    if (document.getElementById('ed_toast_badge')) document.getElementById('ed_toast_badge').value = p.badge;
+    if (document.getElementById('ed_toast_image')) document.getElementById('ed_toast_image').value = p.image;
+    if (document.getElementById('ed_toast_price')) document.getElementById('ed_toast_price').value = p.price || '';
+    if (document.getElementById('ed_toast_action_text')) document.getElementById('ed_toast_action_text').value = p.action_text;
+    if (document.getElementById('ed_toast_action_url')) document.getElementById('ed_toast_action_url').value = p.action_url;
+    if (document.getElementById('ed_toast_curiosity_answer')) document.getElementById('ed_toast_curiosity_answer').value = p.curiosity_answer || '';
+
+    const curWrap = document.getElementById('ed_toast_curiosity_ans_wrap');
+    if (curWrap) curWrap.style.display = p.type === 'sakhi_curiosity_toast' ? 'block' : 'none';
+
+    window.updateToastLivePreview();
+  };
+
+  window.selectToastBadgePreset = function (val) {
+    if (!val) return;
+    const b = document.getElementById('ed_toast_badge');
+    if (b) {
+      b.value = val;
+      window.updateToastLivePreview();
+    }
+  };
+
+  window.selectToastUrlPreset = function (url, text) {
+    if (url && document.getElementById('ed_toast_action_url')) {
+      document.getElementById('ed_toast_action_url').value = url;
+    }
+    if (text && document.getElementById('ed_toast_action_text')) {
+      document.getElementById('ed_toast_action_text').value = text;
+    }
+    window.updateToastLivePreview();
+  };
+
+
+  window.renderLiveToastsTable = function () {
+    const wrap = document.getElementById('adm_live_toasts_table_wrap');
+    const badgeEl = document.getElementById('adm_toast_count_badge');
+    if (!wrap) return;
+
+    if (badgeEl) badgeEl.textContent = `${adminLiveToastsList.length} टोस्ट्स`;
+
+    if (adminLiveToastsList.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.85rem;text-align:center;padding:16px;">कोई सक्रिय टोस्ट नहीं है। ऊपर दिए फॉर्म से नया टोस्ट बनाएं।</div>';
+      return;
+    }
+
+    wrap.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${adminLiveToastsList.map((t, idx) => `
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 240px; flex: 1;">
+              <div style="width: 54px; height: 38px; min-width: 54px; border-radius: 6px; overflow: hidden; background: #0b1120; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <img src="${t.image || '/images/logo/logo.png'}" alt="Thumb" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png';" />
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 0.7rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.type}</span>
+                  <span style="font-size: 0.7rem; background: rgba(16,185,129,0.15); color: #34d399; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.badge || ''}</span>
+                  ${t.price ? `<span style="font-weight: 800; color: #fbbf24; font-size: 0.75rem;">${t.price}</span>` : ''}
+                </div>
+                <strong style="color: #f8fafc; font-size: 0.86rem; display: block; margin-top: 2px;">${escapeHtml(t.title)}</strong>
+                <p style="margin: 2px 0 0 0; color: var(--admin-muted); font-size: 0.76rem; max-width: 500px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(t.message)}</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <!-- 1. MOBILE PUSH SELECTION CHECKBOX -->
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 0.75rem; background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; padding: 4px 8px; border-radius: 6px; color: #34d399; font-weight: 800; cursor: pointer;">
+                <input type="checkbox" class="adm-push-check" ${t.push_selected ? 'checked' : ''} onchange="window.toggleToastPushSelected('${t.id}', this.checked)" style="accent-color: #10b981; width: 16px; height: 16px;" />
+                <span>📲 मोबाइल पुश</span>
+              </label>
+
+              <!-- 2. INSTANT 1-SEC TEST BUTTON -->
+              <button type="button" onclick="window.testSingleToastPush('${t.id}')" class="admin-button small-button" style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: 800; padding: 4px 8px;" title="अपने डिवाइस पर इस टोस्ट का 1-सेकंड टेस्ट पुश देखें">
+                ⚡ टेस्ट
+              </button>
+
+              <!-- 3. WEB ACTIVE TOGGLE -->
+              <label style="display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" ${t.enabled !== false ? 'checked' : ''} onchange="window.toggleToastItemEnabled('${t.id}', this.checked)" style="accent-color: #10b981;" />
+                <span>वेब</span>
+              </label>
+
+              <button type="button" onclick="window.editToastItem('${t.id}')" class="admin-button small-button" style="background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fbbf24; font-weight: 700;">
+                ✏️
+              </button>
+              <button type="button" onclick="window.deleteToastItem('${t.id}')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171;" title="हटाएं">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `).join('')}
       </div>
-    `).join('');
+    `;
+    window.updateSelectedPushCounter();
   };
 
-  window.addSocialProofItem = function () {
-    if (!currentPopupsConfig) currentPopupsConfig = { social_proof_toasts: { enabled: true, items: [] } };
-    if (!currentPopupsConfig.social_proof_toasts) currentPopupsConfig.social_proof_toasts = { enabled: true, items: [] };
-    if (!Array.isArray(currentPopupsConfig.social_proof_toasts.items)) currentPopupsConfig.social_proof_toasts.items = [];
+  // -------------------------------------------------------------
+  // AUTOMATIC CLIENT-SIDE KB IMAGE COMPRESSOR & DISK PERSISTENCE
+  // -------------------------------------------------------------
+  window.handleToastImageUpload = function (input) {
+    if (!input || !input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const statusEl = document.getElementById('ed_toast_upload_status');
+    if (statusEl) statusEl.textContent = '⏳ इमेज कंप्रेस व सुरक्षित की जा रही है...';
 
-    currentPopupsConfig.social_proof_toasts.items.push({
-      name: "नया किसान",
-      city_state: "मध्य प्रदेश",
-      book_title: "खेती का डॉक्टर",
-      cover_image: "/images/books/fasal-ka-doctor-cover.webp",
-      time_ago: "1 मिनट पहले",
-      avatar: "👨‍🌾"
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = async function () {
+        const canvas = document.createElement('canvas');
+        const maxDim = 640;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const webpData = canvas.toDataURL('image/webp', 0.85);
+        const kbSize = Math.round((webpData.length * 3) / 4 / 1024);
+
+        const imgInput = document.getElementById('ed_toast_image');
+        let finalImageUrl = webpData;
+
+        // Auto-save to physical disk file to keep JSON / LocalStorage memory tiny and prevent leaks
+        try {
+          const resp = await fetch('/api/save_book_landing.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'save_toast_image',
+              image_base64: webpData
+            })
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data.success && data.image_url) {
+              finalImageUrl = data.image_url;
+            }
+          }
+        } catch (netErr) { }
+
+        if (imgInput) imgInput.value = finalImageUrl;
+        if (statusEl) statusEl.innerHTML = `<span style="color:#10b981;">✅ सफल! मात्र ${kbSize} KB (WebP) में सेव हुई (जीरो मेमोरी लीक)</span>`;
+        window.updateToastLivePreview();
+        if (typeof showToast === 'function') {
+          showToast(`✅ फोटो सफलता से ${kbSize}KB WebP में सेव हो गई!`, 'success');
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // -------------------------------------------------------------
+  // MOBILE PUSH SELECTION & DISPATCH CONTROLLER
+  // -------------------------------------------------------------
+  window.toggleToastPushSelected = function (toastId, isChecked) {
+    const t = adminLiveToastsList.find(x => x.id === toastId);
+    if (t) {
+      t.push_selected = isChecked;
+    }
+    window.updateSelectedPushCounter();
+  };
+
+  window.toggleSelectAllPushToasts = function (isChecked) {
+    adminLiveToastsList.forEach(t => {
+      t.push_selected = isChecked;
     });
-    window.renderSocialProofItemsList();
-    showToast('✨ नया सोशल प्रूफ आइटम जोड़ा गया!', 'info');
+    window.renderLiveToastsTable();
   };
 
-  window.removeSocialProofItem = function (idx) {
-    if (currentPopupsConfig?.social_proof_toasts?.items) {
-      currentPopupsConfig.social_proof_toasts.items.splice(idx, 1);
-      window.renderSocialProofItemsList();
-      showToast('🗑️ आइटम हटा दिया गया', 'info');
+  window.updateSelectedPushCounter = function () {
+    const selectedCount = adminLiveToastsList.filter(t => t.push_selected).length;
+    const badge = document.getElementById('adm_selected_push_count');
+    if (badge) badge.textContent = selectedCount;
+    const chkAll = document.getElementById('adm_select_all_push_toggle');
+    if (chkAll) chkAll.checked = selectedCount > 0 && selectedCount === adminLiveToastsList.length;
+  };
+
+  window.testSingleToastPush = async function (toastId) {
+    const t = adminLiveToastsList.find(x => x.id === toastId);
+    if (!t) return;
+    await window.triggerNativePushNotification(t);
+  };
+
+  window.testInstantMobilePushAlert = async function () {
+    const selected = adminLiveToastsList.filter(t => t.push_selected);
+    const target = selected.length > 0 ? selected[0] : (adminLiveToastsList[0] || null);
+    if (!target) {
+      alert('कोई टोस्ट उपलब्ध नहीं है!');
+      return;
     }
+    await window.triggerNativePushNotification(target);
   };
 
-  window.updateSocialProofField = function (idx, field, val) {
-    if (currentPopupsConfig?.social_proof_toasts?.items?.[idx]) {
-      currentPopupsConfig.social_proof_toasts.items[idx][field] = val;
+  window.triggerNativePushNotification = async function (toast) {
+    if (!('Notification' in window)) {
+      alert('आपके ब्राउज़र में नोटिफिकेशन सपोर्ट उपलब्ध नहीं है।');
+      return;
     }
-  };
-
-  window.savePopupsConfig = async function () {
-    if (!currentPopupsConfig) currentPopupsConfig = { social_proof_toasts: {}, exit_popup: {} };
-
-    const toastChk = document.getElementById('adm_popups_toasts_enabled');
-    const toastInterval = document.getElementById('adm_popups_interval');
-    const exitChk = document.getElementById('adm_popups_exit_enabled');
-    const exitCoupon = document.getElementById('adm_popups_coupon');
-
-    currentPopupsConfig.social_proof_toasts = {
-      ...(currentPopupsConfig.social_proof_toasts || {}),
-      enabled: toastChk ? toastChk.checked : true,
-      interval_seconds: toastInterval ? (parseInt(toastInterval.value, 10) || 10) : 10,
-      items: currentPopupsConfig.social_proof_toasts?.items || []
-    };
-
-    currentPopupsConfig.exit_popup = {
-      ...(currentPopupsConfig.exit_popup || {}),
-      enabled: exitChk ? exitChk.checked : true,
-      coupon_code: exitCoupon ? (exitCoupon.value.trim() || 'KISAN10') : 'KISAN10'
-    };
+    if (Notification.permission !== 'granted') {
+      const res = await Notification.requestPermission();
+      if (res !== 'granted') {
+        alert('कृपया ब्राउज़र से नोटिफिकेशन की अनुमति (Allow) दें!');
+        return;
+      }
+    }
 
     try {
-      localStorage.setItem('AAROGYAM_NOTIFS_POPUPS_CONFIG', JSON.stringify(currentPopupsConfig));
+      // 🛡️ ZERO CROP GUARANTEE:
+      // 1. 'icon' MUST be the crisp 1:1 square app logo. If a 16:9 banner is set as 'icon', Windows & Android crop it into a square!
+      // 2. 'image' displays the full-width uncropped banner (BigPictureStyle) on Android & Windows!
+      const squareAppIcon = '/images/icons/pwa-icon-192x192.png';
+      const wideBanner = toast.image || undefined;
+
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        if (reg && reg.showNotification) {
+          await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
+            body: toast.message || '',
+            icon: squareAppIcon,
+            badge: '/images/icons/pwa-icon-96x96.png',
+            image: wideBanner,
+            tag: 'aarogyam_live_toast',
+            renotify: true,
+            vibrate: [200, 100, 200],
+            data: {
+              url: toast.action_url || '/'
+            }
+          });
+          if (typeof showToast === 'function') {
+            showToast('⚡ टेस्ट पुश नोटिफिकेशन आपके डिवाइस पर बज गया!', 'success');
+          }
+          return;
+        }
+      }
+      new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
+        body: toast.message || '',
+        icon: squareAppIcon,
+        image: wideBanner,
+        tag: 'aarogyam_live_toast'
+      });
+      if (typeof showToast === 'function') {
+        showToast('⚡ टेस्ट पुश नोटिफिकेशन आपकी स्क्रीन पर आ गया!', 'success');
+      }
+    } catch (e) {
+      alert('नोटिफिकेशन एरर: ' + e.message);
+    }
+  };
+
+  window.dispatchSelectedToastsToMobilePush = async function () {
+    const selectedToasts = adminLiveToastsList.filter(t => t.push_selected);
+    if (selectedToasts.length === 0) {
+      alert('कृपया नीचे दी गई सूची में कम से कम 1 या 2 टोस्ट्स के आगे "📲 मोबाइल पुश" चेकबॉक्स टिक करें!');
+      return;
+    }
+
+    const intervalSelect = document.getElementById('adm_mobile_push_interval');
+    const intervalVal = intervalSelect ? intervalSelect.value : '3';
+    const validitySelect = document.getElementById('adm_mobile_push_validity');
+    const validityHours = validitySelect ? parseInt(validitySelect.value, 10) : 24;
+
+    let shelvesMaster = null;
+    try {
+      shelvesMaster = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+    } catch (e) { }
+    if (!shelvesMaster) {
+      try {
+        const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+        if (res.ok) shelvesMaster = await res.json();
+      } catch (e) { }
+    }
+    if (!shelvesMaster) shelvesMaster = {};
+
+    shelvesMaster.active_mobile_push_queue = selectedToasts;
+    shelvesMaster.mobile_push_config = {
+      enabled: true,
+      interval_mode: intervalVal,
+      interval_hours: intervalVal === 'now' ? 0 : parseInt(intervalVal, 10),
+      validity_hours: validityHours,
+      dispatched_at: new Date().toISOString(),
+      active_count: selectedToasts.length
+    };
+    shelvesMaster.updated_at = new Date().toISOString();
+
+    try {
+      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
+      localStorage.setItem('AAROGYAM_NOTIF_DISPATCH_TIME', String(Date.now()));
+      localStorage.setItem('AAROGYAM_LATEST_PUSHED_TOAST', JSON.stringify(selectedToasts[0]));
     } catch (e) { }
 
-    // Save to server
     try {
-      const res = await fetch('/api/save_book_landing.php', {
+      await fetch('/api/save_book_landing.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'save_popups',
-          popupsConfig: currentPopupsConfig
+          action: 'save_shelves_config',
+          shelvesConfig: shelvesMaster
         })
       });
-      if (res.ok) {
-        showToast('🎉 सोशल प्रूफ व पॉपअप सेटिंग्स सर्वर पर सुरक्षित हो गईं!', 'success');
-        return;
-      }
     } catch (e) { }
 
-    showToast('💾 सोशल प्रूफ व पॉपअप सेटिंग्स सुरक्षित हो गईं!', 'success');
+    // Instant sync to top Header Bell Notification Panel
+    if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.syncPushedToasts === 'function') {
+      window.USER_NOTIFICATIONS.syncPushedToasts(true);
+    }
+    window.dispatchEvent(new CustomEvent('aarogyam:new-push-toast', { detail: selectedToasts[0] }));
+
+    // Immediate first push trigger (right NOW!)
+    await window.triggerNativePushNotification(selectedToasts[0]);
+
+    if (intervalVal === 'now') {
+      if (typeof showToast === 'function') {
+        showToast(`🚀 [NOW] ${selectedToasts.length} टोस्ट्स तुरंत मोबाइल नोटिफिकेशन में सक्रिय कर दिए गए!`, 'success');
+      }
+    } else {
+      if (typeof showToast === 'function') {
+        showToast(`📲 सफलता! पहला पुश अभी भेजा गया, और शेष ${selectedToasts.length} टोस्ट्स हर ${intervalVal} घंटे के शेड्यूलर (वैधता: ${validityHours ? validityHours + ' घंटे' : 'असीमित'}) में लॉक कर दिए गए!`, 'success');
+      }
+    }
+  };
+
+  // -------------------------------------------------------------
+  // TURN OFF / PAUSE MOBILE PUSH
+  // -------------------------------------------------------------
+  window.toggleMobilePushPowerOff = async function () {
+    let shelvesMaster = null;
+    try {
+      shelvesMaster = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+    } catch (e) { }
+    if (!shelvesMaster) {
+      try {
+        const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+        if (res.ok) shelvesMaster = await res.json();
+      } catch (e) { }
+    }
+    if (!shelvesMaster) shelvesMaster = {};
+    if (!shelvesMaster.mobile_push_config) shelvesMaster.mobile_push_config = {};
+
+    shelvesMaster.mobile_push_config.enabled = false;
+    shelvesMaster.updated_at = new Date().toISOString();
+
+    try {
+      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
+    } catch (e) { }
+
+    try {
+      await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_shelves_config',
+          shelvesConfig: shelvesMaster
+        })
+      });
+    } catch (e) { }
+
+    if (typeof showToast === 'function') {
+      showToast('⏹️ मोबाइल पुश नोटिफिकेशन शेड्यूलर सफलतापूर्वक बंद (PAUSED) कर दिया गया!', 'info');
+    }
+  };
+
+  window.saveAllToastsConfig = async function () {
+    const chkEnabled = document.getElementById('adm_toast_global_enabled');
+    const inputInterval = document.getElementById('adm_toast_interval');
+    const inputDuration = document.getElementById('adm_toast_duration');
+    const selectPosition = document.getElementById('adm_toast_position');
+    const selectAnimation = document.getElementById('adm_toast_animation');
+
+    adminToastsConfig = {
+      enabled: chkEnabled ? chkEnabled.checked : true,
+      interval_seconds: inputInterval ? (parseInt(inputInterval.value, 10) || 30) : 30,
+      display_duration_seconds: inputDuration ? (parseInt(inputDuration.value, 10) || 6) : 6,
+      position: selectPosition ? selectPosition.value : 'bottom_left',
+      animation: selectAnimation ? selectAnimation.value : 'slide_up',
+      types_enabled: {
+        book_sell_toast: document.getElementById('adm_type_book_sell')?.checked ?? true,
+        user_sell_toast: document.getElementById('adm_type_user_sell')?.checked ?? true,
+        sakhi_user_ask_toast: document.getElementById('adm_type_sakhi_ask')?.checked ?? true,
+        sakhi_curiosity_toast: document.getElementById('adm_type_sakhi_curiosity')?.checked ?? true,
+        webpage_toast: document.getElementById('adm_type_webpage')?.checked ?? true
+      }
+    };
+
+    let shelvesMaster = null;
+    try {
+      shelvesMaster = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+    } catch (e) { }
+    if (!shelvesMaster) {
+      try {
+        const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+        if (res.ok) shelvesMaster = await res.json();
+      } catch (e) { }
+    }
+    if (!shelvesMaster) shelvesMaster = {};
+
+    shelvesMaster.toasts_config = adminToastsConfig;
+    shelvesMaster.live_toasts = adminLiveToastsList;
+    shelvesMaster.updated_at = new Date().toISOString();
+
+    try {
+      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
+    } catch (e) { }
+
+    try {
+      await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_shelves_config',
+          shelvesConfig: shelvesMaster
+        })
+      });
+    } catch (e) { }
+
+    showToast('🎉 सभी लाइव टोस्ट्स व सेटिंग्स सुरक्षित हो गईं!', 'success');
+  };
+
+  // -------------------------------------------------------------
+  // SUB-TAB 5: AI PROFILE BRAIN & USER INTENT MONITOR
+  // -------------------------------------------------------------
+  window.renderAiProfileBrainTab = function () {
+    const wrap = document.getElementById('admin-ai-profile-brain-status-wrap');
+    if (!wrap) return;
+
+    const brain = window.AarogyamAiProfileBrain;
+    if (!brain) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);padding:20px;text-align:center;">AI Profile Brain स्क्रिप्ट लोड नहीं हो सकी। कृपया पेज रीलोड करें।</div>';
+      return;
+    }
+
+    const profile = brain.getProfile();
+    const scores = brain.getScores();
+    const pills = brain.getCachedPills();
+
+    wrap.innerHTML = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div class="admin-card" style="padding: 14px; background: var(--admin-surface-2, #0f172a); border-left: 4px solid #10b981;">
+          <div style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">👤 अनाम प्रोफाइल आईडी (Zero PII)</div>
+          <div style="font-size: 0.92rem; font-weight: 800; color: #34d399; margin-top: 4px; font-family: monospace; word-break: break-all;">
+            ${profile.profile_id}
+          </div>
+        </div>
+        <div class="admin-card" style="padding: 14px; background: var(--admin-surface-2, #0f172a); border-left: 4px solid #38bdf8;">
+          <div style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">🎯 एक्टिव यूजर इंटेंट स्कोर</div>
+          <div style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; margin-top: 4px;">
+            ${scores.user_score} <span style="font-size: 0.8rem; color: var(--admin-muted); font-weight: 600;">/ 100</span>
+          </div>
+        </div>
+        <div class="admin-card" style="padding: 14px; background: var(--admin-surface-2, #0f172a); border-left: 4px solid #f59e0b;">
+          <div style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">👑 प्रभावी डोमेन (Dominant Domain)</div>
+          <div style="font-size: 1.2rem; font-weight: 900; color: #fbbf24; margin-top: 4px;">
+            ${profile.dominant_domain === 'agri' ? '🌾 कृषि व फसल (Agriculture)' :
+        profile.dominant_domain === 'business' ? '💼 बिजनेस व कमाई (Business)' :
+          profile.dominant_domain === 'health' ? '🩺 स्वास्थ्य व पशुपालन (Health)' : '❄️ नया यूजर (Cold Start)'}
+          </div>
+        </div>
+        <div class="admin-card" style="padding: 14px; background: var(--admin-surface-2, #0f172a); border-left: 4px solid #a855f7;">
+          <div style="font-size: 0.75rem; color: var(--admin-muted); font-weight: 700;">⚡ कुल इंटरैक्शन काउंट</div>
+          <div style="font-size: 1.6rem; font-weight: 900; color: #c084fc; margin-top: 4px;">
+            ${profile.interaction_count}
+          </div>
+        </div>
+      </div>
+
+      <!-- SCORES BREAKDOWN PROGRESS BARS -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; font-weight: 800; color: #f8fafc;">
+          📊 इंटेंट स्कोर वितरण (Intent Weight Breakdown)
+        </h4>
+        
+        <div style="margin-bottom: 12px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+            <span style="font-weight:700;color:#86efac;">🌾 Regular Interest (फसल / कृषि) — 50% Weight</span>
+            <span style="font-weight:900;color:#86efac;">${scores.regular_interest || 0} / 100</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${Math.min(100, scores.regular_interest || 0)}%;background:#22c55e;border-radius:4px;transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+            <span style="font-weight:700;color:#fde047;">💼 Business Interest (कमाई / VIP) — 30% Weight</span>
+            <span style="font-weight:900;color:#fde047;">${scores.business_interest || 0} / 100</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${Math.min(100, scores.business_interest || 0)}%;background:#f59e0b;border-radius:4px;transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+            <span style="font-weight:700;color:#7dd3fc;">🩺 Exploratory / Health (स्वास्थ्य / पशुपालन) — 20% Weight</span>
+            <span style="font-weight:900;color:#7dd3fc;">${scores.exploratory_health || 0} / 100</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${Math.min(100, scores.exploratory_health || 0)}%;background:#0284c7;border-radius:4px;transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOCAL CACHED PILLS QUEUE (10-15 CARDS) -->
+      <div style="background: var(--admin-surface-2, #0f172a); border: 1px solid var(--admin-border); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: #f8fafc;">
+            📦 लोकल शेड्यूल्ड एंगेजमेंट पिल्स (${pills.length} कतारबद्ध)
+          </h4>
+          <span style="font-size: 0.72rem; color: var(--admin-muted);">Supabase पर बिना लोड डाले लोकल टाइमर से ट्रिगर होते हैं</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+          ${pills.map(p => `
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: flex-start;">
+              <img src="${p.image || '/images/logo/logo.png'}" alt="Thumb" style="width: 32px; height: 42px; object-fit: cover; border-radius: 4px; flex-shrink: 0;" />
+              <div>
+                <span style="font-size: 0.68rem; background: rgba(56,189,248,0.2); color: #38bdf8; padding: 1px 5px; border-radius: 3px; font-weight: 800;">${p.badge || p.type}</span>
+                <strong style="display: block; font-size: 0.82rem; color: #fff; margin-top: 3px;">${escapeHtml(p.title)}</strong>
+                <p style="margin: 2px 0 0 0; font-size: 0.74rem; color: var(--admin-muted); line-height: 1.2;">${escapeHtml(p.message)}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- TEST INTENT SIMULATOR -->
+      <div style="background: rgba(16,185,129,0.06); border: 1.5px dashed #10b981; border-radius: 12px; padding: 16px;">
+        <h4 style="margin: 0 0 8px 0; font-size: 0.95rem; font-weight: 800; color: #34d399;">
+          🧪 लाइव इंटेंट सिम्युलेटर (Test User Intent In Real-Time)
+        </h4>
+        <p style="font-size: 0.8rem; color: var(--admin-muted); margin-bottom: 12px;">
+          किसी भी विषय (उदा. "प्याज में जलेबी रोग", "घर बैठे पैसे कमाएँ", "गाय का दूध बढ़ाएं") को टेस्ट करके प्रोफाइल ब्रेन का रिस्पॉन्स देखें:
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="ai_test_topic_input" placeholder="उदा. लहसुन की फसल में थ्रिप्स व पीलापन" class="admin-input" style="flex: 1; padding: 8px 12px;" />
+          <button type="button" onclick="window.simulateAiIntent()" class="admin-button" style="background: #10b981; color: #000; font-weight: 800; white-space: nowrap;">
+            ⚡ सिम्युलेट करें
+          </button>
+          <button type="button" onclick="window.resetAiProfile()" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171; white-space: nowrap;">
+            🔄 रिसेट प्रोफाइल
+          </button>
+        </div>
+      </div>
+    `;
+  };
+
+  window.simulateAiIntent = function () {
+    const input = document.getElementById('ai_test_topic_input');
+    const val = input ? input.value.trim() : '';
+    if (!val) {
+      alert('कृपया कोई टेस्ट टॉपिक या सवाल दर्ज करें!');
+      return;
+    }
+    if (window.AarogyamAiProfileBrain) {
+      window.AarogyamAiProfileBrain.recordInteraction('test_simulation', val);
+      window.renderAiProfileBrainTab();
+      showToast(`🎯 इंटेंट सिम्युलेट किया गया: '${val}'`, 'success');
+    }
+  };
+
+  window.resetAiProfile = function () {
+    if (confirm('क्या आप टेस्ट प्रोफाइल डेटा रिसेट करना चाहते हैं?')) {
+      if (window.AarogyamAiProfileBrain) {
+        window.AarogyamAiProfileBrain.resetProfile();
+        window.renderAiProfileBrainTab();
+        showToast('🔄 प्रोफाइल सफलता पूर्वक रिसेट हो गई!', 'info');
+      }
+    }
   };
 
   // -------------------------------------------------------------
@@ -5571,243 +6811,563 @@ Instant Download & Lifetime Access
   document.getElementById('btn_gen_fd_code')?.addEventListener('click', window.autoGenerateFdCode);
 
   // -------------------------------------------------------------
-  // RENDER STORE SHELVES & SEGMENTS MANAGER
+  // RENDER DYNAMIC STORE SHELVES & WINDOWS MANAGER
   // -------------------------------------------------------------
-  window.renderStoreShelvesTab = function () {
+  let adminShelvesMaster = null;
+
+  async function loadAdminShelvesConfig() {
+    try {
+      const local = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+      if (local && Array.isArray(local.shelves)) {
+        adminShelvesMaster = local;
+      }
+    } catch (e) { }
+
+    if (!adminShelvesMaster) {
+      try {
+        const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+        if (res.ok) {
+          adminShelvesMaster = await res.json();
+        }
+      } catch (e) { }
+    }
+
+    if (!adminShelvesMaster || !Array.isArray(adminShelvesMaster.shelves)) {
+      adminShelvesMaster = {
+        updated_at: new Date().toISOString(),
+        shelves: [],
+        landing_page_windows: {}
+      };
+    }
+  }
+
+  window.renderStoreShelvesTab = async function () {
     const wrap = document.getElementById('admin-shelves-grid-container');
     if (!wrap) return;
 
-    // Combine all unique books from books.json + custom books + landing pages
-    const combinedBooksMap = new Map();
+    await loadAdminShelvesConfig();
+
+    // Map unique catalog books
+    const catalogBooksMap = new Map();
     allBooks.forEach(b => {
       if (b && b.id) {
-        combinedBooksMap.set(b.id, {
+        catalogBooksMap.set(String(b.id).toUpperCase().trim(), {
           id: b.id,
           title: b.heading || b.name || b.id,
           cover: b.cover || b.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
           category: b.category || 'Agriculture',
-          offerPrice: b.offerPrice || 99,
-          mrp: b.mrp || 299,
-          badge: b.badge || b.store_badge || (b.isComingSoon || b.status === 'coming_soon' ? 'coming_soon' : 'best_seller'),
-          isComingSoon: b.isComingSoon || b.status === 'coming_soon'
+          offerPrice: b.offerPrice || 99
         });
       }
     });
     allLandingPages.forEach(p => {
       if (p && p.id) {
-        const existing = combinedBooksMap.get(p.id) || {};
-        combinedBooksMap.set(p.id, {
+        const existing = catalogBooksMap.get(String(p.id).toUpperCase().trim()) || {};
+        catalogBooksMap.set(String(p.id).toUpperCase().trim(), {
           ...existing,
           id: p.id,
           title: p.hero?.title || existing.title || p.id,
           cover: p.hero?.cover_image || existing.cover || '/images/books/kharif-master-guide-2026-cover.webp',
           category: p.category || existing.category || 'Agriculture',
-          offerPrice: p.hero?.offer_price || existing.offerPrice || 99,
-          mrp: p.hero?.mrp || existing.mrp || 299,
-          badge: p.store_badge || existing.badge || 'best_seller',
-          isComingSoon: p.is_coming_soon || existing.isComingSoon || false
+          offerPrice: p.hero?.offer_price || existing.offerPrice || 99
         });
       }
     });
 
-    const uniqueBookList = Array.from(combinedBooksMap.values());
+    const catalogList = Array.from(catalogBooksMap.values());
 
-    const shelves = [
-      { key: 'best_seller', title: '🔥 Best Sellers Shelf (सर्वाधिक बिकने वाली)', desc: 'स्टोर पर सबसे ऊपर मुख्य ग्रिड में दिखने वाली ई-बुक्स।' },
-      { key: 'new_arrival', title: '🆕 New Arrivals Shelf (नई पुस्तकें)', desc: 'हाल ही में जोड़ी गई नई ई-बुक्स और रिसर्च गाइड्स।' },
-      { key: 'trending', title: '⭐ Trending Shelf (ट्रेंडिंग)', desc: 'सर्वाधिक खोजी व चर्चित ई-बुक्स।' },
-      { key: 'coming_soon', title: '⏳ Coming Soon Shelf (आगामी पुस्तकें)', desc: 'प्री-लॉन्च पुस्तकें जहाँ किसान "Notify Me" बटन दबा सकते हैं।' }
+    // Map bundles
+    let bundleList = [
+      { id: 'BUN001', name: '🌾 3-Book कृषि सुरक्षा महा-कॉम्बो बंडल', price: 198 },
+      { id: 'BUN002', name: '👑 Complete Farm Master Collection (All 6 Books)', price: 349 }
     ];
 
+    const shelves = adminShelvesMaster.shelves || [];
+
     wrap.innerHTML = shelves.map(shelf => {
-      const booksInShelf = uniqueBookList.filter(b => {
-        const lp = allLandingPages.find(p => p.id === b.id);
-        const currentBadge = lp ? (lp.store_badge || (lp.is_coming_soon ? 'coming_soon' : '')) : (b.badge || (b.isComingSoon ? 'coming_soon' : ''));
-        return currentBadge === shelf.key || (shelf.key === 'coming_soon' && (b.isComingSoon || lp?.is_coming_soon));
-      });
+      const isBundles = shelf.type === 'bundles';
+      const itemIds = isBundles ? (shelf.bundle_ids || []) : (shelf.book_ids || []);
+      const dispStyle = shelf.display_style || 'horizontal_scroll';
+      const pages = Array.isArray(shelf.display_pages) ? shelf.display_pages : [];
 
       return `
-        <div style="background:var(--admin-surface, #1e293b);border:1.5px solid var(--admin-border);border-radius:12px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <div style="font-weight:800;font-size:1rem;color:#f8fafc;">
-              ${shelf.title}
+        <div style="background:var(--admin-surface, #1e293b);border:1.5px solid var(--admin-border);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,0.25);display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;">
+              <div>
+                ${shelf.badge ? `<span style="font-size:0.68rem;background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid #f59e0b;padding:2px 6px;border-radius:4px;font-weight:800;display:inline-block;margin-bottom:4px;">${shelf.badge}</span>` : ''}
+                <h4 style="margin:0;font-size:1.02rem;font-weight:800;color:#f8fafc;line-height:1.25;">${escapeHtml(shelf.title)}</h4>
+                ${shelf.subtitle ? `<p style="margin:2px 0 0 0;font-size:0.75rem;color:var(--admin-muted);line-height:1.2;">${escapeHtml(shelf.subtitle)}</p>` : ''}
+              </div>
+              <label style="display:flex;align-items:center;gap:4px;font-size:0.75rem;color:#cbd5e1;cursor:pointer;white-space:nowrap;">
+                <input type="checkbox" ${shelf.enabled !== false ? 'checked' : ''} onchange="window.toggleShelfEnabled('${shelf.id}', this.checked)" style="accent-color:#10b981;" />
+                <span>सक्रिय</span>
+              </label>
             </div>
-            <span style="font-size:0.75rem;background:rgba(168,85,247,0.15);color:#c084fc;padding:2px 8px;border-radius:12px;font-weight:800;">
-              ${booksInShelf.length} पुस्तकें
-            </span>
-          </div>
-          <p style="font-size:0.75rem;color:var(--admin-muted);margin-bottom:12px;">
-            ${shelf.desc}
-          </p>
 
-          <div style="background:#0f172a;border-radius:8px;padding:10px;min-height:90px;max-height:220px;overflow-y:auto;margin-bottom:12px;">
-            ${booksInShelf.length === 0 ? '<div style="color:var(--admin-muted);font-size:0.78rem;text-align:center;padding:10px;">इस शेल्फ में अभी कोई पुस्तक नहीं है।</div>' :
-          booksInShelf.map(b => `
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1e293b;gap:8px;">
-                  <div style="display:flex;align-items:center;gap:8px;overflow:hidden;">
-                    <img src="${b.cover}" alt="Cover" style="width:26px;height:34px;object-fit:cover;border-radius:3px;flex-shrink:0;" />
-                    <span style="font-size:0.82rem;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${b.title}">
-                      [${b.id}] ${b.title}
-                    </span>
-                  </div>
-                  <button type="button" onclick="window.removeBookFromShelf('${b.id}')" style="background:rgba(239,68,68,0.1);border:1px solid #ef4444;color:#ef4444;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:0.75rem;font-weight:800;flex-shrink:0;">
-                    &times; हटाएं
+            <!-- DISPLAY STYLE & PAGE TARGETS ROW -->
+            <div style="background:#090d16;border-radius:8px;padding:10px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06);">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div>
+                  <label class="admin-label" style="font-size:0.7rem;font-weight:700;">डिस्प्ले स्टाइल:</label>
+                  <select onchange="window.changeShelfDisplayStyle('${shelf.id}', this.value)" class="admin-select" style="width:100%;padding:4px 6px;font-size:0.75rem;font-weight:700;color:#38bdf8;">
+                    <option value="horizontal_scroll" ${dispStyle === 'horizontal_scroll' ? 'selected' : ''}>↔️ Horizontal Scroll</option>
+                    <option value="slider" ${dispStyle === 'slider' ? 'selected' : ''}>🎠 Slider / Carousel</option>
+                    <option value="grid" ${dispStyle === 'grid' ? 'selected' : ''}>🔲 Grid View</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="admin-label" style="font-size:0.7rem;font-weight:700;">अधिकतम सीमा (Limit):</label>
+                  <input type="number" min="1" max="24" value="${shelf.limit || 8}" onchange="window.changeShelfLimit('${shelf.id}', this.value)" class="admin-input" style="width:100%;padding:4px 6px;font-size:0.75rem;font-weight:700;" />
+                </div>
+              </div>
+
+              <div>
+                <label class="admin-label" style="font-size:0.7rem;font-weight:700;margin-bottom:4px;display:block;">दिखने वाले पेज (Unlimited Target Pages):</label>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:0.7rem;margin-bottom:6px;">
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#38bdf8;font-weight:700;">
+                    <input type="checkbox" ${pages.includes('all') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'all', this.checked)" /> 🌟 All Pages
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('home') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'home', this.checked)" /> Home
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('ebook_store') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'ebook_store', this.checked)" /> Store
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('my_library') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'my_library', this.checked)" /> Library
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('category_agri') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'category_agri', this.checked)" /> Agri Hub
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('category_health') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'category_health', this.checked)" /> Health
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('category_pashupalan') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'category_pashupalan', this.checked)" /> Pashu
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('category_business') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'category_business', this.checked)" /> Business
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('category_digital_ai') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'category_digital_ai', this.checked)" /> Digital AI
+                  </label>
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:2px;color:#e2e8f0;">
+                    <input type="checkbox" ${pages.includes('category_netsurf') ? 'checked' : ''} onchange="window.toggleShelfPageTarget('${shelf.id}', 'category_netsurf', this.checked)" /> NetSurf
+                  </label>
+                </div>
+                <!-- Custom Page Input Adder -->
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <input type="text" id="custom_page_target_${shelf.id}" placeholder="उदा. /crop-doctor.html या my-page" class="admin-input" style="padding:2px 6px;font-size:0.68rem;flex:1;" />
+                  <button type="button" onclick="window.addCustomShelfPageTarget('${shelf.id}')" class="admin-button small-button" style="padding:2px 8px;font-size:0.68rem;background:#0284c7;color:#fff;">
+                    + जोड़ें
                   </button>
                 </div>
-              `).join('')
+              </div>
+            </div>
+
+            <!-- SHELF ITEMS LIST WITH REORDERING (UP/DOWN) -->
+            <div style="background:#0f172a;border-radius:8px;padding:8px 10px;min-height:90px;max-height:220px;overflow-y:auto;margin-bottom:12px;border:1px solid rgba(255,255,255,0.04);">
+              ${itemIds.length === 0 ? '<div style="color:var(--admin-muted);font-size:0.75rem;text-align:center;padding:12px;">इस शेल्फ में अभी कोई आइटम नहीं है। नीचे से जोड़ें।</div>' :
+          itemIds.map((id, idx) => {
+            const bObj = catalogBooksMap.get(String(id).toUpperCase().trim());
+            const bunObj = bundleList.find(b => b.id === id);
+            const title = bObj ? bObj.title : (bunObj ? bunObj.name : id);
+            const cover = bObj ? bObj.cover : '/images/banners/kisan-combo-offer.webp';
+
+            return `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);gap:8px;">
+                      <div style="display:flex;align-items:center;gap:8px;overflow:hidden;flex:1;">
+                        <span style="font-size:0.72rem;color:var(--admin-muted);font-weight:700;width:16px;">${idx + 1}.</span>
+                        <img src="${cover}" alt="Thumb" style="width:24px;height:32px;object-fit:cover;border-radius:3px;flex-shrink:0;" onerror="this.src='/images/logo/logo.png';" />
+                        <span style="font-size:0.8rem;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${title}">
+                          [${id}] ${title}
+                        </span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                        <button type="button" onclick="window.moveBookInShelf('${shelf.id}', '${id}', -1)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:4px;padding:1px 6px;cursor:pointer;font-size:0.75rem;" title="ऊपर करें (Move Up)">
+                          🔼
+                        </button>
+                        <button type="button" onclick="window.moveBookInShelf('${shelf.id}', '${id}', 1)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:4px;padding:1px 6px;cursor:pointer;font-size:0.75rem;" title="नीचे करें (Move Down)">
+                          🔽
+                        </button>
+                        <button type="button" onclick="window.removeBookFromDynamicShelf('${shelf.id}', '${id}')" style="background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#f87171;border-radius:4px;padding:1px 6px;cursor:pointer;font-size:0.75rem;" title="हटाएं">
+                          &times;
+                        </button>
+                      </div>
+                    </div>
+                  `;
+          }).join('')
         }
+            </div>
           </div>
 
-          <div style="display:flex;gap:6px;">
-            <select id="shelf_add_select_${shelf.key}" class="admin-select" style="flex:1;padding:6px;font-size:0.78rem;font-weight:700;">
-              <option value="">📚 लाइब्रेरी से पुस्तक चुनें (${uniqueBookList.length} उपलब्ध)...</option>
-              ${uniqueBookList.map(b => `<option value="${b.id}">[${b.id}] ${b.title} (₹${b.offerPrice})</option>`).join('')}
-            </select>
-            <button type="button" onclick="window.addBookToShelf('${shelf.key}')" class="admin-button small-button" style="background:#16a34a;color:#fff;font-weight:800;">
-              जोड़ें
-            </button>
+          <!-- ADD ITEM DROPDOWN -->
+          <div>
+            <div style="display:flex;gap:6px;">
+              <select id="shelf_add_sel_${shelf.id}" class="admin-select" style="flex:1;padding:6px;font-size:0.76rem;font-weight:700;">
+                <option value="">${isBundles ? '📦 बंडल चुनें...' : `📚 पुस्तक चुनें (${catalogList.length} उपलब्ध)...`}</option>
+                ${isBundles ?
+          bundleList.map(bun => `<option value="${bun.id}">[${bun.id}] ${bun.name} (₹${bun.price})</option>`).join('') :
+          catalogList.map(b => `<option value="${b.id}">[${b.id}] ${b.title} (₹${b.offerPrice})</option>`).join('')
+        }
+              </select>
+              <button type="button" onclick="window.addBookToDynamicShelf('${shelf.id}')" class="admin-button small-button" style="background:#16a34a;color:#fff;font-weight:800;white-space:nowrap;">
+                + जोड़ें
+              </button>
+            </div>
+            ${shelf.id.startsWith('shelf_custom_') ? `
+              <div style="text-align:right;margin-top:8px;">
+                <button type="button" onclick="window.deleteDynamicShelf('${shelf.id}')" style="background:transparent;border:none;color:#ef4444;font-size:0.72rem;cursor:pointer;text-decoration:underline;">
+                  🗑️ यह पूरा शेल्फ हटाएं
+                </button>
+              </div>
+            ` : ''}
           </div>
         </div>
       `;
     }).join('');
+
+    // Prepopulate landing page windows form with default selection
+    const selLp = document.getElementById('admin_lp_window_select');
+    if (selLp) {
+      window.handleLpWindowSelection(selLp.value || 'default');
+    }
   };
 
-  window.addBookToShelf = function (shelfKey) {
-    const sel = document.getElementById(`shelf_add_select_${shelfKey}`);
-    const bId = sel?.value;
-    if (!bId) {
-      showToast('⚠️ कृपया जोड़ने के लिए पुस्तक चुनें!', 'error');
+  window.toggleAddNewShelfForm = function (show) {
+    const card = document.getElementById('admin-add-custom-shelf-card');
+    if (!card) return;
+    if (typeof show === 'boolean') card.style.display = show ? 'block' : 'none';
+    else card.style.display = card.style.display === 'none' ? 'block' : 'none';
+  };
+
+  window.submitCreateCustomShelf = function () {
+    const title = document.getElementById('new_shelf_title')?.value.trim();
+    if (!title) {
+      alert('⚠️ कृपया शेल्फ का शीर्षक भरें!');
+      return;
+    }
+    const subtitle = document.getElementById('new_shelf_subtitle')?.value.trim() || '';
+    const badge = document.getElementById('new_shelf_badge')?.value.trim() || '✨ SPECIAL';
+    const category = document.getElementById('new_shelf_category')?.value || 'all';
+    const type = document.getElementById('new_shelf_type')?.value || 'books';
+    const style = document.getElementById('new_shelf_display_style')?.value || 'horizontal_scroll';
+
+    const newShelf = {
+      id: 'shelf_custom_' + Date.now().toString(36),
+      title,
+      subtitle,
+      badge,
+      category,
+      type,
+      display_style: style,
+      book_ids: [],
+      bundle_ids: [],
+      display_pages: ['home', 'ebook_store'],
+      limit: 8,
+      enabled: true
+    };
+
+    if (!adminShelvesMaster) adminShelvesMaster = { shelves: [] };
+    adminShelvesMaster.shelves.push(newShelf);
+
+    window.saveAllShelvesConfig();
+    window.renderStoreShelvesTab();
+    window.toggleAddNewShelfForm(false);
+    showToast('✨ नया शेल्फ सफलतापूर्वक जोड़ा गया!', 'success');
+  };
+
+  window.moveBookInShelf = function (shelfId, itemId, dir) {
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (!shelf) return;
+    const isBundles = shelf.type === 'bundles';
+    const list = isBundles ? shelf.bundle_ids : shelf.book_ids;
+    if (!Array.isArray(list)) return;
+
+    const idx = list.indexOf(itemId);
+    if (idx < 0) return;
+
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+
+    // Swap
+    const temp = list[idx];
+    list[idx] = list[targetIdx];
+    list[targetIdx] = temp;
+
+    window.saveAllShelvesConfig();
+    window.renderStoreShelvesTab();
+  };
+
+  window.removeBookFromDynamicShelf = function (shelfId, itemId) {
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (!shelf) return;
+    const isBundles = shelf.type === 'bundles';
+    if (isBundles) {
+      shelf.bundle_ids = (shelf.bundle_ids || []).filter(x => x !== itemId);
+    } else {
+      shelf.book_ids = (shelf.book_ids || []).filter(x => x !== itemId);
+    }
+    window.saveAllShelvesConfig();
+    window.renderStoreShelvesTab();
+    showToast('🗑️ आइटम शेल्फ से हटा दिया गया।', 'info');
+  };
+
+  window.addBookToDynamicShelf = function (shelfId) {
+    const sel = document.getElementById(`shelf_add_sel_${shelfId}`);
+    const val = sel?.value;
+    if (!val) {
+      alert('⚠️ कृपया शेल्फ में जोड़ने के लिए आइटम चुनें!');
+      return;
+    }
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (!shelf) return;
+
+    const isBundles = shelf.type === 'bundles';
+    if (isBundles) {
+      if (!Array.isArray(shelf.bundle_ids)) shelf.bundle_ids = [];
+      if (!shelf.bundle_ids.includes(val)) shelf.bundle_ids.push(val);
+    } else {
+      if (!Array.isArray(shelf.book_ids)) shelf.book_ids = [];
+      if (!shelf.book_ids.includes(val)) shelf.book_ids.push(val);
+    }
+
+    window.saveAllShelvesConfig();
+    window.renderStoreShelvesTab();
+    showToast(`✅ [${val}] को '${shelf.title}' शेल्फ में जोड़ दिया गया!`, 'success');
+  };
+
+  window.changeShelfDisplayStyle = function (shelfId, style) {
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (shelf) {
+      shelf.display_style = style;
+      window.saveAllShelvesConfig();
+      showToast(`🎨 डिस्प्ले स्टाइल बदलकर '${style}' कर दिया गया!`, 'info');
+    }
+  };
+
+  window.changeShelfLimit = function (shelfId, limit) {
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (shelf) {
+      shelf.limit = parseInt(limit, 10) || 8;
+      window.saveAllShelvesConfig();
+    }
+  };
+
+  window.addCustomShelfPageTarget = function (shelfId) {
+    const inp = document.getElementById(`custom_page_target_${shelfId}`);
+    const val = (inp?.value || '').trim().toLowerCase();
+    if (!val) return;
+    window.toggleShelfPageTarget(shelfId, val, true);
+    if (inp) inp.value = '';
+  };
+
+  window.toggleShelfPageTarget = function (shelfId, pageKey, isChecked) {
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (!shelf) return;
+    if (!Array.isArray(shelf.display_pages)) shelf.display_pages = [];
+
+    if (isChecked) {
+      if (!shelf.display_pages.includes(pageKey)) shelf.display_pages.push(pageKey);
+    } else {
+      shelf.display_pages = shelf.display_pages.filter(p => p !== pageKey);
+    }
+    window.saveAllShelvesConfig();
+  };
+
+  window.toggleShelfEnabled = function (shelfId, isEnabled) {
+    const shelf = adminShelvesMaster.shelves.find(s => s.id === shelfId);
+    if (shelf) {
+      shelf.enabled = isEnabled;
+      window.saveAllShelvesConfig();
+      showToast(isEnabled ? '🟢 शेल्फ सक्रिय किया गया!' : '🔴 शेल्फ निष्क्रिय किया गया!', 'info');
+    }
+  };
+
+  window.deleteDynamicShelf = function (shelfId) {
+    if (!confirm('क्या आप सचमुच इस पूरे शेल्फ को हटाना चाहते हैं?')) return;
+    adminShelvesMaster.shelves = adminShelvesMaster.shelves.filter(s => s.id !== shelfId);
+    window.saveAllShelvesConfig();
+    window.renderStoreShelvesTab();
+    showToast('🗑️ शेल्फ हटा दिया गया।', 'info');
+  };
+
+  window.appendWindowBookId = function (bId) {
+    const el = document.getElementById('admin_lp_window_books');
+    if (!el) return;
+    const current = el.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    if (!current.includes(bId.toUpperCase())) {
+      current.push(bId.toUpperCase());
+      el.value = current.join(', ');
+      showToast(`+ जोड़ा: ${bId}`, 'info');
+    }
+  };
+
+  window.appendWindowBundleId = function (bunId) {
+    const el = document.getElementById('admin_lp_window_bundles');
+    if (!el) return;
+    const current = el.value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    if (!current.includes(bunId.toUpperCase())) {
+      current.push(bunId.toUpperCase());
+      el.value = current.join(', ');
+      showToast(`+ बंडल जोड़ा: ${bunId}`, 'info');
+    }
+  };
+
+  window.handleLpWindowSelection = function (bookId) {
+    if (!adminShelvesMaster) return;
+    const windows = adminShelvesMaster.landing_page_windows || {};
+    const win = windows[bookId] || (bookId === 'default' ? {} : windows['default']) || {};
+
+    const selEl = document.getElementById('admin_lp_window_select');
+    const titleEl = document.getElementById('admin_lp_window_title');
+    const booksEl = document.getElementById('admin_lp_window_books');
+    const bundlesEl = document.getElementById('admin_lp_window_bundles');
+    const chkEnabled = document.getElementById('admin_lp_window_enabled');
+
+    if (selEl) selEl.value = bookId;
+    if (titleEl) titleEl.value = win.shelf_title || '';
+    if (booksEl) booksEl.value = (win.recommended_book_ids || []).join(', ');
+    if (bundlesEl) bundlesEl.value = (win.recommended_bundle_ids || []).join(', ');
+    if (chkEnabled) chkEnabled.checked = win.enabled !== false;
+  };
+
+  window.saveLandingWindowConfig = function () {
+    if (!adminShelvesMaster) return;
+    const selLp = document.getElementById('admin_lp_window_select');
+    const bookId = selLp ? selLp.value : 'default';
+    const title = document.getElementById('admin_lp_window_title')?.value.trim() || '🌾 पाठकों की अन्य लोकप्रिय पसंद';
+    const booksRaw = document.getElementById('admin_lp_window_books')?.value || '';
+    const bundlesRaw = document.getElementById('admin_lp_window_bundles')?.value || '';
+    const isEnabled = document.getElementById('admin_lp_window_enabled')?.checked ?? true;
+
+    const recBooks = booksRaw.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const recBundles = bundlesRaw.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+
+    if (!adminShelvesMaster.landing_page_windows) {
+      adminShelvesMaster.landing_page_windows = {};
+    }
+
+    adminShelvesMaster.landing_page_windows[bookId] = {
+      shelf_title: title,
+      recommended_book_ids: recBooks,
+      recommended_bundle_ids: recBundles,
+      enabled: isEnabled,
+      display_style: 'horizontal_scroll',
+      limit: Math.max(2, recBooks.length + recBundles.length)
+    };
+
+    window.saveAllShelvesConfig();
+    window.renderLandingWindowsTable();
+    showToast(`🎉 [${bookId}] के लिए बॉटम क्रॉस-सेल विंडो सुरक्षित हो गई!`, 'success');
+  };
+
+  window.toggleLandingWindowEnabled = function (bookId, enabled) {
+    if (!adminShelvesMaster || !adminShelvesMaster.landing_page_windows) return;
+    if (adminShelvesMaster.landing_page_windows[bookId]) {
+      adminShelvesMaster.landing_page_windows[bookId].enabled = enabled;
+      window.saveAllShelvesConfig();
+      window.renderLandingWindowsTable();
+      showToast(`[${bookId}] विंडो स्टेटस: ${enabled ? '🟢 चालू' : '🔴 बंद'}`, 'info');
+    }
+  };
+
+  window.deleteLandingWindow = function (bookId) {
+    if (!adminShelvesMaster || !adminShelvesMaster.landing_page_windows) return;
+    if (bookId === 'default') {
+      alert('⚠️ Default विंडो को हटाया नहीं जा सकता (आप इसे एडिट कर सकते हैं)।');
+      return;
+    }
+    if (!confirm(`क्या आप [${bookId}] की कस्टमाइज्ड विंडो को हटाना चाहते हैं? (इसके बाद इस किताब पर Default विंडो लागू होगी)`)) return;
+
+    delete adminShelvesMaster.landing_page_windows[bookId];
+    window.saveAllShelvesConfig();
+    window.renderLandingWindowsTable();
+    window.handleLpWindowSelection('default');
+    showToast(`🗑️ [${bookId}] विंडो हटा दी गई!`, 'success');
+  };
+
+  window.renderLandingWindowsTable = function () {
+    const wrap = document.getElementById('admin_lp_windows_table_wrap');
+    const badge = document.getElementById('admin_lp_windows_count_badge');
+    if (!wrap || !adminShelvesMaster) return;
+
+    const windows = adminShelvesMaster.landing_page_windows || {};
+    const keys = Object.keys(windows);
+
+    if (badge) badge.textContent = `${keys.length} विंडोज़`;
+
+    if (keys.length === 0) {
+      wrap.innerHTML = '<div style="color:var(--admin-muted);font-size:0.8rem;text-align:center;padding:12px;">कोई कस्टमाइज्ड विंडो नहीं है। ऊपर दिए फॉर्म से सेट करें।</div>';
       return;
     }
 
-    let page = allLandingPages.find(p => p.id === bId);
-    const bookObj = allBooks.find(b => b.id === bId);
+    wrap.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${keys.map(k => {
+      const win = windows[k] || {};
+      const isEnabled = win.enabled !== false;
+      const booksStr = (win.recommended_book_ids || []).join(', ') || 'कोई नहीं';
+      const bunStr = (win.recommended_bundle_ids || []).join(', ') || 'कोई नहीं';
+      const isDefault = k === 'default';
 
-    if (!page && bookObj) {
-      page = {
-        id: bookObj.id,
-        slug: bookObj.slug || bookObj.id.toLowerCase(),
-        category: bookObj.category || 'Agriculture',
-        status: 'active',
-        theme_primary: '#15803d',
-        theme_dark: '#0e5227',
-        store_badge: shelfKey,
-        is_coming_soon: shelfKey === 'coming_soon',
-        publish_targets: ['ebook_store', 'category_page', 'my_library', 'home_page'],
-        hero: {
-          tag: '🌾 Agriculture eBook Guide',
-          title: bookObj.heading || bookObj.name || bookObj.id,
-          subtitle: 'सम्पूर्ण वैज्ञानिक व व्यावहारिक मार्गदर्शिका',
-          description: 'इस डिजिटल पुस्तक में फसल प्रबंधन और समाधान के प्रमाणित तरीके विस्तार से समझाए गए हैं।',
-          mrp: bookObj.mrp || 299,
-          offer_price: bookObj.offerPrice || 99,
-          offer_badge: 'Launch Offer',
-          rating_score: '4.9',
-          rating_count: '120+ Ratings',
-          cover_image: bookObj.cover || bookObj.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp',
-          banner_image: bookObj.banner || '/images/banners/kharif-master-guide-2026-hero-banner.webp',
-          features: ['120+ रंगीन पेज', 'रोग व कीट पहचान', 'स्प्रे चार्ट', 'आजीवन डिजिटल एक्सेस']
-        }
-      };
-      allLandingPages.unshift(page);
-    } else if (page) {
-      page.store_badge = shelfKey;
-      page.is_coming_soon = shelfKey === 'coming_soon';
-    }
+      return `
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--admin-border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 220px;">
+                <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 2px;">
+                  <span style="font-size: 0.72rem; background: ${isDefault ? '#64748b' : '#0284c7'}; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 800;">
+                    ${isDefault ? '🌐 DEFAULT' : `📖 ${k}`}
+                  </span>
+                  <strong style="color: #f8fafc; font-size: 0.88rem;">${escapeHtml(win.shelf_title || 'सुझावित पुस्तकें')}</strong>
+                </div>
+                <div style="font-size: 0.74rem; color: #94a3b8; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 3px;">
+                  <span>📚 <strong>बुक्स:</strong> ${booksStr}</span>
+                  <span>📦 <strong>बंडल्स:</strong> ${bunStr}</span>
+                </div>
+              </div>
 
-    if (bookObj) {
-      bookObj.badge = shelfKey;
-      bookObj.store_badge = shelfKey;
-      bookObj.isComingSoon = shelfKey === 'coming_soon';
-    }
-
-    try {
-      localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
-
-      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
-      const cbIdx = customBooks.findIndex(x => x.id === bId);
-      const updatedCustom = {
-        ...(bookObj || {}),
-        id: bId,
-        heading: page?.hero?.title || bookObj?.heading || bId,
-        name: page?.hero?.title || bookObj?.name || bId,
-        badge: shelfKey,
-        store_badge: shelfKey,
-        isComingSoon: shelfKey === 'coming_soon'
-      };
-      if (cbIdx >= 0) customBooks[cbIdx] = updatedCustom;
-      else customBooks.unshift(updatedCustom);
-      localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
-
-      // Background server sync to Git + save_book_landing.php
-      if (page) {
-        const apiUrl = getAutoSyncApiUrl();
-        fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'save', pageData: page, bookData: updatedCustom, uploadedFiles: [] })
-        }).catch(() => null);
-        fetch('/api/save_book_landing.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pageData: page, bookData: updatedCustom })
-        }).catch(() => null);
-      }
-    } catch (e) { }
-
-    window.renderStoreShelvesTab();
-    renderTable();
-    updateKPIs();
-    showToast(`✅ [${bId}] पुस्तक को '${shelfKey}' शेल्फ में जोड़ दिया गया!`, 'success');
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #cbd5e1; cursor: pointer;">
+                  <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="window.toggleLandingWindowEnabled('${k}', this.checked)" style="accent-color: #10b981; width: 15px; height: 15px;" />
+                  <span>${isEnabled ? 'सक्रिय' : 'बंद'}</span>
+                </label>
+                <button type="button" onclick="window.handleLpWindowSelection('${k}')" class="admin-button small-button" style="background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-weight: 700;">
+                  ✏️ एडिट
+                </button>
+                ${!isDefault ? `
+                  <button type="button" onclick="window.deleteLandingWindow('${k}')" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171;" title="हटाएं">
+                    🗑️
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+    }).join('')}
+      </div>
+    `;
   };
 
-  window.removeBookFromShelf = function (bId) {
-    const page = allLandingPages.find(p => p.id === bId);
-    if (page) {
-      page.store_badge = 'other';
-      page.is_coming_soon = false;
-    }
-
-    const bookObj = allBooks.find(b => b.id === bId);
-    if (bookObj) {
-      bookObj.badge = 'other';
-      bookObj.store_badge = 'other';
-      bookObj.isComingSoon = false;
-    }
+  window.saveAllShelvesConfig = async function () {
+    if (!adminShelvesMaster) return;
+    adminShelvesMaster.updated_at = new Date().toISOString();
 
     try {
-      localStorage.setItem('AAROGYAM_BOOK_LANDING_PAGES', JSON.stringify(allLandingPages));
-      const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
-      const cbIdx = customBooks.findIndex(x => x.id === bId);
-      let updatedCustom = null;
-      if (cbIdx >= 0) {
-        customBooks[cbIdx].badge = 'other';
-        customBooks[cbIdx].store_badge = 'other';
-        customBooks[cbIdx].isComingSoon = false;
-        updatedCustom = customBooks[cbIdx];
-        localStorage.setItem('AAROGYAM_CUSTOM_BOOKS', JSON.stringify(customBooks));
-      }
-
-      // Background server sync to Git + save_book_landing.php
-      if (page) {
-        const apiUrl = getAutoSyncApiUrl();
-        fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'save', pageData: page, bookData: updatedCustom || bookObj, uploadedFiles: [] })
-        }).catch(() => null);
-        fetch('/api/save_book_landing.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pageData: page, bookData: updatedCustom || bookObj })
-        }).catch(() => null);
-      }
+      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(adminShelvesMaster));
     } catch (e) { }
 
-    window.renderStoreShelvesTab();
-    renderTable();
-    updateKPIs();
-    showToast(`🗑️ [${bId}] पुस्तक को शेल्फ से हटा दिया गया।`, 'info');
+    try {
+      await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_shelves_config',
+          shelvesConfig: adminShelvesMaster
+        })
+      });
+    } catch (e) { }
+
+    showToast('🎉 सभी स्टोर शेल्व्स व सेटिंग्स सुरक्षित हो गईं!', 'success');
   };
 
   // -------------------------------------------------------------

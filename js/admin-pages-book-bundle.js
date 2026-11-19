@@ -1914,9 +1914,24 @@ async function handleSaveBundle() {
     buttonText: document.getElementById('bFormFinalBuyBtnText')?.value.trim() || `🛒 पूरा कॉम्बो ₹${offerPrice} में अभी खरीदें`
   };
 
+  function generateNextBundleCode() {
+    let maxNum = 0;
+    (_bundles || []).forEach(b => {
+      const m = String(b.id || '').toUpperCase().match(/^BUN(\d+)$/);
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (n > maxNum) maxNum = n;
+      }
+    });
+    const nextNum = Math.min(100, maxNum + 1);
+    return `BUN${String(nextNum).padStart(3, '0')}`;
+  }
+
+  const cleanBundleId = (id || '').trim().toUpperCase() || generateNextBundleCode();
+
   const bundleObj = {
-    id: id || `BUNDLE_${Date.now()}`,
-    slug: slug || id.toLowerCase(),
+    id: cleanBundleId,
+    slug: slug || cleanBundleId.toLowerCase(),
     title,
     subtitle,
     description,

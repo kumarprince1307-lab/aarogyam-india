@@ -602,22 +602,40 @@
     <!-- 6. Main Container & Sections -->
     <div class="library-container">
 
-      <!-- Section 1: Purchased / Active Books -->
-      <div id="section-purchased" class="book-section">
-        <div class="section-title">
-          <span>मेरी एक्टिव / खरीदी गई ई-बुक्स (Digital Locker)</span>
+            <!-- Section 1: Purchased / Active Books (Personal Mahogany Digital Bookshelf) -->
+      <div id="section-purchased" class="book-section" style="background: linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #0f172a 100%); border: 2.5px solid #f59e0b; border-radius: 20px; padding: 22px 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.45); color: #ffffff; margin-bottom: 28px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1.5px solid rgba(245,158,11,0.3); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="background: #f59e0b; color: #000; font-size: 1.2rem; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(245,158,11,0.4);">📖</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.3rem; font-weight: 900; color: #fbbf24; letter-spacing: 0.3px;">मेरी व्यक्तिगत डिजिटल शेल्फ (My Bookshelf)</h3>
+              <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #cbd5e1;">आपकी खरीदी गई सभी सक्रिय पुस्तकें — कभी भी पढ़ें या ऑफलाइन डाउनलोड करें</p>
+            </div>
+          </div>
+          <span style="background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #10b981; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;">
+            🔒 100% वेरिफाइड डिजिटल एक्सेस
+          </span>
         </div>
-        <div class="book-grid-2col" id="purchasedBooksGrid">
+        <div class="book-grid-2col" id="purchasedBooksGrid" style="border-bottom: 8px solid #78350f; border-radius: 10px; padding-bottom: 12px; background: rgba(0,0,0,0.25);">
           <!-- Dynamically loaded via JS: Read Now, Download PDF, Book Details, Purchased Badge -->
         </div>
       </div>
 
-      <!-- Section 2: Available Books -->
-      <div id="section-available" class="book-section" style="display: block;">
-        <div class="section-title">
-          <span>खरीद के लिए उपलब्ध प्रमुख पुस्तकें (Available Books)</span>
+      <!-- Section 2: Available Books (Daytime Mint Store Showcase Shelf) -->
+      <div id="section-available" class="book-section" style="display: block; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%); border: 2.5px solid #86efac; border-radius: 20px; padding: 22px 18px; box-shadow: 0 8px 24px rgba(22,163,74,0.08); margin-bottom: 28px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1.5px solid #bbf7d0; padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="background: #16a34a; color: #fff; font-size: 1.2rem; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(22,163,74,0.3);">🏪</span>
+            <div>
+              <h3 style="margin: 0; font-size: 1.3rem; font-weight: 900; color: #14532d; letter-spacing: 0.3px;">स्टोर में उपलब्ध प्रमुख पुस्तकें (Store Showcase)</h3>
+              <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #15803d;">नवीनतम कृषि, स्वास्थ्य व व्यापार गाइड्स — स्पेशल ऑफर मूल्य पर अनलॉक करें</p>
+            </div>
+          </div>
+          <a href="/ebooks/ebook.html" style="background: #16a34a; color: #fff; text-decoration: none; font-size: 0.78rem; font-weight: 800; padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 8px rgba(22,163,74,0.3);">
+            सम्पूर्ण स्टोर देखें ➔
+          </a>
         </div>
-        <div class="book-grid-2col" id="availableBooksGrid">
+        <div class="book-grid-2col" id="availableBooksGrid" style="border-bottom: 6px solid #bbf7d0; border-radius: 10px; padding-bottom: 12px;">
           <!-- Dynamically loaded via JS: Buy Now, Preview, Book Details, Offer Badge -->
         </div>
       </div>

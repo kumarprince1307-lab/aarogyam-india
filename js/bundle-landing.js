@@ -215,9 +215,9 @@
       }
     } catch (_) { }
 
-    // 4. Default High-Converting Master Bundle (5-in-1 Active Master)
+    // 4. Default High-Converting Master Bundle (5-in-1 Active Master: BUN001)
     return {
-      id: "BUNDLE_KISAN_5IN1",
+      id: "BUN001",
       slug: "kisan-master-bundle-5in1",
       title: "महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो",
       subtitle: "खेती का डॉक्टर + दवा सलाहकार + 11 सब्जी खेती + गेहूँ व चना मास्टर गाइड्स का सम्पूर्ण संग्रह!",

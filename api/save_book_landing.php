@@ -27,6 +27,78 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
     json_resp(400, ['error' => 'Invalid JSON payload']);
 }
 
+// Check if this is a save_shelves_config action
+if (isset($payload['action']) && $payload['action'] === 'save_shelves_config' && isset($payload['shelvesConfig'])) {
+    $shelvesJsonPath = __DIR__ . '/../data/store-shelves-config.json';
+    $backupDir = __DIR__ . '/../data/backups';
+    if (!is_dir($backupDir)) {
+        @mkdir($backupDir, 0755, true);
+    }
+    $timestamp = date('Ymd_His');
+    if (file_exists($shelvesJsonPath)) {
+        @copy($shelvesJsonPath, $backupDir . "/shelves_backup_{$timestamp}.json");
+    }
+    $tmpShelves = $shelvesJsonPath . '.tmp';
+    file_put_contents($tmpShelves, json_encode($payload['shelvesConfig'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    rename($tmpShelves, $shelvesJsonPath);
+    json_resp(200, [
+        'success' => true,
+        'message' => 'Store shelves and live toasts config saved successfully'
+    ]);
+}
+
+// Check if this is a save_toast_image action (Auto-save compressed WebP to disk to prevent RAM/JSON bloat)
+if (isset($payload['action']) && $payload['action'] === 'save_toast_image' && !empty($payload['image_base64'])) {
+    $base64Data = $payload['image_base64'];
+    if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
+        $base64Data = substr($base64Data, strpos($base64Data, ',') + 1);
+    }
+    $decodedData = base64_decode($base64Data);
+    if ($decodedData === false) {
+        json_resp(400, ['error' => 'Invalid base64 image data']);
+    }
+
+    $toastDir = __DIR__ . '/../images/uploads/toasts';
+    if (!is_dir($toastDir)) {
+        @mkdir($toastDir, 0755, true);
+    }
+
+    $fileId = 'toast_' . time() . '_' . substr(md5(uniqid(mt_rand(), true)), 0, 8) . '.webp';
+    $targetFile = $toastDir . '/' . $fileId;
+    file_put_contents($targetFile, $decodedData);
+
+    json_resp(200, [
+        'success' => true,
+        'image_url' => '/images/uploads/toasts/' . $fileId,
+        'size_bytes' => strlen($decodedData)
+    ]);
+}
+
+// Check if this is a delete_toast_image action (Physical disk cleanup when a toast is deleted)
+if (isset($payload['action']) && $payload['action'] === 'delete_toast_image' && !empty($payload['image_path'])) {
+    $imagePath = $payload['image_path'];
+    $cleanedFilename = basename($imagePath);
+    
+    // Safety check: ONLY allow deleting files inside images/uploads/toasts starting with toast_
+    if (strpos($imagePath, '/images/uploads/toasts/') !== false && strpos($cleanedFilename, 'toast_') === 0) {
+        $targetFile = realpath(__DIR__ . '/../images/uploads/toasts/' . $cleanedFilename);
+        $expectedDir = realpath(__DIR__ . '/../images/uploads/toasts');
+
+        if ($targetFile && $expectedDir && strpos($targetFile, $expectedDir) === 0 && file_exists($targetFile)) {
+            @unlink($targetFile);
+            json_resp(200, [
+                'success' => true,
+                'message' => 'Toast image physically deleted from disk: ' . $cleanedFilename
+            ]);
+        }
+    }
+
+    json_resp(200, [
+        'success' => true,
+        'message' => 'Image path ignored or not a custom upload'
+    ]);
+}
+
 // Check if this is a save_popups action
 if (isset($payload['action']) && $payload['action'] === 'save_popups' && isset($payload['popupsConfig'])) {
     $popupsJsonPath = __DIR__ . '/../data/notifications-popups.json';

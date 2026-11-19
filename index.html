@@ -258,37 +258,78 @@
     </div>
   </section>
 
-  <!-- 👑 AAROGYAM PRO VIP MEMBERSHIP PROMOTION STRIP (BELOW HERO CAROUSEL) -->
-  <section class="aarogyam-vip-promo-strip-section" style="padding: 10px 0 16px 0; background: transparent;">
+  <!-- 👑 AAROGYAM PRO VIP MEMBERSHIP PROMOTION STRIP (MODERN SLIM ANIMATED 3D BADGE) -->
+  <style>
+    @keyframes vipGlowPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 16px rgba(245, 158, 11, 0.4), 0 0 0 0 rgba(245, 158, 11, 0.3);
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 0 26px rgba(245, 158, 11, 0.75), 0 0 0 6px rgba(245, 158, 11, 0.15);
+        transform: scale(1.04);
+      }
+    }
+
+    @keyframes badgeShineSweep {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(200%);
+      }
+    }
+  </style>
+  <section class="aarogyam-vip-promo-strip-section" style="padding: 8px 0 14px 0; background: transparent;">
     <div class="container">
-      <a href="/ebooks/book-landing.html?id=SUB001" class="aarogyam-vip-promo-link" style="text-decoration:none; display:block;">
-        <div class="aarogyam-vip-promo-card" style="background: linear-gradient(135deg, #090d1a 0%, #172554 45%, #0f172a 100%); border: 1.5px solid #f59e0b; border-radius: 14px; padding: 12px 18px; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.22); display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+      <a href="/ebooks/book-landing.html?id=SUB001" class="aarogyam-vip-promo-link"
+        style="text-decoration:none; display:block;">
+        <div class="aarogyam-vip-promo-card"
+          style="position:relative; overflow:hidden; background: linear-gradient(135deg, #050b14 0%, #0d1e3a 50%, #064e3b 100%); border: 1.5px solid #f59e0b; border-radius: 14px; padding: 10px 16px; box-shadow: 0 4px 22px rgba(6, 78, 59, 0.35); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
           <div style="display:flex; align-items:center; gap: 12px; min-width: 260px; flex: 1;">
-            <div style="width: 44px; height: 44px; min-width: 44px; border-radius: 10px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);">
-              👑
+            <!-- Slim 3D Animated Gold Crown Icon -->
+            <div
+              style="position:relative; width: 44px; height: 44px; min-width: 44px; border-radius: 12px; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); display: flex; align-items: center; justify-content: center; animation: vipGlowPulse 2.8s infinite ease-in-out;">
+              <span style="font-size: 1.45rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));">👑</span>
             </div>
             <div>
               <div style="display:flex; align-items:center; gap: 8px; flex-wrap: wrap;">
-                <span style="background: #ef4444; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.5px;">LAUNCH OFFER 97% OFF</span>
-                <span style="color: #f59e0b; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.3px;">Aarogyam Pro VIP सदस्यता (1 Year All-Access)</span>
+                <span
+                  style="background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; font-size: 0.7rem; font-weight: 900; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(239,68,68,0.4);">🔥
+                  97% OFF LAUNCH PASS</span>
+                <span style="color: #fbbf24; font-weight: 900; font-size: 0.95rem; letter-spacing: 0.3px;">Aarogyam Pro
+                  VIP सदस्यता (1 Year All-Access)</span>
               </div>
-              <p style="margin: 2px 0 0 0; color: #cbd5e1; font-size: 0.85rem; font-weight: 500; line-height: 1.3;">
-                🤖 24×7 सखी AI डॉक्टर • 📒 डिजिटल बही-खाता • 💰 शेयर & अर्न रिवॉर्ड्स • 📚 समस्त ई-बुक्स 365 दिन असीमित
+              <p style="margin: 2px 0 0 0; color: #cbd5e1; font-size: 0.82rem; font-weight: 500; line-height: 1.3;">
+                🤖 24×7 सखी AI डॉक्टर • 📒 डिजिटल बही-खाता • 💰 शेयर & अर्न • 📚 समस्त ई-बुक्स 365 दिन असीमित
               </p>
             </div>
           </div>
           <div style="display:flex; align-items:center; gap: 10px;">
             <div style="text-align: right; line-height: 1.1;">
               <span style="color: #94a3b8; font-size: 0.75rem; text-decoration: line-through;">₹2,999</span>
-              <div style="color: #38bdf8; font-weight: 900; font-size: 1.15rem;">₹99 <span style="font-size: 0.75rem; color: #cbd5e1; font-weight: 600;">/वर्ष</span></div>
+              <div style="color: #38bdf8; font-weight: 900; font-size: 1.15rem;">₹99 <span
+                  style="font-size: 0.72rem; color: #cbd5e1; font-weight: 600;">/वर्ष</span></div>
             </div>
-            <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; font-size: 0.85rem; padding: 8px 16px; border-radius: 25px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4); white-space: nowrap;">
+            <div
+              style="background: linear-gradient(135deg, #fbbf24, #d97706); color: #000; font-weight: 900; font-size: 0.82rem; padding: 8px 16px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 12px rgba(245, 158, 11, 0.4); white-space: nowrap;">
               <span>अभी VIP बनें</span>
               <i class="fa-solid fa-arrow-right"></i>
             </div>
           </div>
         </div>
       </a>
+    </div>
+  </section>
+
+  <!-- 📦 DYNAMIC BOOK BUNDLES SHOWCASE (RIGHT BELOW VIP MEMBERSHIP) -->
+  <section class="home-bundles-shelf-section" style="padding: 4px 0 24px 0; background: transparent;">
+    <div class="container" id="home-bundles-shelf-container">
+      <!-- Bundles with dynamic book cover stacks rendered here by universal-shelves-renderer.js?v=20261119_v55 -->
     </div>
   </section>
 
@@ -504,182 +545,14 @@
     </div>
   </section>
 
-  <!-- 10. KINDLE 3D BEST SELLERS SHELF (ZERO DUPLICATE BOOKS) -->
-  <section class="shelf-section" style="padding: 50px 0; background: #ffffff;">
-    <div class="container">
-      <div class="shelf-header">
-        <div class="shelf-title-wrap">
-          <span class="shelf-icon">🔥</span>
-          <div>
-            <h2 class="shelf-title" style="color:#0f172a;">सर्वाधिक बिकने वाली ई-बुक्स (Best Sellers)</h2>
-            <p class="shelf-subtitle" style="color:#64748b;">10,000+ किसानों द्वारा प्रमाणित डिजिटल गाइड्स — 1-क्लिक
-              इंस्टेंट एक्सेस</p>
-          </div>
-        </div>
-        <a href="/ebooks/ebook.html" style="color:#2563eb;font-weight:800;font-size:0.9rem;text-decoration:underline;">
-          सभी ई-बुक्स देखें →
-        </a>
-      </div>
-
-
-      <!-- DYNAMIC BUNDLE / COMBO CARDS SLOT (CONNECTED TO ADMIN) -->
-      <div id="home-top-mega-deal-slot" class="aarogyam-mega-deal-slot"
-        style="width: 100%; margin-bottom: 24px; display: none;"></div>
-
-      <div class="shelf-books-grid" id="home-kindle-bestsellers-grid">
-        <!-- 1. BK016 - कृषि दवा डायरेक्टरी -->
-        <div class="shelf-book-card"
-          style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">
-          <div class="kindle-book-cover-3d" style="width:110px;height:150px;flex-shrink:0;cursor:pointer;"
-            onclick="window.location.href='/ebooks/book-landing.html?id=BK016'">
-            <img src="/images/books/bk016-cover.webp" alt="कृषि दवा डायरेक्टरी"
-              style="width:100%;height:100%;object-fit:cover;border-radius:6px 12px 12px 6px;box-shadow:-6px 8px 20px rgba(0,0,0,0.35);" />
-          </div>
-          <div style="flex:1;min-width:200px;">
-            <span
-              style="background:#fef08a;color:#854d0e;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;">
-              🆕 नई कृषि दवा डायरेक्टरी
-            </span>
-            <h3 style="font-size:1.15rem;font-weight:900;margin:0 0 6px 0;color:#0f172a;">
-              कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा
-            </h3>
-            <p style="font-size:0.84rem;color:#64748b;margin:0 0 12px 0;line-height:1.4;">
-              रासायनिक दवाएँ • जैविक विकल्प • किसान के नुस्खे • 4-पेज Quick Directory
-            </p>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:1.3rem;font-weight:900;color:#16a34a;">₹99</span>
-              <span style="font-size:0.9rem;color:#94a3b8;text-decoration:line-through;">₹499</span>
-              <a href="/ebooks/book-landing.html?id=BK016" class="btn"
-                style="background:#facc15;color:#000;font-weight:900;font-size:0.85rem;padding:8px 18px;border-radius:20px;text-decoration:none;margin-left:auto;">
-                📖 देखें →
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. BK002 - खेती का डॉक्टर -->
-        <div class="shelf-book-card"
-          style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">
-          <div class="kindle-book-cover-3d" style="width:110px;height:150px;flex-shrink:0;cursor:pointer;"
-            onclick="window.location.href='/ebooks/book-landing.html?id=BK002'">
-            <img src="/images/books/fasal-ka-doctor-cover.webp" alt="खेती का डॉक्टर"
-              style="width:100%;height:100%;object-fit:cover;border-radius:6px 12px 12px 6px;box-shadow:-6px 8px 20px rgba(0,0,0,0.35);" />
-          </div>
-          <div style="flex:1;min-width:200px;">
-            <span
-              style="background:#fef08a;color:#854d0e;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;">
-              🩺 किसान का डॉक्टर
-            </span>
-            <h3 style="font-size:1.15rem;font-weight:900;margin:0 0 6px 0;color:#0f172a;">
-              खेती का डॉक्टर (Pocket Doctor)
-            </h3>
-            <p style="font-size:0.84rem;color:#64748b;margin:0 0 12px 0;line-height:1.4;">
-              फसल के 50+ रोगों, कीटों व पोषक तत्वों की कमी की फोटो सहित पहचान व तत्काल स्प्रे फॉर्मूला
-            </p>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:1.3rem;font-weight:900;color:#16a34a;">₹99</span>
-              <span style="font-size:0.9rem;color:#94a3b8;text-decoration:line-through;">₹299</span>
-              <a href="/ebooks/book-landing.html?id=BK002" class="btn"
-                style="background:#facc15;color:#000;font-weight:900;font-size:0.85rem;padding:8px 18px;border-radius:20px;text-decoration:none;margin-left:auto;">
-                📖 देखें →
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. BK015 - सब्जी खेती मास्टर -->
-        <div class="shelf-book-card"
-          style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">
-          <div class="kindle-book-cover-3d" style="width:110px;height:150px;flex-shrink:0;cursor:pointer;"
-            onclick="window.location.href='/ebooks/book-landing.html?id=BK015'">
-            <img src="/images/books/bk015-cover.webp" alt="सब्जी खेती मास्टर"
-              style="width:100%;height:100%;object-fit:cover;border-radius:6px 12px 12px 6px;box-shadow:-6px 8px 20px rgba(0,0,0,0.35);" />
-          </div>
-          <div style="flex:1;min-width:200px;">
-            <span
-              style="background:#fef08a;color:#854d0e;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;">
-              🌱 सब्जी खेती मास्टर
-            </span>
-            <h3 style="font-size:1.15rem;font-weight:900;margin:0 0 6px 0;color:#0f172a;">
-              🌱 सब्जी खेती मास्टर (PART 1)
-            </h3>
-            <p style="font-size:0.84rem;color:#64748b;margin:0 0 12px 0;line-height:1.4;">
-              टमाटर, मिर्च, शिमला मिर्च, बैंगन, भिंडी व 10+ सब्जियों की नर्सरी से कटाई तक सम्पूर्ण गाइड
-            </p>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:1.3rem;font-weight:900;color:#16a34a;">₹149</span>
-              <span style="font-size:0.9rem;color:#94a3b8;text-decoration:line-through;">₹1999</span>
-              <a href="/ebooks/book-landing.html?id=BK015" class="btn"
-                style="background:#facc15;color:#000;font-weight:900;font-size:0.85rem;padding:8px 18px;border-radius:20px;text-decoration:none;margin-left:auto;">
-                📖 देखें →
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. BK001 - खरीफ फसल मास्टर गाइड 2026 -->
-        <div class="shelf-book-card"
-          style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:18px;padding:18px;display:flex;gap:18px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,0.06);flex-wrap:wrap;">
-          <div class="kindle-book-cover-3d" style="width:110px;height:150px;flex-shrink:0;cursor:pointer;"
-            onclick="window.location.href='/ebooks/book-landing.html?id=BK001'">
-            <img src="/images/books/kharif-master-guide-2026-cover.webp" alt="खरीफ फसल मास्टर गाइड 2026"
-              style="width:100%;height:100%;object-fit:cover;border-radius:6px 12px 12px 6px;box-shadow:-6px 8px 20px rgba(0,0,0,0.35);" />
-          </div>
-          <div style="flex:1;min-width:200px;">
-            <span
-              style="background:#fef08a;color:#854d0e;font-size:0.72rem;font-weight:900;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;">
-              🔥 सर्वाधिक लोकप्रिय
-            </span>
-            <h3 style="font-size:1.15rem;font-weight:900;margin:0 0 6px 0;color:#0f172a;">
-              खरीफ फसल मास्टर गाइड 2026
-            </h3>
-            <p style="font-size:0.84rem;color:#64748b;margin:0 0 12px 0;line-height:1.4;">
-              धान, सोयाबीन, मक्का व कपास की सम्पूर्ण सचित्र वैज्ञानिक गाइड
-            </p>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span style="font-size:1.3rem;font-weight:900;color:#16a34a;">₹99</span>
-              <span style="font-size:0.9rem;color:#94a3b8;text-decoration:line-through;">₹299</span>
-              <a href="/ebooks/book-landing.html?id=BK001" class="btn"
-                style="background:#facc15;color:#000;font-weight:900;font-size:0.85rem;padding:8px 18px;border-radius:20px;text-decoration:none;margin-left:auto;">
-                📖 देखें →
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- 10. DYNAMIC STOREFRONT SHELVES & BUNDLES (100% ADMIN CONTROLLED) -->
+  <section class="shelf-section" style="padding: 30px 0 50px 0; background: #ffffff;">
+    <div class="container" id="home-dynamic-shelves-container">
+      <!-- Universal Dynamic Shelves loaded via js/universal-shelves-renderer.js?v=20261119_v55 -->
     </div>
   </section>
 
-  <!-- 11. SMART AUTO-COMBO CART KPI NOTICE -->
-  <section style="padding: 10px 0 35px 0; background: #ffffff;">
-    <div class="container">
-      <div
-        style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px dashed #16a34a; border-radius: 18px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 18px rgba(22,163,74,0.1);">
-        <div style="display:flex; align-items:center; gap:16px;">
-          <div
-            style="width:52px; height:52px; border-radius:14px; background:#16a34a; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0; box-shadow:0 4px 12px rgba(22,163,74,0.3);">
-            🛒
-          </div>
-          <div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <span
-                style="background:#16a34a; color:#fff; font-size:0.75rem; font-weight:900; padding:2px 10px; border-radius:12px;">स्वतः
-                कॉम्बो डिस्काउंट</span>
-              <strong style="color:#0f172a; font-size:1.05rem;">कार्ट में 2 या अधिक ई-बुक्स जोड़ते ही स्वतः कॉम्बो ऑफर
-                लागू!</strong>
-            </div>
-            <p style="margin:4px 0 0 0; color:#334155; font-size:0.88rem; line-height:1.4;">
-              अपनी पसंद की कोई भी 2 पुस्तकें कार्ट में जोड़ें — चेकआउट पर ₹100 की अतिरिक्त फ्लैट छूट अपने आप जुड़ जाएगी।
-            </p>
-          </div>
-        </div>
-        <a href="/ebooks/my-library.html" class="btn"
-          style="background:#16a34a; color:#fff; font-weight:900; font-size:0.9rem; padding:10px 22px; border-radius:24px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 4px 12px rgba(22,163,74,0.25);">
-          <span>📚 लाइब्रेरी से पुस्तकें चुनें</span> →
-        </a>
-      </div>
-    </div>
-  </section>
+
 
   <!-- 12. DYNAMIC VIDEO GUIDES SHOWCASE (POWERED BY UNIVERSAL VIDEO LOADER) -->
   <section
@@ -1173,9 +1046,11 @@
   <script src="/js/universal-nav-drawer.js?v=20261108_v35_pure_share_id_only"></script>
   <script src="/js/universal-video-loader.js?v=1.2"></script>
   <script src="/js/viral-share-engine.js?v=1.2"></script>
-  <script src="/js/live-page-cms-bridge.js?v=1.2"></script>
+  <script src="/js/live-page-cms-bridge.js?v=20261119_v55"></script>
   <script src="/js/home-revamp.js?v=20261105_v100_dynamic_deal"></script>
-  <script src="/js/recent-purchase-toast.js?v=1.2"></script>
+  <script src="/js/recent-purchase-toast.js?v=20261120_v90"></script>
+  <script src="/js/universal-shelves-renderer.js?v=20261120_v90"></script>
+  <script src="/js/ai-user-intent-brain.js?v=20261120_v90" defer></script>
   <script src="/js/global-guest-modal.js?v=1.2"></script>
   <script src="/js/audio-greeting-engine.js?v=2.5"></script>
   <script src="/js/dual-whatsapp-order.js?v=1.2"></script>

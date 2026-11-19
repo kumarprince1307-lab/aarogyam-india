@@ -268,6 +268,7 @@
                             this.items = cachedItems;
                             this._cache = cachedItems;
                             this._cacheTime = Date.now();
+                            await this.syncPushedToasts();
                             this.updateBadgeCount();
                             this.renderList();
                             return; // 🛡️ 100% ZERO EGRESS
@@ -539,8 +540,88 @@
                 localStorage.setItem(lastFetchDateKey, todayStr);
                 localStorage.setItem(processedDispatchKey, String(lastAdminDispatch || Date.now()));
             } catch (e) { }
+            await this.syncPushedToasts();
             this.updateBadgeCount();
             this.renderList();
+        },
+
+        // 4.1 Sync Active Pushed Toasts & Alerts into Bell Notification Panel (100% Zero Supabase Egress)
+        syncPushedToasts: async function (force = false) {
+            try {
+                let shelvesCfg = null;
+                const localShelves = localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG');
+                if (localShelves) {
+                    try { shelvesCfg = JSON.parse(localShelves); } catch (e) { }
+                }
+                if (!shelvesCfg && window.aarogyamStoreShelvesConfig) {
+                    shelvesCfg = window.aarogyamStoreShelvesConfig;
+                }
+                if (!shelvesCfg) {
+                    try {
+                        const res = await fetch('/data/store-shelves-config.json?v=' + (Math.floor(Date.now() / 60000)));
+                        if (res.ok) shelvesCfg = await res.json();
+                    } catch (e) { }
+                }
+
+                const pushQueue = shelvesCfg?.active_mobile_push_queue || [];
+                const user = this.getUser();
+                const userKey = user.id || user.mobile || 'guest';
+                const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${userKey}`) || '[]');
+
+                if (Array.isArray(pushQueue) && pushQueue.length > 0) {
+                    const activePushed = pushQueue.filter(t => t && t.enabled !== false);
+                    activePushed.forEach(toast => {
+                        const notifId = `push_toast_${toast.id}`;
+                        this.items = this.items.filter(n => n.id !== notifId);
+
+                        const isRead = readStore.includes(notifId);
+                        const toastNotif = {
+                            id: notifId,
+                            category: 'announcements',
+                            isPushedToast: true,
+                            icon: toast.badge?.includes('सखी') ? '🤖' : (toast.badge?.includes('खरीद') ? '🛒' : '🌾'),
+                            iconClass: 'user-notif-icon-announcement',
+                            title: toast.title || 'आरोग्यम इंडिया 🌾',
+                            desc: (toast.message || '') + (toast.curiosity_answer ? ` (💡 उत्तर: ${toast.curiosity_answer})` : ''),
+                            image: toast.image,
+                            actionUrl: toast.action_url || '/',
+                            actionText: toast.action_text || '👉 विवरण देखें',
+                            timestamp: shelvesCfg.mobile_push_config?.dispatched_at || toast.created_at || new Date().toISOString(),
+                            isRead: isRead
+                        };
+                        this.items.unshift(toastNotif);
+                    });
+                }
+
+                try {
+                    const latestPushedRaw = localStorage.getItem('AAROGYAM_LATEST_PUSHED_TOAST');
+                    if (latestPushedRaw) {
+                        const lt = JSON.parse(latestPushedRaw);
+                        if (lt && lt.id) {
+                            const notifId = `push_toast_${lt.id}`;
+                            if (!this.items.some(n => n.id === notifId)) {
+                                this.items.unshift({
+                                    id: notifId,
+                                    category: 'announcements',
+                                    isPushedToast: true,
+                                    icon: lt.badge?.includes('सखी') ? '🤖' : (lt.badge?.includes('खरीद') ? '🛒' : '🌾'),
+                                    iconClass: 'user-notif-icon-announcement',
+                                    title: lt.title || 'आरोग्यम इंडिया 🌾',
+                                    desc: (lt.message || '') + (lt.curiosity_answer ? ` (💡 उत्तर: ${lt.curiosity_answer})` : ''),
+                                    image: lt.image,
+                                    actionUrl: lt.action_url || '/',
+                                    actionText: lt.action_text || '👉 विवरण देखें',
+                                    timestamp: new Date().toISOString(),
+                                    isRead: readStore.includes(notifId)
+                                });
+                            }
+                        }
+                    }
+                } catch (e) { }
+
+                this.updateBadgeCount();
+                this.renderList();
+            } catch (err) { }
         },
 
         // 5. Ensure DOM Shell (Drawer Panel & Top Toast) Exists
@@ -668,48 +749,60 @@
 
             container.innerHTML = filtered.map(item => {
                 const timeText = this.formatTimeAgo(item.timestamp);
+                const hasAction = Boolean(item.actionUrl && item.actionUrl !== '#');
                 return `
-                    <li class="user-notif-item ${item.isRead ? 'read' : 'unread'}" data-notif-id="${item.id}">
-                        <div class="user-notif-icon-box ${item.iconClass || 'user-notif-icon-broadcast'}">
-                            ${item.icon || '🔔'}
-                        </div>
-                        <div class="user-notif-content">
+                    <li class="user-notif-item ${item.isRead ? 'read' : 'unread'}" data-notif-id="${item.id}" ${hasAction ? `data-action-url="${item.actionUrl}"` : ''} style="cursor: pointer; display: flex; gap: 10px; align-items: flex-start;">
+                        ${item.image ? `
+                            <div style="width: 58px; height: 42px; min-width: 58px; border-radius: 6px; overflow: hidden; background: #0b1120; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                                <img src="${item.image}" alt="Thumb" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png';" />
+                            </div>
+                        ` : `
+                            <div class="user-notif-icon-box ${item.iconClass || 'user-notif-icon-broadcast'}">
+                                ${item.icon || '🔔'}
+                            </div>
+                        `}
+                        <div class="user-notif-content" style="flex: 1; min-width: 0;">
                             <h4 class="user-notif-item-title">${item.title}</h4>
                             <p class="user-notif-item-desc">${item.desc}</p>
-                            <div class="user-notif-item-meta">
+                            <div class="user-notif-item-meta" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px;">
                                 <span>🕒 ${timeText}</span>
-                                ${!item.isRead ? '<span style="color:#059669;font-weight:700;">• नया</span>' : ''}
+                                ${hasAction ? `<span style="color: #38bdf8; font-weight: 800; font-size: 0.72rem;">${item.actionText || '👉 खोलें'}</span>` : (!item.isRead ? '<span style="color:#059669;font-weight:700;">• नया</span>' : '')}
                             </div>
                         </div>
                     </li>
                 `;
             }).join('');
 
-            // Click on item to mark as read
+            // Click on item to mark as read and navigate
             container.querySelectorAll('.user-notif-item').forEach(itemEl => {
                 itemEl.addEventListener('click', () => {
                     const notifId = itemEl.getAttribute('data-notif-id');
                     this.markAsRead(notifId);
+                    const actUrl = itemEl.getAttribute('data-action-url');
+                    if (actUrl) {
+                        window.location.href = actUrl;
+                    }
                 });
             });
         },
 
         // 8. Open & Close Notification Panel
-        togglePanel: function () {
+        togglePanel: async function () {
             const overlay = document.getElementById('userNotifOverlay');
             if (!overlay) return;
 
             if (overlay.classList.contains('show')) {
                 this.closePanel();
             } else {
-                this.openPanel();
+                await this.openPanel();
             }
         },
 
-        openPanel: function () {
+        openPanel: async function () {
             const overlay = document.getElementById('userNotifOverlay');
             if (overlay) {
                 this.playBellSound();
+                await this.syncPushedToasts();
                 overlay.classList.add('show');
             }
         },
@@ -854,60 +947,129 @@
             // Egress Zero Policy: No periodic background queries. Data loaded on explicit page load/refresh.
         },
 
-        // 13. Smart Once-a-Day Web Push Permission Prompter
+        // 13. High-Converting Center Technical Modal (Anywhere Clickable Permission Requester)
         initWebPushPrompt: function () {
             try {
                 if (typeof window === 'undefined' || !('Notification' in window)) return;
-                if (Notification.permission === 'granted' || Notification.permission === 'denied') return;
+                if (Notification.permission === 'granted') return;
 
-                const today = new Date().toISOString().split('T')[0];
-                const lastPrompt = localStorage.getItem('AI_PUSH_PROMPT_DATE');
-                if (lastPrompt === today) return; // Strict: only ask once per day
-
-                // Do not display in admin panel
+                // Do not display in admin panel or checkout funnels
                 if (window.location.pathname.includes('/admin/') || this.isLandingPage()) return;
 
-                setTimeout(() => {
-                    if (document.getElementById('ai-push-permission-toast')) return;
-                    const toast = document.createElement('div');
-                    toast.id = 'ai-push-permission-toast';
-                    toast.innerHTML = `
-                        <div style="position:fixed;bottom:76px;left:50%;transform:translateX(-50%);max-width:92vw;width:420px;background:#0F172A;color:#fff;border:1.5px solid #38BDF8;border-radius:14px;padding:12px 16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);z-index:99990;display:flex;align-items:center;gap:12px;font-family:sans-serif;">
-                            <div style="font-size:1.6rem;background:rgba(56,189,248,0.15);width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🔔</div>
-                            <div style="flex:1;">
-                                <div style="font-weight:800;font-size:0.88rem;color:#F8FAFC;">अपडेट्स नोटिफिकेशन चालू करें?</div>
-                                <div style="font-size:0.75rem;color:#94A3B8;margin-top:2px;">कृषि व स्वास्थ्य की नई ई-बुक्स, वीडियो व विशेष छूट अलर्ट तुरंत पाएं।</div>
+                const showCenterModal = () => {
+                    if (Notification.permission === 'granted') return;
+                    if (document.getElementById('ai-push-permission-modal-wrap')) return;
+
+                    const backdrop = document.createElement('div');
+                    backdrop.id = 'ai-push-permission-modal-wrap';
+                    backdrop.style.cssText = `
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(15, 23, 42, 0.72);
+                        backdrop-filter: blur(6px);
+                        -webkit-backdrop-filter: blur(6px);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 999999;
+                        padding: 16px;
+                        animation: fadeInModal 0.25s ease-out;
+                    `;
+
+                    backdrop.innerHTML = `
+                        <div id="aiPushModalCard" style="background: #ffffff; color: #0f172a; border-radius: 20px; border: 2.5px solid #22c55e; box-shadow: 0 25px 60px rgba(0,0,0,0.45); max-width: 420px; width: 100%; padding: 24px 20px; text-align: center; font-family: system-ui, -apple-system, sans-serif; position: relative; cursor: pointer; user-select: none;">
+                            
+                            <button type="button" id="btnAiPushCloseX" title="बंद करें" style="position: absolute; top: 12px; right: 14px; background: transparent; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; line-height: 1; padding: 4px 8px; z-index: 10;">&times;</button>
+
+                            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); border: 2px solid #22c55e; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(34,197,94,0.25);">
+                                🔔
                             </div>
-                            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-                                <button type="button" id="btnAiPushAllow" style="background:#0284C7;border:none;color:#fff;font-weight:800;font-size:0.78rem;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;">चालू करें</button>
-                                <button type="button" id="btnAiPushDeny" style="background:transparent;border:none;color:#94A3B8;font-size:0.75rem;padding:4px;cursor:pointer;white-space:nowrap;">बाद में</button>
+
+                            <h3 style="margin: 0 0 6px 0; font-size: 1.15rem; font-weight: 900; color: #0f172a; line-height: 1.3;">
+                                🌾 फसल सुरक्षा, मौसम व स्वास्थ्य अलर्ट्स
+                            </h3>
+
+                            <p style="margin: 0 0 16px 0; font-size: 0.8rem; color: #475569; line-height: 1.35;">
+                                आरोग्यम इंडिया की ताज़ा सलाह, बीमारी रोकथाम व विशेष ऑफर्स सीधे अपने मोबाइल पर तुरंत पाएं:
+                            </p>
+
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 9px; font-size: 0.82rem; color: #1e293b; margin-bottom: 8px;">
+                                    <span style="color: #16a34a; font-weight: 900; font-size: 1.05rem; line-height: 1;">✔</span>
+                                    <span><strong>मौसम, बारिश व पाले की सटीक लाइव चेतावनी</strong></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 9px; font-size: 0.82rem; color: #1e293b; margin-bottom: 8px;">
+                                    <span style="color: #16a34a; font-weight: 900; font-size: 1.05rem; line-height: 1;">✔</span>
+                                    <span><strong>फसल रोग, कीट व स्प्रे का सही वैज्ञानिक समय</strong></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 9px; font-size: 0.82rem; color: #1e293b; margin-bottom: 8px;">
+                                    <span style="color: #16a34a; font-weight: 900; font-size: 1.05rem; line-height: 1;">✔</span>
+                                    <span><strong>दुधारू पशुओं में दूध व फैट वृद्धि के घरेलू उपाय</strong></span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 9px; font-size: 0.82rem; color: #1e293b;">
+                                    <span style="color: #16a34a; font-weight: 900; font-size: 1.05rem; line-height: 1;">✔</span>
+                                    <span><strong>सखी AI डॉक्टर व नई ई-बुक्स के विशेष डिस्काउंट</strong></span>
+                                </div>
                             </div>
+
+                            <button type="button" id="btnAiPushAllow" style="width: 100%; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-radius: 12px; padding: 13px; font-size: 0.98rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 16px rgba(22,163,74,0.4); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
+                                <span>🔔</span> <span>सूचनाएं चालू करें (Allow Notifications)</span>
+                            </button>
+
+                            <div style="font-size: 0.72rem; color: #16a34a; font-weight: 700; margin-bottom: 6px;">
+                                👆 कार्ड पर कहीं भी क्लिक करके सीधे चालू करें
+                            </div>
+
+                            <button type="button" id="btnAiPushDeny" style="background: transparent; border: none; color: #64748b; font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 6px;">
+                                बाद में याद दिलाएं (Remind Later)
+                            </button>
                         </div>
                     `;
-                    document.body.appendChild(toast);
 
-                    document.getElementById('btnAiPushDeny')?.addEventListener('click', () => {
-                        localStorage.setItem('AI_PUSH_PROMPT_DATE', today);
-                        toast.remove();
-                    });
+                    document.body.appendChild(backdrop);
 
-                    document.getElementById('btnAiPushAllow')?.addEventListener('click', async () => {
-                        localStorage.setItem('AI_PUSH_PROMPT_DATE', today);
+                    const closeAndSnooze = (e) => {
+                        if (e) e.stopPropagation();
+                        backdrop.remove();
+                        // Retry after 60 seconds (1 minute) until permission granted
+                        setTimeout(showCenterModal, 60000);
+                    };
+
+                    const requestAndAllow = async () => {
+                        backdrop.remove();
                         try {
                             const res = await Notification.requestPermission();
-                            if (res === 'granted' && 'serviceWorker' in navigator) {
-                                navigator.serviceWorker.ready.then(reg => {
-                                    reg.showNotification('आरोग्यम इंडिया में स्वागत है! 🌾', {
-                                        body: 'आपको सभी महत्वपूर्ण अपडेट्स व विशेष ऑफर्स की सूचना समय पर मिलेगी।',
-                                        icon: '/images/icons/pwa-icon-192x192.png',
-                                        badge: '/images/icons/pwa-icon-96x96.png'
+                            if (res === 'granted') {
+                                if ('serviceWorker' in navigator) {
+                                    navigator.serviceWorker.ready.then(reg => {
+                                        reg.showNotification('आरोग्यम इंडिया • नोटिफिकेशन सक्रिय! 🌾', {
+                                            body: 'राम-राम! अब आपको मौसम, फसल सुरक्षा और पशु पोषण के जरूरी अपडेट्स समय पर मिलते रहेंगे।',
+                                            icon: '/images/icons/pwa-icon-192x192.png',
+                                            badge: '/images/icons/pwa-icon-96x96.png'
+                                        });
                                     });
-                                });
+                                }
+                            } else {
+                                setTimeout(showCenterModal, 60000);
                             }
                         } catch (e) { }
-                        toast.remove();
+                    };
+
+                    document.getElementById('btnAiPushCloseX')?.addEventListener('click', closeAndSnooze);
+                    document.getElementById('btnAiPushDeny')?.addEventListener('click', closeAndSnooze);
+
+                    // 🎯 USER REQUEST: Clicking ANYWHERE on the card allows notifications!
+                    document.getElementById('aiPushModalCard')?.addEventListener('click', (e) => {
+                        if (e.target.closest('#btnAiPushCloseX') || e.target.closest('#btnAiPushDeny')) {
+                            return;
+                        }
+                        requestAndAllow();
                     });
-                }, 4000);
+                };
+
+                // Initial prompt after 4 seconds of page load
+                setTimeout(showCenterModal, 4000);
+
             } catch (err) { }
         },
 
@@ -1077,5 +1239,16 @@
         if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.ensureBellIcon === 'function') {
             window.USER_NOTIFICATIONS.ensureBellIcon();
         }
+    });
+
+    // 🔔 Real-time synchronization of pushed toasts across tabs and windows
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'AAROGYAM_NOTIF_DISPATCH_TIME' || e.key === 'AAROGYAM_STORE_SHELVES_CONFIG' || e.key === 'AAROGYAM_LATEST_PUSHED_TOAST') {
+            window.USER_NOTIFICATIONS?.syncPushedToasts?.(true);
+        }
+    });
+
+    window.addEventListener('aarogyam:new-push-toast', () => {
+        window.USER_NOTIFICATIONS?.syncPushedToasts?.(true);
     });
 })();

@@ -1,521 +1,551 @@
+
+  window.openSakhiChatWithQuestion = function(question) {
+    if (window.AarogyamAiProfileBrain) {
+      window.AarogyamAiProfileBrain.recordInteraction('sakhi_question_ask', 'toast_trigger', { question });
+    }
+    if (window.AarogyamSakhiChat && typeof window.AarogyamSakhiChat.openWithQuestion === 'function') {
+      window.AarogyamSakhiChat.openWithQuestion(question);
+      return;
+    }
+    // Check if Sakhi floating button or chat drawer exists
+    const sakhiBtn = document.getElementById('sakhi-chat-btn') || document.querySelector('.floating-sakhi-btn');
+    if (sakhiBtn) {
+      sakhiBtn.click();
+      return;
+    }
+    if (typeof window.openUniversalDrawer === 'function') {
+      window.openUniversalDrawer();
+      return;
+    }
+    // Fallback: alert/navigate to Sakhi
+    window.location.href = '/ebooks/agriculture.html#sakhi';
+  };
+
 /**
  * ====================================================================
- * AAROGYAM INDIA - RECENT PURCHASE TOASTS & NETFLIX-STYLE 3D POPUP ENGINE
- * Version: 3.0 (Smart Daily Limit, Position Above Bottom Nav, Contextual 3D Popups)
+ * AAROGYAM INDIA — DYNAMIC SOCIAL PROOF & MULTI-TYPE TOAST ENGINE
+ * Version: 4.0 (Full Dynamic Admin Controlled + 5 Toast Types)
+ * Supports:
+ *  1. book_sell_toast      - Recent verified book purchase
+ *  2. user_sell_toast      - VIP Member join / Referral Reward
+ *  3. sakhi_user_ask_toast - Live farmer asking Sakhi AI
+ *  4. sakhi_curiosity_toast - "क्या आप जानते हैं?" curiosity teaser + answer
+ *  5. webpage_toast        - Contextual solution links (dental, milk yield, etc.)
  * ====================================================================
  */
 
-(function () {
+(function (window, document) {
   'use strict';
 
-  /* ====================================================================
-     1. RECENT PURCHASE SOCIAL PROOF TOAST ENGINE (DYNAMIC ADMIN CONTROLLED)
-     ==================================================================== */
-  let LIVE_SALES_DATA = [
-    {
-      name: 'Rameshwar Patel',
-      city: 'Ujjain, MP',
-      bookTitle: 'खरीफ फसल मास्टर गाइड 2026',
-      price: '₹99',
-      image: '/images/books/kharif-master-guide-2026-cover.webp',
-      link: '/ebooks/kharif-master-guide-2026.html',
-      timeAgo: 'अभी-अभी'
-    },
-    {
-      name: 'धर्मेन्द्र सिंह पटेल',
-      city: 'जबलपुर, MP',
-      bookTitle: 'कृषि दवा डायरेक्टरी व स्प्रे गाइड',
-      price: '₹149',
-      image: '/images/books/bk016-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK016',
-      timeAgo: '1 मिनट पहले'
-    },
-    {
-      name: 'अमन वर्मा',
-      city: 'लखनऊ, UP',
-      bookTitle: 'घर बैठे पैसे कैसे कमाएँ? Income Guide',
-      price: '₹149',
-      image: '/images/books/bk018-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK018',
-      timeAgo: '2 मिनट पहले'
-    },
-    {
-      name: 'Suresh Kumar Yadav',
-      city: 'Karnal, Haryana',
-      bookTitle: 'खेती का डॉक्टर (Pocket Doctor)',
-      price: '₹99',
-      image: '/images/books/fasal-ka-doctor-cover.webp',
-      link: '/ebooks/kheti-dr.html',
-      timeAgo: '3 मिनट पहले'
-    },
-    {
-      name: 'हरविंदर सिंह संधू',
-      city: 'लुधियाना, पंजाब',
-      bookTitle: 'कृषि दवा डायरेक्टरी (BK016)',
-      price: '₹149',
-      image: '/images/books/bk016-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK016',
-      timeAgo: '5 मिनट पहले'
-    },
-    {
-      name: 'विकास गुप्ता',
-      city: 'जयपुर, राजस्थान',
-      bookTitle: 'घर बैठे पैसे कैसे कमाएँ? Income Guide',
-      price: '₹149',
-      image: '/images/books/bk018-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK018',
-      timeAgo: '7 मिनट पहले'
-    },
-    {
-      name: 'Kamlesh Patidar',
-      city: 'Indore, MP',
-      bookTitle: '2-Book सुपर सेवर कॉम्बो',
-      price: '₹198',
-      image: '/images/books/kharif-master-guide-2026-cover.webp',
-      link: '/ebooks/checkout.html?combo=agri2',
-      timeAgo: '9 मिनट पहले'
-    },
-    {
-      name: 'रोहन कुलकर्णी',
-      city: 'पुणे, महाराष्ट्र',
-      bookTitle: 'घर बैठे पैसे कैसे कमाएँ? Income Guide',
-      price: '₹149',
-      image: '/images/books/bk018-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK018',
-      timeAgo: '11 मिनट पहले'
-    },
-    {
-      name: 'रामनिवास जाट',
-      city: 'सीकर, राजस्थान',
-      bookTitle: 'कृषि दवा डायरेक्टरी व स्प्रे गाइड',
-      price: '₹149',
-      image: '/images/books/bk016-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK016',
-      timeAgo: '13 मिनट पहले'
-    },
-    {
-      name: 'आकाशदीप शर्मा',
-      city: 'भोपाल, MP',
-      bookTitle: 'घर बैठे पैसे कैसे कमाएँ? Income Guide',
-      price: '₹149',
-      image: '/images/books/bk018-cover.webp',
-      link: '/ebooks/book-landing.html?id=BK018',
-      timeAgo: '15 मिनट पहले'
-    },
-    {
-      name: 'Rajesh Verma',
-      city: 'Sitapur, UP',
-      bookTitle: 'खेती का डॉक्टर (Pocket Doctor)',
-      price: '₹99',
-      image: '/images/books/fasal-ka-doctor-cover.webp',
-      link: '/ebooks/kheti-dr.html',
-      timeAgo: '18 मिनट पहले'
-    }
-  ];
+  // -------------------------------------------------------------
+  // SECURITY & SANITIZATION HELPERS
+  // -------------------------------------------------------------
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
+  function safeUrl(url) {
+    if (!url) return '#';
+    const trimmed = String(url).trim();
+    if (trimmed.startsWith('/') || trimmed.startsWith('https://') || trimmed.startsWith('http://') || trimmed.startsWith('#')) {
+      return escapeHtml(trimmed);
+    }
+    return '#';
+  }
+
+  let toastsConfig = {
+    enabled: true,
+    interval_seconds: 30,
+    display_duration_seconds: 6,
+    position: 'bottom_left',
+    animation: 'slide_up',
+    types_enabled: {
+      book_sell_toast: true,
+      user_sell_toast: true,
+      sakhi_user_ask_toast: true,
+      sakhi_curiosity_toast: true,
+      webpage_toast: true
+    }
+  };
+
+  let activeToastsList = [];
   let toastIndex = 0;
   let toastTimer = null;
-  let isToastsEnabled = true;
-  let toastIntervalSeconds = 55;
+  let isStreamRunning = false;
+  let sessionToastCount = 0;
+  const MAX_SESSION_TOASTS = 30;
 
-  async function loadPopupAndToastConfig() {
+  // -------------------------------------------------------------
+  // 1. DATA LOADER (JSON + LOCALSTORAGE OVERRIDES)
+  // -------------------------------------------------------------
+  async function loadToastsConfigAndItems() {
     try {
-      // 1. Try local storage admin overrides
-      const localConf = localStorage.getItem('AAROGYAM_NOTIFS_POPUPS_CONFIG');
-      if (localConf) {
-        const parsed = JSON.parse(localConf);
-        applyConfig(parsed);
-        return;
-      }
-    } catch(e) {}
-
-    // 2. Fetch data/notifications-popups.json
-    try {
-      const res = await fetch('/data/notifications-popups.json');
+      const cacheBust = Date.now();
+      const res = await fetch('/data/store-shelves-config.json?v=' + cacheBust);
       if (res.ok) {
         const json = await res.json();
-        applyConfig(json);
-      }
-    } catch(e) {}
-  }
-
-  function applyConfig(cfg) {
-    if (!cfg) return;
-    const sp = cfg.social_proof_toasts;
-    if (sp) {
-      if (typeof sp.enabled === 'boolean') isToastsEnabled = sp.enabled;
-      if (sp.interval_seconds) toastIntervalSeconds = parseInt(sp.interval_seconds, 10) || 15;
-      if (Array.isArray(sp.items) && sp.items.length > 0) {
-        LIVE_SALES_DATA = sp.items;
-      }
-    }
-  }
-
-  loadPopupAndToastConfig();
-
-  function createPurchaseToastContainer() {
-    let container = document.getElementById('ai-live-purchase-toast-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'ai-live-purchase-toast-container';
-      document.body.appendChild(container);
-    }
-    return container;
-  }
-
-  function getCurrentPageItemPool() {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const curId = (urlParams.get('id') || urlParams.get('book') || (typeof currentBookId !== 'undefined' ? currentBookId : '')).toUpperCase().trim();
-
-      if (curId === 'BK016') {
-        const matched = LIVE_SALES_DATA.filter(it => (it.bookTitle || '').includes('BK016') || (it.bookTitle || '').includes('दवा') || (it.link || '').includes('BK016'));
-        if (matched.length > 0) return matched;
-      } else if (curId === 'BK018') {
-        const matched = LIVE_SALES_DATA.filter(it => (it.bookTitle || '').includes('BK018') || (it.bookTitle || '').includes('पैसे कैसे कमाएँ') || (it.bookTitle || '').includes('Income') || (it.link || '').includes('BK018'));
-        if (matched.length > 0) return matched;
-      } else if (curId === 'BK001') {
-        const matched = LIVE_SALES_DATA.filter(it => (it.bookTitle || '').includes('खरीफ') || (it.link || '').includes('kharif'));
-        if (matched.length > 0) return matched;
-      } else if (curId === 'BK002') {
-        const matched = LIVE_SALES_DATA.filter(it => (it.bookTitle || '').includes('डॉक्टर') || (it.link || '').includes('kheti-dr'));
-        if (matched.length > 0) return matched;
-      }
-    } catch (e) {}
-    return LIVE_SALES_DATA;
-  }
-
-  function showNextPurchaseToast() {
-    if (sessionStorage.getItem('AI_TOAST_DISMISSED') === 'true') return;
-    if (!isToastsEnabled || LIVE_SALES_DATA.length === 0) return;
-    const container = createPurchaseToastContainer();
-    const pool = getCurrentPageItemPool();
-    const rawItem = pool[toastIndex % pool.length];
-    toastIndex++;
-
-    const item = {
-      name: rawItem.name || 'ग्राहक साथी',
-      city: rawItem.city || rawItem.city_state || 'भारत',
-      bookTitle: rawItem.bookTitle || rawItem.book_title || 'डिजिटल ई-बुक',
-      price: rawItem.price || '₹149',
-      image: rawItem.image || rawItem.cover_image || '/images/books/kharif-master-guide-2026-cover.webp',
-      link: rawItem.link || '/ebooks/cart.html',
-      timeAgo: rawItem.timeAgo || rawItem.time_ago || 'अभी-अभी'
-    };
-
-    const toast = document.createElement('div');
-    toast.className = 'ai-purchase-toast-card';
-    toast.style.cssText = `
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: #ffffff;
-      border: 1.5px solid rgba(59, 130, 246, 0.4);
-      border-left: 3.5px solid #3b82f6;
-      border-radius: 12px;
-      padding: 7px 11px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-      max-width: 280px;
-      cursor: pointer;
-      transform: translate3d(120%, 0, 0);
-      opacity: 0;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      margin-top: 6px;
-    `;
-
-    toast.innerHTML = `
-      <div style="width: 38px; height: 48px; flex-shrink: 0; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);">
-        <img src="${item.image}" alt="${item.bookTitle}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';" />
-      </div>
-      <div style="flex: 1; min-width: 0;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 2px;">
-          <span style="font-weight: 800; font-size: 0.82rem; color: #fde047; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
-            ${item.name}
-          </span>
-          <span style="font-size: 0.65rem; color: #94a3b8; flex-shrink: 0;">
-            ${item.timeAgo}
-          </span>
-        </div>
-        <div style="font-size: 0.70rem; color: #cbd5e1; margin-bottom: 2px;">
-          📍 ${item.city}
-        </div>
-        <div style="font-size: 0.75rem; font-weight: 700; color: #ffffff; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
-          📘 ${item.bookTitle}
-        </div>
-        <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
-          <span style="background: #16a34a; color: #ffffff; font-size: 0.60rem; font-weight: 800; padding: 1px 5px; border-radius: 8px;">
-            ✓ Verified Purchase
-          </span>
-          <span style="font-size: 0.70rem; font-weight: 900; color: #38bdf8;">
-            ${item.price}
-          </span>
-        </div>
-      </div>
-      <button type="button" class="ai-toast-close" style="position: absolute; top: 3px; right: 3px; background: transparent; border: none; color: #94a3b8; font-size: 1.1rem; cursor: pointer; padding: 2px 6px;">&times;</button>
-      <div class="ai-toast-progress" style="position: absolute; bottom: 0; left: 0; height: 2.5px; background: linear-gradient(90deg, #10b981, #3b82f6); width: 100%; transition: width 4.5s linear;"></div>
-    `;
-
-    toast.onclick = (e) => {
-      if (e.target.classList.contains('ai-toast-close')) {
-        e.stopPropagation();
-        sessionStorage.setItem('AI_TOAST_DISMISSED', 'true');
-        if (toastTimer) clearInterval(toastTimer);
-        removeToast(toast);
-        return;
-      }
-      window.location.href = item.link;
-    };
-
-    container.appendChild(toast);
-
-    // Animate In from Right
-    requestAnimationFrame(() => {
-      toast.style.transform = 'translate3d(0, 0, 0)';
-      toast.style.opacity = '1';
-      const bar = toast.querySelector('.ai-toast-progress');
-      if (bar) {
-        requestAnimationFrame(() => { bar.style.width = '0%'; });
-      }
-    });
-
-    // Auto Remove after 4.5 seconds
-    setTimeout(() => {
-      removeToast(toast);
-    }, 4500);
-  }
-
-  function removeToast(toast) {
-    if (!toast) return;
-    toast.style.transform = 'translate3d(120%, 0, 0)';
-    toast.style.opacity = '0';
-    setTimeout(() => {
-      toast.remove();
-    }, 400);
-  }
-
-  let sessionToastCount = 0;
-  const MAX_SESSION_TOASTS = 2;
-
-  function startPurchaseToastStream() {
-    if (sessionStorage.getItem('AI_TOAST_DISMISSED') === 'true') return;
-
-    // Non-intrusive timing: first toast at 28 seconds, subsequent at 55-60 seconds, max 2 per session
-    setTimeout(() => {
-      if (sessionStorage.getItem('AI_TOAST_DISMISSED') === 'true') return;
-      if (sessionToastCount >= MAX_SESSION_TOASTS) return;
-      sessionToastCount++;
-      showNextPurchaseToast();
-
-      if (toastTimer) clearInterval(toastTimer);
-      const intervalMs = Math.max(50000, (toastIntervalSeconds && toastIntervalSeconds > 20 ? toastIntervalSeconds : 55) * 1000);
-      toastTimer = setInterval(() => {
-        if (sessionStorage.getItem('AI_TOAST_DISMISSED') === 'true' || sessionToastCount >= MAX_SESSION_TOASTS) {
-          clearInterval(toastTimer);
-          return;
+        if (json.toasts_config) {
+          toastsConfig = { ...toastsConfig, ...json.toasts_config };
         }
-        sessionToastCount++;
-        showNextPurchaseToast();
-      }, intervalMs);
-    }, 28000);
-  }
-
-  /* ====================================================================
-     2. SMART NETFLIX-STYLE 3D MINI POPUP SYSTEM (ONCE A DAY PER USER)
-     ==================================================================== */
-  function getTodayKey() {
-    const d = new Date();
-    return `AAROGYAM_NETFLIX_POPUP_${d.getFullYear()}_${d.getMonth() + 1}_${d.getDate()}`;
-  }
-
-  function hasShownPopupToday() {
-    try {
-      return localStorage.getItem(getTodayKey()) === '1';
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function markPopupShownToday() {
-    try {
-      localStorage.setItem(getTodayKey(), '1');
-    } catch (e) {}
-  }
-
-  function getPurchasedBookIds() {
-    try {
-      const p = JSON.parse(localStorage.getItem('AAROGYAM_PURCHASED_BOOKS') || localStorage.getItem('purchased_ebooks') || '[]');
-      if (Array.isArray(p)) {
-        return p.map(b => (typeof b === 'string' ? b : b.id || b.code || '')).filter(Boolean);
+        if (Array.isArray(json.live_toasts) && json.live_toasts.length > 0) {
+          activeToastsList = json.live_toasts;
+        }
+        setupNativeBackgroundPushScheduler(json);
       }
-      return [];
     } catch (e) {
-      return [];
+      console.warn('[ToastEngine] Notice loading config from server:', e);
     }
-  }
 
-  function getUserProfile() {
+    // Check localStorage overrides from Admin Panel
     try {
-      return JSON.parse(localStorage.getItem('AAROGYAM_USER') || localStorage.getItem('aarogyam_user_data') || '{}');
-    } catch (e) {
-      return {};
+      const localShelves = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+      if (localShelves) {
+        if (localShelves.toasts_config) toastsConfig = { ...toastsConfig, ...localShelves.toasts_config };
+        if (Array.isArray(localShelves.live_toasts) && localShelves.live_toasts.length > 0) {
+          activeToastsList = localShelves.live_toasts;
+        }
+        setupNativeBackgroundPushScheduler(localShelves);
+      }
+    } catch (e) { }
+
+    // Fallback if list is empty
+    if (activeToastsList.length === 0) {
+      activeToastsList = [
+        {
+          id: 'tst_fallback_1',
+          type: 'book_sell_toast',
+          title: 'सुरेश पटेल (उज्जैन, MP)',
+          message: 'ने अभी-अभी "लहसुन मास्टर गाइड" खरीदी!',
+          price: '₹99',
+          image: '/images/books/sub001-cover.webp',
+          action_text: '📖 विवरण देखें',
+          action_url: '/ebooks/book-landing.html?id=BK016',
+          badge: '🛒 सफल खरीद',
+          enabled: true
+        },
+        {
+          id: 'tst_fallback_2',
+          type: 'sakhi_curiosity_toast',
+          title: '🌾 क्या आप जानते हैं?',
+          message: 'गलत समय पर किया गया स्प्रे 40% तक दवा को बेअसर कर देता है। जानें स्प्रे का सही वैज्ञानिक समय!',
+          image: '/images/sakhi/aarogyam-sakhi.webp',
+          action_text: '🧪 सही समय जानें',
+          action_url: '/ebooks/book-landing.html?id=BK016',
+          badge: '💡 कृषि रहस्य',
+          enabled: true
+        }
+      ];
     }
   }
 
-  function determineContextualPopup() {
-    const currentPath = (window.location.pathname || '').toLowerCase();
-    const currentSearch = (window.location.search || '').toLowerCase();
+  // -------------------------------------------------------------
+  // 2. TOAST CARD HTML GENERATOR (FOR SITE & ADMIN PREVIEW)
+  // -------------------------------------------------------------
+  window.renderLiveToastCardHtml = function (toast) {
+    if (!toast) return '';
+    const type = toast.type || 'book_sell_toast';
+    const title = toast.title || 'आरोग्यम सूचना';
+    const msg = toast.message || '';
+    const badge = toast.badge || (
+      type === 'book_sell_toast' ? '🛒 सफल खरीद' :
+      type === 'user_sell_toast' ? '👑 VIP मेंबर' :
+      type === 'sakhi_user_ask_toast' ? '⚡ सखी AI लाइव' :
+      type === 'sakhi_curiosity_toast' ? '💡 क्या आप जानते हैं?' : '🌿 समाधान'
+    );
+    const img = toast.image || '/images/logo/logo.png';
+    const actionText = toast.action_text || '👉 विवरण देखें';
+    const actionUrl = toast.action_url || '#';
+    const price = toast.price || '';
+    const curiosityAnswer = toast.curiosity_answer || '';
 
-    // 1. Strictly SUPPRESS big intrusive popups on chat pages, dedicated book pages, reader, or checkout
-    if (
-      currentPath.includes('sakhi') ||
-      currentPath.includes('chat') ||
-      document.getElementById('sakhiChatApp') ||
-      document.getElementById('sakhiMessagesWrap') ||
-      currentPath.includes('book-landing') || 
-      currentPath.includes('reader') || 
-      currentPath.includes('checkout') || 
-      currentPath.includes('cart') || 
-      currentPath.includes('payment') || 
-      currentPath.includes('kharif-master-guide') || 
-      currentPath.includes('kheti-dr') ||
-      currentSearch.includes('id=bk') ||
-      currentSearch.includes('book=bk')
-    ) {
-      return null;
+    // Color accents based on type
+    let accentBorder = '#10b981';
+    let badgeBg = 'rgba(16, 185, 129, 0.18)';
+    let badgeColor = '#34d399';
+
+    if (type === 'user_sell_toast') {
+      accentBorder = '#f59e0b';
+      badgeBg = 'rgba(245, 158, 11, 0.2)';
+      badgeColor = '#fbbf24';
+    } else if (type === 'sakhi_user_ask_toast') {
+      accentBorder = '#38bdf8';
+      badgeBg = 'rgba(56, 189, 248, 0.2)';
+      badgeColor = '#38bdf8';
+    } else if (type === 'sakhi_curiosity_toast') {
+      accentBorder = '#a855f7';
+      badgeBg = 'rgba(168, 85, 247, 0.2)';
+      badgeColor = '#c084fc';
+    } else if (type === 'webpage_toast') {
+      accentBorder = '#14b8a6';
+      badgeBg = 'rgba(20, 184, 166, 0.2)';
+      badgeColor = '#2dd4bf';
     }
 
-    const purchased = getPurchasedBookIds();
-    const user = getUserProfile();
+    const escTitle = escapeHtml(title);
+    const escMsg = escapeHtml(msg);
+    const escBadge = escapeHtml(badge);
+    const escPrice = escapeHtml(price);
+    const escActionText = escapeHtml(actionText);
+    const validUrl = safeUrl(actionUrl);
+    const escCuriosityAnswer = escapeHtml(curiosityAnswer);
+    const validImg = safeUrl(img);
+    const encodedAskText = encodeURIComponent(toast.message || toast.title || '');
 
-    // 2. Unpurchased Book Rule for General Pages (Home / Catalog only):
-    if (!purchased.includes('BK001')) {
-      return {
-        type: 'book_kharif',
-        badge: '🌾 लोकप्रिय ई-बुक',
-        title: 'खरीफ फसल मास्टर गाइड 2026',
-        desc: '300+ सचित्र वैज्ञानिक गाइड व स्प्रे चार्ट!',
-        priceTag: 'मात्र ₹99',
-        ctaText: '📖 ई-बुक देखें',
-        link: '/ebooks/kharif-master-guide-2026.html',
-        image: '/images/books/kharif-master-guide-2026-cover.webp'
-      };
-    }
-
-    if (!purchased.includes('BK002')) {
-      return {
-        type: 'book_kheti_dr',
-        badge: '🩺 फसल सुरक्षा गाइड',
-        title: 'खेती का डॉक्टर (Pocket Doctor)',
-        desc: 'रोग पहचान व सही स्प्रे की सम्पूर्ण विधि!',
-        priceTag: 'मात्र ₹99',
-        ctaText: '📖 ई-बुक देखें',
-        link: '/ebooks/kheti-dr.html',
-        image: '/images/books/fasal-ka-doctor-cover.webp'
-      };
-    }
-
-    return null;
-  }
-
-  function initNetflixStyleMiniPopup() {
-    // ANTI-IRRITATION CHECK: Show strictly ONCE per day per user
-    if (hasShownPopupToday()) {
-      return;
-    }
-
-    const popupData = determineContextualPopup();
-    if (!popupData) return;
-
-    // Show after 45 seconds on allowed general pages (not right after landing)
-    setTimeout(() => {
-      renderNetflix3dPopup(popupData);
-      markPopupShownToday();
-    }, 45000);
-  }
-
-  function renderNetflix3dPopup(data) {
-    const wrap = document.createElement('div');
-    wrap.className = 'netflix-3d-popup-wrap';
-
-    wrap.innerHTML = `
-      <div class="netflix-3d-popup-card" id="netflix-3d-popup-card-elem">
-        <button type="button" class="netflix-popup-close-btn" title="Close" id="netflix-popup-close-trigger">&times;</button>
+    return `
+      <div class="ai-live-toast-inner" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1.5px solid rgba(255, 255, 255, 0.12); border-left: 4.5px solid ${accentBorder}; border-radius: 14px; padding: 10px 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); width: 320px; max-width: 90vw; box-sizing: border-box; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; position: relative;">
         
-        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 6px;">
-          <div style="width: 40px; height: 50px; border-radius: 6px; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);">
-            <img src="${data.image}" alt="${data.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/images/logo/logo.png';" />
+        <button type="button" class="ai-toast-close-btn" onclick="event.stopPropagation(); window.dismissLiveToast && window.dismissLiveToast();" style="position: absolute; top: 6px; right: 8px; background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; line-height: 1; cursor: pointer; padding: 2px 6px;">&times;</button>
+        
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <div style="width: 68px; height: 52px; min-width: 68px; border-radius: 8px; overflow: hidden; background: #0b1120; box-shadow: 0 3px 8px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <img src="${validImg}" alt="Thumb" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png';" />
           </div>
+
           <div style="flex: 1; min-width: 0;">
-            <span class="netflix-badge-tag">
-              ${data.badge}
-            </span>
-            <h4 style="font-size: 0.88rem; font-weight: 800; margin: 3px 0 2px 0; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">
-              ${data.title}
-            </h4>
-            <div style="font-size: 0.72rem; color: #fde047; font-weight: 800;">
-              ${data.priceTag}
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px;">
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; white-space: nowrap;">
+                ${escBadge}
+              </span>
+              ${escPrice ? `<span style="font-weight: 900; color: #38bdf8; font-size: 0.84rem; margin-right: 18px;">${escPrice}</span>` : ''}
+            </div>
+
+            <div style="font-weight: 800; font-size: 0.85rem; color: #f8fafc; line-height: 1.25; margin-bottom: 3px; word-break: break-word;">
+              ${escTitle}
+            </div>
+
+            <div style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.3; margin-bottom: 6px; word-break: break-word;">
+              ${escMsg}
+            </div>
+
+            ${escCuriosityAnswer ? `
+              <div id="curiosity_ans_box" style="display: none; background: rgba(168, 85, 247, 0.15); border: 1px dashed #a855f7; border-radius: 6px; padding: 6px 8px; font-size: 0.72rem; color: #e9d5ff; margin-bottom: 6px; line-height: 1.3;">
+                💡 <strong>उत्तर:</strong> ${escCuriosityAnswer}
+              </div>
+            ` : ''}
+
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px;">
+              ${escCuriosityAnswer ? `
+                <button type="button" onclick="event.stopPropagation(); const el=this.closest('.ai-live-toast-inner').querySelector('#curiosity_ans_box'); if(el) el.style.display=el.style.display==='none'?'block':'none';" style="background: rgba(255,255,255,0.12); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer;">
+                  💡 उत्तर देखें
+                </button>
+              ` : '<span></span>'}
+
+              ${(type === 'sakhi_user_ask_toast' || type === 'sakhi_curiosity_toast') ? `
+                <button type="button" onclick="event.stopPropagation(); window.openSakhiChatWithQuestion(decodeURIComponent('${encodedAskText}'))" style="background: ${accentBorder}; color: #000000; font-weight: 900; font-size: 0.72rem; padding: 4px 12px; border-radius: 20px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); white-space: nowrap;">
+                  ${escActionText}
+                </button>
+              ` : `
+                <a href="${validUrl}" style="background: ${accentBorder}; color: #000000; font-weight: 800; font-size: 0.72rem; padding: 4px 10px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); white-space: nowrap;">
+                  ${escActionText}
+                </a>
+              `}
             </div>
           </div>
         </div>
 
-        <p style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.35; margin: 0 0 8px 0;">
-          ${data.desc}
-        </p>
-
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <a href="${data.link}" class="netflix-popup-btn-cta">
-            <span>${data.ctaText}</span> &rarr;
-          </a>
-          <span style="font-size: 0.7rem; color: #94a3b8;">
-            ✓ 100% सुरक्षित
-          </span>
-        </div>
+        <div class="ai-live-toast-progress" style="position: absolute; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg, ${accentBorder}, #38bdf8); width: 100%; transition: width ${toastsConfig.display_duration_seconds || 6}s linear; border-radius: 0 0 14px 14px;"></div>
       </div>
     `;
+  };
 
-    document.body.appendChild(wrap);
+  // -------------------------------------------------------------
+  // 3. ADMIN PANEL REAL-TIME PREVIEW METHOD
+  // -------------------------------------------------------------
+  window.renderLiveToastPreview = function (toast, targetEl) {
+    if (!targetEl) return;
+    targetEl.innerHTML = window.renderLiveToastCardHtml(toast);
+  };
 
-    const card = document.getElementById('netflix-3d-popup-card-elem');
-    const closeBtn = document.getElementById('netflix-popup-close-trigger');
+  // -------------------------------------------------------------
+  // 4. DISPLAY CONTROLLER & ANIMATOR
+  // -------------------------------------------------------------
+  function createToastContainer() {
+    let container = document.getElementById('ai-universal-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'ai-universal-toast-container';
+      document.body.appendChild(container);
+    }
 
-    // 3D Animation In
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        if (card) card.classList.add('show');
-      }, 50);
-    });
+    const pos = toastsConfig.position || 'bottom_left';
+    container.style.cssText = `
+      position: fixed;
+      ${pos === 'bottom_right' ? 'right: 18px;' : 'left: 18px;'}
+      bottom: 74px;
+      z-index: 99999;
+      pointer-events: auto;
+      transition: all 0.3s ease;
+    `;
+    return container;
+  }
 
-    function closePopup() {
-      if (card) {
-        card.classList.remove('show');
-        card.classList.add('hide');
+  window.dismissLiveToast = function () {
+    const container = document.getElementById('ai-universal-toast-container');
+    if (container) container.innerHTML = '';
+  };
+
+  function showNextToast() {
+    if (sessionStorage.getItem('AI_TOAST_DISMISSED') === 'true') return;
+    if (!toastsConfig.enabled) return;
+
+    // Filter enabled types
+    const enabledTypes = toastsConfig.types_enabled || {};
+    const validPool = activeToastsList.filter(t => t && t.enabled !== false && (enabledTypes[t.type] !== false));
+    if (validPool.length === 0) return;
+
+    const toastData = validPool[toastIndex % validPool.length];
+    toastIndex++;
+    sessionToastCount++;
+
+    const container = createToastContainer();
+    container.innerHTML = window.renderLiveToastCardHtml(toastData);
+
+    const card = container.firstElementChild;
+    if (!card) return;
+
+    // Apply animation style
+    const anim = toastsConfig.animation || 'slide_up';
+    if (anim === 'fade') {
+      card.style.opacity = '0';
+      card.style.transition = 'opacity 0.4s ease';
+      requestAnimationFrame(() => card.style.opacity = '1');
+    } else if (anim === 'bounce') {
+      card.style.transform = 'scale(0.7) translateY(40px)';
+      card.style.opacity = '0';
+      card.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease';
+      requestAnimationFrame(() => {
+        card.style.transform = 'scale(1) translateY(0)';
+        card.style.opacity = '1';
+      });
+    } else if (anim === 'glass_glow') {
+      card.style.transform = 'translateY(20px)';
+      card.style.opacity = '0';
+      card.style.boxShadow = '0 0 25px rgba(56, 189, 248, 0.6)';
+      card.style.transition = 'all 0.4s ease';
+      requestAnimationFrame(() => {
+        card.style.transform = 'translateY(0)';
+        card.style.opacity = '1';
+      });
+    } else {
+      // default: slide_up
+      card.style.transform = 'translateY(100px)';
+      card.style.opacity = '0';
+      card.style.transition = 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease';
+      requestAnimationFrame(() => {
+        card.style.transform = 'translateY(0)';
+        card.style.opacity = '1';
+      });
+    }
+
+    // Trigger progress bar
+    const bar = card.querySelector('.ai-live-toast-progress');
+    if (bar) {
+      requestAnimationFrame(() => bar.style.width = '0%');
+    }
+
+    // Notify Profile Brain of Toast Impression
+    if (window.AarogyamAiProfileBrain) {
+      window.AarogyamAiProfileBrain.recordInteraction('toast_impression', toastData.type, toastData);
+    }
+
+    // Card click event
+    card.onclick = (e) => {
+      if (e.target.closest('.ai-toast-close-btn') || e.target.closest('#curiosity_ans_box') || e.target.tagName === 'BUTTON') {
+        return;
       }
-      setTimeout(() => {
-        wrap.remove();
-      }, 400);
+      if (window.AarogyamAiProfileBrain) {
+        window.AarogyamAiProfileBrain.recordInteraction('toast_click', toastData.type, toastData);
+      }
+      if (toastData.type === 'sakhi_user_ask_toast' || toastData.type === 'sakhi_curiosity_toast') {
+        window.openSakhiChatWithQuestion(toastData.message || toastData.title);
+        return;
+      }
+      if (toastData.action_url && toastData.action_url !== '#') {
+        window.location.href = toastData.action_url;
+      }
+    };
+
+    // Auto dismiss after display duration
+    const durationMs = (toastsConfig.display_duration_seconds || 6) * 1000;
+    setTimeout(() => {
+      if (card && card.parentElement) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(40px)';
+        setTimeout(() => {
+          if (container && container.contains(card)) {
+            container.removeChild(card);
+          }
+        }, 400);
+      }
+    }, durationMs);
+  }
+
+  // -------------------------------------------------------------
+  // 5. STREAM LIFECYCLE CONTROLLER
+  // -------------------------------------------------------------
+  function startToastStream() {
+    if (isStreamRunning) return;
+    isStreamRunning = true;
+
+    // Suppress popups on reader and checkout
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('reader') || path.includes('checkout') || path.includes('payment')) {
+      return;
     }
 
-    if (closeBtn) {
-      closeBtn.onclick = (e) => {
-        e.stopPropagation();
-        closePopup();
-      };
+    const intervalSeconds = Math.max(10, parseInt(toastsConfig.interval_seconds, 10) || 30);
+
+    // First toast after 10 seconds
+    setTimeout(() => {
+      showNextToast();
+      toastTimer = setInterval(() => {
+        if (sessionToastCount >= MAX_SESSION_TOASTS) {
+          clearInterval(toastTimer);
+          return;
+        }
+        showNextToast();
+      }, intervalSeconds * 1000);
+    }, 12000);
+  }
+
+  // -------------------------------------------------------------
+  // 6. REAL-TIME PURCHASE EVENT RECEIVER
+  // -------------------------------------------------------------
+  window.recordLivePurchaseToast = function (orderData) {
+    if (!orderData) return;
+    const newToast = {
+      id: 'live_' + Date.now(),
+      type: 'book_sell_toast',
+      title: `${orderData.userName || 'किसान साथी'} (${orderData.city || 'भारत'})`,
+      message: `ने अभी-अभी '${orderData.bookTitle || 'डिजिटल गाइड'}' खरीदी!`,
+      price: orderData.price ? `₹${orderData.price}` : '₹99',
+      image: orderData.cover || '/images/books/kharif-master-guide-2026-cover.webp',
+      action_text: '📖 विवरण देखें',
+      action_url: orderData.landingUrl || '/ebooks/ebook.html',
+      badge: '🛒 सफल खरीद',
+      enabled: true
+    };
+    activeToastsList.unshift(newToast);
+    // Show immediately
+    showNextToast();
+  };
+
+  // -------------------------------------------------------------
+  // 7. NATIVE BACKGROUND MOBILE PUSH QUEUE RUNNER
+  // Zero Egress Client-Side Native Notifications
+  // -------------------------------------------------------------
+  function setupNativeBackgroundPushScheduler(shelvesData) {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
+
+    const pushConfig = shelvesData?.mobile_push_config || {};
+    // Check if push is globally paused / turned OFF by admin
+    if (pushConfig.enabled === false) return;
+
+    const pushQueue = shelvesData?.active_mobile_push_queue || [];
+    if (!Array.isArray(pushQueue) || pushQueue.length === 0) return;
+
+    const intervalHours = pushConfig.interval_hours !== undefined ? pushConfig.interval_hours : 3;
+    const intervalMs = (intervalHours <= 0 ? 0 : intervalHours * 3600 * 1000);
+
+    const now = Date.now();
+
+    // Check validity / expiration
+    const dispatchedAt = pushConfig.dispatched_at ? new Date(pushConfig.dispatched_at).getTime() : 0;
+    if (dispatchedAt > 0 && pushConfig.validity_hours > 0) {
+      const ageMs = now - dispatchedAt;
+      if (ageMs > pushConfig.validity_hours * 3600 * 1000) {
+        // Expired notification batch
+        return;
+      }
+    }
+
+    const STORAGE_LAST_PUSH = 'AAROGYAM_LAST_NATIVE_PUSH_TS';
+    const lastPushTs = parseInt(localStorage.getItem(STORAGE_LAST_PUSH) || '0', 10);
+
+    // Immediate first push on subscription or when interval expires
+    const isDue = (lastPushTs === 0) || (intervalMs === 0 && (now - lastPushTs > 60000)) || (now - lastPushTs >= intervalMs);
+
+    if (isDue) {
+      // Pick best toast matching AI User Intent
+      let selectedToast = null;
+      if (window.AarogyamAiProfileBrain && typeof window.AarogyamAiProfileBrain.getState === 'function') {
+        const brainState = window.AarogyamAiProfileBrain.getState();
+        const dominant = brainState?.dominant_domain || 'agri';
+        
+        // Match with dominant domain
+        selectedToast = pushQueue.find(t => {
+          if (!t) return false;
+          if (dominant === 'agri' && (t.type === 'book_sell_toast' || t.title?.includes('फसल') || t.title?.includes('कृषि'))) return true;
+          if (dominant === 'business' && (t.type === 'user_sell_toast' || t.title?.includes('VIP') || t.title?.includes('कॉम्बो'))) return true;
+          if (dominant === 'health' && (t.type === 'webpage_toast' || t.title?.includes('दूध') || t.title?.includes('पशु'))) return true;
+          return false;
+        });
+      }
+
+      if (!selectedToast) {
+        // Fallback: Pick rotational toast
+        const pushIndex = parseInt(localStorage.getItem('AAROGYAM_NATIVE_PUSH_IDX') || '0', 10);
+        selectedToast = pushQueue[pushIndex % pushQueue.length];
+        localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', String(pushIndex + 1));
+      }
+
+      if (selectedToast) {
+        localStorage.setItem(STORAGE_LAST_PUSH, String(now));
+        dispatchNativeToastAlert(selectedToast);
+      }
     }
   }
 
-  // Initialize both systems on page ready
+  function dispatchNativeToastAlert(toast) {
+    if (!toast) return;
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+          if (reg && reg.showNotification) {
+            reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
+              body: toast.message || '',
+              icon: toast.image || '/images/icons/pwa-icon-192x192.png',
+              badge: '/images/icons/pwa-icon-96x96.png',
+              image: toast.image || undefined,
+              tag: 'aarogyam_live_toast',
+              renotify: true,
+              vibrate: [200, 100, 200],
+              data: {
+                url: toast.action_url || '/'
+              }
+            });
+          }
+        });
+        return;
+      }
+      new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
+        body: toast.message || '',
+        icon: toast.image || '/images/icons/pwa-icon-192x192.png',
+        image: toast.image || undefined,
+        tag: 'aarogyam_live_toast'
+      });
+    } catch(e) {}
+  }
+
+  // -------------------------------------------------------------
+  // 8. INITIALIZE ENGINE
+  // -------------------------------------------------------------
+  async function init() {
+    await loadToastsConfigAndItems();
+    startToastStream();
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      startPurchaseToastStream();
-      initNetflixStyleMiniPopup();
-    });
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    startPurchaseToastStream();
-    initNetflixStyleMiniPopup();
+    init();
   }
-})();
+
+})(window, document);

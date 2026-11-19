@@ -508,8 +508,13 @@
   }
 
   function renderDynamicKpiBadges(pageConfig) {
-    if (!pageConfig || !Array.isArray(pageConfig.kpi_cards) || pageConfig.kpi_cards.length === 0) return;
-    let kpiSection = document.getElementById('sec-kpi-badges');
+    const isHidden = pageConfig && Array.isArray(pageConfig.hidden_sections) && pageConfig.hidden_sections.includes('sec_kpi_badges');
+    let existingKpi = document.getElementById('sec-kpi-badges');
+    if (isHidden || !pageConfig || !Array.isArray(pageConfig.kpi_cards) || pageConfig.kpi_cards.length === 0) {
+      if (existingKpi) existingKpi.remove();
+      return;
+    }
+    let kpiSection = existingKpi;
     if (!kpiSection) {
       kpiSection = document.createElement('section');
       kpiSection.id = 'sec-kpi-badges';
@@ -521,10 +526,9 @@
         matrix.parentNode.insertBefore(kpiSection, matrix.nextSibling);
       } else if (hero && hero.nextSibling) {
         hero.parentNode.insertBefore(kpiSection, hero.nextSibling);
-      } else {
-        document.body.prepend(kpiSection);
       }
     }
+    if (!kpiSection || !kpiSection.parentNode) return;
 
     kpiSection.innerHTML = `
       <div class="container">

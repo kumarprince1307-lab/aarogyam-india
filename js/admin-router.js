@@ -13,7 +13,7 @@ const ROUTES = {
   'all-phonebook': () => import('./admin-pages-phonebook.js').then(m => m.initAllPhonebook()),
   'all-surveys': () => import('./admin-pages-surveys.js').then(m => m.initAllSurveys()),
   'all-landing-pages': () => import('./admin-pages-landing-pages.js?v=31.4').then(m => m.initAllLandingPages()),
-  'book-landing-pages': () => import('./admin-pages-book-landing.js?v=42.5').then(m => m.initBookLandingPages()),
+  'book-landing-pages': () => import('./admin-pages-book-landing.js?v=45.0_all_updates').then(m => m.initBookLandingPages()),
   'book-bundles': () => import('./admin-pages-book-bundle.js?v=20261108_v31_autopick').then(m => (m.renderBookBundlesPage ? m.renderBookBundlesPage() : m.initBookBundles())),
   'book-audio-studio': () => import('./admin-pages-book-audio-studio.js?v=20261111_v5_syntax_fixed').then(m => m.initBookAudioStudio()),
   'page-editor': () => import('./admin-pages-page-editor.js?v=38.1').then(m => m.initPageEditor()),
