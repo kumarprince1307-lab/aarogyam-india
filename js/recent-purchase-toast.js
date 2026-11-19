@@ -198,50 +198,50 @@
     const encodedAskText = encodeURIComponent(toast.message || toast.title || '');
 
     return `
-      <div class="ai-live-toast-inner" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1.5px solid rgba(255, 255, 255, 0.12); border-left: 4.5px solid ${accentBorder}; border-radius: 14px; padding: 10px 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); width: 320px; max-width: 90vw; box-sizing: border-box; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; position: relative;">
+      <div class="ai-live-toast-inner" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1.5px solid rgba(255, 255, 255, 0.12); border-left: 4px solid ${accentBorder}; border-radius: 12px; padding: 8px 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); width: 288px; max-width: 86vw; box-sizing: border-box; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; position: relative;">
         
-        <button type="button" class="ai-toast-close-btn" onclick="event.stopPropagation(); window.dismissLiveToast && window.dismissLiveToast();" style="position: absolute; top: 6px; right: 8px; background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; line-height: 1; cursor: pointer; padding: 2px 6px;">&times;</button>
+        <button type="button" class="ai-toast-close-btn" onclick="event.stopPropagation(); window.dismissLiveToast && window.dismissLiveToast();" style="position: absolute; top: 4px; right: 6px; background: transparent; border: none; color: #94a3b8; font-size: 1.05rem; line-height: 1; cursor: pointer; padding: 2px 4px;">&times;</button>
         
-        <div style="display: flex; gap: 10px; align-items: flex-start;">
-          <div style="width: 68px; height: 52px; min-width: 68px; border-radius: 8px; overflow: hidden; background: #0b1120; box-shadow: 0 3px 8px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <div style="display: flex; gap: 8px; align-items: flex-start;">
+          <div style="width: 60px; height: 46px; min-width: 60px; border-radius: 6px; overflow: hidden; background: #0b1120; box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <img src="${validImg}" alt="Thumb" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png';" />
           </div>
 
           <div style="flex: 1; min-width: 0;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px;">
-              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.68rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; white-space: nowrap;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.62rem; font-weight: 800; padding: 1.5px 6px; border-radius: 4px; letter-spacing: 0.2px; white-space: nowrap;">
                 ${escBadge}
               </span>
-              ${escPrice ? `<span style="font-weight: 900; color: #38bdf8; font-size: 0.84rem; margin-right: 18px;">${escPrice}</span>` : ''}
+              ${escPrice ? `<span style="font-weight: 900; color: #38bdf8; font-size: 0.76rem; margin-right: 14px;">${escPrice}</span>` : ''}
             </div>
 
-            <div style="font-weight: 800; font-size: 0.85rem; color: #f8fafc; line-height: 1.25; margin-bottom: 3px; word-break: break-word;">
+            <div style="font-weight: 800; font-size: 0.78rem; color: #f8fafc; line-height: 1.2; margin-bottom: 2px; word-break: break-word;">
               ${escTitle}
             </div>
 
-            <div style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.3; margin-bottom: 6px; word-break: break-word;">
+            <div style="font-size: 0.68rem; color: #cbd5e1; line-height: 1.25; margin-bottom: 4px; word-break: break-word;">
               ${escMsg}
             </div>
 
             ${escCuriosityAnswer ? `
-              <div id="curiosity_ans_box" style="display: none; background: rgba(168, 85, 247, 0.15); border: 1px dashed #a855f7; border-radius: 6px; padding: 6px 8px; font-size: 0.72rem; color: #e9d5ff; margin-bottom: 6px; line-height: 1.3;">
+              <div id="curiosity_ans_box" style="display: none; background: rgba(168, 85, 247, 0.15); border: 1px dashed #a855f7; border-radius: 6px; padding: 4px 6px; font-size: 0.66rem; color: #e9d5ff; margin-bottom: 4px; line-height: 1.25;">
                 💡 <strong>उत्तर:</strong> ${escCuriosityAnswer}
               </div>
             ` : ''}
 
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 3px;">
               ${escCuriosityAnswer ? `
-                <button type="button" onclick="event.stopPropagation(); const el=this.closest('.ai-live-toast-inner').querySelector('#curiosity_ans_box'); if(el) el.style.display=el.style.display==='none'?'block':'none';" style="background: rgba(255,255,255,0.12); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer;">
+                <button type="button" onclick="event.stopPropagation(); const el=this.closest('.ai-live-toast-inner').querySelector('#curiosity_ans_box'); if(el) el.style.display=el.style.display==='none'?'block':'none';" style="background: rgba(255,255,255,0.12); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); font-size: 0.64rem; font-weight: 700; padding: 2px 6px; border-radius: 5px; cursor: pointer;">
                   💡 उत्तर देखें
                 </button>
               ` : '<span></span>'}
 
               ${(type === 'sakhi_user_ask_toast' || type === 'sakhi_curiosity_toast') ? `
-                <button type="button" onclick="event.stopPropagation(); window.openSakhiChatWithQuestion(decodeURIComponent('${encodedAskText}'))" style="background: ${accentBorder}; color: #000000; font-weight: 900; font-size: 0.72rem; padding: 4px 12px; border-radius: 20px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); white-space: nowrap;">
+                <button type="button" onclick="event.stopPropagation(); window.openSakhiChatWithQuestion(decodeURIComponent('${encodedAskText}'))" style="background: ${accentBorder}; color: #000000; font-weight: 900; font-size: 0.66rem; padding: 3px 10px; border-radius: 18px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); white-space: nowrap;">
                   ${escActionText}
                 </button>
               ` : `
-                <a href="${validUrl}" style="background: ${accentBorder}; color: #000000; font-weight: 800; font-size: 0.72rem; padding: 4px 10px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); white-space: nowrap;">
+                <a href="${validUrl}" style="background: ${accentBorder}; color: #000000; font-weight: 800; font-size: 0.66rem; padding: 3px 9px; border-radius: 18px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); white-space: nowrap;">
                   ${escActionText}
                 </a>
               `}
@@ -249,7 +249,7 @@
           </div>
         </div>
 
-        <div class="ai-live-toast-progress" style="position: absolute; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg, ${accentBorder}, #38bdf8); width: 100%; transition: width ${toastsConfig.display_duration_seconds || 6}s linear; border-radius: 0 0 14px 14px;"></div>
+        <div class="ai-live-toast-progress" style="position: absolute; bottom: 0; left: 0; height: 2.5px; background: linear-gradient(90deg, ${accentBorder}, #38bdf8); width: 100%; transition: width ${toastsConfig.display_duration_seconds || 6}s linear; border-radius: 0 0 12px 12px;"></div>
       </div>
     `;
   };
@@ -506,14 +506,17 @@
   function dispatchNativeToastAlert(toast) {
     if (!toast) return;
     try {
+      const notifIcon = toast.image || '/images/icons/pwa-icon-192x192.png';
+      const wideBanner = toast.image || undefined;
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(reg => {
           if (reg && reg.showNotification) {
             reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
               body: toast.message || '',
-              icon: toast.image || '/images/icons/pwa-icon-192x192.png',
+              icon: notifIcon,
               badge: '/images/icons/pwa-icon-96x96.png',
-              image: toast.image || undefined,
+              image: wideBanner,
               tag: 'aarogyam_live_toast',
               renotify: true,
               vibrate: [200, 100, 200],
@@ -527,11 +530,143 @@
       }
       new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
         body: toast.message || '',
-        icon: toast.image || '/images/icons/pwa-icon-192x192.png',
-        image: toast.image || undefined,
+        icon: notifIcon,
+        image: wideBanner,
         tag: 'aarogyam_live_toast'
       });
     } catch(e) {}
+  }
+
+  // -------------------------------------------------------------
+  // 7.1 UNIVERSAL CENTER PUSH PERMISSION PROMPT (ALL SITE PAGES)
+  // -------------------------------------------------------------
+  function ensureWebPushPermissionPrompt() {
+    try {
+      if (typeof window === 'undefined' || !('Notification' in window)) return;
+      if (Notification.permission === 'granted') return;
+      if (window.location.pathname.includes('/admin/')) return;
+
+      const showModal = () => {
+        if (Notification.permission === 'granted') return;
+        if (document.getElementById('ai-push-permission-modal-wrap')) return;
+
+        const backdrop = document.createElement('div');
+        backdrop.id = 'ai-push-permission-modal-wrap';
+        backdrop.style.cssText = `
+          position: fixed;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.72);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 999999;
+          padding: 16px;
+        `;
+
+        backdrop.innerHTML = `
+          <div id="aiPushModalCard" style="background: #ffffff; color: #0f172a; border-radius: 20px; border: 2.5px solid #22c55e; box-shadow: 0 25px 60px rgba(0,0,0,0.45); max-width: 400px; width: 100%; padding: 22px 18px; text-align: center; font-family: system-ui, -apple-system, sans-serif; position: relative; cursor: pointer; user-select: none;">
+            
+            <button type="button" id="btnAiPushCloseX" title="बंद करें" style="position: absolute; top: 10px; right: 12px; background: transparent; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; line-height: 1; padding: 4px 8px; z-index: 10;">&times;</button>
+
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); border: 2px solid #22c55e; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(34,197,94,0.25);">
+              🔔
+            </div>
+
+            <h3 style="margin: 0 0 5px 0; font-size: 1.1rem; font-weight: 900; color: #0f172a; line-height: 1.3;">
+              🌾 फसल सुरक्षा, मौसम व स्वास्थ्य अलर्ट्स
+            </h3>
+
+            <p style="margin: 0 0 14px 0; font-size: 0.78rem; color: #475569; line-height: 1.35;">
+              आरोग्यम इंडिया की ताज़ा सलाह, बीमारी रोकथाम व विशेष ऑफर्स सीधे अपने मोबाइल पर तुरंत पाएं:
+            </p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #1e293b; margin-bottom: 7px;">
+                <span style="color: #16a34a; font-weight: 900; font-size: 1rem; line-height: 1;">✔</span>
+                <span><strong>मौसम, बारिश व पाले की सटीक लाइव चेतावनी</strong></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #1e293b; margin-bottom: 7px;">
+                <span style="color: #16a34a; font-weight: 900; font-size: 1rem; line-height: 1;">✔</span>
+                <span><strong>फसल रोग, कीट व स्प्रे का सही वैज्ञानिक समय</strong></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #1e293b; margin-bottom: 7px;">
+                <span style="color: #16a34a; font-weight: 900; font-size: 1rem; line-height: 1;">✔</span>
+                <span><strong>दुधारू पशुओं में दूध व फैट वृद्धि के घरेलू उपाय</strong></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #1e293b;">
+                <span style="color: #16a34a; font-weight: 900; font-size: 1rem; line-height: 1;">✔</span>
+                <span><strong>सखी AI डॉक्टर व नई ई-बुक्स के विशेष डिस्काउंट</strong></span>
+              </div>
+            </div>
+
+            <button type="button" id="btnAiPushAllow" style="width: 100%; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border: none; border-radius: 12px; padding: 12px; font-size: 0.95rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 16px rgba(22,163,74,0.4); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;">
+              <span>🔔</span> <span>सूचनाएं चालू करें (Allow Notifications)</span>
+            </button>
+
+            <div style="font-size: 0.72rem; color: #16a34a; font-weight: 700; margin-bottom: 6px;">
+              👆 कार्ड पर कहीं भी क्लिक करके सीधे चालू करें
+            </div>
+
+            <button type="button" id="btnAiPushDeny" style="background: transparent; border: none; color: #64748b; font-size: 0.78rem; font-weight: 700; cursor: pointer; padding: 4px;">
+              बाद में याद दिलाएं (Remind Later)
+            </button>
+          </div>
+        `;
+
+        document.body.appendChild(backdrop);
+
+        const closeAndSnooze = (e) => {
+          if (e) e.stopPropagation();
+          backdrop.remove();
+          setTimeout(showModal, 60000);
+        };
+
+        const requestAndAllow = async () => {
+          backdrop.remove();
+          try {
+            const res = await Notification.requestPermission();
+            if (res === 'granted') {
+              // Immediately fire first toast from push queue on mobile phone!
+              let firstToast = activeToastsList[0];
+              try {
+                const localShelves = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || '{}');
+                if (localShelves?.active_mobile_push_queue?.length > 0) {
+                  firstToast = localShelves.active_mobile_push_queue[0];
+                }
+              } catch(e) {}
+              if (firstToast) {
+                dispatchNativeToastAlert(firstToast);
+              }
+              // Initialize native push scheduler
+              let shelvesData = null;
+              try {
+                shelvesData = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+              } catch (e) { }
+              if (shelvesData) {
+                setupNativeBackgroundPushScheduler(shelvesData);
+              }
+            } else {
+              setTimeout(showModal, 60000);
+            }
+          } catch (e) { }
+        };
+
+        document.getElementById('btnAiPushCloseX')?.addEventListener('click', closeAndSnooze);
+        document.getElementById('btnAiPushDeny')?.addEventListener('click', closeAndSnooze);
+
+        // Clicking anywhere on card triggers permission allow
+        document.getElementById('aiPushModalCard')?.addEventListener('click', (e) => {
+          if (e.target.closest('#btnAiPushCloseX') || e.target.closest('#btnAiPushDeny')) {
+            return;
+          }
+          requestAndAllow();
+        });
+      };
+
+      setTimeout(showModal, 3500);
+    } catch(err) {}
   }
 
   // -------------------------------------------------------------
@@ -540,6 +675,7 @@
   async function init() {
     await loadToastsConfigAndItems();
     startToastStream();
+    ensureWebPushPermissionPrompt();
   }
 
   if (document.readyState === 'loading') {

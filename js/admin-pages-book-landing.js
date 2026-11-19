@@ -2268,8 +2268,6 @@ Instant Download & Lifetime Access
             </select>
           </div>
 
-          </div>
-
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
               <label class="admin-label" style="font-size: 0.76rem;">टोस्ट का प्रकार (Toast Type):</label>
@@ -4340,10 +4338,7 @@ Instant Download & Lifetime Access
     }
 
     try {
-      // 🛡️ ZERO CROP GUARANTEE:
-      // 1. 'icon' MUST be the crisp 1:1 square app logo. If a 16:9 banner is set as 'icon', Windows & Android crop it into a square!
-      // 2. 'image' displays the full-width uncropped banner (BigPictureStyle) on Android & Windows!
-      const squareAppIcon = '/images/icons/pwa-icon-192x192.png';
+      const notifIcon = toast.image || '/images/icons/pwa-icon-192x192.png';
       const wideBanner = toast.image || undefined;
 
       if ('serviceWorker' in navigator) {
@@ -4351,7 +4346,7 @@ Instant Download & Lifetime Access
         if (reg && reg.showNotification) {
           await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
             body: toast.message || '',
-            icon: squareAppIcon,
+            icon: notifIcon,
             badge: '/images/icons/pwa-icon-96x96.png',
             image: wideBanner,
             tag: 'aarogyam_live_toast',
@@ -4369,7 +4364,7 @@ Instant Download & Lifetime Access
       }
       new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
         body: toast.message || '',
-        icon: squareAppIcon,
+        icon: notifIcon,
         image: wideBanner,
         tag: 'aarogyam_live_toast'
       });

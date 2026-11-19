@@ -550,16 +550,19 @@
             try {
                 let shelvesCfg = null;
                 const localShelves = localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG');
-                if (localShelves) {
+                if (localShelves && !force) {
                     try { shelvesCfg = JSON.parse(localShelves); } catch (e) { }
                 }
                 if (!shelvesCfg && window.aarogyamStoreShelvesConfig) {
                     shelvesCfg = window.aarogyamStoreShelvesConfig;
                 }
-                if (!shelvesCfg) {
+                if (!shelvesCfg || force || !Array.isArray(shelvesCfg.active_mobile_push_queue)) {
                     try {
                         const res = await fetch('/data/store-shelves-config.json?v=' + (Math.floor(Date.now() / 60000)));
-                        if (res.ok) shelvesCfg = await res.json();
+                        if (res.ok) {
+                            shelvesCfg = await res.json();
+                            try { localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesCfg)); } catch (e) { }
+                        }
                     } catch (e) { }
                 }
 
@@ -575,12 +578,13 @@
                         this.items = this.items.filter(n => n.id !== notifId);
 
                         const isRead = readStore.includes(notifId);
+                        const isBookSale = toast.type === 'book_sell_toast' || (toast.badge && toast.badge.includes('खरीद'));
                         const toastNotif = {
                             id: notifId,
-                            category: 'announcements',
+                            category: isBookSale ? 'sales' : 'announcements',
                             isPushedToast: true,
-                            icon: toast.badge?.includes('सखी') ? '🤖' : (toast.badge?.includes('खरीद') ? '🛒' : '🌾'),
-                            iconClass: 'user-notif-icon-announcement',
+                            icon: toast.badge?.includes('सखी') ? '🤖' : (isBookSale ? '🛒' : '🌾'),
+                            iconClass: isBookSale ? 'user-notif-icon-sale' : 'user-notif-icon-announcement',
                             title: toast.title || 'आरोग्यम इंडिया 🌾',
                             desc: (toast.message || '') + (toast.curiosity_answer ? ` (💡 उत्तर: ${toast.curiosity_answer})` : ''),
                             image: toast.image,
@@ -600,12 +604,13 @@
                         if (lt && lt.id) {
                             const notifId = `push_toast_${lt.id}`;
                             if (!this.items.some(n => n.id === notifId)) {
+                                const isLtSale = lt.type === 'book_sell_toast' || (lt.badge && lt.badge.includes('खरीद'));
                                 this.items.unshift({
                                     id: notifId,
-                                    category: 'announcements',
+                                    category: isLtSale ? 'sales' : 'announcements',
                                     isPushedToast: true,
-                                    icon: lt.badge?.includes('सखी') ? '🤖' : (lt.badge?.includes('खरीद') ? '🛒' : '🌾'),
-                                    iconClass: 'user-notif-icon-announcement',
+                                    icon: lt.badge?.includes('सखी') ? '🤖' : (isLtSale ? '🛒' : '🌾'),
+                                    iconClass: isLtSale ? 'user-notif-icon-sale' : 'user-notif-icon-announcement',
                                     title: lt.title || 'आरोग्यम इंडिया 🌾',
                                     desc: (lt.message || '') + (lt.curiosity_answer ? ` (💡 उत्तर: ${lt.curiosity_answer})` : ''),
                                     image: lt.image,
@@ -617,6 +622,12 @@
                             }
                         }
                     }
+                } catch (e) { }
+
+                // Persist synced notifications to cache so they stay visible
+                const cacheKey = `AI_NOTIFS_CACHE_${userKey}`;
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify(this.items));
                 } catch (e) { }
 
                 this.updateBadgeCount();
@@ -953,8 +964,8 @@
                 if (typeof window === 'undefined' || !('Notification' in window)) return;
                 if (Notification.permission === 'granted') return;
 
-                // Do not display in admin panel or checkout funnels
-                if (window.location.pathname.includes('/admin/') || this.isLandingPage()) return;
+                // Do not display in admin panel
+                if (window.location.pathname.includes('/admin/')) return;
 
                 const showCenterModal = () => {
                     if (Notification.permission === 'granted') return;
