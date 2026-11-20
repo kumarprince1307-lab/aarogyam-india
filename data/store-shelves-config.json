@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T13:50:40.140Z",
+  "updated_at": "2026-11-20T13:51:12.490Z",
   "version": "1.0",
   "shelves": [
     {
@@ -429,7 +429,7 @@
       "badge": "💡 बागवानी रहस्य",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": true,
+      "wakeup_selected": false,
       "inapp_selected": false
     },
     {
@@ -564,7 +564,7 @@
       "badge": "🌿 जैविक समाधान",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": false,
+      "wakeup_selected": true,
       "inapp_selected": false
     },
     {
@@ -600,15 +600,15 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_cur_004",
-      "type": "sakhi_curiosity_toast",
-      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
-      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
-      "image": "/images/books/sub001-cover.webp",
-      "action_text": "🍎 फल सुरक्षा गाइड",
-      "action_url": "/ebooks/book-landing.html?id=BK022",
-      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
-      "badge": "💡 बागवानी रहस्य",
+      "id": "tst_bun_003",
+      "type": "webpage_toast",
+      "title": "🌿 100% जैविक फसल पोषण किट (NetSurf)",
+      "message": "स्टीमरिच + बायो-99 + शेत: रासायनिक खाद का 40% खर्च घटाएं और उपज 30% बढ़ाएं।",
+      "price": "ऑर्डर चालू",
+      "image": "/images/products/netsurf/stimrich.webp",
+      "action_text": "📲 WhatsApp पर मंगाएं",
+      "action_url": "/ebooks/agriculture.html#sec-agri-products",
+      "badge": "🌿 जैविक समाधान",
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
@@ -616,25 +616,25 @@
     }
   ],
   "mobile_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795181758488",
+    "enabled": true,
+    "batch_id": "wakeup_1795182672490",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T13:35:58.488Z",
+    "dispatched_at": "2026-11-20T13:51:12.490Z",
     "active_count": 1
   },
   "wake_up_push_queue": [
     {
-      "id": "tst_cur_004",
-      "type": "sakhi_curiosity_toast",
-      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
-      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
-      "image": "/images/books/sub001-cover.webp",
-      "action_text": "🍎 फल सुरक्षा गाइड",
-      "action_url": "/ebooks/book-landing.html?id=BK022",
-      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
-      "badge": "💡 बागवानी रहस्य",
+      "id": "tst_bun_003",
+      "type": "webpage_toast",
+      "title": "🌿 100% जैविक फसल पोषण किट (NetSurf)",
+      "message": "स्टीमरिच + बायो-99 + शेत: रासायनिक खाद का 40% खर्च घटाएं और उपज 30% बढ़ाएं।",
+      "price": "ऑर्डर चालू",
+      "image": "/images/products/netsurf/stimrich.webp",
+      "action_text": "📲 WhatsApp पर मंगाएं",
+      "action_url": "/ebooks/agriculture.html#sec-agri-products",
+      "badge": "🌿 जैविक समाधान",
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
@@ -642,12 +642,12 @@
     }
   ],
   "wake_up_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795181758488",
+    "enabled": true,
+    "batch_id": "wakeup_1795182672490",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T13:35:58.488Z",
+    "dispatched_at": "2026-11-20T13:51:12.490Z",
     "active_count": 1
   },
   "active_in_app_queue": [
