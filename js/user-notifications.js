@@ -620,6 +620,7 @@
                 }
 
                 if (Array.isArray(dispatchedLog) && dispatchedLog.length > 0) {
+                    const newPushItems = [];
                     dispatchedLog.forEach(toast => {
                         const notifId = `push_toast_${toast.id}`;
                         this.items = this.items.filter(n => n.id !== notifId);
@@ -640,8 +641,11 @@
                             timestamp: toast.dispatchedAt ? new Date(toast.dispatchedAt).toISOString() : (shelvesCfg?.mobile_push_config?.dispatched_at || toast.created_at || new Date().toISOString()),
                             isRead: isRead
                         };
-                        this.items.unshift(toastNotif);
+                        newPushItems.push(toastNotif);
                     });
+                    this.items = [...newPushItems, ...this.items];
+                    // Strict Chronological Sort: Newest timestamp ALWAYS at top!
+                    this.items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
                 }
 
                 try {
@@ -1316,9 +1320,11 @@
       } catch (e) { }
     };
 
+    window.AAROGYAM_VAPID_PUBLIC_KEY = 'BDosaDIayZKVLvPuuSk5he5fb_Q9aNBOruOkB_Elw_Wk1VMnpwZk3ZyipaCUbWs_i54HBjwe_uxn9-A5lMJZKG8';
+
     // -------------------------------------------------------------
     // SUPABASE USER NOTIFICATION & PWA STATUS SYNCHRONIZER
-    // Automatically persists notifications_enabled & pwa_installed in profiles
+    // Automatically persists notifications_enabled, pwa_installed & push_subscription in profiles
     // -------------------------------------------------------------
     window.syncUserPushAndPwaStatus = async function (forceStatus) {
       try {
@@ -1345,13 +1351,43 @@
         const isGranted = (notifPermission === 'granted');
         const isPwa = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-        const syncKey = `AI_NOTIF_SYNC_${isGranted ? '1' : '0'}_${isPwa ? '1' : '0'}`;
-        if (sessionStorage.getItem(syncKey) === 'true') return;
-
         const payload = {
           notifications_enabled: isGranted,
           pwa_installed: isPwa
         };
+
+        // 🛡️ TRUE WEB PUSH VAPID SUBSCRIPTION (For wake-up when screen & app are closed)
+        if (isGranted && 'serviceWorker' in navigator && 'PushManager' in window) {
+          try {
+            const reg = await navigator.serviceWorker.ready;
+            if (reg && reg.pushManager) {
+              let sub = await reg.pushManager.getSubscription();
+              if (!sub) {
+                const rawKey = window.AAROGYAM_VAPID_PUBLIC_KEY;
+                const padding = '='.repeat((4 - rawKey.length % 4) % 4);
+                const base64 = (rawKey + padding).replace(/-/g, '+').replace(/_/g, '/');
+                const rawData = window.atob(base64);
+                const outputArray = new Uint8Array(rawData.length);
+                for (let i = 0; i < rawData.length; ++i) {
+                  outputArray[i] = rawData.charCodeAt(i);
+                }
+                sub = await reg.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: outputArray
+                });
+              }
+              if (sub) {
+                payload.push_subscription = sub.toJSON();
+                localStorage.setItem('AAROGYAM_PUSH_SUBSCRIPTION', JSON.stringify(sub));
+              }
+            }
+          } catch (subErr) {
+            console.warn('[PushSub] VAPID registration notice:', subErr);
+          }
+        }
+
+        const syncKey = `AI_NOTIF_SYNC_${isGranted ? '1' : '0'}_${isPwa ? '1' : '0'}_${payload.push_subscription ? 'sub' : 'nosub'}`;
+        if (sessionStorage.getItem(syncKey) === 'true') return;
 
         let query = null;
         if (currentId) {

@@ -2444,80 +2444,104 @@ Instant Download & Lifetime Access
         </div>
       </div>
 
-      <!-- DUAL ACTION CONTROLLER & MOBILE PUSH DISPATCHER BAR -->
-      <div style="background: radial-gradient(circle at left, rgba(16,185,129,0.15) 0%, rgba(15,23,42,0.95) 100%); border: 2px solid #10b981; border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; box-shadow: 0 4px 20px rgba(16,185,129,0.2);">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(16,185,129,0.25); padding-bottom: 10px;">
-          <div>
-            <div style="font-weight: 900; font-size: 1.05rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
-              <span>📲</span> <span>मोबाइल पुश शेड्यूलर व डुअल एक्शन कंट्रोल (Mobile Push Scheduler)</span>
+      <!-- DUAL ENGINE CONTROLLER: 1. LOCK-SCREEN WAKE-UP PUSH & 2. IN-APP FEED -->
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+        
+        <!-- ENGINE 1: LOCK-SCREEN WAKE-UP PUSH (FOR CLOSED MOBILES & LOCKED SCREEN) -->
+        <div style="background: radial-gradient(circle at left, rgba(245,158,11,0.18) 0%, rgba(15,23,42,0.98) 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 16px 18px; box-shadow: 0 6px 24px rgba(245,158,11,0.2);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(245,158,11,0.3); padding-bottom: 10px;">
+            <div>
+              <div style="font-weight: 900; font-size: 1.05rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
+                <span>⚡</span> <span>1. लॉक-स्क्रीन वेk-अप पुश (Wake-Up Push for Locked Mobiles)</span>
+                <span style="font-size: 0.7rem; background: rgba(245,158,11,0.25); color: #fde047; padding: 2px 8px; border-radius: 10px; border: 1px solid #f59e0b;">Google FCM 24x7</span>
+              </div>
+              <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 3px;">
+                जब यूज़र का मोबाइल व ऐप बंद हो — यूज़र को जगाकर ऐप ओपन कराने के लिए वेक-अप टोस्ट्स चुनें व पुश करें:
+              </div>
             </div>
-            <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 3px;">
-              नीचे सूची में से मनचाहे टोस्ट्स चुनें और 'पुश' दबाएं — ऐप बंद होने पर भी यूजर्स के मोबाइल पर घंटी बजेगी:
+            
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <button type="button" onclick="window.testInstantWakeUpPush()" class="admin-button small-button" style="background: rgba(245,158,11,0.25); border: 1.5px solid #f59e0b; color: #fde047; font-weight: 900; padding: 6px 14px; border-radius: 8px;" title="अपने बंद मोबाइल की स्क्रीन पर तुरंत 1-सेकंड टेस्ट वेक-अप अलर्ट देखें">
+                <span>⚡</span> <span>टेस्ट वेक-अप अलर्ट (Live Phone Wake-Up Test)</span>
+              </button>
             </div>
           </div>
-          
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <button type="button" onclick="window.testInstantMobilePushAlert()" class="admin-button small-button" style="background: rgba(56,189,248,0.2); border: 1.5px solid #38bdf8; color: #38bdf8; font-weight: 800; padding: 6px 14px; border-radius: 8px;" title="अपने डिवाइस पर इस क्षण 1-सेकंड टेस्ट पुश देखें">
-              <span>⚡</span> <span>टेस्ट पुश (1-Sec Live Test)</span>
-            </button>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(245,158,11,0.3);">
+                <span style="font-size: 0.78rem; font-weight: 800; color: #fde047;">⏰ वेक-अप टाइमर:</span>
+                <select id="adm_wakeup_push_interval" class="admin-select" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 800; background: #0f172a; color: #ffffff; border: 1px solid #f59e0b; border-radius: 6px;">
+                  <option value="now">⚡ NOW (तुरंत अभी भेजें - Instant Push)</option>
+                  <option value="1">⏰ हर 1 घंटे (1 Hour Interval)</option>
+                  <option value="2">⏰ हर 2 घंटे (2 Hours Interval)</option>
+                  <option value="3" selected>⏰ हर 3 घंटे (3 Hours - अनुशंसित)</option>
+                  <option value="6">⏰ हर 6 घंटे (6 Hours Interval)</option>
+                </select>
+              </div>
+
+              <!-- NOTIFICATION VALIDITY SELECTOR -->
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(245,158,11,0.3);">
+                <span style="font-size: 0.78rem; font-weight: 800; color: #a7f3d0;">⏳ वैधता:</span>
+                <select id="adm_wakeup_push_validity" class="admin-select" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 800; background: #0f172a; color: #ffffff; border: 1px solid #10b981; border-radius: 6px;">
+                  <option value="24" selected>24 घंटे (1 दिन)</option>
+                  <option value="48">48 घंटे (2 दिन)</option>
+                  <option value="72">72 घंटे (3 दिन)</option>
+                  <option value="168">7 दिन (1 सप्ताह)</option>
+                  <option value="0">असीमित (जब तक न बदलें)</option>
+                </select>
+              </div>
+
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 800; color: #fde047; cursor: pointer; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); padding: 6px 10px; border-radius: 6px;">
+                <input type="checkbox" id="adm_select_all_wakeup_toggle" onchange="window.toggleSelectAllWakeUpToasts(this.checked)" style="accent-color: #f59e0b; width: 16px; height: 16px;" />
+                <span>वेक-अप: सभी चुनें / हटाएं</span>
+              </label>
+            </div>
+
+            <!-- ACTION BUTTONS: WAKE UP -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <button type="button" onclick="window.dispatchSelectedWakeUpPush()" class="admin-button" style="background: linear-gradient(135deg, #d97706, #b45309); color: #fff; font-weight: 900; padding: 9px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(217,119,6,0.5); display: inline-flex; align-items: center; gap: 6px;">
+                <span>⚡</span> <span>1. चयनित (<span id="adm_selected_wakeup_count">0</span>) वेक-अप पुश भेजें</span>
+              </button>
+
+              <span id="adm_wakeup_status_pill" style="font-size: 0.78rem; font-weight: 800; padding: 7px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(245,158,11,0.18); border: 1px solid #f59e0b; color: #fde047;">
+                🟢 वेक-अप चालू है
+              </span>
+
+              <button type="button" id="btn_toggle_wakeup_off" onclick="window.toggleWakeUpPushPowerOff()" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: 800; padding: 9px 14px; border-radius: 8px;" title="वेक-अप पुश चालू या बंद करें">
+                <span>⏹️</span> <span>वेक-अप रोकें</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENGINE 2: IN-APP LIVE STREAM & BELL NOTIFICATION FEED HUB -->
+        <div style="background: radial-gradient(circle at left, rgba(16,185,129,0.16) 0%, rgba(15,23,42,0.98) 100%); border: 2px solid #10b981; border-radius: 12px; padding: 14px 18px; box-shadow: 0 4px 18px rgba(16,185,129,0.18);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div style="font-weight: 900; font-size: 1rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+                <span>📱</span> <span>2. इन-ऐप सोशल प्रूफ व घंटी फ़ीड (In-App Stream & Bell Hub)</span>
+                <span style="font-size: 0.7rem; background: rgba(16,185,129,0.2); color: #34d399; padding: 2px 8px; border-radius: 10px; border: 1px solid #10b981;">अंदर घंटी में लाइन अप</span>
+              </div>
+              <div style="font-size: 0.76rem; color: #cbd5e1; margin-top: 3px;">
+                जब यूज़र ऐप खोले तो ये टोस्ट्स घंटी (मेरी सूचनाएं) में लाइन अप रहेंगे और नीचे स्क्रीन पर धीरे-धीरे तैरेंगे:
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 800; color: #34d399; cursor: pointer; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 6px 10px; border-radius: 6px;">
+                <input type="checkbox" id="adm_select_all_inapp_toggle" onchange="window.toggleSelectAllInAppToasts(this.checked)" style="accent-color: #10b981; width: 16px; height: 16px;" />
+                <span>इन-ऐप: सभी चुनें / हटाएं</span>
+              </label>
+
+              <!-- BUTTON: IN-APP FEED SAVE -->
+              <button type="button" onclick="window.saveInAppToastsAndBellFeed()" class="admin-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 900; padding: 9px 18px; border-radius: 8px; box-shadow: 0 4px 14px rgba(2,132,199,0.4); display: inline-flex; align-items: center; gap: 6px;">
+                <span>💾</span> <span>2. चयनित (<span id="adm_selected_inapp_count">0</span>) इन-ऐप टोस्ट्स व घंटी सुरक्षित करें</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
-              <span style="font-size: 0.78rem; font-weight: 800; color: #fde047;">⏰ पुश टाइमर:</span>
-              <select id="adm_mobile_push_interval" class="admin-select" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 800; background: #0f172a; color: #ffffff; border: 1px solid #38bdf8; border-radius: 6px;">
-                <option value="now">⚡ NOW (तुरंत अभी भेजें - Instant Push)</option>
-                <option value="1">⏰ हर 1 घंटे (1 Hour Interval)</option>
-                <option value="2">⏰ हर 2 घंटे (2 Hours Interval)</option>
-                <option value="3" selected>⏰ हर 3 घंटे (3 Hours - अनुशंसित)</option>
-                <option value="4">⏰ हर 4 घंटे (4 Hours Interval)</option>
-                <option value="6">⏰ हर 6 घंटे (6 Hours Interval)</option>
-              </select>
-            </div>
-
-            <!-- NOTIFICATION VALIDITY SELECTOR -->
-            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
-              <span style="font-size: 0.78rem; font-weight: 800; color: #a7f3d0;">⏳ वैधता:</span>
-              <select id="adm_mobile_push_validity" class="admin-select" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 800; background: #0f172a; color: #ffffff; border: 1px solid #10b981; border-radius: 6px;">
-                <option value="24" selected>24 घंटे (1 दिन)</option>
-                <option value="48">48 घंटे (2 दिन)</option>
-                <option value="72">72 घंटे (3 दिन)</option>
-                <option value="168">7 दिन (1 सप्ताह)</option>
-                <option value="0">असीमित (जब तक न बदलें)</option>
-              </select>
-            </div>
-
-            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; color: #94a3b8; cursor: pointer; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px;">
-              <input type="checkbox" id="adm_select_all_push_toggle" onchange="window.toggleSelectAllPushToasts(this.checked)" style="accent-color: #10b981; width: 16px; height: 16px;" />
-              <span>सभी चुनें / हटाएं</span>
-            </label>
-          </div>
-
-          <!-- THE ACTION BUTTONS INCLUDING TURN OFF -->
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <!-- BUTTON 1: WEB TOASTS SAVE -->
-            <button type="button" onclick="window.saveAllToastsConfig()" class="admin-button" style="background: #0284c7; color: #fff; font-weight: 800; padding: 9px 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(2,132,199,0.3);">
-              💾 1. वेबसाइट टोस्ट्स सुरक्षित करें
-            </button>
-
-            <!-- BUTTON 2: MOBILE PUSH DISPATCH -->
-            <button type="button" onclick="window.dispatchSelectedToastsToMobilePush()" class="admin-button" style="background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-weight: 900; padding: 9px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(22,163,74,0.45); display: inline-flex; align-items: center; gap: 6px;">
-              <span>📲</span> <span>2. चयनित (<span id="adm_selected_push_count">0</span>) टोस्ट्स पुश करें</span>
-            </button>
-
-            <!-- LIVE STATUS PILL -->
-            <span id="adm_push_status_pill" style="font-size: 0.78rem; font-weight: 800; padding: 7px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #34d399;">
-              🟢 पुश सक्रिय है
-            </span>
-
-            <!-- BUTTON 3: TURN OFF / PAUSE PUSH -->
-            <button type="button" id="btn_toggle_push_off" onclick="window.toggleMobilePushPowerOff()" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: 800; padding: 9px 14px; border-radius: 8px;" title="मोबाइल पुश नोटिफिकेशन स्थिति बदलें">
-              <span>⏹️</span> <span>पुश बंद करें</span>
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- ACTIVE TOASTS FEED LIST -->
@@ -3782,18 +3806,23 @@ Instant Download & Lifetime Access
         if (Array.isArray(json.live_toasts) && json.live_toasts.length > 0) {
           adminLiveToastsList = json.live_toasts;
         }
-        // Central Sync: align push_selected strictly with active_mobile_push_queue so ALL devices see identical count
-        const queueIds = new Set(Array.isArray(json.active_mobile_push_queue) ? json.active_mobile_push_queue.map(q => q.id) : []);
+        // Central Sync: align wakeup_selected and inapp_selected across all devices
+        const wakeQueueIds = new Set(Array.isArray(json.wake_up_push_queue) ? json.wake_up_push_queue.map(q => q.id) : (Array.isArray(json.active_mobile_push_queue) ? json.active_mobile_push_queue.map(q => q.id) : []));
+        const inAppQueueIds = new Set(Array.isArray(json.active_in_app_queue) ? json.active_in_app_queue.map(q => q.id) : adminLiveToastsList.map(q => q.id));
+
         adminLiveToastsList.forEach(t => {
-          t.push_selected = queueIds.has(t.id);
+          t.wakeup_selected = wakeQueueIds.has(t.id);
+          t.inapp_selected = inAppQueueIds.has(t.id);
+          t.push_selected = t.wakeup_selected;
         });
-        if (json.mobile_push_config) {
-          const pConf = json.mobile_push_config;
-          const selInterval = document.getElementById('adm_mobile_push_interval');
-          if (selInterval && pConf.interval_mode) selInterval.value = pConf.interval_mode;
-          const selValidity = document.getElementById('adm_mobile_push_validity');
-          if (selValidity && pConf.validity_hours !== undefined) selValidity.value = String(pConf.validity_hours);
-          window.updatePushPowerButtonUI(pConf.enabled !== false, pConf.interval_mode);
+
+        const wConf = json.wake_up_push_config || json.mobile_push_config;
+        if (wConf) {
+          const selInterval = document.getElementById('adm_wakeup_push_interval') || document.getElementById('adm_mobile_push_interval');
+          if (selInterval && wConf.interval_mode) selInterval.value = wConf.interval_mode;
+          const selValidity = document.getElementById('adm_wakeup_push_validity') || document.getElementById('adm_mobile_push_validity');
+          if (selValidity && wConf.validity_hours !== undefined) selValidity.value = String(wConf.validity_hours);
+          window.updatePushPowerButtonUI(wConf.enabled !== false, wConf.interval_mode);
         }
         try {
           localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(json));
@@ -4318,14 +4347,20 @@ Instant Download & Lifetime Access
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <!-- 1. MOBILE PUSH SELECTION CHECKBOX -->
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 0.75rem; background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; padding: 4px 8px; border-radius: 6px; color: #34d399; font-weight: 800; cursor: pointer;">
-                <input type="checkbox" class="adm-push-check" ${t.push_selected ? 'checked' : ''} onchange="window.toggleToastPushSelected('${t.id}', this.checked)" style="accent-color: #10b981; width: 16px; height: 16px;" />
-                <span>📲 मोबाइल पुश</span>
+              <!-- 1. LOCK-SCREEN WAKE-UP SELECTION CHECKBOX -->
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 0.75rem; background: rgba(245,158,11,0.14); border: 1.5px solid #f59e0b; padding: 4px 8px; border-radius: 6px; color: #fbbf24; font-weight: 800; cursor: pointer;" title="जब फ़ोन बंद हो तो लॉक स्क्रीन पर यह वेक-अप नोटिफिकेशन बजेगा">
+                <input type="checkbox" class="adm-wakeup-check" ${t.wakeup_selected ? 'checked' : ''} onchange="window.toggleToastWakeUpSelected('${t.id}', this.checked)" style="accent-color: #f59e0b; width: 16px; height: 16px;" />
+                <span>⚡ वेक-अप</span>
               </label>
 
-              <!-- 2. INSTANT 1-SEC TEST BUTTON -->
-              <button type="button" onclick="window.testSingleToastPush('${t.id}')" class="admin-button small-button" style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: 800; padding: 4px 8px;" title="अपने डिवाइस पर इस टोस्ट का 1-सेकंड टेस्ट पुश देखें">
+              <!-- 2. IN-APP FEED SELECTION CHECKBOX -->
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 0.75rem; background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; padding: 4px 8px; border-radius: 6px; color: #34d399; font-weight: 800; cursor: pointer;" title="ऐप के अंदर घंटी व स्क्रीन पर तैरने के लिए">
+                <input type="checkbox" class="adm-inapp-check" ${t.inapp_selected !== false ? 'checked' : ''} onchange="window.toggleToastInAppSelected('${t.id}', this.checked)" style="accent-color: #10b981; width: 16px; height: 16px;" />
+                <span>📱 इन-ऐप</span>
+              </label>
+
+              <!-- 3. INSTANT WAKE-UP TEST BUTTON -->
+              <button type="button" onclick="window.testSingleToastWakeUp('${t.id}')" class="admin-button small-button" style="background: rgba(245,158,11,0.22); border: 1px solid #f59e0b; color: #fde047; font-weight: 900; padding: 4px 8px;" title="अपने बंद मोबाइल की स्क्रीन पर तुरंत इस टोस्ट का टेस्ट वेक-अप देखें">
                 ⚡ टेस्ट
               </button>
 
@@ -4416,115 +4451,128 @@ Instant Download & Lifetime Access
   };
 
   // -------------------------------------------------------------
-  // MOBILE PUSH SELECTION & DISPATCH CONTROLLER
+  // DUAL-ENGINE: 1. LOCK-SCREEN WAKE-UP & 2. IN-APP SELECTION CONTROLLERS
   // -------------------------------------------------------------
-  window.toggleToastPushSelected = function (toastId, isChecked) {
+  window.toggleToastWakeUpSelected = function (toastId, isChecked) {
     const t = adminLiveToastsList.find(x => x.id === toastId);
     if (t) {
-      t.push_selected = isChecked;
+      t.wakeup_selected = isChecked;
     }
-    window.updateSelectedPushCounter();
+    window.updateSelectedWakeUpCounter();
   };
 
-  window.toggleSelectAllPushToasts = function (isChecked) {
+  window.toggleSelectAllWakeUpToasts = function (isChecked) {
     adminLiveToastsList.forEach(t => {
-      t.push_selected = isChecked;
+      t.wakeup_selected = isChecked;
     });
     window.renderLiveToastsTable();
   };
 
-  window.updateSelectedPushCounter = function () {
-    const selectedCount = adminLiveToastsList.filter(t => t.push_selected).length;
-    const badge = document.getElementById('adm_selected_push_count');
+  window.updateSelectedWakeUpCounter = function () {
+    const selectedCount = adminLiveToastsList.filter(t => t.wakeup_selected).length;
+    const badge = document.getElementById('adm_selected_wakeup_count');
     if (badge) badge.textContent = selectedCount;
-    const chkAll = document.getElementById('adm_select_all_push_toggle');
+    const chkAll = document.getElementById('adm_select_all_wakeup_toggle');
     if (chkAll) chkAll.checked = selectedCount > 0 && selectedCount === adminLiveToastsList.length;
   };
 
-  window.testSingleToastPush = async function (toastId) {
+  window.toggleToastInAppSelected = function (toastId, isChecked) {
     const t = adminLiveToastsList.find(x => x.id === toastId);
-    if (!t) return;
-    await window.triggerNativePushNotification(t);
+    if (t) {
+      t.inapp_selected = isChecked;
+    }
+    window.updateSelectedInAppCounter();
   };
 
-  window.testInstantMobilePushAlert = async function () {
-    const selected = adminLiveToastsList.filter(t => t.push_selected);
-    const target = selected.length > 0 ? selected[0] : (adminLiveToastsList[0] || null);
-    if (!target) {
+  window.toggleSelectAllInAppToasts = function (isChecked) {
+    adminLiveToastsList.forEach(t => {
+      t.inapp_selected = isChecked;
+    });
+    window.renderLiveToastsTable();
+  };
+
+  window.updateSelectedInAppCounter = function () {
+    const selectedCount = adminLiveToastsList.filter(t => t.inapp_selected !== false).length;
+    const badge = document.getElementById('adm_selected_inapp_count');
+    if (badge) badge.textContent = selectedCount;
+    const chkAll = document.getElementById('adm_select_all_inapp_toggle');
+    if (chkAll) chkAll.checked = selectedCount > 0 && selectedCount === adminLiveToastsList.length;
+  };
+
+  // Backwards-compatible aliases
+  window.toggleToastPushSelected = window.toggleToastWakeUpSelected;
+  window.toggleSelectAllPushToasts = window.toggleSelectAllWakeUpToasts;
+  window.updateSelectedPushCounter = function() {
+    window.updateSelectedWakeUpCounter();
+    window.updateSelectedInAppCounter();
+  };
+
+  // -------------------------------------------------------------
+  // ENGINE 1: LOCK-SCREEN WAKE-UP PUSH DISPATCHER (VIA GOOGLE FCM)
+  // -------------------------------------------------------------
+  window.testSingleToastWakeUp = async function (toastId) {
+    const t = adminLiveToastsList.find(x => x.id === toastId);
+    if (!t) return;
+    await window.triggerServerWakeUpPush([t], 'single_test');
+  };
+
+  window.testInstantWakeUpPush = async function () {
+    const selected = adminLiveToastsList.filter(t => t.wakeup_selected);
+    const targetToasts = selected.length > 0 ? selected : [adminLiveToastsList[0] || null];
+    if (!targetToasts[0]) {
       alert('कोई टोस्ट उपलब्ध नहीं है!');
       return;
     }
-    await window.triggerNativePushNotification(target);
+    await window.triggerServerWakeUpPush(targetToasts, 'test_instant');
   };
 
-  window.triggerNativePushNotification = async function (toast) {
-    if (!('Notification' in window)) {
-      alert('आपके ब्राउज़र में नोटिफिकेशन सपोर्ट उपलब्ध नहीं है।');
-      return;
-    }
-    if (Notification.permission !== 'granted') {
-      const res = await Notification.requestPermission();
-      if (res !== 'granted') {
-        alert('कृपया ब्राउज़र से नोटिफिकेशन की अनुमति (Allow) दें!');
-        return;
-      }
+  window.triggerServerWakeUpPush = async function (toasts, mode = 'live') {
+    const targetToast = toasts[0];
+    if (!targetToast) return;
+
+    if (typeof showToast === 'function') {
+      showToast('⚡ Google FCM को वेक-अप सिग्नल भेजा जा रहा है...', 'info');
     }
 
+    // 1. Direct Web Push API trigger via Vercel Serverless Function
     try {
-      const notifIcon = toast.image || '/images/icons/pwa-icon-192x192.png';
-      const wideBanner = toast.image || undefined;
-
-      if ('serviceWorker' in navigator) {
-        let reg = await navigator.serviceWorker.getRegistration().catch(() => null);
-        if (!reg) {
-          reg = await Promise.race([
-            navigator.serviceWorker.ready,
-            new Promise(r => setTimeout(() => r(null), 1200))
-          ]).catch(() => null);
-        }
-        if (reg && typeof reg.showNotification === 'function') {
-          await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
-            body: toast.message || '',
-            icon: notifIcon,
-            badge: '/images/icons/pwa-icon-96x96.png',
-            image: wideBanner,
-            tag: 'aarogyam_live_toast',
-            renotify: true,
-            vibrate: [200, 100, 200],
-            data: {
-              url: toast.action_url || '/'
-            }
-          });
-          if (typeof showToast === 'function') {
-            showToast('⚡ टेस्ट पुश नोटिफिकेशन आपके डिवाइस पर बज गया!', 'success');
-          }
-          return;
-        }
-      }
-      new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
-        body: toast.message || '',
-        icon: notifIcon,
-        image: wideBanner,
-        tag: 'aarogyam_live_toast'
+      const resp = await fetch('/api/send-wake-up-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toasts: toasts })
       });
-      if (typeof showToast === 'function') {
-        showToast('⚡ टेस्ट पुश नोटिफिकेशन आपकी स्क्रीन पर आ गया!', 'success');
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.sent > 0) {
+          if (typeof showToast === 'function') {
+            showToast(`🔔 ${data.sent} मोबाइल डिवाइसेस पर वेक-अप अलर्ट भेजा गया! बंद मोबाइल तुरंत जाग जाएगा।`, 'success');
+          }
+        } else {
+          if (typeof showToast === 'function') {
+            showToast('⚡ वेक-अप ट्रिगर हो गया! (यदि किसी डिवाइस ने अनुमति नहीं दी है तो पहले Allow करें)', 'info');
+          }
+        }
       }
-    } catch (e) {
-      alert('नोटिफिकेशन एरर: ' + e.message);
+    } catch (apiErr) {
+      console.warn('API wake-up error:', apiErr);
     }
+
+    // 2. Client-side Native Fallback for currently active devices
+    try {
+      await window.triggerNativePushNotification(targetToast);
+    } catch(e) {}
   };
 
-  window.dispatchSelectedToastsToMobilePush = async function () {
-    const selectedToasts = adminLiveToastsList.filter(t => t.push_selected);
-    if (selectedToasts.length === 0) {
-      alert('कृपया नीचे दी गई सूची में कम से कम 1 या 2 टोस्ट्स के आगे "📲 मोबाइल पुश" चेकबॉक्स टिक करें!');
+  window.dispatchSelectedWakeUpPush = async function () {
+    const selectedWakeUp = adminLiveToastsList.filter(t => t.wakeup_selected);
+    if (selectedWakeUp.length === 0) {
+      alert('कृपया नीचे दी गई सूची में कम से कम 1 या 2 टोस्ट्स के आगे "⚡ वेक-अप" चेकबॉक्स टिक करें!');
       return;
     }
 
-    const intervalSelect = document.getElementById('adm_mobile_push_interval');
-    const intervalVal = intervalSelect ? intervalSelect.value : '3';
-    const validitySelect = document.getElementById('adm_mobile_push_validity');
+    const intervalSelect = document.getElementById('adm_wakeup_push_interval');
+    const intervalVal = intervalSelect ? intervalSelect.value : 'now';
+    const validitySelect = document.getElementById('adm_wakeup_push_validity');
     const validityHours = validitySelect ? parseInt(validitySelect.value, 10) : 24;
 
     let shelvesMaster = null;
@@ -4539,64 +4587,47 @@ Instant Download & Lifetime Access
     }
     if (!shelvesMaster) shelvesMaster = {};
 
-    const batchId = 'push_' + Date.now();
+    const batchId = 'wakeup_' + Date.now();
     shelvesMaster.live_toasts = adminLiveToastsList;
-    shelvesMaster.active_mobile_push_queue = selectedToasts;
-    shelvesMaster.mobile_push_config = {
+    shelvesMaster.wake_up_push_queue = selectedWakeUp;
+    shelvesMaster.wake_up_push_config = {
       enabled: true,
       batch_id: batchId,
       interval_mode: intervalVal,
       interval_hours: intervalVal === 'now' ? 0 : parseInt(intervalVal, 10),
       validity_hours: validityHours,
       dispatched_at: new Date().toISOString(),
-      active_count: selectedToasts.length
+      active_count: selectedWakeUp.length
     };
+    // Keep backwards compatibility for mobile push config
+    shelvesMaster.active_mobile_push_queue = selectedWakeUp;
+    shelvesMaster.mobile_push_config = shelvesMaster.wake_up_push_config;
     shelvesMaster.updated_at = new Date().toISOString();
 
-    if (typeof window.updatePushPowerButtonUI === 'function') {
-      window.updatePushPowerButtonUI(true, intervalVal);
+    const pill = document.getElementById('adm_wakeup_status_pill');
+    if (pill) {
+      pill.innerHTML = '🟢 वेक-अप सक्रिय है';
+      pill.style.color = '#fde047';
     }
-
-    // Log the first dispatched toast so the Bell list only shows what has actually been sent
-    try {
-      localStorage.setItem('AAROGYAM_LATEST_PUSHED_TOAST', JSON.stringify(selectedToasts[0]));
-      const log = JSON.parse(localStorage.getItem('AAROGYAM_DISPATCHED_TOASTS_LOG') || '[]');
-      const firstEntry = {
-        ...selectedToasts[0],
-        dispatchedAt: Date.now(),
-        batchId: batchId
-      };
-      const updatedLog = [firstEntry, ...log.filter(x => x.id !== selectedToasts[0].id)].slice(0, 20);
-      localStorage.setItem('AAROGYAM_DISPATCHED_TOASTS_LOG', JSON.stringify(updatedLog));
-    } catch (e) { }
 
     // Triple Cloud & Local Auto-Git Publish
-    await window.syncStoreShelvesToCloud(shelvesMaster, `Dispatch mobile push (${selectedToasts.length} toasts, interval: ${intervalVal}h) [Admin]`);
+    await window.syncStoreShelvesToCloud(shelvesMaster, `Dispatch wake-up push (${selectedWakeUp.length} toasts, interval: ${intervalVal}h) [Admin]`);
 
-    // Instant sync to top Header Bell Notification Panel
-    if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.syncPushedToasts === 'function') {
-      window.USER_NOTIFICATIONS.syncPushedToasts(true);
-    }
-    window.dispatchEvent(new CustomEvent('aarogyam:new-push-toast', { detail: selectedToasts[0] }));
-
-    // Immediate first push trigger (right NOW!)
-    await window.triggerNativePushNotification(selectedToasts[0]);
+    // Fire Google FCM Server Push immediately!
+    await window.triggerServerWakeUpPush(selectedWakeUp, 'dispatch');
 
     if (intervalVal === 'now') {
       if (typeof showToast === 'function') {
-        showToast(`🚀 [NOW] ${selectedToasts.length} टोस्ट्स तुरंत मोबाइल नोटिफिकेशन में सक्रिय कर दिए गए!`, 'success');
+        showToast(`⚡ [NOW] ${selectedWakeUp.length} वेक-अप टोस्ट्स का सिग्नल भेज दिया गया!`, 'success');
       }
     } else {
       if (typeof showToast === 'function') {
-        showToast(`📲 सफलता! पहला पुश अभी भेजा गया, और शेष ${selectedToasts.length} टोस्ट्स हर ${intervalVal} घंटे के शेड्यूलर (वैधता: ${validityHours ? validityHours + ' घंटे' : 'असीमित'}) में लॉक कर दिए गए!`, 'success');
+        showToast(`⚡ सफलता! पहला वेक-अप अलर्ट अभी भेजा गया, और शेष ${selectedWakeUp.length} टोस्ट्स हर ${intervalVal} घंटे के टाइमर पर शेड्यूल हो गए!`, 'success');
       }
     }
   };
 
-  // -------------------------------------------------------------
-  // TURN OFF / PAUSE / RESUME MOBILE PUSH
-  // -------------------------------------------------------------
-  window.toggleMobilePushPowerOff = async function () {
+  window.toggleWakeUpPushPowerOff = async function () {
     let shelvesMaster = null;
     try {
       const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
@@ -4608,23 +4639,70 @@ Instant Download & Lifetime Access
       } catch (e) { }
     }
     if (!shelvesMaster) shelvesMaster = {};
-    if (!shelvesMaster.mobile_push_config) shelvesMaster.mobile_push_config = {};
+    if (!shelvesMaster.wake_up_push_config) shelvesMaster.wake_up_push_config = {};
 
-    const currentlyEnabled = shelvesMaster.mobile_push_config.enabled !== false;
+    const currentlyEnabled = shelvesMaster.wake_up_push_config.enabled !== false;
     const newStatus = !currentlyEnabled;
-    shelvesMaster.mobile_push_config.enabled = newStatus;
+    shelvesMaster.wake_up_push_config.enabled = newStatus;
+    if (shelvesMaster.mobile_push_config) shelvesMaster.mobile_push_config.enabled = newStatus;
     shelvesMaster.updated_at = new Date().toISOString();
 
-    if (typeof window.updatePushPowerButtonUI === 'function') {
-      window.updatePushPowerButtonUI(newStatus, shelvesMaster.mobile_push_config.interval_mode);
+    const pill = document.getElementById('adm_wakeup_status_pill');
+    const btn = document.getElementById('btn_toggle_wakeup_off');
+    if (pill) {
+      pill.innerHTML = newStatus ? '🟢 वेक-अप सक्रिय है' : '⏹️ वेक-अप रुका हुआ है';
+      pill.style.color = newStatus ? '#fde047' : '#f87171';
+    }
+    if (btn) {
+      btn.innerHTML = newStatus ? '<span>⏹️</span> <span>वेक-अप रोकें</span>' : '<span>▶️</span> <span>वेक-अप चालू करें</span>';
     }
 
-    await window.syncStoreShelvesToCloud(shelvesMaster, (newStatus ? 'Resume' : 'Pause') + ' mobile push scheduler [Admin]');
-
+    await window.syncStoreShelvesToCloud(shelvesMaster, (newStatus ? 'Resume' : 'Pause') + ' wake-up push scheduler [Admin]');
     if (typeof showToast === 'function') {
-      showToast(newStatus ? '▶️ मोबाइल पुश शेड्यूलर सफलतापूर्वक चालू कर दिया गया!' : '⏹️ मोबाइल पुश शेड्यूलर सफलतापूर्वक बंद (PAUSED) कर दिया गया!', newStatus ? 'success' : 'info');
+      showToast(newStatus ? '▶️ वेक-अप पुश पुनः चालू कर दिया गया!' : '⏹️ वेक-अप पुश रोक दिया गया (PAUSED)!', newStatus ? 'success' : 'info');
     }
   };
+
+  // -------------------------------------------------------------
+  // ENGINE 2: IN-APP LIVE STREAM & BELL NOTIFICATION FEED SAVER
+  // -------------------------------------------------------------
+  window.saveInAppToastsAndBellFeed = async function () {
+    const selectedInApp = adminLiveToastsList.filter(t => t.inapp_selected !== false);
+    if (selectedInApp.length === 0) {
+      alert('कृपया कम से कम 1 इन-ऐप टोस्ट चुनें!');
+      return;
+    }
+
+    let shelvesMaster = null;
+    try {
+      shelvesMaster = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+    } catch (e) { }
+    if (!shelvesMaster) {
+      try {
+        const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+        if (res.ok) shelvesMaster = await res.json();
+      } catch (e) { }
+    }
+    if (!shelvesMaster) shelvesMaster = {};
+
+    shelvesMaster.live_toasts = adminLiveToastsList;
+    shelvesMaster.active_in_app_queue = selectedInApp;
+    shelvesMaster.updated_at = new Date().toISOString();
+
+    // Sync to Bell Notification Hub
+    if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.syncPushedToasts === 'function') {
+      window.USER_NOTIFICATIONS.syncPushedToasts(true);
+    }
+
+    await window.syncStoreShelvesToCloud(shelvesMaster, `Save in-app toasts & bell feed (${selectedInApp.length} items) [Admin]`);
+    if (typeof showToast === 'function') {
+      showToast(`💾 सफलता! ${selectedInApp.length} टोस्ट्स इन-ऐप स्ट्रीम व घंटी (Bell) सूची में सुरक्षित कर दिए गए!`, 'success');
+    }
+  };
+
+  // Backwards-compatibility
+  window.dispatchSelectedToastsToMobilePush = window.dispatchSelectedWakeUpPush;
+  window.toggleMobilePushPowerOff = window.toggleWakeUpPushPowerOff;
 
   window.saveAllToastsConfig = async function () {
     const chkEnabled = document.getElementById('adm_toast_global_enabled');

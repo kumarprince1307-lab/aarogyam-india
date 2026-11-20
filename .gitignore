@@ -4,3 +4,5 @@ scratch/
 *.log
 *.pptx
 uploads/Netsurf Q3 2026/
+node_modules/
+

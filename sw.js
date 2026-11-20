@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v93.0';
+const STATIC_CACHE = 'aarogyam-public-static-v94.0';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v68.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
@@ -307,14 +307,19 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'Aarogyam India Notification',
-    icon: '/images/icons/pwa-icon-192x192.png',
+    icon: data.icon || '/images/icons/pwa-icon-192x192.png',
     badge: '/images/icons/pwa-icon-96x96.png',
-    vibrate: [100, 50, 100],
+    image: data.image || undefined,
+    tag: 'aarogyam_wakeup_' + (data.id || Date.now()),
+    renotify: true,
+    requireInteraction: true, // Wakes up screen & stays until user dismisses or taps
+    silent: false,
+    vibrate: [300, 100, 400, 100, 300], // Strong vibration pattern
     data: {
       url: data.url || '/'
     },
     actions: [
-      { action: 'open', title: '🔗 खोलें (Open)' },
+      { action: 'open', title: '👉 अभी खोलें (Open)' },
       { action: 'close', title: '✕ बंद करें' }
     ]
   };
