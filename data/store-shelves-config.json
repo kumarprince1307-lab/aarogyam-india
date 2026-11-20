@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T05:37:58.910Z",
+  "updated_at": "2026-11-20T05:38:06.614Z",
   "version": "1.0",
   "shelves": [
     {
@@ -550,25 +550,25 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_ask_001",
+      "id": "tst_ask_005",
       "type": "sakhi_user_ask_toast",
-      "title": "राजेन्द्र बिश्नोई (जोधपुर, राजस्थान)",
-      "message": "ने सखी AI से पूछा: 'सरसों में माहू (चेपा) और तना गलन का जैविक व केमिकल उपचार क्या है?'",
-      "image": "/images/sakhi/aarogyam-sakhi.webp",
-      "action_text": "🤖 सखी समाधान देखें",
-      "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
+      "title": "गोविंदभाई पटेल (आनंद, गुजरात)",
+      "message": "ने सखी AI से पूछा: 'दुधारू गाय व भैंस में दूध और फैट (SNF) प्राकृतिक रूप से कैसे बढ़ाएं?'",
+      "image": "/images/sakhi/pashupalan-sakhi.webp",
+      "action_text": "🥛 दूध वृद्धि उपाय",
+      "action_url": "/aarogyam-sakhi.html?q=गाय+भैंस+दूध+फैट+वृद्धि",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
       "push_selected": true
     }
   ],
   "mobile_push_config": {
-    "enabled": false,
-    "batch_id": "push_1795149902499",
-    "interval_mode": "now",
-    "interval_hours": 0,
+    "enabled": true,
+    "batch_id": "push_1795153086614",
+    "interval_mode": "3",
+    "interval_hours": 3,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T04:45:02.499Z",
+    "dispatched_at": "2026-11-20T05:38:06.614Z",
     "active_count": 1
   }
 }
