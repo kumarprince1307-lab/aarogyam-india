@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T05:38:27.177Z",
+  "updated_at": "2026-11-20T05:55:26.377Z",
   "version": "1.0",
   "shelves": [
     {
@@ -550,25 +550,26 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_ask_005",
-      "type": "sakhi_user_ask_toast",
-      "title": "गोविंदभाई पटेल (आनंद, गुजरात)",
-      "message": "ने सखी AI से पूछा: 'दुधारू गाय व भैंस में दूध और फैट (SNF) प्राकृतिक रूप से कैसे बढ़ाएं?'",
-      "image": "/images/sakhi/pashupalan-sakhi.webp",
-      "action_text": "🥛 दूध वृद्धि उपाय",
-      "action_url": "/aarogyam-sakhi.html?q=गाय+भैंस+दूध+फैट+वृद्धि",
-      "badge": "⚡ सखी AI लाइव सवाल",
+      "id": "tst_buy_001",
+      "type": "book_sell_toast",
+      "title": "सुरेश पाटीदार (उज्जैन, मध्य प्रदेश)",
+      "message": "ने अभी-अभी 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा मास्टर गाइड' खरीदी!",
+      "price": "₹99",
+      "image": "/images/books/fasal-ka-doctor-cover.webp",
+      "action_text": "📖 विवरण देखें",
+      "action_url": "/ebooks/book-landing.html?id=BK002",
+      "badge": "🛒 सफल खरीद",
       "enabled": true,
       "push_selected": true
     }
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "push_1795153107177",
+    "batch_id": "push_1795154126377",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T05:38:27.177Z",
+    "dispatched_at": "2026-11-20T05:55:26.377Z",
     "active_count": 1
   }
 }
