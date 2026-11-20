@@ -505,15 +505,24 @@
       }
     } catch (e) { }
 
+    // Check if this is a brand new push batch dispatched by admin
+    const lastBatchId = localStorage.getItem('AAROGYAM_LAST_PUSH_BATCH_ID');
+    const isNewBatch = Boolean(pushConfig.batch_id && pushConfig.batch_id !== lastBatchId);
+
+    if (isNewBatch) {
+      localStorage.setItem('AAROGYAM_LAST_PUSH_BATCH_ID', pushConfig.batch_id);
+      localStorage.removeItem('AAROGYAM_LAST_NATIVE_TOAST_ID'); // Always reset toast ID memory on new batch!
+    }
+
     // Fire the latest eligible toast natively on the device screen if permission granted and not already shown
     const latestToast = pushQueue[eligibleCount - 1];
     const STORAGE_LAST_PUSH = 'AAROGYAM_LAST_NATIVE_PUSH_TS';
     const lastNativeId = localStorage.getItem('AAROGYAM_LAST_NATIVE_TOAST_ID');
 
-    if (latestToast && latestToast.id !== lastNativeId) {
-      localStorage.setItem('AAROGYAM_LAST_NATIVE_TOAST_ID', latestToast.id);
-      localStorage.setItem(STORAGE_LAST_PUSH, String(now));
+    if (latestToast && (isNewBatch || latestToast.id !== lastNativeId)) {
       if ('Notification' in window && Notification.permission === 'granted') {
+        localStorage.setItem('AAROGYAM_LAST_NATIVE_TOAST_ID', latestToast.id);
+        localStorage.setItem(STORAGE_LAST_PUSH, String(now));
         dispatchNativeToastAlert(latestToast);
       }
     }
@@ -800,8 +809,15 @@
             if (typeof window.playAarogyamChime === 'function') window.playAarogyamChime();
             if (typeof window.syncUserPushAndPwaStatus === 'function') window.syncUserPushAndPwaStatus('granted');
             if (typeof window.updateDrawerNotificationStatus === 'function') window.updateDrawerNotificationStatus();
-            if (activeToastsList.length > 0) {
-              dispatchNativeToastAlert(activeToastsList[0]);
+            let notifToast = activeToastsList[0];
+            try {
+              const localShelves = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || '{}');
+              if (Array.isArray(localShelves?.active_mobile_push_queue) && localShelves.active_mobile_push_queue.length > 0) {
+                notifToast = localShelves.active_mobile_push_queue[0];
+              }
+            } catch (e) { }
+            if (notifToast) {
+              dispatchNativeToastAlert(notifToast);
             }
           } else {
             bar.remove();

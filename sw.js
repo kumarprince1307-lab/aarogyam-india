@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v92.0';
+const STATIC_CACHE = 'aarogyam-public-static-v93.0';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v68.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
@@ -352,4 +352,64 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const d = event.data.payload || {};
+    self.registration.showNotification(d.title || 'आरोग्यम इंडिया 🌾', {
+      body: d.body || '',
+      icon: d.icon || '/images/icons/pwa-icon-192x192.png',
+      badge: '/images/icons/pwa-icon-96x96.png',
+      image: d.image || undefined,
+      tag: d.tag || ('aarogyam_notif_' + Date.now()),
+      renotify: true,
+      vibrate: [200, 100, 200],
+      data: {
+        url: d.url || '/'
+      }
+    });
+  }
 });
+
+// 7. PERIODIC BACKGROUND SYNC (Android PWA background checks)
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'aarogyam-check-push') {
+    event.waitUntil(checkAndDispatchBackgroundPush());
+  }
+});
+
+async function checkAndDispatchBackgroundPush() {
+  try {
+    const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+    if (!res.ok) return;
+    const json = await res.json();
+    const pushConfig = json.mobile_push_config;
+    if (!pushConfig || pushConfig.enabled === false) return;
+    const queue = json.active_mobile_push_queue || [];
+    if (queue.length === 0) return;
+
+    const intervalHours = pushConfig.interval_hours !== undefined ? pushConfig.interval_hours : 3;
+    const intervalMs = (intervalHours <= 0 ? 0 : intervalHours * 3600 * 1000);
+    const now = Date.now();
+    const dispatchedAt = pushConfig.dispatched_at ? new Date(pushConfig.dispatched_at).getTime() : now;
+
+    let eligibleCount = 1;
+    if (intervalMs > 0 && dispatchedAt > 0 && now >= dispatchedAt) {
+      eligibleCount = Math.floor((now - dispatchedAt) / intervalMs) + 1;
+    } else if (intervalMs <= 0) {
+      eligibleCount = queue.length;
+    }
+    eligibleCount = Math.max(1, Math.min(eligibleCount, queue.length));
+    const targetToast = queue[eligibleCount - 1];
+    if (targetToast) {
+      await self.registration.showNotification(targetToast.title || 'आरोग्यम इंडिया 🌾', {
+        body: targetToast.message || '',
+        icon: targetToast.image || '/images/icons/pwa-icon-192x192.png',
+        badge: '/images/icons/pwa-icon-96x96.png',
+        image: targetToast.image || undefined,
+        tag: 'aarogyam_bg_push_' + (targetToast.id || 'now'),
+        renotify: true,
+        vibrate: [200, 100, 200],
+        data: { url: targetToast.action_url || '/' }
+      });
+    }
+  } catch(e) {}
+}

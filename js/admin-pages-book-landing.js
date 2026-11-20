@@ -3783,12 +3783,10 @@ Instant Download & Lifetime Access
           adminLiveToastsList = json.live_toasts;
         }
         // Central Sync: align push_selected strictly with active_mobile_push_queue so ALL devices see identical count
-        if (Array.isArray(json.active_mobile_push_queue) && json.active_mobile_push_queue.length > 0) {
-          const queueIds = new Set(json.active_mobile_push_queue.map(q => q.id));
-          adminLiveToastsList.forEach(t => {
-            t.push_selected = queueIds.has(t.id);
-          });
-        }
+        const queueIds = new Set(Array.isArray(json.active_mobile_push_queue) ? json.active_mobile_push_queue.map(q => q.id) : []);
+        adminLiveToastsList.forEach(t => {
+          t.push_selected = queueIds.has(t.id);
+        });
         if (json.mobile_push_config) {
           const pConf = json.mobile_push_config;
           const selInterval = document.getElementById('adm_mobile_push_interval');
