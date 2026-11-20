@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T06:15:12.106Z",
+  "updated_at": "2026-11-20T06:30:23.977Z",
   "version": "1.0",
   "shelves": [
     {
@@ -338,7 +338,7 @@
       "action_url": "/aarogyam-sakhi.html?q=गेहूं+पीला+रतुआ+उपचार",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_ask_005",
@@ -350,7 +350,7 @@
       "action_url": "/aarogyam-sakhi.html?q=गाय+भैंस+दूध+फैट+वृद्धि",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_cur_001",
@@ -363,7 +363,7 @@
       "curiosity_answer": "स्प्रे हमेशा सुबह ओस सूखने के बाद (8-10 बजे) या शाम को 4 बजे के बाद करें, जब पौधों के रंध्र (Stomata) पूरी तरह खुले होते हैं।",
       "badge": "💡 कृषि रहस्य",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_cur_002",
@@ -376,7 +376,7 @@
       "curiosity_answer": "फसल के शुरुआती 30 दिनों में फास्फोरस व बायो-स्टिमुलेंट (जैसे Stimrich) दें जिससे सफेद जड़ों का 3 गुना जाल बनता है।",
       "badge": "💡 कृषि रहस्य",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_cur_003",
@@ -389,7 +389,7 @@
       "curiosity_answer": "प्रति 100 किग्रा शरीर भार पर 2.5 किग्रा शुष्क पदार्थ और प्रतिदिन 50 ग्राम चीलेटेड मिनरल मिक्चर अवश्य दें।",
       "badge": "🐄 पशुपालन रहस्य",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_cur_004",
@@ -402,7 +402,7 @@
       "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
       "badge": "💡 बागवानी रहस्य",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_cur_005",
@@ -415,7 +415,7 @@
       "curiosity_answer": "हमेशा 15 लीटर पानी की टंकी में 5 मिली Bio-99 मिलाएं, जिससे दवा पत्ती के आर-पार फैलकर कीटों को तुरंत खत्म करती है।",
       "badge": "💡 आधुनिक तकनीक",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_vip_001",
@@ -428,7 +428,7 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_vip_002",
@@ -441,7 +441,7 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_vip_003",
@@ -454,7 +454,7 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_vip_004",
@@ -467,7 +467,7 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_vip_005",
@@ -480,7 +480,7 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_bun_001",
@@ -493,7 +493,7 @@
       "action_url": "/ebooks/book-landing.html?id=BUN001",
       "badge": "🔥 महाबचत बंडल",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_bun_002",
@@ -506,7 +506,7 @@
       "action_url": "/ebooks/agriculture.html#sec-agri-bundles",
       "badge": "🔥 कॉम्बो ऑफर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_bun_003",
@@ -519,7 +519,7 @@
       "action_url": "/ebooks/agriculture.html#sec-agri-products",
       "badge": "🌿 जैविक समाधान",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_bun_004",
@@ -532,7 +532,7 @@
       "action_url": "/ebooks/book-landing.html?id=BK001",
       "badge": "⏳ सीमित ऑफर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     },
     {
       "id": "tst_bun_005",
@@ -545,7 +545,7 @@
       "action_url": "/aarogyam-sakhi.html",
       "badge": "🤖 24x7 AI डॉक्टर",
       "enabled": true,
-      "push_selected": false
+      "push_selected": true
     }
   ],
   "active_mobile_push_queue": [
@@ -649,15 +649,234 @@
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
       "push_selected": true
+    },
+    {
+      "id": "tst_ask_004",
+      "type": "sakhi_user_ask_toast",
+      "title": "हरविंदर सिंह (लुधियाना, पंजाब)",
+      "message": "ने सखी AI से पूछा: 'गेहूँ में पीला रतुआ (Yellow Rust) और फफूंद से बचाव कैसे करें?'",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🌱 सुरक्षा स्प्रे शेड्यूल",
+      "action_url": "/aarogyam-sakhi.html?q=गेहूं+पीला+रतुआ+उपचार",
+      "badge": "⚡ सखी AI लाइव सवाल",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_ask_005",
+      "type": "sakhi_user_ask_toast",
+      "title": "गोविंदभाई पटेल (आनंद, गुजरात)",
+      "message": "ने सखी AI से पूछा: 'दुधारू गाय व भैंस में दूध और फैट (SNF) प्राकृतिक रूप से कैसे बढ़ाएं?'",
+      "image": "/images/sakhi/pashupalan-sakhi.webp",
+      "action_text": "🥛 दूध वृद्धि उपाय",
+      "action_url": "/aarogyam-sakhi.html?q=गाय+भैंस+दूध+फैट+वृद्धि",
+      "badge": "⚡ सखी AI लाइव सवाल",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_cur_001",
+      "type": "sakhi_curiosity_toast",
+      "title": "🌾 क्या आप जानते हैं? (स्प्रे साइंस)",
+      "message": "दोपहर की तेज धूप में कीटनाशक स्प्रे करने से 40% तक दवा वाष्पित होकर बेकार हो जाती है!",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🧪 सही स्प्रे समय जानें",
+      "action_url": "/ebooks/book-landing.html?id=BK002",
+      "curiosity_answer": "स्प्रे हमेशा सुबह ओस सूखने के बाद (8-10 बजे) या शाम को 4 बजे के बाद करें, जब पौधों के रंध्र (Stomata) पूरी तरह खुले होते हैं।",
+      "badge": "💡 कृषि रहस्य",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_cur_002",
+      "type": "sakhi_curiosity_toast",
+      "title": "🌱 क्या आप जानते हैं? (जड़ विकास)",
+      "message": "यूरिया अधिक डालने से पौधे की ऊपरी बढ़वार तो होती है पर जड़ें कमजोर होकर पौधा गिर जाता है!",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🔬 संतुलित पोषण गाइड",
+      "action_url": "/ebooks/book-landing.html?id=BK001",
+      "curiosity_answer": "फसल के शुरुआती 30 दिनों में फास्फोरस व बायो-स्टिमुलेंट (जैसे Stimrich) दें जिससे सफेद जड़ों का 3 गुना जाल बनता है।",
+      "badge": "💡 कृषि रहस्य",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_cur_003",
+      "type": "sakhi_curiosity_toast",
+      "title": "🐄 क्या आप जानते हैं? (पशु पोषण)",
+      "message": "पशुओं को हरा चारा और सूखा चारा 3:1 के अनुपात में न देने पर उनका पाचन बिगड़कर दूध घट जाता है!",
+      "image": "/images/sakhi/pashupalan-sakhi.webp",
+      "action_text": "🥛 आहार संतुलन चार्ट",
+      "action_url": "/aarogyam-sakhi.html?q=पशु+संतुलित+आहार+चार्ट",
+      "curiosity_answer": "प्रति 100 किग्रा शरीर भार पर 2.5 किग्रा शुष्क पदार्थ और प्रतिदिन 50 ग्राम चीलेटेड मिनरल मिक्चर अवश्य दें।",
+      "badge": "🐄 पशुपालन रहस्य",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_cur_004",
+      "type": "sakhi_curiosity_toast",
+      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
+      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🍎 फल सुरक्षा गाइड",
+      "action_url": "/ebooks/book-landing.html?id=BK022",
+      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
+      "badge": "💡 बागवानी रहस्य",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_cur_005",
+      "type": "sakhi_curiosity_toast",
+      "title": "💧 क्या आप जानते हैं? (दवा चिपकाने का नियम)",
+      "message": "बिना स्टीकर/स्प्रेडर (सिलिकॉन स्प्रेडर) के स्प्रे करने पर 50% दवा पत्तों से फिसलकर मिट्टी में गिर जाती है!",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🌿 Bio-99 स्प्रेडर देखें",
+      "action_url": "/ebooks/agriculture.html#sec-agri-products",
+      "curiosity_answer": "हमेशा 15 लीटर पानी की टंकी में 5 मिली Bio-99 मिलाएं, जिससे दवा पत्ती के आर-पार फैलकर कीटों को तुरंत खत्म करती है।",
+      "badge": "💡 आधुनिक तकनीक",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_vip_001",
+      "type": "user_sell_toast",
+      "title": "विक्रम सिंह तोमर (मुरैना, MP)",
+      "message": "ने 1-Year Aarogyam Pro VIP All-Access सदस्यता सक्रिय की!",
+      "price": "₹99",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "👑 VIP पास लें",
+      "action_url": "/ebooks/book-landing.html?id=SUB001",
+      "badge": "👑 VIP मेंबर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_vip_002",
+      "type": "user_sell_toast",
+      "title": "गुरप्रीत सिंह (बठिंडा, पंजाब)",
+      "message": "ने 26+ डिजिटल गाइड्स का VIP लाइफटाइम पास अनलॉक किया!",
+      "price": "₹99",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "👑 तुरंत अनलॉक करें",
+      "action_url": "/ebooks/book-landing.html?id=SUB001",
+      "badge": "👑 VIP मेंबर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_vip_003",
+      "type": "user_sell_toast",
+      "title": "नितिन गडकरी (नागपुर, महाराष्ट्र)",
+      "message": "ने Aarogyam VIP पास से 5 कृषि कॉम्बो बंडल मुफ़्त प्राप्त किए!",
+      "price": "₹99",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "👑 पास विवरण देखें",
+      "action_url": "/ebooks/book-landing.html?id=SUB001",
+      "badge": "👑 VIP मेंबर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_vip_004",
+      "type": "user_sell_toast",
+      "title": "प्रवीण शर्मा (जयपुर, राजस्थान)",
+      "message": "ने 365 दिन अनलिमिटेड ई-बुक डाउनलोड पास जॉइन किया!",
+      "price": "₹99",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "👑 VIP पास लें",
+      "action_url": "/ebooks/book-landing.html?id=SUB001",
+      "badge": "👑 VIP मेंबर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_vip_005",
+      "type": "user_sell_toast",
+      "title": "संजय कुशवाहा (वाराणसी, UP)",
+      "message": "ने Aarogyam Pro VIP सदस्यता एक्टिव की और ₹2,400 की सीधी बचत की!",
+      "price": "₹99",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "👑 VIP मेंबर बनें",
+      "action_url": "/ebooks/book-landing.html?id=SUB001",
+      "badge": "👑 VIP मेंबर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_bun_001",
+      "type": "webpage_toast",
+      "title": "🔥 महाबचत 5-इन-1 अनाज मास्टर कॉम्बो",
+      "message": "गेहूँ, धान, मक्का, चना और सरसों की पूरी मास्टर गाइड्स केवल ₹149 (₹800 की भारी छूट)",
+      "price": "₹149",
+      "image": "/images/books/kharif-master-guide-2026-cover.webp",
+      "action_text": "⚡ कॉम्बो ऑफर देखें",
+      "action_url": "/ebooks/book-landing.html?id=BUN001",
+      "badge": "🔥 महाबचत बंडल",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_bun_002",
+      "type": "webpage_toast",
+      "title": "🍇 फल एवं बागवानी सुरक्षा 4-इन-1 कॉम्बो",
+      "message": "अनार, केला, आम व पपीता की संपूर्ण वैज्ञानिक गाइड - आज केवल ₹129 में!",
+      "price": "₹129",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🍎 बागवानी पैक लें",
+      "action_url": "/ebooks/agriculture.html#sec-agri-bundles",
+      "badge": "🔥 कॉम्बो ऑफर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_bun_003",
+      "type": "webpage_toast",
+      "title": "🌿 100% जैविक फसल पोषण किट (NetSurf)",
+      "message": "स्टीमरिच + बायो-99 + शेत: रासायनिक खाद का 40% खर्च घटाएं और उपज 30% बढ़ाएं।",
+      "price": "ऑर्डर चालू",
+      "image": "/images/products/netsurf/stimrich.webp",
+      "action_text": "📲 WhatsApp पर मंगाएं",
+      "action_url": "/ebooks/agriculture.html#sec-agri-products",
+      "badge": "🌿 जैविक समाधान",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_bun_004",
+      "type": "webpage_toast",
+      "title": "⏳ सीमित स्टॉक: केवल 14 प्रतियां शेष!",
+      "message": "'खरीफ फसल मास्टर गाइड 2026' स्पेशल डिस्काउंट केवल आज रात 12 बजे तक मान्य।",
+      "price": "₹99",
+      "image": "/images/books/kharif-master-guide-2026-cover.webp",
+      "action_text": "📖 अभी बुक करें",
+      "action_url": "/ebooks/book-landing.html?id=BK001",
+      "badge": "⏳ सीमित ऑफर",
+      "enabled": true,
+      "push_selected": true
+    },
+    {
+      "id": "tst_bun_005",
+      "type": "webpage_toast",
+      "title": "🩺 खेती का डॉक्टर + 24x7 सखी AI असिस्टेंट",
+      "message": "फसल में कोई भी रोग हो, फोटो भेजें या नाम बताएं - सखी AI देगी 10 सेकंड में अचूक इलाज!",
+      "price": "मुफ़्त सेवा",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "💬 सखी से बात करें",
+      "action_url": "/aarogyam-sakhi.html",
+      "badge": "🤖 24x7 AI डॉक्टर",
+      "enabled": true,
+      "push_selected": true
     }
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "push_1795155312106",
-    "interval_mode": "now",
-    "interval_hours": 0,
+    "batch_id": "push_1795156223977",
+    "interval_mode": "1",
+    "interval_hours": 1,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T06:15:12.106Z",
-    "active_count": 8
+    "dispatched_at": "2026-11-20T06:30:23.977Z",
+    "active_count": 25
   }
 }
