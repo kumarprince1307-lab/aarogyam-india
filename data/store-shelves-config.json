@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T15:09:42.243Z",
+  "updated_at": "2026-11-20T15:10:25.211Z",
   "version": "1.0",
   "shelves": [
     {
@@ -238,9 +238,9 @@
       "action_url": "/ebooks/book-landing.html?id=BK002",
       "badge": "🛒 सफल खरीद",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_buy_002",
@@ -253,9 +253,9 @@
       "action_url": "/ebooks/book-landing.html?id=BK017",
       "badge": "🛒 सफल खरीद",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_buy_003",
@@ -268,9 +268,9 @@
       "action_url": "/ebooks/book-landing.html?id=BK023",
       "badge": "🛒 सफल खरीद",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_buy_004",
@@ -283,9 +283,9 @@
       "action_url": "/ebooks/book-landing.html?id=BK026",
       "badge": "🛒 सफल खरीद",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_buy_005",
@@ -298,9 +298,9 @@
       "action_url": "/ebooks/book-landing.html?id=BK020",
       "badge": "🛒 सफल खरीद",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_ask_001",
@@ -312,9 +312,9 @@
       "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_ask_002",
@@ -326,9 +326,9 @@
       "action_url": "/aarogyam-sakhi.html?q=चना+सोयाबीन+इल्ली+नियंत्रण",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_ask_003",
@@ -340,9 +340,9 @@
       "action_url": "/aarogyam-sakhi.html?q=धान+कल्ले+वृद्धि+फॉर्मूला",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_ask_004",
@@ -354,9 +354,9 @@
       "action_url": "/aarogyam-sakhi.html?q=गेहूं+पीला+रतुआ+उपचार",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_ask_005",
@@ -368,9 +368,9 @@
       "action_url": "/aarogyam-sakhi.html?q=गाय+भैंस+दूध+फैट+वृद्धि",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_cur_001",
@@ -383,9 +383,9 @@
       "curiosity_answer": "स्प्रे हमेशा सुबह ओस सूखने के बाद (8-10 बजे) या शाम को 4 बजे के बाद करें, जब पौधों के रंध्र (Stomata) पूरी तरह खुले होते हैं।",
       "badge": "💡 कृषि रहस्य",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_cur_002",
@@ -398,9 +398,9 @@
       "curiosity_answer": "फसल के शुरुआती 30 दिनों में फास्फोरस व बायो-स्टिमुलेंट (जैसे Stimrich) दें जिससे सफेद जड़ों का 3 गुना जाल बनता है।",
       "badge": "💡 कृषि रहस्य",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_cur_003",
@@ -413,9 +413,9 @@
       "curiosity_answer": "प्रति 100 किग्रा शरीर भार पर 2.5 किग्रा शुष्क पदार्थ और प्रतिदिन 50 ग्राम चीलेटेड मिनरल मिक्चर अवश्य दें।",
       "badge": "🐄 पशुपालन रहस्य",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_cur_004",
@@ -428,9 +428,9 @@
       "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
       "badge": "💡 बागवानी रहस्य",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_cur_005",
@@ -443,9 +443,9 @@
       "curiosity_answer": "हमेशा 15 लीटर पानी की टंकी में 5 मिली Bio-99 मिलाएं, जिससे दवा पत्ती के आर-पार फैलकर कीटों को तुरंत खत्म करती है।",
       "badge": "💡 आधुनिक तकनीक",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_vip_001",
@@ -458,9 +458,9 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_vip_002",
@@ -473,9 +473,9 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_vip_003",
@@ -488,9 +488,9 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_vip_004",
@@ -503,9 +503,9 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_vip_005",
@@ -518,9 +518,9 @@
       "action_url": "/ebooks/book-landing.html?id=SUB001",
       "badge": "👑 VIP मेंबर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_bun_001",
@@ -535,7 +535,7 @@
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_bun_002",
@@ -548,9 +548,9 @@
       "action_url": "/ebooks/agriculture.html#sec-agri-bundles",
       "badge": "🔥 कॉम्बो ऑफर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_bun_003",
@@ -563,9 +563,9 @@
       "action_url": "/ebooks/agriculture.html#sec-agri-products",
       "badge": "🌿 जैविक समाधान",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_bun_004",
@@ -578,9 +578,9 @@
       "action_url": "/ebooks/book-landing.html?id=BK001",
       "badge": "⏳ सीमित ऑफर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     },
     {
       "id": "tst_bun_005",
@@ -593,9 +593,9 @@
       "action_url": "/aarogyam-sakhi.html",
       "badge": "🤖 24x7 AI डॉक्टर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": false
+      "inapp_selected": true
     }
   ],
   "active_mobile_push_queue": [
@@ -612,16 +612,16 @@
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
-      "inapp_selected": false
+      "inapp_selected": true
     }
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "wakeup_1795187382243",
+    "batch_id": "wakeup_1795187425211",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T15:09:42.243Z",
+    "dispatched_at": "2026-11-20T15:10:25.211Z",
     "active_count": 1
   },
   "wake_up_push_queue": [
@@ -638,16 +638,16 @@
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
-      "inapp_selected": false
+      "inapp_selected": true
     }
   ],
   "wake_up_push_config": {
     "enabled": true,
-    "batch_id": "wakeup_1795187382243",
+    "batch_id": "wakeup_1795187425211",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T15:09:42.243Z",
+    "dispatched_at": "2026-11-20T15:10:25.211Z",
     "active_count": 1
   },
   "active_in_app_queue": [
