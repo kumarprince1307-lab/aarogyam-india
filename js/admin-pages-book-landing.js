@@ -4515,9 +4515,15 @@ Instant Download & Lifetime Access
     if (typeof window.playAarogyamChime === 'function') {
       window.playAarogyamChime();
     }
+
+    // Always display prominent visual confirmation inside Admin
+    if (typeof showToast === 'function') {
+      showToast(`⚡ [अलर्ट] ${toast.title}: ${toast.message}`, 'success');
+    }
+
     if (!('Notification' in window)) return;
     if (Notification.permission !== 'granted') {
-      const res = await Notification.requestPermission();
+      const res = await Notification.requestPermission().catch(() => 'denied');
       if (res !== 'granted') return;
     }
 
@@ -4545,7 +4551,7 @@ Instant Download & Lifetime Access
         ]).catch(() => null);
       }
       if (reg && typeof reg.showNotification === 'function') {
-        await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions);
+        await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions).catch(() => {});
         return;
       }
     }
@@ -4579,9 +4585,13 @@ Instant Download & Lifetime Access
       showToast('⚡ Google FCM को वेक-अप सिग्नल भेजा जा रहा है...', 'info');
     }
 
-    // 1. Direct Web Push API trigger via Vercel Serverless Function
+    // 1. Direct Web Push API trigger via Vercel Serverless Function (Supports Localhost & Production)
+    const apiUrl = (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'))
+      ? 'https://aarogyamindia.online/api/send-wake-up-push'
+      : '/api/send-wake-up-push';
+
     try {
-      const resp = await fetch('/api/send-wake-up-push', {
+      const resp = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ toasts: toasts })

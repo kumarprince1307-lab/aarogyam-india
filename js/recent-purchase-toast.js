@@ -450,14 +450,14 @@
   function setupNativeBackgroundPushScheduler(shelvesData) {
     if (typeof window === 'undefined') return;
 
-    const pushConfig = shelvesData?.mobile_push_config || {};
+    const pushConfig = shelvesData?.wake_up_push_config || shelvesData?.mobile_push_config || {};
     // Check if push is globally paused / turned OFF by admin
     if (pushConfig.enabled === false) return;
 
-    const pushQueue = shelvesData?.active_mobile_push_queue || [];
+    const pushQueue = shelvesData?.wake_up_push_queue || shelvesData?.active_in_app_queue || shelvesData?.active_mobile_push_queue || [];
     if (!Array.isArray(pushQueue) || pushQueue.length === 0) return;
 
-    const intervalHours = pushConfig.interval_hours !== undefined ? pushConfig.interval_hours : 3;
+    const intervalHours = pushConfig.interval_hours !== undefined ? pushConfig.interval_hours : (pushConfig.interval_mode === 'now' ? 0 : 3);
     const intervalMs = (intervalHours <= 0 ? 0 : intervalHours * 3600 * 1000);
     const now = Date.now();
 
@@ -490,13 +490,12 @@
       for (let i = 0; i < eligibleCount; i++) {
         const t = pushQueue[i];
         if (!t) continue;
-        const toastTime = intervalMs > 0 ? (dispatchedAt + (i * intervalMs)) : dispatchedAt;
-        if (!logMap.has(t.id)) {
-          logMap.set(t.id, {
-            ...t,
-            dispatchedAt: Math.min(toastTime, now)
-          });
-        }
+        // In NOW mode (intervalMs <= 0), index 0 is newest (now), subsequent have small 2s decrements so order is pristine
+        const toastTime = intervalMs > 0 ? (dispatchedAt + (i * intervalMs)) : (now - (i * 2000));
+        logMap.set(t.id, {
+          ...t,
+          dispatchedAt: Math.min(toastTime, now)
+        });
       }
       const updatedLog = Array.from(logMap.values()).sort((a, b) => (b.dispatchedAt || 0) - (a.dispatchedAt || 0)).slice(0, 25);
       localStorage.setItem('AAROGYAM_DISPATCHED_TOASTS_LOG', JSON.stringify(updatedLog));

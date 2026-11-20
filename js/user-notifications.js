@@ -597,7 +597,7 @@
                     } catch (e) { }
                 }
 
-                const pushQueue = shelvesCfg?.active_mobile_push_queue || [];
+                const pushQueue = shelvesCfg?.wake_up_push_queue || shelvesCfg?.active_in_app_queue || shelvesCfg?.active_mobile_push_queue || [];
                 const user = this.getUser();
                 const userKey = user.id || user.mobile || 'guest';
                 const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${userKey}`) || '[]');
@@ -614,7 +614,7 @@
                     if (firstActive) {
                         dispatchedLog = [{
                             ...firstActive,
-                            dispatchedAt: shelvesCfg.mobile_push_config?.dispatched_at || Date.now()
+                            dispatchedAt: shelvesCfg.wake_up_push_config?.dispatched_at || shelvesCfg.mobile_push_config?.dispatched_at || Date.now()
                         }];
                     }
                 }
@@ -627,6 +627,14 @@
 
                         const isRead = readStore.includes(notifId);
                         const isBookSale = toast.type === 'book_sell_toast' || (toast.badge && toast.badge.includes('खरीद'));
+                        
+                        let toastTs = new Date().toISOString();
+                        if (toast.dispatchedAt) {
+                            toastTs = new Date(toast.dispatchedAt).toISOString();
+                        } else if (shelvesCfg?.wake_up_push_config?.dispatched_at || shelvesCfg?.mobile_push_config?.dispatched_at) {
+                            toastTs = new Date(shelvesCfg.wake_up_push_config?.dispatched_at || shelvesCfg.mobile_push_config?.dispatched_at).toISOString();
+                        }
+
                         const toastNotif = {
                             id: notifId,
                             category: isBookSale ? 'sales' : 'announcements',
@@ -638,7 +646,7 @@
                             image: toast.image,
                             actionUrl: toast.action_url || '/',
                             actionText: toast.action_text || '👉 विवरण देखें',
-                            timestamp: toast.dispatchedAt ? new Date(toast.dispatchedAt).toISOString() : (shelvesCfg?.mobile_push_config?.dispatched_at || toast.created_at || new Date().toISOString()),
+                            timestamp: toastTs,
                             isRead: isRead
                         };
                         newPushItems.push(toastNotif);
@@ -788,15 +796,22 @@
             });
         },
 
-        // 7. Render Items in Drawer List
+        // 7. Render Items in Drawer List (Strict Newest-First Chronological Order)
         renderList: function () {
             const container = document.getElementById('userNotifListContainer');
             if (!container) return;
 
-            let filtered = this.items;
+            let filtered = [...this.items];
             if (this.currentFilter !== 'all') {
-                filtered = this.items.filter(n => n.category === this.currentFilter);
+                filtered = filtered.filter(n => n.category === this.currentFilter);
             }
+
+            // 🛡️ STRICT REVERSE-CHRONOLOGICAL SORT: Newest notifications ALWAYS at the top!
+            filtered.sort((a, b) => {
+                const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                return timeB - timeA;
+            });
 
             if (filtered.length === 0) {
                 container.innerHTML = `

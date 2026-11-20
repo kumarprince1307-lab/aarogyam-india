@@ -23,7 +23,12 @@ module.exports = async function handler(req, res) {
     const webpush = webpushModule.default || webpushModule;
     webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
-    const body = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch(e) { body = {}; }
+    }
+    if (!body) body = {};
+
     const toasts = Array.isArray(body.toasts) && body.toasts.length > 0 ? body.toasts : (body.toast ? [body.toast] : []);
     const targetMobile = body.targetMobile ? String(body.targetMobile).replace(/\D/g, '').slice(-10) : null;
 
@@ -33,12 +38,18 @@ module.exports = async function handler(req, res) {
 
     // Pick target toast (first in queue or specified)
     const targetToast = toasts[0];
+    const baseUrl = 'https://aarogyamindia.online';
+    const toAbs = (u) => {
+      if (!u || typeof u !== 'string') return undefined;
+      return u.startsWith('http') ? u : (baseUrl + (u.startsWith('/') ? '' : '/') + u);
+    };
+
     const payload = JSON.stringify({
       title: targetToast.title || 'आरोग्यम इंडिया 🌾',
       body: targetToast.message || 'फसल सुरक्षा, मौसम व नई सलाह देखें!',
-      icon: targetToast.image || '/images/icons/pwa-icon-192x192.png',
-      badge: '/images/icons/pwa-icon-96x96.png',
-      image: targetToast.image || undefined,
+      icon: toAbs(targetToast.image) || (baseUrl + '/images/icons/pwa-icon-192x192.png'),
+      badge: baseUrl + '/images/icons/pwa-icon-96x96.png',
+      image: toAbs(targetToast.image),
       url: targetToast.action_url || '/',
       id: targetToast.id || ('notif_' + Date.now())
     });
