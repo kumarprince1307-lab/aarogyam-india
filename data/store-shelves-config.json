@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T15:11:09.627Z",
+  "updated_at": "2026-11-20T16:40:18.616Z",
   "version": "1.0",
   "shelves": [
     {
@@ -240,7 +240,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_buy_002",
@@ -255,7 +255,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_buy_003",
@@ -270,7 +270,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_buy_004",
@@ -285,7 +285,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_buy_005",
@@ -300,7 +300,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_ask_001",
@@ -314,7 +314,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_ask_002",
@@ -328,7 +328,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_ask_003",
@@ -342,7 +342,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_ask_004",
@@ -356,7 +356,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_ask_005",
@@ -370,7 +370,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_cur_001",
@@ -385,7 +385,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_cur_002",
@@ -400,7 +400,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_cur_003",
@@ -415,7 +415,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_cur_004",
@@ -430,7 +430,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_cur_005",
@@ -445,7 +445,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_vip_001",
@@ -460,7 +460,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_vip_002",
@@ -475,7 +475,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_vip_003",
@@ -490,7 +490,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_vip_004",
@@ -505,7 +505,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_vip_005",
@@ -520,7 +520,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_bun_001",
@@ -534,8 +534,8 @@
       "badge": "🔥 महाबचत बंडल",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": true,
-      "inapp_selected": true
+      "wakeup_selected": false,
+      "inapp_selected": false
     },
     {
       "id": "tst_bun_002",
@@ -549,8 +549,8 @@
       "badge": "🔥 कॉम्बो ऑफर",
       "enabled": true,
       "push_selected": false,
-      "wakeup_selected": false,
-      "inapp_selected": true
+      "wakeup_selected": true,
+      "inapp_selected": false
     },
     {
       "id": "tst_bun_003",
@@ -565,7 +565,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_bun_004",
@@ -580,7 +580,7 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     },
     {
       "id": "tst_bun_005",
@@ -595,59 +595,59 @@
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": false,
-      "inapp_selected": true
+      "inapp_selected": false
     }
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_bun_001",
+      "id": "tst_bun_002",
       "type": "webpage_toast",
-      "title": "🔥 महाबचत 5-इन-1 अनाज मास्टर कॉम्बो",
-      "message": "गेहूँ, धान, मक्का, चना और सरसों की पूरी मास्टर गाइड्स केवल ₹149 (₹800 की भारी छूट)",
-      "price": "₹149",
-      "image": "/images/books/kharif-master-guide-2026-cover.webp",
-      "action_text": "⚡ कॉम्बो ऑफर देखें",
-      "action_url": "/ebooks/book-landing.html?id=BUN001",
-      "badge": "🔥 महाबचत बंडल",
+      "title": "🍇 फल एवं बागवानी सुरक्षा 4-इन-1 कॉम्बो",
+      "message": "अनार, केला, आम व पपीता की संपूर्ण वैज्ञानिक गाइड - आज केवल ₹129 में!",
+      "price": "₹129",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🍎 बागवानी पैक लें",
+      "action_url": "/ebooks/agriculture.html#sec-agri-bundles",
+      "badge": "🔥 कॉम्बो ऑफर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": true,
-      "inapp_selected": true
+      "inapp_selected": false
     }
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "wakeup_1795187469627",
+    "batch_id": "wakeup_1795192818616",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T15:11:09.627Z",
+    "dispatched_at": "2026-11-20T16:40:18.616Z",
     "active_count": 1
   },
   "wake_up_push_queue": [
     {
-      "id": "tst_bun_001",
+      "id": "tst_bun_002",
       "type": "webpage_toast",
-      "title": "🔥 महाबचत 5-इन-1 अनाज मास्टर कॉम्बो",
-      "message": "गेहूँ, धान, मक्का, चना और सरसों की पूरी मास्टर गाइड्स केवल ₹149 (₹800 की भारी छूट)",
-      "price": "₹149",
-      "image": "/images/books/kharif-master-guide-2026-cover.webp",
-      "action_text": "⚡ कॉम्बो ऑफर देखें",
-      "action_url": "/ebooks/book-landing.html?id=BUN001",
-      "badge": "🔥 महाबचत बंडल",
+      "title": "🍇 फल एवं बागवानी सुरक्षा 4-इन-1 कॉम्बो",
+      "message": "अनार, केला, आम व पपीता की संपूर्ण वैज्ञानिक गाइड - आज केवल ₹129 में!",
+      "price": "₹129",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🍎 बागवानी पैक लें",
+      "action_url": "/ebooks/agriculture.html#sec-agri-bundles",
+      "badge": "🔥 कॉम्बो ऑफर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": true,
-      "inapp_selected": true
+      "inapp_selected": false
     }
   ],
   "wake_up_push_config": {
     "enabled": true,
-    "batch_id": "wakeup_1795187469627",
+    "batch_id": "wakeup_1795192818616",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T15:11:09.627Z",
+    "dispatched_at": "2026-11-20T16:40:18.616Z",
     "active_count": 1
   },
   "active_in_app_queue": [
