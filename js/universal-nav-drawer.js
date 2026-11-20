@@ -243,6 +243,95 @@
   };
 
   // -------------------------------------------------------------
+  // 4.1 SMART DRAWER NOTIFICATION PERMISSION CONTROLLER
+  // -------------------------------------------------------------
+  window.updateDrawerNotificationStatus = function () {
+    const btn = document.getElementById('drawer-notif-control-btn');
+    const label = document.getElementById('drawer-notif-btn-label');
+    const badge = document.getElementById('drawer-notif-status-badge');
+    if (!btn || !label || !badge) return;
+
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      btn.style.display = 'none';
+      return;
+    }
+
+    const perm = Notification.permission;
+    if (perm === 'granted') {
+      badge.textContent = '🟢 चालू है (Active)';
+      badge.style.background = '#10b981';
+      badge.style.color = '#ffffff';
+      label.textContent = 'सूचनाएं (सक्रिय 🔔)';
+      btn.title = 'सूचनाएं सक्रिय हैं - टेस्ट अलर्ट देखने के लिए क्लिक करें';
+    } else if (perm === 'denied') {
+      badge.textContent = '⚠️ ब्लॉक है (Fix)';
+      badge.style.background = '#ef4444';
+      badge.style.color = '#ffffff';
+      label.textContent = 'सूचनाएं अनब्लॉक करें';
+      btn.title = 'सूचनाएं ब्लॉक हैं - चालू करने का तरीका देखें';
+    } else {
+      badge.textContent = '🔔 चालू करें';
+      badge.style.background = '#fde047';
+      badge.style.color = '#0f172a';
+      label.textContent = 'सूचनाएं चालू करें';
+      btn.title = 'मौसम, फसल सुरक्षा व कृषि अपडेट्स सीधे मोबाइल पर पाएं';
+    }
+  };
+
+  window.triggerDrawerNotificationToggle = async function () {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      alert('⚠️ आपके ब्राउज़र में वेब नोटिफिकेशन सपोर्ट उपलब्ध नहीं है।');
+      return;
+    }
+
+    const perm = Notification.permission;
+    if (perm === 'granted') {
+      if (typeof showDrawerToast === 'function') {
+        showDrawerToast('🔔 सूचनाएं आपके मोबाइल पर पहले से 100% चालू हैं!', 'success');
+      }
+      // Fire a live sample alert so user instantly sees their phone ring
+      if (typeof window.triggerNativePushNotification === 'function') {
+        window.triggerNativePushNotification({
+          title: 'आरोग्यम सूचनाएं 🌾',
+          message: 'बधाई! आपके मोबाइल पर लाइव नोटिफिकेशन सफलतापूर्वक सक्रिय हैं।',
+          image: '/images/books/fasal-ka-doctor-cover.webp',
+          action_url: '/'
+        });
+      }
+      window.updateDrawerNotificationStatus();
+      return;
+    }
+
+    if (perm === 'denied') {
+      alert('⚠️ आपके मोबाइल/ब्राउज़र में नोटिफिकेशन ब्लॉक (Blocked) किया हुआ है!\n\nइसे चालू करने के लिए:\n1. स्क्रीन के सबसे ऊपर वेबसाइट नाम के पास 🔒 (Lock / Tune Icon) पर क्लिक करें।\n2. "Permissions" या "Site Settings" में जाएं।\n3. "Notifications" को "Allow" (चालू) करें।\n4. इसके बाद पेज को रिफ्रेश करें।');
+      return;
+    }
+
+    // Default: Request permission now
+    try {
+      const res = await Notification.requestPermission();
+      window.updateDrawerNotificationStatus();
+      if (res === 'granted') {
+        if (typeof showDrawerToast === 'function') {
+          showDrawerToast('🎉 बधाई! नोटिफिकेशन सफलतापूर्वक चालू हो गए!', 'success');
+        }
+        if (typeof window.triggerNativePushNotification === 'function') {
+          window.triggerNativePushNotification({
+            title: 'आरोग्यम इंडिया 🌾',
+            message: 'नमस्ते! अब आपको मौसम, फसल रोग व पशु पोषण के ताज़ा अलर्ट्स सीधे मिलते रहेंगे।',
+            image: '/images/books/fasal-ka-doctor-cover.webp',
+            action_url: '/'
+          });
+        }
+      } else if (res === 'denied') {
+        alert('⚠️ आपने अनुमति नहीं दी। आप कभी भी ब्राउज़र के 🔒 लॉक आइकॉन पर क्लिक करके नोटिफिकेशन चालू कर सकते हैं।');
+      }
+    } catch (e) {
+      console.warn('Notification permission error:', e);
+    }
+  };
+
+  // -------------------------------------------------------------
   // 5. MULTI-PLATFORM REFERRAL SHARE ENGINE MODAL (TRANSPARENT 5-BUTTON STACK)
   // -------------------------------------------------------------
   window.recordModalShareEvent = function (platform, targetUrl, title) {
@@ -1129,6 +1218,15 @@
               <span class="drawer-tag-pill" style="background:#fde047; color:#0f172a; font-weight:900;">1 MB 📲</span>
             </a>
 
+            <!-- 1.3 SMART NOTIFICATION PERMISSION CONTROLLER IN DRAWER -->
+            <div id="drawer-notif-control-btn" onclick="window.triggerDrawerNotificationToggle()" class="drawer-nav-item-btn" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important; border-color: #34d399 !important; box-shadow: 0 4px 14px rgba(16,185,129,0.3) !important; cursor: pointer;">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background: #022c22; border-color: #34d399;"><i class="fa-solid fa-bell" style="color: #34d399;"></i></div>
+                <span class="drawer-item-title" id="drawer-notif-btn-label">सूचनाएं चालू करें (Alerts)</span>
+              </div>
+              <span class="drawer-tag-pill" id="drawer-notif-status-badge" style="background: #fde047; color: #0f172a; font-weight: 900;">🔔 चालू करें</span>
+            </div>
+
             <!-- 2. MY LIBRARY (Main Menu Direct Button) -->
             <a href="/ebooks/my-library.html" class="drawer-nav-item-btn ${currentPath.includes('my-library') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
@@ -1536,6 +1634,9 @@
     }
     if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.updateBadgeCount === 'function') {
       window.USER_NOTIFICATIONS.updateBadgeCount();
+    }
+    if (typeof window.updateDrawerNotificationStatus === 'function') {
+      window.updateDrawerNotificationStatus();
     }
     const backdrop = document.getElementById('universal-drawer-backdrop');
     const card = document.getElementById('universal-drawer-card');

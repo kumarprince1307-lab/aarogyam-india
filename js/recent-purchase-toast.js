@@ -438,7 +438,7 @@
 
   // -------------------------------------------------------------
   // 7. NATIVE BACKGROUND MOBILE PUSH QUEUE RUNNER
-  // Zero Egress Client-Side Native Notifications
+  // Zero Egress Client-Side Native Notifications (Diwali Time-Queue Pattern)
   // -------------------------------------------------------------
   function setupNativeBackgroundPushScheduler(shelvesData) {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
@@ -453,11 +453,10 @@
 
     const intervalHours = pushConfig.interval_hours !== undefined ? pushConfig.interval_hours : 3;
     const intervalMs = (intervalHours <= 0 ? 0 : intervalHours * 3600 * 1000);
-
     const now = Date.now();
 
     // Check validity / expiration
-    const dispatchedAt = pushConfig.dispatched_at ? new Date(pushConfig.dispatched_at).getTime() : 0;
+    const dispatchedAt = pushConfig.dispatched_at ? new Date(pushConfig.dispatched_at).getTime() : now;
     if (dispatchedAt > 0 && pushConfig.validity_hours > 0) {
       const ageMs = now - dispatchedAt;
       if (ageMs > pushConfig.validity_hours * 3600 * 1000) {
@@ -466,33 +465,59 @@
       }
     }
 
+    // Calculate how many toasts in the queue are eligible right now according to the timeline
+    let eligibleCount = 1;
+    if (intervalMs > 0 && dispatchedAt > 0 && now >= dispatchedAt) {
+      const elapsedMs = now - dispatchedAt;
+      eligibleCount = Math.floor(elapsedMs / intervalMs) + 1;
+    } else if (intervalMs <= 0) {
+      eligibleCount = pushQueue.length;
+    }
+    eligibleCount = Math.max(1, Math.min(eligibleCount, pushQueue.length));
+
+    // Populate all eligible past & current toasts into the Bell Notification Panel with their exact scheduled timestamps
+    try {
+      const log = JSON.parse(localStorage.getItem('AAROGYAM_DISPATCHED_TOASTS_LOG') || '[]');
+      const logMap = new Map();
+      log.forEach(item => { if (item && item.id) logMap.set(item.id, item); });
+
+      for (let i = 0; i < eligibleCount; i++) {
+        const t = pushQueue[i];
+        if (!t) continue;
+        const toastTime = intervalMs > 0 ? (dispatchedAt + (i * intervalMs)) : dispatchedAt;
+        if (!logMap.has(t.id)) {
+          logMap.set(t.id, {
+            ...t,
+            dispatchedAt: Math.min(toastTime, now)
+          });
+        }
+      }
+      const updatedLog = Array.from(logMap.values()).sort((a, b) => (b.dispatchedAt || 0) - (a.dispatchedAt || 0)).slice(0, 25);
+      localStorage.setItem('AAROGYAM_DISPATCHED_TOASTS_LOG', JSON.stringify(updatedLog));
+      if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.syncPushedToasts === 'function') {
+        window.USER_NOTIFICATIONS.syncPushedToasts();
+      }
+    } catch (e) { }
+
+    // Fire the latest eligible toast natively on the device screen if not already shown
+    const latestToast = pushQueue[eligibleCount - 1];
     const STORAGE_LAST_PUSH = 'AAROGYAM_LAST_NATIVE_PUSH_TS';
-    const lastPushTs = parseInt(localStorage.getItem(STORAGE_LAST_PUSH) || '0', 10);
-    const lastBatchId = localStorage.getItem('AAROGYAM_LAST_PUSH_BATCH_ID');
-    const isNewBatch = Boolean(pushConfig.batch_id && (pushConfig.batch_id !== lastBatchId));
+    const lastNativeId = localStorage.getItem('AAROGYAM_LAST_NATIVE_TOAST_ID');
 
-    // Immediate first push on fresh batch from admin, first load, or when interval expires
-    const isDue = isNewBatch || (lastPushTs === 0) || (intervalMs === 0 && (now - lastPushTs > 60000)) || (now - lastPushTs >= intervalMs);
+    if (latestToast && latestToast.id !== lastNativeId) {
+      localStorage.setItem('AAROGYAM_LAST_NATIVE_TOAST_ID', latestToast.id);
+      localStorage.setItem(STORAGE_LAST_PUSH, String(now));
+      dispatchNativeToastAlert(latestToast);
+    }
 
-    if (isDue) {
-      if (isNewBatch) {
-        localStorage.setItem('AAROGYAM_LAST_PUSH_BATCH_ID', pushConfig.batch_id);
-        localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', '0');
-      }
-
-      let selectedToast = null;
-      if (isNewBatch) {
-        selectedToast = pushQueue[0];
-        localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', '1');
-      } else {
-        const pushIndex = parseInt(localStorage.getItem('AAROGYAM_NATIVE_PUSH_IDX') || '0', 10);
-        selectedToast = pushQueue[pushIndex % pushQueue.length];
-        localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', String(pushIndex + 1));
-      }
-
-      if (selectedToast) {
-        localStorage.setItem(STORAGE_LAST_PUSH, String(now));
-        dispatchNativeToastAlert(selectedToast);
+    // Schedule next upcoming toast if queue has remaining items
+    if (eligibleCount < pushQueue.length && intervalMs > 0) {
+      const nextTime = dispatchedAt + (eligibleCount * intervalMs);
+      const waitMs = nextTime - now;
+      if (waitMs > 0 && waitMs <= 24 * 3600 * 1000) {
+        setTimeout(() => {
+          setupNativeBackgroundPushScheduler(shelvesData);
+        }, waitMs);
       }
     }
   }

@@ -288,17 +288,27 @@
             // --- A. Real Referral Signups from Supabase ---
             const isUuid = (val) => Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val).trim()));
             const targetUuid = (user.id && isUuid(user.id)) ? user.id : null;
+            const targetMobile = user.mobile ? String(user.mobile).replace(/\D/g, '').slice(-10) : null;
+            const targetShareId = user.share_id || user.referral_code || null;
 
-            if (db && typeof db.from === 'function' && targetUuid) {
+            if (db && typeof db.from === 'function' && (targetUuid || targetMobile || targetShareId)) {
                 try {
-                    const { data: directRefs } = await db
-                        .from('profiles')
-                        .select('id, full_name, mobile, created_at')
-                        .eq('referred_by', targetUuid)
-                        .order('created_at', { ascending: false })
-                        .limit(10);
+                    let query = db.from('profiles').select('id, full_name, mobile, created_at').order('created_at', { ascending: false }).limit(15);
+                    
+                    if (targetUuid && targetShareId && targetMobile) {
+                        query = query.or(`referred_by.eq.${targetUuid},referral_code.eq.${targetShareId},referral_mobile.eq.${targetMobile}`);
+                    } else if (targetUuid && targetShareId) {
+                        query = query.or(`referred_by.eq.${targetUuid},referral_code.eq.${targetShareId}`);
+                    } else if (targetUuid) {
+                        query = query.eq('referred_by', targetUuid);
+                    } else if (targetShareId) {
+                        query = query.eq('referral_code', targetShareId);
+                    } else if (targetMobile) {
+                        query = query.eq('referral_mobile', targetMobile);
+                    }
 
-                    if (Array.isArray(directRefs)) {
+                    const { data: directRefs } = await query;
+                    if (Array.isArray(directRefs) && directRefs.length > 0) {
                         directRefs.forEach(ref => {
                             const dateStr = ref.created_at || new Date().toISOString();
                             list.push({
@@ -312,6 +322,27 @@
                                 isRead: readStore.includes(`ref_${ref.id}`)
                             });
                         });
+                        try {
+                            localStorage.setItem(`AI_CACHED_REFS_${userKey}`, JSON.stringify(directRefs));
+                        } catch (e) { }
+                    } else {
+                        try {
+                            const cached = JSON.parse(localStorage.getItem(`AI_CACHED_REFS_${userKey}`) || '[]');
+                            if (Array.isArray(cached) && cached.length > 0) {
+                                cached.forEach(ref => {
+                                    list.push({
+                                        id: `ref_${ref.id}`,
+                                        category: 'sales',
+                                        icon: '👥',
+                                        iconClass: 'user-notif-icon-lead',
+                                        title: `🎉 नया रेफरल जुड़ा: ${ref.full_name || 'नया सदस्य'}`,
+                                        desc: `मोबाइल: ${ref.mobile ? ref.mobile.slice(0, 6) + 'XXXX' : '---'} आपके रेफरल लिंक से सफलतापूर्वक रजिस्टर हुआ।`,
+                                        timestamp: ref.created_at || new Date().toISOString(),
+                                        isRead: readStore.includes(`ref_${ref.id}`)
+                                    });
+                                });
+                            }
+                        } catch (e) { }
                     }
                 } catch (e) {
                     console.warn("Referral notif note:", e);
