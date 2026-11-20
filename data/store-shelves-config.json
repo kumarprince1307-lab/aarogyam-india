@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T04:45:02.499Z",
+  "updated_at": "2026-11-20T04:47:53.106Z",
   "version": "1.0",
   "shelves": [
     {
@@ -550,25 +550,26 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_ask_001",
-      "type": "sakhi_user_ask_toast",
-      "title": "राजेन्द्र बिश्नोई (जोधपुर, राजस्थान)",
-      "message": "ने सखी AI से पूछा: 'सरसों में माहू (चेपा) और तना गलन का जैविक व केमिकल उपचार क्या है?'",
-      "image": "/images/sakhi/aarogyam-sakhi.webp",
-      "action_text": "🤖 सखी समाधान देखें",
-      "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
-      "badge": "⚡ सखी AI लाइव सवाल",
+      "id": "tst_buy_002",
+      "type": "book_sell_toast",
+      "title": "महिपाल सिंह राणा (करनाल, हरियाणा)",
+      "message": "ने अभी-अभी 'गेहूँ की वैज्ञानिक खेती (BK017)' डिजिटल गाइड डाउनलोड की!",
+      "price": "₹75",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🌾 गाइड देखें",
+      "action_url": "/ebooks/book-landing.html?id=BK017",
+      "badge": "🛒 सफल खरीद",
       "enabled": true,
       "push_selected": true
     }
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "push_1795149902499",
+    "batch_id": "push_1795150073106",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T04:45:02.499Z",
+    "dispatched_at": "2026-11-20T04:47:53.106Z",
     "active_count": 1
   }
 }
