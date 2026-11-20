@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T06:02:02.136Z",
+  "updated_at": "2026-11-20T06:02:07.502Z",
   "version": "1.0",
   "shelves": [
     {
@@ -550,26 +550,26 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_buy_001",
+      "id": "tst_buy_002",
       "type": "book_sell_toast",
-      "title": "सुरेश पाटीदार (उज्जैन, मध्य प्रदेश)",
-      "message": "ने अभी-अभी 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा मास्टर गाइड' खरीदी!",
-      "price": "₹99",
-      "image": "/images/books/fasal-ka-doctor-cover.webp",
-      "action_text": "📖 विवरण देखें",
-      "action_url": "/ebooks/book-landing.html?id=BK002",
+      "title": "महिपाल सिंह राणा (करनाल, हरियाणा)",
+      "message": "ने अभी-अभी 'गेहूँ की वैज्ञानिक खेती (BK017)' डिजिटल गाइड डाउनलोड की!",
+      "price": "₹75",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🌾 गाइड देखें",
+      "action_url": "/ebooks/book-landing.html?id=BK017",
       "badge": "🛒 सफल खरीद",
       "enabled": true,
       "push_selected": true
     }
   ],
   "mobile_push_config": {
-    "enabled": false,
-    "batch_id": "push_1795154126377",
+    "enabled": true,
+    "batch_id": "push_1795154527502",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T05:55:26.377Z",
+    "dispatched_at": "2026-11-20T06:02:07.502Z",
     "active_count": 1
   }
 }
