@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T13:35:46.484Z",
+  "updated_at": "2026-11-20T13:35:58.488Z",
   "version": "1.0",
   "shelves": [
     {
@@ -414,7 +414,7 @@
       "badge": "🐄 पशुपालन रहस्य",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": true,
+      "wakeup_selected": false,
       "inapp_selected": false
     },
     {
@@ -429,7 +429,7 @@
       "badge": "💡 बागवानी रहस्य",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": false,
+      "wakeup_selected": true,
       "inapp_selected": false
     },
     {
@@ -600,15 +600,15 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_cur_003",
+      "id": "tst_cur_004",
       "type": "sakhi_curiosity_toast",
-      "title": "🐄 क्या आप जानते हैं? (पशु पोषण)",
-      "message": "पशुओं को हरा चारा और सूखा चारा 3:1 के अनुपात में न देने पर उनका पाचन बिगड़कर दूध घट जाता है!",
-      "image": "/images/sakhi/pashupalan-sakhi.webp",
-      "action_text": "🥛 आहार संतुलन चार्ट",
-      "action_url": "/aarogyam-sakhi.html?q=पशु+संतुलित+आहार+चार्ट",
-      "curiosity_answer": "प्रति 100 किग्रा शरीर भार पर 2.5 किग्रा शुष्क पदार्थ और प्रतिदिन 50 ग्राम चीलेटेड मिनरल मिक्चर अवश्य दें।",
-      "badge": "🐄 पशुपालन रहस्य",
+      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
+      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🍎 फल सुरक्षा गाइड",
+      "action_url": "/ebooks/book-landing.html?id=BK022",
+      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
+      "badge": "💡 बागवानी रहस्य",
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
@@ -616,25 +616,25 @@
     }
   ],
   "mobile_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795181627658",
+    "enabled": true,
+    "batch_id": "wakeup_1795181758488",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T13:33:47.658Z",
+    "dispatched_at": "2026-11-20T13:35:58.488Z",
     "active_count": 1
   },
   "wake_up_push_queue": [
     {
-      "id": "tst_cur_003",
+      "id": "tst_cur_004",
       "type": "sakhi_curiosity_toast",
-      "title": "🐄 क्या आप जानते हैं? (पशु पोषण)",
-      "message": "पशुओं को हरा चारा और सूखा चारा 3:1 के अनुपात में न देने पर उनका पाचन बिगड़कर दूध घट जाता है!",
-      "image": "/images/sakhi/pashupalan-sakhi.webp",
-      "action_text": "🥛 आहार संतुलन चार्ट",
-      "action_url": "/aarogyam-sakhi.html?q=पशु+संतुलित+आहार+चार्ट",
-      "curiosity_answer": "प्रति 100 किग्रा शरीर भार पर 2.5 किग्रा शुष्क पदार्थ और प्रतिदिन 50 ग्राम चीलेटेड मिनरल मिक्चर अवश्य दें।",
-      "badge": "🐄 पशुपालन रहस्य",
+      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
+      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
+      "image": "/images/books/sub001-cover.webp",
+      "action_text": "🍎 फल सुरक्षा गाइड",
+      "action_url": "/ebooks/book-landing.html?id=BK022",
+      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
+      "badge": "💡 बागवानी रहस्य",
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
@@ -642,12 +642,12 @@
     }
   ],
   "wake_up_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795181627658",
+    "enabled": true,
+    "batch_id": "wakeup_1795181758488",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T13:33:47.658Z",
+    "dispatched_at": "2026-11-20T13:35:58.488Z",
     "active_count": 1
   },
   "active_in_app_queue": [
