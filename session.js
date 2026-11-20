@@ -245,6 +245,11 @@
                     localStorage.removeItem('aim_ns_sponsor_phone');
                     localStorage.removeItem('aarogyam_upline_phone');
                 }
+
+                // 7. Sync Push Notification & PWA status with Supabase
+                if (typeof window !== 'undefined' && typeof window.syncUserPushAndPwaStatus === 'function') {
+                    window.syncUserPushAndPwaStatus();
+                }
             }
         } catch (e) {
             console.warn("[V1_SESSION] Session reconciliation notice:", e);

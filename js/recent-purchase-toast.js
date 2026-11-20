@@ -356,11 +356,6 @@
       requestAnimationFrame(() => bar.style.width = '0%');
     }
 
-    // Play pleasant haptic chime & vibration
-    if (typeof window.playAarogyamChime === 'function') {
-      window.playAarogyamChime();
-    }
-
     // Notify Profile Brain of Toast Impression
     if (window.AarogyamAiProfileBrain) {
       window.AarogyamAiProfileBrain.recordInteraction('toast_impression', toastData.type, toastData);
@@ -535,7 +530,7 @@
     }
   }
 
-  function dispatchNativeToastAlert(toast) {
+  async function dispatchNativeToastAlert(toast) {
     if (!toast) return;
     try {
       if (typeof window.playAarogyamChime === 'function') {
@@ -559,42 +554,42 @@
         }
       } catch (e) { }
 
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.ready.then(reg => {
-          if (reg && reg.showNotification) {
-            reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
-              body: toast.message || '',
-              icon: notifIcon,
-              badge: '/images/icons/pwa-icon-96x96.png',
-              image: wideBanner,
-              tag: 'aarogyam_live_toast',
-              renotify: true,
-              vibrate: [200, 100, 200],
-              data: {
-                url: toast.action_url || '/'
-              }
-            });
-          }
-        }).catch(() => {
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
-              body: toast.message || '',
-              icon: notifIcon,
-              image: wideBanner,
-              tag: 'aarogyam_live_toast'
-            });
-          }
-        });
+      if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
         return;
       }
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
-          body: toast.message || '',
-          icon: notifIcon,
-          image: wideBanner,
-          tag: 'aarogyam_live_toast'
-        });
+
+      const notifOptions = {
+        body: toast.message || '',
+        icon: notifIcon,
+        badge: '/images/icons/pwa-icon-96x96.png',
+        image: wideBanner,
+        tag: 'aarogyam_live_toast_' + (toast.id || 'now'),
+        renotify: true,
+        vibrate: [200, 100, 200],
+        data: {
+          url: toast.action_url || '/'
+        }
+      };
+
+      // 1. Primary path on Android & PWA: ServiceWorker Registration showNotification
+      if ('serviceWorker' in navigator) {
+        let reg = await navigator.serviceWorker.getRegistration().catch(() => null);
+        if (!reg) {
+          reg = await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise(r => setTimeout(() => r(null), 1200))
+          ]).catch(() => null);
+        }
+        if (reg && typeof reg.showNotification === 'function') {
+          await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions);
+          return;
+        }
       }
+
+      // 2. Desktop Fallback (PC/Mac only - avoid Android "Illegal constructor" error)
+      try {
+        new Notification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions);
+      } catch (e) { }
     } catch (e) { }
   }
 
@@ -749,18 +744,21 @@
       bar.id = 'ai-top-smart-notif-bar';
       bar.style.cssText = `
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 100000;
+        top: 38px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 20px);
+        max-width: 520px;
+        z-index: 99998;
         background: linear-gradient(135deg, #090d16 0%, #0f172a 100%);
-        border-bottom: 2px solid #10b981;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.7);
-        padding: 7px 12px;
+        border: 1.5px solid #10b981;
+        border-radius: 28px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.65), 0 0 12px rgba(16,185,129,0.3);
+        padding: 6px 12px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 8px;
         color: #ffffff;
         font-family: system-ui, -apple-system, sans-serif;
         box-sizing: border-box;

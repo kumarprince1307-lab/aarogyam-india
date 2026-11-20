@@ -4477,8 +4477,14 @@ Instant Download & Lifetime Access
       const wideBanner = toast.image || undefined;
 
       if ('serviceWorker' in navigator) {
-        const reg = await navigator.serviceWorker.ready;
-        if (reg && reg.showNotification) {
+        let reg = await navigator.serviceWorker.getRegistration().catch(() => null);
+        if (!reg) {
+          reg = await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise(r => setTimeout(() => r(null), 1200))
+          ]).catch(() => null);
+        }
+        if (reg && typeof reg.showNotification === 'function') {
           await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
             body: toast.message || '',
             icon: notifIcon,
