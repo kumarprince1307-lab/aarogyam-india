@@ -2507,8 +2507,13 @@ Instant Download & Lifetime Access
               <span>📲</span> <span>2. चयनित (<span id="adm_selected_push_count">0</span>) टोस्ट्स पुश करें</span>
             </button>
 
+            <!-- LIVE STATUS PILL -->
+            <span id="adm_push_status_pill" style="font-size: 0.78rem; font-weight: 800; padding: 7px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #34d399;">
+              🟢 पुश सक्रिय है
+            </span>
+
             <!-- BUTTON 3: TURN OFF / PAUSE PUSH -->
-            <button type="button" id="btn_toggle_push_off" onclick="window.toggleMobilePushPowerOff()" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: 800; padding: 9px 14px; border-radius: 8px;" title="मोबाइल पुश नोटिफिकेशन पूरी तरह बंद करें">
+            <button type="button" id="btn_toggle_push_off" onclick="window.toggleMobilePushPowerOff()" class="admin-button small-button" style="background: rgba(239,68,68,0.2); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: 800; padding: 9px 14px; border-radius: 8px;" title="मोबाइल पुश नोटिफिकेशन स्थिति बदलें">
               <span>⏹️</span> <span>पुश बंद करें</span>
             </button>
           </div>
@@ -3732,27 +3737,89 @@ Instant Download & Lifetime Access
   let adminLiveToastsList = [];
   let currentEditingToastId = null;
 
-  window.renderPopupsManagerTab = async function () {
-    try {
-      const localData = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
-      if (localData) {
-        if (localData.toasts_config) adminToastsConfig = localData.toasts_config;
-        if (Array.isArray(localData.live_toasts) && localData.live_toasts.length >= 20) adminLiveToastsList = localData.live_toasts;
+  window.updatePushPowerButtonUI = function (enabled, intervalMode) {
+    const pill = document.getElementById('adm_push_status_pill');
+    const btn = document.getElementById('btn_toggle_push_off');
+    const isEn = enabled !== false;
+    if (pill) {
+      if (isEn) {
+        pill.innerHTML = `🟢 पुश चालू है (${intervalMode === 'now' ? 'तुरंत' : 'हर ' + (intervalMode || '3') + ' घंटे'})`;
+        pill.style.background = 'rgba(16,185,129,0.15)';
+        pill.style.borderColor = '#10b981';
+        pill.style.color = '#34d399';
+      } else {
+        pill.innerHTML = '🔴 पुश बंद है (Paused)';
+        pill.style.background = 'rgba(239,68,68,0.15)';
+        pill.style.borderColor = '#ef4444';
+        pill.style.color = '#fca5a5';
       }
-    } catch (e) { }
+    }
+    if (btn) {
+      if (isEn) {
+        btn.innerHTML = '<span>⏹️</span> <span>पुश बंद करें</span>';
+        btn.style.background = 'rgba(239,68,68,0.2)';
+        btn.style.borderColor = '#ef4444';
+        btn.style.color = '#fca5a5';
+        btn.title = 'मोबाइल पुश नोटिफिकेशन को रोकें (Pause)';
+      } else {
+        btn.innerHTML = '<span>▶️</span> <span>पुश चालू करें</span>';
+        btn.style.background = 'rgba(16,185,129,0.2)';
+        btn.style.borderColor = '#10b981';
+        btn.style.color = '#34d399';
+        btn.title = 'मोबाइल पुश नोटिफिकेशन शेड्यूलर को चालू करें';
+      }
+    }
+  };
 
+  window.renderPopupsManagerTab = async function () {
+    let serverConfigLoaded = false;
     try {
       const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
       if (res.ok) {
         const json = await res.json();
-        if (json.toasts_config && (!adminToastsConfig || !adminToastsConfig.interval_seconds || adminToastsConfig.interval_seconds < 25)) {
-          adminToastsConfig = json.toasts_config;
-        }
-        if (Array.isArray(json.live_toasts) && json.live_toasts.length > 0 && adminLiveToastsList.length < 20) {
+        serverConfigLoaded = true;
+        if (json.toasts_config) adminToastsConfig = json.toasts_config;
+        if (Array.isArray(json.live_toasts) && json.live_toasts.length > 0) {
           adminLiveToastsList = json.live_toasts;
         }
+        // Central Sync: align push_selected strictly with active_mobile_push_queue so ALL devices see identical count
+        if (Array.isArray(json.active_mobile_push_queue) && json.active_mobile_push_queue.length > 0) {
+          const queueIds = new Set(json.active_mobile_push_queue.map(q => q.id));
+          adminLiveToastsList.forEach(t => {
+            t.push_selected = queueIds.has(t.id);
+          });
+        }
+        if (json.mobile_push_config) {
+          const pConf = json.mobile_push_config;
+          const selInterval = document.getElementById('adm_mobile_push_interval');
+          if (selInterval && pConf.interval_mode) selInterval.value = pConf.interval_mode;
+          const selValidity = document.getElementById('adm_mobile_push_validity');
+          if (selValidity && pConf.validity_hours !== undefined) selValidity.value = String(pConf.validity_hours);
+          window.updatePushPowerButtonUI(pConf.enabled !== false, pConf.interval_mode);
+        }
+        try {
+          localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(json));
+        } catch (e) { }
       }
-    } catch (e) { }
+    } catch (e) {
+      console.warn('Server shelves fetch note:', e);
+    }
+
+    if (!serverConfigLoaded) {
+      try {
+        const localData = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+        if (localData) {
+          if (localData.toasts_config) adminToastsConfig = localData.toasts_config;
+          if (Array.isArray(localData.live_toasts) && localData.live_toasts.length > 0) adminLiveToastsList = localData.live_toasts;
+          if (localData.mobile_push_config) {
+            const pConf = localData.mobile_push_config;
+            const selInterval = document.getElementById('adm_mobile_push_interval');
+            if (selInterval && pConf.interval_mode) selInterval.value = pConf.interval_mode;
+            window.updatePushPowerButtonUI(pConf.enabled !== false, pConf.interval_mode);
+          }
+        }
+      } catch (e) { }
+    }
 
     if (!adminToastsConfig) {
       adminToastsConfig = {
@@ -4469,6 +4536,7 @@ Instant Download & Lifetime Access
     if (!shelvesMaster) shelvesMaster = {};
 
     const batchId = 'push_' + Date.now();
+    shelvesMaster.live_toasts = adminLiveToastsList;
     shelvesMaster.active_mobile_push_queue = selectedToasts;
     shelvesMaster.mobile_push_config = {
       enabled: true,
@@ -4480,6 +4548,10 @@ Instant Download & Lifetime Access
       active_count: selectedToasts.length
     };
     shelvesMaster.updated_at = new Date().toISOString();
+
+    if (typeof window.updatePushPowerButtonUI === 'function') {
+      window.updatePushPowerButtonUI(true, intervalVal);
+    }
 
     // Log the first dispatched toast so the Bell list only shows what has actually been sent
     try {
@@ -4518,29 +4590,35 @@ Instant Download & Lifetime Access
   };
 
   // -------------------------------------------------------------
-  // TURN OFF / PAUSE MOBILE PUSH
+  // TURN OFF / PAUSE / RESUME MOBILE PUSH
   // -------------------------------------------------------------
   window.toggleMobilePushPowerOff = async function () {
     let shelvesMaster = null;
     try {
-      shelvesMaster = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+      const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
+      if (res.ok) shelvesMaster = await res.json();
     } catch (e) { }
     if (!shelvesMaster) {
       try {
-        const res = await fetch('/data/store-shelves-config.json?v=' + Date.now());
-        if (res.ok) shelvesMaster = await res.json();
+        shelvesMaster = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
       } catch (e) { }
     }
     if (!shelvesMaster) shelvesMaster = {};
     if (!shelvesMaster.mobile_push_config) shelvesMaster.mobile_push_config = {};
 
-    shelvesMaster.mobile_push_config.enabled = false;
+    const currentlyEnabled = shelvesMaster.mobile_push_config.enabled !== false;
+    const newStatus = !currentlyEnabled;
+    shelvesMaster.mobile_push_config.enabled = newStatus;
     shelvesMaster.updated_at = new Date().toISOString();
 
-    await window.syncStoreShelvesToCloud(shelvesMaster, 'Pause mobile push scheduler [Admin]');
+    if (typeof window.updatePushPowerButtonUI === 'function') {
+      window.updatePushPowerButtonUI(newStatus, shelvesMaster.mobile_push_config.interval_mode);
+    }
+
+    await window.syncStoreShelvesToCloud(shelvesMaster, (newStatus ? 'Resume' : 'Pause') + ' mobile push scheduler [Admin]');
 
     if (typeof showToast === 'function') {
-      showToast('⏹️ मोबाइल पुश नोटिफिकेशन शेड्यूलर सफलतापूर्वक बंद (PAUSED) कर दिया गया!', 'info');
+      showToast(newStatus ? '▶️ मोबाइल पुश शेड्यूलर सफलतापूर्वक चालू कर दिया गया!' : '⏹️ मोबाइल पुश शेड्यूलर सफलतापूर्वक बंद (PAUSED) कर दिया गया!', newStatus ? 'success' : 'info');
     }
   };
 

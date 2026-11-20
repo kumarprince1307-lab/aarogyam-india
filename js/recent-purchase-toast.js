@@ -82,14 +82,16 @@
   const MAX_SESSION_TOASTS = 30;
 
   // -------------------------------------------------------------
-  // 1. DATA LOADER (JSON + LOCALSTORAGE OVERRIDES)
+  // 1. DATA LOADER (CENTRAL SERVER JSON SINGLE SOURCE OF TRUTH)
   // -------------------------------------------------------------
   async function loadToastsConfigAndItems() {
+    let serverLoaded = false;
     try {
       const cacheBust = Date.now();
       const res = await fetch('/data/store-shelves-config.json?v=' + cacheBust);
       if (res.ok) {
         const json = await res.json();
+        serverLoaded = true;
         if (json.toasts_config) {
           toastsConfig = { ...toastsConfig, ...json.toasts_config };
         }
@@ -97,22 +99,27 @@
           activeToastsList = json.live_toasts;
         }
         setupNativeBackgroundPushScheduler(json);
+        try {
+          localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(json));
+        } catch (e) { }
       }
     } catch (e) {
       console.warn('[ToastEngine] Notice loading config from server:', e);
     }
 
-    // Check localStorage overrides from Admin Panel
-    try {
-      const localShelves = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
-      if (localShelves) {
-        if (localShelves.toasts_config) toastsConfig = { ...toastsConfig, ...localShelves.toasts_config };
-        if (Array.isArray(localShelves.live_toasts) && localShelves.live_toasts.length > 0) {
-          activeToastsList = localShelves.live_toasts;
+    // Offline fallback only when server fetch fails
+    if (!serverLoaded) {
+      try {
+        const localShelves = JSON.parse(localStorage.getItem('AAROGYAM_STORE_SHELVES_CONFIG') || 'null');
+        if (localShelves) {
+          if (localShelves.toasts_config) toastsConfig = { ...toastsConfig, ...localShelves.toasts_config };
+          if (Array.isArray(localShelves.live_toasts) && localShelves.live_toasts.length > 0) {
+            activeToastsList = localShelves.live_toasts;
+          }
+          setupNativeBackgroundPushScheduler(localShelves);
         }
-        setupNativeBackgroundPushScheduler(localShelves);
-      }
-    } catch (e) { }
+      } catch (e) { }
+    }
 
     // Fallback if list is empty
     if (activeToastsList.length === 0) {
@@ -441,8 +448,7 @@
   // Zero Egress Client-Side Native Notifications (Diwali Time-Queue Pattern)
   // -------------------------------------------------------------
   function setupNativeBackgroundPushScheduler(shelvesData) {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    if (Notification.permission !== 'granted') return;
+    if (typeof window === 'undefined') return;
 
     const pushConfig = shelvesData?.mobile_push_config || {};
     // Check if push is globally paused / turned OFF by admin
@@ -499,7 +505,7 @@
       }
     } catch (e) { }
 
-    // Fire the latest eligible toast natively on the device screen if not already shown
+    // Fire the latest eligible toast natively on the device screen if permission granted and not already shown
     const latestToast = pushQueue[eligibleCount - 1];
     const STORAGE_LAST_PUSH = 'AAROGYAM_LAST_NATIVE_PUSH_TS';
     const lastNativeId = localStorage.getItem('AAROGYAM_LAST_NATIVE_TOAST_ID');
@@ -507,7 +513,9 @@
     if (latestToast && latestToast.id !== lastNativeId) {
       localStorage.setItem('AAROGYAM_LAST_NATIVE_TOAST_ID', latestToast.id);
       localStorage.setItem(STORAGE_LAST_PUSH, String(now));
-      dispatchNativeToastAlert(latestToast);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        dispatchNativeToastAlert(latestToast);
+      }
     }
 
     // Schedule next upcoming toast if queue has remaining items
@@ -542,7 +550,7 @@
         }
       } catch (e) { }
 
-      if ('serviceWorker' in navigator) {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
         navigator.serviceWorker.ready.then(reg => {
           if (reg && reg.showNotification) {
             reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', {
@@ -558,15 +566,26 @@
               }
             });
           }
+        }).catch(() => {
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
+              body: toast.message || '',
+              icon: notifIcon,
+              image: wideBanner,
+              tag: 'aarogyam_live_toast'
+            });
+          }
         });
         return;
       }
-      new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
-        body: toast.message || '',
-        icon: notifIcon,
-        image: wideBanner,
-        tag: 'aarogyam_live_toast'
-      });
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(toast.title || 'आरोग्यम इंडिया 🌾', {
+          body: toast.message || '',
+          icon: notifIcon,
+          image: wideBanner,
+          tag: 'aarogyam_live_toast'
+        });
+      }
     } catch (e) { }
   }
 
@@ -703,12 +722,22 @@
   }
 
   // -------------------------------------------------------------
-  // 8. INITIALIZE ENGINE
+  // 8. INITIALIZE ENGINE & REAL-TIME MULTI-DEVICE BACKGROUND SYNC
   // -------------------------------------------------------------
   async function init() {
     await loadToastsConfigAndItems();
     startToastStream();
     ensureWebPushPermissionPrompt();
+
+    // Real-Time Multi-Device Sync: Auto-detects pushes when user unlocks phone or tab becomes visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        loadToastsConfigAndItems();
+      }
+    });
+
+    // Check periodically for fresh pushes from admin across all active mobile clients
+    setInterval(loadToastsConfigAndItems, 45000);
   }
 
   if (document.readyState === 'loading') {
