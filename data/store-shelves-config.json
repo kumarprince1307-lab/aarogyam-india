@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T15:08:05.565Z",
+  "updated_at": "2026-11-20T15:08:47.444Z",
   "version": "1.0",
   "shelves": [
     {
@@ -239,7 +239,7 @@
       "badge": "🛒 सफल खरीद",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": true,
+      "wakeup_selected": false,
       "inapp_selected": false
     },
     {
@@ -534,7 +534,7 @@
       "badge": "🔥 महाबचत बंडल",
       "enabled": true,
       "push_selected": true,
-      "wakeup_selected": false,
+      "wakeup_selected": true,
       "inapp_selected": false
     },
     {
@@ -600,15 +600,15 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_buy_001",
-      "type": "book_sell_toast",
-      "title": "सुरेश पाटीदार (उज्जैन, मध्य प्रदेश)",
-      "message": "ने अभी-अभी 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा मास्टर गाइड' खरीदी!",
-      "price": "₹99",
-      "image": "/images/books/fasal-ka-doctor-cover.webp",
-      "action_text": "📖 विवरण देखें",
-      "action_url": "/ebooks/book-landing.html?id=BK002",
-      "badge": "🛒 सफल खरीद",
+      "id": "tst_bun_001",
+      "type": "webpage_toast",
+      "title": "🔥 महाबचत 5-इन-1 अनाज मास्टर कॉम्बो",
+      "message": "गेहूँ, धान, मक्का, चना और सरसों की पूरी मास्टर गाइड्स केवल ₹149 (₹800 की भारी छूट)",
+      "price": "₹149",
+      "image": "/images/books/kharif-master-guide-2026-cover.webp",
+      "action_text": "⚡ कॉम्बो ऑफर देखें",
+      "action_url": "/ebooks/book-landing.html?id=BUN001",
+      "badge": "🔥 महाबचत बंडल",
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
@@ -617,24 +617,24 @@
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "wakeup_1795187285565",
+    "batch_id": "wakeup_1795187327444",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T15:08:05.565Z",
+    "dispatched_at": "2026-11-20T15:08:47.444Z",
     "active_count": 1
   },
   "wake_up_push_queue": [
     {
-      "id": "tst_buy_001",
-      "type": "book_sell_toast",
-      "title": "सुरेश पाटीदार (उज्जैन, मध्य प्रदेश)",
-      "message": "ने अभी-अभी 'खेती का डॉक्टर - सम्पूर्ण फसल सुरक्षा मास्टर गाइड' खरीदी!",
-      "price": "₹99",
-      "image": "/images/books/fasal-ka-doctor-cover.webp",
-      "action_text": "📖 विवरण देखें",
-      "action_url": "/ebooks/book-landing.html?id=BK002",
-      "badge": "🛒 सफल खरीद",
+      "id": "tst_bun_001",
+      "type": "webpage_toast",
+      "title": "🔥 महाबचत 5-इन-1 अनाज मास्टर कॉम्बो",
+      "message": "गेहूँ, धान, मक्का, चना और सरसों की पूरी मास्टर गाइड्स केवल ₹149 (₹800 की भारी छूट)",
+      "price": "₹149",
+      "image": "/images/books/kharif-master-guide-2026-cover.webp",
+      "action_text": "⚡ कॉम्बो ऑफर देखें",
+      "action_url": "/ebooks/book-landing.html?id=BUN001",
+      "badge": "🔥 महाबचत बंडल",
       "enabled": true,
       "push_selected": true,
       "wakeup_selected": true,
@@ -643,11 +643,11 @@
   ],
   "wake_up_push_config": {
     "enabled": true,
-    "batch_id": "wakeup_1795187285565",
+    "batch_id": "wakeup_1795187327444",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T15:08:05.565Z",
+    "dispatched_at": "2026-11-20T15:08:47.444Z",
     "active_count": 1
   },
   "active_in_app_queue": [
