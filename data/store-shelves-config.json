@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T06:03:06.668Z",
+  "updated_at": "2026-11-20T06:03:36.908Z",
   "version": "1.0",
   "shelves": [
     {
@@ -550,26 +550,26 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_buy_002",
-      "type": "book_sell_toast",
-      "title": "महिपाल सिंह राणा (करनाल, हरियाणा)",
-      "message": "ने अभी-अभी 'गेहूँ की वैज्ञानिक खेती (BK017)' डिजिटल गाइड डाउनलोड की!",
-      "price": "₹75",
-      "image": "/images/books/sub001-cover.webp",
-      "action_text": "🌾 गाइड देखें",
-      "action_url": "/ebooks/book-landing.html?id=BK017",
-      "badge": "🛒 सफल खरीद",
+      "id": "tst_cur_003",
+      "type": "sakhi_curiosity_toast",
+      "title": "🐄 क्या आप जानते हैं? (पशु पोषण)",
+      "message": "पशुओं को हरा चारा और सूखा चारा 3:1 के अनुपात में न देने पर उनका पाचन बिगड़कर दूध घट जाता है!",
+      "image": "/images/sakhi/pashupalan-sakhi.webp",
+      "action_text": "🥛 आहार संतुलन चार्ट",
+      "action_url": "/aarogyam-sakhi.html?q=पशु+संतुलित+आहार+चार्ट",
+      "curiosity_answer": "प्रति 100 किग्रा शरीर भार पर 2.5 किग्रा शुष्क पदार्थ और प्रतिदिन 50 ग्राम चीलेटेड मिनरल मिक्चर अवश्य दें।",
+      "badge": "🐄 पशुपालन रहस्य",
       "enabled": true,
       "push_selected": true
     }
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "push_1795154586668",
+    "batch_id": "push_1795154616908",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T06:03:06.668Z",
+    "dispatched_at": "2026-11-20T06:03:36.908Z",
     "active_count": 1
   }
 }
