@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T05:38:06.614Z",
+  "updated_at": "2026-11-20T05:38:27.177Z",
   "version": "1.0",
   "shelves": [
     {
@@ -564,11 +564,11 @@
   ],
   "mobile_push_config": {
     "enabled": true,
-    "batch_id": "push_1795153086614",
-    "interval_mode": "3",
-    "interval_hours": 3,
+    "batch_id": "push_1795153107177",
+    "interval_mode": "now",
+    "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T05:38:06.614Z",
+    "dispatched_at": "2026-11-20T05:38:27.177Z",
     "active_count": 1
   }
 }
