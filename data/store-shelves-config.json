@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T13:35:58.488Z",
+  "updated_at": "2026-11-20T13:50:40.140Z",
   "version": "1.0",
   "shelves": [
     {
@@ -616,7 +616,7 @@
     }
   ],
   "mobile_push_config": {
-    "enabled": true,
+    "enabled": false,
     "batch_id": "wakeup_1795181758488",
     "interval_mode": "now",
     "interval_hours": 0,
@@ -642,7 +642,7 @@
     }
   ],
   "wake_up_push_config": {
-    "enabled": true,
+    "enabled": false,
     "batch_id": "wakeup_1795181758488",
     "interval_mode": "now",
     "interval_hours": 0,
