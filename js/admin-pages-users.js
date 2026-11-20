@@ -41,10 +41,16 @@ function renderUserRow(user) {
         </div>
       </td>
       <td>
-        ${user.appInstalled 
-          ? `<span class="admin-pill active" title="${user.appInstalledAt ? 'Installed: ' + user.appInstalledAt : 'App Installed'}" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">📱 Installed</span>` 
-          : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">🌐 Web Only</span>`
-        }
+        <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+          ${user.pwaInstalled || user.appInstalled 
+            ? `<span class="admin-pill active" title="${user.appInstalledAt ? 'Installed: ' + user.appInstalledAt : 'PWA App Installed'}" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#34d399; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:4px;">📱 App Installed</span>` 
+            : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px; font-size:0.72rem; padding:2px 6px;">🌐 Web Only</span>`
+          }
+          ${user.notificationsEnabled
+            ? `<span class="admin-pill active" title="पुश नोटिफिकेशन सक्रिय है" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:4px;">🟢 Push: ON</span>`
+            : `<span class="admin-pill" title="पुश नोटिफिकेशन बंद या ब्लॉक है" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px; background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#f87171; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:4px;">🔴 Push: OFF</span>`
+          }
+        </div>
       </td>
       <td>${user.source || 'N/A'}</td>
       <td><a href="#user-details?id=${user.id}" data-route="user-details?id=${user.id}" data-id="${user.id}" class="admin-subtle-link"><strong>${user.shareId || 'N/A'}</strong></a></td>
@@ -138,7 +144,7 @@ function renderUsersTable(users) {
             <th>#</th>
             <th>Name</th>
             <th>Mobile</th>
-            <th>App Status / Device (Reset)</th>
+            <th>App / 🔔 Push Status</th>
             <th>Reg. Source</th>
             <th>Share ID</th>
             <th style="background: rgba(37,99,235,0.15); color: #60a5fa; white-space: nowrap;">🎥 Webinar Report</th>
@@ -200,9 +206,13 @@ function renderUsersTable(users) {
                 </td>
                 <td>
                   <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
-                    ${u.appInstalled 
-                      ? `<span class="admin-pill active" title="${u.appInstalledAt ? 'Installed: ' + u.appInstalledAt : 'App Installed'}" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">📱 App</span>` 
-                      : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px;">🌐 Web</span>`
+                    ${u.pwaInstalled || u.appInstalled 
+                      ? `<span class="admin-pill active" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px; background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#34d399; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:4px;">📱 App</span>` 
+                      : `<span class="admin-pill" style="opacity:0.65; white-space:nowrap; display:inline-flex; align-items:center; gap:3px; font-size:0.72rem; padding:2px 6px;">🌐 Web</span>`
+                    }
+                    ${u.notificationsEnabled
+                      ? `<span class="admin-pill active" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px; background:rgba(34,197,94,0.18); border:1px solid #22c55e; color:#4ade80; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:4px;">🟢 Push: ON</span>`
+                      : `<span class="admin-pill" style="white-space:nowrap; display:inline-flex; align-items:center; gap:3px; background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#f87171; font-weight:800; font-size:0.72rem; padding:2px 6px; border-radius:4px;">🔴 Push: OFF</span>`
                     }
                     <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
                       <span id="devStatusPill_${u.id}" class="admin-pill" style="background:#f1f5f9;color:#475569;font-size:0.68rem;padding:2px 5px;font-weight:700;">📱 Active</span>
@@ -346,6 +356,8 @@ export async function initUsers() {
           <option value="has_referrals">👥 Referrers (Refs >0)</option>
           <option value="installed">📱 App Installed</option>
           <option value="web">🌐 Web Only</option>
+          <option value="push_on">🟢 Push: ON (सूचनाएं चालू)</option>
+          <option value="push_off">🔴 Push: OFF (सूचनाएं बंद)</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
@@ -435,9 +447,13 @@ export async function initUsers() {
       } else if (statusVal === 'has_referrals') {
         result = result.filter(u => (u.directReferrals || 0) > 0);
       } else if (statusVal === 'installed') {
-        result = result.filter(u => u.appInstalled === true || String(u.source || '').toLowerCase().includes('pwa') || String(u.source || '').toLowerCase().includes('app'));
+        result = result.filter(u => u.appInstalled === true || u.pwaInstalled === true || String(u.source || '').toLowerCase().includes('pwa') || String(u.source || '').toLowerCase().includes('app'));
       } else if (statusVal === 'web') {
-        result = result.filter(u => !u.appInstalled && !String(u.source || '').toLowerCase().includes('pwa') && !String(u.source || '').toLowerCase().includes('app'));
+        result = result.filter(u => !u.appInstalled && !u.pwaInstalled && !String(u.source || '').toLowerCase().includes('pwa') && !String(u.source || '').toLowerCase().includes('app'));
+      } else if (statusVal === 'push_on') {
+        result = result.filter(u => u.notificationsEnabled === true);
+      } else if (statusVal === 'push_off') {
+        result = result.filter(u => !u.notificationsEnabled);
       } else if (statusVal === 'active') {
         result = result.filter(u => u.status === 'active');
       } else if (statusVal === 'inactive') {
@@ -565,7 +581,10 @@ export async function initUsers() {
               totalSpent: 0,
               totalDownloads: 0,
               downloadLimit: 0,
-              appInstalled: String(np.registration_source || '').toLowerCase().includes('pwa') || String(np.registration_source || '').toLowerCase().includes('app'),
+              appInstalled: np.pwa_installed === true || String(np.registration_source || '').toLowerCase().includes('pwa') || String(np.registration_source || '').toLowerCase().includes('app'),
+              pwaInstalled: np.pwa_installed === true || String(np.registration_source || '').toLowerCase().includes('pwa') || String(np.registration_source || '').toLowerCase().includes('app'),
+              notificationsEnabled: Boolean(np.notifications_enabled),
+              pushSubscription: np.push_subscription || null,
               appInstalledAt: null,
               registrationDate: np.created_at || null,
               createdAt: np.created_at || null,

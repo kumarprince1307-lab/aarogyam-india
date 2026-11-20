@@ -1280,12 +1280,110 @@
         }
     };
 
+    // -------------------------------------------------------------
+    // WEBAUDIO ZERO-EGRESS PLEASANT NOTIFICATION CHIME & HAPTIC VIBRATION
+    // -------------------------------------------------------------
+    window.playAarogyamChime = function () {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        // 2-tone melodic chime: D5 (587.33Hz) -> A5 (880Hz)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.28, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.45);
+
+        if ('vibrate' in navigator) {
+          navigator.vibrate([120, 60, 120]);
+        }
+      } catch (e) { }
+    };
+
+    // -------------------------------------------------------------
+    // SUPABASE USER NOTIFICATION & PWA STATUS SYNCHRONIZER
+    // Automatically persists notifications_enabled & pwa_installed in profiles
+    // -------------------------------------------------------------
+    window.syncUserPushAndPwaStatus = async function (forceStatus) {
+      try {
+        if (typeof window === 'undefined') return;
+        const db = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+        if (!db || typeof db.from !== 'function') return;
+
+        let user = null;
+        if (window.AarogyamSession && typeof window.AarogyamSession.getCurrentUser === 'function') {
+          user = window.AarogyamSession.getCurrentUser();
+        }
+        if (!user) {
+          try {
+            user = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}');
+          } catch (e) { }
+        }
+
+        const currentMobile = (user && user.mobile) || localStorage.getItem('aim_user_mobile') || localStorage.getItem('aarogyam_user_phone');
+        const currentId = user && user.id;
+
+        if (!currentId && !currentMobile) return;
+
+        const notifPermission = forceStatus !== undefined ? forceStatus : (('Notification' in window) ? Notification.permission : 'default');
+        const isGranted = (notifPermission === 'granted');
+        const isPwa = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        const syncKey = `AI_NOTIF_SYNC_${isGranted ? '1' : '0'}_${isPwa ? '1' : '0'}`;
+        if (sessionStorage.getItem(syncKey) === 'true') return;
+
+        const payload = {
+          notifications_enabled: isGranted,
+          pwa_installed: isPwa
+        };
+
+        let query = null;
+        if (currentId) {
+          query = db.from('profiles').update(payload).eq('id', currentId);
+        } else if (currentMobile) {
+          const cleanM = String(currentMobile).replace(/\D/g, '').slice(-10);
+          if (cleanM.length === 10) {
+            query = db.from('profiles').update(payload).eq('mobile', cleanM);
+          }
+        }
+
+        if (query) {
+          await query;
+          sessionStorage.setItem(syncKey, 'true');
+        }
+      } catch (err) { }
+    };
+
     // Auto-init on page load & re-ensure on load / dynamic nav
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => window.USER_NOTIFICATIONS.init());
+        document.addEventListener('DOMContentLoaded', () => {
+            window.USER_NOTIFICATIONS.init();
+            window.syncUserPushAndPwaStatus();
+        });
     } else {
         window.USER_NOTIFICATIONS.init();
+        window.syncUserPushAndPwaStatus();
     }
+
+    window.addEventListener('appinstalled', () => {
+        window.syncUserPushAndPwaStatus();
+    });
 
     window.addEventListener('load', () => {
         if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.ensureBellIcon === 'function') {

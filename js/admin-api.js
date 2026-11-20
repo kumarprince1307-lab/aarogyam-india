@@ -1368,7 +1368,10 @@ export async function fetchUsers(params = {}) {
           totalSpent: ownPurchases.totalSpent,
           totalDownloads: Math.max(downloadCounts[user.id] || 0, ownPurchases.totalDownloads || 0),
           downloadLimit: (ownPurchases.totalPurchases || 0) * 3,
-          appInstalled: user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
+          appInstalled: user.pwa_installed === true || user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
+          pwaInstalled: user.pwa_installed === true || user.app_installed === true || String(user.registration_source || '').toLowerCase().includes('pwa') || String(user.registration_source || '').toLowerCase().includes('app'),
+          notificationsEnabled: Boolean(user.notifications_enabled),
+          pushSubscription: user.push_subscription || null,
           appInstalledAt: user.app_installed_at ? new Date(user.app_installed_at).toLocaleDateString('en-GB') : null,
           registrationDate: user.created_at || null,
           createdAt: user.created_at || null,
@@ -1411,7 +1414,7 @@ export async function fetchUsersDelta(sinceIsoDate) {
 
     const [newProfilesRes, newPurchasesRes, newSakhiRes] = await Promise.all([
       db.from('profiles')
-        .select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referral_code, referral_mobile, referred_by')
+        .select('id, full_name, mobile, email, registration_source, is_active, created_at, share_id, referral_code, referral_mobile, referred_by, notifications_enabled, pwa_installed, push_subscription')
         .gte('created_at', sinceIsoDate),
       db.from('purchases')
         .select('profile_id, amount, download_count, purchase_date')

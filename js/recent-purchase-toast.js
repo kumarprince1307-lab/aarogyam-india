@@ -356,6 +356,11 @@
       requestAnimationFrame(() => bar.style.width = '0%');
     }
 
+    // Play pleasant haptic chime & vibration
+    if (typeof window.playAarogyamChime === 'function') {
+      window.playAarogyamChime();
+    }
+
     // Notify Profile Brain of Toast Impression
     if (window.AarogyamAiProfileBrain) {
       window.AarogyamAiProfileBrain.recordInteraction('toast_impression', toastData.type, toastData);
@@ -533,6 +538,10 @@
   function dispatchNativeToastAlert(toast) {
     if (!toast) return;
     try {
+      if (typeof window.playAarogyamChime === 'function') {
+        window.playAarogyamChime();
+      }
+
       const notifIcon = toast.image || '/images/icons/pwa-icon-192x192.png';
       const wideBanner = toast.image || undefined;
 
@@ -722,17 +731,117 @@
   }
 
   // -------------------------------------------------------------
+  // 7.2 SLEEK TOP FLOATING NOTIFICATION PERMISSION BAR (AUTO-HIDES ON ALLOW)
+  // -------------------------------------------------------------
+  function ensureTopSmartNotificationBar() {
+    try {
+      if (typeof window === 'undefined' || !('Notification' in window)) return;
+      if (Notification.permission === 'granted') {
+        const ex = document.getElementById('ai-top-smart-notif-bar');
+        if (ex) ex.remove();
+        return;
+      }
+      if (window.location.pathname.includes('/admin/')) return;
+      if (sessionStorage.getItem('AI_TOP_NOTIF_BAR_DISMISSED') === 'true') return;
+      if (document.getElementById('ai-top-smart-notif-bar')) return;
+
+      const bar = document.createElement('div');
+      bar.id = 'ai-top-smart-notif-bar';
+      bar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100000;
+        background: linear-gradient(135deg, #090d16 0%, #0f172a 100%);
+        border-bottom: 2px solid #10b981;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+        padding: 7px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: #ffffff;
+        font-family: system-ui, -apple-system, sans-serif;
+        box-sizing: border-box;
+      `;
+
+      bar.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; cursor: pointer;" id="ai_top_bar_text_area">
+          <div style="width: 32px; height: 32px; min-width: 32px; border-radius: 50%; background: #022c22; border: 1.5px solid #10b981; display: flex; align-items: center; justify-content: center;">
+            <span style="font-size: 1.05rem;">🔔</span>
+          </div>
+          <div style="min-width: 0;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;">
+              <span>सूचनाएं चालू करें</span>
+              <span style="font-size: 0.65rem; background: #ef4444; color: #fff; padding: 1px 5px; border-radius: 8px; font-weight: 900;">जरूरी</span>
+            </div>
+            <div style="font-size: 0.7rem; color: #a7f3d0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              मौसम, फसल रोग व डिस्काउंट सीधे मोबाइल पर
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+          <button type="button" id="btn_top_bar_allow" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-weight: 900; font-size: 0.74rem; padding: 5px 12px; border-radius: 16px; border: 1px solid #34d399; cursor: pointer; box-shadow: 0 2px 8px rgba(16,185,129,0.4); display: flex; align-items: center; gap: 4px; white-space: nowrap;">
+            <span>🔔</span> <span>चालू करें</span>
+          </button>
+          <button type="button" id="btn_top_bar_close" style="background: transparent; border: none; color: #94a3b8; font-size: 1rem; cursor: pointer; padding: 2px 4px;" title="बंद करें">
+            ✕
+          </button>
+        </div>
+      `;
+
+      document.body.prepend(bar);
+
+      const triggerAllow = async () => {
+        try {
+          const res = await Notification.requestPermission();
+          if (res === 'granted') {
+            bar.remove();
+            if (typeof window.playAarogyamChime === 'function') window.playAarogyamChime();
+            if (typeof window.syncUserPushAndPwaStatus === 'function') window.syncUserPushAndPwaStatus('granted');
+            if (typeof window.updateDrawerNotificationStatus === 'function') window.updateDrawerNotificationStatus();
+            if (activeToastsList.length > 0) {
+              dispatchNativeToastAlert(activeToastsList[0]);
+            }
+          } else {
+            bar.remove();
+            sessionStorage.setItem('AI_TOP_NOTIF_BAR_DISMISSED', 'true');
+            if (typeof window.syncUserPushAndPwaStatus === 'function') window.syncUserPushAndPwaStatus('denied');
+          }
+        } catch (e) {
+          bar.remove();
+        }
+      };
+
+      document.getElementById('btn_top_bar_allow')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerAllow();
+      });
+      document.getElementById('ai_top_bar_text_area')?.addEventListener('click', triggerAllow);
+      document.getElementById('btn_top_bar_close')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        bar.remove();
+        sessionStorage.setItem('AI_TOP_NOTIF_BAR_DISMISSED', 'true');
+      });
+    } catch (e) { }
+  }
+
+  // -------------------------------------------------------------
   // 8. INITIALIZE ENGINE & REAL-TIME MULTI-DEVICE BACKGROUND SYNC
   // -------------------------------------------------------------
   async function init() {
     await loadToastsConfigAndItems();
     startToastStream();
+    ensureTopSmartNotificationBar();
     ensureWebPushPermissionPrompt();
 
     // Real-Time Multi-Device Sync: Auto-detects pushes when user unlocks phone or tab becomes visible
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         loadToastsConfigAndItems();
+        ensureTopSmartNotificationBar();
       }
     });
 
