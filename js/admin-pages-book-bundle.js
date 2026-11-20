@@ -159,6 +159,34 @@ let _currentSectionOrder = [
   'sec-final-cta',
   'bundleFloatingAudioPill'
 ];
+
+// Helper functions for safe DOM form binding
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = (val !== undefined && val !== null) ? val : '';
+}
+function setChk(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.checked = Boolean(val);
+}
+
+function getNextBundleId() {
+  const list = Array.isArray(_activeBundlesList) ? _activeBundlesList : [];
+  let maxNum = 0;
+  list.forEach(b => {
+    if (b && b.id) {
+      const match = String(b.id).trim().match(/^BUN(\d+)$/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num > maxNum) {
+          maxNum = num;
+        }
+      }
+    }
+  });
+  const nextNum = maxNum + 1;
+  return 'BUN' + String(nextNum).padStart(3, '0');
+}
 let _currentSectionVisibility = {
   'sec-top-ribbon': true,
   'sec-hero': true,
@@ -263,13 +291,13 @@ export async function renderBookBundlesPage() {
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:20px;">
           <div>
-            <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">बंडल ID (Unique):</label>
-            <input type="text" id="bFormId" class="admin-input" placeholder="e.g. BUNDLE_KISAN_4IN1" required style="width:100%; box-sizing:border-box;" />
+            <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">बंडल ID (उदा. BUN001, BUN002):</label>
+            <input type="text" id="bFormId" class="admin-input" placeholder="उदा. BUN003" required style="width:100%; box-sizing:border-box; font-family:monospace; font-weight:700; color:#38bdf8;" />
           </div>
           <div>
-            <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">URL स्लग (Slug):</label>
-            <input type="text" id="bFormSlug" class="admin-input" placeholder="e.g. kisan-master-bundle" required style="width:100%; box-sizing:border-box;" />
-            <small style="color:#94a3b8; font-size:0.75rem;">लाइव लिंक: /bundle.html?slug=kisan-master-bundle</small>
+            <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">URL स्लग (Slug - वेब पेज का लिंक नाम):</label>
+            <input type="text" id="bFormSlug" class="admin-input" placeholder="उदा. kisan-combo-03" required style="width:100%; box-sizing:border-box; font-family:monospace;" />
+            <small id="bFormSlugLiveHint" style="color:#38bdf8; font-size:0.75rem;">लाइव लिंक: /bundle.html?slug=kisan-combo-03</small>
           </div>
           <div>
             <label style="display:block; font-size:0.82rem; font-weight:700; color:#cbd5e1; margin-bottom:5px;">मुख्य टाइटल (Heading):</label>
@@ -811,15 +839,33 @@ function bindBundleHubEvents() {
   window.showBundleList = showList;
 
   tabBtnList?.addEventListener('click', showList);
-  tabBtnBuilder?.addEventListener('click', () => showBuilder(Boolean(_editingBundleId)));
+  tabBtnBuilder?.addEventListener('click', () => {
+    if (!_editingBundleId) {
+      try { resetBundleForm(); } catch (e) { console.warn('resetBundleForm error:', e); }
+    }
+    showBuilder(Boolean(_editingBundleId));
+  });
   btnCancel?.addEventListener('click', showList);
 
   btnOpenCreate?.addEventListener('click', () => {
-    resetBundleForm();
+    try {
+      resetBundleForm();
+    } catch (e) {
+      console.warn('resetBundleForm error on create:', e);
+    }
     showBuilder(false);
   });
 
   offerPriceInput?.addEventListener('input', calculateSavingsPreview);
+
+  // Live Slug Link Preview on typing
+  document.getElementById('bFormSlug')?.addEventListener('input', (e) => {
+    const slugHint = document.getElementById('bFormSlugLiveHint');
+    if (slugHint) {
+      const val = (e.target.value || '').trim();
+      slugHint.textContent = val ? `लाइव लिंक: /bundle.html?slug=${val}` : 'लाइव लिंक: /bundle.html?id=...';
+    }
+  });
 
   // Live Banner Preview on typing
   document.getElementById('bFormBannerImage')?.addEventListener('input', (e) => {
@@ -2042,6 +2088,8 @@ window.editBundle = function (bundleId) {
 
   setVal('bFormId', bundle.id);
   setVal('bFormSlug', bundle.slug);
+  const slugHint = document.getElementById('bFormSlugLiveHint');
+  if (slugHint) slugHint.textContent = `लाइव लिंक: /bundle.html?slug=${bundle.slug || bundle.id}`;
   setVal('bFormTitle', bundle.title);
   setVal('bFormSubtitle', bundle.subtitle);
   setVal('bFormDescription', bundle.description);
@@ -2236,28 +2284,55 @@ function resetBundleForm() {
   _currentDemoImages = [];
   _currentBookCustomDetails = {};
 
-  document.getElementById('bFormId').value = 'BUNDLE_' + Date.now();
-  document.getElementById('bFormSlug').value = 'mega-combo-' + Math.floor(Math.random() * 900 + 100);
-  document.getElementById('bFormPixelId').value = '1671873500553134';
-  document.getElementById('bFormGaId').value = 'G-2BWPJVQWPK';
-  document.getElementById('bFormOfferPrice').value = '199';
+  const nextId = getNextBundleId();
+  const nextNum = parseInt(nextId.replace(/\D/g, '') || '1', 10);
+  const nextSlug = 'kisan-combo-' + nextNum;
+
+  setVal('bFormId', nextId);
+  setVal('bFormSlug', nextSlug);
+  setVal('bFormPixelId', '1671873500553134');
+  setVal('bFormGaId', 'G-2BWPJVQWPK');
+  setVal('bFormOfferPrice', '199');
   setVal('bFormAdsModeEnabled', 'false');
+
+  const slugHint = document.getElementById('bFormSlugLiveHint');
+  if (slugHint) slugHint.textContent = 'लाइव लिंक: /bundle.html?slug=' + nextSlug;
 
   const cbs = document.querySelectorAll('input[name="bundleBooks"]');
   cbs.forEach((cb, i) => {
     cb.checked = (i < 4);
   });
 
-  window.recalcBundleMrp();
-  window.syncSelectedBooksCustomizer();
-  window.updateBookSelectorDropdowns();
-  renderHeroKpisList();
-  renderVideosList();
-  renderReviewsList();
-  renderFaqsList();
-  renderWhyBuyFeatures();
-  renderDemoThumbnailsStrip();
-  renderSectionControls();
+  if (typeof window.recalcBundleMrp === 'function') {
+    try { window.recalcBundleMrp(); } catch (e) { console.warn(e); }
+  }
+  if (typeof window.syncSelectedBooksCustomizer === 'function') {
+    try { window.syncSelectedBooksCustomizer(); } catch (e) { console.warn(e); }
+  }
+  if (typeof window.updateBookSelectorDropdowns === 'function') {
+    try { window.updateBookSelectorDropdowns(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderHeroKpisList === 'function') {
+    try { renderHeroKpisList(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderVideosList === 'function') {
+    try { renderVideosList(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderReviewsList === 'function') {
+    try { renderReviewsList(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderFaqsList === 'function') {
+    try { renderFaqsList(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderWhyBuyFeatures === 'function') {
+    try { renderWhyBuyFeatures(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderDemoThumbnailsStrip === 'function') {
+    try { renderDemoThumbnailsStrip(); } catch (e) { console.warn(e); }
+  }
+  if (typeof renderSectionControls === 'function') {
+    try { renderSectionControls(); } catch (e) { console.warn(e); }
+  }
 }
 
 async function fetchAllBundles() {
