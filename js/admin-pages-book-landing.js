@@ -4510,6 +4510,51 @@ Instant Download & Lifetime Access
   // -------------------------------------------------------------
   // ENGINE 1: LOCK-SCREEN WAKE-UP PUSH DISPATCHER (VIA GOOGLE FCM)
   // -------------------------------------------------------------
+  window.triggerNativePushNotification = async function (toast) {
+    if (!toast) return;
+    if (typeof window.playAarogyamChime === 'function') {
+      window.playAarogyamChime();
+    }
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'granted') {
+      const res = await Notification.requestPermission();
+      if (res !== 'granted') return;
+    }
+
+    const notifIcon = (toast.image && toast.image.startsWith('http')) ? toast.image : (window.location.origin + (toast.image || '/images/icons/pwa-icon-192x192.png'));
+    const notifOptions = {
+      body: toast.message || '',
+      icon: notifIcon,
+      badge: window.location.origin + '/images/icons/pwa-icon-96x96.png',
+      tag: 'aarogyam_admin_toast_' + (toast.id || Date.now()),
+      renotify: true,
+      requireInteraction: true,
+      vibrate: [300, 100, 400, 100, 300],
+      data: { url: toast.action_url || '/' }
+    };
+    if (toast.image && typeof toast.image === 'string' && toast.image.trim()) {
+      notifOptions.image = toast.image.startsWith('http') ? toast.image : (window.location.origin + toast.image);
+    }
+
+    if ('serviceWorker' in navigator) {
+      let reg = await navigator.serviceWorker.getRegistration().catch(() => null);
+      if (!reg) {
+        reg = await Promise.race([
+          navigator.serviceWorker.ready,
+          new Promise(r => setTimeout(() => r(null), 1200))
+        ]).catch(() => null);
+      }
+      if (reg && typeof reg.showNotification === 'function') {
+        await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions);
+        return;
+      }
+    }
+
+    try {
+      new Notification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions);
+    } catch (e) { }
+  };
+
   window.testSingleToastWakeUp = async function (toastId) {
     const t = adminLiveToastsList.find(x => x.id === toastId);
     if (!t) return;

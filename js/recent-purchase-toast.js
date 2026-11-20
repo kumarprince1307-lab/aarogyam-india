@@ -514,8 +514,10 @@
       localStorage.removeItem('AAROGYAM_LAST_NATIVE_TOAST_ID'); // Always reset toast ID memory on new batch!
     }
 
-    // Fire the latest eligible toast natively on the device screen if permission granted and not already shown
-    const latestToast = pushQueue[eligibleCount - 1];
+    // Fire the target toast natively on the device screen
+    // If NOW mode, fire first prominent toast; otherwise fire current scheduled toast
+    const targetToastIndex = (intervalMs <= 0) ? 0 : (eligibleCount - 1);
+    const latestToast = pushQueue[targetToastIndex] || pushQueue[0];
     const STORAGE_LAST_PUSH = 'AAROGYAM_LAST_NATIVE_PUSH_TS';
     const lastNativeId = localStorage.getItem('AAROGYAM_LAST_NATIVE_TOAST_ID');
 

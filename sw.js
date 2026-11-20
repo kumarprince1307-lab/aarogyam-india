@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v94.0';
+const STATIC_CACHE = 'aarogyam-public-static-v95.0';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v68.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
@@ -296,7 +296,7 @@ self.addEventListener('fetch', (event) => {
 
 // 4. PUSH NOTIFICATIONS: Handles background push messages
 self.addEventListener('push', (event) => {
-  let data = { title: 'Aarogyam India 🌾', body: 'नया कृषि अपडेट या वेबिनार लाइव है!', url: '/' };
+  let data = { title: 'आरोग्यम इंडिया 🌾', body: 'फसल सुरक्षा व नई सलाह देखें!', url: '/' };
   try {
     if (event.data) {
       data = event.data.json();
@@ -305,28 +305,42 @@ self.addEventListener('push', (event) => {
     if (event.data) data.body = event.data.text();
   }
 
+  const origin = self.location ? self.location.origin : 'https://aarogyamindia.online';
+  const iconUrl = (data.icon && data.icon.startsWith('http')) ? data.icon : (origin + (data.icon || '/images/icons/pwa-icon-192x192.png'));
+  const badgeUrl = origin + '/images/icons/pwa-icon-96x96.png';
+
   const options = {
-    body: data.body || 'Aarogyam India Notification',
-    icon: data.icon || '/images/icons/pwa-icon-192x192.png',
-    badge: '/images/icons/pwa-icon-96x96.png',
-    image: data.image || undefined,
+    body: data.body || '',
+    icon: iconUrl,
+    badge: badgeUrl,
     tag: 'aarogyam_wakeup_' + (data.id || Date.now()),
     renotify: true,
-    requireInteraction: true, // Wakes up screen & stays until user dismisses or taps
+    requireInteraction: true, // Wakes up Android screen & stays until dismissed
     silent: false,
     vibrate: [300, 100, 400, 100, 300], // Strong vibration pattern
     data: {
       url: data.url || '/'
-    },
-    actions: [
-      { action: 'open', title: '👉 अभी खोलें (Open)' },
-      { action: 'close', title: '✕ बंद करें' }
-    ]
+    }
   };
 
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'Aarogyam India', options)
-  );
+  // Only attach image if it is a valid non-empty string
+  if (data.image && typeof data.image === 'string' && data.image.trim()) {
+    options.image = data.image.startsWith('http') ? data.image : (origin + data.image);
+  }
+
+  // Bulletproof showNotification with safe fallback
+  const promiseChain = self.registration.showNotification(data.title || 'आरोग्यम इंडिया 🌾', options)
+    .catch((err) => {
+      console.warn('[SW Push] Full notification failed, trying simple fallback:', err);
+      return self.registration.showNotification(data.title || 'आरोग्यम इंडिया 🌾', {
+        body: data.body || '',
+        icon: iconUrl,
+        vibrate: [300, 100, 300],
+        data: { url: data.url || '/' }
+      });
+    });
+
+  event.waitUntil(promiseChain);
 });
 
 // 5. NOTIFICATION CLICK: Open URL on notification tap
