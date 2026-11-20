@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20T17:04:35.717Z",
+  "updated_at": "2026-11-20T17:04:46.645Z",
   "version": "1.0",
   "shelves": [
     {
@@ -313,7 +313,7 @@
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
       "push_selected": false,
-      "wakeup_selected": false,
+      "wakeup_selected": true,
       "inapp_selected": true
     },
     {
@@ -429,7 +429,7 @@
       "badge": "💡 बागवानी रहस्य",
       "enabled": true,
       "push_selected": false,
-      "wakeup_selected": true,
+      "wakeup_selected": false,
       "inapp_selected": true
     },
     {
@@ -600,15 +600,14 @@
   ],
   "active_mobile_push_queue": [
     {
-      "id": "tst_cur_004",
-      "type": "sakhi_curiosity_toast",
-      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
-      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
-      "image": "/images/books/sub001-cover.webp",
-      "action_text": "🍎 फल सुरक्षा गाइड",
-      "action_url": "/ebooks/book-landing.html?id=BK022",
-      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
-      "badge": "💡 बागवानी रहस्य",
+      "id": "tst_ask_001",
+      "type": "sakhi_user_ask_toast",
+      "title": "राजेन्द्र बिश्नोई (जोधपुर, राजस्थान)",
+      "message": "ने सखी AI से पूछा: 'सरसों में माहू (चेपा) और तना गलन का जैविक व केमिकल उपचार क्या है?'",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🤖 सखी समाधान देखें",
+      "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
+      "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": true,
@@ -616,25 +615,24 @@
     }
   ],
   "mobile_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795193999176",
+    "enabled": true,
+    "batch_id": "wakeup_1795194286645",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T16:59:59.176Z",
+    "dispatched_at": "2026-11-20T17:04:46.645Z",
     "active_count": 1
   },
   "wake_up_push_queue": [
     {
-      "id": "tst_cur_004",
-      "type": "sakhi_curiosity_toast",
-      "title": "🥭 क्या आप जानते हैं? (बागवानी फल झड़न)",
-      "message": "फूल आते समय आम और अनार में पानी का भारी भराव करने से 70% फूल झड़ जाते हैं!",
-      "image": "/images/books/sub001-cover.webp",
-      "action_text": "🍎 फल सुरक्षा गाइड",
-      "action_url": "/ebooks/book-landing.html?id=BK022",
-      "curiosity_answer": "फूल खिलने की अवस्था में सिंचाई रोकें या बहुत हल्की नमी रखें। दाना बनने के बाद ही नियमित ड्रिप सिंचाई शुरू करें।",
-      "badge": "💡 बागवानी रहस्य",
+      "id": "tst_ask_001",
+      "type": "sakhi_user_ask_toast",
+      "title": "राजेन्द्र बिश्नोई (जोधपुर, राजस्थान)",
+      "message": "ने सखी AI से पूछा: 'सरसों में माहू (चेपा) और तना गलन का जैविक व केमिकल उपचार क्या है?'",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🤖 सखी समाधान देखें",
+      "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
+      "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
       "push_selected": false,
       "wakeup_selected": true,
@@ -642,12 +640,12 @@
     }
   ],
   "wake_up_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795193999176",
+    "enabled": true,
+    "batch_id": "wakeup_1795194286645",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T16:59:59.176Z",
+    "dispatched_at": "2026-11-20T17:04:46.645Z",
     "active_count": 1
   },
   "active_in_app_queue": [
