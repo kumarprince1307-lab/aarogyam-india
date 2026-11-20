@@ -3873,7 +3873,7 @@ Instant Download & Lifetime Access
 
     if (chkEnabled) chkEnabled.checked = adminToastsConfig.enabled !== false;
     if (inputInterval) inputInterval.value = adminToastsConfig.interval_seconds || 30;
-    if (inputDuration) inputDuration.value = adminToastsConfig.display_duration_seconds || 6;
+    if (inputDuration) inputDuration.value = adminToastsConfig.display_duration_seconds || 8;
     if (selectPosition) selectPosition.value = adminToastsConfig.position || 'bottom_left';
     if (selectAnimation) selectAnimation.value = adminToastsConfig.animation || 'slide_up';
 
@@ -4039,7 +4039,7 @@ Instant Download & Lifetime Access
   window.deleteToastItem = async function (toastId) {
     if (!confirm('क्या आप इस टोस्ट को हटाना चाहते हैं? इसकी इमेज भी मेमोरी और डिस्क से पूरी तरह साफ कर दी जाएगी।')) return;
     const target = adminLiveToastsList.find(t => t.id === toastId);
-    
+
     // 🛡️ ZERO DISK / MEMORY LEAK: Clean up uploaded image file from server disk!
     if (target && target.image && target.image.includes('/images/uploads/toasts/')) {
       try {
@@ -4050,7 +4050,7 @@ Instant Download & Lifetime Access
             action: 'delete_toast_image',
             image_path: target.image
           })
-        }).catch(() => {});
+        }).catch(() => { });
       } catch (e) { }
     }
 
@@ -4502,7 +4502,7 @@ Instant Download & Lifetime Access
   // Backwards-compatible aliases
   window.toggleToastPushSelected = window.toggleToastWakeUpSelected;
   window.toggleSelectAllPushToasts = window.toggleSelectAllWakeUpToasts;
-  window.updateSelectedPushCounter = function() {
+  window.updateSelectedPushCounter = function () {
     window.updateSelectedWakeUpCounter();
     window.updateSelectedInAppCounter();
   };
@@ -4531,10 +4531,11 @@ Instant Download & Lifetime Access
     const notifOptions = {
       body: toast.message || '',
       icon: notifIcon,
-      badge: window.location.origin + '/images/icons/pwa-icon-96x96.png',
+      badge: window.location.origin + '/images/icons/badge-silhouette-96x96.png',
       tag: 'aarogyam_admin_toast_' + (toast.id || Date.now()),
       renotify: true,
       requireInteraction: true,
+      color: '#f97316',
       vibrate: [300, 100, 400, 100, 300],
       data: { url: toast.action_url || '/' }
     };
@@ -4551,7 +4552,7 @@ Instant Download & Lifetime Access
         ]).catch(() => null);
       }
       if (reg && typeof reg.showNotification === 'function') {
-        await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions).catch(() => {});
+        await reg.showNotification(toast.title || 'आरोग्यम इंडिया 🌾', notifOptions).catch(() => { });
         return;
       }
     }
@@ -4615,7 +4616,7 @@ Instant Download & Lifetime Access
     // 2. Client-side Native Fallback for currently active devices
     try {
       await window.triggerNativePushNotification(targetToast);
-    } catch(e) {}
+    } catch (e) { }
   };
 
   window.dispatchSelectedWakeUpPush = async function () {
@@ -4769,7 +4770,7 @@ Instant Download & Lifetime Access
     adminToastsConfig = {
       enabled: chkEnabled ? chkEnabled.checked : true,
       interval_seconds: inputInterval ? (parseInt(inputInterval.value, 10) || 30) : 30,
-      display_duration_seconds: inputDuration ? (parseInt(inputDuration.value, 10) || 6) : 6,
+      display_duration_seconds: inputDuration ? (parseInt(inputDuration.value, 10) || 8) : 8,
       position: selectPosition ? selectPosition.value : 'bottom_left',
       animation: selectAnimation ? selectAnimation.value : 'slide_up',
       types_enabled: {

@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
       title: targetToast.title || 'आरोग्यम इंडिया 🌾',
       body: targetToast.message || 'फसल सुरक्षा, मौसम व नई सलाह देखें!',
       icon: toAbs(targetToast.image) || (baseUrl + '/images/icons/pwa-icon-192x192.png'),
-      badge: baseUrl + '/images/icons/pwa-icon-96x96.png',
+      badge: baseUrl + '/images/icons/badge-silhouette-96x96.png',
       image: toAbs(targetToast.image),
       url: targetToast.action_url || '/',
       id: targetToast.id || ('notif_' + Date.now())

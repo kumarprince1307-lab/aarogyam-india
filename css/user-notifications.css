@@ -107,12 +107,13 @@
 
 /* 3. Panel Header */
 .user-notif-header {
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .user-notif-title-wrap {
@@ -175,34 +176,41 @@
     background: #e2e8f0;
 }
 
-/* 4. Filter Tabs */
+/* 4. Filter Tabs - Anchored & Never Squashed */
 .user-notif-tabs {
     display: flex;
     background: #ffffff;
-    padding: 8px 12px;
-    gap: 6px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 10px 14px;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
     overflow-x: auto;
     scrollbar-width: none;
+    flex-shrink: 0;
+    min-height: 48px;
+    box-sizing: border-box;
+    align-items: center;
 }
 .user-notif-tabs::-webkit-scrollbar { display: none; }
 
 .user-notif-tab {
     background: #f1f5f9;
-    border: 1px solid transparent;
-    color: #475569;
-    font-size: 0.76rem;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.15s ease;
+    flex-shrink: 0;
+    line-height: 1.2;
 }
 
 .user-notif-tab.active {
     background: #059669;
     color: #ffffff;
+    border-color: #059669;
     box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
 }
 
@@ -212,7 +220,9 @@
     margin: 0;
     list-style: none;
     overflow-y: auto;
-    max-height: 380px;
+    flex: 1;
+    min-height: 0;
+    max-height: 420px;
 }
 
 .user-notif-item {

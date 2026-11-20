@@ -9,7 +9,7 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v96.0';
+const STATIC_CACHE = 'aarogyam-public-static-v97.0';
 const AUTO_UPDATE_BROADCAST = true;
 const PAGES_CACHE = 'aarogyam-public-pages-v68.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
@@ -307,7 +307,7 @@ self.addEventListener('push', (event) => {
 
   const origin = self.location ? self.location.origin : 'https://aarogyamindia.online';
   const iconUrl = (data.icon && data.icon.startsWith('http')) ? data.icon : (origin + (data.icon || '/images/icons/pwa-icon-192x192.png'));
-  const badgeUrl = origin + '/images/icons/pwa-icon-96x96.png';
+  const badgeUrl = origin + '/images/icons/badge-silhouette-96x96.png';
 
   const options = {
     body: data.body || '',
@@ -317,6 +317,7 @@ self.addEventListener('push', (event) => {
     renotify: true,
     requireInteraction: true, // Wakes up Android screen & stays until dismissed
     silent: false,
+    color: '#f97316', // Aarogyam Kesariya Orange header accent
     vibrate: [300, 100, 400, 100, 300], // Strong vibration pattern
     data: {
       url: data.url || '/'

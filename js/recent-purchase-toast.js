@@ -205,50 +205,55 @@
     const encodedAskText = encodeURIComponent(toast.message || toast.title || '');
 
     return `
-      <div class="ai-live-toast-inner" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1.5px solid rgba(255, 255, 255, 0.12); border-left: 4px solid ${accentBorder}; border-radius: 12px; padding: 8px 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); width: 288px; max-width: 86vw; box-sizing: border-box; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; position: relative;">
+      <div class="ai-live-toast-inner" style="background: linear-gradient(145deg, rgba(9, 14, 26, 0.98) 0%, rgba(17, 24, 39, 0.98) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1.5px solid rgba(255, 255, 255, 0.14); border-left: 4px solid #f97316; border-radius: 14px; padding: 10px 12px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 1px rgba(255,255,255,0.2); width: 345px; max-width: 92vw; box-sizing: border-box; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; position: relative; overflow: hidden;">
         
-        <button type="button" class="ai-toast-close-btn" onclick="event.stopPropagation(); window.dismissLiveToast && window.dismissLiveToast();" style="position: absolute; top: 4px; right: 6px; background: transparent; border: none; color: #94a3b8; font-size: 1.05rem; line-height: 1; cursor: pointer; padding: 2px 4px;">&times;</button>
+        <!-- Subtle Indian Tiranga Header Accent Ribbon -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 2.5px; background: linear-gradient(90deg, #ff9933 0%, #ffffff 50%, #138808 100%);"></div>
+
+        <button type="button" class="ai-toast-close-btn" onclick="event.stopPropagation(); window.dismissLiveToast && window.dismissLiveToast();" style="position: absolute; top: 6px; right: 8px; background: rgba(255,255,255,0.08); border: none; color: #94a3b8; font-size: 1.1rem; line-height: 1; cursor: pointer; padding: 2px 6px; border-radius: 50%;" title="बंद करें">&times;</button>
         
-        <div style="display: flex; gap: 8px; align-items: flex-start;">
-          <div style="width: 60px; height: 46px; min-width: 60px; border-radius: 6px; overflow: hidden; background: #0b1120; box-shadow: 0 2px 6px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <div style="display: flex; gap: 10px; align-items: flex-start; margin-top: 2px;">
+          <div style="width: 64px; height: 50px; min-width: 64px; border-radius: 8px; overflow: hidden; background: #030712; box-shadow: 0 3px 8px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <img src="${validImg}" alt="Thumb" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png';" />
           </div>
 
           <div style="flex: 1; min-width: 0;">
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
-              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.62rem; font-weight: 800; padding: 1.5px 6px; border-radius: 4px; letter-spacing: 0.2px; white-space: nowrap;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 3px;">
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.64rem; font-weight: 800; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.2px; white-space: nowrap; border: 1px solid rgba(255,255,255,0.12);">
                 ${escBadge}
               </span>
-              ${escPrice ? `<span style="font-weight: 900; color: #38bdf8; font-size: 0.76rem; margin-right: 14px;">${escPrice}</span>` : ''}
+              ${escPrice ? `<span style="font-weight: 900; color: #38bdf8; font-size: 0.78rem; margin-right: 18px;">${escPrice}</span>` : ''}
             </div>
 
-            <div style="font-weight: 800; font-size: 0.78rem; color: #f8fafc; line-height: 1.2; margin-bottom: 2px; word-break: break-word;">
+            <!-- Stark High-Contrast White Heading -->
+            <div style="font-weight: 800; font-size: 0.84rem; color: #ffffff; line-height: 1.25; margin-bottom: 3px; word-break: break-word; text-shadow: 0 1px 2px rgba(0,0,0,0.6);">
               ${escTitle}
             </div>
 
-            <div style="font-size: 0.68rem; color: #cbd5e1; line-height: 1.25; margin-bottom: 4px; word-break: break-word;">
+            <!-- Clear Crisp Light Body Text -->
+            <div style="font-size: 0.72rem; color: #e2e8f0; line-height: 1.3; margin-bottom: 5px; word-break: break-word;">
               ${escMsg}
             </div>
 
             ${escCuriosityAnswer ? `
-              <div id="curiosity_ans_box" style="display: none; background: rgba(168, 85, 247, 0.15); border: 1px dashed #a855f7; border-radius: 6px; padding: 4px 6px; font-size: 0.66rem; color: #e9d5ff; margin-bottom: 4px; line-height: 1.25;">
+              <div id="curiosity_ans_box" style="display: none; background: rgba(168, 85, 247, 0.18); border: 1px dashed #c084fc; border-radius: 6px; padding: 5px 8px; font-size: 0.70rem; color: #f3e8ff; margin-bottom: 5px; line-height: 1.3;">
                 💡 <strong>उत्तर:</strong> ${escCuriosityAnswer}
               </div>
             ` : ''}
 
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 3px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px;">
               ${escCuriosityAnswer ? `
-                <button type="button" onclick="event.stopPropagation(); const el=this.closest('.ai-live-toast-inner').querySelector('#curiosity_ans_box'); if(el) el.style.display=el.style.display==='none'?'block':'none';" style="background: rgba(255,255,255,0.12); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); font-size: 0.64rem; font-weight: 700; padding: 2px 6px; border-radius: 5px; cursor: pointer;">
+                <button type="button" onclick="event.stopPropagation(); const el=this.closest('.ai-live-toast-inner').querySelector('#curiosity_ans_box'); if(el) el.style.display=el.style.display==='none'?'block':'none';" style="background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer;">
                   💡 उत्तर देखें
                 </button>
               ` : '<span></span>'}
 
               ${(type === 'sakhi_user_ask_toast' || type === 'sakhi_curiosity_toast') ? `
-                <button type="button" onclick="event.stopPropagation(); window.openSakhiChatWithQuestion(decodeURIComponent('${encodedAskText}'))" style="background: ${accentBorder}; color: #000000; font-weight: 900; font-size: 0.66rem; padding: 3px 10px; border-radius: 18px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); white-space: nowrap;">
+                <button type="button" onclick="event.stopPropagation(); window.openSakhiChatWithQuestion(decodeURIComponent('${encodedAskText}'))" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #ffffff; font-weight: 800; font-size: 0.70rem; padding: 4px 12px; border-radius: 20px; border:none; cursor:pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4); white-space: nowrap;">
                   ${escActionText}
                 </button>
               ` : `
-                <a href="${validUrl}" style="background: ${accentBorder}; color: #000000; font-weight: 800; font-size: 0.66rem; padding: 3px 9px; border-radius: 18px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); white-space: nowrap;">
+                <a href="${validUrl}" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #ffffff; font-weight: 800; font-size: 0.70rem; padding: 4px 12px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4); white-space: nowrap;">
                   ${escActionText}
                 </a>
               `}
@@ -256,7 +261,7 @@
           </div>
         </div>
 
-        <div class="ai-live-toast-progress" style="position: absolute; bottom: 0; left: 0; height: 2.5px; background: linear-gradient(90deg, ${accentBorder}, #38bdf8); width: 100%; transition: width ${toastsConfig.display_duration_seconds || 6}s linear; border-radius: 0 0 12px 12px;"></div>
+        <div class="ai-live-toast-progress" style="position: absolute; bottom: 0; left: 0; height: 2.5px; background: linear-gradient(90deg, #f97316 0%, #ffffff 50%, #16a34a 100%); width: 100%; transition: width ${toastsConfig.display_duration_seconds || 8}s linear; border-radius: 0 0 14px 14px;"></div>
       </div>
     `;
   };
@@ -378,8 +383,8 @@
       }
     };
 
-    // Auto dismiss after display duration
-    const durationMs = (toastsConfig.display_duration_seconds || 6) * 1000;
+    // Auto dismiss after display duration (Default 8 seconds for comfortable reading)
+    const durationMs = (toastsConfig.display_duration_seconds || 8) * 1000;
     setTimeout(() => {
       if (card && card.parentElement) {
         card.style.opacity = '0';
@@ -571,7 +576,8 @@
       const notifOptions = {
         body: toast.message || '',
         icon: notifIcon,
-        badge: '/images/icons/pwa-icon-96x96.png',
+        badge: '/images/icons/badge-silhouette-96x96.png',
+        color: '#f97316',
         image: wideBanner,
         tag: 'aarogyam_live_toast_' + (toast.id || 'now'),
         renotify: true,

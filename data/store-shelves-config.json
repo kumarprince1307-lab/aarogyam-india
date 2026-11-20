@@ -215,7 +215,7 @@
   "toasts_config": {
     "enabled": true,
     "interval_seconds": 30,
-    "display_duration_seconds": 6,
+    "display_duration_seconds": 8,
     "position": "bottom_left",
     "animation": "slide_up",
     "types_enabled": {
