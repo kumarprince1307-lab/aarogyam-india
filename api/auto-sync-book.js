@@ -687,6 +687,21 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
+    // ACTION: SAVE STORE SHELVES, LIVE TOASTS & MOBILE PUSH QUEUE (data/store-shelves-config.json)
+    // -------------------------------------------------------------
+    if (action === 'save_shelves_config' || action === 'save_store_shelves') {
+      const shelvesConfig = payload.shelvesConfig || {};
+      const updatedShelvesBase64 = Buffer.from(JSON.stringify(shelvesConfig, null, 2), 'utf8').toString('base64');
+      await commitFile('data/store-shelves-config.json', updatedShelvesBase64, 'Update Store Shelves, Live Toasts & Mobile Push Queue [Auto-Sync]', token);
+
+      return sendJson(res, 200, {
+        success: true,
+        message: 'Store Shelves & Mobile Push Queue successfully published to GitHub repository.',
+        updatedFiles: ['data/store-shelves-config.json']
+      });
+    }
+
+    // -------------------------------------------------------------
     // ACTION: SAVE / PUBLISH BOOK CATALOG & LANDING PAGE (1-Click Atomic Commit)
     // -------------------------------------------------------------
     if (!payload || !payload.pageData || !payload.pageData.id) {

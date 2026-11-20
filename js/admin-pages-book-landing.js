@@ -95,6 +95,74 @@ export async function initBookLandingPages() {
     return { success: false, error: 'Upload failed after 3 attempts' };
   }
 
+  // Universal Triple-Sync for Store Shelves, Live Toasts, & Mobile Push Queue
+  window.syncStoreShelvesToCloud = async function (shelvesMaster, commitMessage = 'Update Store Shelves & Mobile Push Queue') {
+    if (!shelvesMaster) return { success: false, error: 'No shelves data' };
+
+    try {
+      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
+      localStorage.setItem('AAROGYAM_NOTIF_DISPATCH_TIME', String(Date.now()));
+    } catch (e) { }
+
+    let syncSuccess = false;
+
+    // 1. If running locally (127.0.0.1 / localhost), sync to port 5505 (local-sync-server.py) -> Auto-Git Push
+    if (typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')) {
+      try {
+        const localRes = await fetch('http://127.0.0.1:5505', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_config',
+            path: 'data/store-shelves-config.json',
+            content: shelvesMaster,
+            auto_push: true,
+            message: commitMessage
+          })
+        });
+        if (localRes.ok) {
+          const lData = await localRes.json().catch(() => ({}));
+          if (lData.success) syncSuccess = true;
+        }
+      } catch (localErr) {
+        console.warn('[ShelvesSync] Port 5505 fallback to API:', localErr);
+      }
+    }
+
+    // 2. Sync to Cloud API (/api/auto-sync-book) which pushes directly to GitHub repo
+    try {
+      const apiUrl = getAutoSyncApiUrl();
+      const apiRes = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_shelves_config',
+          shelvesConfig: shelvesMaster
+        })
+      });
+      if (apiRes.ok) {
+        const aData = await apiRes.json().catch(() => ({}));
+        if (aData.success) syncSuccess = true;
+      }
+    } catch (apiErr) {
+      console.warn('[ShelvesSync] Cloud API sync notice:', apiErr);
+    }
+
+    // 3. Fallback to PHP endpoint if PHP server is running
+    try {
+      await fetch('/api/save_book_landing.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_shelves_config',
+          shelvesConfig: shelvesMaster
+        })
+      });
+    } catch (phpErr) { }
+
+    return { success: syncSuccess };
+  };
+
   let allBooks = [];
   let allLandingPages = [];
   let editingBookId = null;
@@ -4400,9 +4468,11 @@ Instant Download & Lifetime Access
     }
     if (!shelvesMaster) shelvesMaster = {};
 
+    const batchId = 'push_' + Date.now();
     shelvesMaster.active_mobile_push_queue = selectedToasts;
     shelvesMaster.mobile_push_config = {
       enabled: true,
+      batch_id: batchId,
       interval_mode: intervalVal,
       interval_hours: intervalVal === 'now' ? 0 : parseInt(intervalVal, 10),
       validity_hours: validityHours,
@@ -4411,22 +4481,21 @@ Instant Download & Lifetime Access
     };
     shelvesMaster.updated_at = new Date().toISOString();
 
+    // Log the first dispatched toast so the Bell list only shows what has actually been sent
     try {
-      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
-      localStorage.setItem('AAROGYAM_NOTIF_DISPATCH_TIME', String(Date.now()));
       localStorage.setItem('AAROGYAM_LATEST_PUSHED_TOAST', JSON.stringify(selectedToasts[0]));
+      const log = JSON.parse(localStorage.getItem('AAROGYAM_DISPATCHED_TOASTS_LOG') || '[]');
+      const firstEntry = {
+        ...selectedToasts[0],
+        dispatchedAt: Date.now(),
+        batchId: batchId
+      };
+      const updatedLog = [firstEntry, ...log.filter(x => x.id !== selectedToasts[0].id)].slice(0, 20);
+      localStorage.setItem('AAROGYAM_DISPATCHED_TOASTS_LOG', JSON.stringify(updatedLog));
     } catch (e) { }
 
-    try {
-      await fetch('/api/save_book_landing.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_shelves_config',
-          shelvesConfig: shelvesMaster
-        })
-      });
-    } catch (e) { }
+    // Triple Cloud & Local Auto-Git Publish
+    await window.syncStoreShelvesToCloud(shelvesMaster, `Dispatch mobile push (${selectedToasts.length} toasts, interval: ${intervalVal}h) [Admin]`);
 
     // Instant sync to top Header Bell Notification Panel
     if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.syncPushedToasts === 'function') {
@@ -4468,20 +4537,7 @@ Instant Download & Lifetime Access
     shelvesMaster.mobile_push_config.enabled = false;
     shelvesMaster.updated_at = new Date().toISOString();
 
-    try {
-      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
-    } catch (e) { }
-
-    try {
-      await fetch('/api/save_book_landing.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_shelves_config',
-          shelvesConfig: shelvesMaster
-        })
-      });
-    } catch (e) { }
+    await window.syncStoreShelvesToCloud(shelvesMaster, 'Pause mobile push scheduler [Admin]');
 
     if (typeof showToast === 'function') {
       showToast('⏹️ मोबाइल पुश नोटिफिकेशन शेड्यूलर सफलतापूर्वक बंद (PAUSED) कर दिया गया!', 'info');
@@ -4526,20 +4582,7 @@ Instant Download & Lifetime Access
     shelvesMaster.live_toasts = adminLiveToastsList;
     shelvesMaster.updated_at = new Date().toISOString();
 
-    try {
-      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(shelvesMaster));
-    } catch (e) { }
-
-    try {
-      await fetch('/api/save_book_landing.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_shelves_config',
-          shelvesConfig: shelvesMaster
-        })
-      });
-    } catch (e) { }
+    await window.syncStoreShelvesToCloud(shelvesMaster, 'Save Live Toasts and Display Settings [Admin]');
 
     showToast('🎉 सभी लाइव टोस्ट्स व सेटिंग्स सुरक्षित हो गईं!', 'success');
   };
@@ -7347,20 +7390,7 @@ Instant Download & Lifetime Access
     if (!adminShelvesMaster) return;
     adminShelvesMaster.updated_at = new Date().toISOString();
 
-    try {
-      localStorage.setItem('AAROGYAM_STORE_SHELVES_CONFIG', JSON.stringify(adminShelvesMaster));
-    } catch (e) { }
-
-    try {
-      await fetch('/api/save_book_landing.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'save_shelves_config',
-          shelvesConfig: adminShelvesMaster
-        })
-      });
-    } catch (e) { }
+    await window.syncStoreShelvesToCloud(adminShelvesMaster, 'Save Store Shelves and Windows Config [Admin]');
 
     showToast('🎉 सभी स्टोर शेल्व्स व सेटिंग्स सुरक्षित हो गईं!', 'success');
   };

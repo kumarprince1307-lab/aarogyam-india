@@ -571,9 +571,25 @@
                 const userKey = user.id || user.mobile || 'guest';
                 const readStore = JSON.parse(localStorage.getItem(`AI_NOTIFS_READ_${userKey}`) || '[]');
 
-                if (Array.isArray(pushQueue) && pushQueue.length > 0) {
-                    const activePushed = pushQueue.filter(t => t && t.enabled !== false);
-                    activePushed.forEach(toast => {
+                // Load actually dispatched toasts log to avoid dumping all future queued toasts at once
+                let dispatchedLog = [];
+                try {
+                    dispatchedLog = JSON.parse(localStorage.getItem('AAROGYAM_DISPATCHED_TOASTS_LOG') || '[]');
+                } catch (e) { }
+
+                // If dispatched log is empty, but pushQueue exists, only show the first active toast
+                if ((!Array.isArray(dispatchedLog) || dispatchedLog.length === 0) && Array.isArray(pushQueue) && pushQueue.length > 0) {
+                    const firstActive = pushQueue.find(t => t && t.enabled !== false) || pushQueue[0];
+                    if (firstActive) {
+                        dispatchedLog = [{
+                            ...firstActive,
+                            dispatchedAt: shelvesCfg.mobile_push_config?.dispatched_at || Date.now()
+                        }];
+                    }
+                }
+
+                if (Array.isArray(dispatchedLog) && dispatchedLog.length > 0) {
+                    dispatchedLog.forEach(toast => {
                         const notifId = `push_toast_${toast.id}`;
                         this.items = this.items.filter(n => n.id !== notifId);
 
@@ -590,7 +606,7 @@
                             image: toast.image,
                             actionUrl: toast.action_url || '/',
                             actionText: toast.action_text || '👉 विवरण देखें',
-                            timestamp: shelvesCfg.mobile_push_config?.dispatched_at || toast.created_at || new Date().toISOString(),
+                            timestamp: toast.dispatchedAt ? new Date(toast.dispatchedAt).toISOString() : (shelvesCfg?.mobile_push_config?.dispatched_at || toast.created_at || new Date().toISOString()),
                             isRead: isRead
                         };
                         this.items.unshift(toastNotif);

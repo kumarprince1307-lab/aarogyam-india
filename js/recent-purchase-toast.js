@@ -468,29 +468,23 @@
 
     const STORAGE_LAST_PUSH = 'AAROGYAM_LAST_NATIVE_PUSH_TS';
     const lastPushTs = parseInt(localStorage.getItem(STORAGE_LAST_PUSH) || '0', 10);
+    const lastBatchId = localStorage.getItem('AAROGYAM_LAST_PUSH_BATCH_ID');
+    const isNewBatch = Boolean(pushConfig.batch_id && (pushConfig.batch_id !== lastBatchId));
 
-    // Immediate first push on subscription or when interval expires
-    const isDue = (lastPushTs === 0) || (intervalMs === 0 && (now - lastPushTs > 60000)) || (now - lastPushTs >= intervalMs);
+    // Immediate first push on fresh batch from admin, first load, or when interval expires
+    const isDue = isNewBatch || (lastPushTs === 0) || (intervalMs === 0 && (now - lastPushTs > 60000)) || (now - lastPushTs >= intervalMs);
 
     if (isDue) {
-      // Pick best toast matching AI User Intent
-      let selectedToast = null;
-      if (window.AarogyamAiProfileBrain && typeof window.AarogyamAiProfileBrain.getState === 'function') {
-        const brainState = window.AarogyamAiProfileBrain.getState();
-        const dominant = brainState?.dominant_domain || 'agri';
-        
-        // Match with dominant domain
-        selectedToast = pushQueue.find(t => {
-          if (!t) return false;
-          if (dominant === 'agri' && (t.type === 'book_sell_toast' || t.title?.includes('फसल') || t.title?.includes('कृषि'))) return true;
-          if (dominant === 'business' && (t.type === 'user_sell_toast' || t.title?.includes('VIP') || t.title?.includes('कॉम्बो'))) return true;
-          if (dominant === 'health' && (t.type === 'webpage_toast' || t.title?.includes('दूध') || t.title?.includes('पशु'))) return true;
-          return false;
-        });
+      if (isNewBatch) {
+        localStorage.setItem('AAROGYAM_LAST_PUSH_BATCH_ID', pushConfig.batch_id);
+        localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', '0');
       }
 
-      if (!selectedToast) {
-        // Fallback: Pick rotational toast
+      let selectedToast = null;
+      if (isNewBatch) {
+        selectedToast = pushQueue[0];
+        localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', '1');
+      } else {
         const pushIndex = parseInt(localStorage.getItem('AAROGYAM_NATIVE_PUSH_IDX') || '0', 10);
         selectedToast = pushQueue[pushIndex % pushQueue.length];
         localStorage.setItem('AAROGYAM_NATIVE_PUSH_IDX', String(pushIndex + 1));
@@ -508,6 +502,20 @@
     try {
       const notifIcon = toast.image || '/images/icons/pwa-icon-192x192.png';
       const wideBanner = toast.image || undefined;
+
+      // Log this specifically dispatched toast so Bell list has accurate real-world timestamps
+      try {
+        const log = JSON.parse(localStorage.getItem('AAROGYAM_DISPATCHED_TOASTS_LOG') || '[]');
+        const entry = {
+          ...toast,
+          dispatchedAt: Date.now()
+        };
+        const updatedLog = [entry, ...log.filter(x => x.id !== toast.id)].slice(0, 20);
+        localStorage.setItem('AAROGYAM_DISPATCHED_TOASTS_LOG', JSON.stringify(updatedLog));
+        if (window.USER_NOTIFICATIONS && typeof window.USER_NOTIFICATIONS.syncPushedToasts === 'function') {
+          window.USER_NOTIFICATIONS.syncPushedToasts();
+        }
+      } catch (e) { }
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(reg => {
@@ -534,7 +542,7 @@
         image: wideBanner,
         tag: 'aarogyam_live_toast'
       });
-    } catch(e) {}
+    } catch (e) { }
   }
 
   // -------------------------------------------------------------
