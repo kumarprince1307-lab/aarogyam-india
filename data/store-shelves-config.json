@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T18:16:19.949Z",
+  "updated_at": "2026-11-21T18:22:07.276Z",
   "version": "1.0",
   "shelves": [
     {
@@ -312,7 +312,7 @@
       "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
-      "push_selected": false,
+      "push_selected": true,
       "wakeup_selected": true,
       "inapp_selected": true
     },
@@ -399,7 +399,7 @@
       "badge": "💡 कृषि रहस्य",
       "enabled": true,
       "push_selected": false,
-      "wakeup_selected": false,
+      "wakeup_selected": true,
       "inapp_selected": true
     },
     {
@@ -548,7 +548,7 @@
       "action_url": "/ebooks/agriculture.html#sec-agri-bundles",
       "badge": "🔥 कॉम्बो ऑफर",
       "enabled": true,
-      "push_selected": true,
+      "push_selected": false,
       "wakeup_selected": false,
       "inapp_selected": true
     },
@@ -609,19 +609,34 @@
       "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
+      "push_selected": true,
+      "wakeup_selected": true,
+      "inapp_selected": true
+    },
+    {
+      "id": "tst_cur_002",
+      "type": "sakhi_curiosity_toast",
+      "title": "🌱 क्या आप जानते हैं? (जड़ विकास)",
+      "message": "यूरिया अधिक डालने से पौधे की ऊपरी बढ़वार तो होती है पर जड़ें कमजोर होकर पौधा गिर जाता है!",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🔬 संतुलित पोषण गाइड",
+      "action_url": "/ebooks/book-landing.html?id=BK001",
+      "curiosity_answer": "फसल के शुरुआती 30 दिनों में फास्फोरस व बायो-स्टिमुलेंट (जैसे Stimrich) दें जिससे सफेद जड़ों का 3 गुना जाल बनता है।",
+      "badge": "💡 कृषि रहस्य",
+      "enabled": true,
       "push_selected": false,
       "wakeup_selected": true,
       "inapp_selected": true
     }
   ],
   "mobile_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795194286645",
+    "enabled": true,
+    "batch_id": "wakeup_1795285327276",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T17:04:46.645Z",
-    "active_count": 1
+    "dispatched_at": "2026-11-21T18:22:07.276Z",
+    "active_count": 2
   },
   "wake_up_push_queue": [
     {
@@ -634,19 +649,34 @@
       "action_url": "/aarogyam-sakhi.html?q=सरसों+माहू+चेपा+उपचार",
       "badge": "⚡ सखी AI लाइव सवाल",
       "enabled": true,
+      "push_selected": true,
+      "wakeup_selected": true,
+      "inapp_selected": true
+    },
+    {
+      "id": "tst_cur_002",
+      "type": "sakhi_curiosity_toast",
+      "title": "🌱 क्या आप जानते हैं? (जड़ विकास)",
+      "message": "यूरिया अधिक डालने से पौधे की ऊपरी बढ़वार तो होती है पर जड़ें कमजोर होकर पौधा गिर जाता है!",
+      "image": "/images/sakhi/aarogyam-sakhi.webp",
+      "action_text": "🔬 संतुलित पोषण गाइड",
+      "action_url": "/ebooks/book-landing.html?id=BK001",
+      "curiosity_answer": "फसल के शुरुआती 30 दिनों में फास्फोरस व बायो-स्टिमुलेंट (जैसे Stimrich) दें जिससे सफेद जड़ों का 3 गुना जाल बनता है।",
+      "badge": "💡 कृषि रहस्य",
+      "enabled": true,
       "push_selected": false,
       "wakeup_selected": true,
       "inapp_selected": true
     }
   ],
   "wake_up_push_config": {
-    "enabled": false,
-    "batch_id": "wakeup_1795194286645",
+    "enabled": true,
+    "batch_id": "wakeup_1795285327276",
     "interval_mode": "now",
     "interval_hours": 0,
     "validity_hours": 24,
-    "dispatched_at": "2026-11-20T17:04:46.645Z",
-    "active_count": 1
+    "dispatched_at": "2026-11-21T18:22:07.276Z",
+    "active_count": 2
   },
   "active_in_app_queue": [
     {
