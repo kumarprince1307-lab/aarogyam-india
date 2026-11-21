@@ -533,7 +533,7 @@
   // ==========================================
 
   function getGeneratedReferralLink() {
-    const origin = window.location.origin || 'https://aarogyamindia.in';
+    const origin = window.location.origin || 'https://aarogyamindia.online';
     const shareId = window.UCAS_SESSION.getShareId();
     const landingPath = selectedLandingPage.path;
     const url = new URL(landingPath, origin);

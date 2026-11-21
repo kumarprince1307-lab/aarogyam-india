@@ -3,6 +3,26 @@
 
 <head>
   <meta charset="UTF-8">
+  <script>
+    // Instant Zero-Lag Smart Redirect to Modular My Team Pages
+    (function() {
+      try {
+        var hash = window.location.hash || '';
+        var search = window.location.search || '';
+        if (hash.indexOf('tab-diary-ledger') !== -1) {
+          window.location.replace('/pages/myteam-bahikhata.html' + search);
+        } else if (hash.indexOf('tab-diary-followup') !== -1) {
+          window.location.replace('/pages/myteam-followup.html' + search);
+        } else if (hash.indexOf('tab-diary-todo') !== -1) {
+          window.location.replace('/pages/myteam-todo.html' + search);
+        } else if (hash.indexOf('tab-diary-autoship') !== -1 || hash.indexOf('tab-diary-pocket') !== -1) {
+          window.location.replace('/pages/myteam-dairy.html' + search);
+        } else {
+          window.location.replace('/pages/myteam.html' + search + hash);
+        }
+      } catch (_) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>आरोग्यम बहीखाता — डिजिटल लेज़र, किसान व टीम फील्ड डायरी | Aarogyam India</title>
 

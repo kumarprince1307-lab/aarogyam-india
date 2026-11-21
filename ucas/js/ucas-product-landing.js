@@ -200,11 +200,11 @@
         message: 'फसलों की पैदावार दोगुनी करने और मिट्टी को उपजाऊ बनाने के लिए संपूर्ण जैविक किट। अभी ऑर्डर करें और विशेष छूट पाएं!',
         mrp: 1999,
         offer_price: 999,
-        buynow_url: 'https://aarogyamindia.in',
+        buynow_url: 'https://aarogyamindia.online',
         product_data: {
           mrp: '1999',
           offer_price: '999',
-          buynow_url: 'https://aarogyamindia.in',
+          buynow_url: 'https://aarogyamindia.online',
           image: 'https://aarogyamindia.online/images/banners/farmer-community-banner.jpeg'
         },
         status: 'active',

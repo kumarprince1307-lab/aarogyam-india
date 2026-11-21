@@ -1398,6 +1398,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
 
         // 8. Minimised Floating Gift Box Widget (Bottom-Left)
         renderMinimisedFloatingGift: function (promo, isPoppingIn = false) {
+            if (promo) this.activePromo = promo;
             // Strict Rule: Time khatm hone ke baad (after end_date) gift box bilkul nahi aana chahiye!
             if (!this.isPromoTimeActive(promo)) {
                 const old = document.getElementById('agy-floating-gift-box');
@@ -1461,6 +1462,22 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                     #agy-floating-gift-box.agy-pop-entrance {
                         animation: agyGiftPopIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, agyGiftFloat 3.6s ease-in-out 0.45s infinite alternate !important;
                     }
+                    #agy-floating-gift-box.agy-gift-compressed {
+                        width: 46px !important;
+                        height: 46px !important;
+                        min-width: 46px !important;
+                        max-width: 46px !important;
+                        padding: 0 !important;
+                        border-radius: 50% !important;
+                        justify-content: center !important;
+                        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    }
+                    #agy-floating-gift-box.agy-gift-compressed .agy-floating-gift-text {
+                        display: none !important;
+                    }
+                    #agy-floating-gift-box.agy-gift-compressed .agy-floating-gift-pulse {
+                        border-radius: 50% !important;
+                    }
                     @keyframes agyGiftPopIn {
                         0% { transform: scale(0.2) translateY(24px); opacity: 0; }
                         60% { transform: scale(1.18) translateY(-4px); opacity: 1; }
@@ -1519,10 +1536,25 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                 <div class="agy-floating-gift-pulse"></div>
                 <div class="agy-floating-gift-icon">🎁</div>
                 <div class="agy-floating-gift-text">
-                    <span class="agy-fgt-main">उत्सव उपहार</span>
+                    <span class="agy-fgt-main">उपहार</span>
                     <span class="agy-fgt-sub">पॉइंट्स कमाएँ</span>
                 </div>
             `;
+
+            // 5-second automatic compression into the right-docked sticky bar
+            setTimeout(() => {
+                if (box && document.body.contains(box)) {
+                    const stickyGift = document.getElementById('universal-sticky-gift-btn');
+                    if (stickyGift) {
+                        box.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                        box.style.opacity = '0';
+                        box.style.transform = 'scale(0.4)';
+                        setTimeout(() => { if (box && box.parentNode) box.remove(); }, 500);
+                    } else {
+                        box.classList.add('agy-gift-compressed');
+                    }
+                }
+            }, 5000);
 
             box.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1532,6 +1564,28 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
             });
 
             document.body.appendChild(box);
+        },
+
+        openModal: function () {
+            if (this.isBookLandingPage()) return;
+            const p = this.activePromo || {
+                id: 'PROM_HEALTH_JOINT_CARE',
+                type: 'bundle_offer',
+                title: 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो',
+                subtitle: 'खेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह! 10 logo ko share kare 10 rs ki gift paye',
+                badge: '🎁 कॉम्बो महाबचत',
+                animation_preset: 'achiever_confetti',
+                image_url: '/images/banners/promo-1794338984876.webp',
+                cta_text: '🎁 ₹ 149 में बंडल प्राप्त करें →',
+                target_url: '/bundle.html?id=BUNDLE_KISAN_5IN1',
+                start_date: '2026-11-01T00:00',
+                end_date: '2026-12-31T23:59',
+                is_active: true,
+                target_pages: ['all'],
+                share_enabled: true,
+                share_message_template: '🌾 किसान भाइयों के लिए शानदार महाबचत ऑफर!\n\nखेती का डॉक्टर + दवा सलाहकार + गेहूँ, चना व सरसों मास्टर गाइड्स का सम्पूर्ण संग्रह! 10 logo ko share kare 10 rs ki gift paye \n{sender_name}\n{link}'
+            };
+            this.renderPromotion(p);
         },
 
         // 9. Bootstrap Engine
@@ -1633,6 +1687,7 @@ _(नोट: यह 5 पॉइंट्स उपहार केवल नए 
                 const eligible = eligibleList[0] || null;
 
                 if (eligible) {
+                    this.activePromo = eligible;
                     // Check if campaign was updated by admin - if so, auto un-minimize!
                     if (this.isCampaignUpdated(eligible)) {
                         this.clearMinimizedFlags(eligible.id);

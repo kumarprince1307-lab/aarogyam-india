@@ -40,7 +40,7 @@
       } catch (e) { }
 
       // Map Books
-            // Ensure shelf_bundles is never rendered in generic dynamic shelves loop (bundles have their dedicated containers)
+      // Ensure shelf_bundles is never rendered in generic dynamic shelves loop (bundles have their dedicated containers)
       if (shelvesConfig && Array.isArray(shelvesConfig.shelves)) {
         shelvesConfig.shelves = shelvesConfig.shelves.filter(s => s && s.id !== 'shelf_bundles');
       }
@@ -116,7 +116,7 @@
     const mrp = bundle.mrp || 999;
     const isOffline = bundle.status === 'offline' || bundle.status === 'inactive' || bundle.enabled === false;
     const bookIds = Array.isArray(bundle.bookIds) ? bundle.bookIds : [];
-    
+
     // Dynamically retrieve covers of books inside this bundle
     const bookCovers = [];
     bookIds.forEach(bId => {
@@ -135,18 +135,18 @@
     const coversFanHtml = `
       <div class="bundle-covers-dynamic-fan" style="position:relative;height:98px;display:flex;align-items:center;justify-content:center;margin:4px 0 8px 0;perspective:800px;overflow:visible;">
         ${displayCovers.map((cUrl, idx) => {
-          const total = displayCovers.length;
-          const offset = idx - (total - 1) / 2;
-          const rotDeg = offset * 8;
-          const transX = offset * 22;
-          const zIdx = 10 + idx;
-          return `
+      const total = displayCovers.length;
+      const offset = idx - (total - 1) / 2;
+      const rotDeg = offset * 8;
+      const transX = offset * 22;
+      const zIdx = 10 + idx;
+      return `
             <img src="${cUrl}" alt="Included Book ${idx + 1}"
               style="position:absolute;width:62px;height:88px;object-fit:cover;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,0.45);transform:translateX(${transX}px) rotate(${rotDeg}deg);z-index:${zIdx};border:1.5px solid rgba(255,255,255,0.8);transition:transform 0.25s ease;"
               onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp';"
             />
           `;
-        }).join('')}
+    }).join('')}
       </div>
     `;
 
@@ -280,7 +280,7 @@
             <i class="fa-solid fa-chevron-left"></i>
           </button>
           
-          <div id="${shelfId}_scroll_box" class="universal-shelf-track" style="display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;padding:6px 2px 14px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+          <div id="${shelfId}_scroll_box" class="universal-shelf-track" style="display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;padding:4px 2px 10px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
             ${itemsHtml}
           </div>
 
@@ -291,16 +291,33 @@
       `;
     }
 
+    const isHomeBundles = shelfId === 'home_super_bundles';
+    const isSpecialMegaSaver = badge && (badge.includes('MEGA SAVER') || badge.includes('SPECIAL MEGA SAVER'));
+    const isBestseller = badge && (badge.includes('BESTSELLER') || badge.includes('BEST SELLER'));
+    const isBlackBadge = isSpecialMegaSaver || isBestseller;
+
+    let badgeHtml = '';
+    if (badge) {
+      if (isBlackBadge) {
+        badgeHtml = `<span style="background:#000000;color:#ffffff;border:1.5px solid #000000;font-size:0.75rem;font-weight:900;padding:4px 10px;border-radius:6px;letter-spacing:0.5px;display:inline-block;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${badge}</span>`;
+      } else {
+        badgeHtml = `<span style="background:rgba(245,158,11,0.15);color:#d97706;border:1px solid #f59e0b;font-size:0.72rem;font-weight:900;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;display:inline-block;margin-bottom:6px;">${badge}</span>`;
+      }
+    }
+
+    const shelfMarginBottom = isHomeBundles ? '6px' : '10px';
+    const headerMarginBottom = isHomeBundles ? '4px' : '6px';
+
     return `
-      <section class="universal-shelf-container" id="${shelfId}" style="margin-bottom:34px;">
-        <div class="shelf-header" style="margin-bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <section class="universal-shelf-container" id="${shelfId}" style="margin-bottom:${shelfMarginBottom};">
+        <div class="shelf-header" style="margin-bottom:${headerMarginBottom};display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:8px;">
           <div>
-            ${badge ? `<span style="background:rgba(245,158,11,0.15);color:#d97706;border:1px solid #f59e0b;font-size:0.72rem;font-weight:900;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;display:inline-block;margin-bottom:6px;">${badge}</span>` : ''}
-            <h2 style="margin:0;font-size:1.4rem;font-weight:900;color:#0f172a;line-height:1.25;">${title}</h2>
-            ${subtitle ? `<p style="margin:4px 0 0 0;font-size:0.88rem;color:#64748b;font-weight:500;">${subtitle}</p>` : ''}
+            ${badgeHtml}
+            ${!isHomeBundles && title ? `<h2 style="margin:0;font-size:1.35rem;font-weight:900;color:#0f172a;line-height:1.25;">${title}</h2>` : ''}
+            ${!isHomeBundles && subtitle ? `<p style="margin:3px 0 0 0;font-size:0.86rem;color:#64748b;font-weight:500;">${subtitle}</p>` : ''}
           </div>
-          <span style="font-size:0.82rem;font-weight:700;color:#2563eb;cursor:pointer;" onclick="window.location.href='/ebooks/ebook.html'">
-            सभी देखें (${items.length}) ➔
+          <span style="font-size:0.82rem;font-weight:700;color:#2563eb;cursor:pointer;white-space:nowrap;" onclick="window.location.href='/ebooks/ebook.html'">
+            सभी देखें ➔
           </span>
         </div>
         ${contentHtml}
@@ -401,8 +418,8 @@
       if (allBundles.length > 0) {
         const bundlesShelf = {
           id: 'home_super_bundles',
-          title: '📦 महा-कॉम्बो बंडल (Save up to 90%)',
-          subtitle: 'सम्पूर्ण कृषि व फसल डॉक्टर गाइड्स एक साथ — भारी छूट व 1-Year VIP ऑल-एक्सेस मुफ्त',
+          title: '',
+          subtitle: '',
           badge: '⚡ SPECIAL MEGA SAVER',
           type: 'bundles',
           display_style: 'slider',
@@ -478,9 +495,9 @@
     // D. BOOK LANDING CROSS-SELL WINDOW MOUNT
     if (path.includes('book-landing.html')) {
       const bId = (urlParams.get('id') || 'BK001').toUpperCase().trim();
-      const crossSellTarget = document.getElementById('suggested-books-grid') || 
-                              document.getElementById('suggested-books-list') || 
-                              document.getElementById('landing-dynamic-cross-sell-shelf');
+      const crossSellTarget = document.getElementById('suggested-books-grid') ||
+        document.getElementById('suggested-books-list') ||
+        document.getElementById('landing-dynamic-cross-sell-shelf');
       if (crossSellTarget && shelvesConfig.landing_page_windows) {
         const win = shelvesConfig.landing_page_windows[bId] || shelvesConfig.landing_page_windows['default'];
         if (win && win.enabled !== false) {

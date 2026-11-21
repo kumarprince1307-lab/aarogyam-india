@@ -3156,16 +3156,33 @@
     renderDiaryPickerList('');
     modal.style.display = 'flex';
 
-    // If local entries are few, asynchronously fetch from Supabase phonebook to enrich list
+    // Asynchronously fetch phonebook and direct referrals from Supabase to enrich list
     try {
       if (window.supabase && typeof window.supabase.createClient === 'function') {
         const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // 1. Fetch phonebook entries
         client.from('phonebook').select('name, mobile, place').limit(100).then(({ data }) => {
           if (data && data.length > 0) {
             localStorage.setItem('AI_PHONEBOOK_CACHE', JSON.stringify(data));
-            renderDiaryPickerList(document.getElementById('diaryContactSearchInput')?.value || '');
+            const searchVal = document.getElementById('diaryPickerSearchInput')?.value || document.getElementById('diaryContactSearchInput')?.value || '';
+            renderDiaryPickerList(searchVal);
           }
         }).catch(() => {});
+
+        // 2. Fetch User's Direct Referrals & Team Members
+        const myShareId = getAppUserShareId();
+        const myMob = getUserMobile();
+        if (myShareId || myMob) {
+          const filterStr = myShareId ? (myMob ? `referred_by.eq.${myShareId},referred_by.eq.${myMob}` : `referred_by.eq.${myShareId}`) : `referred_by.eq.${myMob}`;
+          client.from('profiles').select('id, full_name, mobile, place, share_id, referred_by').or(filterStr).limit(100).then(({ data: refData }) => {
+            if (refData && refData.length > 0) {
+              localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(refData));
+              const searchVal = document.getElementById('diaryPickerSearchInput')?.value || document.getElementById('diaryContactSearchInput')?.value || '';
+              renderDiaryPickerList(searchVal);
+            }
+          }).catch(() => {});
+        }
       }
     } catch (_) {}
   }
@@ -3180,23 +3197,87 @@
   }
 
   function renderDiaryPickerList(query) {
-    const listWrap = document.getElementById('diaryContactPickerList');
+    const listWrap = document.getElementById('diaryPickerContactsList') || document.getElementById('diaryContactPickerList');
     if (!listWrap) return;
 
     const diaryEntries = getLocalDiaryEntries();
+    const kbEntries = getKbEntries();
     let pbEntries = [];
-    try {
-      pbEntries = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
+    let directRefEntries = [];
+    try { pbEntries = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]'); } catch (_) {}
+    try { 
+      directRefEntries = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]');
+      if (!directRefEntries.length) {
+        directRefEntries = JSON.parse(localStorage.getItem('AOI_DIRECT_REFERRALS_LEDGER') || '[]');
+      }
     } catch (_) {}
 
     // Merge without duplicates by mobile
     const allContactsMap = new Map();
+
+    // 1. Local Diary Entries
     diaryEntries.forEach(e => {
-      if (e.mobile) allContactsMap.set(e.mobile, { id: e.id, name: e.name, mobile: e.mobile, place: e.place, source: 'diary', type: e.type, crop_name: e.crop_name, netsurf_id: e.netsurf_id });
+      if (e.mobile) {
+        allContactsMap.set(e.mobile, {
+          id: e.id,
+          name: e.name || 'किसान साथी',
+          mobile: e.mobile,
+          place: e.place || '',
+          source: 'diary',
+          type: e.type || 'customer',
+          crop_name: e.crop_name || '',
+          netsurf_id: e.netsurf_id || ''
+        });
+      }
     });
+
+    // 2. Khatabook Parties
+    kbEntries.forEach(k => {
+      const kMob = k.customer_mobile;
+      if (kMob && !allContactsMap.has(kMob)) {
+        allContactsMap.set(kMob, {
+          id: 'kb_' + kMob,
+          name: k.customer_name || 'खाता ग्राहक',
+          mobile: kMob,
+          place: k.customer_place || '',
+          source: 'khata',
+          type: k.party_type || 'customer',
+          crop_name: '',
+          netsurf_id: ''
+        });
+      }
+    });
+
+    // 3. User's Direct Referrals / Team Members
+    directRefEntries.forEach(r => {
+      const rMob = r.mobile || r.phone;
+      if (rMob && !allContactsMap.has(rMob)) {
+        allContactsMap.set(rMob, {
+          id: 'ref_' + rMob,
+          name: r.full_name || r.name || 'डायरेक्ट साथी',
+          mobile: rMob,
+          place: r.place || r.city || '',
+          source: 'referral',
+          type: 'team',
+          crop_name: '',
+          netsurf_id: r.share_id || ''
+        });
+      }
+    });
+
+    // 4. Phonebook Cache
     pbEntries.forEach(p => {
       if (p.mobile && !allContactsMap.has(p.mobile)) {
-        allContactsMap.set(p.mobile, { id: 'pb_' + p.mobile, name: p.name, mobile: p.mobile, place: p.place, source: 'phonebook', type: 'customer' });
+        allContactsMap.set(p.mobile, {
+          id: 'pb_' + p.mobile,
+          name: p.name || 'संपर्क',
+          mobile: p.mobile,
+          place: p.place || '',
+          source: 'phonebook',
+          type: 'customer',
+          crop_name: '',
+          netsurf_id: ''
+        });
       }
     });
 
@@ -3207,39 +3288,84 @@
       if (!q) return true;
       return (e.name && e.name.toLowerCase().includes(q)) ||
              (e.mobile && e.mobile.includes(q)) ||
-             (e.place && e.place.toLowerCase().includes(q));
+             (e.place && e.place.toLowerCase().includes(q)) ||
+             (e.netsurf_id && e.netsurf_id.toLowerCase().includes(q));
     });
 
     if (filtered.length === 0) {
       listWrap.innerHTML = `
-        <div style="text-align:center; padding:24px; color:#94a3b8; font-size:0.85rem;">
-          <div style="font-size:1.6rem; margin-bottom:6px;">📭</div>
-          <strong style="color:#cbd5e1; display:block;">कोई संपर्क नहीं मिला</strong>
+        <div style="text-align:center; padding:24px; color:#64748b; font-size:0.85rem;">
+          <div style="font-size:1.8rem; margin-bottom:6px;">📭</div>
+          <strong style="color:#0f172a; display:block; font-size:0.95rem;">कोई संपर्क नहीं मिला</strong>
           <span style="font-size:0.75rem;">फॉर्म में नया नाम और 10 अंकों का मोबाइल नंबर सीधे भरें।</span>
         </div>
       `;
       return;
     }
 
-    listWrap.innerHTML = filtered.map(e => `
-      <div onclick="window.AarogyamETailer.selectContactFromDiary('${e.mobile}')" style="background:#0b1120; border:1px solid #1e3a8a; border-radius:8px; padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:background 0.2s;">
-        <div>
-          <strong style="color:#ffffff; font-size:0.94rem; display:block;">${e.name}</strong>
-          <span style="font-size:0.75rem; color:#94a3b8;">📱 ${e.mobile} • 📍 ${e.place || 'स्थानीय'}</span>
+    listWrap.innerHTML = filtered.map(e => {
+      let badgeLabel = '📖 डायरी';
+      let badgeBg = '#eff6ff';
+      let badgeColor = '#0052cc';
+      if (e.source === 'referral') {
+        badgeLabel = '🤝 डायरेक्ट टीम';
+        badgeBg = '#f0fdf4';
+        badgeColor = '#16a34a';
+      } else if (e.source === 'khata') {
+        badgeLabel = '📕 बहीखाता';
+        badgeBg = '#fef2f2';
+        badgeColor = '#dc2626';
+      } else if (e.source === 'phonebook') {
+        badgeLabel = '📱 फोन बुक';
+        badgeBg = '#f8fafc';
+        badgeColor = '#475569';
+      }
+
+      return `
+        <div onclick="window.AarogyamETailer.selectContactFromDiary('${e.mobile}')" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:all 0.15s; margin-bottom:6px;">
+          <div>
+            <strong style="color:#0f172a; font-size:0.96rem; display:block; font-weight:800;">${e.name}</strong>
+            <span style="font-size:0.76rem; color:#64748b; font-weight:600;">📱 ${e.mobile} ${e.place ? '• 📍 ' + e.place : ''} ${e.netsurf_id ? '• 🆔 ' + e.netsurf_id : ''}</span>
+          </div>
+          <span style="background:${badgeBg}; color:${badgeColor}; font-size:0.72rem; font-weight:900; padding:4px 8px; border-radius:6px; border:1px solid rgba(0,0,0,0.08); white-space:nowrap;">
+            ${badgeLabel}
+          </span>
         </div>
-        <span style="background:#1e293b; color:#38bdf8; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:6px;">
-          ${e.source === 'diary' ? '📖 डायरी' : '📱 फोन बुक'}
-        </span>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function selectContactFromDiary(mobile) {
     const diaryEntries = getLocalDiaryEntries();
+    const kbEntries = getKbEntries();
     let pbEntries = [];
+    let directRefEntries = [];
     try { pbEntries = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]'); } catch (_) {}
+    try { 
+      directRefEntries = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]');
+      if (!directRefEntries.length) {
+        directRefEntries = JSON.parse(localStorage.getItem('AOI_DIRECT_REFERRALS_LEDGER') || '[]');
+      }
+    } catch (_) {}
 
-    const contact = diaryEntries.find(e => e.mobile === mobile) || pbEntries.find(p => p.mobile === mobile);
+    let contact = diaryEntries.find(e => e.mobile === mobile);
+    if (!contact) {
+      const k = kbEntries.find(e => e.customer_mobile === mobile);
+      if (k) {
+        contact = { name: k.customer_name, mobile: k.customer_mobile, place: k.customer_place, type: k.party_type || 'customer' };
+      }
+    }
+    if (!contact) {
+      const r = directRefEntries.find(e => (e.mobile || e.phone) === mobile);
+      if (r) {
+        contact = { name: r.full_name || r.name, mobile: r.mobile || r.phone, place: r.place || r.city, type: 'team', netsurf_id: r.share_id };
+      }
+    }
+    if (!contact) {
+      const p = pbEntries.find(e => e.mobile === mobile);
+      if (p) contact = p;
+    }
+
     if (!contact) return;
 
     if (currentPickerTarget === 'kb_party') {
@@ -3254,7 +3380,7 @@
       if (document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = contact.name || '';
       if (document.getElementById('diaryInputMobile')) document.getElementById('diaryInputMobile').value = contact.mobile || '';
       if (document.getElementById('diaryInputPlace')) document.getElementById('diaryInputPlace').value = contact.place || '';
-      if (contact.type) setEntityType(contact.type);
+      if (contact.type && typeof setEntityType === 'function') setEntityType(contact.type);
       if (contact.crop_name && document.getElementById('diaryCropName')) document.getElementById('diaryCropName').value = contact.crop_name;
       if (contact.netsurf_id && document.getElementById('diaryInputNetsurfId')) document.getElementById('diaryInputNetsurfId').value = contact.netsurf_id;
     }
@@ -3692,18 +3818,30 @@
   }
 
   // Step-by-Step Hindi Audio Player
-  function playStepAudio(stepNum) {
+  function playStepAudio(stepNum, btnEl) {
     if (!('speechSynthesis' in window)) {
       alert('आपके ब्राउज़र में आवाज़ (Text-to-Speech) सपोर्ट नहीं है।');
       return;
     }
-    window.speechSynthesis.cancel();
+
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('.step-audio-btn').forEach(b => {
+        b.innerHTML = '<span>🔊</span> <span>ऑडियो सुनें</span>';
+      });
+      if (window._currentActiveStepAudio === stepNum) {
+        window._currentActiveStepAudio = null;
+        return;
+      }
+    }
+
+    window._currentActiveStepAudio = stepNum;
 
     const stepScripts = {
       1: "आरोग्यम मेरी डायरी में 30 सेकंड में सरल एंट्री करने के लिए व्यक्ति का नाम, 10 अंकों का मोबाइल नंबर और गाँव भरें। किसान साथी, टीम साथी या 6 महीने ऑटोशिप चुनें। दवा या उधारी दी है तो राशि दर्ज करें और सुरक्षित करें।",
       2: "खाता बुक में आपका पूरा उधारी और नकद हिसाब सुरक्षित रहता है। पेमेंट रिमाइंडर बटन दबाते ही ग्राहक के व्हाट्सएप पर डिजिटल हिसाब और खताबुक जैसी पुष्टि लिंक चली जाती है, जिससे वह आपके रेफरल में भी जुड़ जाता है।",
-      3: "फॉलो-अप टैब में आप एक साथ कई किसानों को चुनकर व्हाट्सएप, एसएमएस या कॉल क्यू शुरू कर सकते हैं। 6 तरह के बने-बनाए मैसेज भेज सकते हैं और कॉल के बाद तुरंत रिमार्क व अगली तारीख दर्ज कर सकते हैं।",
-      4: "8-लेवल गेमिंग सिस्टम में हर एंट्री और काम पर आपके प्वाइंट बढ़ते हैं और आपका लेवल अपग्रेड होता है। 6-महीने ऑटोशिप में लगातार 5 महीने दवा लेने वाले किसान को 6वें महीने 100% मुफ़्त गिफ्ट मिलता है।"
+      3: "फॉलो-अप टैब में आप एक साथ कई किसानों को चुनकर व्हाट्सएप, एसएमएस या कॉल क्यू शुरू कर सकते हैं। बने-बनाए 5 मुख्य विषयों के मैसेज भेज सकते हैं और कॉल के बाद तुरंत रिमार्क दर्ज कर सकते हैं।",
+      4: "8-लेवल गेमिंग सिस्टम में हर एंट्री और काम पर आपके प्वाइंट बढ़ते हैं और आपका लेवल अपग्रेड होता है। 6-महीने ऑटोशिप में लगातार 5 महीने उत्पाद लेने वाले किसान को 6वें महीने 100% मुफ़्त उपहार मिलता है।"
     };
 
     const textToSpeak = stepScripts[stepNum] || "आरोग्यम मेरी डायरी में आपका स्वागत है।";
@@ -3714,6 +3852,27 @@
     const voices = window.speechSynthesis.getVoices();
     const hiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
     if (hiVoice) utterance.voice = hiVoice;
+
+    // Visual button state
+    const allStepBtns = document.querySelectorAll('.step-audio-btn');
+    allStepBtns.forEach(b => {
+      b.innerHTML = '<span>🔊</span> <span>ऑडियो सुनें</span>';
+    });
+
+    const activeBtn = btnEl || event?.currentTarget || document.querySelectorAll('.step-audio-btn')[stepNum - 1];
+    if (activeBtn) {
+      activeBtn.innerHTML = '<span>⏸️</span> <span>रोकें</span>';
+    }
+
+    utterance.onend = function () {
+      window._currentActiveStepAudio = null;
+      if (activeBtn) activeBtn.innerHTML = '<span>🔊</span> <span>ऑडियो सुनें</span>';
+    };
+
+    utterance.onerror = function () {
+      window._currentActiveStepAudio = null;
+      if (activeBtn) activeBtn.innerHTML = '<span>🔊</span> <span>ऑडियो सुनें</span>';
+    };
 
     window.speechSynthesis.speak(utterance);
   }
@@ -4874,8 +5033,13 @@
         balanceHtml = `
           <div style="text-align:right;">
             <div style="font-size:1.05rem; font-weight:900; color:#dc2626;">₹ ${net.toLocaleString('hi-IN')}</div>
-            <div onclick="event.stopPropagation(); window.AarogyamETailer.sendKbWhatsAppReminderForCustomer('${c.mobile}')" style="font-size:0.75rem; font-weight:800; color:#2563eb; cursor:pointer; margin-top:2px;">
-              रिमाइंड कराएं &gt;
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:3px;">
+              <span onclick="event.stopPropagation(); window.AarogyamETailer.openPublicPassbookByCode('${c.short_code}')" style="background:#eff6ff; color:#0052cc; border:1px solid #bfdbfe; border-radius:4px; padding:2px 6px; font-size:0.70rem; font-weight:800; cursor:pointer;" title="ऑनलाइन पासबुक देखें">
+                📖 पासबुक
+              </span>
+              <span onclick="event.stopPropagation(); window.AarogyamETailer.sendKbWhatsAppReminderForCustomer('${c.mobile}')" style="font-size:0.75rem; font-weight:800; color:#dc2626; cursor:pointer;">
+                रिमाइंड &gt;
+              </span>
             </div>
           </div>
         `;
@@ -4884,7 +5048,12 @@
         balanceHtml = `
           <div style="text-align:right;">
             <div style="font-size:1.05rem; font-weight:900; color:#16a34a;">₹ ${Math.abs(net).toLocaleString('hi-IN')}</div>
-            <span style="font-size:0.70rem; color:#64748b;">(एडवांस जमा)</span>
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:3px;">
+              <span onclick="event.stopPropagation(); window.AarogyamETailer.openPublicPassbookByCode('${c.short_code}')" style="background:#eff6ff; color:#0052cc; border:1px solid #bfdbfe; border-radius:4px; padding:2px 6px; font-size:0.70rem; font-weight:800; cursor:pointer;" title="ऑनलाइन पासबुक देखें">
+                📖 पासबुक
+              </span>
+              <span style="font-size:0.70rem; color:#64748b;">(एडवांस जमा)</span>
+            </div>
           </div>
         `;
       } else {
@@ -4892,7 +5061,12 @@
         balanceHtml = `
           <div style="text-align:right;">
             <div style="font-size:1.0rem; font-weight:800; color:#64748b;">₹ 0</div>
-            <span style="font-size:0.68rem; color:#94a3b8;">हिसाब चुकता</span>
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:3px;">
+              <span onclick="event.stopPropagation(); window.AarogyamETailer.openPublicPassbookByCode('${c.short_code}')" style="background:#eff6ff; color:#0052cc; border:1px solid #bfdbfe; border-radius:4px; padding:2px 6px; font-size:0.70rem; font-weight:800; cursor:pointer;" title="ऑनलाइन पासबुक देखें">
+                📖 पासबुक
+              </span>
+              <span style="font-size:0.68rem; color:#94a3b8;">हिसाब चुकता</span>
+            </div>
           </div>
         `;
       }
@@ -4983,6 +5157,29 @@
     renderKhatabookPro();
     // Automatically open ledger for this customer
     openCustomerLedger(mobile);
+
+    // Send Welcome WhatsApp with Digital Passbook Link (Previewing bahi-khata-welcome.jpg)
+    setTimeout(() => {
+      try {
+        if (confirm('✓ ' + name + ' का खाता सफलतापूर्वक जुड़ गया!\n\nक्या आप ग्राहक को WhatsApp पर डिजिटल पासबुक लिंक और वेलकम संदेश भेजना चाहते हैं?')) {
+          sendKbWelcomeWhatsApp(mobile, name, shortCode);
+        }
+      } catch (_) {}
+    }, 350);
+  }
+
+  function sendKbWelcomeWhatsApp(mobile, name, shortCode) {
+    const sName = getUserDisplayName();
+    const sMob = getUserMobile();
+    const passbookLink = 'https://aarogyamindia.online/pages/myteam-bahikhata.html?code=' + encodeURIComponent(shortCode);
+    const msg = '📕 *आरोग्यम डिजिटल बहीखाता* 🙏\n\n' +
+                'नमस्ते *' + (name || 'साथी') + ' जी*,\n' +
+                '*' + sName + '* (📞 ' + sMob + ') ने आपका डिजिटल खाता Aarogyam India में सुरक्षित रूप से शुरू किया है।\n\n' +
+                '📖 *अपनी पूरी डिजिटल पासबुक और लेन-देन हिसाब यहाँ देखें:*\n' +
+                passbookLink + '\n\n' +
+                '*(इस लिंक पर क्लिक करके आप अपना पूरा हिसाब कभी भी पारदर्शी रूप से देख सकते हैं)*\n\n' +
+                '— *' + sName + '* • Aarogyam India';
+    window.open('https://api.whatsapp.com/send?phone=91' + mobile + '&text=' + encodeURIComponent(msg), '_blank');
   }
 
   // Open Customer Detail / Ledger Passbook Modal
@@ -5344,7 +5541,7 @@
 
     const net = gave - got;
     const shortCode = (recentTx && recentTx.short_code) || first.short_code || generateShortCode(mobile);
-    const shortLink = 'https://aarogyamindia.online/pages/smart-etailer.html?k=' + shortCode + '&ref=' + encodeURIComponent(shareId);
+    const shortLink = 'https://aarogyamindia.online/pages/myteam-bahikhata.html?code=' + shortCode + '&ref=' + encodeURIComponent(shareId);
 
     const custName = first.customer_name || 'किसान साथी';
     let msg = '';
@@ -5406,7 +5603,7 @@
     });
     const net = gave - got;
     const shortCode = activeKbCustomer.short_code || generateShortCode(activeKbCustomer.mobile);
-    const shortLink = `https://aarogyamindia.online/pages/smart-etailer.html?k=${shortCode}`;
+    const shortLink = `https://aarogyamindia.online/pages/myteam-bahikhata.html?code=${shortCode}`;
     const sName = getUserDisplayName();
     const text = `Namaste ${activeKbCustomer.name}! Aapka ${sName} ke pass kul bakaya Rs.${net} hai. Passbook dekhein: ${shortLink}`;
     window.location.href = `sms:+91${activeKbCustomer.mobile}?body=${encodeURIComponent(text)}`;
@@ -5687,11 +5884,11 @@
     alert('💵 दैनिक कैश बुक: आज कुल ₹' + (document.getElementById('kbSummaryDebit')?.textContent || '0') + ' का लेन-देन हुआ है।');
   }
 
-  // Check URL Parameter ?k=XXXXXX on page load
+  // Check URL Parameter ?k=XXXXXX or ?code=XXXXXX on page load
   function checkIncomingKhataShortCode() {
     try {
       const params = new URLSearchParams(window.location.search);
-      const kCode = params.get('k');
+      const kCode = params.get('k') || params.get('code');
       if (kCode) {
         setTimeout(() => {
           openPublicPassbookByCode(kCode.trim());
@@ -6501,11 +6698,58 @@
     },
 
     playTutorialMasterAudio: function () {
-      const text = "नमस्ते ई-टेलर साथियों! स्मार्ट ई-टेलर आपके मोबाइल का सबसे बड़ा बिजनेस टूल है। सबसे पहले टैब 1 में 'कंज्यूमर सर्वे' है, जहां आप 30 सेकंड में किसी भी किसान या ग्राहक की समस्या चुनकर 1-क्लिक में WhatsApp नुस्खा भेज सकते हैं। टैब 2 में 'खाता बुक' है, जहां आप जो भी नकद या उधार सेल दर्ज करते हैं, वह सीधे आपके शुक्रवार के 15% रिटेल बोनस में जुड़ जाती है। टैब 3 में 'ऑटोशिप 6th मंथ रडार' है, जिससे आप 5 महीने प्रोडक्ट लेने वाले ग्राहक को 6वें महीने फ्री गिफ्ट देकर पक्का ग्राहक बना सकते हैं। टैब 4 में 'DSR' है जहां रोज 5 किसानों से मिलकर आप ₹8,19,250 कैप की ओर बढ़ते हैं। और टैब 5 में आपको अपनी ₹1 करोड़ कमाने की अनुमानित तारीख दिखती है!";
-      window.AarogyamETailer.playAudioWithProgressBar('master_tut', 'मास्टर ई-टेलर वॉकथ्रू', 'मास्टर ट्रेनर', text, '');
-    },
+        if (!('speechSynthesis' in window)) {
+          alert('आपके ब्राउज़र में आवाज़ (Text-to-Speech) सपोर्ट नहीं है।');
+          return;
+        }
 
-    playCustomAudio: function (lessonId) {
+        const btnText = document.getElementById('masterAudioPlayText');
+        const btnIcon = document.getElementById('masterAudioPlayIcon');
+
+        if (window.speechSynthesis.speaking && window._masterAudioPlaying) {
+          window.speechSynthesis.cancel();
+          window._masterAudioPlaying = false;
+          if (btnText) btnText.textContent = 'मास्टर ऑडियो सुनें';
+          if (btnIcon) btnIcon.textContent = '▶️';
+          return;
+        }
+
+        window.speechSynthesis.cancel();
+        window._masterAudioPlaying = true;
+        if (btnText) btnText.textContent = '⏸️ ऑडियो रोकें';
+        if (btnIcon) btnIcon.textContent = '⏸️';
+
+        const isKhataPage = window.location.pathname.includes('bahikhata') || (document.getElementById('kbCustomerList') !== null);
+        let text = "नमस्ते ई-टेलर साथियों! स्मार्ट ई-टेलर आपके मोबाइल का सबसे बड़ा बिजनेस टूल है। यहाँ आप 30 सेकंड में किसान या टीम साथी की एंट्री कर सकते हैं, उधारी और जमा का हिसाब रख सकते हैं और 1-क्लिक WhatsApp फॉलो-अप भेज सकते हैं!";
+
+        if (isKhataPage) {
+          text = "नमस्ते साथियों! आरोग्यम डिजिटल बहीखाता आपका 100% मुफ़्त और सुरक्षित खाता-बुक है। नीचे लाल रंग के '+ ग्राहक जोड़ें' बटन से ग्राहक का नाम व मोबाइल नंबर जोड़ें। ग्राहक के नाम पर क्लिक करके 'आपने दिए' यानी उधार या 'आपको मिले' यानी जमा दर्ज करें। WhatsApp रिमाइंडर बटन से ग्राहक को तुरंत हिसाब का संदेश जाता है, और पासबुक देखें बटन से ग्राहक की पूरी ऑनलाइन पासबुक कभी भी देख सकते हैं!";
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.95;
+
+        const voices = window.speechSynthesis.getVoices();
+        const hiVoice = voices.find(v => v.lang && (v.lang.includes('hi') || v.lang.includes('HI')));
+        if (hiVoice) utterance.voice = hiVoice;
+
+        utterance.onend = function () {
+          window._masterAudioPlaying = false;
+          if (btnText) btnText.textContent = 'मास्टर ऑडियो सुनें';
+          if (btnIcon) btnIcon.textContent = '▶️';
+        };
+
+        utterance.onerror = function () {
+          window._masterAudioPlaying = false;
+          if (btnText) btnText.textContent = 'मास्टर ऑडियो सुनें';
+          if (btnIcon) btnIcon.textContent = '▶️';
+        };
+
+        window.speechSynthesis.speak(utterance);
+      },
+
+      playCustomAudio: function (lessonId) {
       let lessons = (publishedAudioLessons && publishedAudioLessons.length) ? publishedAudioLessons : ((catalogData && catalogData.audio_training_lessons) || []);
       try {
         const adminLessons = JSON.parse(localStorage.getItem('AI_ADMIN_AUDIO_LESSONS') || '[]');

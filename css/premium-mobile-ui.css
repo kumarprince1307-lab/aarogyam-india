@@ -58,45 +58,29 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .landscape-hero-banner-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-  border-radius: 18px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  object-fit: contain !important;
+  border-radius: 14px !important;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Mobile Hero Banner Optimization: Never shrink into an unreadable thin strip! */
+/* Mobile Hero Banner Optimization: Never crop or cut off top/bottom */
 @media (max-width: 768px) {
   .landscape-hero-banner-link,
   .home-hero-full-banner-wrap {
-    border-radius: 16px;
-    box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.14) !important;
+    height: auto !important;
   }
   .landscape-hero-banner-img {
-    min-height: 190px;
-    max-height: 270px;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 15px;
-  }
-  /* Zoom hint badge over mobile hero banner */
-  .landscape-hero-banner-link::after {
-    content: "🔍 HD फ़ोटो देखें";
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(15, 23, 42, 0.72);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #ffffff;
-    font-size: 0.68rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    pointer-events: none;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    object-fit: contain !important; /* ZERO CROPPING */
+    border-radius: 12px !important;
   }
 }
 

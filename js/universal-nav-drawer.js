@@ -18,7 +18,7 @@
     let savedUser = {};
     try {
       savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
-    } catch (e) {}
+    } catch (e) { }
     if (savedUser.share_id && /^AI\d{4,8}$/i.test(savedUser.share_id)) return savedUser.share_id;
     if (savedUser.referral_code && /^AI\d{4,8}$/i.test(savedUser.referral_code)) return savedUser.referral_code;
 
@@ -39,7 +39,7 @@
       if (urlRef && /^AI\d{4,8}$/i.test(urlRef)) return urlRef;
       const cachedRef = localStorage.getItem('AOI_REFERRER_ID');
       if (cachedRef && /^AI\d{4,8}$/i.test(cachedRef)) return cachedRef;
-    } catch(e) {}
+    } catch (e) { }
 
     return 'AI000004';
   };
@@ -69,7 +69,7 @@
     let savedUser = {};
     try {
       savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
-    } catch (e) {}
+    } catch (e) { }
 
     const userMobile = (savedUser.mobile || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || '').replace(/\D/g, '').slice(-10);
     const userName = savedUser.full_name || savedUser.name || localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || '';
@@ -94,11 +94,11 @@
     let consultantName = 'आरोग्यम प्रोडक्ट कंसलटेंट जी';
 
     try {
-      const sponsorMob = localStorage.getItem('AOI_SPONSOR_MOBILE') || 
-                         localStorage.getItem('aim_sponsor_mobile') || 
-                         localStorage.getItem('AOI_REFERRER_MOBILE') ||
-                         savedUser.referred_by_mobile ||
-                         savedUser.sponsor_mobile;
+      const sponsorMob = localStorage.getItem('AOI_SPONSOR_MOBILE') ||
+        localStorage.getItem('aim_sponsor_mobile') ||
+        localStorage.getItem('AOI_REFERRER_MOBILE') ||
+        savedUser.referred_by_mobile ||
+        savedUser.sponsor_mobile;
       if (sponsorMob && /^\d{10}$/.test(String(sponsorMob).replace(/\D/g, '').slice(-10))) {
         consultantPhone = String(sponsorMob).replace(/\D/g, '').slice(-10);
       }
@@ -106,7 +106,7 @@
       if (sponsorName && sponsorName.trim()) {
         consultantName = sponsorName.trim() + ' जी';
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 3. User Details & Share ID
     const displayName = userName || 'स्वास्थ्य साधक';
@@ -120,8 +120,8 @@
     const shareLink = `${currentUrl}?ref=${encodeURIComponent(shareId)}`;
 
     // 4. Build Complete Structured WhatsApp Message
-    const waMessage = 
-`नमस्ते ${consultantName},
+    const waMessage =
+      `नमस्ते ${consultantName},
 
 मेरा नाम: ${displayName}${displayMobile}
 विषय: ${pageTitle}
@@ -139,7 +139,7 @@
     let savedUser = {};
     try {
       savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('aarogyam_user') || localStorage.getItem('CURRENT_USER') || '{}');
-    } catch (e) {}
+    } catch (e) { }
 
     const userName = savedUser.full_name || savedUser.name || localStorage.getItem('aim_user_name') || 'स्वास्थ्य साधक';
     const userPhone = savedUser.mobile || localStorage.getItem('aim_user_mobile') || '';
@@ -157,7 +157,7 @@
       }
       const sponsorName = localStorage.getItem('AOI_SPONSOR_NAME') || localStorage.getItem('aim_sponsor_name');
       if (sponsorName && sponsorName.trim()) consultantName = sponsorName.trim() + ' जी';
-    } catch(e) {}
+    } catch (e) { }
 
     const message = `नमस्ते ${consultantName},\n\nमेरा नाम: ${userName}${userMeta}\nविषय: ${cleanTopic}\n${details ? 'विवरण: ' + details + '\n' : ''}\nमुझे इस विषय पर उचित सलाह व उत्पाद मार्गदर्शन चाहिए।\nपेज लिंक: ${shareLink}`;
     return `https://api.whatsapp.com/send?phone=91${consultantPhone}&text=${encodeURIComponent(message)}`;
@@ -171,15 +171,15 @@
   function isPwaInstalled() {
     try {
       // Return true ONLY when running inside the installed standalone PWA app window
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                           window.navigator.standalone === true;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
       if (isStandalone) return true;
 
       // Android TWA / WebAPK wrapper
       if (document.referrer && document.referrer.startsWith('android-app://')) {
         return true;
       }
-    } catch(e) {}
+    } catch (e) { }
     return false;
   }
 
@@ -202,7 +202,7 @@
   });
 
   window.addEventListener('appinstalled', () => {
-    try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
+    try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch (e) { }
     const installBtns = document.querySelectorAll('#universal-sticky-pwa-install-btn, .sticky-float-install-pill, #header-pwa-install-btn, .btn-pwa-install');
     installBtns.forEach(btn => btn.style.setProperty('display', 'none', 'important'));
   });
@@ -213,7 +213,7 @@
         checkPwaInstallState();
       });
     }
-  } catch(e) {}
+  } catch (e) { }
 
   window.triggerPwaInstall = function () {
     if (isPwaInstalled()) {
@@ -225,7 +225,7 @@
       deferredPwaPrompt.prompt();
       deferredPwaPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch(e) {}
+          try { localStorage.setItem('AI_PWA_INSTALLED', 'true'); } catch (e) { }
           const installBtns = document.querySelectorAll('#universal-sticky-pwa-install-btn, .sticky-float-install-pill');
           installBtns.forEach(btn => btn.style.setProperty('display', 'none', 'important'));
           showDrawerToast('🎉 Aarogyam India App installed successfully!', 'success');
@@ -258,23 +258,35 @@
 
     const perm = Notification.permission;
     if (perm === 'granted') {
-      badge.textContent = '🟢 चालू है (Active)';
-      badge.style.background = '#10b981';
-      badge.style.color = '#ffffff';
-      label.textContent = 'सूचनाएं (सक्रिय 🔔)';
-      btn.title = 'सूचनाएं सक्रिय हैं - टेस्ट अलर्ट देखने के लिए क्लिक करें';
+      btn.style.background = '#16a34a';
+      btn.style.color = '#ffffff';
+      btn.style.border = '1.5px solid #15803d';
+      btn.style.boxShadow = '0 2px 8px rgba(22,163,74,0.35)';
+      badge.textContent = 'Active';
+      badge.style.background = '#ffffff';
+      badge.style.color = '#15803d';
+      label.textContent = 'Notification';
+      btn.title = 'Notifications are Active';
     } else if (perm === 'denied') {
-      badge.textContent = '⚠️ ब्लॉक है (Fix)';
-      badge.style.background = '#ef4444';
-      badge.style.color = '#ffffff';
-      label.textContent = 'सूचनाएं अनब्लॉक करें';
-      btn.title = 'सूचनाएं ब्लॉक हैं - चालू करने का तरीका देखें';
+      btn.style.background = '#ef4444';
+      btn.style.color = '#ffffff';
+      btn.style.border = '1.5px solid #dc2626';
+      btn.style.boxShadow = '0 2px 8px rgba(239,68,68,0.35)';
+      badge.textContent = 'Off';
+      badge.style.background = '#ffffff';
+      badge.style.color = '#b91c1c';
+      label.textContent = 'Notification';
+      btn.title = 'Notifications are Blocked';
     } else {
-      badge.textContent = '🔔 चालू करें';
-      badge.style.background = '#fde047';
-      badge.style.color = '#0f172a';
-      label.textContent = 'सूचनाएं चालू करें';
-      btn.title = 'मौसम, फसल सुरक्षा व कृषि अपडेट्स सीधे मोबाइल पर पाएं';
+      btn.style.background = '#f59e0b';
+      btn.style.color = '#ffffff';
+      btn.style.border = '1.5px solid #d97706';
+      btn.style.boxShadow = '0 2px 8px rgba(245,158,11,0.35)';
+      badge.textContent = 'Enable';
+      badge.style.background = '#ffffff';
+      badge.style.color = '#b45309';
+      label.textContent = 'Notification';
+      btn.title = 'Enable Push Notifications';
     }
   };
 
@@ -359,7 +371,7 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ p_share_token: sId })
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
       // Connect WhatsApp share action with 10-Share Goal Challenge & Audio Chime
@@ -368,7 +380,7 @@
           window.AarogyamPromotionGateway.recordShareAction();
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   window.openUniversalShareModal = function (optionsOrTitle, text, url, image) {
@@ -405,7 +417,7 @@
 
     const referralUrl = window.generateReferralShareUrl(targetUrl);
     title = title || document.title || 'Aarogyam India - Digital Agriculture & Healthcare Hub';
-    
+
     let fullShareText = '';
     const curPath = window.location.pathname.toLowerCase();
 
@@ -679,67 +691,94 @@
           let c = ca[i].trim();
           if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
         }
-      } catch (_) {}
+      } catch (_) { }
       return '';
     }
 
     let savedUser = {};
     try {
       savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || localStorage.getItem('AI_SESSION') || '{}');
-    } catch (e) {}
+    } catch (e) { }
 
     const userPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || localStorage.getItem('aarogyam_user_phone') || localStorage.getItem('SAKHI_USER_PHONE') || getDrawerCookie('aim_user_mobile') || savedUser.mobile || savedUser.phone || '').replace(/\D/g, '').slice(-10);
     const isLogged = typeof window.isUserLoggedIn === 'function' ? window.isUserLoggedIn() : (userPhone.length === 10);
     let userName = localStorage.getItem('aim_user_name') || localStorage.getItem('user_name') || localStorage.getItem('aarogyam_user_name') || localStorage.getItem('SAKHI_USER_NAME') || getDrawerCookie('aim_user_name') || savedUser.full_name || savedUser.name || savedUser.fullName || '';
     if (!isLogged || !userName || userName.toLowerCase() === 'null' || userName.toLowerCase() === 'undefined' || userName.toLowerCase().includes('guest')) {
-      userName = isLogged ? 'किसान साथी' : 'Guest User';
+      userName = isLogged ? 'Aarogyam Member' : 'Guest User';
     }
-    const userRole = isLogged ? (savedUser.isVip ? '👑 Pro VIP Member' : '🌱 Verified Member') : 'Guest Mode';
+    const memberStatusHtml = isLogged
+      ? `<span class="drawer-user-status-pill active" style="display:inline-flex;align-items:center;gap:5px;background:#16a34a;color:#ffffff;font-size:0.75rem;font-weight:800;padding:2px 9px;border-radius:12px;border:1px solid #15803d;box-shadow:none !important;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:#ffffff;display:inline-block;"></span> ${savedUser.isVip ? 'VIP Active' : 'Active Member'}</span>`
+      : `<span class="drawer-user-status-pill inactive" style="display:inline-flex;align-items:center;gap:5px;background:#ef4444;color:#ffffff;font-size:0.75rem;font-weight:800;padding:2px 9px;border-radius:12px;border:1px solid #dc2626;box-shadow:none !important;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:#ffffff;display:inline-block;"></span> Inactive Guest</span>`;
     const shareId = isLogged ? window.getUserShareId() : null;
 
     return `
       <button type="button" class="drawer-close-btn" onclick="window.closeUniversalDrawer()" title="Close Menu">&times;</button>
       
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="drawer-avatar-wrap">
-          ${isLogged ? (savedUser.isVip ? '👑' : '👨‍🌾') : '👤'}
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="drawer-avatar-wrap" style="width:64px;height:64px;border-radius:50%;background:#ffffff;border:2.5px solid #22c55e;box-shadow:none !important;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;position:relative;padding:0;box-sizing:border-box;">
+          <img src="/images/logo/aarogyam-official-avatar.png?v=20261121_v7" alt="Aarogyam India" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;" onerror="this.onerror=null;this.src='/images/logo/logo.png';" />
+          ${isLogged ? '<span style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;background:#22c55e;border:2px solid #0f172a;border-radius:50%;box-shadow:0 0 6px #22c55e;"></span>' : ''}
         </div>
-        <div class="drawer-user-meta">
-          <h3 class="drawer-user-name">${userName}</h3>
-          <span class="drawer-user-role">${userRole}</span>
-          ${isLogged && userPhone ? `<div style="font-size:0.78rem;color:#93c5fd;font-weight:700;margin-top:2px;"><i class="fa-solid fa-phone" style="font-size:0.72rem;margin-right:5px;color:#38bdf8;"></i>+91 ${userPhone}</div>` : ''}
-          ${isLogged && shareId ? `
-          <div style="font-size:0.72rem;color:#34d399;font-weight:800;margin-top:3px;display:inline-flex;align-items:center;gap:5px;background:rgba(52,211,153,0.15);padding:2px 8px;border-radius:6px;border:1px solid rgba(52,211,153,0.35);">
-            <span>🎯 Share ID:</span>
-            <span style="letter-spacing:0.5px;">${shareId}</span>
-          </div>` : ''}
+        <div class="drawer-user-meta" style="flex:1;min-width:0;">
+          <div style="font-size:0.74rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Welcome</div>
+          <h3 class="drawer-user-name" style="margin:2px 0 0 0;font-size:1.25rem;font-weight:900;color:#38bdf8 !important;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none !important;">${userName}</h3>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap;">
+            ${memberStatusHtml}
+            ${isLogged && userPhone ? `<span style="font-size:0.80rem;color:#93c5fd;font-weight:800;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;background:rgba(15,23,42,0.6);padding:2px 8px;border-radius:12px;border:1px solid rgba(147,197,253,0.3);"><i class="fa-solid fa-phone" style="font-size:0.72rem;color:#38bdf8;"></i> +91 ${userPhone}</span>` : ''}
+          </div>
         </div>
       </div>
 
-      <!-- Profile & Login / Logout Action -->
-      <div class="drawer-hdr-actions">
-        ${isLogged ? `
-          <a href="/ucas/index.html" class="drawer-hdr-pill-btn drawer-hdr-profile-btn">
-            <i class="fa-solid fa-user-circle"></i>
-            <span>My Profile</span>
+      <!-- 2-Row Balanced Header Action Matrix (Full Responsive for all browsers) -->
+      <div class="drawer-header-matrix" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
+        
+        <!-- Row 1: Share ID & Install App (Clean White Buttons) -->
+        <div style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;">
+          ${isLogged && shareId ? `
+            <button type="button" onclick="navigator.clipboard?.writeText('${shareId}');if(window.showDrawerToast){window.showDrawerToast('🎯 Share ID Copied: ${shareId}','success');}" style="flex:1;height:38px;background:#ffffff;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:10px;font-weight:800;font-size:0.80rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:all 0.2s;" title="Click to copy Share ID">
+              <span style="font-size:0.9rem;">🎯</span>
+              <span>ID: <strong style="letter-spacing:0.5px;font-family:monospace;color:#0284c7;">${shareId}</strong></span>
+            </button>
+          ` : `
+            <div style="flex:1;height:38px;background:#ffffff;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:10px;font-weight:800;font-size:0.80rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+              <span>🌱 Aarogyam Hub</span>
+            </div>
+          `}
+
+          <a href="/aarogyam-app.html" onclick="window.closeUniversalDrawer();" style="flex:1;height:38px;background:#ffffff;color:#0f172a;border:1.5px solid #cbd5e1;border-radius:10px;font-weight:800;font-size:0.80rem;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:all 0.2s;" title="Install App">
+            <i class="fa-solid fa-mobile-screen-button" style="color:#2563eb;font-size:0.9rem;"></i>
+            <span>Install App</span>
           </a>
-          <button type="button" onclick="window.logoutUniversalUser()" class="drawer-hdr-pill-btn drawer-hdr-logout-btn">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>Logout</span>
+        </div>
+
+        <!-- Row 2: Notification (Green ON / Red OFF) & Logout (Red) / Login (Green) -->
+        <div style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;">
+          <button type="button" id="drawer-notif-control-btn" onclick="window.triggerDrawerNotificationToggle()" style="flex:1;height:38px;background:#16a34a;color:#ffffff;border:1.5px solid #15803d;border-radius:10px;font-weight:800;font-size:0.80rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;transition:all 0.2s;" title="Push Notifications">
+            <i class="fa-solid fa-bell" style="font-size:0.88rem;"></i>
+            <span id="drawer-notif-btn-label">Notification</span>
+            <span id="drawer-notif-status-badge" style="background:#ffffff;color:#15803d;font-size:0.68rem;font-weight:900;padding:2px 6px;border-radius:8px;">Active</span>
           </button>
-        ` : `
-          <button type="button" onclick="window.openUniversalLoginHandler()" class="drawer-hdr-pill-btn drawer-hdr-login-btn">
-            <i class="fa-solid fa-key"></i>
-            <span>Login / Register</span>
-          </button>
-        `}
+
+          ${isLogged ? `
+            <button type="button" onclick="window.logoutUniversalUser()" style="flex:1;height:38px;background:#ef4444;color:#ffffff;border:1.5px solid #dc2626;border-radius:10px;font-weight:900;font-size:0.82rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(239,68,68,0.35);transition:all 0.2s;">
+              <i class="fa-solid fa-arrow-right-from-bracket" style="font-size:0.88rem;"></i>
+              <span>Logout</span>
+            </button>
+          ` : `
+            <button type="button" onclick="window.openUniversalLoginHandler()" style="flex:1;height:38px;background:#16a34a;color:#ffffff;border:1.5px solid #15803d;border-radius:10px;font-weight:900;font-size:0.82rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.12) !important;">
+              <i class="fa-solid fa-key" style="font-size:0.88rem;"></i>
+              <span>Login</span>
+            </button>
+          `}
+        </div>
+
       </div>
     `;
   }
 
   function clearAllAuthCookies() {
     const cookiesToClear = [
-      'aim_user_mobile', 'aim_user_name', 'user_mobile', 'user_phone', 
+      'aim_user_mobile', 'aim_user_name', 'user_mobile', 'user_phone',
       'farmer_mobile', 'farmer_name', 'aarogyam_user_phone', 'aarogyam_user_name', 'user_share_id',
       'aim_user_email', 'user_email', 'aarogyam_user_registered', 'AI_USER_LOGGED_IN'
     ];
@@ -775,7 +814,7 @@
       'sakhi_chat_history', 'AAROGYAM_SUPERADMIN_HARDWARE'
     ];
     keysToRemove.forEach(k => {
-      try { localStorage.removeItem(k); } catch (_) {}
+      try { localStorage.removeItem(k); } catch (_) { }
     });
     try {
       for (let i = localStorage.length - 1; i >= 0; i--) {
@@ -784,7 +823,7 @@
           localStorage.removeItem(k);
         }
       }
-    } catch (_) {}
+    } catch (_) { }
     try {
       sessionStorage.removeItem('ads_gateway_passed');
       sessionStorage.removeItem('wb_registered');
@@ -795,15 +834,15 @@
           sessionStorage.removeItem(k);
         }
       }
-    } catch (_) {}
+    } catch (_) { }
     clearAllAuthCookies();
   }
 
-  window.logoutUniversalUser = function() {
+  window.logoutUniversalUser = function () {
     if (!confirm('क्या आप सचमुच लॉग आउट करना चाहते हैं?')) return;
     purgeAllStoredUserData();
     if (window.V1_SESSION && typeof window.V1_SESSION.logout === 'function') {
-      try { window.V1_SESSION.logout(); } catch (_) {}
+      try { window.V1_SESSION.logout(); } catch (_) { }
     }
     window.updateUniversalDrawerProfile();
     window.dispatchEvent(new CustomEvent('ai:user-logged-out'));
@@ -813,7 +852,7 @@
     window.location.reload();
   };
 
-  window.openUniversalLoginHandler = function() {
+  window.openUniversalLoginHandler = function () {
     if (typeof window.closeUniversalDrawer === 'function') {
       window.closeUniversalDrawer();
     }
@@ -853,7 +892,7 @@
         let savedUser = {};
         try {
           savedUser = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
-        } catch (e) {}
+        } catch (e) { }
         const name = (savedUser && (savedUser.full_name || savedUser.name)) || localStorage.getItem('aim_user_name') || 'सदस्य';
         const isVip = Boolean(savedUser.isVip);
         existingBadge.innerHTML = `
@@ -869,12 +908,12 @@
           </button>
         `;
       }
-    } catch(e) {
+    } catch (e) {
       console.warn("Header user badge notice:", e);
     }
   }
 
-  window.updateUniversalDrawerProfile = function() {
+  window.updateUniversalDrawerProfile = function () {
     const headerEl = document.querySelector('#universal-drawer-card .drawer-profile-header');
     if (headerEl) {
       headerEl.innerHTML = generateDrawerProfileHeaderHtml();
@@ -892,151 +931,175 @@
     style.id = 'universal-nav-drawer-runtime-style';
     style.textContent = `
       #universal-drawer-card {
-        background: #080f1e !important;
-        color: #ffffff !important;
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        left: auto !important;
+        width: 340px !important;
+        max-width: 90vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
         font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         -webkit-font-smoothing: antialiased !important;
-        -moz-osx-font-smoothing: grayscale !important;
-        text-rendering: optimizeLegibility !important;
-      }
-      .drawer-profile-header {
-        background: linear-gradient(135deg, #0d1b38 0%, #081126 100%) !important;
-        color: #ffffff !important;
-        border-bottom: 2px solid #1e3a8a !important;
-      }
-      .drawer-user-name {
-        color: #ffffff !important;
-        font-weight: 800 !important;
-      }
-      .drawer-user-role {
-        color: #38bdf8 !important;
-      }
-      .drawer-hdr-actions {
-        margin-top: 14px !important;
-        display: flex !important;
-        gap: 10px !important;
-        align-items: center !important;
-        flex-wrap: wrap !important;
-      }
-      .drawer-hdr-pill-btn {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 7px !important;
-        padding: 7px 16px !important;
-        border-radius: 20px !important;
-        font-size: 0.8rem !important;
-        font-weight: 800 !important;
-        text-decoration: none !important;
-        cursor: pointer !important;
-        border: none !important;
-      }
-      .drawer-hdr-profile-btn {
-        background: #2563eb !important;
-        color: #ffffff !important;
-        border: 1px solid #60a5fa !important;
-        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.45) !important;
-      }
-      .drawer-hdr-logout-btn {
-        background: #dc2626 !important;
-        color: #ffffff !important;
-        border: 1px solid #ef4444 !important;
-        box-shadow: 0 3px 10px rgba(220, 38, 38, 0.5) !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-      }
-      .drawer-hdr-login-btn {
-        background: #16a34a !important;
-        color: #ffffff !important;
-        border: 1px solid #4ade80 !important;
-      }
-      .drawer-menu-list {
-        padding: 12px 10px !important;
+        box-shadow: -10px 0 45px rgba(0, 0, 0, 0.28) !important;
+        border-left: 1.5px solid #cbd5e1 !important;
+        border-right: none !important;
+        transform: translate3d(100%, 0, 0) !important;
+        transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.26s ease !important;
+        z-index: 9999999 !important;
         display: flex !important;
         flex-direction: column !important;
-        gap: 7px !important;
-        background: transparent !important;
       }
-      .drawer-nav-item-btn {
-        width: 100% !important;
-        background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+      #universal-drawer-card.open {
+        transform: translate3d(0, 0, 0) !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+      }
+      @media (max-width: 480px) {
+        #universal-drawer-card {
+          width: 320px !important;
+          max-width: 88vw !important;
+          right: 0 !important;
+          left: auto !important;
+          transform: translate3d(100%, 0, 0) !important;
+        }
+        #universal-drawer-card.open {
+          transform: translate3d(0, 0, 0) !important;
+        }
+      }
+      .drawer-profile-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
         color: #ffffff !important;
-        border: 1.5px solid #3b82f6 !important;
-        border-radius: 14px !important;
+        padding: 24px 18px 18px 18px !important;
+        border-bottom: 2px solid #334155 !important;
+        position: relative !important;
+      }
+      .drawer-close-btn {
+        position: absolute !important;
+        top: 14px !important;
+        right: 14px !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important;
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.2rem !important;
+        cursor: pointer !important;
+        line-height: 1 !important;
+      }
+      .drawer-close-btn:hover {
+        background: rgba(239, 68, 68, 0.8) !important;
+      }
+      .drawer-menu-list {
+        padding: 14px 12px 30px 12px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        background: #ffffff !important;
+      }
+      /* Single-line full width utility rows */
+      .drawer-util-single-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 10px 14px !important;
+        border-radius: 12px !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        font-weight: 800 !important;
+        font-size: 0.88rem !important;
+        border: 1.5px solid #e2e8f0 !important;
+        background: #f8fafc !important;
+        margin-bottom: 6px !important;
+        transition: all 0.2s ease !important;
+      }
+      .drawer-util-single-row:hover {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+      }
+            .drawer-nav-item-btn {
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 12px !important;
         padding: 13px 15px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        cursor: pointer !important;
-        text-align: left !important;
+        font-weight: 900 !important;
+        font-size: 0.95rem !important;
         text-decoration: none !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
         box-sizing: border-box !important;
-        box-shadow: 0 4px 14px rgba(29, 78, 216, 0.4) !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
       }
       .drawer-nav-item-btn:hover {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.55) !important;
-        color: #ffffff !important;
+        background: #f8fafc !important;
+        border-color: #64748b !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        transform: translateY(-1px) !important;
       }
       .drawer-nav-item-btn.active-pill {
-        background: #1e3a8a !important;
-        border-color: #60a5fa !important;
-        color: #ffffff !important;
-        box-shadow: 0 0 16px rgba(96, 165, 250, 0.45) !important;
+        background: #f0fdf4 !important;
+        border-color: #22c55e !important;
+        color: #15803d !important;
+        box-shadow: 0 3px 10px rgba(34, 197, 94, 0.15) !important;
       }
-      .drawer-nav-item-btn.accordion-open {
-        background: #1e3a8a !important;
-        border-color: #38bdf8 !important;
-        color: #ffffff !important;
+      .drawer-item-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
       }
       .drawer-icon-box {
         width: 36px !important;
         height: 36px !important;
-        min-width: 36px !important;
         border-radius: 10px !important;
-        background: rgba(255, 255, 255, 0.22) !important;
-        color: #ffffff !important;
-        border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 1.12rem !important;
+        font-size: 1.05rem !important;
         flex-shrink: 0 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
       }
       .drawer-item-title {
-        font-size: 1.02rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-        line-height: 1.25 !important;
+        font-weight: 900 !important;
+        font-size: 0.96rem !important;
         letter-spacing: 0.2px !important;
-      }
-      .drawer-accordion-arrow {
-        font-size: 0.92rem !important;
-        color: #ffffff !important;
-        flex-shrink: 0 !important;
-        margin-left: 8px !important;
+        color: #0f172a !important;
       }
       .drawer-tag-pill {
-        font-size: 0.7rem !important;
-        font-weight: 800 !important;
-        padding: 2px 8px !important;
-        border-radius: 6px !important;
-        background: rgba(255, 255, 255, 0.22) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        letter-spacing: 0.2px !important;
-        flex-shrink: 0 !important;
+        font-size: 0.75rem !important;
+        font-weight: 900 !important;
+        padding: 3px 10px !important;
+        border-radius: 20px !important;
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+      }
+      .drawer-accordion-arrow {
+        font-size: 0.88rem !important;
+        color: #475569 !important;
+        font-weight: 900 !important;
+        transition: transform 0.25s ease !important;
+      }
+      .drawer-nav-item-btn.expanded .drawer-accordion-arrow {
+        transform: rotate(180deg) !important;
       }
       .drawer-submenu-panel {
         display: none;
         flex-direction: column !important;
-        gap: 5px !important;
-        background: #060e1d !important;
-        border-radius: 0 12px 12px 12px !important;
-        margin: 4px 0 10px 14px !important;
-        padding: 8px !important;
-        border: 1px solid #1e3a8a !important;
-        border-left: 3.5px solid #38bdf8 !important;
+        gap: 6px !important;
+        padding: 6px 0 8px 12px !important;
+        border-left: 2px solid #cbd5e1 !important;
+        margin-left: 18px !important;
       }
       .drawer-submenu-panel.open {
         display: flex !important;
@@ -1045,49 +1108,184 @@
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        padding: 8px 11px !important;
-        background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%) !important;
-        color: #ffffff !important;
+        padding: 10px 14px !important;
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 10px !important;
         text-decoration: none !important;
-        font-weight: 700 !important;
-        font-size: 0.84rem !important;
-        border-radius: 8px !important;
-        border: 1px solid #38bdf8 !important;
-        box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
+        color: #0f172a !important;
+        font-size: 0.88rem !important;
+        font-weight: 800 !important;
+        transition: all 0.15s ease !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03) !important;
+      }
+      .drawer-sub-link-item span,
+      .drawer-sub-link-item .drawer-item-left span,
+      .drawer-sub-link-item div span {
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        font-size: 0.88rem !important;
       }
       .drawer-sub-link-item:hover {
-        background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%) !important;
-        color: #ffffff !important;
+        background: #f0fdf4 !important;
+        border-color: #22c55e !important;
+        color: #15803d !important;
+        transform: translateX(4px) !important;
+        box-shadow: 0 3px 8px rgba(34, 197, 94, 0.15) !important;
       }
-      .drawer-sub-link-item span {
-        color: #ffffff !important;
-        font-size: 0.84rem !important;
+      .drawer-sub-link-item:hover span,
+      .drawer-sub-link-item:hover .drawer-item-left span,
+      .drawer-sub-link-item:hover div span {
+        color: #15803d !important;
       }
       .drawer-sub-icon-box {
-        width: 24px !important;
-        height: 24px !important;
-        min-width: 24px !important;
-        border-radius: 6px !important;
-        background: rgba(255, 255, 255, 0.25) !important;
-        color: #ffffff !important;
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 8px !important;
+        background: #e2e8f0 !important;
+        color: #1e293b !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 0.78rem !important;
+        font-size: 0.85rem !important;
         flex-shrink: 0 !important;
       }
-      .drawer-sub-section-title {
-        font-size: 0.72rem !important;
-        font-weight: 800 !important;
-        color: #fde047 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.6px !important;
-        padding: 6px 6px 3px 6px !important;
-        margin-top: 6px !important;
-        border-top: 1px solid rgba(56, 189, 248, 0.3) !important;
+      
+      /* Right Docked Bar */
+      .universal-sticky-dock-bar {
+        position: fixed !important;
+        right: 0 !important;
+        top: auto !important;
+        bottom: 84px !important;
+        transform: none !important;
+        z-index: 99990 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        background: rgba(15, 23, 42, 0.88) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        padding: 6px 5px 6px 7px !important;
+        border-radius: 14px 0 0 14px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-right: none !important;
+        box-shadow: -4px 6px 20px rgba(0, 0, 0, 0.25) !important;
+        opacity: 0.4 !important; /* 40% default translucent opacity */
+        transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s ease !important;
+      }
+      .universal-sticky-dock-bar.dock-idle-faded {
+        opacity: 0.4 !important;
+      }
+      .universal-sticky-dock-bar:hover,
+      .universal-sticky-dock-bar:active,
+      .universal-sticky-dock-bar:focus-within,
+      .universal-sticky-dock-bar.dock-active-focus,
+      body.ai-tour-in-progress .universal-sticky-dock-bar {
+        opacity: 1 !important;
+        transform: scale(1.02) !important;
+      }
+      @media (max-width: 768px) {
+        .universal-sticky-dock-bar {
+          bottom: 78px !important;
+          top: auto !important;
+          transform: none !important;
+          padding: 5px 4px 5px 6px !important;
+          gap: 5px !important;
+          opacity: 0.4 !important;
+        }
+        .dock-pill-btn {
+          width: 35px !important;
+          height: 35px !important;
+          font-size: 0.95rem !important;
+        }
+      }
+      .dock-pill-btn {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 10px !important;
         display: flex !important;
         align-items: center !important;
-        gap: 6px !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        border: none !important;
+        text-decoration: none !important;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+      }
+      .dock-pill-btn:hover, .dock-pill-btn:active {
+        transform: scale(1.14) !important;
+      }
+      .dock-gift-btn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5) !important;
+      }
+      .dock-tube-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5) !important;
+      }
+      .dock-audio-btn {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+      }
+      .dock-share-btn {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+      }
+      .dock-pwa-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      }
+
+      /* Mobile 7-Tab Bottom Nav */
+      @media (max-width: 768px) {
+        .universal-mobile-bottom-nav {
+          display: flex !important;
+          position: fixed !important;
+          bottom: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          width: 100% !important;
+          height: 60px !important;
+          background: #ffffff !important;
+          border-top: 1.5px solid #e2e8f0 !important;
+          box-shadow: 0 -3px 16px rgba(0, 0, 0, 0.08) !important;
+          z-index: 99999 !important;
+          justify-content: space-around !important;
+          align-items: center !important;
+          padding: 4px 2px calc(4px + env(safe-area-inset-bottom)) 2px !important;
+          box-sizing: border-box !important;
+        }
+        .universal-mobile-bottom-nav .u-nav-tab {
+          flex: 1 !important;
+          min-width: 0 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          text-decoration: none !important;
+          color: #64748b !important;
+          gap: 2px !important;
+        }
+        .universal-mobile-bottom-nav .u-nav-tab .u-icon-wrap {
+          font-size: 1.15rem !important;
+          line-height: 1 !important;
+        }
+        .universal-mobile-bottom-nav .u-nav-tab span {
+          font-size: 0.68rem !important;
+          font-weight: 800 !important;
+          white-space: nowrap !important;
+        }
+        .universal-mobile-bottom-nav .u-nav-tab.active {
+          color: #16a34a !important;
+        }
+        .universal-mobile-bottom-nav .u-nav-tab.active .u-icon-wrap {
+          transform: scale(1.12);
+        }
+      }
+
+      /* Suppress legacy duplicate left floating buttons */
+      #at-floating-pill,
+      #agy-floating-gift-box {
+        display: none !important;
       }
     `;
     document.head.appendChild(style);
@@ -1156,13 +1354,13 @@
     try {
       const c = JSON.parse(localStorage.getItem('AI_CART_ITEMS') || '[]');
       cartCount = Array.isArray(c) ? c.length : 0;
-    } catch (e) {}
+    } catch (e) { }
 
     let wishCount = 0;
     try {
       const w = JSON.parse(localStorage.getItem('AAROGYAM_WISHLIST') || '[]');
       wishCount = Array.isArray(w) ? w.length : 0;
-    } catch (e) {}
+    } catch (e) { }
 
     const currentPath = (window.location.pathname || '').toLowerCase();
     const currentSearch = (window.location.search || '').toLowerCase();
@@ -1173,7 +1371,7 @@
       try {
         document.body.classList.add('book-landing-page');
         document.body.dataset.pageType = 'book-landing';
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const drawerHtml = `
@@ -1181,426 +1379,356 @@
         <!-- Backdrop Overlay -->
         <div id="universal-drawer-backdrop" onclick="window.closeUniversalDrawer()"></div>
 
-        <!-- Slide-in Drawer Card (Desktop Left / Mobile Right via CSS) -->
+        <!-- Slide-in Drawer Card (Right Side on Desktop & Mobile) -->
         <div id="universal-drawer-card">
           
-          <!-- Sleek Black User Profile Header Banner -->
+          <!-- Sleek User Profile Header Banner -->
           <div class="drawer-profile-header">
             ${generateDrawerProfileHeaderHtml()}
           </div>
 
-          <!-- Clean Executive Blue Canvas Menu List -->
+          <!-- Clean White & Slate Canvas Menu List -->
           <div class="drawer-menu-list" style="flex:1;overflow-y:auto;">
 
-            <!-- 1. HOME (Main Menu Direct Button) -->
+            <!-- 1. HOME (Direct Button) -->
             <a href="/index.html" class="drawer-nav-item-btn ${currentPath === '/' || currentPath.endsWith('index.html') ? 'active-pill' : ''}">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-house"></i></div>
-                <span class="drawer-item-title">होम (Home)</span>
+                <div class="drawer-icon-box" style="background:#e0e7ff;color:#4338ca;"><i class="fa-solid fa-house"></i></div>
+                <span class="drawer-item-title">Home</span>
               </div>
             </a>
 
-            <!-- 1.1 AAROGYAM SAKHI AI (24x7 Digital Doctor & Kisan Sakhi) -->
-            <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-sakhi') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #15803d 0%, #16a34a 100%) !important; border-color:#86efac !important; box-shadow:0 4px 14px rgba(22,163,74,0.45) !important;">
+            <!-- 2. SAKHI AI (Direct Hero Button) -->
+            <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-sakhi') ? 'active-pill' : ''}" style="background:#f0fdf4 !important; border-color:#86efac !important;">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#0f172a; border-color:#4ade80;"><i class="fa-solid fa-robot" style="color:#4ade80;"></i></div>
-                <span class="drawer-item-title">आरोग्यम सखी AI (24×7 डॉक्टर)</span>
+                <div class="drawer-icon-box" style="background:#15803d;color:#ffffff;"><i class="fa-solid fa-robot"></i></div>
+                <span class="drawer-item-title" style="color:#15803d;font-weight:900;">Sakhi AI</span>
               </div>
-              <span class="drawer-tag-pill" style="background:#fde047; color:#0f172a; font-weight:900;">AI 👩‍🌾</span>
+              <span class="drawer-tag-pill" style="background:#dcfce7;color:#15803d;font-weight:900;">AI</span>
             </a>
 
-            <!-- 1.2 OFFICIAL AAROGYAM APP INSTALL GUIDE -->
-            <a href="/aarogyam-app.html" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn ${currentPath.includes('aarogyam-app') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%) !important; border-color:#60a5fa !important; box-shadow:0 4px 14px rgba(29,78,216,0.35) !important;">
+            <!-- 3. PROFILE & ACCOUNT (Accordion) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-profile" onclick="window.toggleDrawerAccordion('profile', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#0f172a; border-color:#93c5fd;"><i class="fa-solid fa-mobile-screen-button" style="color:#60a5fa;"></i></div>
-                <span class="drawer-item-title">ऐप इंस्टॉल करें (Install App)</span>
+                <div class="drawer-icon-box" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-user-gear"></i></div>
+                <span class="drawer-item-title">Profile & Account</span>
               </div>
-              <span class="drawer-tag-pill" style="background:#fde047; color:#0f172a; font-weight:900;">1 MB 📲</span>
-            </a>
-
-            <!-- 1.3 SMART NOTIFICATION PERMISSION CONTROLLER IN DRAWER -->
-            <div id="drawer-notif-control-btn" onclick="window.triggerDrawerNotificationToggle()" class="drawer-nav-item-btn" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important; border-color: #34d399 !important; box-shadow: 0 4px 14px rgba(16,185,129,0.3) !important; cursor: pointer;">
-              <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background: #022c22; border-color: #34d399;"><i class="fa-solid fa-bell" style="color: #34d399;"></i></div>
-                <span class="drawer-item-title" id="drawer-notif-btn-label">सूचनाएं चालू करें (Alerts)</span>
-              </div>
-              <span class="drawer-tag-pill" id="drawer-notif-status-badge" style="background: #fde047; color: #0f172a; font-weight: 900;">🔔 चालू करें</span>
+              <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
+            </button>
+            <div class="drawer-submenu-panel" id="drawer-panel-profile">
+              <a href="/ucas/index.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-id-card"></i></div><span>My Profile Dashboard</span></div>
+              </a>
+              <a href="/purchases.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-file-invoice-dollar"></i></div><span>My Invoice</span></div>
+              </a>
+              <a href="/ebooks/download.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-download"></i></div><span>Download Center</span></div>
+              </a>
+              <a href="/ebooks/share-rewards.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-wallet"></i></div><span>Share and Earn</span></div>
+              </a>
             </div>
 
-            <!-- 2. MY LIBRARY (Main Menu Direct Button) -->
-            <a href="/ebooks/my-library.html" class="drawer-nav-item-btn ${currentPath.includes('my-library') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-book-open-reader"></i></div>
-                <span class="drawer-item-title">मेरी लाइब्रेरी (My Library)</span>
-              </div>
-              <span class="drawer-tag-pill">रीडर 📖</span>
-            </a>
-
-            <!-- 2. E-BOOKS (Accordion with Submenus) -->
+            <!-- 4. E-BOOKS & COMBOS (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-ebooks" onclick="window.toggleDrawerAccordion('ebooks', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-book-bookmark"></i></div>
-                <span class="drawer-item-title">ई-बुक्स (eBooks)</span>
+                <div class="drawer-icon-box" style="background:#fef3c7;color:#d97706;"><i class="fa-solid fa-book-bookmark"></i></div>
+                <span class="drawer-item-title">E-Books & Combos</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-ebooks">
-              <a href="/bundle.html" class="drawer-sub-link-item" style="background:rgba(16,185,129,0.12); border:1.5px solid #10b981; border-radius:8px; margin:4px 0 6px 0; padding:8px 10px;">
-                <span class="drawer-sub-dot" style="background:#10b981;"></span>
-                <span style="font-weight:900; color:#10b981;">🎁 महाबचत 5-इन-1 कॉम्बो ऑफर (Combo)</span>
-              </a>
               <a href="/ebooks/ebook.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-store"></i></div>
-                  <span>सभी ई-बुक्स स्टोर (Store)</span>
-                </div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-store"></i></div><span>All E-Books Store</span></div>
               </a>
               <a href="/ebooks/agriculture.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-seedling"></i></div>
-                  <span>कृषि ई-बुक्स (Agriculture)</span>
-                </div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-seedling"></i></div><span>Agriculture E-Books</span></div>
+              </a>
+              <a href="/ebooks/my-library.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-book-open-reader"></i></div><span>My Library</span></div>
+                <span class="drawer-tag-pill">Reader 📖</span>
+              </a>
+              <a href="/ebooks/business.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-chart-pie"></i></div><span>Business & Marketing Books</span></div>
+              </a>
+              <a href="/ebooks/education.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-graduation-cap"></i></div><span>Education & Self-Help</span></div>
+              </a>
+              <a href="/ebooks/digital-ai.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-microchip"></i></div><span>Digital & AI Guides</span></div>
               </a>
               <a href="/ebooks/wishlist.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-heart"></i></div>
-                  <span>पसंदीदा ई-बुक्स (Wishlist)</span>
-                </div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-heart"></i></div><span>Wishlist</span></div>
                 <span class="drawer-tag-pill" style="display:${wishCount > 0 ? 'inline-block' : 'none'};">${wishCount}</span>
               </a>
               <a href="/ebooks/cart.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-cart-shopping"></i></div>
-                  <span>शॉपिंग कार्ट (Shopping Cart)</span>
-                </div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cart-shopping"></i></div><span>Shopping Cart</span></div>
                 <span class="drawer-tag-pill" style="display:${cartCount > 0 ? 'inline-block' : 'none'};">${cartCount}</span>
               </a>
             </div>
 
-            <!-- 3. NETSURF (Main Menu with Submenus: Agri, Pashu Palan, Health & Sub-pages) -->
+            <!-- 5. HEALTH (ALL 13 PAGES ACCORDION) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-health" onclick="window.toggleDrawerAccordion('health', event)">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#fee2e2;color:#ef4444;"><i class="fa-solid fa-heart-pulse"></i></div>
+                <span class="drawer-item-title">Health</span>
+              </div>
+              <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
+            </button>
+            <div class="drawer-submenu-panel" id="drawer-panel-health">
+              <a href="/categories/health.html" class="drawer-sub-link-item" style="background:#fef2f2;border-color:#fca5a5;">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#ef4444;color:#fff;"><i class="fa-solid fa-hospital"></i></div><span style="font-weight:900;color:#b91c1c;">Health Care Hub</span></div>
+                <span class="drawer-tag-pill" style="background:#ef4444;color:#fff;">MAIN</span>
+              </a>
+              <a href="/health/diabetes.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-droplet"></i></div><span>1. Diabetes Care</span></div>
+              </a>
+              <a href="/health/joint-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-bone"></i></div><span>2. Joint & Muscle Care</span></div>
+              </a>
+              <a href="/health/heart-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-heart"></i></div><span>3. Heart Health</span></div>
+              </a>
+              <a href="/health/womens-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-person-dress"></i></div><span>4. Women's Health</span></div>
+              </a>
+              <a href="/health/weight-loss.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-weight-scale"></i></div><span>5. Weight Management</span></div>
+              </a>
+              <a href="/health/liver-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-shield-virus"></i></div><span>6. Liver Care</span></div>
+              </a>
+              <a href="/health/thyroid-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-dna"></i></div><span>7. Thyroid Care</span></div>
+              </a>
+              <a href="/health/skin-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-spa"></i></div><span>8. Skin Care</span></div>
+              </a>
+              <a href="/health/hair-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-wind"></i></div><span>9. Hair Care</span></div>
+              </a>
+              <a href="/health/kids-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-child"></i></div><span>10. Kids Wellness</span></div>
+              </a>
+              <a href="/health/dental-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-tooth"></i></div><span>11. Dental Care</span></div>
+              </a>
+              <a href="/health/home-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-house-chimney-medical"></i></div><span>12. Home & Hygiene Care</span></div>
+              </a>
+              <a href="/health/sexual-wellness.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-venus-mars"></i></div><span>13. Sexual Wellness</span></div>
+              </a>
+            </div>
+
+            <!-- 6. NETSURF HUB & CAREER (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-netsurf" onclick="window.toggleDrawerAccordion('netsurf', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-boxes-stacked"></i></div>
-                <span class="drawer-item-title">नेटसर्फ (NetSurf)</span>
+                <div class="drawer-icon-box" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <span class="drawer-item-title">Netsurf Hub</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-netsurf">
               <a href="/categories/netsurf-products.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
-                  <span>सम्पूर्ण कैटलॉग (All Products)</span>
-                </div>
-                <span class="drawer-tag-pill">7 भाषा PDF</span>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-file-pdf"></i></div><span>Product Catalog</span></div>
               </a>
               <a href="/categories/netsurf.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-briefcase"></i></div>
-                  <span>नेटसर्फ करियर (Direct Selling)</span>
-                </div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-briefcase"></i></div><span>Business Plan & Career</span></div>
               </a>
-
-              <!-- Agriculture & Pashupalan Subsection -->
-              <div class="drawer-sub-section-title"><i class="fa-solid fa-seedling"></i> कृषि व पशु पालन</div>
-              <a href="/ebooks/agriculture.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-wheat-awn"></i></div>
-                  <span>कृषि मुख्य पृष्ठ (Agriculture)</span>
-                </div>
-              </a>
-              <a href="/pashu-palan.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-cow"></i></div>
-                  <span>पशु पालन व डेयरी हब (Pashu Palan)</span>
-                </div>
-              </a>
-
-              <!-- Health Subsection & All Health Subpages -->
-              <div class="drawer-sub-section-title"><i class="fa-solid fa-heart-pulse"></i> स्वास्थ्य व वेलनेस (Health)</div>
-              <a href="/categories/health.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-hospital"></i></div>
-                  <span>स्वास्थ्य मुख्य पृष्ठ (Health Hub)</span>
-                </div>
-                <span class="drawer-tag-pill">MAIN</span>
-              </a>
-              <a href="/health/diabetes.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-droplet"></i></div><span>डायबिटीज केयर (Diabetes)</span></div>
-              </a>
-              <a href="/health/joint-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-bone"></i></div><span>जोड़ों का दर्द (Joint Care)</span></div>
-              </a>
-              <a href="/health/heart-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-heart"></i></div><span>हृदय स्वास्थ्य (Heart Care)</span></div>
-              </a>
-              <a href="/health/womens-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-person-dress"></i></div><span>महिला स्वास्थ्य (Women's Care)</span></div>
-              </a>
-              <a href="/health/weight-loss.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-weight-scale"></i></div><span>वजन नियंत्रण (Weight Loss)</span></div>
-              </a>
-              <a href="/health/liver-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-shield-virus"></i></div><span>लिवर केयर (Liver Care)</span></div>
-              </a>
-              <a href="/health/thyroid-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-dna"></i></div><span>थायराइड केयर (Thyroid Care)</span></div>
-              </a>
-              <a href="/health/skin-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-spa"></i></div><span>स्किन केयर (Skin Care)</span></div>
-              </a>
-              <a href="/health/hair-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-wind"></i></div><span>हेयर केयर (Hair Care)</span></div>
-              </a>
-              <a href="/health/kids-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-child"></i></div><span>किड्स केयर (Kids Care)</span></div>
-              </a>
-              <a href="/health/dental-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-tooth"></i></div><span>डेंटल केयर (Dental Care)</span></div>
-              </a>
-              <a href="/health/home-care.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-house-chimney-medical"></i></div><span>होम केयर (Home Care)</span></div>
-              </a>
-              <a href="/health/sexual-wellness.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-venus-mars"></i></div><span>सेक्सुअल वेलनेस (Wellness)</span></div>
+              <a href="/categories/netsurf-pathfinder.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-compass"></i></div><span>Pathfinder Leader Portal</span></div>
               </a>
             </div>
 
-            <!-- 4. KISAN SERVICES (Accordion: Mandi Bhav, Weather, Crop Doctor, Webinar, WhatsApp) -->
+            <!-- 7. KISAN & VETERINARY SERVICES (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-services" onclick="window.toggleDrawerAccordion('services', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                <span class="drawer-item-title">किसान सेवाएं (Kisan Services)</span>
+                <div class="drawer-icon-box" style="background:#e0f2fe;color:#0284c7;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <span class="drawer-item-title">Kisan & Veterinary Services</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-services">
+              <a href="/pashu-palan.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cow"></i></div><span>Pashupalan & Dairy Hub</span></div>
+              </a>
               <a href="/mandi.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-chart-line"></i></div>
-                  <span>लाइव कृषि मंडी भाव (Mandi Bhav)</span>
-                </div>
-                <span class="drawer-tag-pill">LIVE 🔴</span>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-chart-line"></i></div><span>Live Mandi Bhav (APMC Rates)</span></div>
+                <span class="drawer-tag-pill" style="background:#ef4444;color:#fff;">LIVE 🔴</span>
               </a>
               <a href="/weather.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-cloud-sun"></i></div>
-                  <span>7-दिवसीय मौसम पूर्वानुमान (Weather)</span>
-                </div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cloud-sun"></i></div><span>7-Day Weather Forecast</span></div>
               </a>
-              <a href="/krishi-panchang.html" class="drawer-sub-link-item" style="background:rgba(217,119,6,0.12); border-left:3px solid #d97706;">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box" style="background:#d97706; color:#ffffff;"><i class="fa-solid fa-om"></i></div>
-                  <span style="font-weight:800; color:#b45309;">दैनिक वैदिक पंचांग (Panchang)</span>
-                </div>
-                <span class="drawer-tag-pill" style="background:#d97706; color:#ffffff; font-weight:900;">शुभ मुहूर्त 🚩</span>
+              <a href="/krishi-panchang.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-om"></i></div><span>Krishi Panchang (Farming Calendar)</span></div>
+              </a>
+              <a href="/crop-doctor.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-stethoscope"></i></div><span>Crop Doctor AI Diagnostic</span></div>
               </a>
               <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box" style="background:#15803d; color:#ffffff;"><i class="fa-solid fa-robot"></i></div>
-                  <span>आरोग्यम सखी AI (फसल, पशु व सेहत डॉक्टर)</span>
-                </div>
-                <span class="drawer-tag-pill" style="background:#22c55e; color:#0f172a; font-weight:900;">AI 🔬</span>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#15803d;color:#fff;"><i class="fa-solid fa-robot"></i></div><span>Aarogyam Sakhi Consultation</span></div>
+                <span class="drawer-tag-pill" style="background:#22c55e;color:#0f172a;font-weight:900;">AI 🔬</span>
               </a>
               <a href="/webinar.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-video"></i></div>
-                  <span>लाइव ज़ूम वेबिनार (Live Webinar)</span>
-                </div>
-                <span class="drawer-tag-pill">ज़ूम</span>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-video"></i></div><span>Weekly Live Farmer Webinar</span></div>
               </a>
               <a href="javascript:void(0)" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 AI Expert Consultation'); window.closeUniversalDrawer();" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-brands fa-whatsapp"></i></div>
-                  <span>24×7 WhatsApp AI एक्सपर्ट परामर्श</span>
-                </div>
-                <span class="drawer-tag-pill">24×7</span>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-brands fa-whatsapp"></i></div><span>WhatsApp Kisan AI Assistant</span></div>
               </a>
             </div>
 
-            <!-- 📕 AAROGYAM BAHI KHATA (Main Menu Direct Button) -->
-            <a href="/pages/smart-etailer.html" class="drawer-nav-item-btn ${currentPath.includes('smart-etailer') ? 'active-pill' : ''}" style="background:linear-gradient(135deg, #fff1f2, #ffe4e6); border:1.5px solid #fecdd3;">
+            <!-- 8. MY TEAM (Digital Diary & CRM - Inner Ledger Preserved) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-team" onclick="window.toggleDrawerAccordion('team', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#e11d48; color:#ffffff;"><i class="fa-solid fa-book-journal-whills"></i></div>
-                <span class="drawer-item-title" style="color:#9f1239; font-weight:900;">आरोग्यम बहीखाता (Bahi Khata)</span>
-              </div>
-              <span class="drawer-tag-pill" style="background:#e11d48; color:#ffffff; font-weight:900;">नया 📕</span>
-            </a>
-
-            <!-- 5. LIVE WEBINAR (Main Menu Direct Button) -->
-            <a href="/webinar.html" class="drawer-nav-item-btn ${currentPath.includes('webinar') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#dc2626;"><i class="fa-solid fa-video"></i></div>
-                <span class="drawer-item-title">लाइव वेबिनार (Live Webinar)</span>
-              </div>
-              <span class="drawer-tag-pill" style="background:#dc2626;">LIVE 🔴</span>
-            </a>
-
-            <!-- 6. AAROGYAM TUBE (Main Menu Direct Button) -->
-            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}">
-              <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#ef4444;"><i class="fa-brands fa-youtube"></i></div>
-                <span class="drawer-item-title">आरोग्यम ट्यूब (AarogyamTube)</span>
-              </div>
-              <span class="drawer-tag-pill" style="background:#dc2626;">HD 🎬</span>
-            </a>
-
-            <!-- 6. PROFILE & ACCOUNT (Accordion) -->
-            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-profile" onclick="window.toggleDrawerAccordion('profile', event)">
-              <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-user-gear"></i></div>
-                <span class="drawer-item-title">प्रोफाइल व खाता (Profile)</span>
+                <div class="drawer-icon-box" style="background:#ffe4e6;color:#e11d48;"><i class="fa-solid fa-users-gear"></i></div>
+                <span class="drawer-item-title">My Team</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
-            <div class="drawer-submenu-panel" id="drawer-panel-profile">
-              <a href="/purchases.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                  <span>मेरी खरीद व टैक्स इनवॉइस</span>
-                </div>
-                <span class="drawer-tag-pill">बिल 🧾</span>
+            <div class="drawer-submenu-panel" id="drawer-panel-team">
+              <a href="/pages/myteam.html" class="drawer-sub-link-item ${currentPath.endsWith('myteam.html') ? 'active-pill' : ''}">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-pen-to-square"></i></div><span>Team Entry (सरल किसान व टीम एंट्री)</span></div>
               </a>
-              <a href="/subscription.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-crown"></i></div>
-                  <span>VIP पास सदस्यता (₹99)</span>
-                </div>
-                <span class="drawer-tag-pill">VIP</span>
+              <a href="/pages/myteam-bahikhata.html" class="drawer-sub-link-item ${currentPath.includes('bahikhata') ? 'active-pill' : ''}">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#ffe4e6;color:#e11d48;"><i class="fa-solid fa-book-journal-whills"></i></div><span>आरोग्यम बहीखाता (उधारी व जमा खाता)</span></div>
               </a>
-              <a href="/pages/smart-etailer.html" class="drawer-sub-link-item" style="background:#fff1f2; border:1.5px solid #fecdd3; border-radius:10px; padding:10px 12px; margin-bottom:8px;">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box" style="background:#e11d48; color:#ffffff; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-book"></i></div>
-                  <div>
-                    <span style="font-weight:900; color:#be123c; font-size:0.92rem; display:block;">आरोग्यम बहीखाता</span>
-                    <span style="font-size:0.72rem; color:#64748b; font-weight:700;">उधारी लेज़र, किसान व टीम डायरी</span>
-                  </div>
-                </div>
-                <span class="drawer-tag-pill" style="background:#e11d48; color:#ffffff; font-weight:900;">नया 📕</span>
+              <a href="/pages/myteam-followup.html" class="drawer-sub-link-item ${currentPath.includes('followup') ? 'active-pill' : ''}">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#e0f2fe;color:#0284c7;"><i class="fa-brands fa-whatsapp"></i></div><span>1-Tap WhatsApp फॉलो-अप</span></div>
               </a>
-              <a href="/ucas/index.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left">
-                  <div class="drawer-sub-icon-box"><i class="fa-solid fa-sliders"></i></div>
-                  <span>UCAS प्रोफाइल डैशबोर्ड</span>
-                </div>
+              <a href="/pages/myteam-todo.html" class="drawer-sub-link-item ${currentPath.includes('todo') ? 'active-pill' : ''}">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#fef3c7;color:#d97706;"><i class="fa-solid fa-list-check"></i></div><span>To-Do कार्य-डायरी</span></div>
+              </a>
+              <a href="/pages/myteam-dairy.html" class="drawer-sub-link-item ${currentPath.includes('dairy') ? 'active-pill' : ''}">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#f3e8ff;color:#9333ea;"><i class="fa-solid fa-arrows-rotate"></i></div><span>ऑटोशिप व डेली डायरी</span></div>
               </a>
             </div>
 
-            <!-- 7. SUPPORT & POLICIES (Accordion) -->
+            <!-- 9. AAROGYAM TUBE (Direct Button with Real Official Logo) -->
+            <a href="/tube.html" class="drawer-nav-item-btn ${currentPath.includes('tube') ? 'active-pill' : ''}">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#fee2e2;display:flex;align-items:center;justify-content:center;">
+                  <img src="/images/logo/aarogyamtube-logo.png" alt="Tube" style="width:26px;height:26px;object-fit:contain;display:block;">
+                </div>
+                <span class="drawer-item-title">Aarogyam Tube</span>
+              </div>
+            </a>
+
+            <!-- 10. WEBSITE TOUR GUIDE (Hero Direct Button in Main Menu) -->
+            <a href="javascript:void(0)" onclick="if(window.triggerWebsiteTour){window.triggerWebsiteTour(true);}else if(window.startUniversalWalkthrough){window.startUniversalWalkthrough(true);} window.closeUniversalDrawer();" class="drawer-nav-item-btn" style="background:#f0fdf4 !important; border-color:#86efac !important;">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#16a34a;color:#ffffff;"><i class="fa-solid fa-compass"></i></div>
+                <span class="drawer-item-title" style="color:#15803d;font-weight:900;">Website Tour Guide</span>
+              </div>
+              <span class="drawer-tag-pill" style="background:#16a34a;color:#fff;font-weight:900;">TOUR 🧭</span>
+            </a>
+
+            <!-- 11. SUPPORT & LEGAL POLICIES (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-support" onclick="window.toggleDrawerAccordion('support', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box"><i class="fa-solid fa-headset"></i></div>
-                <span class="drawer-item-title">सहायता व नीतियां (Support)</span>
+                <div class="drawer-icon-box" style="background:#f1f5f9;color:#475569;"><i class="fa-solid fa-headset"></i></div>
+                <span class="drawer-item-title">Support & Legal Policies</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-support">
+              <a href="/contact.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-phone-volume"></i></div><span>Contact Support</span></div>
+              </a>
               <a href="/faq.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-circle-question"></i></div><span>अक्सर पूछे जाने वाले सवाल (FAQ)</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-circle-question"></i></div><span>Frequently Asked Questions (FAQ)</span></div>
               </a>
               <a href="/terms.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-file-contract"></i></div><span>नियम व शर्तें (Terms & Conditions)</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-file-contract"></i></div><span>Terms & Conditions</span></div>
               </a>
               <a href="/privacy-policy.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-shield-halved"></i></div><span>गोपनीयता नीति (Privacy Policy)</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-shield-halved"></i></div><span>Privacy Policy</span></div>
               </a>
               <a href="/shipping-policy.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-truck"></i></div><span>शिपिंग व डिलीवरी नीति</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-truck"></i></div><span>Shipping & Delivery Policy</span></div>
               </a>
               <a href="/refund-policy.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-rotate-left"></i></div><span>रिफंड नीति (Refund Policy)</span></div>
-              </a>
-              <a href="/contact.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-phone-volume"></i></div><span>संपर्क सूत्र (Contact Us)</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-rotate-left"></i></div><span>Cancellation & Refund Policy</span></div>
               </a>
             </div>
 
           </div>
-
         </div>
       </div>
 
-      <!-- Sticky Floating Actions Container on Page (Fixed Right Corner - Strictly Icon-Only) -->
+      <!-- Sticky Floating Actions: Right Docked Bar (Sequence: Gift -> Tube -> Sound -> Share -> Install) -->
       ${isBookLanding ? '' : `
-      <div class="sticky-float-widget-container" id="universal-sticky-float-widget">
-        <!-- 1. Red Sticky Install App Button (Only in Browser mode; auto-hidden if opened in installed standalone app) -->
-        <button type="button" onclick="window.triggerPwaInstall()" class="sticky-float-pill sticky-float-install-pill" id="universal-sticky-pwa-install-btn" title="ऐप इंस्टॉल करें (Install App)" aria-label="Install App" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; ${isInstalled ? 'display:none !important;' : 'display:inline-flex;'}; align-items:center; justify-content:center;">
-          <i class="fa-solid fa-mobile-screen-button"></i>
+      <div class="universal-sticky-dock-bar" id="universal-sticky-dock-bar">
+        <!-- 1. Gift Promo Button -->
+        <button type="button" onclick="if(window.AarogyamPromotionGateway?.openModal){window.AarogyamPromotionGateway.openModal();}else if(window.openGiftPromoModal){window.openGiftPromoModal();}" class="dock-pill-btn dock-gift-btn" id="universal-sticky-gift-btn" title="उपहार / पॉइंट्स कमाएँ" aria-label="Gift Promo">
+          <span style="font-size:1.35rem;line-height:1;display:block;">🎁</span>
         </button>
 
-        <!-- 2. Purple Audio Greeting Button -->
-        <button type="button" onclick="window.handleUniversalStickyAudioToggle?.(event)" class="sticky-float-pill sticky-float-audio-pill" id="universal-sticky-audio-btn" title="पेज ऑडियो सुनें / रोकें" aria-label="Audio" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+        <!-- 2. Aarogyam Tube Button (Real Official Icon) -->
+        <a href="/tube.html" class="dock-pill-btn dock-tube-btn" id="universal-sticky-tube-btn" title="Aarogyam Tube" aria-label="Aarogyam Tube">
+          <img src="/images/logo/aarogyamtube-logo.png" alt="AarogyamTube" style="width:26px;height:26px;object-fit:contain;display:block;">
+        </a>
+
+        <!-- 3. Audio Greeting Button -->
+        <button type="button" onclick="window.handleUniversalStickyAudioToggle?.(event)" class="dock-pill-btn dock-audio-btn" id="universal-sticky-audio-btn" title="Page Audio Listen / Mute" aria-label="Audio">
           <i class="fa-solid fa-volume-high"></i>
         </button>
 
-        <!-- 3. Blue Share Referral Button -->
-        <button type="button" onclick="if(window.triggerUniversalPageShare){window.triggerUniversalPageShare();}else if(window.triggerUniversalShare){window.triggerUniversalShare();}else{window.triggerViralPageShare();}" class="sticky-float-pill sticky-float-share-pill" id="universal-sticky-share-btn" title="शेयर करें (Share)" aria-label="Share" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
+        <!-- 4. Share Referral Button -->
+        <button type="button" onclick="if(window.triggerUniversalPageShare){window.triggerUniversalPageShare();}else if(window.triggerUniversalShare){window.triggerUniversalShare();}else{window.triggerViralPageShare();}" class="dock-pill-btn dock-share-btn" id="universal-sticky-share-btn" title="Share & Earn Points" aria-label="Share">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
 
-        <!-- 4. Green Official WhatsApp Contact Button (Direct WhatsApp Helpdesk & Upline Consultant) -->
-        <a href="javascript:void(0)" onclick="if(window.consultAiExpert){window.consultAiExpert(document.title);}else{window.open('https://api.whatsapp.com/send?phone=917974422572&text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%20Aarogyam%20India!%20%E0%A4%B8%E0%A4%B9%E0%A4%BE%E0%A4%AF%E0%A4%A4%E0%A4%BE%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F','_blank');} return false;" class="sticky-float-pill sticky-float-ai-pill" id="universal-sticky-ai-btn" title="WhatsApp सहायता व परामर्श" aria-label="WhatsApp Contact" style="width:42px; height:42px; min-width:42px; max-width:42px; border-radius:50%; padding:0; display:inline-flex; align-items:center; justify-content:center;">
-          <i class="fa-brands fa-whatsapp"></i>
-        </a>
+        <!-- 5. Install App Button -->
+        <button type="button" onclick="window.triggerPwaInstall()" class="dock-pill-btn dock-pwa-btn" id="universal-sticky-pwa-install-btn" title="Install Aarogyam App (1MB)" aria-label="Install App" style="${isInstalled ? 'display:none !important;' : 'display:flex;'}">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </button>
       </div>
       `}
 
       ${isBookLanding ? '' : `
-      <!-- Universal Sticky Mobile Bottom Navigation Bar (Mobile & Tablet) -->
+      <!-- Universal Sticky Mobile Bottom 7-Tab Navigation Bar -->
+      <!-- Sequence: HOME -> PROFILE -> LIBRARY -> MY TEAM -> TUBE -> HEALTH -> NETSURF -->
       <nav class="universal-mobile-bottom-nav" id="universal-mobile-bottom-nav">
         <!-- 1. Home -->
-        <a href="/index.html" class="u-nav-tab ${(currentPath === '/' || currentPath.endsWith('index.html')) && !currentPath.includes('ucas') && !currentPath.includes('smart-etailer') && !currentPath.includes('tube') && !currentPath.includes('netsurf') && !currentPath.includes('health') && !currentPath.includes('pashu') ? 'active' : ''}">
+        <a href="/index.html" class="u-nav-tab ${(currentPath === '/' || currentPath.endsWith('index.html')) && !currentPath.includes('ucas') && !currentPath.includes('smart-etailer') && !currentPath.includes('tube') && !currentPath.includes('netsurf') && !currentPath.includes('health') ? 'active' : ''}">
           <div class="u-icon-wrap"><i class="fa-solid fa-house"></i></div>
           <span>Home</span>
         </a>
-        <!-- 2. AarogyamTube (RED ICON) -->
-        <a href="/tube.html" class="u-nav-tab ${currentPath.includes('tube') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-brands fa-youtube" style="color:#ef4444;font-size:1.15rem;"></i></div>
-          <span style="color:#ef4444;font-weight:800;">Tube</span>
-        </a>
-        <!-- 3. My Library -->
-        <a href="/ebooks/my-library.html" class="u-nav-tab ${currentPath.includes('my-library') || (currentPath.includes('ebook') && !currentPath.includes('smart-etailer')) ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
-          <span>Library</span>
-        </a>
-        <!-- 4. Netsurf All Products Catalog -->
-        <a href="/categories/netsurf-products.html" class="u-nav-tab ${currentPath.includes('netsurf-products') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-boxes-stacked" style="color:#10b981;"></i></div>
-          <span style="color:#10b981;font-weight:800;">कैटलॉग</span>
-        </a>
-        <!-- 4.1 Netsurf Career -->
-        <a href="/categories/netsurf.html" class="u-nav-tab ${currentPath.includes('netsurf') && !currentPath.includes('netsurf-products') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-briefcase" style="color:#059669;"></i></div>
-          <span style="color:#059669;font-weight:800;">Netsurf</span>
-        </a>
-        <!-- 5. Health -->
-        <a href="/categories/health.html" class="u-nav-tab ${currentPath.includes('health') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-heart-pulse" style="color:#ec4899;"></i></div>
-          <span style="color:#ec4899;font-weight:800;">Health</span>
-        </a>
-        <!-- 6. Pashupalan -->
-        <a href="/pashu-palan.html" class="u-nav-tab ${currentPath.includes('pashu') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-cow" style="color:#0284c7;"></i></div>
-          <span style="color:#0284c7;font-weight:800;">पशु पालन</span>
-        </a>
-        <!-- 7. बहीखाता (Bahi Khata) -->
-        <a href="/pages/smart-etailer.html" class="u-nav-tab ${currentPath.includes('smart-etailer') || currentPath.includes('marketing') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-book-journal-whills" style="color:#e11d48; font-size:1.15rem;"></i></div>
-          <span style="color:#e11d48;font-weight:900;">बहीखाता</span>
-        </a>
-        <!-- 8. Profile -->
+        <!-- 2. Profile -->
         <a href="/ucas/index.html" class="u-nav-tab ${(currentPath.includes('ucas') || currentPath.includes('profile')) && !currentPath.includes('smart-etailer') ? 'active' : ''}">
-          <div class="u-icon-wrap"><i class="fa-solid fa-user" style="color:#3b82f6;"></i></div>
+          <div class="u-icon-wrap"><i class="fa-solid fa-user" style="color:#7c3aed;"></i></div>
           <span>Profile</span>
         </a>
-        <!-- 9. Drawer / Menu Trigger -->
-        <button type="button" onclick="window.openUniversalDrawer(event)" class="u-nav-tab" style="cursor:pointer;" title="सभी मेनू व सेवाएं खोलें">
-          <div class="u-icon-wrap"><i class="fa-solid fa-bars" style="color:#8b5cf6;"></i></div>
-          <span style="color:#8b5cf6;font-weight:800;">Drawer</span>
-        </button>
+        <!-- 3. Library -->
+        <a href="/ebooks/my-library.html" class="u-nav-tab ${currentPath.includes('my-library') || (currentPath.includes('ebook') && !currentPath.includes('smart-etailer')) ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-book-bookmark" style="color:#d97706;"></i></div>
+          <span>Library</span>
+        </a>
+        <!-- 4. My Team (कार्य डायरी व बहीखाता) -->
+        <a href="/pages/myteam.html" class="u-nav-tab ${currentPath.includes('myteam') || currentPath.includes('smart-etailer') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-users-gear" style="color:#e11d48;"></i></div>
+          <span style="color:#e11d48;font-weight:900;">My Team</span>
+        </a>
+        <!-- 5. Tube -->
+        <a href="/tube.html" class="u-nav-tab ${currentPath.includes('tube') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-brands fa-youtube" style="color:#ef4444;"></i></div>
+          <span style="color:#ef4444;font-weight:800;">Tube</span>
+        </a>
+        <!-- 6. Health -->
+        <a href="/categories/health.html" class="u-nav-tab ${currentPath.includes('health') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-heart-pulse" style="color:#059669;"></i></div>
+          <span style="color:#059669;font-weight:800;">Health</span>
+        </a>
+        <!-- 7. Netsurf -->
+        <a href="/categories/netsurf.html" class="u-nav-tab ${currentPath.includes('netsurf') ? 'active' : ''}">
+          <div class="u-icon-wrap"><i class="fa-solid fa-briefcase" style="color:#2563eb;"></i></div>
+          <span style="color:#2563eb;font-weight:800;">Netsurf</span>
+        </a>
       </nav>
       `}
     `;
-
     document.body.insertAdjacentHTML('beforeend', drawerHtml);
     if (isBookLanding) {
       const bottomNav = document.getElementById('universal-mobile-bottom-nav');
@@ -1711,7 +1839,7 @@
       <span class="sakhi-pill-live-dot"></span>
     `;
 
-    pill.onclick = function(e) {
+    pill.onclick = function (e) {
       if (e) e.preventDefault();
       window.location.href = '/aarogyam-sakhi.html';
     };
@@ -1786,6 +1914,8 @@
       if (bNav) bNav.remove();
       const fWidget = document.getElementById('universal-sticky-float-widget');
       if (fWidget) fWidget.remove();
+      const dockBar = document.getElementById('universal-sticky-dock-bar');
+      if (dockBar) dockBar.remove();
     }
   }
 
@@ -1799,12 +1929,19 @@
       ensureAarogyamSakhiLoaded();
       injectSakhiPillDirectly();
     }
+    if (!isBookLandingPage() && !document.querySelector('script[src*="universal-walkthrough-tour.js"]')) {
+      const tourScript = document.createElement('script');
+      tourScript.src = '/js/universal-walkthrough-tour.js?v=20261121_v1';
+      tourScript.async = true;
+      document.body.appendChild(tourScript);
+    }
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initUniversalDrawerAndSakhi);
   } else {
     initUniversalDrawerAndSakhi();
+    resetDockIdleTimer();
   }
   window.addEventListener('load', () => {
     purgeBookLandingDrawerNav();
@@ -1862,3 +1999,41 @@ window.handleUniversalStickyAudioToggle = function (e) {
   };
   document.head.appendChild(s);
 };
+
+// Universal Website Walkthrough Tour Trigger
+window.triggerWebsiteTour = function (forceRestart) {
+  if (typeof window.startUniversalWalkthrough === 'function') {
+    window.startUniversalWalkthrough(forceRestart);
+  } else {
+    const s = document.createElement('script');
+    s.src = '/js/universal-walkthrough-tour.js?v=' + Date.now();
+    s.onload = function () {
+      if (typeof window.startUniversalWalkthrough === 'function') {
+        window.startUniversalWalkthrough(forceRestart);
+      }
+    };
+    document.head.appendChild(s);
+  }
+};
+
+
+// Floating Side Dock Opacity: 40% resting, 100% on direct interaction / click
+let dockIdleTimeout = null;
+function activateDockFullOpacity() {
+  const dock = document.getElementById('universal-sticky-dock-bar');
+  if (!dock) return;
+  dock.classList.add('dock-active-focus');
+  clearTimeout(dockIdleTimeout);
+  dockIdleTimeout = setTimeout(() => {
+    dock.classList.remove('dock-active-focus');
+  }, 6000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dock = document.getElementById('universal-sticky-dock-bar');
+  if (dock) {
+    dock.addEventListener('mouseenter', activateDockFullOpacity);
+    dock.addEventListener('touchstart', activateDockFullOpacity, { passive: true });
+    dock.addEventListener('click', activateDockFullOpacity);
+  }
+});

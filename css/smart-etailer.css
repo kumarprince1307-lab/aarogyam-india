@@ -2138,7 +2138,7 @@ body.light-theme .game-modal-card label {
 #tab-diary-ledger label,
 #tab-diary-followup label,
 #tab-diary-pocket label {
-  color: #ffffff !important;
+  color: #0f172a !important;
   font-weight: 700 !important;
   font-size: 0.85rem !important;
   margin-bottom: 5px !important;
@@ -2976,5 +2976,402 @@ input, select, textarea {
 .kb-fab-btn span, #kbMainFabBtn span {
   color: #ffffff !important;
   font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+
+/* === UNIVERSAL HIGH-CONTRAST LIGHT THEME SAFEGUARDS === */
+html[data-theme="light"] body,
+body.light-theme {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .smart-form-card,
+body.light-theme .smart-form-card,
+.smart-form-card.light-card,
+#myTeamFormCard {
+  background: #ffffff !important;
+  border: 1.5px solid #bfdbfe !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 18px rgba(0, 82, 204, 0.08) !important;
+}
+
+html[data-theme="light"] .smart-form-card label,
+body.light-theme .smart-form-card label,
+#myTeamFormCard label,
+#tab-diary-entry label {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  font-size: 0.90rem !important;
+  text-shadow: none !important;
+  display: block !important;
+  margin-bottom: 5px !important;
+}
+
+html[data-theme="light"] .contact-dock-box,
+body.light-theme .contact-dock-box,
+.contact-dock-box {
+  background: #eff6ff !important;
+  border: 1.5px solid #bfdbfe !important;
+  border-radius: 10px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 14px !important;
+}
+
+html[data-theme="light"] .contact-dock-box *,
+body.light-theme .contact-dock-box *,
+.contact-dock-box * {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .contact-dock-btn,
+body.light-theme .contact-dock-btn,
+.contact-dock-btn {
+  background: #ffffff !important;
+  color: #0052cc !important;
+  border: 1.5px solid #bfdbfe !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  padding: 10px 8px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 82, 204, 0.08) !important;
+}
+
+
+/* Scoped Light Theme High Contrast for Followup & Forms */
+body.light-theme #tab-diary-followup label,
+body.light-theme .smart-form-card label,
+body.light-theme label {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  font-size: 0.90rem !important;
+  text-shadow: none !important;
+}
+
+body.light-theme select,
+body.light-theme input,
+body.light-theme textarea {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+
+/* ==========================================================================
+   HIGH CONTRAST & SHARP TEXT SAFEGUARDS (LIGHT BLUE / BLACK THEME)
+   ========================================================================== */
+body.light-theme, html[data-theme="light"] {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Sharp Bold Black Labels Everywhere in Forms & Followup */
+body.light-theme label,
+html[data-theme="light"] label,
+.smart-form-card label,
+#tab-diary-followup label {
+  color: #0f172a !important;
+  font-weight: 900 !important;
+  font-size: 0.92rem !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* Sharp Inputs */
+body.light-theme input,
+body.light-theme select,
+body.light-theme textarea,
+.game-input {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  border: 1.5px solid #cbd5e1 !important;
+}
+
+/* Follow-up Action Buttons: Dark Saturated Green & Ocean Blue, Pure White Text */
+#btnHubSendWa,
+.btn-hub-send-wa {
+  background: #15803d !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 1.0rem !important;
+  text-shadow: none !important;
+  border: none !important;
+}
+#btnHubSendWa *,
+.btn-hub-send-wa * {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+#btnHubSendSms,
+.btn-hub-send-sms {
+  background: #0369a1 !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 1.0rem !important;
+  text-shadow: none !important;
+  border: none !important;
+}
+#btnHubSendSms *,
+.btn-hub-send-sms * {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+/* Contact Auto-Fill Buttons in Team Entry */
+.contact-dock-btn {
+  background: #ffffff !important;
+  color: #0052cc !important;
+  border: 2px solid #0052cc !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+.contact-dock-btn * {
+  color: #0052cc !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+
+/* ==========================================================================
+   AUTHENTIC KHATABOOK PRO - FLOATING ACTION BUTTON (BOTTOM RIGHT) & RED BOX TEXT
+   ========================================================================== */
+.kb-fab-btn,
+#kbMainFabBtn {
+  position: fixed !important;
+  bottom: 75px !important;
+  left: 18px !important;
+  right: auto !important;
+  background: linear-gradient(135deg, #be123c 0%, #990033 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 30px !important;
+  padding: 13px 22px !important;
+  font-size: 0.98rem !important;
+  font-weight: 900 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-shadow: 0 6px 20px rgba(190, 18, 60, 0.45) !important;
+  cursor: pointer !important;
+  z-index: 9999 !important;
+  text-shadow: none !important;
+  letter-spacing: 0.3px !important;
+}
+
+.kb-fab-btn *,
+#kbMainFabBtn * {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+.kb-fab-btn:hover,
+#kbMainFabBtn:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 25px rgba(190, 18, 60, 0.55) !important;
+}
+
+/* Ensure ALL Red Boxes / Badges in Bahi Khata Have Pure Sharp White Text */
+.bahi-khata-brand-card,
+.bahi-khata-brand-card *,
+#kbTxModalHeader,
+#kbTxModalHeader *,
+div[style*="background:#dc2626"],
+div[style*="background:#dc2626"] *,
+div[style*="background: #dc2626"],
+div[style*="background: #dc2626"] *,
+div[style*="background:#be123c"],
+div[style*="background:#be123c"] *,
+div[style*="background: #be123c"],
+div[style*="background: #be123c"] *,
+div[style*="background:#b91c1c"],
+div[style*="background:#b91c1c"] *,
+div[style*="background: #b91c1c"],
+div[style*="background: #b91c1c"] *,
+div[style*="background:#991b1b"],
+div[style*="background:#991b1b"] *,
+div[style*="background: #991b1b"],
+div[style*="background: #991b1b"] * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL HIGH-CONTRAST SAFEGUARD FOR ALL BUTTONS & ACTIONS
+   Prevents body.light-theme from turning button text/spans/icons dark
+   ========================================================================== */
+button[style*="background:#dc2626"],
+button[style*="background: #dc2626"],
+button[style*="background:#b91c1c"],
+button[style*="background: #b91c1c"],
+button[style*="background:#be123c"],
+button[style*="background: #be123c"],
+button[style*="background:#15803d"],
+button[style*="background: #15803d"],
+button[style*="background:#16a34a"],
+button[style*="background: #16a34a"],
+button[style*="background:#0052cc"],
+button[style*="background: #0052cc"],
+button[style*="background:#0369a1"],
+button[style*="background: #0369a1"],
+button[style*="background:#0284c7"],
+button[style*="background: #0284c7"],
+button[style*="background:#7c3aed"],
+button[style*="background: #7c3aed"],
+button[style*="background:#b45309"],
+button[style*="background: #b45309"],
+#btnHubSendWa,
+#btnHubSendSms,
+#btnSubmitDiaryEntry,
+.kb-fab-btn,
+#kbMainFabBtn,
+.btn-royal-blue,
+.btn-royal-green,
+.btn-action-green,
+button[onclick*="sendAndNext"],
+button[onclick*="startMyTeamTour"],
+button[onclick*="openTutorialModal"] {
+  color: #ffffff !important;
+  text-shadow: none !important;
+  font-weight: 900 !important;
+}
+
+button[style*="background:#dc2626"] *,
+button[style*="background: #dc2626"] *,
+button[style*="background:#b91c1c"] *,
+button[style*="background: #b91c1c"] *,
+button[style*="background:#be123c"] *,
+button[style*="background: #be123c"] *,
+button[style*="background:#15803d"] *,
+button[style*="background: #15803d"] *,
+button[style*="background:#16a34a"] *,
+button[style*="background: #16a34a"] *,
+button[style*="background:#0052cc"] *,
+button[style*="background: #0052cc"] *,
+button[style*="background:#0369a1"] *,
+button[style*="background: #0369a1"] *,
+button[style*="background:#0284c7"] *,
+button[style*="background: #0284c7"] *,
+button[style*="background:#7c3aed"] *,
+button[style*="background: #7c3aed"] *,
+button[style*="background:#b45309"] *,
+button[style*="background: #b45309"] *,
+#btnHubSendWa *,
+#btnHubSendSms *,
+#btnSubmitDiaryEntry *,
+.kb-fab-btn *,
+#kbMainFabBtn *,
+.btn-royal-blue *,
+.btn-royal-green *,
+.btn-action-green *,
+button[onclick*="sendAndNext"] *,
+button[onclick*="startMyTeamTour"] *,
+button[onclick*="openTutorialModal"] * {
+  color: #ffffff !important;
+  text-shadow: none !important;
+  font-weight: 900 !important;
+}
+
+/* ==========================================================================
+   SMART E-TAILER TUTORIAL & GUIDE MODAL HIGH CONTRAST THEME
+   Guarantees 100% sharp contrast: white on dark boxes, dark on light boxes
+   ========================================================================== */
+#smartETailerTutorialModal,
+#smartETailerTutorialModal .game-modal-card {
+  background: #070d18 !important;
+  color: #ffffff !important;
+}
+
+#smartETailerTutorialModal h3,
+#smartETailerTutorialModal h4,
+#smartETailerTutorialModal h5 {
+  color: #60a5fa !important;
+  text-shadow: none !important;
+}
+
+#smartETailerTutorialModal strong,
+#smartETailerTutorialModal b {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+#smartETailerTutorialModal p,
+#smartETailerTutorialModal span {
+  color: #f1f5f9;
+  text-shadow: none !important;
+}
+
+#smartETailerTutorialModal .btn-tutorial-video-tab {
+  font-weight: 800 !important;
+}
+
+#smartETailerTutorialModal .btn-tutorial-video-tab.active,
+#smartETailerTutorialModal .btn-tutorial-video-tab:hover {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+#btnMasterAudioPlayToggle,
+#btnMasterAudioPlayToggle span {
+  color: #1d4ed8 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+#smartETailerTutorialModal .step-audio-btn,
+#smartETailerTutorialModal .step-audio-btn span,
+#smartETailerTutorialModal button[onclick*="playStepAudio"],
+#smartETailerTutorialModal button[onclick*="playStepAudio"] * {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+/* ==========================================================================
+   AUTHENTIC KHATABOOK FAB - LEFT POSITIONED (AVOIDS RIGHT STICKY DOCK)
+   ========================================================================== */
+.kb-fab-btn,
+#kbMainFabBtn {
+  position: fixed !important;
+  bottom: 75px !important;
+  left: 18px !important;
+  right: auto !important;
+  z-index: 9999 !important;
+}
+
+/* ==========================================================================
+   DRAWER USER PROFILE & BUTTON SHARPNESS FIX (NO GLOW / SHARP TEXT)
+   ========================================================================== */
+#universal-nav-drawer .drawer-user-meta .drawer-user-name,
+#universal-nav-drawer h3.drawer-user-name,
+.drawer-user-name {
+  color: #38bdf8 !important; /* Crisp Sky Blue */
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+#universal-nav-drawer .drawer-user-meta div {
+  color: #94a3b8 !important;
+  text-shadow: none !important;
+}
+
+#universal-nav-drawer .drawer-avatar-wrap {
+  box-shadow: none !important;
+  border: 2px solid #38bdf8 !important;
+}
+
+#universal-nav-drawer .drawer-header-matrix button,
+#universal-nav-drawer .drawer-header-matrix a {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
   text-shadow: none !important;
 }

@@ -262,15 +262,21 @@
       .doctor-consult-img,
       .remedy-diagram-img,
       section:not(#header) img:not([src*="logo"]):not([src*="fevicon"]):not([src*="icon"]):not(.header-brand-wrap img):not(.bundle-fan-book):not(.bundle-card-thumb):not(.sticky-multi-thumb):not(.hero-banner-bg)
+      section:not(#header):not(.home-hero-section):not(#sec-hero-slider):not(.aarogyam-vip-promo-strip-section) img:not([src*="logo"]):not([src*="fevicon"]):not([src*="icon"]):not(.header-brand-wrap img):not(.bundle-fan-book):not(.bundle-card-thumb):not(.sticky-multi-thumb):not(.hero-banner-bg):not(.landscape-hero-banner-img):not(.vip-card-banner-img)
     `);
 
     images.forEach(img => {
+      // Exclude all hero banners, slider links, and VIP promo cards so clicks navigate directly
+      if (img.closest('.landscape-hero-banner-link, .home-hero-slide-item, .bighaat-carousel-container, .home-hero-section, .aarogyam-vip-promo-link, .vip-banner-split-card, [data-no-lightbox]')) {
+        return;
+      }
       if (img.dataset.aiZoomBound) return;
       img.dataset.aiZoomBound = '1';
       img.classList.add('ai-zoomable-img');
 
       img.addEventListener('click', (e) => {
         if (img.closest('.bundle-fan-stack-container, .bundle-fan-book-item, .bundle-fan-book, .bundle-card-img-wrap, .demo-slide, #babyBrowserBackdrop, .baby-browser-backdrop, [data-no-lightbox]')) {
+        if (img.closest('.bundle-fan-stack-container, .bundle-fan-book-item, .bundle-fan-book, .bundle-card-img-wrap, .demo-slide, #babyBrowserBackdrop, .baby-browser-backdrop, [data-no-lightbox], .landscape-hero-banner-link, .home-hero-slide-item, .bighaat-carousel-container, .aarogyam-vip-promo-link')) {
           return;
         }
         const parentLink = img.closest('a');

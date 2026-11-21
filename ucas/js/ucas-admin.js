@@ -403,7 +403,7 @@
 
     tbody.innerHTML = pages.map((lp, idx) => {
       const dateStr = lp.created_at ? new Date(lp.created_at).toLocaleDateString('hi-IN') : '-';
-      const origin = window.location.origin || 'https://aarogyamindia.in';
+      const origin = window.location.origin || 'https://aarogyamindia.online';
       const publicUrl = `${origin}/ucas/landing.html?id=${lp.id}&share_id=${lp.share_id || 'AI000004'}`;
       const mediaBadge = lp.content_type === 'youtube'
         ? '<span style="background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:4px;font-size:0.72rem;font-weight:700;"><i class="fa-brands fa-youtube"></i> YouTube</span>'
@@ -819,7 +819,7 @@
               ${userLandingPages.length === 0 ? `
                 <tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--text-muted);">कोई लैंडिंग पेज नहीं बनाया गया है।</td></tr>
               ` : userLandingPages.map((lp, i) => {
-                const origin = window.location.origin || 'https://aarogyamindia.in';
+                const origin = window.location.origin || 'https://aarogyamindia.online';
                 const shareUrl = `${origin}/ucas/landing.html?id=${lp.id}&share_id=${shareId}`;
                 return `
                   <tr>

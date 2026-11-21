@@ -900,15 +900,15 @@ section{padding:55px 0;}
 
 /* 4. CURATED SHELF SECTION (AMAZON KINDLE STYLE) */
 .shelf-section {
-    margin: 40px 0;
+    margin: 8px 0;
 }
 .shelf-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 12px;
+    margin-bottom: 8px;
+    border-bottom: none;
+    padding-bottom: 4px;
 }
 .shelf-title-wrap {
     display: flex;
