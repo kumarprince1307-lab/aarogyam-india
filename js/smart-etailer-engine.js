@@ -2414,17 +2414,37 @@
         return;
       }
 
+      // 1. Check Local Diary for duplicates
       const entries = getLocalDiaryEntries();
       const existingIndex = entries.findIndex(item => item.mobile === mobile);
       if (existingIndex !== -1) {
         const exist = entries[existingIndex];
         const typeLabel = exist.type === 'team' ? 'टीम साथी' : (exist.is_autoship ? 'ऑटोशिप ग्राहक' : 'किसान ग्राहक');
-        const doEdit = confirm(`यह मोबाइल नंबर (${mobile}) आपकी डायरी में पहले से "${exist.name}" (${typeLabel}) के रूप में दर्ज है!\n\nक्या आप इसे एडिट या नई श्रेणी में अपग्रेड करना चाहते हैं?`);
+        const doEdit = confirm(`⚠️ यह मोबाइल नंबर (${mobile}) आपकी डायरी में पहले से "${exist.name}" (${typeLabel}) के रूप में दर्ज है!\n\nक्या आप इसे एडिट या नई श्रेणी में अपग्रेड करना चाहते हैं?`);
         if (doEdit) {
           openEditCategoryModal(exist.id);
           return;
         }
       }
+
+      // 2. Check Khatabook for duplicates
+      try {
+        const kbList = getKbEntries();
+        const kbExist = kbList.find(k => k.customer_mobile === mobile);
+        if (kbExist) {
+          const doContinue = confirm(`ℹ️ यह मोबाइल नंबर (${mobile}) आपके बहीखाता में "${kbExist.customer_name}" के रूप में पहले से मौजूद है।\n\nक्या आप इसे टीम डायरी में भी जोड़ना चाहते हैं?`);
+          if (!doContinue) return;
+        }
+      } catch (_) {}
+
+      // 3. Check Direct Referrals (profiles) for duplicates
+      try {
+        let refList = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]');
+        const refExist = refList.find(r => (r.mobile === mobile || r.phone === mobile));
+        if (refExist) {
+          alert(`🤝 यह मोबाइल नंबर (${mobile}) आपकी डायरेक्ट टीम में साथी "${refExist.full_name || refExist.name}" (ID: ${refExist.share_id || ''}) के रूप में पहले से पंजीकृत है!`);
+        }
+      } catch (_) {}
 
       const newEntry = {
         id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
@@ -2465,15 +2485,29 @@
         }
       } catch (_) {}
 
-      // Asynchronously push to Supabase phonebook without blocking UI
+      // Asynchronously push to Supabase phonebook & surveys (Zero-Duplicate Pipeline XXIX)
       try {
         if (window.supabase && typeof window.supabase.createClient === 'function') {
           const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          const myShareId = getAppUserShareId() || 'AI000004';
+          const myProfileId = getAppUserProfileId() || null;
+
           client.from('phonebook').insert([{
             name: name,
             mobile: mobile,
             place: place || 'स्थानीय',
             source: 'smart_diary'
+          }]).then(() => {}).catch(() => {});
+
+          client.from('surveys').insert([{
+            name: name,
+            mobile: mobile,
+            occupation: currentEntityType === 'team' ? 'टीम साथी' : (currentEntityType === 'autoship' ? 'ऑटोशिप ग्राहक' : 'किसान ग्राहक'),
+            state: place || 'स्थानीय',
+            district: place || 'स्थानीय',
+            source: 'myteam_diary_entry',
+            referred_by: myShareId,
+            profile_id: myProfileId
           }]).then(() => {}).catch(() => {});
         }
       } catch (_) {}
@@ -3149,12 +3183,20 @@
   }
 
 
-  function openDiaryContactPicker(targetMode = 'main') {
+  let activePickerCategoryFilter = 'all';
+
+  function openDiaryContactPicker(targetMode = 'main', initialCategory = 'all') {
     currentPickerTarget = targetMode;
+    activePickerCategoryFilter = initialCategory || 'all';
     const modal = document.getElementById('diaryContactPickerModal');
     if (!modal) return;
     renderDiaryPickerList('');
     modal.style.display = 'flex';
+    try {
+      if (!window.history.state || window.history.state.modal !== 'diaryContactPickerModal') {
+        window.history.pushState({ modal: 'diaryContactPickerModal' }, '');
+      }
+    } catch (_) {}
 
     // Asynchronously fetch phonebook and direct referrals from Supabase to enrich list
     try {
@@ -3190,6 +3232,17 @@
   function closeDiaryContactPicker() {
     const modal = document.getElementById('diaryContactPickerModal');
     if (modal) modal.style.display = 'none';
+    try {
+      if (window.history.state && window.history.state.modal === 'diaryContactPickerModal') {
+        window.history.back();
+      }
+    } catch (_) {}
+  }
+
+  function switchPickerCategory(cat) {
+    activePickerCategoryFilter = cat;
+    const searchVal = document.getElementById('diaryPickerSearchInput')?.value || '';
+    renderDiaryPickerList(searchVal);
   }
 
   function filterDiaryPickerContacts(q) {
@@ -3285,6 +3338,10 @@
     const q = (query || '').toLowerCase().trim();
 
     const filtered = allContacts.filter(e => {
+      if (activePickerCategoryFilter === 'diary' && e.source !== 'diary' && e.source !== 'referral') return false;
+      if (activePickerCategoryFilter === 'phonebook' && e.source !== 'phonebook') return false;
+      if (activePickerCategoryFilter === 'khata' && e.source !== 'khata') return false;
+
       if (!q) return true;
       return (e.name && e.name.toLowerCase().includes(q)) ||
              (e.mobile && e.mobile.includes(q)) ||
@@ -3416,8 +3473,8 @@
         console.warn('Native contacts picker cancelled or not permitted:', err);
       }
     }
-    // Fallback: open Diary & Phonebook modal
-    openDiaryContactPicker(targetMode);
+    // Open Phonebook Modal
+    openDiaryContactPicker(targetMode, 'phonebook');
   }
 
   // 2. MARKETING HUB & 1-TAP AUTOMATION ENGINE (MATCHING SCREENSHOT)
@@ -5090,12 +5147,17 @@
     }).join('');
   }
 
-  // Open & Close Add Party Modal
+  // Open & Close Add Party Modal (With Hardware Back Button & Popstate Support)
   function openAddPartyModal() {
     const modal = document.getElementById('kbAddPartyModal');
     if (modal) {
       modal.style.display = 'flex';
       modal.classList.add('show');
+      try {
+        if (!window.history.state || window.history.state.modal !== 'kbAddPartyModal') {
+          window.history.pushState({ modal: 'kbAddPartyModal' }, '');
+        }
+      } catch (_) {}
       const mobileInput = document.getElementById('kbPartyMobile');
       if (mobileInput) {
         setTimeout(() => mobileInput.focus(), 120);
@@ -5106,6 +5168,11 @@
   function closeAddPartyModal() {
     const modal = document.getElementById('kbAddPartyModal');
     if (modal) modal.style.display = 'none';
+    try {
+      if (window.history.state && window.history.state.modal === 'kbAddPartyModal') {
+        window.history.back();
+      }
+    } catch (_) {}
   }
 
   // Handle Add Party Submit
@@ -5149,8 +5216,33 @@
     if (!exists) {
       entries.unshift(newEntry);
       saveKbEntries(entries);
-      // Note: Supabase khatabook_entries requires amount > 0, so initial party entry
-      // is stored locally and syncs to Supabase on the very first transaction.
+      
+      // Also sync to phonebook and surveys for zero-duplicate pipeline (Aarogyam Manas XXIX)
+      try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          const myShareId = getAppUserShareId() || 'AI000004';
+          const myProfileId = getAppUserProfileId() || null;
+          
+          client.from('phonebook').insert([{
+            name: name,
+            mobile: mobile,
+            place: place || 'स्थानीय',
+            source: 'khatabook_party'
+          }]).then(() => {}).catch(() => {});
+
+          client.from('surveys').insert([{
+            name: name,
+            mobile: mobile,
+            occupation: partyType === 'supplier' ? 'सप्लायर' : 'खाता ग्राहक',
+            state: place || 'स्थानीय',
+            district: place || 'स्थानीय',
+            source: 'khatabook_party',
+            referred_by: myShareId,
+            profile_id: myProfileId
+          }]).then(() => {}).catch(() => {});
+        }
+      } catch (_) {}
     }
 
     closeAddPartyModal();
@@ -6234,6 +6326,7 @@
     sendKhataStatementWhatsApp: sendKhataStatementWhatsApp,
     openDiaryContactPicker: openDiaryContactPicker,
     closeDiaryContactPicker: closeDiaryContactPicker,
+    switchPickerCategory: switchPickerCategory,
     filterDiaryPickerContacts: filterDiaryPickerContacts,
     selectContactFromDiary: selectContactFromDiary,
     handleMobileInputSanitize: handleMobileInputSanitize,

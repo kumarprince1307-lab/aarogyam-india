@@ -1,22 +1,13 @@
 /* ==========================================================================
-   AAROGYAM INDIA - MOBILE STICKY BOTTOM NAV & MOBILE HEADER CLEAN-UP
-   Inspired by modern mobile e-commerce (BigHaat, Flipkart, AgriBegri)
+   AAROGYAM INDIA - RETIRED MOBILE BOTTOM NAV (NEUTRALIZED FOR UNIVERSAL UNIFORMITY)
+   All pages now use universal-nav-drawer.css and universal-nav-drawer.js
    ========================================================================== */
 
-/* 1. Mobile Bottom Sticky Navigation Bar */
 .mobile-bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-top: 1.5px solid #e2e8f0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-  z-index: 9990;
-  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) 4px;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .mobile-bottom-nav-inner {

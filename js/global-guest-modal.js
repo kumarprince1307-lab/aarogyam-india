@@ -473,6 +473,28 @@
               existingProfile = data;
             }
 
+            // [Aarogyam Manas XXIX] Auto-Registration Pipeline from 'surveys'
+            if (!existingProfile) {
+              try {
+                const { data: survLead } = await db
+                  .from('surveys')
+                  .select('*')
+                  .eq('mobile', mobile)
+                  .order('created_at', { ascending: false })
+                  .limit(1)
+                  .maybeSingle();
+
+                if (survLead) {
+                  if (survLead.referred_by && (!sponsorShareId || sponsorShareId === 'AI000004')) {
+                    sponsorShareId = survLead.referred_by;
+                  }
+                  if (!officialName && survLead.name) {
+                    officialName = survLead.name;
+                  }
+                }
+              } catch (_) {}
+            }
+
             // Sponsor Lookup (100% Manas Compliant Dual Resolution & Zero-Null Rule)
             if (sponsorShareId && sponsorShareId !== 'AI000004') {
               try {
@@ -555,6 +577,14 @@
                 if (window.AarogyamWallet && typeof window.AarogyamWallet.creditPoints === 'function') {
                   window.AarogyamWallet.creditPoints(5, '🎁 स्वागत उपहार (5 पॉइंट्स)', 'welcome_bonus');
                 }
+              } catch (_) {}
+
+              // [Aarogyam Manas XXIX] Mark surveys record as converted/registered so data is unified
+              try {
+                await db.from('surveys').update({
+                  source: 'registered_profile',
+                  profile_id: userUniqueShareId
+                }).eq('mobile', mobile);
               } catch (_) {}
 
               // Play Audio Chime Sound
