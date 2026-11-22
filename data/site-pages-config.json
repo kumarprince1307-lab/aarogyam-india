@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795330604345,
+      "admin_edited": 1795333206745,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -3859,14 +3859,14 @@
       "status": "active",
       "theme_primary": "#0284c7",
       "theme_dark": "#00387b",
-      "ticker_text": "🍃 फलों-सब्जियों से कीटनाशक हटाने व केमिकल-फ्री क्लीनिंग गाइड",
+      "ticker_text": "🧹 घर की सफाई के नाम पर रोज़ इस्तेमाल होने वाले तेज़ केमिकल्स से बचें—अपनाएं सुरक्षित और समझदारी भरी क्लीनिंग।",
       "audio_title": "नेचुरल होम केयर व टॉक्सिन-मुक्त घर",
-      "audio_script": "नमस्ते {name} जी! होम केयर पेज पर आपका स्वागत है। घर को केमिकल-मुक्त, स्वच्छ व सुरक्षित रखने के इको-फ्रेंडली समाधान यहाँ उपलब्ध हैं।",
+      "audio_script": "नमस्ते {name} ji kya आपने कभी सोचा है कि घर को साफ रखने के लिए इस्तेमाल होने वाले तेज़ केमिकल्स हमारी त्वचा, सांस और बच्चों की सेहत को प्रभावित कर सकते हैं?\nसफाई जरूरी है, लेकिन सुरक्षित सफाई उससे भी ज्यादा जरूरी है।\nअब समय है ऐसी आदतें अपनाने का, जो घर को स्वच्छ रखें और अनावश्यक केमिकल्स के संपर्क को कम करें।\nआरोग्यम इंडिया के होम केयर पेज पर जानिए सुरक्षित सफाई, फल-सब्जियों की बेहतर धुलाई और प्राकृतिक विकल्पों के बारे में।\nस्वच्छ घर… सुरक्षित परिवार… यही है असली देखभाल!",
       "audio_url": "",
-      "og_title": "केमिकल-मुक्त सुरक्षित व स्वच्छ घर समाधान | Aarogyam India",
-      "og_image": "/images/banners/health-home-care.jpg",
-      "og_description": "फलों-सब्जियों से कीटनाशक हटाने व बायो-एंजाइम क्लीनिंग के 100% प्राकृतिक उपाय।",
-      "share_message": "",
+      "og_title": "केमिकल ज़हर से अपने घर और परिवार को कैसे बचाएँ? | Organic Home Care 🌿",
+      "og_image": "/images/banners/og_image-1003972043-948932-x0p4.webp",
+      "og_description": "क्या आपके घर की रोज़ाना सफाई में इस्तेमाल होने वाले केमिकल आपके परिवार की सेहत को प्रभावित कर सकते हैं? जानिए घर की सफाई, किचन, बाथरूम और फल-सब्जियों की सफाई के लिए सुरक्षित विकल्पों के बारे में। जागरूक बनें, बेहतर विकल्प चुनें और अपने परिवार के लिए स्वच्छ वातावरण बनाएं। Aarogyam India के साथ Organic Home Care की जानकारी प्राप्त करें।  Organic Home Care, Organic Cleaning Products, Chemical Free Home Cleaning, घर की सुरक्षित सफाई, जैविक सफाई उत्पाद, केमिकल से बचाव, फल सब्जी साफ करने का तरीका, Veggie Cleaner, Natural Home Cleaner, Kitchen Cleaning Products, Bathroom Cleaner, Family Health Protection, Aarogyam India Home Care",
+      "share_message": "🏠 क्या हमारा साफ-सुथरा घर वास्तव में सुरक्षित भी है?\n\nरोज़ इस्तेमाल होने वाले सफाई उत्पादों में मौजूद कुछ कठोर केमिकल हमारी त्वचा, आंखों और सांस के संपर्क में आकर परेशानी पैदा कर सकते हैं।\n\n🌿 अब समय है सफाई के बेहतर विकल्प जानने का।\nघर की सफाई हो या फल-सब्जियों की—सही उत्पाद चुनना बेहद जरूरी है।\nअपने परिवार की सुरक्षा और बेहतर जीवनशैली के लिए Organic Home Care के बारे में जानें।\n📲 जानकारी यहाँ देखें और जागरूकता फैलाएँ।\nAarogyam India 🌱\nस्वच्छ घर • सुरक्षित परिवार",
       "floating_banner": {
         "enabled": false,
         "image": "",
@@ -3878,12 +3878,45 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/farmer-community-banner.jpeg",
+          "image": "/images/banners/hero_slide-1003972046-033912-nm5w.webp",
           "tag": "🏡 होम केयर",
           "title": "नेचुरल होम केयर व टॉक्सिन-मुक्त घर",
           "subtitle": "केमिकल-मुक्त सुरक्षित व स्वच्छ वातावरण",
           "cta_text": "💬 होम केयर उत्पाद देखें",
           "cta_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/hero_slide-1003972045-042828-3g3w.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003972047-055762-bs4a.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003972044-061906-2a9w.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -3898,8 +3931,14 @@
       "kpi_cards": [],
       "marketing_cards": [],
       "videos": [],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [],
+      "ladder_header": null,
+      "career_ladder": [],
       "health_diseases": [],
       "crops": [],
       "pashu_cards": [],
@@ -3939,9 +3978,12 @@
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "टॉक्सिन-मुक्त घर: केमिकल के खतरे व प्राकृतिक विकल्प",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1795333206559_e6m2",
             "title": "❓ घर में छिपे खतरे क्या हैं? (Causes)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
             "points": [
@@ -3949,10 +3991,15 @@
               "<strong>एसिड युक्त फर्श व टॉयलेट क्लीनर:</strong> हानिकारक गैसें जो फेफड़ों को नुकसान पहुंचाती हैं।",
               "<strong>सिंथेटिक बर्तन धोने के बार:</strong> रासायनिक अवशेष जो भोजन के साथ पेट में जाते हैं।",
               "<strong>केमिकल रूम फ्रेशनर्स:</strong> अस्थमा व श्वसन संबंधी एलर्जी को बढ़ावा देना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1795333206559_kpgk",
             "title": "⚠️ अनदेखे खतरे व लक्षण (Symptoms)",
+            "badge": "",
             "color": "#2563eb",
             "image": "",
             "points": [
@@ -3960,20 +4007,29 @@
               "फर्श साफ करने के बाद आंखों व गले में जलन या तीखी गंध का अहसास।",
               "हाथों की त्वचा का रूखा होना, छिलना या एग्जिमा/डर्मेटाइटिस होना।",
               "पालतू जानवरों व रेंगने वाले बच्चों द्वारा रासायनिक फर्श चाटना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1795333206559_zcmj",
             "title": "🚨 दीर्घकालिक स्वास्थ्य खतरे (Risks)",
+            "badge": "",
             "color": "#dc2626",
             "image": "",
             "points": [
               "<strong>गंभीर श्वसन रोग (Asthma / COPD):</strong> जहरीले धुएं से फेफड़ों का कमजोर होना।",
               "<strong>हार्मोनल असंतुलन (Endocrine Disruptors):</strong> प्लास्टिक्स व हानिकारक केमिकल से विकार।",
               "<strong>कैंसर व न्यूरोलॉजिकल खतरे:</strong> कीटनाशकों के लंबे समय तक संपर्क से।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1795333206568,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
