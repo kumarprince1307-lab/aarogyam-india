@@ -3711,8 +3711,8 @@
       "url": "/health/kids-care.html",
       "category": "Healthcare Sub-page",
       "status": "active",
-      "theme_primary": "#d97706",
-      "theme_dark": "#8d2b00",
+      "theme_primary": "#06cddb",
+      "theme_dark": "#00818f",
       "ticker_text": "🌟 ब्राह्मी व शंखपुष्पी से तेज दिमाग, भूख सुधार व इम्युनिटी वृद्धि",
       "audio_title": "बच्चों का मानसिक व शारीरिक विकास",
       "audio_script": "नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।",
@@ -3886,7 +3886,7 @@
           }
         ]
       },
-      "admin_edited": 1795328963470,
+      "admin_edited": 1795329468996,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
