@@ -77,7 +77,7 @@
     rel="stylesheet">
 
   <!-- Universal Nav Drawer CSS & Home Revamp CSS -->
-  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v1">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v26_final">
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   <link rel="stylesheet" href="/css/smart-etailer.css?v=20261121_myteam_v3">
 
@@ -274,10 +274,10 @@
           </div>
         </div>
 
-        <!-- Need / Category Selector -->
+        <!-- Need / Category Selector (Multi-Select Supported) -->
         <div style="margin-bottom:14px;">
-          <label style="color:#0f172a; margin-bottom:6px;">
-            🌾 मुख्य आवश्यकता / रुचि (Category & Need):
+          <label style="color:#0f172a; margin-bottom:6px; font-weight:800; font-size:0.88rem;">
+            🌾 मुख्य आवश्यकता / रुचि (एक या अधिक चुनें):
           </label>
           <div style="display:flex; gap:8px; flex-wrap:wrap;" id="diaryNeedPillsWrap">
             <button type="button" class="status-pill-btn active" data-need="कृषि व फसल रोग"
@@ -294,7 +294,11 @@
             </button>
             <button type="button" class="status-pill-btn" data-need="डायरेक्ट बिज़नेस प्लान"
               onclick="window.AarogyamETailer.setNeedCategory('डायरेक्ट बिज़नेस प्लान')">
-              💼 बिज़नेस / पार्ट-टाइम आय
+              💼 नेट्सर्फ़ बिज़नेस
+            </button>
+            <button type="button" class="status-pill-btn" data-need="आरोग्यम टीम लीडर"
+              onclick="window.AarogyamETailer.setNeedCategory('आरोग्यम टीम लीडर')">
+              🏆 आरोग्यम टीम
             </button>
           </div>
         </div>
@@ -653,30 +657,52 @@
     </div>
   </div>
 
-  <!-- Modal: Diary Contact Picker -->
-  <div class="game-modal-overlay" id="diaryContactPickerModal"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; align-items:center; justify-content:center; padding:10px; box-sizing:border-box;">
+    <!-- Modal: Diary & Phonebook Contact Picker -->
+  <div class="game-modal-overlay" id="diaryContactPickerModal" onclick="if(event.target === this) { this.style.display='none'; if(window.AarogyamETailer && window.AarogyamETailer.closeDiaryContactPicker) window.AarogyamETailer.closeDiaryContactPicker(); }"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:10px; box-sizing:border-box;">
     <div
-      style="background:#ffffff; border:2px solid #bfdbfe; border-radius:14px; width:100%; max-width:480px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.4); font-family:inherit;">
+      style="background:#ffffff; border:2px solid #bfdbfe; border-radius:14px; width:100%; max-width:480px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,0.4); font-family:inherit; margin:auto;">
+      
+      <!-- Blue Header with Red Cross Close -->
       <div
         style="background:#0052cc; color:#fff; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0; font-size:1.05rem; font-weight:900; color:#ffffff;">📖 डायरी से संपर्क चुनें</h3>
-        <button type="button" onclick="window.AarogyamETailer.closeDiaryContactPicker()"
-          style="background:none; border:none; color:#fff; font-size:1.3rem; font-weight:900; cursor:pointer;">✕</button>
-      </div>
-      <div style="padding:10px 14px; border-bottom:1px solid #e2e8f0; background:#f8fafc; display:flex; flex-direction:column; gap:8px;">
-        <div style="display:flex; gap:6px; overflow-x:auto;">
-          <button type="button" onclick="window.AarogyamETailer.switchPickerCategory('all')" style="background:#0052cc; color:#fff; border:none; padding:5px 10px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">👥 सभी संपर्क</button>
-          <button type="button" onclick="window.AarogyamETailer.switchPickerCategory('diary')" style="background:#eff6ff; color:#0052cc; border:1px solid #bfdbfe; padding:5px 10px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">📖 मेरी डायरी व टीम</button>
-          <button type="button" onclick="window.AarogyamETailer.switchPickerCategory('phonebook')" style="background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; padding:5px 10px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">📱 फ़ोन बुक</button>
-          <button type="button" onclick="window.AarogyamETailer.switchPickerCategory('khata')" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; padding:5px 10px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">📕 बहीखाता</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">📖</span>
+          <h3 style="margin:0; font-size:1.05rem; font-weight:900; color:#ffffff;">डायरी व फ़ोन बुक संपर्क</h3>
         </div>
-        <input type="text" id="diaryPickerSearchInput" placeholder="नाम या नंबर से खोजें..."
-          oninput="window.AarogyamETailer.filterDiaryPickerContacts(this.value)"
-          style="width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; color:#0f172a; font-weight:700; box-sizing:border-box;">
+        <button type="button" onclick="document.getElementById('diaryContactPickerModal').style.display='none'; if(window.AarogyamETailer && window.AarogyamETailer.closeDiaryContactPicker) window.AarogyamETailer.closeDiaryContactPicker();"
+          style="background:#dc2626; border:none; color:#ffffff; font-size:1.15rem; font-weight:900; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(220,38,38,0.4);" title="बंद करें">✕</button>
       </div>
+
+      <!-- Category Filter Tabs -->
+      <div style="padding:10px 14px 6px 14px; border-bottom:1px solid #e2e8f0; background:#f8fafc; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch;" id="diaryPickerCategoryTabs">
+          <button type="button" id="tabPickAll" onclick="window.AarogyamETailer.switchPickerCategory('all')" style="background:#0052cc; color:#fff; border:none; padding:6px 11px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">👥 सभी संपर्क</button>
+          <button type="button" id="tabPickDiary" onclick="window.AarogyamETailer.switchPickerCategory('diary')" style="background:#eff6ff; color:#0052cc; border:1px solid #bfdbfe; padding:6px 11px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">📖 मेरी डायरी व टीम</button>
+          <button type="button" id="tabPickPhonebook" onclick="window.AarogyamETailer.switchPickerCategory('phonebook')" style="background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; padding:6px 11px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">📱 फ़ोन बुक</button>
+          <button type="button" id="tabPickKhata" onclick="window.AarogyamETailer.switchPickerCategory('khata')" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; padding:6px 11px; border-radius:14px; font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap;">📕 बहीखाता</button>
+        </div>
+
+        <!-- Phonebook Quick Actions Bar (Native Picker & CSV/VCF Upload) -->
+        <div style="display:flex; gap:6px;">
+          <button type="button" onclick="window.AarogyamETailer.pickDeviceContacts()" style="flex:1; background:#ffffff; color:#0f172a; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px 8px; font-size:0.74rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+            <span>📱</span> <span>फ़ोन से चुनें</span>
+          </button>
+          <button type="button" onclick="document.getElementById('diaryVcfFileInput').click()" style="flex:1; background:#ffffff; color:#0f172a; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px 8px; font-size:0.74rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+            <span>📤</span> <span>CSV / VCF अपलोड</span>
+          </button>
+          <input type="file" id="diaryVcfFileInput" accept=".vcf,.csv,text/csv,text/vcard" style="display:none;" onchange="window.AarogyamETailer.handleVcfFileImport(this)">
+        </div>
+
+        <!-- Search Input -->
+        <input type="text" id="diaryPickerSearchInput" placeholder="नाम, मोबाइल या गाँव से खोजें..."
+          oninput="window.AarogyamETailer.filterDiaryPickerContacts(this.value)"
+          style="width:100%; padding:9px 12px; border-radius:8px; border:1.5px solid #cbd5e1; background:#ffffff; color:#0f172a; font-weight:700; font-size:0.88rem; box-sizing:border-box; outline:none;">
+      </div>
+
+      <!-- Contact Items List (Scrollable) -->
       <div id="diaryPickerContactsList"
-        style="flex:1; overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:8px; background:#ffffff;"></div>
+        style="flex:1; overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:8px; background:#f8fafc; -webkit-overflow-scrolling:touch;"></div>
     </div>
   </div>
 
@@ -709,9 +735,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase.js?v=20261101_v300_production_final"></script>
   <script src="/session.js?v=20261101_v300_production_final"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261122_v1"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261122_v26_final"></script>
   <script src="/js/audio-greeting-engine.js?v=20261121_myteam_v2"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261121_myteam_v4"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261122_v26_final"></script>
   <script src="/js/myteam-tour.js?v=20261121_v21"></script>
 </body>
 </html>
