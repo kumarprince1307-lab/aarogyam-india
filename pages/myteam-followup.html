@@ -75,7 +75,7 @@
     rel="stylesheet">
 
   <!-- Universal Nav Drawer CSS & Home Revamp CSS -->
-  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v26_final">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v35_final">
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   <link rel="stylesheet" href="/css/smart-etailer.css?v=20261121_myteam_v2">
 
@@ -107,6 +107,9 @@
       } catch (_) { }
     })();
   </script>
+  <style>
+    .universal-sticky-dock-bar { display: none !important; }
+  </style>
 </head>
 
 <body class="light-theme">
@@ -278,11 +281,16 @@
                   <select id="hubMainSubjectSelect"
                     style="width:100%; margin:0; padding:10px 12px; background:#ffffff; color:#0f172a; font-weight:800; border:1.5px solid #86efac; border-radius:8px; outline:none; font-size:0.88rem;"
                     onchange="window.AarogyamETailer.handleMainSubjectChange(this.value)">
-                    <option value="crop_doctor">🌾 फसल डॉक्टर व जैविक उत्पाद (Biofit)</option>
+                    <option value="crop_doctor">🌾 कृषि व फसल सुरक्षा (Biofit)</option>
+                    <option value="health_wellness">🩺 स्वास्थ्य, पोषण व रोग मुक्ति (Naturamore)</option>
+                    <option value="beauty_care">💄 महिला सौंदर्य व स्किनकेयर (Herbs & More)</option>
+                    <option value="pashupalan">🐄 पशुपालन, दूध व फैट वृद्धि (Pet-Vet CFC)</option>
+                    <option value="all_products">🌐 सभी उत्पाद (All Products Catalog)</option>
                     <option value="tube_videos">🎥 आरोग्यम ट्यूब किसान वीडियो</option>
                     <option value="web_pages">🌐 आरोग्यम वेब पेजेस व टूल्स</option>
-                    <option value="suvichar">☀️ सुविचार व मोटिवेशन (GM, GN, प्रेरक)</option>
+                    <option value="suvichar">☀️ सुविचार व प्रेरणा संदेश</option>
                     <option value="autoship_rem">🎁 6-महीने ऑटोशिप रिमाइंडर</option>
+                    <option value="khata_due">💳 बहीखाता बकाया हिसाब रिमाइंडर</option>
                   </select>
                 </div>
                 <div>
@@ -352,39 +360,31 @@
             </div>
 
 
-            <!-- 1-Tap Action Buttons (Dark Green & Dark Blue, Sharp White Text, Zero Shadow) -->
+            <!-- 1-Tap Action Buttons (Clean Responsive 2x2 Grid, Zero Text Duplication) -->
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <button type="button" id="btnHubSendWa" onclick="window.AarogyamETailer.sendAndNext('whatsapp')"
-                  style="padding:14px 10px !important; font-weight:900 !important; background:#15803d !important; color:#ffffff !important; border:none !important; border-radius:10px !important; font-size:1.0rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; text-shadow:none !important; box-shadow:0 4px 14px rgba(21,128,61,0.45) !important;">
-                  <i class="fa-brands fa-whatsapp" style="font-size:1.25rem;"></i> <span>WhatsApp & Next ➔</span>
-                  <i class="fa-brands fa-whatsapp" style="font-size:1.25rem; color:#ffffff !important;"></i> <span
-                    style="color:#ffffff !important; font-weight:900 !important; text-shadow:none !important;">WhatsApp
-                    & Next ➔</span>
+                  style="padding:13px 8px !important; font-weight:900 !important; background:#15803d !important; color:#ffffff !important; border:none !important; border-radius:10px !important; font-size:0.95rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; text-shadow:none !important; box-shadow:0 4px 14px rgba(21,128,61,0.4) !important;">
+                  <i class="fa-brands fa-whatsapp" style="font-size:1.25rem; color:#ffffff !important;"></i>
+                  <span style="color:#ffffff !important; font-weight:900 !important;">WhatsApp & Next ➔</span>
                 </button>
                 <button type="button" id="btnHubSendSms" onclick="window.AarogyamETailer.sendAndNext('sms')"
-                  style="padding:14px 10px !important; font-weight:900 !important; background:#0369a1 !important; color:#ffffff !important; border:none !important; border-radius:10px !important; font-size:1.0rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; text-shadow:none !important; box-shadow:0 4px 14px rgba(3,105,161,0.45) !important;">
-                  <i class="fa-solid fa-comment-sms" style="font-size:1.25rem;"></i> <span>SMS & Next ➔</span>
-                  <i class="fa-solid fa-comment-sms" style="font-size:1.25rem; color:#ffffff !important;"></i> <span
-                    style="color:#ffffff !important; font-weight:900 !important; text-shadow:none !important;">SMS &
-                    Next ➔</span>
+                  style="padding:13px 8px !important; font-weight:900 !important; background:#0369a1 !important; color:#ffffff !important; border:none !important; border-radius:10px !important; font-size:0.95rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; text-shadow:none !important; box-shadow:0 4px 14px rgba(3,105,161,0.4) !important;">
+                  <i class="fa-solid fa-comment-sms" style="font-size:1.25rem; color:#ffffff !important;"></i>
+                  <span style="color:#ffffff !important; font-weight:900 !important;">SMS & Next ➔</span>
                 </button>
               </div>
 
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <button type="button" onclick="window.AarogyamETailer.callAndRemarkActiveTarget()"
-                  style="padding:12px 10px !important; font-weight:900 !important; background:#b45309 !important; color:#ffffff !important; border:none !important; border-radius:8px !important; font-size:0.90rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; text-shadow:none !important;">
-                  <i class="fa-solid fa-phone"></i> <span>कॉल & रिमार्क</span>
-                  <i class="fa-solid fa-phone" style="color:#ffffff !important;"></i> <span
-                    style="color:#ffffff !important; font-weight:900 !important; text-shadow:none !important;">कॉल &
-                    रिमार्क</span>
+                  style="padding:12px 8px !important; font-weight:900 !important; background:#b45309 !important; color:#ffffff !important; border:none !important; border-radius:8px !important; font-size:0.88rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; text-shadow:none !important;">
+                  <i class="fa-solid fa-phone" style="color:#ffffff !important;"></i>
+                  <span style="color:#ffffff !important; font-weight:900 !important;">कॉल & रिमार्क</span>
                 </button>
                 <button type="button" onclick="window.AarogyamETailer.skipToNextTarget()"
-                  style="padding:12px 10px !important; font-weight:900 !important; background:#f1f5f9 !important; color:#0f172a !important; border:2px solid #cbd5e1 !important; border-radius:8px !important; font-size:0.90rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; text-shadow:none !important;">
-                  <i class="fa-solid fa-forward"></i> <span>छोड़ें (Next)</span>
-                  <i class="fa-solid fa-forward" style="color:#0f172a !important;"></i> <span
-                    style="color:#0f172a !important; font-weight:900 !important; text-shadow:none !important;">छोड़ें
-                    (Next)</span>
+                  style="padding:12px 8px !important; font-weight:900 !important; background:#f1f5f9 !important; color:#0f172a !important; border:2px solid #cbd5e1 !important; border-radius:8px !important; font-size:0.88rem !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; text-shadow:none !important;">
+                  <i class="fa-solid fa-forward" style="color:#0f172a !important;"></i>
+                  <span style="color:#0f172a !important; font-weight:900 !important;">छोड़ें (Next)</span>
                 </button>
               </div>
             </div>
@@ -392,37 +392,42 @@
 
           </div>
 
-          <!-- Follow-up Category Filter Pills -->
+          <!-- Follow-up Category Filter Pills (Responsive Touch Scroll) -->
           <div
-            style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px; -webkit-overflow-scrolling:touch;">
+            style="display:flex; gap:8px; overflow-x:auto; padding:4px 2px 10px 2px; margin-bottom:12px; -webkit-overflow-scrolling:touch;">
             <button type="button" class="status-pill-btn active" data-fu-filter="all"
-              onclick="window.AarogyamETailer.setFollowupFilter('all')">
+              onclick="window.AarogyamETailer.setFollowupFilter('all')"
+              style="white-space:nowrap !important; flex-shrink:0 !important; padding:8px 14px !important; border-radius:20px !important; font-size:0.82rem !important; font-weight:800 !important; cursor:pointer;">
               👥 सभी फॉलो-अप
             </button>
             <button type="button" class="status-pill-btn" data-fu-filter="customer"
-              onclick="window.AarogyamETailer.setFollowupFilter('customer')">
+              onclick="window.AarogyamETailer.setFollowupFilter('customer')"
+              style="white-space:nowrap !important; flex-shrink:0 !important; padding:8px 14px !important; border-radius:20px !important; font-size:0.82rem !important; font-weight:800 !important; cursor:pointer;">
               🌾 किसान ग्राहक
             </button>
             <button type="button" class="status-pill-btn" data-fu-filter="prospect"
-              onclick="window.AarogyamETailer.setFollowupFilter('prospect')">
+              onclick="window.AarogyamETailer.setFollowupFilter('prospect')"
+              style="white-space:nowrap !important; flex-shrink:0 !important; padding:8px 14px !important; border-radius:20px !important; font-size:0.82rem !important; font-weight:800 !important; cursor:pointer;">
               1️⃣ नया प्रोस्पेक्ट
             </button>
             <button type="button" class="status-pill-btn" data-fu-filter="joined"
-              onclick="window.AarogyamETailer.setFollowupFilter('joined')">
+              onclick="window.AarogyamETailer.setFollowupFilter('joined')"
+              style="white-space:nowrap !important; flex-shrink:0 !important; padding:8px 14px !important; border-radius:20px !important; font-size:0.82rem !important; font-weight:800 !important; cursor:pointer;">
               2️⃣ नई जॉइनिंग
             </button>
             <button type="button" class="status-pill-btn" data-fu-filter="active"
-              onclick="window.AarogyamETailer.setFollowupFilter('active')">
+              onclick="window.AarogyamETailer.setFollowupFilter('active')"
+              style="white-space:nowrap !important; flex-shrink:0 !important; padding:8px 14px !important; border-radius:20px !important; font-size:0.82rem !important; font-weight:800 !important; cursor:pointer;">
               3️⃣ सक्रिय साथी
             </button>
             <button type="button" class="status-pill-btn" data-fu-filter="core"
-              onclick="window.AarogyamETailer.setFollowupFilter('core')">
+              onclick="window.AarogyamETailer.setFollowupFilter('core')"
+              style="white-space:nowrap !important; flex-shrink:0 !important; padding:8px 14px !important; border-radius:20px !important; font-size:0.82rem !important; font-weight:800 !important; cursor:pointer;">
               4️⃣ कोर लीडर
             </button>
           </div>
 
-          <!-- Dynamic Followup Cards List Container -->
-          <div id="diaryFollowupList" style="display:flex; flex-direction:column; gap:8px;">
+          <div id="diaryFollowupList" <div id="diaryFollowupList" style="display:flex; flex-direction:column; gap:8px;">
             <!-- Dynamically populated via JS -->
           </div>
 
@@ -834,9 +839,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase.js?v=20261101_v300_production_final"></script>
   <script src="/session.js?v=20261101_v300_production_final"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261122_v26_final"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261122_v35_final"></script>
   <script src="/js/audio-greeting-engine.js?v=20261121_myteam_v2"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261122_v26_final"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261122_v35_final"></script>
   <script src="/js/myteam-tour.js?v=20261121_v21"></script>
 </body>
 </html>

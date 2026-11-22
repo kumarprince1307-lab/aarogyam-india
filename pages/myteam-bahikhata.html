@@ -77,7 +77,7 @@
     rel="stylesheet">
 
   <!-- Universal Nav Drawer CSS & Home Revamp CSS -->
-  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v26_final">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v35_final">
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   <link rel="stylesheet" href="/css/smart-etailer.css?v=20261121_myteam_v4">
 
@@ -109,6 +109,9 @@
       } catch (_) { }
     })();
   </script>
+  <style>
+    .universal-sticky-dock-bar { display: none !important; }
+  </style>
 </head>
 
 <body class="light-theme">
@@ -213,7 +216,7 @@
 
       <!-- Customer Cards List (Rendered dynamically by JS) -->
       <div id="kbCustomerList" style="background:#ffffff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04); min-height:140px; margin-bottom:20px;">
-        <!-- Populated dynamically via smart-etailer-engine.js?v=20261122_v26_final -->
+        <!-- Populated dynamically via smart-etailer-engine.js?v=20261122_v35_final -->
       </div>
 
       <!-- Red Brand Card: All Text Pure White -->
@@ -255,7 +258,7 @@
       </button>
 
 
-<div class="game-modal-overlay" id="kbAddPartyModal" onclick="if(event.target === this) { this.style.display='none'; }" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; overflow-y:auto;">
+<div class="game-modal-overlay" id="kbAddPartyModal" onclick="if(event.target === this) { this.style.display='none'; }" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000000000; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; overflow-y:auto;">
     <div style="width:calc(100vw - 20px); max-width:440px; max-height:90vh; overflow-y:auto; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,0.45); font-family:inherit; box-sizing:border-box; margin:auto;">
       
       <!-- Royal Blue Header with BOTH Back Arrow & Bold Red Cross ✕ Button -->
@@ -366,7 +369,7 @@
   <!-- =============================================================
        KHATABOOK PRO MODAL 2: ग्राहक लेज़र पासबुक (CUSTOMER DETAIL PASSBOOK)
   ============================================================== -->
-  <div class="game-modal-overlay" id="kbCustomerLedgerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999999; align-items:center; justify-content:center; padding:12px;">
+  <div class="game-modal-overlay" id="kbCustomerLedgerModal" onclick="if(event.target === this) { this.style.display='none'; }" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000000000; align-items:center; justify-content:center; padding:12px;">
     <div style="max-width:540px; width:100%; height:92vh; background:#ffffff; border-radius:16px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 16px 40px rgba(0,0,0,0.4); font-family:inherit;">
       
       <!-- Top Royal Blue Header -->
@@ -384,6 +387,7 @@
             <span id="kbLedgerHeaderSub" style="font-size:0.72rem; color:#bfdbfe;">सेटिंग्स देखें</span>
           </div>
         </div>
+        <button type="button" onclick="document.getElementById('kbCustomerLedgerModal').style.display='none'; if(window.AarogyamETailer && window.AarogyamETailer.closeCustomerLedgerModal) window.AarogyamETailer.closeCustomerLedgerModal();" ontouchend="document.getElementById('kbCustomerLedgerModal').style.display='none'; event.preventDefault();" style="background:#dc2626 !important; border:none !important; color:#ffffff !important; font-size:1.3rem !important; font-weight:900 !important; width:38px !important; height:38px !important; border-radius:50% !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; flex-shrink:0 !important; box-shadow:0 3px 10px rgba(220,38,38,0.5) !important;" title="बंद करें (Close)">✕</button>
 
         <div style="display:flex; align-items:center; gap:6px;">
           <button type="button" onclick="window.AarogyamETailer.openEditPartyModal()" style="background:rgba(255,255,255,0.2); border:none; color:#ffffff; padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:900; cursor:pointer;" title="पार्टी एडिट करें">
@@ -449,13 +453,16 @@
   <!-- =============================================================
        KHATABOOK PRO MODAL 3: लेन-देन एंट्री + इन-बिल्ट कैलकुलेटर
   ============================================================== -->
-  <div class="game-modal-overlay" id="kbAddTxModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000000; align-items:center; justify-content:center; padding:10px;">
+  <div class="game-modal-overlay" id="kbAddTxModal" onclick="if(event.target === this) { this.style.display='none'; }" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000000000; align-items:center; justify-content:center; padding:10px;">
     <div style="max-width:440px; width:100%; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,0.4); font-family:inherit;">
       
       <!-- Top Dynamic Header (Red for GAVE, Green for GOT) -->
-      <div id="kbTxModalHeader" style="background:#be123c; color:#ffffff; padding:12px 16px; display:flex; align-items:center; gap:10px;">
-        <button type="button" onclick="window.AarogyamETailer.closeAddTxModal()" style="background:none; border:none; color:#ffffff; font-size:1.3rem; cursor:pointer; padding:0; display:flex; align-items:center;">←</button>
-        <h3 id="kbTxModalTitle" style="margin:0; font-size:1.02rem; font-weight:900; color:#ffffff;">आपने Aarogyam को दिए</h3>
+      <div id="kbTxModalHeader" style="background:#be123c; color:#ffffff; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button type="button" onclick="document.getElementById('kbAddTxModal').style.display='none'; if(window.AarogyamETailer && window.AarogyamETailer.closeAddTxModal) window.AarogyamETailer.closeAddTxModal();" ontouchend="document.getElementById('kbAddTxModal').style.display='none'; event.preventDefault();" style="background:rgba(255,255,255,0.2); border:none; color:#ffffff; font-size:1.2rem; width:34px; height:34px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">←</button>
+          <h3 id="kbTxModalTitle" style="margin:0; font-size:1.02rem; font-weight:900; color:#ffffff;">लेन-देन दर्ज करें</h3>
+        </div>
+        <button type="button" onclick="document.getElementById('kbAddTxModal').style.display='none'; if(window.AarogyamETailer && window.AarogyamETailer.closeAddTxModal) window.AarogyamETailer.closeAddTxModal();" ontouchend="document.getElementById('kbAddTxModal').style.display='none'; event.preventDefault();" style="background:#dc2626 !important; border:none !important; color:#ffffff !important; font-size:1.25rem !important; font-weight:900 !important; width:36px !important; height:36px !important; border-radius:50% !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; flex-shrink:0 !important; box-shadow:0 3px 10px rgba(220,38,38,0.5) !important;" title="बंद करें (Close)">✕</button>
       </div>
 
       <!-- Form Inputs & Keypad -->
@@ -1048,9 +1055,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase.js?v=20261101_v300_production_final"></script>
   <script src="/session.js?v=20261101_v300_production_final"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261122_v26_final"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261122_v35_final"></script>
   <script src="/js/audio-greeting-engine.js?v=20261121_myteam_v2"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261122_v26_final"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261122_v35_final"></script>
   <script src="/js/myteam-tour.js?v=20261121_v21"></script>
 </body>
 </html>

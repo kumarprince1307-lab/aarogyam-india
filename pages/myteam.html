@@ -77,7 +77,7 @@
     rel="stylesheet">
 
   <!-- Universal Nav Drawer CSS & Home Revamp CSS -->
-  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v26_final">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v35_final">
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   <link rel="stylesheet" href="/css/smart-etailer.css?v=20261121_myteam_v3">
 
@@ -109,6 +109,9 @@
       } catch (_) { }
     })();
   </script>
+  <style>
+    .universal-sticky-dock-bar { display: none !important; }
+  </style>
 </head>
 
 
@@ -291,6 +294,14 @@
             <button type="button" class="status-pill-btn" data-need="स्वास्थ्य व पोषण"
               onclick="window.AarogyamETailer.setNeedCategory('स्वास्थ्य व पोषण')">
               🩺 स्वास्थ्य व पोषण
+            </button>
+            <button type="button" class="status-pill-btn" data-need="महिला सौंदर्य व स्किनकेयर"
+              onclick="window.AarogyamETailer.setNeedCategory('महिला सौंदर्य व स्किनकेयर')">
+              💄 सौंदर्य / स्किनकेयर
+            </button>
+            <button type="button" class="status-pill-btn" data-need="सभी जैविक उत्पाद"
+              onclick="window.AarogyamETailer.setNeedCategory('सभी जैविक उत्पाद')">
+              🌐 सभी उत्पाद (All)
             </button>
             <button type="button" class="status-pill-btn" data-need="डायरेक्ट बिज़नेस प्लान"
               onclick="window.AarogyamETailer.setNeedCategory('डायरेक्ट बिज़नेस प्लान')">
@@ -735,9 +746,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase.js?v=20261101_v300_production_final"></script>
   <script src="/session.js?v=20261101_v300_production_final"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261122_v26_final"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261122_v35_final"></script>
   <script src="/js/audio-greeting-engine.js?v=20261121_myteam_v2"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261122_v26_final"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261122_v35_final"></script>
   <script src="/js/myteam-tour.js?v=20261121_v21"></script>
 </body>
 </html>

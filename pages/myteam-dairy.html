@@ -56,7 +56,7 @@
     rel="stylesheet">
 
   <!-- Universal Nav Drawer CSS & Home Revamp CSS -->
-  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v26_final">
+  <link rel="stylesheet" href="/css/universal-nav-drawer.css?v=20261122_v35_final">
   <link rel="stylesheet" href="/css/home-revamp.css?v=1.1">
   <link rel="stylesheet" href="/css/smart-etailer.css?v=20261121_myteam_v2">
 
@@ -134,6 +134,9 @@
     .myteam-quick-card:active {
       transform: scale(0.98);
     }
+  </style>
+  <style>
+    .universal-sticky-dock-bar { display: none !important; }
   </style>
 </head>
 
@@ -218,8 +221,52 @@
         </div>
       </div>
 
-      <!-- TAB 5 CORE: AUTOSHIP RADAR & CASHFLOW -->
+      <!-- TAB 5 CORE: DIRECT TEAM & DIARY WORKBENCH -->
       <section id="tab-diary-autoship" class="tab-pane" style="display:block;">
+
+        <!-- 1. DIRECT TEAM SECTION (मेरी डायरेक्ट टीम साथी) -->
+        <div class="smart-form-card" style="background:#ffffff; border:1.5px solid #bfdbfe; border-radius:12px; padding:14px; margin-bottom:16px; box-shadow:0 3px 12px rgba(0,82,204,0.06);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <div>
+              <h3 style="margin:0; font-size:1.15rem; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                <span>🤝</span> <span>मेरी डायरेक्ट टीम साथी (Direct Referrals)</span>
+              </h3>
+              <p style="margin:3px 0 0 0; font-size:0.78rem; color:#475569; font-weight:600;">
+                आपकी शेयर आईडी से सीधे जुड़े साथी — 1-क्लिक कॉल, WhatsApp व बहीखाता सुविधा
+              </p>
+            </div>
+            <button type="button" onclick="window.AarogyamETailer.openDiaryContactPicker('main', 'diary')" style="background:#eff6ff; color:#0052cc; border:1.5px solid #bfdbfe; font-weight:900; padding:6px 12px; border-radius:20px; font-size:0.78rem; cursor:pointer;">
+              📖 संपर्क विंडो खोलें
+            </button>
+          </div>
+
+          <!-- Direct Team Cards Grid -->
+          <div id="directTeamCardsList" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+            <div style="text-align:center; padding:20px; color:#64748b; font-size:0.84rem;">
+              ⏳ टीम साथी लोड हो रहे हैं...
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. LOCAL DIARY CONTACTS & LEADS SECTION -->
+        <div class="smart-form-card" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:12px; padding:14px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <div>
+              <h3 style="margin:0; font-size:1.10rem; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                <span>📖</span> <span>मेरी डायरी प्रविष्टियाँ (Local Diary & Leads)</span>
+              </h3>
+              <span style="font-size:0.78rem; color:#475569; font-weight:600;">आपके द्वारा दर्ज किसान, ग्राहक व संभावनाएं</span>
+            </div>
+            <a href="/pages/myteam.html" style="background:#16a34a; color:#ffffff; font-weight:900; text-decoration:none; padding:6px 14px; border-radius:20px; font-size:0.78rem; display:inline-flex; align-items:center; gap:4px;">
+              <span>➕</span> <span>नई एंट्री</span>
+            </a>
+          </div>
+
+          <div id="diaryEntriesCardsList" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
 
         <!-- Autoship Header -->
         <div class="smart-form-card"
@@ -670,9 +717,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/supabase.js?v=20261101_v300_production_final"></script>
   <script src="/session.js?v=20261101_v300_production_final"></script>
-  <script src="/js/universal-nav-drawer.js?v=20261122_v26_final"></script>
+  <script src="/js/universal-nav-drawer.js?v=20261122_v35_final"></script>
   <script src="/js/audio-greeting-engine.js?v=20261121_myteam_v2"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261122_v26_final"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261122_v35_final"></script>
   <script src="/js/myteam-tour.js?v=20261121_v21"></script>
 </body>
 </html>

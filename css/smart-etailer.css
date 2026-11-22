@@ -1921,8 +1921,13 @@ body.light-theme .game-modal-card label {
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   transition: all 0.15s;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
 }
 .status-pill-btn.active {
   background: rgba(56, 189, 248, 0.2);

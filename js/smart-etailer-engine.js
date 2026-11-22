@@ -478,6 +478,7 @@
       renderTodoPlanner();
     } else if (tabId === 'tab-diary-autoship') {
       renderAutoshipTracker();
+      renderDirectTeamCards();
       renderGrowthProjection();
       renderCashflowSummary();
     } else if (tabId === 'tab-survey') {
@@ -1069,6 +1070,143 @@
   // -------------------------------------------------------------
   // 10. TAB 3: AUTOSHIP 6TH MONTH RADAR
   // -------------------------------------------------------------
+  
+  // Render Direct Team Members (मेरी डायरेक्ट टीम साथी) on My Team Dairy Page
+  function renderDirectTeamCards() {
+    const teamWrap = document.getElementById('directTeamCardsList');
+    const diaryWrap = document.getElementById('diaryEntriesCardsList');
+
+    const myShareId = getAppUserShareId();
+    const myMob = getUserMobile();
+
+    // 1. Fetch from Supabase profiles & surveys
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const filters = [];
+        if (myShareId) filters.push(`referred_by.eq.${myShareId}`);
+        if (myMob) {
+          filters.push(`referred_by.eq.${myMob}`);
+          filters.push(`referred_by.eq.AI${myMob.slice(-6)}`);
+        }
+        const filterStr = filters.join(',');
+
+        if (filterStr) {
+          client.from('profiles').select('id, full_name, mobile, place, share_id, referred_by, created_at').or(filterStr).order('created_at', { ascending: false }).limit(200).then(({ data }) => {
+            if (data && data.length > 0) {
+              localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(data));
+              renderTeamCardsHtml(data);
+            } else {
+              renderCachedOrEmptyTeam();
+            }
+          }).catch(() => {
+            renderCachedOrEmptyTeam();
+          });
+        } else {
+          renderCachedOrEmptyTeam();
+        }
+      } else {
+        renderCachedOrEmptyTeam();
+      }
+    } catch (_) {
+      renderCachedOrEmptyTeam();
+    }
+
+    // 2. Render Local Diary Leads into #diaryEntriesCardsList
+    if (diaryWrap) {
+      const localEntries = getLocalDiaryEntries();
+      if (!localEntries || localEntries.length === 0) {
+        diaryWrap.innerHTML = `
+          <div style="text-align:center; padding:18px; color:#64748b; font-size:0.84rem; background:#f8fafc; border-radius:8px; border:1px dashed #cbd5e1;">
+            📭 वर्तमान में कोई लोकल डायरी प्रविष्टि दर्ज नहीं है। ऊपर '➕ नई एंट्री' से नया संपर्क जोड़ें!
+          </div>
+        `;
+      } else {
+        diaryWrap.innerHTML = localEntries.slice(0, 50).map(e => `
+          <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <strong style="color:#0f172a; font-size:0.96rem; display:block;">${e.name}</strong>
+              <span style="font-size:0.76rem; color:#64748b; font-weight:600;">📱 ${e.mobile} • 📍 ${e.place || 'स्थानीय'} • 🌾 ${e.need || 'सामान्य'}</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" onclick="window.AarogyamETailer.directFillToKhataForm('${e.mobile}')" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; padding:5px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+                📕 खाता
+              </button>
+              <button type="button" onclick="window.open('https://api.whatsapp.com/send?phone=91${e.mobile}', '_blank')" style="background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; padding:5px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+                💬 WhatsApp
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  }
+
+  function renderCachedOrEmptyTeam() {
+    let cached = [];
+    try { cached = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]'); } catch (_) { }
+    if (!cached.length) {
+      try { cached = JSON.parse(localStorage.getItem('AOI_DIRECT_REFERRALS_LEDGER') || '[]'); } catch (_) { }
+    }
+    renderTeamCardsHtml(cached);
+  }
+
+  function renderTeamCardsHtml(teamList) {
+    const teamWrap = document.getElementById('directTeamCardsList');
+    if (!teamWrap) return;
+
+    if (!teamList || teamList.length === 0) {
+      const myShareId = getAppUserShareId();
+      teamWrap.innerHTML = `
+        <div style="text-align:center; padding:24px 14px; background:#f8fafc; border:1.5px dashed #bfdbfe; border-radius:10px; color:#475569;">
+          <div style="font-size:2rem; margin-bottom:6px;">🤝</div>
+          <strong style="color:#0f172a; font-size:0.98rem; display:block; margin-bottom:4px;">अभी कोई डायरेक्ट टीम साथी पंजीकृत नहीं है</strong>
+          <span style="font-size:0.78rem; color:#64748b; display:block; margin-bottom:12px;">
+            अपनी रेफरल शेयर आईडी (<strong>${myShareId}</strong>) अपने मित्रों व फील्ड साथियों के साथ शेयर करें। जुड़ते ही वे यहाँ लाइव दिखेंगे!
+          </span>
+          <button type="button" onclick="if(window.shareMyTeamPage){window.shareMyTeamPage();}else{window.AarogyamETailer.openUniversalShareModalFromHub();}" style="background:#0052cc; color:#ffffff; border:none; padding:8px 18px; border-radius:20px; font-weight:800; font-size:0.82rem; cursor:pointer; box-shadow:0 3px 10px rgba(0,82,204,0.3);">
+            🔗 अपनी रेफरल लिंक शेयर करें
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    teamWrap.innerHTML = teamList.map(member => {
+      const name = member.full_name || member.name || 'टीम साथी';
+      const mob = member.mobile || member.phone || '';
+      const place = member.place || member.city || 'मध्य प्रदेश';
+      const shareId = member.share_id || '';
+
+      return `
+        <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <strong style="font-size:1.02rem; color:#0f172a; font-weight:900;">${name}</strong>
+              <span style="background:#15803d; color:#ffffff; font-size:0.70rem; font-weight:900; padding:2px 8px; border-radius:4px;">🟢 डायरेक्ट साथी</span>
+              ${shareId ? `<span style="background:#eff6ff; color:#1d4ed8; font-size:0.70rem; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #bfdbfe;">ID: ${shareId}</span>` : ''}
+            </div>
+            <span style="font-size:0.80rem; color:#475569; font-weight:700; display:block; margin-top:3px;">
+              📱 ${mob} • 📍 ${place}
+            </span>
+          </div>
+
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="window.AarogyamETailer.directFillToKhataForm('${mob}')" style="background:#ffffff; color:#dc2626; border:1.5px solid #fecaca; padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <span>📕</span> <span>खाता</span>
+            </button>
+            <button type="button" onclick="window.open('https://api.whatsapp.com/send?phone=91${mob}&text=${encodeURIComponent('नमस्ते ' + name + ' जी! आरोग्यम इंडिया टीम में आपका स्वागत है।')}', '_blank')" style="background:#16a34a; color:#ffffff; border:none; padding:6px 12px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <span>💬</span> <span>WhatsApp</span>
+            </button>
+            <button type="button" onclick="window.location.href='tel:${mob}'" style="background:#0284c7; color:#ffffff; border:none; padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+              <span>📞</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
   function renderAutoshipTracker() {
     const listWrap = document.getElementById('autoshipTrackerList');
     if (!listWrap) return;
@@ -3587,6 +3725,15 @@
 
   const hubCatalogData = {
     // 1. किसान व जैविक फसल सुरक्षा (Biofit)
+    all_products: [
+      { id: "ns_agri_stimrich", title: "🌾 स्टीमरिच (Biofit Stimrich) — 25-40% अधिक फुटाव व चमक", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_stimrich", benefit: "बीज अंकुरण, फुटाव, शाखाएं और उपज में 25-40% बढ़ोत्तरी करता है।" },
+      { id: "ns_agri_bio99", title: "💧 बायो-99 (Biofit Bio-99) — 100% सिलिकॉन स्प्रेडर व स्टीकर", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_bio99", benefit: "दवा को पत्तियों पर चिपकाता है और दवा की बर्बादी 40% कम करता है।" },
+      { id: "ns_health_joint", title: "🦵 नेचुरामोरे जॉइंट केयर (घुटनों, जोड़ों व कमर दर्द से मुक्ति)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_health_joint", benefit: "कार्टिलेज को मजबूत कर जोड़ों के पुराने दर्द और सूजन में चमत्कारी राहत देता है।" },
+      { id: "ns_prod_68977", title: "👩 महिलाओं का संपूर्ण पोषण (Multi-Vitamin For Women)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_68977", benefit: "महिलाओं की कमजोरी, थकान, कमर दर्द और हार्मोनल असंतुलन को दूर करता है।" },
+      { id: "ns_cattle_cfc", title: "🐄 Pet-Vet CFC Plus 1 KG (गाय-भैंस का दूध व फैट वर्धक)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_cattle_cfc", benefit: "दूध में 1 से 2 लीटर की वृद्धि, फैट में बढ़ोत्तरी और पशु को स्वस्थ रखता है।" },
+      { id: "ns_prod_98099", title: "🌸 स्पॉट इरेज़र एंटी-पिग्मेंटेशन क्रीम (झाइयां व काले धब्बे मुक्ति)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_98099", benefit: "चेहरे की झाइयों, डार्क स्पॉट्स और काले धब्बों को जड़ से हटाकर प्राकृतिक निखार देती है।" }
+    ],
+
     crop_doctor: [
       { id: "ns_agri_stimrich", title: "🌱 स्टीमरिच (Biofit Stimrich) — 25-40% अधिक फुटाव व चमक", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_stimrich", benefit: "बीज अंकुरण, फुटाव, शाखाएं और उपज में 25-40% बढ़ोत्तरी करता है।" },
       { id: "ns_agri_bio99", title: "💧 बायो-99 (Biofit Bio-99) — 100% सिलिकॉन स्प्रेडर व स्टीकर", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_agri_bio99", benefit: "दवा को पत्तियों पर चिपकाता है और दवा की बर्बादी 40% कम करता है।" },
@@ -3956,12 +4103,23 @@
         const sid = window.getUserShareId();
         if (sid) return sid;
       }
-      const stored = localStorage.getItem('aarogyam_user_profile') || localStorage.getItem('aarogyam_auth_user');
-      if (stored) {
-        const u = JSON.parse(stored);
-        if (u.share_id) return u.share_id;
-        if (u.referral_code) return u.referral_code;
-        if (u.mobile && u.mobile.length >= 6) return 'AI' + u.mobile.slice(-6);
+      // Check session.js standard object
+      if (window.getCurrentUser && typeof window.getCurrentUser === 'function') {
+        const cu = window.getCurrentUser();
+        if (cu && cu.share_id) return cu.share_id;
+        if (cu && cu.mobile) return 'AI' + cu.mobile.slice(-6);
+      }
+      const userKeys = ['AI_PROFILE', 'AI_USER', 'UCAS_USER', 'aarogyam_user_profile', 'aarogyam_auth_user'];
+      for (const k of userKeys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          try {
+            const u = JSON.parse(val);
+            if (u.share_id) return u.share_id;
+            if (u.referral_code) return u.referral_code;
+            if (u.mobile) return 'AI' + String(u.mobile).replace(/\D/g, '').slice(-6);
+          } catch (_) { }
+        }
       }
       const mob = getUserMobile();
       if (mob && mob.length >= 6) return 'AI' + mob.slice(-6);
@@ -6373,6 +6531,27 @@
     renderKhatabookPro();
   }
 
+  
+  // Universal Android & Mobile Hardware Back Button Handler for Modals
+  window.addEventListener('popstate', function(e) {
+    const modalIds = [
+      'kbAddPartyModal',
+      'kbCustomerLedgerModal',
+      'kbAddTxModal',
+      'kbPublicPassbookModal',
+      'kbEditPartyModal',
+      'diaryContactPickerModal',
+      'smartETailerTutorialModal',
+      'callRemarkModal'
+    ];
+    modalIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.style.display !== 'none' && el.style.display !== '') {
+        el.style.display = 'none';
+      }
+    });
+  });
+
   window.AarogyamETailer = {
     handleKbMobileAutoLookup: handleKbMobileAutoLookup,
     openEditPartyModal: openEditPartyModal,
@@ -6460,6 +6639,7 @@
     saveEditedContact: saveEditedContact,
     renderTodoPlanner: renderTodoPlanner,
     renderAutoshipTracker: renderAutoshipTracker,
+    renderDirectTeamCards: renderDirectTeamCards,
     sendAutoshipFreeAlert: sendAutoshipFreeAlert,
     getAppUserShareId: getAppUserShareId,
     openSmartFollowupPicker: openSmartFollowupPicker,
