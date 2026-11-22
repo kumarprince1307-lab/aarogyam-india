@@ -26,88 +26,11 @@
       },
       "fb_pixel": true,
       "ga_tag": true,
-      "hero_slides": [
-        {
-          "id": "slide_sakhi_ai",
-          "title": "आपकी खेती की AI सखी!",
-          "subtitle": "बीमारी पहचानें • दवा की मात्रा जानें • फसल समस्या का तुरंत समाधान",
-          "tag": "FREE AI SAKHI",
-          "image": "/images/banners/hero-sakhi-ai.webp",
-          "cta_text": "अभी पूछें FREE",
-          "cta_link": "/aarogyam-sakhi.html",
-          "banner_mode": "full",
-          "enabled": true
-        },
-        {
-          "id": "slide_healthcare",
-          "title": "हेल्थ केयर — पूरी तरह FREE",
-          "subtitle": "स्वास्थ्य से जुड़ी पूरी जानकारी और सरल घरेलू व आयुर्वेदिक समाधान",
-          "tag": "HEALTH CARE",
-          "image": "/images/banners/hero-healthcare.webp",
-          "cta_text": "अभी देखें FREE",
-          "cta_link": "/categories/health.html",
-          "banner_mode": "full",
-          "enabled": true
-        },
-        {
-          "id": "slide_ebook_store",
-          "title": "कृषि की सम्पूर्ण जानकारी एक ही जगह! — eBook Store",
-          "subtitle": "ज्ञान और सही मार्गदर्शन के साथ करेगा किसान खेती, बढ़ाएगा उत्पादन और मुनाफा",
-          "tag": "EBOOK STORE",
-          "image": "/images/banners/hero-ebook-store.webp",
-          "cta_text": "अभी देखें eBook Store",
-          "cta_link": "/ebooks/ebook.html",
-          "banner_mode": "full",
-          "enabled": true
-        },
-        {
-          "id": "slide_my_team",
-          "title": "My Team — अपनी टीम को संगठित, सक्रिय और सफल बनाएं!",
-          "subtitle": "कंज्यूमर फॉलो-अप, डिजिटल बही-खाता, टीम प्रबंधन और दैनिक कार्य डायरी",
-          "tag": "MY TEAM",
-          "image": "/images/banners/hero-my-team.webp",
-          "cta_text": "My Team टूल्स",
-          "cta_link": "/pages/smart-etailer.html#tab-diary-ledger",
-          "banner_mode": "full",
-          "enabled": true
-        },
-        {
-          "id": "slide_netsurf",
-          "title": "Netsurf Direct — अब सब जानकारी एक ही जगह!",
-          "subtitle": "सभी प्रोडक्ट्स, इनकम प्लान, कैटलॉग, पाथ फाइंडर और फ्री एजुकेशन",
-          "tag": "NETSURF DIRECT",
-          "image": "/images/banners/hero-netsurf.webp",
-          "cta_text": "अभी देखें / जुड़ें",
-          "cta_link": "/categories/netsurf.html",
-          "banner_mode": "full",
-          "enabled": true
-        },
-        {
-          "id": "slide_my_profile",
-          "title": "My Profile — आपका डिजिटल आरोग्यम डैशबोर्ड",
-          "subtitle": "सुरक्षित प्रोफ़ाइल, टीम ग्रोथ, इनकम रिपोर्ट्स और बिज़नेस प्रबंधन",
-          "tag": "MY PROFILE",
-          "image": "/images/banners/hero-my-profile.webp",
-          "cta_text": "प्रोफाइल खोलें",
-          "cta_link": "/ucas/index.html",
-          "banner_mode": "full",
-          "enabled": true
-        },
-        {
-          "id": "slide_krishi_panchang",
-          "title": "कृषि की स्मार्ट सेवाएं — मौसम, मंडी भाव और पंचांग",
-          "subtitle": "मौसम पूर्वानुमान, देश भर के मंडी भाव, शुभ कृषि मुहूर्त व वैज्ञानिक फसल सलाह",
-          "tag": "SMART SERVICES",
-          "image": "/images/banners/hero-krishi-panchang.webp",
-          "cta_text": "कृषि पंचांग देखें",
-          "cta_link": "/krishi-panchang.html",
-          "banner_mode": "full",
-          "enabled": true
-        }
-      ],
+      "hero_slides": [],
       "sections_order": [
         "sec_ticker",
         "sec_hero_slider",
+        "sec_kpi_badges",
         "sec_category_pills",
         "sec_shelves_bestseller",
         "sec_interspersed_marketing",
@@ -120,9 +43,7 @@
         "sec_faqs",
         "sec_help_support"
       ],
-      "hidden_sections": [
-        "sec_kpi_badges"
-      ],
+      "hidden_sections": [],
       "kpi_cards": [],
       "marketing_cards": [],
       "videos": [],
@@ -456,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1794085806540,
+      "admin_edited": 1795329469233,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
