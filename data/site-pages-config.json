@@ -3712,18 +3712,65 @@
       "category": "Healthcare Sub-page",
       "status": "active",
       "theme_primary": "#d97706",
-      "theme_dark": "#b45309",
+      "theme_dark": "#8d2b00",
+      "ticker_text": "🌟 ब्राह्मी व शंखपुष्पी से तेज दिमाग, भूख सुधार व इम्युनिटी वृद्धि",
+      "audio_title": "बच्चों का मानसिक व शारीरिक विकास",
+      "audio_script": "नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।",
+      "audio_url": "",
+      "og_title": "बच्चों का संपूर्ण शारीरिक व मानसिक विकास गाइड | Aarogyam India",
+      "og_image": "/images/banners/health-kids-care.jpg",
+      "og_description": "बच्चों की लंबाई, वजन, रोग प्रतिरोधक क्षमता व याददाश्त बढ़ाने के प्राकृतिक पोषण उपाय।",
+      "share_message": "",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
       "fb_pixel": true,
       "ga_tag": true,
-      "ticker_text": "🌟 ब्राह्मी व शंखपुष्पी से तेज दिमाग, भूख सुधार व इम्युनिटी वृद्धि",
       "hero_slides": [
         {
-          "image": "/images/banners/achievers-banner.jpeg",
+          "image": "/images/banners/hero_slide-1003971226-899321-vya5.webp",
           "tag": "🧸 किड्स केयर",
           "title": "बच्चों का मानसिक व शारीरिक विकास",
           "subtitle": "स्मृति वृद्धि, भूख सुधार व रोग प्रतिरोधक क्षमता",
           "cta_text": "💬 पोषण विशेषज्ञ परामर्श",
           "cta_link": "https://wa.me/917974422572"
+        },
+        {
+          "image": "/images/banners/hero_slide-1003971222-919853-5cpd.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003971202-933341-p3hg.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003969481-950243-i9wy.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -3736,16 +3783,19 @@
       ],
       "hidden_sections": [],
       "kpi_cards": [],
-      "videos": [],
       "marketing_cards": [],
+      "videos": [],
+      "reviews_heading": "",
+      "reviews_badge": "",
       "reviews": [],
+      "faqs_heading": "",
+      "faqs_badge": "",
       "faqs": [],
-      "whatsapp_support": {
-        "number": "917974422572",
-        "prompt": "नमस्ते, मुझे किड्स केयर व पोषण समाधान चाहिए।"
-      },
-      "audio_title": "बच्चों का मानसिक व शारीरिक विकास",
-      "audio_script": "नमस्ते {name} जी! किड्स केयर पेज पर आपका स्वागत है। बच्चों की याददाश्त, एकाग्रता, लंबाई और रोग प्रतिरोधक क्षमता बढ़ाने का सम्पूर्ण पोषण प्लान यहाँ देखें।",
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [],
+      "crops": [],
+      "pashu_cards": [],
       "products": [
         {
           "id": "ns_health_kids",
@@ -3781,41 +3831,63 @@
           "pack_size": "400 gm"
         }
       ],
+      "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🔬 वैज्ञानिक विश्लेषण",
         "main_title": "बाल स्वास्थ्य: पोषण, लंबाई व रोग प्रतिरोधक क्षमता",
+        "subtitle": "",
         "cards": [
           {
+            "id": "CB_1795328963462_xchv",
             "title": "❓ बच्चे क्यों बीमार पड़ते हैं? (Causes)",
+            "badge": "",
             "color": "#b45309",
+            "image": "",
             "points": [
               "<strong>जंक फूड व पैकेज्ड स्नैक्स:</strong> प्रिजर्वेटिव्स से पाचन व इम्युनिटी कमजोर होना।",
               "<strong>स्क्रीन टाइम व धूप की कमी:</strong> विटामिन D की कमी से हड्डियों का कमजोर विकास।",
               "<strong>माइक्रोन्यूट्रिएंट्स की कमी:</strong> जिंक, आयरन व कैल्शियम की कमी से ग्रोथ रुकना।",
               "<strong>पेट में कीड़े (Intestinal Worms):</strong> खाया-पिया शरीर को न लगना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1795328963462_adi2",
             "title": "⚠️ मुख्य लक्षण (Symptoms)",
+            "badge": "",
             "color": "#b45309",
+            "image": "",
             "points": [
               "मौसम बदलते ही तुरंत सर्दी, खांसी, जुकाम व बुखार की चपेट में आना।",
               "उम्र के अनुसार लंबाई और वजन का सही अनुपात में न बढ़ना।",
               "भूख न लगना, खाना खाने में नखरे करना और चिड़चिड़ापन रहना।",
               "पढ़ाई में ध्यान न लगना, याददाश्त कमजोर होना और जल्दी थक जाना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           },
           {
+            "id": "CB_1795328963462_i5ht",
             "title": "🚨 अनदेखी के परिणाम (Risks)",
+            "badge": "",
             "color": "#dc2626",
+            "image": "",
             "points": [
               "<strong>शारीरिक व मानसिक रुकावट:</strong> क्रिटिकल ग्रोइंग एज में ग्रोथ रुक जाना।",
               "<strong>बार-बार एंटीबायोटिक्स का दुष्प्रभाव:</strong> प्राकृतिक आंतों के बैक्टीरिया नष्ट होना।",
               "<strong>कमजोर दृष्टि:</strong> स्क्रीन से आंखों पर जल्दी चश्मा लगना।"
-            ]
+            ],
+            "remedy": null,
+            "whatsapp_btn": null,
+            "catalog_btn": null
           }
         ]
       },
+      "admin_edited": 1795328963470,
+      "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
           "title": "बच्चों का पौष्टिक ग्रोथ चार्ट",
@@ -3825,7 +3897,8 @@
             "<strong>🍛 दोपहर भोजन:</strong> दाल-चावल-घी + मौसमी हरी सब्जी + 1 कटोरी दही।",
             "<strong>☕ शाम:</strong> मखाना खीर / भुने चने / मौसमी फल (केला, चीकू, अनार)।",
             "<strong>🍲 रात:</strong> हल्का सुपाच्य भोजन + सोते समय खजूर युक्त दूध।"
-          ]
+          ],
+          "images": []
         },
         "exercise": {
           "title": "लंबाई व चुस्ती बढ़ाने के खेल व योग",
@@ -3834,12 +3907,14 @@
             "<strong>2. लटकना (Pull-up Bar Hanging):</strong> 5-10 मिनट रोजाना लटकने से हाइट ग्रोथ तेज होती है।",
             "<strong>3. 1 घंटा आउटडोर खेल:</strong> दौड़ना, साइकिल चलाना व रस्सी कूदना हड्डियों को मजबूत करता है।",
             "<strong>4. 15 मिनट सुबह की धूप:</strong> प्राकृतिक विटामिन D3 व मजबूत इम्युनिटी के लिए।"
-          ]
+          ],
+          "images": []
         }
       },
-      "og_title": "बच्चों का संपूर्ण शारीरिक व मानसिक विकास गाइड | Aarogyam India",
-      "og_image": "/images/banners/health-kids-care.jpg",
-      "og_description": "बच्चों की लंबाई, वजन, रोग प्रतिरोधक क्षमता व याददाश्त बढ़ाने के प्राकृतिक पोषण उपाय।"
+      "whatsapp_support": {
+        "number": "917974422572",
+        "prompt": "नमस्ते, मुझे किड्स केयर व पोषण समाधान चाहिए।"
+      }
     },
     {
       "id": "page_health_home_care",
