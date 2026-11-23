@@ -16,8 +16,8 @@
 
 import './supabase.js'; // CRITICAL: Initialize Supabase client globally
 import { renderHeader } from './admin-components-header.js';
-import { renderSidebar } from './admin-components-sidebar.js?v=28.0';
-import { initRouter } from './admin-router.js?v=20261116_v87_live_credit_box';
+import { renderSidebar } from './admin-components-sidebar.js?v=20261123_v30_team_sec';
+import { initRouter } from './admin-router.js?v=20261123_v30_team_sec';
 import { initAdminPwa } from './admin-pwa.js';
 
 export function initAdminLayout(pageTitle = 'Admin Panel', pageDescription = '') {
