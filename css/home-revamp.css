@@ -1638,3 +1638,66 @@ body {
     z-index: 999999 !important;
   }
 }
+
+/* =============================================================
+   AVNISH JI - HIGH CONTRAST SHARP BLACK (#000000) & +2PT FONT SIZE
+   Universal Clarity for Clinical Breakdown, Causes, Symptoms,
+   Risks, Diet & Exercise Cards across all Pages
+   ============================================================= */
+.problem-box,
+.problem-box p,
+.problem-box div,
+.breakdown-grid p,
+.breakdown-grid div,
+.clinical-breakdown p,
+.clinical-breakdown div,
+.cms-cb-card p,
+.cms-cb-card div,
+#sec-breakdown p,
+#sec-causes p,
+#sec-symptoms p,
+#sec-risks p,
+#sec-diet p,
+#sec-diet div > p,
+#sec-diet li,
+#sec-exercise p,
+#sec-exercise div > p,
+#sec-exercise li,
+.diet-list p,
+.exercise-list p {
+  color: #000000 !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+  line-height: 1.6 !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+.problem-box h3,
+.breakdown-grid h3,
+.clinical-breakdown h3,
+#sec-diet h3,
+#sec-exercise h3 {
+  font-weight: 900 !important;
+  font-size: 1.25rem !important;
+  line-height: 1.35 !important;
+}
+
+.problem-box [style*="color:#334155"],
+.problem-box [style*="color:#475569"],
+.problem-box [style*="color: #475569"],
+.problem-box [style*="color: #334155"],
+.problem-box [style*="color:#64748b"],
+.problem-box [style*="color: #64748b"] {
+  color: #000000 !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+}
+
+#sec-diet [style*="color:#334155"],
+#sec-diet [style*="color:#475569"],
+#sec-exercise [style*="color:#334155"],
+#sec-exercise [style*="color:#475569"] {
+  color: #000000 !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+}
