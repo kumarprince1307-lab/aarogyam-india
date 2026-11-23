@@ -1178,6 +1178,9 @@
       return;
     }
 
+    // 0. Instant Cache-First Render (0.01s instant UI without network delay)
+    renderCachedOrEmptyTeam();
+
     // 1. Fetch from Supabase profiles (UUID-safe and REST fallback enabled)
     try {
       const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
@@ -3598,7 +3601,7 @@
     let u = {};
     try { u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
     const mob = String(u.mobile || u.phone || getUserMobile() || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
-    if (mob === '7974422572' || mob === '7049294111' || u.role === 'admin') return true;
+    if (mob === '7974422572' || mob === '7049294111' || mob === '6260004158' || u.role === 'admin') return true;
     let isActive = Boolean(u.is_active || u.is_subscriber || u.status === 'active' || u.status === 'ACTIVE' || u.isVip);
     if (!isActive) {
       if (localStorage.getItem('user_is_active') === 'true' || localStorage.getItem('user_is_subscriber') === 'true') {
