@@ -217,6 +217,7 @@ function renderUsersTable(users) {
                     <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
                       <span id="devStatusPill_${u.id}" class="admin-pill" style="background:#f1f5f9;color:#475569;font-size:0.68rem;padding:2px 5px;font-weight:700;">📱 Active</span>
                       <button type="button" class="admin-button small-button btn-reset-user-device" onclick="window.resetUserDevice('${u.id}', '${sanitizedMobile}', this)" style="background:#f59e0b;color:#fff;border:1px solid #d97706;font-size:0.68rem;padding:2px 6px;border-radius:4px;font-weight:800;cursor:pointer;white-space:nowrap;" title="उपयोगकर्ता का डिवाइस रीसेट करें ताकि वे नए फोन पर लॉगिन कर सकें">🔄 Reset</button>
+                      <button type="button" class="admin-button small-button btn-manage-team-pin" onclick="window.openTeamSecurityModal('${u.id}', '${sanitizedMobile}', '${(u.name || u.fullName || 'User').replace(/'/g, "\\'")}')" style="background:#3b82f6;color:#fff;border:1px solid #2563eb;font-size:0.68rem;padding:2px 6px;border-radius:4px;font-weight:800;cursor:pointer;white-space:nowrap;" title="My Team पिन व डिवाइस लॉक प्रबंधित करें">🔐 PIN</button>
                     </div>
                   </div>
                 </td>
@@ -1324,6 +1325,10 @@ window.resetUserDevice = async function(userId, mobile, btnEl) {
     const db = window.dbClient || (window.supabase && typeof window.supabase.from === 'function' ? window.supabase : null);
     if (db) {
       await db.from('surveys').delete().eq('phone_number', cleanMob).eq('event_type', 'device_lock');
+      // Also reset team_security_vault device token
+      try {
+        await db.from('team_security_vault').update({ device_token: null, attempts: 0, locked_until: null }).eq('phone', cleanMob);
+      } catch (_) {}
     }
 
     try {
@@ -1352,6 +1357,150 @@ window.resetUserDevice = async function(userId, mobile, btnEl) {
       btnEl.textContent = '🔄 Reset';
     }
   }
+};
+
+// =========================================================================
+// 🔐 ADMIN MY TEAM SECURITY MODAL (View / Reset PIN & Device Lock)
+// =========================================================================
+window.openTeamSecurityModal = async function(userId, mobile, name) {
+  const cleanMob = String(mobile || '').replace(/\D/g, '').slice(-10);
+  if (!cleanMob) {
+    alert("यूजर का मोबाइल नंबर उपलब्ध नहीं है।");
+    return;
+  }
+
+  const old = document.getElementById('admin-team-security-modal');
+  if (old) old.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'admin-team-security-modal';
+  modal.style.cssText = `
+    position: fixed; inset: 0; z-index: 999999;
+    background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    font-family: inherit;
+  `;
+
+  modal.innerHTML = `
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:18px; width:100%; max-width:440px; padding:24px; color:#f8fafc; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:12px; margin-bottom:16px;">
+        <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+          <span>🔐</span> <span>My Team सुरक्षा प्रबंधन</span>
+        </h3>
+        <button type="button" onclick="document.getElementById('admin-team-security-modal').remove()" style="background:#334155; border:none; color:#94a3b8; font-size:1rem; width:28px; height:28px; border-radius:50%; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="margin-bottom:14px; font-size:0.86rem; color:#cbd5e1;">
+        <div><strong>उपयोगकर्ता:</strong> ${name || 'N/A'}</div>
+        <div><strong>मोबाइल:</strong> +91 ${cleanMob}</div>
+      </div>
+
+      <div id="teamSecDetailsBox" style="background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:18px; font-size:0.84rem;">
+        <div style="color:#94a3b8; text-align:center;">डेटा लोड हो रहा है...</div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button type="button" id="btnAdminResetPin" style="padding:11px; background:#f59e0b; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:0.88rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>🔄</span> <span>पिन रीसेट करें (Reset PIN)</span>
+        </button>
+        <button type="button" id="btnAdminResetDevice" style="padding:11px; background:#3b82f6; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:0.88rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>📱</span> <span>डिवाइस लॉक हटाएं (Unbind Device)</span>
+        </button>
+        <button type="button" id="btnAdminUnlockAccount" style="padding:11px; background:#10b981; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:0.88rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>⏳</span> <span>15-मिनट लॉक हटाएं (Unlock Strikes)</span>
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+
+  async function loadDetails() {
+    const box = document.getElementById('teamSecDetailsBox');
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanMob}&select=*`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if (!data || data.length === 0) {
+        box.innerHTML = `<div style="color:#94a3b8; text-align:center;">इस नंबर का अभी कोई पिन या डिवाइस लॉक सेट नहीं है।</div>`;
+        return;
+      }
+      const v = data[0];
+      const isLocked = v.locked_until && new Date(v.locked_until).getTime() > Date.now();
+      box.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div><strong>🔑 मौजूदा PIN:</strong></div>
+          <div style="font-weight:900; color:#38bdf8; font-size:1.05rem; letter-spacing:2px;">${v.pin_code || 'सेट नहीं है'}</div>
+          <div><strong>📱 डिवाइस टोकन:</strong></div>
+          <div style="color:${v.device_token ? '#4ade80' : '#94a3b8'}; word-break:break-all; font-size:0.75rem;">${v.device_token || 'कोई डिवाइस नहीं'}</div>
+          <div><strong>❌ गलत प्रयास:</strong></div>
+          <div style="color:${v.attempts > 0 ? '#f87171' : '#4ade80'};">${v.attempts || 0} / 3</div>
+          <div><strong>🔒 लॉक स्थिति:</strong></div>
+          <div>${isLocked ? '<span style="color:#ef4444; font-weight:800;">⛔ ब्लॉक (15 मिनट)</span>' : '<span style="color:#22c55e;">🟢 सामान्य</span>'}</div>
+        </div>
+      `;
+    } catch (e) {
+      box.innerHTML = `<div style="color:#ef4444;">त्रुटि: ${e.message}</div>`;
+    }
+  }
+
+  loadDetails();
+
+  // Reset PIN
+  document.getElementById('btnAdminResetPin')?.addEventListener('click', async function() {
+    if (!confirm(`क्या आप +91 ${cleanMob} का 4-अंकीय पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
+    this.disabled = true; this.textContent = 'रीसेट हो रहा है...';
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanMob}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin_code: null, updated_at: new Date().toISOString() })
+      });
+      alert(`✅ +91 ${cleanMob} का पिन सफलतापूर्वक रीसेट कर दिया गया है!`);
+      loadDetails();
+    } catch (e) {
+      alert("पिन रीसेट विफल: " + e.message);
+    }
+    this.disabled = false; this.textContent = '🔄 पिन रीसेट करें (Reset PIN)';
+  });
+
+  // Reset Device
+  document.getElementById('btnAdminResetDevice')?.addEventListener('click', async function() {
+    if (!confirm(`क्या आप +91 ${cleanMob} का डिवाइस लॉक हटाना चाहते हैं?\n\nयूजर अपने नए फोन पर आसानी से लॉगिन कर सकेगा।`)) return;
+    this.disabled = true; this.textContent = 'डिवाइस हट रहा है...';
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanMob}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_token: null, updated_at: new Date().toISOString() })
+      });
+      alert(`✅ +91 ${cleanMob} का डिवाइस लॉक हटा दिया गया है!`);
+      loadDetails();
+    } catch (e) {
+      alert("डिवाइस रीसेट विफल: " + e.message);
+    }
+    this.disabled = false; this.textContent = '📱 डिवाइस लॉक हटाएं (Unbind Device)';
+  });
+
+  // Unlock Strikes
+  document.getElementById('btnAdminUnlockAccount')?.addEventListener('click', async function() {
+    this.disabled = true; this.textContent = 'अनलॉक हो रहा है...';
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanMob}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attempts: 0, locked_until: null, updated_at: new Date().toISOString() })
+      });
+      alert(`✅ +91 ${cleanMob} का अकाउंट अनलॉक हो गया है!`);
+      loadDetails();
+    } catch (e) {
+      alert("अनलॉक विफल: " + e.message);
+    }
+    this.disabled = false; this.textContent = '⏳ 15-मिनट लॉक हटाएं (Unlock Strikes)';
+  });
 };
 
 // =========================================================================
