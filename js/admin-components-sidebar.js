@@ -2,7 +2,7 @@
 
 const MENU = [
   { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
-  { label: '🔐 My Team PIN व डिवाइस लॉक', href: 'team-security.html', icon: '🔐', route: 'team-security' },
+  { label: '🔐 My Team PIN व डिवाइस लॉक', href: 'team-security.html', icon: '🔐', directLink: true },
   { label: '🤖 सखी AI नॉलेज हब व एनालिटिक्स', href: 'sakhi-ai-hub.html', icon: '🤖', route: 'sakhi-ai-hub' },
   { label: '🚀 Marketing & Outreach Hub (मार्केटिंग व आउटरीच)', href: 'reports.html', icon: '🎯', route: 'reports' },
   { label: 'Users (उपयोगकर्ता)', icon: '👥', children: [ 
@@ -100,7 +100,10 @@ function createMenuItem(item) {
       </li>
     `;
   }
-  // for top-level links map to data-route for SPA
+  // for top-level links map to data-route for SPA (unless directLink: true)
+  if (item.directLink) {
+    return `<li><a href="${item.href || '#'}" class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
+  }
   const routeName = item.route || ((item.href || '').split('.').shift());
   return `<li><a href="${item.href || '#'}" ${routeName ? `data-route="${routeName}"` : ''} class="menu-link"><span class="menu-icon">${item.icon || ''}</span><span class="menu-label">${item.label}</span></a></li>`;
 }
