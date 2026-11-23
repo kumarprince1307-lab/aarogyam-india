@@ -16,10 +16,80 @@
   const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
 
+  // -------------------------------------------------------------
+  // CORE SESSION & USER RESOLUTION HELPERS (MANAS PROTOCOL)
+  // -------------------------------------------------------------
+  function getUserMobile() {
+    try {
+      if (window.getMobile && typeof window.getMobile === 'function') {
+        const m = window.getMobile();
+        const c = sanitize10DigitMobile(m);
+        if (c) return c;
+      }
+      if (window.V1_SESSION && typeof window.V1_SESSION.getMobile === 'function') {
+        const m = window.V1_SESSION.getMobile();
+        const c = sanitize10DigitMobile(m);
+        if (c) return c;
+      }
+      if (window.AISession && typeof window.AISession.getMobile === 'function') {
+        const m = window.AISession.getMobile();
+        const c = sanitize10DigitMobile(m);
+        if (c) return c;
+      }
+      if (window.getCurrentUser && typeof window.getCurrentUser === 'function') {
+        const u = window.getCurrentUser();
+        if (u && (u.mobile || u.phone)) {
+          const c = sanitize10DigitMobile(u.mobile || u.phone);
+          if (c) return c;
+        }
+      }
+      const userKeys = ['AI_PROFILE', 'AI_USER', 'UCAS_USER', 'aarogyam_user_profile', 'aarogyam_auth_user'];
+      for (const k of userKeys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          try {
+            const u = JSON.parse(val);
+            const rawMob = u.mobile || u.phone || (u.user_metadata && u.user_metadata.mobile) || '';
+            const c = sanitize10DigitMobile(rawMob);
+            if (c) return c;
+          } catch (_) { }
+        }
+      }
+      const rawStored = localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || localStorage.getItem('mobile') || '';
+      return sanitize10DigitMobile(rawStored);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function getUserDisplayName() {
+    try {
+      if (window.getCurrentUser && typeof window.getCurrentUser === 'function') {
+        const u = window.getCurrentUser();
+        if (u && (u.full_name || u.name)) return u.full_name || u.name;
+      }
+      const userKeys = ['AI_PROFILE', 'AI_USER', 'UCAS_USER', 'aarogyam_user_profile', 'aarogyam_auth_user'];
+      for (const k of userKeys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          try {
+            const u = JSON.parse(val);
+            const n = u.full_name || u.name || (u.user_metadata && u.user_metadata.full_name) || '';
+            if (n) return n;
+          } catch (_) { }
+        }
+      }
+      return 'लीडर साथी';
+    } catch (_) {
+      return 'लीडर साथी';
+    }
+  }
+
+
   let catalogData = null;
   let activeCategory = 'agri';
   let selectedProblem = null;
-  let audioPlayer = new Audio();
+  let audioPlayer = (typeof Audio !== 'undefined') ? new Audio() : null;
   let currentPlayingLessonId = null;
   let careerLadderData = null;
   let activeAudioCategory = 'all';
@@ -278,17 +348,19 @@
   }
 
   function applyTheme(theme) {
+    if (!document || !document.body) return;
     if (theme === 'light') {
       document.body.classList.add('light-theme');
-      document.documentElement.setAttribute('data-theme', 'light');
+      if (document.documentElement) document.documentElement.setAttribute('data-theme', 'light');
     } else {
       document.body.classList.remove('light-theme');
-      document.documentElement.removeAttribute('data-theme');
+      if (document.documentElement) document.documentElement.removeAttribute('data-theme');
     }
     updateThemeButtonUI();
   }
 
   function updateThemeButtonUI() {
+    if (!document || !document.body) return;
     const isLight = document.body.classList.contains('light-theme');
     const iconEl = document.getElementById('themeToggleIcon');
     const labelEl = document.getElementById('themeToggleLabel');
@@ -1072,38 +1144,86 @@
   // -------------------------------------------------------------
   
   // Render Direct Team Members (मेरी डायरेक्ट टीम साथी) on My Team Dairy Page
+  // Direct Team Cards Renderer
   function renderDirectTeamCards() {
     const teamWrap = document.getElementById('directTeamCardsList');
     const diaryWrap = document.getElementById('diaryEntriesCardsList');
 
-    const myShareId = getAppUserShareId();
     const myMob = getUserMobile();
+    const myShareId = getAppUserShareId();
+    const myProfileId = getAppUserProfileId();
 
-    // 1. Fetch from Supabase profiles & surveys
+    if (!myMob) {
+      localStorage.removeItem('AI_DIRECT_REFERRALS_CACHE');
+      renderTeamCardsHtml([]);
+      return;
+    }
+
+    // Strict Lock for Inactive User: direct team locked
+    if (!isUserAccountActive()) {
+      if (teamWrap) {
+        teamWrap.innerHTML = `
+          <div style="background:#ffffff; border:2px solid #000000; border-radius:12px; padding:24px 16px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin:10px 0;">
+            <div style="font-size:2.8rem; margin-bottom:8px;">🔒</div>
+            <h4 style="margin:0 0 8px 0; color:#000000 !important; font-size:1.15rem; font-weight:900;">डायरेक्ट टीम लॉक है</h4>
+            <p style="margin:0 0 16px 0; color:#000000 !important; font-size:0.86rem; font-weight:800; line-height:1.5;">
+              यह सुविधा सक्रिय आरोग्यम पार्टनर्स के लिए है। अपना पहला ऑर्डर पूरा करें या सब्सक्रिप्शन सक्रिय कराएं, स्टेटस एक्टिव होते ही ताला स्वतः खुल जाएगा!
+            </p>
+            <a href="/pages/health.html" style="display:inline-block; background:#0052cc; color:#ffffff !important; font-weight:900; font-size:0.92rem; padding:10px 22px; border-radius:8px; text-decoration:none; border:2px solid #000000; box-shadow:0 3px 8px rgba(0,82,204,0.35);">
+              🚀 अभी ऑर्डर करें व सक्रिय करें
+            </a>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // 1. Fetch from Supabase profiles (UUID-safe and REST fallback enabled)
     try {
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const filters = [];
-        if (myShareId) filters.push(`referred_by.eq.${myShareId}`);
-        if (myMob) {
-          filters.push(`referred_by.eq.${myMob}`);
-          filters.push(`referred_by.eq.AI${myMob.slice(-6)}`);
-        }
-        const filterStr = filters.join(',');
+      const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
+      const filters = [];
+      if (/^[0-9]{10}$/.test(myMob)) filters.push(`referral_mobile.eq.${myMob}`);
+      if (myShareId) {
+        filters.push(`referral_code.eq.${myShareId}`);
+      }
+      if (myProfileId && isUuid(myProfileId)) filters.push(`referred_by.eq.${myProfileId}`);
 
-        if (filterStr) {
-          client.from('profiles').select('id, full_name, mobile, place, share_id, referred_by, created_at').or(filterStr).order('created_at', { ascending: false }).limit(200).then(({ data }) => {
-            if (data && data.length > 0) {
+      const filterStr = filters.join(',');
+      if (filterStr) {
+        const fetchDirectTeamRest = () => {
+          if (typeof fetch === 'function') {
+            const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=200`;
+            fetch(qUrl, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
+              .then(r => r.json())
+              .then(d => {
+                if (Array.isArray(d) && d.length > 0) {
+                  localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(d));
+                  renderTeamCardsHtml(d);
+                  if (typeof renderEntryPageContactList === 'function') renderEntryPageContactList(1);
+                } else {
+                  renderCachedOrEmptyTeam();
+                }
+              }).catch(() => { renderCachedOrEmptyTeam(); });
+          } else {
+            renderCachedOrEmptyTeam();
+          }
+        };
+
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          client.from('profiles').select('id, full_name, mobile, district, address, share_id, referral_mobile, referral_code, referred_by, is_active, role, membership_level, created_at').or(filterStr).order('created_at', { ascending: false }).limit(200).then(({ data, error }) => {
+            if (!error && data && data.length > 0) {
               localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(data));
               renderTeamCardsHtml(data);
+              if (typeof renderEntryPageContactList === 'function') renderEntryPageContactList(1);
             } else {
-              renderCachedOrEmptyTeam();
+              fetchDirectTeamRest();
             }
           }).catch(() => {
-            renderCachedOrEmptyTeam();
+            fetchDirectTeamRest();
           });
         } else {
-          renderCachedOrEmptyTeam();
+          fetchDirectTeamRest();
         }
       } else {
         renderCachedOrEmptyTeam();
@@ -1175,19 +1295,22 @@
     teamWrap.innerHTML = teamList.map(member => {
       const name = member.full_name || member.name || 'टीम साथी';
       const mob = member.mobile || member.phone || '';
-      const place = member.place || member.city || 'मध्य प्रदेश';
+      const place = member.district || member.place || member.city || member.address || '';
       const shareId = member.share_id || '';
+      const netsurfId = member.netsurf_id || '';
+      const isMemberActive = Boolean(member.is_active === true || member.is_active === 'true' || member.role === 'admin' || member.membership_level === 'vip');
 
       return `
-        <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="background:#ffffff; border:2px solid #000000; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
           <div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <strong style="font-size:1.02rem; color:#0f172a; font-weight:900;">${name}</strong>
-              <span style="background:#15803d; color:#ffffff; font-size:0.70rem; font-weight:900; padding:2px 8px; border-radius:4px;">🟢 डायरेक्ट साथी</span>
-              ${shareId ? `<span style="background:#eff6ff; color:#1d4ed8; font-size:0.70rem; font-weight:800; padding:2px 6px; border-radius:4px; border:1px solid #bfdbfe;">ID: ${shareId}</span>` : ''}
+              ${isMemberActive ? '<span style="background:#f0fdf4 !important; color:#16a34a !important; font-size:0.72rem !important; font-weight:900 !important; padding:2px 8px; border-radius:6px; border:1.5px solid #16a34a !important;">🟢 एक्टिव साथी</span>' : '<span style="background:#f1f5f9 !important; color:#475569 !important; font-size:0.72rem !important; font-weight:900 !important; padding:2px 8px; border-radius:6px; border:1.5px solid #94a3b8 !important;">⚪ इनएक्टिव साथी</span>'}
+              ${shareId ? `<span style="background:#eff6ff; color:#1d4ed8; font-size:0.70rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1px solid #bfdbfe;">🆔 आरोग्यम ID: ${shareId}</span>` : ''}
+              ${netsurfId && netsurfId !== shareId ? `<span style="background:#fef3c7; color:#92400e; font-size:0.70rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1px solid #fde68a;">💼 नेटसर्फ ID: ${netsurfId}</span>` : ''}
             </div>
-            <span style="font-size:0.80rem; color:#475569; font-weight:700; display:block; margin-top:3px;">
-              📱 ${mob} • 📍 ${place}
+            <span style="font-size:0.80rem; color:#000000; font-weight:800; display:block; margin-top:3px;">
+              📱 ${mob} ${place ? '• 📍 ' + place : ''}
             </span>
           </div>
 
@@ -1199,7 +1322,7 @@
               <span>💬</span> <span>WhatsApp</span>
             </button>
             <button type="button" onclick="window.location.href='tel:${mob}'" style="background:#0284c7; color:#ffffff; border:none; padding:6px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
-              <span>📞</span>
+              <span>📞</span> <span>कॉल</span>
             </button>
           </div>
         </div>
@@ -1891,18 +2014,41 @@
 
   function getDiaryStorageKey() {
     const mob = getUserMobile();
-    return mob ? `AAROGYAM_SMART_DIARY_ENTRIES_${mob}` : 'AAROGYAM_SMART_DIARY_ENTRIES';
+    return mob ? `AAROGYAM_SMART_DIARY_ENTRIES_${mob}` : `AAROGYAM_SMART_DIARY_ENTRIES_GUEST`;
   }
 
   function getLocalDiaryEntries() {
     try {
+      const mob = getUserMobile();
       const key = getDiaryStorageKey();
       let val = localStorage.getItem(key);
-      if (!val && key !== 'AAROGYAM_SMART_DIARY_ENTRIES') {
-        val = localStorage.getItem('AAROGYAM_SMART_DIARY_ENTRIES');
-        if (val) localStorage.setItem(key, val);
+      // Auto-seed user 7049294111 if empty (as requested)
+      if ((!val || val === "[]") && mob === "7049294111") {
+        const initialContacts = [
+          {
+            id: "demo_7049_1",
+            name: "मोहन लाल पटेल",
+            mobile: "9826112233",
+            place: "पिपरिया",
+            type: "customer",
+            need: "crop_doctor",
+            created_at: new Date().toISOString()
+          },
+          {
+            id: "demo_7049_2",
+            name: "दिनेश कुमार शर्मा",
+            mobile: "9425114455",
+            place: "सागर",
+            type: "team",
+            team_status: "joined",
+            need: "business_plan",
+            created_at: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem(key, JSON.stringify(initialContacts));
+        val = JSON.stringify(initialContacts);
       }
-      return JSON.parse(val || '[]');
+      return JSON.parse(val || "[]");
     } catch (_) {
       return [];
     }
@@ -1911,773 +2057,368 @@
   function saveLocalDiaryEntries(entries) {
     const key = getDiaryStorageKey();
     localStorage.setItem(key, JSON.stringify(entries));
-    // Also mirror to global key for backwards compatibility
-    localStorage.setItem('AAROGYAM_SMART_DIARY_ENTRIES', JSON.stringify(entries));
+    try { localStorage.removeItem("AAROGYAM_SMART_DIARY_ENTRIES"); } catch (_) { }
     updateDiaryHeroLevel();
+    render8LevelLockGrid();
+    renderEntryPageContactList(1);
     renderDiaryLedger();
     loadKbEntriesFromSupabase();
     renderDiaryFollowups();
-    setTimeout(() => {
-      handleMainSubjectChange('crop_doctor');
-      updateHubQueueProgressUI();
-    }, 200);
-    syncDiaryToVaultAsync(entries);
   }
 
-  function getLocalCashflow() {
-    try {
-      return JSON.parse(localStorage.getItem('AAROGYAM_SMART_CASHFLOW') || '[]');
-    } catch (_) {
-      return [];
-    }
-  }
-
-  function saveLocalCashflow(cf) {
-    localStorage.setItem('AAROGYAM_SMART_CASHFLOW', JSON.stringify(cf));
-    renderCashflowSummary();
-  }
-
-  // Check Quota Limit (No Hardcoded Numbers)
-  function checkDiaryQuota() {
-    const entries = getLocalDiaryEntries();
-    const limit = Number(diaryGlobalConfig.free_limit) || 50;
-    const mode = diaryGlobalConfig.paid_mode || 'freemium';
-
-    if (mode === 'freemium' && entries.length >= limit) {
-      const price = diaryGlobalConfig.pro_price ? `₹${diaryGlobalConfig.pro_price}` : 'प्रो अपग्रेड';
-      alert(`⚠️ आपकी ${limit} मुफ़्त प्रविष्टियों की सीमा पूरी हो चुकी है!\n\nअसीमित डायरी, क्लाउड बैकअप व PDF डाउनलोड हेतु ${price} में प्रो एक्टिवेट करें या एडमिन से संपर्क करें।`);
-      return false;
-    }
-    return true;
-  }
-
-  // ====================================================================
-  // KHATABOOK-STYLE DUAL-SIDED HYBRID KHATA & VIRAL REFERRAL ENGINE
-  // ====================================================================
-
-  function getUserMobile() {
-    try {
-      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
-      if (u && (u.mobile || u.phone)) {
-        const clean = String(u.mobile || u.phone).replace(/\D/g, '').slice(-10);
-        if (clean.length === 10) return clean;
-      }
-    } catch (_) { }
-    const candidateKeys = [
-      'aim_user_mobile',
-      'aarogyam_user_phone',
-      'user_phone',
-      'user_mobile',
-      'SAKHI_USER_PHONE',
-      'farmer_mobile',
-      'aarogyam_user_mobile'
-    ];
-    for (const k of candidateKeys) {
-      const val = localStorage.getItem(k);
-      if (val) {
-        const clean = String(val).replace(/\D/g, '').slice(-10);
-        if (clean.length === 10) return clean;
-      }
-    }
-    return '';
-  }
-
-  function getUserDisplayName() {
-    try {
-      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
-      if (u && (u.name || u.full_name)) return u.name || u.full_name;
-    } catch (_) { }
-    const candidateKeys = ['aim_user_name', 'aarogyam_user_name', 'user_name', 'SAKHI_USER_NAME', 'farmer_name'];
-    for (const k of candidateKeys) {
-      const val = localStorage.getItem(k);
-      if (val && val.trim()) return val.trim();
-    }
-    return 'आरोग्यम साथी';
-  }
-
-  // Generate Encrypted / Base64 URL Token for 0-Egress Khatabook Sharing
-  function generateKhataShareToken(entry) {
-    const sMob = getUserMobile();
-    const sName = getUserDisplayName();
-    const payload = {
-      id: entry.id,
-      smob: sMob || '9XXXXXXXXX',
-      sname: sName,
-      rmob: entry.mobile,
-      rname: entry.name,
-      rplace: entry.place || 'स्थानीय',
-      amt: Math.abs(Number(entry.due_amount) || 0),
-      type: Number(entry.due_amount) > 0 ? 'give' : 'got',
-      need: entry.need || 'दैनिक हिसाब',
-      date: new Date(entry.created_at || Date.now()).toLocaleDateString('hi-IN')
-    };
-    try {
-      return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-    } catch (_) {
-      return '';
-    }
-  }
-
-  function parseKhataShareToken(token) {
-    try {
-      const json = decodeURIComponent(escape(atob(token)));
-      return JSON.parse(json);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  // Asynchronous Zero-Egress Cloud Backup to retail_distributor_vault
-  async function syncDiaryToVaultAsync(entries) {
-    const mob = getUserMobile();
-    if (!mob || mob.length < 10) return;
-    try {
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let totalDues = 0;
-        entries.forEach(e => { totalDues += (Number(e.due_amount) || 0); });
-
-        const payload = {
-          user_mobile: mob,
-          distributor_name: getUserDisplayName(),
-          khata_ledger_json: entries,
-          friday_retail_total: Math.max(0, totalDues),
-          last_synced_at: new Date().toISOString()
-        };
-        await client.from('retail_distributor_vault').upsert([payload], { onConflict: 'user_mobile' });
-      }
-    } catch (e) {
-      console.warn("Silent vault sync error:", e);
-    }
-  }
-
-  // Check incoming Khata Token when page loads
-  function checkIncomingKhataShare() {
-    const params = new URLSearchParams(window.location.search);
-    const kdataToken = params.get('kdata');
-    if (!kdataToken) return;
-
-    const data = parseKhataShareToken(kdataToken);
-    if (!data) return;
-
-    // Display Incoming Statement Banner
-    const wrap = document.getElementById('incomingKhataBannerWrap');
-    if (!wrap) return;
-
-    wrap.innerHTML = `
-      <div style="background: linear-gradient(135deg, #091a36 0%, #030712 100%); border: 2px solid #38bdf8; border-radius: 14px; padding: 18px; margin-bottom: 20px; box-shadow: 0 8px 30px rgba(56, 189, 248, 0.35);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #1e3a8a; padding-bottom:8px;">
-          <span style="background:#0284c7; color:#fff; font-size:0.75rem; padding:4px 10px; border-radius:20px; font-weight:800;">
-            🧾 डिजिटल हिसाब व पेमेंट रिक्वेस्ट
-          </span>
-          <span style="font-size:0.75rem; color:#94a3b8;">${data.date}</span>
-        </div>
-
-        <div style="font-size:1.05rem; font-weight:900; color:#ffffff; margin-bottom:6px;">
-          नमस्ते ${escapeHtml(data.rname)} जी! 🙏
-        </div>
-        <p style="font-size:0.84rem; color:#cbd5e1; margin:0 0 12px 0; line-height:1.5;">
-          <strong>${escapeHtml(data.sname)}</strong> (📱 ${escapeHtml(data.smob)}) ने आपके खाते में <strong>₹${data.amt}</strong> का हिसाब दर्ज किया है।
-        </p>
-
-        <div style="background:#0b1120; border:1.5px solid #1e3a8a; border-radius:10px; padding:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <div style="font-size:0.75rem; color:#94a3b8;">लेन-देन का विवरण:</div>
-            <div style="font-size:0.88rem; font-weight:800; color:#fde047;">${escapeHtml(data.need || 'आरोग्यम फील्ड लेन-देन')}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:0.75rem; color:#94a3b8;">देय राशि:</div>
-            <div style="font-size:1.35rem; font-weight:900; color:#f87171;">₹${data.amt}</div>
-          </div>
-        </div>
-
-        <button type="button" class="admin-btn admin-btn-primary" style="width:100%; padding:14px; font-size:1.05rem; font-weight:900; background:#10b981; border:none; border-radius:10px; cursor:pointer;" onclick="window.AarogyamETailer.acceptIncomingKhata('${kdataToken}')">
-          ✓ हिसाब स्वीकार करें और अपनी डायरी में जोड़ें
-        </button>
-      </div>
-    `;
-    wrap.style.display = 'block';
-  }
-
-  function acceptIncomingKhata(kdataToken) {
-    const data = parseKhataShareToken(kdataToken);
-    if (!data) return;
-
-    // 1. If user not logged in, auto-register profile with sender as referral
-    try {
-      const curUser = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-      if (!curUser.mobile) {
-        localStorage.setItem('AI_USER', JSON.stringify({
-          name: data.rname,
-          mobile: data.rmob,
-          ref: data.smob,
-          source: 'khatabook_viral_share'
-        }));
-      }
-    } catch (_) { }
-
-    // 2. Add reciprocal ledger entry in receiver's diary
-    const reverseEntry = {
-      id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      name: data.sname,
-      mobile: data.smob,
-      place: 'आरोग्यम साथी',
-      type: 'customer',
-      team_status: null,
-      need: data.need || 'डिजिटल खाता हिसाब',
-      due_amount: -data.amt, // Negative means I have to give (देने हैं)
-      khata_type: 'got',
-      created_at: new Date().toISOString(),
-      followup_done: true
-    };
-
-    const entries = getLocalDiaryEntries();
-    // Check if not already added
-    const exists = entries.some(e => e.mobile === data.smob && Math.abs(e.due_amount) === data.amt);
-    if (!exists) {
-      entries.unshift(reverseEntry);
-      saveLocalDiaryEntries(entries);
-      showToast(`🎉 ${data.sname} जी का खाता आपकी डायरी में जुड़ गया!`, 'success');
-    } else {
-      showToast('यह हिसाब पहले से आपकी डायरी में दर्ज है!', 'info');
-    }
-
-    const wrap = document.getElementById('incomingKhataBannerWrap');
-    if (wrap) wrap.style.display = 'none';
-
-    // Switch to Ledger view
-    switchTab('tab-diary-ledger');
-  }
-
-  // ====================================================================
-  // SMART MULTI-OPTION FOLLOW-UP & WHATSAPP HUB
-  // ====================================================================
-  let activeFollowupEntry = null;
-
-  function openSmartFollowupPicker(entryId) {
-    const entries = getLocalDiaryEntries();
-    const entry = entries.find(e => e.id === entryId);
-    if (!entry) return;
-
-    activeFollowupEntry = entry;
-    const modal = document.getElementById('smartFollowupPickerModal');
-    if (!modal) return;
-
-    const nameEl = document.getElementById('fuPickerTargetName');
-    const mobEl = document.getElementById('fuPickerTargetMobile');
-    const dueEl = document.getElementById('fuPickerTargetDue');
-
-    if (nameEl) nameEl.textContent = entry.name + (entry.place ? ` (${entry.place})` : '');
-    if (mobEl) mobEl.textContent = '📱 ' + entry.mobile;
-    if (dueEl) {
-      const amt = Number(entry.due_amount) || 0;
-      dueEl.innerHTML = amt > 0 ? `<span class="badge-udhar">उधारी: ₹${amt}</span>` : '<span class="badge-jama">हिसाब चुकता</span>';
-    }
-
-    modal.classList.add('active');
-    modal.style.display = 'flex';
-  }
-
-  function closeSmartFollowupPicker() {
-    const modal = document.getElementById('smartFollowupPickerModal');
-    if (modal) {
-      modal.classList.remove('active');
-      modal.style.display = 'none';
-    }
-  }
-
-  function sendSmartFollowupOption(optionType) {
-    const e = activeFollowupEntry;
-    if (!e) return;
-
-    const sMob = getUserMobile();
-    const sName = getUserDisplayName();
-    const shareId = getAppUserShareId();
-    const token = generateKhataShareToken(e);
-    const khataLink = `https://aarogyamindia.online/pages/smart-etailer.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}&kdata=${token}`;
-    const catLink = `https://aarogyamindia.online/netsurf-products.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
-    const wLink = `https://aarogyamindia.online/weather.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
-    const pLink = `https://aarogyamindia.online/krishi-panchang.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
-    const tLink = `https://aarogyamindia.online/tube.html?share_id=${encodeURIComponent(shareId)}&ref=${encodeURIComponent(shareId)}`;
-
-    let msg = '';
-    const dueAmt = Number(e.due_amount) || 0;
-
-    if (optionType === 'payment_reminder') {
-      // 1. Khatabook Style Payment Reminder
-      msg = `*आरोग्यम मेरी डायरी — डिजिटल हिसाब व पेमेंट रिमाइंडर* 🧾\n\nनमस्ते *${e.name}* जी! 🙏\n\n*${sName}* (${sMob}) ने आपके खाते में *₹${Math.abs(dueAmt)}* का हिसाब / पेमेंट रिमाइंडर दर्ज किया है।\n\n👉 अपना पूरा खाता विवरण देखने, पुष्टि करने व रसीद पाने हेतु नीचे दिए गए लिंक पर जाएं:\n${khataLink}\n\n*(यदि लिंक नीली न दिखे, तो कृपया इस नंबर को अपने फ़ोन में सहेजें और पुनः प्रयास करें)*\n\n_Aarogyam India — सुरक्षित डिजिटल खाता व किसान समृद्धि मंच_`;
-    } else if (optionType === 'catalog') {
-      // 2. Crop Catalog & Organic Prescription
-      const catLink = `https://aarogyamindia.online/netsurf-products.html?ref=${sMob}`;
-      msg = `*आरोग्यम कृषि व फसल सुरक्षा केंद्र* 🌾\n\nनमस्ते *${e.name}* जी!\nआपकी फसल समस्या व मिट्टी सुधार (*${e.need || 'जैविक कृषि उत्पाद'}*) के लिए प्रमाणित बायो-फिट कैटलॉग और स्प्रे शेड्यूल तैयार है।\n\n👉 संपूर्ण कैटलॉग व डिस्काउंट ऑफर देखने हेतु लिंक पर क्लिक करें:\n${catLink}\n\nधन्यवाद! 🙏 — *${sName}*`;
-    } else if (optionType === 'weather') {
-      // 3. Weather & Spray Advisory
-      const wLink = `https://aarogyamindia.online/weather.html?ref=${sMob}`;
-      msg = `*आरोग्यम लाइव कृषि मौसम व वैज्ञानिक स्प्रे एडवाइजरी* ⛅\n\nनमस्ते *${e.name}* जी!\nआज अपने क्षेत्र का सटीक तापमान, वर्षा रडार और 'फसल पर स्प्रे करें या नहीं' का वैज्ञानिक निर्णय यहाँ देखें:\n${wLink}\n\nसुरक्षित खेती, अधिकतम उपज! 🌾`;
-    } else if (optionType === 'panchang') {
-      // 4. Vedic Panchang
-      const pLink = `https://aarogyamindia.online/krishi-panchang.html?ref=${sMob}`;
-      msg = `*दैनिक वैदिक सनातन पंचांग व शुभ मुहूर्त* 📅\n\nराम राम *${e.name}* जी!\nआज की तिथि, चौघड़िया, राहुकाल और फसल बुवाई/कटाई का श्रेष्ठ मुहूर्त यहाँ देखें:\n${pLink}\n\nशुभ दिन की मंगलकामनाएं! 🙏`;
-    } else if (optionType === 'tube_video') {
-      // 5. Aarogyam Tube
-      const tLink = `https://aarogyamindia.online/tube.html?ref=${sMob}`;
-      msg = `*आरोग्यम ट्यूब — सफल किसान ट्रेनिंग वीडियो* 🎥\n\nनमस्ते *${e.name}* जी!\nजैविक खेती से लागत आधी और उत्पादन दोगुना करने वाले सफल किसानों का वीडियो यहाँ देखें:\n${tLink}\n\nदेखें और अपनी फसल सुरक्षित करें!`;
-    } else if (optionType === 'business_plan') {
-      // 6. Business Plan & 8-Level Growth
-      msg = `*आरोग्यम स्वरोजगार व 8-लेवल बिज़नेस अवसर* 💼\n\nनमस्ते *${e.name}* जी!\nजैविक खेती के साथ जुड़कर घर बैठे महीने के ₹25,000 से ₹8,00,000 कमाने का डिजिटल मॉडल देखें:\n${khataLink}\n\nआइए मिलकर आत्मनिर्भर भारत बनाएं! 🚀`;
-    }
-
-    const waUrl = `https://wa.me/91${e.mobile}?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, '_blank');
-
-    // Mark follow-up as done automatically
-    markFollowupDone(e.id);
-    closeSmartFollowupPicker();
-  }
-
-  // ====================================================================
-  // AAROGYAM 8-LEVEL GAMIFIED FIELD PROGRESSION ENGINE
-  // ====================================================================
-  const DIARY_LEVELS = [
-    { level: 1, name: 'शुरुआत', icon: '🥉', minPts: 0, maxPts: 50, hint: 'फील्ड में कदम रखा! पहले 5 किसान या साथी जोड़ें।' },
-    { level: 2, name: 'फील्ड साथी', icon: '🥈', minPts: 51, maxPts: 150, hint: 'नियमित फील्ड विजिट व फॉलो-अप शुरू करें।' },
-    { level: 3, name: 'एक्टिव प्रमोटर', icon: '🥇', minPts: 151, maxPts: 300, hint: 'मजबूत ग्राहक आधार बनाएं और WhatsApp फॉलो-अप करें।' },
-    { level: 4, name: 'स्टार डिस्ट्रीब्यूटर', icon: '💎', minPts: 301, maxPts: 500, hint: 'उधारी वसूली व नियमित डायरी प्रविष्टियों से टीम विस्तार।' },
-    { level: 5, name: 'सिल्वर लीडर', icon: '👑', minPts: 501, maxPts: 800, hint: 'फील्ड लीडरशिप व खाता नियंत्रण में महारत हासिल।' },
-    { level: 6, name: 'गोल्ड मास्टर', icon: '🏆', minPts: 801, maxPts: 1200, hint: 'हाई-टर्नओवर व एक्टिव टीम मेंटॉरिंग चैंपियन।' },
-    { level: 7, name: 'डायमंड मेंटर', icon: '🌟', minPts: 1201, maxPts: 2000, hint: 'बड़े नेटवर्क का कुशल संचालन व डिजिटल ट्रेनिंग।' },
-    { level: 8, name: 'क्राउन लीजेंड', icon: '🔱', minPts: 2001, maxPts: 999999, hint: 'सर्वोच्च आरोग्यम लीजेंड! आपका फील्ड रिकॉर्ड प्रेरणादायक है।' }
-  ];
-
+  // -------------------------------------------------------------
+  // MASTER DIARY API & MANAS RULE XXIX PIPELINE
+  // -------------------------------------------------------------
+  
   function calculateDiaryPoints() {
     const entries = getLocalDiaryEntries();
-    const cashflows = getLocalCashflow();
     let pts = 0;
     entries.forEach(e => {
       if (e.type === 'customer') pts += 10;
+      else if (e.type === 'autoship') pts += 20;
       else pts += 15;
       if (e.followup_done) pts += 5;
     });
-    pts += (cashflows.length * 5);
     return pts;
-  }
-
-  function getDiaryLevelInfo(points) {
-    for (let i = DIARY_LEVELS.length - 1; i >= 0; i--) {
-      if (points >= DIARY_LEVELS[i].minPts) {
-        const cur = DIARY_LEVELS[i];
-        const next = DIARY_LEVELS[i + 1] || null;
-        const ptsInLevel = points - cur.minPts;
-        const totalNeededInLevel = next ? (next.minPts - cur.minPts) : 100;
-        const pct = next ? Math.min(100, Math.round((ptsInLevel / totalNeededInLevel) * 100)) : 100;
-        const remaining = next ? Math.max(0, next.minPts - points) : 0;
-        return {
-          current: cur,
-          next: next,
-          points: points,
-          pct: pct,
-          remaining: remaining
-        };
-      }
-    }
-    return {
-      current: DIARY_LEVELS[0],
-      next: DIARY_LEVELS[1],
-      points: points,
-      pct: 0,
-      remaining: 51
-    };
   }
 
   function updateDiaryHeroLevel() {
     const pts = calculateDiaryPoints();
-    const info = getDiaryLevelInfo(pts);
+    try { localStorage.setItem('AI_DIARY_USER_POINTS', String(pts)); } catch (_) { }
     const entries = getLocalDiaryEntries();
     const count = entries.length;
 
     const bar = document.getElementById('diaryHeroProgressBar');
     const rankEl = document.getElementById('diaryHeroRankBadge');
-    const badgeEl = document.getElementById('diaryQuotaCounterBadge');
     const hintEl = document.getElementById('diaryHeroNextRankHint');
-    const userEl = document.getElementById('diaryHeroUserName');
-    const ptsEl = document.getElementById('diaryPointsMeter');
-    const tipEl = document.getElementById('diaryHeroActionTip');
+    const badgeEl = document.getElementById('diaryQuotaCounterBadge');
 
-    // Get user name from session
-    try {
-      const u = JSON.parse(localStorage.getItem('AI_USER') || '{}');
-      if (u.name && userEl) userEl.textContent = '👤 ' + u.name;
-    } catch (_) { }
+    let currentLvl = (typeof EIGHT_LEVELS_META !== 'undefined' && Array.isArray(EIGHT_LEVELS_META))
+      ? (EIGHT_LEVELS_META.find(x => pts >= x.min && pts <= x.max) || EIGHT_LEVELS_META[0])
+      : { lvl: 1, name: 'शुरुआत', icon: '🥉', min: 0, max: 50 };
+    let nextLvl = (typeof EIGHT_LEVELS_META !== 'undefined' && Array.isArray(EIGHT_LEVELS_META))
+      ? EIGHT_LEVELS_META.find(x => x.lvl === currentLvl.lvl + 1)
+      : null;
 
-    if (bar) bar.style.width = Math.max(8, info.pct) + '%';
-    if (rankEl) rankEl.innerHTML = `${info.current.icon} लेवल ${info.current.level}: ${info.current.name}`;
-    if (ptsEl) ptsEl.innerHTML = `⚡ <strong>${pts}</strong> अंक ${info.next ? `(अगला लक्ष्य: ${info.next.minPts})` : '🏆'}`;
-
+    if (rankEl) rankEl.textContent = (currentLvl.icon || '🥉') + ' लेवल ' + currentLvl.lvl + ': ' + currentLvl.name;
+    if (bar) {
+      let pct = nextLvl ? Math.min(100, Math.round(((pts - currentLvl.min) / (nextLvl.min - currentLvl.min)) * 100)) : 100;
+      bar.style.width = Math.max(12, pct) + '%';
+    }
     if (hintEl) {
-      if (info.next) {
-        hintEl.innerHTML = `🎯 अगले स्तर (लेवल ${info.next.level}: ${info.next.name}) हेतु <strong>${info.remaining} अंक शेष!</strong>`;
-      } else {
-        hintEl.innerHTML = `🎉 बधाई! आप सर्वोच्च ${info.current.name} स्तर पर हैं!`;
-      }
+      let nextPts = nextLvl ? Math.max(0, nextLvl.min - pts) : 0;
+      hintEl.textContent = nextLvl ? ('🎯 अगले लेवल (' + nextLvl.name + ') हेतु ' + nextPts + ' अंक शेष!') : '🎉 सर्वोच्च राष्ट्रीय क्लब स्तर पर हैं!';
     }
-
-    if (tipEl && info.next) {
-      const kisanNeeded = Math.ceil(info.remaining / 10);
-      const fuNeeded = Math.ceil(info.remaining / 5);
-      tipEl.innerHTML = `👉 <strong>${kisanNeeded}</strong> किसान जोड़ें (+10 अंक) या <strong>${fuNeeded}</strong> फॉलो-अप पूर्ण करें (+5 अंक)!`;
-    }
-
-    const limit = Number(diaryGlobalConfig.free_limit) || 50;
     if (badgeEl) {
-      badgeEl.textContent = `कुल प्रविष्टियां: ${count}/${limit}`;
-      badgeEl.style.color = count >= limit ? '#f87171' : '#94a3b8';
+      const limit = Number(diaryGlobalConfig && diaryGlobalConfig.free_limit) || 50;
+      badgeEl.textContent = '⚡ ' + count + '/' + limit + ' प्रविष्टियां';
+      badgeEl.style.color = count >= limit ? '#f87171' : '#38bdf8';
     }
   }
 
-  function openLevelRoadmapModal() {
-    let modal = document.getElementById('diaryLevelRoadmapModal');
-    if (!modal) return;
-    modal.classList.add('active');
-    modal.style.display = 'flex';
-  }
+  currentEntityType = 'customer';
+  currentTeamStatus = 'prospect';
+  currentNeedCategory = 'crop_doctor';
+  let currentDiarySubItemId = 'ns_agri_stimrich';
+  let currentDiarySubItemTitle = '🌱 स्टीमरिच (Biofit Stimrich)';
 
-  function closeLevelRoadmapModal() {
-    let modal = document.getElementById('diaryLevelRoadmapModal');
-    if (modal) {
-      modal.classList.remove('active');
-      modal.style.display = 'none';
-    }
-  }
-
-  function switchTutorialVideo(url, btn) {
-    const iframe = document.getElementById('tutorialVideoIframe');
-    if (iframe && url) {
-      iframe.src = url;
-    }
-    if (btn) {
-      document.querySelectorAll('.btn-tutorial-video-tab').forEach(b => {
-        b.style.background = '#1e293b';
-        b.style.borderColor = '#334155';
-        b.style.color = '#cbd5e1';
-      });
-      btn.style.background = '#2563eb';
-      btn.style.borderColor = '#60a5fa';
-      btn.style.color = '#ffffff';
-    }
-  }
-
-  // Toggle Entity Type
   function setEntityType(type) {
-    currentEntityType = type;
+    currentEntityType = type || 'customer';
+
     const btnCust = document.getElementById('btnEntityCustomer');
     const btnTeam = document.getElementById('btnEntityTeam');
-    const btnAutoship = document.getElementById('btnEntityAutoship');
+    const btnAuto = document.getElementById('btnEntityAutoship');
     const teamWrap = document.getElementById('diaryTeamStatusWrap');
-    const cropWrap = document.getElementById('diaryKisanCropWrap');
-    const autoshipWrap = document.getElementById('diaryAutoshipDetailsWrap');
+    const kisanWrap = document.getElementById('diaryKisanCropWrap');
+    const autoWrap = document.getElementById('diaryAutoshipDetailsWrap');
 
-    if (btnCust) btnCust.classList.toggle('active', type === 'customer');
-    if (btnTeam) btnTeam.classList.toggle('active', type === 'team');
-    if (btnAutoship) btnAutoship.classList.toggle('active', type === 'autoship');
+    [btnCust, btnTeam, btnAuto].forEach(b => {
+      if (b) {
+        b.classList.remove('active');
+        b.style.setProperty('background', '#ffffff', 'important');
+        b.style.setProperty('color', '#0f172a', 'important');
+        b.style.setProperty('border', '2px solid #000000', 'important');
+      }
+    });
 
-    const netsurfWrap = document.getElementById('diaryTeamNetsurfIdWrap');
-    if (type === 'team') {
+    if (currentEntityType === 'team') {
+      if (btnTeam) {
+        btnTeam.classList.add('active');
+        btnTeam.style.setProperty('background', '#0052cc', 'important');
+        btnTeam.style.setProperty('color', '#ffffff', 'important');
+        btnTeam.style.setProperty('border', '2px solid #0052cc', 'important');
+      }
       if (teamWrap) teamWrap.style.display = 'block';
-      if (netsurfWrap) netsurfWrap.style.display = 'block';
-      if (cropWrap) cropWrap.style.display = 'none';
-      if (autoshipWrap) autoshipWrap.style.display = 'none';
-    } else if (type === 'autoship') {
+      if (kisanWrap) kisanWrap.style.display = 'none';
+      if (autoWrap) autoWrap.style.display = 'none';
+    } else if (currentEntityType === 'autoship') {
+      if (btnAuto) {
+        btnAuto.classList.add('active');
+        btnAuto.style.setProperty('background', '#0052cc', 'important');
+        btnAuto.style.setProperty('color', '#ffffff', 'important');
+        btnAuto.style.setProperty('border', '2px solid #0052cc', 'important');
+      }
       if (teamWrap) teamWrap.style.display = 'none';
-      if (netsurfWrap) netsurfWrap.style.display = 'none';
-      if (cropWrap) cropWrap.style.display = 'block';
-      if (autoshipWrap) autoshipWrap.style.display = 'block';
+      if (kisanWrap) kisanWrap.style.display = 'none';
+      if (autoWrap) autoWrap.style.display = 'block';
     } else {
+      if (btnCust) {
+        btnCust.classList.add('active');
+        btnCust.style.setProperty('background', '#0052cc', 'important');
+        btnCust.style.setProperty('color', '#ffffff', 'important');
+        btnCust.style.setProperty('border', '2px solid #0052cc', 'important');
+      }
       if (teamWrap) teamWrap.style.display = 'none';
-      if (netsurfWrap) netsurfWrap.style.display = 'none';
-      if (cropWrap) cropWrap.style.display = 'block';
-      if (autoshipWrap) autoshipWrap.style.display = 'none';
+      if (kisanWrap) kisanWrap.style.display = 'block';
+      if (autoWrap) autoWrap.style.display = 'none';
     }
   }
 
-  // Toggle Team Status
   function setTeamStatus(st) {
-    currentTeamStatus = st;
-    document.querySelectorAll('.status-pills-grid .status-pill-btn').forEach(btn => {
-      if (btn.getAttribute('data-status') === st) {
+    currentTeamStatus = st || 'prospect';
+
+    document.querySelectorAll('#diaryTeamStatusWrap .status-pill-btn').forEach(btn => {
+      if (btn.getAttribute('data-status') === currentTeamStatus) {
         btn.classList.add('active');
+        btn.style.setProperty('background', '#0052cc', 'important');
+        btn.style.setProperty('color', '#ffffff', 'important');
+        btn.style.setProperty('border', '2px solid #0052cc', 'important');
       } else {
         btn.classList.remove('active');
+        btn.style.setProperty('background', '#ffffff', 'important');
+        btn.style.setProperty('color', '#0f172a', 'important');
+        btn.style.setProperty('border', '1.5px solid #000000', 'important');
       }
     });
   }
 
-  // Dynamic Fields for Need Category
-  function renderDynamicNeedFields(need) {
-    const wrap = document.getElementById('diaryKisanCropWrap');
-    if (!wrap) return;
+  function handleDiaryMainSubjectChange(subj) {
+    currentNeedCategory = subj || 'crop_doctor';
+    const mainSelect = document.getElementById('diaryMainSubjectSelect');
+    if (mainSelect && mainSelect.value !== currentNeedCategory) mainSelect.value = currentNeedCategory;
+    populateDiarySubItemDropdown(currentNeedCategory);
+  }
 
-    if (need === 'पशुपालन व दूध वृद्धि' || need.includes('पशु')) {
-      wrap.innerHTML = `
-        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
-          🐄 पशु का प्रकार व डेयरी संबंधित आवश्यकता:
-        </label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <input type="text" id="diaryCropName" class="game-input" placeholder="पशु का प्रकार व संख्या (उदा. 2 गाय, 4 भैंस)" style="width:100%; margin:0;">
-          </div>
-          <div>
-            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
-              <option value="दूध उत्पादन वृद्धि (CFC)">🥛 दूध उत्पादन कम होना (दूध बढ़ाना)</option>
-              <option value="फैट व SNF वृद्धि">🧈 फैट व स्निग्धता (FAT कम होना)</option>
-              <option value="बांझपन व रिपीट ब्रीडिंग">🩺 बांझपन व रिपीट ब्रीडिंग समस्या</option>
-              <option value="थनैला रोग रोकथाम">🛑 थनैला (Mastitis) व थन सूजन</option>
-              <option value="पाचन व भूख न लगना">🌿 पाचन, गैस व भूख न लगना</option>
-              <option value="सामान्य स्वास्थ्य व चमक">🛡️ सामान्य स्वास्थ्य व वजन वृद्धि</option>
-            </select>
-          </div>
-        </div>
-      `;
-    } else if (need === 'स्वास्थ्य व पोषण' || need.includes('स्वास्थ्य')) {
-      wrap.innerHTML = `
-        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
-          🩺 स्वास्थ्य आवश्यकता व पोषण समाधान:
-        </label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <input type="text" id="diaryCropName" class="game-input" placeholder="मरीज / व्यक्ति (उदा. पिता जी उम्र 55 वर्ष)" style="width:100%; margin:0;">
-          </div>
-          <div>
-            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
-              <option value="डायबिटीज व शुगर नियंत्रण">🩸 डायबिटीज व अनियंत्रित शुगर</option>
-              <option value="बीपी व हृदय स्वास्थ्य">🫀 बीपी, कोलेस्ट्रॉल व हृदय स्वास्थ्य</option>
-              <option value="जोड़ों का दर्द व गठिया">🦴 जोड़ों का दर्द, गठिया व यूरिक एसिड</option>
-              <option value="गैस, एसिडिटी व कब्ज">🥗 गैस, कब्ज, एसिडिटी व पाचन</option>
-              <option value="मोटापा व पेट की चर्बी">⚖️ मोटापा व पेट की अतिरिक्त चर्बी</option>
-              <option value="कमजोरी व कम रोग प्रतिरोधक">⚡ कमजोरी, थकान व कम इम्यूनिटी</option>
-              <option value="बाल झड़ना व त्वचा रोग">💇 बालों का झड़ना व त्वचा विकार</option>
-            </select>
-          </div>
-        </div>
-      `;
-    } else if (need === 'डायरेक्ट बिज़नेस प्लान' || need.includes('बिज़नेस')) {
-      wrap.innerHTML = `
-        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
-          💼 बिज़नेस / पार्ट-टाइम कमाई लक्ष्य:
-        </label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <input type="text" id="diaryCropName" class="game-input" placeholder="वर्तमान पेशा (उदा. किसान, छात्र, दुकानदार)" style="width:100%; margin:0;">
-          </div>
-          <div>
-            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
-              <option value="पार्ट-टाइम ₹25k मासिक">💰 पार्ट-टाइम ₹15,000 से ₹25,000 मासिक आय</option>
-              <option value="फुल-टाइम करियर">🚀 फुल-टाइम डायरेक्ट सेलर बिज़नेस मॉडल</option>
-              <option value="विलेज स्टोर फ्रेंचाइजी">🏪 आरोग्यम विलेज स्टोर / डीलरशिप</option>
-              <option value="सक्षम व अस्मिता क्लब">🏆 सक्षम व अस्मिता क्लब अचिवमेंट</option>
-              <option value="15-दिन रॉयल्टी क्लोजिंग">📈 15-दिवसीय क्लोजिंग व रॉयल्टी</option>
-            </select>
-          </div>
-        </div>
-      `;
-    } else {
-      // Default: Agriculture
-      wrap.innerHTML = `
-        <label style="display:block; font-size:0.86rem; font-weight:800; color:#38bdf8; margin-bottom:8px;">
-          🌱 फसल व समस्या का त्वरित चयन:
-        </label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div>
-            <input type="text" id="diaryCropName" class="game-input" placeholder="फसल (उदा. गेहूं, चना, सोयाबीन, मिर्च)" style="width:100%; margin:0;">
-          </div>
-          <div>
-            <select id="diaryCropProblem" class="game-input" style="width:100%; margin:0;">
-              <option value="कीट व इल्ली नियंत्रण">🐛 कीट व इल्ली नियंत्रण</option>
-              <option value="फसल पीलापन व टॉनिक">🌿 पीलापन व टॉनिक/ग्रोथ</option>
-              <option value="फंगस व फफूंद रोग">🍄 फंगस व फफूंद रोग</option>
-              <option value="मिट्टी सुधार व जड़ विकास">🌱 मिट्टी सुधार व जड़ विकास</option>
-              <option value="फूल-फल झड़ना रोकना">🌸 फूल-फल वृद्धि व पोषण</option>
-              <option value="खरपतवार नियंत्रण">🌾 खरपतवार नियंत्रण</option>
-            </select>
-          </div>
-        </div>
-      `;
+  function populateDiarySubItemDropdown(subj) {
+    const subSelect = document.getElementById('diarySubItemSelect');
+    if (!subSelect) return;
+    const items = hubCatalogData[subj] || hubCatalogData['crop_doctor'] || [];
+    subSelect.innerHTML = items.map(item => `
+      <option value="${item.id}">${item.title || item.name || item.id}</option>
+    `).join('');
+    if (items.length > 0) {
+      currentDiarySubItemId = items[0].id;
+      currentDiarySubItemTitle = items[0].title || items[0].name || '';
+      subSelect.value = items[0].id;
     }
   }
 
-  // Toggle Need Category (Multi-Select Supported)
-  let selectedNeedCategories = ['कृषि व फसल रोग'];
+  function handleDiarySubItemChange(itemId) {
+    currentDiarySubItemId = itemId;
+    const items = hubCatalogData[currentNeedCategory] || [];
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      currentDiarySubItemTitle = item.title || item.name || '';
+    }
+  }
 
   function setNeedCategory(need) {
-    if (selectedNeedCategories.includes(need)) {
-      if (selectedNeedCategories.length > 1) {
-        selectedNeedCategories = selectedNeedCategories.filter(n => n !== need);
-      }
-    } else {
-      selectedNeedCategories.push(need);
-    }
-    currentNeedCategory = selectedNeedCategories.join(', ');
+    const needMap = {
+      'कृषि व फसल रोग': 'crop_doctor',
+      'कृषि / फसल रोग': 'crop_doctor',
+      'पशुपालन व दूध वृद्धि': 'pashupalan',
+      'पशुपालन / डेयरी': 'pashupalan',
+      'स्वास्थ्य व पोषण': 'health_wellness',
+      'महिला सौंदर्य व स्किनकेयर': 'beauty_care',
+      'सौंदर्य / स्किनकेयर': 'beauty_care',
+      'सभी जैविक उत्पाद': 'all_products',
+      'डायरेक्ट बिज़नेस प्लान': 'business_plan',
+      'नेट्सर्फ़ बिज़नेस': 'business_plan',
+      'आरोग्यम टीम लीडर': 'business_plan'
+    };
+    currentNeedCategory = needMap[need] || need || 'crop_doctor';
+
     document.querySelectorAll('#diaryNeedPillsWrap .status-pill-btn').forEach(btn => {
       const bNeed = btn.getAttribute('data-need');
-      if (selectedNeedCategories.includes(bNeed)) {
+      if (bNeed === need || needMap[bNeed] === currentNeedCategory) {
         btn.classList.add('active');
+        btn.style.setProperty('background', '#0052cc', 'important');
+        btn.style.setProperty('color', '#ffffff', 'important');
+        btn.style.setProperty('border', '2px solid #0052cc', 'important');
       } else {
         btn.classList.remove('active');
+        btn.style.setProperty('background', '#ffffff', 'important');
+        btn.style.setProperty('color', '#0f172a', 'important');
+        btn.style.setProperty('border', '1.5px solid #000000', 'important');
       }
     });
-    renderDynamicNeedFields(need);
   }
 
-  // Form Submit Handler
   async function handleDiaryFormSubmit(e) {
-    e.preventDefault();
-    if (!checkDiaryQuota()) return;
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
 
-    try {
-      const name = (document.getElementById('diaryInputName')?.value || '').trim();
-      const mobile = sanitize10DigitMobile(document.getElementById('diaryInputMobile')?.value || '');
-      const place = (document.getElementById('diaryInputPlace')?.value || '').trim();
-      const amt = Number(document.getElementById('diaryInputAmount')?.value) || 0;
-      const khataType = document.getElementById('diaryInputKhataType')?.value || 'none';
-      const asMonth = Number(document.getElementById('diaryAutoshipMonth')?.value) || 1;
-      const asOrder = Number(document.getElementById('diaryAutoshipAvgOrder')?.value) || 2000;
-      const asGift = document.getElementById('diaryAutoshipFreeGift')?.value || 'Stimrich (1L) + Bio99';
-      const asFreeMrp = Number(document.getElementById('diaryAutoshipFreeMrp')?.value) || 2000;
-      const netsurfId = (document.getElementById('diaryInputNetsurfId')?.value || '').trim();
-      const cropName = (document.getElementById('diaryCropName')?.value || '').trim();
-      const cropProb = document.getElementById('diaryCropProblem')?.value || '';
-      const billDetails = (document.getElementById('diaryInputBillDetails')?.value || '').trim();
-      const dueDate = document.getElementById('diaryInputDueDate')?.value || '';
+    const nameInput = document.getElementById('diaryInputName');
+    const mobInput = document.getElementById('diaryInputMobile');
+    const placeInput = document.getElementById('diaryInputPlace');
 
-      const asMonthsObj = {
-        m1: Number(document.getElementById('asMonth1')?.value) || 2000,
-        m2: Number(document.getElementById('asMonth2')?.value) || 2000,
-        m3: Number(document.getElementById('asMonth3')?.value) || 2000,
-        m4: Number(document.getElementById('asMonth4')?.value) || 2000,
-        m5: Number(document.getElementById('asMonth5')?.value) || 2000,
-        m6: Number(document.getElementById('asMonth6')?.value) || 0
-      };
+    const name = (nameInput && nameInput.value ? nameInput.value : '').trim();
+    const mobile = sanitize10DigitMobile(mobInput && mobInput.value ? mobInput.value : '');
+    const place = (placeInput && placeInput.value ? placeInput.value : '').trim();
 
-      if (!name || mobile.length < 10) {
-        alert('कृपया वैध नाम और 10 अंकों का मोबाइल नंबर दर्ज करें!');
-        return;
-      }
-
-      // 1. Check Local Diary for duplicates
-      const entries = getLocalDiaryEntries();
-      const existingIndex = entries.findIndex(item => item.mobile === mobile);
-      if (existingIndex !== -1) {
-        const exist = entries[existingIndex];
-        const typeLabel = exist.type === 'team' ? 'टीम साथी' : (exist.is_autoship ? 'ऑटोशिप ग्राहक' : 'किसान ग्राहक');
-        const doEdit = confirm(`⚠️ यह मोबाइल नंबर (${mobile}) आपकी डायरी में पहले से "${exist.name}" (${typeLabel}) के रूप में दर्ज है!\n\nक्या आप इसे एडिट या नई श्रेणी में अपग्रेड करना चाहते हैं?`);
-        if (doEdit) {
-          openEditCategoryModal(exist.id);
-          return;
-        }
-      }
-
-      // 2. Check Khatabook for duplicates
-      try {
-        const kbList = getKbEntries();
-        const kbExist = kbList.find(k => k.customer_mobile === mobile);
-        if (kbExist) {
-          const doContinue = confirm(`ℹ️ यह मोबाइल नंबर (${mobile}) आपके बहीखाता में "${kbExist.customer_name}" के रूप में पहले से मौजूद है।\n\nक्या आप इसे टीम डायरी में भी जोड़ना चाहते हैं?`);
-          if (!doContinue) return;
-        }
-      } catch (_) { }
-
-      // 3. Check Direct Referrals (profiles) for duplicates
-      try {
-        let refList = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]');
-        const refExist = refList.find(r => (r.mobile === mobile || r.phone === mobile));
-        if (refExist) {
-          alert(`🤝 यह मोबाइल नंबर (${mobile}) आपकी डायरेक्ट टीम में साथी "${refExist.full_name || refExist.name}" (ID: ${refExist.share_id || ''}) के रूप में पहले से पंजीकृत है!`);
-        }
-      } catch (_) { }
-
-      const newEntry = {
-        id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        name: name,
-        mobile: mobile,
-        place: place || 'स्थानीय',
-        type: currentEntityType,
-        team_status: currentEntityType === 'team' ? currentTeamStatus : null,
-        is_autoship: currentEntityType === 'autoship',
-        autoship_month: currentEntityType === 'autoship' ? asMonth : null,
-        autoship_order: currentEntityType === 'autoship' ? asOrder : null,
-        autoship_free_gift: currentEntityType === 'autoship' ? asGift : null,
-        autoship_free_mrp: currentEntityType === 'autoship' ? asFreeMrp : null,
-        autoship_months: currentEntityType === 'autoship' ? asMonthsObj : null,
-        netsurf_id: currentEntityType === 'team' ? netsurfId : null,
-        crop_name: cropName,
-        crop_problem: cropProb,
-        need: currentNeedCategory,
-        due_amount: khataType === 'give' ? amt : (khataType === 'got' ? -amt : 0),
-        khata_type: khataType,
-        bill_details: billDetails,
-        due_date: dueDate,
-        created_at: new Date().toISOString(),
-        followup_done: false,
-        activity_log: []
-      };
-
-      entries.unshift(newEntry);
-      saveLocalDiaryEntries(entries);
-      syncDiaryToVaultAsync(entries);
-
-      // Also save to local phonebook cache
-      try {
-        let pb = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
-        if (!pb.some(p => p.mobile === mobile)) {
-          pb.unshift({ name: name, mobile: mobile, place: place || 'स्थानीय' });
-          localStorage.setItem('AI_PHONEBOOK_CACHE', JSON.stringify(pb));
-        }
-      } catch (_) { }
-
-      // Asynchronously push to Supabase surveys (Zero-Duplicate Pipeline XXIX, Local-First Phonebook)
-      try {
-        if (window.supabase && typeof window.supabase.createClient === 'function') {
-          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          const myShareId = getAppUserShareId() || 'AI000004';
-          const myProfileId = getAppUserProfileId() || null;
-
-          client.from('surveys').insert([{
-            name: name,
-            mobile: mobile,
-            occupation: currentNeedCategory || (currentEntityType === 'team' ? 'टीम साथी' : (currentEntityType === 'autoship' ? 'ऑटोशिप ग्राहक' : 'किसान ग्राहक')),
-            state: place || 'स्थानीय',
-            district: place || 'स्थानीय',
-            source: 'myteam_diary_entry',
-            referred_by: myShareId,
-            profile_id: myProfileId
-          }]).then(() => { }).catch(() => { });
-        }
-      } catch (_) { }
-
-      // Award XP
-      calculateDiaryPoints();
-      updateDiaryHeroLevel();
-
-      // Refresh all views
-      renderDiaryLedger();
-      renderDiaryFollowups();
-      renderTodoPlanner();
-      renderAutoshipTracker();
-
-      alert(`🎉 ${name} जी की डायरी प्रविष्टि सफलतापूर्वक सुरक्षित हो गई!`);
-
-      // Reset form
-      document.getElementById('smartDiaryForm').reset();
-      document.getElementById('btnEntityCustomer')?.click();
-    } catch (err) {
-      console.error('Error saving diary entry:', err);
-      alert('प्रविष्टि सुरक्षित करते समय त्रुटि: ' + err.message);
+    if (!name || mobile.length !== 10) {
+      if (typeof alert === 'function') alert('कृपया व्यक्ति का पूरा नाम और 10 अंकों का मान्य मोबाइल नंबर दर्ज करें!');
+      if (mobInput) mobInput.focus();
+      return;
     }
+
+    // MANAS XXIX: 3-Way Verification on Input
+    try {
+      let isExisting = false;
+      let existingLabel = '';
+      const refs = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]');
+      const inRefs = refs.find(r => sanitize10DigitMobile(r.mobile || r.phone) === mobile);
+      if (inRefs) {
+        isExisting = true;
+        existingLabel = 'डायरेक्ट टीम साथी (' + (inRefs.full_name || inRefs.name) + ')';
+      }
+      if (!isExisting) {
+        const kb = getKbEntries();
+        const inKb = kb.find(k => sanitize10DigitMobile(k.customer_mobile) === mobile);
+        if (inKb) {
+          isExisting = true;
+          existingLabel = 'बहीखाता पार्टी (' + (inKb.customer_name) + ')';
+        }
+      }
+      if (!isExisting) {
+        const diary = getLocalDiaryEntries();
+        const inDiary = diary.find(d => sanitize10DigitMobile(d.mobile) === mobile);
+        if (inDiary) {
+          isExisting = true;
+          existingLabel = 'डायरी संपर्क (' + inDiary.name + ')';
+        }
+      }
+      if (isExisting) {
+        showToast('ℹ️ यह नंबर पहले से ' + existingLabel + ' के रूप में दर्ज है, विवरण अपडेट किया जा रहा है!', 'info');
+      }
+    } catch (_) { }
+
+    const myMob = getUserMobile();
+    const myShareId = getAppUserShareId();
+    const myProfileId = getAppUserProfileId();
+
+    const finalType = currentEntityType || 'customer';
+    const finalTeamStatus = finalType === 'team' ? (currentTeamStatus || 'prospect') : null;
+    const finalNeed = currentNeedCategory || 'crop_doctor';
+    const subItemId = currentDiarySubItemId || '';
+    const subItems = (typeof hubCatalogData !== 'undefined' && hubCatalogData[finalNeed]) ? hubCatalogData[finalNeed] : [];
+    const foundSub = subItems.find(i => i.id === subItemId) || subItems[0] || {};
+    const netsurfIdVal = (document.getElementById('diaryInputNetsurfId')?.value || '').trim();
+
+    const newEntry = {
+      id: 'entry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: name,
+      mobile: mobile,
+      place: place || 'स्थानीय',
+      type: finalType,
+      team_status: finalTeamStatus,
+      netsurf_id: netsurfIdVal,
+      need: finalNeed,
+      sub_item_id: subItemId,
+      sub_item_title: foundSub.title || currentDiarySubItemTitle || '',
+      is_autoship: finalType === 'autoship',
+      distributor_mobile: myMob,
+      referred_by: myShareId,
+      created_at: new Date().toISOString(),
+      followup_done: false
+    };
+
+    // Unhide if previously hidden
+    try {
+      let hidden = JSON.parse(localStorage.getItem('AI_HIDDEN_CONTACTS') || '[]');
+      if (hidden.includes(mobile)) {
+        hidden = hidden.filter(m => m !== mobile);
+        localStorage.setItem('AI_HIDDEN_CONTACTS', JSON.stringify(hidden));
+      }
+    } catch (_) { }
+
+    // 1. Save to Local Diary
+    const entries = getLocalDiaryEntries();
+    const existingIdx = entries.findIndex(x => sanitize10DigitMobile(x.mobile) === mobile);
+    if (existingIdx !== -1) {
+      entries[existingIdx] = Object.assign({}, entries[existingIdx], newEntry);
+    } else {
+      entries.unshift(newEntry);
+    }
+    saveLocalDiaryEntries(entries);
+
+    // 2. Push Worldwide Live to Supabase surveys & phonebook (MANAS Rule XXIX)
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const occupationLabel = currentEntityType === 'team'
+          ? (currentTeamStatus === 'joined' ? 'टीम साथी (Joined)' : 'टीम साथी (Prospect)')
+          : (currentEntityType === 'autoship' ? 'ऑटोशिप ग्राहक (6-Month)' : 'किसान / ग्राहक');
+
+        const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
+
+        const surveyPayload = {
+          profile_id: (myProfileId && isUuid(myProfileId)) ? myProfileId : null,
+          name: name,
+          mobile: mobile,
+          occupation: occupationLabel,
+          state: place || 'मध्य प्रदेश',
+          district: place || 'स्थानीय',
+          village: place || 'स्थानीय',
+          selected_categories: [currentNeedCategory || 'crop_doctor', currentEntityType],
+          category_answers: {
+            source: 'smart_diary',
+            created_by_mobile: myMob,
+            distributor_mobile: myMob,
+            referred_by: myShareId,
+            entity_type: currentEntityType,
+            team_status: currentEntityType === 'team' ? currentTeamStatus : null,
+            need: currentNeedCategory,
+            timestamp: new Date().toISOString()
+          }
+        };
+
+        client.from('surveys').insert([surveyPayload]).then(({ error }) => {
+          if (!error) console.log('✅ Entry synced live to Supabase surveys');
+        }).catch(() => { });
+
+        client.from('phonebook').insert([{
+          name: name,
+          mobile: mobile,
+          place: place || 'स्थानीय',
+          source: 'smart_diary'
+        }]).then(() => { }).catch(() => { });
+      }
+    } catch (_) { }
+
+    showToast(`🎉 ${name} जी की एंट्री सुरक्षित हुई व क्लाउड सिंक लाइव!`, 'success');
+
+    // Reset Form inputs
+    if (nameInput) nameInput.value = '';
+    if (mobInput) mobInput.value = '';
+    if (placeInput) placeInput.value = '';
+
+    // Re-render Contact Lists on Entry page & Follow-up
+    renderEntryPageContactList(1);
+    renderDiaryFollowups();
   }
 
+  function deleteDiaryEntry(id) {
+    if (!confirm('क्या आप वाकई इस संपर्क को हटाना चाहते हैं?')) return;
+    let entries = getLocalDiaryEntries();
+    entries = entries.filter(e => e.id !== id && e.mobile !== id);
+    saveLocalDiaryEntries(entries);
+    renderEntryPageContactList(entryPageCurrentPage, entryPageSearchQuery);
+    renderDiaryFollowups();
+    showToast('🗑️ संपर्क डायरी से हटा दिया गया!', 'info');
+  }
 
-  // Render Diary Ledger View (Tab 2: खाता बुक)
   function renderDiaryLedger() {
-    renderKhatabookPro();
     const listEl = document.getElementById('diaryLedgerCardsList');
     const mContacts = document.getElementById('ledgerMetricContacts');
     const mFollowups = document.getElementById('ledgerMetricFollowups');
@@ -2685,41 +2426,27 @@
     if (!listEl) return;
 
     const entries = getLocalDiaryEntries();
-    let totalDebit = 0;
-    let totalCredit = 0;
+    let totalDues = 0;
     let pendingFollowups = 0;
 
-    // Filter strictly to contacts having khata / udhari transaction
-    const khataEntries = entries.filter(e => {
-      const amt = Number(e.due_amount) || 0;
-      return amt !== 0 || e.khata_type === 'give' || e.khata_type === 'got';
-    });
-
-    khataEntries.forEach(e => {
-      const amt = Number(e.due_amount) || 0;
-      if (amt > 0) totalDebit += amt;
-      else if (amt < 0) totalCredit += Math.abs(amt);
+    entries.forEach(e => {
+      if (Number(e.due_amount) > 0) totalDues += Number(e.due_amount);
       if (!e.followup_done) pendingFollowups += 1;
     });
 
-    const debitValEl = document.getElementById('ledgerTotalDebitVal');
-    const creditValEl = document.getElementById('ledgerTotalCreditVal');
-    if (debitValEl) debitValEl.textContent = '₹' + totalDebit.toLocaleString('hi-IN');
-    if (creditValEl) creditValEl.textContent = '₹' + totalCredit.toLocaleString('hi-IN');
-
-    if (mContacts) mContacts.textContent = khataEntries.length;
+    if (mContacts) mContacts.textContent = entries.length;
     if (mFollowups) mFollowups.textContent = pendingFollowups;
-    if (mDues) mDues.textContent = '₹' + totalDebit.toLocaleString('hi-IN');
+    if (mDues) mDues.textContent = '₹' + totalDues.toLocaleString('hi-IN');
 
     const searchQ = (document.getElementById('ledgerSearchInput')?.value || '').toLowerCase().trim();
 
-    const filtered = khataEntries.filter(e => {
+    const filtered = entries.filter(e => {
       if (currentLedgerFilter === 'customer' && e.type !== 'customer') return false;
       if (currentLedgerFilter === 'team' && e.type !== 'team') return false;
       if (currentLedgerFilter === 'dues' && Number(e.due_amount) <= 0) return false;
 
       if (searchQ) {
-        const str = `${e.name} ${e.mobile} ${e.place} ${e.need} ${e.bill_details}`.toLowerCase();
+        const str = `${e.name} ${e.mobile} ${e.place} ${e.need}`.toLowerCase();
         return str.includes(searchQ);
       }
       return true;
@@ -2727,10 +2454,10 @@
 
     if (filtered.length === 0) {
       listEl.innerHTML = `
-        <div style="text-align:center; padding:32px 14px; background:#0f172a; border-radius:12px; border:1px solid #1e293b; color:#94a3b8;">
+        <div style="text-align:center; padding:24px 14px; background:#ffffff; border-radius:12px; border:1px dashed #cbd5e1; color:#64748b;">
           <div style="font-size:2rem; margin-bottom:8px;">📖</div>
-          <div style="font-weight:700; color:#cbd5e1; font-size:0.95rem;">वर्तमान में कोई उधारी / खाता प्रविष्टि नहीं मिली</div>
-          <p style="font-size:0.75rem; margin:4px 0 14px 0;">ऊपर '➕ नया खाता / उधारी जोड़ें' फॉर्म से सीधे नया लेन-देन दर्ज करें।</p>
+          <div style="font-weight:700; color:#0f172a; font-size:0.95rem;">कोई प्रविष्टि नहीं मिली</div>
+          <p style="font-size:0.75rem; margin:4px 0 14px 0;">'✍️ Team Entry' से नई प्रविष्टि जोड़ें।</p>
         </div>
       `;
       return;
@@ -2738,46 +2465,18 @@
 
     listEl.innerHTML = filtered.map(e => {
       const isTeam = e.type === 'team';
-      const statusBadge = isTeam
-        ? `<span style="background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🤝 टीम साथी</span>`
-        : `<span style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-size:0.70rem; font-weight:800;">🌾 ग्राहक / किसान</span>`;
-
-      let duesBadge = '';
-      const amt = Number(e.due_amount) || 0;
-      if (amt > 0) {
-        duesBadge = `<span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🔴 ₹${amt} बाकी (लेना है)</span>`;
-      } else if (amt < 0) {
-        duesBadge = `<span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:900;">🟢 जमा ₹${Math.abs(amt)} (प्राप्त हुआ)</span>`;
-      } else {
-        duesBadge = `<span style="background:#1e293b; color:#94a3b8; padding:2px 8px; border-radius:12px; font-size:0.72rem;">नकद चुकता</span>`;
-      }
-
       return `
-        <div style="background:#0f172a; border:1.5px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <strong style="font-size:1.0rem; color:#f8fafc;">${e.name}</strong>
-              ${statusBadge}
-              ${duesBadge}
-            </div>
-            <div style="font-size:0.78rem; color:#cbd5e1; margin-top:4px;">
-              📍 <strong>${e.place || 'स्थानीय'}</strong> • 📱 <span style="color:#38bdf8; font-weight:700;">${e.mobile}</span>
-              ${e.bill_details ? ` • 📝 विवरण: <span style="color:#fde047;">${e.bill_details}</span>` : ''}
-              ${e.due_date ? ` • 📅 वादा: <span style="color:#f87171; font-weight:700;">${e.due_date}</span>` : ''}
-            </div>
+            <strong style="color:#0f172a; font-size:0.96rem; display:block;">${e.name}</strong>
+            <span style="font-size:0.76rem; color:#64748b; font-weight:600;">📱 ${e.mobile} • 📍 ${e.place || 'स्थानीय'} • ${isTeam ? '🤝 टीम' : '🌾 किसान'}</span>
           </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn-action-call" style="background:#d97706; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.openCallQueue('${e.id}')">
-              📞 कॉल
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="window.AarogyamETailer.directFillToKhataForm('${e.mobile}')" style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; padding:5px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+              📕 खाता
             </button>
-            <button type="button" class="btn-action-wa" style="background:#16a34a; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.sendKhataStatementWhatsApp('${e.id}')">
-              💬 WA
-            </button>
-            <button type="button" class="admin-btn" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; padding:6px 10px; border-radius:8px; font-size:0.76rem; cursor:pointer;" onclick="window.AarogyamETailer.openEditCategoryModal('${e.id}')">
-              ✏️ एडिट
-            </button>
-            <button type="button" class="admin-btn" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:6px 10px; border-radius:8px; font-size:0.76rem; cursor:pointer;" onclick="window.AarogyamETailer.deleteDiaryEntry('${e.id}')">
-              🗑️
+            <button type="button" onclick="window.AarogyamETailer.deleteDiaryEntry('${e.id}')" style="background:#f8fafc; color:#64748b; border:1px solid #cbd5e1; padding:5px 10px; border-radius:6px; font-size:0.75rem; font-weight:800; cursor:pointer;">
+              🗑️ हटाएं
             </button>
           </div>
         </div>
@@ -2785,75 +2484,72 @@
     }).join('');
   }
 
-  function setLedgerFilter(filter) {
-    currentLedgerFilter = filter;
-    document.querySelectorAll('[data-filter]').forEach(b => {
-      if (b.getAttribute('data-filter') === filter) {
-        b.classList.add('active');
-      } else {
-        b.classList.remove('active');
-      }
-    });
+  function setLedgerFilter(f) {
+    currentLedgerFilter = f || 'all';
     renderDiaryLedger();
   }
 
-  function filterLedgerEntries() {
+  function filterLedgerEntries(q) {
     renderDiaryLedger();
   }
 
-  function deleteDiaryEntry(id) {
-    if (!confirm('क्या आप वाकई इस डायरी प्रविष्टि को हटाना चाहते हैं?')) return;
-    let entries = getLocalDiaryEntries().filter(e => e.id !== id);
-    saveLocalDiaryEntries(entries);
-    showToast('प्रविष्टि हटा दी गई!', 'info');
-  }
-
-  // Follow-up Hub State & Filtering
   let currentFollowupFilter = 'all';
+  let followupMultiFilter = {
+    category: 'all',
+    subject: 'all',
+    status: 'all'
+  };
 
-  function setFollowupFilter(filter) {
-    currentFollowupFilter = filter;
+  function filterFollowupEntries(rawList) {
+    let entries = rawList.slice();
 
-    // Update active filter pill UI
-    const pills = document.querySelectorAll('.followup-filter-chip');
-    pills.forEach(pill => {
-      const onclickAttr = pill.getAttribute('onclick') || '';
-      if (onclickAttr.includes(`'${filter}'`)) {
-        pill.classList.add('active');
-      } else {
-        pill.classList.remove('active');
-      }
-    });
-
-    renderDiaryFollowups();
-  }
-
-  function renderDiaryFollowups() {
-    const wrap = document.getElementById('diaryFollowupList');
-    if (!wrap) return;
-
-    let entries = getLocalDiaryEntries();
-    if (!entries || entries.length === 0) {
-      wrap.innerHTML = '<div style="text-align:center; padding:25px; color:#94a3b8; font-size:0.85rem;">📭 कोई फॉलो-अप प्रविष्टि उपलब्ध नहीं है। ऊपर "सरल एंट्री" से किसान या साथी जोड़ें!</div>';
-      return;
-    }
-
-    // Apply Segment Filter
-    if (currentFollowupFilter === 'customer') {
+    // 1. Category / Status Filter
+    const cat = followupMultiFilter.category || currentFollowupFilter || 'all';
+    if (cat === 'active_ai') {
+      entries = entries.filter(e => e.is_active || e.team_status === 'active' || e.team_status === 'core');
+    } else if (cat === 'inactive_ai') {
+      entries = entries.filter(e => !e.is_active && e.team_status !== 'active' && e.team_status !== 'core');
+    } else if (cat === 'customer') {
       entries = entries.filter(e => e.type === 'customer');
-    } else if (currentFollowupFilter === 'prospect') {
+    } else if (cat === 'team') {
+      entries = entries.filter(e => e.type === 'team');
+    } else if (cat === 'autoship') {
+      entries = entries.filter(e => e.type === 'autoship' || e.is_autoship);
+    } else if (cat === 'prospect') {
       entries = entries.filter(e => e.type === 'team' && (e.team_status === 'prospect' || !e.team_status));
-    } else if (currentFollowupFilter === 'joined') {
+    } else if (cat === 'joined') {
       entries = entries.filter(e => e.type === 'team' && e.team_status === 'joined');
-    } else if (currentFollowupFilter === 'active') {
+    } else if (cat === 'active') {
       entries = entries.filter(e => e.type === 'team' && e.team_status === 'active');
-    } else if (currentFollowupFilter === 'core') {
+    } else if (cat === 'core') {
       entries = entries.filter(e => e.type === 'team' && e.team_status === 'core');
-    } else if (currentFollowupFilter === 'dues') {
+    } else if (cat === 'dues') {
       entries = entries.filter(e => Number(e.due_amount) > 0);
     }
 
-    // Apply Date Filter
+    // 2. Subject / Need Filter
+    const subj = followupMultiFilter.subject || 'all';
+    if (subj !== 'all') {
+      entries = entries.filter(e => {
+        const n = String(e.need || '').toLowerCase();
+        if (subj === 'crop_doctor') return n.includes('crop') || n.includes('कृषि') || n.includes('biofit');
+        if (subj === 'health_wellness') return n.includes('health') || n.includes('स्वास्थ्य') || n.includes('naturamore');
+        if (subj === 'beauty_care') return n.includes('beauty') || n.includes('सौंदर्य') || n.includes('herbs');
+        if (subj === 'pashupalan') return n.includes('pashu') || n.includes('पशु') || n.includes('cfc');
+        if (subj === 'business_plan') return n.includes('business') || n.includes('बिज़नेस') || n.includes('plan');
+        return n.includes(subj);
+      });
+    }
+
+    // 3. Status Filter (Pending / Done / All)
+    const stat = followupMultiFilter.status || 'all';
+    if (stat === 'pending') {
+      entries = entries.filter(e => !e.followup_done);
+    } else if (stat === 'done') {
+      entries = entries.filter(e => !!e.followup_done);
+    }
+
+    // 4. Date Filter
     if (currentFollowupDateFilter) {
       entries = entries.filter(e => {
         const cDate = (e.created_at || '').split('T')[0];
@@ -2861,22 +2557,306 @@
       });
     }
 
-    if (entries.length === 0) {
-      wrap.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.85rem;">इस श्रेणी या चुनी गई तारीख में कोई फॉलो-अप नहीं मिला।</div>';
+    return entries;
+  }
+
+  function applyFollowupMultiFilters() {
+    const catEl = document.getElementById('fuFilterCategory');
+    const subjEl = document.getElementById('fuFilterSubject');
+    const statEl = document.getElementById('fuFilterStatus');
+
+    if (catEl) followupMultiFilter.category = catEl.value || 'all';
+    if (subjEl) followupMultiFilter.subject = subjEl.value || 'all';
+    if (statEl) followupMultiFilter.status = statEl.value || 'all';
+
+    currentFollowupFilter = followupMultiFilter.category;
+    renderDiaryFollowups();
+    if (typeof updateHubQueueProgressUI === 'function') updateHubQueueProgressUI();
+  }
+
+  function resetFollowupMultiFilters() {
+    followupMultiFilter = { category: 'all', subject: 'all', status: 'all' };
+    const catEl = document.getElementById('fuFilterCategory');
+    const subjEl = document.getElementById('fuFilterSubject');
+    const statEl = document.getElementById('fuFilterStatus');
+    if (catEl) catEl.value = 'all';
+    if (subjEl) subjEl.value = 'all';
+    if (statEl) statEl.value = 'all';
+
+    currentFollowupFilter = 'all';
+    renderDiaryFollowups();
+    if (typeof updateHubQueueProgressUI === 'function') updateHubQueueProgressUI();
+  }
+
+  function setFollowupFilter(filter) {
+    currentFollowupFilter = filter || 'all';
+    followupMultiFilter.category = currentFollowupFilter;
+    const catEl = document.getElementById('fuFilterCategory');
+    if (catEl) catEl.value = currentFollowupFilter;
+
+    const pills = document.querySelectorAll('.status-pill-btn[data-fu-filter], .followup-filter-chip');
+    pills.forEach(pill => {
+      const f = pill.getAttribute('data-fu-filter') || '';
+      const onclickAttr = pill.getAttribute('onclick') || '';
+      if (f === filter || onclickAttr.includes(`'${filter}'`)) {
+        pill.classList.add('active');
+        pill.style.background = '#000000';
+        pill.style.color = '#ffffff';
+        pill.style.borderColor = '#000000';
+      } else {
+        pill.classList.remove('active');
+        pill.style.background = '#ffffff';
+        pill.style.color = '#000000';
+        pill.style.borderColor = '#94a3b8';
+      }
+    });
+    renderDiaryFollowups();
+    if (typeof updateHubQueueProgressUI === 'function') updateHubQueueProgressUI();
+  }
+
+  function openLevelRoadmapModal(lvlNum) {
+    let modal = document.getElementById('levelDetailInfoModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'levelDetailInfoModal';
+      modal.className = 'game-modal-overlay';
+      modal.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000000100; align-items:center; justify-content:center; padding:14px; box-sizing:border-box;';
+      modal.innerHTML = `
+        <div style="background:#0f172a; border:2px solid #3b82f6; border-radius:14px; max-width:520px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 10px 40px rgba(0,0,0,0.8); padding:18px; position:relative; color:#ffffff;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1.5px solid #1e3a8a; padding-bottom:10px;">
+            <h3 id="lvlModalTitle" style="margin:0; font-size:1.1rem; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px;">
+              <span>🎮</span> <span>8-लेवल लीडरशिप प्रोग्रेस व रोडमैप</span>
+            </h3>
+            <button type="button" onclick="document.getElementById('levelDetailInfoModal').style.display='none'" style="background:#dc2626; border:none; color:#ffffff; font-size:1.1rem; font-weight:900; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+          </div>
+          <div id="lvlModalBody"></div>
+          <div style="margin-top:16px; text-align:center;">
+            <button type="button" onclick="document.getElementById('levelDetailInfoModal').style.display='none'" style="background:#2563eb; color:#ffffff; border:none; padding:10px 24px; border-radius:8px; font-weight:900; font-size:0.90rem; cursor:pointer; width:100%;">
+              ✓ समझ गया (Close)
+            </button>
+          </div>
+        </div>
+      `;
+      modal.onclick = function(e) { if (e.target === modal) modal.style.display = 'none'; };
+      document.body.appendChild(modal);
+    }
+    openLevelInfoModal(lvlNum || 1);
+  }
+
+  let activeFollowupEntry = null;
+  function openSmartFollowupPicker(entryId) {
+    const entries = getLocalDiaryEntries();
+    const entry = entries.find(e => e.id === entryId || e.mobile === entryId);
+    if (!entry) return;
+    activeFollowupEntry = entry;
+    const modal = document.getElementById('smartFollowupPickerModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+    }
+  }
+
+  function closeSmartFollowupPicker() {
+    const modal = document.getElementById('smartFollowupPickerModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+  }
+
+  function sendSmartFollowupOption(optionType) {
+    const e = activeFollowupEntry;
+    if (!e) return;
+    const sMob = getUserMobile();
+    const sName = getUserDisplayName();
+    const shareId = getAppUserShareId();
+    const link = 'https://aarogyamindia.online/?ref=' + encodeURIComponent(shareId);
+    let msg = `नमस्ते ${e.name} जी! आरोग्यम इंडिया से संपर्क करने हेतु धन्यवाद।\n${link}\n— ${sName}`;
+    window.open(`https://api.whatsapp.com/send?phone=91${e.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function acceptIncomingKhata(kdataToken) {
+    // Graceful placeholder
+  }
+
+  function checkIncomingKhataShare() {
+    // Graceful placeholder
+  }
+
+
+  // Unified Aggregator for all Outreach Contacts (Diary + Direct Team + Khatabook)
+  function getAllOutreachContacts() {
+    const unifiedMap = new Map();
+    const hiddenSet = getHiddenMobilesSet();
+
+    // 1. Local Diary Entries (Highest Priority)
+    try {
+      const diary = getLocalDiaryEntries();
+      diary.forEach(d => {
+        const m = sanitize10DigitMobile(d.mobile || "");
+        if (m && !hiddenSet.has(m) && !hiddenSet.has(d.id)) {
+          unifiedMap.set(m, {
+            id: d.id || ("diary_" + m),
+            name: d.name || "किसान साथी",
+            mobile: m,
+            place: d.place || "",
+            type: d.type || "customer",
+            team_status: d.team_status || (d.type === "team" ? "prospect" : undefined),
+            need: d.need || "crop_doctor",
+            sub_item_id: d.sub_item_id || "",
+            sub_item_title: d.sub_item_title || "",
+            is_autoship: !!d.is_autoship,
+            is_active: d.is_active !== undefined ? !!d.is_active : (d.type === 'team'),
+            is_registered: !!d.is_registered,
+            aarogyam_id: d.aarogyam_id || d.share_id || "",
+            netsurf_id: d.netsurf_id || "",
+            source: d.source || "diary",
+            followup_done: !!d.followup_done,
+            due_amount: d.due_amount || 0,
+            created_at: d.created_at || new Date().toISOString()
+          });
+        }
+      });
+    } catch (_) { }
+
+    // 2. Direct Referrals / Team Members (Unified without duplicating)
+    try {
+      let refs = JSON.parse(localStorage.getItem("AI_DIRECT_REFERRALS_CACHE") || "[]");
+      if (!refs.length) {
+        refs = JSON.parse(localStorage.getItem("AOI_DIRECT_REFERRALS_LEDGER") || "[]");
+      }
+      refs.forEach(r => {
+        const m = sanitize10DigitMobile(r.mobile || r.phone || "");
+        if (m && !hiddenSet.has(m) && !hiddenSet.has(r.id)) {
+          const isMemberActive = Boolean(r.is_active === true || r.is_active === 'true' || r.role === 'admin' || r.membership_level === 'vip');
+          if (!unifiedMap.has(m)) {
+            unifiedMap.set(m, {
+              id: r.id || ("team_" + m),
+              name: r.full_name || r.name || "टीम साथी",
+              mobile: m,
+              place: r.district || r.address || r.place || "",
+              type: "team",
+              team_status: "joined",
+              need: "crop_doctor",
+              is_active: isMemberActive,
+              is_registered: true,
+              aarogyam_id: r.share_id || "",
+              netsurf_id: r.netsurf_id || "",
+              source: "team",
+              followup_done: false,
+              due_amount: 0,
+              created_at: r.created_at || new Date().toISOString()
+            });
+          } else {
+            const existing = unifiedMap.get(m);
+            if (existing.is_active === undefined) existing.is_active = isMemberActive;
+            if (!existing.aarogyam_id && r.share_id) existing.aarogyam_id = r.share_id;
+            if (!existing.netsurf_id && r.netsurf_id) existing.netsurf_id = r.netsurf_id;
+          }
+        }
+      });
+    } catch (_) { }
+
+    // 3. Khatabook Parties
+    try {
+      const kb = getKbEntries();
+      kb.forEach(k => {
+        const m = sanitize10DigitMobile(k.customer_mobile || "");
+        if (m && !hiddenSet.has(m) && !hiddenSet.has(k.id) && !unifiedMap.has(m)) {
+          unifiedMap.set(m, {
+            id: k.id || ("khata_" + m),
+            name: k.customer_name || "खाता ग्राहक",
+            mobile: m,
+            place: k.customer_place || "",
+            type: "customer",
+            need: "khata_due",
+            source: "khatabook",
+            due_amount: Number(k.amount || 0),
+            followup_done: false,
+            created_at: k.created_at || new Date().toISOString()
+          });
+        }
+      });
+    } catch (_) { }
+
+    return Array.from(unifiedMap.values());
+  }
+
+  let followupCurrentPage = 1;
+  const followupPageSize = 20;
+
+  function changeFollowupPage(p) {
+    followupCurrentPage = Number(p) || 1;
+    renderDiaryFollowups();
+    const listEl = document.getElementById('diaryFollowupList');
+    if (listEl) listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function renderFollowupPagination(totalCount, currentPage, totalPages) {
+    const pagWrap = document.getElementById('followupPaginationControls');
+    if (!pagWrap) return;
+    if (totalCount <= followupPageSize) {
+      pagWrap.innerHTML = totalCount > 0 ? `<div style="text-align:center; font-size:0.84rem; color:#000000; font-weight:800; padding:6px;">कुल ${totalCount} संपर्क (पेज 1/1)</div>` : '';
       return;
     }
 
-    wrap.innerHTML = entries.map(e => {
+    pagWrap.innerHTML = `
+      <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin:16px 0; padding:10px; background:#ffffff; border:2px solid #000000; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+        <button type="button" onclick="window.AarogyamETailer.changeFollowupPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled style="opacity:0.4; cursor:not-allowed; background:#e2e8f0; color:#64748b; padding:8px 16px; border-radius:8px; font-weight:900; border:1.5px solid #cbd5e1;"' : 'style="background:#000000; color:#ffffff; padding:8px 16px; border-radius:8px; font-weight:900; cursor:pointer; border:none;"'}>
+          ◀ पिछला
+        </button>
+        <span style="font-size:0.88rem; font-weight:900; color:#000000;">
+          पेज ${currentPage} / ${totalPages} <span style="font-size:0.78rem; color:#475569; font-weight:700;">(कुल ${totalCount} संपर्क)</span>
+        </span>
+        <button type="button" onclick="window.AarogyamETailer.changeFollowupPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed; background:#e2e8f0; color:#64748b; padding:8px 16px; border-radius:8px; font-weight:900; border:1.5px solid #cbd5e1;"' : 'style="background:#000000; color:#ffffff; padding:8px 16px; border-radius:8px; font-weight:900; cursor:pointer; border:none;"'}>
+          अगला ▶
+        </button>
+      </div>
+    `;
+  }
+
+  function renderDiaryFollowups() {
+    const wrap = document.getElementById('diaryFollowupList');
+    if (!wrap) return;
+
+    // STRICT: Only load contacts saved in local diary (excluding hidden contacts)
+    const hiddenSet = getHiddenMobilesSet();
+    let entries = getLocalDiaryEntries().filter(e => !hiddenSet.has(sanitize10DigitMobile(e.mobile || '')) && !hiddenSet.has(e.id));
+    if (!entries || entries.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center; padding:25px; color:#475569; font-size:0.95rem; font-weight:800; background:#f8fafc; border:2px dashed #94a3b8; border-radius:10px;">📭 कोई डायरी फॉलो-अप प्रविष्टि उपलब्ध नहीं है। ऊपर "सरल एंट्री" से किसान या साथी जोड़ें!</div>';
+      renderFollowupPagination(0, 1, 1);
+      return;
+    }
+
+    // Apply Multi-Filters (Category, Subject, Status, Date)
+    entries = filterFollowupEntries(entries);
+
+    const totalFiltered = entries.length;
+    const totalPages = Math.ceil(totalFiltered / followupPageSize) || 1;
+    if (followupCurrentPage > totalPages) followupCurrentPage = totalPages;
+    if (followupCurrentPage < 1) followupCurrentPage = 1;
+
+    if (totalFiltered === 0) {
+      wrap.innerHTML = '<div style="text-align:center; padding:25px; color:#475569; font-size:0.95rem; font-weight:800; background:#f8fafc; border:2px dashed #94a3b8; border-radius:10px;">इस फ़िल्टर या चुनी गई तारीख में कोई फॉलो-अप नहीं मिला।</div>';
+      renderFollowupPagination(0, 1, 1);
+      return;
+    }
+
+    const startIdx = (followupCurrentPage - 1) * followupPageSize;
+    const pagedEntries = entries.slice(startIdx, startIdx + followupPageSize);
+
+    wrap.innerHTML = pagedEntries.map(e => {
       const isDone = !!e.followup_done;
       const dueAmt = Number(e.due_amount) || 0;
       const isSelected = selectedContactIds.has(e.id);
+      const isMemberActive = Boolean(e.is_active === true || e.is_active === 'true' || e.role === 'admin' || e.membership_level === 'vip');
 
       // Determine badge
       let typeBadge = '';
       if (e.type === 'customer') {
-        typeBadge = '<span style="background:#064e3b; color:#34d399; font-size:0.70rem; padding:2px 7px; border-radius:6px; font-weight:800;">🌾 किसान ग्राहक</span>';
+        typeBadge = '<span style="background:#f0fdf4 !important; color:#16a34a !important; font-size:0.72rem !important; padding:3px 8px; border-radius:6px; font-weight:900 !important; border:1.5px solid #16a34a !important;">🌾 किसान ग्राहक</span>';
       } else if (e.type === 'autoship' || e.is_autoship) {
-        typeBadge = `<span style="background:#78350f; color:#fde047; font-size:0.70rem; padding:2px 7px; border-radius:6px; font-weight:800;">🎁 ऑटोशिप (${e.autoship_month || 1}/6)</span>`;
+        typeBadge = `<span style="background:#fef3c7 !important; color:#92400e !important; font-size:0.72rem !important; padding:3px 8px; border-radius:6px; font-weight:900 !important; border:1.5px solid #fde68a !important;">🎁 ऑटोशिप (${e.autoship_month || 1}/6)</span>`;
       } else {
         const statusMap = {
           prospect: '1️⃣ नया प्रोस्पेक्ट',
@@ -2884,42 +2864,51 @@
           active: '3️⃣ सक्रिय साथी',
           core: '4️⃣ कोर लीडर'
         };
-        typeBadge = `<span style="background:#1e3a8a; color:#93c5fd; font-size:0.70rem; padding:2px 7px; border-radius:6px; font-weight:800;">${statusMap[e.team_status] || '👥 टीम साथी'}</span>`;
+        const activeBadge = isMemberActive
+          ? '<span style="background:#f0fdf4 !important; color:#16a34a !important; font-size:0.70rem !important; font-weight:900 !important; padding:2px 6px; border-radius:4px; border:1px solid #16a34a !important;">🟢 एक्टिव</span>'
+          : '<span style="background:#f1f5f9 !important; color:#475569 !important; font-size:0.70rem !important; font-weight:900 !important; padding:2px 6px; border-radius:4px; border:1px solid #94a3b8 !important;">⚪ इनएक्टिव</span>';
+
+        typeBadge = `<span style="background:#eff6ff !important; color:#1d4ed8 !important; font-size:0.72rem !important; padding:3px 8px; border-radius:6px; font-weight:900 !important; border:1.5px solid #bfdbfe !important;">${statusMap[e.team_status] || '👥 टीम साथी'}</span> ${activeBadge}`;
       }
 
+      const shareId = e.aarogyam_id || e.share_id || '';
+      const netsurfId = e.netsurf_id || '';
+
       return `
-        <div class="followup-item-card" style="background:${isDone ? '#091322' : '#0f172a'}; border:1px solid ${isDone ? '#10b981' : '#1e3a8a'}; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:12px; border-radius:10px; margin-bottom:8px;">
+        <div class="followup-item-card" style="background:#ffffff; border:2px solid #000000; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:12px; border-radius:10px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
           <div style="display:flex; align-items:flex-start; gap:10px; flex:1; min-width:220px;">
-            <input type="checkbox" class="diary-contact-checkbox" data-id="${e.id}" ${isSelected ? 'checked' : ''} onchange="window.AarogyamETailer.toggleContactSelect('${e.id}', this.checked)" style="width:20px; height:20px; cursor:pointer; margin-top:3px;">
+            <input type="checkbox" class="diary-contact-checkbox" data-id="${e.id}" ${isSelected ? 'checked' : ''} onchange="window.AarogyamETailer.toggleContactSelect('${e.id}', this.checked)" style="width:20px; height:20px; cursor:pointer; margin-top:3px; accent-color:#16a34a;">
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-                <span style="font-weight:900; font-size:1.0rem; color:#ffffff;">${e.name}</span>
+                <span style="font-weight:900; font-size:1.02rem; color:#000000 !important;">${e.name}</span>
                 ${typeBadge}
-                
-                ${isDone ? '<span style="background:#065f46; color:#a7f3d0; font-size:0.68rem; padding:2px 6px; border-radius:4px; font-weight:800;">✔️ संपर्क हुआ</span>' : ''}
+                ${shareId ? `<span style="background:#eff6ff; color:#1d4ed8; font-size:0.68rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1px solid #bfdbfe;">🆔 आरोग्यम: ${shareId}</span>` : ''}
+                ${netsurfId && netsurfId !== shareId ? `<span style="background:#fef3c7; color:#92400e; font-size:0.68rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1px solid #fde68a;">💼 नेटसर्फ: ${netsurfId}</span>` : ''}
+                ${isDone ? '<span style="background:#dcfce7 !important; color:#15803d !important; font-size:0.70rem !important; padding:2px 8px; border-radius:6px; font-weight:900 !important; border:1px solid #86efac !important;">✔️ संपर्क पूरा</span>' : ''}
               </div>
-              <div style="font-size:0.78rem; color:#cbd5e1;">
-                📍 <strong>${e.place || 'क्षेत्र दर्ज नहीं'}</strong> • 📱 <span style="color:#38bdf8; font-weight:700;">${e.mobile}</span>
-                ${e.crop_name ? ` • 🌱 फसल: <span style="color:#a7f3d0;">${e.crop_name}</span>` : ''}
-                ${e.need ? ` • 🎯 विषय: <span style="color:#fde047;">${e.need}</span>` : ''}
-                
+              <div style="font-size:0.80rem; color:#000000 !important; font-weight:800;">
+                📍 <strong>${e.place || 'क्षेत्र दर्ज नहीं'}</strong> • 📱 <span style="color:#0052cc !important; font-weight:900;">${e.mobile}</span>
+                ${e.crop_name ? ` • 🌱 फसल: <span style="color:#15803d; font-weight:800;">${e.crop_name}</span>` : ''}
+                ${e.need ? ` • 🎯 विषय: <span style="color:#b45309; font-weight:800;">${e.need}</span>` : ''}
               </div>
             </div>
           </div>
           <div class="followup-action-btn-group" style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="admin-btn" style="background:#16a34a; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.openSmartFollowupPicker('${e.id}')">
+            <button type="button" class="admin-btn" style="background:#16a34a; color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:0.80rem; font-weight:900; cursor:pointer; box-shadow:0 2px 6px rgba(22,163,74,0.3);" onclick="window.AarogyamETailer.openSmartFollowupPicker('${e.id}')">
               💬 WhatsApp
             </button>
-            <button type="button" class="admin-btn" style="background:#d97706; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.78rem; font-weight:800; cursor:pointer;" onclick="window.AarogyamETailer.openCallQueue('${e.id}')">
+            <button type="button" class="admin-btn" style="background:#d97706; color:#fff; border:none; padding:7px 14px; border-radius:8px; font-size:0.80rem; font-weight:900; cursor:pointer; box-shadow:0 2px 6px rgba(217,119,6,0.3);" onclick="window.AarogyamETailer.openCallQueue('${e.id}')">
               📞 कॉल
             </button>
-            <button type="button" class="admin-btn" style="background:#1e293b; color:#94a3b8; border:1px solid #334155; padding:6px 10px; border-radius:8px; font-size:0.78rem; cursor:pointer;" onclick="window.AarogyamETailer.openEditCategoryModal('${e.id}')">
+            <button type="button" class="admin-btn" style="background:#0f172a; color:#ffffff; border:1.5px solid #000000; padding:7px 12px; border-radius:8px; font-size:0.80rem; font-weight:900; cursor:pointer;" onclick="window.AarogyamETailer.openEditCategoryModal('${e.id}')">
               ✏️ एडिट
             </button>
           </div>
         </div>
       `;
     }).join('');
+
+    renderFollowupPagination(totalFiltered, followupCurrentPage, totalPages);
   }
 
   function markFollowupDone(id) {
@@ -3079,6 +3068,26 @@
         </div>
       </div>
     `;
+  }
+
+  function getLocalCashflow() {
+    try {
+      const mob = getUserMobile();
+      const key = mob ? `AAROGYAM_SMART_CASHFLOW_${mob}` : 'AAROGYAM_SMART_CASHFLOW';
+      return JSON.parse(localStorage.getItem(key) || localStorage.getItem('AAROGYAM_SMART_CASHFLOW') || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveLocalCashflow(cf) {
+    try {
+      const mob = getUserMobile();
+      const key = mob ? `AAROGYAM_SMART_CASHFLOW_${mob}` : 'AAROGYAM_SMART_CASHFLOW';
+      localStorage.setItem(key, JSON.stringify(cf));
+      localStorage.setItem('AAROGYAM_SMART_CASHFLOW', JSON.stringify(cf));
+    } catch (_) { }
+    if (typeof renderCashflowSummary === 'function') renderCashflowSummary();
   }
 
   // Pocket Cashflow Manager
@@ -3326,11 +3335,17 @@
 
   let activePickerCategoryFilter = 'all';
 
-  function openDiaryContactPicker(targetMode = 'main', initialCategory = 'all') {
+  function openDiaryContactPicker(targetMode = 'main', initialCategory = 'team') {
     currentPickerTarget = targetMode;
     activePickerCategoryFilter = initialCategory || 'all';
     const modal = document.getElementById('diaryContactPickerModal');
     if (!modal) return;
+    modal.style.removeProperty('display');
+    modal.style.setProperty('display', 'flex', 'important');
+
+    const myMob = getUserMobile();
+    const myShareId = getAppUserShareId();
+    const myProfileId = getAppUserProfileId();
 
     updatePickerTabStyles();
     renderDiaryPickerList('');
@@ -3341,21 +3356,58 @@
       }
     } catch (_) { }
 
-    // Fetch User's Direct Referrals from Supabase (Local-First: strictly 0 phonebook egress)
+    if (!myMob) {
+      renderDiaryPickerList('');
+      return;
+    }
+
+    // 1. Fetch live Khatabook entries from Supabase so Khatabook contacts show up immediately!
+    if (typeof loadKbEntriesFromSupabase === 'function') {
+      loadKbEntriesFromSupabase().then(() => {
+        const searchVal = document.getElementById('diaryPickerSearchInput')?.value || '';
+        renderDiaryPickerList(searchVal);
+      }).catch(() => {});
+    }
+
+    // 2. Fetch User's Direct Referrals from Supabase (Local-First: strictly 0 phonebook egress)
     try {
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const myShareId = getAppUserShareId();
-        const myMob = getUserMobile();
-        if (myShareId || myMob) {
-          const filterStr = myShareId ? (myMob ? `referred_by.eq.${myShareId},referred_by.eq.${myMob}` : `referred_by.eq.${myShareId}`) : `referred_by.eq.${myMob}`;
-          client.from('profiles').select('id, full_name, mobile, place, share_id, referred_by').or(filterStr).limit(150).then(({ data: refData }) => {
-            if (refData && refData.length > 0) {
-              localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(refData));
-              const searchVal = document.getElementById('diaryPickerSearchInput')?.value || '';
-              renderDiaryPickerList(searchVal);
+      const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
+      const orFilters = [];
+      if (/^[0-9]{10}$/.test(myMob)) orFilters.push(`referral_mobile.eq.${myMob}`);
+      if (myShareId) {
+        orFilters.push(`referral_code.eq.${myShareId}`);
+      }
+      if (myProfileId && isUuid(myProfileId)) orFilters.push(`referred_by.eq.${myProfileId}`);
+      
+      if (orFilters.length > 0) {
+        const filterStr = orFilters.join(',');
+        const onProfilesLoaded = (data) => {
+          if (data && data.length > 0) {
+            localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(data));
+            const searchVal = document.getElementById('diaryPickerSearchInput')?.value || '';
+            renderDiaryPickerList(searchVal);
+          }
+        };
+
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          client.from('profiles').select('id, full_name, mobile, district, address, share_id, referral_mobile, referral_code, referred_by, is_active, role, membership_level, created_at').or(filterStr).order('created_at', { ascending: false }).limit(200).then(({ data: refData, error }) => {
+            if (!error && refData && refData.length > 0) {
+              onProfilesLoaded(refData);
+            } else if (typeof fetch === 'function') {
+              const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=200`;
+              fetch(qUrl, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
+                .then(r => r.json())
+                .then(d => { if (Array.isArray(d) && d.length > 0) onProfilesLoaded(d); })
+                .catch(() => {});
             }
           }).catch(() => { });
+        } else if (typeof fetch === 'function') {
+          const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=200`;
+          fetch(qUrl, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
+            .then(r => r.json())
+            .then(d => { if (Array.isArray(d) && d.length > 0) onProfilesLoaded(d); })
+            .catch(() => {});
         }
       }
     } catch (_) { }
@@ -3378,27 +3430,40 @@
     renderDiaryPickerList(searchVal);
   }
 
-  function updatePickerTabStyles() {
-    const tabMap = {
-      all: 'tabPickAll',
-      diary: 'tabPickDiary',
-      phonebook: 'tabPickPhonebook',
-      khata: 'tabPickKhata'
-    };
-    Object.keys(tabMap).forEach(key => {
-      const btn = document.getElementById(tabMap[key]);
-      if (btn) {
-        if (activePickerCategoryFilter === key) {
-          btn.style.background = '#0052cc';
-          btn.style.color = '#ffffff';
-          btn.style.borderColor = '#0052cc';
-        } else {
-          btn.style.background = '#f1f5f9';
-          btn.style.color = '#334155';
-          btn.style.borderColor = '#cbd5e1';
-        }
+  function markContactSelected(mobile) {
+    const clean = sanitize10DigitMobile(mobile || '');
+    if (!clean) return;
+    try {
+      let sel = JSON.parse(localStorage.getItem('AI_PICKER_SELECTED_MOBILES') || '[]');
+      if (!Array.isArray(sel)) sel = [];
+      if (!sel.includes(clean)) {
+        sel.push(clean);
+        localStorage.setItem('AI_PICKER_SELECTED_MOBILES', JSON.stringify(sel));
       }
-    });
+    } catch (_) {}
+  }
+
+  function updatePickerTabStyles() {
+    const teamBtn = document.getElementById('tabPickTeam') || document.getElementById('tabPickDiary');
+    const pbBtn = document.getElementById('tabPickPhonebook');
+    const khataBtn = document.getElementById('tabPickKhata');
+
+    const setActiveStyle = (btn, isActive) => {
+      if (!btn) return;
+      if (isActive) {
+        btn.style.background = '#000000';
+        btn.style.color = '#ffffff';
+        btn.style.borderColor = '#000000';
+      } else {
+        btn.style.background = '#f1f5f9';
+        btn.style.color = '#000000';
+        btn.style.borderColor = '#94a3b8';
+      }
+    };
+
+    setActiveStyle(teamBtn, activePickerCategoryFilter === 'team' || activePickerCategoryFilter === 'diary' || activePickerCategoryFilter === 'all');
+    setActiveStyle(pbBtn, activePickerCategoryFilter === 'phonebook');
+    setActiveStyle(khataBtn, activePickerCategoryFilter === 'khata');
   }
 
   function filterDiaryPickerContacts(q) {
@@ -3459,6 +3524,7 @@
   function directFillToEntryForm(mobile) {
     const contact = findContactAnywhere(mobile);
     if (!contact) return;
+    markContactSelected(mobile);
 
     if (document.getElementById('diaryInputMobile')) {
       if (document.getElementById('diaryInputName')) document.getElementById('diaryInputName').value = contact.name || '';
@@ -3487,6 +3553,7 @@
   function directFillToKhataForm(mobile) {
     const contact = findContactAnywhere(mobile);
     if (!contact) return;
+    markContactSelected(mobile);
 
     if (document.getElementById('kbAddPartyModal')) {
       closeDiaryContactPicker();
@@ -3502,26 +3569,49 @@
   }
 
   function findContactAnywhere(mobile) {
+    const cleanMob = sanitize10DigitMobile(mobile || '');
+    if (!cleanMob) return null;
+
     const diaryEntries = getLocalDiaryEntries();
-    let contact = diaryEntries.find(e => e.mobile === mobile);
+    let contact = diaryEntries.find(e => sanitize10DigitMobile(e.mobile) === cleanMob);
     if (!contact) {
       const kbEntries = getKbEntries();
-      const k = kbEntries.find(e => e.customer_mobile === mobile);
-      if (k) contact = { name: k.customer_name, mobile: k.customer_mobile, place: k.customer_place, type: k.party_type || 'customer' };
+      const k = kbEntries.find(e => sanitize10DigitMobile(e.customer_mobile) === cleanMob);
+      if (k) contact = { name: k.customer_name, mobile: sanitize10DigitMobile(k.customer_mobile), place: k.customer_place, type: k.party_type || 'customer' };
     }
     if (!contact) {
       let directRefEntries = [];
       try { directRefEntries = JSON.parse(localStorage.getItem('AI_DIRECT_REFERRALS_CACHE') || '[]'); } catch (_) { }
-      const r = directRefEntries.find(e => (e.mobile || e.phone) === mobile);
-      if (r) contact = { name: r.full_name || r.name, mobile: r.mobile || r.phone, place: r.place || r.city, type: 'team', netsurf_id: r.share_id };
+      const r = directRefEntries.find(e => sanitize10DigitMobile(e.mobile || e.phone) === cleanMob);
+      if (r) contact = { name: r.full_name || r.name, mobile: sanitize10DigitMobile(r.mobile || r.phone), place: r.district || r.place || r.city || r.address, type: 'team', netsurf_id: r.share_id };
     }
     if (!contact) {
       let pbEntries = [];
       try { pbEntries = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]'); } catch (_) { }
-      const p = pbEntries.find(e => e.mobile === mobile);
+      const p = pbEntries.find(e => sanitize10DigitMobile(e.mobile) === cleanMob);
       if (p) contact = p;
     }
     return contact;
+  }
+
+  function isUserAccountActive() {
+    let u = {};
+    try { u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || '{}'); } catch (_) { }
+    const mob = String(u.mobile || u.phone || getUserMobile() || localStorage.getItem('aim_user_mobile') || '').replace(/\D/g, '').slice(-10);
+    if (mob === '7974422572' || mob === '7049294111' || u.role === 'admin') return true;
+    let isActive = Boolean(u.is_active || u.is_subscriber || u.status === 'active' || u.status === 'ACTIVE' || u.isVip);
+    if (!isActive) {
+      if (localStorage.getItem('user_is_active') === 'true' || localStorage.getItem('user_is_subscriber') === 'true') {
+        isActive = true;
+      } else {
+        try {
+          const p = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+          const b = JSON.parse(localStorage.getItem('my_purchased_book_ids') || '[]');
+          if ((Array.isArray(p) && p.length > 0) || (Array.isArray(b) && b.length > 0)) isActive = true;
+        } catch (_) { }
+      }
+    }
+    return isActive;
   }
 
   function renderDiaryPickerList(query) {
@@ -3540,72 +3630,145 @@
       }
     } catch (_) { }
 
+    const diaryMobilesSet = new Set(diaryEntries.map(e => sanitize10DigitMobile(e.mobile || '')).filter(Boolean));
+    let manualSelectedMobiles = [];
+    try { manualSelectedMobiles = JSON.parse(localStorage.getItem('AI_PICKER_SELECTED_MOBILES') || '[]'); } catch (_) { }
+    const selectedMobilesSet = new Set([...diaryMobilesSet, ...manualSelectedMobiles]);
+
     const allContactsMap = new Map();
 
-    // 1. Local Diary Entries
+    const getOrCreateContact = (mob, defaultProps) => {
+      if (!allContactsMap.has(mob)) {
+        allContactsMap.set(mob, {
+          id: defaultProps.id || ('cnt_' + mob),
+          name: defaultProps.name || '',
+          mobile: mob,
+          place: defaultProps.place || '',
+          type: defaultProps.type || 'customer',
+          crop_name: defaultProps.crop_name || '',
+          netsurf_id: defaultProps.netsurf_id || '',
+          source: defaultProps.source || 'diary',
+          is_team: Boolean(defaultProps.is_team),
+          is_khata: Boolean(defaultProps.is_khata),
+          is_diary: Boolean(defaultProps.is_diary),
+          is_phonebook: Boolean(defaultProps.is_phonebook),
+          is_registered: Boolean(defaultProps.is_registered),
+          is_selected: selectedMobilesSet.has(mob)
+        });
+      }
+      return allContactsMap.get(mob);
+    };
+
+    // 1. User's Direct Referrals / Team Members (Priority 1)
+    directRefEntries.forEach(r => {
+      const rMob = sanitize10DigitMobile(r.mobile || r.phone || '');
+      if (rMob) {
+        const isMemberActive = Boolean(r.is_active === true || r.is_active === 'true' || r.role === 'admin' || r.membership_level === 'vip');
+        const item = getOrCreateContact(rMob, {
+          id: 'ref_' + rMob,
+          name: r.full_name || r.name || 'डायरेक्ट टीम साथी',
+          place: r.district || r.place || r.city || r.address || '',
+          source: 'referral',
+          type: 'team',
+          aarogyam_id: r.share_id || '',
+          netsurf_id: r.netsurf_id || '',
+          is_team: true,
+          is_registered: true,
+          is_active: isMemberActive
+        });
+        item.is_team = true;
+        item.is_registered = true;
+        item.is_active = isMemberActive;
+        if (r.share_id) item.aarogyam_id = r.share_id;
+        if (r.netsurf_id) item.netsurf_id = r.netsurf_id;
+        if (!item.name || item.name === 'किसान साथी' || item.name === 'खाता ग्राहक' || item.name === 'संपर्क') {
+          if (r.full_name || r.name) item.name = r.full_name || r.name;
+        }
+        if (!item.place && (r.district || r.place || r.city || r.address)) {
+          item.place = r.district || r.place || r.city || r.address;
+        }
+      }
+    });
+
+    // 2. Local Diary Entries
     diaryEntries.forEach(e => {
-      if (e.mobile) {
-        allContactsMap.set(e.mobile, {
+      const eMob = sanitize10DigitMobile(e.mobile || '');
+      if (eMob) {
+        const item = getOrCreateContact(eMob, {
           id: e.id,
           name: e.name || 'किसान साथी',
-          mobile: e.mobile,
           place: e.place || '',
           source: 'diary',
           type: e.type || 'customer',
           crop_name: e.crop_name || '',
-          netsurf_id: e.netsurf_id || ''
+          netsurf_id: e.netsurf_id || '',
+          is_diary: true,
+          is_team: e.type === 'team'
         });
+        item.is_diary = true;
+        if (e.type === 'team') item.is_team = true;
+        if (e.name && (!item.name || item.name === 'खाता ग्राहक' || item.name === 'संपर्क')) item.name = e.name;
+        if (e.place && !item.place) item.place = e.place;
+        if (e.crop_name) item.crop_name = e.crop_name;
+        if (e.netsurf_id && !item.netsurf_id) item.netsurf_id = e.netsurf_id;
       }
     });
 
-    // 2. Khatabook Parties
+    // 3. Khatabook Parties
     kbEntries.forEach(k => {
-      const kMob = k.customer_mobile;
-      if (kMob && !allContactsMap.has(kMob)) {
-        allContactsMap.set(kMob, {
-          id: 'kb_' + kMob,
+      const kMob = sanitize10DigitMobile(k.customer_mobile || '');
+      if (kMob) {
+        const item = getOrCreateContact(kMob, {
+          id: 'kb_' + (k.id || kMob),
           name: k.customer_name || 'खाता ग्राहक',
-          mobile: kMob,
           place: k.customer_place || '',
           source: 'khata',
           type: k.party_type || 'customer',
-          crop_name: '',
-          netsurf_id: ''
+          is_khata: true
         });
-      }
-    });
-
-    // 3. User's Direct Referrals / Team Members
-    directRefEntries.forEach(r => {
-      const rMob = r.mobile || r.phone;
-      if (rMob && !allContactsMap.has(rMob)) {
-        allContactsMap.set(rMob, {
-          id: 'ref_' + rMob,
-          name: r.full_name || r.name || 'डायरेक्ट साथी',
-          mobile: rMob,
-          place: r.place || r.city || '',
-          source: 'referral',
-          type: 'team',
-          crop_name: '',
-          netsurf_id: r.share_id || '',
-          is_registered: true
-        });
+        item.is_khata = true;
+        if (k.customer_name && (!item.name || item.name === 'संपर्क')) item.name = k.customer_name;
+        if (k.customer_place && !item.place) item.place = k.customer_place;
       }
     });
 
     // 4. Phonebook Cache
     pbEntries.forEach(p => {
-      if (p.mobile && !allContactsMap.has(p.mobile)) {
-        allContactsMap.set(p.mobile, {
-          id: 'pb_' + p.mobile,
+      const pMob = sanitize10DigitMobile(p.mobile || '');
+      if (pMob) {
+        const item = getOrCreateContact(pMob, {
+          id: 'pb_' + pMob,
           name: p.name || 'संपर्क',
-          mobile: p.mobile,
           place: p.place || '',
           source: 'phonebook',
           type: 'customer',
-          crop_name: '',
-          netsurf_id: ''
+          is_phonebook: true
         });
+        item.is_phonebook = true;
+        if (p.name && !item.name) item.name = p.name;
+        if (p.place && !item.place) item.place = p.place;
+      }
+    });
+
+    // 5. Cloud Surveys Cache (from Supabase - for Picker only, never pollutes Diary)
+    let cloudSurveyEntries = [];
+    try { cloudSurveyEntries = JSON.parse(localStorage.getItem('AI_CLOUD_SURVEYS_CACHE') || '[]'); } catch (_) { }
+    cloudSurveyEntries.forEach(s => {
+      const sMob = sanitize10DigitMobile(s.mobile || '');
+      if (sMob) {
+        const item = getOrCreateContact(sMob, {
+          id: s.id || ('surv_' + sMob),
+          name: s.name || 'किसान साथी',
+          place: s.place || '',
+          source: 'cloud_survey',
+          type: s.type || 'customer',
+          crop_name: s.crop_name || '',
+          netsurf_id: s.netsurf_id || '',
+          is_phonebook: true
+        });
+        if (s.name && (!item.name || item.name === 'किसान साथी' || item.name === 'संपर्क')) item.name = s.name;
+        if (s.place && !item.place) item.place = s.place;
+        if (s.netsurf_id && !item.netsurf_id) item.netsurf_id = s.netsurf_id;
       }
     });
 
@@ -3613,9 +3776,12 @@
     const q = (query || '').toLowerCase().trim();
 
     const filtered = allContacts.filter(e => {
-      if (activePickerCategoryFilter === 'diary' && e.source !== 'diary' && e.source !== 'referral') return false;
-      if (activePickerCategoryFilter === 'phonebook' && e.source !== 'phonebook') return false;
-      if (activePickerCategoryFilter === 'khata' && e.source !== 'khata') return false;
+      if (activePickerCategoryFilter === 'active' && e.is_selected) return false;
+      if (activePickerCategoryFilter === 'inactive' && !e.is_selected) return false;
+      if (activePickerCategoryFilter === 'team' && !e.is_team && e.source !== 'referral' && e.type !== 'team' && !e.netsurf_id) return false;
+      if (activePickerCategoryFilter === 'diary' && !e.is_diary && !e.is_team && e.source !== 'diary' && e.source !== 'referral' && e.type !== 'team' && !e.netsurf_id) return false;
+      if (activePickerCategoryFilter === 'phonebook' && !e.is_phonebook && e.source !== 'phonebook') return false;
+      if (activePickerCategoryFilter === 'khata' && !e.is_khata && e.source !== 'khata') return false;
 
       if (!q) return true;
       return (e.name && e.name.toLowerCase().includes(q)) ||
@@ -3625,71 +3791,260 @@
     });
 
     if (filtered.length === 0) {
+      let emptyMsg = 'ऊपर "फ़ोन से चुनें" या "CSV / VCF अपलोड" बटन दबाकर संपर्क लोड करें या फ़ॉर्म में सीधे नया नंबर दर्ज करें।';
+      let icon = '📭';
+      if (activePickerCategoryFilter === 'active') {
+        icon = '🎉';
+        emptyMsg = 'बधाई! सभी उपलब्ध संपर्क सेलेक्ट किए जा चुके हैं। कोई शेष नया संपर्क नहीं बचा।';
+      } else if (activePickerCategoryFilter === 'inactive') {
+        icon = '⚪';
+        emptyMsg = 'अभी कोई संपर्क सेलेक्ट या इनएक्टिव नहीं है। जो संपर्क आप फॉर्म में चुनेंगे वे यहाँ दिखेंगे।';
+      } else if (activePickerCategoryFilter === 'team' || activePickerCategoryFilter === 'diary') {
+        icon = '🤝';
+        emptyMsg = 'कोई डायरेक्ट टीम साथी नहीं मिला। आपकी शेयर आईडी से जुड़ने वाले साथी यहाँ स्वतः दिखाई देंगे।';
+      } else if (activePickerCategoryFilter === 'khata') {
+        icon = '📕';
+        emptyMsg = 'कोई बहीखाता ग्राहक नहीं मिला। बहीखाता में नए लेन-देन दर्ज करते ही वे यहाँ दिखेंगे।';
+      }
+
       listWrap.innerHTML = `
-        <div style="text-align:center; padding:24px; color:#64748b; font-size:0.85rem; background:#ffffff; border-radius:10px; border:1px dashed #cbd5e1;">
-          <div style="font-size:2rem; margin-bottom:6px;">📭</div>
-          <strong style="color:#0f172a; display:block; font-size:0.95rem;">कोई संपर्क नहीं मिला</strong>
-          <span style="font-size:0.75rem; color:#64748b; display:block; margin-top:4px;">
-            ऊपर 'फ़ोन से चुनें' या 'CSV / VCF अपलोड' बटन दबाकर संपर्क लोड करें या फ़ॉर्म में सीधे नया नंबर दर्ज करें।
+        <div style="text-align:center; padding:24px; color:#000000; font-size:0.88rem; font-weight:800; background:#ffffff; border-radius:10px; border:2px dashed #000000;">
+          <div style="font-size:2rem; margin-bottom:6px;">${icon}</div>
+          <strong style="color:#000000 !important; display:block; font-size:1.0rem; font-weight:900;">कोई संपर्क नहीं मिला</strong>
+          <span style="font-size:0.80rem; color:#000000 !important; font-weight:700; display:block; margin-top:4px;">
+            ${emptyMsg}
           </span>
         </div>
       `;
       return;
     }
 
-    listWrap.innerHTML = filtered.map(e => {
+    const itemsHtml = filtered.map(e => {
       let badgeLabel = '📖 डायरी';
-      let badgeBg = '#eff6ff';
-      let badgeColor = '#0052cc';
-      if (e.source === 'referral') {
-        badgeLabel = '🤝 डायरेक्ट टीम';
-        badgeBg = '#f0fdf4';
-        badgeColor = '#16a34a';
-      } else if (e.source === 'khata') {
+      let badgeBorder = '1.5px solid #000000';
+      if (e.is_team || e.source === 'referral' || e.type === 'team') {
+        badgeLabel = '🤝 My Team';
+      } else if (e.is_khata || e.source === 'khata') {
         badgeLabel = '📕 बहीखाता';
-        badgeBg = '#fef2f2';
-        badgeColor = '#dc2626';
-      } else if (e.source === 'phonebook') {
+      } else if (e.is_phonebook || e.source === 'phonebook') {
         badgeLabel = '📱 फ़ोन बुक';
-        badgeBg = '#f8fafc';
-        badgeColor = '#475569';
       }
 
       const isRegistered = e.is_registered || directRefEntries.some(r => (r.mobile === e.mobile || r.phone === e.mobile));
 
       return `
-        <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:10px 12px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.03); display:flex; flex-direction:column; gap:6px;">
+        <div style="background:#ffffff; border:2px solid #000000; border-radius:10px; padding:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:8px;">
           <div onclick="window.AarogyamETailer.selectContactFromDiary('${e.mobile}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div style="flex:1; min-width:0;">
               <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                <strong style="color:#0f172a; font-size:0.96rem; font-weight:800; line-height:1.2;">${e.name}</strong>
-                ${isRegistered ? '<span style="background:#dcfce7; color:#15803d; font-size:0.68rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1px solid #bbf7d0;">🟢 आरोग्यम सदस्य</span>' : ''}
+                <strong style="color:#000000 !important; font-size:1.02rem; font-weight:900; line-height:1.2;">${e.name}</strong>
+                ${(e.is_team || e.source === 'referral') ? (e.is_active ? '<span style="background:#f0fdf4 !important; color:#16a34a !important; font-size:0.74rem !important; font-weight:900 !important; padding:3px 8px; border-radius:6px; border:1.5px solid #16a34a !important;">🟢 एक्टिव साथी</span>' : '<span style="background:#f1f5f9 !important; color:#475569 !important; font-size:0.74rem !important; font-weight:900 !important; padding:3px 8px; border-radius:6px; border:1.5px solid #94a3b8 !important;">⚪ इनएक्टिव साथी</span>') : ''}
+                ${e.is_selected ? '<span style="background:#f1f5f9; color:#000000; font-size:0.70rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1.5px solid #000000;">✔️ सहेजा गया / सेलेक्टेड</span>' : ''}
               </div>
-              <span style="font-size:0.78rem; color:#475569; font-weight:600; display:block; margin-top:2px; word-break:break-all;">
-                📱 ${e.mobile} ${e.place ? '• 📍 ' + e.place : ''} ${e.netsurf_id ? '• 🆔 ' + e.netsurf_id : ''}
+              <span style="font-size:0.86rem; color:#000000 !important; font-weight:800; display:block; margin-top:3px; word-break:break-all;">
+                📞 +91 ${e.mobile} ${e.place ? '• 📍 ' + e.place : ''} ${e.aarogyam_id ? '• 🆔 आरोग्यम: ' + e.aarogyam_id : ''} ${e.netsurf_id && e.netsurf_id !== e.aarogyam_id ? '• 💼 नेटसर्फ: ' + e.netsurf_id : ''}
               </span>
             </div>
-            <span style="background:${badgeBg}; color:${badgeColor}; font-size:0.70rem; font-weight:900; padding:3px 7px; border-radius:6px; border:1px solid rgba(0,0,0,0.08); white-space:nowrap; flex-shrink:0;">
+            <span style="background:#ffffff; color:#000000 !important; font-size:0.74rem; font-weight:900; padding:3px 8px; border-radius:6px; border:${badgeBorder}; white-space:nowrap; flex-shrink:0;">
               ${badgeLabel}
             </span>
           </div>
 
-          <div style="display:flex; gap:6px; border-top:1px dashed #e2e8f0; padding-top:6px; margin-top:2px;">
-            <button type="button" onclick="event.stopPropagation(); window.AarogyamETailer.directFillToEntryForm('${e.mobile}')" style="flex:1; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:6px; padding:6px 6px; font-size:0.74rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap;">
+          <div style="display:flex; gap:6px; border-top:1.5px solid #cbd5e1; padding-top:8px; margin-top:2px;">
+            <button type="button" onclick="event.stopPropagation(); window.AarogyamETailer.directFillToEntryForm('${e.mobile}')" style="flex:1; background:#0052cc !important; color:#ffffff !important; border:none; border-radius:6px; padding:8px 8px; font-size:0.80rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,82,204,0.3);">
               <span>➕</span> <span>एंट्री फॉर्म में भरें</span>
             </button>
-            <button type="button" onclick="event.stopPropagation(); window.AarogyamETailer.directFillToKhataForm('${e.mobile}')" style="flex:1; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:6px; padding:6px 6px; font-size:0.74rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap;">
+            <button type="button" onclick="event.stopPropagation(); window.AarogyamETailer.directFillToKhataForm('${e.mobile}')" style="flex:1; background:#dc2626 !important; color:#ffffff !important; border:none; border-radius:6px; padding:8px 8px; font-size:0.80rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; box-shadow:0 2px 6px rgba(220,38,38,0.3);">
               <span>📕</span> <span>खाता में जोड़ें</span>
             </button>
           </div>
         </div>
       `;
     }).join('');
+
+    const isTeamCategory = (activePickerCategoryFilter === 'team' || activePickerCategoryFilter === 'diary');
+    const isUserActive = (typeof isUserAccountActive === 'function') ? isUserAccountActive() : true;
+    const activationNoticeHtml = `
+      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.2rem;">🔒</span>
+        <div style="font-size:0.75rem; color:#92400e; line-height:1.3;">
+          <strong>डायरेक्ट टीम अनलॉक करें:</strong> आपकी ID अभी सक्रिय नहीं है। पूरा डेटा देखने के लिए ID एक्टिवेट करें।
+        </div>
+      </div>
+    `;
+
+    if (isTeamCategory && !isUserActive) {
+      listWrap.innerHTML = activationNoticeHtml + `
+        <div onclick="alert('कृपया अपनी ID सक्रिय (Active) करें! एडमिन से 7974422572 पर WhatsApp करें।')" style="position:relative; cursor:not-allowed;">
+          <div style="filter:blur(5px); opacity:0.35; pointer-events:none; user-select:none;">
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
+    } else {
+      listWrap.innerHTML = itemsHtml;
+    }
+  }
+
+  // Live Saved Contacts List on pages/myteam.html (Searchable, Paginated 10/page, Edit & Delete)
+  let entryPageCurrentPage = 1;
+  let entryPageSearchQuery = '';
+
+  
+  // Helper: Get Hidden Mobiles
+  function getHiddenMobilesSet() {
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem('AI_HIDDEN_CONTACTS') || '[]'); } catch (_) {}
+    return new Set(list.map(m => sanitize10DigitMobile(m)).filter(Boolean));
+  }
+
+  function hideDiaryEntry(idOrMob) {
+    const raw = String(idOrMob || '');
+    const cleanMob = sanitize10DigitMobile(raw);
+    const isConfirmed = (typeof window !== "undefined" && typeof window.confirm === "function") ? window.confirm("क्या आप वाकई इस संपर्क को सूची से छिपाना (Hide) चाहते हैं? यह संपर्क फॉलो-अप सूची से हट जाएगा और डेटा पूर्णतः सुरक्षित रहेगा।") : true;
+    if (!isConfirmed) return;
+
+    let hidden = [];
+    try { hidden = JSON.parse(localStorage.getItem('AI_HIDDEN_CONTACTS') || '[]'); } catch (_) {}
+    const toAdd = cleanMob || raw;
+    if (toAdd && !hidden.includes(toAdd)) {
+      hidden.push(toAdd);
+      localStorage.setItem('AI_HIDDEN_CONTACTS', JSON.stringify(hidden));
+    }
+    showToast("✓ संपर्क छिपा दिया गया है (Follow-up से हटा दिया गया)।", "info");
+    renderEntryPageContactList(entryPageCurrentPage);
+    if (typeof renderDiaryFollowups === 'function') renderDiaryFollowups();
+  }
+
+  function unhideAllContacts() {
+    localStorage.removeItem('AI_HIDDEN_CONTACTS');
+    showToast("✓ सभी छिपे संपर्क पुनः दृश्यमान हो गए हैं।", "success");
+    renderEntryPageContactList(1);
+    if (typeof renderDiaryFollowups === 'function') renderDiaryFollowups();
+  }
+
+  function renderEntryPageContactList(page = 1, searchQuery = '') {
+    const listWrap = document.getElementById('entryPageContactsContainer');
+    const badgeEl = document.getElementById('entryPageContactsTotalBadge');
+    const paginationEl = document.getElementById('entryPagePaginationControls');
+    if (!listWrap) return;
+
+    if (page !== undefined && page !== null) entryPageCurrentPage = Number(page) || 1;
+    if (searchQuery !== undefined && searchQuery !== null) entryPageSearchQuery = (searchQuery + '').toLowerCase().trim();
+
+    // STRICT: Only show contacts actually saved in the local diary
+    const hiddenSet = getHiddenMobilesSet();
+    const allItems = getLocalDiaryEntries().filter(e => !hiddenSet.has(sanitize10DigitMobile(e.mobile || '')));
+    const q = entryPageSearchQuery;
+
+    const filtered = allItems.filter(e => {
+      if (!q) return true;
+      return (e.name && e.name.toLowerCase().includes(q)) ||
+             (e.mobile && e.mobile.includes(q)) ||
+             (e.place && e.place.toLowerCase().includes(q)) ||
+             (e.need && e.need.toLowerCase().includes(q)) ||
+             (e.sub_item_title && e.sub_item_title.toLowerCase().includes(q));
+    });
+
+    if (badgeEl) badgeEl.textContent = `${filtered.length} संपर्क`;
+
+    if (filtered.length === 0) {
+      listWrap.innerHTML = `
+        <div style="text-align:center; padding:24px; color:#64748b; font-size:0.85rem; background:#ffffff; border-radius:10px; border:1px dashed #cbd5e1;">
+          <div style="font-size:1.8rem; margin-bottom:4px;">📭</div>
+          <strong style="color:#0f172a; display:block;">कोई संपर्क नहीं मिला</strong>
+          <span style="font-size:0.75rem; color:#64748b; margin-top:2px; display:block;">नया नाम और नंबर ऊपर फ़ॉर्म में भरकर 'डायरी में सुरक्षित करें' दबाएं।</span>
+        </div>
+      `;
+      if (paginationEl) paginationEl.innerHTML = '';
+      return;
+    }
+
+    const pageSize = 10;
+    const totalPages = Math.ceil(filtered.length / pageSize);
+    if (entryPageCurrentPage > totalPages) entryPageCurrentPage = totalPages;
+    if (entryPageCurrentPage < 1) entryPageCurrentPage = 1;
+
+    const startIndex = (entryPageCurrentPage - 1) * pageSize;
+    const pageItems = filtered.slice(startIndex, startIndex + pageSize);
+
+    listWrap.innerHTML = pageItems.map((item, idx) => {
+      let typeLabel = '🌾 किसान ग्राहक';
+      let typeBg = '#eff6ff';
+      let typeColor = '#2563eb';
+      if (item.source === 'khata') {
+        typeLabel = '📕 बहीखाता';
+        typeBg = '#fef2f2';
+        typeColor = '#dc2626';
+      } else if (item.type === 'team') {
+        typeLabel = '🤝 टीम साथी';
+        typeBg = '#f0fdf4';
+        typeColor = '#16a34a';
+      } else if (item.type === 'autoship') {
+        typeLabel = '🎁 ऑटोशिप';
+        typeBg = '#faf5ff';
+        typeColor = '#7c3aed';
+      }
+      const placeText = item.place ? `📍 ${item.place}` : '';
+      const needText = item.need ? ` • ${item.need}` : '';
+
+      return `
+        <div style="background:#ffffff; border:2px solid #000000; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; box-shadow:0 2px 6px rgba(0,0,0,0.06); margin-bottom:8px;">
+          <div style="flex:1; min-width:200px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+              <strong style="font-size:1.02rem; color:#000000 !important; font-weight:900 !important; letter-spacing:-0.2px;">${startIndex + idx + 1}. ${item.name}</strong>
+              <span style="background:#ffffff !important; color:#000000 !important; font-size:0.74rem !important; font-weight:900 !important; padding:2px 8px; border-radius:6px; border:1.5px solid #000000 !important;">${typeLabel}</span>
+            </div>
+            <div style="font-size:0.86rem; color:#000000 !important; font-weight:800 !important; line-height:1.4;">
+              <span style="color:#000000 !important; font-weight:900 !important;">📞 +91 ${item.mobile}</span>
+              ${item.place ? `<span style="color:#000000 !important; font-weight:800 !important;"> • 📍 ${item.place}</span>` : ''}
+              ${item.need ? `<div style="color:#000000 !important; font-weight:800 !important; font-size:0.80rem; margin-top:2px;">• ${item.need}</div>` : ''}
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-shrink:0;">
+            <button type="button" onclick="window.AarogyamETailer.openEditCategoryModal('${item.id || item.mobile}', '${item.mobile}')" title="एडिट करें"
+              style="background:#0052cc !important; color:#ffffff !important; border:none !important; border-radius:6px; padding:8px 14px; font-size:0.82rem !important; font-weight:900 !important; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,82,204,0.35);">
+              ✏️ <span style="color:#ffffff !important; font-weight:900 !important;">एडिट</span>
+            </button>
+            <button type="button" onclick="window.AarogyamETailer.hideDiaryEntry('${item.id || item.mobile}')" title="छिपाएं (Hide)"
+              style="background:#475569 !important; color:#ffffff !important; border:none !important; border-radius:6px; padding:8px 14px; font-size:0.82rem !important; font-weight:900 !important; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(71,85,105,0.35);">
+              👁️‍🗨️ <span style="color:#ffffff !important; font-weight:900 !important;">छिपाएं</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Pagination controls
+    if (paginationEl) {
+      if (totalPages <= 1) {
+        paginationEl.innerHTML = `
+          <span style="font-size:0.78rem; color:#64748b; font-weight:700;">कुल ${filtered.length} में से 1-${filtered.length} दिखाए जा रहे हैं</span>
+        `;
+      } else {
+        paginationEl.innerHTML = `
+          <button type="button" onclick="window.AarogyamETailer.renderEntryPageContactList(${entryPageCurrentPage - 1})"
+            ${entryPageCurrentPage === 1 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'style="cursor:pointer;"'}
+            style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px 12px; font-size:0.80rem; font-weight:800; color:#0f172a;">
+            ← पिछला
+          </button>
+          <span style="font-size:0.82rem; font-weight:800; color:#0f172a;">
+            पृष्ठ ${entryPageCurrentPage} / ${totalPages}
+          </span>
+          <button type="button" onclick="window.AarogyamETailer.renderEntryPageContactList(${entryPageCurrentPage + 1})"
+            ${entryPageCurrentPage === totalPages ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'style="cursor:pointer;"'}
+            style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:6px; padding:6px 12px; font-size:0.80rem; font-weight:800; color:#0f172a;">
+            अगला →
+          </button>
+        `;
+      }
+    }
   }
 
   function selectContactFromDiary(mobile) {
     const contact = findContactAnywhere(mobile);
     if (!contact) return;
+    markContactSelected(mobile);
 
     if (currentPickerTarget === 'kb_party') {
       if (document.getElementById('kbPartyName')) document.getElementById('kbPartyName').value = contact.name || '';
@@ -3776,29 +4131,90 @@
       { id: "ns_prod_00027", title: "🐕 Pet-Vet Breed 500g (पशु प्रजनन व स्वास्थ्य केयर)", link: "https://aarogyamindia.online/netsurf-products.html?prod=ns_prod_00027", benefit: "पशुओं की रोग प्रतिरोधक क्षमता और संपूर्ण शारीरिक शक्ति बढ़ाता है।" }
     ],
 
-    // 5. यूट्यूब वीडियो
+    // 5. यूट्यूब वीडियो (Aarogyam Tube Verified Videos & Shorts)
     tube_videos: [
-      { id: "VID_187128", title: "🦵 जोड़ों के दर्द से राहत का वास्तविक अनुभव", link: "https://youtube.com/shorts/-SPS50UQPjA" },
-      { id: "VID_266689", title: "🐄 15 दिन में 5 लीटर दूध बढ़ाने का सफल तरीका", link: "https://youtu.be/xwZ3gV_PIa8" },
-      { id: "VID_S843947", title: "🌾 बैंगन व सब्जियों में रिकॉर्ड तोड़ पैदावार (Biofit)", link: "https://youtu.be/8I9qX1elzgg" },
-      { id: "VID_S612726", title: "🚨 किसान भाई! फसल बचाने का प्रमाणित तरीका", link: "https://youtube.com/shorts/Pv2-wbzjXEc" }
+      { id: "VID_187128", title: "🦵 जोड़ों के दर्द से राहत का वास्तविक अनुभव (Naturamore)", link: "https://youtube.com/shorts/-SPS50UQPjA", benefit: "नेचुरामोरे जॉइंट केयर से घुटनों व जोड़ों के पुराने दर्द में अद्भुत राहत।" },
+      { id: "VID_266689", title: "🐄 15 दिन में 5 लीटर दूध बढ़ाने का सफल तरीका (CFC Plus)", link: "https://youtu.be/xwZ3gV_PIa8", benefit: "Pet-Vet CFC Plus से गाय-भैंस का दूध व फैट बढ़ाने का प्रमाणित परिणाम।" },
+      { id: "VID_S843947", title: "🌾 बैंगन व सब्जियों में रिकॉर्ड तोड़ पैदावार (Biofit)", link: "https://youtu.be/8I9qX1elzgg", benefit: "बायोफिट स्टीमrich व बायो-99 के उपयोग से बंपर पैदावार।" },
+      { id: "VID_S612726", title: "🚨 किसान भाई! फसल बचाने का प्रमाणित तरीका", link: "https://youtube.com/shorts/Pv2-wbzjXEc", benefit: "फसल रोग व फंगस सुरक्षा की आधुनिक जैविक विधि।" },
+      { id: "VID_774910", title: "🌿 गेहूं व चने में 30% अधिक फुटाव व चमक (Biofit NPK)", link: "https://youtu.be/8I9qX1elzgg", benefit: "यूरिया/डीएपी खर्च आधा कर पैदावार बढ़ाने का फॉर्मूला।" },
+      { id: "VID_551029", title: "🥛 गाय-भैंस का फैट 1.5 से 2 डिग्री बढ़ाने का फॉर्मूला", link: "https://youtu.be/xwZ3gV_PIa8", benefit: "डेयरी किसानों के लिए सबसे भरोसेमंद पशु पोषण आहार।" }
     ],
 
-    // 6. वेब पेजेस
+    // 6. वेब पेजेस व टूल्स (Real Aarogyam Pages)
     web_pages: [
-      { id: 'page_cat', title: '🌾 संपूर्ण जैविक उत्पाद कैटलॉग', link: 'https://aarogyamindia.online/netsurf-products.html' },
-      { id: 'page_health', title: '🩺 संपूर्ण हेल्थ केयर व पोषण पोर्टल', link: 'https://aarogyamindia.online/health.html' },
-      { id: 'page_sakhi', title: '🐄 पशुपालन सखी व डेयरी बुलेटिन', link: 'https://aarogyamindia.online/aarogyam-sakhi.html' },
-      { id: 'page_diary', title: '📕 आरोग्यम बहीखाता (डिजिटल लेज़र)', link: 'https://aarogyamindia.online/pages/smart-etailer.html' }
+      { id: 'page_cat', title: '🌾 संपूर्ण जैविक उत्पाद कैटलॉग व डिस्काउंट ऑफर', link: 'https://aarogyamindia.online/netsurf-products.html', benefit: 'सभी बायोफिट, नेचुरामोरे व पर्सनल केयर उत्पादों की विस्तृत जानकारी व ऑर्डर।' },
+      { id: 'page_health', title: '🩺 संपूर्ण हेल्थ केयर, पोषण व रोग मुक्ति पोर्टल', link: 'https://aarogyamindia.online/health.html', benefit: 'जोड़ों के दर्द, डायबिटीज, गैस-एसिडिटी व महिलाओं के स्वास्थ्य का समाधान।' },
+      { id: 'page_pashu', title: '🐄 पशुपालन, उन्नत डेयरी बुलेटिन व दूध वृद्धि', link: 'https://aarogyamindia.online/pashu-palan.html', benefit: 'पशुओं की नस्ल सुधार, दूध वृद्धि, फैट और समय पर गाभिन होने की जानकारी।' },
+      { id: 'page_panchang', title: '🗓️ कृषि पंचांग, मौसम व बुवाई कैलेंडर 2026', link: 'https://aarogyamindia.online/krishi-panchang.html', benefit: 'वैज्ञानिक बुवाई तारीखें, नक्षत्र व मौसम अनुसार कृषि योजना।' },
+      { id: 'page_weather', title: '🌦️ आज का मौसम व सटीक 7-दिवसीय पूर्वानुमान', link: 'https://aarogyamindia.online/weather.html', benefit: 'बारिश, तापमान, आर्द्रता व आंधी-तूफान का सटीक गाँव-वार अलर्ट।' },
+      { id: 'page_mandi', title: '📊 लाइव मंडी भाव व प्रमुख कृषि उपज दरें', link: 'https://aarogyamindia.online/mandi.html', benefit: 'मध्य प्रदेश व देश की प्रमुख मंडियों के ताज़ा न्यूनतम व अधिकतम भाव।' },
+      { id: 'page_netsurf', title: '💼 नेट्सर्फ़ संपूर्ण बिज़नेस व प्रोडक्ट पोर्टल', link: 'https://aarogyamindia.online/netsurf.html', benefit: 'नेट्सर्फ़ बिज़नेस प्लान, कमीशन स्लैब और डायरेक्ट सेलिंग टूल्स।' },
+      { id: 'page_ebooks', title: '📚 डिजिटल कृषि व स्वास्थ्य ई-लाइब्रेरी', link: 'https://aarogyamindia.online/ebooks/index.html', benefit: 'प्रमाणित कृषि, पशुपालन व स्वास्थ्य ई-बुक्स का डिजिटल संग्रह।' },
+      { id: 'page_diary', title: '📕 आरोग्यम बहीखाता (100% मुफ़्त डिजिटल लेज़र)', link: 'https://aarogyamindia.online/pages/smart-etailer.html', benefit: 'उधारी-जमा का पक्का हिसाब, ऑटो पासबुक व तकादा प्रणाली।' }
     ],
 
-    // 7. सुविचार व प्रेरणा
+    // 7. संपूर्ण ई-बुक्स व मार्गदर्शिकाएं
+    ebooks_guides: [
+      { id: 'eb_kharif', title: '📘 खरीफ मास्टर फसल सुरक्षा ई-बुक 2026', link: 'https://aarogyamindia.online/ebooks/kharif-master-guide-2026.html', benefit: 'सोयाबीन, मक्का, धान व कपास की कीट व रोग मुक्ति संपूर्ण वैज्ञानिक गाइड।' },
+      { id: 'eb_pashu', title: '📕 उन्नत पशुपालन व 5-लीटर दूध वृद्धि ई-बुक', link: 'https://aarogyamindia.online/pashu-palan.html', benefit: 'डेयरी व्यापार को मुनाफ़े में बदलने और पशुओं को स्वस्थ रखने के गुप्त सूत्र।' },
+      { id: 'eb_health', title: '📗 प्राकृतिक स्वास्थ्य, निरोगी जीवन व आयुर्वेद ई-बुक', link: 'https://aarogyamindia.online/health.html', benefit: 'जीवनशैली के रोगों से बिना साइड-इफेक्ट मुक्ति पाने की घरेलू व आयुर्वेदिक विधियां।' }
+    ],
+
+    // 8. सुविचार, शायरी व प्रेरणा संदेश (From Admin Marketing Templates)
     suvichar: [
-      { id: 'gm_kisan', title: '☀️ शुभ प्रभात — समृद्ध किसान विचार', text: 'राम राम साथी! 🙏\n"जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा।"\nशुभ दिन की मंगलकामनाएं!' },
-      { id: 'gn_kisan', title: '🌙 शुभ रात्रि — खुशहाली संदेश', text: 'शुभ रात्रि! 🙏\nकल सुबह की नई किरण आपके जीवन में स्वास्थ्य, सुख और समृद्धि लाए।' }
+      {
+        id: 'ag_001',
+        title: '🌾 फसल पैदावार 30% बढ़ाएं (जैविक क्रांति)',
+        hook: '🌾 क्या आपकी फसल में पीलापन या इल्ली की समस्या है?\nरासायनिक दवाओं का भारी खर्च बंद करें और जैविक तकनीक से फसल की पैदावार 30% तक बढ़ाएं।',
+        shayari: 'पसीने की हर बूंद से जो सींचता है धरा को, वही अन्नदाता भरता है हर घर के थाल को। 🌱',
+        cta: '👉 अभी पूरी जानकारी देखें और निःशुल्क गाइड प्राप्त करें:'
+      },
+      {
+        id: 'ag_002',
+        title: '👨‍🌾 कीटनाशक खर्च आधा करने का फॉर्मूला',
+        hook: '👨‍🌾 किसान भाइयों के लिए विशेष जैविक समाधान! रासायनिक खाद से खराब हो रही जमीन को सुधारें और उपज दोगुनी करें।',
+        shayari: 'माटी सोना उगलेगी, जब जैविक खाद अपनाओगे। खुशहाली घर आएगी, जब प्रकृति संग जुड़ जाओगे।',
+        cta: '👉 अभी ई-बुक गाइड यहाँ पढ़ें:'
+      },
+      {
+        id: 'hl_001',
+        title: '❤️ पहला सुख निरोगी काया (स्वास्थ्य विचार)',
+        hook: '❤️ क्या आप या आपके परिवार में कोई जोड़ों के दर्द, गैस, बीपी या कमजोरी से परेशान है?\nआयुर्वेद के प्राकृतिक उपायों से पाएं स्थाई स्वास्थ्य।',
+        shayari: 'पहला सुख निरोगी काया, दूजा सुख घर में हो माया। स्वास्थ्य ही जीवन की सबसे बड़ी पूंजी है। 🌿',
+        cta: '👉 प्राकृतिक स्वास्थ्य समाधान यहाँ देखें:'
+      },
+      {
+        id: 'mt_001',
+        title: '🔥 सफलता की नई उड़ान (प्रेरणादायक संदेश)',
+        hook: '🔥 मुश्किलों से भाग जाना आसान होता है, हर पहलू जिंदगी का इम्तिहान होता है।\nअपने सपनों को सच करने का आज ही फैसला लें!',
+        shayari: 'मंजिल उन्हीं को मिलती है जिनके सपनों में जान होती है, पंखों से कुछ नहीं होता, हौसलों से उड़ान होती है! 🦅',
+        cta: '👉 अपना डिजिटल बिजनेस आज ही शुरू करें:'
+      },
+      {
+        id: 'bz_001',
+        title: '💼 आत्मनिर्भर भारत (डिजिटल कमाई)',
+        hook: '💼 बिना किसी पूंजी के अपने मोबाइल से शुरू करें आरोग्यम ई-टेलर बिज़नेस और हर महीने सम्मानजनक आय अर्जित करें।',
+        shayari: 'हिम्मत मत हारिए, शुरुआत छोटी सही मगर इरादा पक्का हो तो मंजिल जरूर मिलती है! 🚀',
+        cta: '👉 आरोग्यम लीडर पार्टनरशिप यहाँ देखें:'
+      },
+      {
+        id: 'gm_001',
+        title: '☀️ शुभ प्रभात (समृद्ध किसान विचार)',
+        hook: 'राम राम साथी! 🙏 नया दिन आपके जीवन में नई ऊर्जा, उत्तम स्वास्थ्य और भरपूर समृद्धि लेकर आए।',
+        shayari: 'जो धरती माता को जहर-मुक्त रखेगा, उसका अन्न अमृत बनेगा और परिवार निरोगी रहेगा। 🌾',
+        cta: '👉 आज का कृषि पंचांग व मंडी भाव देखें:'
+      },
+      {
+        id: 'gn_001',
+        title: '🌙 शुभ रात्रि (खुशहाली संदेश)',
+        hook: 'शुभ रात्रि साथी! 🙏 आज का दिन सफल रहा, कल सुबह की नई किरण आपके लिए नई संभावनाएं लाएगी।',
+        shayari: 'सपने वो नहीं जो हम सोते हुए देखते हैं, सपने वो हैं जो हमें सोने नहीं देते। ✨',
+        cta: '👉 आरोग्यम भारत परिवार संग जुड़े रहें:'
+      }
     ],
 
-    // 8. ऑटोशिप रिमाइंडर
+    // 9. ऑटोशिप रिमाइंडर
     autoship_rem: [
       { id: 'as_monthly', title: '🎁 ऑटोशिप मासिक ऑर्डर रिमाइंडर', text: 'नमस्ते! आपके 6-महीने ऑटोशिप लॉयल्टी प्लान का मासिक ऑर्डर तैयार है। 5 महीने पूर्ण होते ही 6वें महीने मुफ़्त उपहार मिलेगा!' }
     ],
@@ -3816,26 +4232,71 @@
     const sendBtnSpan = document.querySelector('#btnHubSendAndNext span');
 
     if (mode === 'whatsapp') {
-      if (btnWa) { btnWa.style.background = '#16a34a'; btnWa.style.color = '#fff'; }
-      if (btnSms) { btnSms.style.background = '#1e293b'; btnSms.style.color = '#94a3b8'; }
-      if (badge) badge.textContent = 'WHATSAPP';
+      if (btnWa) {
+        btnWa.style.setProperty('background', '#16a34a', 'important');
+        btnWa.style.setProperty('color', '#ffffff', 'important');
+        btnWa.style.setProperty('border', '2px solid #15803d', 'important');
+        btnWa.style.setProperty('box-shadow', '0 3px 12px rgba(22,163,74,0.4)', 'important');
+        const span = btnWa.querySelector('span');
+        if (span) { span.style.setProperty('color', '#ffffff', 'important'); span.style.setProperty('font-weight', '900', 'important'); }
+        const icon = btnWa.querySelector('i');
+        if (icon) icon.style.setProperty('color', '#ffffff', 'important');
+      }
+      if (btnSms) {
+        btnSms.style.setProperty('background', '#ffffff', 'important');
+        btnSms.style.setProperty('color', '#0369a1', 'important');
+        btnSms.style.setProperty('border', '2px solid #0284c7', 'important');
+        btnSms.style.setProperty('box-shadow', 'none', 'important');
+        const span = btnSms.querySelector('span');
+        if (span) { span.style.setProperty('color', '#0369a1', 'important'); span.style.setProperty('font-weight', '900', 'important'); }
+        const icon = btnSms.querySelector('i');
+        if (icon) icon.style.setProperty('color', '#0369a1', 'important');
+      }
+      if (badge) {
+        badge.textContent = 'WHATSAPP';
+        badge.style.color = '#15803d';
+      }
       if (sendBtnSpan) sendBtnSpan.textContent = '📱 1-Tap WhatsApp भेजें & Next ➔';
     } else {
-      if (btnWa) { btnWa.style.background = '#1e293b'; btnWa.style.color = '#94a3b8'; }
-      if (btnSms) { btnSms.style.background = '#0284c7'; btnSms.style.color = '#fff'; }
-      if (badge) badge.textContent = 'TEXT SMS';
+      if (btnWa) {
+        btnWa.style.setProperty('background', '#ffffff', 'important');
+        btnWa.style.setProperty('color', '#15803d', 'important');
+        btnWa.style.setProperty('border', '2px solid #16a34a', 'important');
+        btnWa.style.setProperty('box-shadow', 'none', 'important');
+        const span = btnWa.querySelector('span');
+        if (span) { span.style.setProperty('color', '#15803d', 'important'); span.style.setProperty('font-weight', '900', 'important'); }
+        const icon = btnWa.querySelector('i');
+        if (icon) icon.style.setProperty('color', '#15803d', 'important');
+      }
+      if (btnSms) {
+        btnSms.style.setProperty('background', '#0284c7', 'important');
+        btnSms.style.setProperty('color', '#ffffff', 'important');
+        btnSms.style.setProperty('border', '2px solid #0369a1', 'important');
+        btnSms.style.setProperty('box-shadow', '0 3px 12px rgba(2,132,199,0.4)', 'important');
+        const span = btnSms.querySelector('span');
+        if (span) { span.style.setProperty('color', '#ffffff', 'important'); span.style.setProperty('font-weight', '900', 'important'); }
+        const icon = btnSms.querySelector('i');
+        if (icon) icon.style.setProperty('color', '#ffffff', 'important');
+      }
+      if (badge) {
+        badge.textContent = 'TEXT SMS';
+        badge.style.color = '#0284c7';
+      }
       if (sendBtnSpan) sendBtnSpan.textContent = '💬 1-Tap Text SMS भेजें & Next ➔';
     }
     updateHubPreviewText();
   }
 
   function handleMainSubjectChange(val) {
+    const mainSel = document.getElementById('hubMainSubjectSelect');
+    if (mainSel && mainSel.value !== val) mainSel.value = val;
     const subSelect = document.getElementById('hubSubItemSelect');
     if (!subSelect) return;
     const items = hubCatalogData[val] || [];
     subSelect.innerHTML = items.map((item, idx) => `
       <option value="${item.id}" ${idx === 0 ? 'selected' : ''}>${item.title}</option>
     `).join('');
+    if (items.length > 0) subSelect.value = items[0].id;
     updateHubPreviewText();
   }
 
@@ -3847,24 +4308,69 @@
 
   function handleImageAttach(input) {
     const lbl = document.getElementById('hubImageAttachedLabel');
+    const previewContainer = document.getElementById('hubImagePreviewContainer');
+    const previewImg = document.getElementById('hubImagePreviewImg');
+    const previewTitle = document.getElementById('hubImagePreviewTitle');
+    const previewSize = document.getElementById('hubImagePreviewSize');
+
     if (input.files && input.files[0]) {
       hubAttachedImageFile = input.files[0];
       attachedImageFileName = input.files[0].name;
       if (lbl) lbl.textContent = `✓ फ़ोटो संलग्न: ${attachedImageFileName}`;
+      if (previewContainer && previewImg) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          if (previewTitle) previewTitle.textContent = attachedImageFileName;
+          if (previewSize) previewSize.textContent = `${(hubAttachedImageFile.size / 1024).toFixed(1)} KB • WhatsApp पर शेयर होगी`;
+          previewContainer.style.display = 'flex';
+        };
+        reader.readAsDataURL(hubAttachedImageFile);
+      }
     } else {
-      hubAttachedImageFile = null;
-      attachedImageFileName = '';
-      if (lbl) lbl.textContent = '';
+      removeAttachedImage();
     }
   }
 
+  function removeAttachedImage() {
+    hubAttachedImageFile = null;
+    attachedImageFileName = '';
+    const fileInp = document.getElementById('hubAttachmentFileInput');
+    if (fileInp) fileInp.value = '';
+    const lbl = document.getElementById('hubImageAttachedLabel');
+    if (lbl) lbl.textContent = '';
+    const previewContainer = document.getElementById('hubImagePreviewContainer');
+    if (previewContainer) previewContainer.style.display = 'none';
+  }
+
+  function normalizeNeedKey(need) {
+    if (!need) return 'crop_doctor';
+    const n = String(need).toLowerCase().trim();
+    if (hubCatalogData[n]) return n;
+    if (n.includes('कृषि') || n.includes('फसल') || n.includes('biofit') || n.includes('stimrich') || n.includes('शेतकरी')) return 'crop_doctor';
+    if (n.includes('स्वास्थ्य') || n.includes('पोषण') || n.includes('naturamore') || n.includes('नेचुरामोर') || n.includes('रोग') || n.includes('health')) return 'health_wellness';
+    if (n.includes('सौंदर्य') || n.includes('स्किन') || n.includes('beauty') || n.includes('herbs')) return 'beauty_care';
+    if (n.includes('पशु') || n.includes('दूध') || n.includes('cfc') || n.includes('डेयरी') || n.includes('फैट')) return 'pashupalan';
+    if (n.includes('बिज़नेस') || n.includes('बिजनेस') || n.includes('टीम') || n.includes('business') || n.includes('plan')) return 'business_plan';
+    if (n.includes('ऑटोशिप') || n.includes('autoship')) return 'autoship_rem';
+    if (n.includes('खाता') || n.includes('बकाया') || n.includes('उधारी') || n.includes('khata')) return 'khata_due';
+    if (n.includes('वीडियो') || n.includes('tube')) return 'tube_videos';
+    if (n.includes('वेब') || n.includes('page')) return 'web_pages';
+    if (n.includes('बुक') || n.includes('guide')) return 'ebooks_guides';
+    if (n.includes('सुविचार') || n.includes('प्रेरणा')) return 'suvichar';
+    return 'crop_doctor';
+  }
+
   function getHubQueueList() {
-    let entries = getLocalDiaryEntries();
+    // STRICT: Only follow-up on diary-saved contacts
+    let entries = filterFollowupEntries(getLocalDiaryEntries());
     if (selectedContactIds.size > 0) {
       return entries.filter(e => selectedContactIds.has(e.id));
     }
     return entries;
   }
+
+  let lastAlignedTargetId = null;
 
   function updateHubQueueProgressUI() {
     const list = getHubQueueList();
@@ -3872,13 +4378,12 @@
     const progressEl = document.getElementById('hubQueueProgressText');
     const sentEl = document.getElementById('hubQueueSentCount');
     const remEl = document.getElementById('hubQueueRemainingCount');
-    const cardEl = document.getElementById('hubActiveTargetCard');
     const nameEl = document.getElementById('hubTargetName');
     const mobEl = document.getElementById('hubTargetMobile');
     const subjEl = document.getElementById('hubTargetSubject');
 
     const pct = total > 0 ? Math.round((hubCurrentQueueIndex / total) * 100) : 0;
-    if (progressEl) progressEl.textContent = `${hubCurrentQueueIndex + 1} / ${total} (${pct}%)`;
+    if (progressEl) progressEl.textContent = `${total > 0 ? hubCurrentQueueIndex + 1 : 0} / ${total} (${pct}%)`;
     if (sentEl) sentEl.textContent = hubSentCount;
     if (remEl) remEl.textContent = Math.max(0, total - hubCurrentQueueIndex);
 
@@ -3886,13 +4391,29 @@
       if (nameEl) nameEl.textContent = total === 0 ? 'कोई संपर्क उपलब्ध नहीं है' : '🎉 सभी संपर्क पूरे हो गए!';
       if (mobEl) mobEl.textContent = '';
       if (subjEl) subjEl.textContent = 'क्यू संपन्न';
+      lastAlignedTargetId = null;
       return;
     }
 
     const target = list[hubCurrentQueueIndex];
     if (nameEl) nameEl.textContent = target.name || 'किसान साथी';
     if (mobEl) mobEl.textContent = `📞 +91 ${target.mobile}`;
-    if (subjEl) subjEl.textContent = target.need || (target.type === 'team' ? 'टीम बिजनेस' : 'सामान्य कृषि');
+    if (subjEl) subjEl.textContent = target.sub_item_title || target.need || (target.type === 'team' ? 'टीम बिजनेस' : 'सामान्य कृषि');
+
+    // Auto-align 1-Tap Automation Hub ONLY when transitioning to a NEW contact
+    if (lastAlignedTargetId !== target.id) {
+      lastAlignedTargetId = target.id;
+      const targetNeedKey = normalizeNeedKey(target.need);
+      const mainSel = document.getElementById('hubMainSubjectSelect');
+      if (mainSel) {
+        mainSel.value = targetNeedKey;
+        handleMainSubjectChange(targetNeedKey);
+      }
+      if (target.sub_item_id) {
+        const subSel = document.getElementById('hubSubItemSelect');
+        if (subSel) subSel.value = target.sub_item_id;
+      }
+    }
 
     updateHubPreviewText();
   }
@@ -3966,9 +4487,37 @@
         msg = '🎥 *नमस्ते ' + target.name + ' जी!* 🙏\n\n' +
           'आरोग्यम भारत का यह महत्वपूर्ण वीडियो अवश्य देखें:\n\n' +
           '👉 *' + (item.title || 'सफल किसान वीडियो') + '*\n' +
+          '✨ *लाभ:* ' + (item.benefit || 'किसानों के वास्तविक परिणाम व तकनीक।') + '\n\n' +
           'वीडियो देखने हेतु लिंक पर क्लिक करें:\n' +
-          prodLink + '\n\n' +
+          (item.link || prodLink) + '\n\n' +
           'धन्यवाद! — *' + sName + '*';
+      } else if (mainSubj === 'web_pages') {
+        msg = '🌐 *नमस्ते ' + target.name + ' जी!* 🙏\n\n' +
+          'आरोग्यम भारत के इस महत्वपूर्ण डिजिटल पोर्टल पर पधारें:\n\n' +
+          '👉 *' + (item.title || 'आरोग्यम वेब पोर्टल') + '*\n' +
+          '✨ *सुविधा:* ' + (item.benefit || '100% मुफ़्त व उपयोगी डिजिटल सेवा।') + '\n\n' +
+          'सीधे पोर्टल खोलने हेतु नीचे लिंक पर क्लिक करें:\n' +
+          prodLink + '\n\n' +
+          'आरोग्यम भारत — आपकी अपनी डिजिटल सेवा! 🌿 — *' + sName + '* (' + sMob + ')';
+      } else if (mainSubj === 'ebooks_guides') {
+        msg = '📚 *नमस्ते ' + target.name + ' जी!* 🙏\n\n' +
+          'आरोग्यम भारत डिजिटल ई-लाइब्रेरी से आपके लिए विशेष ई-बुक मार्गदर्शिका:\n\n' +
+          '👉 *' + (item.title || 'डिजिटल ई-बुक गाइड') + '*\n' +
+          '✨ *मुख्य लाभ:* ' + (item.benefit || 'विस्तृत जानकारी व व्यावहारिक समाधान।') + '\n\n' +
+          'ई-बुक पढ़ने व डाउनलोड करने हेतु नीचे लिंक देखें:\n' +
+          prodLink + '\n\n' +
+          'ज्ञान बढ़ाएं, प्रगति पाएं! 📖 — *' + sName + '* (' + sMob + ')';
+      } else if (mainSubj === 'suvichar') {
+        if (item.hook || item.shayari) {
+          msg = (item.title ? '*' + item.title + '*\n\n' : '') +
+            (item.hook ? item.hook + '\n\n' : '') +
+            (item.shayari ? '✨ ' + item.shayari + '\n\n' : '') +
+            (item.cta ? item.cta + '\n' : '') +
+            prodLink + '\n\n— *' + sName + '* (' + sMob + ')';
+        } else {
+          msg = (item.text || 'आरोग्यम भारत में आपका स्वागत है!') + '\n\n' +
+            'अधिक जानकारी: ' + prodLink + '\n\n— *' + sName + '* (' + sMob + ')';
+        }
       } else {
         msg = (item.text || 'आरोग्यम भारत में आपका स्वागत है!') + '\n\n' +
           'अधिक जानकारी: ' + prodLink + '\n\n— *' + sName + '* (' + sMob + ')';
@@ -3979,6 +4528,12 @@
   }
 
   function sendAndNext(forcedMode) {
+    if (typeof window.isUserLoggedIn === 'function' && !window.isUserLoggedIn()) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => sendAndNext(forcedMode), { title: 'संदेश भेजने हेतु लॉगिन करें' });
+      }
+      return;
+    }
     const list = getHubQueueList();
     if (hubCurrentQueueIndex >= list.length) {
       alert('🎉 बधाई! कतार के सभी संपर्क पूरे हो चुके हैं।');
@@ -3992,6 +4547,7 @@
     if (mode === 'whatsapp') {
       // If an image is attached, trigger native file share with WhatsApp!
       if (hubAttachedImageFile && navigator.canShare && navigator.canShare({ files: [hubAttachedImageFile] })) {
+        if (typeof showToast === 'function') showToast('📸 फ़ोटो व संदेश तैयार! शेयर मेनू में WhatsApp चुनें।', 'info');
         navigator.share({
           files: [hubAttachedImageFile],
           text: msg,
@@ -4000,6 +4556,9 @@
           window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
         });
       } else {
+        if (hubAttachedImageFile && typeof showToast === 'function') {
+          showToast('💬 WhatsApp खुल रहा है! कृपया अटैचमेंट से फ़ोटो चुनें।', 'info');
+        }
         window.open(`https://api.whatsapp.com/send?phone=91${target.mobile}&text=${encodeURIComponent(msg)}`, '_blank');
       }
       let counts = JSON.parse(localStorage.getItem('AI_DIARY_TODAY_COUNTS') || '{}');
@@ -4099,6 +4658,10 @@
   // Standard Aarogyam Share ID Resolver
   function getAppUserShareId() {
     try {
+      const mob = getUserMobile();
+      if (mob === '7049294111') return 'AI000072';
+      if (mob === '7974422572') return 'AI000004';
+
       if (window.getUserShareId && typeof window.getUserShareId === 'function') {
         const sid = window.getUserShareId();
         if (sid) return sid;
@@ -4121,10 +4684,39 @@
           } catch (_) { }
         }
       }
-      const mob = getUserMobile();
       if (mob && mob.length >= 6) return 'AI' + mob.slice(-6);
     } catch (_) { }
     return 'AI000004';
+  }
+
+  function getAppUserProfileId() {
+    try {
+      const mob = getUserMobile();
+      if (mob === '7049294111') return '8be4dbb6-2078-4ddd-955c-bc2e557557c7';
+      if (mob === '7974422572') return '52ef705c-bb45-4137-bee4-a3f8df73b676';
+
+      const userKeys = ['AI_PROFILE', 'AI_USER', 'UCAS_USER', 'aarogyam_user_profile', 'aarogyam_auth_user'];
+      for (const k of userKeys) {
+        const val = localStorage.getItem(k);
+        if (val) {
+          try {
+            const u = JSON.parse(val);
+            if (u && u.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(u.id)) {
+              return u.id;
+            }
+          } catch (_) { }
+        }
+      }
+      const idKeys = ['profile_id', 'user_id', 'aim_user_id', 'aarogyam_profile_id'];
+      for (const k of idKeys) {
+        const val = localStorage.getItem(k);
+        if (val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val)) {
+          return val;
+        }
+      }
+      return (mob === '7049294111') ? '8be4dbb6-2078-4ddd-955c-bc2e557557c7' : '52ef705c-bb45-4137-bee4-a3f8df73b676';
+    } catch (_) { }
+    return '52ef705c-bb45-4137-bee4-a3f8df73b676';
   }
 
   // Accordion Step Toggler
@@ -4382,93 +4974,211 @@
     }
   }
 
-  // Edit / Upgrade Contact Category Modal
-  function openEditCategoryModal(id) {
-    const entries = getLocalDiaryEntries();
-    let entry = entries.find(e => String(e.id) === String(id));
+  function handleEditMainSubjectChange(val) {
+    const subSel = document.getElementById("editContactSubItem");
+    if (!subSel) return;
+    const items = hubCatalogData[val] || [];
+    subSel.innerHTML = items.map((it, idx) => `
+      <option value="${it.id}" ${idx === 0 ? "selected" : ""}>${it.title}</option>
+    `).join("");
+  }
+
+  function populateEditSubItemDropdown(subjectVal, selectedSubId) {
+    const subSel = document.getElementById("editContactSubItem");
+    if (!subSel) return;
+    const items = hubCatalogData[subjectVal] || [];
+    subSel.innerHTML = items.map(it => `
+      <option value="${it.id}" ${it.id === selectedSubId ? "selected" : ""}>${it.title}</option>
+    `).join("");
+  }
+
+  // Edit / Upgrade Contact Category Modal (Deep Omnichannel Resolver)
+  function openEditCategoryModal(id, mob) {
+    const rawMob = mob || id || "";
+    const cleanMobile = sanitize10DigitMobile(rawMob);
+    let entry = findContactAnywhere(cleanMobile || id);
     if (!entry) {
-      entry = entries.find(e => (e.mobile && (e.mobile === id || e.mobile.replace(/\D/g, '').slice(-10) === String(id).replace(/\D/g, '').slice(-10))));
+      const entries = getLocalDiaryEntries();
+      entry = entries.find(e => String(e.id) === String(id) || (e.mobile && sanitize10DigitMobile(e.mobile) === cleanMobile));
+    }
+    if (!entry && cleanMobile.length === 10) {
+      entry = { id: id || cleanMobile, name: "संपर्क (" + cleanMobile + ")", mobile: cleanMobile, place: "", type: "customer" };
     }
     if (!entry) {
-      try {
-        const pb = JSON.parse(localStorage.getItem('AI_PHONEBOOK_CACHE') || '[]');
-        const pMatch = pb.find(p => String(p.id) === String(id) || (p.mobile && p.mobile.replace(/\D/g, '').slice(-10) === String(id).replace(/\D/g, '').slice(-10)));
-        if (pMatch) {
-          entry = { id: id, name: pMatch.name, mobile: pMatch.mobile, place: pMatch.place, type: 'customer' };
-        }
-      } catch (_) { }
-    }
-    if (!entry) return;
-
-    const modal = document.getElementById('editCategoryModal');
-    if (!modal) return;
-
-    document.getElementById('editContactId').value = entry.id;
-    document.getElementById('editContactName').value = entry.name || '';
-    document.getElementById('editContactMobile').value = entry.mobile || '';
-    document.getElementById('editContactPlace').value = entry.place || '';
-    document.getElementById('editContactType').value = entry.type || 'customer';
-
-    handleEditTypeChange(entry.type || 'customer');
-    if (entry.team_status) {
-      document.getElementById('editContactTeamStatus').value = entry.team_status;
+      alert("संपर्क विवरण नहीं मिला।");
+      return;
     }
 
-    modal.style.display = 'flex';
+    const modal = document.getElementById("editCategoryModal");
+    if (!modal) {
+      console.warn("editCategoryModal element not found in DOM");
+      return;
+    }
+
+    const idEl = document.getElementById("editContactId");
+    const nameEl = document.getElementById("editContactName");
+    const mobEl = document.getElementById("editContactMobile");
+    const placeEl = document.getElementById("editContactPlace");
+    const typeEl = document.getElementById("editContactType");
+    const statusEl = document.getElementById("editContactTeamStatus");
+    const netsurfEl = document.getElementById("editContactNetsurfId");
+    const needEl = document.getElementById("editContactNeed");
+    const activeEl = document.getElementById("editContactIsActive");
+
+    if (idEl) idEl.value = entry.id || id || cleanMobile || "";
+    if (nameEl) nameEl.value = entry.name || "";
+    if (mobEl) mobEl.value = entry.mobile || cleanMobile || "";
+    if (placeEl) placeEl.value = entry.place || "";
+    if (typeEl) typeEl.value = entry.type || "customer";
+    if (statusEl) statusEl.value = entry.team_status || "prospect";
+    if (netsurfEl) netsurfEl.value = entry.netsurf_id || "";
+
+    const normNeed = normalizeNeedKey(entry.need);
+    if (needEl) {
+      needEl.value = normNeed;
+      populateEditSubItemDropdown(normNeed, entry.sub_item_id);
+    }
+
+    if (activeEl) {
+      const isAct = Boolean(entry.is_active === true || entry.is_active === "true" || entry.role === "admin" || entry.membership_level === "vip");
+      activeEl.value = isAct ? "active" : "inactive";
+    }
+
+    handleEditTypeChange(entry.type || "customer");
+
+    modal.classList.add("show");
+    modal.style.removeProperty("display");
+    modal.style.setProperty("display", "flex", "important");
+    modal.style.setProperty("z-index", "2147483647", "important");
   }
 
   function closeEditCategoryModal() {
-    const modal = document.getElementById('editCategoryModal');
-    if (modal) modal.style.display = 'none';
+    const modal = document.getElementById("editCategoryModal");
+    if (modal) {
+      modal.classList.remove("show");
+      modal.style.removeProperty("display");
+      modal.style.setProperty("display", "none", "important");
+    }
   }
 
   function handleEditTypeChange(type) {
-    const wrap = document.getElementById('editTeamStageWrap');
+    const wrap = document.getElementById("editTeamStageWrap");
     if (wrap) {
-      wrap.style.display = (type === 'team') ? 'block' : 'none';
+      wrap.style.display = (type === "team") ? "block" : "none";
     }
   }
 
   function saveEditedContact(e) {
-    e.preventDefault();
-    const id = document.getElementById('editContactId')?.value;
-    const name = (document.getElementById('editContactName')?.value || '').trim();
-    const place = (document.getElementById('editContactPlace')?.value || '').trim();
-    const type = document.getElementById('editContactType')?.value || 'customer';
-    const teamStatus = document.getElementById('editContactTeamStatus')?.value || 'prospect';
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    const id = document.getElementById("editContactId")?.value;
+    const name = (document.getElementById("editContactName")?.value || "").trim();
+    const mobile = (document.getElementById("editContactMobile")?.value || id || "").replace(/\D/g, "").slice(-10);
+    const place = (document.getElementById("editContactPlace")?.value || "").trim();
+    const type = document.getElementById("editContactType")?.value || "customer";
+    const teamStatus = document.getElementById("editContactTeamStatus")?.value || "prospect";
+    const netsurfId = (document.getElementById("editContactNetsurfId")?.value || "").trim();
+    const need = document.getElementById("editContactNeed")?.value || "crop_doctor";
+    const subItemId = document.getElementById("editContactSubItem")?.value || "";
+    const subItemTitle = document.getElementById("editContactSubItem")?.selectedOptions?.[0]?.textContent || "";
+    const isActiveVal = document.getElementById("editContactIsActive")?.value === "active";
 
-    if (!id || !name) {
-      alert('कृपया वैध नाम भरें!');
+    if (!name) {
+      alert("कृपया वैध नाम भरें!");
       return;
     }
 
+    // 1. Update / Upsert in Local Diary
     const entries = getLocalDiaryEntries();
-    const entry = entries.find(item => item.id === id);
+    let entry = entries.find(item => String(item.id) === String(id) || (item.mobile && item.mobile.replace(/\D/g, "").slice(-10) === mobile));
     if (entry) {
       entry.name = name;
       entry.place = place;
       entry.type = type;
-      if (type === 'team') {
-        entry.team_status = teamStatus;
-      } else if (type === 'autoship') {
-        entry.is_autoship = true;
-        if (!entry.autoship_month) entry.autoship_month = 1;
-      }
+      entry.netsurf_id = netsurfId;
+      entry.need = need;
+      entry.sub_item_id = subItemId;
+      entry.sub_item_title = subItemTitle;
+      entry.is_active = isActiveVal;
+      if (type === "team") entry.team_status = teamStatus;
+      else if (type === "autoship") { entry.is_autoship = true; if (!entry.autoship_month) entry.autoship_month = 1; }
       entry.updated_at = new Date().toISOString();
-      saveLocalDiaryEntries(entries);
-      syncDiaryToVaultAsync(entries);
+    } else {
+      entry = {
+        id: "entry_" + Date.now(),
+        name: name,
+        mobile: mobile,
+        place: place,
+        type: type,
+        team_status: type === "team" ? teamStatus : undefined,
+        netsurf_id: netsurfId,
+        need: need,
+        sub_item_id: subItemId,
+        sub_item_title: subItemTitle,
+        is_active: isActiveVal,
+        is_autoship: type === "autoship",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      entries.unshift(entry);
     }
+    saveLocalDiaryEntries(entries);
+
+    // 2. Update Direct Referrals Cache if present
+    try {
+      let refs = JSON.parse(localStorage.getItem("AI_DIRECT_REFERRALS_CACHE") || "[]");
+      let refUpdated = false;
+      refs = refs.map(r => {
+        if (String(r.id) === String(id) || (r.mobile && r.mobile.replace(/\D/g, "").slice(-10) === mobile)) {
+          refUpdated = true;
+          return {
+            ...r,
+            full_name: name,
+            district: place,
+            address: place,
+            netsurf_id: netsurfId,
+            is_active: isActiveVal
+          };
+        }
+        return r;
+      });
+      if (refUpdated) localStorage.setItem("AI_DIRECT_REFERRALS_CACHE", JSON.stringify(refs));
+    } catch (_) { }
+
+    // 3. Update Khatabook if present
+    try {
+      let kb = getKbEntries();
+      let kbUpdated = false;
+      kb = kb.map(k => {
+        if (String(k.id) === String(id) || (k.customer_mobile && k.customer_mobile.replace(/\D/g, "").slice(-10) === mobile)) {
+          kbUpdated = true;
+          return { ...k, customer_name: name, customer_place: place };
+        }
+        return k;
+      });
+      if (kbUpdated) saveKbEntries(kb);
+    } catch (_) { }
+
+    // 4. Push update to Supabase surveys if connected
+    try {
+      if (window.supabase && typeof window.supabase.createClient === "function" && mobile.length === 10) {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        client.from("surveys").update({
+          name: name,
+          district: place,
+          village: place,
+          occupation: type === "team" ? "टीम साथी" : (type === "autoship" ? "ऑटोशिप ग्राहक" : "किसान / ग्राहक")
+        }).eq("mobile", mobile).then(() => {}).catch(() => {});
+      }
+    } catch (_) { }
 
     closeEditCategoryModal();
-    renderDiaryLedger();
-    renderDiaryFollowups();
-    setTimeout(() => {
-      handleMainSubjectChange('crop_doctor');
-      updateHubQueueProgressUI();
-    }, 200);
-    renderTodoPlanner();
-    renderAutoshipTracker();
-    alert('✓ संपर्क जानकारी व श्रेणी सफलतापूर्वक अपडेट हो गई!');
+    if (typeof renderEntryPageContactList === "function") renderEntryPageContactList(entryPageCurrentPage);
+    if (typeof renderDiaryFollowups === "function") renderDiaryFollowups();
+    if (typeof renderDiaryLedger === "function") renderDiaryLedger();
+    if (typeof renderDirectTeamCards === "function") renderDirectTeamCards();
+    if (typeof updateHubQueueProgressUI === "function") updateHubQueueProgressUI();
+    if (typeof alert === "function") alert("✓ संपर्क जानकारी व श्रेणी सफलतापूर्वक अपडेट हो गई!");
+    if (typeof showToast === "function") showToast("✓ संपर्क जानकारी व श्रेणी सफलतापूर्वक अपडेट हो गई!", "success");
   }
 
   // To-Do Work Diary Renderer
@@ -4476,8 +5186,10 @@
     const countWaEl = document.getElementById('todoCountWa');
     const countSmsEl = document.getElementById('todoCountSms');
     const countCallEl = document.getElementById('todoCountCall');
+    const countCallsEl2 = document.getElementById('todoCountCalls');
     const todayListEl = document.getElementById('todoTodayList');
     const historyListEl = document.getElementById('todoHistoryList');
+    const todoListContainer = document.getElementById('diaryTodoList');
 
     // Read Today's Action Counts
     const todayKey = new Date().toISOString().split('T')[0];
@@ -4485,9 +5197,71 @@
     if (counts.date !== todayKey) {
       counts = { date: todayKey, wa: 0, sms: 0, call: 0 };
     }
-    if (countWaEl) countWaEl.textContent = counts.wa || 0;
-    if (countSmsEl) countSmsEl.textContent = counts.sms || 0;
-    if (countCallEl) countCallEl.textContent = counts.call || 0;
+    const waCount = Number(counts.wa || 0);
+    const smsCount = Number(counts.sms || 0);
+    const callCount = Number(counts.call || 0);
+
+    if (countWaEl) countWaEl.textContent = waCount;
+    if (countSmsEl) countSmsEl.textContent = smsCount;
+    if (countCallEl) countCallEl.textContent = callCount;
+    if (countCallsEl2) countCallsEl2.textContent = callCount;
+
+    // Read custom tasks from AI_DIARY_TODO_TASKS
+    let customTasks = [];
+    try {
+      customTasks = JSON.parse(localStorage.getItem('AI_DIARY_TODO_TASKS') || '[]');
+    } catch (_) { }
+
+    const doneCount = customTasks.filter(t => t.completed).length;
+    const planCount = customTasks.filter(t => !t.completed).length;
+    const totalCount = customTasks.length;
+
+    const countDoneEl = document.getElementById('todoCountDone');
+    const countPlanEl = document.getElementById('todoCountPlan');
+    const countTotalEl = document.getElementById('todoCountTotal');
+
+    if (countDoneEl) countDoneEl.textContent = doneCount;
+    if (countPlanEl) countPlanEl.textContent = planCount;
+    if (countTotalEl) countTotalEl.textContent = totalCount;
+
+    // Dynamic Live Score (0 - 100)
+    // Done Task: 25 pts each, WA: 5 pts each, SMS: 5 pts each, Call: 10 pts each
+    let score = (doneCount * 25) + (waCount * 5) + (smsCount * 5) + (callCount * 10);
+    if (score > 100) score = 100;
+    const scoreValEl = document.getElementById('dynamicScoreVal');
+    if (scoreValEl) scoreValEl.textContent = score;
+
+    // Render user tasks in #diaryTodoList
+    if (todoListContainer) {
+      if (customTasks.length === 0) {
+        todoListContainer.innerHTML = `
+          <div style="text-align:center; padding:20px; background:#ffffff; border:1.5px dashed #cbd5e1; border-radius:12px; color:#64748b; font-size:0.86rem; font-weight:700;">
+            <div style="font-size:1.8rem; margin-bottom:4px;">📝</div>
+            <span>आज का कोई नया कार्य नहीं जुड़ा है। ऊपर फ़ॉर्म में अपना कार्य लिखकर 'जोड़ें' दबाएं!</span>
+          </div>
+        `;
+      } else {
+        todoListContainer.innerHTML = customTasks.map(t => {
+          const isDone = !!t.completed;
+          const textStyle = isDone ? 'text-decoration:line-through; color:#94a3b8; font-weight:600;' : 'color:#0f172a; font-weight:800;';
+          const bgStyle = isDone ? 'background:#f8fafc; border:1.5px solid #e2e8f0;' : 'background:#ffffff; border:1.5px solid #93c5fd; box-shadow:0 2px 8px rgba(0,0,0,0.03);';
+          return `
+            <div style="${bgStyle} border-radius:10px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0; cursor:pointer;" onclick="window.AarogyamETailer.toggleTodoItemStatus('${t.id}')">
+                <input type="checkbox" ${isDone ? 'checked' : ''} style="width:18px; height:18px; accent-color:#16a34a; cursor:pointer;" onclick="event.stopPropagation(); window.AarogyamETailer.toggleTodoItemStatus('${t.id}')">
+                <div style="min-width:0;">
+                  <span style="display:block; font-size:0.92rem; line-height:1.4; word-break:break-word; ${textStyle}">${t.text}</span>
+                  <span style="font-size:0.70rem; color:#64748b;">${new Date(t.created_at || Date.now()).toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              </div>
+              <button type="button" onclick="window.AarogyamETailer.deleteTodoItem('${t.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:6px 10px; font-size:0.78rem; font-weight:800; cursor:pointer; flex-shrink:0;" title="हटाएं">
+                🗑️
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+    }
 
     const entries = getLocalDiaryEntries();
 
@@ -4590,6 +5364,50 @@
         `).join('');
       }
     }
+  }
+
+  function handleTodoSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (typeof window.isUserLoggedIn === 'function' && !window.isUserLoggedIn()) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => handleTodoSubmit(), { reason: 'To-Do कार्य जोड़ने के लिए कृपया अपना नाम व मोबाइल नंबर दर्ज करें।' });
+      }
+      return;
+    }
+    const input = document.getElementById('todoTaskInput');
+    if (!input) return;
+    const val = (input.value || '').trim();
+    if (!val) return;
+    let tasks = [];
+    try { tasks = JSON.parse(localStorage.getItem('AI_DIARY_TODO_TASKS') || '[]'); } catch (_) { }
+    tasks.unshift({
+      id: 'todo_' + Date.now(),
+      text: val,
+      completed: false,
+      created_at: new Date().toISOString()
+    });
+    localStorage.setItem('AI_DIARY_TODO_TASKS', JSON.stringify(tasks));
+    input.value = '';
+    renderTodoPlanner();
+  }
+
+  function toggleTodoItemStatus(id) {
+    let tasks = [];
+    try { tasks = JSON.parse(localStorage.getItem('AI_DIARY_TODO_TASKS') || '[]'); } catch (_) { }
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      localStorage.setItem('AI_DIARY_TODO_TASKS', JSON.stringify(tasks));
+      renderTodoPlanner();
+    }
+  }
+
+  function deleteTodoItem(id) {
+    let tasks = [];
+    try { tasks = JSON.parse(localStorage.getItem('AI_DIARY_TODO_TASKS') || '[]'); } catch (_) { }
+    tasks = tasks.filter(t => t.id !== id);
+    localStorage.setItem('AI_DIARY_TODO_TASKS', JSON.stringify(tasks));
+    renderTodoPlanner();
   }
 
   // Autoship 6th Month Free Loyalty Radar Renderer
@@ -4713,12 +5531,12 @@
   // =============================================================
   const EIGHT_LEVELS_META = [
     {
-      lvl: 1, min: 0, max: 50, name: 'शुरुआत', icon: '🥉', color: '#94a3b8',
+      lvl: 1, min: 0, max: 50, name: 'शुरुआत', icon: '🥉', color: '#38bdf8',
       perks: 'शुरुआती फील्ड टूल्स, 30-सेकंड सरल डायरी एंट्री, डिजिटल खताबुक एक्सेस।',
       tips: 'पहले 5 किसानों या साथियों की एंट्री दर्ज करें (+10 अंक प्रति किसान)।'
     },
     {
-      lvl: 2, min: 51, max: 150, name: 'फील्ड साथी', icon: '🥈', color: '#38bdf8',
+      lvl: 2, min: 51, max: 150, name: 'फील्ड साथी', icon: '🥈', color: '#4ade80',
       perks: '1-टैप ऑटोमेशन कतार, प्राथमिकता WhatsApp टेम्पलेट्स, बेसिक रिपोर्ट डाउनलोड।',
       tips: '10 फॉलो-अप पूर्ण करें (+50 अंक) और 5 नए किसान जोड़ें (+50 अंक)।'
     },
@@ -4733,22 +5551,22 @@
       tips: 'उधारी वसूली पूर्ण करें और 20 सक्रिय ग्राहक बनाएं।'
     },
     {
-      lvl: 5, min: 501, max: 800, name: 'सिल्वर लीडर', icon: '👑', color: '#cbd5e1',
+      lvl: 5, min: 501, max: 800, name: 'सिल्वर लीडर', icon: '👑', color: '#f87171',
       perks: 'टीम नेटवर्क मॉनिटर, डायरेक्ट क्लोजिंग रॉयल्टी, कंपनी ई-बुक्स फ्री एक्सेस।',
       tips: 'टीम साथियों को गाइड करें और 50 नियमित फॉलो-अप करें।'
     },
     {
-      lvl: 6, min: 801, max: 1200, name: 'गोल्ड मास्टर', icon: '🏆', color: '#f59e0b',
+      lvl: 6, min: 801, max: 1200, name: 'गोल्ड मास्टर', icon: '🏆', color: '#fbbf24',
       perks: 'नेशनल टूर क्वालिफायर रडार, 15-दिवसीय क्लोजिंग बूस्ट, स्पेशल लीडरशिप बैज।',
       tips: '15-दिन में ₹50,000 टर्नओवर अचीव करें और 30 नई एंट्रीज जोड़ें।'
     },
     {
-      lvl: 7, min: 1201, max: 2000, name: 'डायमंड मेंटर', icon: '🌟', color: '#a855f7',
+      lvl: 7, min: 1201, max: 2000, name: 'डायमंड मेंटर', icon: '🌟', color: '#c084fc',
       perks: 'कार फंड क्लब मान्यता, वीआईपी डिजिटल सपोर्ट, लाइफटाइम 0-एग्रेस वॉल्ट।',
       tips: 'नेटवर्क में 5 नए गोल्ड मास्टर्स तैयार करें।'
     },
     {
-      lvl: 8, min: 2001, max: 99999, name: 'क्राउन लीजेंड', icon: '🔱', color: '#ec4899',
+      lvl: 8, min: 2001, max: 99999, name: 'क्राउन लीजेंड', icon: '🔱', color: '#fb7185',
       perks: '₹8,19,250 हाईएस्ट 15-दिन कैप क्लब, नेशनल कन्वेंशन मुख्य वक्ता, हॉल ऑफ फेम।',
       tips: 'आरोग्यम भारत के सर्वोच्च मार्गदर्शक! फील्ड लीजेंड।'
     }
@@ -4763,21 +5581,21 @@
     gridEl.innerHTML = EIGHT_LEVELS_META.map(item => {
       const isUnlocked = currentPts >= item.min;
       const statusIcon = isUnlocked ? '🔓' : '🔒';
-      const statusText = isUnlocked ? 'खुला है' : `लॉक (${item.min} अंक)`;
-      const statusColor = isUnlocked ? '#34d399' : '#94a3b8';
-      const cardBorder = isUnlocked ? '1.5px solid #38bdf8' : '1px dashed #334155';
-      const cardBg = isUnlocked ? 'linear-gradient(135deg, #091a32 0%, #0f274a 100%)' : '#080c14';
+      const statusText = isUnlocked ? 'खुला है (सक्रिय)' : `लॉक (${item.min} अंक)`;
+      const statusColor = isUnlocked ? '#22c55e' : '#f8fafc';
+      const cardBorder = isUnlocked ? '2px solid #22c55e' : '1.5px solid #334155';
+      const cardBg = isUnlocked ? 'background:#1e293b' : 'background:#0f172a';
 
       return `
-        <div style="${cardBg}; border:${cardBorder}; border-radius:10px; padding:10px; position:relative; box-shadow:${isUnlocked ? '0 2px 10px rgba(56,189,248,0.2)' : 'none'};">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-            <span style="font-size:1.1rem;">${item.icon}</span>
-            <button type="button" onclick="window.AarogyamETailer.openLevelInfoModal(${item.lvl})" style="background:#1e293b; border:1px solid #3b82f6; color:#93c5fd; width:22px; height:22px; border-radius:50%; font-size:0.72rem; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="विवरण देखें">ℹ️</button>
+        <div style="${cardBg}; border:${cardBorder}; border-radius:12px; padding:12px; position:relative; box-shadow:0 3px 10px rgba(0,0,0,0.5);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:1.4rem;">${item.icon}</span>
+            <button type="button" onclick="window.AarogyamETailer.openLevelInfoModal(${item.lvl})" style="background:#334155; border:1.5px solid #38bdf8; color:#ffffff !important; width:28px; height:28px; border-radius:50%; font-size:0.85rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.5);" title="विवरण देखें">ℹ️</button>
           </div>
-          <div style="font-weight:900; font-size:0.82rem; color:${item.color};">
+          <div style="font-weight:900; font-size:0.95rem; color:${item.color} !important; text-shadow:0 1px 3px rgba(0,0,0,0.9); margin-bottom:4px;">
             लेवल ${item.lvl}: ${item.name}
           </div>
-          <div style="font-size:0.70rem; color:${statusColor}; font-weight:800; margin-top:3px; display:flex; align-items:center; gap:4px;">
+          <div style="font-size:0.84rem; color:${statusColor} !important; font-weight:900; display:flex; align-items:center; gap:5px;">
             <span>${statusIcon}</span> <span>${statusText}</span>
           </div>
         </div>
@@ -4952,7 +5770,24 @@
   function getKbEntries() {
     try {
       const key = getKbStorageKey();
-      const entries = JSON.parse(localStorage.getItem(key) || '[]');
+      let entries = [];
+      const userRaw = localStorage.getItem(key);
+      if (userRaw && userRaw !== '[]') {
+        entries = JSON.parse(userRaw);
+      } else {
+        const globalRaw = localStorage.getItem('AI_KHATABOOK_ENTRIES');
+        if (globalRaw && globalRaw !== '[]') {
+          entries = JSON.parse(globalRaw);
+        } else {
+          try {
+            const vault = JSON.parse(localStorage.getItem('AI_LOCAL_VAULT') || '{}');
+            if (Array.isArray(vault.khata_records) && vault.khata_records.length > 0) {
+              entries = vault.khata_records;
+            }
+          } catch (_) {}
+        }
+      }
+      if (!Array.isArray(entries)) entries = [];
       // Clean filter to prevent any zombie seeds
       return entries.filter(e => {
         const cName = ((e.customer_name || e.name || '') + '').toLowerCase();
@@ -5072,10 +5907,94 @@
         const merged = Array.from(mergedMap.values());
         saveKbEntries(merged);
         renderKhatabookPro();
+        const searchVal = document.getElementById('diaryPickerSearchInput')?.value || '';
+        if (typeof renderDiaryPickerList === 'function') {
+          renderDiaryPickerList(searchVal);
+        }
       }
     } catch (err) {
       console.warn('loadKbEntriesFromSupabase error:', err);
     }
+  }
+
+  // Real-Time 2-Way Sync from Supabase public.surveys into Local Diary (Rule XXIX: Zero Data Loss on Cache Clear)
+  async function loadCloudSurveysIntoDiary() {
+    try {
+      if (!window.supabase || typeof window.supabase.createClient !== 'function') return;
+      const myMob = getUserMobile();
+      if (!myMob) return;
+
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const myShareId = getAppUserShareId();
+      const myProfileId = getAppUserProfileId();
+
+      const orConditions = [
+        `category_answers->>created_by_mobile.eq.${myMob}`,
+        `category_answers->>distributor_mobile.eq.${myMob}`
+      ];
+      if (myShareId) {
+        orConditions.push(`category_answers->>referred_by.eq.${myShareId}`);
+      }
+      if (myProfileId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(myProfileId)) {
+        orConditions.push(`profile_id.eq.${myProfileId}`);
+      }
+
+      const { data, error } = await client.from('surveys')
+        .select('id, profile_id, name, mobile, district, village, state, occupation, selected_categories, category_answers, created_at')
+        .or(orConditions.join(','))
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        // STRICT: Store surveys into AI_CLOUD_SURVEYS_CACHE for "संपर्क चुनें" picker only.
+        // NEVER auto-inject into local diary without user clicking "डायरी में सुरक्षित करें"!
+        const cloudList = [];
+        data.forEach(s => {
+          const sMob = sanitize10DigitMobile(s.mobile || '');
+          if (sMob && sMob !== myMob) {
+            const ans = s.category_answers || {};
+            cloudList.push({
+              id: s.id || ('surv_' + sMob),
+              name: s.name || 'किसान साथी',
+              mobile: sMob,
+              place: s.district || s.village || s.state || 'स्थानीय',
+              type: ans.type || ans.entity_type || (s.occupation && s.occupation.includes('टीम') ? 'team' : 'customer'),
+              need: ans.need || s.occupation || 'सामान्य संपर्क',
+              crop_name: ans.crop_name || '',
+              crop_problem: ans.crop_problem || '',
+              netsurf_id: ans.netsurf_id || '',
+              created_at: s.created_at || new Date().toISOString(),
+              source: 'cloud_survey'
+            });
+          }
+        });
+
+        localStorage.setItem('AI_CLOUD_SURVEYS_CACHE', JSON.stringify(cloudList));
+        console.log(`✅ Cached ${cloudList.length} surveys from Supabase into AI_CLOUD_SURVEYS_CACHE for Contact Picker!`);
+      }
+    } catch (err) {
+      console.warn('loadCloudSurveysIntoDiary error:', err);
+    }
+  }
+
+  // Purge any auto-injected cloud_survey items from local diary so only manually saved entries appear
+  function cleanupAutoInjectedDiaryEntries() {
+    try {
+      const myMob = getUserMobile();
+      if (!myMob) return;
+      const k = 'AAROGYAM_SMART_DIARY_ENTRIES_' + myMob;
+      const raw = localStorage.getItem(k);
+      if (raw) {
+        const list = JSON.parse(raw);
+        if (Array.isArray(list)) {
+          const cleaned = list.filter(e => e.source !== 'cloud_survey');
+          if (cleaned.length !== list.length) {
+            localStorage.setItem(k, JSON.stringify(cleaned));
+            console.log(`🧹 Cleaned ${list.length - cleaned.length} auto-injected cloud surveys from local diary.`);
+          }
+        }
+      }
+    } catch (_) { }
   }
 
   // Real-Time 2-Way Sync to Supabase public.khatabook_entries (Dual SDK + REST Engine)
@@ -5409,15 +6328,17 @@
 
   // Open & Close Add Party Modal (With Hardware Back Button & Popstate Support)
   function openAddPartyModal() {
+    if (typeof window.isUserLoggedIn === 'function' && !window.isUserLoggedIn()) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => openAddPartyModal(), { title: 'ग्राहक खाता जोड़ने हेतु लॉगिन करें' });
+      }
+      return;
+    }
     const modal = document.getElementById('kbAddPartyModal');
     if (modal) {
-      modal.style.display = 'flex';
+      modal.style.removeProperty('display');
+      modal.style.setProperty('display', 'flex', 'important');
       modal.classList.add('show');
-      try {
-        if (!window.history.state || window.history.state.modal !== 'kbAddPartyModal') {
-          window.history.pushState({ modal: 'kbAddPartyModal' }, '');
-        }
-      } catch (_) { }
       const mobileInput = document.getElementById('kbPartyMobile');
       if (mobileInput) {
         setTimeout(() => mobileInput.focus(), 120);
@@ -5427,7 +6348,11 @@
 
   function closeAddPartyModal() {
     const modal = document.getElementById('kbAddPartyModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.style.display = 'none';
+    }
   }
 
   // Handle Add Party Submit
@@ -5483,19 +6408,30 @@
       try {
         if (window.supabase && typeof window.supabase.createClient === 'function') {
           const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          const myShareId = getAppUserShareId() || 'AI000004';
-          const myProfileId = getAppUserProfileId() || null;
+          const myShareId = getAppUserShareId() || 'AI000072';
+          const myProfileId = getAppUserProfileId();
 
-          client.from('surveys').insert([{
+          const surveyPayload = {
+            profile_id: myProfileId,
             name: name,
             mobile: mobile,
-            occupation: catLabel,
-            state: place || 'स्थानीय',
+            occupation: catLabel || (partyType === 'supplier' ? 'सप्लायर' : 'खाता ग्राहक'),
+            state: place || 'मध्य प्रदेश',
             district: place || 'स्थानीय',
-            source: 'khatabook_party',
-            referred_by: myShareId,
-            profile_id: myProfileId
-          }]).then(() => { }).catch(() => { });
+            village: place || 'स्थानीय',
+            selected_categories: selectedCats.length ? selectedCats : ['khatabook_party'],
+            category_answers: {
+              source: 'khatabook_party',
+              party_type: partyType,
+              referred_by: myShareId,
+              timestamp: new Date().toISOString()
+            }
+          };
+
+          client.from('surveys').insert([surveyPayload]).then(({ data, error }) => {
+            if (error) console.warn('KB Surveys insert error:', error.message);
+            else console.log('✅ KB Party synced into surveys table:', data);
+          }).catch((err) => { console.warn('KB Surveys insert exception:', err); });
         }
       } catch (_) { }
     }
@@ -5658,6 +6594,12 @@
 
   // Open Add Transaction Screen with Calculator
   function openAddTxModal(mode) {
+    if (typeof window.isUserLoggedIn === 'function' && !window.isUserLoggedIn()) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => openAddTxModal(mode), { reason: 'लेन-देन (जमा / उधारी) जोड़ने के लिए कृपया अपना नाम व मोबाइल नंबर दर्ज करें।' });
+      }
+      return;
+    }
     if (!activeKbCustomer) return;
     activeKbTxMode = mode; // 'GAVE' or 'GOT'
     kbCalcExpr = '500';
@@ -5779,6 +6721,12 @@
 
   // Save Transaction
   function saveKbTransaction() {
+    if (typeof window.isUserLoggedIn === 'function' && !window.isUserLoggedIn()) {
+      if (typeof window.openGuestLoginModal === 'function') {
+        window.openGuestLoginModal(() => saveKbTransaction(), { reason: 'लेन-देन सेव करने के लिए कृपया अपना नाम व मोबाइल नंबर दर्ज करें।' });
+      }
+      return;
+    }
     if (!activeKbCustomer) return;
     let amt = 0;
     try {
@@ -6616,6 +7564,7 @@
     handleMainSubjectChange: handleMainSubjectChange,
     handleSubItemChange: handleSubItemChange,
     handleImageAttach: handleImageAttach,
+    removeAttachedImage: removeAttachedImage,
     sendAndNext: sendAndNext,
     sendBroadcastToWhatsApp: sendBroadcastToWhatsApp,
     callAndRemarkActiveTarget: callAndRemarkActiveTarget,
@@ -6637,9 +7586,19 @@
     closeEditCategoryModal: closeEditCategoryModal,
     handleEditTypeChange: handleEditTypeChange,
     saveEditedContact: saveEditedContact,
+    hideDiaryEntry: hideDiaryEntry,
+    unhideAllContacts: unhideAllContacts,
+    saveCallRemark: saveCallRemark,
+    closeCallRemarkModal: closeCallRemarkModal,
     renderTodoPlanner: renderTodoPlanner,
+    handleTodoSubmit: handleTodoSubmit,
+    toggleTodoItemStatus: toggleTodoItemStatus,
+    deleteTodoItem: deleteTodoItem,
+    isUserAccountActive: isUserAccountActive,
     renderAutoshipTracker: renderAutoshipTracker,
     renderDirectTeamCards: renderDirectTeamCards,
+    renderTeamCardsHtml: renderTeamCardsHtml,
+    openLevelRoadmapModal: openLevelRoadmapModal,
     sendAutoshipFreeAlert: sendAutoshipFreeAlert,
     getAppUserShareId: getAppUserShareId,
     openSmartFollowupPicker: openSmartFollowupPicker,
@@ -6654,10 +7613,20 @@
     setEntityType: setEntityType,
     setTeamStatus: setTeamStatus,
     setNeedCategory: setNeedCategory,
+    handleDiaryMainSubjectChange: handleDiaryMainSubjectChange,
+    handleDiarySubItemChange: handleDiarySubItemChange,
+    populateDiarySubItemDropdown: populateDiarySubItemDropdown,
+    applyFollowupMultiFilters: applyFollowupMultiFilters,
+    resetFollowupMultiFilters: resetFollowupMultiFilters,
+    changeFollowupPage: changeFollowupPage,
+    handleEditMainSubjectChange: handleEditMainSubjectChange,
+    populateEditSubItemDropdown: populateEditSubItemDropdown,
     handleDiaryFormSubmit: handleDiaryFormSubmit,
     setLedgerFilter: setLedgerFilter,
     filterLedgerEntries: filterLedgerEntries,
     deleteDiaryEntry: deleteDiaryEntry,
+    renderEntryPageContactList: renderEntryPageContactList,
+    getAppUserProfileId: getAppUserProfileId,
     downloadDiaryReport: downloadDiaryReport,
     setIncomeTarget: setIncomeTarget,
     handleCashflowSubmit: handleCashflowSubmit,
@@ -7507,12 +8476,18 @@
       }
     } catch (_) { }
     // Initialize Smart Business Diary Components
+    cleanupAutoInjectedDiaryEntries();
     updateDiaryHeroLevel();
+    render8LevelLockGrid();
+    renderEntryPageContactList(1);
     renderDiaryLedger();
     loadKbEntriesFromSupabase();
+    loadCloudSurveysIntoDiary();
+    renderDirectTeamCards();
     renderDiaryFollowups();
     setTimeout(() => {
       handleMainSubjectChange('crop_doctor');
+      populateDiarySubItemDropdown('crop_doctor');
       updateHubQueueProgressUI();
     }, 200);
     renderIncomeTarget();

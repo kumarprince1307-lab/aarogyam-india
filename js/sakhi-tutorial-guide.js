@@ -143,7 +143,11 @@
     // Zero-Egress fetch: Query only minimal necessary fields
     try {
       const sbKey = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
-      const url = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(referral_code.eq.${encodeURIComponent(shareId)},referred_by.eq.${encodeURIComponent(shareId)})&select=full_name,mobile,created_at&limit=10&order=created_at.desc`;
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(shareId || ''));
+      const queryFilter = isUuid
+        ? `or=(referral_code.eq.${encodeURIComponent(shareId)},referred_by.eq.${encodeURIComponent(shareId)})`
+        : `referral_code=eq.${encodeURIComponent(shareId)}`;
+      const url = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?${queryFilter}&select=full_name,mobile,created_at&limit=10&order=created_at.desc`;
       const res = await fetch(url, { headers: { 'apikey': sbKey, 'Authorization': 'Bearer ' + sbKey } });
       if (res.ok) {
         const data = await res.json();

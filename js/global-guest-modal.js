@@ -764,7 +764,6 @@
 
   window.ensureAuthenticatedGuest = function(callback, options = {}) {
     if (typeof window.isUserLoggedIn === 'function' && window.isUserLoggedIn()) {
-      if (typeof callback === 'function') callback();
       return true;
     }
     window.openGuestLoginModal(callback, { force: true, ...options });

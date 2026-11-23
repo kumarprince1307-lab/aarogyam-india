@@ -1700,13 +1700,9 @@ body.ai-tour-in-progress .universal-sticky-dock-bar {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
 }
 
-/* HIDE RIGHT FLOATING DOCK ON ALL MY TEAM PAGES */
-body.myteam-page .universal-sticky-dock-bar,
-body:has(#tab-diary-followup) .universal-sticky-dock-bar,
-body:has(#smartDiaryForm) .universal-sticky-dock-bar,
-body:has(#tab-diary-khata) .universal-sticky-dock-bar,
-body:has(#tab-diary-autoship) .universal-sticky-dock-bar,
-body:has(#tab-diary-todo) .universal-sticky-dock-bar,
-body:has(.myteam-quick-card) .universal-sticky-dock-bar {
-  display: none !important;
+/* Floating dock bar visible across all pages per Aarogyam Manas */
+.universal-sticky-dock-bar {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
