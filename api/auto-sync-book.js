@@ -306,11 +306,11 @@ module.exports = async function handler(req, res) {
         try {
           await githubRequest(`git/refs/heads/${GITHUB_BRANCH}`, 'PATCH', token, {
             sha: newCommitSha,
-            force: false
+            force: true
           });
           break;
         } catch (err) {
-          if (attempt === 3 || !/fast forward|reference update/i.test(err.message || '')) throw err;
+          if (attempt === 3) throw err;
         }
       }
 
@@ -426,7 +426,7 @@ module.exports = async function handler(req, res) {
       // 6. Update Branch Reference
       await githubRequest(`git/refs/heads/${GITHUB_BRANCH}`, 'PATCH', token, {
         sha: newCommitSha,
-        force: false
+        force: true
       });
 
       return sendJson(res, 200, {
@@ -855,7 +855,7 @@ module.exports = async function handler(req, res) {
     // 7. ATOMICALLY UPDATE TARGET BRANCH HEAD IN ONE STEP
     await githubRequest(`git/refs/heads/${GITHUB_BRANCH}`, 'PATCH', token, {
       sha: newCommitSha,
-      force: false
+      force: true
     });
 
     return sendJson(res, 200, {
