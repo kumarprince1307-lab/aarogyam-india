@@ -195,12 +195,12 @@ function filterTable(q) {
 window.actResetPin = async function(phone) {
   if (!confirm(`क्या आप +91 ${phone} का 4-अंकीय सुरक्षा पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
-      method: 'PATCH',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin_code: null, updated_at: new Date().toISOString() })
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
-    alert(`✅ +91 ${phone} का पिन सफलतापूर्वक रीसेट कर दिया गया है!`);
+    if (!res.ok) throw new Error('Status: ' + res.status);
+    alert(`✅ +91 ${phone} का पिन सफलतापूर्वक रीसेट कर दिया गया है!\n\nअब यूजर जब भी My Team खोलेगा, उसे नया पिन सेट करने का विकल्प मिलेगा।`);
     loadVaultData();
   } catch (e) {
     alert("त्रुटि: " + e.message);
