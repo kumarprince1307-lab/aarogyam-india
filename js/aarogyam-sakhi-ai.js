@@ -4327,16 +4327,87 @@ if (typeof document !== 'undefined') {
 
     const row = document.createElement('div');
     row.className = 'sakhi-msg-row bot';
-    row.innerHTML = `
-      <div class="sakhi-msg-bubble">
-        ${finalHtml}
-        <div class="sakhi-msg-time" style="font-size:0.68rem;color:#94a3b8;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:600;">
-          <span>${formatMsgTime(now)}</span>
-          <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
+
+    // ✍️ PROGRESSIVE TYPEWRITER STREAMER (ChatGPT/Gemini Style)
+    // Types out the opening 2-3 lines word-by-word (~350ms), then smoothly reveals the full card & action chips!
+    const introCandidates = (speechText || textContentOnly || '').split(/[।!?\n]+/);
+    const firstSentence = (introCandidates[0] || '').trim();
+    const shouldTypewrite = firstSentence.length > 8 && !finalHtml.includes('sakhi-care-followup');
+
+    if (shouldTypewrite) {
+      const words = firstSentence.split(/\s+/).slice(0, 18);
+      row.innerHTML = `
+        <div class="sakhi-msg-bubble">
+          <div class="sakhi-typewriter-preview" style="font-size:0.95rem;line-height:1.65;color:#1e293b;font-weight:600;min-height:28px;">
+            <span class="sakhi-typed-text"></span><span class="sakhi-blink-cursor" style="color:#16a34a;font-weight:900;margin-left:2px;display:inline-block;">|</span>
+          </div>
+          <div class="sakhi-full-content" style="display:none;opacity:0;transition:opacity 0.28s ease;">
+            ${finalHtml}
+            <div class="sakhi-msg-time" style="font-size:0.68rem;color:#94a3b8;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:600;">
+              <span>${formatMsgTime(now)}</span>
+              <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
+            </div>
+          </div>
         </div>
-      </div>
-    `;
-    wrap.appendChild(row);
+      `;
+      wrap.appendChild(row);
+
+      const typedSpan = row.querySelector('.sakhi-typed-text');
+      const cursor = row.querySelector('.sakhi-blink-cursor');
+      const previewDiv = row.querySelector('.sakhi-typewriter-preview');
+      const fullDiv = row.querySelector('.sakhi-full-content');
+
+      let wIdx = 0;
+      let isRevealed = false;
+
+      function revealFull() {
+        if (isRevealed) return;
+        isRevealed = true;
+        if (previewDiv) previewDiv.style.display = 'none';
+        if (fullDiv) {
+          fullDiv.style.display = 'block';
+          setTimeout(() => { fullDiv.style.opacity = '1'; }, 10);
+        }
+        try { row.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
+      }
+
+      let blinkInterval = setInterval(() => {
+        if (cursor) cursor.style.opacity = (cursor.style.opacity === '0' ? '1' : '0');
+      }, 300);
+
+      const typeInterval = setInterval(() => {
+        if (wIdx < words.length) {
+          typedSpan.textContent += (wIdx > 0 ? ' ' : '') + words[wIdx];
+          wIdx++;
+          try { row.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
+        } else {
+          clearInterval(typeInterval);
+          clearInterval(blinkInterval);
+          if (cursor) cursor.remove();
+          setTimeout(revealFull, 100);
+        }
+      }, 26);
+
+      // Fast reveal on user tap
+      row.addEventListener('click', () => {
+        clearInterval(typeInterval);
+        clearInterval(blinkInterval);
+        revealFull();
+      }, { once: true });
+
+    } else {
+      row.innerHTML = `
+        <div class="sakhi-msg-bubble">
+          ${finalHtml}
+          <div class="sakhi-msg-time" style="font-size:0.68rem;color:#94a3b8;text-align:right;margin-top:6px;display:flex;justify-content:flex-end;align-items:center;gap:4px;font-weight:600;">
+            <span>${formatMsgTime(now)}</span>
+            <i class="fa-solid fa-check-double" style="color:#16a34a;font-size:0.7rem;" title="सत्यापित AI उत्तर"></i>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(row);
+    }
+
     // Smooth Top-Anchor (ChatGPT/Gemini Style): Anchor view at top of the new response so user reads comfortably from line 1
     try {
       row.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -5203,6 +5274,29 @@ if (typeof document !== 'undefined') {
         } else if (cleanedSub.length >= 2) {
           cleanNormQ = normalizeQueryText(cleanedSub);
           effectiveQuery = cleanedSub;
+        }
+      }
+
+      // 🧠 SAKHI SOVEREIGN DESI NLP CLASSIFIER (0ms, Local Brain First)
+      if (window.SakhiDesiNLP && typeof window.SakhiDesiNLP.classify === 'function' && !/(?:सर्च\s*कर|खोज\s*कर|गूगल|विकी|wikipedia|\bsearch\b|\bkhoj\b|इंटरनेट\s*पर)/i.test(cleanNormQ)) {
+        try {
+          const nlpResult = window.SakhiDesiNLP.classify(cleanNormQ);
+          if (nlpResult && nlpResult.isSovereignMatch && nlpResult.match) {
+            const match = nlpResult.match;
+            if (typeof sakhiConversationState !== 'undefined' && sakhiConversationState) {
+              sakhiConversationState.lastActiveDomain = match.domain;
+              sakhiConversationState.lastActiveEntity = match.id;
+              sakhiConversationState.lastActiveEntityName = match.entity;
+              sakhiConversationState.lastAnswerSource = 'Sovereign Desi NLP';
+            }
+            const cardHtml = typeof match.renderHtml === 'function' ? match.renderHtml() : '';
+            if (cardHtml) {
+              streamBotMessage(cardHtml, match.speech || '');
+              return;
+            }
+          }
+        } catch (nlpErr) {
+          console.warn('[Sakhi Desi NLP Guard] Non-fatal evaluation error:', nlpErr);
         }
       }
 
@@ -20324,6 +20418,9 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
             vault.unshift(newRecord);
             saveLocalLearnedVault(vault);
             syncVaultItemToSupabase(newRecord);
+            if (window.SakhiDesiNLP && typeof window.SakhiDesiNLP.learnAnswer === 'function') {
+              window.SakhiDesiNLP.learnAnswer(query, geminiRes.summary, domain);
+            }
           } catch (e) { }
           renderLearnedVaultAnswerBox(newRecord);
           return;

@@ -467,8 +467,8 @@
     const q = (rawQ || cleanQ || '').trim();
     if (!q || q.length < 3) return null;
 
-    // Fast, lightweight and responsive Google Gemini model cascade
-    const models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+    // Fast, lightweight and responsive Google Gemini model cascade (Active free-tier models first)
+    const models = ['gemini-3.5-flash-lite', 'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-flash-latest'];
 
     // Dynamic Persona & Salutation Guide based on actual user profile (SAKHI_MANAS.md Protocol)
     let userSalutationRule = 'शुरुआत आत्मीय व सम्मानजनक अभिवादन से करें (जैसे "राम-राम जी!", "नमस्ते जी!")। कभी भी "भाई/बहन" स्लैश न लगाएं।';
@@ -518,7 +518,7 @@
       let timeoutId = null;
       if (typeof AbortController !== 'undefined') {
         controller = new AbortController();
-        timeoutId = setTimeout(() => controller.abort(), 16000);
+        timeoutId = setTimeout(() => controller.abort(), 6500);
       }
 
       const res = await fetch('/api/sakhi-chat', {

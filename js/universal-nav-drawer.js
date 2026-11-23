@@ -798,6 +798,11 @@
   }
 
   function purgeAllStoredUserData() {
+    try {
+      if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.logoutPurge === 'function') {
+        window.AarogyamTeamSecurity.logoutPurge();
+      }
+    } catch (_) {}
     const keysToRemove = [
       'aim_user_name', 'aim_user_mobile', 'aarogyam_user_name', 'aarogyam_user_phone',
       'aarogyam_user_registered', 'aarogyam_user', 'CURRENT_USER', 'aoi_user_session', 'wb_registered',

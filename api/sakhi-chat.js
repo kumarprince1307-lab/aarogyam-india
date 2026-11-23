@@ -6,10 +6,10 @@ const https = require('https');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
 const DEFAULT_MODELS = [
-  'gemini-2.5-flash',
+  'gemini-3.5-flash-lite',
   'gemini-1.5-flash',
   'gemini-flash-latest',
-  'gemini-3.5-flash-lite'
+  'gemini-2.5-flash'
 ];
 
 function forwardToGemini(model, payload, apiKey) {
@@ -123,13 +123,14 @@ module.exports = async function handler(req, res) {
           });
         }
 
-        // On 429 quota exhaustion, stop immediately to save retries
-        if (result.status === 429) {
-          return res.status(429).json(result.data);
+        // On 429 (rate-limit / model quota) or 404/503, cascade to next healthy model!
+        if (result.status === 429 || result.status === 404 || result.status === 503) {
+          console.warn(`[Gemini Cascade] Model ${model} returned ${result.status}. Cascading to next model...`);
+          continue;
         }
 
-        // If not 404/503 (e.g. 400 Bad Request or 403 Forbidden), do not cascade
-        if (result.status !== 404 && result.status !== 503) {
+        // If 400 Bad Request or 403 Forbidden (Auth), do not cascade
+        if (result.status === 400 || result.status === 401 || result.status === 403) {
           return res.status(result.status).json(result.data);
         }
       } catch (err) {

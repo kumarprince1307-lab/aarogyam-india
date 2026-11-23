@@ -287,6 +287,11 @@
      * This is the single, authoritative logout function for the entire site.
      */
     function logout() {
+        try {
+            if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.logoutPurge === 'function') {
+                window.AarogyamTeamSecurity.logoutPurge();
+            }
+        } catch (_) {}
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(PROFILE_KEY);
         localStorage.removeItem(SESSION_KEY);
