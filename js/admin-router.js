@@ -7,6 +7,7 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js?v=20261115_v85_correct_links').then(m => m.initDashboard()),
+  'team-security': () => import('./admin-pages-team-security.js?v=1.0').then(m => m.initTeamSecurity()),
   'users': () => import('./admin-pages-users.js?v=20261116_v87_live_credit_box').then(m => m.initUsers()),
   'user-details': () => import('./admin-pages-user-details.js?v=27.5').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
