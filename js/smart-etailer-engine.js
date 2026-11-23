@@ -1195,7 +1195,7 @@
       if (filterStr) {
         const fetchDirectTeamRest = () => {
           if (typeof fetch === 'function') {
-            const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=200`;
+            const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=1000`;
             fetch(qUrl, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
               .then(r => r.json())
               .then(d => {
@@ -1214,7 +1214,7 @@
 
         if (window.supabase && typeof window.supabase.createClient === 'function') {
           const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          client.from('profiles').select('id, full_name, mobile, district, address, share_id, referral_mobile, referral_code, referred_by, is_active, role, membership_level, created_at').or(filterStr).order('created_at', { ascending: false }).limit(200).then(({ data, error }) => {
+          client.from('profiles').select('id, full_name, mobile, district, address, share_id, referral_mobile, referral_code, referred_by, is_active, role, membership_level, created_at').or(filterStr).order('created_at', { ascending: false }).limit(1000).then(({ data, error }) => {
             if (!error && data && data.length > 0) {
               localStorage.setItem('AI_DIRECT_REFERRALS_CACHE', JSON.stringify(data));
               renderTeamCardsHtml(data);
@@ -3394,11 +3394,11 @@
 
         if (window.supabase && typeof window.supabase.createClient === 'function') {
           const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          client.from('profiles').select('id, full_name, mobile, district, address, share_id, referral_mobile, referral_code, referred_by, is_active, role, membership_level, created_at').or(filterStr).order('created_at', { ascending: false }).limit(200).then(({ data: refData, error }) => {
+          client.from('profiles').select('id, full_name, mobile, district, address, share_id, referral_mobile, referral_code, referred_by, is_active, role, membership_level, created_at').or(filterStr).order('created_at', { ascending: false }).limit(1000).then(({ data: refData, error }) => {
             if (!error && refData && refData.length > 0) {
               onProfilesLoaded(refData);
             } else if (typeof fetch === 'function') {
-              const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=200`;
+              const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=1000`;
               fetch(qUrl, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
                 .then(r => r.json())
                 .then(d => { if (Array.isArray(d) && d.length > 0) onProfilesLoaded(d); })
@@ -3406,7 +3406,7 @@
             }
           }).catch(() => { });
         } else if (typeof fetch === 'function') {
-          const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=200`;
+          const qUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/profiles?or=(${encodeURIComponent(filterStr)})&select=id,full_name,mobile,district,address,share_id,referral_mobile,referral_code,referred_by,is_active,role,membership_level,created_at&order=created_at.desc&limit=1000`;
           fetch(qUrl, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } })
             .then(r => r.json())
             .then(d => { if (Array.isArray(d) && d.length > 0) onProfilesLoaded(d); })
