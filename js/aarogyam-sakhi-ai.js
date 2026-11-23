@@ -20775,22 +20775,22 @@ E-Teller वह स्वतंत्र डिजिटल पार्टन�
             </button>
           </div>
 
-          <!-- 5. CHAT HISTORY (Black Box Heading, High Contrast Items) -->
-          <div style="flex:1 1 auto;min-height:0;margin-bottom:14px;">
-            <div style="background:#000000;color:#ffffff;padding:6px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.3px;">
+          <!-- 5. CHAT HISTORY (Black Box Heading, High Contrast Items - Subject-Wise) -->
+          <div style="flex-shrink:0;margin-bottom:18px;">
+            <div style="background:#000000;color:#ffffff;padding:8px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.3px;">
               <div style="display:flex;align-items:center;gap:6px;">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span>🕒 चैट इतिहास (CHAT HISTORY)</span>
+                <i class="fa-solid fa-list-check"></i>
+                <span>📂 विषय अनुसार चैट इतिहास (SUBJECT-WISE)</span>
               </div>
-              <button type="button" onclick="if(confirm('क्या आप सखी का चैट इतिहास साफ करना चाहते हैं?')){window.clearSakhiChatHistory();window.toggleSakhiPlusMenu(false);}" style="background:#ffffff;border:none;color:#000000;font-size:0.72rem;font-weight:900;cursor:pointer;padding:2px 8px;border-radius:4px;">साफ करें</button>
+              <button type="button" onclick="if(confirm('क्या आप सखी का चैट इतिहास साफ करना चाहते हैं?')){window.clearSakhiChatHistory();window.toggleSakhiPlusMenu(false);}" style="background:#ffffff;border:none;color:#000000;font-size:0.72rem;font-weight:900;cursor:pointer;padding:3px 8px;border-radius:4px;">साफ करें</button>
             </div>
-            <div id="sakhiMenuChatHistoryWrap" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;padding-right:2px;">
+            <div id="sakhiMenuChatHistoryWrap" style="display:flex;flex-direction:column;gap:6px;padding-right:2px;">
               <!-- Populated dynamically via renderDrawerChatHistory() -->
             </div>
           </div>
 
           <!-- 6. SAKHI AI SHARE & LABH (Sharp Black Button, White Text) -->
-          <div style="padding-top:10px;border-top:2px solid #000000;margin-top:auto;">
+          <div style="padding-top:12px;border-top:2px solid #000000;margin-bottom:24px;flex-shrink:0;">
             <button type="button" onclick="window.toggleSakhiPlusMenu(false); window.openSakhiShareBenefitsModal();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#000000;color:#ffffff;border:1.5px solid #000000;border-radius:12px;padding:12px 14px;font-size:0.92rem;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);letter-spacing:0.3px;">
               <i class="fa-solid fa-share-nodes" style="font-size:1.05rem;"></i>
               <span>📲 सखी AI शेयर करें और लाभ पाएं</span>
@@ -21433,6 +21433,33 @@ ${shareUrl}`;
     wrap.scrollTop = wrap.scrollHeight;
   };
 
+  function detectSubjectFromText(text) {
+    if (!text || typeof text !== 'string') return { id: 'crop', tag: 'फसल/खेती परामर्श', icon: '🌾' };
+    const q = text.toLowerCase();
+    if (q.includes('गेंहू') || q.includes('गेहूं') || q.includes('धान') || q.includes('सरसों') || q.includes('फसल') || q.includes('स्प्रे') || q.includes('खाद') || q.includes('यूरिया') || q.includes('बीज') || q.includes('कीट') || q.includes('इल्ली') || q.includes('रोग') || q.includes('फंगस') || q.includes('खेती') || q.includes('कृषि') || q.includes('उर्वरक') || q.includes('चना') || q.includes('मटर') || q.includes('टमाटर') || q.includes('मिर्च') || q.includes('पत्ता') || q.includes('जड़') || q.includes('खरपतवार') || q.includes('कीड़ा') || q.includes('दवा')) {
+      return { id: 'crop', tag: 'फसल/खेती परामर्श', icon: '🌾' };
+    }
+    if (q.includes('गाय') || q.includes('भैंस') || q.includes('दूध') || q.includes('फैट') || q.includes('पशु') || q.includes('थनैला') || q.includes('चारा') || q.includes('बछड़ा') || q.includes('पशुपालन') || q.includes('डेयरी') || q.includes('dairy')) {
+      return { id: 'pashu', tag: 'पशुपालन व डेयरी', icon: '🐄' };
+    }
+    if (q.includes('दर्द') || q.includes('जोड़') || q.includes('शुगर') || q.includes('डायबिटीज') || q.includes('बीपी') || q.includes('पर्ची') || q.includes('डॉक्टर') || q.includes('स्वास्थ्य') || q.includes('बुखार') || q.includes('खांसी') || q.includes('पेट') || q.includes('गैस') || q.includes('लीवर') || q.includes('कमजोरी') || q.includes('नेचुरामो') || q.includes('naturamore') || q.includes('हड्डी')) {
+      return { id: 'health', tag: 'स्वास्थ्य व डॉक्टर परामर्श', icon: '🩺' };
+    }
+    if (q.includes('बाल') || q.includes('झड़ना') || q.includes('चेहरा') || q.includes('त्वचा') || q.includes('पिंपल') || q.includes('दाग') || q.includes('स्किन') || q.includes('शैम्पू') || q.includes('सौंदर्य')) {
+      return { id: 'beauty', tag: 'त्वचा व सौंदर्य', icon: '🌸' };
+    }
+    if (q.includes('नेट्सर्फ') || q.includes('netsurf') || q.includes('बिज़नेस') || q.includes('कमीशन') || q.includes('कैपिंग') || q.includes('टीम') || q.includes('कमाई') || q.includes('डायरेक्ट') || q.includes('पेआउट') || q.includes('लाख') || q.includes('बिजनेस')) {
+      return { id: 'business', tag: 'नेट्सर्फ 4-स्टेप बिज़नेस', icon: '💼' };
+    }
+    if (q.includes('ई-बुक') || q.includes('किताब') || q.includes('पुस्तक') || q.includes('डाउनलोड') || q.includes('pdf') || q.includes('लाइब्रेरी') || q.includes('खरीद') || q.includes('स्टोर')) {
+      return { id: 'ebook', tag: 'ई-बुक स्टोर', icon: '📚' };
+    }
+    if (q.includes('मौसम') || q.includes('बारिश') || q.includes('तापमान') || q.includes('हवा') || q.includes('कोहरा') || q.includes('पाला') || q.includes('बरसात')) {
+      return { id: 'weather', tag: 'कृषि मौसम परामर्श', icon: '⛅' };
+    }
+    return { id: 'general', tag: 'अन्य मुख्य सवाल', icon: '🌱' };
+  }
+
   function renderDrawerChatHistory() {
     const wrap = document.getElementById('sakhiMenuChatHistoryWrap');
     if (!wrap) return;
@@ -21464,55 +21491,80 @@ ${shareUrl}`;
       }
     }
 
-    const sessions = getAllUserSessions();
+    let sessions = getAllUserSessions();
+    const activeSid = getActiveSessionId();
+
+    // Fallback: if sessions empty, extract questions from persistent chat
     if (!Array.isArray(sessions) || sessions.length === 0) {
-      // Fallback: check persistent chat log
       const phone = getUserPhone() || 'user';
       const raw = localStorage.getItem(`${SAKHI_PERSISTENT_CHAT_KEY}_${phone}`) || '[]';
       let history = [];
-      try { history = JSON.parse(raw); } catch(e) {}
-      const userMsgs = history.filter(m => (m.role === 'user' || m.sender === 'user') && m.text && !m.text.startsWith('📷')).slice(-8).reverse();
+      try { history = JSON.parse(raw); } catch (e) { }
+      const userMsgs = history.filter(m => (m.role === 'user' || m.sender === 'user') && m.text && !m.text.startsWith('📷')).slice(-15).reverse();
 
       if (userMsgs.length === 0) {
-        wrap.innerHTML = `<div style="font-size:0.75rem;color:#94a3b8;padding:8px 0;text-align:center;">(अभी कोई पिछली बातचीत नहीं है)</div>`;
+        wrap.innerHTML = `
+          <div style="background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:10px;padding:14px 10px;text-align:center;">
+            <div style="font-size:1.3rem;margin-bottom:2px;">💬</div>
+            <div style="font-size:0.82rem;font-weight:900;color:#000000;">अभी कोई चैट इतिहास नहीं है</div>
+            <div style="font-size:0.72rem;font-weight:600;color:#64748b;margin-top:2px;">ऊपर दिए गए विषयों पर क्लिक करके बातचीत शुरू करें!</div>
+          </div>`;
         return;
       }
 
-      wrap.innerHTML = userMsgs.map(m => {
+      // Convert persistent user messages into mock session objects
+      sessions = userMsgs.map((m, idx) => {
         const clean = (m.text || '').replace(/<[^>]*>/g, '').trim();
-        const preview = clean.length > 34 ? clean.substring(0, 34) + '...' : clean;
-        const safeQ = clean.replace(/"/g, '&quot;');
-        return `<button type="button" class="sakhi-drawer-history-item" onclick="window.toggleSakhiPlusMenu(false);window.sendSakhiSuggestion('${safeQ}')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;font-size:0.80rem;font-weight:700;color:#334155;cursor:pointer;margin-bottom:4px;transition:all 0.15s ease;">
-          <i class="fa-regular fa-message" style="color:#16a34a;font-size:0.75rem;"></i>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">${preview}</span>
-        </button>`;
-      }).join('');
-      return;
+        return {
+          id: `fallback_${idx}`,
+          title: clean.length > 40 ? clean.substring(0, 40) + '...' : clean,
+          firstQuestion: clean,
+          isFallback: true
+        };
+      });
     }
 
-    const activeSid = getActiveSessionId();
-    wrap.innerHTML = sessions.map(s => {
-      const isActive = (s.id === activeSid);
-      const bg = isActive ? '#f0fdf4' : '#f8fafc';
-      const bdr = isActive ? '#86efac' : '#e2e8f0';
-      const color = isActive ? '#15803d' : '#334155';
-      const safeTitle = (s.title || s.firstQuestion || 'चैट सत्र').replace(/"/g, '&quot;');
-      const dateStr = s.updatedAt ? new Date(s.updatedAt).toLocaleDateString([], { month:'short', day:'numeric' }) : '';
+    // 🏷️ SUBJECT-WISE GROUPING (फसल, स्वास्थ्य, बिज़नेस, पशुपालन, मौसम, आदि)
+    const grouped = {};
+    sessions.forEach(s => {
+      const text = s.title || s.firstQuestion || '';
+      const subj = detectSubjectFromText(text);
+      if (!grouped[subj.id]) {
+        grouped[subj.id] = { tag: subj.tag, icon: subj.icon, items: [] };
+      }
+      grouped[subj.id].items.push(s);
+    });
 
-      const itemBdr = isActive ? '2px solid #000000' : '1.5px solid #000000';
-      const itemBg = isActive ? '#000000' : '#ffffff';
-      const itemColor = isActive ? '#ffffff' : '#000000';
-      const iconColor = isActive ? '#ffffff' : '#000000';
-      const dateColor = isActive ? '#e2e8f0' : '#475569';
+    let html = '';
+    for (const key of Object.keys(grouped)) {
+      const grp = grouped[key];
+      html += `
+        <div style="margin-bottom:10px;">
+          <div style="font-size:0.75rem;font-weight:900;color:#000000;background:#f1f5f9;border:1px solid #000000;padding:4px 10px;border-radius:6px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.2px;">
+            <span>${grp.icon} ${grp.tag}</span>
+            <span style="background:#000000;color:#ffffff;font-size:0.68rem;padding:1px 6px;border-radius:10px;font-weight:900;">${grp.items.length}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            ${grp.items.map(s => {
+              const isActive = (s.id === activeSid);
+              const safeTitle = (s.title || s.firstQuestion || 'चैट प्रश्न').replace(/"/g, '&quot;');
+              const clickAction = s.isFallback
+                ? `window.toggleSakhiPlusMenu(false); window.sendSakhiSuggestion('${safeTitle}')`
+                : `window.openSakhiSessionChat('${s.id}')`;
+              return `
+                <button type="button" class="sakhi-drawer-history-item" onclick="${clickAction}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;background:${isActive ? '#000000' : '#ffffff'};color:${isActive ? '#ffffff' : '#000000'};border:${isActive ? '2px solid #000000' : '1.5px solid #000000'};border-radius:8px;padding:8px 10px;font-size:0.84rem;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:all 0.15s ease;">
+                  <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1;">
+                    <i class="fa-regular fa-message" style="color:${isActive ? '#ffffff' : '#000000'};font-size:0.78rem;flex-shrink:0;"></i>
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${safeTitle}</span>
+                  </div>
+                  <span style="font-size:0.68rem;font-weight:900;background:${isActive ? '#ffffff' : '#f1f5f9'};color:#000000;padding:2px 6px;border-radius:4px;border:1px solid #000000;flex-shrink:0;">खोलें →</span>
+                </button>`;
+            }).join('')}
+          </div>
+        </div>`;
+    }
 
-      return `<button type="button" class="sakhi-drawer-history-item" onclick="window.openSakhiSessionChat('${s.id}')" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;background:${itemBg};border:${itemBdr};border-radius:10px;padding:9px 12px;font-size:0.88rem;font-weight:800;color:${itemColor};cursor:pointer;margin-bottom:5px;box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:all 0.15s ease;">
-        <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-          <i class="fa-regular fa-message" style="color:${iconColor};font-size:0.85rem;flex-shrink:0;"></i>
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;">${safeTitle}</span>
-        </div>
-        <span style="font-size:0.74rem;font-weight:700;color:${dateColor};flex-shrink:0;">${dateStr}</span>
-      </button>`;
-    }).join('');
+    wrap.innerHTML = html;
   }
 
 
@@ -21547,18 +21599,36 @@ ${shareUrl}`;
         }
       }
       menu.classList.add('active');
-      menu.style.setProperty('display', 'block', 'important');
+      menu.style.setProperty('display', 'flex', 'important');
+      menu.style.setProperty('transform', 'translateX(0)', 'important');
+      menu.style.setProperty('opacity', '1', 'important');
+      menu.style.setProperty('visibility', 'visible', 'important');
+      menu.style.setProperty('pointer-events', 'auto', 'important');
       if (backdrop) {
         backdrop.classList.add('active');
         backdrop.style.setProperty('display', 'block', 'important');
+        backdrop.style.setProperty('opacity', '1', 'important');
+        backdrop.style.setProperty('pointer-events', 'auto', 'important');
       }
     } else {
       menu.classList.remove('active');
-      menu.style.setProperty('display', 'none', 'important');
+      menu.style.setProperty('transform', 'translateX(-105%)', 'important');
+      menu.style.setProperty('opacity', '0', 'important');
+      menu.style.setProperty('pointer-events', 'none', 'important');
       if (backdrop) {
         backdrop.classList.remove('active');
-        backdrop.style.setProperty('display', 'none', 'important');
+        backdrop.style.setProperty('opacity', '0', 'important');
+        backdrop.style.setProperty('pointer-events', 'none', 'important');
       }
+      setTimeout(() => {
+        if (!menu.classList.contains('active')) {
+          menu.style.setProperty('display', 'none', 'important');
+          menu.style.setProperty('visibility', 'hidden', 'important');
+        }
+        if (backdrop && !backdrop.classList.contains('active')) {
+          backdrop.style.setProperty('display', 'none', 'important');
+        }
+      }, 280);
     }
   };
 

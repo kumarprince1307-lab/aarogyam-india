@@ -51,9 +51,79 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261029_v17_orchard">
+  <link rel="stylesheet" href="/css/aarogyam-sakhi-ai.css?v=20261123_v704_left_drawer">
 
   <style>
+    /* 🌿 SAKHI AI 70% LEFT DRAWER SIDEBAR (TOP-TO-BOTTOM FIT) */
+    .sakhi-plus-menu {
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: auto !important;
+      width: 70vw !important;
+      max-width: 320px !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      background: #ffffff !important;
+      color: #000000 !important;
+      border-right: 2.5px solid #000000 !important;
+      border-top: none !important;
+      border-bottom: none !important;
+      border-left: none !important;
+      border-radius: 0 16px 16px 0 !important;
+      box-shadow: 12px 0 40px rgba(0, 0, 0, 0.5) !important;
+      padding: 14px 12px 32px 12px !important;
+      z-index: 2147483647 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transform: translateX(-105%) !important;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s ease !important;
+      will-change: transform, opacity;
+      box-sizing: border-box !important;
+      margin: 0 !important;
+    }
+
+    .sakhi-plus-menu.active {
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: translateX(0) !important;
+    }
+
+    .sakhi-plus-menu-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      background: rgba(0, 0, 0, 0.65) !important;
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      z-index: 2147483646 !important;
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity 0.22s ease !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .sakhi-plus-menu-backdrop.active {
+      display: block !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
     /* Natural Card Layout with Dynamic Viewport Height */
     html,
     body {
@@ -644,22 +714,22 @@
             </button>
           </div>
 
-          <!-- 5. CHAT HISTORY (Black Box Heading, High Contrast Items) -->
-          <div style="flex:1 1 auto;min-height:0;margin-bottom:14px;">
-            <div style="background:#000000;color:#ffffff;padding:6px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.3px;">
+          <!-- 5. CHAT HISTORY (Black Box Heading, High Contrast Items - Subject-Wise) -->
+          <div style="flex-shrink:0;margin-bottom:18px;">
+            <div style="background:#000000;color:#ffffff;padding:8px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.3px;">
               <div style="display:flex;align-items:center;gap:6px;">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span>🕒 चैट इतिहास (CHAT HISTORY)</span>
+                <i class="fa-solid fa-list-check"></i>
+                <span>📂 विषय अनुसार चैट इतिहास (SUBJECT-WISE)</span>
               </div>
-              <button type="button" onclick="if(confirm('क्या आप सखी का चैट इतिहास साफ करना चाहते हैं?')){window.clearSakhiChatHistory();window.toggleSakhiPlusMenu(false);}" style="background:#ffffff;border:none;color:#000000;font-size:0.72rem;font-weight:900;cursor:pointer;padding:2px 8px;border-radius:4px;">साफ करें</button>
+              <button type="button" onclick="if(confirm('क्या आप सखी का चैट इतिहास साफ करना चाहते हैं?')){window.clearSakhiChatHistory();window.toggleSakhiPlusMenu(false);}" style="background:#ffffff;border:none;color:#000000;font-size:0.72rem;font-weight:900;cursor:pointer;padding:3px 8px;border-radius:4px;">साफ करें</button>
             </div>
-            <div id="sakhiMenuChatHistoryWrap" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;padding-right:2px;">
+            <div id="sakhiMenuChatHistoryWrap" style="display:flex;flex-direction:column;gap:6px;padding-right:2px;">
               <!-- Populated dynamically via renderDrawerChatHistory() -->
             </div>
           </div>
 
           <!-- 6. SAKHI AI SHARE & LABH (Sharp Black Button, White Text) -->
-          <div style="padding-top:10px;border-top:2px solid #000000;margin-top:auto;">
+          <div style="padding-top:12px;border-top:2px solid #000000;margin-bottom:24px;flex-shrink:0;">
             <button type="button" onclick="window.toggleSakhiPlusMenu(false); window.openSakhiShareBenefitsModal();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#000000;color:#ffffff;border:1.5px solid #000000;border-radius:12px;padding:12px 14px;font-size:0.92rem;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);letter-spacing:0.3px;">
               <i class="fa-solid fa-share-nodes" style="font-size:1.05rem;"></i>
               <span>📲 सखी AI शेयर करें और लाभ पाएं</span>
@@ -921,7 +991,7 @@
   <script src="/js/sakhi-knowledge-vault-v2.js?v=20261105_v41_salutation_fix"></script>
   <script src="/js/sakhi-moderation-engine.js?v=20261105_v42_dual_lock"></script>
   <script src="/js/wallet-reward-engine.js?v=20261107_v2_passbook_guide"></script>
-  <script src="/js/aarogyam-sakhi-ai.js?v=20261115_v85_live_calc"></script>
+  <script src="/js/aarogyam-sakhi-ai.js?v=20261123_v705_subject_history"></script>
   <script>
     (function () {
       function lockWindowScroll() {
