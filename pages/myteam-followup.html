@@ -210,7 +210,7 @@
         <!-- Follow-up Queue Controller -->
         <div id="followupQueueStrip"
           style="background:#f8fafc; border:1.5px solid #86efac; border-radius:10px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
             <label
               style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:800; font-size:0.86rem; color:#0f172a; margin:0;">
               <input type="checkbox" id="selectAllFollowupCheckbox"
@@ -221,6 +221,20 @@
             <span id="selectedQueueCountBadge"
               style="background:#dcfce7; color:#15803d; font-size:0.75rem; font-weight:800; padding:3px 10px; border-radius:12px; border:1px solid #86efac;">0
               चुने गए</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button type="button"
+              onclick="window.AarogyamETailer.resetHubQueue(false)"
+              style="background:#eff6ff; color:#1d4ed8; border:1.5px solid #3b82f6; padding:6px 12px; border-radius:8px; font-size:0.80rem; font-weight:900; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"
+              title="कतार को शुरू से फिर से चलाएं">
+              <span>🔁</span> <span>कतार रीसेट</span>
+            </button>
+            <button type="button"
+              onclick="window.AarogyamETailer.resetHubQueue(true)"
+              style="background:#fef2f2; color:#b91c1c; border:1.5px solid #f87171; padding:6px 12px; border-radius:8px; font-size:0.80rem; font-weight:900; cursor:pointer; display:inline-flex; align-items:center; gap:4px;"
+              title="कतार खाली करें और सभी चयन हटाएं">
+              <span>🧹</span> <span>कतार खाली / चयन हटाएं</span>
+            </button>
           </div>
         </div>
 
@@ -320,6 +334,11 @@
               <span style="color:#16a34a;">✅ भेजे गए: <strong id="hubQueueSentCount">0</strong></span> •
               <span style="color:#d97706;">⏳ बाकी: <strong id="hubQueueRemainingCount">0</strong></span>
             </div>
+            <button type="button" onclick="window.AarogyamETailer.resetHubQueue(false)"
+              style="background:#ffffff; color:#0f172a; border:1.5px solid #94a3b8; border-radius:6px; padding:4px 10px; font-size:0.78rem; font-weight:800; cursor:pointer;"
+              title="कतार को शुरू से फिर से चलाएं">
+              🔄 शुरू से चलाएं
+            </button>
           </div>
 
           <!-- Active Contact Card in Queue -->
@@ -1026,7 +1045,7 @@
   <script src="/js/global-guest-modal.js?v=20261122_v38_live"></script>
   <script src="/js/universal-nav-drawer.js?v=20261123_v703_final"></script>
   <script src="/js/audio-greeting-engine.js?v=20261121_myteam_v2"></script>
-  <script src="/js/smart-etailer-engine.js?v=20261123_v57_all_497_directs"></script>
+  <script src="/js/smart-etailer-engine.js?v=20261123_v58_diary_sync_queue_reset"></script>
   <script src="/js/myteam-tour.js?v=20261121_v21"></script>
   <!-- Edit Contact Category Modal (High-Contrast Bold Black UI) -->
   <div class="game-modal-overlay" id="editCategoryModal"

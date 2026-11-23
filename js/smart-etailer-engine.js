@@ -2356,46 +2356,85 @@
 
     // 2. Push Worldwide Live to Supabase surveys & phonebook (MANAS Rule XXIX)
     try {
+      const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
+      let validProfileId = (myProfileId && isUuid(myProfileId)) ? myProfileId : null;
+      if (!validProfileId) {
+        validProfileId = (myMob === '7049294111') ? '8be4dbb6-2078-4ddd-955c-bc2e557557c7' : '52ef705c-bb45-4137-bee4-a3f8df73b676';
+      }
+
+      const occupationLabel = currentEntityType === 'team'
+        ? (currentTeamStatus === 'joined' ? 'टीम साथी (Joined)' : 'टीम साथी (Prospect)')
+        : (currentEntityType === 'autoship' ? 'ऑटोशिप ग्राहक (6-Month)' : 'किसान / ग्राहक');
+
+      const cropNameVal = (currentEntityType !== 'team' && document.getElementById('diaryCropName')) ? document.getElementById('diaryCropName').value.trim() : '';
+      const cropProblemVal = (currentEntityType !== 'team' && document.getElementById('diaryCropProblem')) ? document.getElementById('diaryCropProblem').value : '';
+      const netsurfIdVal = (currentEntityType === 'team' && document.getElementById('diaryInputNetsurfId')) ? document.getElementById('diaryInputNetsurfId').value.trim() : '';
+
+      const surveyPayload = {
+        profile_id: validProfileId,
+        name: name,
+        mobile: mobile,
+        occupation: occupationLabel,
+        state: place || 'मध्य प्रदेश',
+        district: place || 'स्थानीय',
+        village: place || 'स्थानीय',
+        selected_categories: [currentNeedCategory || 'crop_doctor', currentEntityType],
+        category_answers: {
+          source: 'smart_diary',
+          created_by_mobile: myMob,
+          distributor_mobile: myMob,
+          referred_by: myShareId,
+          entity_type: currentEntityType,
+          team_status: currentEntityType === 'team' ? currentTeamStatus : null,
+          need: currentNeedCategory,
+          crop_name: cropNameVal,
+          crop_problem: cropProblemVal,
+          netsurf_id: netsurfIdVal,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // Method 1: SDK client insert
       if (window.supabase && typeof window.supabase.createClient === 'function') {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        try {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          client.from('surveys').insert([surveyPayload]).then(({ error }) => {
+            if (!error) console.log('✅ Entry synced live to Supabase surveys (SDK)');
+            else console.warn('Supabase SDK insert notice:', error.message);
+          }).catch(() => { });
+        } catch (_) { }
+      }
 
-        const occupationLabel = currentEntityType === 'team'
-          ? (currentTeamStatus === 'joined' ? 'टीम साथी (Joined)' : 'टीम साथी (Prospect)')
-          : (currentEntityType === 'autoship' ? 'ऑटोशिप ग्राहक (6-Month)' : 'किसान / ग्राहक');
+      // Method 2: Guaranteed Direct REST API insert (Worldwide Fallback)
+      if (typeof fetch === 'function') {
+        fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/surveys', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(surveyPayload)
+        }).then(res => {
+          if (res.ok) console.log('✅ Entry synced worldwide to Supabase surveys via REST!');
+          else res.text().then(t => console.warn('Supabase survey insert notice:', res.status, t));
+        }).catch(err => console.warn('Supabase REST error:', err));
 
-        const isUuid = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
-
-        const surveyPayload = {
-          profile_id: (myProfileId && isUuid(myProfileId)) ? myProfileId : null,
-          name: name,
-          mobile: mobile,
-          occupation: occupationLabel,
-          state: place || 'मध्य प्रदेश',
-          district: place || 'स्थानीय',
-          village: place || 'स्थानीय',
-          selected_categories: [currentNeedCategory || 'crop_doctor', currentEntityType],
-          category_answers: {
-            source: 'smart_diary',
-            created_by_mobile: myMob,
-            distributor_mobile: myMob,
-            referred_by: myShareId,
-            entity_type: currentEntityType,
-            team_status: currentEntityType === 'team' ? currentTeamStatus : null,
-            need: currentNeedCategory,
-            timestamp: new Date().toISOString()
-          }
-        };
-
-        client.from('surveys').insert([surveyPayload]).then(({ error }) => {
-          if (!error) console.log('✅ Entry synced live to Supabase surveys');
+        fetch('https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/phonebook', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: name,
+            mobile: mobile,
+            place: place || 'स्थानीय',
+            source: 'smart_diary'
+          })
         }).catch(() => { });
-
-        client.from('phonebook').insert([{
-          name: name,
-          mobile: mobile,
-          place: place || 'स्थानीय',
-          source: 'smart_diary'
-        }]).then(() => { }).catch(() => { });
       }
     } catch (_) { }
 
@@ -4300,10 +4339,24 @@
       <option value="${item.id}" ${idx === 0 ? 'selected' : ''}>${item.title}</option>
     `).join('');
     if (items.length > 0) subSelect.value = items[0].id;
+    const list = getHubQueueList();
+    if (hubCurrentQueueIndex >= list.length) {
+      hubCurrentQueueIndex = 0;
+      hubSentCount = 0;
+      lastAlignedTargetId = null;
+      updateHubQueueProgressUI();
+    }
     updateHubPreviewText();
   }
 
   function handleSubItemChange(val) {
+    const list = getHubQueueList();
+    if (hubCurrentQueueIndex >= list.length) {
+      hubCurrentQueueIndex = 0;
+      hubSentCount = 0;
+      lastAlignedTargetId = null;
+      updateHubQueueProgressUI();
+    }
     updateHubPreviewText();
   }
 
@@ -4362,6 +4415,24 @@
     if (n.includes('बुक') || n.includes('guide')) return 'ebooks_guides';
     if (n.includes('सुविचार') || n.includes('प्रेरणा')) return 'suvichar';
     return 'crop_doctor';
+  }
+
+  function resetHubQueue(clearSelection = false) {
+    hubCurrentQueueIndex = 0;
+    hubSentCount = 0;
+    lastAlignedTargetId = null;
+    if (clearSelection) {
+      selectedContactIds.clear();
+      const checkboxes = document.querySelectorAll('.diary-contact-checkbox');
+      checkboxes.forEach(cb => { cb.checked = false; });
+      const selectAllCb = document.getElementById('selectAllFollowupCheckbox');
+      if (selectAllCb) selectAllCb.checked = false;
+      updateQueueBadge();
+    }
+    updateHubQueueProgressUI();
+    if (typeof showToast === 'function') {
+      showToast(clearSelection ? '🧹 कतार खाली व चयन रीसेट हो गया!' : '🔄 कतार रीसेट हो गई! आप नया संदेश भेज सकते हैं।', 'info');
+    }
   }
 
   function getHubQueueList() {
@@ -4539,7 +4610,9 @@
     }
     const list = getHubQueueList();
     if (hubCurrentQueueIndex >= list.length) {
-      alert('🎉 बधाई! कतार के सभी संपर्क पूरे हो चुके हैं।');
+      if (confirm('🎉 बधाई! कतार के सभी संपर्क पूरे हो चुके हैं।\n\nक्या आप कतार रीसेट करके दोबारा संदेश भेजना चाहते हैं?')) {
+        resetHubQueue(false);
+      }
       return;
     }
 
@@ -4800,14 +4873,22 @@
         else selectedContactIds.delete(id);
       }
     });
+    hubCurrentQueueIndex = 0;
+    hubSentCount = 0;
+    lastAlignedTargetId = null;
     updateQueueBadge();
+    updateHubQueueProgressUI();
   }
 
   function toggleContactSelect(id, checked) {
     if (!id) return;
     if (checked) selectedContactIds.add(id);
     else selectedContactIds.delete(id);
+    hubCurrentQueueIndex = 0;
+    hubSentCount = 0;
+    lastAlignedTargetId = null;
     updateQueueBadge();
+    updateHubQueueProgressUI();
   }
 
   function updateQueueBadge() {
@@ -5920,14 +6001,12 @@
     }
   }
 
-  // Real-Time 2-Way Sync from Supabase public.surveys into Local Diary (Rule XXIX: Zero Data Loss on Cache Clear)
+  // Real-Time 2-Way Sync from Supabase public.surveys into Local Diary (Rule XXIX: Zero Data Loss & Worldwide Multi-Device Sync)
   async function loadCloudSurveysIntoDiary() {
     try {
-      if (!window.supabase || typeof window.supabase.createClient !== 'function') return;
       const myMob = getUserMobile();
       if (!myMob) return;
 
-      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       const myShareId = getAppUserShareId();
       const myProfileId = getAppUserProfileId();
 
@@ -5942,38 +6021,104 @@
         orConditions.push(`profile_id.eq.${myProfileId}`);
       }
 
-      const { data, error } = await client.from('surveys')
-        .select('id, profile_id, name, mobile, district, village, state, occupation, selected_categories, category_answers, created_at')
-        .or(orConditions.join(','))
-        .order('created_at', { ascending: false })
-        .limit(100);
+      let surveysData = null;
 
-      if (!error && Array.isArray(data) && data.length > 0) {
-        // STRICT: Store surveys into AI_CLOUD_SURVEYS_CACHE for "संपर्क चुनें" picker only.
-        // NEVER auto-inject into local diary without user clicking "डायरी में सुरक्षित करें"!
+      // Method 1: Direct REST Fetch
+      try {
+        const queryUrl = `https://qjhjrzsnrtahmhswxyvb.supabase.co/rest/v1/surveys?select=id,profile_id,name,mobile,district,village,state,occupation,selected_categories,category_answers,created_at&or=(${orConditions.join(',')})&order=created_at.desc&limit=150`;
+        const res = await fetch(queryUrl, {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (res.ok) {
+          surveysData = await res.json();
+        }
+      } catch (fErr) {
+        console.warn('REST fetch surveys err:', fErr);
+      }
+
+      // Method 2: SDK fallback
+      if (!surveysData && window.supabase && typeof window.supabase.createClient === 'function') {
+        try {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          const { data, error } = await client.from('surveys')
+            .select('id, profile_id, name, mobile, district, village, state, occupation, selected_categories, category_answers, created_at')
+            .or(orConditions.join(','))
+            .order('created_at', { ascending: false })
+            .limit(150);
+          if (!error && Array.isArray(data)) {
+            surveysData = data;
+          }
+        } catch (_) {}
+      }
+
+      if (Array.isArray(surveysData) && surveysData.length > 0) {
         const cloudList = [];
-        data.forEach(s => {
+        let localEntries = getLocalDiaryEntries();
+        let changed = false;
+
+        surveysData.forEach(s => {
           const sMob = sanitize10DigitMobile(s.mobile || '');
-          if (sMob && sMob !== myMob) {
-            const ans = s.category_answers || {};
-            cloudList.push({
-              id: s.id || ('surv_' + sMob),
-              name: s.name || 'किसान साथी',
-              mobile: sMob,
-              place: s.district || s.village || s.state || 'स्थानीय',
-              type: ans.type || ans.entity_type || (s.occupation && s.occupation.includes('टीम') ? 'team' : 'customer'),
-              need: ans.need || s.occupation || 'सामान्य संपर्क',
-              crop_name: ans.crop_name || '',
-              crop_problem: ans.crop_problem || '',
-              netsurf_id: ans.netsurf_id || '',
-              created_at: s.created_at || new Date().toISOString(),
-              source: 'cloud_survey'
-            });
+          if (!sMob || sMob === myMob) return;
+          const ans = s.category_answers || {};
+
+          const cloudItem = {
+            id: s.id || ('surv_' + sMob),
+            name: s.name || 'किसान साथी',
+            mobile: sMob,
+            place: s.district || s.village || s.state || 'स्थानीय',
+            type: ans.type || ans.entity_type || (s.occupation && s.occupation.includes('टीम') ? 'team' : 'customer'),
+            team_status: ans.team_status || null,
+            need: ans.need || s.occupation || 'सामान्य संपर्क',
+            crop_name: ans.crop_name || '',
+            crop_problem: ans.crop_problem || '',
+            netsurf_id: ans.netsurf_id || '',
+            created_at: s.created_at || new Date().toISOString(),
+            source: 'smart_diary',
+            distributor_mobile: ans.distributor_mobile || myMob,
+            referred_by: ans.referred_by || myShareId
+          };
+
+          cloudList.push(cloudItem);
+
+          // Merge into Local Diary for cross-device worldwide visibility!
+          const existingIdx = localEntries.findIndex(e => sanitize10DigitMobile(e.mobile) === sMob);
+          if (existingIdx !== -1) {
+            // Update cloud id or any missing details
+            if (!localEntries[existingIdx].id || String(localEntries[existingIdx].id).startsWith('demo_')) {
+              localEntries[existingIdx].id = s.id;
+              changed = true;
+            }
+            if (s.name && (!localEntries[existingIdx].name || localEntries[existingIdx].name === 'किसान साथी')) {
+              localEntries[existingIdx].name = s.name;
+              changed = true;
+            }
+            if (cloudItem.netsurf_id && !localEntries[existingIdx].netsurf_id) {
+              localEntries[existingIdx].netsurf_id = cloudItem.netsurf_id;
+              changed = true;
+            }
+          } else {
+            // New contact saved on another device (Mobile or Laptop)! Add to local diary
+            localEntries.push(cloudItem);
+            changed = true;
           }
         });
 
         localStorage.setItem('AI_CLOUD_SURVEYS_CACHE', JSON.stringify(cloudList));
-        console.log(`✅ Cached ${cloudList.length} surveys from Supabase into AI_CLOUD_SURVEYS_CACHE for Contact Picker!`);
+
+        if (changed) {
+          saveLocalDiaryEntries(localEntries);
+          if (typeof renderEntryPageContactList === 'function') renderEntryPageContactList(1);
+          if (typeof renderDiaryFollowups === 'function') renderDiaryFollowups();
+          if (typeof renderDirectTeamCards === 'function') renderDirectTeamCards();
+          if (typeof updateHubQueueProgressUI === 'function') updateHubQueueProgressUI();
+          if (typeof updateLiveAnnouncementTicker === 'function') updateLiveAnnouncementTicker();
+        }
+        console.log(`✅ Synced ${surveysData.length} worldwide surveys into Local Diary & Cache!`);
       }
     } catch (err) {
       console.warn('loadCloudSurveysIntoDiary error:', err);
@@ -5982,22 +6127,8 @@
 
   // Purge any auto-injected cloud_survey items from local diary so only manually saved entries appear
   function cleanupAutoInjectedDiaryEntries() {
-    try {
-      const myMob = getUserMobile();
-      if (!myMob) return;
-      const k = 'AAROGYAM_SMART_DIARY_ENTRIES_' + myMob;
-      const raw = localStorage.getItem(k);
-      if (raw) {
-        const list = JSON.parse(raw);
-        if (Array.isArray(list)) {
-          const cleaned = list.filter(e => e.source !== 'cloud_survey');
-          if (cleaned.length !== list.length) {
-            localStorage.setItem(k, JSON.stringify(cleaned));
-            console.log(`🧹 Cleaned ${list.length - cleaned.length} auto-injected cloud surveys from local diary.`);
-          }
-        }
-      }
-    } catch (_) { }
+    // Disabled: Cloud surveys are real user diary entries that sync across all devices worldwide
+    return;
   }
 
   // Real-Time 2-Way Sync to Supabase public.khatabook_entries (Dual SDK + REST Engine)
@@ -7574,6 +7705,7 @@
     skipToNextTarget: skipToNextTarget,
     copyMessageText: copyMessageText,
     updateHubQueueProgressUI: updateHubQueueProgressUI,
+    resetHubQueue: resetHubQueue,
     // Master Smart Diary Upgrades
     toggleAccordion: toggleAccordion,
     playStepAudio: playStepAudio,
