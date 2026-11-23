@@ -27,7 +27,7 @@
   <meta property="og:title" content="आरोग्यम सखी AI - फसल रोग पहचान व 24×7 किसान सलाहकार">
   <meta property="og:description"
     content="फसलों के रोग, कीट व सही दवा का तुरंत 24×7 समाधान पाएं। फोटो भेजें और वैज्ञानिक सलाह नि:शुल्क लें।">
-  <meta property="og:image" content="https://aarogyamindia.online/images/sakhi/aarogyam-sakhi-og.webp">
+  <meta property="og:image" content="https://aarogyamindia.online//images/banners/hero-sakhi-ai.webp">
   <meta property="og:image:width" content="1024">
   <meta property="og:image:height" content="768">
   <meta property="og:url" content="https://aarogyamindia.online/aarogyam-sakhi.html">
@@ -37,7 +37,7 @@
   <meta name="twitter:title" content="🌿 किसान व परिवारजनों के लिए बड़ी खुशखबरी! - आरोग्यम सखी AI">
   <meta name="twitter:description"
     content="खेती, गेहूं, सरसों, धान, पशुपालन (दूध-फैट), सेहत (डायबिटीज, जोड़ दर्द), सौंदर्य व बिज़नेस के 100% सही व वैज्ञानिक जवाब!">
-  <meta name="twitter:image" content="https://aarogyamindia.online/images/sakhi/aarogyam-sakhi-og.webp">
+  <meta name="twitter:image" content="https://aarogyamindia.online//images/banners/hero-sakhi-ai.webp">
 
   <!-- Favicons -->
   <link rel="icon" type="image/png" href="/images/logo/fevicon.png">
@@ -528,6 +528,146 @@
 
 <body class="sakhi-page-body">
 
+  <!-- Backdrop for Plus Menu (Closed by default) -->
+        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" style="display:none;"
+          onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
+
+        <!-- ChatGPT-Style Plus Menu (Opened only when ☰ Button is tapped) -->
+        <!-- ChatGPT-Style Left Drawer / Menu (Sliding Sidebar) -->
+        <!-- ChatGPT-Style Left Drawer / Menu (Sliding Sidebar - Sharp Black & White Theme) -->
+        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="background:#ffffff;color:#000000;font-family:'Outfit','Noto Sans Devanagari',sans-serif;">
+          <!-- 1. USER PROFILE HEADER (Name + Status) -->
+          <div class="sakhi-drawer-user-header" style="background:#000000;color:#ffffff;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,0.18);">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <div style="width:38px;height:38px;border-radius:50%;background:#ffffff;color:#000000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0;">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div style="min-width:0;">
+                <div id="sakhiDrawerUserName" style="font-weight:900;color:#ffffff;font-size:1.02rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.3px;">
+                  लोड हो रहा है...
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+                  <span id="sakhiDrawerStatusDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ffffff;"></span>
+                  <span id="sakhiDrawerUserStatus" style="font-size:0.75rem;font-weight:800;color:#ffffff;">सत्यापित यूज़र</span>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false); if(event.cancelable) event.preventDefault();" aria-label="बंद करें" style="background:#ffffff;border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#000000;font-size:1.2rem;font-weight:900;cursor:pointer;">&times;</button>
+          </div>
+
+          <!-- Top Action: New Chat (Sharp Black Button, White Text) -->
+          <button type="button" onclick="window.startSakhiNewChat();window.toggleSakhiPlusMenu(false);" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#000000;color:#ffffff;border:1.5px solid #000000;border-radius:12px;padding:12px 14px;font-size:0.95rem;font-weight:900;cursor:pointer;margin-bottom:10px;box-shadow:0 3px 8px rgba(0,0,0,0.15);letter-spacing:0.3px;">
+            <i class="fa-solid fa-plus-circle" style="font-size:1.05rem;"></i>
+            <span>+ नई बातचीत शुरू करें</span>
+          </button>
+
+          <!-- 2. INSTALL APP PAGE LINK -->
+          <a href="/aarogyam-app.html" onclick="window.toggleSakhiPlusMenu(false);" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f8fafc;border:2px solid #000000;border-radius:12px;padding:10px 14px;text-decoration:none;margin-bottom:12px;color:#000000;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <i class="fa-solid fa-mobile-screen-button" style="color:#000000;font-size:1.15rem;"></i>
+              <span style="font-size:0.90rem;font-weight:900;color:#000000;">📲 ऐप इंस्टॉल करें (Install App)</span>
+            </div>
+            <span style="font-size:0.75rem;font-weight:900;background:#000000;color:#ffffff;padding:3px 8px;border-radius:8px;">FREE</span>
+          </a>
+
+          <!-- 3. COMPACT CREDIT BOXES (Black Box Heading, High Contrast) -->
+          <div style="margin-bottom:12px;">
+            <div style="background:#000000;color:#ffffff;padding:6px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.3px;">
+              <span>⚡ आपका दैनिक AI क्रेडिट बैलेंस</span>
+              <span id="sakhiDrawerTierBadge" style="font-size:0.72rem;background:#ffffff;color:#000000;padding:2px 8px;border-radius:6px;font-weight:900;">ACTIVE</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="background:#ffffff;border:1.5px solid #000000;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:0.85rem;color:#000000;font-weight:800;"><i class="fa-solid fa-camera" style="margin-right:6px;"></i>फोटो / कैमरा जांच</span>
+                <span id="sakhiDrawerImgCredits" style="font-size:0.88rem;font-weight:900;color:#000000;">15 / 15 शेष</span>
+              </div>
+              <div style="background:#ffffff;border:1.5px solid #000000;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:0.85rem;color:#000000;font-weight:800;"><i class="fa-solid fa-comments" style="margin-right:6px;"></i>सखी AI चैट</span>
+                <span id="sakhiDrawerChatCredits" style="font-size:0.88rem;font-weight:900;color:#000000;">200 / 200 शेष</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. CORE MENU TOOLS (Heading: CHAT SUBJECT / चैट विषय) -->
+          <div style="margin-bottom:14px;">
+            <div style="background:#000000;color:#ffffff;padding:6px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:6px;letter-spacing:0.3px;">
+              📌 चैट विषय (CHAT SUBJECT)
+            </div>
+            <!-- Top 5 Tools -->
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('फसलों का संपूर्ण वैज्ञानिक स्प्रे कैलेंडर')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.88rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🌾</span> <span>1. फसलों का 4-चरण स्प्रे कैलेंडर</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('स्वास्थ्य व डॉक्टर पर्ची परामर्श')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.88rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🩺</span> <span>2. स्वास्थ्य व डॉक्टर पर्ची परामर्श</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('नेट्सर्फ 4-स्टेप बिज़नेस प्लान और 15-दिन कैपिंग')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.88rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>💼</span> <span>3. नेट्सर्फ 4-स्टेप बिज़नेस व लीड्स</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.location.href='/store.html'; window.toggleSakhiPlusMenu(false);" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.88rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>📚</span> <span>4. ई-बुक स्टोर (E-Book Store)</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiTopic('टीम साइज और 15-दिन ₹8.19 लाख कैपिंग')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border:2px solid #000000;border-radius:9px;font-weight:900;font-size:0.88rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>👥</span> <span>5. टीम साइज व शेयर & अर्न (Share)</span>
+              </button>
+            </div>
+
+            <!-- Remaining 7 Tools Container (Collapsible - Opens ABOVE the button) -->
+            <div id="sakhiMoreToolsWrap" style="display:none;flex-direction:column;gap:5px;margin-bottom:6px;">
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('pashu')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🐄</span> <span>6. पशुपालन, दूध व डेयरी</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('panchang')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🗓️</span> <span>7. दैनिक पंचांग व शुभ मुहूर्त</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('fisheries')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🐟</span> <span>8. मछली पालन (Aqua Culture)</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('poultry')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🐔</span> <span>9. मुर्गी पालन (Poultry Farm)</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('goat')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>🐐</span> <span>10. बकरी पालन (Goat Farming)</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('solar')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>☀️</span> <span>11. सोलर पंप व सरकारी योजनाएं</span>
+              </button>
+              <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('checklist')" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;background:#ffffff;border:1.5px solid #000000;border-radius:9px;font-weight:800;font-size:0.86rem;color:#000000;text-align:left;cursor:pointer;">
+                <span>📋</span> <span>12. ऑल-इन-वन स्मार्ट चेकलिस्ट</span>
+              </button>
+            </div>
+
+            <!-- Accordion Toggle Button: Placed Below the 7 Tools -->
+            <button type="button" id="sakhiMoreToolsToggleBtn" onclick="window.toggleSakhiMoreTools()" style="width:100%;margin-top:4px;background:#000000;color:#ffffff;border:none;border-radius:8px;padding:9px;font-size:0.82rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+              <span id="sakhiMoreToolsToggleText">⬇️ और देखें (7 अन्य विषय)</span>
+              <i class="fa-solid fa-chevron-down" id="sakhiMoreToolsToggleIcon" style="font-size:0.75rem;"></i>
+            </button>
+          </div>
+
+          <!-- 5. CHAT HISTORY (Black Box Heading, High Contrast Items) -->
+          <div style="flex:1 1 auto;min-height:0;margin-bottom:14px;">
+            <div style="background:#000000;color:#ffffff;padding:6px 12px;border-radius:8px;font-size:0.80rem;font-weight:900;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;letter-spacing:0.3px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>🕒 चैट इतिहास (CHAT HISTORY)</span>
+              </div>
+              <button type="button" onclick="if(confirm('क्या आप सखी का चैट इतिहास साफ करना चाहते हैं?')){window.clearSakhiChatHistory();window.toggleSakhiPlusMenu(false);}" style="background:#ffffff;border:none;color:#000000;font-size:0.72rem;font-weight:900;cursor:pointer;padding:2px 8px;border-radius:4px;">साफ करें</button>
+            </div>
+            <div id="sakhiMenuChatHistoryWrap" style="display:flex;flex-direction:column;gap:5px;max-height:220px;overflow-y:auto;padding-right:2px;">
+              <!-- Populated dynamically via renderDrawerChatHistory() -->
+            </div>
+          </div>
+
+          <!-- 6. SAKHI AI SHARE & LABH (Sharp Black Button, White Text) -->
+          <div style="padding-top:10px;border-top:2px solid #000000;margin-top:auto;">
+            <button type="button" onclick="window.toggleSakhiPlusMenu(false); window.openSakhiShareBenefitsModal();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#000000;color:#ffffff;border:1.5px solid #000000;border-radius:12px;padding:12px 14px;font-size:0.92rem;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);letter-spacing:0.3px;">
+              <i class="fa-solid fa-share-nodes" style="font-size:1.05rem;"></i>
+              <span>📲 सखी AI शेयर करें और लाभ पाएं</span>
+            </button>
+          </div>
+        </div>
+
+
   <div id="sakhiFullscreenContainer">
     <div class="sakhi-fullscreen-wrapper">
       <div class="sakhi-chat-window" id="sakhiChatWindow">
@@ -551,10 +691,7 @@
                   AI</span>
                 <span class="sakhi-live-dot" title="ऑनलाइन 24×7"></span>
               </h3>
-              <div id="sakhiHeaderUserShortName"
-                style="font-size:0.72rem;color:#bbf7d0;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:115px;line-height:1.1;">
-                👤 किसान साथी
-              </div>
+              
             </div>
           </div>
           <div class="sakhi-header-actions" style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
@@ -566,38 +703,6 @@
                 <span style="width:6px;height:6px;border-radius:50%;background:#fde047;"></span>
                 <span>Guest</span>
               </button>
-            </div>
-            <!-- Chat Mode Dropdown (New Chat / Old Chat) -->
-            <div class="sakhi-chat-dropdown-wrap" style="position:relative;display:inline-block;flex-shrink:0;">
-              <button type="button" class="sakhi-new-chat-btn" id="sakhiChatModeBtn"
-                onclick="window.toggleSakhiChatMenu()" title="चैट मोड चुनें"
-                style="display:inline-flex;align-items:center;gap:4px;padding:5px 9px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:20px;color:#166534;font-weight:800;font-size:0.80rem;cursor:pointer;white-space:nowrap;">
-                <i class="fa-solid fa-plus" id="sakhiChatModeIcon" style="color:#16a34a;font-size:0.85rem;"></i>
-                <span id="sakhiChatModeLabel">चैट</span>
-                <i class="fa-solid fa-chevron-down" style="font-size:0.62rem;opacity:0.7;"></i>
-              </button>
-              <div id="sakhiChatMenuDropdown"
-                style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:14px;box-shadow:0 14px 35px rgba(0,0,0,0.25);padding:6px;min-width:185px;z-index:2147483647;">
-                <button type="button" onclick="window.switchSakhiChatView('new')"
-                  style="width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:10px;font-size:0.92rem;font-weight:700;color:#0f172a;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.2s;"
-                  onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
-                  <i class="fa-solid fa-plus-circle" style="color:#16a34a;font-size:1.05rem;"></i>
-                  <span>नया चैट (डैशबोर्ड)</span>
-                </button>
-                <button type="button" onclick="window.switchSakhiChatView('old')"
-                  style="width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:10px;font-size:0.92rem;font-weight:700;color:#0f172a;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.2s;"
-                  onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
-                  <i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;font-size:1.05rem;"></i>
-                  <span>पुरानी चैट (इतिहास)</span>
-                </button>
-                <button type="button" onclick="window.location.href='/aarogyam-app.html'"
-                  style="width:100%;text-align:left;background:transparent;border:none;padding:10px 12px;border-radius:10px;font-size:0.92rem;font-weight:700;color:#1e3a8a;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.2s;border-top:1px solid #f1f5f9;"
-                  onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='transparent'">
-                  <i class="fa-solid fa-mobile-screen-button" style="color:#2563eb;font-size:1.05rem;"></i>
-                  <span>📲 ऐप इंस्टॉल करें (Install App)</span>
-                </button>
-
-              </div>
             </div>
             <button type="button" class="sakhi-fullscreen-btn" id="sakhiFullscreenToggleBtn"
               onclick="window.toggleSakhiFullscreen()" title="फुल स्क्रीन"
@@ -667,96 +772,7 @@
           </div>
         </div>
 
-        <!-- Backdrop for Plus Menu (Closed by default) -->
-        <div class="sakhi-plus-menu-backdrop" id="sakhiPlusMenuBackdrop" style="display:none;"
-          onclick="window.toggleSakhiPlusMenu(false)" ontouchend="window.toggleSakhiPlusMenu(false)"></div>
-
-        <!-- ChatGPT-Style Plus Menu (Opened only when [+] Button is tapped; strictly closed by default) -->
-        <div class="sakhi-plus-menu" id="sakhiPlusMenu" style="display:none;">
-          <div class="sakhi-plus-menu-header">
-            <span>✨ मुख्य विषय व टूल्स चुनें</span>
-            <button type="button" class="sakhi-plus-menu-close" onclick="window.toggleSakhiPlusMenu(false)"
-              ontouchend="window.toggleSakhiPlusMenu(false); if(event.cancelable) event.preventDefault();"
-              aria-label="बंद करें">&times;</button>
-          </div>
-
-          <!-- Live Dynamic AI Credit Card in Plus Menu -->
-          <div id="sakhiPlusMenuCreditsCard"
-            style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);border:1.5px solid #334155;border-radius:14px;padding:12px 14px;margin:0 0 14px 0;box-shadow:0 6px 16px rgba(0,0,0,0.25);">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="font-size:0.80rem;font-weight:800;color:#94a3b8;display:flex;align-items:center;gap:6px;">
-                <span>⚡</span> आपका दैनिक AI क्रेडिट बैलेंस
-              </span>
-              <span id="sakhiUserTierBadge"
-                style="font-size:0.68rem;font-weight:900;padding:2px 8px;border-radius:12px;background:#15803d;color:#dcfce7;letter-spacing:0.5px;">
-                ACTIVE ID
-              </span>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-              <div
-                style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 6px;text-align:center;">
-                <div style="font-size:0.72rem;color:#cbd5e1;font-weight:700;">📷 फोटो / कैमरा</div>
-                <div id="sakhiImageCreditsDisplay"
-                  style="font-size:1.05rem;font-weight:900;color:#38bdf8;margin-top:2px;">15 / 15 शेष</div>
-              </div>
-              <div
-                style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 6px;text-align:center;">
-                <div style="font-size:0.72rem;color:#cbd5e1;font-weight:700;">💬 सखी AI चैट</div>
-                <div id="sakhiTextCreditsDisplay"
-                  style="font-size:1.05rem;font-weight:900;color:#4ade80;margin-top:2px;">200 / 200 शेष</div>
-              </div>
-            </div>
-            <div id="sakhiTierUpgradePrompt"
-              style="margin-top:8px;font-size:0.74rem;color:#fbbf24;font-weight:700;display:flex;align-items:center;justify-content:space-between;">
-              <span>🚀 3x ज्यादा कोटा पाने हेतु आईडी एक्टिवेट करें</span>
-              <a href="/subscription.html"
-                style="background:#eab308;color:#000;padding:2px 8px;border-radius:8px;text-decoration:none;font-weight:900;">एक्टिवेट</a>
-            </div>
-          </div>
-
-          <div class="sakhi-plus-grid">
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('krishi')">
-              🌾 कृषि व फसल डॉक्टर
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('pashu')">
-              🐄 पशुपालन, दूध व डेयरी
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('health')">
-              🩺 स्वास्थ्य, डाइट व लैब रिपोर्ट
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('netsurf')">
-              💼 नेट्सर्फ 25% छूट व प्लान
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('panchang')">
-              🗓️ दैनिक पंचांग व शुभ मुहूर्त
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('fisheries')">
-              🐟 मछली पालन (Aqua Culture)
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('poultry')">
-              🐔 मुर्गी पालन (Poultry Farm)
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('goat')">
-              🐐 बकरी पालन (Goat Farming)
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('solar')">
-              ☀️ सोलर पंप व सरकारी योजनाएं
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('prompts')">
-              🎨 AI पोस्टर प्रॉम्प्ट स्टूडियो
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('checklist')">
-              📋 ऑल-इन-वन स्मार्ट चेकलिस्ट
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.selectSakhiDomain('ebooks')">
-              📚 'खेती का डॉक्टर' ई-बुक्स
-            </button>
-            <button type="button" class="sakhi-menu-item" onclick="window.location.href='/aarogyam-app.html'"
-              style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);color:#1e3a8a;border:1.5px solid #60a5fa;font-weight:900;">
-              📲 ऐप इंस्टॉल गाइड (PWA)
-            </button>
-          </div>
-        </div>
+        
 
         <!-- Smart 1-Tap Contextual Pills Container (Dynamic Follow-up Chips) -->
         <div id="sakhiSmartPillsContainer" class="sakhi-smart-pills-container" style="display:block;">
@@ -845,9 +861,10 @@
 
         <!-- Input Footer: [+] on Left, Wide Textarea in Center, Camera/Mic/Send on Right Side -->
         <div class="sakhi-input-footer" style="position:relative;z-index:1000;pointer-events:auto;">
-          <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="विषय व टूल्स चुनें"
-            onclick="window.toggleSakhiPlusMenu(event)">
-            <i class="fa-solid fa-plus"></i>
+          <button type="button" class="sakhi-plus-btn" id="sakhiPlusBtn" title="सखी मेनू व चैट इतिहास (☰)"
+            onclick="window.toggleSakhiPlusMenu(event)"
+            style="display:inline-flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-bars" style="font-size:1.15rem;"></i>
           </button>
 
           <textarea name="sakhi_chat_query" class="sakhi-text-input" id="sakhiTextInput" rows="1"

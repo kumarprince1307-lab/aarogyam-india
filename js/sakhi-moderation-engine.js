@@ -203,6 +203,9 @@
     isAbusive: function (text) {
       if (!text || typeof text !== 'string') return false;
       const clean = text.toLowerCase();
+      // CRITICAL MEDICAL EXCLUSION: Dog/Animal bites & Rabies first aid is never abuse!
+      const isAnimalBite = clean.includes('काट') || clean.includes('काटा') || clean.includes('कटा') || clean.includes('bite') || clean.includes('rabies') || clean.includes('रेबीज') || clean.includes('घाव') || clean.includes('सुई') || clean.includes('इंजेक्शन') || clean.includes('खरोंच') || (clean.includes('कुत्ते') && (clean.includes('हाथ') || clean.includes('पैर') || clean.includes('शरीर') || clean.includes('निशान')));
+      if (isAnimalBite) return false;
       return ABUSE_PATTERNS.some(pat => pat.test(clean));
     },
 

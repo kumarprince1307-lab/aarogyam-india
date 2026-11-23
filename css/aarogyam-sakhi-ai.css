@@ -427,21 +427,21 @@ body.is-fullscreen .sakhi-chat-window {
 
 /* Backdrop for Plus Menu to ensure smooth tap-to-dismiss on mobile devices */
 .sakhi-plus-menu-backdrop {
-  position: fixed;
-  inset: 0;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  z-index: 9999;
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  z-index: 2147483646 !important;
   display: none !important;
   opacity: 0;
   pointer-events: none !important;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.22s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -452,36 +452,52 @@ body.is-fullscreen .sakhi-chat-window {
   pointer-events: auto !important;
 }
 
+/* ChatGPT-Style Left Drawer (Sliding Sidebar - Sharp Black & White Theme) */
 .sakhi-plus-menu {
-  display: none !important;
-  position: absolute;
-  bottom: 72px;
-  left: 12px;
-  right: 12px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.28);
-  padding: 14px 12px;
-  z-index: 10001;
-  max-height: 62vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(14px) scale(0.96);
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s ease;
+  display: flex !important;
+  flex-direction: column !important;
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  width: 80vw !important;
+  max-width: 340px !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-right: 2px solid #000000 !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-radius: 0 16px 16px 0 !important;
+  box-shadow: 20px 0 50px rgba(0, 0, 0, 0.45) !important;
+  padding: 14px 14px 32px 14px !important;
+  z-index: 2147483647 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateX(-105%) !important;
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s ease !important;
   will-change: transform, opacity;
   touch-action: manipulation;
+  box-sizing: border-box !important;
 }
 
 .sakhi-plus-menu.active {
-  display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  transform: translateY(0) scale(1) !important;
+  transform: translateX(0) !important;
+}
+
+.sakhi-plus-menu-backdrop {
+  z-index: 100000 !important;
 }
 
 .sakhi-plus-menu-header {
@@ -3043,4 +3059,14 @@ body.sakhi-page-body {
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
+}
+
+
+@keyframes sakhiModalPop {
+  0% { opacity: 0; transform: scale(0.88) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes sakhiBackdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
