@@ -5,7 +5,6 @@ const MENU = [
   { label: '🤖 सखी AI नॉलेज हब व एनालिटिक्स', href: 'sakhi-ai-hub.html', icon: '🤖', route: 'sakhi-ai-hub' },
   { label: '🚀 Marketing & Outreach Hub (मार्केटिंग व आउटरीच)', href: 'reports.html', icon: '🎯', route: 'reports' },
   { label: 'Users (उपयोगकर्ता)', icon: '👥', children: [ 
-    { label: '🔐 My Team PIN व डिवाइस लॉक', href: 'team-security.html', route: 'team-security' },
     { label: 'All Users (सभी यूजर)', href: 'users.html', route: 'users' }, 
     { label: '🔍 User Details & Search', href: 'user-details.html', route: 'user-details' },
     { label: '🛡️ All User Permissions', href: 'user-permissions.html', route: 'user-permissions' },

@@ -523,6 +523,29 @@ function renderProfile(detail, ucasData) {
     <!-- 1. Subscription Section -->
     ${renderSubscriptionSection(sub)}
 
+    <!-- 1.5. My Team PIN & Device Security Section -->
+    <div class="admin-section" style="border: 1.5px solid #3b82f6; background: rgba(15, 23, 42, 0.7); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+      <div class="admin-section-header" style="margin-bottom: 12px; border-bottom: 1px solid rgba(59, 130, 246, 0.3); padding-bottom: 8px;">
+        <div class="admin-section-title" style="color: #38bdf8; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.05rem;">
+          <span>🔐</span> <span>My Team सुरक्षा व PIN रीसेट (Leader Workbench Security)</span>
+        </div>
+      </div>
+      <div id="user-team-sec-box" style="margin-bottom: 14px;">
+        <div style="color: #94a3b8; font-size: 0.86rem;">सुरक्षा डेटा लोड हो रहा है...</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button type="button" id="btn-dtl-reset-pin" class="admin-button small-button" style="background: #f59e0b; color: #fff; font-weight: 800; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+          🔄 PIN रीसेट करें
+        </button>
+        <button type="button" id="btn-dtl-reset-dev" class="admin-button small-button" style="background: #3b82f6; color: #fff; font-weight: 800; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+          📱 डिवाइस टोकन हटाएं (Unbind)
+        </button>
+        <button type="button" id="btn-dtl-unlock-strikes" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 800; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
+          ⏳ 15-मिनट लॉक हटाएं
+        </button>
+      </div>
+    </div>
+
     <!-- 2. Phonebook Section -->
     ${renderPhonebookSection(phonebook)}
 
@@ -1000,6 +1023,91 @@ export async function initUserDetails() {
 
     const ucasData = ucasRes.success ? ucasRes.data : null;
     container.innerHTML = renderProfile(result.data, ucasData);
+
+    // 0.A Load and Bind My Team Security (PIN & Device)
+    const cleanUserMobile = String(result.data?.mobile || '').replace(/\D/g, '').slice(-10);
+    const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
+
+    async function loadTeamSecurityStatus() {
+      const box = document.getElementById('user-team-sec-box');
+      if (!box || !cleanUserMobile) return;
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}&select=*`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const vData = await res.json();
+        if (!vData || vData.length === 0) {
+          box.innerHTML = `<div style="color:#94a3b8; font-size:0.86rem;">इस नंबर (+91 ${cleanUserMobile}) पर अभी कोई PIN या डिवाइस लॉक सक्रिय नहीं है।</div>`;
+          return;
+        }
+        const v = vData[0];
+        const isLocked = v.locked_until && new Date(v.locked_until).getTime() > Date.now();
+        box.innerHTML = `
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px; font-size:0.85rem;">
+            <div>
+              <span style="color:#94a3b8; display:block; font-size:0.75rem;">🔑 4-अंकीय PIN:</span>
+              <strong style="color:#38bdf8; font-size:1.15rem; letter-spacing:2px; font-family:monospace;">${v.pin_code || 'सेट नहीं है'}</strong>
+            </div>
+            <div>
+              <span style="color:#94a3b8; display:block; font-size:0.75rem;">📱 अधिकृत डिवाइस टोकन:</span>
+              <code style="color:${v.device_token ? '#4ade80' : '#94a3b8'}; font-size:0.76rem;">${v.device_token || 'अनबाउंड (सभी डिवाइस खुले हैं)'}</code>
+            </div>
+            <div>
+              <span style="color:#94a3b8; display:block; font-size:0.75rem;">❌ गलत प्रयास:</span>
+              <strong style="color:${v.attempts > 0 ? '#f87171' : '#4ade80'};">${v.attempts || 0} / 3 स्ट्राइक</strong>
+            </div>
+            <div>
+              <span style="color:#94a3b8; display:block; font-size:0.75rem;">🔒 खाता स्थिति:</span>
+              ${isLocked ? '<span style="color:#ef4444; font-weight:800;">⛔ 15-मिनट लॉक</span>' : '<span style="color:#22c55e; font-weight:800;">🟢 सक्रिय व सुरक्षित</span>'}
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        box.innerHTML = `<div style="color:#ef4444; font-size:0.84rem;">सुरक्षा स्थिति लोड करने में त्रुटि: ${err.message}</div>`;
+      }
+    }
+
+    loadTeamSecurityStatus();
+
+    // Bind Action Buttons
+    document.getElementById('btn-dtl-reset-pin')?.addEventListener('click', async () => {
+      if (!confirm(`क्या आप +91 ${cleanUserMobile} का 4-अंकीय पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}`, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin_code: null, updated_at: new Date().toISOString() })
+        });
+        alert(`✅ +91 ${cleanUserMobile} का पिन सफलतापूर्वक रीसेट हो गया!`);
+        loadTeamSecurityStatus();
+      } catch (e) { alert('त्रुटि: ' + e.message); }
+    });
+
+    document.getElementById('btn-dtl-reset-dev')?.addEventListener('click', async () => {
+      if (!confirm(`क्या आप +91 ${cleanUserMobile} का डिवाइस लॉक हटाना चाहते हैं?\n\nयूजर अपने नए फोन पर आसानी से लॉगिन कर सकेगा।`)) return;
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}`, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ device_token: null, updated_at: new Date().toISOString() })
+        });
+        alert(`✅ +91 ${cleanUserMobile} का डिवाइस लॉक हटा दिया गया है!`);
+        loadTeamSecurityStatus();
+      } catch (e) { alert('त्रुटि: ' + e.message); }
+    });
+
+    document.getElementById('btn-dtl-unlock-strikes')?.addEventListener('click', async () => {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}`, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ attempts: 0, locked_until: null, updated_at: new Date().toISOString() })
+        });
+        alert(`✅ +91 ${cleanUserMobile} का 15-मिनट लॉक हटा दिया गया है!`);
+        loadTeamSecurityStatus();
+      } catch (e) { alert('त्रुटि: ' + e.message); }
+    });
 
     // 0. Bind Open "Edit Profile" Button
     const openEditProfileBtn = document.getElementById('btn-open-edit-profile');
