@@ -371,6 +371,23 @@
     return await res.json();
   }
 
+  async function patchVaultRecord(mobile, updates) {
+    updates.updated_at = new Date().toISOString();
+    const url = `${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${mobile}`;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) throw new Error('Failed to patch vault record');
+    return await res.json();
+  }
+
   // 7. Render Mandatory Login Screen (Strict Mode - Cannot be dismissed)
   function renderMandatoryLoginScreen() {
     let existing = document.getElementById('aiTeamSecurityOverlay');
@@ -666,8 +683,7 @@
         if (vaultRow && vaultRow.pin_code && entered === String(vaultRow.pin_code)) {
           try {
             if (vaultRow.attempts > 0) {
-              await upsertVaultRecord({
-                phone: mobile,
+              await patchVaultRecord(mobile, {
                 attempts: 0,
                 locked_until: null
               });
@@ -684,20 +700,22 @@
           if (attemptsRemaining <= 0) {
             const lockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000).toISOString();
             try {
-              await upsertVaultRecord({
-                phone: mobile,
+              await patchVaultRecord(mobile, {
                 attempts: newAttempts,
                 locked_until: lockedUntil
               });
-            } catch (_) { }
+            } catch (err) {
+              console.error('Failed to save lockout:', err);
+            }
             renderLockoutScreen(mobile, Date.now() + LOCKOUT_MINUTES * 60 * 1000);
           } else {
             try {
-              await upsertVaultRecord({
-                phone: mobile,
+              await patchVaultRecord(mobile, {
                 attempts: newAttempts
               });
-            } catch (_) { }
+            } catch (err) {
+              console.error('Failed to save attempt strike:', err);
+            }
             showError(`गलत पिन! केवल ${attemptsRemaining} प्रयास शेष हैं।`);
             currentInput = '';
             renderDots();
