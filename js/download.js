@@ -1,10 +1,10 @@
 
 // Audio/TTS Unsupported Banner (Completely Disabled - Zero Intrusive Popups)
 function showAarogyamTtsUnsupportedBanner() {
-  return; // Silent no-op as per user instruction
+    return; // Silent no-op as per user instruction
 }
 if (typeof window !== 'undefined') {
-  window.showAarogyamTtsUnsupportedBanner = showAarogyamTtsUnsupportedBanner;
+    window.showAarogyamTtsUnsupportedBanner = showAarogyamTtsUnsupportedBanner;
 }
 
 /* =================================================================
@@ -23,9 +23,9 @@ const getDownloadSessionManager = () => {
             }
 
             const keys = [
-                'supabase.auth.token', 
-                'sb-access-token', 
-                'sb-refresh-token', 
+                'supabase.auth.token',
+                'sb-access-token',
+                'sb-refresh-token',
                 'aoi_user_session',
                 'current_user',
                 'user_id'
@@ -35,7 +35,7 @@ const getDownloadSessionManager = () => {
                     return true;
                 }
             }
-            return true; 
+            return true;
         },
 
         requireLogin: () => {
@@ -59,9 +59,9 @@ const getDownloadSessionManager = () => {
                     if (parsed && parsed.id) return parsed;
                 }
 
-                const rawData = localStorage.getItem('supabase.auth.token') || 
-                                localStorage.getItem('current_user') || 
-                                sessionStorage.getItem('supabase.auth.token');
+                const rawData = localStorage.getItem('supabase.auth.token') ||
+                    localStorage.getItem('current_user') ||
+                    sessionStorage.getItem('supabase.auth.token');
                 if (rawData) {
                     const parsed = JSON.parse(rawData);
                     if (parsed?.currentSession?.user) return parsed.currentSession.user;
@@ -105,7 +105,7 @@ function cleanBookTitle(rawTitle) {
 }
 
 // Scroll smoothly to any section
-window.scrollToSection = function(sectionId) {
+window.scrollToSection = function (sectionId) {
     const el = document.getElementById(sectionId);
     if (el) {
         const rect = el.getBoundingClientRect();
@@ -113,6 +113,44 @@ window.scrollToSection = function(sectionId) {
         window.scrollTo({ top: Math.max(0, rect.top + scrollTop - 75), behavior: 'smooth' });
     }
 };
+
+function isMasterAdminUser() {
+    const mob = (state.userData?.mobile || localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_mobile') || localStorage.getItem('user_phone') || '').replace(/\D/g, '').slice(-10);
+    return Boolean(mob === '7974422572' || mob === '7049294111');
+}
+
+function renderUnpurchasedBlockScreen(bookData) {
+    const mainWrap = document.querySelector('main') || document.querySelector('.download-container') || document.body;
+    const existing = document.getElementById('unpurchasedBlockScreen');
+    if (existing) existing.remove();
+
+    const blockEl = document.createElement('div');
+    blockEl.id = 'unpurchasedBlockScreen';
+    blockEl.style.cssText = 'max-width:540px;margin:40px auto;padding:36px 24px;background:#ffffff;border:2px solid #ef4444;border-radius:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.12);box-sizing:border-box;font-family:inherit;';
+    blockEl.innerHTML = `
+        <div style="width:76px;height:76px;margin:0 auto 16px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:2px solid #fecaca;box-shadow:0 4px 14px rgba(239,68,68,0.2);">🔒</div>
+        <div style="display:inline-block;background:#fee2e2;color:#dc2626;font-size:0.75rem;font-weight:900;padding:4px 12px;border-radius:20px;border:1px solid #f87171;margin-bottom:12px;">डाउनलोड केंद्र (Download Center)</div>
+        <h2 style="font-size:1.30rem;font-weight:900;color:#0f172a;margin:0 0 10px;line-height:1.35;">ई-बुक डाउनलोड अनधिकृत</h2>
+        <p style="font-size:0.88rem;color:#64748b;line-height:1.55;margin:0 0 24px;">
+            आपके खाते में इस ई-बुक का कोई खरीद रिकॉर्ड उपलब्ध नहीं है। यह सामग्री केवल अधिकृत खरीदारों के लिए उपलब्ध है।
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="/ebooks/my-library.html" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg, #16a34a, #15803d);color:#ffffff;text-decoration:none;padding:13px;border-radius:12px;font-size:0.95rem;font-weight:900;box-shadow:0 4px 14px rgba(22,163,74,0.35);">
+                <span>📚</span> <span>My Library में जाएं (खरीदी गई ई-बुक्स देखें)</span> <span>→</span>
+            </a>
+            <a href="/index.html" style="display:flex;align-items:center;justify-content:center;gap:6px;background:#f1f5f9;color:#334155;text-decoration:none;padding:11px;border-radius:12px;font-size:0.86rem;font-weight:800;border:1px solid #cbd5e1;">
+                <span>🏠</span> <span>होम पेज पर लौटें</span>
+            </a>
+        </div>
+    `;
+
+    const dlCard = document.getElementById('downloadCard');
+    if (dlCard && dlCard.parentNode) {
+        dlCard.parentNode.insertBefore(blockEl, dlCard);
+    } else {
+        mainWrap.prepend(blockEl);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loadingState = document.getElementById('loadingState');
@@ -132,8 +170,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             initialBundle = ['BK017', 'BK016', 'BK002', 'BK019', 'BK020'];
             state.bookId = 'BK017';
             state.bundleBooks = initialBundle;
+        } else if (rawBookParam) {
+            state.bookId = rawBookParam.toUpperCase();
         } else {
-            state.bookId = rawBookParam ? rawBookParam.toUpperCase() : 'BK017';
+            // No book specified in URL: check user's purchased books first
+            let firstPurchasedId = null;
+            try {
+                const localPurchases = JSON.parse(localStorage.getItem('aarogyam_purchases') || localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
+                if (Array.isArray(localPurchases) && localPurchases.length > 0) {
+                    firstPurchasedId = (localPurchases[0].book_id || '').toUpperCase().trim();
+                }
+            } catch (_) { }
+
+            if (firstPurchasedId) {
+                state.bookId = firstPurchasedId;
+            } else if (isMasterAdminUser()) {
+                state.bookId = 'BK017';
+            } else {
+                // No purchase found and no book in URL: block immediately!
+                state.bookId = null;
+                if (loadingState) loadingState.style.display = 'none';
+                if (downloadCard) downloadCard.style.display = 'none';
+                renderUnpurchasedBlockScreen(null);
+                return;
+            }
         }
 
         const sessionManager = getDownloadSessionManager();
@@ -164,14 +224,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const pBooks = purchaseData.book_id.split(',').map(x => x.trim().toUpperCase()).filter(Boolean);
                 state.bundleBooks = Array.from(new Set([...(state.bundleBooks || []), ...pBooks]));
             }
-        } else {
+        } else if (isMasterAdminUser()) {
             state.purchaseData = {
-                id: 'local_purchase_' + state.bookId,
-                profile_id: user.id,
+                id: 'admin_preview_' + state.bookId,
+                profile_id: user.id || 'admin',
                 book_id: state.bookId,
                 download_count: 0,
                 purchase_date: new Date().toISOString()
             };
+        } else {
+            // STRICT SECURITY GUARD: User did NOT purchase this book!
+            state.purchaseData = null;
+            if (loadingState) loadingState.style.display = 'none';
+            if (downloadCard) downloadCard.style.display = 'none';
+            const heroCelebration = document.getElementById('heroCelebrationSection');
+            if (heroCelebration) heroCelebration.style.display = 'none';
+            const stickyDock = document.getElementById('stickyDownloadDock');
+            if (stickyDock) stickyDock.style.display = 'none';
+
+            renderUnpurchasedBlockScreen(bookData);
+            return;
         }
 
         // If user profile resolved during purchase fetch, reload logs
@@ -180,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (!bookData) throw new Error('ई-बुक की जानकारी लोड नहीं हो सकी।');
-        
+
         state.bookData = bookData;
         window.currentBookData = bookData;
         state.maxAllowedDownloads = bookData.downloadLimit || 3;
@@ -285,7 +357,7 @@ async function fetchBookData(bookId) {
                 if (match.download_funnel) mergedData.download_funnel = match.download_funnel;
             }
         }
-    } catch (e) {}
+    } catch (e) { }
 
     // 4. Check custom books from Audio Studio / localStorage
     try {
@@ -305,7 +377,7 @@ async function fetchBookData(bookId) {
                 if (match.cover) mergedData.cover = match.cover;
             }
         }
-    } catch (e) {}
+    } catch (e) { }
 
     // 5. Check free demo books from Audio Studio / localStorage
     try {
@@ -325,7 +397,7 @@ async function fetchBookData(bookId) {
                 if (match.cover) mergedData.cover = match.cover;
             }
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return mergedData;
 }
@@ -333,16 +405,16 @@ async function fetchBookData(bookId) {
 async function fetchPurchaseRecord(userId, bookId) {
     const cleanId = String(bookId || '').toUpperCase().trim();
     const client = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof db !== 'undefined' ? db : null);
-    
+
     // 1. Check Supabase first for absolute source of truth
     if (client) {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('order_id') || urlParams.get('order');
             const paymentId = urlParams.get('payment_id') || urlParams.get('payment');
-            
+
             const purchaseFields = 'id, profile_id, book_id, order_id, payment_id, status, amount, download_count, created_at, phone, customer_name';
-            
+
             // Check by order_id or payment_id if available in URL
             if (orderId) {
                 const { data } = await client.from('purchases').select(purchaseFields).eq('order_id', orderId).eq('book_id', cleanId).maybeSingle();
@@ -363,7 +435,7 @@ async function fetchPurchaseRecord(userId, bookId) {
                         .select('id, full_name, mobile')
                         .eq('mobile', cleanPhone)
                         .maybeSingle();
-                    
+
                     if (profData?.id) {
                         state.userData = { ...state.userData, id: profData.id, full_name: profData.full_name || state.userData.full_name, mobile: profData.mobile };
                         const { data: pData } = await client
@@ -398,7 +470,7 @@ async function fetchPurchaseRecord(userId, bookId) {
                     .order('created_at', { ascending: false })
                     .limit(1)
                     .maybeSingle();
-                    
+
                 if (!error && data) return data;
                 // Fallback for combo bundle purchases with comma-separated IDs
                 const { data: comboData } = await client
@@ -410,7 +482,7 @@ async function fetchPurchaseRecord(userId, bookId) {
                     .maybeSingle();
                 if (comboData) return comboData;
             }
-        } catch(e) {
+        } catch (e) {
             console.warn('Supabase purchase fetch warning:', e);
         }
     }
@@ -423,7 +495,7 @@ async function fetchPurchaseRecord(userId, bookId) {
             return rawB === cleanId || rawB.split(',').map(x => x.trim()).includes(cleanId);
         });
         if (found) return found;
-    } catch(e) {}
+    } catch (e) { }
 
     return null;
 }
@@ -439,7 +511,7 @@ async function fetchAllBooksCatalog() {
             const data = await response.json();
             list = Array.isArray(data.books) ? data.books : (Array.isArray(data) ? data : []);
         }
-    } catch (_) {}
+    } catch (_) { }
 
     try {
         const customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
@@ -450,7 +522,7 @@ async function fetchAllBooksCatalog() {
                 }
             });
         }
-    } catch (_) {}
+    } catch (_) { }
 
     window.allBooksCatalog = list;
     return list;
@@ -550,7 +622,7 @@ function savePersistentDownloadCount(count, targetBookId) {
                 localStorage.setItem(k, JSON.stringify(list));
             }
         });
-    } catch (e) {}
+    } catch (e) { }
 }
 
 // Render Interactive Top Bundle Books Carousel / Chips
@@ -579,7 +651,7 @@ function renderBundleBooksSelector() {
                 bundleList.push(raw);
             }
         });
-    } catch (_) {}
+    } catch (_) { }
 
     bundleList = Array.from(new Set(bundleList.filter(Boolean)));
 
@@ -600,7 +672,7 @@ function renderBundleBooksSelector() {
         const cover = matched.cover || matched.cover_image || `/images/books/${bId.toLowerCase()}-cover.webp`;
         const used = getPersistentDownloadCount(bId);
         const max = 3;
-        
+
         return `
             <div class="bundle-book-chip ${isActive ? 'active' : ''}" onclick="window.selectBundleBook('${bId}')" title="${title} को अनलॉक व डाउनलोड करें">
                 ${isActive ? '<span class="bundle-book-active-tag">✓ चयनित</span>' : ''}
@@ -616,7 +688,7 @@ function renderBundleBooksSelector() {
     }).join('');
 }
 
-window.selectBundleBook = async function(bookId) {
+window.selectBundleBook = async function (bookId) {
     if (!bookId) return;
     const cleanId = bookId.toUpperCase().trim();
     if (state.bookId === cleanId) {
@@ -634,7 +706,7 @@ window.selectBundleBook = async function(bookId) {
             state.maxAllowedDownloads = bookData.downloadLimit || 3;
             window.maxAllowedDownloads = state.maxAllowedDownloads;
         }
-    } catch (_) {}
+    } catch (_) { }
 
     populateUI();
     renderBundleBooksSelector();
@@ -678,27 +750,27 @@ function updateDownloadButtonCountBadges(used, max) {
 function populateUI() {
     const bookCover = document.getElementById('bookCover');
     if (bookCover) bookCover.src = state.bookData.cover || `/images/books/${(state.bookId || 'bk001').toLowerCase()}-cover.webp`;
-    
+
     // Clean Book Title (Remove BK001, BK015, etc.)
     const rawTitle = state.bookData.heading || state.bookData.name || 'Aarogyam India E-Book';
     const cleanTitle = cleanBookTitle(rawTitle);
     const bookName = document.getElementById('bookName');
     if (bookName) bookName.textContent = cleanTitle;
-    
+
     const bookCategory = document.getElementById('bookCategory');
     if (bookCategory) bookCategory.textContent = state.bookData.category || 'कृषि मास्टर गाइड';
 
     const userName = state.userData.full_name || state.userData.email || 'किसान मित्र';
     const customerName = document.getElementById('customerName');
     if (customerName) customerName.textContent = userName;
-    
+
     // Dynamic user greeting: "बधाई हो, <User Name> जी!"
     const celebrationUserName = document.getElementById('celebrationUserName');
     if (celebrationUserName) celebrationUserName.textContent = userName;
-    
+
     const customerMobile = document.getElementById('customerMobile');
     if (customerMobile) customerMobile.textContent = state.userData.mobile || 'वेरिफाइड पाठक';
-    
+
     const purchaseDateEl = document.getElementById('purchaseDate');
     if (purchaseDateEl && state.purchaseData.purchase_date) {
         purchaseDateEl.textContent = new Date(state.purchaseData.purchase_date).toLocaleDateString('hi-IN');
@@ -756,13 +828,13 @@ function populateUI() {
     try {
         const localPurchases = JSON.parse(localStorage.getItem('AI_PURCHASES') || localStorage.getItem('purchases') || '[]');
         const uniqueOtherBookIds = Array.from(new Set(localPurchases.map(p => p.book_id).filter(id => id && id !== state.bookId)));
-        
+
         let bundleSection = document.getElementById('bundleOtherBooksSection');
         if (!bundleSection && uniqueOtherBookIds.length > 0) {
             bundleSection = document.createElement('div');
             bundleSection.id = 'bundleOtherBooksSection';
             bundleSection.style.cssText = 'margin:24px auto; max-width:600px; background:#1e293b; border:1.5px solid #10b981; border-radius:16px; padding:18px 14px; box-shadow:0 8px 25px rgba(0,0,0,0.4); color:#fff;';
-            
+
             const cardEl = document.getElementById('downloadCard');
             if (cardEl && cardEl.parentNode) {
                 cardEl.parentNode.insertBefore(bundleSection, cardEl.nextSibling);
@@ -776,11 +848,11 @@ function populateUI() {
                 </div>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     ${uniqueOtherBookIds.map(oId => {
-                        const bCat = (typeof allBooks !== "undefined" && Array.isArray(allBooks)) ? allBooks : [];
-                        const matchedBook = bCat.find(b => (b.id && b.id.toUpperCase() === oId.toUpperCase()) || (b.book_id && b.book_id.toUpperCase() === oId.toUpperCase())) || {};
-                        const bTitle = matchedBook.name || matchedBook.heading || matchedBook.title || oId;
-                        const bCover = matchedBook.cover || matchedBook.cover_image || `/images/books/${oId.toLowerCase()}-cover.webp`;
-                        return `
+                const bCat = (typeof allBooks !== "undefined" && Array.isArray(allBooks)) ? allBooks : [];
+                const matchedBook = bCat.find(b => (b.id && b.id.toUpperCase() === oId.toUpperCase()) || (b.book_id && b.book_id.toUpperCase() === oId.toUpperCase())) || {};
+                const bTitle = matchedBook.name || matchedBook.heading || matchedBook.title || oId;
+                const bCover = matchedBook.cover || matchedBook.cover_image || `/images/books/${oId.toLowerCase()}-cover.webp`;
+                return `
                         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; background:#0f172a; padding:10px 12px; border-radius:10px; border:1px solid #334155;">
                             <div style="display:flex; align-items:center; gap:10px; min-width:0;">
                                 <img src="${bCover}" alt="Cover" style="width:38px; height:52px; border-radius:4px; object-fit:cover; flex-shrink:0; border:1px solid rgba(255,255,255,0.2);" onerror="this.style.display='none'" />
@@ -799,7 +871,7 @@ function populateUI() {
                             </div>
                         </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
                 <div style="text-align:center; margin-top:14px;">
                     <a href="/my-library.html" style="color:#38bdf8; font-weight:700; font-size:0.84rem; text-decoration:none;">
@@ -808,7 +880,7 @@ function populateUI() {
                 </div>
             `;
         }
-    } catch (_) {}
+    } catch (_) { }
 
     // Wire up sticky Read Now button
     const stickyReadNowBtn = document.getElementById('stickyReadNowBtn');
@@ -871,7 +943,7 @@ let downloadAudioElement = null;
 // Exact Hindi script requested by user
 const AUDIO_GUIDANCE_SCRIPT = 'नमस्ते किसान भाइयों व पाठकों! Aarogyam India में आपका स्वागत है। आपकी ई-बुक सफलतापूर्वक अनलॉक हो चुकी है। अगर आप बार-बार PDF डाउनलोड करने और मोबाइल की मेमोरी भरने से बचना चाहते हैं, तो Aarogyam App इंस्टॉल करें। इसमें आप बिना इंटरनेट भी कभी भी किताबें पढ़ सकते हैं, ज़ूम कर सकते हैं और ऑडियो सुन सकते हैं। अगर आपको PDF का Print निकालना है, तो नीचे नीले रंग के बॉक्स में Full HD पर क्लिक करें। ध्यान रहे, आप केवल 3 बार ही डाउनलोड कर सकते हैं। लेकिन Reader और Audio को कभी भी, कितनी भी बार इस्तेमाल कर सकते हैं। और अगर आपको कोई भी असुविधा होती है, तो आप सीधे WhatsApp बटन पर क्लिक करके हमसे संपर्क कर सकते हैं। साथ ही नीचे हमारी अन्य सबसे लोकप्रिय कृषि मास्टर गाइड्स भी दी गई हैं, जिन्हें पढ़कर और सुनकर हजारों किसान भाई अपनी खेती को आधुनिक और अत्यधिक लाभदायक बना रहे हैं, उन्हें भी जरूर देखें!';
 
-window.toggleAudioGuidance = function() {
+window.toggleAudioGuidance = function () {
     const statusEl = document.getElementById('audioGuideStatus');
     const iconEl = document.getElementById('audioGuideIcon');
     const bars = document.querySelectorAll('.sound-bar, .f-bar');
@@ -880,7 +952,7 @@ window.toggleAudioGuidance = function() {
 
     if (isAudioGuidancePlaying) {
         if (downloadAudioElement) {
-            try { downloadAudioElement.pause(); } catch(e){}
+            try { downloadAudioElement.pause(); } catch (e) { }
         }
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
@@ -932,9 +1004,9 @@ window.toggleAudioGuidance = function() {
 
     function playTtsGuidance() {
         if (!('speechSynthesis' in window)) {
-        if (typeof showAarogyamTtsUnsupportedBanner === 'function') showAarogyamTtsUnsupportedBanner();
-        return;
-    }
+            if (typeof showAarogyamTtsUnsupportedBanner === 'function') showAarogyamTtsUnsupportedBanner();
+            return;
+        }
 
         window.speechSynthesis.cancel();
 
@@ -977,14 +1049,14 @@ window.toggleAudioGuidance = function() {
 };
 
 // Dismiss/Close Floating Audio Pill
-window.dismissFloatingAudio = function() {
+window.dismissFloatingAudio = function () {
     const floatingPill = document.getElementById('aoi-download-floating-audio');
     if (floatingPill) {
         floatingPill.style.display = 'none';
     }
     if (isAudioGuidancePlaying) {
         if (downloadAudioElement) {
-            try { downloadAudioElement.pause(); } catch(e){}
+            try { downloadAudioElement.pause(); } catch (e) { }
         }
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
@@ -999,12 +1071,12 @@ window.dismissFloatingAudio = function() {
 // Autoplay Setup (Attempt immediately + first user gesture listener)
 function setupDownloadAudioAutoplay() {
     if ('speechSynthesis' in window) {
-        try { window.speechSynthesis.getVoices(); } catch(e){}
+        try { window.speechSynthesis.getVoices(); } catch (e) { }
     }
 
     const tryAutoStart = () => {
         if (!isAudioGuidancePlaying) {
-            try { window.toggleAudioGuidance(); } catch(e) {}
+            try { window.toggleAudioGuidance(); } catch (e) { }
         }
     };
 
@@ -1034,7 +1106,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPwaPrompt = e;
 });
 
-window.triggerPwaInstallPrompt = async function() {
+window.triggerPwaInstallPrompt = async function () {
     if (deferredPwaPrompt) {
         deferredPwaPrompt.prompt();
         const choiceResult = await deferredPwaPrompt.userChoice;
@@ -1053,9 +1125,9 @@ window.triggerPwaInstallPrompt = async function() {
 
 window.isAoiDownloading = false;
 
-window.triggerDownloadTier = async function(tier = 'fast') {
-    if (!state.bookData || !state.purchaseData) {
-        alert('डाउनलोड डेटा उपलब्ध नहीं है।');
+window.triggerDownloadTier = async function (tier = 'fast') {
+    if (!state.bookData || !state.purchaseData || String(state.purchaseData.id).startsWith('local_purchase_')) {
+        alert('⚠️ डाउनलोड अनधिकृत: यह ई-बुक आपके खाते में खरीदी नहीं गई है। कृपया My Library से ई-बुक खरीदें।');
         return;
     }
 
@@ -1089,12 +1161,12 @@ window.triggerDownloadTier = async function(tier = 'fast') {
 
     // Check limit first (Admin and local custom book test bypass)
     const isAdminUser = (typeof window.AarogyamDeviceGuard !== 'undefined' && window.AarogyamDeviceGuard.isSuperAdmin(state.userData?.mobile)) ||
-                        localStorage.getItem('admin_session') === 'true';
+        localStorage.getItem('admin_session') === 'true';
     let isCustomLocal = false;
     try {
         const cBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
         isCustomLocal = cBooks.some(b => b && b.id && b.id.toUpperCase() === cleanId);
-    } catch (_) {}
+    } catch (_) { }
 
     if (!isAdminUser && !isCustomLocal && (max - used) <= 0) {
         alert('⚠️ आपकी डाउनलोड लिमिट (3 डाउनलोड) पूरी हो चुकी है।\n\nचिंता न करें! आप नीचे "My Library में ऑनलाइन पढ़ें" बटन दबाकर असीमित बार कभी भी पढ़ और सुन सकते हैं।');
@@ -1130,7 +1202,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
                         break;
                     }
                 }
-            } catch (_) {}
+            } catch (_) { }
         }
     }
 
@@ -1144,7 +1216,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
             link.click();
             setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1000);
             isDelivered = true;
-        } catch(dlErr) {
+        } catch (dlErr) {
             console.warn('Direct link trigger note:', dlErr);
         }
 
@@ -1153,7 +1225,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
             try {
                 window.location.href = staticPdfUrl;
                 isDelivered = true;
-            } catch(_) {}
+            } catch (_) { }
         }
     }
 
@@ -1167,7 +1239,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
             } else {
                 alert('⚠️ पुस्तक के पेज लोड नहीं हो सके। कृपया इंटरनेट कनेक्शन जांचें या My Library में पढ़ें।');
             }
-        } catch(e) {
+        } catch (e) {
             console.error('PDF assembly error:', e);
             alert('⚠️ PDF Error: ' + e.message);
         } finally {
@@ -1252,7 +1324,7 @@ window.triggerDownloadTier = async function(tier = 'fast') {
 // SECTION 4: पाठकों की विशेष पसंद (SLIDE-DOWN ACCORDION & FUNNEL)
 // =================================================================
 
-window.toggleFunnelAccordion = function() {
+window.toggleFunnelAccordion = function () {
     const body = document.getElementById('funnelCollapsibleBody');
     const header = document.getElementById('funnelToggleHeader');
     const hint = document.getElementById('funnelExpandHint');
@@ -1333,7 +1405,7 @@ async function renderBusinessFunnel() {
                 for (const b of bList) {
                     const rawId = (b.id || b.book_id || '').toUpperCase().trim();
                     const baseId = getBaseBookId(rawId);
-                    
+
                     if (!baseId) continue;
                     const isDemo = rawId.startsWith('DEMO') || b.book_type === 'demo' || b.is_demo === true || b.isDemo === true;
 
@@ -1341,10 +1413,10 @@ async function renderBusinessFunnel() {
                     if (baseId.startsWith('SUB') || (b.category || '').toLowerCase().includes('subscri')) continue;
                     if (b.status === 'coming_soon' || b.is_coming_soon === true || b.is_coming_soon === 'true' || b.store_badge === 'coming_soon') continue;
                     if (b.status && b.status !== 'active') continue;
-                    
+
                     // Exclude current purchased book
                     if (baseId === currentBaseId || rawId === rawCurrentId) continue;
-                    
+
                     // Deduplicate by baseId and cleaned title
                     const cTitle = cleanBookTitle(b.heading || b.name || b.id).toLowerCase();
                     if (seenIds.has(baseId) || seenTitles.has(cTitle)) continue;
@@ -1365,7 +1437,7 @@ async function renderBusinessFunnel() {
                 }
             }
         }
-    } catch(e) {
+    } catch (e) {
         console.warn('renderBusinessFunnel error:', e);
     }
 
@@ -1418,7 +1490,7 @@ async function renderBusinessFunnel() {
         const pitchText = b.pitch ? b.pitch.substring(0, 85) + '...' : 'सम्पूर्ण वैज्ञानिक व प्रैक्टिकल गाइड।';
         const isDemo = !!b.isDemo;
 
-        const badgeHtml = isDemo 
+        const badgeHtml = isDemo
             ? `<span class="funnel-badge-demo" style="font-size:0.68rem;background:linear-gradient(135deg, rgba(16,185,129,0.28), rgba(5,150,105,0.4));color:#34d399;border:1px solid rgba(52,211,153,0.6);padding:2px 8px;border-radius:4px;font-weight:800;margin-left:auto;letter-spacing:0.3px;box-shadow:0 0 8px rgba(52,211,153,0.25);">🎁 Free Demo Book</span>`
             : `<span style="font-size:0.68rem;background:rgba(245,158,11,0.22);color:#fbbf24;border:1px solid rgba(245,158,11,0.4);padding:2px 7px;border-radius:4px;font-weight:800;margin-left:auto;">बेस्टसेलर</span>`;
 
@@ -1454,7 +1526,7 @@ async function renderBusinessFunnel() {
 
 // Motivational cross-selling audio sample player
 let funnelAudioUtterance = null;
-window.playFunnelBookAudio = function(bookTitle, bookId) {
+window.playFunnelBookAudio = function (bookTitle, bookId) {
     if (!('speechSynthesis' in window)) {
         if (typeof showAarogyamTtsUnsupportedBanner === 'function') showAarogyamTtsUnsupportedBanner();
         return;
@@ -1583,7 +1655,7 @@ async function resolveBookPagesForDownload(bookId, bookData) {
                 if (!db.objectStoreNames.contains('bookPages')) return resolve(null);
                 const tx = db.transaction('bookPages', 'readonly');
                 const store = tx.objectStore('bookPages');
-                
+
                 // Multi-key case-insensitive probe: cleanId, uppercase, lowercase
                 const probeKeys = [cleanId, cleanId.toUpperCase(), cleanId.toLowerCase()].filter(Boolean);
                 (async () => {
@@ -1603,7 +1675,7 @@ async function resolveBookPagesForDownload(bookId, bookData) {
         if (Array.isArray(idbPages) && idbPages.length > 0) {
             return idbPages.map(normalizeDownloadPageSrc);
         }
-    } catch (_) {}
+    } catch (_) { }
 
     // 3. Check localStorage (AOI_BOOK_PAGES_..., AAROGYAM_CUSTOM_BOOKS, AAROGYAM_FREE_DEMO_BOOKS)
     try {
@@ -1633,12 +1705,12 @@ async function resolveBookPagesForDownload(bookId, bookData) {
                 return parsedStudio.pageImages.map(normalizeDownloadPageSrc);
             }
         }
-    } catch (_) {}
+    } catch (_) { }
 
     // 4. Check Disk WebP Pages
     const declaredPages = parseInt(bookData?.totalPages || 0, 10);
-    const knownDefaultTotal = (cleanId === 'BK001' || cleanId.startsWith('KHARIF')) ? 152 
-                            : ((cleanId === 'BK002' || cleanId.startsWith('KHETI')) ? 118 : 0);
+    const knownDefaultTotal = (cleanId === 'BK001' || cleanId.startsWith('KHARIF')) ? 152
+        : ((cleanId === 'BK002' || cleanId.startsWith('KHETI')) ? 118 : 0);
     const expectedTotal = declaredPages > 0 ? declaredPages : knownDefaultTotal;
 
     const folderCandidates = [
@@ -1693,7 +1765,7 @@ async function preloadBookDownloadAssets(bookId, bookData) {
                     if (!staticPdfUrl) staticPdfUrl = c;
                 }
             }
-        } catch (_) {}
+        } catch (_) { }
     }));
 
     // Resolve exact book pages in background
@@ -1717,7 +1789,7 @@ async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
         showDlProgress(0, 1, 'PDF लाइब्रेरी लोड हो रही है...');
         try {
             await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-        } catch(e) {
+        } catch (e) {
             await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
         }
     }
@@ -1797,7 +1869,7 @@ async function assembleDownloadPdf(bookId, bookTitle, tier = 'fast') {
             const jpegData = canvas.toDataURL('image/jpeg', compressionQuality);
             if (i > 0) doc.addPage();
             doc.addImage(jpegData, 'JPEG', 0, 0, pdfW, pdfH);
-        } catch(e) {
+        } catch (e) {
             console.warn(`Page ${pageNum} assemble skip:`, e);
         }
 

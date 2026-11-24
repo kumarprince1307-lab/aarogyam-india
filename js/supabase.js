@@ -671,14 +671,36 @@ function logoutUser() {
     localStorage.removeItem('AAROGYAM_SMART_DIARY_ENTRIES');
     localStorage.removeItem('AAROGYAM_SMART_CASHFLOW');
     localStorage.removeItem('AI_PHONEBOOK_CACHE');
+    localStorage.removeItem('AI_DIRECT_REFERRALS_CACHE');
+    localStorage.removeItem('AOI_DIRECT_REFERRALS_LEDGER');
+    localStorage.removeItem('AI_CLOUD_SURVEYS_CACHE');
+    localStorage.removeItem('AI_PICKER_SELECTED_MOBILES');
+    localStorage.removeItem('AI_LOCAL_VAULT');
+    localStorage.removeItem('AI_HIDDEN_CONTACTS');
+    localStorage.removeItem('admin_session');
+    localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_role');
+    localStorage.removeItem('AAROGYAM_SUPERADMIN_HARDWARE');
     localStorage.removeItem('AI_DIARY_TODAY_COUNTS');
     // ⚠️ Clear wallet vault on logout so next user gets a fresh wallet
     localStorage.removeItem('AOI_WALLET_VAULT_V1');
     localStorage.removeItem('AOI_WALLET_BALANCE');
     try {
+        if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.logoutPurge === 'function') {
+            window.AarogyamTeamSecurity.logoutPurge();
+        }
+    } catch (_) {}
+    try {
         for (let i = localStorage.length - 1; i >= 0; i--) {
             const k = localStorage.key(i);
-            if (k && (k.startsWith('AI_KHATABOOK_') || k.startsWith('AAROGYAM_SMART_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_') || k.startsWith('aim_') || k.startsWith('ai_'))) {
+            if (k && (
+                k.startsWith('AI_') ||
+                k.startsWith('AOI_') ||
+                k.startsWith('AAROGYAM_SMART_') ||
+                k.startsWith('aim_') ||
+                k.startsWith('ai_') ||
+                k.startsWith('aarogyam_')
+            )) {
                 localStorage.removeItem(k);
             }
         }

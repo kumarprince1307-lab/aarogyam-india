@@ -2,7 +2,7 @@
 
 const MENU = [
   { label: 'Dashboard', href: 'dashboard.html', icon: '🏠', route: 'dashboard' },
-  { label: '🔐 My Team PIN व डिवाइस लॉक', href: 'team-security.html', icon: '🔐', directLink: true },
+  { label: '🔐 My Team PIN व डिवाइस लॉक', href: 'team-security.html', icon: '🔐', route: 'team-security' },
   { label: '🤖 सखी AI नॉलेज हब व एनालिटिक्स', href: 'sakhi-ai-hub.html', icon: '🤖', route: 'sakhi-ai-hub' },
   { label: '🚀 Marketing & Outreach Hub (मार्केटिंग व आउटरीच)', href: 'reports.html', icon: '🎯', route: 'reports' },
   { label: 'Users (उपयोगकर्ता)', icon: '👥', children: [ 

@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v150.0';
+const STATIC_CACHE = 'aarogyam-public-static-v153.0';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v113.0';
+const PAGES_CACHE = 'aarogyam-public-pages-v114.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
 const OFFLINE_URL = '/offline.html';
 
@@ -434,5 +434,5 @@ async function checkAndDispatchBackgroundPush() {
         data: { url: targetToast.action_url || '/' }
       });
     }
-  } catch(e) {}
+  } catch (e) { }
 }

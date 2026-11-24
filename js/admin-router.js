@@ -7,7 +7,7 @@
 
 const ROUTES = {
   'dashboard': () => import('./admin-pages-dashboard.js?v=20261115_v85_correct_links').then(m => m.initDashboard()),
-  'team-security': () => import('./admin-pages-team-security.js?v=1.0').then(m => m.initTeamSecurity()),
+  'team-security': () => import('./admin-pages-team-security.js?v=20261124_v28_split_boxes').then(m => m.initTeamSecurity()),
   'users': () => import('./admin-pages-users.js?v=20261116_v87_live_credit_box').then(m => m.initUsers()),
   'user-details': () => import('./admin-pages-user-details.js?v=27.5').then(m => m.initUserDetails()),
   'user-permissions': () => import('./admin-pages-user-permissions.js').then(m => m.initUserPermissions()),
@@ -38,7 +38,7 @@ const ROUTES = {
   'admin-app': () => import('./admin-pages-admin-app.js').then(m => m.initAdminApp()),
   'smart-etailer': () => import('./admin-pages-smart-etailer.js?v=20261031_v38_hybrid_khata').then(m => m.initSmartEtailerAdmin()),
   'sakhi-ai-hub': () => import('./admin-pages-sakhi-ai-hub.js?v=20261115_v83_user_credit_live').then(m => m.initSakhiAiHub()),
-  'settings': () => import('./admin-pages-settings.js?v=2.0').then(m => m.initSettings()).catch(() => {}),
+  'settings': () => import('./admin-pages-settings.js?v=2.0').then(m => m.initSettings()).catch(() => { }),
   'support': () => renderSupportModule(),
   'crop-doctor': () => renderCropDoctorModule(),
   'offline-preview': () => renderOfflinePreviewModule(),
@@ -104,8 +104,8 @@ export async function navigateTo(routeName) {
 
   const adminSession = localStorage.getItem('admin_session');
   if (!adminSession) {
-    // If not logged in, allow temporary access in local test or redirect
-    localStorage.setItem('admin_session', 'true');
+    window.location.replace('login.html');
+    return;
   }
 
   // Update compact title & breadcrumb in header
@@ -119,9 +119,15 @@ export async function navigateTo(routeName) {
   const targetHash = `${name}${query}`;
   try {
     history.pushState(null, '', `#${targetHash}`);
-  } catch (e) {}
+  } catch (e) { }
 
   const loader = document.getElementById('page-content');
+  if (!loader) {
+    if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/admin/')) {
+      window.location.href = `index.html#${targetHash}`;
+      return;
+    }
+  }
   if (loader) loader.innerHTML = '<div class="admin-loading">Loading ' + pretty + '…</div>';
 
   const route = ROUTES[name];
@@ -183,10 +189,9 @@ export function initRouter() {
   document.addEventListener('click', (e) => {
     const target = e.target.closest('[data-route]');
     if (target) {
-      e.preventDefault();
       let route = target.dataset.route || target.getAttribute('href') || 'dashboard';
       const href = target.getAttribute('href') || '';
-      
+
       // If element has data-id and route doesn't already have query params, append ?id=...
       if (target.dataset.id && !route.includes('?')) {
         route = `${route}?id=${encodeURIComponent(target.dataset.id)}`;
@@ -194,6 +199,14 @@ export function initRouter() {
         const qs = href.substring(href.indexOf('?'));
         route = `${route}${qs}`;
       }
+
+      const pageContent = document.getElementById('page-content');
+      if (!pageContent && !window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/admin/')) {
+        window.location.href = `index.html#${route}`;
+        return;
+      }
+
+      e.preventDefault();
       navigateTo(route);
     }
   });

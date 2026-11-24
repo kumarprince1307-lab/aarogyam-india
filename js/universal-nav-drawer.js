@@ -710,6 +710,7 @@
       ? `<span class="drawer-user-status-pill active" style="display:inline-flex;align-items:center;gap:5px;background:#16a34a;color:#ffffff;font-size:0.75rem;font-weight:800;padding:2px 9px;border-radius:12px;border:1px solid #15803d;box-shadow:none !important;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:#ffffff;display:inline-block;"></span> ${savedUser.isVip ? 'VIP Active' : 'Active Member'}</span>`
       : `<span class="drawer-user-status-pill inactive" style="display:inline-flex;align-items:center;gap:5px;background:#ef4444;color:#ffffff;font-size:0.75rem;font-weight:800;padding:2px 9px;border-radius:12px;border:1px solid #dc2626;box-shadow:none !important;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:#ffffff;display:inline-block;"></span> Inactive Guest</span>`;
     const shareId = isLogged ? window.getUserShareId() : null;
+    const isAdminUser = Boolean(userPhone === '7974422572' || userPhone === '7049294111');
 
     return `
       <button type="button" class="drawer-close-btn" onclick="window.closeUniversalDrawer()" title="Close Menu">&times;</button>
@@ -732,6 +733,15 @@
       <!-- 2-Row Balanced Header Action Matrix (Full Responsive for all browsers) -->
       <div class="drawer-header-matrix" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
         
+        ${isAdminUser ? `
+        <!-- Admin Master 1-Tap Fast-Pass Button -->
+        <div style="width:100%;box-sizing:border-box;">
+          <a href="/admin/" onclick="window.closeUniversalDrawer();" style="width:100%;height:38px;background:linear-gradient(135deg, #1e1b4b, #0f172a);color:#facc15;border:1.5px solid #eab308;border-radius:10px;font-weight:900;font-size:0.85rem;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 10px rgba(234,179,8,0.25);box-sizing:border-box;">
+            <span>👑</span> <span>मास्टर एडमिन पैनल खोलें (Admin Panel)</span> <span>⚡</span>
+          </a>
+        </div>
+        ` : ''}
+
         <!-- Row 1: Share ID & Install App (Clean White Buttons) -->
         <div style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;">
           ${isLogged && shareId ? `
@@ -802,7 +812,7 @@
       if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.logoutPurge === 'function') {
         window.AarogyamTeamSecurity.logoutPurge();
       }
-    } catch (_) {}
+    } catch (_) { }
     const keysToRemove = [
       'aim_user_name', 'aim_user_mobile', 'aarogyam_user_name', 'aarogyam_user_phone',
       'aarogyam_user_registered', 'aarogyam_user', 'CURRENT_USER', 'aoi_user_session', 'wb_registered',
@@ -816,7 +826,10 @@
       'aarogyam_user_direct_referrals', 'aarogyam_user_shares_count', 'aarogyam_user_wallet_balance',
       'aim_user_direct_referrals', 'aim_user_shares_count', 'aim_user_wallet_balance',
       'AOI_WHATSAPP_OFFER_PURCHASES', 'AI_PURCHASES', 'purchases', 'user_purchases', 'aim_purchases', 'cached_purchases',
-      'sakhi_chat_history', 'AAROGYAM_SUPERADMIN_HARDWARE'
+      'sakhi_chat_history', 'AAROGYAM_SUPERADMIN_HARDWARE',
+      'admin_session', 'admin_user', 'admin_role',
+      'AI_DIRECT_REFERRALS_CACHE', 'AI_PHONEBOOK_CACHE', 'AI_CLOUD_SURVEYS_CACHE', 'AI_PICKER_SELECTED_MOBILES',
+      'AI_KHATABOOK_ENTRIES', 'AAROGYAM_SMART_DIARY_ENTRIES', 'AAROGYAM_SMART_CASHFLOW', 'AI_LOCAL_VAULT', 'AI_HIDDEN_CONTACTS'
     ];
     keysToRemove.forEach(k => {
       try { localStorage.removeItem(k); } catch (_) { }
@@ -824,7 +837,20 @@
     try {
       for (let i = localStorage.length - 1; i >= 0; i--) {
         const k = localStorage.key(i);
-        if (k && (k.startsWith('AOI_WALLET_VAULT_') || k.startsWith('AI_PURCHASED_') || k.startsWith('AOI_SHARE_') || k.startsWith('AI_KB_') || k.startsWith('AI_DIARY_'))) {
+        if (k && (
+          k.startsWith('AOI_') ||
+          k.startsWith('AI_PURCHASED_') ||
+          k.startsWith('AI_KB_') ||
+          k.startsWith('AI_DIARY_') ||
+          k.startsWith('AI_KHATABOOK_') ||
+          k.startsWith('AAROGYAM_SMART_') ||
+          k.startsWith('AI_PHONEBOOK_') ||
+          k.startsWith('AI_DIRECT_') ||
+          k.startsWith('AI_CLOUD_') ||
+          k.startsWith('AI_TEAM_SECURITY_') ||
+          k.startsWith('aim_') ||
+          k.startsWith('aarogyam_')
+        )) {
           localStorage.removeItem(k);
         }
       }
@@ -832,10 +858,11 @@
     try {
       sessionStorage.removeItem('ads_gateway_passed');
       sessionStorage.removeItem('wb_registered');
+      sessionStorage.removeItem('admin_session');
       // Clean up cached duplicate purchase flags so new purchases on same browser aren't blocked
       for (let i = sessionStorage.length - 1; i >= 0; i--) {
         const k = sessionStorage.key(i);
-        if (k && (k.startsWith('AI_PURCHASED_') || k.startsWith('AI_ADM_'))) {
+        if (k && (k.startsWith('AI_PURCHASED_') || k.startsWith('AI_ADM_') || k.startsWith('AI_TEAM_SECURITY_'))) {
           sessionStorage.removeItem(k);
         }
       }
@@ -1372,6 +1399,13 @@
     const isInstalled = isPwaInstalled();
     const isBookLanding = isBookLandingPage();
 
+    let drawerUserPhone = '';
+    try {
+      const u = JSON.parse(localStorage.getItem('AI_USER') || localStorage.getItem('AI_PROFILE') || localStorage.getItem('UCAS_USER') || '{}');
+      drawerUserPhone = (localStorage.getItem('aim_user_mobile') || localStorage.getItem('user_phone') || u.mobile || u.phone || '').replace(/\D/g, '').slice(-10);
+    } catch (_) { }
+    const isMasterAdmin = Boolean(drawerUserPhone === '7974422572' || drawerUserPhone === '7049294111');
+
     if (isBookLanding && document.body) {
       try {
         document.body.classList.add('book-landing-page');
@@ -1394,6 +1428,17 @@
 
           <!-- Clean White & Slate Canvas Menu List -->
           <div class="drawer-menu-list" style="flex:1;overflow-y:auto;">
+
+            ${isMasterAdmin ? `
+            <!-- 0. MASTER ADMIN (Direct 1-Tap Entry for Owner) -->
+            <a href="/admin/" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn" style="background:linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%) !important; border:1.5px solid #eab308 !important; box-shadow:0 4px 12px rgba(234,179,8,0.2) !important;">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#facc15;color:#0f172a;"><i class="fa-solid fa-crown"></i></div>
+                <span class="drawer-item-title" style="color:#facc15;font-weight:900;">👑 मुख्य एडमिन पैनल (Master Admin)</span>
+              </div>
+              <span class="drawer-tag-pill" style="background:#facc15;color:#000;font-weight:900;">ADMIN ⚡</span>
+            </a>
+            ` : ''}
 
             <!-- 1. HOME (Direct Button) -->
             <a href="/index.html" class="drawer-nav-item-btn ${currentPath === '/' || currentPath.endsWith('index.html') ? 'active-pill' : ''}">
@@ -1427,7 +1472,7 @@
               <a href="/purchases.html" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-file-invoice-dollar"></i></div><span>My Invoice</span></div>
               </a>
-              <a href="/ebooks/download.html" class="drawer-sub-link-item">
+              <a href="/ebooks/my-library.html?tab=purchased#purchased" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-download"></i></div><span>Download Center</span></div>
               </a>
               <a href="/ebooks/share-rewards.html" class="drawer-sub-link-item">

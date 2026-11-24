@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="hi">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -7,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin — My Team सुरक्षा व PIN रीसेट हब</title>
-  
+
   <link rel="icon" type="image/png" href="../images/logo/fevicon.png">
   <link rel="apple-touch-icon" href="../images/logo/fevicon.png">
   <meta name="theme-color" content="#0f172a">
@@ -18,11 +19,15 @@
     if (!adminSession) {
       window.location.replace('login.html');
     }
+    if (window.location.hash && window.location.hash !== '#' && window.location.hash !== '#team-security') {
+      window.location.replace('index.html' + window.location.hash);
+    }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/admin-panel.css?v=26.0">
   <link rel="stylesheet" href="../css/admin-components.css?v=26.0">
   <style>
@@ -32,11 +37,14 @@
       margin-top: 14px;
       font-size: 0.88rem;
     }
-    .vault-table th, .vault-table td {
+
+    .vault-table th,
+    .vault-table td {
       padding: 12px 14px;
       border-bottom: 1px solid #334155;
       text-align: left;
     }
+
     .vault-table th {
       background: #0f172a;
       color: #94a3b8;
@@ -45,9 +53,11 @@
       font-size: 0.76rem;
       letter-spacing: 0.05em;
     }
+
     .vault-table tr:hover {
       background: rgba(255, 255, 255, 0.02);
     }
+
     .btn-act {
       padding: 6px 10px;
       border-radius: 6px;
@@ -61,10 +71,26 @@
       margin-right: 4px;
       transition: opacity 0.15s;
     }
-    .btn-act:hover { opacity: 0.85; }
-    .btn-reset-pin { background: #f59e0b; color: #fff; }
-    .btn-unbind-dev { background: #3b82f6; color: #fff; }
-    .btn-unlock-strikes { background: #10b981; color: #fff; }
+
+    .btn-act:hover {
+      opacity: 0.85;
+    }
+
+    .btn-reset-pin {
+      background: #f59e0b;
+      color: #fff;
+    }
+
+    .btn-unbind-dev {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .btn-unlock-strikes {
+      background: #10b981;
+      color: #fff;
+    }
+
     .status-badge {
       display: inline-block;
       padding: 3px 8px;
@@ -72,58 +98,80 @@
       font-size: 0.75rem;
       font-weight: 800;
     }
-    .status-normal { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-    .status-locked { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .status-normal {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-locked {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
   </style>
 </head>
+
 <body>
   <div id="admin-app" class="admin-app">
     <div id="sidebar-placeholder"></div>
     <div id="sidebar-backdrop"></div>
     <div id="main-area" class="admin-main">
       <div id="header-placeholder"></div>
-      
+
       <div class="admin-container" style="padding: 24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom: 20px;">
+        <div
+          style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom: 20px;">
           <div>
-            <h1 style="margin:0; font-size:1.6rem; font-weight:900; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+            <h1
+              style="margin:0; font-size:1.6rem; font-weight:900; color:#38bdf8; display:flex; align-items:center; gap:8px;">
               <span>🔐</span> <span>My Team सुरक्षा व PIN रीसेट हब</span>
             </h1>
             <p style="margin:4px 0 0; color:#94a3b8; font-size:0.88rem;">
-              लीडर वर्कबेंच, बहीखाता, डायरी और टू-डू पेजों के 4-अंकीय PIN, अधिकृत डिवाइस टोकन और 15-मिनट लॉक को नियंत्रित करें।
+              लीडर वर्कबेंच, बहीखाता, डायरी और टू-डू पेजों के 4-अंकीय PIN, अधिकृत डिवाइस टोकन और 15-मिनट लॉक को
+              नियंत्रित करें।
             </p>
           </div>
-          <button type="button" onclick="loadVaultRecords()" class="admin-button" style="background:#2563eb; color:#fff; font-weight:800; padding:10px 18px; border-radius:8px; border:none; cursor:pointer;">
+          <button type="button" onclick="loadVaultRecords()" class="admin-button"
+            style="background:#2563eb; color:#fff; font-weight:800; padding:10px 18px; border-radius:8px; border:none; cursor:pointer;">
             🔄 रीफ़्रेश डेटा
           </button>
         </div>
 
         <!-- Quick Stats Cards -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
-          <div class="admin-card" style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px;">
+        <div
+          style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="admin-card"
+            style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px;">
             <div style="font-size:0.80rem; color:#94a3b8; font-weight:700;">कुल सेट किए गए PIN</div>
             <div id="statTotalPins" style="font-size:1.8rem; font-weight:900; color:#38bdf8; margin-top:4px;">0</div>
           </div>
-          <div class="admin-card" style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px;">
+          <div class="admin-card"
+            style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px;">
             <div style="font-size:0.80rem; color:#94a3b8; font-weight:700;">अधिकृत डिवाइस (Locked Devices)</div>
             <div id="statTotalDevices" style="font-size:1.8rem; font-weight:900; color:#4ade80; margin-top:4px;">0</div>
           </div>
-          <div class="admin-card" style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px;">
+          <div class="admin-card"
+            style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px;">
             <div style="font-size:0.80rem; color:#94a3b8; font-weight:700;">वर्तमान में ब्लॉक (15 Min Strike)</div>
             <div id="statTotalLocked" style="font-size:1.8rem; font-weight:900; color:#ef4444; margin-top:4px;">0</div>
           </div>
         </div>
 
         <!-- Search Bar -->
-        <div class="admin-card" style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px; margin-bottom:20px;">
-          <input type="text" id="vaultSearchInput" placeholder="मोबाइल नंबर से खोजें (उदा. 6260004158 या 7049...)" 
+        <div class="admin-card"
+          style="padding:16px; background:#1e293b; border:1px solid #334155; border-radius:12px; margin-bottom:20px;">
+          <input type="text" id="vaultSearchInput" placeholder="मोबाइल नंबर से खोजें (उदा. 6260004158 या 7049...)"
             oninput="filterVaultRecords(this.value)"
             style="width:100%; padding:12px 14px; background:#0f172a; border:1px solid #334155; border-radius:8px; color:#fff; font-size:0.95rem; font-weight:700; box-sizing:border-box; outline:none;">
         </div>
 
         <!-- Table Card -->
-        <div class="admin-card" style="padding:20px; background:#1e293b; border:1px solid #334155; border-radius:14px; overflow-x:auto;">
-          <div id="vaultLoading" style="text-align:center; padding:30px; color:#94a3b8; font-weight:700;">डेटा लोड हो रहा है...</div>
+        <div class="admin-card"
+          style="padding:20px; background:#1e293b; border:1px solid #334155; border-radius:14px; overflow-x:auto;">
+          <div id="vaultLoading" style="text-align:center; padding:30px; color:#94a3b8; font-weight:700;">डेटा लोड हो
+            रहा है...</div>
           <table class="vault-table" id="vaultTable" style="display:none;">
             <thead>
               <tr>
@@ -212,21 +260,21 @@
           <td><strong style="color:#f8fafc; font-size:1rem;">+91 ${r.phone}</strong></td>
           <td>
             ${(r.pin_code && r.pin_code !== 'RESET')
-              ? `<span style="font-family:monospace; font-size:1.1rem; font-weight:900; color:#38bdf8; background:#0f172a; padding:3px 8px; border-radius:6px; letter-spacing:2px;">${r.pin_code}</span>` 
-              : '<span style="color:#f59e0b; font-weight:800; font-size:0.80rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>'}
+            ? `<span style="font-family:monospace; font-size:1.1rem; font-weight:900; color:#38bdf8; background:#0f172a; padding:3px 8px; border-radius:6px; letter-spacing:2px;">${r.pin_code}</span>`
+            : '<span style="color:#f59e0b; font-weight:800; font-size:0.80rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>'}
           </td>
           <td>
-            ${r.device_token 
-              ? `<code style="color:#4ade80; background:#0f172a; padding:2px 6px; border-radius:4px; font-size:0.75rem;">${r.device_token}</code>` 
-              : '<span style="color:#64748b;">अनबाउंड (सभी फोन खुले हैं)</span>'}
+            ${r.device_token
+            ? `<code style="color:#4ade80; background:#0f172a; padding:2px 6px; border-radius:4px; font-size:0.75rem;">${r.device_token}</code>`
+            : '<span style="color:#64748b;">अनबाउंड (सभी फोन खुले हैं)</span>'}
           </td>
           <td>
             <span style="font-weight:800; color:${r.attempts > 0 ? '#f87171' : '#4ade80'};">${r.attempts || 0} / 3</span>
           </td>
           <td>
-            ${isLocked 
-              ? `<span class="status-badge status-locked">⛔ 15-Min लॉक</span>` 
-              : `<span class="status-badge status-normal">🟢 सामान्य</span>`}
+            ${isLocked
+            ? `<span class="status-badge status-locked">⛔ 15-Min लॉक</span>`
+            : `<span class="status-badge status-normal">🟢 सामान्य</span>`}
           </td>
           <td style="white-space:nowrap;">
             <button type="button" class="btn-act btn-reset-pin" onclick="actionResetPin('${r.phone}')" title="पिन रीसेट करें ताकि यूजर नया पिन बना सके">
@@ -260,7 +308,7 @@
       renderTable(filtered);
     }
 
-    window.actionResetPin = async function(phone) {
+    window.actionResetPin = async function (phone) {
       if (!confirm(`क्या आप +91 ${phone} का 4-अंकीय सुरक्षा पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
@@ -276,7 +324,7 @@
       }
     };
 
-    window.actionUnbindDevice = async function(phone) {
+    window.actionUnbindDevice = async function (phone) {
       if (!confirm(`क्या आप +91 ${phone} का अधिकृत डिवाइस लॉक हटाना चाहते हैं?\n\nयूजर अब किसी भी नए फोन पर आसानी से लॉगिन कर सकेगा।`)) return;
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
@@ -291,7 +339,7 @@
       }
     };
 
-    window.actionUnlockStrikes = async function(phone) {
+    window.actionUnlockStrikes = async function (phone) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
           method: 'PATCH',
@@ -311,4 +359,5 @@
     document.addEventListener('DOMContentLoaded', loadVaultRecords);
   </script>
 </body>
+
 </html>

@@ -2448,6 +2448,12 @@
     // Re-render Contact Lists on Entry page & Follow-up
     renderEntryPageContactList(1);
     renderDiaryFollowups();
+
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 500);
+    }
   }
 
   function deleteDiaryEntry(id) {
@@ -3159,6 +3165,12 @@
     showToast('खर्च / आय सफलतापूर्वक दर्ज हुई!', 'success');
     document.getElementById('cashflowAmount').value = '';
     document.getElementById('cashflowNote').value = '';
+
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 600);
+    }
   }
 
   function renderCashflowSummary() {
@@ -3375,11 +3387,11 @@
   }
 
 
-  let activePickerCategoryFilter = 'all';
+  let activePickerCategoryFilter = 'team';
 
   function openDiaryContactPicker(targetMode = 'main', initialCategory = 'team') {
     currentPickerTarget = targetMode;
-    activePickerCategoryFilter = initialCategory || 'all';
+    activePickerCategoryFilter = initialCategory || 'team';
     const modal = document.getElementById('diaryContactPickerModal');
     if (!modal) return;
     modal.style.removeProperty('display');
@@ -3503,7 +3515,7 @@
       }
     };
 
-    setActiveStyle(teamBtn, activePickerCategoryFilter === 'team' || activePickerCategoryFilter === 'diary' || activePickerCategoryFilter === 'all');
+    setActiveStyle(teamBtn, activePickerCategoryFilter === 'team');
     setActiveStyle(pbBtn, activePickerCategoryFilter === 'phonebook');
     setActiveStyle(khataBtn, activePickerCategoryFilter === 'khata');
   }
@@ -3745,10 +3757,9 @@
           crop_name: e.crop_name || '',
           netsurf_id: e.netsurf_id || '',
           is_diary: true,
-          is_team: e.type === 'team'
+          is_team: false
         });
         item.is_diary = true;
-        if (e.type === 'team') item.is_team = true;
         if (e.name && (!item.name || item.name === 'खाता ग्राहक' || item.name === 'संपर्क')) item.name = e.name;
         if (e.place && !item.place) item.place = e.place;
         if (e.crop_name) item.crop_name = e.crop_name;
@@ -3820,8 +3831,9 @@
     const filtered = allContacts.filter(e => {
       if (activePickerCategoryFilter === 'active' && e.is_selected) return false;
       if (activePickerCategoryFilter === 'inactive' && !e.is_selected) return false;
-      if (activePickerCategoryFilter === 'team' && !e.is_team && e.source !== 'referral' && e.type !== 'team' && !e.netsurf_id) return false;
-      if (activePickerCategoryFilter === 'diary' && !e.is_diary && !e.is_team && e.source !== 'diary' && e.source !== 'referral' && e.type !== 'team' && !e.netsurf_id) return false;
+      // STRICT: My Team tab strictly contains verified direct team referrals from Supabase
+      if (activePickerCategoryFilter === 'team' && e.source !== 'referral') return false;
+      if (activePickerCategoryFilter === 'diary' && !e.is_diary && e.source !== 'diary') return false;
       if (activePickerCategoryFilter === 'phonebook' && !e.is_phonebook && e.source !== 'phonebook') return false;
       if (activePickerCategoryFilter === 'khata' && !e.is_khata && e.source !== 'khata') return false;
 
@@ -3841,9 +3853,12 @@
       } else if (activePickerCategoryFilter === 'inactive') {
         icon = '⚪';
         emptyMsg = 'अभी कोई संपर्क सेलेक्ट या इनएक्टिव नहीं है। जो संपर्क आप फॉर्म में चुनेंगे वे यहाँ दिखेंगे।';
-      } else if (activePickerCategoryFilter === 'team' || activePickerCategoryFilter === 'diary') {
+      } else if (activePickerCategoryFilter === 'team') {
         icon = '🤝';
         emptyMsg = 'कोई डायरेक्ट टीम साथी नहीं मिला। आपकी शेयर आईडी से जुड़ने वाले साथी यहाँ स्वतः दिखाई देंगे।';
+      } else if (activePickerCategoryFilter === 'diary') {
+        icon = '📖';
+        emptyMsg = 'डायरी में अभी कोई संपर्क नहीं है। नीचे फॉर्म से संपर्क सहेजें।';
       } else if (activePickerCategoryFilter === 'khata') {
         icon = '📕';
         emptyMsg = 'कोई बहीखाता ग्राहक नहीं मिला। बहीखाता में नए लेन-देन दर्ज करते ही वे यहाँ दिखेंगे।';
@@ -3864,7 +3879,7 @@
     const itemsHtml = filtered.map(e => {
       let badgeLabel = '📖 डायरी';
       let badgeBorder = '1.5px solid #000000';
-      if (e.is_team || e.source === 'referral' || e.type === 'team') {
+      if (e.is_team || e.source === 'referral') {
         badgeLabel = '🤝 My Team';
       } else if (e.is_khata || e.source === 'khata') {
         badgeLabel = '📕 बहीखाता';
@@ -3872,7 +3887,33 @@
         badgeLabel = '📱 फ़ोन बुक';
       }
 
-      const isRegistered = e.is_registered || directRefEntries.some(r => (r.mobile === e.mobile || r.phone === e.mobile));
+      const isTeamCard = Boolean(e.is_team || e.source === 'referral');
+      const isCardLocked = isTeamCard && !e.is_active;
+
+      if (isCardLocked) {
+        return `
+          <div style="background:#ffffff; border:1.5px solid #fca5a5; border-radius:10px; padding:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(239,68,68,0.08); display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <strong style="filter:blur(4.5px); -webkit-filter:blur(4.5px); user-select:none; pointer-events:none; color:#000000 !important; font-size:1.02rem; font-weight:900; line-height:1.2;">${e.name}</strong>
+                  <span style="background:#fef2f2 !important; color:#dc2626 !important; font-size:0.72rem !important; font-weight:900 !important; padding:2px 8px; border-radius:6px; border:1px solid #ef4444 !important; display:inline-flex; align-items:center; gap:4px;">🔒 इनएक्टिव साथी (विवरण लॉक)</span>
+                </div>
+                <span style="filter:blur(4.5px); -webkit-filter:blur(4.5px); user-select:none; pointer-events:none; font-size:0.86rem; color:#475569 !important; font-weight:800; display:block; margin-top:3px; word-break:break-all;">
+                  📞 +91 ${e.mobile ? (e.mobile.slice(0, 2) + '******' + e.mobile.slice(-2)) : '**********'} ${e.place ? '• 📍 ' + e.place : ''}
+                </span>
+              </div>
+              <span style="background:#ffffff; color:#dc2626 !important; font-size:0.74rem; font-weight:900; padding:3px 8px; border-radius:6px; border:1.5px solid #ef4444; white-space:nowrap; flex-shrink:0;">
+                🔒 My Team
+              </span>
+            </div>
+
+            <div style="background:#fff7ed; border:1px dashed #f97316; border-radius:6px; padding:7px 10px; font-size:0.75rem; color:#9a3412; font-weight:800; display:flex; align-items:center; gap:6px;">
+              <span>⚡</span> <span>यह डायरेक्ट टीम साथी अभी इनएक्टिव हैं। साथी द्वारा ई-बुक सक्रियण के बाद इनका विवरण अनलॉक हो जाएगा।</span>
+            </div>
+          </div>
+        `;
+      }
 
       return `
         <div style="background:#ffffff; border:2px solid #000000; border-radius:10px; padding:12px; margin-bottom:8px; box-shadow:0 2px 6px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:8px;">
@@ -3880,7 +3921,7 @@
             <div style="flex:1; min-width:0;">
               <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                 <strong style="color:#000000 !important; font-size:1.02rem; font-weight:900; line-height:1.2;">${e.name}</strong>
-                ${(e.is_team || e.source === 'referral') ? (e.is_active ? '<span style="background:#f0fdf4 !important; color:#16a34a !important; font-size:0.74rem !important; font-weight:900 !important; padding:3px 8px; border-radius:6px; border:1.5px solid #16a34a !important;">🟢 एक्टिव साथी</span>' : '<span style="background:#f1f5f9 !important; color:#475569 !important; font-size:0.74rem !important; font-weight:900 !important; padding:3px 8px; border-radius:6px; border:1.5px solid #94a3b8 !important;">⚪ इनएक्टिव साथी</span>') : ''}
+                ${(e.is_team || e.source === 'referral') ? '<span style="background:#f0fdf4 !important; color:#16a34a !important; font-size:0.74rem !important; font-weight:900 !important; padding:3px 8px; border-radius:6px; border:1.5px solid #16a34a !important;">🟢 एक्टिव साथी</span>' : ''}
                 ${e.is_selected ? '<span style="background:#f1f5f9; color:#000000; font-size:0.70rem; font-weight:900; padding:2px 6px; border-radius:4px; border:1.5px solid #000000;">✔️ सहेजा गया / सेलेक्टेड</span>' : ''}
               </div>
               <span style="font-size:0.86rem; color:#000000 !important; font-weight:800; display:block; margin-top:3px; word-break:break-all;">
@@ -3904,28 +3945,7 @@
       `;
     }).join('');
 
-    const isTeamCategory = (activePickerCategoryFilter === 'team' || activePickerCategoryFilter === 'diary');
-    const isUserActive = (typeof isUserAccountActive === 'function') ? isUserAccountActive() : true;
-    const activationNoticeHtml = `
-      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-        <span style="font-size:1.2rem;">🔒</span>
-        <div style="font-size:0.75rem; color:#92400e; line-height:1.3;">
-          <strong>डायरेक्ट टीम अनलॉक करें:</strong> आपकी ID अभी सक्रिय नहीं है। पूरा डेटा देखने के लिए ID एक्टिवेट करें।
-        </div>
-      </div>
-    `;
-
-    if (isTeamCategory && !isUserActive) {
-      listWrap.innerHTML = activationNoticeHtml + `
-        <div onclick="alert('कृपया अपनी ID सक्रिय (Active) करें! एडमिन से 7974422572 पर WhatsApp करें।')" style="position:relative; cursor:not-allowed;">
-          <div style="filter:blur(5px); opacity:0.35; pointer-events:none; user-select:none;">
-            ${itemsHtml}
-          </div>
-        </div>
-      `;
-    } else {
-      listWrap.innerHTML = itemsHtml;
-    }
+    listWrap.innerHTML = itemsHtml;
   }
 
   // Live Saved Contacts List on pages/myteam.html (Searchable, Paginated 10/page, Edit & Delete)
@@ -5052,6 +5072,12 @@
     renderDiaryFollowups();
     renderTodoPlanner();
 
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 500);
+    }
+
     if (activeQueueList.length > 0 && activeQueueIndex < activeQueueList.length - 1) {
       activeQueueIndex++;
       executeCurrentQueueItem();
@@ -5263,6 +5289,12 @@
     if (typeof updateHubQueueProgressUI === "function") updateHubQueueProgressUI();
     if (typeof alert === "function") alert("✓ संपर्क जानकारी व श्रेणी सफलतापूर्वक अपडेट हो गई!");
     if (typeof showToast === "function") showToast("✓ संपर्क जानकारी व श्रेणी सफलतापूर्वक अपडेट हो गई!", "success");
+
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 700);
+    }
   }
 
   // To-Do Work Diary Renderer
@@ -5473,6 +5505,12 @@
     localStorage.setItem('AI_DIARY_TODO_TASKS', JSON.stringify(tasks));
     input.value = '';
     renderTodoPlanner();
+
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 500);
+    }
   }
 
   function toggleTodoItemStatus(id) {
@@ -5850,15 +5888,17 @@
     return mob ? ('AI_KHATABOOK_ENTRIES_' + mob) : 'AI_KHATABOOK_ENTRIES';
   }
 
-  // Helper: Get or Init Khatabook Entries (NO FAKE / DUMMY SEEDS)
+  // Helper: Get or Init Khatabook Entries (NO FAKE / DUMMY SEEDS, USER SCOPED ONLY)
   function getKbEntries() {
     try {
+      const mob = getUserMobile();
       const key = getKbStorageKey();
       let entries = [];
       const userRaw = localStorage.getItem(key);
       if (userRaw && userRaw !== '[]') {
         entries = JSON.parse(userRaw);
-      } else {
+      } else if (!mob) {
+        // Fallback ONLY for guest user without a phone number
         const globalRaw = localStorage.getItem('AI_KHATABOOK_ENTRIES');
         if (globalRaw && globalRaw !== '[]') {
           entries = JSON.parse(globalRaw);
@@ -5893,10 +5933,12 @@
   }
 
   function saveKbEntries(entries) {
+    const mob = getUserMobile();
     const key = getKbStorageKey();
     localStorage.setItem(key, JSON.stringify(entries));
-    // Mirror to global key for offline safety
-    localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
+    if (!mob) {
+      localStorage.setItem('AI_KHATABOOK_ENTRIES', JSON.stringify(entries));
+    }
   }
 
   // 6-Character Unique Short Code Generator (for /khata?k=...)
@@ -6470,10 +6512,21 @@
     }
     const modal = document.getElementById('kbAddPartyModal');
     if (modal) {
+      // Clean Form Reset: Never carry over stale data from previous user or entries
+      const form = document.getElementById('kbAddPartyForm');
+      if (form) form.reset();
+      const mobileInput = document.getElementById('kbPartyMobile');
+      if (mobileInput) mobileInput.value = '';
+      const nameInput = document.getElementById('kbPartyName');
+      if (nameInput) nameInput.value = '';
+      const placeInput = document.getElementById('kbPartyPlace');
+      if (placeInput) placeInput.value = '';
+      const hint = document.getElementById('kbMobileLookupHint');
+      if (hint) { hint.style.display = 'none'; hint.innerHTML = ''; }
+
       modal.style.removeProperty('display');
       modal.style.setProperty('display', 'flex', 'important');
       modal.classList.add('show');
-      const mobileInput = document.getElementById('kbPartyMobile');
       if (mobileInput) {
         setTimeout(() => mobileInput.focus(), 120);
       }
@@ -6486,6 +6539,16 @@
       modal.classList.remove('show');
       modal.style.setProperty('display', 'none', 'important');
       modal.style.display = 'none';
+      const form = document.getElementById('kbAddPartyForm');
+      if (form) form.reset();
+      const mobileInput = document.getElementById('kbPartyMobile');
+      if (mobileInput) mobileInput.value = '';
+      const nameInput = document.getElementById('kbPartyName');
+      if (nameInput) nameInput.value = '';
+      const placeInput = document.getElementById('kbPartyPlace');
+      if (placeInput) placeInput.value = '';
+      const hint = document.getElementById('kbMobileLookupHint');
+      if (hint) { hint.style.display = 'none'; hint.innerHTML = ''; }
     }
   }
 
@@ -6572,17 +6635,15 @@
 
     closeAddPartyModal();
     renderKhatabookPro();
+    showToast('✓ ' + name + ' का खाता सफलतापूर्वक जुड़ गया!', 'success');
     // Automatically open ledger for this customer
     openCustomerLedger(mobile);
 
-    // Send Welcome WhatsApp with Digital Passbook Link (Previewing bahi-khata-welcome.jpg)
-    setTimeout(() => {
-      try {
-        if (confirm('✓ ' + name + ' का खाता सफलतापूर्वक जुड़ गया!\n\nक्या आप ग्राहक को WhatsApp पर डिजिटल पासबुक लिंक और वेलकम संदेश भेजना चाहते हैं?')) {
-          sendKbWelcomeWhatsApp(mobile, name, shortCode);
-        }
-      } catch (_) { }
-    }, 350);
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 450);
+    }
   }
 
   function sendKbWelcomeWhatsApp(mobile, name, shortCode) {
@@ -6923,6 +6984,12 @@
     closeAddTxModal();
     renderKhatabookPro();
     openCustomerLedger(activeKbCustomer.mobile);
+
+    if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+      setTimeout(() => {
+        window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+      }, 700);
+    }
 
     // Offer to send WhatsApp receipt
     const promptMsg = activeKbTxMode === 'GAVE'
@@ -7848,6 +7915,12 @@
       renderAllViews();
       showToast("🎉 खाता एंट्री दर्ज हो गई!", "success");
       document.getElementById('khataEntryForm').reset();
+
+      if (window.AarogyamTeamSecurity && typeof window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt === 'function') {
+        setTimeout(() => {
+          window.AarogyamTeamSecurity.checkFirstTimeOptInPrompt();
+        }, 600);
+      }
     },
 
     deleteKhataEntry: function (idx) {
@@ -8683,6 +8756,11 @@
               diaryForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           }
+          // Clean query parameters from URL so browser refreshes do NOT re-fill stale data
+          try {
+            const cleanUrl = window.location.pathname + (window.location.hash || '');
+            window.history.replaceState({}, document.title, cleanUrl);
+          } catch (_) {}
         }, 500);
       }
     } catch (e) { }

@@ -1,23 +1,142 @@
 <!doctype html>
-<html lang="en">
+<html lang="hi">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin Login - Aarogyam India</title>
+  <title>Admin Login — Aarogyam India</title>
+  <link rel="icon" type="image/png" href="../images/logo/fevicon.png">
   <link rel="stylesheet" href="../css/admin-login.css">
+  <style>
+    .admin-auth-card {
+      max-width: 420px;
+      border: 1px solid #334155;
+      background: #111827;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .pin-input-field {
+      text-align: center;
+      letter-spacing: 12px;
+      font-size: 24px;
+      font-family: monospace;
+      font-weight: 900;
+      color: #38bdf8;
+    }
+
+    .rescue-alert {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid #22c55e;
+      color: #4ade80;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .error-alert {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #f87171;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .admin-layer-badge {
+      display: inline-block;
+      background: #1f2937;
+      color: #94a3b8;
+      border: 1px solid #374151;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+  </style>
 </head>
+
 <body>
   <div class="admin-auth-screen">
     <div class="admin-auth-card">
-      <h1>Admin Login</h1>
-      <p>Enter your admin credentials to access the dashboard.</p>
+      <div style="text-align:center; margin-bottom:12px;">
+        <span style="font-size:36px;">🔐</span>
+        <h1 style="margin:8px 0 4px; font-size:1.45rem; font-weight:900; color:#ffffff;">Aarogyam Admin</h1>
+        <div class="admin-layer-badge" id="layerBadge">लेयर 1: ID व पासवर्ड सत्यापन</div>
+      </div>
+
+      <div id="rescueAlert" class="rescue-alert"></div>
+      <div id="errorAlert" class="error-alert"></div>
+
+      <!-- Step 1: Username & Password -->
       <form id="admin-login-form" class="admin-auth-form">
-        <input type="text" id="admin-username" class="admin-input" placeholder="Username" required>
-        <input type="password" id="admin-password" class="admin-input" placeholder="Password" required>
-        <button class="admin-button" type="submit">Login</button>
+        <div>
+          <label style="display:block; font-size:0.80rem; color:#94a3b8; margin-bottom:6px; font-weight:700;">यूज़रनेम
+            (Username)</label>
+          <input type="text" id="admin-username" class="admin-input" placeholder="Admin007" autocomplete="username"
+            required>
+        </div>
+        <div>
+          <label style="display:block; font-size:0.80rem; color:#94a3b8; margin-bottom:6px; font-weight:700;">पासवर्ड
+            (Password)</label>
+          <input type="password" id="admin-password" class="admin-input" placeholder="••••••"
+            autocomplete="current-password" required>
+        </div>
+        <button class="admin-button" id="btnSubmitCredentials" type="submit"
+          style="font-weight:800; font-size:0.95rem; margin-top:8px;">
+          आगे बढ़ें →
+        </button>
       </form>
+
+      <!-- Step 2: 4-Digit Master Admin PIN -->
+      <form id="admin-pin-form" class="admin-auth-form" style="display:none;">
+        <p style="margin:0 0 16px; font-size:0.86rem; color:#94a3b8; text-align:center;">
+          हार्डवेयर सत्यापित! कृपया डैशबोर्ड खोलने हेतु <strong>4-अंकीय मास्टर एडमिन PIN</strong> दर्ज करें:
+        </p>
+        <div>
+          <input type="password" id="admin-pin" class="admin-input pin-input-field" maxlength="4" placeholder="••••"
+            autocomplete="off" inputmode="numeric" required>
+        </div>
+        <button class="admin-button" type="submit" style="background:#10b981; font-weight:800; font-size:0.95rem;">
+          🔓 डैशबोर्ड खोलें
+        </button>
+        <button type="button" id="btnBackToCredentials"
+          style="background:transparent; border:none; color:#64748b; font-size:0.80rem; cursor:pointer; margin-top:6px;">
+          ← वापस क्रेडेंशियल्स पर जाएं
+        </button>
+      </form>
+
+      <!-- Step 3: Blocked Device Warning -->
+      <div id="admin-blocked-screen" style="display:none; text-align:center; padding:10px 0;">
+        <div style="font-size:36px; margin-bottom:10px;">📱⛔</div>
+        <h3 style="margin:0 0 8px; color:#ef4444; font-size:1.15rem; font-weight:900;">अनधिकृत डिवाइस ब्लॉक</h3>
+        <p style="font-size:0.84rem; color:#9ca3af; line-height:1.5; margin:0 0 16px;">
+          यह फोन/लैपटॉप एडमिन पैनल एक्सेस करने हेतु अधिकृत नहीं है। सुरक्षा कारणों से एडमिन केवल अधिकृत हार्डवेयर से ही
+          संचालित हो सकता है।
+        </p>
+        <div
+          style="background:#1f2937; border:1px solid #374151; border-radius:8px; padding:10px; font-size:0.78rem; color:#cbd5e1; text-align:left; margin-bottom:16px;">
+          <strong>🛡️ रिकवरी निर्देश:</strong><br>
+          1. अपने मूल अधिकृत फोन/लैपटॉप से लॉगिन करें।<br>
+          2. या Supabase में जाकर <code>team_security_vault</code> से <code>device_token</code> रीसेट करें।<br>
+          3. या अपने आपातकालीन मालिक रिकवरी लिंक (Master Rescue Key) का उपयोग करें।
+        </div>
+        <button type="button" onclick="window.location.reload()" class="admin-button"
+          style="background:#374151; font-size:0.85rem;">
+          पुनः प्रयास करें
+        </button>
+      </div>
+
     </div>
   </div>
-  <script src="../js/admin-login.js"></script>
+  <script src="../js/admin-login.js?v=20261124_v28_split_boxes"></script>
 </body>
+
 </html>
