@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795491174156,
+      "admin_edited": 1795491360581,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -4131,7 +4131,9 @@
         "sec_reviews",
         "sec_help_support"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_kpi_badges"
+      ],
       "kpi_cards": [
         {
           "icon": "fa-shield-halved",
@@ -4405,7 +4407,7 @@
           }
         ]
       },
-      "admin_edited": 1795491173974,
+      "admin_edited": 1795491360322,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
