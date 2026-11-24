@@ -732,15 +732,6 @@
 
       <!-- 2-Row Balanced Header Action Matrix (Full Responsive for all browsers) -->
       <div class="drawer-header-matrix" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;width:100%;box-sizing:border-box;">
-        
-        ${isAdminUser ? `
-        <!-- Admin Master 1-Tap Fast-Pass Button -->
-        <div style="width:100%;box-sizing:border-box;">
-          <a href="/admin/" onclick="window.closeUniversalDrawer();" style="width:100%;height:38px;background:linear-gradient(135deg, #1e1b4b, #0f172a);color:#facc15;border:1.5px solid #eab308;border-radius:10px;font-weight:900;font-size:0.85rem;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 10px rgba(234,179,8,0.25);box-sizing:border-box;">
-            <span>👑</span> <span>मास्टर एडमिन पैनल खोलें (Admin Panel)</span> <span>⚡</span>
-          </a>
-        </div>
-        ` : ''}
 
         <!-- Row 1: Share ID & Install App (Clean White Buttons) -->
         <div style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;">
@@ -1428,17 +1419,6 @@
 
           <!-- Clean White & Slate Canvas Menu List -->
           <div class="drawer-menu-list" style="flex:1;overflow-y:auto;">
-
-            ${isMasterAdmin ? `
-            <!-- 0. MASTER ADMIN (Direct 1-Tap Entry for Owner) -->
-            <a href="/admin/" onclick="window.closeUniversalDrawer();" class="drawer-nav-item-btn" style="background:linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%) !important; border:1.5px solid #eab308 !important; box-shadow:0 4px 12px rgba(234,179,8,0.2) !important;">
-              <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#facc15;color:#0f172a;"><i class="fa-solid fa-crown"></i></div>
-                <span class="drawer-item-title" style="color:#facc15;font-weight:900;">👑 मुख्य एडमिन पैनल (Master Admin)</span>
-              </div>
-              <span class="drawer-tag-pill" style="background:#facc15;color:#000;font-weight:900;">ADMIN ⚡</span>
-            </a>
-            ` : ''}
 
             <!-- 1. HOME (Direct Button) -->
             <a href="/index.html" class="drawer-nav-item-btn ${currentPath === '/' || currentPath.endsWith('index.html') ? 'active-pill' : ''}">

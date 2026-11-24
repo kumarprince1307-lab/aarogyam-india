@@ -43,9 +43,6 @@
     while (str.startsWith('0') && str.length > 10) {
       str = str.substring(1);
     }
-    if (str.startsWith('0')) {
-      str = str.substring(1);
-    }
     if (str.length === 12 && str.startsWith('91')) {
       str = str.substring(2);
     }
@@ -142,7 +139,7 @@
   // 4. Build and Inject the Single Universal Smart 2-Step Modal
   function createOrGetAuthModal() {
     let overlay = document.getElementById('ai-universal-auth-modal');
-    if (overlay) overlay.remove();
+    if (overlay) return overlay;
 
     const sponsorId = getActiveSponsorShareId();
     overlay = document.createElement('div');
@@ -742,9 +739,13 @@
     }
 
     pendingAuthCallback = callback || null;
-    createOrGetAuthModal();
+    const modal = createOrGetAuthModal();
 
-    const modal = document.getElementById('ai-universal-auth-modal');
+    // If modal is already open and visible, do not re-trigger or disrupt user typing!
+    if (modal && modal.style.visibility === 'visible' && currentAuthOptions.autoTrigger) {
+      return;
+    }
+
     const card = document.getElementById('ai-universal-auth-card');
     const mobInp = document.getElementById('ai-auth-input-mobile');
 
@@ -752,7 +753,9 @@
       modal.style.visibility = 'visible';
       modal.style.opacity = '1';
       card.style.transform = 'scale(1) translateY(0)';
-      setTimeout(() => { if (mobInp) mobInp.focus(); }, 120);
+      if (mobInp && document.activeElement !== mobInp) {
+        setTimeout(() => { if (mobInp) mobInp.focus(); }, 120);
+      }
     }
   };
 
@@ -815,6 +818,8 @@
     const delayMs = isSakhi ? 2000 : 15000;
 
     setTimeout(() => {
+      const activeModal = document.getElementById('ai-universal-auth-modal');
+      if (activeModal && activeModal.style.visibility === 'visible') return; // User already has modal open
       if (!window.isUserLoggedIn()) {
         if (!isSakhi && isDismissedThisSession()) return;
         window.openGuestLoginModal(null, { autoTrigger: true, source: getGranularPageSource() });

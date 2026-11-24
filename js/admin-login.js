@@ -176,8 +176,16 @@
         const expectedPhone = vaultRow?.phone || MASTER_ADMIN_PHONE;
         const expectedPass = vaultRow?.admin_password || V1_PASSWORD;
 
-        const isUserMatch = (username === expectedUser || username === expectedPhone || username === V1_USERNAME);
-        const isPassMatch = (password === expectedPass || password === V1_PASSWORD);
+        // Strict Matching: If Supabase has an admin_password configured, strictly enforce that password!
+        // Fall back to V1_PASSWORD only if Supabase vault has no password set yet.
+        const isPassMatch = vaultRow?.admin_password ? (password === vaultRow.admin_password) : (password === V1_PASSWORD);
+        const isUserMatch = (
+          username === expectedUser || 
+          username === expectedPhone || 
+          username === '7049294111' || 
+          (ADMIN_PHONES.includes(username.replace(/\D/g, '').slice(-10))) ||
+          (!vaultRow?.admin_username && username === V1_USERNAME)
+        );
 
         if (!isUserMatch || !isPassMatch) {
           showError('अमान्य यूज़रनेम या पासवर्ड! कृपया सही विवरण दर्ज करें।');
