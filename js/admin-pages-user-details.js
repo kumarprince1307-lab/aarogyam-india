@@ -1033,7 +1033,8 @@ export async function initUserDetails() {
       const box = document.getElementById('user-team-sec-box');
       if (!box || !cleanUserMobile) return;
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}&select=*`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}&select=*&_t=${Date.now()}`, {
+          cache: 'no-store',
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const vData = await res.json();
@@ -1043,11 +1044,15 @@ export async function initUserDetails() {
         }
         const v = vData[0];
         const isLocked = v.locked_until && new Date(v.locked_until).getTime() > Date.now();
+        const pinDisplay = (v.pin_code && v.pin_code !== 'RESET')
+          ? `<strong style="color:#38bdf8; font-size:1.15rem; letter-spacing:2px; font-family:monospace;">${v.pin_code}</strong>`
+          : '<span style="color:#f59e0b; font-weight:800; font-size:0.82rem;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>';
+
         box.innerHTML = `
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px; font-size:0.85rem;">
             <div>
               <span style="color:#94a3b8; display:block; font-size:0.75rem;">🔑 4-अंकीय PIN:</span>
-              <strong style="color:#38bdf8; font-size:1.15rem; letter-spacing:2px; font-family:monospace;">${v.pin_code || 'सेट नहीं है'}</strong>
+              ${pinDisplay}
             </div>
             <div>
               <span style="color:#94a3b8; display:block; font-size:0.75rem;">📱 अधिकृत डिवाइस टोकन:</span>
@@ -1075,8 +1080,9 @@ export async function initUserDetails() {
       if (!confirm(`क्या आप +91 ${cleanUserMobile} का 4-अंकीय पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}`, {
-          method: 'DELETE',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+          body: JSON.stringify({ pin_code: 'RESET', device_token: null, attempts: 0, locked_until: null, updated_at: new Date().toISOString() })
         });
         if (!res.ok) throw new Error('Status: ' + res.status);
         alert(`✅ +91 ${cleanUserMobile} का पिन सफलतापूर्वक रीसेट हो गया!\n\nअब यूजर नया 4-अंकीय पिन बना सकेगा।`);

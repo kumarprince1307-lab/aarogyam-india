@@ -152,7 +152,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="../js/admin-main.js"></script>
+  <script type="module" src="../js/admin-main.js?v=20261124_v35_solid"></script>
   <script>
     const SUPABASE_URL = 'https://qjhjrzsnrtahmhswxyvb.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_6vM_e1EWiYhKdzDP02pKTg_0wJWoLGU';
@@ -165,7 +165,8 @@
       table.style.display = 'none';
 
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?select=*&order=created_at.desc`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?select=*&order=created_at.desc&_t=${Date.now()}`, {
+          cache: 'no-store',
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -210,9 +211,9 @@
           <td>${idx + 1}</td>
           <td><strong style="color:#f8fafc; font-size:1rem;">+91 ${r.phone}</strong></td>
           <td>
-            ${r.pin_code 
+            ${(r.pin_code && r.pin_code !== 'RESET')
               ? `<span style="font-family:monospace; font-size:1.1rem; font-weight:900; color:#38bdf8; background:#0f172a; padding:3px 8px; border-radius:6px; letter-spacing:2px;">${r.pin_code}</span>` 
-              : '<span style="color:#64748b; font-style:italic;">कोई पिन नहीं</span>'}
+              : '<span style="color:#f59e0b; font-weight:800; font-size:0.80rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>'}
           </td>
           <td>
             ${r.device_token 
@@ -263,8 +264,9 @@
       if (!confirm(`क्या आप +91 ${phone} का 4-अंकीय सुरक्षा पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
-          method: 'DELETE',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+          body: JSON.stringify({ pin_code: 'RESET', device_token: null, attempts: 0, locked_until: null, updated_at: new Date().toISOString() })
         });
         if (!res.ok) throw new Error('Status: ' + res.status);
         alert(`✅ +91 ${phone} का पिन सफलतापूर्वक रीसेट कर दिया गया है!\n\nअब यूजर जब भी My Team खोलेगा, उसे नया पिन सेट करने का विकल्प मिलेगा।`);

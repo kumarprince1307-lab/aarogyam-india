@@ -92,7 +92,8 @@ async function loadVaultData() {
   if (table) table.style.display = 'none';
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?select=*&order=created_at.desc`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?select=*&order=created_at.desc&_t=${Date.now()}`, {
+      cache: 'no-store',
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -139,9 +140,9 @@ function renderVaultTable(list) {
       <td style="padding:10px;">${idx + 1}</td>
       <td style="padding:10px;"><strong style="color:#f8fafc; font-size:0.95rem;">+91 ${r.phone}</strong></td>
       <td style="padding:10px;">
-        ${r.pin_code 
+        ${(r.pin_code && r.pin_code !== 'RESET')
           ? `<span style="font-family:monospace; font-size:1.1rem; font-weight:900; color:#38bdf8; background:#0f172a; padding:3px 8px; border-radius:6px; letter-spacing:2px;">${r.pin_code}</span>` 
-          : '<span style="color:#64748b; font-style:italic;">कोई पिन नहीं</span>'}
+          : '<span style="color:#f59e0b; font-weight:800; font-size:0.80rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>'}
       </td>
       <td style="padding:10px;">
         ${r.device_token 
@@ -196,8 +197,9 @@ window.actResetPin = async function(phone) {
   if (!confirm(`क्या आप +91 ${phone} का 4-अंकीय सुरक्षा पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
-      method: 'DELETE',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ pin_code: 'RESET', device_token: null, attempts: 0, locked_until: null, updated_at: new Date().toISOString() })
     });
     if (!res.ok) throw new Error('Status: ' + res.status);
     alert(`✅ +91 ${phone} का पिन सफलतापूर्वक रीसेट कर दिया गया है!\n\nअब यूजर जब भी My Team खोलेगा, उसे नया पिन सेट करने का विकल्प मिलेगा।`);

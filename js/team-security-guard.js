@@ -342,8 +342,9 @@
 
   // 6. Supabase Vault Queries
   async function fetchVaultRecord(mobile) {
-    const url = `${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${mobile}&select=*`;
+    const url = `${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${mobile}&select=*&_t=${Date.now()}`;
     const res = await fetch(url, {
+      cache: 'no-store',
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
@@ -527,7 +528,8 @@
       document.body.appendChild(existing);
     }
 
-    const isNewSetup = !vaultRow || !vaultRow.pin_code;
+    // A user needs new PIN setup if no row exists, or pin_code is null/empty, or admin reset flag 'RESET'
+    const isNewSetup = !vaultRow || !vaultRow.pin_code || vaultRow.pin_code === 'RESET';
     let mode = isNewSetup ? 'SET_FIRST' : 'VERIFY';
     let firstEnteredPin = '';
     let currentInput = '';
@@ -698,7 +700,14 @@
           attemptsRemaining = Math.max(0, MAX_ATTEMPTS - newAttempts);
 
           if (attemptsRemaining <= 0) {
-            const lockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000).toISOString();
+            const lockedUntilMs = Date.now() + LOCKOUT_MINUTES * 60 * 1000;
+            const lockedUntil = new Date(lockedUntilMs).toISOString();
+            // 1. Instantly persist to localStorage so no home/reload bypass is possible
+            try {
+              localStorage.setItem('AI_TEAM_SECURITY_LOCKOUT_' + mobile, lockedUntil);
+            } catch (_) { }
+
+            // 2. Persist to Supabase Vault so Admin Panel reflects 15-Min Lock immediately
             try {
               await patchVaultRecord(mobile, {
                 attempts: newAttempts,
@@ -707,7 +716,7 @@
             } catch (err) {
               console.error('Failed to save lockout:', err);
             }
-            renderLockoutScreen(mobile, Date.now() + LOCKOUT_MINUTES * 60 * 1000);
+            renderLockoutScreen(mobile, lockedUntilMs);
           } else {
             try {
               await patchVaultRecord(mobile, {
@@ -783,6 +792,21 @@
       return;
     }
 
+    // Fast-path Lockout Check from LocalStorage (Instant block even before network returns)
+    try {
+      const localLock = localStorage.getItem('AI_TEAM_SECURITY_LOCKOUT_' + mobile);
+      if (localLock) {
+        const localMs = new Date(localLock).getTime();
+        if (localMs > Date.now()) {
+          console.warn('🛡️ [Team Security]: Local client lockout active.');
+          renderLockoutScreen(mobile, localMs);
+          return;
+        } else {
+          localStorage.removeItem('AI_TEAM_SECURITY_LOCKOUT_' + mobile);
+        }
+      }
+    } catch (_) { }
+
     // C. Zero-Egress Session Check (Valid only for same session + same device)
     if (isSessionUnlocked(mobile)) {
       console.log('🛡️ [Team Security]: Session verified on current device. Instant access granted.');
@@ -804,9 +828,21 @@
         const lockedUntilMs = new Date(vaultRow.locked_until).getTime();
         if (lockedUntilMs > Date.now()) {
           console.warn('🛡️ [Team Security]: Account locked due to 3 wrong attempts.');
+          try { localStorage.setItem('AI_TEAM_SECURITY_LOCKOUT_' + mobile, vaultRow.locked_until); } catch (_) { }
           renderLockoutScreen(mobile, lockedUntilMs);
           return;
+        } else {
+          // Lockout expired, clear local storage and clean attempts in Supabase
+          try { localStorage.removeItem('AI_TEAM_SECURITY_LOCKOUT_' + mobile); } catch (_) { }
+          if (vaultRow.attempts > 0) {
+            patchVaultRecord(mobile, { attempts: 0, locked_until: null }).catch(() => { });
+            vaultRow.attempts = 0;
+            vaultRow.locked_until = null;
+          }
         }
+      } else {
+        // If Supabase has no lock (e.g. Admin reset/unlocked it), clear any leftover local lock
+        try { localStorage.removeItem('AI_TEAM_SECURITY_LOCKOUT_' + mobile); } catch (_) { }
       }
 
       // 2. Strict Device Token Mismatch Check

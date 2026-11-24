@@ -1456,8 +1456,8 @@ window.openTeamSecurityModal = async function(userId, mobile, name) {
     try {
       await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanMob}`, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin_code: null, updated_at: new Date().toISOString() })
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify({ pin_code: 'RESET', device_token: null, attempts: 0, locked_until: null, updated_at: new Date().toISOString() })
       });
       alert(`✅ +91 ${cleanMob} का पिन सफलतापूर्वक रीसेट कर दिया गया है!`);
       loadDetails();
