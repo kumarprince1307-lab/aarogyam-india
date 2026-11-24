@@ -5694,9 +5694,9 @@ export async function initPageEditor() {
         <div>
           <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--admin-text); display: flex; align-items: center; gap: 8px;">
             <span>📋 वेबसाइट पेजेस डायरेक्टरी (Universal Pages Directory)</span>
-            <span id="pe_total_pages_count" style="font-size: 0.75rem; background: rgba(59,130,246,0.18); color: #38bdf8; padding: 2px 10px; border-radius: 12px; font-weight: 800;">23 Pages</span>
+            <span id="pe_total_pages_count" style="font-size: 0.75rem; background: rgba(59,130,246,0.18); color: #38bdf8; padding: 2px 10px; border-radius: 12px; font-weight: 800;">${allPages.length || 32} Pages</span>
           </h3>
-          <small style="color: var(--admin-muted); font-size: 0.76rem;">सभी 23 पेजों की सेटिंग्स, मॉड्यूल्स, और लाइव स्थिति एक कॉम्पैक्ट दृश्य में देखें व प्रबंधित करें</small>
+          <small style="color: var(--admin-muted); font-size: 0.76rem;">सभी पेजों की सेटिंग्स, मॉड्यूल्स, और लाइव स्थिति एक कॉम्पैक्ट दृश्य में देखें व प्रबंधित करें</small>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
           <input type="text" id="pe_search_input" class="admin-input" placeholder="🔍 नाम, रूट या कैटेगरी खोजें..." style="min-width: 260px; padding: 7px 12px; font-size: 0.84rem; border-radius: 8px;" />

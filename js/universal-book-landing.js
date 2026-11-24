@@ -505,6 +505,15 @@ if (typeof window !== 'undefined') {
     } catch(e) { console.warn('initAdsLeadGateway error:', e); }
     try { enforceHiddenSections(); } catch(e) { console.warn('enforceHiddenSections error:', e); }
     try { window.updateAuthStatusUI(); } catch(e) { console.warn('updateAuthStatusUI error:', e); }
+    // Fade out and remove dynamic book loading overlay once all sections are rendered
+    try {
+      const loader = document.getElementById('blp-dynamic-loader-overlay');
+      if (loader) {
+        loader.style.opacity = '0';
+        loader.style.visibility = 'hidden';
+        setTimeout(() => { if (loader.parentNode) loader.remove(); }, 300);
+      }
+    } catch(e) {}
   }
 
   function initLandingPageAutoplay() {
@@ -2031,6 +2040,9 @@ if (typeof window !== 'undefined') {
       : 0;
     const pageCount = verifiedPageCount || details.pages || landing.totalPages || landing.total_pages || book.totalPages;
     setElemText('spec-pages', pageCount ? `${pageCount} Pages` : '');
+    const imageCount = details.images || details.total_images || landing.totalImages || landing.total_images || (pageCount ? `${pageCount * 2}+` : '');
+    setElemText('spec-images', imageCount ? `${imageCount} Real Photos` : '');
+    setElemText('spec-format', details.format || landing.format || book.format || 'PDF (Digital eBook) & Mobile Reader');
     setElemText('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
     setElemText('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
     const bonusCount = Array.isArray(landing.bonuses) ? landing.bonuses.length : (Array.isArray(landing.bonus_books) ? landing.bonus_books.length : 0);
@@ -2085,12 +2097,19 @@ if (typeof window !== 'undefined') {
           { icon: 'fa-globe', text: '150+ वेरिफाइड वेबसाइट्स लिस्ट' },
           { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
         ];
-      } else {
+      } else if (b.category === 'Agriculture' || l.category === 'Agriculture' || (b.id && ['BK001','BK002','BK017'].includes(b.id.toUpperCase()))) {
         badges = [
           { icon: 'fa-seedling', text: `${b.totalPages || 120} पेज की प्रीमियम गाइड` },
           { icon: 'fa-camera', text: '300+ वास्तविक रंगीन फोटो' },
-          { icon: 'fa-flask', text: 'स्प्रे साइंस व सटीक फॉर्मूला' },
+          { icon: 'fa-flask', text: 'सटीक स्प्रे शेड्यूल व फॉर्मूला' },
           { icon: 'fa-gift', text: 'फ्री बोनस PDF व WhatsApp हेल्प' }
+        ];
+      } else {
+        badges = [
+          { icon: 'fa-book-open', text: `${b.totalPages || 100} पेज की सम्पूर्ण गाइड` },
+          { icon: 'fa-certificate', text: '100% प्रैक्टिकल वैज्ञानिक जानकारी' },
+          { icon: 'fa-mobile-screen', text: 'मोबाइल रीडर + HD PDF एक्सेस' },
+          { icon: 'fa-gift', text: 'फ्री बोनस PDF व 24×7 हेल्प' }
         ];
       }
     }

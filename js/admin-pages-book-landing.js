@@ -1146,6 +1146,12 @@ export async function initBookLandingPages() {
             <label class="admin-label">Version / संस्करण
               <input id="blp_book_version" class="admin-input" placeholder="संस्करण / Version" />
             </label>
+            <label class="admin-label">Format / प्रारूप
+              <input id="blp_book_format" class="admin-input" placeholder="PDF (Digital eBook) & Mobile Reader" />
+            </label>
+            <label class="admin-label">Total Real Images / कुल वास्तविक फोटो
+              <input id="blp_book_images" class="admin-input" placeholder="उदा. 300+ या 150+" />
+            </label>
           </div>
 
           <div id="blp_toc_points_list_wrap" style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
@@ -10071,6 +10077,8 @@ Instant Download & Lifetime Access
       setVal('blp_book_language', page.language || 'Hindi');
       setVal('blp_book_pages', page.totalPages || 0);
       setVal('blp_book_version', page.version || '2026');
+      setVal('blp_book_format', page.format || page.book_details?.format || 'PDF (Digital eBook) & Mobile Reader');
+      setVal('blp_book_images', page.total_images || page.totalImages || page.book_details?.images || '');
       currentFaqs = page.faqs || [];
       currentSectionsOrder = (page.sections_order && Array.isArray(page.sections_order) && page.sections_order.length > 0) ?
         [...page.sections_order] : defaultSectionsList.map(s => s.key);
@@ -10631,6 +10639,8 @@ Instant Download & Lifetime Access
       language: (document.getElementById('blp_book_language')?.value || 'Hindi').trim(),
       totalPages,
       version: (document.getElementById('blp_book_version')?.value || '2026').trim(),
+      format: (document.getElementById('blp_book_format')?.value || 'PDF (Digital eBook) & Mobile Reader').trim(),
+      total_images: (document.getElementById('blp_book_images')?.value || '').trim(),
       category: category,
       status: isComingSoon ? 'coming_soon' : (document.getElementById('blp_status')?.value || 'active'),
       is_coming_soon: isComingSoon,
