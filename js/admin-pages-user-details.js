@@ -1033,7 +1033,7 @@ export async function initUserDetails() {
       const box = document.getElementById('user-team-sec-box');
       if (!box || !cleanUserMobile) return;
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}&select=*&_t=${Date.now()}`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${cleanUserMobile}&select=*`, {
           cache: 'no-store',
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });

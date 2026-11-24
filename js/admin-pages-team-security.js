@@ -92,7 +92,7 @@ async function loadVaultData() {
   if (table) table.style.display = 'none';
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?select=*&order=created_at.desc&_t=${Date.now()}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?select=*&order=created_at.desc`, {
       cache: 'no-store',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -141,21 +141,21 @@ function renderVaultTable(list) {
       <td style="padding:10px;"><strong style="color:#f8fafc; font-size:0.95rem;">+91 ${r.phone}</strong></td>
       <td style="padding:10px;">
         ${(r.pin_code && r.pin_code !== 'RESET')
-          ? `<span style="font-family:monospace; font-size:1.1rem; font-weight:900; color:#38bdf8; background:#0f172a; padding:3px 8px; border-radius:6px; letter-spacing:2px;">${r.pin_code}</span>` 
-          : '<span style="color:#f59e0b; font-weight:800; font-size:0.80rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>'}
+        ? `<span style="font-family:monospace; font-size:1.1rem; font-weight:900; color:#38bdf8; background:#0f172a; padding:3px 8px; border-radius:6px; letter-spacing:2px;">${r.pin_code}</span>`
+        : '<span style="color:#f59e0b; font-weight:800; font-size:0.80rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px;">🔄 रीसेट (नया पिन प्रतीक्षित)</span>'}
       </td>
       <td style="padding:10px;">
-        ${r.device_token 
-          ? `<code style="color:#4ade80; background:#0f172a; padding:2px 6px; border-radius:4px; font-size:0.75rem;">${r.device_token}</code>` 
-          : '<span style="color:#64748b; font-size:0.80rem;">अनबाउंड (सभी फोन खुले हैं)</span>'}
+        ${r.device_token
+        ? `<code style="color:#4ade80; background:#0f172a; padding:2px 6px; border-radius:4px; font-size:0.75rem;">${r.device_token}</code>`
+        : '<span style="color:#64748b; font-size:0.80rem;">अनबाउंड (सभी फोन खुले हैं)</span>'}
       </td>
       <td style="padding:10px;">
         <span style="font-weight:800; color:${r.attempts > 0 ? '#f87171' : '#4ade80'};">${r.attempts || 0} / 3</span>
       </td>
       <td style="padding:10px;">
-        ${isLocked 
-          ? `<span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; border-radius:12px; padding:2px 8px; font-size:0.75rem; font-weight:800;">⛔ 15-Min लॉक</span>` 
-          : `<span style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid #22c55e; border-radius:12px; padding:2px 8px; font-size:0.75rem; font-weight:800;">🟢 सामान्य</span>`}
+        ${isLocked
+        ? `<span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid #ef4444; border-radius:12px; padding:2px 8px; font-size:0.75rem; font-weight:800;">⛔ 15-Min लॉक</span>`
+        : `<span style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid #22c55e; border-radius:12px; padding:2px 8px; font-size:0.75rem; font-weight:800;">🟢 सामान्य</span>`}
       </td>
       <td style="padding:10px; white-space:nowrap;">
         <button type="button" class="admin-button small-button" onclick="window.actResetPin('${r.phone}')" style="background:#f59e0b; color:#fff; border:none; border-radius:6px; font-size:0.75rem; font-weight:800; padding:4px 8px; cursor:pointer; margin-right:4px;" title="पिन रीसेट करें ताकि यूजर नया पिन बना सके">
@@ -193,7 +193,7 @@ function filterTable(q) {
 }
 
 // Global actions
-window.actResetPin = async function(phone) {
+window.actResetPin = async function (phone) {
   if (!confirm(`क्या आप +91 ${phone} का 4-अंकीय सुरक्षा पिन रीसेट करना चाहते हैं?\n\nयूजर को अगली बार नया पिन बनाने के लिए कहा जाएगा।`)) return;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
@@ -209,7 +209,7 @@ window.actResetPin = async function(phone) {
   }
 };
 
-window.actUnbindDevice = async function(phone) {
+window.actUnbindDevice = async function (phone) {
   if (!confirm(`क्या आप +91 ${phone} का अधिकृत डिवाइस लॉक हटाना चाहते हैं?\n\nयूजर अब किसी भी नए फोन पर आसानी से लॉगिन कर सकेगा।`)) return;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
@@ -224,7 +224,7 @@ window.actUnbindDevice = async function(phone) {
   }
 };
 
-window.actUnlockStrikes = async function(phone) {
+window.actUnlockStrikes = async function (phone) {
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${phone}`, {
       method: 'PATCH',

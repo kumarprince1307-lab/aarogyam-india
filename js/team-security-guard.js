@@ -342,7 +342,7 @@
 
   // 6. Supabase Vault Queries
   async function fetchVaultRecord(mobile) {
-    const url = `${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${mobile}&select=*&_t=${Date.now()}`;
+    const url = `${SUPABASE_URL}/rest/v1/team_security_vault?phone=eq.${mobile}&select=*`;
     const res = await fetch(url, {
       cache: 'no-store',
       headers: {
@@ -859,6 +859,10 @@
       });
     } catch (err) {
       console.error('🛡️ [Team Security]: Vault check failed:', err);
+      // Fallback: Ensure screen NEVER remains blank/white under any circumstance
+      renderPinPrompt(mobile, null, () => {
+        console.log('🛡️ [Team Security]: Security PIN verified via fallback.');
+      });
     }
   }
 
