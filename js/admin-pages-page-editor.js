@@ -3287,13 +3287,38 @@ export async function initPageEditor() {
         "ticker_text": "⚡ भ्रामक प्रचार व केमिकल दवाओं से सावधान • 100% सुरक्षित प्राकृतिक पोषण, पेल्विक योगासन व वैज्ञानिक लाइफस्टाइल से पाएं खोई हुई शक्ति • 🩺 24×7 गोपनीय AI डॉक्टर परामर्श",
         "hero_slides": [
             {
-                "image": "/images/banners/health-banner.jpeg",
-                "tag": "⚡ VITALITY & MEN'S HEALTH",
-                "title": "पौरुष कमजोरी: भ्रामक दवाओं से बचें, वैज्ञानिक समाधान चुनें",
-                "subtitle": "नसों में ब्लड फ्लो, टेस्टोस्टेरोन और सहनशक्ति का 100% सुरक्षित आयुर्वेदिक कायाकल्प।",
-                "cta_text": "💬 गोपनीय AI डॉक्टर परामर्श",
-                "cta_link": "https://wa.me/917974422572"
-            }
+                    "image": "/images/banners/hero_slide-1003986653-688530-c5yk.webp",
+                    "tag": "⚡ VITALITY & MEN'S HEALTH",
+                    "title": "पौरुष कमजोरी: भ्रामक दवाओं से बचें, वैज्ञानिक समाधान",
+                    "subtitle": "नसों में ब्लड फ्लो, टेस्टोस्टेरोन और सहनशक्ति का 100% सुरक्षित प्राकृतिक समाधान।",
+                    "cta_text": "💬 विशेषज्ञ सलाह",
+                    "cta_link": "https://wa.me/917974422572",
+                    "cta_secondary_text": "📦 हर्बल उत्पाद",
+                    "cta_secondary_link": "#sec-products",
+                    "banner_mode": "full"
+          },
+          {
+                    "image": "/images/banners/hero_slide-ed67-970852-vf7e.webp",
+                    "tag": "🥗 NATURAL PROTOCOL",
+                    "title": "24-घंटे का टेस्टोस्टेरोन व शक्ति वर्धक डाइट चार्ट",
+                    "subtitle": "जिंक, ओमेगा-3 व पेल्विक केगेल व्यायाम से नसों को दें नई ताकत।",
+                    "cta_text": "🥗 डाइट चार्ट पढ़ें",
+                    "cta_link": "#sec-diet",
+                    "cta_secondary_text": "🛒 उत्पाद देखें",
+                    "cta_secondary_link": "#sec-products",
+                    "banner_mode": "full"
+          },
+          {
+                    "image": "/images/banners/hero_slide-youn-334-893093-m2u5.webp",
+                    "tag": "💪 नेचुरल वाइटैलिटी",
+                    "title": "पुरुष जीवन शक्ति व स्टैमिना वर्धक पोषण",
+                    "subtitle": "Naturamore For Him व Men's Wellness द्वारा ऊर्जा संवर्धन",
+                    "cta_text": "🛒 अभी आर्डर करें",
+                    "cta_link": "#sec-products",
+                    "cta_secondary_text": "⭐ रिव्यू पढ़ें",
+                    "cta_secondary_link": "#sec-reviews",
+                    "banner_mode": "full"
+          }
         ],
         "sections_order": [
             "sec_ticker",
