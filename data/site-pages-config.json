@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795622380611,
+      "admin_edited": 1795624244184,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -7834,12 +7834,24 @@
       "category": "Livestock",
       "status": "active",
       "theme_primary": "#0284c7",
-      "theme_dark": "#0369a1",
+      "theme_dark": "#00387b",
       "ticker_text": "🐟 बायोफ्लॉक व तालाब मछली पालन: 24×7 Aarogyam Sakhi AI सहायता | अमोनिया नियंत्रण व तीव्र वजन वृद्धि समाधान!",
+      "audio_title": "🐟 मत्स्य पालन व तालाब प्रबंधन (Fisheries Hub)",
+      "audio_script": "",
+      "audio_url": "",
       "og_title": "मछली पालन व तालाब प्रबंधन हब | 100% जैविक समाधान | आरोग्यम भारत",
       "og_image": "/images/pages/og-machhli-palan.webp",
       "og_description": "बायोफ्लॉक व मीठे पानी में मछली पालन की संपूर्ण वैज्ञानिक गाइड। अमोनिया नियंत्रण, जल शुद्धिकरण और उच्च FCR आहार प्रबंधन।",
       "share_message": "🐟 मछली पालन में 2X मुनाफा कमाएं! बायोफ्लॉक व तालाब प्रबंधन की वैज्ञानिक गाइड। 24×7 Aarogyam Sakhi AI सहायता उपलब्ध:",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
       "hero_slides": [
         {
           "image": "",
@@ -7852,93 +7864,23 @@
           "cta_secondary_link": "/pashu-palan.html"
         }
       ],
-      "marketing_cards": [
-        {
-          "book_id": "BK001",
-          "heading": "📚 सम्पूर्ण कृषि व मत्स्य प्रबंधन गाइड",
-          "subheading": "जल गुणवत्ता, FCR सुधार व रोगों से संपूर्ण सुरक्षा",
-          "badge": "BESTSELLER",
-          "cta_text": "तुरंत ई-बुक पढ़ें"
-        }
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
       ],
-      "products": [
-        {
-          "id": "PET_VET_AQUA_CLEAR",
-          "name": "Pet-Vet Aqua Clear (जल शुद्धिकरण व अमोनिया कंट्रोल)",
-          "category": "Livestock",
-          "price": 850,
-          "mrp": 999,
-          "badge": "जल शोधक",
-          "image": "/images/products/biofit-aqua-culture.webp",
-          "desc": "तालाब के पानी में घुले हानिकारक अमोनिया, नाइट्राइट और दुर्गंध को तुरंत नियंत्रित कर ऑक्सीजन स्तर सुधारता है।"
-        },
-        {
-          "id": "PET_VET_AQUA_CULTURE",
-          "name": "Pet-Vet Aqua Culture (बायो-कल्चर व तलछट क्लीनर)",
-          "category": "Livestock",
-          "price": 950,
-          "mrp": 1100,
-          "badge": "बायोफ्लॉक स्पेशल",
-          "image": "/images/products/biofit-aqua-culture.webp",
-          "desc": "तालाब की तली में जमे अपशिष्ट, मल और कीचड़ को जैविक रूप से विघटित कर मछलियों को रोगमुक्त रखता है।"
-        },
-        {
-          "id": "PET_VET_AQUA_FEED",
-          "name": "Pet-Vet Aqua Feed Concentrate (मत्स्य आहार पूरक)",
-          "category": "Livestock",
-          "price": 1200,
-          "mrp": 1400,
-          "badge": "तेज वजन वृद्धि",
-          "image": "/images/products/biofit-pet-vet-cattle.webp",
-          "desc": "प्रोटीन, विटामिन व खनिजों से भरपूर पूरक आहार जो FCR सुधारकर मछलियों का वजन तेजी से बढ़ाता है।"
-        }
-      ],
-      "clinical_breakdown": [
-        {
-          "title": "जल गुणवत्ता व pH नियंत्रण",
-          "desc": "मछली पालन में 7.5-8.5 pH और 5 ppm से अधिक घुलित ऑक्सीजन (DO) आदर्श माना जाता है।"
-        },
-        {
-          "title": "अमोनिया व नाइट्राइट संकट",
-          "desc": "अत्यधिक मल व बिना खाया दाना तली में सड़कर अमोनिया बनाता है। Pet-Vet Aqua Clear से तुरंत नियंत्रण करें।"
-        },
-        {
-          "title": "उच्च FCR व आहार प्रबंधन",
-          "desc": "मछलियों को दिन में 2 बार उनके वजन का 2-3% संतुलित दाना दें ताकि लागत कम हो और वजन तेजी से बढ़े।"
-        }
-      ],
-      "reviews": [
-        {
-          "name": "राजेश निषाद",
-          "role": "प्रगतिशील मत्स्य पालक, गोरखपुर",
-          "rating": 5,
-          "comment": "Aqua Clear के उपयोग से मेरे तालाब का अमोनिया स्तर 2 दिन में सामान्य हो गया और मछलियों की मृत्यु रुक गई।"
-        },
-        {
-          "name": "मनोज पाटिल",
-          "role": "बायोफ्लॉक फार्मर, नागपुर",
-          "rating": 5,
-          "comment": "Aqua Culture से पानी का रंग और गुणवत्ता एकदम संतुलित है। FCR बहुत शानदार मिला है।"
-        }
-      ],
-      "faqs": [
-        {
-          "question": "मछली पालन में अमोनिया बढ़ने के क्या लक्षण हैं?",
-          "answer": "मछलियां सुबह के समय पानी की सतह पर आकर मुंह खोलकर सांस लेती हैं और दाना खाना बंद कर देती हैं।"
-        },
-        {
-          "question": "Aqua Culture का प्रयोग तालाब में कैसे करें?",
-          "answer": "1 एकड़ तालाब के लिए 500 मिलीलीटर Aqua Culture को 20 लीटर पानी में मिलाकर तालाब के चारों ओर समान रूप से छिड़कें।"
-        }
-      ],
-      "videos": [
-        {
-          "id": "v_aqua_1",
-          "title": "तालाब में अमोनिया व पानी का pH कैसे ठीक करें?",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "गाइड"
-        }
-      ],
+      "hidden_sections": [],
       "kpi_cards": [
         {
           "icon": "fa-water",
@@ -7973,7 +7915,331 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "marketing_cards": [
+        {
+          "book_id": "BK022",
+          "heading": "📚 सम्पूर्ण कृषि व मत्स्य प्रबंधन गाइड",
+          "subheading": "जल गुणवत्ता, FCR सुधार व रोगों से संपूर्ण सुरक्षा",
+          "badge": "BESTSELLER",
+          "cta_text": "तुरंत ई-बुक पढ़ें",
+          "headline": "आम की खेती (Mango Master Guide):"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_aqua_1",
+          "title": "🐄 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका | Biofit PET-VET",
+          "youtube_id": "Y1lrwNHaAcE",
+          "badge": "गाइड",
+          "video_id": "VID_S106444",
+          "desc": "दूध उत्पादन बढ़ाने और पशु स्वास्थ्य के लिए 1-मिनट का प्रैक्टिकल गाइड।",
+          "url": "/tube.html?vid=VID_S106444",
+          "thumbnail": "https://img.youtube.com/vi/Y1lrwNHaAcE/hqdefault.jpg",
+          "duration": "0:58",
+          "ratio": "9:16"
+        }
+      ],
+      "reviews_heading": "",
+      "reviews_badge": "",
+      "reviews": [
+        {
+          "name": "राजेश निषाद",
+          "role": "प्रगतिशील मत्स्य पालक, गोरखपुर",
+          "rating": 5,
+          "comment": "Aqua Clear के उपयोग से मेरे तालाब का अमोनिया स्तर 2 दिन में सामान्य हो गया और मछलियों की मृत्यु रुक गई।"
+        },
+        {
+          "name": "मनोज पाटिल",
+          "role": "बायोफ्लॉक फार्मर, नागपुर",
+          "rating": 5,
+          "comment": "Aqua Culture से पानी का रंग और गुणवत्ता एकदम संतुलित है। FCR बहुत शानदार मिला है।"
+        }
+      ],
+      "faqs_heading": "",
+      "faqs_badge": "",
+      "faqs": [
+        {
+          "question": "मछली पालन में अमोनिया बढ़ने के क्या लक्षण हैं?",
+          "answer": "मछलियां सुबह के समय पानी की सतह पर आकर मुंह खोलकर सांस लेती हैं और दाना खाना बंद कर देती हैं।"
+        },
+        {
+          "question": "Aqua Culture का प्रयोग तालाब में कैसे करें?",
+          "answer": "1 एकड़ तालाब के लिए 500 मिलीलीटर Aqua Culture को 20 लीटर पानी में मिलाकर तालाब के चारों ओर समान रूप से छिड़कें।"
+        }
+      ],
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [
+        {
+          "id": "DIS001",
+          "name": "मधुमेह / डायबिटीज",
+          "badge": "ब्लड शुगर नियंत्रण",
+          "color": "#3b82f6",
+          "icon": "🩸",
+          "image": "/images/banners/health-diabetes.jpg",
+          "symptoms": [
+            "बार-बार पेशाब आना",
+            "थकान व कमजोरी",
+            "शुगर असंतुलन"
+          ],
+          "description": "फास्टिंग व PP शुगर का प्राकृतिक संतुलन, अग्न्याशय पोषण और इंसुलिन संवेदनशीलता सुधार।",
+          "solution": "जामुन-करेला अर्क, गिलोय व मेथी दाना का प्राकृतिक योग और वैज्ञानिक डाइट प्लान।"
+        },
+        {
+          "id": "DIS002",
+          "name": "जोड़ों का दर्द व गठिया",
+          "badge": "जोड़ों का दर्द राहत",
+          "color": "#8b5cf6",
+          "icon": "🦴",
+          "image": "/images/banners/health-joint-care.jpg",
+          "symptoms": [
+            "घुटनों व जोड़ों में दर्द",
+            "चलने में तकलीफ",
+            "सूजन व जकड़न"
+          ],
+          "description": "कार्टिलेज पोषण, यूरिक एसिड नियंत्रण और जोड़ों के दर्द से प्राकृतिक आयुर्वेदिक समाधान।",
+          "solution": "शल्लाकी, गुग्गुल, निर्गुंडी तैलम मालिश व यूरिक एसिड घटाने वाला प्राकृतिक अर्क।"
+        },
+        {
+          "id": "DIS003",
+          "name": "महिला स्वास्थ्य / PCOD",
+          "badge": "हार्मोनल संतुलन",
+          "color": "#ec4899",
+          "icon": "🌸",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "अनियमित माहवारी",
+            "हार्मोनल असंतुलन",
+            "कमजोरी"
+          ],
+          "description": "हार्मोनल संतुलन, गर्भाशय पोषण और पीसीओडी/पीसीओएस का सम्पूर्ण सुरक्षित हर्बल समाधान।",
+          "solution": "अशोकारिष्ट, शतावरी, लोध्र व कांचनार गुग्गुलु का सुरक्षित आयुर्वेदिक सेवन।"
+        },
+        {
+          "id": "DIS004",
+          "name": "बाल झड़ना व डैंड्रफ",
+          "badge": "हेयर फॉल कंट्रोल",
+          "color": "#6366f1",
+          "icon": "💇",
+          "image": "/images/banners/health-hair-care.jpg",
+          "symptoms": [
+            "तेजी से बाल झड़ना",
+            "रूसी व डैंड्रफ",
+            "सिर में खुजली"
+          ],
+          "description": "बालों की जड़ों को पोषण, नए बालों का विकास और डैंड्रफ मुक्त घने बालों के लिए विशेष थेरेपी।",
+          "solution": "भृंगराज, आंवला, शिकाकाई हर्बल हेयर ऑयल व एंटी-डैंड्रफ स्कैल्प सीरम।"
+        },
+        {
+          "id": "DIS005",
+          "name": "त्वचा रोग व ग्लो",
+          "badge": "ग्लोइंग स्किन",
+          "color": "#06b6d4",
+          "icon": "✨",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कील-मुंहासे (पिंपल्स)",
+            "दाद व खुजली",
+            "झाइयां"
+          ],
+          "description": "रक्त शुद्धि और प्राकृतिक जड़ी-बूटियों द्वारा पिंपल्स, झाइयों और त्वचा संक्रमण से राहत।",
+          "solution": "नीम, मंजिष्ठा, खदिरारिष्ट रक्त शोधक और एलोवेरा-हल्दी जेल लेप।"
+        },
+        {
+          "id": "DIS006",
+          "name": "मोटापा व वजन नियंत्रण",
+          "badge": "नेचुरल फैट बर्न",
+          "color": "#f59e0b",
+          "icon": "⚖️",
+          "image": "/images/banners/health-weight-loss.jpg",
+          "symptoms": [
+            "पेट की जिद्दी चर्बी",
+            "सांस फूलना",
+            "धीमा मेटाबॉलिज्म"
+          ],
+          "description": "प्राकृतिक मेटाबॉलिज्म बूस्ट और जिद्दी फैट घटाने की सम्पूर्ण वैज्ञानिक डाइट और हर्बल फार्मूला।",
+          "solution": "मेदोहर गुग्गुलु, त्रिफला, दालचीनी-ग्रीन टी एक्सट्रैक्ट व 24 घंटे की डिटॉक्स डाइट।"
+        },
+        {
+          "id": "DIS007",
+          "name": "बच्चों का पोषण व दिमाग",
+          "badge": "स्मार्ट किड्स",
+          "color": "#10b981",
+          "icon": "👶",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "कमजोर याददाश्त",
+            "भूख न लगना",
+            "धीमी शारीरिक लंबाई"
+          ],
+          "description": "बच्चों की रोग प्रतिरोधक क्षमता, लंबाई और मानसिक एकाग्रता बढ़ाने का सम्पूर्ण प्राकृतिक न्यूट्रिशन।",
+          "solution": "शंखपुष्पी, ब्राह्मी, अश्वगंधा सिरप और प्राकृतिक सुपरफूड्स व बादाम शेक डाइट।"
+        },
+        {
+          "id": "DIS008",
+          "name": "नेचुरल होम केयर",
+          "badge": "टॉक्सिन फ्री",
+          "color": "#84cc16",
+          "icon": "🏡",
+          "image": "/images/banners/health-banner.jpeg",
+          "symptoms": [
+            "केमिकल युक्त फिनाइल व डिटर्जेंट",
+            "बच्चों व बुजुर्गों को एलर्जी"
+          ],
+          "description": "घर को हानिकारक रसायनों से मुक्त, स्वच्छ और रोगाणु-रहित रखने के इको-फ्रेंडली बायो-नेचुरल क्लीनर्स।",
+          "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
+        }
+      ],
+      "crops": [
+        {
+          "id": "CROP001",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP002",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ / रबी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP003",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP004",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ व जायद",
+          "image": "/images/crops/cotton.jpeg",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP005",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ / जायद",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP006",
+          "name": "सब्जियां, मिर्च व टमाटर",
+          "season": "बारहमासी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
+          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
+        }
+      ],
+      "pashu_cards": [
+        {
+          "id": "PASHU001",
+          "name": "गाय - दुग्ध वृद्धि व पोषण",
+          "category": "गाय पालन (Cow Care)",
+          "icon": "🐄",
+          "badge": "1-2L दूध वृद्धि",
+          "image": "/images/banners/pashu-cow-care.jpg",
+          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+        },
+        {
+          "id": "PASHU002",
+          "name": "भैंस - FAT% व SNF वृद्धि",
+          "category": "भैंस पालन (Buffalo Care)",
+          "icon": "🐃",
+          "badge": "FAT 8% तक",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
+          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+        },
+        {
+          "id": "PASHU003",
+          "name": "बकरी पालन - वजन वृद्धि",
+          "category": "बकरी पालन (Goat Farming)",
+          "icon": "🐐",
+          "badge": "उच्च मुनाफा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
+          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+        },
+        {
+          "id": "PASHU004",
+          "name": "पशुओं में थनैला व पाचन रोग",
+          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-palan-banner.jpg",
+          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
+          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+        }
+      ],
+      "products": [
+        {
+          "id": "PET_VET_AQUA_CLEAR",
+          "name": "Pet-Vet Aqua Clear (जल शुद्धिकरण व अमोनिया कंट्रोल)",
+          "category": "Livestock",
+          "price": 850,
+          "mrp": 999,
+          "badge": "जल शोधक",
+          "image": "/images/products/biofit-aqua-culture.webp",
+          "desc": "तालाब के पानी में घुले हानिकारक अमोनिया, नाइट्राइट और दुर्गंध को तुरंत नियंत्रित कर ऑक्सीजन स्तर सुधारता है।"
+        },
+        {
+          "id": "PET_VET_AQUA_CULTURE",
+          "name": "Pet-Vet Aqua Culture (बायो-कल्चर व तलछट क्लीनर)",
+          "category": "Livestock",
+          "price": 950,
+          "mrp": 1100,
+          "badge": "बायोफ्लॉक स्पेशल",
+          "image": "/images/products/biofit-aqua-culture.webp",
+          "desc": "तालाब की तली में जमे अपशिष्ट, मल और कीचड़ को जैविक रूप से विघटित कर मछलियों को रोगमुक्त रखता है।"
+        },
+        {
+          "id": "PET_VET_AQUA_FEED",
+          "name": "Pet-Vet Aqua Feed Concentrate (मत्स्य आहार पूरक)",
+          "category": "Livestock",
+          "price": 1200,
+          "mrp": 1400,
+          "badge": "तेज वजन वृद्धि",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "प्रोटीन, विटामिन व खनिजों से भरपूर पूरक आहार जो FCR सुधारकर मछलियों का वजन तेजी से बढ़ाता है।"
+        }
+      ],
+      "page_kpi_sections": [],
+      "clinical_breakdown": {
+        "badge_text": "🔬 वैज्ञानिक विश्लेषण",
+        "main_title": "",
+        "subtitle": "",
+        "cards": []
+      },
+      "admin_edited": 1795624244020,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "919876543210",
+        "prompt": ""
+      }
     },
     {
       "id": "page_pashu_murgi",
@@ -8888,6 +9154,13 @@
           "headline": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
           "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
           "sales_counter": "1,200+ किसानों ने खरीदा"
+        },
+        {
+          "book_id": "BK023",
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "अनार मास्टर गाइड (Pomegranate Master Guide)",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा"
         }
       ],
       "videos": [
@@ -9271,7 +9544,7 @@
           }
         ]
       },
-      "admin_edited": 1795623338883,
+      "admin_edited": 1795623914543,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
