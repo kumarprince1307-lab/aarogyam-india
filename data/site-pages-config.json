@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795627938122,
+      "admin_edited": 1795628424935,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -9211,24 +9211,49 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "BIOFIT_SHET_RABI",
-          "name": "Biofit SHET (सॉइल हेल्थ - रबी स्पेशल)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "जड़ विकास",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "सर्दियों में मिट्टी के तापमान को संतुलित रखता है और फास्फोरस व पोटाश की उपलब्धता बढ़ाता है।"
+          "title": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
+          "name": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
+          "description": "नेट्सर्फ बायोफिट की नवीनतम उन्नत पीढ़ी का क्रांतिकारी बायो-स्टिमुलेंट। उन्नत बायो-एक्टिव पेप्टाइड्स, अमीनो एसिड्स व फुल्विक कॉम्प्लेक्स से समृद्ध। फसलों के बीजों के तेज अंकुरण, अधिक कल्ले/फुटाव, बंपर फूल व फल विकास में चमत्कारी परिणाम देता है।",
+          "image": "/images/products/biofit-stim-rich.webp",
+          "mrp": 1450,
+          "price": 1450,
+          "discount_pct": 25,
+          "dose": "1.5 से 2 ml प्रति लीटर पानी (स्प्रे) अथवा 500 ml से 1 लीटर प्रति एकड़ (ड्रिप/सिंचाई)।",
+          "badge": "🔥 New Premium Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "BIOFIT_STIMRICH_RABI",
-          "name": "Biofit Stimrich (कल्ले व दाना भराव)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "दाना वजन 20% वृद्धि",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "गेहूं में बालियों की लंबाई और सरसों में फलियों की संख्या में अभूतपूर्व वृद्धि करता है।"
+          "title": "नया उत्पाद (New Product)",
+          "description": "उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...",
+          "image": "",
+          "mrp": 850,
+          "discount_pct": 20,
+          "dose": "2ml / लीटर पानी",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
+          "name": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
+          "description": "हवा से नाइट्रोजन और मिट्टी में फिक्स फास्फोरस व पोटाश को पौधे को उपलब्ध कराने वाले जीवित बैक्टीरिया।",
+          "image": "/images/products/product--------------------361242-xj50.webp",
+          "mrp": 1800,
+          "price": 1800,
+          "discount_pct": 20,
+          "dose": "प्रत्येक का 1 लीटर प्रति एकड़ ड्रिप/सिंचाई में या गोबर की खाद में मिलाकर जमीन में दें।",
+          "badge": "🧪 नाइट्रोजन, फास्फोरस, पोटाश जीवाणु",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
+          "name": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
+          "description": "नेट्सर्फ बायोफिट की नवीनतम उन्नत पीढ़ी का क्रांतिकारी बायो-स्टिमुलेंट। उन्नत बायो-एक्टिव पेप्टाइड्स, अमीनो एसिड्स व फुल्विक कॉम्प्लेक्स से समृद्ध। फसलों के बीजों के तेज अंकुरण, अधिक कल्ले/फुटाव, बंपर फूल व फल विकास में चमत्कारी परिणाम देता है।",
+          "image": "/images/products/biofit-stim-rich.webp",
+          "mrp": 1450,
+          "price": 1450,
+          "discount_pct": 25,
+          "dose": "1.5 से 2 ml प्रति लीटर पानी (स्प्रे) अथवा 500 ml से 1 लीटर प्रति एकड़ (ड्रिप/सिंचाई)।",
+          "badge": "🔥 New Premium Launch",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -9327,7 +9352,7 @@
           }
         ]
       },
-      "admin_edited": 1795628121048,
+      "admin_edited": 1795628424844,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
