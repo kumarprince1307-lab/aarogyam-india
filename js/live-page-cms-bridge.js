@@ -1907,8 +1907,7 @@
           const clickAction = ytId
             ? `window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')`
             : `window.location.href='${escapeHtml(v.url || '/tube.html')}'`;
-          return `
-            const isVertical = (v.ratio === '9:16' || v.format === 'short_reel');
+          const isVertical = (v.ratio === '9:16' || v.format === 'short_reel');
           const paddingRatio = isVertical ? '177.77%' : '56.25%';
           const cardMaxWidth = isVertical ? 'max-width: 270px; margin: 0 auto;' : '';
           return `
