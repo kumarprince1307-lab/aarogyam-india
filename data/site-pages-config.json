@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795622260199,
+      "admin_edited": 1795622380611,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -8875,19 +8875,45 @@
       ],
       "marketing_cards": [
         {
-          "book_id": "BK015",
+          "book_id": "BK024",
           "heading": "📚 सब्जी खेती मास्टर गाइड (PART 1)",
           "subheading": "तरबूज, खरबूजा, लौकी, तोरी, खीरा और भिंडी की संपूर्ण गाइड",
           "badge": "BESTSELLER",
-          "cta_text": "ई-बुक तुरंत पढ़ें"
+          "cta_text": "ई-बुक तुरंत पढ़ें",
+          "headline": "अंगूर मास्टर गाइड (Grape Master Guide)"
+        },
+        {
+          "book_id": "BK026",
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा"
         }
       ],
       "videos": [
         {
           "id": "v_jayad_1",
-          "title": "तरबूज और खरबूजे की खेती से 60 दिन में लाखों कैसे कमाएं?",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "जायद स्पेशल"
+          "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱 | पहले सावधान हों!",
+          "youtube_id": "Pv2-wbzjXEc",
+          "badge": "जायद स्पेशल",
+          "video_id": "VID_S612726",
+          "desc": "किसान भाइयों, क्या आप बिना पूरी जानकारी के फसल में दवा का छिड़काव कर रहे हैं? ⚠️\nगलत दवा, गलत मात्रा और गलत समय आपकी मेहनत और फसल दोनों को न",
+          "url": "/tube.html?vid=VID_S612726",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "0:58",
+          "ratio": "9:16",
+          "target_page": "jayad-summer-crops"
+        },
+        {
+          "video_id": "VID_S363050",
+          "title": "बीज संस्कार: मजबूत फसल का राज 🌱",
+          "desc": "🌾 बुवाई से पहले बीज संस्कार जरूर करें!\nधान, मक्का और सोयाबीन के बीजों को सही तरीके से तैयार करने से अच्छे अंकुरण और स्वस्थ फसल में मदद मिल ",
+          "url": "/tube.html?vid=VID_S363050",
+          "youtube_id": "Ae9E-arA8lo",
+          "thumbnail": "https://img.youtube.com/vi/Ae9E-arA8lo/hqdefault.jpg",
+          "duration": "0:58",
+          "target_page": "jayad-summer-crops",
+          "ratio": "9:16"
         }
       ],
       "reviews_heading": "",
@@ -9137,24 +9163,16 @@
       ],
       "products": [
         {
-          "id": "BIOFIT_STIMRICH_JAYAD",
-          "name": "Biofit Stimrich (फूल-फल ड्रॉप कंट्रोल)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "फल चमक व मिठास",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "तेज गर्मी और लू में भी फूल गिरने से रोकता है और फलों का आकार व मिठास (TSS) बढ़ाता है।"
-        },
-        {
-          "id": "BIOFIT_SHET_JAYAD",
-          "name": "Biofit SHET (ड्रिप व ड्रेंचिंग स्पेशल)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "रूटजोन हेल्थ",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "गर्मी में मिट्टी में नमी धारण क्षमता बढ़ाता है और जड़ों को सूखने से बचाता है।"
+          "title": "स्टीमरिच (Biofit Stimrich)",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp",
+          "mrp": 1695,
+          "price": 1695,
+          "discount_pct": 20,
+          "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -9253,7 +9271,7 @@
           }
         ]
       },
-      "admin_edited": 1795622380459,
+      "admin_edited": 1795623338883,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
