@@ -1044,24 +1044,24 @@ body {
 
 .health-kpi-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)) !important;
-  gap: 8px !important;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+  gap: 7px !important;
 }
 
 .health-kpi-item {
-  background: #0f172a !important; /* DARK BACKGROUND AS REQUESTED */
-  border: 1.5px solid #334155 !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25) !important;
-  color: #f8fafc !important;
-  border-radius: 12px !important;
-  padding: 10px 6px !important;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important; /* ROYAL DARK SKY BLUE */
+  border: 1.5px solid #38bdf8 !important;
+  box-shadow: 0 3px 8px rgba(2, 132, 199, 0.2) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 6px 3px !important;
   text-decoration: none !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
-  min-height: 75px !important;
+  min-height: 64px !important; /* 10% COMPACT */
   transition: all 0.2s ease !important;
   position: relative !important;
   box-sizing: border-box !important;
@@ -1069,25 +1069,25 @@ body {
 
 .health-kpi-item:hover {
   transform: translateY(-2px) !important;
-  background: #1e293b !important;
-  border-color: #38bdf8 !important;
-  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.25) !important;
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+  border-color: #7dd3fc !important;
+  box-shadow: 0 5px 14px rgba(2, 132, 199, 0.3) !important;
 }
 
 .health-kpi-item .kpi-icon {
-  font-size: 1.5rem !important;
-  margin-bottom: 3px !important;
+  font-size: 1.35rem !important; /* 10% COMPACT */
+  margin-bottom: 2px !important;
   line-height: 1 !important;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) !important;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)) !important;
 }
 
 .health-kpi-item .kpi-title {
-  font-size: 0.76rem !important;
+  font-size: 0.72rem !important;
   font-weight: 800 !important;
-  color: #f1f5f9 !important; /* Pure crisp white on dark */
+  color: #ffffff !important; /* Pure crisp white on dark sky blue */
   display: block !important;
   margin: 0 !important;
-  line-height: 1.2 !important;
+  line-height: 1.15 !important;
   text-align: center !important;
 }
 
@@ -1095,34 +1095,40 @@ body {
   display: none !important; /* Redundant subtext removed */
 }
 
-/* Active State for Current Page */
+/* Slightly Darker Navy/Ocean Gradient for Main Gateway Doors */
+.health-kpi-item.main-gateway-kpi {
+  background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%) !important;
+  border: 1.5px solid #0284c7 !important;
+}
+
+/* Active State for Current Page (#1 Position Highlight) */
 .health-kpi-item.active-health-kpi {
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
-  border: 1.5px solid #60a5fa !important;
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+  border: 2px solid #fde047 !important; /* Vibrant Gold border */
   color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(253, 224, 71, 0.4) !important;
 }
 .health-kpi-item.active-health-kpi .kpi-title {
-  color: #fde047 !important;
+  color: #fde047 !important; /* Gold text */
 }
 .health-kpi-item .active-kpi-badge {
   position: absolute;
-  top: -5px;
+  top: -4px;
   right: -3px;
   background: #fde047;
   color: #0f172a;
-  font-size: 0.52rem;
+  font-size: 0.5rem;
   font-weight: 900;
   padding: 1px 4px;
-  border-radius: 6px;
+  border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.25);
   line-height: 1.2;
 }
 
-/* MOBILE 4-4 PER ROW CHOUKOR (SQUARE) BOX DARK APPLIKE GRID */
+/* MOBILE, TABLET & IN-APP (FACEBOOK/INSTA BROWSER) RESPONSIVE GRID */
 @media (max-width: 768px) {
   .health-kpi-matrix-section {
-    padding: 6px 0 8px 0 !important;
+    padding: 8px 0 12px 0 !important;
     margin: 0 !important;
   }
   .health-kpi-grid {
@@ -1130,27 +1136,25 @@ body {
     gap: 5px !important;
   }
   .health-kpi-item {
-    background: #0f172a !important; /* DARK BACKGROUND ON MOBILE */
-    border: 1.5px solid #334155 !important;
-    padding: 6px 2px !important;
-    border-radius: 10px !important;
-    min-height: 66px !important;
+    padding: 5px 2px !important;
+    border-radius: 8px !important;
+    min-height: 56px !important; /* 10% COMPACT ON MOBILE */
     aspect-ratio: 1 / 1 !important;
     justify-content: center !important;
     align-items: center !important;
     text-align: center !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16) !important;
   }
   .health-kpi-item .kpi-icon {
-    font-size: 1.35rem !important;
+    font-size: 1.15rem !important;
     line-height: 1 !important;
     margin-bottom: 2px !important;
   }
   .health-kpi-item .kpi-title {
-    font-size: 0.65rem !important;
-    line-height: 1.15 !important;
+    font-size: 0.62rem !important;
+    line-height: 1.12 !important;
     font-weight: 800 !important;
-    color: #f8fafc !important; /* Crisp white */
+    color: #ffffff !important;
     display: -webkit-box !important;
     -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
@@ -1158,6 +1162,12 @@ body {
     word-break: break-word !important;
     text-align: center !important;
     white-space: normal !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .health-kpi-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
   }
 }
 

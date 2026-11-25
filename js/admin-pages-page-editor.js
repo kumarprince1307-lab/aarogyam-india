@@ -448,16 +448,7 @@ export async function initPageEditor() {
         }
       }
 
-      // Safe image replace: Clean up old replaced custom image to prevent orphaned storage accumulation
-      if (oldImagePath && typeof oldImagePath === 'string' && oldImagePath.trim() !== webpPath) {
-        const cleanOld = oldImagePath.trim().replace(/^\/+/, '');
-        const isProtected = ['health-banner.jpeg', 'logo', 'brand', 'default', 'icon'].some(p => cleanOld.toLowerCase().includes(p));
-        if (cleanOld.startsWith('images/') && !isProtected) {
-          console.log('[Admin Image Replace] Cleaning up old replaced image:', cleanOld);
-          deleteAssetFromGitHub(cleanOld).catch(() => null);
-        }
-      }
-
+      // Stage the new asset for the single atomic save bundle
       stagePageEditorAsset(generatedPath, dataUrl);
       showToast(`✅ HD WebP तैयार (${sizeKb} KB)। इमेज और पेज बदलाव एक साथ प्रकाशित करने के लिए Save दबाएँ।`, 'success');
     } catch (err) {
@@ -4572,7 +4563,1464 @@ export async function initPageEditor() {
                 "prompt": "नमस्ते, मुझे हृदय स्वास्थ्य, बीपी व ब्लॉकेज के बारे में परामर्श चाहिए।"
         }
 }
-];
+,
+    {
+      "id": "page_pashu_machhli",
+        "kpi_cards": [
+          {
+                    "icon": "fa-water",
+                    "title": "जल शुद्धिकरण व DO संतुलन",
+                    "value": "5+ ppm DO",
+                    "badge": "100% जैविक",
+                    "desc": "घुलित ऑक्सीजन में वृद्धि व अमोनिया का संपूर्ण खात्मा।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-fish",
+                    "title": "तीव्र शारीरिक विकास (FCR)",
+                    "value": "1.2 FCR",
+                    "badge": "तेज़ बढ़त",
+                    "desc": "प्रोटीन व एंजाइम युक्त पूरक आहार से कम समय में अधिकतम वजन।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-shield-halved",
+                    "title": "रोग व फंगस सुरक्षा",
+                    "value": "शून्य मृत्यु दर",
+                    "badge": "सुरक्षा कवच",
+                    "desc": "बायोफ्लॉक व तालाब में हानिकारक जीवाणुओं का जैविक नियंत्रण।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-robot",
+                    "title": "24×7 सखी AI एक्वा डॉक्टर",
+                    "value": "1-टैप समाधान",
+                    "badge": "AI एक्सपर्ट",
+                    "desc": "जल परीक्षण व रोग निदान हेतु त्वरित डिजिटल सलाह।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "machhli-palan",
+      "name": "🐟 मत्स्य पालन व तालाब प्रबंधन (Fisheries Hub)",
+      "url": "/pashu-palan/machhli-palan.html",
+      "category": "Livestock",
+      "status": "active",
+      "theme_primary": "#0284c7",
+      "theme_dark": "#0369a1",
+      "ticker_text": "🐟 बायोफ्लॉक व तालाब मछली पालन: 24×7 Aarogyam Sakhi AI सहायता | अमोनिया नियंत्रण व तीव्र वजन वृद्धि समाधान!",
+      "og_title": "मछली पालन व तालाब प्रबंधन हब | 100% जैविक समाधान | आरोग्यम भारत",
+      "og_image": "/images/pages/og-machhli-palan.webp",
+      "og_description": "बायोफ्लॉक व मीठे पानी में मछली पालन की संपूर्ण वैज्ञानिक गाइड। अमोनिया नियंत्रण, जल शुद्धिकरण और उच्च FCR आहार प्रबंधन।",
+      "share_message": "🐟 मछली पालन में 2X मुनाफा कमाएं! बायोफ्लॉक व तालाब प्रबंधन की वैज्ञानिक गाइड। 24×7 Aarogyam Sakhi AI सहायता उपलब्ध:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🐟 वैज्ञानिक मत्स्य पालन 2026",
+          "title": "उन्नत मछली पालन व बायोफ्लॉक तालाब प्रबंधन",
+          "subtitle": "अमोनिया नियंत्रण, उच्च FCR और मछलियों का तीव्र वजन वृद्धि समाधान",
+          "cta_text": "जैविक उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "पशुपालन हब",
+          "cta_secondary_link": "/pashu-palan.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 सम्पूर्ण कृषि व मत्स्य प्रबंधन गाइड",
+          "subheading": "जल गुणवत्ता, FCR सुधार व रोगों से संपूर्ण सुरक्षा",
+          "badge": "BESTSELLER",
+          "cta_text": "तुरंत ई-बुक पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "PET_VET_AQUA_CLEAR",
+          "name": "Pet-Vet Aqua Clear (जल शुद्धिकरण व अमोनिया कंट्रोल)",
+          "category": "Livestock",
+          "price": 850,
+          "mrp": 999,
+          "badge": "जल शोधक",
+          "image": "/images/products/biofit-aqua-culture.webp",
+          "desc": "तालाब के पानी में घुले हानिकारक अमोनिया, नाइट्राइट और दुर्गंध को तुरंत नियंत्रित कर ऑक्सीजन स्तर सुधारता है।"
+        },
+        {
+          "id": "PET_VET_AQUA_CULTURE",
+          "name": "Pet-Vet Aqua Culture (बायो-कल्चर व तलछट क्लीनर)",
+          "category": "Livestock",
+          "price": 950,
+          "mrp": 1100,
+          "badge": "बायोफ्लॉक स्पेशल",
+          "image": "/images/products/biofit-aqua-culture.webp",
+          "desc": "तालाब की तली में जमे अपशिष्ट, मल और कीचड़ को जैविक रूप से विघटित कर मछलियों को रोगमुक्त रखता है।"
+        },
+        {
+          "id": "PET_VET_AQUA_FEED",
+          "name": "Pet-Vet Aqua Feed Concentrate (मत्स्य आहार पूरक)",
+          "category": "Livestock",
+          "price": 1200,
+          "mrp": 1400,
+          "badge": "तेज वजन वृद्धि",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "प्रोटीन, विटामिन व खनिजों से भरपूर पूरक आहार जो FCR सुधारकर मछलियों का वजन तेजी से बढ़ाता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "जल गुणवत्ता व pH नियंत्रण",
+          "desc": "मछली पालन में 7.5-8.5 pH और 5 ppm से अधिक घुलित ऑक्सीजन (DO) आदर्श माना जाता है।"
+        },
+        {
+          "title": "अमोनिया व नाइट्राइट संकट",
+          "desc": "अत्यधिक मल व बिना खाया दाना तली में सड़कर अमोनिया बनाता है। Pet-Vet Aqua Clear से तुरंत नियंत्रण करें।"
+        },
+        {
+          "title": "उच्च FCR व आहार प्रबंधन",
+          "desc": "मछलियों को दिन में 2 बार उनके वजन का 2-3% संतुलित दाना दें ताकि लागत कम हो और वजन तेजी से बढ़े।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "राजेश निषाद",
+          "role": "प्रगतिशील मत्स्य पालक, गोरखपुर",
+          "rating": 5,
+          "comment": "Aqua Clear के उपयोग से मेरे तालाब का अमोनिया स्तर 2 दिन में सामान्य हो गया और मछलियों की मृत्यु रुक गई।"
+        },
+        {
+          "name": "मनोज पाटिल",
+          "role": "बायोफ्लॉक फार्मर, नागपुर",
+          "rating": 5,
+          "comment": "Aqua Culture से पानी का रंग और गुणवत्ता एकदम संतुलित है। FCR बहुत शानदार मिला है।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "मछली पालन में अमोनिया बढ़ने के क्या लक्षण हैं?",
+          "answer": "मछलियां सुबह के समय पानी की सतह पर आकर मुंह खोलकर सांस लेती हैं और दाना खाना बंद कर देती हैं।"
+        },
+        {
+          "question": "Aqua Culture का प्रयोग तालाब में कैसे करें?",
+          "answer": "1 एकड़ तालाब के लिए 500 मिलीलीटर Aqua Culture को 20 लीटर पानी में मिलाकर तालाब के चारों ओर समान रूप से छिड़कें।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_aqua_1",
+          "title": "तालाब में अमोनिया व पानी का pH कैसे ठीक करें?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "गाइड"
+        }
+      ]
+    },
+    {
+      "id": "page_pashu_murgi",
+        "kpi_cards": [
+          {
+                    "icon": "fa-egg",
+                    "title": "निरंतर अंडा उत्पादन",
+                    "value": "300+ अंडे/वर्ष",
+                    "badge": "उच्च उत्पादकता",
+                    "desc": "कैल्शियम व चेलेटेड मिनरल्स से मजबूत छिलका व उच्च फर्टिलिटी।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-feather",
+                    "title": "चूजा ब्रूडिंग व मृत्यु रोकथाम",
+                    "value": "< 1% मृत्यु दर",
+                    "badge": "इम्युनिटी बूस्टर",
+                    "desc": "रोग प्रतिरोधक क्षमता बढ़ाकर शुरुआती 7 दिनों में चूजों की सुरक्षा।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-weight-scale",
+                    "title": "FCR सुधार व वजन वृद्धि",
+                    "value": "1.5 kg / 70 दिन",
+                    "badge": "देसी व ब्रायलर",
+                    "desc": "संतुलित पाचन एंजाइम्स से आहार की अधिकतम खपत।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-robot",
+                    "title": "24×7 सखी AI पोल्ट्री डॉक्टर",
+                    "value": "तत्काल सहायता",
+                    "badge": "AI परामर्श",
+                    "desc": "रानीखेत व गम्बोरो टीकाकरण व बायो-सिक्योरिटी गाइड।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "murgi-palan",
+      "name": "🐔 कुक्कुट व पोल्ट्री पालन (Poultry Hub)",
+      "url": "/pashu-palan/murgi-palan.html",
+      "category": "Livestock",
+      "status": "active",
+      "theme_primary": "#d97706",
+      "theme_dark": "#78350f",
+      "ticker_text": "🐔 देसी व ब्रायलर पोल्ट्री: 24×7 Aarogyam Sakhi AI सहायता | FCR सुधार, अंडा उत्पादन वृद्धि व बायो-सिक्योरिटी!",
+      "og_title": "मुर्गी पालन व पोल्ट्री प्रबंधन हब | 100% जैविक समाधान | आरोग्यम भारत",
+      "og_image": "/images/pages/og-murgi-palan.webp",
+      "og_description": "देसी मुर्गी व ब्रायलर फार्मिंग की वैज्ञानिक गाइड। मृत्यु दर में कमी, वजन वृद्धि और अंडा उत्पादन बढ़ाने के जैविक उपाय।",
+      "share_message": "🐔 मुर्गी पालन में कम लागत में अधिकतम मुनाफा पाएं! 24×7 Aarogyam Sakhi AI पोल्ट्री सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🐔 आधुनिक पोल्ट्री फार्मिंग 2026",
+          "title": "उन्नत मुर्गी पालन, ब्रूडिंग व FCR प्रबंधन",
+          "subtitle": "मृत्यु दर में कमी, तीव्र शारीरिक विकास और निरंतर अंडा उत्पादन",
+          "cta_text": "पोल्ट्री पोषण देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "पशुपालन हब",
+          "cta_secondary_link": "/pashu-palan.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 आधुनिक पोल्ट्री व पशुपालन मास्टर गाइड",
+          "subheading": "देसी मुर्गी पालन, टीकाकरण शेड्यूल व बायो-सिक्योरिटी",
+          "badge": "BESTSELLER",
+          "cta_text": "गाइड पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "PET_VET_ADVANCED_POULTRY",
+          "name": "Pet-Vet Advanced Nutrition (पोल्ट्री ग्रोथ व इम्युनिटी)",
+          "category": "Livestock",
+          "price": 650,
+          "mrp": 750,
+          "badge": "ग्रोथ प्रमोटर",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "चूजों और वयस्क मुर्गियों में रोग प्रतिरोधक क्षमता बढ़ाकर तेजी से वजन और अंडा उत्पादन बढ़ाता है।"
+        },
+        {
+          "id": "PET_VET_DIGEST_POULTRY",
+          "name": "Pet-Vet Digest (पाचन व आंत स्वास्थ्य)",
+          "category": "Livestock",
+          "price": 580,
+          "mrp": 680,
+          "badge": "FCR बूस्टर",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "पाचन क्रिया को सुदृढ़ कर आहार की खपत (FCR) को अनुकूलित करता है और पतली बीट की समस्या रोकता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "ब्रूडिंग तापमान व वेंटिलेशन",
+          "desc": "शुरुआती 7 दिनों में 95°F तापमान बनाए रखें और ताजी हवा का निरंतर प्रवाह सुनिश्चित करें।"
+        },
+        {
+          "title": "टीकाकरण व बायो-सिक्योरिटी",
+          "desc": "रानीखेत (F1/LaSota) और गम्बोरो (IBD) का समयबद्ध टीकाकरण कराएं।"
+        },
+        {
+          "title": "अंडा उत्पादन व कैल्शियम संतुलन",
+          "desc": "लेयर मुर्गियों में मजबूत छिलके और लगातार अंडा उत्पादन के लिए खनिज पोषण अत्यंत आवश्यक है।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "सुरेश वर्मा",
+          "role": "देसी मुर्गी पालक, इंदौर",
+          "rating": 5,
+          "comment": "Pet-Vet Advanced देने से चूजों की मृत्यु दर 1% से भी कम हो गई और 70 दिन में 1.5 किग्रा वजन मिला।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "ब्रूडिंग के समय चूजों को सबसे पहले क्या देना चाहिए?",
+          "answer": "पहले 24 घंटे हल्के गुनगुने पानी में गुड़ और इलेक्ट्रोलाइट्स देना चाहिए ताकि यात्रा का तनाव दूर हो।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_poultry_1",
+          "title": "देसी मुर्गी फार्मिंग में मुनाफा कैसे दोगुना करें?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "पोल्ट्री गाइड"
+        }
+      ]
+    },
+    {
+      "id": "page_pashu_dog",
+        "kpi_cards": [
+          {
+                    "icon": "fa-shield-virus",
+                    "title": "टिक्स व पिस्सू सुरक्षा",
+                    "value": "100% हर्बल",
+                    "badge": "एंटी-पैरासाइट",
+                    "desc": "नीम व नीलगिरी अर्क से जूं, टिक्स और पिस्सुओं से प्राकृतिक मुक्ति।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-wand-magic-sparkles",
+                    "title": "चमकदार फर व कोट हेल्थ",
+                    "value": "शून्य हेयरफॉल",
+                    "badge": "ओमेगा 3 व 6",
+                    "desc": "रूसी, खुजली और बाल झड़ने की समस्या का प्राकृतिक समाधान।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-bone",
+                    "title": "जोड़ों व हड्डियों की मजबूती",
+                    "value": "सक्रिय जीवन",
+                    "badge": "कैल्शियम प्लस",
+                    "desc": "कैल्शियम और आवश्यक विटामिन्स से हड्डियों व दांतों का विकास।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-robot",
+                    "title": "24×7 सखी AI पेट डॉक्टर",
+                    "value": "डिजिटल क्लिनिक",
+                    "badge": "24x7 AI",
+                    "desc": "डॉग आहार, डिवर्मिंग व व्यवहार संबंधी विशेषज्ञ सलाह।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "dog-care",
+      "name": "🐕 श्वान व पेट केयर (Dog & Pet Wellness)",
+      "url": "/pashu-palan/dog-care.html",
+      "category": "Livestock",
+      "status": "active",
+      "theme_primary": "#7c3aed",
+      "theme_dark": "#4c1d95",
+      "ticker_text": "🐕 श्वान व पेट केयर: 24×7 Aarogyam Sakhi AI सलाह | चमकदार फर, टिक व पिस्सू सुरक्षा और संपूर्ण स्वास्थ्य!",
+      "og_title": "डॉग व पेट केयर हब | आयुर्वेदिक व जैविक पोषण | आरोग्यम भारत",
+      "og_image": "/images/pages/og-dog-care.webp",
+      "og_description": "श्वान एवं पालतू पशुओं की वैज्ञानिक देखभाल। टिक-पिस्सू से मुक्ति, चमकदार कोट, पाचन संतुलन और संपूर्ण स्वास्थ्य गाइड।",
+      "share_message": "🐕 आपके डॉग के चमकदार फर और मजबूत स्वास्थ्य का प्राकृतिक राज! 24×7 Aarogyam Sakhi AI पेट केयर:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🐕 प्रीमियम पेट वेलनेस 2026",
+          "title": "डॉग व पालतू पशुओं की सम्पूर्ण स्वास्थ्य देखभाल",
+          "subtitle": "टिक-पिस्सू से संपूर्ण सुरक्षा, चमकदार फर और सक्रिय जीवनशैली",
+          "cta_text": "पेट केयर उत्पाद",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "पशुपालन हब",
+          "cta_secondary_link": "/pashu-palan.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 सम्पूर्ण पशु व श्वान पोषण मैनुअल",
+          "subheading": "आहार, टीकाकरण, कृमि मुक्ति (Deworming) और व्यवहार प्रशिक्षण",
+          "badge": "EXPERT PICK",
+          "cta_text": "ई-बुक पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "PET_VET_SHAMPOO_DOG",
+          "name": "Pet-Vet Advanced Ayurvedic Shampoo (टिक व पिस्सू सुरक्षा)",
+          "category": "Livestock",
+          "price": 450,
+          "mrp": 520,
+          "badge": "एंटी-टिक हर्बल",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "नीम और यूकेलिप्टस अर्क युक्त आयुर्वेदिक शैम्पू जो टिक्स, जूं और पिस्सुओं को प्राकृतिक रूप से दूर रखता है।"
+        },
+        {
+          "id": "PET_VET_NUTRITION_DOG",
+          "name": "Pet-Vet Advanced Vital Nutrition (चमकदार फर व हड्डियां)",
+          "category": "Livestock",
+          "price": 650,
+          "mrp": 750,
+          "badge": "कोट व जॉइंट हेल्थ",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "ओमेगा 3 व 6 फैटी एसिड, कैल्शियम और आवश्यक विटामिन्स जो फर झड़ना रोकते हैं और जोड़ों को मजबूत बनाते हैं।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "टिक व पिस्सू (Ticks & Fleas) रोकथाम",
+          "desc": "नियमित नीम आधारित हर्बल स्नान कराएं और टिक जनित बुखार (Babesiosis) से बचाव रखें।"
+        },
+        {
+          "title": "फर झड़ना व त्वचा संक्रमण",
+          "desc": "रासायनिक शैम्पू की जगह प्राकृतिक Pet-Vet शैम्पू का प्रयोग करें और आहार में ओमेगा फैटी एसिड शामिल करें।"
+        },
+        {
+          "title": "कृमि मुक्ति (Deworming) एवं टीकाकरण",
+          "desc": "हर 3 महीने में डिवर्मिंग कराएं और 7-इन-1 तथा रेबीज वैक्सीन का कार्ड अद्यतन रखें।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "अमित सक्सेना",
+          "role": "लैब्राडोर ओनर, भोपाल",
+          "rating": 5,
+          "comment": "Pet-Vet Shampoo के 2 इस्तेमाल के बाद मेरे डॉग के सारे टिक्स खत्म हो गए और बाल झड़ना बंद हो गया।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "डॉग को कितनी बार नहलाना चाहिए?",
+          "answer": "गर्मियों में 10-15 दिन में एक बार और सर्दियों में 20-25 दिन में एक बार हल्के गुनगुने पानी और हर्बल शैम्पू से नहलाएं।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_dog_1",
+          "title": "डॉग में टिक्स और बाल झड़ने का घरेलू व प्राकृतिक इलाज",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "केयर गाइड"
+        }
+      ]
+    },
+    {
+      "id": "page_pashu_bakra",
+        "kpi_cards": [
+          {
+                    "icon": "fa-weight-scale",
+                    "title": "तीव्र वजन वृद्धि (स्टॉल-फेड)",
+                    "value": "10-15 kg अतिरिक्त",
+                    "badge": "मांस उत्पादन",
+                    "desc": "चेलेटेड मिनरल पोषण से 3-4 माह में 40 किलो तक वजन वृद्धि।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-shield-heart",
+                    "title": "PPR व ETV रोग सुरक्षा",
+                    "value": "शून्य बीमारी",
+                    "badge": "टीकाकरण",
+                    "desc": "बकरी प्लेग व आंतों के जहर से संपूर्ण जैविक सुरक्षा चक्र।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-pills",
+                    "title": "पाचन व अफरा निवारण",
+                    "value": "स्वस्थ रूमन",
+                    "badge": "पाचन टॉनिक",
+                    "desc": "पेट फूलने और बदहजमी से तुरंत राहत और भूख में वृद्धि।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-robot",
+                    "title": "24×7 सखी AI गोट डॉक्टर",
+                    "value": "व्यावसायिक सलाह",
+                    "badge": "AI एक्सपर्ट",
+                    "desc": "नस्ल चयन (सिरोही, बरबरी) व शेड निर्माण पर पूर्ण गाइड।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "bakra-palan",
+      "name": "🐐 बकरी व बकरा पालन (Goat Farming Hub)",
+      "url": "/pashu-palan/bakra-palan.html",
+      "category": "Livestock",
+      "status": "active",
+      "theme_primary": "#16a34a",
+      "theme_dark": "#14532d",
+      "ticker_text": "🐐 उन्नत बकरी पालन: 24×7 Aarogyam Sakhi AI सलाह | सिरोही, बरबरी, ब्लैक बंगाल नस्ल संवर्धन व वजन वृद्धि!",
+      "og_title": "बकरा-बकरी पालन हब | 100% वैज्ञानिक प्रबंधन | आरोग्यम भारत",
+      "og_image": "/images/pages/og-bakra-palan.webp",
+      "og_description": "सिरोही, बरबरी, तोतापरी और ब्लैक बंगाल बकरा पालन की संपूर्ण वैज्ञानिक गाइड। तीव्र वजन वृद्धि, रोग रोकथाम और ईद स्पेशल वजन प्रबंधन।",
+      "share_message": "🐐 कम लागत में एटीएम मशीन - बकरी पालन से लाखों का मुनाफा! 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🐐 वैज्ञानिक गोट फार्मिंग 2026",
+          "title": "उन्नत बकरा-बकरी पालन व वजन वृद्धि प्रबंधन",
+          "subtitle": "नस्ल सुधार, PPR व ईटीवी से बचाव, और 30 से 40 किग्रा तक तीव्र वजन वृद्धि",
+          "cta_text": "पोषण उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "पशुपालन हब",
+          "cta_secondary_link": "/pashu-palan.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 व्यावसायिक बकरी पालन संपूर्ण मार्गदर्शिका",
+          "subheading": "शेड निर्माण, नस्ल चयन, आहार फॉर्मूलेशन व विपणन रणनीति",
+          "badge": "POPULAR",
+          "cta_text": "गाइड पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "PET_VET_ADVANCED_GOAT",
+          "name": "Pet-Vet Advanced (बकरा-बकरी वजन वर्धक)",
+          "category": "Livestock",
+          "price": 650,
+          "mrp": 750,
+          "badge": "तेज वजन वृद्धि",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "खनिज लवणों, चेलेटेड मिनरल्स और विटामिन्स से भरपूर जो बकरों में 3-4 महीने में 10-15 किग्रा अतिरिक्त वजन बढ़ाता है।"
+        },
+        {
+          "id": "PET_VET_DIGEST_GOAT",
+          "name": "Pet-Vet Digest (गोट डाइजेशन व एसिडोसिस सुरक्षा)",
+          "category": "Livestock",
+          "price": 580,
+          "mrp": 680,
+          "badge": "पाचन सुरक्षा",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "अनाज खाने के बाद होने वाले पेट फूलने (अफरा) और बदहजमी से तुरंत राहत दिलाता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "उन्नत नस्ल चयन",
+          "desc": "मांस उत्पादन के लिए सिरोही, बरबरी, बीटल और ब्लैक बंगाल नस्लें सर्वाधिक उपयुक्त हैं।"
+        },
+        {
+          "title": "PPR व ETV टीकाकरण",
+          "desc": "पीपीआर (बकरी प्लेग) का टीका 3 साल में एक बार और एंटरोटॉक्सीमिया (ETV) का टीका वर्षा पूर्व अवश्य लगाएं।"
+        },
+        {
+          "title": "स्टॉल-फेड आहार फॉर्मूलेशन",
+          "desc": "दाना मिश्रण (मक्का 40%, चोकर 30%, खली 28%, नमक व Pet-Vet 2%) देने से वजन तेजी से बढ़ता है।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "इकबाल खान",
+          "role": "गोट फार्मर, अजमेर",
+          "rating": 5,
+          "comment": "Pet-Vet Advanced देने से ईद के लिए तैयार मेरे बकरों का वजन 3 माह में 12 किलो बढ़ गया। शानदार उत्पाद!"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "बकरियों में अफरा (पेट फूलना) होने पर क्या करें?",
+          "answer": "तुरंत Pet-Vet Digest दें और मीठा सोडा (20 ग्राम) थोड़े गुनगुने पानी में पिलाएं। दाना बंद कर सूखा चारा दें।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_goat_1",
+          "title": "स्टॉल-फेड बकरा पालन: 4 महीने में 40 किलो वजन कैसे करें?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "गोट फार्मिंग"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_kharif",
+        "kpi_cards": [
+          {
+                    "icon": "fa-seedling",
+                    "title": "कल्ले व फुटाव वृद्धि",
+                    "value": "35-45 कल्ले/पौधा",
+                    "badge": "धान व सोयाबीन",
+                    "desc": "Stimrich व SHET से जड़ों का गहरा फैलाव और बंपर कल्ले।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-bug-slash",
+                    "title": "कीट व सुंडी से सुरक्षा",
+                    "value": "100% जैविक",
+                    "badge": "रसचूसक नियंत्रक",
+                    "desc": "तना छेदक, गर्डल बीटल और फॉल आर्मीवर्म का रासायनिक-मुक्त खात्मा।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-shield-halved",
+                    "title": "फफूंद व शीथ ब्लाइट सुरक्षा",
+                    "value": "शून्य झुलसा",
+                    "badge": "बायो-प्रोटेक्शन",
+                    "desc": "पत्तियों और बालियों को फंगल रोगों से बचाने वाला सुरक्षा कवच।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-arrow-trend-up",
+                    "title": "प्रति एकड़ शुद्ध उत्पादन वृद्धि",
+                    "value": "+30% उपज",
+                    "badge": "प्रमाणित परिणाम",
+                    "desc": "लागत में 25% कमी और दानों की चमक व वजन में भारी वृद्धि।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "kharif-crops",
+      "name": "🌾 खरीफ फसल हब (धान, सोयाबीन, मक्का, कपास)",
+      "url": "/agriculture/kharif-crops.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#15803d",
+      "theme_dark": "#052e16",
+      "ticker_text": "🌾 खरीफ फसल महा-अभियान: 24×7 Aarogyam Sakhi AI सलाह | धान, सोयाबीन, कपास में बंपर पैदावार व जैविक समाधान!",
+      "og_title": "खरीफ फसल हब | धान, सोयाबीन, मक्का, कपास प्रबंधन | आरोग्यम भारत",
+      "og_image": "/images/pages/og-kharif-crops.webp",
+      "og_description": "मानसून की प्रमुख खरीफ फसलों की वैज्ञानिक व जैविक खेती पद्धति। शीथ ब्लाइट, पीला मोज़ेक, गुलाबी सुंडी नियंत्रण और पोषक तत्व प्रबंधन।",
+      "share_message": "🌾 खरीफ 2026 में 30% अधिक पैदावार का रहस्य! 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🌾 खरीफ 2026 स्पेशल",
+          "title": "खरीफ फसलों का वैज्ञानिक व जैविक प्रबंधन",
+          "subtitle": "धान, सोयाबीन, मक्का और कपास में लागत घटाएं और प्रति एकड़ 30% तक उपज बढ़ाएं",
+          "cta_text": "जैविक उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "ई-बुक्स स्टोर",
+          "cta_secondary_link": "/ebooks/bundle.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 खरीफ फसल संपूर्ण वैज्ञानिक गाइड (BK001)",
+          "subheading": "धान, सोयाबीन, कपास, मक्का का 100% सफल उत्पादन रोडमैप",
+          "badge": "MUST READ",
+          "cta_text": "ई-बुक तुरंत पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_SHET",
+          "name": "Biofit SHET (सॉइल हेल्थ एनहांसमेंट टेक्नोलॉजी)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "मिट्टी सुधारक",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "करोड़ों लाभकारी जीवाणुओं का समूह जो मिट्टी की संरचना सुधारता है और जड़ विकास तेज करता है।"
+        },
+        {
+          "id": "BIOFIT_STIMRICH",
+          "name": "Biofit Stimrich (पौधा वृद्धि व कल्ले फुटाव)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "वृद्धि प्रमोटर",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "अमीनो एसिड और समुद्री शैवाल युक्त जो धान में कल्ले, सोयाबीन में शाखाएं और फूलों की संख्या बढ़ाता है।"
+        },
+        {
+          "id": "BIOFIT_BIO99",
+          "name": "Biofit Bio-99 (स्प्रेडर, स्टीकर व पेनिट्रेटर)",
+          "category": "Agriculture",
+          "price": 380,
+          "mrp": 450,
+          "badge": "दवा बचत 30%",
+          "image": "/images/products/biofit-bio99.webp",
+          "desc": "छिड़काव के समय दवाओं को पत्तियों पर समान रूप से फैलाता है और बारिश से धुलने से बचाता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "धान: तना छेदक व शीथ ब्लाइट",
+          "desc": "कल्ले फूटने के समय Biofit Stimrich व Bio-99 का छिड़काव करें और पानी का स्तर नियंत्रित रखें।"
+        },
+        {
+          "title": "सोयाबीन: पीला मोज़ेक व इल्ली नियंत्रण",
+          "desc": "सफेद मक्खी को रोकने के लिए पीले स्टिकी ट्रैप लगाएं और Biofit इंटैक्ट का छिड़काव करें।"
+        },
+        {
+          "title": "कपास: गुलाबी सुंडी (Pink Bollworm)",
+          "desc": "फूल-डोडिया बनते समय फेरोमोन ट्रैप लगाएं और जैविक सुरक्षा चक्र अपनाएं।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "बलविंदर सिंह",
+          "role": "किसान, करनाल",
+          "rating": 5,
+          "comment": "धान में Stimrich और SHET डालने से कल्ले 35 से 45 प्रति पौधा निकले और दाना चमकदार बना।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "सोयाबीन में फूल गिरना कैसे रोकें?",
+          "answer": "फूल आने की शुरुआत में Biofit Stimrich (1.5 ml/लीटर) और Bio-99 (0.3 ml/लीटर) का छिड़काव करें।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_kharif_1",
+          "title": "खरीफ फसलों में कम लागत में अधिक कल्ले और फलियां कैसे पाएं?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "खरीफ गाइड"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_rabi",
+        "kpi_cards": [
+          {
+                    "icon": "fa-wheat-awn",
+                    "title": "गेहूं कल्ले व बालियों का भराव",
+                    "value": "25 क्विंटल/एकड़",
+                    "badge": "दाना वजन",
+                    "desc": "CRI अवस्था में जैविक पोषण से बालियों की लंबाई व दानों की चमक।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-snowflake",
+                    "title": "पाला व ठंड से सुरक्षा",
+                    "value": "थर्मल प्रोटेक्शन",
+                    "badge": "सर्दियों की ढाल",
+                    "desc": "मिट्टी के तापमान को संतुलित रखकर पाले के नुकसान से 100% बचाव।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-droplet",
+                    "title": "सरसों में तेल प्रतिशत वृद्धि",
+                    "value": "42%+ तेल",
+                    "badge": "उच्च मंडी भाव",
+                    "desc": "सल्फर व प्राकृतिक पोटाश से फलियों का पूर्ण भराव और वजन।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-shield-virus",
+                    "title": "चने में उकठा (Wilt) रोकथाम",
+                    "value": "जड़ गलन मुक्ति",
+                    "badge": "बायो-फंगीसाइड",
+                    "desc": "जड़ों में माइकोराइजा संतुलन से उकठा रोग का जड़ से खात्मा।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "rabi-crops",
+      "name": "🌾 रबी फसल हब (गेहूं, चना, सरसों, आलू)",
+      "url": "/agriculture/rabi-crops.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#ca8a04",
+      "theme_dark": "#713f12",
+      "ticker_text": "🌾 रबी फसल महा-क्रांति: 24×7 Aarogyam Sakhi AI सलाह | गेहूं, चना, सरसों में अधिकतम दाना भराव व पाला सुरक्षा!",
+      "og_title": "रबी फसल हब | गेहूं, चना, सरसों प्रबंधन | आरोग्यम भारत",
+      "og_image": "/images/pages/og-rabi-crops.webp",
+      "og_description": "रबी सीजन की फसलों का सम्पूर्ण वैज्ञानिक एवं जैविक प्रबंधन। गेहूं में कल्ले फुटाव, सरसों में तेल प्रतिशत वृद्धि और चने में उकठा रोग नियंत्रण।",
+      "share_message": "🌾 रबी फसलों में बंपर पैदावार और पाला से 100% सुरक्षा! 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🌾 रबी फसल प्रबंधन 2026",
+          "title": "रबी फसलों की उन्नत वैज्ञानिक व जैविक खेती",
+          "subtitle": "गेहूं, सरसों, चना और आलू में दाना भराव, पाला सुरक्षा और बंपर उपज",
+          "cta_text": "रबी उत्पाद देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "ई-बुक्स स्टोर",
+          "cta_secondary_link": "/ebooks/bundle.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 रबी फसल संपूर्ण वैज्ञानिक गाइड",
+          "subheading": "गेहूं, चना, सरसों, मटर और आलू का संपूर्ण रोग व पोषण चक्र",
+          "badge": "TOP GUIDE",
+          "cta_text": "गाइड पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_SHET_RABI",
+          "name": "Biofit SHET (सॉइल हेल्थ - रबी स्पेशल)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "जड़ विकास",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "सर्दियों में मिट्टी के तापमान को संतुलित रखता है और फास्फोरस व पोटाश की उपलब्धता बढ़ाता है।"
+        },
+        {
+          "id": "BIOFIT_STIMRICH_RABI",
+          "name": "Biofit Stimrich (कल्ले व दाना भराव)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "दाना वजन 20% वृद्धि",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "गेहूं में बालियों की लंबाई और सरसों में फलियों की संख्या में अभूतपूर्व वृद्धि करता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "गेहूं: सीआरआई (CRI) व कल्ले फुटाव",
+          "desc": "बुवाई के 21 दिन बाद पहली सिंचाई के साथ Biofit SHET और Stimrich का प्रयोग अवश्य करें।"
+        },
+        {
+          "title": "सरसों: माहू (चेपा) व पाला सुरक्षा",
+          "desc": "पाला पड़ने की संभावना होने पर खेत में नमी बनाए रखें और Biofit Wrapup का सुरक्षा कवच दें।"
+        },
+        {
+          "title": "चना: उकठा (Wilt) व फली छेदक",
+          "desc": "बीज उपचार Trichoderma और Biofit SHET से करें ताकि जड़ों में फफूंद न लगे।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "दीपक पाटीदार",
+          "role": "किसान, मंदसौर",
+          "rating": 5,
+          "comment": "सरसों में फलियों का भराव गजब का हुआ और तेल की मात्रा 42% तक पहुंची। बहुत असरदार!"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "गेहूं में पीला रतुआ (Yellow Rust) दिखने पर क्या करें?",
+          "answer": "लक्षण दिखते ही प्रभावित क्षेत्रों में तुरंत जैविक कवकनाशी का छिड़काव करें और नाइट्रोजन अधिक न दें।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_rabi_1",
+          "title": "गेहूं में 25 क्विंटल प्रति एकड़ पैदावार लेने का वैज्ञानिक फॉर्मूला",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "रबी स्पेशल"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_jayad",
+        "kpi_cards": [
+          {
+                    "icon": "fa-sun",
+                    "title": "तेज धूप व लू से बचाव",
+                    "value": "नमी संरक्षण",
+                    "badge": "ग्रीष्मकालीन ढाल",
+                    "desc": "मल्चिंग व जैविक स्प्रे से पौधों को सूखने और मुरझाने से बचाएं।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-candy-cane",
+                    "title": "तरबूज-खरबूजा मिठास व साइज",
+                    "value": "12-14 TSS मिठास",
+                    "badge": "बंपर मिठास",
+                    "desc": "फलों का आकार 5 से 7 किलो और आकर्षक गहरा लाल रंग।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-spa",
+                    "title": "फूल व फल ड्रॉप नियंत्रण",
+                    "value": "80% ड्रॉप कमी",
+                    "badge": "हार्मोनल बैलेंस",
+                    "desc": "टमाटर, मिर्च, खीरे में फूलों को गिरने से रोककर फलन दोगुना करें।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-clock",
+                    "title": "अल्पकालिक 60 दिन में मुनाफा",
+                    "value": "₹2 लाख+/एकड़",
+                    "badge": "फास्ट कैश",
+                    "desc": "कम समय में खाली खेत से अधिकतम व्यावसायिक नकद आमदनी।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "jayad-summer-crops",
+      "name": "☀️ जायद व सब्जी हब (तरबूज, खरबूजा, मूंग, खीरा)",
+      "url": "/agriculture/jayad-summer-crops.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#059669",
+      "theme_dark": "#064e3b",
+      "ticker_text": "☀️ जायद व ग्रीष्मकालीन फसलें: 24×7 Aarogyam Sakhi AI सलाह | तरबूज, खरबूजा, मूंग, भिंडी में 60 दिन में रिकॉर्ड मुनाफा!",
+      "og_title": "जायद व सब्जी फसल हब | तरबूज, मूंग, खीरा प्रबंधन | आरोग्यम भारत",
+      "og_image": "/images/pages/og-jayad-summer.webp",
+      "og_description": "गर्मी के मौसम की फसलों और सब्जियों की संपूर्ण वैज्ञानिक खेती। लू से सुरक्षा, ड्रिप फर्टिगेशन, फल मक्खी नियंत्रण और मिठास वृद्धि।",
+      "share_message": "☀️ गर्मी में 60 दिन में 3 लाख का मुनाफा! जायद फसलों की वैज्ञानिक खेती। 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "☀️ जायद फसल प्रबंधन 2026",
+          "title": "उन्नत जायद व ग्रीष्मकालीन सब्जी उत्पादन",
+          "subtitle": "तरबूज, खरबूजा, उड़द, मूंग और ककड़ी-खीरा में बंपर मिठास व उच्च मंडी भाव",
+          "cta_text": "सब्जी पोषण देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "सब्जी ई-बुक",
+          "cta_secondary_link": "/ebooks/book-landing.html?book=BK015"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK015",
+          "heading": "📚 सब्जी खेती मास्टर गाइड (PART 1)",
+          "subheading": "तरबूज, खरबूजा, लौकी, तोरी, खीरा और भिंडी की संपूर्ण गाइड",
+          "badge": "BESTSELLER",
+          "cta_text": "ई-बुक तुरंत पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_STIMRICH_JAYAD",
+          "name": "Biofit Stimrich (फूल-फल ड्रॉप कंट्रोल)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "फल चमक व मिठास",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "तेज गर्मी और लू में भी फूल गिरने से रोकता है और फलों का आकार व मिठास (TSS) बढ़ाता है।"
+        },
+        {
+          "id": "BIOFIT_SHET_JAYAD",
+          "name": "Biofit SHET (ड्रिप व ड्रेंचिंग स्पेशल)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "रूटजोन हेल्थ",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "गर्मी में मिट्टी में नमी धारण क्षमता बढ़ाता है और जड़ों को सूखने से बचाता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "तरबूज-खरबूजा: फल मक्खी व फटना",
+          "desc": "खेत में प्रति एकड़ 8-10 फेरोमोन फ्रूट फ्लाई ट्रैप लगाएं और ड्रिप से कैल्शियम-बोरॉन संतुलित दें।"
+        },
+        {
+          "title": "ग्रीष्मकालीन मूंग-उड़द: पीला मोज़ेक",
+          "desc": "सफेद मक्खी पर अंकुश रखें और बुवाई के 25 दिन बाद पहला फूल आने पर बायो-स्प्रे करें।"
+        },
+        {
+          "title": "सब्जियों में लू (Heat Stress) प्रबंधन",
+          "desc": "सुबह के समय सिंचाई करें और मल्चिंग पेपर का प्रयोग कर मिट्टी का वाष्पीकरण रोकें।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "राकेश गुर्जर",
+          "role": "तरबूज उत्पादक, कोटा",
+          "rating": 5,
+          "comment": "Stimrich के प्रयोग से तरबूज का वजन 4 से 6 किलो प्रति फल आया और मिठास बहुत बढ़िया रही।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "तरबूज में मिठास और लाल रंग कैसे बढ़ाएं?",
+          "answer": "फल पकने के 15 दिन पहले पोटाश और सूक्ष्म पोषक तत्वों का जैविक छिड़काव करें और सिंचाई हल्की करें।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_jayad_1",
+          "title": "तरबूज और खरबूजे की खेती से 60 दिन में लाखों कैसे कमाएं?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "जायद स्पेशल"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_fruits",
+        "kpi_cards": [
+          {
+                    "icon": "fa-apple-whole",
+                    "title": "एक्सपोर्ट क्वालिटी फल उत्पादन",
+                    "value": "प्रीमियम साइज",
+                    "badge": "चमकदार रंग",
+                    "desc": "एकसमान सुंदर आकार, बेदाग त्वचा और बाजार में 20% प्रीमियम भाव।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-ban",
+                    "title": "फल ड्रॉप व मंजर झुलसा रोकथाम",
+                    "value": "शून्य ड्रॉप",
+                    "badge": "मंजर रक्षक",
+                    "desc": "आम में मंजर आने से लेकर फल बनने तक का सम्पूर्ण सुरक्षा चक्र।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-shield-virus",
+                    "title": "तेलिया व विल्ट से बाग की रक्षा",
+                    "value": "बैक्टीरियल सुरक्षा",
+                    "badge": "सुरक्षा कवच",
+                    "desc": "अनार में तेला और केले में पनामा विल्ट फंगस से 100% जैविक सुरक्षा।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-weight-hanging",
+                    "title": "केले की घार का रिकॉर्ड वजन",
+                    "value": "35+ kg घार",
+                    "badge": "टिशू कल्चर",
+                    "desc": "उन्नत ड्रिप फर्टिगेशन से घार की लंबाई व वजन में भारी वृद्धि।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "fruit-orchards",
+      "name": "🍎 बागवानी व फल हब (केला, आम, अनार, पपीता)",
+      "url": "/agriculture/fruit-orchards.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#ea580c",
+      "theme_dark": "#7c2d12",
+      "ticker_text": "🍎 फल व बागवानी हब: 24×7 Aarogyam Sakhi AI सलाह | केला, आम, अनार, पपीता में एक्सपोर्ट क्वालिटी फल उत्पादन!",
+      "og_title": "फल व बागवानी हब | केला, आम, अनार, पपीता | आरोग्यम भारत",
+      "og_image": "/images/pages/og-fruit-orchards.webp",
+      "og_description": "व्यावसायिक फल बागवानी की संपूर्ण वैज्ञानिक गाइड। आम में मंजर सुरक्षा, अनार में तेला व बैक्टीरियल ब्लाइट और केला में घार वजन वृद्धि।",
+      "share_message": "🍎 बागवानी में एक्सपोर्ट क्वालिटी फल और रिकॉर्ड मुनाफा! 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🍎 हाई-टेक बागवानी 2026",
+          "title": "व्यावसायिक फल बागवानी एवं ऑर्चर्ड प्रबंधन",
+          "subtitle": "केला, आम, अनार और पपीता में फल ड्रॉप नियंत्रण, एक्सपोर्ट चमक और बंपर वजन",
+          "cta_text": "बागवानी पोषण देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "आम मास्टर गाइड",
+          "cta_secondary_link": "/ebooks/book-landing.html?book=BK022"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK026",
+          "heading": "🍌 केला मास्टर गाइड (Banana Master Guide)",
+          "subheading": "टिशू कल्चर, फर्टिगेशन शेड्यूल, घार वजन 35+ किग्रा तकनीक",
+          "badge": "BESTSELLER",
+          "cta_text": "गाइड तुरंत पढ़ें"
+        },
+        {
+          "book_id": "BK022",
+          "heading": "🥭 आम मास्टर गाइड (Mango Master Guide)",
+          "subheading": "मंजर सुरक्षा, फल मक्खी नियंत्रण व निरंतर फलन फॉर्मूला",
+          "badge": "POPULAR",
+          "cta_text": "गाइड तुरंत पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_STIMRICH_FRUITS",
+          "name": "Biofit Stimrich (फल ड्रॉप कंट्रोल व साइज)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "फल चमक व वजन",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "फलों के झड़ने की समस्या को 80% तक कम करता है और एकसमान सुंदर रंग व आकार देता है।"
+        },
+        {
+          "id": "BIOFIT_SHET_FRUITS",
+          "name": "Biofit SHET (रूटजोन माइक्रोबायोम)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "कंद व जड़ विकास",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "फल वृक्षों में माइकोराइजा और पोषक तत्वों के अवशोषण को 3 गुना बढ़ा देता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "आम: मंजर सुरक्षा व हॉपर (मधुआ)",
+          "desc": "फूल खिलने से पहले नीम तेल व जैविक कीटनाशी का छिड़काव करें। फूल खिलने पर परागण हेतु कीटनाशक न डालें।"
+        },
+        {
+          "title": "अनार: तेलिया रोग (Bacterial Blight)",
+          "desc": "बोर्डो मिश्रण और Biofit Wrapup का सुरक्षा चक्र चलाएं और संक्रमित टहनियों को काटकर जलाएं।"
+        },
+        {
+          "title": "केला: पनामा विल्ट व घार भराव",
+          "desc": "ड्रिप से नियमित Biofit SHET दें ताकि फ्युजेरियम विल्ट की फफूंद जड़ों में न पनपे।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "विनोद देशमुख",
+          "role": "केला उत्पादक, जलगांव",
+          "rating": 5,
+          "comment": "Stimrich और SHET से मेरे केले की घार 32 से 36 किलो की बनी और व्यापारी ने 2 रुपये प्रीमियम भाव दिया।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "आम में फूल आने के बाद क्या सिंचाई करनी चाहिए?",
+          "answer": "फूल आते समय सिंचाई बिल्कुल बंद रखनी चाहिए, जब फल मटर के दाने के बराबर हो जाएं तब हल्की सिंचाई शुरू करें।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_fruits_1",
+          "title": "केले और आम में एक्सपोर्ट क्वालिटी फल तैयार करने का रहस्य",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "बागवानी मास्टर"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_flowers",
+        "kpi_cards": [
+          {
+                    "icon": "fa-fan",
+                    "title": "3X अधिक कलियां व शाखाएं",
+                    "value": "80-100 फूल/पौधा",
+                    "badge": "पिंचिंग तकनीक",
+                    "desc": "समयबद्ध जैविक पोषण से नई शाखाओं व कलियों का भारी फुटाव।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-clock-rotate-left",
+                    "title": "लंबी ताजगी व शेल्फ लाइफ",
+                    "value": "7-10 दिन ताजगी",
+                    "badge": "मजबूत डंडी",
+                    "desc": "तुड़ाई के बाद भी फूल मुरझाते नहीं और लंबी दूरी तक सुरक्षित पहुंचते हैं।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-palette",
+                    "title": "गहरा आकर्षक रंग व सुगंध",
+                    "value": "प्राकृतिक तेल",
+                    "badge": "प्रीमियम क्वालिटी",
+                    "desc": "गुलाब और गेंदे में पंखुड़ियों की संख्या और गहरा चटख रंग।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-coins",
+                    "title": "दैनिक नकद आमदनी",
+                    "value": "त्योहारों पर 3X भाव",
+                    "badge": "कैश फ्लो",
+                    "desc": "हर दूसरे दिन फूलों की तुड़ाई से किसान के हाथ में निरंतर कैश।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "floriculture",
+      "name": "🌸 पुष्प व फ्लोरीकल्चर हब (गुलाब, गेंदा, रजनीगंधा)",
+      "url": "/agriculture/floriculture.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#ec4899",
+      "theme_dark": "#831843",
+      "ticker_text": "🌸 पुष्प व फ्लोरीकल्चर हब: 24×7 Aarogyam Sakhi AI सलाह | गेंदा, गुलाब, रजनीगंधा में 3X कलियां व लंबी शेल्फ लाइफ!",
+      "og_title": "पुष्प व फ्लोरीकल्चर हब | गुलाब, गेंदा, रजनीगंधा | आरोग्यम भारत",
+      "og_image": "/images/pages/og-floriculture.webp",
+      "og_description": "व्यावसायिक फूल उत्पादन की वैज्ञानिक गाइड। गेंदा में बंपर कलियां, गुलाब में कट फ्लावर क्वालिटी और त्योहारों पर अधिकतम मंडी भाव।",
+      "share_message": "🌸 फूलों की खेती से हर दिन नकद आमदनी! 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🌸 आधुनिक पुष्प उत्पादन 2026",
+          "title": "उन्नत फ्लोरीकल्चर व पुष्प व्यवसाय प्रबंधन",
+          "subtitle": "गुलाब, गेंदा, जरबेरा और रजनीगंधा में अधिक कलियां, गहरा रंग और लंबी ताजगी",
+          "cta_text": "पुष्प पोषण उत्पाद",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "कृषि हब",
+          "cta_secondary_link": "/agriculture/kharif-crops.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK015",
+          "heading": "📚 फ्लोरीकल्चर व नकदी फसल मास्टर गाइड",
+          "subheading": "गेंदा, गुलाब, ग्लैडियोलस का संपूर्ण रोपण व कटाई कैलेंडर",
+          "badge": "FEATURED",
+          "cta_text": "गाइड तुरंत पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_STIMRICH_FLOWERS",
+          "name": "Biofit Stimrich (कलियां व फूल चमक)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "3X अधिक कलियां",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "पौधे में हार्मोनल संतुलन सुधारकर कलियों की संख्या और फूलों का आकार व सुगंध बढ़ाता है।"
+        },
+        {
+          "id": "BIOFIT_BIO99_FLOWERS",
+          "name": "Biofit Bio-99 (स्प्रेडर व शाइनर)",
+          "category": "Agriculture",
+          "price": 380,
+          "mrp": 450,
+          "badge": "चमकदार पंखुड़ियां",
+          "image": "/images/products/biofit-bio99.webp",
+          "desc": "पत्तियों और पंखुड़ियों पर समान रूप से स्प्रे फैलाकर रोगों से सुरक्षित रखता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "गेंदा: पिंचिंग (Pinching) व कलियां",
+          "desc": "रोपाई के 25-30 दिन बाद ऊपरी सिरे की पिंचिंग करने से बगल से 15-20 नई शाखाएं और कलियां फूटती हैं।"
+        },
+        {
+          "title": "गुलाब: डाइ-बैक (Dieback) व प्रूनिंग",
+          "desc": "अक्टूबर में छंटाई के बाद कटे भाग पर कॉपर ऑक्सीक्लोराइड का लेप लगाएं ताकि टहनी ऊपर से न सूखे।"
+        },
+        {
+          "title": "रजनीगंधा: कंद रोपण व डंडी लंबाई",
+          "desc": "2-3 सेमी आकार के कंद लगाएं और डंडी को सीधा व लंबा रखने के लिए पर्याप्त जैविक पोटाश दें।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "महेश सैनी",
+          "role": "गेंदा उत्पादक, अजमेर",
+          "rating": 5,
+          "comment": "दीवाली के समय गेंदे में Stimrich का छिड़काव किया था, एक-एक पौधे पर 80 से 100 फूल आए!"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "गेंदा की तुड़ाई का सबसे अच्छा समय क्या है?",
+          "answer": "सुबह के समय जब ओस सूख जाए तब फूलों की तुड़ाई करें। इससे फूल मंडी तक ताजे रहते हैं।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_flowers_1",
+          "title": "गेंदे की खेती: 1 एकड़ में 2 लाख का शुद्ध मुनाफा कैसे लें?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "फूल गाइड"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_doctor",
+        "kpi_cards": [
+          {
+                    "icon": "fa-stethoscope",
+                    "title": "1-क्लिक सटीक रोग डायग्नोस्टिक",
+                    "value": "100+ रोग पहचान",
+                    "badge": "AI फसल डॉक्टर",
+                    "desc": "पत्तियों का पीलापन, मरोड़िया, उकठा और फंगस का तत्काल सचित्र निदान।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-flask-vial",
+                    "title": "100% जहर-मुक्त जैविक इलाज",
+                    "value": "शून्य रसायन",
+                    "badge": "बायो-सॉल्यूशन",
+                    "desc": "रासायनिक दवाओं के साइड इफेक्ट्स और पेस्टीसाइड रेजिस्टेंस से मुक्ति।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-shield-halved",
+                    "title": "संपूर्ण फसल सुरक्षा कवच",
+                    "value": "बीज से कटाई तक",
+                    "badge": "360° सुरक्षा",
+                    "desc": "मिट्टी, तना, पत्ती और फल चारों स्तरों पर फंगल व कीट से सुरक्षा।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-robot",
+                    "title": "24×7 सखी AI डॉक्टर क्लिनिक",
+                    "value": "तत्काल फोटो समाधान",
+                    "badge": "लाइव AI",
+                    "desc": "व्हाट्सएप व ऐप पर फोटो भेजते ही 30 सेकंड में सटीक स्प्रे डोज।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "crop-doctor",
+      "name": "🩺 फसल रोग व कीट डॉक्टर हब (Diagnostic Center)",
+      "url": "/agriculture/crop-doctor.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#dc2626",
+      "theme_dark": "#7f1d1d",
+      "ticker_text": "🩺 फसल डॉक्टर क्लिनिक: 24×7 Aarogyam Sakhi AI सलाह | कीट, फंगस, वायरस और पोषक तत्व कमी का 1-क्लिक सटीक समाधान!",
+      "og_title": "फसल रोग व कीट डॉक्टर हब | 1-क्लिक डायग्नोस्टिक | आरोग्यम भारत",
+      "og_image": "/images/pages/og-crop-doctor.webp",
+      "og_description": "फसलों में लगने वाले कीट, फंगस, वायरस और पोषण की कमी का 100% सटीक निदान। 24×7 Aarogyam Sakhi AI फसल डॉक्टर द्वारा जैविक उपचार।",
+      "share_message": "🩺 अपनी फसल की बीमारी का तुरंत फोटो भेजें और सटीक जैविक इलाज पाएं! 24×7 Aarogyam Sakhi AI फसल डॉक्टर:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🩺 एआई फसल क्लीनिक 2026",
+          "title": "फसल कीट, रोग व पोषण कमी निदान डॉक्टर हब",
+          "subtitle": "पत्तियों का पीलापन, उकठा, ब्लाइट, सुंडी और चूसक कीटों का संपूर्ण जैविक इलाज",
+          "cta_text": "जैविक रक्षक उत्पाद",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "खेती डॉक्टर ई-बुक",
+          "cta_secondary_link": "/ebooks/book-landing.html?book=BK002"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK002",
+          "heading": "📚 संपूर्ण खेती डॉक्टर गाइड (BK002)",
+          "subheading": "100+ फसल रोगों, कीटों और फफूंद का सचित्र जैविक समाधान",
+          "badge": "ESSENTIAL",
+          "cta_text": "गाइड तुरंत पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_WRAPUP",
+          "name": "Biofit Wrapup (बायो-फंगीसाइड व सुरक्षा कवच)",
+          "category": "Agriculture",
+          "price": 850,
+          "mrp": 990,
+          "badge": "फंगस रक्षक",
+          "image": "/images/products/biofit-wrapup.webp",
+          "desc": "पत्तियों और तने पर सुरक्षात्मक परत बनाकर ब्लाइट, डाउनी मिल्ड्यू और फंगल रोगों को रोकता है।"
+        },
+        {
+          "id": "BIOFIT_INTACT",
+          "name": "Biofit Intact (जैविक चूसक कीट नियंत्रक)",
+          "category": "Agriculture",
+          "price": 780,
+          "mrp": 900,
+          "badge": "माहू व थ्रिप्स रोधक",
+          "image": "/images/products/biofit-intact.webp",
+          "desc": "थ्रिप्स, माइट्स, एफिड्स और सफेद मक्खी को जैविक रूप से नियंत्रित करता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "पत्तियों का मुड़ना व पीलापन",
+          "desc": "यह थ्रिप्स या वायरस का लक्षण हो सकता है। Intact और Wrapup का संयुक्त छिड़काव प्रभावी है।"
+        },
+        {
+          "title": "जड़ गलन व उकठा (Wilt/Root Rot)",
+          "desc": "मिट्टी में अत्यधिक जलभराव से फफूंद पनपती है। Biofit SHET की ड्रेंचिंग से जड़ें पुनः स्वस्थ होती हैं।"
+        },
+        {
+          "title": "कीटों का जैविक नियंत्रण चक्र",
+          "desc": "रासायनिक कीटनाशकों के प्रतिरोध (Resistance) से बचने के लिए फेरोमोन ट्रैप और बायो-कीटनाशक अपनाएं।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "रमेश चंद्र",
+          "role": "सब्जी उत्पादक, नासिक",
+          "rating": 5,
+          "comment": "मिर्च में पत्ता मरोड़ (Chilli Leaf Curl) की समस्या Intact और Wrapup के प्रयोग से पूरी तरह ठीक हो गई।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "फसल में बीमारी पहचान न आने पर क्या करें?",
+          "answer": "आरोग्यम सखी AI पर अपनी फसल की स्पष्ट फोटो भेजें, AI तुरंत रोग की पहचान कर जैविक उपाय बताएगा।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_doctor_1",
+          "title": "फसल में कीट व फंगस को बिना जहर के कैसे खत्म करें?",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "डॉक्टर गाइड"
+        }
+      ]
+    },
+    {
+      "id": "page_agri_medicinal",
+        "kpi_cards": [
+          {
+                    "icon": "fa-mortar-pestle",
+                    "title": "सक्रिय घटक (Withanolides) वृद्धि",
+                    "value": "+35% अल्कलाइड",
+                    "badge": "उच्च ग्रेड",
+                    "desc": "अश्वगंधा व शतावरी में औषधीय तत्वों की मात्रा बढ़ाकर प्रीमियम भाव पाएं।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-plant-wilt",
+                    "title": "कंद व जड़ सड़न से 100% सुरक्षा",
+                    "value": "शून्य कॉलर रॉट",
+                    "badge": "कवकनाशी कवच",
+                    "desc": "सफेद मूसली और शतावरी में जलभराव जनित सड़न का जैविक नियंत्रण।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-scale-balanced",
+                    "title": "जड़ों की मोटाई व वजन वृद्धि",
+                    "value": "पेंसिल ग्रेड जड़ें",
+                    "badge": "सॉइल टेक्नोलॉजी",
+                    "desc": "Biofit SHET से मिट्टी भुरभुरी होकर जड़ों का विकास 40% तेज होता है।",
+                    "image": ""
+          },
+          {
+                    "icon": "fa-handshake",
+                    "title": "प्रमाणित खरीददार व मंडी लिंक",
+                    "value": "₹35,000+/क्विंटल",
+                    "badge": "कॉन्ट्रैक्ट फार्मिंग",
+                    "desc": "नीमच, मंदसौर आयुर्वेदिक मंडियों और दवा कंपनियों से सीधा संपर्क।",
+                    "image": ""
+          }
+],
+        "page_kpi_sections": [],
+      "slug": "medicinal-farming",
+      "name": "🌱 औषधीय खेती हब (अश्वगंधा, शतावरी, मूसली)",
+      "url": "/agriculture/medicinal-farming.html",
+      "category": "Agriculture",
+      "status": "active",
+      "theme_primary": "#065f46",
+      "theme_dark": "#022c22",
+      "ticker_text": "🌱 औषधीय खेती क्रांति: 24×7 Aarogyam Sakhi AI सलाह | अश्वगंधा, शतावरी, सफेद मूसली में विथानोलाइड्स वृद्धि व जैविक खरीद!",
+      "og_title": "औषधीय खेती हब | अश्वगंधा, शतावरी, सफेद मूसली | आरोग्यम भारत",
+      "og_image": "/images/pages/og-medicinal-farming.webp",
+      "og_description": "अश्वगंधा, शतावरी, सफेद मूसली, कालमेघ की वैज्ञानिक व जैविक खेती पद्धति। उच्च विथानोलाइड्स, कंद सड़न रोकथाम और विपणन मार्गदर्शन।",
+      "share_message": "🌱 औषधीय खेती से प्रति एकड़ 3 से 5 लाख का मुनाफा! 24×7 Aarogyam Sakhi AI सलाह:",
+      "hero_slides": [
+        {
+          "image": "",
+          "tag": "🌱 औषधीय खेती 2026",
+          "title": "उन्नत औषधीय खेती एवं हर्बल फसल प्रबंधन",
+          "subtitle": "अश्वगंधा, शतावरी, सफेद मूसली और कालमेघ में उच्च सक्रिय घटक व अधिकतम मंडी भाव",
+          "cta_text": "जैविक पोषण उत्पाद",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "ई-बुक्स स्टोर",
+          "cta_secondary_link": "/ebooks/bundle.html"
+        }
+      ],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 औषधीय व नकदी फसल संपूर्ण गाइड",
+          "subheading": "अश्वगंधा, शतावरी, मूसली की ग्रेडिंग, सुखाने की विधि व खरीददार संपर्क",
+          "badge": "HIGH ROI",
+          "cta_text": "गाइड तुरंत पढ़ें"
+        }
+      ],
+      "products": [
+        {
+          "id": "BIOFIT_SHET_MEDICINAL",
+          "name": "Biofit SHET (कंद व जड़ विकास टेक्नोलॉजी)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "जड़ विकास 40%",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "अश्वगंधा और शतावरी में जड़ों की मोटाई और वजन बढ़ाने में सर्वाधिक प्रभावी जैविक फार्मूला।"
+        },
+        {
+          "id": "BIOFIT_STIMRICH_MEDICINAL",
+          "name": "Biofit Stimrich (विथानोलाइड्स व सक्रिय घटक वर्धक)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "उच्च अल्कलाइड",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "औषधीय पौधों में सक्रिय एल्कलॉइड्स (Withanolides) की सांद्रता को 30% तक बढ़ा देता है।"
+        }
+      ],
+      "clinical_breakdown": [
+        {
+          "title": "अश्वगंधा: बलुई दोमट व जल निकासी",
+          "desc": "अश्वगंधा को कभी भी जलभराव वाली जमीन में न लगाएं। हल्की बलुई दोमट में जड़ें सीधी और मोटी बैठती हैं।"
+        },
+        {
+          "title": "शतावरी: उबलना व छांव में सुखाना",
+          "desc": "जड़ों को उखाड़कर तुरंत गर्म पानी में 10 मिनट उबालें और छिलका उतारकर सुखाएं, इससे सफेद रंग मिलता है।"
+        },
+        {
+          "title": "सफेद मूसली: कंद गलन से संपूर्ण सुरक्षा",
+          "desc": "खेत में Biofit Wrapup व SHET की ड्रेंचिंग अवश्य करें ताकि कंद गलन न फैले।"
+        }
+      ],
+      "reviews": [
+        {
+          "name": "कैलाश धाकड़",
+          "role": "अश्वगंधा उत्पादक, नीमच",
+          "rating": 5,
+          "comment": "Stimrich और SHET डालने से मेरी अश्वगंधा की जड़ें पेंसिल जैसी मोटी हुईं और मंडी में ₹38,000 क्विंटल बिकीं।"
+        }
+      ],
+      "faqs": [
+        {
+          "question": "अश्वगंधा की कटाई का सही समय कैसे पहचानें?",
+          "answer": "जब पौधे की पत्तियां पीली पड़ने लगें और फल लाल हो जाएं (150-170 दिन में), तब जड़ें निकालने का सही समय होता है।"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_medicinal_1",
+          "title": "अश्वगंधा की वैज्ञानिक खेती से 1 एकड़ में 2 लाख का शुद्ध मुनाफा",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "औषधीय गाइड"
+        }
+      ]
+    }
+  ];
 
   // Load order: 1) site-pages-config.json (Server Truth Network First) -> 2) localStorage fallback -> 3) defaultPages
   let allPages = [];

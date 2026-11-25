@@ -62,11 +62,14 @@
   function resolveAssetSrc(item, field = 'image', fallback = '') {
     if (!item) return fallback;
     const path = item[field] || '';
-    if (!path) return fallback;
+    if (path && (path.startsWith('/') || path.startsWith('http') || path.startsWith('images/'))) {
+      return path;
+    }
+    if (!path && item.image_preview) return item.image_preview;
     try {
       const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
       if (offSync[path]) return offSync[path];
-      const norm = '/' + path.replace(/^\/+/, '');
+      const norm = '/' + (path || '').replace(/^\/+/, '');
       if (offSync[norm]) return offSync[norm];
     } catch (e) {}
     return path || fallback;
@@ -97,19 +100,30 @@
       const subpageMatch = allPages.find(p => {
         const s = (p.slug || '').toLowerCase();
         const id = (p.id || '').toLowerCase();
-        return s === `health-${cleanFilename}` || s === cleanFilename || id === `page_health_${cleanFilename.replace(/-/g, '_')}` || id === `page_${cleanFilename.replace(/-/g, '_')}`;
+        const u = (p.url || '').toLowerCase();
+        return s === cleanFilename ||
+               s === `health-${cleanFilename}` ||
+               s === `pashu-${cleanFilename}` ||
+               s === `agri-${cleanFilename}` ||
+               id === `page_${cleanFilename.replace(/-/g, '_')}` ||
+               id === `page_health_${cleanFilename.replace(/-/g, '_')}` ||
+               id === `page_pashu_${cleanFilename.replace(/-/g, '_')}` ||
+               id === `page_agri_${cleanFilename.replace(/-/g, '_')}` ||
+               u.endsWith(`/${cleanFilename}.html`);
       });
       if (subpageMatch) return subpageMatch;
     }
 
-    // 5. Explicit section keywords
-    if (path.includes('pashu')) {
-      const pashuPage = allPages.find(p => p.id === 'page_pashu' || p.id === 'page_pashu_palan' || p.id.includes('cattle'));
+    // 5. Explicit section keywords fallback only for main hubs
+    const isMainPashu = path.endsWith('/pashu-palan.html') || path === '/pashu-palan.html' || path.endsWith('/pashu-palan');
+    if (isMainPashu) {
+      const pashuPage = allPages.find(p => p.id === 'page_cattle_care' || p.id === 'page_pashu' || p.id === 'page_pashu_palan');
       if (pashuPage) return pashuPage;
     }
 
-    if (path.includes('agriculture')) {
-      const agriPage = allPages.find(p => p.id && p.id.includes('agriculture'));
+    const isMainAgri = path.endsWith('/agriculture.html') || path === '/agriculture.html' || path.endsWith('/agriculture');
+    if (isMainAgri) {
+      const agriPage = allPages.find(p => p.id === 'page_agriculture');
       if (agriPage) return agriPage;
     }
 
@@ -380,16 +394,8 @@
     const parentSec = carouselContainer.closest('section') || carouselContainer.parentElement;
     if (parentSec) delete parentSec.dataset.carouselInit;
 
-    // Safety Guard: if all slides only contain placeholder strings like "नया बैनर शीर्षक यहाँ लिखें"
-    // and the page already has static slides in HTML, preserve static slides rather than overwriting with placeholder text!
-    const existingSlides = slideHost.querySelectorAll('.home-hero-slide-item');
-    const isOnlyPlaceholders = validSlides.every(s => (s.title || '').includes('नया बैनर शीर्षक') && (s.subtitle || '').includes('बैनर का आकर्षक विवरण'));
-    if (isOnlyPlaceholders && existingSlides.length > 0) {
-      setupUniversalCarouselController(slideHost, existingSlides.length);
-      return;
-    }
-
     // Remove existing slide items cleanly from slideHost
+    const existingSlides = slideHost.querySelectorAll('.home-hero-slide-item');
     existingSlides.forEach(el => el.remove());
 
     const isHealthPage = window.location.pathname.includes('/health/');
@@ -698,13 +704,14 @@
 
     let prods = Array.isArray(pageConfig?.products) ? [...pageConfig.products] : [];
 
-    // Live Auto-Join from Master Catalog
-    if (isPashu) {
+    // Live Auto-Join from Master Catalog only when page-specific products are not configured
+    const isMainCattle = path.endsWith('/pashu-palan.html') || path === '/pashu-palan.html' || path.endsWith('/pashu-palan');
+    if (prods.length === 0 && isMainCattle) {
       const cattleMaster = masterProductsCatalog.filter(m => m.category === 'cattle');
       if (cattleMaster.length > 0) {
         prods = cattleMaster;
       }
-    } else if (isHealthHub) {
+    } else if (prods.length === 0 && isHealthHub) {
       const healthMaster = masterProductsCatalog.filter(m => m.category === 'health');
       if (healthMaster.length > 0) {
         prods = healthMaster;
@@ -1726,6 +1733,13 @@
 
       // Render Multi-Image Gallery for Diet
       if (Array.isArray(de.diet.images) && de.diet.images.length > 0) {
+        // Clean any old static placeholder images outside the gallery
+        dietBox.querySelectorAll('img').forEach(imgEl => {
+          if (!imgEl.closest('.cms-diet-gallery')) {
+            const wrap = imgEl.closest('div[style*="border-radius:12px"]') || imgEl.parentElement;
+            if (wrap && !wrap.closest('.cms-diet-gallery')) wrap.remove();
+          }
+        });
         let dietGallery = dietBox.querySelector('.cms-diet-gallery');
         if (!dietGallery) {
           dietGallery = document.createElement('div');
@@ -1765,6 +1779,13 @@
 
       // Render Multi-Image Gallery for Exercise & Yoga
       if (Array.isArray(de.exercise.images) && de.exercise.images.length > 0) {
+        // Clean any old static placeholder images outside the gallery
+        exBox.querySelectorAll('img').forEach(imgEl => {
+          if (!imgEl.closest('.cms-exercise-gallery')) {
+            const wrap = imgEl.closest('div[style*="border-radius:12px"]') || imgEl.parentElement;
+            if (wrap && !wrap.closest('.cms-exercise-gallery')) wrap.remove();
+          }
+        });
         let exGallery = exBox.querySelector('.cms-exercise-gallery');
         if (!exGallery) {
           exGallery = document.createElement('div');
@@ -1912,6 +1933,100 @@
     `;
   }
 
+  async function renderDynamicMarketingCards(pageConfig) {
+    if (!pageConfig || !Array.isArray(pageConfig.marketing_cards) || pageConfig.marketing_cards.length === 0) return;
+    const container = document.querySelector('#sec-interspersed-marketing .container') ||
+                      document.getElementById('sec-interspersed-marketing') ||
+                      document.querySelector('.interspersed-marketing-container');
+    if (!container) return;
+
+    let booksList = [];
+    try {
+      const bRes = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
+      if (bRes.ok) {
+        const bData = await bRes.json();
+        booksList = bData.books || [];
+      }
+    } catch (_) {}
+
+    const cardsHtml = pageConfig.marketing_cards.map((card, idx) => {
+      const book = booksList.find(b => b.id === card.book_id) || {};
+      const cover = book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
+      const title = card.headline || book.heading || book.name || 'आरोग्यम विशेष डिजिटल ई-बुक';
+      const desc = card.desc || book.seo?.description || 'वैज्ञानिक विधि व 100% समाधान युक्त डिजिटल गाइड।';
+      const tag = card.tag || '🔥 सर्वाधिक लोकप्रिय';
+      const sales = card.sales_counter || '1,400+ किसानों ने खरीदा';
+      const price = book.offerPrice || 99;
+      const mrp = book.mrp || 299;
+      const landingUrl = book.landingPage || `/ebooks/book-landing.html?id=${card.book_id}`;
+      const demoUrl = book.demoPage || `/ebooks/reader.html?id=${card.book_id}&demo=true`;
+
+      return `
+        <div class="interspersed-book-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 22px; color: #fff; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border: 1.5px solid rgba(245, 158, 11, 0.4); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+          <div style="position: absolute; top: -10px; right: -10px; width: 80px; height: 80px; background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%); pointer-events: none;"></div>
+          
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+              <span style="background: #f59e0b; color: #000; font-size: 0.76rem; font-weight: 900; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">
+                ${escapeHtml(tag)}
+              </span>
+              <span style="font-size: 0.78rem; color: #94a3b8; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block;"></span>
+                ${escapeHtml(sales)}
+              </span>
+            </div>
+
+            <div style="display: flex; gap: 16px; margin-bottom: 14px; align-items: center;">
+              <div style="width: 80px; flex-shrink: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.4); border-radius: 10px; overflow: hidden; background: #000;">
+                <img src="${escapeHtml(cover)}" alt="${escapeHtml(title)}" style="width: 100%; height: auto; display: block;" onerror="this.src='/images/books/kharif-master-guide-2026-cover.webp'">
+              </div>
+              <div style="flex: 1;">
+                <h3 style="font-size: 1.1rem; font-weight: 900; margin: 0 0 6px 0; color: #ffffff; line-height: 1.35;">${escapeHtml(title)}</h3>
+                <p style="font-size: 0.82rem; color: #cbd5e1; margin: 0 0 8px 0; line-height: 1.45;">${escapeHtml(desc)}</p>
+                <div style="display: flex; align-items: baseline; gap: 8px;">
+                  <span style="font-size: 1.25rem; font-weight: 900; color: #f59e0b;">₹${price}</span>
+                  <span style="font-size: 0.85rem; color: #64748b; text-decoration: line-through;">₹${mrp}</span>
+                  <span style="font-size: 0.74rem; background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 2px 8px; border-radius: 6px; font-weight: 800;">70% OFF</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+            <a href="${escapeHtml(landingUrl)}" class="btn" style="flex: 1; min-width: 130px; background: #f59e0b; color: #000; font-weight: 900; font-size: 0.85rem; padding: 10px 14px; border-radius: 12px; text-decoration: none; text-align: center; box-shadow: 0 4px 14px rgba(245,158,11,0.35);">
+              📖 संपूर्ण ई-बुक देखें
+            </a>
+            <a href="${escapeHtml(demoUrl)}" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-weight: 800; font-size: 0.85rem; padding: 10px 14px; border-radius: 12px; text-decoration: none; text-align: center;">
+              👁️ फ्री डेमो
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    let grid = container.querySelector('.interspersed-marketing-grid') || container.querySelector('div[style*="grid"]');
+    if (!grid) {
+      container.innerHTML = `
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span style="background: rgba(245,158,11,0.15); color: #d97706; font-weight: 900; font-size: 0.78rem; padding: 4px 14px; border-radius: 20px; text-transform: uppercase;">
+            📢 BESTSELLER GUIDES
+          </span>
+          <h2 style="font-size: 1.75rem; font-weight: 900; margin: 8px 0 4px 0; color: #0f172a;">
+            किसानों व पशुपालकों की सर्वाधिक लोकप्रिय ई-बुक्स
+          </h2>
+          <p style="color: #64748b; font-size: 0.88rem; max-width: 600px; margin: 0 auto;">
+            सीधे अपने मोबाइल में डाउनलोड करें और तुरंत पढ़ना शुरू करें
+          </p>
+        </div>
+        <div class="interspersed-marketing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+          ${cardsHtml}
+        </div>
+      `;
+    } else {
+      grid.innerHTML = cardsHtml;
+    }
+  }
+
   function renderFloatingBanner(pageConfig) {
     let fbEl = document.getElementById('home-3d-floating-banner') || document.getElementById('live-3d-floating-banner');
     if (!pageConfig || !pageConfig.floating_banner || !pageConfig.floating_banner.image) {
@@ -2033,6 +2148,7 @@
     renderDynamicPageKpiSections(pageConfig);
     renderDynamicHealthDomainMatrix(pageConfig);
     renderDynamicProducts(pageConfig);
+    renderDynamicMarketingCards(pageConfig);
     renderDynamicClinicalBreakdown(pageConfig);
     renderDynamicDietExercise(pageConfig);
     renderDynamicStepLadder(pageConfig);

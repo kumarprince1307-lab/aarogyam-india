@@ -1572,40 +1572,91 @@
               </a>
             </div>
 
-            <!-- 7. KISAN & VETERINARY SERVICES (Accordion) -->
+            <!-- 7. PASHUPALAN & DAIRY HUBS (5) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-livestock" onclick="window.toggleDrawerAccordion('livestock', event)">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#e0f2fe;color:#0284c7;"><i class="fa-solid fa-paw"></i></div>
+                <span class="drawer-item-title">पशुपालन हब्स (5)</span>
+              </div>
+              <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
+            </button>
+            <div class="drawer-submenu-panel" id="drawer-panel-livestock">
+              <a href="/pashu-palan.html" class="drawer-sub-link-item" style="background:#f0f9ff;border-color:#bae6fd;">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#0284c7;color:#fff;"><i class="fa-solid fa-cow"></i></div><span style="font-weight:800;color:#0369a1;">1. गाय-भैंस डेयरी हब</span></div>
+                <span class="drawer-tag-pill" style="background:#0284c7;color:#fff;">MAIN</span>
+              </a>
+              <a href="/pashu-palan/machhli-palan.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-fish"></i></div><span>2. मत्स्य पालन हब</span></div>
+              </a>
+              <a href="/pashu-palan/murgi-palan.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-egg"></i></div><span>3. मुर्गी व पोल्ट्री पालन</span></div>
+              </a>
+              <a href="/pashu-palan/dog-care.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-dog"></i></div><span>4. डॉग व पेट केयर</span></div>
+              </a>
+              <a href="/pashu-palan/bakra-palan.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-sheep"></i></div><span>5. बकरा-बकरी पालन</span></div>
+              </a>
+            </div>
+
+            <!-- 8. AGRICULTURE & CROPS HUBS (7) -->
+            <button type="button" class="drawer-nav-item-btn" id="drawer-btn-agriculture" onclick="window.toggleDrawerAccordion('agriculture', event)">
+              <div class="drawer-item-left">
+                <div class="drawer-icon-box" style="background:#dcfce7;color:#16a34a;"><i class="fa-solid fa-wheat-awn"></i></div>
+                <span class="drawer-item-title">उन्नत कृषि हब्स (7)</span>
+              </div>
+              <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
+            </button>
+            <div class="drawer-submenu-panel" id="drawer-panel-agriculture">
+              <a href="/agriculture/kharif-crops.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cloud-sun-rain"></i></div><span>1. खरीफ फसलें (धान, सोयाबीन, कपास)</span></div>
+              </a>
+              <a href="/agriculture/rabi-crops.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-seedling"></i></div><span>2. रबी फसलें (गेहूं, चना, सरसों)</span></div>
+              </a>
+              <a href="/agriculture/jayad-summer-crops.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-sun"></i></div><span>3. जायद व सब्जियां (तरबूज, खीरा)</span></div>
+              </a>
+              <a href="/agriculture/fruit-orchards.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-apple-whole"></i></div><span>4. फल व बागवानी (केला, आम, अनार)</span></div>
+              </a>
+              <a href="/agriculture/floriculture.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-fan"></i></div><span>5. पुष्प / फ्लोरीकल्चर (गुलाब, गेंदा)</span></div>
+              </a>
+              <a href="/agriculture/crop-doctor.html" class="drawer-sub-link-item" style="background:#fef2f2;border-color:#fca5a5;">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#dc2626;color:#fff;"><i class="fa-solid fa-stethoscope"></i></div><span style="font-weight:800;color:#991b1b;">6. फसल रोग डॉक्टर हब</span></div>
+                <span class="drawer-tag-pill" style="background:#dc2626;color:#fff;">AI 🔬</span>
+              </a>
+              <a href="/agriculture/medicinal-farming.html" class="drawer-sub-link-item">
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-mortar-pestle"></i></div><span>7. औषधीय खेती (अश्वगंधा, मूसली)</span></div>
+              </a>
+            </div>
+
+            <!-- 9. KISAN & UTILITY SERVICES (Accordion) -->
             <button type="button" class="drawer-nav-item-btn" id="drawer-btn-services" onclick="window.toggleDrawerAccordion('services', event)">
               <div class="drawer-item-left">
-                <div class="drawer-icon-box" style="background:#e0f2fe;color:#0284c7;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                <span class="drawer-item-title">Kisan & Veterinary Services</span>
+                <div class="drawer-icon-box" style="background:#fef3c7;color:#d97706;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <span class="drawer-item-title">दैनिक किसान सेवाएं (3)</span>
               </div>
               <i class="fa-solid fa-chevron-down drawer-accordion-arrow"></i>
             </button>
             <div class="drawer-submenu-panel" id="drawer-panel-services">
-              <a href="/pashu-palan.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cow"></i></div><span>Pashupalan & Dairy Hub</span></div>
-              </a>
               <a href="/mandi.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-chart-line"></i></div><span>Live Mandi Bhav (APMC Rates)</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-chart-line"></i></div><span>ताजा मंडी भाव (APMC Rates)</span></div>
                 <span class="drawer-tag-pill" style="background:#ef4444;color:#fff;">LIVE 🔴</span>
               </a>
               <a href="/weather.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cloud-sun"></i></div><span>7-Day Weather Forecast</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-cloud-sun"></i></div><span>मौसम पूर्वानुमान (Weather)</span></div>
               </a>
               <a href="/krishi-panchang.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-om"></i></div><span>Krishi Panchang (Farming Calendar)</span></div>
-              </a>
-              <a href="/crop-doctor.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-stethoscope"></i></div><span>Crop Doctor AI Diagnostic</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-calendar-check"></i></div><span>कृषि पंचांग व शुभ मुहूर्त</span></div>
               </a>
               <a href="/aarogyam-sakhi.html" onclick="window.closeUniversalDrawer();" class="drawer-sub-link-item">
                 <div class="drawer-item-left"><div class="drawer-sub-icon-box" style="background:#15803d;color:#fff;"><i class="fa-solid fa-robot"></i></div><span>Aarogyam Sakhi Consultation</span></div>
                 <span class="drawer-tag-pill" style="background:#22c55e;color:#0f172a;font-weight:900;">AI 🔬</span>
               </a>
               <a href="/webinar.html" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-video"></i></div><span>Weekly Live Farmer Webinar</span></div>
-              </a>
-              <a href="javascript:void(0)" onclick="window.location.href=window.getPersonalizedWhatsAppUrl('24x7 AI Expert Consultation'); window.closeUniversalDrawer();" class="drawer-sub-link-item">
-                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-brands fa-whatsapp"></i></div><span>WhatsApp Kisan AI Assistant</span></div>
+                <div class="drawer-item-left"><div class="drawer-sub-icon-box"><i class="fa-solid fa-video"></i></div><span>साप्ताहिक किसान वेबिनार</span></div>
               </a>
             </div>
 
