@@ -467,6 +467,44 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------
+    // ACTION: DELETE SINGLE ASSET (Old image cleanup on replace)
+    // -------------------------------------------------------------
+    if (action === 'delete_asset') {
+      const filePath = String(payload.path || '').replace(/^\/+/, '');
+      if (!filePath || !filePath.startsWith('images/')) {
+        return sendJson(res, 400, { success: false, error: 'Valid image path required for delete_asset.' });
+      }
+
+      // Security: never delete core branding or default assets
+      const protectedAssets = ['health-banner.jpeg', 'logo', 'brand', 'default', 'icon'];
+      if (protectedAssets.some(p => filePath.toLowerCase().includes(p))) {
+        return sendJson(res, 200, { success: true, message: 'Protected default asset skipped from deletion.' });
+      }
+
+      try {
+        const existingSha = await getFileSha(filePath, token);
+        if (!existingSha) {
+          return sendJson(res, 200, { success: true, message: 'Asset does not exist or already removed.' });
+        }
+
+        const delRes = await githubRequest(`contents/${encodeURIComponent(filePath).replace(/%2F/g, '/')}`, 'DELETE', token, {
+          message: `Delete old replaced asset ${filePath} [Auto-Sync Cleanup]`,
+          sha: existingSha,
+          branch: GITHUB_BRANCH
+        });
+
+        return sendJson(res, 200, {
+          success: true,
+          message: `Asset ${filePath} successfully deleted from GitHub.`,
+          deleted: filePath,
+          commit: delRes.data
+        });
+      } catch (delErr) {
+        return sendJson(res, 200, { success: false, error: delErr.message });
+      }
+    }
+
+    // -------------------------------------------------------------
     // ACTION: SAVE AUDIO STUDIO CONFIG & MANIFEST
     // -------------------------------------------------------------
     if (action === 'save_audio_studio') {

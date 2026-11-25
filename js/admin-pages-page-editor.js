@@ -93,6 +93,24 @@ export async function initPageEditor() {
     return { success: false, error: 'Upload failed after 3 attempts' };
   }
 
+  async function deleteAssetFromGitHub(path) {
+    const cleanPath = String(path || '').replace(/^\/+/, '');
+    if (!cleanPath || !cleanPath.startsWith('images/')) return { success: false };
+    const protectedList = ['health-banner.jpeg', 'logo', 'brand', 'default', 'icon'];
+    if (protectedList.some(p => cleanPath.toLowerCase().includes(p))) return { success: true, protected: true };
+    try {
+      const apiUrl = getAutoSyncApiUrl();
+      const res = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_asset', path: cleanPath })
+      });
+      return await res.json().catch(() => ({}));
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  }
+
   const pendingPageEditorAssets = new Map();
 
   function stagePageEditorAsset(path, dataUrl) {
@@ -343,13 +361,19 @@ export async function initPageEditor() {
         localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
       } catch (e) {}
 
+      let oldImagePath = null;
+
       if (targetType === 'hero_slide' && currentSlides[targetIndex]) {
+        oldImagePath = currentSlides[targetIndex][fieldName];
         currentSlides[targetIndex][fieldName] = webpPath;
         currentSlides[targetIndex]['image_preview'] = dataUrl;
         renderHeroSlidesInBuilder();
       } else if (targetType === 'floating_banner') {
         const inputEl = document.getElementById('pe_input_floating_banner_img');
-        if (inputEl) inputEl.value = webpPath;
+        if (inputEl) {
+          oldImagePath = inputEl.value;
+          inputEl.value = webpPath;
+        }
         const chkEl = document.getElementById('pe_chk_floating_banner');
         if (chkEl) chkEl.checked = true;
         const prevWrap = document.getElementById('pe_floating_banner_preview');
@@ -359,53 +383,76 @@ export async function initPageEditor() {
           prevWrap.style.display = 'block';
         }
       } else if (targetType === 'achiever' && currentAchievers[targetIndex]) {
+        oldImagePath = currentAchievers[targetIndex][fieldName];
         currentAchievers[targetIndex][fieldName] = webpPath;
         currentAchievers[targetIndex]['image_preview'] = dataUrl;
         renderAchieversList();
       } else if (targetType === 'health_card' && currentHealthDiseases[targetIndex]) {
+        oldImagePath = currentHealthDiseases[targetIndex][fieldName];
         currentHealthDiseases[targetIndex][fieldName] = webpPath;
         currentHealthDiseases[targetIndex]['image_preview'] = dataUrl;
         renderHealthCardsInBuilder();
       } else if (targetType === 'crop_card' && currentCrops[targetIndex]) {
+        oldImagePath = currentCrops[targetIndex][fieldName];
         currentCrops[targetIndex][fieldName] = webpPath;
         currentCrops[targetIndex]['image_preview'] = dataUrl;
         renderCropCardsInBuilder();
       } else if (targetType === 'pashu_card' && currentPashuCards[targetIndex]) {
+        oldImagePath = currentPashuCards[targetIndex][fieldName];
         currentPashuCards[targetIndex][fieldName] = webpPath;
         currentPashuCards[targetIndex]['image_preview'] = dataUrl;
         renderPashuCardsInBuilder();
       } else if (targetType === 'marketing_card' && currentMarketingCards[targetIndex]) {
+        oldImagePath = currentMarketingCards[targetIndex][fieldName];
         currentMarketingCards[targetIndex][fieldName] = webpPath;
         currentMarketingCards[targetIndex]['image_preview'] = dataUrl;
         renderMarketingCardsInBuilder();
       } else if (targetType === 'review' && currentReviews[targetIndex]) {
+        oldImagePath = currentReviews[targetIndex][fieldName];
         currentReviews[targetIndex][fieldName] = webpPath;
         currentReviews[targetIndex]['image_preview'] = dataUrl;
         renderReviewsInBuilder();
       } else if (targetType === 'product' && currentProducts[targetIndex]) {
+        oldImagePath = currentProducts[targetIndex][fieldName];
         currentProducts[targetIndex][fieldName] = webpPath;
         currentProducts[targetIndex]['image_preview'] = dataUrl;
         renderProductsInBuilder();
       } else if (targetType === 'kpi_card' && currentKpiCards[targetIndex]) {
+        oldImagePath = currentKpiCards[targetIndex][fieldName];
         currentKpiCards[targetIndex][fieldName] = webpPath;
         currentKpiCards[targetIndex]['image_preview'] = dataUrl;
         renderKpiCardsInBuilder();
       } else if (targetType === 'kpi_section' && currentPageKpiSections[targetIndex]) {
+        oldImagePath = currentPageKpiSections[targetIndex][fieldName];
         currentPageKpiSections[targetIndex][fieldName] = webpPath;
         currentPageKpiSections[targetIndex]['image_preview'] = dataUrl;
         renderPageKpiSectionsInBuilder();
       } else if (targetType === 'cb_card' && currentCbCards[targetIndex]) {
+        oldImagePath = currentCbCards[targetIndex][fieldName];
         currentCbCards[targetIndex][fieldName] = webpPath;
         currentCbCards[targetIndex]['image_preview'] = dataUrl;
         renderCbCardsInBuilder();
       } else if (targetType === 'og_image') {
         const inputEl = document.getElementById('pe_input_og_image');
-        if (inputEl) inputEl.value = webpPath;
+        if (inputEl) {
+          oldImagePath = inputEl.value;
+          inputEl.value = webpPath;
+        }
         const prevWrap = document.getElementById('pe_og_image_preview');
         const prevImg = document.getElementById('pe_og_image_preview_img');
         if (prevWrap && prevImg) {
           prevImg.src = dataUrl;
           prevWrap.style.display = 'block';
+        }
+      }
+
+      // Safe image replace: Clean up old replaced custom image to prevent orphaned storage accumulation
+      if (oldImagePath && typeof oldImagePath === 'string' && oldImagePath.trim() !== webpPath) {
+        const cleanOld = oldImagePath.trim().replace(/^\/+/, '');
+        const isProtected = ['health-banner.jpeg', 'logo', 'brand', 'default', 'icon'].some(p => cleanOld.toLowerCase().includes(p));
+        if (cleanOld.startsWith('images/') && !isProtected) {
+          console.log('[Admin Image Replace] Cleaning up old replaced image:', cleanOld);
+          deleteAssetFromGitHub(cleanOld).catch(() => null);
         }
       }
 
@@ -9696,7 +9743,7 @@ export async function initPageEditor() {
     closePageDrawer();
     resetPageForm();
     renderPagesTable();
-    showToast(`⏳ '${name}' और नई इमेजें एक साथ प्रकाशित हो रही हैं...`, 'info');
+    showToast(`⏳ '${name}' पेज सुरक्षित किया जा रहा है...`, 'info');
 
     try {
       const cleanAllPages = stripImagePreviews(allPages);
@@ -9746,7 +9793,7 @@ export async function initPageEditor() {
       }
 
       const result = await publishPageEditorBundle(cleanAllPages);
-      showToast(`✅ पेज '${name}' और ${result.updatedFiles?.length || 0} फ़ाइलें एक Git commit में प्रकाशित हुईं।`, 'success');
+      showToast(`✅ '${name}' पेज सफलतापूर्वक सुरक्षित हो गया।`, 'success');
     } catch (e) {
       console.error('[Admin Save] Publish failed:', e);
       showToast(`❌ बदलाव publish नहीं हुए: ${e.message}. इस browser में draft सुरक्षित है; फिर Save/Publish करें।`, 'error');

@@ -131,7 +131,7 @@
       if (img.id === 'hero-banner-img' || img.classList.contains('hero-banner-bg')) {
         img.style.display = 'none';
       } else if (img.id === 'hero-book-cover' || img.classList.contains('hero-book-cover') || img.id === 'sticky-thumb-img') {
-        img.src = '/images/books/kharif-master-guide-2026-cover.webp';
+        img.style.display = 'none';
       }
     };
   </script>
@@ -721,9 +721,7 @@
 
         <!-- RIGHT: BOOK DETAILS -->
         <div class="hero-details">
-          <span id="hero-tag" class="hero-tag">
-            🌾 Bestseller Agriculture eBook
-          </span>
+          <span id="hero-tag" class="hero-tag"></span>
 
           <h1 id="hero-title" class="hero-title hero-title-black-box">
           </h1>
