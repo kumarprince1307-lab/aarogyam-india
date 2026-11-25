@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795491174156,
+      "admin_edited": 1795579755851,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -1090,6 +1090,17 @@
           "cta_secondary_text": "⭐ किसान अनुभव",
           "cta_secondary_link": "#sec-reviews",
           "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/hero_slide-1003986713-751334-qrka.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -1577,7 +1588,7 @@
           }
         ]
       },
-      "admin_edited": 1791022298188,
+      "admin_edited": 1795579755712,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
