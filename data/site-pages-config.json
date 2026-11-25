@@ -44,9 +44,43 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-book-open",
+          "title": "120+ रंगीन पेज",
+          "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
+        },
+        {
+          "icon": "fa-bolt",
+          "title": "इंस्टेंट PDF डाउनलोड",
+          "desc": "भुगतान के तुरंत बाद आजीवन एक्सेस"
+        },
+        {
+          "icon": "fa-robot",
+          "title": "24×7 WhatsApp AI डॉक्टर",
+          "desc": "किताब पढ़ते समय तुरंत सवाल पूछें"
+        },
+        {
+          "icon": "fa-shield-halved",
+          "title": "100% सुरक्षित भुगतान",
+          "desc": "UPI, PhonePe, GPay व कार्ड्स"
+        }
+      ],
       "marketing_cards": [],
-      "videos": [],
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो",
+          "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
+          "ratio": "16:9"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
+          "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
+          "ratio": "16:9"
+        }
+      ],
       "reviews_heading": "",
       "reviews_badge": "",
       "reviews": [
@@ -968,7 +1002,28 @@
       "hidden_sections": [
         "sec_kpi_badges"
       ],
-      "kpi_cards": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-seedling",
+          "title": "बीज उपचार व किस्में",
+          "desc": "टॉप उन्नत वैरायटी का चयन"
+        },
+        {
+          "icon": "fa-spray-can",
+          "title": "स्प्रे साइंस चार्ट",
+          "desc": "सटीक रासायनिक व जैविक स्प्रे"
+        },
+        {
+          "icon": "fa-bug",
+          "title": "कीट व रोग नियंत्रण",
+          "desc": "लक्षण व प्रमाणित रोकथाम"
+        },
+        {
+          "icon": "fa-comments",
+          "title": "24×7 WhatsApp AI सहायता",
+          "desc": "कृषि विशेषज्ञों का डिजिटल सहयोग"
+        }
+      ],
       "videos": [
         {
           "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -1645,7 +1700,28 @@
       "hidden_sections": [
         "sec_kpi_badges"
       ],
-      "kpi_cards": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-bolt",
+          "title": "Instant PDF",
+          "desc": "1-सेकंड में डाउनलोड"
+        },
+        {
+          "icon": "fa-seedling",
+          "title": "100% Practical",
+          "desc": "प्रमाणित वैज्ञानिक ज्ञान"
+        },
+        {
+          "icon": "fa-robot",
+          "title": "AI Doctor Support",
+          "desc": "24×7 WhatsApp सहायता"
+        },
+        {
+          "icon": "fa-lock",
+          "title": "256-Bit SSL",
+          "desc": "100% सुरक्षित चेकआउट"
+        }
+      ],
       "videos": [
         {
           "url": "https://www.youtube.com/watch?v=EbdpqfJDN4c",
@@ -4020,7 +4096,7 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/hero_slide-1003986653-688530-c5yk.webp",
+          "image": "/images/banners/hero_slide-1003986653-828838-mdyi.webp",
           "tag": "⚡ VITALITY & MEN'S HEALTH",
           "title": "पौरुष कमजोरी: भ्रामक दवाओं से बचें, वैज्ञानिक समाधान",
           "subtitle": "नसों में ब्लड फ्लो, टेस्टोस्टेरोन और सहनशक्ति का 100% सुरक्षित प्राकृतिक समाधान।",
@@ -4051,6 +4127,28 @@
           "cta_secondary_text": "⭐ रिव्यू पढ़ें",
           "cta_secondary_link": "#sec-reviews",
           "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/hero_slide-1003986621-804841-a0g0.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003986620-852199-xbg5.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -4341,7 +4439,7 @@
           }
         ]
       },
-      "admin_edited": 1795586812283,
+      "admin_edited": 1795619864202,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
