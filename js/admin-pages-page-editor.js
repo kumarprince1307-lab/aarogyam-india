@@ -6264,7 +6264,7 @@ export async function initPageEditor() {
     { id: 'CROP001', name: 'सोयाबीन (Soybean)', season: 'खरीफ फसल', image: '/images/crops/soyabeen.jpeg', badge: 'प्रमुख तिलहन', color: '#3b82f6', mainIssues: 'गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर', solution: 'बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।' },
     { id: 'CROP002', name: 'धान / चावल (Paddy)', season: 'खरीफ / रबी', image: '/images/crops/paddy.jpeg', badge: 'अन्नदाता फसल', color: '#8b5cf6', mainIssues: 'ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट', solution: 'ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।' },
     { id: 'CROP003', name: 'गेहूं (Wheat)', season: 'रबी फसल', image: '/images/crops/wheat.jpeg', badge: 'मुख्य खाद्यान्न', color: '#6366f1', mainIssues: 'पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना', solution: 'प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।' },
-    { id: 'CROP004', name: 'कपास / नरमा (Cotton)', season: 'खरीफ व जायद', image: '/images/banners/hero-banner-1.jpeg', badge: 'सफेद सोना', color: '#0ea5e9', mainIssues: 'गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस', solution: 'फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।' },
+    { id: 'CROP004', name: 'कपास / नरमा (Cotton)', season: 'खरीफ व जायद', image: '/images/crops/cotton.jpeg', badge: 'सफेद सोना', color: '#0ea5e9', mainIssues: 'गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस', solution: 'फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।' },
     { id: 'CROP005', name: 'मक्का (Maize)', season: 'खरीफ / जायद', image: '/images/crops/maize.jpeg', badge: 'अनाज व चारा', color: '#06b6d4', mainIssues: 'फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना', solution: 'एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।' },
     { id: 'CROP006', name: 'सब्जियां, मिर्च व टमाटर', season: 'बारहमासी', image: '/images/crops/vegetables.jpeg', badge: 'नकदी फसल', color: '#10b981', mainIssues: 'मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा', solution: 'ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।' }
   ];
@@ -10413,18 +10413,31 @@ export async function initPageEditor() {
     const navNetsurf = document.getElementById('pe-nav-netsurf');
 
     const isNetsurf = (editingPageId === 'page_netsurf_career' || category === 'Career & Direct Selling');
-    const isPashu = (editingPageId === 'page_cattle_care' || category === 'Livestock');
+    const isPashu = (editingPageId === 'page_cattle_care' || category === 'Livestock' || (editingPageId && editingPageId.startsWith('page_pashu_')));
     const isHealthSubPage = (category === 'Healthcare Sub-page') || (editingPageId && editingPageId.startsWith('page_health_') && editingPageId !== 'page_health_hub');
+    const isAgriSubPage = (editingPageId && editingPageId.startsWith('page_agri_')) || (category === 'Agriculture' && editingPageId !== 'page_agriculture');
     const isAgri = (category === 'Agriculture' || category === 'eBooks' || category === 'Core') && !isNetsurf && !isPashu;
     const showHealth = (category === 'Health' || category === 'Healthcare' || category === 'Core') && !isNetsurf && !isPashu;
 
     if (netsurfSection) netsurfSection.style.display = isNetsurf ? 'block' : 'none';
     if (chipNetsurf) chipNetsurf.style.display = isNetsurf ? 'inline-block' : 'none';
     if (navNetsurf) navNetsurf.style.display = isNetsurf ? 'block' : 'none';
-    if (cbSection) cbSection.style.display = (isPashu || isHealthSubPage) ? 'block' : 'none';
+    
+    // Enable Clinical Breakdown / Diagnostics cards on Agri sub-pages, Pashu sub-pages, and Health sub-pages
+    if (cbSection) {
+      cbSection.style.display = (isPashu || isHealthSubPage || isAgriSubPage) ? 'block' : 'none';
+      const cbHeaderSpan = cbSection.querySelector('.admin-section-title span') || cbSection.querySelector('span');
+      if (cbHeaderSpan) {
+        if (isAgriSubPage) cbHeaderSpan.textContent = '🌾 9.1 प्रमुख फसल समस्याएं, रोग व सटीक समाधान (Crop Diagnostics & Remedies)';
+        else if (isPashu) cbHeaderSpan.textContent = '🐄 9.1 प्रमुख पशु रोग, लक्षण व सटीक समाधान (Livestock Diagnostics & Care)';
+        else cbHeaderSpan.textContent = '🩺 9.1 मुख्य स्वास्थ्य समस्याएं, लक्षण व समाधान (Clinical Breakdown)';
+      }
+    }
+    
     if (healthSection) healthSection.style.display = (showHealth && !isHealthSubPage) ? 'block' : 'none';
-    if (cropSection) cropSection.style.display = isAgri ? 'block' : 'none';
-    if (pashuSection) pashuSection.style.display = isPashu ? 'block' : 'none';
+    // Only show generic cropSection on main ebook/agri hub, hide on specific sub-pages to prevent confusion
+    if (cropSection) cropSection.style.display = (isAgri && !isAgriSubPage) ? 'block' : 'none';
+    if (pashuSection) pashuSection.style.display = (isPashu && editingPageId === 'page_cattle_care') ? 'block' : 'none';
     if (pageKpiSection) pageKpiSection.style.display = isHealthSubPage ? 'block' : 'none';
   }
   window.updateContextualSections = updateContextualSections;
