@@ -9738,8 +9738,14 @@ export async function initPageEditor() {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
           <div>
             <label style="font-size: 0.72rem; color: var(--admin-muted); display: block;">प्रमोट की जाने वाली पुस्तक (Book ID)</label>
-            <select onchange="window.updateMarketingCardBook(${idx}, this.value)" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.8rem;">
-              ${availableBooks.map(b => `<option value="${b.id}" ${b.id === m.book_id ? 'selected' : ''}>[${b.id}] ${b.heading || b.name} (₹${b.offerPrice || 99})</option>`).join('')}
+            <select onchange="window.updateMarketingCardBook(${idx}, this.value)" class="admin-select" style="width: 100%; padding: 5px 8px; font-size: 0.8rem; font-weight: 700;">
+              <optgroup label="📦 महाबचत ई-बुक बंडल (Bundles & Combos)">
+                <option value="BUN001" ${m.book_id === 'BUN001' ? 'selected' : ''}>[बंडल: BUN001] महाबचत 5-इन-1 सम्पूर्ण किसान कॉम्बो (₹149)</option>
+                <option value="BUN002" ${m.book_id === 'BUN002' ? 'selected' : ''}>[बंडल: BUN002] 4-इन-1 किसान मास्टर बंडल (₹199)</option>
+              </optgroup>
+              <optgroup label="📖 सभी एकल ई-बुक्स (Single eBooks)">
+                ${availableBooks.map(b => `<option value="${b.id}" ${b.id === m.book_id ? 'selected' : ''}>[${b.id}] ${b.heading || b.name} (₹${b.offerPrice || 99})</option>`).join('')}
+              </optgroup>
             </select>
           </div>
           <div>
@@ -9782,9 +9788,25 @@ export async function initPageEditor() {
   window.updateMarketingCardBook = function(idx, bookId) {
     if (currentMarketingCards[idx]) {
       currentMarketingCards[idx].book_id = bookId;
-      const b = availableBooks.find(x => x.id === bookId);
-      if (b) {
-        currentMarketingCards[idx].headline = b.heading || b.name || '';
+      if (bookId === 'BUN001') {
+        currentMarketingCards[idx].headline = 'महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो';
+        currentMarketingCards[idx].tag = '🔥 94% महाबचत कॉम्बो';
+        currentMarketingCards[idx].sales_counter = '3,800+ किसानों ने खरीदा';
+        currentMarketingCards[idx].desc = 'खेती का डॉक्टर + दवा सलाहकार + गेहूं, चना, सरसों गाइड्स का महाबचत संग्रह!';
+        currentMarketingCards[idx].is_bundle = true;
+      } else if (bookId === 'BUN002') {
+        currentMarketingCards[idx].headline = '4-इन-1 किसान मास्टर बंडल';
+        currentMarketingCards[idx].tag = '🔥 83% महाबचत';
+        currentMarketingCards[idx].sales_counter = '2,400+ किसानों ने खरीदा';
+        currentMarketingCards[idx].desc = 'धान, सोयाबीन, मक्का व संपूर्ण फसल डॉक्टर डिजिटल संग्रह!';
+        currentMarketingCards[idx].is_bundle = true;
+      } else {
+        const b = availableBooks.find(x => x.id === bookId);
+        if (b) {
+          currentMarketingCards[idx].headline = b.heading || b.name || '';
+          currentMarketingCards[idx].tag = '🔥 सर्वाधिक लोकप्रिय';
+          currentMarketingCards[idx].is_bundle = false;
+        }
       }
       renderMarketingCardsInBuilder();
     }
@@ -9827,23 +9849,31 @@ export async function initPageEditor() {
           <button type="button" onclick="window.removeVideoItem(${idx})" class="admin-button small-button" style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); padding: 4px 10px; font-size: 0.75rem;">&times; हटाएं</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
           <div>
             <label style="font-size: 0.72rem; color: #38bdf8; font-weight: 800; display: block; margin-bottom: 4px;">
-              🎬 AarogyamTube वीडियो लाइब्रेरी से चुनें:
+              🎬 AarogyamTube वीडियो लाइब्रेरी:
             </label>
             <select onchange="window.selectAarogyamTubeVideo(${idx}, this.value)" class="admin-select" style="width: 100%; padding: 7px 10px; font-size: 0.8rem; background: #0f172a; color: #38bdf8; border: 1.5px solid #38bdf8; border-radius: 8px; font-weight: 700;">
               <option value="">-- AarogyamTube वीडियो चुनें --</option>
               ${availableTubeRecordings.map(r => `
                 <option value="${r.id}" ${(v.video_id === r.id || v.url?.includes(r.id)) ? 'selected' : ''}>
-                  ${r.format === 'short_reel' ? '📱 [शॉर्ट]' : '🎬 [वीडियो]'} ${escapeHtml(r.title.substring(0, 44))} (${r.duration || ''})
+                  ${r.format === 'short_reel' ? '📱 [शॉर्ट]' : '🎬 [वीडियो]'} ${escapeHtml(r.title.substring(0, 40))} (${r.duration || ''})
                 </option>
               `).join('')}
             </select>
           </div>
 
           <div>
-            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block; margin-bottom: 4px;">प्रदर्शित करने वाला पेज (Target Page)</label>
+            <label style="font-size: 0.72rem; color: #f59e0b; font-weight: 800; display: block; margin-bottom: 4px;">📐 वीडियो फॉर्मेट / अनुपात (Ratio)</label>
+            <select onchange="window.updateVideoItem(${idx}, 'ratio', this.value); window.renderVideosInBuilder();" class="admin-select" style="width: 100%; padding: 7px 10px; font-size: 0.8rem; background: #0f172a; color: #f59e0b; border: 1.5px solid #f59e0b; border-radius: 8px; font-weight: 700;">
+              <option value="16:9" ${(v.ratio || '16:9') === '16:9' ? 'selected' : ''}>🎬 16:9 (Landscape / चौड़ा वीडियो)</option>
+              <option value="9:16" ${v.ratio === '9:16' ? 'selected' : ''}>📱 9:16 (Vertical Shorts / रील्स)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; color: var(--admin-muted); display: block; margin-bottom: 4px;">प्रदर्शित करने वाला पेज</label>
             <select onchange="window.updateVideoItem(${idx}, 'target_page', this.value)" class="admin-select" style="width: 100%; padding: 7px 10px; font-size: 0.8rem; background: #1e293b; color: #fff; border-radius: 8px;">
               ${pageTargetOptions.map(opt => `<option value="${opt.id}" ${(v.target_page || 'all') === opt.id ? 'selected' : ''}>${opt.label}</option>`).join('')}
             </select>
@@ -10773,11 +10803,13 @@ export async function initPageEditor() {
     currentMarketingCards = Array.isArray(p.marketing_cards) ? JSON.parse(JSON.stringify(p.marketing_cards)) : [];
     currentReviews = Array.isArray(p.reviews) ? JSON.parse(JSON.stringify(p.reviews)) : [];
     currentFaqs = Array.isArray(p.faqs) ? JSON.parse(JSON.stringify(p.faqs)) : [];
-    // For health sub-pages, don't load global disease defaults — start empty or load page-specific
+    // Categorical domain separation: Health sub-pages, Livestock, Agri
     const isHealthSubPage = (p.category === 'Healthcare Sub-page') || (p.id && p.id.startsWith('page_health_') && p.id !== 'page_health_hub');
-    currentHealthDiseases = Array.isArray(p.health_diseases) ? JSON.parse(JSON.stringify(p.health_diseases)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES)));
-    currentCrops = Array.isArray(p.crops) ? JSON.parse(JSON.stringify(p.crops)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST)));
-    currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : (isHealthSubPage ? [] : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST)));
+    const isLivestockPage = (p.category === 'Livestock') || (p.category === 'Pashupalan') || (p.id && (p.id.includes('pashu') || p.id === 'page_cattle_care'));
+    const isAgriPage = (p.category === 'Agriculture') || (p.id && p.id.startsWith('page_agri_'));
+    currentHealthDiseases = Array.isArray(p.health_diseases) ? JSON.parse(JSON.stringify(p.health_diseases)) : ((isHealthSubPage || isLivestockPage || isAgriPage) ? [] : JSON.parse(JSON.stringify(DEFAULT_HEALTH_DISEASES)));
+    currentCrops = Array.isArray(p.crops) ? JSON.parse(JSON.stringify(p.crops)) : ((isHealthSubPage || isLivestockPage) ? [] : (isAgriPage ? [] : JSON.parse(JSON.stringify(DEFAULT_CROPS_LIST))));
+    currentPashuCards = Array.isArray(p.pashu_cards) ? JSON.parse(JSON.stringify(p.pashu_cards)) : ((isHealthSubPage || isAgriPage) ? [] : JSON.parse(JSON.stringify(DEFAULT_PASHU_LIST)));
     currentProducts = Array.isArray(p.products) ? JSON.parse(JSON.stringify(p.products)) : [];
     // Auto sync & enrich with master products catalog
     if (Array.isArray(masterProducts) && masterProducts.length > 0) {

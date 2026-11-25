@@ -773,7 +773,7 @@
           "id": "CROP004",
           "name": "कपास / नरमा (Cotton)",
           "season": "खरीफ व जायद",
-          "image": "/images/banners/hero-banner-1.jpeg",
+          "image": "/images/crops/cotton.jpeg",
           "badge": "सफेद सोना",
           "color": "#0ea5e9",
           "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
@@ -1152,8 +1152,49 @@
           "desc": "WhatsApp पर तुरंत परामर्श"
         }
       ],
-      "marketing_cards": [],
-      "videos": [],
+      "marketing_cards": [
+        {
+          "book_id": "BK002",
+          "headline": "🐄 पशु व खेती डॉक्टर सम्पूर्ण गाइड",
+          "tag": "🔥 100% सुरक्षित पशुधन",
+          "sales_counter": "3,800+ पशुपालकों का भरोसा",
+          "desc": "गाय, भैंस, बकरी में दूध वृद्धि, थनैला नियंत्रण व समय पर गाभिन कराने का संपूर्ण वैज्ञानिक फॉर्मूला।"
+        }
+      ],
+      "videos": [
+        {
+          "title": "🐄 क्या सच में गाय ने देना शुरू किया 12 लीटर दूध? | PET-VET Product Review",
+          "youtube_id": "QKFdahi5FLk",
+          "thumbnail": "https://img.youtube.com/vi/QKFdahi5FLk/hqdefault.jpg",
+          "duration": "08:45",
+          "views": "1.4 लाख+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "देखे क्या खिलाया इसने 15 दिन में 5 लीटर दूध बढ़ा डेरी वालो के लिए वरदान",
+          "youtube_id": "W37dZEnnQ74",
+          "thumbnail": "https://img.youtube.com/vi/W37dZEnnQ74/hqdefault.jpg",
+          "duration": "11:15",
+          "views": "2.8 लाख+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "🐄 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका",
+          "youtube_id": "Y1lrwNHaAcE",
+          "thumbnail": "https://img.youtube.com/vi/Y1lrwNHaAcE/hqdefault.jpg",
+          "duration": "07:30",
+          "views": "5.6 लाख+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "☠️ गौ माता को बचाओ - संपूर्ण प्राथमिक चिकित्सा गाइड",
+          "youtube_id": "ew5tDJgGTK8",
+          "thumbnail": "https://img.youtube.com/vi/ew5tDJgGTK8/hqdefault.jpg",
+          "duration": "09:50",
+          "views": "95K+ व्यूज",
+          "ratio": "16:9"
+        }
+      ],
       "reviews_heading": "पशुपालकों के 10 वास्तविक अनुभव",
       "reviews_badge": "⭐ 100% पशुपालक संतुष्टि",
       "reviews": [
@@ -1395,68 +1436,7 @@
           "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
         }
       ],
-      "crops": [
-        {
-          "id": "CROP001",
-          "name": "सोयाबीन (Soybean)",
-          "season": "खरीफ फसल",
-          "image": "/images/crops/soyabeen.jpeg",
-          "badge": "प्रमुख तिलहन",
-          "color": "#3b82f6",
-          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
-          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
-        },
-        {
-          "id": "CROP002",
-          "name": "धान / चावल (Paddy)",
-          "season": "खरीफ / रबी",
-          "image": "/images/crops/paddy.jpeg",
-          "badge": "अन्नदाता फसल",
-          "color": "#8b5cf6",
-          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
-          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
-        },
-        {
-          "id": "CROP003",
-          "name": "गेहूं (Wheat)",
-          "season": "रबी फसल",
-          "image": "/images/crops/wheat.jpeg",
-          "badge": "मुख्य खाद्यान्न",
-          "color": "#6366f1",
-          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
-          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
-        },
-        {
-          "id": "CROP004",
-          "name": "कपास / नरमा (Cotton)",
-          "season": "खरीफ व जायद",
-          "image": "/images/banners/hero-banner-1.jpeg",
-          "badge": "सफेद सोना",
-          "color": "#0ea5e9",
-          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
-          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
-        },
-        {
-          "id": "CROP005",
-          "name": "मक्का (Maize)",
-          "season": "खरीफ / जायद",
-          "image": "/images/crops/maize.jpeg",
-          "badge": "अनाज व चारा",
-          "color": "#06b6d4",
-          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
-          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
-        },
-        {
-          "id": "CROP006",
-          "name": "सब्जियां, मिर्च व टमाटर",
-          "season": "बारहमासी",
-          "image": "/images/crops/vegetables.jpeg",
-          "badge": "नकदी फसल",
-          "color": "#10b981",
-          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
-          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
-        }
-      ],
+      "crops": [],
       "pashu_cards": [
         {
           "id": "PASHU001",
@@ -1466,7 +1446,7 @@
           "badge": "1-2L दूध वृद्धि",
           "image": "/images/banners/pashu-cow-care.jpg",
           "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
-          "solution": "आयुर्वेदिक मिनरल मिक्सचर (Pet-Vet), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
         },
         {
           "id": "PASHU002",
@@ -4855,7 +4835,7 @@
           "id": "CROP004",
           "name": "कपास / नरमा (Cotton)",
           "season": "खरीफ व जायद",
-          "image": "/images/banners/hero-banner-1.jpeg",
+          "image": "/images/crops/cotton.jpeg",
           "badge": "सफेद सोना",
           "color": "#0ea5e9",
           "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
@@ -6168,7 +6148,7 @@
           "id": "CROP004",
           "name": "कपास / नरमा (Cotton)",
           "season": "खरीफ व जायद",
-          "image": "/images/banners/hero-banner-1.jpeg",
+          "image": "/images/crops/cotton.jpeg",
           "badge": "सफेद सोना",
           "color": "#0ea5e9",
           "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
@@ -7917,26 +7897,21 @@
       ],
       "marketing_cards": [
         {
-          "book_id": "BK022",
-          "heading": "📚 सम्पूर्ण कृषि व मत्स्य प्रबंधन गाइड",
-          "subheading": "जल गुणवत्ता, FCR सुधार व रोगों से संपूर्ण सुरक्षा",
-          "badge": "BESTSELLER",
-          "cta_text": "तुरंत ई-बुक पढ़ें",
-          "headline": "आम की खेती (Mango Master Guide):"
+          "book_id": "BK002",
+          "headline": "🩺 पशु व मछली पालन सम्पूर्ण डॉक्टर गाइड",
+          "tag": "🔥 100% सुरक्षित प्रबंधन",
+          "sales_counter": "2,400+ किसानों का भरोसा",
+          "desc": "तालाब निर्माण, बीज चयन, फीडिंग तालिका व जल गुणवत्ता प्रबंधन की संपूर्ण मार्गदर्शिका।"
         }
       ],
       "videos": [
         {
-          "id": "v_aqua_1",
-          "title": "🐄 गाय-भैंस का दूध कम हो गया? 5.6 लाख पशुपालकों द्वारा देखा गया आसान तरीका | Biofit PET-VET",
-          "youtube_id": "Y1lrwNHaAcE",
-          "badge": "गाइड",
-          "video_id": "VID_S106444",
-          "desc": "दूध उत्पादन बढ़ाने और पशु स्वास्थ्य के लिए 1-मिनट का प्रैक्टिकल गाइड।",
-          "url": "/tube.html?vid=VID_S106444",
-          "thumbnail": "https://img.youtube.com/vi/Y1lrwNHaAcE/hqdefault.jpg",
-          "duration": "0:58",
-          "ratio": "9:16"
+          "title": "मत्स्य पालन: तालाब निर्माण से लेकर 5 गुना मुनाफा लेने का पूरा राज",
+          "youtube_id": "Pv2-wbzjXEc",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "10:00",
+          "views": "1.2 लाख+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "reviews_heading": "",
@@ -8090,108 +8065,47 @@
           "solution": "बायो-एंजाइम फ्लोर क्लीनर, प्राकृतिक नीम-कपूर कीटनाशक स्प्रे।"
         }
       ],
-      "crops": [
-        {
-          "id": "CROP001",
-          "name": "सोयाबीन (Soybean)",
-          "season": "खरीफ फसल",
-          "image": "/images/crops/soyabeen.jpeg",
-          "badge": "प्रमुख तिलहन",
-          "color": "#3b82f6",
-          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
-          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
-        },
-        {
-          "id": "CROP002",
-          "name": "धान / चावल (Paddy)",
-          "season": "खरीफ / रबी",
-          "image": "/images/crops/paddy.jpeg",
-          "badge": "अन्नदाता फसल",
-          "color": "#8b5cf6",
-          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
-          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
-        },
-        {
-          "id": "CROP003",
-          "name": "गेहूं (Wheat)",
-          "season": "रबी फसल",
-          "image": "/images/crops/wheat.jpeg",
-          "badge": "मुख्य खाद्यान्न",
-          "color": "#6366f1",
-          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
-          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
-        },
-        {
-          "id": "CROP004",
-          "name": "कपास / नरमा (Cotton)",
-          "season": "खरीफ व जायद",
-          "image": "/images/crops/cotton.jpeg",
-          "badge": "सफेद सोना",
-          "color": "#0ea5e9",
-          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
-          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
-        },
-        {
-          "id": "CROP005",
-          "name": "मक्का (Maize)",
-          "season": "खरीफ / जायद",
-          "image": "/images/crops/maize.jpeg",
-          "badge": "अनाज व चारा",
-          "color": "#06b6d4",
-          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
-          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
-        },
-        {
-          "id": "CROP006",
-          "name": "सब्जियां, मिर्च व टमाटर",
-          "season": "बारहमासी",
-          "image": "/images/crops/vegetables.jpeg",
-          "badge": "नकदी फसल",
-          "color": "#10b981",
-          "mainIssues": "मिर्च में चुर्रा-मुर्रा (Leaf Curl), फल छेदक, उकठा रोग व झुलसा",
-          "solution": "ब्लू-येलो स्टिकी ट्रैप, एसिटामिप्रिड + नीम तेल स्प्रे व ट्राइकोडर्मा विरिडी।"
-        }
-      ],
+      "crops": [],
       "pashu_cards": [
         {
-          "id": "PASHU001",
-          "name": "गाय - दुग्ध वृद्धि व पोषण",
-          "category": "गाय पालन (Cow Care)",
-          "icon": "🐄",
-          "badge": "1-2L दूध वृद्धि",
-          "image": "/images/banners/pashu-cow-care.jpg",
-          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
-          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
+          "id": "PASHU_FISH_01",
+          "name": "रोहू मछली (Rohu Carp)",
+          "category": "मत्स्य पालन (Fisheries)",
+          "icon": "🐟",
+          "badge": "उच्च मांग",
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "तालाब में ऑक्सीजन कमी, धीमी वृद्धि, पूंछ सड़न रोग",
+          "solution": "प्रति एकड़ 1.5 HP एरेटर, प्रोबायोटिक फीड व चूना-पोटाश जल शुद्धिकरण।"
         },
         {
-          "id": "PASHU002",
-          "name": "भैंस - FAT% व SNF वृद्धि",
-          "category": "भैंस पालन (Buffalo Care)",
-          "icon": "🐃",
-          "badge": "FAT 8% तक",
-          "image": "/images/banners/pashu-palan-banner.jpg",
-          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
-          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
+          "id": "PASHU_FISH_02",
+          "name": "कतला मछली (Catla Carp)",
+          "category": "सतही मछली",
+          "icon": "🐠",
+          "badge": "तीव्र वृद्धि",
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "प्लवक (Plankton) की कमी, गिल्स (गलफड़े) में फंगस",
+          "solution": "जैविक गोबर खाद द्वारा प्लवक संवर्धन व पोटेशियम परमैंगनेट स्नान।"
         },
         {
-          "id": "PASHU003",
-          "name": "बकरी पालन - वजन वृद्धि",
-          "category": "बकरी पालन (Goat Farming)",
-          "icon": "🐐",
-          "badge": "उच्च मुनाफा",
-          "image": "/images/banners/pashu-goat-care.jpg",
-          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
-          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
+          "id": "PASHU_FISH_03",
+          "name": "पंगेशियस (Pangasius Catfish)",
+          "category": "हाई डेंसिटी फार्मिंग",
+          "icon": "🐟",
+          "badge": "बंपर उत्पादन",
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "सर्दियों में ठंड से मृत्यु, अमोनिया गैस वृद्धि",
+          "solution": "तालाब में ताजा बोरवेल जल प्रवाह व जिओलाइट पाउडर द्वारा अमोनिया शमन।"
         },
         {
-          "id": "PASHU004",
-          "name": "पशुओं में थनैला व पाचन रोग",
-          "category": "रोग नियंत्रण व प्राथमिक उपचार",
+          "id": "PASHU_FISH_04",
+          "name": "अल्सर व लाल चकत्ते रोग (EUS)",
+          "category": "रोग निवारण",
           "icon": "🩺",
           "badge": "100% सुरक्षा",
-          "image": "/images/banners/pashu-palan-banner.jpg",
-          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
-          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "शरीर पर लाल घाव, फफूंद संक्रमण, सामूहिक मृत्यु",
+          "solution": "सीफैक्स (CIFAX) दवा का छिड़काव व 200 किग्रा चूना प्रति एकड़ अनुप्रयोग।"
         }
       ],
       "products": [
@@ -8269,11 +8183,11 @@
       ],
       "marketing_cards": [
         {
-          "book_id": "BK001",
-          "heading": "📚 आधुनिक पोल्ट्री व पशुपालन मास्टर गाइड",
-          "subheading": "देसी मुर्गी पालन, टीकाकरण शेड्यूल व बायो-सिक्योरिटी",
-          "badge": "BESTSELLER",
-          "cta_text": "गाइड पढ़ें"
+          "book_id": "BK002",
+          "headline": "🐔 सम्पूर्ण पोल्ट्री व पक्षी डॉक्टर गाइड",
+          "tag": "🔥 100% सुरक्षा",
+          "sales_counter": "1,900+ पोल्ट्री फार्मर्स का भरोसा",
+          "desc": "ब्रूडिंग से लेकर टीकाकरण, फीड कन्वर्जन (FCR) सुधार व अंडा-मांस उत्पादन बढ़ाने का सटीक फॉर्मूला।"
         }
       ],
       "products": [
@@ -8328,10 +8242,12 @@
       ],
       "videos": [
         {
-          "id": "v_poultry_1",
-          "title": "देसी मुर्गी फार्मिंग में मुनाफा कैसे दोगुना करें?",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "पोल्ट्री गाइड"
+          "title": "पोल्ट्री फार्मिंग: कम लागत में चूजों की देखभाल और भारी मुनाफा",
+          "youtube_id": "Pv2-wbzjXEc",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "09:15",
+          "views": "85K+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -8368,7 +8284,50 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [],
+      "pashu_cards": [
+        {
+          "id": "PASHU_POULTRY_01",
+          "name": "ब्रायलर पालन (Broiler Care)",
+          "category": "मांस उत्पादन",
+          "icon": "🐔",
+          "badge": "35 दिन में 2Kg",
+          "image": "/images/sakhi/murgi-sakhi.webp",
+          "mainIssues": "शुरुआती चूजों में मृत्यु (Chicks Mortality), तापमान असंतुलन, दस्त",
+          "solution": "ब्रूडिंग तापमान 95°F, इलेक्ट्रोलाइट्स व विटामिन सप्लीमेंट्स का शुरुआती 7 दिन प्रयोग।"
+        },
+        {
+          "id": "PASHU_POULTRY_02",
+          "name": "लेयर मुर्गी (Layer Farming)",
+          "category": "अंडा उत्पादन",
+          "icon": "🥚",
+          "badge": "300+ अंडे/वर्ष",
+          "image": "/images/sakhi/murgi-sakhi.webp",
+          "mainIssues": "अंडे के छिलके का पतला होना, कैल्शियम कमी, ड्रॉपिंग समस्या",
+          "solution": "डाई-कैल्शियम फॉस्फेट (DCP), शैल ग्रिट व लीवर टॉनिक का नियमित आहार में समावेश।"
+        },
+        {
+          "id": "PASHU_POULTRY_03",
+          "name": "देसी व कड़कनाथ पालन",
+          "category": "देसी फार्मिंग",
+          "icon": "🐓",
+          "badge": "प्रीमियम भाव",
+          "image": "/images/sakhi/murgi-sakhi.webp",
+          "mainIssues": "धीमी वृद्धि, रानीखेत रोग, जंगली जानवरों से सुरक्षा",
+          "solution": "फ्री-रेंज बाड़ा प्रबंधन, अजमोद-हल्दी आहार मिश्रण और लासोटा टीका।"
+        },
+        {
+          "id": "PASHU_POULTRY_04",
+          "name": "रानीखेत (ND) व गम्बोरो सुरक्षा",
+          "category": "टीकाकरण शिड्यूल",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/sakhi/murgi-sakhi.webp",
+          "mainIssues": "गर्दन मरोड़, सांस लेने में घरघराहट, अचानक भारी मृत्यु दर",
+          "solution": "7वें दिन F1 लासोटा, 14वें दिन गम्बोरो व 28वें दिन लासोटा बूस्टर वैक्सीनेशन।"
+        }
+      ]
     },
     {
       "id": "page_pashu_dog",
@@ -8398,11 +8357,11 @@
       ],
       "marketing_cards": [
         {
-          "book_id": "BK001",
-          "heading": "📚 सम्पूर्ण पशु व श्वान पोषण मैनुअल",
-          "subheading": "आहार, टीकाकरण, कृमि मुक्ति (Deworming) और व्यवहार प्रशिक्षण",
-          "badge": "EXPERT PICK",
-          "cta_text": "ई-बुक पढ़ें"
+          "book_id": "BK002",
+          "headline": "🐕 संपूर्ण डॉग व पेट केयर मास्टर गाइड",
+          "tag": "🔥 स्वस्थ पेट्स",
+          "sales_counter": "1,400+ पेट लवर्स का भरोसा",
+          "desc": "डॉग न्यूट्रिशन, टीकाकरण, टिक्स नियंत्रण व व्यवहार ट्रेनिंग की संपूर्ण मार्गदर्शिका।"
         }
       ],
       "products": [
@@ -8457,10 +8416,12 @@
       ],
       "videos": [
         {
-          "id": "v_dog_1",
           "title": "डॉग में टिक्स और बाल झड़ने का घरेलू व प्राकृतिक इलाज",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "केयर गाइड"
+          "youtube_id": "Pv2-wbzjXEc",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "08:40",
+          "views": "68K+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -8497,7 +8458,40 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [],
+      "pashu_cards": [
+        {
+          "id": "PASHU_DOG_01",
+          "name": "जर्मन शेफर्ड व लैब्राडोर केयर",
+          "category": "श्वान पोषण",
+          "icon": "🐕",
+          "badge": "एक्टिव व स्वस्थ",
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "बाल झड़ना (Hairfall), भूख न लगना, त्वचा संक्रमण",
+          "solution": "ओमेगा-3 व 6 फैटी एसिड सप्लीमेंट, उच्च प्रोटीन आहार और नियमित ब्रशिंग।"
+        },
+        {
+          "id": "PASHU_DOG_02",
+          "name": "टिक्स (चिचड़ी) व पिस्सू सुरक्षा",
+          "category": "परजीवी नियंत्रण",
+          "icon": "🩺",
+          "badge": "100% राहत",
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "टिक्स बुखार, शरीर पर खुजली, घाव",
+          "solution": "फिपप्रोनिल टिक स्प्रे, एंटी-टिक शैम्पू व नीम अर्क से डॉग बेड की सफाई।"
+        },
+        {
+          "id": "PASHU_DOG_03",
+          "name": "7-इन-1 व पार्वो वैक्सीनेशन",
+          "category": "टीकाकरण शिड्यूल",
+          "icon": "💉",
+          "badge": "जीवन रक्षा",
+          "image": "/images/banners/agriculture-banner.jpeg",
+          "mainIssues": "पार्वो वायरस (उल्टी-दस्त), डिस्टेंपर, रेबीज",
+          "solution": "6 सप्ताह की उम्र में पार्वो, 8वें सप्ताह 7-इन-1 और 12वें सप्ताह एंटी-रेबीज टीका।"
+        }
+      ]
     },
     {
       "id": "page_pashu_bakra",
@@ -8527,11 +8521,11 @@
       ],
       "marketing_cards": [
         {
-          "book_id": "BK001",
-          "heading": "📚 व्यावसायिक बकरी पालन संपूर्ण मार्गदर्शिका",
-          "subheading": "शेड निर्माण, नस्ल चयन, आहार फॉर्मूलेशन व विपणन रणनीति",
-          "badge": "POPULAR",
-          "cta_text": "गाइड पढ़ें"
+          "book_id": "BK002",
+          "headline": "🐐 आधुनिक बकरी व बकरा पालन मास्टर गाइड",
+          "tag": "🔥 उच्च मुनाफा",
+          "sales_counter": "2,800+ पशुपालकों का भरोसा",
+          "desc": "नस्ल सुधार, 4 महीने में 40 किलो वजन वृद्धि, शेड डिजाइन व टीकाकरण का संपूर्ण रोडमैप।"
         }
       ],
       "products": [
@@ -8586,10 +8580,12 @@
       ],
       "videos": [
         {
-          "id": "v_goat_1",
-          "title": "स्टॉल-फेड बकरा पालन: 4 महीने में 40 किलो वजन कैसे करें?",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "गोट फार्मिंग"
+          "title": "बकरी पालन: 10 बकरियों से 5 लाख सालाना मुनाफा कैसे कमाएं?",
+          "youtube_id": "Pv2-wbzjXEc",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "11:20",
+          "views": "1.5 लाख+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -8626,7 +8622,40 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [],
+      "pashu_cards": [
+        {
+          "id": "PASHU_GOAT_01",
+          "name": "सिरोही व बरबरी नस्ल",
+          "category": "बकरी पालन (Breeding)",
+          "icon": "🐐",
+          "badge": "उच्च प्रजनन",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "गर्मी में हांफना, बच्चों में दस्त, कृमि संक्रमण",
+          "solution": "शेड में वेंटिलेशन, एल्बेंडाजोल से नियमित डीवर्मिंग और मिनरल ब्रिक्स।"
+        },
+        {
+          "id": "PASHU_GOAT_02",
+          "name": "स्टॉल-फेड बकरा पालन",
+          "category": "वजन वृद्धि",
+          "icon": "🐐",
+          "badge": "40Kg वजन",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "धीमी शारीरिक वृद्धि, अपच, आफरा (Bloat)",
+          "solution": "सूखा चारा (भूसा) + हरा चारा + मक्का-सोयाबीन दाना मिश्रण और बायोफिट PET-VET।"
+        },
+        {
+          "id": "PASHU_GOAT_03",
+          "name": "पीपीआर (PPR) व ईटीवी टीका",
+          "category": "टीकाकरण सुरक्षा",
+          "icon": "🩺",
+          "badge": "100% सुरक्षा",
+          "image": "/images/banners/pashu-goat-care.jpg",
+          "mainIssues": "मुंह में छाले, तेज बुखार, खूनी दस्त",
+          "solution": "वर्ष में एक बार पीपीआर (PPR) और छह माह में ईटीवी (ETV) टीका अनिवार्य।"
+        }
+      ]
     },
     {
       "id": "page_agri_kharif",
@@ -8657,10 +8686,18 @@
       "marketing_cards": [
         {
           "book_id": "BK001",
-          "heading": "📚 खरीफ फसल संपूर्ण वैज्ञानिक गाइड (BK001)",
-          "subheading": "धान, सोयाबीन, कपास, मक्का का 100% सफल उत्पादन रोडमैप",
-          "badge": "MUST READ",
-          "cta_text": "ई-बुक तुरंत पढ़ें"
+          "headline": "🌾 खरीफ फसल मास्टर गाइड 2026",
+          "tag": "🔥 खरीफ सर्वाधिक लोकप्रिय",
+          "sales_counter": "4,500+ किसानों ने खरीदा",
+          "desc": "धान, सोयाबीन, कपास और मक्का में खरपतवार नियंत्रण, कीट सुरक्षा व रिकॉर्ड उपज फॉर्मूला।"
+        },
+        {
+          "book_id": "BUN002",
+          "headline": "4-इन-1 किसान मास्टर बंडल",
+          "tag": "🔥 83% महाबचत",
+          "sales_counter": "2,900+ किसानों का भरोसा",
+          "desc": "धान, सोयाबीन, मक्का व संपूर्ण फसल डॉक्टर डिजिटल संग्रह!",
+          "is_bundle": true
         }
       ],
       "products": [
@@ -8802,10 +8839,20 @@
       ],
       "videos": [
         {
-          "id": "v_kharif_1",
-          "title": "खरीफ फसलों में कम लागत में अधिक कल्ले और फलियां कैसे पाएं?",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "खरीफ गाइड"
+          "title": "बीज संस्कार: मजबूत फसल का राज 🌱",
+          "youtube_id": "Ae9E-arA8lo",
+          "thumbnail": "https://img.youtube.com/vi/Ae9E-arA8lo/hqdefault.jpg",
+          "duration": "06:18",
+          "views": "92K+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱",
+          "youtube_id": "jxu9W_s-C70",
+          "thumbnail": "https://img.youtube.com/vi/jxu9W_s-C70/hqdefault.jpg",
+          "duration": "07:40",
+          "views": "74K+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -8842,7 +8889,69 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [
+        {
+          "id": "CROP_KHARIF_01",
+          "name": "धान / चावल (Paddy)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "अन्नदाता फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "ब्लास्ट (झुलसा), तना छेदक, भूरा माहू (BPH), शीथ ब्लाइट",
+          "solution": "ट्राइसाइक्लाजोल व नीम ऑयल स्प्रे, जिंक सल्फेट प्रयोग और जल स्तर प्रबंधन तालिका।"
+        },
+        {
+          "id": "CROP_KHARIF_02",
+          "name": "सोयाबीन (Soybean)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "प्रमुख तिलहन",
+          "color": "#3b82f6",
+          "mainIssues": "गर्डल बीटल, पीला मोज़ेक वायरस, तना मक्खी व सेमीलूपर",
+          "solution": "बीज उपचार, सही समय पर कीटनाशक-फफूंदनाशक स्प्रे और पोटाश-बोरोन पोषण प्रबंधन।"
+        },
+        {
+          "id": "CROP_KHARIF_03",
+          "name": "मक्का (Maize)",
+          "season": "खरीफ फसल",
+          "image": "/images/crops/maize.jpeg",
+          "badge": "अनाज व चारा",
+          "color": "#06b6d4",
+          "mainIssues": "फॉल आर्मीवर्म (सैनिक कीट), तना छेदक, भुट्टे में दाने न भरना",
+          "solution": "एमामेक्टिन बेंजोएट या कोराजन का सटीक छिड़काव व दानेदार कीटनाशक का पोंगे में प्रयोग।"
+        },
+        {
+          "id": "CROP_KHARIF_04",
+          "name": "कपास / नरमा (Cotton)",
+          "season": "खरीफ नकदी फसल",
+          "image": "/images/books/bk016-cover.webp",
+          "badge": "सफेद सोना",
+          "color": "#0ea5e9",
+          "mainIssues": "गुलाबी सुंडी (Pink Bollworm), सफेद मक्खी, पत्ती मरोड़ वायरस",
+          "solution": "फेरोमोन ट्रैप, प्रोफेनोफॉस स्प्रे और बोरॉन-कैल्शियम से टिंडे झड़ने की रोकथाम।"
+        },
+        {
+          "id": "CROP_KHARIF_05",
+          "name": "मूंगफली (Groundnut)",
+          "season": "खरीफ तिलहन",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "गरीबों का बादाम",
+          "color": "#f59e0b",
+          "mainIssues": "सफेद लट (White Grub), टिक्का रोग, कॉलर रॉट",
+          "solution": "क्लोरोपायरीफॉस या फिप्रोनिल से मृदा उपचार व हेक्साकोनाजोल स्प्रे।"
+        },
+        {
+          "id": "CROP_KHARIF_06",
+          "name": "अरहर / तुअर (Pigeon Pea)",
+          "season": "खरीफ दलहन",
+          "image": "/images/books/bk019-cover.webp",
+          "badge": "प्रमुख दलहन",
+          "color": "#10b981",
+          "mainIssues": "उकठा (Wilt), फली छेदक इल्ली, स्टंटिंग",
+          "solution": "ट्राइकोडर्मा बीज उपचार व फूल आने पर नीम ऑयल + कीटनाशक स्प्रे।"
+        }
+      ]
     },
     {
       "id": "page_agri_rabi",
@@ -8872,11 +8981,26 @@
       ],
       "marketing_cards": [
         {
-          "book_id": "BK001",
-          "heading": "📚 रबी फसल संपूर्ण वैज्ञानिक गाइड",
-          "subheading": "गेहूं, चना, सरसों, मटर और आलू का संपूर्ण रोग व पोषण चक्र",
-          "badge": "TOP GUIDE",
-          "cta_text": "गाइड पढ़ें"
+          "book_id": "BK017",
+          "headline": "🌾 गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका",
+          "tag": "🔥 रबी बेस्टसेलर",
+          "sales_counter": "3,200+ किसानों ने खरीदा",
+          "desc": "कल्ले बढ़ाने, पीला रतुआ रोकथाम और 25 क्विंटल प्रति एकड़ उपज लेने का वैज्ञानिक फॉर्मूला।"
+        },
+        {
+          "book_id": "BK020",
+          "headline": "🌻 सरसों खेती गाइड सम्पूर्ण वैज्ञानिक मार्गदर्शिका",
+          "tag": "🔥 माहू व पाला सुरक्षा",
+          "sales_counter": "2,600+ किसानों का भरोसा",
+          "desc": "सरसों में तेल प्रतिशत 42% तक बढ़ाने व पाले से 100% सुरक्षा का संपूर्ण व्यावहारिक रोडमैप।"
+        },
+        {
+          "book_id": "BUN001",
+          "headline": "महाबचत 5-इन-1 सम्पूर्ण किसान मास्टर कॉम्बो",
+          "tag": "🔥 94% महाबचत कॉम्बो",
+          "sales_counter": "4,100+ किसानों ने खरीदा",
+          "desc": "गेहूं, चना, सरसों, फसल डॉक्टर व दवा सलाहकार गाइड्स का सम्पूर्ण डिजिटल संग्रह!",
+          "is_bundle": true
         }
       ],
       "products": [
@@ -9008,10 +9132,36 @@
       ],
       "videos": [
         {
-          "id": "v_rabi_1",
-          "title": "गेहूं में 25 क्विंटल प्रति एकड़ पैदावार लेने का वैज्ञानिक फॉर्मूला",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "रबी स्पेशल"
+          "title": "सरसों की खेती करने जा रहे है तो अभी रुकिए: रिजल्ट बायोफिट",
+          "youtube_id": "EOmAH2HdfZA",
+          "thumbnail": "https://img.youtube.com/vi/EOmAH2HdfZA/hqdefault.jpg",
+          "duration": "10:24",
+          "views": "1.2 लाख+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "क्या चने के खेत में चना ही चना चाहिए तो अभी ये वीडियो देखिए",
+          "youtube_id": "elfPs4vU_s0",
+          "thumbnail": "https://img.youtube.com/vi/elfPs4vU_s0/hqdefault.jpg",
+          "duration": "08:45",
+          "views": "85K+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "चना बीज उपचार: सही तरीका 🌱",
+          "youtube_id": "mHRWuIRq604",
+          "thumbnail": "https://img.youtube.com/vi/mHRWuIRq604/hqdefault.jpg",
+          "duration": "05:12",
+          "views": "62K+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "🛑 फसल का तनाज़ोर और दाना मजबूत क्यों नहीं? जानिए पोटाश का समाधान!",
+          "youtube_id": "DOAn6BkMvwE",
+          "thumbnail": "https://img.youtube.com/vi/DOAn6BkMvwE/hqdefault.jpg",
+          "duration": "12:30",
+          "views": "94K+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -9048,7 +9198,69 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [
+        {
+          "id": "CROP_RABI_01",
+          "name": "गेहूं (Wheat)",
+          "season": "रबी फसल",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "मुख्य खाद्यान्न",
+          "color": "#6366f1",
+          "mainIssues": "पीला व भूरा रतुआ (Rust), दीमक, करनाल बंट, दाने का छोटा रहना",
+          "solution": "प्रोपिकोनाजोल स्प्रे, कल्ले बढ़ाते समय नैनो यूरिया व बायोफिट एनपीके + ह्यूमिक एसिड का वैज्ञानिक प्रयोग।"
+        },
+        {
+          "id": "CROP_RABI_02",
+          "name": "चना (Gram / Chickpea)",
+          "season": "रबी फसल",
+          "image": "/images/books/bk019-cover.webp",
+          "badge": "दलहन राजा",
+          "color": "#f59e0b",
+          "mainIssues": "उकठा रोग (Fusarium Wilt), फली छेदक (Helicoverpa), कॉलर रॉट",
+          "solution": "ट्राइकोडर्मा से बीज उपचार, जैविक फेरोमोन ट्रैप व फलियों में दाना भराव हेतु बायोफिट स्टिमरिच छिड़काव।"
+        },
+        {
+          "id": "CROP_RABI_03",
+          "name": "सरसों (Mustard / Rapeseed)",
+          "season": "रबी फसल",
+          "image": "/images/books/bk020-cover.webp",
+          "badge": "तिलहन सम्राट",
+          "color": "#eab308",
+          "mainIssues": "माहू (चेपा / Aphids), सफेद रतुआ (White Rust), पाले (Frost) से नुकसान",
+          "solution": "नीम तेल व बायो-99 स्टिकर स्प्रे, गंधक (सल्फर) व पोटाश द्वारा पाले से 100% सुरक्षा और तेल प्रतिशत वृद्धि।"
+        },
+        {
+          "id": "CROP_RABI_04",
+          "name": "आलू (Potato)",
+          "season": "रबी नकदी फसल",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "नकदी फसल",
+          "color": "#10b981",
+          "mainIssues": "पछेती झुलसा (Late Blight), अगेती झुलसा, कंद का छोटा रहना व सड़न",
+          "solution": "बायोफिट रैप-अप फंगस शील्ड, कंद बनते समय पोटाश व बोरॉन का संतुलित फोलियर स्प्रे।"
+        },
+        {
+          "id": "CROP_RABI_05",
+          "name": "मटर (Green Peas)",
+          "season": "रबी सब्जी",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "हरी सब्जी",
+          "color": "#14b8a6",
+          "mainIssues": "चूर्णिल आसिता (Powdery Mildew), फली छेदक, जड़ गलन",
+          "solution": "सल्फर युक्त जैव कवकनाशी, प्रोफेनोफॉस + बायोफिट स्प्रे और जैविक जीवामृत।"
+        },
+        {
+          "id": "CROP_RABI_06",
+          "name": "लहसुन व प्याज (Garlic & Onion)",
+          "season": "रबी मसाला",
+          "image": "/images/books/bk016-cover.webp",
+          "badge": "मसाला फसल",
+          "color": "#8b5cf6",
+          "mainIssues": "थ्रिप्स (पीलापन), पर्पल ब्लॉच (बैंगनी धब्बा), कंद सड़न",
+          "solution": "ब्लू स्टिकी ट्रैप, बायो-99 के साथ कीटनाशक छिड़काव और पोटाश-सल्फर उर्वरक प्रबंधन।"
+        }
+      ]
     },
     {
       "id": "page_agri_jayad",
@@ -9581,17 +9793,17 @@
       "marketing_cards": [
         {
           "book_id": "BK026",
-          "heading": "🍌 केला मास्टर गाइड (Banana Master Guide)",
-          "subheading": "टिशू कल्चर, फर्टिगेशन शेड्यूल, घार वजन 35+ किग्रा तकनीक",
-          "badge": "BESTSELLER",
-          "cta_text": "गाइड तुरंत पढ़ें"
+          "headline": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
+          "tag": "🔥 बंपर फल उत्पादन",
+          "sales_counter": "2,100+ किसानों का भरोसा",
+          "desc": "टिश्यू कल्चर से लेकर घौद की चमक और एक्सपोर्ट क्वालिटी केला उत्पादन का संपूर्ण राज।"
         },
         {
           "book_id": "BK022",
-          "heading": "🥭 आम मास्टर गाइड (Mango Master Guide)",
-          "subheading": "मंजर सुरक्षा, फल मक्खी नियंत्रण व निरंतर फलन फॉर्मूला",
-          "badge": "POPULAR",
-          "cta_text": "गाइड तुरंत पढ़ें"
+          "headline": "🥭 आम की खेती (Mango Master Guide)",
+          "tag": "🔥 आम एक्सपोर्ट फॉर्मूला",
+          "sales_counter": "1,800+ किसानों ने खरीदा",
+          "desc": "बौर गिरने से रोकने, फल का आकार बढ़ाने व फल मक्खी से 100% सुरक्षा की आधुनिक गाइड।"
         }
       ],
       "products": [
@@ -9723,10 +9935,12 @@
       ],
       "videos": [
         {
-          "id": "v_fruits_1",
-          "title": "केले और आम में एक्सपोर्ट क्वालिटी फल तैयार करने का रहस्य",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "बागवानी मास्टर"
+          "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱",
+          "youtube_id": "Pv2-wbzjXEc",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "08:20",
+          "views": "1.1 लाख+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -9763,7 +9977,69 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [
+        {
+          "id": "CROP_FRUIT_01",
+          "name": "आम (Mango)",
+          "season": "बारहमासी फल",
+          "image": "/images/books/bk022-cover.webp",
+          "badge": "फलों का राजा",
+          "color": "#f59e0b",
+          "mainIssues": "बौर गिरना, फल मक्खी (Fruit Fly), पाउडरी मिल्ड्यू, ब्लैक टिप",
+          "solution": "प्लानोफिक्स या स्टिमरिच स्प्रे, फेरोमोन ट्रैप व फल मक्खी ट्रैप का बगीचे में प्रयोग।"
+        },
+        {
+          "id": "CROP_FRUIT_02",
+          "name": "केला (Banana)",
+          "season": "बारहमासी फल",
+          "image": "/images/books/bk026-cover.webp",
+          "badge": "उच्च मुनाफा",
+          "color": "#eab308",
+          "mainIssues": "सिगाटोका पत्ती धब्बा, पनामा विल्ट, घुन (Rhizome Weevil)",
+          "solution": "बायोफिट रैप-अप स्प्रे, ड्रिप द्वारा पोटाश पोषण और रोगमुक्त टिश्यू कल्चर पौधे।"
+        },
+        {
+          "id": "CROP_FRUIT_03",
+          "name": "अनार (Pomegranate)",
+          "season": "बागवानी फल",
+          "image": "/images/books/bk023-cover.webp",
+          "badge": "निर्यात फल",
+          "color": "#ef4444",
+          "mainIssues": "तेलिया रोग (Bacterial Blight), फल फटना, थ्रिप्स व बोरर",
+          "solution": "कॉपर ऑक्सीक्लोराइड + एंटीबायोटिक स्प्रे, बोरॉन छिड़काव से फल फटने पर 100% रोक।"
+        },
+        {
+          "id": "CROP_FRUIT_04",
+          "name": "पपीता (Papaya)",
+          "season": "वार्षिक फल",
+          "image": "/images/books/bk028-cover.webp",
+          "badge": "शीघ्र उत्पादन",
+          "color": "#f97316",
+          "mainIssues": "रिंग स्पॉट वायरस, तना व जड़ सड़न, एफिड कीट",
+          "solution": "जल निकासी युक्त ऊंची मेड़ पर रोपाई, नीम ऑयल व वायरस प्रतिरोधी किस्में।"
+        },
+        {
+          "id": "CROP_FRUIT_05",
+          "name": "अंगूर (Grape)",
+          "season": "बागवानी फल",
+          "image": "/images/books/bk024-cover.webp",
+          "badge": "प्रीमियम फल",
+          "color": "#8b5cf6",
+          "mainIssues": "डाउनी मिल्ड्यू, एन्थ्रेक्नोज, थ्रिप्स",
+          "solution": "बोर्डो मिश्रण, बायो-99 के साथ सल्फर स्प्रे और वैज्ञानिक छंटाई।"
+        },
+        {
+          "id": "CROP_FRUIT_06",
+          "name": "चीकू (Sapota)",
+          "season": "सदाबहार फल",
+          "image": "/images/books/bk029-cover.webp",
+          "badge": "सदाबहार",
+          "color": "#10b981",
+          "mainIssues": "कली छेदक, पत्ती जाला कीट, फल मक्खी",
+          "solution": "फेरोमोन ट्रैप, जैविक कीटनाशक व सूक्ष्म पोषक तत्व स्प्रे।"
+        }
+      ]
     },
     {
       "id": "page_agri_flowers",
@@ -10000,10 +10276,17 @@
       "marketing_cards": [
         {
           "book_id": "BK002",
-          "heading": "📚 संपूर्ण खेती डॉक्टर गाइड (BK002)",
-          "subheading": "100+ फसल रोगों, कीटों और फफूंद का सचित्र जैविक समाधान",
-          "badge": "ESSENTIAL",
-          "cta_text": "गाइड तुरंत पढ़ें"
+          "headline": "🩺 खेती का डॉक्टर: सम्पूर्ण रोग व कीट निदान",
+          "tag": "🔥 100% वैज्ञानिक समाधान",
+          "sales_counter": "5,800+ किसानों का भरोसा",
+          "desc": "फसलों के 100+ गंभीर रोगों और कीटों का बिना अनावश्यक खर्च के अचूक घरेलू व जैविक इलाज।"
+        },
+        {
+          "book_id": "BK016",
+          "headline": "💊 कृषि दवा सलाहकार गाइड",
+          "tag": "🔥 सटीक दवा फॉर्मूला",
+          "sales_counter": "3,100+ किसानों ने खरीदा",
+          "desc": "कौन सी दवा कब, कितनी मात्रा में और किस संयोजन के साथ स्प्रे करें, जानिए पूरा चार्ट।"
         }
       ],
       "products": [
@@ -10135,10 +10418,20 @@
       ],
       "videos": [
         {
-          "id": "v_doctor_1",
-          "title": "फसल में कीट व फंगस को बिना जहर के कैसे खत्म करें?",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "डॉक्टर गाइड"
+          "title": "खेती का डॉक्टर बुक क्यों खरीदे | सम्पूर्ण वॉकथ्रू",
+          "youtube_id": "bvCuBEuyg48",
+          "thumbnail": "https://img.youtube.com/vi/bvCuBEuyg48/hqdefault.jpg",
+          "duration": "06:15",
+          "views": "88K+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "टमाटर में कुकड़ा रोग का इलाज | TYLCV वायरस की दवाई",
+          "youtube_id": "KMvbvTV0dHg",
+          "thumbnail": "https://img.youtube.com/vi/KMvbvTV0dHg/hqdefault.jpg",
+          "duration": "09:30",
+          "views": "65K+ व्यूज",
+          "ratio": "16:9"
         }
       ],
       "kpi_cards": [
@@ -10175,7 +10468,69 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "page_kpi_sections": [],
+      "crops": [
+        {
+          "id": "CROP_DOC_01",
+          "name": "रसचूसक कीट (Sucking Pests)",
+          "season": "सभी मौसम",
+          "image": "/images/books/bk016-cover.webp",
+          "badge": "कीट सुरक्षा",
+          "color": "#ef4444",
+          "mainIssues": "थ्रिप्स, सफेद मक्खी, एफिड (माहू), हरा तेला",
+          "solution": "येलो-ब्लू स्टिकी ट्रैप, बायोफिट बायो-99 के साथ नीम ऑयल व एसिटामिप्रिड स्प्रे।"
+        },
+        {
+          "id": "CROP_DOC_02",
+          "name": "इल्ली व सुंडी (Caterpillar & Borer)",
+          "season": "सभी फसलें",
+          "image": "/images/books/fasal-ka-doctor-cover.webp",
+          "badge": "कीट नियंत्रण",
+          "color": "#f97316",
+          "mainIssues": "फॉल आर्मीवर्म, तना छेदक, गुलाबी सुंडी, फल छेदक",
+          "solution": "फेरोमोन ट्रैप, एमामेक्टिन बेंजोएट या क्लोरेंट्रानिलिप्रोल (कोराजन) सटीक स्प्रे।"
+        },
+        {
+          "id": "CROP_DOC_03",
+          "name": "फफूंद व झुलसा (Fungal Blight)",
+          "season": "वर्षा व सर्दी",
+          "image": "/images/crops/paddy.jpeg",
+          "badge": "रोग निवारण",
+          "color": "#3b82f6",
+          "mainIssues": "ब्लास्ट, शीथ ब्लाइट, डाउनी मिल्ड्यू, लेट ब्लाइट",
+          "solution": "बायोफिट रैप-अप फंगस शील्ड या एज़ोक्सीस्ट्रोबिन + डाइफेनोकोनाजोल छिड़काव।"
+        },
+        {
+          "id": "CROP_DOC_04",
+          "name": "उकठा व जड़ सड़न (Wilt & Root Rot)",
+          "season": "मृदा जनित रोग",
+          "image": "/images/crops/soyabeen.jpeg",
+          "badge": "मृदा उपचार",
+          "color": "#8b5cf6",
+          "mainIssues": "फ्यूजेरियम विल्ट, कॉलर रॉट, पौधा अचानक सूखना",
+          "solution": "ट्राइकोडर्मा विरिडी या स्यूडोमोनास द्वारा मृदा उपचार व ड्रेंचिंग।"
+        },
+        {
+          "id": "CROP_DOC_05",
+          "name": "वायरस व पत्ती मरोड़ (Virus / Curl)",
+          "season": "सभी सब्जियां",
+          "image": "/images/crops/vegetables.jpeg",
+          "badge": "वायरस शील्ड",
+          "color": "#10b981",
+          "mainIssues": "येलो वेन मोज़ेक, मिर्च का चुर्रा-मुर्रा, लीफ कर्ल",
+          "solution": "रसचूसक कीटों का तुरंत नियंत्रण और जिंक-पोटाश द्वारा पौधों की रोग प्रतिरोधक क्षमता वृद्धि।"
+        },
+        {
+          "id": "CROP_DOC_06",
+          "name": "पोषक तत्व कमी (Deficiency)",
+          "season": "पोषण प्रबंधन",
+          "image": "/images/crops/wheat.jpeg",
+          "badge": "संतुलित पोषण",
+          "color": "#eab308",
+          "mainIssues": "पत्तियों का पीला पड़ना (जिंक/फेरस कमी), फूल-फल गिरना (बोरॉन कमी)",
+          "solution": "बायोफिट एनपीके + चेलेटेड माइक्रोन्यूट्रिएंट्स का संतुलित फोलियर स्प्रे।"
+        }
+      ]
     },
     {
       "id": "page_agri_medicinal",

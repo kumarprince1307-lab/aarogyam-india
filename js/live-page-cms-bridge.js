@@ -1908,8 +1908,12 @@
             ? `window.openUniversalVideoModal('${escapeHtml(title)}', '${ytId}')`
             : `window.location.href='${escapeHtml(v.url || '/tube.html')}'`;
           return `
-            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer;" onclick="${clickAction}">
-              <div style="position:relative; width:100%; padding-bottom:56.25%; background:#0f172a; overflow:hidden;">
+            const isVertical = (v.ratio === '9:16' || v.format === 'short_reel');
+          const paddingRatio = isVertical ? '177.77%' : '56.25%';
+          const cardMaxWidth = isVertical ? 'max-width: 270px; margin: 0 auto;' : '';
+          return `
+            <div class="universal-video-card" style="background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; transition:transform 0.2s, box-shadow 0.2s; cursor:pointer; width:100%; ${cardMaxWidth}" onclick="${clickAction}">
+              <div style="position:relative; width:100%; padding-bottom:${paddingRatio}; background:#0f172a; overflow:hidden;">
                 <img src="${thumb}" alt="${escapeHtml(title)}" loading="lazy" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.92;" onerror="this.src='/images/banners/health-banner.jpeg'" />
                 <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
                 <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:46px; height:46px; border-radius:50%; background:rgba(239,68,68,0.92); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 15px rgba(239,68,68,0.6);">
@@ -1940,26 +1944,36 @@
                       document.querySelector('.interspersed-marketing-container');
     if (!container) return;
 
-    let booksList = [];
+        let booksList = [];
+    let bundlesList = [];
     try {
-      const bRes = await fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000));
-      if (bRes.ok) {
+      const [bRes, bunRes] = await Promise.all([
+        fetch('/data/books.json?v=' + Math.floor(Date.now() / 300000)).catch(() => null),
+        fetch('/data/book-bundles.json?v=' + Math.floor(Date.now() / 300000)).catch(() => null)
+      ]);
+      if (bRes && bRes.ok) {
         const bData = await bRes.json();
         booksList = bData.books || [];
+      }
+      if (bunRes && bunRes.ok) {
+        const bunData = await bunRes.json();
+        bundlesList = bunData.bundles || [];
       }
     } catch (_) {}
 
     const cardsHtml = pageConfig.marketing_cards.map((card, idx) => {
-      const book = booksList.find(b => b.id === card.book_id) || {};
-      const cover = book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp';
-      const title = card.headline || book.heading || book.name || 'आरोग्यम विशेष डिजिटल ई-बुक';
-      const desc = card.desc || book.seo?.description || 'वैज्ञानिक विधि व 100% समाधान युक्त डिजिटल गाइड।';
-      const tag = card.tag || '🔥 सर्वाधिक लोकप्रिय';
-      const sales = card.sales_counter || '1,400+ किसानों ने खरीदा';
-      const price = book.offerPrice || 99;
-      const mrp = book.mrp || 299;
-      const landingUrl = book.landingPage || `/ebooks/book-landing.html?id=${card.book_id}`;
-      const demoUrl = book.demoPage || `/ebooks/reader.html?id=${card.book_id}&demo=true`;
+            const isBundleCard = (card.book_id && String(card.book_id).startsWith('BUN')) || card.is_bundle;
+      const bundle = isBundleCard ? (bundlesList.find(b => b.id === card.book_id) || bundlesList[0] || {}) : null;
+      const book = (!isBundleCard ? booksList.find(b => b.id === card.book_id) : null) || {};
+      
+      const cover = isBundleCard ? (bundle?.bannerImage || '/images/banners/kisan-combo-offer.webp') : (book.cover || book.thumbnail || '/images/books/kharif-master-guide-2026-cover.webp');
+      const title = card.headline || (isBundleCard ? bundle?.title : (book.heading || book.name)) || 'आरोग्यम विशेष डिजिटल ई-बुक';
+      const desc = card.desc || (isBundleCard ? bundle?.subtitle : book.seo?.description) || 'वैज्ञानिक विधि व 100% समाधान युक्त डिजिटल गाइड।';
+      const tag = card.tag || (isBundleCard ? (bundle?.badge || '🔥 महाबचत कॉम्बो') : '🔥 सर्वाधिक लोकप्रिय');
+      const sales = card.sales_counter || (isBundleCard ? '3,800+ किसानों का भरोसा' : '1,400+ किसानों ने खरीदा');
+      const price = isBundleCard ? (bundle?.offerPrice || 149) : (book.offerPrice || 99);
+      const mrp = isBundleCard ? (bundle?.mrp || 1695) : (book.mrp || 299);
+      const landingUrl = isBundleCard ? (bundle?.slug ? `/bundle.html?bundle=${bundle.slug}` : '/bundle.html') : (book.landingPage || `/ebooks/book-landing.html?id=${card.book_id}`);
 
       return `
         <div class="interspersed-book-card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: 22px; color: #fff; box-shadow: 0 12px 36px rgba(0,0,0,0.18); border: 1.5px solid rgba(245, 158, 11, 0.4); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
@@ -1992,13 +2006,13 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
-            <a href="${escapeHtml(landingUrl)}" class="btn" style="flex: 1; min-width: 130px; background: #f59e0b; color: #000; font-weight: 900; font-size: 0.85rem; padding: 10px 14px; border-radius: 12px; text-decoration: none; text-align: center; box-shadow: 0 4px 14px rgba(245,158,11,0.35);">
-              📖 संपूर्ण ई-बुक देखें
+          <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+            <a href="${escapeHtml(landingUrl)}" class="btn" style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 900; font-size: 0.82rem; padding: 10px 12px; border-radius: 12px; text-decoration: none; text-align: center; box-shadow: 0 4px 14px rgba(245,158,11,0.35); display: flex; align-items: center; justify-content: center; gap: 4px;">
+              <span>⚡</span> ${isBundleCard ? 'पूरा कॉम्बो लें (₹' + price + ')' : 'अभी खरीदें (₹' + price + ')'}
             </a>
-            <a href="${escapeHtml(demoUrl)}" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-weight: 800; font-size: 0.85rem; padding: 10px 14px; border-radius: 12px; text-decoration: none; text-align: center;">
-              👁️ फ्री डेमो
-            </a>
+            <button type="button" class="btn" onclick="event.stopPropagation(); if (window.AarogyamCart && typeof window.AarogyamCart.addBook === 'function') { window.AarogyamCart.addBook({ id: '${card.book_id}', title: '${escapeHtml(title)}', price: ${price}, image: '${escapeHtml(cover)}' }); } else { window.location.href='/ebooks/cart.html'; }" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; font-weight: 800; font-size: 0.82rem; padding: 10px 12px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 4px 12px rgba(37,99,235,0.3);">
+              <span>🛒</span> कार्ट में जोड़ें
+            </button>
           </div>
         </div>
       `;
