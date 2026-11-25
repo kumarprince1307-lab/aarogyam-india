@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795576258942,
+      "admin_edited": 1795576692443,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -1090,17 +1090,6 @@
           "cta_secondary_text": "⭐ किसान अनुभव",
           "cta_secondary_link": "#sec-reviews",
           "banner_mode": "full"
-        },
-        {
-          "image": "/images/banners/hero_slide-watermarked_img_1419-253482-dly6.webp",
-          "banner_mode": "full",
-          "tag": "✨ नया स्पेशल ऑफर",
-          "title": "नया बैनर शीर्षक यहाँ लिखें",
-          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
-          "cta_text": "अभी देखें",
-          "cta_link": "#sec-products",
-          "cta_secondary_text": "",
-          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -1588,7 +1577,7 @@
           }
         ]
       },
-      "admin_edited": 1795576258839,
+      "admin_edited": 1791022298188,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -4076,15 +4065,15 @@
       "url": "/health/sexual-wellness.html",
       "category": "Healthcare Sub-page",
       "status": "active",
-      "theme_primary": "#0011ff",
-      "theme_dark": "#0000b3",
+      "theme_primary": "#ff7b00",
+      "theme_dark": "#b32f00",
       "ticker_text": "⚡ भ्रामक प्रचार व केमिकल दवाओं से सावधान • 100% सुरक्षित प्राकृतिक पोषण, पेल्विक योगासन व वैज्ञानिक लाइफस्टाइल से पाएं खोई हुई शक्ति • 🩺 24×7 गोपनीय AI डॉक्टर परामर्श",
       "audio_title": "पौरुष शक्ति व यौन स्वास्थ्य समाधान",
       "audio_script": "नमस्ते {name} जी! पौरुष शक्ति व यौन स्वास्थ्य पेज पर आपका स्वागत है। अत्यधिक मानसिक तनाव, नींद की कमी, स्मोकिंग और नसों में रक्त प्रवाह की रुकावट पौरुष कमजोरी के मुख्य कारण होते हैं। सड़क किनारे मिलने वाली केमिकल दवाओं या वियाग्रा जैसी गोलियों से बचें क्योंकि ये दिल, किडनी और लिवर पर गंभीर असर डालती हैं। सही डाइट, पेल्विक फ्लोर एक्सरसाइज और सुरक्षित आयुर्वेदिक पोषण से इस समस्या को प्राकृतिक रूप से ठीक किया जा सकता है। Aarogyam India पूरी गोपनीयता के साथ आपके स्वास्थ्य सुधार में साथ है।",
       "audio_url": "",
       "og_title": "Aarogyam India | पौरुष शक्ति व यौन स्वास्थ्य | वैज्ञानिक व प्राकृतिक समाधान",
       "og_image": "/images/banners/og_image-ed-677895-iqr6.webp",
-      "og_description": "“ED, शीघ्रपतन, लो टेस्टोस्टेरोन और स्पर्म काउंट की कमी का सच। भ्रामक केमिकल दवाओं से बचें और सुरक्षित प्राकृतिक समाधान जानें।”",
+      "og_description": "ED, शीघ्रपतन, लो टेस्टोस्टेरोन और स्पर्म काउंट की कमी का असली सच जानिए। भ्रामक केमिकल दवाओं के खतरों से बचें और सुरक्षित प्राकृतिक समाधान अपनाएं। क्या आप ED, शीघ्रपतन, लो टेस्टोस्टेरोन या स्पर्म काउंट की कमी से परेशान हैं? भ्रामक केमिकल दवाओं के साइड इफेक्ट्स से बचें और डाइट, योग व प्राकृतिक समाधान से पाएं स्थायी सुधार।",
       "share_message": "📲 पौरुष कमजोरी का सही वैज्ञानिक समाधान: क्या खाएं, कौन से आसन करें और केमिकल दवाओं के नुकसान से कैसे बचें? पूरी जानकारी अभी देखें:",
       "floating_banner": {
         "enabled": false,
@@ -4128,6 +4117,17 @@
           "cta_secondary_text": "⭐ रिव्यू पढ़ें",
           "cta_secondary_link": "#sec-reviews",
           "banner_mode": "full"
+        },
+        {
+          "image": "/images/banners/hero_slide-slmmgsg-686097-o6c2.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -4418,7 +4418,7 @@
           }
         ]
       },
-      "admin_edited": 1795491360322,
+      "admin_edited": 1795576692200,
       "netsurf_plan": null,
       "diet_exercise": {
         "diet": {
