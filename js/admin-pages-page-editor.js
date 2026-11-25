@@ -6070,6 +6070,15 @@ export async function initPageEditor() {
         if ((!existing.products || existing.products.length === 0) && dp.products && dp.products.length > 0) {
           existing.products = JSON.parse(JSON.stringify(dp.products));
         }
+        if ((!existing.kpi_cards || existing.kpi_cards.length === 0) && dp.kpi_cards && dp.kpi_cards.length > 0) {
+          existing.kpi_cards = JSON.parse(JSON.stringify(dp.kpi_cards));
+        }
+        if ((!existing.videos || existing.videos.length === 0) && dp.videos && dp.videos.length > 0) {
+          existing.videos = JSON.parse(JSON.stringify(dp.videos));
+        }
+        if ((!existing.faqs || existing.faqs.length === 0) && dp.faqs && dp.faqs.length > 0) {
+          existing.faqs = JSON.parse(JSON.stringify(dp.faqs));
+        }
         // Ensure category and url match ground truth
         if (!existing.category && dp.category) existing.category = dp.category;
         if (!existing.url && dp.url) existing.url = dp.url;
