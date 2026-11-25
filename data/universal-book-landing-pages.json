@@ -7227,34 +7227,26 @@
     },
     {
       "id": "BK026",
-      "updated_at": "2026-11-20T05:25:04.230Z",
+      "updated_at": "2026-11-25T05:16:45.226Z",
       "admin_edited": true,
       "slug": "bk026",
       "book_type": "paid",
       "audience": "all",
       "target_main_books": [],
       "book_name": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
-      "author": "",
+      "author": "Dada avnish",
       "language": "Hindi",
       "totalPages": 60,
       "version": "2026",
+      "format": "PDF (Digital eBook) & Mobile Reader",
+      "total_images": "100+",
       "category": "Agriculture",
       "status": "active",
       "is_coming_soon": false,
       "isComingSoon": false,
       "store_badge": "best_seller",
       "badge": "best_seller",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
-      ],
+      "publish_targets": [],
       "facebook_pixel_id": "1671873500553134",
       "google_analytics_id": "G-2BWPJVQWPK",
       "facebook_pixel_enabled": true,
@@ -7286,7 +7278,14 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_vip_stack",
+        "sec_video",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_specs_toc",
+        "sec_help"
+      ],
       "section_banners": {
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
         "sec_preview": "/images/banners/bk022-sec_preview-banner.webp",
@@ -7355,22 +7354,8 @@
       "ai_support_title": "🌟 Aarogyam Sakhi – आपकी अपनी AI साथी",
       "ai_support_cover": "",
       "ai_support_desc": "भारत की पहली ऐसी AI सखी, जो खेती-किसानी, फसल, पशुपालन और स्वास्थ्य से जुड़ी जानकारी देने में आपकी मदद करती है।\nअब सिर्फ सवाल लिखने की जरूरत नहीं! अपनी फसल, खेत, पौधे, कीट-रोग या दवा की फोटो Aarogyam Sakhi को भेजें और अपनी समस्या के अनुसार जानकारी एवं संभावित समाधान प्राप्त करें।\nखेती हो, पशुपालन हो या स्वास्थ्य से जुड़ा सामान्य सवाल – Aarogyam Sakhi से पूछिए और आसान भाषा में जानकारी पाइए।",
-      "bonuses": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
-      "bonus_books": [
-        {
-          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
-          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
-          "mrp": 199,
-          "image": "/images/books/kharif-fasal-hero-2.webp"
-        }
-      ],
+      "bonuses": [],
+      "bonus_books": [],
       "bonus_points": [
         "🎁 इस किताब के साथ Aarogyam Sakhi का 1 साल का सपोर्ट बिल्कुल FREE!",
         "🌾 खेती और फसलों से जुड़ी जानकारी 💬 आसान भाषा में सवाल-जवाब और मार्गदर्शन",
@@ -7470,15 +7455,27 @@
       "preview_banner": "/images/banners/bk022-sec_preview-banner.webp",
       "demo_images": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "preview_images": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "previewImages": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "demo_reader_pages": "",
       "demoPages": "",
@@ -7492,20 +7489,10 @@
         "खरपतवार नियंत्रण",
         "रोग एवं कीट प्रबंधन",
         "पोषक तत्वों की कमी",
-        "स्प्रे चार्ट",
-        "IPM तकनीक",
-        "अधिक उत्पादन के उपाय",
-        "विशेषज्ञ सुझाव"
+        "स्प्रे चार्ट"
       ],
       "videos": [],
       "testimonials": [
-        {
-          "name": "रामस्वरूप पटेल",
-          "location": " सीहोर, मध्य प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "फलदार बाग लगाने से पहले बहुत सारी जानकारी अलग-अलग जगह ढूँढनी पड़ती है। किस्म, पौधे, खाद और बाजार जैसे विषय एक साथ मिलना उपयोगी लगा।"
-        },
         {
           "name": "महेंद्र सिंह चौहान ",
           "location": "जयपुर, राजस्थान",
@@ -7579,13 +7566,6 @@
       ],
       "reviews": [
         {
-          "name": "रामस्वरूप पटेल",
-          "location": " सीहोर, मध्य प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "फलदार बाग लगाने से पहले बहुत सारी जानकारी अलग-अलग जगह ढूँढनी पड़ती है। किस्म, पौधे, खाद और बाजार जैसे विषय एक साथ मिलना उपयोगी लगा।"
-        },
-        {
           "name": "महेंद्र सिंह चौहान ",
           "location": "जयपुर, राजस्थान",
           "rating": 5,
@@ -7657,13 +7637,6 @@
         }
       ],
       "customer_reviews": [
-        {
-          "name": "रामस्वरूप पटेल",
-          "location": " सीहोर, मध्य प्रदेश",
-          "rating": 5,
-          "gender": "male",
-          "comment": "फलदार बाग लगाने से पहले बहुत सारी जानकारी अलग-अलग जगह ढूँढनी पड़ती है। किस्म, पौधे, खाद और बाजार जैसे विषय एक साथ मिलना उपयोगी लगा।"
-        },
         {
           "name": "महेंद्र सिंह चौहान ",
           "location": "जयपुर, राजस्थान",

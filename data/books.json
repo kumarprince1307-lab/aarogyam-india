@@ -2449,17 +2449,7 @@
       "thumbnail": "/images/books/bk026-cover.webp",
       "banner": "/images/banners/bk022-hero-banner.webp",
       "status": "active",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
-      ],
+      "publish_targets": [],
       "store_badge": "best_seller",
       "badge": "best_seller",
       "isComingSoon": false,
@@ -2470,19 +2460,35 @@
       "demoPdf": "",
       "demoImages": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "demo_images": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "preview_images": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "previewImages": [
         "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp"
+        "/images/books/bk026-preview-2.webp",
+        "/images/books/BK026/25.webp",
+        "/images/books/BK026/35.webp",
+        "/images/books/BK026/45.webp",
+        "/images/books/BK026/50.webp"
       ],
       "demoAvailable": true,
       "demo_reader_pages": "",
@@ -2542,13 +2548,13 @@
         "फसल से बेहतर बाजार तक"
       ],
       "totalPages": 60,
-      "author": "",
+      "author": "Dada avnish",
       "language": "Hindi",
       "version": "2026",
       "landingPage": "/ebooks/book-landing.html?id=BK026",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-20T05:24:55.849Z",
+      "updated_at": "2026-11-25T05:16:45.227Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
