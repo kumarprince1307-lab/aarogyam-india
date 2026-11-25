@@ -143,14 +143,11 @@ export async function initPageEditor() {
       }
     }
     collectImagePaths(sitePages);
+
+    // CRITICAL FIX: Only upload assets that are actively pending in this current editing session
+    // Never re-upload previously synced assets from historical offline store
     pendingPageEditorAssets.forEach((dataUrl, path) => {
       if (referencedImages.has(path)) assetsByPath.set(path, dataUrl);
-    });
-    referencedImages.forEach(path => {
-      const cached = offlineUploads['/' + path] || offlineUploads[path];
-      if (cached && String(cached).startsWith('data:') && !assetsByPath.has(path)) {
-        assetsByPath.set(path, cached);
-      }
     });
 
     const assets = Array.from(assetsByPath, ([path, base64]) => ({ path, base64 }));
@@ -222,7 +219,12 @@ export async function initPageEditor() {
     assets.forEach(({ path, base64 }) => {
       if (pendingPageEditorAssets.get(path) === base64) pendingPageEditorAssets.delete(path);
     });
-    // Retain AI_OFFLINE_UPLOADS in local storage as reliable cache until CDN deployment finishes
+    // Clear pendingPageEditorAssets completely to ensure next save is clean
+    pendingPageEditorAssets.clear();
+    // Purge AI_OFFLINE_UPLOADS from localStorage so browser stays fast and never re-triggers bulk uploads
+    try {
+      localStorage.removeItem('AI_OFFLINE_UPLOADS');
+    } catch (e) {}
   }
 
   function stripPageEditorImagePreviews(obj) {
