@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795628424935,
+      "admin_edited": 1795634823010,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -8981,7 +8981,7 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "",
+          "image": "/images/banners/hero_slide-1003990678-772221-qn57.webp",
           "tag": "🌾 रबी फसल प्रबंधन 2026",
           "title": "रबी फसलों की उन्नत वैज्ञानिक व जैविक खेती",
           "subtitle": "गेहूं, सरसों, चना और आलू में दाना भराव, पाला सुरक्षा और बंपर उपज",
@@ -8989,6 +8989,28 @@
           "cta_link": "#sec-products",
           "cta_secondary_text": "ई-बुक्स स्टोर",
           "cta_secondary_link": "/ebooks/bundle.html"
+        },
+        {
+          "image": "/images/banners/hero_slide-1003990677-779700-a19k.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003990676-795928-9v30.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
       "sections_order": [
@@ -9352,7 +9374,7 @@
           }
         ]
       },
-      "admin_edited": 1795628424844,
+      "admin_edited": 1795634822871,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
