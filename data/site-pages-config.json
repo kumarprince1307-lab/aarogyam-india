@@ -9903,15 +9903,27 @@
       "category": "Agriculture",
       "status": "active",
       "theme_primary": "#ea580c",
-      "theme_dark": "#7c2d12",
+      "theme_dark": "#9e0c00",
       "ticker_text": "🍎 फल व बागवानी हब: 24×7 Aarogyam Sakhi AI सलाह | केला, आम, अनार, पपीता में एक्सपोर्ट क्वालिटी फल उत्पादन!",
+      "audio_title": "🍎 बागवानी व फल हब (केला, आम, अनार, पपीता)",
+      "audio_script": "",
+      "audio_url": "",
       "og_title": "फल व बागवानी हब | केला, आम, अनार, पपीता | आरोग्यम भारत",
       "og_image": "/images/pages/og-fruit-orchards.webp",
       "og_description": "व्यावसायिक फल बागवानी की संपूर्ण वैज्ञानिक गाइड। आम में मंजर सुरक्षा, अनार में तेला व बैक्टीरियल ब्लाइट और केला में घार वजन वृद्धि।",
       "share_message": "🍎 बागवानी में एक्सपोर्ट क्वालिटी फल और रिकॉर्ड मुनाफा! 24×7 Aarogyam Sakhi AI सलाह:",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
       "hero_slides": [
         {
-          "image": "",
+          "image": "/images/banners/hero_slide-1003991523-519486-tlm2.webp",
           "tag": "🍎 हाई-टेक बागवानी 2026",
           "title": "व्यावसायिक फल बागवानी एवं ऑर्चर्ड प्रबंधन",
           "subtitle": "केला, आम, अनार और पपीता में फल ड्रॉप नियंत्रण, एक्सपोर्ट चमक और बंपर वजन",
@@ -9919,161 +9931,36 @@
           "cta_link": "#sec-products",
           "cta_secondary_text": "आम मास्टर गाइड",
           "cta_secondary_link": "/ebooks/book-landing.html?book=BK022"
-        }
-      ],
-      "marketing_cards": [
-        {
-          "book_id": "BK026",
-          "headline": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
-          "tag": "🔥 बंपर फल उत्पादन",
-          "sales_counter": "2,100+ किसानों का भरोसा",
-          "desc": "टिश्यू कल्चर से लेकर घौद की चमक और एक्सपोर्ट क्वालिटी केला उत्पादन का संपूर्ण राज।"
         },
         {
-          "book_id": "BK022",
-          "headline": "🥭 आम की खेती (Mango Master Guide)",
-          "tag": "🔥 आम एक्सपोर्ट फॉर्मूला",
-          "sales_counter": "1,800+ किसानों ने खरीदा",
-          "desc": "बौर गिरने से रोकने, फल का आकार बढ़ाने व फल मक्खी से 100% सुरक्षा की आधुनिक गाइड।"
+          "image": "/images/banners/hero_slide-1003991524-528515-s1wd.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
-      "products": [
-        {
-          "id": "BIOFIT_STIMRICH_FRUITS",
-          "name": "Biofit Stimrich (फल ड्रॉप कंट्रोल व साइज)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "फल चमक व वजन",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "फलों के झड़ने की समस्या को 80% तक कम करता है और एकसमान सुंदर रंग व आकार देता है।"
-        },
-        {
-          "id": "BIOFIT_SHET_FRUITS",
-          "name": "Biofit SHET (रूटजोन माइक्रोबायोम)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "कंद व जड़ विकास",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "फल वृक्षों में माइकोराइजा और पोषक तत्वों के अवशोषण को 3 गुना बढ़ा देता है।"
-        }
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
       ],
-      "clinical_breakdown": {
-        "badge_text": "🍎 HORTICULTURE & ORCHARD REMEDIES",
-        "main_title": "बागवानी की प्रमुख 4 समस्याएं: कारण, लक्षण व अचूक समाधान",
-        "subtitle": "फलों की चमक, मिठास व वजन बढ़ाएं, फफूंद व कीटों से सुरक्षित रखें",
-        "cards": [
-          {
-            "id": "CB_AGRI_FRUITS_1",
-            "title": "केले में सिगाटोका लीफ स्पॉट व पनामा विल्ट",
-            "badge": "केला विशेष",
-            "color": "#eab308",
-            "image": "/images/crops/banana.jpeg",
-            "points": [
-              "• कारण: उच्च नमी व मिट्टी में फफूंद का जमाव।",
-              "• लक्षण: पत्तियों पर भूरे-काले धब्बे और तने का चीरा लगने पर अंदर से काला पड़ना।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान",
-              "steps": [
-                "Biofit SHET + Wrapup ड्रिप व स्प्रे दें। पत्तियों का पीलापन दूर होकर घौद (Bunch) भारी बनेगी।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_FRUITS_2",
-            "title": "आम में बौर (फूल) झड़ना व मिलीबग",
-            "badge": "आम का राजा",
-            "color": "#f59e0b",
-            "image": "/images/crops/mango.jpeg",
-            "points": [
-              "• कारण: तने पर चढ़ने वाली सफेद मिलीबग और बौर पर रसचूसक फुदका (Hopper)।",
-              "• लक्षण: बौर काला पड़कर गिरना और छोटे फलों पर चिपचिपा काला पदार्थ।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान",
-              "steps": [
-                "तने पर ग्रीस पट्टी लगाएं और Biofit Intact + Stimrich का बौर निकलने पर स्प्रे करें।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_FRUITS_3",
-            "title": "अनार में तैलीय धब्बा (Bacterial Blight / तेला)",
-            "badge": "अनार सुरक्षा",
-            "color": "#ef4444",
-            "image": "/images/crops/pomegranate.jpeg",
-            "points": [
-              "• कारण: ज़ैंथोमोनास बैक्टीरिया, बारिश में तेज फैलाव।",
-              "• लक्षण: पत्तियों, टहनियों व फलों पर काले तैलीय धब्बे व फलों का फटना।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान",
-              "steps": [
-                "Biofit Wrapup का 15 दिन के अंतराल पर 2 बार स्प्रे करें। फल पर दाग नहीं बनता और एक्सपोर्ट क्वालिटी तैयार होती है।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_FRUITS_4",
-            "title": "पपीता में रिंग स्पॉट वायरस (PRSV)",
-            "badge": "पपीता वायरस",
-            "color": "#10b981",
-            "image": "/images/crops/papaya.jpeg",
-            "points": [
-              "• कारण: एफिड (माहू) द्वारा वायरस का संचार।",
-              "• लक्षण: ऊपरी पत्तियों का मुड़ना, तने पर गहरे हरे छल्ले और फलों पर गोल चकत्ते।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान",
-              "steps": [
-                "Biofit Intact + Bio-99 से एफिड रोकें और जड़ों में SHET देकर पौधे की रोग प्रतिरोधक क्षमता बढ़ाएं।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          }
-        ]
-      },
-      "reviews": [
-        {
-          "name": "विनोद देशमुख",
-          "role": "केला उत्पादक, जलगांव",
-          "rating": 5,
-          "comment": "Stimrich और SHET से मेरे केले की घार 32 से 36 किलो की बनी और व्यापारी ने 2 रुपये प्रीमियम भाव दिया।"
-        }
-      ],
-      "faqs": [
-        {
-          "question": "आम में फूल आने के बाद क्या सिंचाई करनी चाहिए?",
-          "answer": "फूल आते समय सिंचाई बिल्कुल बंद रखनी चाहिए, जब फल मटर के दाने के बराबर हो जाएं तब हल्की सिंचाई शुरू करें।"
-        }
-      ],
-      "videos": [
-        {
-          "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱",
-          "youtube_id": "Pv2-wbzjXEc",
-          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
-          "duration": "08:20",
-          "views": "1.1 लाख+ व्यूज",
-          "ratio": "16:9"
-        }
-      ],
+      "hidden_sections": [],
       "kpi_cards": [
         {
           "icon": "fa-apple-whole",
@@ -10108,7 +9995,93 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": [],
+      "marketing_cards": [
+        {
+          "book_id": "BK026",
+          "headline": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
+          "tag": "🔥 बंपर फल उत्पादन",
+          "sales_counter": "2,100+ किसानों का भरोसा",
+          "desc": "टिश्यू कल्चर से लेकर घौद की चमक और एक्सपोर्ट क्वालिटी केला उत्पादन का संपूर्ण राज।"
+        },
+        {
+          "book_id": "BK022",
+          "headline": "🥭 आम की खेती (Mango Master Guide)",
+          "tag": "🔥 आम एक्सपोर्ट फॉर्मूला",
+          "sales_counter": "1,800+ किसानों ने खरीदा",
+          "desc": "बौर गिरने से रोकने, फल का आकार बढ़ाने व फल मक्खी से 100% सुरक्षा की आधुनिक गाइड।"
+        },
+        {
+          "book_id": "BK028",
+          "tag": "🔥 सर्वाधिक लोकप्रिय",
+          "headline": "पपीते की खेती  MASTER GUIDE",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "is_bundle": false
+        },
+        {
+          "book_id": "BK029",
+          "tag": "🔥 सर्वाधिक लोकप्रिय",
+          "headline": "चीकू (सपोटा) की खेती मास्टर गाइड",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "is_bundle": false
+        },
+        {
+          "book_id": "BK025",
+          "tag": "🔥 सर्वाधिक लोकप्रिय",
+          "headline": "ड्रैगन फ्रूट मास्टर गाइड (Dragon Fruit Master Guide)",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "is_bundle": false
+        },
+        {
+          "book_id": "BK024",
+          "tag": "🔥 सर्वाधिक लोकप्रिय",
+          "headline": "अंगूर मास्टर गाइड (Grape Master Guide)",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "is_bundle": false
+        },
+        {
+          "book_id": "BK023",
+          "tag": "🔥 सर्वाधिक लोकप्रिय",
+          "headline": "अनार मास्टर गाइड (Pomegranate Master Guide)",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा",
+          "is_bundle": false
+        }
+      ],
+      "videos": [
+        {
+          "title": "🚨 किसान भाई! एक गलत फैसला आपकी पूरी फसल बर्बाद कर सकता है 😱",
+          "youtube_id": "Pv2-wbzjXEc",
+          "thumbnail": "https://img.youtube.com/vi/Pv2-wbzjXEc/hqdefault.jpg",
+          "duration": "08:20",
+          "views": "1.1 लाख+ व्यूज",
+          "ratio": "16:9"
+        }
+      ],
+      "reviews_heading": "",
+      "reviews_badge": "",
+      "reviews": [
+        {
+          "name": "विनोद देशमुख",
+          "role": "केला उत्पादक, जलगांव",
+          "rating": 5,
+          "comment": "Stimrich और SHET से मेरे केले की घार 32 से 36 किलो की बनी और व्यापारी ने 2 रुपये प्रीमियम भाव दिया।"
+        }
+      ],
+      "faqs_heading": "",
+      "faqs_badge": "",
+      "faqs": [
+        {
+          "question": "आम में फूल आने के बाद क्या सिंचाई करनी चाहिए?",
+          "answer": "फूल आते समय सिंचाई बिल्कुल बंद रखनी चाहिए, जब फल मटर के दाने के बराबर हो जाएं तब हल्की सिंचाई शुरू करें।"
+        }
+      ],
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [],
       "crops": [
         {
           "id": "CROP_FRUIT_01",
@@ -10170,7 +10143,182 @@
           "mainIssues": "कली छेदक, पत्ती जाला कीट, फल मक्खी",
           "solution": "फेरोमोन ट्रैप, जैविक कीटनाशक व सूक्ष्म पोषक तत्व स्प्रे।"
         }
-      ]
+      ],
+      "pashu_cards": [],
+      "products": [
+        {
+          "title": "स्टीमरिच (Biofit Stimrich)",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp",
+          "mrp": 1695,
+          "price": 1695,
+          "discount_pct": 0,
+          "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
+          "name": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
+          "description": "हवा से नाइट्रोजन और मिट्टी में फिक्स फास्फोरस व पोटाश को पौधे को उपलब्ध कराने वाले जीवित बैक्टीरिया।",
+          "image": "/images/products/product--------------------361242-xj50.webp",
+          "mrp": 1800,
+          "price": 1800,
+          "discount_pct": 0,
+          "dose": "प्रत्येक का 1 लीटर प्रति एकड़ ड्रिप/सिंचाई में या गोबर की खाद में मिलाकर जमीन में दें।",
+          "badge": "🧪 नाइट्रोजन, फास्फोरस, पोटाश जीवाणु",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "बायो-99 (Biofit Bio-99) 100mL",
+          "name": "बायो-99 (Biofit Bio-99) 100mL",
+          "description": "सुपर सिलिकॉन स्प्रेडर, स्टीकर व पेनिट्रेटर। दवा को पत्ते के आर-पार फैलाता है और बारिश में धुलने नहीं देता।",
+          "image": "/images/products/product------99--biofit-bi-132062-t2y2.webp",
+          "mrp": 299,
+          "price": 299,
+          "discount_pct": 0,
+          "dose": "5ml प्रति 15 लीटर पानी का पंप। किसी भी कीटनाशक, फफूंदनाशक या टॉनिक के साथ मिलाएं।",
+          "badge": "💧 100% सिलिकॉन स्प्रेडर",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "नया उत्पाद (New Product)",
+          "description": "उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...",
+          "image": "",
+          "mrp": 850,
+          "discount_pct": 20,
+          "dose": "2ml / लीटर पानी",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "सेट (Biofit Shet - Soil Health)",
+          "name": "सेट (Biofit Shet - Soil Health)",
+          "description": "कड़क व खारी मिट्टी को भुरभुरी और उपजाऊ बनाता है। केंचुओं को सक्रिय कर यूरिया-डीएपी की 30-40% बचत करता है।",
+          "image": "/images/products/product------biofit-shet---191286-cejz.webp",
+          "mrp": 1200,
+          "price": 1200,
+          "discount_pct": 0,
+          "dose": "30ml प्रति 15 लीटर पंप।  1 लीटर प्रति एकड़ ड्रिप, क्यारी में पानी के साथ या 200 लीटर पानी में घोलकर जमीन पर छिड़कें।",
+          "badge": "🌾 मिट्टी सुधारक जीवाणु",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "रैपअप (Biofit Wrapup)",
+          "name": "रैपअप (Biofit Wrapup)",
+          "description": "पौधों पर सुरक्षात्मक जैविक परत बनाकर फंगस, उकठा और जड़ गलन से 100% जैविक सुरक्षा प्रदान करता है।",
+          "image": "/images/products/product--------biofit-wrap-278702-ozh4.webp",
+          "mrp": 1500,
+          "price": 1500,
+          "discount_pct": 5,
+          "dose": "30ml प्रति 15 लीटर पंप (पत्ते पर छिड़काव) या 1 लीटर प्रति एकड़ ड्रेंचिंग।",
+          "badge": "🛡️ जैविक फफूंद सुरक्षा",
+          "whatsapp_link": "https://wa.me/917974422572"
+        }
+      ],
+      "page_kpi_sections": [],
+      "clinical_breakdown": {
+        "badge_text": "🍎 HORTICULTURE & ORCHARD REMEDIES",
+        "main_title": "बागवानी की प्रमुख 4 समस्याएं: कारण, लक्षण व अचूक समाधान",
+        "subtitle": "फलों की चमक, मिठास व वजन बढ़ाएं, फफूंद व कीटों से सुरक्षित रखें",
+        "cards": [
+          {
+            "id": "CB_AGRI_FRUITS_1",
+            "title": "केले में सिगाटोका लीफ स्पॉट व पनामा विल्ट",
+            "badge": "केला विशेष",
+            "color": "#eab308",
+            "image": "/images/crops/banana.jpeg",
+            "points": [
+              "• कारण: उच्च नमी व मिट्टी में फफूंद का जमाव।",
+              "• लक्षण: पत्तियों पर भूरे-काले धब्बे और तने का चीरा लगने पर अंदर से काला पड़ना।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान",
+              "steps": [
+                "Biofit SHET + Wrapup ड्रिप व स्प्रे दें। पत्तियों का पीलापन दूर होकर घौद (Bunch) भारी बनेगी।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_FRUITS_2",
+            "title": "आम में बौर (फूल) झड़ना व मिलीबग",
+            "badge": "आम का राजा",
+            "color": "#f59e0b",
+            "image": "/images/crops/mango.jpeg",
+            "points": [
+              "• कारण: तने पर चढ़ने वाली सफेद मिलीबग और बौर पर रसचूसक फुदका (Hopper)।",
+              "• लक्षण: बौर काला पड़कर गिरना और छोटे फलों पर चिपचिपा काला पदार्थ।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान",
+              "steps": [
+                "तने पर ग्रीस पट्टी लगाएं और Biofit Intact + Stimrich का बौर निकलने पर स्प्रे करें।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_FRUITS_3",
+            "title": "अनार में तैलीय धब्बा (Bacterial Blight / तेला)",
+            "badge": "अनार सुरक्षा",
+            "color": "#ef4444",
+            "image": "/images/crops/pomegranate.jpeg",
+            "points": [
+              "• कारण: ज़ैंथोमोनास बैक्टीरिया, बारिश में तेज फैलाव।",
+              "• लक्षण: पत्तियों, टहनियों व फलों पर काले तैलीय धब्बे व फलों का फटना।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान",
+              "steps": [
+                "Biofit Wrapup का 15 दिन के अंतराल पर 2 बार स्प्रे करें। फल पर दाग नहीं बनता और एक्सपोर्ट क्वालिटी तैयार होती है।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_FRUITS_4",
+            "title": "पपीता में रिंग स्पॉट वायरस (PRSV)",
+            "badge": "पपीता वायरस",
+            "color": "#10b981",
+            "image": "/images/crops/papaya.jpeg",
+            "points": [
+              "• कारण: एफिड (माहू) द्वारा वायरस का संचार।",
+              "• लक्षण: ऊपरी पत्तियों का मुड़ना, तने पर गहरे हरे छल्ले और फलों पर गोल चकत्ते।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान",
+              "steps": [
+                "Biofit Intact + Bio-99 से एफिड रोकें और जड़ों में SHET देकर पौधे की रोग प्रतिरोधक क्षमता बढ़ाएं।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          }
+        ]
+      },
+      "admin_edited": 1795660537536,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "7049294111",
+        "prompt": ""
+      }
     },
     {
       "id": "page_agri_flowers",
