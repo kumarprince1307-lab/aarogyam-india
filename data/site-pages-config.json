@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795668925676,
+      "admin_edited": 1795669635387,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -8760,36 +8760,23 @@
       "marketing_cards": [
         {
           "book_id": "BK001",
-          "headline": "🌾 खरीफ फसल मास्टर गाइड 2026",
-          "tag": "🔥 खरीफ सर्वाधिक लोकप्रिय",
-          "sales_counter": "4,500+ किसानों ने खरीदा",
-          "desc": "धान, सोयाबीन, कपास और मक्का में खरपतवार नियंत्रण, कीट सुरक्षा व रिकॉर्ड उपज फॉर्मूला।"
-        },
-        {
-          "book_id": "BUN002",
-          "headline": "4-इन-1 किसान मास्टर बंडल",
-          "tag": "🔥 83% महाबचत",
-          "sales_counter": "2,900+ किसानों का भरोसा",
-          "desc": "धान, सोयाबीन, मक्का व संपूर्ण फसल डॉक्टर डिजिटल संग्रह!",
-          "is_bundle": true
+          "tag": "🔥 बेस्टसेलर डील",
+          "headline": "खरीफ फसल मास्टर गाइड 2026",
+          "desc": "विशेषज्ञों द्वारा तैयार प्रमाणित मार्गदर्शिका।",
+          "sales_counter": "1,200+ किसानों ने खरीदा"
         }
       ],
       "videos": [
         {
-          "title": "बीज संस्कार: मजबूत फसल का राज 🌱",
-          "youtube_id": "Ae9E-arA8lo",
-          "thumbnail": "https://img.youtube.com/vi/Ae9E-arA8lo/hqdefault.jpg",
-          "duration": "06:18",
+          "title": "⚠️ सावधान किसान! खेती में कोई भी फैसला लेने से पहले Aarogyam Sakhi AI से पूछें 🌱",
+          "youtube_id": "OfEad_pk6PU",
+          "thumbnail": "https://img.youtube.com/vi/OfEad_pk6PU/hqdefault.jpg",
+          "duration": "0:28",
           "views": "92K+ व्यूज",
-          "ratio": "16:9"
-        },
-        {
-          "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱",
-          "youtube_id": "jxu9W_s-C70",
-          "thumbnail": "https://img.youtube.com/vi/jxu9W_s-C70/hqdefault.jpg",
-          "duration": "07:40",
-          "views": "74K+ व्यूज",
-          "ratio": "16:9"
+          "ratio": "9:16",
+          "video_id": "VID_S706483",
+          "desc": "🚜 किसान भाइयों, सावधान! खेती में गलत जानकारी, गलत दवा या गलत तरीके से छिड़काव करने से नुकसान हो सकता है।\nअब खेती से जुड़े सवालों के लिए इस्",
+          "url": "/tube.html?vid=VID_S706483"
         }
       ],
       "reviews_heading": "",
@@ -8878,34 +8865,64 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "BIOFIT_SHET",
-          "name": "Biofit SHET (सॉइल हेल्थ एनहांसमेंट टेक्नोलॉजी)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "मिट्टी सुधारक",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "करोड़ों लाभकारी जीवाणुओं का समूह जो मिट्टी की संरचना सुधारता है और जड़ विकास तेज करता है।"
+          "title": "स्टीमरिच (Biofit Stimrich)",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp",
+          "mrp": 1695,
+          "price": 1695,
+          "discount_pct": 20,
+          "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "BIOFIT_STIMRICH",
-          "name": "Biofit Stimrich (पौधा वृद्धि व कल्ले फुटाव)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "वृद्धि प्रमोटर",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "अमीनो एसिड और समुद्री शैवाल युक्त जो धान में कल्ले, सोयाबीन में शाखाएं और फूलों की संख्या बढ़ाता है।"
+          "title": "बायो-99 (Biofit Bio-99) 100mL",
+          "name": "बायो-99 (Biofit Bio-99) 100mL",
+          "description": "सुपर सिलिकॉन स्प्रेडर, स्टीकर व पेनिट्रेटर। दवा को पत्ते के आर-पार फैलाता है और बारिश में धुलने नहीं देता।",
+          "image": "/images/products/product------99--biofit-bi-132062-t2y2.webp",
+          "mrp": 299,
+          "price": 299,
+          "discount_pct": 20,
+          "dose": "5ml प्रति 15 लीटर पानी का पंप। किसी भी कीटनाशक, फफूंदनाशक या टॉनिक के साथ मिलाएं।",
+          "badge": "💧 100% सिलिकॉन स्प्रेडर",
+          "whatsapp_link": "https://wa.me/917974422572"
         },
         {
-          "id": "BIOFIT_BIO99",
-          "name": "Biofit Bio-99 (स्प्रेडर, स्टीकर व पेनिट्रेटर)",
-          "category": "Agriculture",
-          "price": 380,
-          "mrp": 450,
-          "badge": "दवा बचत 30%",
-          "image": "/images/products/biofit-bio99.webp",
-          "desc": "छिड़काव के समय दवाओं को पत्तियों पर समान रूप से फैलाता है और बारिश से धुलने से बचाता है।"
+          "title": "सेट (Biofit Shet - Soil Health)",
+          "name": "सेट (Biofit Shet - Soil Health)",
+          "description": "कड़क व खारी मिट्टी को भुरभुरी और उपजाऊ बनाता है। केंचुओं को सक्रिय कर यूरिया-डीएपी की 30-40% बचत करता है।",
+          "image": "/images/products/product------biofit-shet---191286-cejz.webp",
+          "mrp": 1200,
+          "price": 1200,
+          "discount_pct": 20,
+          "dose": "30ml प्रति 15 लीटर पंप।  1 लीटर प्रति एकड़ ड्रिप, क्यारी में पानी के साथ या 200 लीटर पानी में घोलकर जमीन पर छिड़कें।",
+          "badge": "🌾 मिट्टी सुधारक जीवाणु",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "रैपअप (Biofit Wrapup)",
+          "name": "रैपअप (Biofit Wrapup)",
+          "description": "पौधों पर सुरक्षात्मक जैविक परत बनाकर फंगस, उकठा और जड़ गलन से 100% जैविक सुरक्षा प्रदान करता है।",
+          "image": "/images/products/product--------biofit-wrap-278702-ozh4.webp",
+          "mrp": 1500,
+          "price": 1500,
+          "discount_pct": 20,
+          "dose": "30ml प्रति 15 लीटर पंप (पत्ते पर छिड़काव) या 1 लीटर प्रति एकड़ ड्रेंचिंग।",
+          "badge": "🛡️ जैविक फफूंद सुरक्षा",
+          "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
+          "name": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
+          "description": "हवा से नाइट्रोजन और मिट्टी में फिक्स फास्फोरस व पोटाश को पौधे को उपलब्ध कराने वाले जीवित बैक्टीरिया।",
+          "image": "/images/products/product--------------------361242-xj50.webp",
+          "mrp": 1800,
+          "price": 1800,
+          "discount_pct": 20,
+          "dose": "प्रत्येक का 1 लीटर प्रति एकड़ ड्रिप/सिंचाई में या गोबर की खाद में मिलाकर जमीन में दें।",
+          "badge": "🧪 नाइट्रोजन, फास्फोरस, पोटाश जीवाणु",
+          "whatsapp_link": "https://wa.me/917974422572"
         }
       ],
       "page_kpi_sections": [],
@@ -9004,7 +9021,7 @@
           }
         ]
       },
-      "admin_edited": 1795669233275,
+      "admin_edited": 1795669635291,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
