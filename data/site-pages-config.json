@@ -44,43 +44,9 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [
-        {
-          "icon": "fa-book-open",
-          "title": "120+ रंगीन पेज",
-          "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
-        },
-        {
-          "icon": "fa-bolt",
-          "title": "इंस्टेंट PDF डाउनलोड",
-          "desc": "भुगतान के तुरंत बाद आजीवन एक्सेस"
-        },
-        {
-          "icon": "fa-robot",
-          "title": "24×7 WhatsApp AI डॉक्टर",
-          "desc": "किताब पढ़ते समय तुरंत सवाल पूछें"
-        },
-        {
-          "icon": "fa-shield-halved",
-          "title": "100% सुरक्षित भुगतान",
-          "desc": "UPI, PhonePe, GPay व कार्ड्स"
-        }
-      ],
+      "kpi_cards": [],
       "marketing_cards": [],
-      "videos": [
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो",
-          "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
-          "ratio": "16:9"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
-          "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
-          "ratio": "16:9"
-        }
-      ],
+      "videos": [],
       "reviews_heading": "",
       "reviews_badge": "",
       "reviews": [
@@ -9957,7 +9923,7 @@
       "ga_tag": true,
       "hero_slides": [
         {
-          "image": "/images/banners/hero_slide-1003991523-519486-tlm2.webp",
+          "image": "/images/banners/hero_slide-1003991523-151460-3u8f.webp",
           "tag": "🍎 हाई-टेक बागवानी 2026",
           "title": "व्यावसायिक फल बागवानी एवं ऑर्चर्ड प्रबंधन",
           "subtitle": "केला, आम, अनार और पपीता में फल ड्रॉप नियंत्रण, एक्सपोर्ट चमक और बंपर वजन",
@@ -9968,6 +9934,28 @@
         },
         {
           "image": "/images/banners/hero_slide-1003991524-528515-s1wd.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003992122-737603-ukgj.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
+        },
+        {
+          "image": "/images/banners/hero_slide-1003992123-745871-0y7z.webp",
           "banner_mode": "full",
           "tag": "✨ नया स्पेशल ऑफर",
           "title": "नया बैनर शीर्षक यहाँ लिखें",
@@ -10261,7 +10249,7 @@
             "title": "केले में सिगाटोका लीफ स्पॉट व पनामा विल्ट",
             "badge": "केला विशेष",
             "color": "#eab308",
-            "image": "/images/crops/banana.jpeg",
+            "image": "/images/banners/cb_card-1003992126-877809-zdi4.webp",
             "points": [
               "• कारण: उच्च नमी व मिट्टी में फफूंद का जमाव।",
               "• लक्षण: पत्तियों पर भूरे-काले धब्बे और तने का चीरा लगने पर अंदर से काला पड़ना।"
@@ -10269,7 +10257,7 @@
             "remedy": {
               "title": "सटीक समाधान",
               "steps": [
-                "Bio 99 + Wrapup ड्रिप व स्प्रे दें। पत्तियों का पीलापन दूर होकर घौद (Bunch) भारी बनेगी।"
+                "Biofit SHET + Wrapup ड्रिप व स्प्रे दें। पत्तियों का पीलापन दूर होकर घौद (Bunch) भारी बनेगी।"
               ]
             },
             "whatsapp_btn": {
@@ -10335,7 +10323,7 @@
             "remedy": {
               "title": "सटीक समाधान",
               "steps": [
-                "Biofit larvicide + Bio-99 से एफिड रोकें और जड़ों में SHET देकर पौधे की रोग प्रतिरोधक क्षमता बढ़ाएं।"
+                "Biofit Intact + Bio-99 से एफिड रोकें और जड़ों में SHET देकर पौधे की रोग प्रतिरोधक क्षमता बढ़ाएं।"
               ]
             },
             "whatsapp_btn": {
@@ -10346,7 +10334,7 @@
           }
         ]
       },
-      "admin_edited": 1795664620429,
+      "admin_edited": 1795664888225,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
