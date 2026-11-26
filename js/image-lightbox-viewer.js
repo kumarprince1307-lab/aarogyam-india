@@ -275,7 +275,6 @@
       img.classList.add('ai-zoomable-img');
 
       img.addEventListener('click', (e) => {
-        if (img.closest('.bundle-fan-stack-container, .bundle-fan-book-item, .bundle-fan-book, .bundle-card-img-wrap, .demo-slide, #babyBrowserBackdrop, .baby-browser-backdrop, [data-no-lightbox]')) {
         if (img.closest('.bundle-fan-stack-container, .bundle-fan-book-item, .bundle-fan-book, .bundle-card-img-wrap, .demo-slide, #babyBrowserBackdrop, .baby-browser-backdrop, [data-no-lightbox], .landscape-hero-banner-link, .home-hero-slide-item, .bighaat-carousel-container, .aarogyam-vip-promo-link')) {
           return;
         }
