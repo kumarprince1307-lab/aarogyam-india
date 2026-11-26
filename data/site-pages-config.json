@@ -10271,7 +10271,7 @@
             "title": "आम में बौर (फूल) झड़ना व मिलीबग",
             "badge": "आम का राजा",
             "color": "#f59e0b",
-            "image": "/images/crops/mango.jpeg",
+            "image": "/images/banners/cb_card-1003992143-988339-9bvo.webp",
             "points": [
               "• कारण: तने पर चढ़ने वाली सफेद मिलीबग और बौर पर रसचूसक फुदका (Hopper)।",
               "• लक्षण: बौर काला पड़कर गिरना और छोटे फलों पर चिपचिपा काला पदार्थ।"
@@ -10293,7 +10293,7 @@
             "title": "अनार में तैलीय धब्बा (Bacterial Blight / तेला)",
             "badge": "अनार सुरक्षा",
             "color": "#ef4444",
-            "image": "/images/crops/pomegranate.jpeg",
+            "image": "/images/banners/cb_card-1003992146-060355-uygw.webp",
             "points": [
               "• कारण: ज़ैंथोमोनास बैक्टीरिया, बारिश में तेज फैलाव।",
               "• लक्षण: पत्तियों, टहनियों व फलों पर काले तैलीय धब्बे व फलों का फटना।"
@@ -10315,7 +10315,7 @@
             "title": "पपीता में रिंग स्पॉट वायरस (PRSV)",
             "badge": "पपीता वायरस",
             "color": "#10b981",
-            "image": "/images/crops/papaya.jpeg",
+            "image": "/images/banners/cb_card-1003992156-138221-ibws.webp",
             "points": [
               "• कारण: एफिड (माहू) द्वारा वायरस का संचार।",
               "• लक्षण: ऊपरी पत्तियों का मुड़ना, तने पर गहरे हरे छल्ले और फलों पर गोल चकत्ते।"
@@ -10334,7 +10334,7 @@
           }
         ]
       },
-      "admin_edited": 1795664888225,
+      "admin_edited": 1795665173877,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
