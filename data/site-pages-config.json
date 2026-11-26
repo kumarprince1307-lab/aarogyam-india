@@ -44,9 +44,43 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-book-open",
+          "title": "120+ रंगीन पेज",
+          "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
+        },
+        {
+          "icon": "fa-bolt",
+          "title": "इंस्टेंट PDF डाउनलोड",
+          "desc": "भुगतान के तुरंत बाद आजीवन एक्सेस"
+        },
+        {
+          "icon": "fa-robot",
+          "title": "24×7 WhatsApp AI डॉक्टर",
+          "desc": "किताब पढ़ते समय तुरंत सवाल पूछें"
+        },
+        {
+          "icon": "fa-shield-halved",
+          "title": "100% सुरक्षित भुगतान",
+          "desc": "UPI, PhonePe, GPay व कार्ड्स"
+        }
+      ],
       "marketing_cards": [],
-      "videos": [],
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो",
+          "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
+          "ratio": "16:9"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
+          "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
+          "ratio": "16:9"
+        }
+      ],
       "reviews_heading": "",
       "reviews_badge": "",
       "reviews": [
@@ -10235,7 +10269,7 @@
             "remedy": {
               "title": "सटीक समाधान",
               "steps": [
-                "Biofit SHET + Wrapup ड्रिप व स्प्रे दें। पत्तियों का पीलापन दूर होकर घौद (Bunch) भारी बनेगी।"
+                "Bio 99 + Wrapup ड्रिप व स्प्रे दें। पत्तियों का पीलापन दूर होकर घौद (Bunch) भारी बनेगी।"
               ]
             },
             "whatsapp_btn": {
@@ -10301,7 +10335,7 @@
             "remedy": {
               "title": "सटीक समाधान",
               "steps": [
-                "Biofit Intact + Bio-99 से एफिड रोकें और जड़ों में SHET देकर पौधे की रोग प्रतिरोधक क्षमता बढ़ाएं।"
+                "Biofit larvicide + Bio-99 से एफिड रोकें और जड़ों में SHET देकर पौधे की रोग प्रतिरोधक क्षमता बढ़ाएं।"
               ]
             },
             "whatsapp_btn": {
@@ -10312,7 +10346,7 @@
           }
         ]
       },
-      "admin_edited": 1795660615506,
+      "admin_edited": 1795664620429,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
