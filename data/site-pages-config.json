@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795712923192,
+      "admin_edited": 1795715640736,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -1504,48 +1504,7 @@
         }
       ],
       "crops": [],
-      "pashu_cards": [
-        {
-          "id": "PASHU001",
-          "name": "गाय - दुग्ध वृद्धि व पोषण",
-          "category": "गाय पालन (Cow Care)",
-          "icon": "🐄",
-          "badge": "1-2L दूध वृद्धि",
-          "image": "/images/banners/pashu-cow-care.jpg",
-          "mainIssues": "दूध उत्पादन में कमी, समय पर गाभिन न होना, कैल्शियम व मिनरल की कमी",
-          "solution": "आयुर्वेदिक मिनरल मिक्सचर (CFL), प्रोबायोटिक फीड सप्लीमेंट और संतुलित आहार तालिका।"
-        },
-        {
-          "id": "PASHU002",
-          "name": "भैंस - FAT% व SNF वृद्धि",
-          "category": "भैंस पालन (Buffalo Care)",
-          "icon": "🐃",
-          "badge": "FAT 8% तक",
-          "image": "/images/banners/pashu-palan-banner.jpg",
-          "mainIssues": "दूध में फैट (FAT) कम आना, गर्मी में हांफना व सुस्ती, बांझपन",
-          "solution": "बायपास फैट, रुमेन बफर और हर्बल पाचक चूर्ण द्वारा दूध में गाढ़ापन और उच्चतम फैट प्रतिशत।"
-        },
-        {
-          "id": "PASHU003",
-          "name": "बकरी पालन - वजन वृद्धि",
-          "category": "बकरी पालन (Goat Farming)",
-          "icon": "🐐",
-          "badge": "उच्च मुनाफा",
-          "image": "/images/banners/pashu-goat-care.jpg",
-          "mainIssues": "बच्चों में दस्त व निमोनिया, वजन धीमी गति से बढ़ना, पेट के कीड़े",
-          "solution": "नियमित डीवर्मिंग (कृमिनाशक), प्रोटीन युक्त दाना मिश्रण और ग्रोथ प्रमोटर सप्लीमेंट्स।"
-        },
-        {
-          "id": "PASHU004",
-          "name": "पशुओं में थनैला व पाचन रोग",
-          "category": "रोग नियंत्रण व प्राथमिक उपचार",
-          "icon": "🩺",
-          "badge": "100% सुरक्षा",
-          "image": "/images/banners/pashu-palan-banner.jpg",
-          "mainIssues": "थनैला (Mastitis), अयन में सूजन, छेछड़े आना, आफरा (गैस) व अपच",
-          "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
-        }
-      ],
+      "pashu_cards": [],
       "products": [
         {
           "id": "ns_prod_00027",
@@ -1615,7 +1574,7 @@
             "title": "थनों में सूजन, दर्द व छीछड़े",
             "badge": "🚨 थनैला (Mastitis) रोकथाम",
             "color": "#ef4444",
-            "image": "/images/banners/pashu-palan-banner.jpg",
+            "image": "/images/banners/cb_card-1003995597-264163-c2tc.webp",
             "points": [
               "• कारण: थन में जीवाणु संक्रमण (Streptococcus), फर्श की अस्वच्छता, दूध अधूरा निकालना।",
               "• लक्षण: अयन सख्त व गर्म होना, छूने पर दर्द, दूध फटा हुआ या मवाद/खून युक्त आना।"
@@ -1637,7 +1596,7 @@
             "title": "दूध की मात्रा व फैट प्रतिशत वृद्धि",
             "badge": "🥛 दूध व FAT% संवर्धन",
             "color": "#f59e0b",
-            "image": "/images/banners/pashu-palan-banner.jpg",
+            "image": "/images/banners/cb_card-1003995606-498660-qp51.webp",
             "points": [
               "• कारण: रूमेन में माइक्रोफ्लोरा असंतुलन, मिनरल्स (जिंक, कॉपर, कोबाल्ट) की कमी।",
               "• लक्षण: पशु का सुस्त दिखना, दूध गाढ़ा न होना, ब्यात के 2-3 महीने बाद ही दूध सूखना।"
@@ -1659,7 +1618,7 @@
             "title": "समय पर हीट में न आना या सीमन न ठहरना",
             "badge": "🔄 बांझपन (Infertility) मुक्ति",
             "color": "#8b5cf6",
-            "image": "/images/banners/pashu-palan-banner.jpg",
+            "image": "/images/banners/cb_card-1003995605-510774-r2vm.webp",
             "points": [
               "• कारण: गर्भाशय में इंफेक्शन (Metritis), ओवेरियन सिस्ट, फॉस्फोरस व विटामिन E की कमी।",
               "• लक्षण: हीट के समय गंदा डिस्चार्ज देना, हर 21 दिन में बार-बार सीमन डलवाने पर भी खाली रहना।"
@@ -1681,7 +1640,7 @@
             "title": "पेट का ढोल की तरह फूलना व सांस फूलना",
             "badge": "⚠️ आफरा व एसिडोसिस राहत",
             "color": "#ea580c",
-            "image": "/images/banners/pashu-palan-banner.jpg",
+            "image": "/images/banners/cb_card-1003995604-520526-qkca.webp",
             "points": [
               "• कारण: गीला व सड़ा चारा खाना, अत्यधिक अनाज या दलिया एक साथ खा लेना, गैस न निकलना।",
               "• लक्षण: बाईं कोख का फूल जाना, जुगाली बंद होना, मुंह से लार टपकना व बेचैनी।"
@@ -1700,7 +1659,7 @@
           }
         ]
       },
-      "admin_edited": 1795704733000,
+      "admin_edited": 1795716538760,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
