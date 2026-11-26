@@ -11047,15 +11047,27 @@
       "category": "Agriculture",
       "status": "active",
       "theme_primary": "#065f46",
-      "theme_dark": "#022c22",
+      "theme_dark": "#001300",
       "ticker_text": "🌱 औषधीय खेती क्रांति: 24×7 Aarogyam Sakhi AI सलाह | अश्वगंधा, शतावरी, सफेद मूसली में विथानोलाइड्स वृद्धि व जैविक खरीद!",
+      "audio_title": "🌱 औषधीय खेती हब (अश्वगंधा, शतावरी, मूसली)",
+      "audio_script": "",
+      "audio_url": "",
       "og_title": "औषधीय खेती हब | अश्वगंधा, शतावरी, सफेद मूसली | आरोग्यम भारत",
       "og_image": "/images/pages/og-medicinal-farming.webp",
       "og_description": "अश्वगंधा, शतावरी, सफेद मूसली, कालमेघ की वैज्ञानिक व जैविक खेती पद्धति। उच्च विथानोलाइड्स, कंद सड़न रोकथाम और विपणन मार्गदर्शन।",
       "share_message": "🌱 औषधीय खेती से प्रति एकड़ 3 से 5 लाख का मुनाफा! 24×7 Aarogyam Sakhi AI सलाह:",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": false,
       "hero_slides": [
         {
-          "image": "",
+          "image": "/images/banners/hero_slide-1003993325-916329-rb8y.webp",
           "tag": "🌱 औषधीय खेती 2026",
           "title": "उन्नत औषधीय खेती एवं हर्बल फसल प्रबंधन",
           "subtitle": "अश्वगंधा, शतावरी, सफेद मूसली और कालमेघ में उच्च सक्रिय घटक व अधिकतम मंडी भाव",
@@ -11063,75 +11075,36 @@
           "cta_link": "#sec-products",
           "cta_secondary_text": "ई-बुक्स स्टोर",
           "cta_secondary_link": "/ebooks/bundle.html"
-        }
-      ],
-      "marketing_cards": [
-        {
-          "book_id": "BK001",
-          "heading": "📚 औषधीय व नकदी फसल संपूर्ण गाइड",
-          "subheading": "अश्वगंधा, शतावरी, मूसली की ग्रेडिंग, सुखाने की विधि व खरीददार संपर्क",
-          "badge": "HIGH ROI",
-          "cta_text": "गाइड तुरंत पढ़ें"
-        }
-      ],
-      "products": [
-        {
-          "id": "BIOFIT_SHET_MEDICINAL",
-          "name": "Biofit SHET (कंद व जड़ विकास टेक्नोलॉजी)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "जड़ विकास 40%",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "अश्वगंधा और शतावरी में जड़ों की मोटाई और वजन बढ़ाने में सर्वाधिक प्रभावी जैविक फार्मूला।"
         },
         {
-          "id": "BIOFIT_STIMRICH_MEDICINAL",
-          "name": "Biofit Stimrich (विथानोलाइड्स व सक्रिय घटक वर्धक)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "उच्च अल्कलाइड",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "औषधीय पौधों में सक्रिय एल्कलॉइड्स (Withanolides) की सांद्रता को 30% तक बढ़ा देता है।"
+          "image": "/images/banners/hero_slide-1003993324-926980-88pn.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
-      "clinical_breakdown": [
-        {
-          "title": "अश्वगंधा: बलुई दोमट व जल निकासी",
-          "desc": "अश्वगंधा को कभी भी जलभराव वाली जमीन में न लगाएं। हल्की बलुई दोमट में जड़ें सीधी और मोटी बैठती हैं।"
-        },
-        {
-          "title": "शतावरी: उबलना व छांव में सुखाना",
-          "desc": "जड़ों को उखाड़कर तुरंत गर्म पानी में 10 मिनट उबालें और छिलका उतारकर सुखाएं, इससे सफेद रंग मिलता है।"
-        },
-        {
-          "title": "सफेद मूसली: कंद गलन से संपूर्ण सुरक्षा",
-          "desc": "खेत में Biofit Wrapup व SHET की ड्रेंचिंग अवश्य करें ताकि कंद गलन न फैले।"
-        }
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
       ],
-      "reviews": [
-        {
-          "name": "कैलाश धाकड़",
-          "role": "अश्वगंधा उत्पादक, नीमच",
-          "rating": 5,
-          "comment": "Stimrich और SHET डालने से मेरी अश्वगंधा की जड़ें पेंसिल जैसी मोटी हुईं और मंडी में ₹38,000 क्विंटल बिकीं।"
-        }
-      ],
-      "faqs": [
-        {
-          "question": "अश्वगंधा की कटाई का सही समय कैसे पहचानें?",
-          "answer": "जब पौधे की पत्तियां पीली पड़ने लगें और फल लाल हो जाएं (150-170 दिन में), तब जड़ें निकालने का सही समय होता है।"
-        }
-      ],
-      "videos": [
-        {
-          "id": "v_medicinal_1",
-          "title": "अश्वगंधा की वैज्ञानिक खेती से 1 एकड़ में 2 लाख का शुद्ध मुनाफा",
-          "youtube_id": "dQw4w9WgXcQ",
-          "badge": "औषधीय गाइड"
-        }
-      ],
+      "hidden_sections": [],
       "kpi_cards": [
         {
           "icon": "fa-mortar-pestle",
@@ -11166,7 +11139,82 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": []
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "heading": "📚 औषधीय व नकदी फसल संपूर्ण गाइड",
+          "subheading": "अश्वगंधा, शतावरी, मूसली की ग्रेडिंग, सुखाने की विधि व खरीददार संपर्क",
+          "badge": "HIGH ROI",
+          "cta_text": "गाइड तुरंत पढ़ें"
+        }
+      ],
+      "videos": [
+        {
+          "id": "v_medicinal_1",
+          "title": "अश्वगंधा की वैज्ञानिक खेती से 1 एकड़ में 2 लाख का शुद्ध मुनाफा",
+          "youtube_id": "dQw4w9WgXcQ",
+          "badge": "औषधीय गाइड"
+        }
+      ],
+      "reviews_heading": "",
+      "reviews_badge": "",
+      "reviews": [
+        {
+          "name": "कैलाश धाकड़",
+          "role": "अश्वगंधा उत्पादक, नीमच",
+          "rating": 5,
+          "comment": "Stimrich और SHET डालने से मेरी अश्वगंधा की जड़ें पेंसिल जैसी मोटी हुईं और मंडी में ₹38,000 क्विंटल बिकीं।"
+        }
+      ],
+      "faqs_heading": "",
+      "faqs_badge": "",
+      "faqs": [
+        {
+          "question": "अश्वगंधा की कटाई का सही समय कैसे पहचानें?",
+          "answer": "जब पौधे की पत्तियां पीली पड़ने लगें और फल लाल हो जाएं (150-170 दिन में), तब जड़ें निकालने का सही समय होता है।"
+        }
+      ],
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [],
+      "crops": [],
+      "pashu_cards": [],
+      "products": [
+        {
+          "id": "BIOFIT_SHET_MEDICINAL",
+          "name": "Biofit SHET (कंद व जड़ विकास टेक्नोलॉजी)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "जड़ विकास 40%",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "अश्वगंधा और शतावरी में जड़ों की मोटाई और वजन बढ़ाने में सर्वाधिक प्रभावी जैविक फार्मूला।"
+        },
+        {
+          "id": "BIOFIT_STIMRICH_MEDICINAL",
+          "name": "Biofit Stimrich (विथानोलाइड्स व सक्रिय घटक वर्धक)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "उच्च अल्कलाइड",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "औषधीय पौधों में सक्रिय एल्कलॉइड्स (Withanolides) की सांद्रता को 30% तक बढ़ा देता है।"
+        }
+      ],
+      "page_kpi_sections": [],
+      "clinical_breakdown": {
+        "badge_text": "🔬 वैज्ञानिक विश्लेषण",
+        "main_title": "",
+        "subtitle": "",
+        "cards": []
+      },
+      "admin_edited": 1795681974523,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "919876543210",
+        "prompt": ""
+      }
     }
   ]
 }
