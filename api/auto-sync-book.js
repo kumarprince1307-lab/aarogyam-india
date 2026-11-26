@@ -166,6 +166,38 @@ async function commitFile(filePath, base64Content, commitMessage, token) {
   return res.data;
 }
 
+function updateHtmlWithPageConfig(html, page) {
+  if (!html || !page) return html;
+  const ogImgUrl = page.og_image ? (page.og_image.startsWith('/') ? 'https://aarogyamindia.online' + page.og_image : page.og_image) : '';
+  const ogTitle = page.og_title || page.name || '';
+  const ogDesc = page.og_description || '';
+
+  if (ogTitle) {
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${ogTitle} | Aarogyam India</title>`);
+    html = html.replace(/<meta\s+property=["']og:title["']\s+content=["'][\s\S]*?["']>/i, `<meta property="og:title" content="${ogTitle}">`);
+    html = html.replace(/<meta\s+name=["']twitter:title["']\s+content=["'][\s\S]*?["']>/i, `<meta name="twitter:title" content="${ogTitle}">`);
+  }
+  if (ogDesc) {
+    html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["']>/i, `<meta name="description" content="${ogDesc}">`);
+    html = html.replace(/<meta\s+property=["']og:description["']\s+content=["'][\s\S]*?["']>/i, `<meta property="og:description" content="${ogDesc}">`);
+    html = html.replace(/<meta\s+name=["']twitter:description["']\s+content=["'][\s\S]*?["']>/i, `<meta name="twitter:description" content="${ogDesc}">`);
+  }
+  if (ogImgUrl) {
+    html = html.replace(/<meta\s+property=["']og:image["']\s+content=["'][\s\S]*?["']>/i, `<meta property="og:image" content="${ogImgUrl}">`);
+    if (html.includes('og:image:secure_url')) {
+      html = html.replace(/<meta\s+property=["']og:image:secure_url["']\s+content=["'][\s\S]*?["']>/i, `<meta property="og:image:secure_url" content="${ogImgUrl}">`);
+    } else {
+      html = html.replace(/(<meta\s+property=["']og:image["']\s+content=["'][^"']*["']>)/i, `$1\n  <meta property="og:image:secure_url" content="${ogImgUrl}">\n  <meta property="og:image:type" content="image/webp">\n  <meta property="og:image:width" content="1200">\n  <meta property="og:image:height" content="630">`);
+    }
+    html = html.replace(/<meta\s+name=["']twitter:image["']\s+content=["'][\s\S]*?["']>/i, `<meta name="twitter:image" content="${ogImgUrl}">`);
+  }
+  const heroImg = page.hero_slides?.[0]?.image ? (page.hero_slides[0].image.startsWith('/') ? 'https://aarogyamindia.online' + page.hero_slides[0].image : page.hero_slides[0].image) : '';
+  if (heroImg) {
+    html = html.replace(/(<div class="home-hero-full-banner-wrap"[^>]*>[\s\S]*?<img\s+src=")[^"]*(")/i, `$1${heroImg}$2`);
+  }
+  return html;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.writeHead(200, {
@@ -274,6 +306,26 @@ module.exports = async function handler(req, res) {
 
       const configBase64 = Buffer.from(JSON.stringify({ sitePages: payload.sitePages }, null, 2), 'utf8').toString('base64');
       files.set('data/site-pages-config.json', configBase64);
+
+      // Dynamically auto-sync static HTML for saved pages so WhatsApp/Social scrapers get fresh OG tags immediately
+      try {
+        const now = Date.now();
+        const recentThresholdMs = 25 * 60 * 1000;
+        const editedPages = payload.sitePages.filter(p => p && p.url && p.admin_edited && (now - p.admin_edited) < recentThresholdMs);
+        for (const page of editedPages) {
+          let cleanUrl = String(page.url || '').replace(/^\/+/, '').split('?')[0].split('#')[0];
+          if (cleanUrl && cleanUrl.endsWith('.html')) {
+            const fileData = await getFileContent(cleanUrl, token);
+            if (fileData && fileData.content) {
+              const updatedHtml = updateHtmlWithPageConfig(fileData.content, page);
+              const updatedHtmlBase64 = Buffer.from(updatedHtml, 'utf8').toString('base64');
+              files.set(cleanUrl, updatedHtmlBase64);
+            }
+          }
+        }
+      } catch (syncErr) {
+        console.warn('[AutoSync] Error auto-syncing page HTML:', syncErr);
+      }
 
       const treeItems = await Promise.all(Array.from(files, async ([filePath, base64Content]) => ({
         path: filePath,
