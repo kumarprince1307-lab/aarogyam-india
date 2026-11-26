@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795708959473,
+      "admin_edited": 1795709621663,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -8495,7 +8495,7 @@
             "title": "गिल रॉट, टेल रॉट व फंगल संक्रमण",
             "badge": "फंगल व बैक्टीरियल रोग",
             "color": "#dc2626",
-            "image": "",
+            "image": "/images/banners/cb_card-1003995037-615152-v8us.webp",
             "points": [
               "• कारण: रोगजनक बैक्टीरिया (Aeromonas) व पानी में अस्वच्छता।",
               "• लक्षण: गलफड़ों का सड़ना, पंखों का कटना, शरीर पर लाल चकत्ते व अल्सर।"
@@ -8514,7 +8514,7 @@
           }
         ]
       },
-      "admin_edited": 1795708959288,
+      "admin_edited": 1795709621543,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
