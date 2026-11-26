@@ -307,6 +307,16 @@ module.exports = async function handler(req, res) {
       const configBase64 = Buffer.from(JSON.stringify({ sitePages: payload.sitePages }, null, 2), 'utf8').toString('base64');
       files.set('data/site-pages-config.json', configBase64);
 
+      // Automated snapshot backup: preserve existing config before overwriting
+      try {
+        const prevConfig = await getFileContent('data/site-pages-config.json', token);
+        if (prevConfig && prevConfig.content) {
+          files.set('data/site-pages-config.backup.json', Buffer.from(prevConfig.content, 'utf8').toString('base64'));
+        }
+      } catch (backupErr) {
+        console.warn('Backup creation skipped:', backupErr.message);
+      }
+
       // Dynamically auto-sync static HTML for saved pages so WhatsApp/Social scrapers get fresh OG tags immediately
       try {
         const now = Date.now();

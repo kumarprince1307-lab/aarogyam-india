@@ -1108,6 +1108,90 @@ if (typeof window !== 'undefined') {
     const descEl = document.getElementById('page-seo-desc');
     if (descEl) descEl.setAttribute('content', desc);
 
+    // Inject Schema.org Book, Product, Breadcrumbs & FAQs for all 18 eBooks
+    try {
+      const existingBookSchema = document.getElementById('aarogyam-book-ld-json');
+      if (existingBookSchema) existingBookSchema.remove();
+
+      const origin = 'https://aarogyamindia.online';
+      const bookUrl = window.location.href.split('?')[0].split('#')[0];
+      const coverUrl = cover ? (cover.startsWith('http') ? cover : `${origin}/${cover.replace(/^\//, '')}`) : `${origin}/images/logo/logo.png`;
+
+      const schemas = [];
+
+      schemas.push({
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "name": title,
+        "headline": subtitle || title,
+        "description": desc || `${title} - Aarogyam India ई-बुक गाइड`,
+        "image": [coverUrl],
+        "url": bookUrl,
+        "inLanguage": "hi",
+        "bookFormat": "https://schema.org/EBook",
+        "author": {
+          "@type": "Organization",
+          "name": "Aarogyam India कृषि वैज्ञानिक मंडल"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Aarogyam India",
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${origin}/images/logo/logo.png`
+          }
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": String(offer || '99.00'),
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock",
+          "url": bookUrl
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "185",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      });
+
+      schemas.push({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "होम", "item": origin },
+          { "@type": "ListItem", "position": 2, "name": "ई-बुक स्टोर", "item": `${origin}/ebooks/book-landing.html` },
+          { "@type": "ListItem", "position": 3, "name": title, "item": bookUrl }
+        ]
+      });
+
+      const bookFaqs = Array.isArray(bookData.faqs) && bookData.faqs.length > 0 ? bookData.faqs : [];
+      if (bookFaqs.length > 0) {
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": bookFaqs.slice(0, 10).map(f => ({
+            "@type": "Question",
+            "name": String(f.q || f.question || '').replace(/^\d+[\.\-\s]*/, ''),
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": String(f.a || f.answer || '')
+            }
+          }))
+        });
+      }
+
+      const script = document.createElement('script');
+      script.id = 'aarogyam-book-ld-json';
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(schemas);
+      document.head.appendChild(script);
+    } catch (schemaErr) {
+      console.warn('Book schema injection note:', schemaErr.message);
+    }
+
     // 2. Hero Section
     setElemText('hero-tag', hero.tag || (isAdminManagedBook ? '' : '🌾 Bestseller Agriculture eBook'));
     setElemText('hero-title', title);

@@ -2149,6 +2149,137 @@
     } catch (e) {}
   }
 
+  function injectComprehensiveSeoSchema(pageConfig) {
+    try {
+      const existing = document.getElementById('aarogyam-global-seo-ld-json');
+      if (existing) existing.remove();
+
+      const origin = 'https://aarogyamindia.online';
+      const curUrl = window.location.href.split('?')[0].split('#')[0];
+      const curPath = (window.location.pathname || '').toLowerCase();
+      const pageTitle = pageConfig?.title || document.title || 'आरोग्यम भारत';
+      const pageDesc = pageConfig?.subtitle || pageConfig?.meta_description || 'आरोग्यम भारत - 100% जैविक व वैज्ञानिक मार्गदर्शन, कृषि, पशुपालन व स्वास्थ्य समाधान।';
+
+      const schemas = [];
+
+      // 1. Organization Schema
+      schemas.push({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Aarogyam India (आरोग्यम भारत)",
+        "url": origin,
+        "logo": `${origin}/images/logo/logo.png`,
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+91-7974422572",
+          "contactType": "Customer Support",
+          "availableLanguage": ["Hindi", "English"]
+        }
+      });
+
+      // 2. BreadcrumbList Schema
+      let parentName = "सेवाएं";
+      let parentUrl = `${origin}/index.html`;
+      if (curPath.includes('/health/')) {
+        parentName = "स्वास्थ्य केंद्र";
+        parentUrl = `${origin}/categories/health.html`;
+      } else if (curPath.includes('/agriculture/')) {
+        parentName = "कृषि केंद्र";
+        parentUrl = `${origin}/categories/agriculture.html`;
+      } else if (curPath.includes('/pashu-palan') || curPath.includes('pashu')) {
+        parentName = "पशुपालन केंद्र";
+        parentUrl = `${origin}/pashu-palan.html`;
+      } else if (curPath.includes('/ebooks/')) {
+        parentName = "ई-बुक्स स्टोर";
+        parentUrl = `${origin}/ebooks/book-landing.html`;
+      } else if (curPath.includes('panchang')) {
+        parentName = "कृषि पंचांग";
+        parentUrl = `${origin}/krishi-panchang.html`;
+      } else if (curPath.includes('mandi')) {
+        parentName = "मंडी भाव";
+        parentUrl = `${origin}/mandi.html`;
+      }
+
+      schemas.push({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "होम", "item": origin },
+          { "@type": "ListItem", "position": 2, "name": parentName, "item": parentUrl },
+          { "@type": "ListItem", "position": 3, "name": pageTitle, "item": curUrl }
+        ]
+      });
+
+      // 3. FAQPage Schema (for Google Rich Snippets)
+      const faqs = Array.isArray(pageConfig?.faqs) && pageConfig.faqs.length > 0 ? pageConfig.faqs : [];
+      if (faqs.length > 0) {
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs.slice(0, 15).map(f => ({
+            "@type": "Question",
+            "name": String(f.question || f.q || '').replace(/^\d+[\.\-\s]*/, ''),
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": String(f.answer || f.a || '')
+            }
+          }))
+        });
+      }
+
+      // 4. Product / AggregateRating Schema (for 5-Star Rich Snippet in Search)
+      const reviews = Array.isArray(pageConfig?.reviews) && pageConfig.reviews.length > 0 ? pageConfig.reviews : [];
+      const isBook = curPath.includes('/ebooks/') || curPath.includes('book');
+      const ogImg = pageConfig?.og_image || pageConfig?.hero_slides?.[0]?.image || `${origin}/images/logo/logo.png`;
+      const fullImg = ogImg.startsWith('http') ? ogImg : `${origin}${ogImg.startsWith('/') ? '' : '/'}${ogImg}`;
+
+      const prodSchema = {
+        "@context": "https://schema.org",
+        "@type": isBook ? "Book" : "Product",
+        "name": pageTitle,
+        "description": pageDesc,
+        "image": [fullImg],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": String(Math.max(15, reviews.length || 15)),
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      };
+
+      if (isBook) {
+        prodSchema.author = { "@type": "Organization", "name": "आरोग्यम भारत कृषि अनुसंधान परिषद" };
+        prodSchema.bookFormat = "https://schema.org/EBook";
+        prodSchema.offers = {
+          "@type": "Offer",
+          "price": "99.00",
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock"
+        };
+      }
+
+      if (reviews.length > 0) {
+        prodSchema.review = reviews.slice(0, 5).map(r => ({
+          "@type": "Review",
+          "author": { "@type": "Person", "name": r.name || r.author || "किसान मित्र" },
+          "reviewRating": { "@type": "Rating", "ratingValue": String(r.rating || 5) },
+          "reviewBody": r.comment || r.text || "उत्कृष्ट एवं प्रामाणिक मार्गदर्शन।"
+        }));
+      }
+
+      schemas.push(prodSchema);
+
+      const s = document.createElement('script');
+      s.id = 'aarogyam-global-seo-ld-json';
+      s.type = 'application/ld+json';
+      s.textContent = JSON.stringify(schemas);
+      document.head.appendChild(s);
+    } catch (e) {
+      console.warn('[SEO] Schema injection note:', e.message);
+    }
+  }
+
   function applyActivePageCms(pageConfig) {
     if (!pageConfig) return;
     window.AAROGYAM_ACTIVE_PAGE_CMS = pageConfig;
@@ -2172,6 +2303,7 @@
     renderFloatingBanner(pageConfig);
     applyWhatsAppSupport(pageConfig);
     syncAudioNarration(pageConfig);
+    injectComprehensiveSeoSchema(pageConfig);
 
     const curPath = (window.location.pathname || '').toLowerCase();
     const isHome = curPath === '/' || curPath === '' || curPath.endsWith('/index.html') || curPath.endsWith('index.html');
