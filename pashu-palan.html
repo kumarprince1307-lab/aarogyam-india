@@ -136,9 +136,35 @@
   </header>
 
   <!-- 3. PANORAMIC BIGHAT-STYLE HERO CAROUSEL -->
-  
+  <section style="padding: 24px 0 16px 0; background: #ffffff;" id="sec-hero-slider" class="home-hero-section">
+    <div class="container">
+      <div class="bighaat-carousel-container">
+        <!-- Navigation Arrows -->
+        <button type="button" class="bighaat-carousel-arrow prev" title="Previous Slide" aria-label="Previous Slide">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button type="button" class="bighaat-carousel-arrow next" title="Next Slide" aria-label="Next Slide">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
-  <!-- 4. IN-DEPTH CATTLE PROBLEMS, CAUSES, SYMPTOMS & PROTOCOLS -->
+        <!-- Slide 1: Pashu Palan Grand Banner (Dynamic via CMS) -->
+        <div class="home-hero-slide-item">
+          <div class="home-hero-full-banner-wrap" style="width:100%; aspect-ratio:16/9; max-height:480px; border-radius:18px; overflow:hidden; background:#0f172a; box-shadow:0 10px 30px rgba(0,0,0,0.12); position:relative;">
+            <img src="https://aarogyamindia.online/images/banners/hero_slide-pashupalan-banner-371712-0doa.webp" alt="पशु पोषण, दुग्ध वृद्धि व थनैला मुक्ति हब" style="width:100%; height:100%; object-fit:cover; display:block;" fetchpriority="high">
+          </div>
+        </div>
+
+        <div class="bighaat-carousel-dots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3.1 DYNAMIC KPI BADGES (Populated dynamically from config) -->
+  <section class="cms-dynamic-kpi-badges-section" id="sec-kpi-badges" style="padding: 16px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;">
+    <!-- Rendered dynamically by live-page-cms-bridge.js?v=20261125_v222 -->
+  </section>
+
+<!-- 4. IN-DEPTH CATTLE PROBLEMS, CAUSES, SYMPTOMS & PROTOCOLS -->
   <section style="padding: 40px 0; background: #f8fafc;" id="sec-mastitis">
     <div class="container">
       <div style="text-align:center; margin-bottom:30px;">
@@ -304,10 +330,7 @@
     </div>
   </section>
 
-  <!-- 3. DYNAMIC KPI BADGES (Populated dynamically from CMS) -->
-  <section class="cms-dynamic-kpi-badges-section" id="sec-kpi-badges" style="padding: 16px 0; background: #ffffff; border-bottom: 1.5px solid #e2e8f0;">
-    <!-- Rendered dynamically by live-page-cms-bridge.js?v=20261125_v222 -->
-  </section>
+  
 
 
   <!-- 5. CATTLE PRODUCTS CATALOG & DUAL WHATSAPP ORDER BAR -->
