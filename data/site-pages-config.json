@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795665174002,
+      "admin_edited": 1795665810715,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -8665,15 +8665,27 @@
       "category": "Agriculture",
       "status": "active",
       "theme_primary": "#15803d",
-      "theme_dark": "#052e16",
+      "theme_dark": "#003400",
       "ticker_text": "🌾 खरीफ फसल महा-अभियान: 24×7 Aarogyam Sakhi AI सलाह | धान, सोयाबीन, कपास में बंपर पैदावार व जैविक समाधान!",
+      "audio_title": "🌾 खरीफ फसल हब (धान, सोयाबीन, मक्का, कपास)",
+      "audio_script": "",
+      "audio_url": "",
       "og_title": "खरीफ फसल हब | धान, सोयाबीन, मक्का, कपास प्रबंधन | आरोग्यम भारत",
       "og_image": "/images/pages/og-kharif-crops.webp",
       "og_description": "मानसून की प्रमुख खरीफ फसलों की वैज्ञानिक व जैविक खेती पद्धति। शीथ ब्लाइट, पीला मोज़ेक, गुलाबी सुंडी नियंत्रण और पोषक तत्व प्रबंधन।",
       "share_message": "🌾 खरीफ 2026 में 30% अधिक पैदावार का रहस्य! 24×7 Aarogyam Sakhi AI सलाह:",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
       "hero_slides": [
         {
-          "image": "",
+          "image": "/images/banners/hero_slide-1003992266-676920-b5af.webp",
           "tag": "🌾 खरीफ 2026 स्पेशल",
           "title": "खरीफ फसलों का वैज्ञानिक व जैविक प्रबंधन",
           "subtitle": "धान, सोयाबीन, मक्का और कपास में लागत घटाएं और प्रति एकड़ 30% तक उपज बढ़ाएं",
@@ -8681,180 +8693,36 @@
           "cta_link": "#sec-products",
           "cta_secondary_text": "ई-बुक्स स्टोर",
           "cta_secondary_link": "/ebooks/bundle.html"
-        }
-      ],
-      "marketing_cards": [
-        {
-          "book_id": "BK001",
-          "headline": "🌾 खरीफ फसल मास्टर गाइड 2026",
-          "tag": "🔥 खरीफ सर्वाधिक लोकप्रिय",
-          "sales_counter": "4,500+ किसानों ने खरीदा",
-          "desc": "धान, सोयाबीन, कपास और मक्का में खरपतवार नियंत्रण, कीट सुरक्षा व रिकॉर्ड उपज फॉर्मूला।"
         },
         {
-          "book_id": "BUN002",
-          "headline": "4-इन-1 किसान मास्टर बंडल",
-          "tag": "🔥 83% महाबचत",
-          "sales_counter": "2,900+ किसानों का भरोसा",
-          "desc": "धान, सोयाबीन, मक्का व संपूर्ण फसल डॉक्टर डिजिटल संग्रह!",
-          "is_bundle": true
+          "image": "/images/banners/hero_slide-1003992269-727223-j35t.webp",
+          "banner_mode": "full",
+          "tag": "✨ नया स्पेशल ऑफर",
+          "title": "नया बैनर शीर्षक यहाँ लिखें",
+          "subtitle": "बैनर का आकर्षक विवरण और लाभ यहाँ लिखें",
+          "cta_text": "अभी देखें",
+          "cta_link": "#sec-products",
+          "cta_secondary_text": "",
+          "cta_secondary_link": ""
         }
       ],
-      "products": [
-        {
-          "id": "BIOFIT_SHET",
-          "name": "Biofit SHET (सॉइल हेल्थ एनहांसमेंट टेक्नोलॉजी)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "मिट्टी सुधारक",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "करोड़ों लाभकारी जीवाणुओं का समूह जो मिट्टी की संरचना सुधारता है और जड़ विकास तेज करता है।"
-        },
-        {
-          "id": "BIOFIT_STIMRICH",
-          "name": "Biofit Stimrich (पौधा वृद्धि व कल्ले फुटाव)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "वृद्धि प्रमोटर",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "अमीनो एसिड और समुद्री शैवाल युक्त जो धान में कल्ले, सोयाबीन में शाखाएं और फूलों की संख्या बढ़ाता है।"
-        },
-        {
-          "id": "BIOFIT_BIO99",
-          "name": "Biofit Bio-99 (स्प्रेडर, स्टीकर व पेनिट्रेटर)",
-          "category": "Agriculture",
-          "price": 380,
-          "mrp": 450,
-          "badge": "दवा बचत 30%",
-          "image": "/images/products/biofit-bio99.webp",
-          "desc": "छिड़काव के समय दवाओं को पत्तियों पर समान रूप से फैलाता है और बारिश से धुलने से बचाता है।"
-        }
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
       ],
-      "clinical_breakdown": {
-        "badge_text": "🩺 KHARIF CROP DIAGNOSTICS & REMEDIES",
-        "main_title": "खरीफ फसलों की प्रमुख 4 गंभीर समस्याएं: कारण, लक्षण व सटीक समाधान",
-        "subtitle": "कल्लों की संख्या दोगुनी करें, कीट-रोगों से सुरक्षा पाएं और मिट्टी को बनाएं उपजाऊ",
-        "cards": [
-          {
-            "id": "CB_AGRI_KHARIF_1",
-            "title": "सोयाबीन में पीला मोज़ेक वायरस (YMV)",
-            "badge": "सफेद मक्खी जनित",
-            "color": "#eab308",
-            "image": "/images/crops/soyabeen.jpeg",
-            "points": [
-              "• कारण: सफेद मक्खी (Whitefly) द्वारा वायरस का तीव्र फैलाव।",
-              "• लक्षण: पत्तियों पर अनियमित पीले-हरे धब्बे, पत्तियों का सिकुड़ना व फलियों में दाना न बनना।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान व उपचार",
-              "steps": [
-                "Biofit Intact + Bio-99 का छिड़काव करें। रसचूसक सफेद मक्खी तुरंत नियंत्रित होगी और नई पत्तियां स्वस्थ निकलेंगी।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_KHARIF_2",
-            "title": "धान में तना छेदक (Stem Borer) व सफेद बालियां",
-            "badge": "अन्नदाता सुरक्षा",
-            "color": "#ef4444",
-            "image": "/images/crops/paddy.jpeg",
-            "points": [
-              "• कारण: पीले तना छेदक की सुंडी तने के अंदर घुसकर संवहनी ऊतकों को काटती है।",
-              "• लक्षण: गोभ का सूखना (Dead Heart) और बालियां निकलने पर सफेद बालियां (White Earhead) होना।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान व उपचार",
-              "steps": [
-                "Biofit Intact + Stimrich का उपयोग करें। दाना पूरी तरह भरेगा और तना छेदक का 100% जैविक खात्मा होगा।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_KHARIF_3",
-            "title": "मक्का में फॉल आर्मीवर्म (FAW) इल्ली",
-            "badge": "आक्रामक कीट",
-            "color": "#16a34a",
-            "image": "/images/crops/maize.jpeg",
-            "points": [
-              "• कारण: विदेशी आक्रामक सैनिक कीट, जो पोंगे (Whorl) में छिपकर तेजी से पत्तियां खाता है।",
-              "• लक्षण: पत्तियों में छलनी जैसे बड़े छेद और पोंगे में भूरे रंग का बुरादा (Frass) दिखना।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान व उपचार",
-              "steps": [
-                "Biofit Intact को पोंगे (Whorl) में शाम के समय स्प्रे करें। आर्मीवर्म का लारवा पूरी तरह नष्ट हो जाएगा।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_KHARIF_4",
-            "title": "कपास में गुलाबी सुंडी (Pink Bollworm)",
-            "badge": "सफेद सोना सुरक्षा",
-            "color": "#0284c7",
-            "image": "/images/crops/cotton.jpeg",
-            "points": [
-              "• कारण: रात में सक्रिय कीट जो फूल व टिंडे में छेद कर रेशे को बर्बाद करता है।",
-              "• लक्षण: रोसेट फूल (गुलाब जैसे मुड़े फूल), टिंडों में छेद व बिनौले का सड़ाव।"
-            ],
-            "remedy": {
-              "title": "सटीक समाधान व उपचार",
-              "steps": [
-                "फेरोमोन ट्रैप लगाएं और Biofit Wrapup + Intact का स्प्रे करें। टिंडे स्वस्थ व रेशा चमकदार बनेगा।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          }
-        ]
-      },
-      "reviews": [
-        {
-          "name": "बलविंदर सिंह",
-          "role": "किसान, करनाल",
-          "rating": 5,
-          "comment": "धान में Stimrich और SHET डालने से कल्ले 35 से 45 प्रति पौधा निकले और दाना चमकदार बना।"
-        }
-      ],
-      "faqs": [
-        {
-          "question": "सोयाबीन में फूल गिरना कैसे रोकें?",
-          "answer": "फूल आने की शुरुआत में Biofit Stimrich (1.5 ml/लीटर) और Bio-99 (0.3 ml/लीटर) का छिड़काव करें।"
-        }
-      ],
-      "videos": [
-        {
-          "title": "बीज संस्कार: मजबूत फसल का राज 🌱",
-          "youtube_id": "Ae9E-arA8lo",
-          "thumbnail": "https://img.youtube.com/vi/Ae9E-arA8lo/hqdefault.jpg",
-          "duration": "06:18",
-          "views": "92K+ व्यूज",
-          "ratio": "16:9"
-        },
-        {
-          "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱",
-          "youtube_id": "jxu9W_s-C70",
-          "thumbnail": "https://img.youtube.com/vi/jxu9W_s-C70/hqdefault.jpg",
-          "duration": "07:40",
-          "views": "74K+ व्यूज",
-          "ratio": "16:9"
-        }
-      ],
+      "hidden_sections": [],
       "kpi_cards": [
         {
           "icon": "fa-seedling",
@@ -8889,7 +8757,62 @@
           "image": ""
         }
       ],
-      "page_kpi_sections": [],
+      "marketing_cards": [
+        {
+          "book_id": "BK001",
+          "headline": "🌾 खरीफ फसल मास्टर गाइड 2026",
+          "tag": "🔥 खरीफ सर्वाधिक लोकप्रिय",
+          "sales_counter": "4,500+ किसानों ने खरीदा",
+          "desc": "धान, सोयाबीन, कपास और मक्का में खरपतवार नियंत्रण, कीट सुरक्षा व रिकॉर्ड उपज फॉर्मूला।"
+        },
+        {
+          "book_id": "BUN002",
+          "headline": "4-इन-1 किसान मास्टर बंडल",
+          "tag": "🔥 83% महाबचत",
+          "sales_counter": "2,900+ किसानों का भरोसा",
+          "desc": "धान, सोयाबीन, मक्का व संपूर्ण फसल डॉक्टर डिजिटल संग्रह!",
+          "is_bundle": true
+        }
+      ],
+      "videos": [
+        {
+          "title": "बीज संस्कार: मजबूत फसल का राज 🌱",
+          "youtube_id": "Ae9E-arA8lo",
+          "thumbnail": "https://img.youtube.com/vi/Ae9E-arA8lo/hqdefault.jpg",
+          "duration": "06:18",
+          "views": "92K+ व्यूज",
+          "ratio": "16:9"
+        },
+        {
+          "title": "मित्र जीवाणुओं का बड़ा फैसला! 🦠🌱",
+          "youtube_id": "jxu9W_s-C70",
+          "thumbnail": "https://img.youtube.com/vi/jxu9W_s-C70/hqdefault.jpg",
+          "duration": "07:40",
+          "views": "74K+ व्यूज",
+          "ratio": "16:9"
+        }
+      ],
+      "reviews_heading": "",
+      "reviews_badge": "",
+      "reviews": [
+        {
+          "name": "बलविंदर सिंह",
+          "role": "किसान, करनाल",
+          "rating": 5,
+          "comment": "धान में Stimrich और SHET डालने से कल्ले 35 से 45 प्रति पौधा निकले और दाना चमकदार बना।"
+        }
+      ],
+      "faqs_heading": "",
+      "faqs_badge": "",
+      "faqs": [
+        {
+          "question": "सोयाबीन में फूल गिरना कैसे रोकें?",
+          "answer": "फूल आने की शुरुआत में Biofit Stimrich (1.5 ml/लीटर) और Bio-99 (0.3 ml/लीटर) का छिड़काव करें।"
+        }
+      ],
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [],
       "crops": [
         {
           "id": "CROP_KHARIF_01",
@@ -8951,7 +8874,143 @@
           "mainIssues": "उकठा (Wilt), फली छेदक इल्ली, स्टंटिंग",
           "solution": "ट्राइकोडर्मा बीज उपचार व फूल आने पर नीम ऑयल + कीटनाशक स्प्रे।"
         }
-      ]
+      ],
+      "pashu_cards": [],
+      "products": [
+        {
+          "id": "BIOFIT_SHET",
+          "name": "Biofit SHET (सॉइल हेल्थ एनहांसमेंट टेक्नोलॉजी)",
+          "category": "Agriculture",
+          "price": 750,
+          "mrp": 890,
+          "badge": "मिट्टी सुधारक",
+          "image": "/images/products/biofit-shet.webp",
+          "desc": "करोड़ों लाभकारी जीवाणुओं का समूह जो मिट्टी की संरचना सुधारता है और जड़ विकास तेज करता है।"
+        },
+        {
+          "id": "BIOFIT_STIMRICH",
+          "name": "Biofit Stimrich (पौधा वृद्धि व कल्ले फुटाव)",
+          "category": "Agriculture",
+          "price": 650,
+          "mrp": 750,
+          "badge": "वृद्धि प्रमोटर",
+          "image": "/images/products/biofit-stimrich.webp",
+          "desc": "अमीनो एसिड और समुद्री शैवाल युक्त जो धान में कल्ले, सोयाबीन में शाखाएं और फूलों की संख्या बढ़ाता है।"
+        },
+        {
+          "id": "BIOFIT_BIO99",
+          "name": "Biofit Bio-99 (स्प्रेडर, स्टीकर व पेनिट्रेटर)",
+          "category": "Agriculture",
+          "price": 380,
+          "mrp": 450,
+          "badge": "दवा बचत 30%",
+          "image": "/images/products/biofit-bio99.webp",
+          "desc": "छिड़काव के समय दवाओं को पत्तियों पर समान रूप से फैलाता है और बारिश से धुलने से बचाता है।"
+        }
+      ],
+      "page_kpi_sections": [],
+      "clinical_breakdown": {
+        "badge_text": "🩺 KHARIF CROP DIAGNOSTICS & REMEDIES",
+        "main_title": "खरीफ फसलों की प्रमुख 4 गंभीर समस्याएं: कारण, लक्षण व सटीक समाधान",
+        "subtitle": "कल्लों की संख्या दोगुनी करें, कीट-रोगों से सुरक्षा पाएं और मिट्टी को बनाएं उपजाऊ",
+        "cards": [
+          {
+            "id": "CB_AGRI_KHARIF_1",
+            "title": "सोयाबीन में पीला मोज़ेक वायरस (YMV)",
+            "badge": "सफेद मक्खी जनित",
+            "color": "#eab308",
+            "image": "/images/banners/cb_card-1003992316-060045-a0xc.webp",
+            "points": [
+              "• कारण: सफेद मक्खी (Whitefly) द्वारा वायरस का तीव्र फैलाव।",
+              "• लक्षण: पत्तियों पर अनियमित पीले-हरे धब्बे, पत्तियों का सिकुड़ना व फलियों में दाना न बनना।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान व उपचार",
+              "steps": [
+                "Biofit Intact + Bio-99 का छिड़काव करें। रसचूसक सफेद मक्खी तुरंत नियंत्रित होगी और नई पत्तियां स्वस्थ निकलेंगी।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_KHARIF_2",
+            "title": "धान में तना छेदक (Stem Borer) व सफेद बालियां",
+            "badge": "अन्नदाता सुरक्षा",
+            "color": "#ef4444",
+            "image": "/images/banners/cb_card-1003992353-128500-vcja.webp",
+            "points": [
+              "• कारण: पीले तना छेदक की सुंडी तने के अंदर घुसकर संवहनी ऊतकों को काटती है।",
+              "• लक्षण: गोभ का सूखना (Dead Heart) और बालियां निकलने पर सफेद बालियां (White Earhead) होना।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान व उपचार",
+              "steps": [
+                "Biofit Intact + Stimrich का उपयोग करें। दाना पूरी तरह भरेगा और तना छेदक का 100% जैविक खात्मा होगा।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_KHARIF_3",
+            "title": "मक्का में फॉल आर्मीवर्म (FAW) इल्ली",
+            "badge": "आक्रामक कीट",
+            "color": "#16a34a",
+            "image": "/images/crops/maize.jpeg",
+            "points": [
+              "• कारण: विदेशी आक्रामक सैनिक कीट, जो पोंगे (Whorl) में छिपकर तेजी से पत्तियां खाता है।",
+              "• लक्षण: पत्तियों में छलनी जैसे बड़े छेद और पोंगे में भूरे रंग का बुरादा (Frass) दिखना।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान व उपचार",
+              "steps": [
+                "Biofit Intact को पोंगे (Whorl) में शाम के समय स्प्रे करें। आर्मीवर्म का लारवा पूरी तरह नष्ट हो जाएगा।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_KHARIF_4",
+            "title": "कपास में गुलाबी सुंडी (Pink Bollworm)",
+            "badge": "सफेद सोना सुरक्षा",
+            "color": "#0284c7",
+            "image": "/images/crops/cotton.jpeg",
+            "points": [
+              "• कारण: रात में सक्रिय कीट जो फूल व टिंडे में छेद कर रेशे को बर्बाद करता है।",
+              "• लक्षण: रोसेट फूल (गुलाब जैसे मुड़े फूल), टिंडों में छेद व बिनौले का सड़ाव।"
+            ],
+            "remedy": {
+              "title": "सटीक समाधान व उपचार",
+              "steps": [
+                "फेरोमोन ट्रैप लगाएं और Biofit Wrapup + Intact का स्प्रे करें। टिंडे स्वस्थ व रेशा चमकदार बनेगा।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          }
+        ]
+      },
+      "admin_edited": 1795667133753,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "919876543210",
+        "prompt": ""
+      }
     },
     {
       "id": "page_agri_rabi",
