@@ -221,9 +221,14 @@ export async function initPageEditor() {
     });
     // Clear pendingPageEditorAssets completely to ensure next save is clean
     pendingPageEditorAssets.clear();
-    // Purge AI_OFFLINE_UPLOADS from localStorage so browser stays fast and never re-triggers bulk uploads
+    // Retain only the most recent 10 published previews in AI_OFFLINE_UPLOADS so admin panel immediately displays them without waiting for Vercel deployment
     try {
-      localStorage.removeItem('AI_OFFLINE_UPLOADS');
+      const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+      const keys = Object.keys(offSync);
+      if (keys.length > 10) {
+        keys.slice(0, keys.length - 10).forEach(k => delete offSync[k]);
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+      }
     } catch (e) {}
   }
 
@@ -340,8 +345,8 @@ export async function initPageEditor() {
     if (!file) return;
 
     const isBanner = ['hero_slide', 'floating_banner', 'banner', 'og_image'].includes(targetType);
-    const maxTargetBytes = isBanner ? 180000 : 75000;
-    const maxWidth = isBanner ? 1600 : 800;
+    const maxTargetBytes = isBanner ? 140000 : 65000;
+    const maxWidth = isBanner ? 1400 : 720;
 
     showToast(`⏳ इमेज प्रोसेस हो रही है (${isBanner ? 'HD WebP 1600px' : 'WebP'} कम्प्रेशन)...`, 'info');
 
@@ -356,12 +361,25 @@ export async function initPageEditor() {
       const generatedPath = generateAssetPath(targetType, file.name);
       const webpPath = '/' + generatedPath;
 
-      // Cache locally in browser offline uploads store
+      // Cache locally in browser offline uploads store (bounded to max 10 to protect mobile localStorage 5MB quota)
       try {
         const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
         offSync[webpPath] = dataUrl;
+        const keys = Object.keys(offSync);
+        if (keys.length > 10) {
+          keys.slice(0, keys.length - 10).forEach(k => delete offSync[k]);
+        }
         localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
-      } catch (e) {}
+      } catch (e) {
+        // If quota exceeded, clean half and retry
+        try {
+          const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+          const keys = Object.keys(offSync);
+          keys.slice(0, Math.floor(keys.length / 2)).forEach(k => delete offSync[k]);
+          offSync[webpPath] = dataUrl;
+          localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+        } catch (_) {}
+      }
 
       let oldImagePath = null;
 
@@ -11361,12 +11379,25 @@ export async function initPageEditor() {
       const generatedPath = generateAssetPath('health_card', file.name);
       const webpPath = '/' + generatedPath;
 
-      // Cache locally in browser offline uploads store
+      // Cache locally in browser offline uploads store (bounded to max 10 to protect mobile localStorage 5MB quota)
       try {
         const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
         offSync[webpPath] = dataUrl;
+        const keys = Object.keys(offSync);
+        if (keys.length > 10) {
+          keys.slice(0, keys.length - 10).forEach(k => delete offSync[k]);
+        }
         localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
-      } catch (e) {}
+      } catch (e) {
+        // If quota exceeded, clean half and retry
+        try {
+          const offSync = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+          const keys = Object.keys(offSync);
+          keys.slice(0, Math.floor(keys.length / 2)).forEach(k => delete offSync[k]);
+          offSync[webpPath] = dataUrl;
+          localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(offSync));
+        } catch (_) {}
+      }
 
       const inputIds = ['pe_input_cb_causes_img', 'pe_input_cb_symptoms_img', 'pe_input_cb_risks_img'];
       const targetInput = document.getElementById(inputIds[cardIdx]);
