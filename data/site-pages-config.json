@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795788884757,
+      "admin_edited": 1795788988101,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -12464,15 +12464,6 @@
           "pack_size": "100 ml"
         },
         {
-          "title": "नया उत्पाद (New Product)",
-          "description": "उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...",
-          "image": "",
-          "mrp": 850,
-          "discount_pct": 20,
-          "dose": "2ml / लीटर पानी",
-          "whatsapp_link": "https://wa.me/917974422572"
-        },
-        {
           "title": "सेट (Biofit Shet - Soil Health)",
           "name": "सेट (Biofit Shet - Soil Health)",
           "description": "कड़क व खारी मिट्टी को भुरभुरी और उपजाऊ बनाता है। केंचुओं को सक्रिय कर यूरिया-डीएपी की 30-40% बचत करता है।",
@@ -12641,7 +12632,7 @@
           }
         ]
       },
-      "admin_edited": 1795700057940,
+      "admin_edited": 1795788987657,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
