@@ -1786,119 +1786,112 @@
       const multi = getProductMultilingualData(p, langKey);
       const packTranslated = translatePackSize(p.pack_size, langKey);
       
-      // Clean, short brand tag to give title full horizontal width
+      // Clean, short brand tag with distinctive styling
       const shortBrandTag = ({
-        agri: 'Biofit',
-        cattle: 'Cattle Care',
-        health: 'Naturamore',
-        herbs_more: 'Herbs & More',
-        clean_more: 'Clean & More'
-      })[p.category] || 'Netsurf';
+        agri: '🌿 Biofit Agriculture',
+        cattle: '🐄 Biofit Cattle Care',
+        health: '🩺 Naturamore Health',
+        herbs_more: '✨ Herbs & More',
+        clean_more: '🏡 Clean & More'
+      })[p.category] || '🌱 Netsurf Direct';
 
       // Dynamic Auto-Font Scaling:
-      // Computes font size dynamically based on character count so short text is bold & prominent,
-      // and longer text scales smoothly without ever overflowing or pushing dosage out of view.
       const nameLen = (multi.name || '').length;
       const descLen = (multi.description || '').length;
       const ingLen = (multi.ingredients || '').length;
       const doseLen = (multi.dose || '').length;
       const totalChars = nameLen + descLen + ingLen + doseLen;
 
-      let titleFont = '14.2px';
-      let titleLh = '1.24';
-      let descFont = '11.0px';
-      let descLh = '1.34';
-      let boxFont = '10.2px';
-      let boxLh = '1.30';
-      let boxPad = '3.5px 7px';
-      let boxMargin = '3px';
+      let titleFont = '13.6px';
+      let titleLh = '1.22';
+      let descFont = '10.2px';
+      let descLh = '1.30';
+      let boxFont = '9.5px';
+      let boxLh = '1.26';
+      let showTrustStrip = true;
 
       if (totalChars < 160) {
-        // Short text: Maximum font size and impact
-        titleFont = '14.8px';
-        titleLh = '1.28';
-        descFont = '11.5px';
-        descLh = '1.38';
-        boxFont = '10.6px';
-        boxLh = '1.34';
-        boxPad = '4px 8px';
-        boxMargin = '4px';
-      } else if (totalChars <= 250) {
-        // Balanced standard
-        titleFont = '13.8px';
+        titleFont = '14.2px';
         titleLh = '1.24';
-        descFont = '10.8px';
-        descLh = '1.32';
-        boxFont = '10.0px';
+        descFont = '10.6px';
+        descLh = '1.34';
+        boxFont = '9.8px';
         boxLh = '1.28';
-        boxPad = '3px 7px';
-        boxMargin = '3px';
-      } else if (totalChars <= 320) {
-        // Moderate length: Scaled down gracefully
-        titleFont = '12.8px';
+        showTrustStrip = true;
+      } else if (totalChars <= 270) {
+        titleFont = '13.2px';
         titleLh = '1.20';
         descFont = '10.0px';
         descLh = '1.28';
-        boxFont = '9.5px';
+        boxFont = '9.3px';
         boxLh = '1.24';
-        boxPad = '2.5px 6px';
-        boxMargin = '2.5px';
+        showTrustStrip = true;
       } else {
-        // Dense text: Scaled down to prevent overflow
-        titleFont = '12.0px';
+        titleFont = '12.4px';
         titleLh = '1.18';
         descFont = '9.4px';
-        descLh = '1.24';
-        boxFont = '8.9px';
+        descLh = '1.22';
+        boxFont = '8.8px';
         boxLh = '1.20';
-        boxPad = '2px 5px';
-        boxMargin = '2px';
+        showTrustStrip = totalChars < 360; // Auto-hide trust strip for dense products to prevent overflow
       }
 
       return `
         <div class="pdf-product-card-grid">
-          <!-- Left: Larger Product Image, Pack Size & Dark Red Pricing -->
-          <div class="pdf-card-left-grid">
-            <div class="pdf-card-img-box-grid">
-              <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
-            </div>
-            ${packTranslated ? `<span class="pdf-pack-chip-grid">📦 ${escapeHtml(packTranslated)}</span>` : ''}
-            <div class="pdf-price-box-grid">
-              <span class="pdf-offer-price-grid">₹${offerPrice}</span>
-              ${mrp > offerPrice ? `
-                <div style="display:flex; align-items:center; justify-content:center; gap:3px; margin-top:2px;">
-                  <span class="pdf-mrp-cross-grid">MRP ₹${mrp}</span>
-                  <span class="pdf-discount-badge-grid">${discountPct}% ${escapeHtml(i18n.discountBadge || 'छूट')}</span>
-                </div>
-              ` : ''}
+          <!-- Top Card Strip: Category Badge & Pack Size -->
+          <div class="pdf-card-top-strip">
+            <span class="pdf-cat-chip-grid">${escapeHtml(shortBrandTag)}</span>
+            <div style="display:flex; align-items:center; gap:4px;">
+              ${packTranslated ? `<span class="pdf-pack-chip-grid">📦 ${escapeHtml(packTranslated)}</span>` : ''}
+              ${discountPct > 0 ? `<span class="pdf-discount-badge-grid">${discountPct}% ${escapeHtml(i18n.discountBadge || 'छूट')}</span>` : ''}
             </div>
           </div>
 
-          <!-- Right: Bold Black Titles, Category Badge, Benefits & Dosage -->
-          <div class="pdf-card-right-grid" style="display:flex; flex-direction:column; justify-content:space-between; flex:1; overflow:hidden;">
-            <div>
-              <div class="pdf-title-row-grid">
-                <h4 class="pdf-product-title-grid" style="font-size:${titleFont}; line-height:${titleLh};">${escapeHtml(multi.name)}</h4>
-                <span class="pdf-cat-chip-grid">${escapeHtml(shortBrandTag)}</span>
+          <!-- Main Body: Unified Visual Hub Left + Information Suite Right -->
+          <div class="pdf-card-main-body">
+            <!-- Left: High-Res Image & High-Impact Price Card (Tightly Integrated) -->
+            <div class="pdf-card-left-grid">
+              <div class="pdf-card-img-box-grid">
+                <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
               </div>
+              <div class="pdf-price-box-grid">
+                <span class="pdf-offer-price-grid">₹${offerPrice}</span>
+                ${mrp > offerPrice ? `
+                  <div style="display:flex; align-items:center; justify-content:center; gap:3px; margin-top:1px;">
+                    <span class="pdf-mrp-cross-grid">MRP ₹${mrp}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Right: Title, Concise Description, Ingredients, Dosage & Gap-Filling Trust Tags -->
+            <div class="pdf-card-right-grid">
+              <h4 class="pdf-product-title-grid" style="font-size:${titleFont}; line-height:${titleLh};">
+                ${escapeHtml(multi.name)}
+              </h4>
 
               ${multi.description ? `
-                <div class="pdf-card-desc-grid" style="font-size:${descFont}; line-height:${descLh}; margin:2px 0 ${boxMargin} 0;">
+                <div class="pdf-card-desc-grid" style="font-size:${descFont}; line-height:${descLh};">
                   ${escapeHtml(multi.description)}
                 </div>
               ` : ''}
-            </div>
 
-            <div style="display:flex; flex-direction:column; gap:${boxMargin};">
               ${multi.ingredients ? `
-                <div class="pdf-card-box-grid" style="font-size:${boxFont}; line-height:${boxLh}; padding:${boxPad};">
-                  <strong style="color:#0c2340; font-weight:800;">${escapeHtml(i18n.ingLabel)}</strong> ${escapeHtml(multi.ingredients)}
+                <div class="pdf-card-box-grid" style="font-size:${boxFont}; line-height:${boxLh};">
+                  <strong style="color:#15803d; font-weight:800;">${escapeHtml(i18n.ingLabel)}</strong> ${escapeHtml(multi.ingredients)}
                 </div>
               ` : ''}
 
               ${multi.dose ? `
-                <div class="pdf-card-box-grid dose" style="font-size:${boxFont}; line-height:${boxLh}; padding:${boxPad};">
-                  <strong style="color:#b91c1c; font-weight:800;">${escapeHtml(i18n.doseLabel)}</strong> ${escapeHtml(multi.dose)}
+                <div class="pdf-card-box-grid dose" style="font-size:${boxFont}; line-height:${boxLh};">
+                  <strong style="color:#b45309; font-weight:800;">${escapeHtml(i18n.doseLabel)}</strong> ${escapeHtml(multi.dose)}
+                </div>
+              ` : ''}
+
+              ${showTrustStrip ? `
+                <div class="pdf-card-trust-strip">
+                  <span class="pdf-trust-pill">✓ 100% जैविक व प्राकृतिक</span>
+                  <span class="pdf-trust-pill">✓ DSIR R&D लैब प्रमाणित</span>
                 </div>
               ` : ''}
             </div>
@@ -1910,21 +1903,25 @@
     // Corporate feature filler card to balance the 6-slot grid on the final product page
     function renderPdfQualityGuaranteeFiller(title, icon, desc) {
       return `
-        <div class="pdf-product-card-grid" style="border: 2px solid #0c2340; background: #f8fbfe; height: 75mm; max-height: 75mm;">
-          <div class="pdf-card-left-grid" style="justify-content: center; align-items: center; border-right: 1.5px dashed #cbdfe9;">
-            <div style="width: 70px; height: 70px; border-radius: 50%; background: #0c2340; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 3px 8px rgba(12,35,64,0.12);">
-              ${icon}
-            </div>
-            <span style="font-size: 9.5px; font-weight: 900; color: #b91c1c; text-transform: uppercase; margin-top: 5px; letter-spacing: 0.5px;">100% प्रामाणिक</span>
+        <div class="pdf-product-card-grid" style="border: 1.5px solid #0c2340; background: #f8fbfe;">
+          <div class="pdf-card-top-strip">
+            <span class="pdf-cat-chip-grid" style="background:#0c2340;">✓ आधिकारिक नेटसर्फ गारंटी</span>
+            <span class="pdf-pack-chip-grid" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;">100% प्रामाणिक</span>
           </div>
-          <div class="pdf-card-right-grid" style="justify-content: center; gap: 5px;">
-            <span class="pdf-cat-chip-grid" style="align-self: flex-start; font-size: 9.5px; padding: 2px 7px;">✓ आधिकारिक नेटसर्फ गारंटी</span>
-            <h4 class="pdf-product-title-grid" style="color: #0c2340; font-size: 14px; margin: 2px 0;">${title}</h4>
-            <div class="pdf-card-desc-grid" style="color: #334155; font-size: 10.5px; line-height: 1.38; -webkit-line-clamp: 3;">
-              ${desc}
+          <div class="pdf-card-main-body" style="align-items:center;">
+            <div class="pdf-card-left-grid" style="justify-content: center; align-items: center; border-right: 1.5px dashed #cbdfe9;">
+              <div style="width: 68px; height: 68px; border-radius: 50%; background: #0c2340; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 3px 8px rgba(12,35,64,0.12);">
+                ${icon}
+              </div>
             </div>
-            <div style="background: #ffffff; border: 1.5px solid #cbdfe9; border-radius: 6px; padding: 4px 8px; font-size: 9.5px; color: #0c2340; font-weight: 700; margin-top: 3px;">
-              📞 WhatsApp परामर्श: +91 ${escapeHtml(distPhone)}
+            <div class="pdf-card-right-grid" style="justify-content: center; gap: 4px;">
+              <h4 class="pdf-product-title-grid" style="color: #0c2340; font-size: 13.5px;">${title}</h4>
+              <div class="pdf-card-desc-grid" style="color: #334155; font-size: 10px; line-height: 1.35;">
+                ${desc}
+              </div>
+              <div style="background: #ffffff; border: 1px solid #cbdfe9; border-radius: 6px; padding: 3px 7px; font-size: 9.2px; color: #0c2340; font-weight: 800; margin-top: 2px;">
+                📞 WhatsApp परामर्श: +91 ${escapeHtml(distPhone)}
+              </div>
             </div>
           </div>
         </div>
@@ -2066,50 +2063,70 @@
             margin: 2px 0 3px 0;
           }
 
-          /* Individual 2-Column Product Shelf Card - High-Contrast Razor-Sharp Typography */
+          /* Individual 2-Column Product Shelf Card - Executive Magazine Architecture */
           .pdf-product-card-grid {
             background: #ffffff;
-            border: 1.5px solid #0c2340;
+            border: 1.2px solid #cbd5e1;
             border-radius: 9px;
-            padding: 6px 9px;
+            padding: 5px 8px;
             display: flex;
-            gap: 10px;
-            box-shadow: 0 2px 6px rgba(12, 35, 64, 0.06);
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(12, 35, 64, 0.05);
             box-sizing: border-box;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
             height: 73.5mm;
             max-height: 73.5mm;
             overflow: hidden;
+          }
+
+          .pdf-card-top-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 3px;
+            flex-shrink: 0;
+          }
+
+          .pdf-card-main-body {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
             align-items: stretch;
           }
 
           .pdf-card-left-grid {
-            width: 94px;
-            min-width: 94px;
-            max-width: 94px;
+            width: 88px;
+            min-width: 88px;
+            max-width: 88px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            gap: 2px;
+            justify-content: flex-start;
+            gap: 4px;
             flex-shrink: 0;
             border-right: 1.5px dashed #cbdfe9;
-            padding-right: 8px;
+            padding-right: 6px;
           }
 
           .pdf-card-img-box-grid {
-            width: 86px;
-            height: 86px;
+            width: 82px;
+            height: 82px;
             background: #ffffff;
-            border: 1.2px solid #cbdfe9;
+            border: 1.2px solid #e2e8f0;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            padding: 3px;
+            padding: 2px;
             box-sizing: border-box;
+            flex-shrink: 0;
           }
           .pdf-card-img-box-grid img {
             width: 100%;
@@ -2117,47 +2134,38 @@
             object-fit: contain;
           }
 
-          .pdf-pack-chip-grid {
-            font-size: 10.5px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: #edf5fc;
-            color: #0c2340;
-            border: 1px solid #cbdfe9;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
-            white-space: nowrap;
-          }
-
           .pdf-price-box-grid {
             text-align: center;
             width: 100%;
-            border-top: 1.5px solid #edf5fc;
-            padding-top: 2px;
+            background: #fff8f8;
+            border: 1px solid #fee2e2;
+            border-radius: 6px;
+            padding: 3px 2px;
+            box-sizing: border-box;
+            flex-shrink: 0;
           }
           .pdf-offer-price-grid {
-            font-size: 22px;
+            font-size: 19px;
             font-weight: 900;
             color: #b91c1c;
             display: block;
             line-height: 1.1;
           }
           .pdf-mrp-cross-grid {
-            font-size: 10.5px;
-            color: #475569;
+            font-size: 9.2px;
+            color: #64748b;
             text-decoration: line-through;
             font-weight: 700;
           }
           .pdf-discount-badge-grid {
-            font-size: 9.5px;
+            font-size: 8.5px;
             font-weight: 800;
             background: #fee2e2;
             color: #b91c1c;
-            padding: 1px 5px;
+            padding: 0.5px 4px;
             border-radius: 3px;
-            border: 1px solid #fecaca;
+            border: 1px solid #fca5a5;
+            display: inline-block;
           }
 
           .pdf-card-right-grid {
@@ -2165,56 +2173,76 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             gap: 2.5px;
             overflow: hidden;
           }
-          .pdf-title-row-grid {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 6px;
-          }
           .pdf-product-title-grid {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 900;
-            color: #000000;
+            color: #0f172a;
             margin: 0;
-            line-height: 1.25;
-            letter-spacing: -0.2px;
+            line-height: 1.22;
+            letter-spacing: -0.15px;
           }
           .pdf-cat-chip-grid {
-            font-size: 9px;
+            font-size: 8.8px;
             font-weight: 800;
-            padding: 2px 7px;
+            padding: 1.5px 6px;
             border-radius: 4px;
-            background: #edf5fc;
-            color: #0c2340;
-            border: 1px solid #0c2340;
+            background: #0c2340;
+            color: #ffffff;
             white-space: nowrap;
-            flex-shrink: 0;
+          }
+          .pdf-pack-chip-grid {
+            font-size: 8.8px;
+            font-weight: 800;
+            padding: 1.5px 6px;
+            border-radius: 4px;
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            white-space: nowrap;
           }
           .pdf-card-desc-grid {
-            font-size: 10.8px;
+            font-size: 10px;
             font-weight: 600;
-            color: #0f172a;
-            line-height: 1.35;
-            margin: 2px 0;
+            color: #334155;
+            line-height: 1.32;
+            margin: 1px 0 2px 0;
           }
           .pdf-card-box-grid {
-            background: #f8fbfe;
-            border-left: 3.5px solid #0c2340;
+            background: #f0fdf4;
+            border-left: 3px solid #16a34a;
             border-radius: 4px;
-            padding: 3px 7px;
-            font-size: 10px;
-            line-height: 1.32;
-            color: #000000;
+            padding: 2.5px 6px;
+            font-size: 9.4px;
+            line-height: 1.28;
+            color: #14532d;
             font-weight: 600;
           }
           .pdf-card-box-grid.dose {
-            border-left-color: #b91c1c;
-            background: #fff8f8;
-            color: #000000;
+            border-left-color: #d97706;
+            background: #fefce8;
+            color: #78350f;
+          }
+          .pdf-card-trust-strip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: auto;
+            padding-top: 2px;
+          }
+          .pdf-trust-pill {
+            font-size: 8.2px;
+            font-weight: 700;
+            color: #0284c7;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 3px;
+            padding: 1px 5px;
+            white-space: nowrap;
           }
 
           /* Running Header & Footer Font Increases */
