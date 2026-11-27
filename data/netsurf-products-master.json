@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T14:07:55.303Z",
-  "total_products": 60,
+  "updated_at": "2026-11-27T14:31:12.002Z",
+  "total_products": 59,
   "categories": [
     {
       "id": "agri",
@@ -224,44 +224,6 @@
       ]
     },
     {
-      "id": "ns_prod_45399",
-      "name": "Biofit Zn ",
-      "category": "agri",
-      "category_label": "🌾 कृषि बायोफिट (Biofit Agriculture)",
-      "subcategory": "",
-      "subcategory_label": "",
-      "badge": "✨ New Launch",
-      "pack_size": "1 Ltr",
-      "problem_tags": [
-        "agri_soil_health",
-        "agri_flower_fruit",
-        "crop_chana",
-        "crop_wheat",
-        "crop_mustard",
-        "crop_soybean",
-        "crop_paddy"
-      ],
-      "mrp": 600,
-      "discount_pct": 0,
-      "discounted_price": 600,
-      "image": "/images/products/product-biofit-zn-122032-m5hb.webp",
-      "description": "Biofit Zn एक लिक्विड बायो-फ़र्टिलाइज़र है जिसमें जिंक घुलनशील बैक्टीरिया होते हैं। यह मिट्टी में जिंक की उपलब्धता बढ़ाता है, फसलों में जिंक की कमी सुधारता है और सभी विकास चरणों में पौधों व मिट्टी की सेहत को बेहतर बनाता है।",
-      "ingredients": "जिंक घुलनशील लाभकारी जीवाणु (Zinc Solubilizing Bacteria) व जैविक माध्यम।",
-      "dose": "बीज उपचार: 10–20 मिली प्रति 1 किग्रा बीज (बुवाई से पहले छाया में सुखाएं)। पौध उपचार: 5 मिली प्रति लीटर पानी में जड़ों को 30 मिनट डुबोएं। मृदा प्रयोग: 5 मिली प्रति लीटर पानी या 1 लीटर प्रति एकड़ को 200 लीटर पानी में मिलाकर ड्रेंचिंग/ड्रिप से जड़ क्षेत्र में दें।",
-      "precautions": "बीज उपचार के बाद बीजों को तेज धूप के बजाय छाया में सुखाएं। ठंडी व सूखी जगह पर रखें, सीधी धूप व बच्चों से दूर रखें और दिए गए निर्देशानुसार ही उपयोग करें।",
-      "applicable_pages": [
-        "index",
-        "netsurf-products",
-        "kharif-crops",
-        "rabi-crops",
-        "jayad-summer-crops",
-        "fruit-orchards",
-        "medicinal-farming",
-        "crop-doctor",
-        "floriculture"
-      ]
-    },
-    {
       "id": "ns_prod_48016",
       "name": "Biofit K ",
       "category": "agri",
@@ -369,7 +331,7 @@
       "mrp": 890,
       "discount_pct": 0,
       "discounted_price": 890,
-      "image": "/images/products/product-antiviral-519197-cv91.webp",
+      "image": "/images/products/product-antiviral-858411-3puz.webp",
       "description": "Biofit Antiviral फसलों में होने वाले व्यापक स्तर के वायरल रोगों—जैसे Tobacco Mosaic Virus (TMV), Tomato Yellow Leaf Curl Virus, Tomato Spotted Wilt Virus, Cucumber Mosaic Virus (CMV) और Potato Virus Y (PVY)—को नियंत्रित करने में मदद करता है। यह कृषि क्षेत्र में पहली बार लाई गई Nano-Emulsion तकनीक पर आधारित हर्बल उत्पाद है, जो पौधों की रोग-प्रतिरोधक क्षमता बढ़ाता है, वायरस फैलाने वाले कीटों (जैसे थ्रिप्स, सफेद मक्खी, माहू/एफिड्स और जैसिड्स) को भगाता है, संक्रमण होने के बाद भी वायरस के आगे बढ़ने को रोकता है और पत्तियों व फसल की रिकवरी में सहायता करता है। यह दो तरह से काम करता है: पहले वायरस वाहक कीटों के तंत्रिका, शारीरिक और जैविक तंत्र पर असर डालकर उन्हें दूर भगाता है, और दूसरे पत्तियों की सतह (leaf cuticle) में प्रवेश करके वायरस कणों को घेरकर नष्ट करता है।",
       "ingredients": "इसमें Essential Oils (आवश्यक पौध तेल), Herbal Plant Extracts (हर्बल पौध अर्क), Sophorolipids / Biosurfactants (गैर-रोगजनक यीस्ट कोशिकाओं से प्राप्त प्राकृतिक बायोसर्फैक्टेंट) और Emulsifiers का संतुलित मिश्रण शामिल है। इन घटकों का मिलाजुला असर इसकी विकर्षक क्षमता (repellent activity) को बढ़ाता है, सुगंधित तत्वों को लंबे समय तक सक्रिय रखता है और यह सुनिश्चित करता है कि उत्पाद की हर बूंद में सक्रिय तत्व मौजूद रहें।",
       "dose": "प्रति 1 लीटर पानी में 2 ml Biofit Antiviral मिलाकर छिड़काव करें। पहला छिड़काव कीट या समस्या की शुरुआती पहचान पर करें और उसके बाद कीटों की संख्या के अनुसार हर 7 से 10 दिन के अंतराल पर दोबारा छिड़काव करें। छिड़काव करते समय पत्तियों के निचले हिस्से को भी अच्छी तरह भिगोएँ और सबसे अच्छे परिणाम के लिए सुबह जल्दी या शाम को सूरज ढलने के बाद छिड़काव करें। इसे केवल Biofit Bio-99, Biofit Bio Larvicide और Biofit Intact के साथ ही मिलाकर उपयोग किया जा सकता है।",
