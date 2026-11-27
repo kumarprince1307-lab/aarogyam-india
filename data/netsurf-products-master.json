@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T06:33:35.129Z",
+  "updated_at": "2026-11-27T07:21:05.131Z",
   "total_products": 43,
   "categories": [
     {
@@ -169,7 +169,11 @@
       ],
       "applicable_pages": [
         "pashu-palan",
-        "netsurf-career"
+        "netsurf-career",
+        "dog-care",
+        "bakra-palan",
+        "murgi-palan",
+        "netsurf-products"
       ]
     },
     {
@@ -1241,8 +1245,8 @@
       "name": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
       "category": "agri",
       "category_label": "कृषि देखभाल (Biofit Agriculture)",
-      "subcategory": "agri_chana",
-      "subcategory_label": "🌱 चना फसल (Gram / Chickpea)",
+      "subcategory": "plant_growth",
+      "subcategory_label": "🌱 पादप वृद्धि व टॉनिक (Plant Growth)",
       "badge": "🔥 New Premium Launch",
       "mrp": 1450,
       "discount_pct": 0,
