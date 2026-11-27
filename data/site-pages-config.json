@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795789018053,
+      "admin_edited": 1795789051925,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -13071,12 +13071,24 @@
       "category": "Agriculture",
       "status": "active",
       "theme_primary": "#dc2626",
-      "theme_dark": "#7f1d1d",
+      "theme_dark": "#900000",
       "ticker_text": "🩺 फसल डॉक्टर क्लिनिक: 24×7 Aarogyam Sakhi AI सलाह | कीट, फंगस, वायरस और पोषक तत्व कमी का 1-क्लिक सटीक समाधान!",
+      "audio_title": "🩺 फसल रोग व कीट डॉक्टर हब (Diagnostic Center)",
+      "audio_script": "",
+      "audio_url": "",
       "og_title": "फसल रोग व कीट डॉक्टर हब | 1-क्लिक डायग्नोस्टिक | आरोग्यम भारत",
       "og_image": "/images/pages/og-crop-doctor.webp",
       "og_description": "फसलों में लगने वाले कीट, फंगस, वायरस और पोषण की कमी का 100% सटीक निदान। 24×7 Aarogyam Sakhi AI फसल डॉक्टर द्वारा जैविक उपचार।",
       "share_message": "🩺 अपनी फसल की बीमारी का तुरंत फोटो भेजें और सटीक जैविक इलाज पाएं! 24×7 Aarogyam Sakhi AI फसल डॉक्टर:",
+      "floating_banner": {
+        "enabled": false,
+        "image": "",
+        "badge_title": "",
+        "action_link": "",
+        "animation": "ublFloatBook3D"
+      },
+      "fb_pixel": true,
+      "ga_tag": true,
       "hero_slides": [
         {
           "image": "",
@@ -13087,6 +13099,57 @@
           "cta_link": "#sec-products",
           "cta_secondary_text": "खेती डॉक्टर ई-बुक",
           "cta_secondary_link": "/ebooks/book-landing.html?book=BK002"
+        }
+      ],
+      "sections_order": [
+        "sec_ticker",
+        "sec_hero_slider",
+        "sec_kpi_badges",
+        "sec_category_pills",
+        "sec_shelves_bestseller",
+        "sec_interspersed_marketing",
+        "sec_shelves_new",
+        "sec_shelves_coming_soon",
+        "sec_combo_promo",
+        "sec_videos",
+        "sec_reviews",
+        "sec_trust_guarantee",
+        "sec_faqs",
+        "sec_help_support"
+      ],
+      "hidden_sections": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-stethoscope",
+          "title": "1-क्लिक सटीक रोग डायग्नोस्टिक",
+          "value": "100+ रोग पहचान",
+          "badge": "AI फसल डॉक्टर",
+          "desc": "पत्तियों का पीलापन, मरोड़िया, उकठा और फंगस का तत्काल सचित्र निदान।",
+          "image": ""
+        },
+        {
+          "icon": "fa-flask-vial",
+          "title": "100% जहर-मुक्त जैविक इलाज",
+          "value": "शून्य रसायन",
+          "badge": "बायो-सॉल्यूशन",
+          "desc": "रासायनिक दवाओं के साइड इफेक्ट्स और पेस्टीसाइड रेजिस्टेंस से मुक्ति।",
+          "image": ""
+        },
+        {
+          "icon": "fa-shield-halved",
+          "title": "संपूर्ण फसल सुरक्षा कवच",
+          "value": "बीज से कटाई तक",
+          "badge": "360° सुरक्षा",
+          "desc": "मिट्टी, तना, पत्ती और फल चारों स्तरों पर फंगल व कीट से सुरक्षा।",
+          "image": ""
+        },
+        {
+          "icon": "fa-robot",
+          "title": "24×7 सखी AI डॉक्टर क्लिनिक",
+          "value": "तत्काल फोटो समाधान",
+          "badge": "लाइव AI",
+          "desc": "व्हाट्सएप व ऐप पर फोटो भेजते ही 30 सेकंड में सटीक स्प्रे डोज।",
+          "image": ""
         }
       ],
       "marketing_cards": [
@@ -13105,163 +13168,26 @@
           "desc": "कौन सी दवा कब, कितनी मात्रा में और किस संयोजन के साथ स्प्रे करें, जानिए पूरा चार्ट।"
         }
       ],
-      "products": [
+      "videos": [
         {
-          "id": "BIOFIT_WRAPUP",
-          "name": "Biofit Wrapup (बायो-फंगीसाइड व सुरक्षा कवच)",
-          "category": "Agriculture",
-          "price": 850,
-          "mrp": 990,
-          "badge": "फंगस रक्षक",
-          "image": "/images/products/biofit-wrapup.webp",
-          "desc": "पत्तियों और तने पर सुरक्षात्मक परत बनाकर ब्लाइट, डाउनी मिल्ड्यू और फंगल रोगों को रोकता है।"
+          "title": "खेती का डॉक्टर बुक क्यों खरीदे | सम्पूर्ण वॉकथ्रू",
+          "youtube_id": "bvCuBEuyg48",
+          "thumbnail": "https://img.youtube.com/vi/bvCuBEuyg48/hqdefault.jpg",
+          "duration": "06:15",
+          "views": "88K+ व्यूज",
+          "ratio": "16:9"
         },
         {
-          "id": "BIOFIT_INTACT",
-          "name": "Biofit Intact (जैविक चूसक कीट नियंत्रक)",
-          "category": "Agriculture",
-          "price": 780,
-          "mrp": 900,
-          "badge": "माहू व थ्रिप्स रोधक",
-          "image": "/images/products/biofit-intact.webp",
-          "desc": "थ्रिप्स, माइट्स, एफिड्स और सफेद मक्खी को जैविक रूप से नियंत्रित करता है।"
-        },
-        {
-          "id": "ns_prod_86352",
-          "name": "स्टीमरिच (Biofit Stimrich)",
-          "mrp": 600,
-          "price": 600,
-          "discount_pct": 0,
-          "pack_size": "250 ml",
-          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
-          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
-          "image": "/images/products/product-----------biofit-s-069210-gir4.webp"
-        },
-        {
-          "id": "ns_prod_22569",
-          "name": "Biofit P ",
-          "mrp": 600,
-          "price": 600,
-          "discount_pct": 0,
-          "pack_size": "1 Ltr",
-          "badge": "✨ New Launch",
-          "description": "Biofit P एक लिक्विड बायो-फ़र्टिलाइज़र है जिसमें फॉस्फोरस घुलनशील बैक्टीरिया (PSB) होते हैं। यह मिट्टी में मौजूद अघुलनशील (fixed/unavailable) फॉस्फोरस को घुलनशील रूप में बदलकर पौधों को आसानी से उपलब्ध कराता है। इससे जड़ों के विकास, फूल-फल बनने और पैदावार में सुधार होता है तथा रासायनिक फॉस्फेट खाद पर निर्भरता कम होती है।",
-          "image": "/images/products/product-biofit-p-279874-1ty0.webp"
-        },
-        {
-          "id": "ns_prod_45399",
-          "name": "Biofit Zn ",
-          "mrp": 600,
-          "price": 600,
-          "discount_pct": 0,
-          "pack_size": "1 Ltr",
-          "badge": "✨ New Launch",
-          "description": "Biofit Zn एक लिक्विड बायो-फ़र्टिलाइज़र है जिसमें जिंक घुलनशील बैक्टीरिया होते हैं। यह मिट्टी में जिंक की उपलब्धता बढ़ाता है, फसलों में जिंक की कमी सुधारता है और सभी विकास चरणों में पौधों व मिट्टी की सेहत को बेहतर बनाता है।",
-          "image": "/images/products/product-biofit-zn-122032-m5hb.webp"
-        },
-        {
-          "id": "ns_prod_25198",
-          "name": "Biofit VAM ",
-          "mrp": 600,
-          "price": 600,
-          "discount_pct": 0,
-          "pack_size": "1 Ltr",
-          "badge": "✨ New Launch",
-          "description": "Biofit VAM एक फंगल बायो-फ़र्टिलाइज़र (Vesicular-Arbuscular Mycorrhiza) है जो पौधों की जड़ों के साथ सहजीवी संबंध बनाकर जड़ों का फैलाव व द्रव्यमान बढ़ाता है। यह मिट्टी में अघुलनशील पोषक तत्वों को घुलनशील बनाकर पौधों को उपलब्ध कराता है, जिससे जड़ों का मजबूत विकास, बेहतर फूल-फल, जड़ जनित रोगों से सुरक्षा और सूखे/तनाव सहन करने की क्षमता बढ़ती है।",
-          "image": "/images/products/product-biofit-vam-359042-03hr.webp"
+          "title": "टमाटर में कुकड़ा रोग का इलाज | TYLCV वायरस की दवाई",
+          "youtube_id": "KMvbvTV0dHg",
+          "thumbnail": "https://img.youtube.com/vi/KMvbvTV0dHg/hqdefault.jpg",
+          "duration": "09:30",
+          "views": "65K+ व्यूज",
+          "ratio": "16:9"
         }
       ],
-      "clinical_breakdown": {
-        "badge_text": "🩺 CROP DOCTOR 24×7 DIAGNOSTICS",
-        "main_title": "फसल रोगों के 4 मुख्य प्रकार: लक्षण, पहचान व जैविक डॉक्टर समाधान",
-        "subtitle": "लक्षण पहचानें, सही दवा चुनें और फसल को 24 घंटे में रोगमुक्त बनाएं",
-        "cards": [
-          {
-            "id": "CB_AGRI_DOC_1",
-            "title": "रसचूसक कीट (थ्रिप्स, सफेद मक्खी, माहू)",
-            "badge": "सटीक पहचान",
-            "color": "#eab308",
-            "image": "/images/crops/crop-doctor-insects.jpeg",
-            "points": [
-              "• लक्षण: पत्तियों का नाव की तरह मुड़ना (चूरा-मुर्रा), पीलापन व चिपचिपापन।",
-              "• खतरा: 70% तक फसल का वायरस संक्रमण।"
-            ],
-            "remedy": {
-              "title": "डॉक्टर समाधान",
-              "steps": [
-                "Biofit Intact (2ml/L) + Bio-99 (0.5ml/L) का 10 दिन में 2 बार छिड़काव करें।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_DOC_2",
-            "title": "फंगल व बैक्टीरियल रोग (झुलसा, उकठा, ब्लास्ट)",
-            "badge": "फंगस शील्ड",
-            "color": "#ef4444",
-            "image": "/images/crops/crop-doctor-fungal.jpeg",
-            "points": [
-              "• लक्षण: पत्तियों पर काले-भूरे धब्बे, तनों का सड़ना, पौधों का अचानक सूखना।",
-              "• खतरा: 2-3 दिन में पूरे खेत में तीव्र फैलाव।"
-            ],
-            "remedy": {
-              "title": "डॉक्टर समाधान",
-              "steps": [
-                "Biofit Wrapup (2ml/L) + SHET जड़ों में दें। फफूंद तुरंत निष्क्रिय होगी।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_DOC_3",
-            "title": "इल्लियां व छेदक (सेमीलूपर, आर्मीवर्म, फॉल)",
-            "badge": "इल्ली नाशक",
-            "color": "#16a34a",
-            "image": "/images/crops/crop-doctor-worms.jpeg",
-            "points": [
-              "• लक्षण: पत्तियों को छलनी करना, फल-टमाटर-टिंडों में छेद होना।",
-              "• खतरा: उपज में 50% से अधिक भारी नुकसान।"
-            ],
-            "remedy": {
-              "title": "डॉक्टर समाधान",
-              "steps": [
-                "शाम के समय Biofit Intact का सघन छिड़काव करें। लारवा 24 घंटे में नष्ट।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          },
-          {
-            "id": "CB_AGRI_DOC_4",
-            "title": "पोषक तत्वों की कमी (जिंक, फेरस, बोरॉन)",
-            "badge": "पौष्टिक टॉनिक",
-            "color": "#0284c7",
-            "image": "/images/crops/crop-doctor-nutrients.jpeg",
-            "points": [
-              "• लक्षण: पत्तियों की नसें हरी व बीच में पीलापन (Chlorosis), कल्ले न फूटना।",
-              "• खतरा: भोजन निर्माण रुकना व दाना हल्का रहना।"
-            ],
-            "remedy": {
-              "title": "डॉक्टर समाधान",
-              "steps": [
-                "Biofit NPK लिक्विड + Stimrich ड्रिप या फोलियर स्प्रे दें। पौधा 3 दिन में गहरा हरा।"
-              ]
-            },
-            "whatsapp_btn": {
-              "enabled": true,
-              "text": "सलाह लें"
-            }
-          }
-        ]
-      },
+      "reviews_heading": "🩺 फसल डॉक्टर द्वारा रोग मुक्त हुए किसानों के वास्तविक अनुभव",
+      "reviews_badge": "⭐ 100% सत्यापित किसान केस स्टडीज",
       "reviews": [
         {
           "name": "शिवनारायण पाटीदार",
@@ -13369,6 +13295,8 @@
           "comment": "मैंने '5-इन-1 किसान मास्टर बंडल' लिया था जिसमें फसल डॉक्टर की पूरी किताब मिली। यह किताब नहीं, हर किसान का अपना निजी कृषि वैज्ञानिक है। खेती की हर समस्या का पक्का समाधान इसमें है।"
         }
       ],
+      "faqs_heading": "🩺 फसल डॉक्टर: फसलों के रोग, कीट, पीलापन व पोषण निदान (FAQs)",
+      "faqs_badge": "❓ फसल स्वास्थ्य निदान केंद्र",
       "faqs": [
         {
           "question": "फसल में पीलापन (Yellowing) नाइट्रोजन की कमी है या फंगस या जिंक की कमी — कैसे पहचानें?",
@@ -13431,59 +13359,9 @@
           "answer": "वेबसाइट के प्रोडक्ट कैटलॉग से अपनी जरूरत का उत्पाद चुनें और '🛒 कार्ट में जोड़ें' या '⚡ अभी खरीदें' पर क्लिक करें। आप सीधे व्हाट्सएप नंबर 7974422572 पर भी अपनी फसल का फोटो भेजकर डॉक्टर की पर्ची के अनुसार पूरी किट घर बैठे कैश ऑन डिलीवरी पर मंगवा सकते हैं।"
         }
       ],
-      "videos": [
-        {
-          "title": "खेती का डॉक्टर बुक क्यों खरीदे | सम्पूर्ण वॉकथ्रू",
-          "youtube_id": "bvCuBEuyg48",
-          "thumbnail": "https://img.youtube.com/vi/bvCuBEuyg48/hqdefault.jpg",
-          "duration": "06:15",
-          "views": "88K+ व्यूज",
-          "ratio": "16:9"
-        },
-        {
-          "title": "टमाटर में कुकड़ा रोग का इलाज | TYLCV वायरस की दवाई",
-          "youtube_id": "KMvbvTV0dHg",
-          "thumbnail": "https://img.youtube.com/vi/KMvbvTV0dHg/hqdefault.jpg",
-          "duration": "09:30",
-          "views": "65K+ व्यूज",
-          "ratio": "16:9"
-        }
-      ],
-      "kpi_cards": [
-        {
-          "icon": "fa-stethoscope",
-          "title": "1-क्लिक सटीक रोग डायग्नोस्टिक",
-          "value": "100+ रोग पहचान",
-          "badge": "AI फसल डॉक्टर",
-          "desc": "पत्तियों का पीलापन, मरोड़िया, उकठा और फंगस का तत्काल सचित्र निदान।",
-          "image": ""
-        },
-        {
-          "icon": "fa-flask-vial",
-          "title": "100% जहर-मुक्त जैविक इलाज",
-          "value": "शून्य रसायन",
-          "badge": "बायो-सॉल्यूशन",
-          "desc": "रासायनिक दवाओं के साइड इफेक्ट्स और पेस्टीसाइड रेजिस्टेंस से मुक्ति।",
-          "image": ""
-        },
-        {
-          "icon": "fa-shield-halved",
-          "title": "संपूर्ण फसल सुरक्षा कवच",
-          "value": "बीज से कटाई तक",
-          "badge": "360° सुरक्षा",
-          "desc": "मिट्टी, तना, पत्ती और फल चारों स्तरों पर फंगल व कीट से सुरक्षा।",
-          "image": ""
-        },
-        {
-          "icon": "fa-robot",
-          "title": "24×7 सखी AI डॉक्टर क्लिनिक",
-          "value": "तत्काल फोटो समाधान",
-          "badge": "लाइव AI",
-          "desc": "व्हाट्सएप व ऐप पर फोटो भेजते ही 30 सेकंड में सटीक स्प्रे डोज।",
-          "image": ""
-        }
-      ],
-      "page_kpi_sections": [],
+      "ladder_header": null,
+      "career_ladder": [],
+      "health_diseases": [],
       "crops": [
         {
           "id": "CROP_DOC_01",
@@ -13546,11 +13424,156 @@
           "solution": "बायोफिट एनपीके + चेलेटेड माइक्रोन्यूट्रिएंट्स का संतुलित फोलियर स्प्रे।"
         }
       ],
-      "reviews_heading": "🩺 फसल डॉक्टर द्वारा रोग मुक्त हुए किसानों के वास्तविक अनुभव",
-      "reviews_badge": "⭐ 100% सत्यापित किसान केस स्टडीज",
-      "faqs_heading": "🩺 फसल डॉक्टर: फसलों के रोग, कीट, पीलापन व पोषण निदान (FAQs)",
-      "faqs_badge": "❓ फसल स्वास्थ्य निदान केंद्र",
-      "admin_edited": 1795700057940
+      "pashu_cards": [],
+      "products": [
+        {
+          "id": "ns_prod_86352",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "mrp": 600,
+          "price": 600,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp"
+        },
+        {
+          "id": "ns_prod_22569",
+          "name": "Biofit P ",
+          "mrp": 600,
+          "price": 600,
+          "discount_pct": 0,
+          "pack_size": "1 Ltr",
+          "badge": "✨ New Launch",
+          "description": "Biofit P एक लिक्विड बायो-फ़र्टिलाइज़र है जिसमें फॉस्फोरस घुलनशील बैक्टीरिया (PSB) होते हैं। यह मिट्टी में मौजूद अघुलनशील (fixed/unavailable) फॉस्फोरस को घुलनशील रूप में बदलकर पौधों को आसानी से उपलब्ध कराता है। इससे जड़ों के विकास, फूल-फल बनने और पैदावार में सुधार होता है तथा रासायनिक फॉस्फेट खाद पर निर्भरता कम होती है।",
+          "image": "/images/products/product-biofit-p-279874-1ty0.webp"
+        },
+        {
+          "id": "ns_prod_45399",
+          "name": "Biofit Zn ",
+          "mrp": 600,
+          "price": 600,
+          "discount_pct": 0,
+          "pack_size": "1 Ltr",
+          "badge": "✨ New Launch",
+          "description": "Biofit Zn एक लिक्विड बायो-फ़र्टिलाइज़र है जिसमें जिंक घुलनशील बैक्टीरिया होते हैं। यह मिट्टी में जिंक की उपलब्धता बढ़ाता है, फसलों में जिंक की कमी सुधारता है और सभी विकास चरणों में पौधों व मिट्टी की सेहत को बेहतर बनाता है।",
+          "image": "/images/products/product-biofit-zn-122032-m5hb.webp"
+        },
+        {
+          "id": "ns_prod_25198",
+          "name": "Biofit VAM ",
+          "mrp": 600,
+          "price": 600,
+          "discount_pct": 0,
+          "pack_size": "1 Ltr",
+          "badge": "✨ New Launch",
+          "description": "Biofit VAM एक फंगल बायो-फ़र्टिलाइज़र (Vesicular-Arbuscular Mycorrhiza) है जो पौधों की जड़ों के साथ सहजीवी संबंध बनाकर जड़ों का फैलाव व द्रव्यमान बढ़ाता है। यह मिट्टी में अघुलनशील पोषक तत्वों को घुलनशील बनाकर पौधों को उपलब्ध कराता है, जिससे जड़ों का मजबूत विकास, बेहतर फूल-फल, जड़ जनित रोगों से सुरक्षा और सूखे/तनाव सहन करने की क्षमता बढ़ती है।",
+          "image": "/images/products/product-biofit-vam-359042-03hr.webp"
+        }
+      ],
+      "page_kpi_sections": [],
+      "clinical_breakdown": {
+        "badge_text": "🩺 CROP DOCTOR 24×7 DIAGNOSTICS",
+        "main_title": "फसल रोगों के 4 मुख्य प्रकार: लक्षण, पहचान व जैविक डॉक्टर समाधान",
+        "subtitle": "लक्षण पहचानें, सही दवा चुनें और फसल को 24 घंटे में रोगमुक्त बनाएं",
+        "cards": [
+          {
+            "id": "CB_AGRI_DOC_1",
+            "title": "रसचूसक कीट (थ्रिप्स, सफेद मक्खी, माहू)",
+            "badge": "सटीक पहचान",
+            "color": "#eab308",
+            "image": "/images/crops/crop-doctor-insects.jpeg",
+            "points": [
+              "• लक्षण: पत्तियों का नाव की तरह मुड़ना (चूरा-मुर्रा), पीलापन व चिपचिपापन।",
+              "• खतरा: 70% तक फसल का वायरस संक्रमण।"
+            ],
+            "remedy": {
+              "title": "डॉक्टर समाधान",
+              "steps": [
+                "Biofit Intact (2ml/L) + Bio-99 (0.5ml/L) का 10 दिन में 2 बार छिड़काव करें।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_DOC_2",
+            "title": "फंगल व बैक्टीरियल रोग (झुलसा, उकठा, ब्लास्ट)",
+            "badge": "फंगस शील्ड",
+            "color": "#ef4444",
+            "image": "/images/crops/crop-doctor-fungal.jpeg",
+            "points": [
+              "• लक्षण: पत्तियों पर काले-भूरे धब्बे, तनों का सड़ना, पौधों का अचानक सूखना।",
+              "• खतरा: 2-3 दिन में पूरे खेत में तीव्र फैलाव।"
+            ],
+            "remedy": {
+              "title": "डॉक्टर समाधान",
+              "steps": [
+                "Biofit Wrapup (2ml/L) + SHET जड़ों में दें। फफूंद तुरंत निष्क्रिय होगी।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_DOC_3",
+            "title": "इल्लियां व छेदक (सेमीलूपर, आर्मीवर्म, फॉल)",
+            "badge": "इल्ली नाशक",
+            "color": "#16a34a",
+            "image": "/images/crops/crop-doctor-worms.jpeg",
+            "points": [
+              "• लक्षण: पत्तियों को छलनी करना, फल-टमाटर-टिंडों में छेद होना।",
+              "• खतरा: उपज में 50% से अधिक भारी नुकसान।"
+            ],
+            "remedy": {
+              "title": "डॉक्टर समाधान",
+              "steps": [
+                "शाम के समय Biofit Intact का सघन छिड़काव करें। लारवा 24 घंटे में नष्ट।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          },
+          {
+            "id": "CB_AGRI_DOC_4",
+            "title": "पोषक तत्वों की कमी (जिंक, फेरस, बोरॉन)",
+            "badge": "पौष्टिक टॉनिक",
+            "color": "#0284c7",
+            "image": "/images/crops/crop-doctor-nutrients.jpeg",
+            "points": [
+              "• लक्षण: पत्तियों की नसें हरी व बीच में पीलापन (Chlorosis), कल्ले न फूटना।",
+              "• खतरा: भोजन निर्माण रुकना व दाना हल्का रहना।"
+            ],
+            "remedy": {
+              "title": "डॉक्टर समाधान",
+              "steps": [
+                "Biofit NPK लिक्विड + Stimrich ड्रिप या फोलियर स्प्रे दें। पौधा 3 दिन में गहरा हरा।"
+              ]
+            },
+            "whatsapp_btn": {
+              "enabled": true,
+              "text": "सलाह लें"
+            },
+            "catalog_btn": null
+          }
+        ]
+      },
+      "admin_edited": 1795789051742,
+      "netsurf_plan": null,
+      "diet_exercise": null,
+      "whatsapp_support": {
+        "number": "919876543210",
+        "prompt": ""
+      }
     },
     {
       "id": "page_agri_medicinal",
