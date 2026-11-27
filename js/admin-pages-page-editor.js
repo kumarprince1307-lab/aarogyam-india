@@ -8714,7 +8714,7 @@ export async function initPageEditor() {
           <div onclick="window.toggleMpmCard(${idx})" style="padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: ${isExpanded ? 'rgba(16,185,129,0.1)' : 'transparent'}; border-bottom: ${isExpanded ? '1px solid #1e293b' : 'none'}; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
               <div style="width: 52px; height: 52px; border-radius: 10px; border: 1.5px solid #334155; overflow: hidden; background: #070d19; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
-                <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;" onerror="this.src='/images/logo/logo.png'">
+                <img id="mpm_card_thumb_${idx}" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;" onerror="this.src='/images/logo/logo.png'">
               </div>
               <div style="min-width: 0; flex: 1;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -8818,7 +8818,7 @@ export async function initPageEditor() {
                   <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #fbbf24; display: flex; justify-content: space-between; align-items: center; user-select: none;">
                     <span style="display: flex; align-items: center; gap: 6px;">
                       <span>🩺</span> <span>संबंधित बीमारी, फसल व पशु टैग्स (Problem Tags)</span>
-                      <span style="font-size: 0.72rem; background: rgba(245,158,11,0.2); color: #fde047; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
+                      <span id="mpm_tags_badge_${idx}" style="font-size: 0.72rem; background: rgba(245,158,11,0.2); color: #fde047; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
                         ${(p.problem_tags || []).length} चयनित
                       </span>
                     </span>
@@ -8835,7 +8835,7 @@ export async function initPageEditor() {
                       }).map(t => {
                         const isChecked = Array.isArray(p.problem_tags) && p.problem_tags.includes(t.id);
                         return `
-                          <button type="button" onclick="window.toggleMpmProductTag(${idx}, '${t.id}')" style="cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 0.74rem; font-weight: 700; border: 1.5px solid ${isChecked ? '#f59e0b' : '#334155'}; background: ${isChecked ? 'rgba(245,158,11,0.3)' : '#0d1527'}; color: ${isChecked ? '#fef08a' : '#94a3b8'}; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
+                          <button type="button" onclick="window.toggleMpmProductTag(${idx}, '${t.id}', this)" style="cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 0.74rem; font-weight: 700; border: 1.5px solid ${isChecked ? '#f59e0b' : '#334155'}; background: ${isChecked ? 'rgba(245,158,11,0.3)' : '#0d1527'}; color: ${isChecked ? '#fef08a' : '#94a3b8'}; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
                             <span>${isChecked ? '☑️' : '⬜'}</span> <span>${t.label}</span>
                           </button>
                         `;
@@ -8849,7 +8849,7 @@ export async function initPageEditor() {
                   <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #c084fc; display: flex; justify-content: space-between; align-items: center; user-select: none;">
                     <span style="display: flex; align-items: center; gap: 6px;">
                       <span>🎯</span> <span>कहाँ-कहाँ प्रदर्शित करें? (Landing Pages Targeting)</span>
-                      <span style="font-size: 0.72rem; background: rgba(168,85,247,0.25); color: #e9d5ff; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
+                      <span id="mpm_pages_badge_${idx}" style="font-size: 0.72rem; background: rgba(168,85,247,0.25); color: #e9d5ff; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
                         ${(p.applicable_pages || []).length} पेज एक्टिव
                       </span>
                     </span>
@@ -8877,7 +8877,7 @@ export async function initPageEditor() {
                               ${grpPages.map(pg => {
                                 const isSelected = Array.isArray(p.applicable_pages) && p.applicable_pages.includes(pg.slug);
                                 return `
-                                  <button type="button" onclick="window.toggleMpmProductPage(${idx}, '${pg.slug}')" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; border: 1.5px solid ${isSelected ? '#a855f7' : '#334155'}; background: ${isSelected ? 'rgba(168,85,247,0.3)' : '#070d19'}; color: ${isSelected ? '#f3e8ff' : '#94a3b8'}; display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease;">
+                                  <button type="button" onclick="window.toggleMpmProductPage(${idx}, '${pg.slug}', this)" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; border: 1.5px solid ${isSelected ? '#a855f7' : '#334155'}; background: ${isSelected ? 'rgba(168,85,247,0.3)' : '#070d19'}; color: ${isSelected ? '#f3e8ff' : '#94a3b8'}; display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease;">
                                     <span>${isSelected ? '☑️' : '⬜'}</span> <span>${pg.label}</span>
                                   </button>
                                 `;
@@ -8908,7 +8908,7 @@ export async function initPageEditor() {
                 <div>
                   <label class="admin-label" style="font-size: 0.78rem;">उत्पाद फोटो (WebP Image)</label>
                   <div style="display: flex; gap: 6px; align-items: center;">
-                    <input type="text" value="${escapeHtml(p.image || '')}" oninput="window.updateMpmProductField(${idx}, 'image', this.value)" class="admin-input" style="flex: 1; padding: 6px 8px; font-size: 0.76rem;" placeholder="/images/products/..." />
+                    <input type="text" id="mpm_img_path_${idx}" value="${escapeHtml(p.image || '')}" oninput="window.updateMpmProductField(${idx}, 'image', this.value)" class="admin-input" style="flex: 1; padding: 6px 8px; font-size: 0.76rem;" placeholder="/images/products/..." />
                     <label class="admin-button small-button" style="background: #10b981; color: #fff; cursor: pointer; padding: 6px 10px; margin: 0; font-size: 0.75rem; white-space: nowrap;">
                       📁 अपलोड
                       <input type="file" accept="image/*" style="display: none;" onchange="window.handleMpmProductImageUpload(${idx}, this)">
@@ -8916,8 +8916,8 @@ export async function initPageEditor() {
                   </div>
                   ${imgSrc ? `
                     <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
-                      <img src="${escapeHtml(imgSrc)}" alt="Preview" style="height: 38px; width: 38px; border-radius: 6px; object-fit: contain; border: 1px solid #334155; background: #070d19;" onerror="this.src='/images/logo/logo.png'" />
-                      <span style="font-size: 0.7rem; color: #86efac;">${p.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव फोटो'}</span>
+                      <img id="mpm_img_preview_${idx}" src="${escapeHtml(imgSrc)}" alt="Preview" style="height: 38px; width: 38px; border-radius: 6px; object-fit: contain; border: 1px solid #334155; background: #070d19;" onerror="this.src='/images/logo/logo.png'" />
+                      <span id="mpm_img_status_${idx}" style="font-size: 0.7rem; color: #86efac;">${p.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव फोटो'}</span>
                     </div>
                   ` : ''}
                 </div>
@@ -8984,6 +8984,18 @@ export async function initPageEditor() {
     const prod = masterProducts[idx];
     const prodName = prod.name || 'उत्पाद';
     showToast(`⏳ '${prodName}' सुरक्षित हो रहा है...`, 'info');
+
+    // 1. Sync product image if newly uploaded or in offline store
+    if (prod.image && prod.image.startsWith('/images/products/')) {
+      try {
+        const off = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        const imgData = prod.image_preview || off[prod.image];
+        if (imgData && imgData.startsWith('data:')) {
+          const base64 = imgData.replace(/^data:[^;]+;base64,/, '');
+          await syncAssetToGitHub(prod.image, base64);
+        }
+      } catch (e) {}
+    }
 
     // Clean single product
     const cleanProd = { ...prod };
@@ -9122,6 +9134,8 @@ export async function initPageEditor() {
       }
     } catch (e) {}
 
+    // Auto-collapse form after saving successfully
+    mpmExpandedIdx = null;
     renderMasterProductsList();
     showToast(`✅ '${prodName}' सफलतापूर्वक सुरक्षित व लाइव हो गया!`, 'success');
   };
@@ -9144,34 +9158,60 @@ export async function initPageEditor() {
     }
   };
 
-  
-  window.toggleMpmProductPage = function(idx, slug) {
-    if (masterProducts[idx]) {
-      if (!Array.isArray(masterProducts[idx].applicable_pages)) {
-        masterProducts[idx].applicable_pages = [];
-      }
-      const pagesList = masterProducts[idx].applicable_pages;
-      const pos = pagesList.indexOf(slug);
-      if (pos >= 0) {
-        pagesList.splice(pos, 1);
-      } else {
-        pagesList.push(slug);
-      }
+  window.toggleMpmProductPage = function(idx, slug, btnEl) {
+    if (!masterProducts[idx]) return;
+    if (!Array.isArray(masterProducts[idx].applicable_pages)) {
+      masterProducts[idx].applicable_pages = [];
+    }
+    const pagesList = masterProducts[idx].applicable_pages;
+    const pos = pagesList.indexOf(slug);
+    let isSelected = false;
+    if (pos >= 0) {
+      pagesList.splice(pos, 1);
+      isSelected = false;
+    } else {
+      pagesList.push(slug);
+      isSelected = true;
+    }
+
+    if (btnEl) {
+      btnEl.style.border = isSelected ? '1.5px solid #a855f7' : '1.5px solid #334155';
+      btnEl.style.background = isSelected ? 'rgba(168,85,247,0.3)' : '#070d19';
+      btnEl.style.color = isSelected ? '#f3e8ff' : '#94a3b8';
+      const markSpan = btnEl.querySelector('span');
+      if (markSpan) markSpan.textContent = isSelected ? '☑️' : '⬜';
+      const badge = document.getElementById(`mpm_pages_badge_${idx}`);
+      if (badge) badge.textContent = `${pagesList.length} पेज एक्टिव`;
+    } else {
       renderMasterProductsList();
     }
   };
-window.toggleMpmProductTag = function(idx, tag) {
-    if (masterProducts[idx]) {
-      if (!Array.isArray(masterProducts[idx].problem_tags)) {
-        masterProducts[idx].problem_tags = [];
-      }
-      const tags = masterProducts[idx].problem_tags;
-      const pos = tags.indexOf(tag);
-      if (pos >= 0) {
-        tags.splice(pos, 1);
-      } else {
-        tags.push(tag);
-      }
+
+  window.toggleMpmProductTag = function(idx, tag, btnEl) {
+    if (!masterProducts[idx]) return;
+    if (!Array.isArray(masterProducts[idx].problem_tags)) {
+      masterProducts[idx].problem_tags = [];
+    }
+    const tags = masterProducts[idx].problem_tags;
+    const pos = tags.indexOf(tag);
+    let isChecked = false;
+    if (pos >= 0) {
+      tags.splice(pos, 1);
+      isChecked = false;
+    } else {
+      tags.push(tag);
+      isChecked = true;
+    }
+
+    if (btnEl) {
+      btnEl.style.border = isChecked ? '1.5px solid #f59e0b' : '1.5px solid #334155';
+      btnEl.style.background = isChecked ? 'rgba(245,158,11,0.3)' : '#0d1527';
+      btnEl.style.color = isChecked ? '#fef08a' : '#94a3b8';
+      const markSpan = btnEl.querySelector('span');
+      if (markSpan) markSpan.textContent = isChecked ? '☑️' : '⬜';
+      const badge = document.getElementById(`mpm_tags_badge_${idx}`);
+      if (badge) badge.textContent = `${tags.length} चयनित`;
+    } else {
       renderMasterProductsList();
     }
   };
@@ -9309,26 +9349,58 @@ window.toggleMpmProductTag = function(idx, tag) {
   window.handleMpmProductImageUpload = async function(idx, inputEl) {
     const file = inputEl.files?.[0];
     if (!file || !masterProducts[idx]) return;
-    showToast('⏳ उत्पाद फोटो प्रोसेस हो रही है (HD WebP)...', 'info');
+    const prodName = masterProducts[idx].name || 'prod';
+    showToast(`⏳ '${prodName}' फोटो प्रोसेस हो रही है (HD WebP)...`, 'info');
     try {
-      const { dataUrl } = await compressImageToWebp(file, 80000, 800);
-      if (dataUrl) {
-        const prodName = masterProducts[idx].name || 'prod';
-        const cleanPath = generateAssetPath('product', prodName);
-        masterProducts[idx].image = '/' + cleanPath;
-        masterProducts[idx].image_preview = dataUrl;
+      const { dataUrl } = await compressImageToWebp(file, 85000, 800);
+      if (!dataUrl) {
+        showToast('❌ फोटो प्रोसेस में त्रुटि', 'error');
+        return;
+      }
+      const cleanPath = generateAssetPath('product', prodName);
+      const webpPath = '/' + cleanPath;
+      masterProducts[idx].image = webpPath;
+      masterProducts[idx].image_preview = dataUrl;
 
-        // Save to offline uploads store
-        try {
-          const off = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
-          off['/' + cleanPath] = dataUrl;
-          localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(off));
-        } catch (e) {}
+      // 1. Update UI preview in-place instantly
+      const imgPreview = document.getElementById(`mpm_img_preview_${idx}`);
+      if (imgPreview) imgPreview.src = dataUrl;
+      const cardThumb = document.getElementById(`mpm_card_thumb_${idx}`);
+      if (cardThumb) cardThumb.src = dataUrl;
+      const imgInput = document.getElementById(`mpm_img_path_${idx}`);
+      if (imgInput) imgInput.value = webpPath;
+      const statusSpan = document.getElementById(`mpm_img_status_${idx}`);
+      if (statusSpan) {
+        statusSpan.textContent = '⏳ Git / डिस्क पर अपलोड हो रही है...';
+        statusSpan.style.color = '#38bdf8';
+      }
 
-        renderMasterProductsList();
-        showToast('✅ फोटो लोड हो गई (सुरक्षित करने पर Git में अपलोड होगी)', 'success');
+      // 2. Save to offline uploads store
+      try {
+        const off = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        off[webpPath] = dataUrl;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(off));
+      } catch (e) {}
+
+      // 3. Immediately upload to disk & GitHub so file is live right away
+      const base64Data = dataUrl.replace(/^data:[^;]+;base64,/, '');
+      const uploadRes = await syncAssetToGitHub(cleanPath, base64Data);
+
+      if (uploadRes && uploadRes.success) {
+        if (statusSpan) {
+          statusSpan.textContent = '✓ फोटो लाइव व सुरक्षित (HD WebP)';
+          statusSpan.style.color = '#4ade80';
+        }
+        showToast(`✅ '${prodName}' फोटो तुरंत अपलोड व सुरक्षित हो गई!`, 'success');
+      } else {
+        if (statusSpan) {
+          statusSpan.textContent = '✓ ऑफलाइन सुरक्षित (सेव पर अपलोड होगी)';
+          statusSpan.style.color = '#fde047';
+        }
+        showToast('⚠️ फोटो ऑफलाइन सुरक्षित हो गई, सेव दबाने पर पुनः प्रयास होगा।', 'info');
       }
     } catch (e) {
+      console.error('[Admin MPM] Upload error:', e);
       showToast('❌ फोटो प्रोसेस में त्रुटि', 'error');
     }
   };

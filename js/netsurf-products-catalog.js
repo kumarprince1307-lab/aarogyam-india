@@ -1795,46 +1795,7 @@
         clean_more: '🏡 Clean & More'
       })[p.category] || '🌱 Netsurf Direct';
 
-      // Dynamic Auto-Font Scaling:
-      const nameLen = (multi.name || '').length;
-      const descLen = (multi.description || '').length;
-      const ingLen = (multi.ingredients || '').length;
-      const doseLen = (multi.dose || '').length;
-      const totalChars = nameLen + descLen + ingLen + doseLen;
-
-      let titleFont = '15.5px';
-      let titleLh = '1.24';
-      let descFont = '11.5px';
-      let descLh = '1.34';
-      let boxFont = '10.5px';
-      let boxLh = '1.30';
-      let showTrustStrip = true;
-
-      if (totalChars < 160) {
-        titleFont = '16.0px';
-        titleLh = '1.26';
-        descFont = '12.0px';
-        descLh = '1.36';
-        boxFont = '11.0px';
-        boxLh = '1.32';
-        showTrustStrip = true;
-      } else if (totalChars <= 270) {
-        titleFont = '15.0px';
-        titleLh = '1.22';
-        descFont = '11.2px';
-        descLh = '1.30';
-        boxFont = '10.2px';
-        boxLh = '1.26';
-        showTrustStrip = true;
-      } else {
-        titleFont = '13.8px';
-        titleLh = '1.20';
-        descFont = '10.5px';
-        descLh = '1.24';
-        boxFont = '9.6px';
-        boxLh = '1.22';
-        showTrustStrip = totalChars < 360; // Auto-hide trust strip for dense products to prevent overflow
-      }
+      const benefitTag = p.category === 'agri' ? 'उत्कृष्ट फसल वृद्धि व अधिक पैदावार' : (p.category === 'cattle' ? 'रोगमुक्त पशु, दुग्ध व वजन वृद्धि' : 'सम्पूर्ण स्वास्थ्य व ऊर्जा');
 
       return `
         <div class="pdf-product-card-grid">
@@ -1847,53 +1808,60 @@
             </div>
           </div>
 
-          <!-- Main Body: Unified Visual Hub Left + Information Suite Right -->
+          <!-- Main Body: Unified Visual Hub Left (142px) + Information Suite Right -->
           <div class="pdf-card-main-body">
-            <!-- Left: High-Res Image & High-Impact Price Card (Tightly Integrated) -->
+            <!-- Left: High-Res Image (136px), High-Impact Canva Red Price Card & Order Tag -->
             <div class="pdf-card-left-grid">
               <div class="pdf-card-img-box-grid">
                 <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
               </div>
-              <div class="pdf-price-box-grid" style="background:#b91c1c; border:1.5px solid #991b1b; border-radius:8px; padding:4px 2px; text-align:center; width:100%; box-shadow:0 3px 8px rgba(185,28,28,0.28);">
-                <span class="pdf-offer-price-grid" style="color:#ffffff; font-size:22px; font-weight:900; line-height:1.05;">₹${offerPrice}</span>
-                ${mrp > offerPrice ? `
-                  <div style="display:flex; align-items:center; justify-content:center; gap:4px; margin-top:2px;">
-                    <span class="pdf-mrp-cross-grid" style="color:#fee2e2; font-size:10px; text-decoration:line-through; font-weight:700;">MRP ₹${mrp}</span>
-                  </div>
-                ` : ''}
+              <div class="pdf-price-box-grid">
+                <span class="pdf-offer-price-grid">₹${offerPrice}</span>
+                <div style="display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
+                  ${mrp > offerPrice ? `<span class="pdf-mrp-cross-grid">MRP ₹${mrp}</span>` : ''}
+                  ${discountPct > 0 ? `<span class="pdf-discount-badge-grid">${discountPct}% ${escapeHtml(i18n.discountBadge || 'छूट')}</span>` : ''}
+                </div>
+              </div>
+              <div class="pdf-order-micro-pill">
+                <span>📞 +91 ${escapeHtml(distPhone)}</span>
               </div>
             </div>
 
-            <!-- Right: Title, Concise Description, Ingredients, Dosage & Gap-Filling Trust Tags -->
+            <!-- Right: Title, Concise Description, Benefits, Ingredients, Dosage & Trust Tags -->
             <div class="pdf-card-right-grid">
-              <h4 class="pdf-product-title-grid" style="font-size:${titleFont}; line-height:${titleLh};">
+              <h4 class="pdf-product-title-grid">
                 ${escapeHtml(multi.name)}
               </h4>
 
               ${multi.description ? `
-                <div class="pdf-card-desc-grid" style="font-size:${descFont}; line-height:${descLh};">
+                <div class="pdf-card-desc-grid">
                   ${escapeHtml(multi.description)}
                 </div>
               ` : ''}
 
+              <!-- Key Benefits bullet strip to eliminate dead space -->
+              <div class="pdf-card-benefits-grid">
+                <span class="pdf-benefit-item">✨ <strong>${benefitTag}</strong></span>
+                <span class="pdf-benefit-item">🌱 <strong>100% बायो-टेक्नोलॉजी आधारित</strong></span>
+              </div>
+
               ${multi.ingredients ? `
-                <div class="pdf-card-box-grid" style="font-size:${boxFont}; line-height:${boxLh};">
+                <div class="pdf-card-box-grid">
                   <strong style="color:#15803d; font-weight:900;">${escapeHtml(i18n.ingLabel)}</strong> ${escapeHtml(multi.ingredients)}
                 </div>
               ` : ''}
 
               ${multi.dose ? `
-                <div class="pdf-card-box-grid dose" style="font-size:${boxFont}; line-height:${boxLh};">
+                <div class="pdf-card-box-grid dose">
                   <strong style="color:#b45309; font-weight:900;">${escapeHtml(i18n.doseLabel)}</strong> ${escapeHtml(multi.dose)}
                 </div>
               ` : ''}
 
-              ${showTrustStrip ? `
-                <div class="pdf-card-trust-strip">
-                  <span class="pdf-trust-pill">✓ 100% जैविक व प्राकृतिक</span>
-                  <span class="pdf-trust-pill">✓ DSIR R&D लैब प्रमाणित</span>
-                </div>
-              ` : ''}
+              <div class="pdf-card-trust-strip">
+                <span class="pdf-trust-pill">✓ 100% प्राकृतिक</span>
+                <span class="pdf-trust-pill">✓ DSIR R&D लैब प्रमाणित</span>
+                <span class="pdf-trust-pill">🚚 सुरक्षित डिलीवरी</span>
+              </div>
             </div>
           </div>
         </div>
@@ -2093,7 +2061,7 @@
 
           .pdf-card-main-body {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex: 1;
             min-height: 0;
             overflow: hidden;
@@ -2101,25 +2069,25 @@
           }
 
           .pdf-card-left-grid {
-            width: 122px;
-            min-width: 122px;
-            max-width: 122px;
+            width: 142px;
+            min-width: 142px;
+            max-width: 142px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            gap: 5px;
+            justify-content: space-between;
+            gap: 4px;
             flex-shrink: 0;
             border-right: 1.5px dashed #cbdfe9;
-            padding-right: 8px;
+            padding-right: 10px;
           }
 
           .pdf-card-img-box-grid {
-            width: 114px;
-            height: 114px;
+            width: 136px;
+            height: 136px;
             background: #ffffff;
             border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2138,34 +2106,48 @@
           .pdf-price-box-grid {
             text-align: center;
             width: 100%;
-            background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
-            border: 1.5px solid #fca5a5;
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            border: 1.5px solid #7f1d1d;
             border-radius: 8px;
-            padding: 3px 2px;
+            padding: 4px 2px;
             box-sizing: border-box;
             flex-shrink: 0;
+            box-shadow: 0 3px 8px rgba(185,28,28,0.28);
           }
           .pdf-offer-price-grid {
-            font-size: 21px;
+            font-size: 24px;
             font-weight: 900;
-            color: #b91c1c;
+            color: #ffffff;
             display: block;
-            line-height: 1.1;
+            line-height: 1.05;
+            letter-spacing: -0.5px;
           }
           .pdf-mrp-cross-grid {
-            font-size: 10px;
-            color: #64748b;
+            font-size: 11px;
+            color: #fee2e2;
             text-decoration: line-through;
             font-weight: 700;
           }
           .pdf-discount-badge-grid {
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 900;
-            background: #b91c1c;
-            color: #ffffff;
-            padding: 1.5px 6px;
+            background: #ffffff;
+            color: #b91c1c;
+            padding: 1px 6px;
             border-radius: 4px;
             display: inline-block;
+          }
+          .pdf-order-micro-pill {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1.5px solid #bbf7d0;
+            font-size: 9.5px;
+            font-weight: 800;
+            border-radius: 6px;
+            padding: 3px 4px;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
           }
 
           .pdf-card-right-grid {
@@ -2173,13 +2155,13 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: space-between;
             gap: 3px;
             overflow: hidden;
             padding-left: 2px;
           }
           .pdf-product-title-grid {
-            font-size: 14.8px;
+            font-size: 16px;
             font-weight: 900;
             color: #0c2340;
             margin: 0;
@@ -2187,18 +2169,18 @@
             letter-spacing: -0.2px;
           }
           .pdf-cat-chip-grid {
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: 800;
-            padding: 2px 8px;
+            padding: 2.5px 9px;
             border-radius: 6px;
             background: #0c2340;
             color: #ffffff;
             white-space: nowrap;
           }
           .pdf-pack-chip-grid {
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: 800;
-            padding: 2px 8px;
+            padding: 2.5px 9px;
             border-radius: 6px;
             background: #eff6ff;
             color: #1e40af;
@@ -2206,19 +2188,33 @@
             white-space: nowrap;
           }
           .pdf-card-desc-grid {
-            font-size: 11px;
+            font-size: 11.8px;
             font-weight: 600;
             color: #334155;
-            line-height: 1.34;
-            margin: 1px 0 2px 0;
+            line-height: 1.35;
+            margin: 0;
+          }
+          .pdf-card-benefits-grid {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 3px 6px;
+          }
+          .pdf-benefit-item {
+            font-size: 10px;
+            color: #0f172a;
+            font-weight: 700;
           }
           .pdf-card-box-grid {
             background: #f0fdf4;
             border-left: 3.5px solid #16a34a;
             border-radius: 5px;
-            padding: 3px 8px;
-            font-size: 10.2px;
-            line-height: 1.28;
+            padding: 3.5px 8px;
+            font-size: 10.8px;
+            line-height: 1.30;
             color: #14532d;
             font-weight: 600;
           }
@@ -2232,17 +2228,16 @@
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
-            margin-top: auto;
             padding-top: 2px;
           }
           .pdf-trust-pill {
-            font-size: 8.8px;
+            font-size: 9.5px;
             font-weight: 800;
             color: #0369a1;
             background: #f0f9ff;
             border: 1px solid #bae6fd;
             border-radius: 4px;
-            padding: 1.5px 6px;
+            padding: 2px 7px;
             white-space: nowrap;
           }
 
@@ -2570,9 +2565,9 @@
                     </div>
                   </div>
 
-                  <div style="text-align: center; background: #f0fdf4; border: 2px solid #16a34a; border-radius: 9px; padding: 4px 16px; box-shadow: 0 2px 6px rgba(22,163,74,0.15);">
+                  <div style="text-align: center; background: #f0fdf4; border: 2.5px solid #16a34a; border-radius: 9px; padding: 4px 18px; box-shadow: 0 2px 6px rgba(22,163,74,0.15);">
                     <span style="font-size: 10px; color: #166534; font-weight:700;">${escapeHtml(i18n.presentedByHeader)} <strong style="color: #0c2340; font-size: 12px;">${escapeHtml(distName)}</strong></span>
-                    <span style="display: block; font-size: 15px; color: #15803d; font-weight: 900; letter-spacing: 0.5px;">📞 WhatsApp / कॉल: +91 ${escapeHtml(distPhone)}</span>
+                    <span style="display: block; font-size: 16.5px; color: #15803d; font-weight: 900; letter-spacing: 0.6px;">📞 WhatsApp / कॉल: +91 ${escapeHtml(distPhone)}</span>
                   </div>
 
                   <div style="display: flex; align-items: center; gap: 6px;">
