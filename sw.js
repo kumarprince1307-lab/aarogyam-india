@@ -9,9 +9,9 @@
    - Strict isolation for Admin Panel (/admin/*)
 */
 
-const STATIC_CACHE = 'aarogyam-public-static-v165.0';
+const STATIC_CACHE = 'aarogyam-public-static-v166.0';
 const AUTO_UPDATE_BROADCAST = true;
-const PAGES_CACHE = 'aarogyam-public-pages-v125.0';
+const PAGES_CACHE = 'aarogyam-public-pages-v126.0';
 const MEDIA_CACHE = 'aarogyam-public-media-v5.0';
 const OFFLINE_URL = '/offline.html';
 
@@ -130,6 +130,12 @@ self.addEventListener('fetch', (event) => {
 
   // Exclude Admin Panel from Public SW
   if (url.pathname.startsWith('/admin') || url.pathname === '/admin.html') {
+    return;
+  }
+
+  // Bypass cache completely on localhost & 127.0.0.1 for zero-delay live development
+  if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') {
+    event.respondWith(fetch(request));
     return;
   }
 

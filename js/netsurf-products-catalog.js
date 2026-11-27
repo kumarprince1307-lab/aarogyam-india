@@ -1854,11 +1854,11 @@
               <div class="pdf-card-img-box-grid">
                 <img src="${imgSrc}" alt="${escapeHtml(multi.name)}" onerror="this.src='https://aarogyamindia.online/images/logo/logo.png'">
               </div>
-              <div class="pdf-price-box-grid">
-                <span class="pdf-offer-price-grid">₹${offerPrice}</span>
+              <div class="pdf-price-box-grid" style="background:#b91c1c; border:1.5px solid #991b1b; border-radius:8px; padding:4px 2px; text-align:center; width:100%; box-shadow:0 3px 8px rgba(185,28,28,0.28);">
+                <span class="pdf-offer-price-grid" style="color:#ffffff; font-size:22px; font-weight:900; line-height:1.05;">₹${offerPrice}</span>
                 ${mrp > offerPrice ? `
                   <div style="display:flex; align-items:center; justify-content:center; gap:4px; margin-top:2px;">
-                    <span class="pdf-mrp-cross-grid">MRP ₹${mrp}</span>
+                    <span class="pdf-mrp-cross-grid" style="color:#fee2e2; font-size:10px; text-decoration:line-through; font-weight:700;">MRP ₹${mrp}</span>
                   </div>
                 ` : ''}
               </div>
@@ -2101,9 +2101,9 @@
           }
 
           .pdf-card-left-grid {
-            width: 114px;
-            min-width: 114px;
-            max-width: 114px;
+            width: 122px;
+            min-width: 122px;
+            max-width: 122px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -2115,19 +2115,19 @@
           }
 
           .pdf-card-img-box-grid {
-            width: 106px;
-            height: 106px;
+            width: 114px;
+            height: 114px;
             background: #ffffff;
             border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            padding: 3px;
+            padding: 4px;
             box-sizing: border-box;
             flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
           }
           .pdf-card-img-box-grid img {
             width: 100%;
@@ -2570,9 +2570,9 @@
                     </div>
                   </div>
 
-                  <div style="text-align: center; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 9px; padding: 3px 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
-                    <span style="font-size: 10px; color: #475569;">${escapeHtml(i18n.presentedByHeader)} <strong style="color: #0c2340; font-size: 11.5px;">${escapeHtml(distName)}</strong></span>
-                    <span style="display: block; font-size: 14px; color: #15803d; font-weight: 900; letter-spacing: 0.4px;">📞 WhatsApp / कॉल: +91 ${escapeHtml(distPhone)}</span>
+                  <div style="text-align: center; background: #f0fdf4; border: 2px solid #16a34a; border-radius: 9px; padding: 4px 16px; box-shadow: 0 2px 6px rgba(22,163,74,0.15);">
+                    <span style="font-size: 10px; color: #166534; font-weight:700;">${escapeHtml(i18n.presentedByHeader)} <strong style="color: #0c2340; font-size: 12px;">${escapeHtml(distName)}</strong></span>
+                    <span style="display: block; font-size: 15px; color: #15803d; font-weight: 900; letter-spacing: 0.5px;">📞 WhatsApp / कॉल: +91 ${escapeHtml(distPhone)}</span>
                   </div>
 
                   <div style="display: flex; align-items: center; gap: 6px;">
