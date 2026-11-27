@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795789310458,
+      "admin_edited": 1795789343180,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -9874,28 +9874,7 @@
           "solution": "वर्ष में एक बार पीपीआर (PPR) और छह माह में ईटीवी (ETV) टीका अनिवार्य।"
         }
       ],
-      "products": [
-        {
-          "id": "PET_VET_ADVANCED_GOAT",
-          "name": "Pet-Vet Advanced (बकरा-बकरी वजन वर्धक)",
-          "category": "Livestock",
-          "price": 650,
-          "mrp": 750,
-          "badge": "तेज वजन वृद्धि",
-          "image": "/images/products/biofit-pet-vet-cattle.webp",
-          "desc": "खनिज लवणों, चेलेटेड मिनरल्स और विटामिन्स से भरपूर जो बकरों में 3-4 महीने में 10-15 किग्रा अतिरिक्त वजन बढ़ाता है।"
-        },
-        {
-          "id": "PET_VET_DIGEST_GOAT",
-          "name": "Pet-Vet Digest (गोट डाइजेशन व एसिडोसिस सुरक्षा)",
-          "category": "Livestock",
-          "price": 580,
-          "mrp": 680,
-          "badge": "पाचन सुरक्षा",
-          "image": "/images/products/biofit-pet-vet-cattle.webp",
-          "desc": "अनाज खाने के बाद होने वाले पेट फूलने (अफरा) और बदहजमी से तुरंत राहत दिलाता है।"
-        }
-      ],
+      "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🩺 GOAT DIAGNOSIS & REMEDIES",
@@ -9992,7 +9971,7 @@
           }
         ]
       },
-      "admin_edited": 1795715640552,
+      "admin_edited": 1795789343034,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
