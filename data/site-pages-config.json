@@ -377,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795789018053,
+      "admin_edited": 1795789115244,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -13872,26 +13872,6 @@
       "pashu_cards": [],
       "products": [
         {
-          "id": "BIOFIT_SHET_MEDICINAL",
-          "name": "Biofit SHET (कंद व जड़ विकास टेक्नोलॉजी)",
-          "category": "Agriculture",
-          "price": 750,
-          "mrp": 890,
-          "badge": "जड़ विकास 40%",
-          "image": "/images/products/biofit-shet.webp",
-          "desc": "अश्वगंधा और शतावरी में जड़ों की मोटाई और वजन बढ़ाने में सर्वाधिक प्रभावी जैविक फार्मूला।"
-        },
-        {
-          "id": "BIOFIT_STIMRICH_MEDICINAL",
-          "name": "Biofit Stimrich (विथानोलाइड्स व सक्रिय घटक वर्धक)",
-          "category": "Agriculture",
-          "price": 650,
-          "mrp": 750,
-          "badge": "उच्च अल्कलाइड",
-          "image": "/images/products/biofit-stimrich.webp",
-          "desc": "औषधीय पौधों में सक्रिय एल्कलॉइड्स (Withanolides) की सांद्रता को 30% तक बढ़ा देता है।"
-        },
-        {
           "id": "ns_prod_22569",
           "name": "Biofit P ",
           "mrp": 600,
@@ -14021,7 +14001,7 @@
           }
         ]
       },
-      "admin_edited": 1795707247304,
+      "admin_edited": 1795789115084,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
