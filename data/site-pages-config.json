@@ -385,6 +385,17 @@
           "badge": "✨ New Launch",
           "description": " यह मछली, झींगा (Shrimp), प्रॉन और केकड़ों के तालाबों का पानी साफ रखने व उसकी गुणवत्ता सुधारने के लिए तैयार किया गया उत्पाद है। यह तालाब की कुल क्षारीयता (Total Alkalinity) और उचित pH स्तर को संतुलित रखता है, लंबे समय तक घुलित ऑक्सीजन (D.O.) बनाए रखता है, अमोनिया, $\\text{H}_2\\text{S}$ व नाइट्राइट्स जैसी ज़हरीली गैसों को कम करता है और हानिकारक रोगाणुओं व दुर्गंध को घटाकर जीवित रहने की दर व पैदावार बढ़ाता है।",
           "image": "/images/products/product-aqua-clear-928810-9o94.webp"
+        },
+        {
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "✨ New Launch",
+          "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
+          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -857,15 +868,15 @@
       ],
       "products": [
         {
-          "id": "ns_prod_91347",
-          "name": "Aqua Feed Concentrate ",
-          "mrp": 699,
-          "price": 699,
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
           "discount_pct": 0,
-          "pack_size": "500 ml",
+          "pack_size": "250 ml",
           "badge": "✨ New Launch",
           "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
-          "image": "/images/products/product-aqua-feed-concentrat-752075-lj8i.webp"
+          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
         },
         {
           "id": "ns_prod_72313",
@@ -6741,15 +6752,15 @@
       "og_image": "/images/banners/og_image-netsurf-398382-r3uq.webp",
       "products": [
         {
-          "id": "ns_prod_91347",
-          "name": "Aqua Feed Concentrate ",
-          "mrp": 699,
-          "price": 699,
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
           "discount_pct": 0,
-          "pack_size": "500 ml",
+          "pack_size": "250 ml",
           "badge": "✨ New Launch",
           "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
-          "image": "/images/products/product-aqua-feed-concentrat-752075-lj8i.webp"
+          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
         },
         {
           "id": "ns_prod_72313",
@@ -8566,6 +8577,17 @@
           "badge": "✨ New Launch",
           "description": " यह मछली, झींगा (Shrimp), प्रॉन और केकड़ों के तालाबों का पानी साफ रखने व उसकी गुणवत्ता सुधारने के लिए तैयार किया गया उत्पाद है। यह तालाब की कुल क्षारीयता (Total Alkalinity) और उचित pH स्तर को संतुलित रखता है, लंबे समय तक घुलित ऑक्सीजन (D.O.) बनाए रखता है, अमोनिया, $\\text{H}_2\\text{S}$ व नाइट्राइट्स जैसी ज़हरीली गैसों को कम करता है और हानिकारक रोगाणुओं व दुर्गंध को घटाकर जीवित रहने की दर व पैदावार बढ़ाता है।",
           "image": "/images/products/product-aqua-clear-928810-9o94.webp"
+        },
+        {
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "✨ New Launch",
+          "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
+          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
         }
       ],
       "page_kpi_sections": [],
