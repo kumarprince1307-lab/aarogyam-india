@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T11:30:53.680Z",
-  "total_products": 51,
+  "updated_at": "2026-11-27T11:31:33.025Z",
+  "total_products": 52,
   "categories": [
     {
       "id": "agri",
@@ -930,6 +930,34 @@
       "ingredients": "बायपास प्रोटीन, चेलेटेड मिनरल्स (Zinc, Copper, Mn), प्रोबायोटिक्स, मेथाओनिन, विटामिन A, D3, E",
       "precautions": "सूखा न खिलाएं। पैकेट खोलने के बाद एयरटाइट डिब्बे में रखें और नमी से बचाएं।",
       "pack_size": "500 gm",
+      "problem_tags": [
+        "cattle_care",
+        "cattle_health",
+        "poultry_care",
+        "goat_care"
+      ],
+      "applicable_pages": [
+        "pashu-palan",
+        "netsurf-career"
+      ]
+    },
+    {
+      "id": "ns_prod_67574",
+      "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm (कॉपी)",
+      "category": "cattle",
+      "category_label": "पशु पोषण",
+      "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
+      "mrp": 399,
+      "discount_pct": 0,
+      "discounted_price": 399,
+      "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
+      "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp",
+      "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
+      "subcategory": "cattle_cfc",
+      "subcategory_label": "दुग्ध वृद्धि व पोषण",
+      "ingredients": "बायपास प्रोटीन, चेलेटेड मिनरल्स (Zinc, Copper, Mn), प्रोबायोटिक्स, मेथाओनिन, विटामिन A, D3, E",
+      "precautions": "सूखा न खिलाएं। पैकेट खोलने के बाद एयरटाइट डिब्बे में रखें और नमी से बचाएं।",
+      "pack_size": "250 ml",
       "problem_tags": [
         "cattle_care",
         "cattle_health",
