@@ -5311,7 +5311,7 @@
           "price": 335
         },
         {
-          "id": "ns_agri_stimrich",
+          "id": "ns_prod_00129",
           "name": "स्टीमरिच (Biofit Stimrich)",
           "category": "agri",
           "category_label": "कृषि बायोफिट",
@@ -5326,7 +5326,7 @@
           "subcategory_label": "पौध विकास व पैदावार",
           "ingredients": "अमीनो एसिड्स (Biological Origin), सीवीड अर्क (Seaweed Extract), साइटोकाइनिन, बायो-पेप्टाइड्स",
           "precautions": "कड़ी धूप या बारिश की संभावना में छिड़काव न करें। रासायनिक खरपतवारनाशक के साथ न मिलाएं।",
-          "pack_size": "1 Litre",
+          "pack_size": "500 ml",
           "price": 1695
         },
         {
@@ -10382,8 +10382,8 @@
           "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
           "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
           "whatsapp_link": "https://wa.me/917974422572",
-          "id": "ns_agri_stimrich",
-          "pack_size": "1 Litre"
+          "id": "ns_prod_00129",
+          "pack_size": "500 ml"
         },
         {
           "title": "बायो-99 (Biofit Bio-99) 100mL",
@@ -11030,6 +11030,17 @@
           "whatsapp_link": "https://wa.me/917974422572",
           "id": "ns_prod_pro_stimrich",
           "pack_size": "1 Litre / 500 ml"
+        },
+        {
+          "id": "ns_prod_00129",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "mrp": 1695,
+          "price": 1695,
+          "discount_pct": 0,
+          "pack_size": "500 ml",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -11709,8 +11720,8 @@
           "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
           "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
           "whatsapp_link": "https://wa.me/917974422572",
-          "id": "ns_agri_stimrich",
-          "pack_size": "1 Litre"
+          "id": "ns_prod_00129",
+          "pack_size": "500 ml"
         }
       ],
       "page_kpi_sections": [],
@@ -12256,8 +12267,8 @@
           "dose": "30ml प्रति 15 लीटर पंप। फसल के कल्ले फूटने व फूल आने से पहले छिड़काव करें।",
           "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
           "whatsapp_link": "https://wa.me/917974422572",
-          "id": "ns_agri_stimrich",
-          "pack_size": "1 Litre"
+          "id": "ns_prod_00129",
+          "pack_size": "500 ml"
         },
         {
           "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
@@ -12857,6 +12868,17 @@
           "badge": "माहू व थ्रिप्स रोधक",
           "image": "/images/products/biofit-intact.webp",
           "desc": "थ्रिप्स, माइट्स, एफिड्स और सफेद मक्खी को जैविक रूप से नियंत्रित करता है।"
+        },
+        {
+          "id": "ns_prod_00129",
+          "name": "स्टीमरिच (Biofit Stimrich)",
+          "mrp": 1695,
+          "price": 1695,
+          "discount_pct": 0,
+          "pack_size": "500 ml",
+          "badge": "🌱 ग्रोथ व फ्लावरिंग बूस्टर",
+          "description": "कल्ले, नई शाखाओं और फूलों की संख्या में 30-40% वृद्धि। फूल झड़ने से रोकता है और पैदावार बढ़ाता है।",
+          "image": "/images/products/product-----------biofit-s-069210-gir4.webp"
         }
       ],
       "clinical_breakdown": {
