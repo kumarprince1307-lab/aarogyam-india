@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T11:02:48.504Z",
-  "total_products": 45,
+  "updated_at": "2026-11-27T11:21:40.422Z",
+  "total_products": 46,
   "categories": [
     {
       "id": "agri",
@@ -147,6 +147,32 @@
     "helpline_text": "आरोग्यम इंडिया सपोर्ट हेल्पलाइन: +91 79744 22572 | www.aarogyamindia.online"
   },
   "products": [
+    {
+      "id": "ns_prod_72313",
+      "name": "Aqua Clear",
+      "category": "cattle",
+      "category_label": "पशु पोषण व मत्स्य पालन (Biofit Cattle & Aquaculture)",
+      "subcategory": "cattle_fish",
+      "subcategory_label": "🐟 मछली पालन व संवर्धन (Fish Farming & Aquaculture)",
+      "badge": "✨ New Launch",
+      "pack_size": "250 ml",
+      "problem_tags": [
+        "aqua_fish"
+      ],
+      "mrp": 535,
+      "discount_pct": 0,
+      "discounted_price": 535,
+      "image": "/images/products/product-aqua-clear-064938-cef3.webp",
+      "description": " यह मछली, झींगा (Shrimp), प्रॉन और केकड़ों के तालाबों का पानी साफ रखने व उसकी गुणवत्ता सुधारने के लिए तैयार किया गया उत्पाद है। यह तालाब की कुल क्षारीयता (Total Alkalinity) और उचित pH स्तर को संतुलित रखता है, लंबे समय तक घुलित ऑक्सीजन (D.O.) बनाए रखता है, अमोनिया, $\\text{H}_2\\text{S}$ व नाइट्राइट्स जैसी ज़हरीली गैसों को कम करता है और हानिकारक रोगाणुओं व दुर्गंध को घटाकर जीवित रहने की दर व पैदावार बढ़ाता है।",
+      "ingredients": "इसमें Yucca extract (20%), Zeolite (30%), Bicarbonate (30%) और Binder (20%) शामिल हैं। यह 250 gm पैक में आता है और इसका MRP ₹535 है (पेज पर 25% छूट दर्शाई गई है)।",
+      "dose": "प्रति एकड़ एक्वाकल्चर तालाब में 1 किलोग्राम Biofit Aqua Clear को लगभग 5 से 6 किलोग्राम पूरी तरह सूखे अर्ध-पिसे अनाज, मिट्टी या बारीक रेत में मिलाकर तालाब में डालें। इसका प्रयोग हर 15 दिन में करें।",
+      "precautions": "Aqua Clear और Aqua Culture को आपस में न मिलाएं तथा दोनों के उपयोग के बीच 4 से 5 दिन का अंतर रखें। Aqua Feed और Aqua Clear के उपयोग में 4 से 6 घंटे का अंतर रखें और तालाब में डालने से पहले इसे तैयार करते समय पानी व अतिरिक्त नमी के संपर्क से बचाएं। उत्पाद को ठंडी, सूखी जगह और बच्चों की पहुँच से दूर रखें।",
+      "applicable_pages": [
+        "netsurf-products",
+        "index",
+        "machhli-palan"
+      ]
+    },
     {
       "id": "ns_prod_54135",
       "name": "Aqua Feed Concentrate",
