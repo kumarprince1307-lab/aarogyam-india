@@ -408,7 +408,19 @@
           "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
         }
       ],
-      "products": [],
+      "products": [
+        {
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "✨ New Launch",
+          "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
+          "image": "/images/products/product-aqua-feed-concentrat-922182-pxzf.webp"
+        }
+      ],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
       "admin_edited": 1795716538940,
@@ -877,7 +889,19 @@
           "solution": "पोटेशियम परमैंगनेट से अयन की सफाई, एंटी-मैस्टाइटिस हर्बल स्प्रे व हींग-अजवाइन पाचक काढ़ा।"
         }
       ],
-      "products": [],
+      "products": [
+        {
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "✨ New Launch",
+          "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
+          "image": "/images/products/product-aqua-feed-concentrat-922182-pxzf.webp"
+        }
+      ],
       "page_kpi_sections": [],
       "whatsapp_support": {
         "number": "919876543210",
@@ -6657,7 +6681,19 @@
       "og_title": "सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग (All Netsurf Products) | Aarogyam India",
       "og_description": "कृषि, पशु पोषण, स्वास्थ्य व पर्सनल केयर के सभी 39+ ऑर्गेनिक प्रोडक्ट्स। 7 भाषाओं में पर्सनलाइज्ड PDF कैटलॉग डाउनलोड करें।",
       "og_image": "/images/banners/og_image-netsurf-398382-r3uq.webp",
-      "products": []
+      "products": [
+        {
+          "id": "ns_prod_54135",
+          "name": "Aqua Feed Concentrate",
+          "mrp": 400,
+          "price": 400,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "✨ New Launch",
+          "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
+          "image": "/images/products/product-aqua-feed-concentrat-922182-pxzf.webp"
+        }
+      ]
     },
     {
       "id": "page_health_dental_care",
