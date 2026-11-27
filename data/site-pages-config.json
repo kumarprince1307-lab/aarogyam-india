@@ -11204,15 +11204,6 @@
           "pack_size": "1 Litre / 500 ml"
         },
         {
-          "title": "नया उत्पाद (New Product)",
-          "description": "उत्पाद के लाभ व उपयोग विधि यहाँ लिखें...",
-          "image": "",
-          "mrp": 850,
-          "discount_pct": 20,
-          "dose": "2ml / लीटर पानी",
-          "whatsapp_link": "https://wa.me/917974422572"
-        },
-        {
           "title": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
           "name": "एनपीके बायो-फर्टिलाइजर (Biofit NPK)",
           "description": "हवा से नाइट्रोजन और मिट्टी में फिक्स फास्फोरस व पोटाश को पौधे को उपलब्ध कराने वाले जीवित बैक्टीरिया।",
@@ -11381,7 +11372,7 @@
           }
         ]
       },
-      "admin_edited": 1795700057926,
+      "admin_edited": 1795788884586,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
