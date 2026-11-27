@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T07:21:05.131Z",
+  "updated_at": "2026-11-27T07:34:17.454Z",
   "total_products": 43,
   "categories": [
     {
@@ -152,8 +152,8 @@
       "name": "Pet-Vet Breed 500 GM ",
       "category": "cattle",
       "category_label": "पशु पोषण (Biofit Cattle Care)",
-      "subcategory": "cattle_health",
-      "subcategory_label": "💪 पशु स्वास्थ्य व पाचन (Animal Care)",
+      "subcategory": "cattle_fish",
+      "subcategory_label": "🐟 मछली पालन व संवर्धन (Fish Farming & Aquaculture)",
       "badge": "✨ New Launch",
       "mrp": 650,
       "discount_pct": 0,
@@ -169,11 +169,7 @@
       ],
       "applicable_pages": [
         "pashu-palan",
-        "netsurf-career",
-        "dog-care",
-        "bakra-palan",
-        "murgi-palan",
-        "netsurf-products"
+        "netsurf-career"
       ]
     },
     {
