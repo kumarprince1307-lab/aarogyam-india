@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T14:03:20.333Z",
-  "total_products": 59,
+  "updated_at": "2026-11-27T14:06:11.704Z",
+  "total_products": 60,
   "categories": [
     {
       "id": "agri",
@@ -147,6 +147,44 @@
     "helpline_text": "आरोग्यम इंडिया सपोर्ट हेल्पलाइन: +91 79744 22572 | www.aarogyamindia.online"
   },
   "products": [
+    {
+      "id": "ns_prod_25198",
+      "name": "Biofit VAM ",
+      "category": "agri",
+      "category_label": "🌾 कृषि बायोफिट (Biofit Agriculture)",
+      "subcategory": "",
+      "subcategory_label": "",
+      "badge": "✨ New Launch",
+      "pack_size": "1 Ltr",
+      "problem_tags": [
+        "agri_soil_health",
+        "agri_flower_fruit",
+        "crop_chana",
+        "crop_wheat",
+        "crop_mustard",
+        "crop_soybean",
+        "crop_paddy"
+      ],
+      "mrp": 600,
+      "discount_pct": 0,
+      "discounted_price": 600,
+      "image": "/images/products/product-biofit-vam-359042-03hr.webp",
+      "description": "Biofit VAM एक फंगल बायो-फ़र्टिलाइज़र (Vesicular-Arbuscular Mycorrhiza) है जो पौधों की जड़ों के साथ सहजीवी संबंध बनाकर जड़ों का फैलाव व द्रव्यमान बढ़ाता है। यह मिट्टी में अघुलनशील पोषक तत्वों को घुलनशील बनाकर पौधों को उपलब्ध कराता है, जिससे जड़ों का मजबूत विकास, बेहतर फूल-फल, जड़ जनित रोगों से सुरक्षा और सूखे/तनाव सहन करने की क्षमता बढ़ती है।",
+      "ingredients": "वेसिकुलर आर्बस्कुलर माइकोराइजा (Vesicular-Arbuscular Mycorrhiza - VAM) लाभकारी फंगल बीजाणु व जैविक संवर्धन माध्यम।",
+      "dose": "बीज उपचार: 10 ग्राम प्रति 1 किग्रा बीज को पर्याप्त पानी में मिलाकर बुवाई से ठीक पहले उपचारित करें। ड्रिप व ड्रेंचिंग (मृदा प्रयोग): 100–200 ग्राम प्रति एकड़ को 200 लीटर पानी में मिलाकर खड़ी फसल के जड़ क्षेत्र के पास दें। वृक्ष उपचार: 5–10 ग्राम प्रति लीटर पानी में मिलाकर पेड़ की जड़ों के पास डालें।",
+      "precautions": "इसे किसी भी रासायनिक या जैविक कीटनाशक, फफूंदनाशी या खरपतवारनाशी के साथ न मिलाएं। फॉस्फेट खाद डालने से कम से कम 7 दिन पहले इसका प्रयोग करें, ठंडी व सूखी जगह पर रखें और बच्चों की पहुँच से दूर रखें।",
+      "applicable_pages": [
+        "kharif-crops",
+        "rabi-crops",
+        "jayad-summer-crops",
+        "fruit-orchards",
+        "floriculture",
+        "crop-doctor",
+        "medicinal-farming",
+        "index",
+        "netsurf-products"
+      ]
+    },
     {
       "id": "ns_prod_45399",
       "name": "Biofit Zn ",
