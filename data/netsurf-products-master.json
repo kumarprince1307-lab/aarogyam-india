@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T13:03:48.802Z",
-  "total_products": 55,
+  "updated_at": "2026-11-27T13:50:50.685Z",
+  "total_products": 56,
   "categories": [
     {
       "id": "agri",
@@ -147,6 +147,44 @@
     "helpline_text": "आरोग्यम इंडिया सपोर्ट हेल्पलाइन: +91 79744 22572 | www.aarogyamindia.online"
   },
   "products": [
+    {
+      "id": "ns_prod_22569",
+      "name": "Biofit P ",
+      "category": "agri",
+      "category_label": "🌾 कृषि बायोफिट (Biofit Agriculture)",
+      "subcategory": "",
+      "subcategory_label": "",
+      "badge": "✨ New Launch",
+      "pack_size": "1 Ltr",
+      "problem_tags": [
+        "agri_soil_health",
+        "agri_flower_fruit",
+        "crop_paddy",
+        "crop_chana",
+        "crop_soybean",
+        "crop_mustard",
+        "crop_wheat"
+      ],
+      "mrp": 600,
+      "discount_pct": 0,
+      "discounted_price": 600,
+      "image": "/images/products/product-biofit-p-279874-1ty0.webp",
+      "description": "Biofit P एक लिक्विड बायो-फ़र्टिलाइज़र है जिसमें फॉस्फोरस घुलनशील बैक्टीरिया (PSB) होते हैं। यह मिट्टी में मौजूद अघुलनशील (fixed/unavailable) फॉस्फोरस को घुलनशील रूप में बदलकर पौधों को आसानी से उपलब्ध कराता है। इससे जड़ों के विकास, फूल-फल बनने और पैदावार में सुधार होता है तथा रासायनिक फॉस्फेट खाद पर निर्भरता कम होती है।",
+      "ingredients": "फॉस्फोरस घुलनशील लाभकारी जीवाणु (Phosphate Solubilizing Bacteria — PSB) व जैविक संवर्धन माध्यम।",
+      "dose": "बीज उपचार: 1 किग्रा बीज के लिए 10 मिली Biofit P मिलाकर छाया में सुखाएँ और बुवाई करें।\n\nपौध/जड़ उपचार: रोपाई से पहले 5 मिली प्रति लीटर पानी के घोल में जड़ों को डुबोएँ।\n\nमृदा प्रयोग / ड्रेंचिंग / ड्रिप: 5 मिली प्रति लीटर पानी या 1 लीटर प्रति एकड़ को 200 लीटर पानी में मिलाकर जड़ क्षेत्र के पास डालें।",
+      "precautions": "ठंडी व सूखी जगह पर रखें, सीधी तेज धूप से बचाएँ और बच्चों की पहुँच से दूर रखें। बीज उपचार के बाद सुखाने की प्रक्रिया छाया में ही करें।",
+      "applicable_pages": [
+        "rabi-crops",
+        "jayad-summer-crops",
+        "fruit-orchards",
+        "medicinal-farming",
+        "crop-doctor",
+        "floriculture",
+        "kharif-crops",
+        "index",
+        "netsurf-products"
+      ]
+    },
     {
       "id": "ns_prod_30027",
       "name": "Biofit N",
