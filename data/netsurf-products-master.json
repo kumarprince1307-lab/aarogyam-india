@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T13:50:50.685Z",
-  "total_products": 56,
+  "updated_at": "2026-11-27T14:00:40.447Z",
+  "total_products": 57,
   "categories": [
     {
       "id": "agri",
@@ -147,6 +147,25 @@
     "helpline_text": "आरोग्यम इंडिया सपोर्ट हेल्पलाइन: +91 79744 22572 | www.aarogyamindia.online"
   },
   "products": [
+    {
+      "id": "ns_prod_48016",
+      "name": "Biofit K ",
+      "category": "agri",
+      "category_label": "🌾 कृषि बायोफिट (Biofit Agriculture)",
+      "subcategory": "",
+      "subcategory_label": "",
+      "badge": "✨ New Launch",
+      "pack_size": "1 Ltr",
+      "problem_tags": [],
+      "mrp": 600,
+      "discount_pct": 0,
+      "discounted_price": 600,
+      "image": "/images/products/product-biofit-k-005531-3r8t.webp",
+      "description": "Biofit K एक लिक्विड बायोफ़र्टिलाइज़र है जिसमें पोटाश मोबिलाइज़िंग बैक्टीरिया (KMB) होते हैं। यह मिट्टी की अघुलनशील पोटाश को घुलनशील रूप में बदलकर पौधों को उपलब्ध कराता है, जिससे पौधों की तनाव सहनशीलता, रोग प्रतिरोधक क्षमता और फसल की गुणवत्ता",
+      "ingredients": "पोटाश मोबिलाइज़िंग बैक्टीरिया (Potash Mobilizing Bacteria - KMB) व सक्रिय जैविक माध्यम।",
+      "dose": "बीज उपचार: 10 मिली प्रति 1 किग्रा बीज (बुवाई से पहले छाया में सुखाएं)। पौध उपचार: 5 मिली प्रति लीटर पानी में जड़ें डुबोएं। मृदा प्रयोग: 5 मिली प्रति लीटर पानी या 1 लीटर प्रति एकड़ को 200 लीटर पानी में मिलाकर ड्रेंचिंग/ड्रिप से दें।",
+      "precautions": "उपचारित बीजों को तेज धूप के बजाय छाया में सुखाएं। ठंडी व सूखी जगह पर रखें, सीधी धूप व बच्चों से दूर रखें और दिए गए निर्देशानुसार ही प्रयोग करें।"
+    },
     {
       "id": "ns_prod_22569",
       "name": "Biofit P ",
