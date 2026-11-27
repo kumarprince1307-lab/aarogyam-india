@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T04:27:44.978Z",
+  "updated_at": "2026-11-27T06:33:35.129Z",
   "total_products": 43,
   "categories": [
     {
@@ -166,6 +166,10 @@
       "pack_size": "500 gm",
       "problem_tags": [
         "cattle_care"
+      ],
+      "applicable_pages": [
+        "pashu-palan",
+        "netsurf-career"
       ]
     },
     {
@@ -187,6 +191,10 @@
       "pack_size": "500 gm",
       "problem_tags": [
         "cattle_care"
+      ],
+      "applicable_pages": [
+        "pashu-palan",
+        "netsurf-career"
       ]
     },
     {
@@ -208,6 +216,9 @@
       "pack_size": "20 gm",
       "problem_tags": [
         "skin_care"
+      ],
+      "applicable_pages": [
+        "netsurf-career"
       ]
     },
     {
@@ -229,6 +240,10 @@
       "pack_size": "100 ml",
       "problem_tags": [
         "health_general"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -251,6 +266,10 @@
       "problem_tags": [
         "health_general",
         "weight_loss"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -273,6 +292,11 @@
       "problem_tags": [
         "skin_care",
         "health_general"
+      ],
+      "applicable_pages": [
+        "health-skin-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -297,6 +321,10 @@
         "vitality_wellness",
         "womens_care",
         "weight_loss"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -321,6 +349,12 @@
         "joint_pain",
         "weight_loss",
         "skin_care"
+      ],
+      "applicable_pages": [
+        "health-joint-care",
+        "health-womens-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -346,6 +380,12 @@
         "hair_care",
         "weight_loss",
         "diabetes"
+      ],
+      "applicable_pages": [
+        "health-joint-care",
+        "health-sexual-wellness",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -370,6 +410,11 @@
         "weight_loss",
         "skin_care",
         "joint_pain"
+      ],
+      "applicable_pages": [
+        "health-womens-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -397,6 +442,14 @@
         "vitality_wellness",
         "joint_pain",
         "hair_care"
+      ],
+      "applicable_pages": [
+        "health-diabetes",
+        "health-weight-loss",
+        "netsurf-career",
+        "health",
+        "liver-care",
+        "thyroid-care"
       ]
     },
     {
@@ -422,6 +475,11 @@
         "womens_care",
         "vitality_wellness",
         "diabetes"
+      ],
+      "applicable_pages": [
+        "health-weight-loss",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -449,6 +507,12 @@
         "crop_wheat",
         "crop_paddy",
         "agri_flower_fruit"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "kharif-crops",
+        "jayad-summer-crops",
+        "fruit-orchards"
       ]
     },
     {
@@ -480,6 +544,11 @@
         "crop_mustard",
         "crop_wheat",
         "crop_paddy"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "kharif-crops",
+        "fruit-orchards"
       ]
     },
     {
@@ -507,6 +576,11 @@
         "crop_mustard",
         "crop_wheat",
         "crop_paddy"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "kharif-crops",
+        "fruit-orchards"
       ]
     },
     {
@@ -530,6 +604,11 @@
         "crop_yield",
         "agri_fungus",
         "crop_chana"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "kharif-crops",
+        "fruit-orchards"
       ]
     },
     {
@@ -558,6 +637,12 @@
         "crop_paddy",
         "agri_flower_fruit",
         "agri_soil_health"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "kharif-crops",
+        "rabi-crops",
+        "fruit-orchards"
       ]
     },
     {
@@ -582,6 +667,10 @@
         "poultry_care",
         "goat_care",
         "cattle_health"
+      ],
+      "applicable_pages": [
+        "pashu-palan",
+        "netsurf-career"
       ]
     },
     {
@@ -606,6 +695,10 @@
         "cattle_health",
         "poultry_care",
         "goat_care"
+      ],
+      "applicable_pages": [
+        "pashu-palan",
+        "netsurf-career"
       ]
     },
     {
@@ -635,6 +728,14 @@
         "skin_care",
         "womens_care",
         "vitality_wellness"
+      ],
+      "applicable_pages": [
+        "health-diabetes",
+        "health-weight-loss",
+        "health-joint-care",
+        "health-kids-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -664,6 +765,11 @@
         "vitality_wellness",
         "joint_pain",
         "diabetes"
+      ],
+      "applicable_pages": [
+        "health-kids-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -685,6 +791,11 @@
       "pack_size": "30 कैप्सूल",
       "problem_tags": [
         "joint_pain"
+      ],
+      "applicable_pages": [
+        "health-joint-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -707,6 +818,11 @@
       "problem_tags": [
         "diabetes",
         "vitality_wellness"
+      ],
+      "applicable_pages": [
+        "health-diabetes",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -730,6 +846,11 @@
         "health_general",
         "diabetes",
         "vitality_wellness"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "health",
+        "heart-care"
       ]
     },
     {
@@ -752,6 +873,10 @@
       "problem_tags": [
         "weight_loss",
         "health_general"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -774,6 +899,12 @@
       "problem_tags": [
         "womens_care",
         "weight_loss"
+      ],
+      "applicable_pages": [
+        "health-womens-care",
+        "netsurf-career",
+        "health",
+        "thyroid-care"
       ]
     },
     {
@@ -796,6 +927,11 @@
       "problem_tags": [
         "vitality_wellness",
         "diabetes"
+      ],
+      "applicable_pages": [
+        "health-sexual-wellness",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -817,6 +953,11 @@
       "pack_size": "400 gm",
       "problem_tags": [
         "kids_care"
+      ],
+      "applicable_pages": [
+        "health-kids-care",
+        "netsurf-career",
+        "health"
       ]
     },
     {
@@ -838,6 +979,10 @@
       "pack_size": "100 gm",
       "problem_tags": [
         "skin_care"
+      ],
+      "applicable_pages": [
+        "health-skin-care",
+        "netsurf-career"
       ]
     },
     {
@@ -859,6 +1004,10 @@
       "pack_size": "20 gm",
       "problem_tags": [
         "skin_care"
+      ],
+      "applicable_pages": [
+        "health-skin-care",
+        "netsurf-career"
       ]
     },
     {
@@ -880,6 +1029,10 @@
       "pack_size": "20 gm",
       "problem_tags": [
         "skin_care"
+      ],
+      "applicable_pages": [
+        "health-skin-care",
+        "netsurf-career"
       ]
     },
     {
@@ -901,6 +1054,10 @@
       "pack_size": "100 ml",
       "problem_tags": [
         "hair_care"
+      ],
+      "applicable_pages": [
+        "health-hair-care",
+        "netsurf-career"
       ]
     },
     {
@@ -922,6 +1079,10 @@
       "pack_size": "200 ml",
       "problem_tags": [
         "hair_care"
+      ],
+      "applicable_pages": [
+        "health-hair-care",
+        "netsurf-career"
       ]
     },
     {
@@ -943,6 +1104,10 @@
       "pack_size": "200 ml",
       "problem_tags": [
         "hair_care"
+      ],
+      "applicable_pages": [
+        "health-hair-care",
+        "netsurf-career"
       ]
     },
     {
@@ -964,6 +1129,10 @@
       "pack_size": "125 gm (Pack of 2)",
       "problem_tags": [
         "health_general"
+      ],
+      "applicable_pages": [
+        "netsurf-career",
+        "dental-care"
       ]
     },
     {
@@ -985,6 +1154,10 @@
       "pack_size": "375 gm (Pack of 5)",
       "problem_tags": [
         "skin_care"
+      ],
+      "applicable_pages": [
+        "health-skin-care",
+        "netsurf-career"
       ]
     },
     {
@@ -1006,6 +1179,10 @@
       "pack_size": "500 ml",
       "problem_tags": [
         "home_care"
+      ],
+      "applicable_pages": [
+        "health-home-care",
+        "netsurf-career"
       ]
     },
     {
@@ -1027,6 +1204,10 @@
       "pack_size": "250 ml",
       "problem_tags": [
         "home_care"
+      ],
+      "applicable_pages": [
+        "health-home-care",
+        "netsurf-career"
       ]
     },
     {
@@ -1049,15 +1230,19 @@
       "problem_tags": [
         "home_care"
       ],
-      "discounted_price": 350
+      "discounted_price": 350,
+      "applicable_pages": [
+        "health-home-care",
+        "netsurf-career"
+      ]
     },
     {
       "id": "ns_prod_pro_stimrich",
       "name": "Biofit Pro Stimrich (प्रो स्टिमरिच)",
       "category": "agri",
       "category_label": "कृषि देखभाल (Biofit Agriculture)",
-      "subcategory": "plant_growth",
-      "subcategory_label": "🌱 पादप वृद्धि व टॉनिक (Plant Growth)",
+      "subcategory": "agri_chana",
+      "subcategory_label": "🌱 चना फसल (Gram / Chickpea)",
       "badge": "🔥 New Premium Launch",
       "mrp": 1450,
       "discount_pct": 0,
@@ -1087,6 +1272,9 @@
         "crop_mustard",
         "crop_wheat",
         "crop_paddy"
+      ],
+      "applicable_pages": [
+        "rabi-crops"
       ]
     },
     {
@@ -1107,7 +1295,8 @@
         "खेत में हानिकारक फंगस व दीमक के संक्रमण को रोकना"
       ],
       "dose": "1 एकड़ फसल अवशेष या 5 टन गोबर खाद हेतु 1 लीटर बायोफिट कल्चर + 1 लीटर शेत + 250ml बायो-99 प्रति 200 लीटर पानी (2 किलो गुड़ व 2 किलो बेसन के साथ)।",
-      "is_active": true
+      "is_active": true,
+      "applicable_pages": []
     },
     {
       "id": "ns_herbs_facial_kit",
@@ -1132,7 +1321,8 @@
         "tanning",
         "bridal_facial",
         "parlour_kit"
-      ]
+      ],
+      "applicable_pages": []
     },
     {
       "id": "ns_naturamore_pain_gel",
@@ -1157,7 +1347,8 @@
         "pain_relief",
         "swelling",
         "animal_kick"
-      ]
+      ],
+      "applicable_pages": []
     }
   ]
 }
