@@ -8706,7 +8706,16 @@ export async function initPageEditor() {
       const mrp = parseInt(p.mrp, 10) || 0;
       const discountPct = parseInt(p.discount_pct, 10) || 0;
       const offerPrice = p.discounted_price || (discountPct ? Math.round(mrp * (1 - discountPct / 100)) : mrp);
-      const imgSrc = p.image_preview || p.image || '/images/logo/logo.png';
+      let cachedUpload = null;
+      try {
+        const off = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        if (p.image && off[p.image]) cachedUpload = off[p.image];
+        if (!cachedUpload && p.name) {
+          const matchKey = Object.keys(off).find(k => k.toLowerCase().includes(p.name.trim().toLowerCase().replace(/[^a-z0-9]/gi, '-')));
+          if (matchKey) cachedUpload = off[matchKey];
+        }
+      } catch (e) {}
+      const imgSrc = p.image_preview || cachedUpload || p.image || '/images/logo/logo.png';
 
       return `
         <div style="background: #0f172a; border: 1.5px solid ${isExpanded ? '#10b981' : '#334155'}; border-radius: 12px; overflow: hidden; transition: all 0.2s; box-shadow: ${isExpanded ? '0 4px 16px rgba(16,185,129,0.2)' : 'none'};">
@@ -8714,7 +8723,7 @@ export async function initPageEditor() {
           <div onclick="window.toggleMpmCard(${idx})" style="padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: ${isExpanded ? 'rgba(16,185,129,0.1)' : 'transparent'}; border-bottom: ${isExpanded ? '1px solid #1e293b' : 'none'}; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
               <div style="width: 52px; height: 52px; border-radius: 10px; border: 1.5px solid #334155; overflow: hidden; background: #070d19; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
-                <img id="mpm_card_thumb_${idx}" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;" onerror="this.src='/images/logo/logo.png'">
+                <img id="mpm_card_thumb_${idx}" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" data-img="${escapeHtml(p.image||'')}" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;" onerror="try{let off=JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS')||'{}'); let k=this.getAttribute('data-img'); if(k && off[k]){this.src=off[k];}else{this.src='/images/logo/logo.png';}}catch(_){this.src='/images/logo/logo.png';}">
               </div>
               <div style="min-width: 0; flex: 1;">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -8916,8 +8925,8 @@ export async function initPageEditor() {
                   </div>
                   ${imgSrc ? `
                     <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
-                      <img id="mpm_img_preview_${idx}" src="${escapeHtml(imgSrc)}" alt="Preview" style="height: 38px; width: 38px; border-radius: 6px; object-fit: contain; border: 1px solid #334155; background: #070d19;" onerror="this.src='/images/logo/logo.png'" />
-                      <span id="mpm_img_status_${idx}" style="font-size: 0.7rem; color: #86efac;">${p.image_preview ? '✓ नया अपलोड (WebP)' : '✓ एक्टिव फोटो'}</span>
+                      <img id="mpm_img_preview_${idx}" src="${escapeHtml(imgSrc)}" alt="Preview" data-img="${escapeHtml(p.image||'')}" style="height: 38px; width: 38px; border-radius: 6px; object-fit: contain; border: 1px solid #334155; background: #070d19;" onerror="try{let off=JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS')||'{}'); let k=this.getAttribute('data-img'); if(k && off[k]){this.src=off[k];}else{this.src='/images/logo/logo.png';}}catch(_){this.src='/images/logo/logo.png';}" />
+                      <span id="mpm_img_status_${idx}" style="font-size: 0.7rem; color: #86efac;">${(p.image_preview || cachedUpload) ? '✓ एक्टिव फोटो (WebP)' : '✓ एक्टिव फोटो'}</span>
                     </div>
                   ` : ''}
                 </div>
@@ -8985,6 +8994,10 @@ export async function initPageEditor() {
     const prodName = prod.name || 'उत्पाद';
     showToast(`⏳ '${prodName}' सुरक्षित हो रहा है...`, 'info');
 
+    // Immediately collapse the card so user gets instant visual feedback!
+    mpmExpandedIdx = null;
+    renderMasterProductsList();
+
     // 1. Sync product image if newly uploaded or in offline store
     if (prod.image && prod.image.startsWith('/images/products/')) {
       try {
@@ -8994,6 +9007,15 @@ export async function initPageEditor() {
           const base64 = imgData.replace(/^data:[^;]+;base64,/, '');
           await syncAssetToGitHub(prod.image, base64);
         }
+      } catch (e) {}
+    }
+
+    // Preserve offline upload in local storage
+    if (prod.image_preview && prod.image) {
+      try {
+        const off = JSON.parse(localStorage.getItem('AI_OFFLINE_UPLOADS') || '{}');
+        off[prod.image] = prod.image_preview;
+        localStorage.setItem('AI_OFFLINE_UPLOADS', JSON.stringify(off));
       } catch (e) {}
     }
 
