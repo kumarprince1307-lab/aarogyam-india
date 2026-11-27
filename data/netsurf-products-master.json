@@ -1,7 +1,7 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T07:34:17.454Z",
-  "total_products": 43,
+  "updated_at": "2026-11-27T10:48:57.274Z",
+  "total_products": 44,
   "categories": [
     {
       "id": "agri",
@@ -147,6 +147,30 @@
     "helpline_text": "आरोग्यम इंडिया सपोर्ट हेल्पलाइन: +91 79744 22572 | www.aarogyamindia.online"
   },
   "products": [
+    {
+      "id": "ns_prod_30829",
+      "name": "Aqua Culture",
+      "category": "cattle",
+      "category_label": "पशु पोषण व मत्स्य पालन (Biofit Cattle & Aquaculture)",
+      "subcategory": "cattle_fish",
+      "subcategory_label": "🐟 मछली पालन व संवर्धन (Fish Farming & Aquaculture)",
+      "badge": "✨ New Launch",
+      "pack_size": "500 ml",
+      "problem_tags": [
+        "aqua_fish"
+      ],
+      "mrp": 330,
+      "discount_pct": 0,
+      "discounted_price": 330,
+      "image": "/images/products/product-aqua-culture-230996-62h4.webp",
+      "description": "लाभकारी प्रोबायोटिक बैक्टीरिया का समूह है, जो मछली, झींगा, प्रॉन और केकड़ों के तालाब व बायोफ्लॉक टैंक का पानी साफ रखता है। यह अतिरिक्त जैविक कचरे और कीचड़ (Sludge) को तोड़ता है, दुर्गंध कम करता है, पुरानी शैवाल हटाकर नई शैवाल पनपने से रोकता है और जलीय जीवों की आंतों का स्वास्थ्य व जीवित रहने की दर बेहतर बनाता है।",
+      "ingredients": "इसमें गैर-रोगजनक और नमक-प्रतिरोधी लाभकारी बैक्टीरिया शामिल हैं—Bacillus subtilis, Bacillus coagulans, Bacillus licheniformis और Bacillus megaterium। यह 500 ml पैक में उपलब्ध है",
+      "dose": "क एकड़ एक्वाकल्चर तालाब के लिए 1 लीटर Biofit Aqua Culture को लगभग 10 लीटर सादे पानी में मिलाकर हर 10 से 15 दिन में डालें। बायोफ्लॉक टैंक (10,000 लीटर) में हर 15 दिन पर 15 ml उत्पाद को 2 लीटर पानी में मिलाकर उपयोग करें।",
+      "precautions": "इसे Biofit Aqua Clear के साथ मिलाकर न डालें और दोनों के उपयोग के बीच 4 से 5 दिन का अंतर रखें। उत्पाद को ठंडी व सूखी जगह पर रखें तथा बच्चों की पहुँच से दूर रखें।",
+      "applicable_pages": [
+        "machhli-palan"
+      ]
+    },
     {
       "id": "ns_prod_00027",
       "name": "Pet-Vet Breed 500 GM ",
