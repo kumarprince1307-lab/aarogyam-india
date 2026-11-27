@@ -1,6 +1,6 @@
 {
   "version": "2026.3",
-  "updated_at": "2026-11-27T10:58:40.027Z",
+  "updated_at": "2026-11-27T11:02:48.504Z",
   "total_products": 45,
   "categories": [
     {
@@ -168,7 +168,9 @@
       "dose": "प्रति 1 किलोग्राम फिश फीड (दाने) में 10 ग्राम Biofit Aqua Feed Concentrate अच्छी तरह मिलाकर जलीय जीवों को दें।",
       "precautions": "यदि तालाब में Biofit Aqua Clear का उपयोग कर रहे हैं, तो उसके और Aqua Feed Concentrate के प्रयोग के बीच कम से कम 4 से 6 घंटे का अंतर रखें। उत्पाद को नमी से बचाकर ठंडी व सूखी जगह पर तथा बच्चों की पहुँच से दूर रखें।",
       "applicable_pages": [
-        "machhli-palan"
+        "machhli-palan",
+        "index",
+        "netsurf-products"
       ]
     },
     {
