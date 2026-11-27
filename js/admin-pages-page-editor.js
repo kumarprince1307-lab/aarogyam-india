@@ -6896,10 +6896,13 @@ export async function initPageEditor() {
           <button type="button" id="btn-mpm-add-product" onclick="window.addMpmProduct()" class="admin-button small-button" style="background: #10b981; color: #fff; font-weight: 900; display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border-radius: 8px; box-shadow: 0 2px 8px rgba(16,185,129,0.4);">
             <span>✨</span> <span>+ नया उत्पाद जोड़ें</span>
           </button>
+          <a href="/categories/netsurf-products.html" target="_blank" class="admin-button small-button" style="background: #2563eb; color: #fff; font-weight: 800; padding: 6px 14px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 8px rgba(37,99,235,0.35); white-space: nowrap;">
+            <span>👁️</span> <span>लाइव कैटलॉग देखें</span>
+          </a>
           <button type="button" onclick="window.saveMasterProducts()" class="admin-button small-button" style="background: #16a34a; color: #fff; font-weight: 900; padding: 6px 16px; border-radius: 8px; box-shadow: 0 4px 14px rgba(22,163,74,0.45); white-space: nowrap;">
             <span>💾</span> <span>Save Live</span>
           </button>
-          <button type="button" id="btn-close-master-product-card" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);" title="बंद करें">✕</button>
+          <button type="button" id="btn-close-master-product-card" onclick="window.closeMpmStudio()" class="admin-button icon-button" style="color: #cbd5e1; font-size: 1.3rem; background: rgba(255,255,255,0.08); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);" title="बंद करें">✕</button>
         </div>
       </header>
 
@@ -8396,6 +8399,41 @@ export async function initPageEditor() {
     { id: 'home_care', label: '🏡 इको-फ्रेंडली होम केयर' }
   ];
 
+  // Master Allowed Landing Pages List (25 Pages + Core/Catalog)
+  const ALLOWED_LANDING_PAGES = [
+    // Health (13 Pages)
+    { slug: 'health-diabetes', label: '🩸 मधुमेह (डायबिटीज)', group: 'Health' },
+    { slug: 'health-weight-loss', label: '🔥 मोटापा व वजन नियंत्रण', group: 'Health' },
+    { slug: 'health-joint-care', label: '🦴 जोड़ों का दर्द व गठिया', group: 'Health' },
+    { slug: 'health-womens-care', label: '🌸 महिला स्वास्थ्य (PCOD/PCOS)', group: 'Health' },
+    { slug: 'health-hair-care', label: '💇‍♀️ हेयर केयर (बाल झड़ना)', group: 'Health' },
+    { slug: 'health-skin-care', label: '🌺 स्किन केयर (मुँहासे/ग्लो)', group: 'Health' },
+    { slug: 'health-kids-care', label: '🧸 किड्स केयर (बाल पोषण)', group: 'Health' },
+    { slug: 'health-home-care', label: '🏡 होम केयर (क्लीनर)', group: 'Health' },
+    { slug: 'health-sexual-wellness', label: '⚡ पौरुष शक्ति व स्टैमिना', group: 'Health' },
+    { slug: 'dental-care', label: '🦷 दंत व मसूड़े सुरक्षा', group: 'Health' },
+    { slug: 'liver-care', label: '🌿 लिवर केयर व डिटॉक्स', group: 'Health' },
+    { slug: 'thyroid-care', label: '🦋 थायरॉइड व मेटाबॉलिज्म', group: 'Health' },
+    { slug: 'heart-care', label: '❤️ हृदय स्वास्थ्य व कार्डियक', group: 'Health' },
+    // Agriculture (7 Pages)
+    { slug: 'kharif-crops', label: '🌾 खरीफ फसल हब (धान/सोयाबीन)', group: 'Agri' },
+    { slug: 'rabi-crops', label: '🌾 रबी फसल हब (गेहूं/चना/सरसों)', group: 'Agri' },
+    { slug: 'jayad-summer-crops', label: '☀️ जायद व सब्जी हब', group: 'Agri' },
+    { slug: 'fruit-orchards', label: '🍎 बागवानी व फल हब', group: 'Agri' },
+    { slug: 'floriculture', label: '🌸 पुष्प व फ्लोरीकल्चर', group: 'Agri' },
+    { slug: 'crop-doctor', label: '🩺 फसल रोग व कीट डॉक्टर', group: 'Agri' },
+    { slug: 'medicinal-farming', label: '🌱 औषधीय खेती हब', group: 'Agri' },
+    // Pashu Palan (5 Pages)
+    { slug: 'pashu-palan', label: '🐄 पशु पालन व दुग्ध वृद्धि (CFC)', group: 'Pashu' },
+    { slug: 'machhli-palan', label: '🐟 मत्स्य पालन (Aquaculture)', group: 'Pashu' },
+    { slug: 'murgi-palan', label: '🐔 कुक्कुट व पोल्ट्री पालन', group: 'Pashu' },
+    { slug: 'dog-care', label: '🐕 श्वान व पेट केयर', group: 'Pashu' },
+    { slug: 'bakra-palan', label: '🐐 बकरी व बकरा पालन', group: 'Pashu' },
+    // Core & Catalog
+    { slug: 'index', label: '🏠 मुख्य पृष्ठ (Home Page)', group: 'Core' },
+    { slug: 'netsurf-products', label: '📑 संपूर्ण कैटलॉग (All Products)', group: 'Core' }
+  ];
+
   async function fetchMasterProductsData() {
     try {
       // 1. Try local storage cache
@@ -8672,50 +8710,46 @@ export async function initPageEditor() {
 
       return `
         <div style="background: #0f172a; border: 1.5px solid ${isExpanded ? '#10b981' : '#334155'}; border-radius: 12px; overflow: hidden; transition: all 0.2s; box-shadow: ${isExpanded ? '0 4px 16px rgba(16,185,129,0.2)' : 'none'};">
-          <!-- Card Compact Header Bar -->
-          <div onclick="window.toggleMpmCard(${idx})" style="padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: ${isExpanded ? 'rgba(16,185,129,0.08)' : 'transparent'}; border-bottom: ${isExpanded ? '1px solid #1e293b' : 'none'}; flex-wrap: wrap; gap: 8px;">
+          <!-- Card Compact Header Bar (Mobile Optimized with Large Touch Targets) -->
+          <div onclick="window.toggleMpmCard(${idx})" style="padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: ${isExpanded ? 'rgba(16,185,129,0.1)' : 'transparent'}; border-bottom: ${isExpanded ? '1px solid #1e293b' : 'none'}; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
-              <div style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #334155; overflow: hidden; background: #1e293b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.src='/images/logo/logo.png'">
+              <div style="width: 52px; height: 52px; border-radius: 10px; border: 1.5px solid #334155; overflow: hidden; background: #070d19; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(p.name)}" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;" onerror="this.src='/images/logo/logo.png'">
               </div>
-              <div style="min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                  <strong style="color: #ffffff; font-size: 0.94rem;">${escapeHtml(p.name)}</strong>
-                  <span style="font-size: 0.7rem; background: #064e3b; color: #6ee7b7; padding: 2px 8px; border-radius: 8px; font-weight: 700;">
+              <div style="min-width: 0; flex: 1;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <strong style="color: #ffffff; font-size: 0.98rem; font-weight: 800; line-height: 1.3;">${escapeHtml(p.name)}</strong>
+                  <span style="font-size: 0.68rem; background: #064e3b; color: #6ee7b7; padding: 2px 8px; border-radius: 8px; font-weight: 700;">
                     ${escapeHtml(p.category_label || p.category)}
                   </span>
-                  ${p.subcategory_label ? `
-                    <span style="font-size: 0.68rem; background: #1e293b; color: #cbd5e1; padding: 2px 7px; border-radius: 8px;">
-                      ${escapeHtml(p.subcategory_label)}
-                    </span>
-                  ` : ''}
                   ${p.badge ? `
                     <span style="font-size: 0.68rem; background: rgba(245,158,11,0.2); color: #fbbf24; padding: 2px 6px; border-radius: 6px; font-weight: 700;">
                       ${escapeHtml(p.badge)}
                     </span>
                   ` : ''}
                 </div>
-                <div style="display: flex; gap: 10px; font-size: 0.78rem; color: #94a3b8; margin-top: 3px; align-items: center; flex-wrap: wrap;">
-                  <span>MRP: <strong style="color: #cbd5e1;">₹${mrp}</strong></span>
-                  <span>छूट: <strong style="color: #f87171;">${discountPct}%</strong></span>
-                  <span>ऑफर रेट: <strong style="color: #34d399; font-size: 0.85rem;">₹${offerPrice}</strong></span>
-                  ${p.pack_size ? `<span style="background: rgba(2,132,199,0.25); color: #38bdf8; padding: 1px 7px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(56,189,248,0.3);">📦 ${escapeHtml(p.pack_size)}</span>` : ''}
+                <div style="display: flex; gap: 8px; font-size: 0.78rem; color: #94a3b8; margin-top: 4px; align-items: center; flex-wrap: wrap;">
+                  <span style="color: #34d399; font-size: 0.95rem; font-weight: 900;">₹${offerPrice}</span>
+                  ${mrp > offerPrice ? `<span style="text-decoration: line-through; color: #64748b; font-size: 0.75rem;">₹${mrp}</span>` : ''}
+                  ${discountPct > 0 ? `<span style="color: #f87171; font-weight: 800; font-size: 0.72rem; background: rgba(239,68,68,0.15); padding: 1px 6px; border-radius: 4px;">-${discountPct}%</span>` : ''}
+                  ${p.pack_size ? `<span style="background: rgba(2,132,199,0.2); color: #38bdf8; padding: 1px 7px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(56,189,248,0.3); font-size: 0.72rem;">📦 ${escapeHtml(p.pack_size)}</span>` : ''}
+                  ${Array.isArray(p.applicable_pages) && p.applicable_pages.length > 0 ? `<span style="background: rgba(168,85,247,0.2); color: #c084fc; padding: 1px 7px; border-radius: 6px; font-weight: 700; font-size: 0.7rem; border: 1px solid rgba(168,85,247,0.3);">📍 ${p.applicable_pages.length} पेजों पर एक्टिव</span>` : ''}
                 </div>
               </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation()">
-              <button type="button" onclick="window.saveSingleMpmProduct(${idx})" class="admin-button small-button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; font-size: 0.72rem; padding: 4px 10px; font-weight: 800; border-radius: 6px; box-shadow: 0 2px 8px rgba(16,185,129,0.35); display: inline-flex; align-items: center; gap: 4px;" title="इस उत्पाद को अभी सुरक्षित करें">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;" onclick="event.stopPropagation()">
+              <button type="button" onclick="window.saveSingleMpmProduct(${idx})" class="admin-button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: none; font-size: 0.76rem; padding: 6px 12px; font-weight: 800; border-radius: 8px; box-shadow: 0 2px 8px rgba(16,185,129,0.35); display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="इस उत्पाद को अभी सुरक्षित करें">
                 <span>💾</span> <span>सेव</span>
               </button>
-              <button type="button" onclick="window.duplicateMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f640; font-size: 0.72rem; padding: 4px 8px;" title="डुप्लीकेट कॉपी बनाएं">
-                📋 कॉपी
+              <button type="button" onclick="window.duplicateMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(59,130,246,0.18); color: #60a5fa; border: 1px solid #3b82f640; font-size: 0.74rem; padding: 6px 9px; border-radius: 6px;" title="डुप्लीकेट कॉपी बनाएं">
+                📋
               </button>
-              <button type="button" onclick="window.deleteMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid #ef444440; font-size: 0.72rem; padding: 4px 8px;" title="उत्पाद हटाएं">
-                🗑️ हटाएं
+              <button type="button" onclick="window.deleteMpmProduct(${idx})" class="admin-button small-button" style="background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid #ef444440; font-size: 0.74rem; padding: 6px 9px; border-radius: 6px;" title="उत्पाद हटाएं">
+                🗑️
               </button>
-              <button type="button" onclick="window.toggleMpmCard(${idx})" class="admin-button small-button" style="background: transparent; color: #cbd5e1; font-size: 0.85rem; padding: 4px 6px;">
-                ${isExpanded ? '▲ समेटें' : '▼ एडिट करें'}
+              <button type="button" onclick="window.toggleMpmCard(${idx})" class="admin-button small-button" style="background: #1e293b; color: #cbd5e1; font-size: 0.76rem; padding: 6px 10px; border-radius: 6px; font-weight: 700;">
+                ${isExpanded ? '▲ बंद करें' : '✏️ एडिट करें'}
               </button>
             </div>
           </div>
@@ -8759,18 +8793,19 @@ export async function initPageEditor() {
                 </div>
               </div>
 
-              <!-- Row 1.5: Pack Size & Health Concern Tags -->
-              <div style="background: rgba(15,23,42,0.85); border: 1.5px solid #1e293b; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <!-- Row 1.5: Pack Size, Filter Tags & Target Landing Pages (Folder Accordion Dropdowns) -->
+              <div style="background: rgba(15,23,42,0.95); border: 1.5px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                <!-- Pack Size Field -->
                 <div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                     <label class="admin-label" style="font-size: 0.78rem; margin: 0; color: #38bdf8; font-weight: 800;">📦 पैकिंग / मात्रा (Pack Size & Quantity)*</label>
-                    <span style="font-size: 0.7rem; color: #94a3b8;">क्विक पिल दबाएं या सीधा टाइप करें</span>
+                    <span style="font-size: 0.7rem; color: #94a3b8;">क्विक पिल दबाएं या सीधा लिखें</span>
                   </div>
                   <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="text" id="mpm_pack_size_${idx}" value="${escapeHtml(p.pack_size || '')}" oninput="window.updateMpmProductField(${idx}, 'pack_size', this.value)" class="admin-input" placeholder="उदा. 250 ml, 500 gm, 1 kg, 30 कैप्सूल" style="flex: 1; min-width: 180px; font-weight: 700; color: #38bdf8;" />
+                    <input type="text" id="mpm_pack_size_${idx}" value="${escapeHtml(p.pack_size || '')}" oninput="window.updateMpmProductField(${idx}, 'pack_size', this.value)" class="admin-input" placeholder="उदा. 250 ml, 500 gm, 1 kg, 30 कैप्सूल" style="flex: 1; min-width: 170px; font-weight: 700; color: #38bdf8;" />
                     <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                       ${['100 ml', '250 ml', '500 ml', '1 Ltr', '20 gm', '100 gm', '200 gm', '400 gm', '500 gm', '1 kg', '30 कैप्सूल', '60 गोलियां', '1 पीस'].map(q => `
-                        <button type="button" onclick="window.setMpmProductPackSize(${idx}, '${q}')" class="admin-button small-button" style="padding: 3px 8px; font-size: 0.72rem; background: ${p.pack_size === q ? '#0284c7' : '#1e293b'}; color: ${p.pack_size === q ? '#fff' : '#cbd5e1'}; border: 1px solid ${p.pack_size === q ? '#38bdf8' : '#334155'}; font-weight: 700;">
+                        <button type="button" onclick="window.setMpmProductPackSize(${idx}, '${q}')" class="admin-button small-button" style="padding: 4px 8px; font-size: 0.72rem; background: ${p.pack_size === q ? '#0284c7' : '#1e293b'}; color: ${p.pack_size === q ? '#fff' : '#cbd5e1'}; border: 1px solid ${p.pack_size === q ? '#38bdf8' : '#334155'}; font-weight: 700;">
                           ${q}
                         </button>
                       `).join('')}
@@ -8778,22 +8813,82 @@ export async function initPageEditor() {
                   </div>
                 </div>
 
-                <div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label class="admin-label" style="font-size: 0.78rem; margin: 0; color: #f59e0b; font-weight: 800;">🩺 संबंधित बीमारी, फसल या पशु फ़िल्टर (Problem / Crop / Animal Tags)*</label>
-                    <span style="font-size: 0.7rem; color: #94a3b8;">क्लिक करके चुनें (एक या अधिक)</span>
+                <!-- 1. PROBLEM / CROP / ANIMAL TAGS FOLDER DROPDOWN (Category Smart Filter) -->
+                <details style="background: #070d19; border: 1.5px solid #f59e0b50; border-radius: 10px; padding: 8px 12px; transition: all 0.2s ease;">
+                  <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #fbbf24; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                      <span>🩺</span> <span>संबंधित बीमारी, फसल व पशु टैग्स (Problem Tags)</span>
+                      <span style="font-size: 0.72rem; background: rgba(245,158,11,0.2); color: #fde047; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
+                        ${(p.problem_tags || []).length} चयनित
+                      </span>
+                    </span>
+                    <span style="font-size: 0.74rem; color: #94a3b8;">▼ फोल्डर खोलें / बंद करें</span>
+                  </summary>
+                  <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #334155; display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-size: 0.72rem; color: #cbd5e1;">कैटेगरी (${p.category}) के आधार पर फिल्टर किए गए टैग्स (क्लिक करके चेक/अनचेक करें):</span>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      ${AVAILABLE_PROBLEM_TAGS.filter(t => {
+                        if (p.category === 'agri') return t.id.startsWith('agri_') || t.id.startsWith('crop_');
+                        if (p.category === 'cattle') return t.id.startsWith('cattle_') || t.id.startsWith('aqua_') || t.id.startsWith('poultry_') || t.id.startsWith('goat_');
+                        if (p.category === 'health') return !t.id.startsWith('agri_') && !t.id.startsWith('crop_') && !t.id.startsWith('cattle_') && !t.id.startsWith('aqua_') && !t.id.startsWith('poultry_') && !t.id.startsWith('goat_');
+                        return true;
+                      }).map(t => {
+                        const isChecked = Array.isArray(p.problem_tags) && p.problem_tags.includes(t.id);
+                        return `
+                          <button type="button" onclick="window.toggleMpmProductTag(${idx}, '${t.id}')" style="cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 0.74rem; font-weight: 700; border: 1.5px solid ${isChecked ? '#f59e0b' : '#334155'}; background: ${isChecked ? 'rgba(245,158,11,0.3)' : '#0d1527'}; color: ${isChecked ? '#fef08a' : '#94a3b8'}; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
+                            <span>${isChecked ? '☑️' : '⬜'}</span> <span>${t.label}</span>
+                          </button>
+                        `;
+                      }).join('')}
+                    </div>
                   </div>
-                  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    ${AVAILABLE_PROBLEM_TAGS.map(t => {
-                      const isChecked = Array.isArray(p.problem_tags) && p.problem_tags.includes(t.id);
-                      return `
-                        <button type="button" onclick="window.toggleMpmProductTag(${idx}, '${t.id}')" style="cursor: pointer; padding: 4px 10px; border-radius: 14px; font-size: 0.72rem; font-weight: 700; border: 1.5px solid ${isChecked ? '#f59e0b' : '#334155'}; background: ${isChecked ? 'rgba(245,158,11,0.25)' : '#070d19'}; color: ${isChecked ? '#fbbf24' : '#94a3b8'}; transition: all 0.15s ease;">
-                          ${isChecked ? '✓ ' : '+ '}${t.label}
-                        </button>
-                      `;
-                    }).join('')}
+                </details>
+
+                <!-- 2. TARGET LANDING PAGES FOLDER DROPDOWN (Health 13, Agri 7, Pashu 5, Core 2) -->
+                <details style="background: #070d19; border: 1.5px solid #a855f750; border-radius: 10px; padding: 8px 12px; transition: all 0.2s ease;">
+                  <summary style="cursor: pointer; font-size: 0.8rem; font-weight: 800; color: #c084fc; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                      <span>🎯</span> <span>कहाँ-कहाँ प्रदर्शित करें? (Landing Pages Targeting)</span>
+                      <span style="font-size: 0.72rem; background: rgba(168,85,247,0.25); color: #e9d5ff; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
+                        ${(p.applicable_pages || []).length} पेज एक्टिव
+                      </span>
+                    </span>
+                    <span style="font-size: 0.74rem; color: #94a3b8;">▼ फोल्डर खोलें / बंद करें</span>
+                  </summary>
+                  <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #334155; display: flex; flex-direction: column; gap: 10px;">
+                    <span style="font-size: 0.72rem; color: #cbd5e1;">नीचे दिए गए 25 लैंडिंग पेजों में से चुनें जहाँ इस उत्पाद को दिखाना है:</span>
+                    
+                    <!-- Grouped Display by Category for Easy Selection -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      ${['Health', 'Agri', 'Pashu', 'Core'].map(grp => {
+                        const grpPages = ALLOWED_LANDING_PAGES.filter(pg => pg.group === grp);
+                        if (grpPages.length === 0) return '';
+                        const grpTitle = ({
+                          Health: '❤️ स्वास्थ्य (Health - 13 पेजेस)',
+                          Agri: '🌱 कृषि (Agriculture - 7 पेजेस)',
+                          Pashu: '🐄 पशु पालन (Livestock - 5 पेजेस)',
+                          Core: '🏠 कोर व कैटलॉग (Home & Catalog - 2 पेजेस)'
+                        })[grp] || grp;
+
+                        return `
+                          <div style="background: rgba(30,41,59,0.4); padding: 8px 10px; border-radius: 8px; border: 1px solid #1e293b;">
+                            <strong style="font-size: 0.72rem; color: #38bdf8; display: block; margin-bottom: 6px;">${grpTitle}</strong>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                              ${grpPages.map(pg => {
+                                const isSelected = Array.isArray(p.applicable_pages) && p.applicable_pages.includes(pg.slug);
+                                return `
+                                  <button type="button" onclick="window.toggleMpmProductPage(${idx}, '${pg.slug}')" style="cursor: pointer; padding: 5px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; border: 1.5px solid ${isSelected ? '#a855f7' : '#334155'}; background: ${isSelected ? 'rgba(168,85,247,0.3)' : '#070d19'}; color: ${isSelected ? '#f3e8ff' : '#94a3b8'}; display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease;">
+                                    <span>${isSelected ? '☑️' : '⬜'}</span> <span>${pg.label}</span>
+                                  </button>
+                                `;
+                              }).join('')}
+                            </div>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
                   </div>
-                </div>
+                </details>
               </div>
 
               <!-- Row 2: MRP, Discount %, Offer Price, Photo & Upload -->
@@ -8961,36 +9056,69 @@ export async function initPageEditor() {
       syncAssetToGitHub('data/netsurf-products-master.json', base64Data);
     } catch (e) {}
 
-    // Cross-page synchronization for this specific product
+    // Cross-page synchronization & target landing page distribution for this specific product
     try {
       let pagesModified = false;
+      const targetSlugs = Array.isArray(cleanProd.applicable_pages) ? cleanProd.applicable_pages : [];
+
       if (Array.isArray(allPages) && allPages.length > 0) {
         allPages.forEach(page => {
-          if (Array.isArray(page.products) && page.products.length > 0) {
-            page.products.forEach(p => {
-              if (
-                (p.id && cleanProd.id && String(p.id).toLowerCase() === String(cleanProd.id).toLowerCase()) ||
-                (p.name && cleanProd.name && p.name.trim().toLowerCase() === cleanProd.name.trim().toLowerCase()) ||
-                (p.title && cleanProd.name && p.title.trim().toLowerCase() === cleanProd.name.trim().toLowerCase())
-              ) {
-                p.id = cleanProd.id;
-                p.name = cleanProd.name;
-                p.mrp = cleanProd.mrp;
-                p.price = cleanProd.discounted_price || cleanProd.mrp;
-                p.discount_pct = cleanProd.discount_pct;
-                p.pack_size = cleanProd.pack_size || p.pack_size || '';
-                pagesModified = true;
-              }
+          if (!Array.isArray(page.products)) page.products = [];
+          const prodIdx = page.products.findIndex(p =>
+            (p.id && cleanProd.id && String(p.id).toLowerCase() === String(cleanProd.id).toLowerCase()) ||
+            (p.name && cleanProd.name && p.name.trim().toLowerCase() === cleanProd.name.trim().toLowerCase()) ||
+            (p.title && cleanProd.name && p.title.trim().toLowerCase() === cleanProd.name.trim().toLowerCase())
+          );
+
+          const shouldBeOnPage = targetSlugs.includes(page.slug);
+
+          if (prodIdx >= 0) {
+            if (targetSlugs.length > 0 && !shouldBeOnPage && page.slug !== 'netsurf-career' && page.slug !== 'health') {
+              // Unlink from this page if user removed the checkbox (protect career and main health hub)
+              page.products.splice(prodIdx, 1);
+              pagesModified = true;
+            } else {
+              // Update details in place
+              const p = page.products[prodIdx];
+              p.id = cleanProd.id;
+              p.name = cleanProd.name;
+              p.mrp = cleanProd.mrp;
+              p.price = cleanProd.discounted_price || cleanProd.mrp;
+              p.discount_pct = cleanProd.discount_pct;
+              p.pack_size = cleanProd.pack_size || p.pack_size || '';
+              p.badge = cleanProd.badge || p.badge;
+              p.description = cleanProd.description || p.description;
+              if (cleanProd.image && !cleanProd.image.includes('logo.png')) p.image = cleanProd.image;
+              pagesModified = true;
+            }
+          } else if (shouldBeOnPage) {
+            // Add product into page if target is checked and not yet present
+            page.products.push({
+              id: cleanProd.id,
+              name: cleanProd.name,
+              mrp: cleanProd.mrp,
+              price: cleanProd.discounted_price || cleanProd.mrp,
+              discount_pct: cleanProd.discount_pct || 0,
+              pack_size: cleanProd.pack_size || '',
+              badge: cleanProd.badge || (cleanProd.category === 'cattle' ? 'आयुर्वेदिक पशु पोषण' : 'प्रमाणित जैविक'),
+              description: cleanProd.description || '',
+              image: cleanProd.image || ''
             });
+            pagesModified = true;
           }
         });
       }
       if (pagesModified) {
+        savePagesToStorage();
         fetch('/api/save_site_pages.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'save_site_pages', sitePages: allPages })
         }).catch(() => null);
+        try {
+          const b64 = btoa(unescape(encodeURIComponent(JSON.stringify({ sitePages: allPages }, null, 2))));
+          syncAssetToGitHub('data/site-pages-config.json', b64);
+        } catch (e) {}
       }
     } catch (e) {}
 
@@ -9016,7 +9144,23 @@ export async function initPageEditor() {
     }
   };
 
-  window.toggleMpmProductTag = function(idx, tag) {
+  
+  window.toggleMpmProductPage = function(idx, slug) {
+    if (masterProducts[idx]) {
+      if (!Array.isArray(masterProducts[idx].applicable_pages)) {
+        masterProducts[idx].applicable_pages = [];
+      }
+      const pagesList = masterProducts[idx].applicable_pages;
+      const pos = pagesList.indexOf(slug);
+      if (pos >= 0) {
+        pagesList.splice(pos, 1);
+      } else {
+        pagesList.push(slug);
+      }
+      renderMasterProductsList();
+    }
+  };
+window.toggleMpmProductTag = function(idx, tag) {
     if (masterProducts[idx]) {
       if (!Array.isArray(masterProducts[idx].problem_tags)) {
         masterProducts[idx].problem_tags = [];
@@ -9350,6 +9494,12 @@ export async function initPageEditor() {
     }
 
     syncMpmWithPresetDropdown();
+    // Auto-close studio on save completion so user is not stuck
+    setTimeout(() => {
+      if (typeof window.closeMpmStudio === 'function') {
+        window.closeMpmStudio();
+      }
+    }, 1200);
   };
 
   window.exportMasterProductsJson = function() {

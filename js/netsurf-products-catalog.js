@@ -815,7 +815,7 @@
     const waUrl = `https://api.whatsapp.com/send?phone=${currentSponsor.phone}&text=${waMsg}`;
 
     return `
-      <div class="np-card" data-cat="${p.category}" data-id="${p.id}">
+      <div class="np-card" data-cat="${p.category}" data-id="${p.id}" style="box-shadow: 0 4px 16px rgba(15,23,42,0.06); border: 1.5px solid #e2e8f0; border-radius: 16px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
         <div>
           <!-- Image Box -->
           <div class="np-img-box">
@@ -2058,10 +2058,10 @@
           .pdf-grid-6 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: repeat(3, 75mm);
+            grid-template-rows: repeat(3, 73.5mm);
             gap: 2.5mm 3.5mm;
-            height: 232mm;
-            max-height: 232mm;
+            height: 226mm;
+            max-height: 226mm;
             overflow: hidden;
             margin: 2px 0 3px 0;
           }
@@ -2078,16 +2078,16 @@
             box-sizing: border-box;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
-            height: 75mm;
-            max-height: 75mm;
+            height: 73.5mm;
+            max-height: 73.5mm;
             overflow: hidden;
             align-items: stretch;
           }
 
           .pdf-card-left-grid {
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
+            width: 94px;
+            min-width: 94px;
+            max-width: 94px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -2099,8 +2099,8 @@
           }
 
           .pdf-card-img-box-grid {
-            width: 90px;
-            height: 90px;
+            width: 86px;
+            height: 86px;
             background: #ffffff;
             border: 1.2px solid #cbdfe9;
             border-radius: 8px;

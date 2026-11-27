@@ -225,6 +225,29 @@
   // Cart state stored as Array of items: [{ id, name, mrp, img, dose, qty }]
   let cartItems = [];
   let isDrawerExpanded = false;
+  let isDrawerMinimized = false;
+  let autoHideTimer = null;
+
+  function resetAutoHideTimer() {
+    if (autoHideTimer) {
+      clearTimeout(autoHideTimer);
+      autoHideTimer = null;
+    }
+    if (!isDrawerMinimized && cartItems.length > 0) {
+      autoHideTimer = setTimeout(() => {
+        isDrawerMinimized = true;
+        isDrawerExpanded = false;
+        updateOrderDrawer();
+      }, 12000); // 12 seconds auto-hide
+    }
+  }
+
+  function cancelAutoHideTimer() {
+    if (autoHideTimer) {
+      clearTimeout(autoHideTimer);
+      autoHideTimer = null;
+    }
+  }
 
   function loadCart() {
     try {
@@ -266,8 +289,9 @@
     const totalCount = cartItems.reduce((sum, item) => sum + (item.qty || 1), 0);
 
     if (totalCount === 0) {
+      cancelAutoHideTimer();
       if (drawer) {
-        drawer.style.transform = 'translateY(120%)';
+        drawer.style.transform = 'translateY(150%) scale(0.9)';
         drawer.style.display = 'none';
       }
       syncPageButtonStates();
@@ -290,73 +314,100 @@
 
     resolveCurrentAdvisor();
 
+    // Reset 12-second auto-hide timer whenever cart changes or updates
+    resetAutoHideTimer();
+
+    // A) If Minimized: Show Discreet Left-Floating Pill
+    if (isDrawerMinimized) {
+      drawer.className = 'sticky-order-drawer-wrap minimized-bubble';
+      drawer.onmouseenter = null;
+      drawer.onmouseleave = null;
+      drawer.innerHTML = `
+        <div onclick="window.minimizeWhatsAppCart(false)" style="display:flex; align-items:center; gap:8px; cursor:pointer; background:linear-gradient(135deg, #059669 0%, #047857 100%); padding:8px 16px; border-radius:30px; box-shadow:0 8px 24px rgba(5,150,105,0.4); border:2px solid #ffffff; color:#ffffff; font-weight:800; font-size:0.84rem; user-select:none; animation: waCartPulse 2s infinite ease-in-out;">
+          <span style="font-size:1.15rem;">🛒</span>
+          <span>ऑर्डर (${totalCount})</span>
+          <span style="font-size:0.78rem; background:rgba(0,0,0,0.3); padding:2px 8px; border-radius:12px; color:#fde047;">₹${totalMrp.toLocaleString('en-IN')}</span>
+        </div>
+      `;
+      drawer.style.transform = 'translateY(0) scale(1)';
+      syncPageButtonStates();
+      return;
+    }
+
+    // B) Full Compact Floating Card on Left Side
+    drawer.className = 'sticky-order-drawer-wrap left-floating-card';
+    
+    // Pause auto-hide timer when user hovers or interacts with the card
+    drawer.onmouseenter = cancelAutoHideTimer;
+    drawer.onmouseleave = resetAutoHideTimer;
+
     drawer.innerHTML = `
-      <div class="container sticky-order-drawer-content">
-        <!-- Drawer Header / Top Summary -->
-        <div class="order-summary-row" style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:10px;">
-          <div class="order-summary-info" style="display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="window.toggleWhatsAppCartExpand()">
-            <div class="order-count-pill" style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:0.9rem;">
-              <span class="order-counter-badge" style="background:#22c55e; color:#000; font-size:0.8rem; font-weight:900; padding:2px 8px; border-radius:12px;">${totalCount}</span>
-              <span>🛒 उत्पाद कार्ट</span>
-              <span style="font-size:0.75rem; color:#38bdf8; text-decoration:underline;">(${isDrawerExpanded ? 'बंद करें ▲' : 'सूची देखें ▼'})</span>
-            </div>
-            <div class="order-mrp-total" style="font-size:0.95rem; color:#fde047; font-weight:800;">
-              कुल: ₹${totalMrp.toLocaleString('en-IN')}
-            </div>
+      <div class="compact-order-card-content">
+        <!-- Card Top Bar: Icon, Title, MRP & Close '✕' Button -->
+        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; gap:8px; padding-bottom:8px; border-bottom:1px solid #1e293b;">
+          <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="window.toggleWhatsAppCartExpand()">
+            <span style="background:#22c55e; color:#000; font-size:0.76rem; font-weight:900; padding:2px 7px; border-radius:10px;">${totalCount}</span>
+            <strong style="color:#ffffff; font-size:0.86rem; display:flex; align-items:center; gap:4px;">
+              <span>🛒</span> <span>उत्पाद (${isDrawerExpanded ? '▲ बंद' : '▼ देखें'})</span>
+            </strong>
+            <span style="color:#fde047; font-weight:800; font-size:0.86rem; margin-left:4px;">₹${totalMrp.toLocaleString('en-IN')}</span>
           </div>
 
-          <div class="order-actions-single" style="display:flex; align-items:center; gap:10px;">
-            <!-- Dedicated Referral Salahkar Button (Only Advisor) -->
-            <button type="button" class="btn-wa-order btn-wa-upline" onclick="window.sendWhatsAppOrder()" style="background:linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
-              <i class="fa-solid fa-user-check"></i>
-              <div class="wa-btn-text">
-                <span class="wa-btn-title">सलाहकार को ऑर्डर भेजें</span>
-                <span class="wa-btn-sub" id="wa-drawer-advisor-sub">${currentAdvisorData.name} (${currentAdvisorData.display})</span>
-              </div>
-            </button>
-
-            <!-- Drawer Close Icon -->
-            <button type="button" onclick="window.toggleWhatsAppCartExpand()" style="background:rgba(255,255,255,0.12); border:none; color:#cbd5e1; width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:0.9rem; display:flex; align-items:center; justify-content:center;" title="सूची देखें/छुपाएं">
-              ${isDrawerExpanded ? '✕' : '▲'}
+          <div style="display:flex; align-items:center; gap:6px;">
+            <!-- Manual Cross / Minimize Button -->
+            <button type="button" onclick="window.minimizeWhatsAppCart(true)" style="background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#cbd5e1; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; justify-content:center; transition:all 0.2s ease;" title="कार्ड हटाएं / मिनीमाइज करें">
+              ✕
             </button>
           </div>
         </div>
 
-        <!-- Expandable Itemized Cart Tray -->
-        <div id="wa-cart-items-tray" style="display:${isDrawerExpanded ? 'block' : 'none'}; width:100%; max-height:220px; overflow-y:auto; margin-top:10px; padding-top:10px; border-top:1px solid #334155;">
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            ${cartItems.map((item, idx) => `
-              <div style="display:flex; align-items:center; justify-content:space-between; background:#1e293b; padding:8px 12px; border-radius:10px; border:1px solid #334155; gap:10px;">
-                <div style="display:flex; align-items:center; gap:10px; flex:1; overflow:hidden;">
-                  ${item.img ? `<img src="${item.img}" alt="${item.name}" style="width:34px; height:34px; object-fit:cover; border-radius:6px; border:1px solid #475569;" onerror="this.style.display='none'">` : '<span style="font-size:1.2rem;">📦</span>'}
+        <!-- Expandable Itemized +/- Tray (Opens only on click) -->
+        <div id="wa-cart-items-tray" style="display:${isDrawerExpanded ? 'block' : 'none'}; width:100%; max-height:200px; overflow-y:auto; margin:8px 0; padding-right:4px;">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${cartItems.map((item) => `
+              <div style="display:flex; align-items:center; justify-content:space-between; background:#070d19; padding:6px 10px; border-radius:8px; border:1px solid #1e293b; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px; flex:1; overflow:hidden;">
+                  ${item.img ? `<img src="${item.img}" alt="${item.name}" style="width:30px; height:30px; object-fit:contain; border-radius:4px; border:1px solid #334155; background:#fff;" onerror="this.style.display='none'">` : '<span style="font-size:1.1rem;">📦</span>'}
                   <div style="overflow:hidden;">
-                    <div style="font-size:0.84rem; font-weight:800; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <div style="font-size:0.78rem; font-weight:800; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${item.name}">
                       ${item.name}
                     </div>
-                    <div style="font-size:0.75rem; color:#94a3b8;">
+                    <div style="font-size:0.72rem; color:#94a3b8;">
                       ₹${item.mrp} × ${item.qty || 1} = <strong style="color:#86efac;">₹${((Number(item.mrp) || 0) * (item.qty || 1)).toLocaleString('en-IN')}</strong>
                     </div>
                   </div>
                 </div>
 
                 <!-- Quantity Controls & Cross Removal -->
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <button type="button" onclick="window.changeWhatsAppCartQty('${item.id}', -1)" style="background:#334155; border:none; color:#fff; width:24px; height:24px; border-radius:6px; font-weight:900; cursor:pointer;">-</button>
-                  <span style="font-size:0.82rem; font-weight:800; color:#fde047; min-width:18px; text-align:center;">${item.qty || 1}</span>
-                  <button type="button" onclick="window.changeWhatsAppCartQty('${item.id}', 1)" style="background:#334155; border:none; color:#fff; width:24px; height:24px; border-radius:6px; font-weight:900; cursor:pointer;">+</button>
-                  <button type="button" onclick="window.removeWhatsAppCartItem('${item.id}')" style="background:#ef4444; border:none; color:#fff; width:24px; height:24px; border-radius:6px; font-size:0.75rem; font-weight:900; cursor:pointer; margin-left:4px;" title="हटाएं">✕</button>
+                <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                  <button type="button" onclick="window.changeWhatsAppCartQty('${item.id}', -1)" style="background:#1e293b; border:1px solid #334155; color:#fff; width:22px; height:22px; border-radius:4px; font-weight:900; font-size:0.75rem; cursor:pointer;">-</button>
+                  <span style="font-size:0.78rem; font-weight:800; color:#fde047; min-width:16px; text-align:center;">${item.qty || 1}</span>
+                  <button type="button" onclick="window.changeWhatsAppCartQty('${item.id}', 1)" style="background:#1e293b; border:1px solid #334155; color:#fff; width:22px; height:22px; border-radius:4px; font-weight:900; font-size:0.75rem; cursor:pointer;">+</button>
+                  <button type="button" onclick="window.removeWhatsAppCartItem('${item.id}')" style="background:rgba(239,68,68,0.25); border:1px solid #ef444450; color:#f87171; width:22px; height:22px; border-radius:4px; font-size:0.72rem; font-weight:900; cursor:pointer; margin-left:3px;" title="हटाएं">✕</button>
                 </div>
               </div>
             `).join('')}
           </div>
         </div>
+
+        <!-- Card Bottom Action: 1-Click WhatsApp Order Button -->
+        <div style="margin-top:8px; width:100%;">
+          <button type="button" onclick="window.sendWhatsAppOrder()" style="width:100%; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff; border:none; padding:9px 14px; border-radius:10px; font-weight:900; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(16,185,129,0.35); transition:all 0.2s ease;">
+            <i class="fa-solid fa-user-check" style="font-size:0.95rem;"></i>
+            <span>सलाहकार को ऑर्डर भेजें (${currentAdvisorData.display})</span>
+          </button>
+        </div>
       </div>
     `;
 
-    drawer.style.transform = 'translateY(0)';
+    drawer.style.transform = 'translateY(0) scale(1)';
     syncPageButtonStates();
   }
 
+  window.minimizeWhatsAppCart = function(minimize = true) {
+    isDrawerMinimized = minimize;
+    updateOrderDrawer();
+  };
   window.toggleWhatsAppCartExpand = function () {
     isDrawerExpanded = !isDrawerExpanded;
     updateOrderDrawer();
@@ -424,7 +475,8 @@
         dose: dose || '',
         qty: 1
       });
-      isDrawerExpanded = false; // keep collapsed by default
+      isDrawerExpanded = true; // Open full item tray on selection so user clearly sees what was added
+      isDrawerMinimized = false;
     }
     saveCart();
     updateOrderDrawer();
@@ -475,112 +527,67 @@
     const style = document.createElement('style');
     style.id = 'dual-whatsapp-order-styles';
     style.textContent = `
-      .sticky-order-drawer-wrap {
-        position: fixed;
-        bottom: 60px;
-        left: 0;
-        right: 0;
-        background: #0f172a;
-        color: #ffffff;
-        border-top: 2px solid #22c55e;
-        box-shadow: 0 -8px 25px rgba(0,0,0,0.4);
-        z-index: 9985;
-        padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px;
-        transform: translateY(120%);
-        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        display: none;
+      @keyframes waCartPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(5,150,105,0.4); }
+        50% { transform: scale(1.04); box-shadow: 0 8px 24px rgba(5,150,105,0.6); }
       }
-      .sticky-order-drawer-content {
+
+      /* 1. Left-Side Compact Floating Card */
+      .sticky-order-drawer-wrap.left-floating-card {
+        position: fixed !important;
+        bottom: calc(75px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 20px !important;
+        right: auto !important;
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border: 1.5px solid #10b981 !important;
+        border-radius: 16px !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.55), 0 4px 12px rgba(16,185,129,0.2) !important;
+        z-index: 9995 !important;
+        padding: 12px 14px !important;
+        width: 320px !important;
+        max-width: calc(100vw - 40px) !important;
+        transform: translateY(0) scale(1) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-sizing: border-box !important;
+      }
+
+      /* 2. Minimized Discreet Floating Pill on Left Side */
+      .sticky-order-drawer-wrap.minimized-bubble {
+        position: fixed !important;
+        bottom: calc(75px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 20px !important;
+        right: auto !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        z-index: 9995 !important;
+        width: auto !important;
+        transform: translateY(0) scale(1) !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+
+      .compact-order-card-content {
         display: flex;
         flex-direction: column;
-        align-items: center;
         width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
+        box-sizing: border-box;
       }
-      .order-actions-dual, .order-actions-single {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .btn-wa-order {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        border-radius: 24px;
-        border: none;
-        cursor: pointer;
-        font-weight: 800;
-        color: #fff;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      }
-      .btn-wa-order:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
-      }
-      .btn-wa-order i {
-        font-size: 1.2rem;
-      }
-      .wa-btn-text {
-        display: flex;
-        flex-direction: column;
-        text-align: left;
-      }
-      .wa-btn-title {
-        font-size: 0.82rem;
-        line-height: 1.1;
-      }
-      .wa-btn-sub {
-        font-size: 0.68rem;
-        opacity: 0.85;
-      }
-      .btn-wa-aarogyam {
-        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-      }
-      .btn-wa-upline {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      }
-      .product-order-toggle-btn {
-        width: 100%;
-        padding: 9px 14px;
-        border-radius: 10px;
-        border: 1.5px solid #16a34a;
-        background: #f0fdf4;
-        color: #16a34a;
-        font-weight: 800;
-        font-size: 0.85rem;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        transition: all 0.2s ease;
-      }
-      .product-order-toggle-btn:hover {
-        background: #16a34a;
-        color: #ffffff;
-      }
-      .product-order-toggle-btn.selected {
-        background: #22c55e;
-        color: #ffffff;
-        border-color: #16a34a;
-      }
+
       @media (max-width: 640px) {
-        .sticky-order-drawer-wrap {
-          bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-          padding: 8px 10px;
+        .sticky-order-drawer-wrap.left-floating-card {
+          left: 12px !important;
+          right: auto !important;
+          bottom: calc(65px + env(safe-area-inset-bottom, 0px)) !important;
+          width: 300px !important;
+          max-width: calc(100vw - 24px) !important;
+          padding: 10px 12px !important;
         }
-        .order-actions-dual {
-          width: 100%;
-          justify-content: space-between;
-        }
-        .btn-wa-order {
-          flex: 1;
-          padding: 7px 10px;
-          justify-content: center;
+        .sticky-order-drawer-wrap.minimized-bubble {
+          left: 12px !important;
+          right: auto !important;
+          bottom: calc(65px + env(safe-area-inset-bottom, 0px)) !important;
         }
       }
     `;

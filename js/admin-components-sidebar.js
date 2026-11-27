@@ -38,7 +38,9 @@ const MENU = [
     { label: '🌾 Mandi & Weather Editor', href: 'page-editor.html?page=mandi', route: 'page-editor?page=mandi' },
     { label: '🌾 खरीफ फसल गाइड लैंडिंग पेज', href: 'page-editor.html?page=page_kharif_guide', route: 'page-editor?page=page_kharif_guide' },
     { label: '🩺 खेती का डॉक्टर लैंडिंग पेज', href: 'page-editor.html?page=page_kheti_dr', route: 'page-editor?page=page_kheti_dr' },
-    { label: '💼 Netsurf Career (नेटसर्फ करियर) Editor', href: 'page-editor.html?page=page_netsurf_career', route: 'page-editor?page=page_netsurf_career' }
+    { label: '🌿 नेट्सर्फ मुख्य हब (Netsurf Hub)', href: 'page-editor.html?page=page_netsurf_career', route: 'page-editor?page=page_netsurf_career' },
+    { label: '🚀 Q3 पाथफाइंडर (TeamFest Pathfinder)', href: 'page-editor.html?page=page_netsurf_pathfinder', route: 'page-editor?page=page_netsurf_pathfinder' },
+    { label: '📑 संपूर्ण कैटलॉग (Products Catalog)', href: 'page-editor.html?page=page_netsurf_products', route: 'page-editor?page=page_netsurf_products' }
   ] },
   { label: '📖 मेरी डायरी (My Diary)', icon: '📖', href: 'smart-etailer.html', route: 'smart-etailer' },
   { label: 'Products (उत्पाद)', icon: '🛍️', children: [ 

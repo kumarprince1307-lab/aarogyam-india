@@ -799,36 +799,49 @@
           flex-direction: column !important;
           justify-content: space-between !important;
           background: #ffffff !important;
-          border-radius: 16px !important;
+          border-radius: 18px !important;
           border: 1.5px solid #e2e8f0 !important;
-          padding: 16px !important;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.04) !important;
+          padding: 18px 16px !important;
+          box-shadow: 0 8px 24px rgba(15,23,42,0.06), 0 2px 6px rgba(15,23,42,0.04) !important;
           box-sizing: border-box !important;
           width: 100% !important;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          position: relative !important;
+        }
+        .cms-product-card:hover {
+          transform: translateY(-4px) scale(1.01) !important;
+          box-shadow: 0 16px 36px rgba(15,23,42,0.11), 0 4px 12px rgba(15,23,42,0.06) !important;
+          border-color: #cbd5e1 !important;
         }
         .cms-product-img-wrap {
           width: 100% !important;
-          height: 200px !important;
-          max-height: 220px !important;
-          border-radius: 12px !important;
+          height: 210px !important;
+          max-height: 230px !important;
+          border-radius: 14px !important;
           overflow: hidden !important;
-          margin-bottom: 12px !important;
-          background: #f8fafc !important;
+          margin-bottom: 14px !important;
+          background: radial-gradient(circle at center, #ffffff 40%, #f8fafc 100%) !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          padding: 10px !important;
+          padding: 12px !important;
           box-sizing: border-box !important;
-          border: 1px solid #f1f5f9 !important;
+          border: 1px solid #edf2f7 !important;
+          position: relative !important;
         }
         .cms-product-img-wrap img {
           width: auto !important;
           max-width: 100% !important;
           height: auto !important;
-          max-height: 180px !important;
+          max-height: 190px !important;
           object-fit: contain !important;
           display: block !important;
           margin: 0 auto !important;
+          filter: drop-shadow(0 6px 12px rgba(0,0,0,0.08)) !important;
+          transition: transform 0.3s ease !important;
+        }
+        .cms-product-card:hover .cms-product-img-wrap img {
+          transform: scale(1.05) !important;
         }
       `;
       document.head.appendChild(st);
@@ -871,8 +884,8 @@
             <h4 style="font-size:0.95rem; font-weight:900; color:#0f172a; margin:0 0 6px 0; line-height:1.35;">${escapeHtml(name)}</h4>
             ${desc ? `<p style="font-size:0.78rem; color:#64748b; line-height:1.45; margin-bottom:10px;">${escapeHtml(desc)}</p>` : ''}
           </div>
-          <button type="button" class="product-order-toggle-btn" style="width:100%;background:${primaryColor};color:#fff;border:none;padding:10px;border-radius:10px;font-weight:800;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;" onclick="window.toggleProductSelection ? window.toggleProductSelection(this, '${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}) : (window.toggleProductOrder && window.toggleProductOrder('${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}, ${mrp}, this))">
-            <i class="fa-solid fa-cart-plus"></i> ऑर्डर जोड़ें
+          <button type="button" class="product-order-toggle-btn" style="width:100%;background:linear-gradient(135deg, ${primaryColor} 0%, #047857 100%);color:#fff;border:none;padding:11px 16px;border-radius:12px;font-weight:900;font-size:0.86rem;letter-spacing:0.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;box-shadow:0 4px 14px rgba(16,185,129,0.25);transition:all 0.2s ease;" onclick="window.toggleProductSelection ? window.toggleProductSelection(this, '${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}, '${escapeHtml(rawImg || '')}') : (window.toggleProductOrder && window.toggleProductOrder('${escapeHtml(id)}', '${escapeHtml(name)}', ${offerPrice || mrp}, ${mrp}, this))">
+            <i class="fa-solid fa-cart-plus" style="font-size:0.95rem;"></i> <span>ऑर्डर में जोड़ें</span>
           </button>
         </div>
       `;

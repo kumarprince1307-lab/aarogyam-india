@@ -1,6 +1,6 @@
 /* Aarogyam India Admin - Isolated Service Worker (V55) */
 
-const CACHE_NAME = 'aarogyam-admin-shell-v74';
+const CACHE_NAME = 'aarogyam-admin-shell-v75';
 
 const OFFLINE_FALLBACK = '/admin/offline.html';
 
