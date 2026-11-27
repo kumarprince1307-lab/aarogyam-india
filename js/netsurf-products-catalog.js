@@ -21,7 +21,7 @@
   let masterCategories = [];
   let masterI18n = null;
   let currentSiteLang = 'hi';
-  try { localStorage.removeItem('aim_catalog_lang'); } catch (e) {}
+  try { localStorage.removeItem('aim_catalog_lang'); } catch (e) { }
 
   let masterCatalogSettings = {
     cover_badge: "🌿 100% प्राकृतिक व वैज्ञानिक बायो-टेक्नोलॉजी उत्पाद",
@@ -348,7 +348,7 @@
         clean_more: "🏡 క్లీన్ & మోర్ (Clean & More)"
       }
     },
-        pa: {
+    pa: {
       coverBadge: "🌿 100% ਕੁਦਰਤੀ ਅਤੇ ਵਿਗਿਆਨਕ ਬਾਇਓ-ਤਕਨਾਲੋਜੀ ਉਤਪਾਦ",
       title: "ਸੰਪੂਰਨ ਨੈੱਟਸਰਫ ਉਤਪਾਦ ਕੈਟਾਲਾਗ 2026",
       subtitle: "ਸਿਹਤ, ਜੈਵਿਕ ਖੇਤੀਬਾੜੀ, ਪਸ਼ੂ ਪੋਸ਼ਣ, ਚਮੜੀ-ਵਾਲਾਂ ਦੀ ਦੇਖਭਾਲ ਅਤੇ ਈਕੋ ਹੋਮ ਕੇਅਰ",
@@ -583,7 +583,7 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (!loggedInProfile) {
@@ -639,18 +639,18 @@
           const data = await res.json();
           if (data && data.products) {
             masterI18n = data;
-            try { localStorage.setItem('aim_netsurf_products_i18n', JSON.stringify(data)); } catch (e) {}
+            try { localStorage.setItem('aim_netsurf_products_i18n', JSON.stringify(data)); } catch (e) { }
             break;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (!masterI18n) {
       try {
         const cached = localStorage.getItem('aim_netsurf_products_i18n');
         if (cached) masterI18n = JSON.parse(cached);
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
@@ -676,12 +676,12 @@
             if (data.catalog_settings) {
               masterCatalogSettings = { ...masterCatalogSettings, ...data.catalog_settings };
             }
-            try { localStorage.setItem('aim_netsurf_products_master', JSON.stringify(data)); } catch (e) {}
+            try { localStorage.setItem('aim_netsurf_products_master', JSON.stringify(data)); } catch (e) { }
             loaded = true;
             break;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (!loaded) {
@@ -697,7 +697,7 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     syncTopKpis();
@@ -980,7 +980,7 @@
   // Website Language: Permanently Locked to Pure Hindi
   window.changeSiteLanguage = function () {
     currentSiteLang = 'hi';
-    try { localStorage.removeItem('aim_catalog_lang'); } catch (e) {}
+    try { localStorage.removeItem('aim_catalog_lang'); } catch (e) { }
     syncTopKpis();
     renderShelves();
   };
@@ -1191,13 +1191,13 @@
       localStorage.setItem('aarogyam_user_registered', 'true');
 
       let existingSession = {};
-      try { existingSession = JSON.parse(localStorage.getItem('AI_SESSION') || '{}'); } catch(err) {}
+      try { existingSession = JSON.parse(localStorage.getItem('AI_SESSION') || '{}'); } catch (err) { }
       existingSession.user_id = userObj.id;
       existingSession.mobile = phone;
       existingSession.full_name = name;
       existingSession.referral_share_id = currentSponsor.shareId || 'AI000004';
       localStorage.setItem('AI_SESSION', JSON.stringify(existingSession));
-    } catch(err) {
+    } catch (err) {
       console.warn('Local session write notice:', err);
     }
 
@@ -1211,9 +1211,9 @@
           referral_code: currentSponsor.shareId || 'AI000004',
           referral_mobile: currentSponsor.phone,
           registration_source: 'NetsurfCatalog'
-        }]).then(() => {}).catch(() => {});
+        }]).then(() => { }).catch(() => { });
       }
-    } catch(err) {}
+    } catch (err) { }
 
     currentSponsor.name = name;
     currentSponsor.phone = phone;
@@ -1252,7 +1252,7 @@
         title: 'सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग 2026',
         text: shareText,
         url: shareUrl
-      }).catch(() => {});
+      }).catch(() => { });
     } else {
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
     }
@@ -1290,7 +1290,7 @@
   // 7. Ultra High-Definition Personalized PDF Catalog Generator (Photoshop Graphic-Designer Quality)
   // Strict 3-Color Palette: Royal Navy Blue (#0c2340), Dark Red (#b91c1c), Bold Jet Black (#0a0f1d) on Glossy Light Blue (#edf5fc) Canvas.
   // 2-Column Grid (6 Products Per Page) + Product Philosophy & Complete Compensation Business Plan (Retail, Binary, Generation Table).
-  
+
   // 100% Pure Multilingual Plan Pages Dictionary (Page 9: Philosophy & Page 10: Compensation Plan)
   const I18N_PLAN_PAGES = {
     hi: {
@@ -1785,7 +1785,7 @@
       const imgSrc = (p.image && !p.image.includes('logo.png')) ? (p.image.startsWith('http') ? p.image : 'https://aarogyamindia.online' + p.image) : 'https://aarogyamindia.online/images/logo/logo.png';
       const multi = getProductMultilingualData(p, langKey);
       const packTranslated = translatePackSize(p.pack_size, langKey);
-      
+
       // Clean, short brand tag with distinctive styling
       const shortBrandTag = ({
         agri: '🌿 Biofit Agriculture',
@@ -1802,37 +1802,37 @@
       const doseLen = (multi.dose || '').length;
       const totalChars = nameLen + descLen + ingLen + doseLen;
 
-      let titleFont = '13.6px';
-      let titleLh = '1.22';
-      let descFont = '10.2px';
-      let descLh = '1.30';
-      let boxFont = '9.5px';
-      let boxLh = '1.26';
+      let titleFont = '15.5px';
+      let titleLh = '1.24';
+      let descFont = '11.5px';
+      let descLh = '1.34';
+      let boxFont = '10.5px';
+      let boxLh = '1.30';
       let showTrustStrip = true;
 
       if (totalChars < 160) {
-        titleFont = '14.2px';
-        titleLh = '1.24';
-        descFont = '10.6px';
-        descLh = '1.34';
-        boxFont = '9.8px';
-        boxLh = '1.28';
+        titleFont = '16.0px';
+        titleLh = '1.26';
+        descFont = '12.0px';
+        descLh = '1.36';
+        boxFont = '11.0px';
+        boxLh = '1.32';
         showTrustStrip = true;
       } else if (totalChars <= 270) {
-        titleFont = '13.2px';
-        titleLh = '1.20';
-        descFont = '10.0px';
-        descLh = '1.28';
-        boxFont = '9.3px';
-        boxLh = '1.24';
+        titleFont = '15.0px';
+        titleLh = '1.22';
+        descFont = '11.2px';
+        descLh = '1.30';
+        boxFont = '10.2px';
+        boxLh = '1.26';
         showTrustStrip = true;
       } else {
-        titleFont = '12.4px';
-        titleLh = '1.18';
-        descFont = '9.4px';
-        descLh = '1.22';
-        boxFont = '8.8px';
-        boxLh = '1.20';
+        titleFont = '13.8px';
+        titleLh = '1.20';
+        descFont = '10.5px';
+        descLh = '1.24';
+        boxFont = '9.6px';
+        boxLh = '1.22';
         showTrustStrip = totalChars < 360; // Auto-hide trust strip for dense products to prevent overflow
       }
 
@@ -1841,7 +1841,7 @@
           <!-- Top Card Strip: Category Badge & Pack Size -->
           <div class="pdf-card-top-strip">
             <span class="pdf-cat-chip-grid">${escapeHtml(shortBrandTag)}</span>
-            <div style="display:flex; align-items:center; gap:4px;">
+            <div style="display:flex; align-items:center; gap:5px;">
               ${packTranslated ? `<span class="pdf-pack-chip-grid">📦 ${escapeHtml(packTranslated)}</span>` : ''}
               ${discountPct > 0 ? `<span class="pdf-discount-badge-grid">${discountPct}% ${escapeHtml(i18n.discountBadge || 'छूट')}</span>` : ''}
             </div>
@@ -1857,7 +1857,7 @@
               <div class="pdf-price-box-grid">
                 <span class="pdf-offer-price-grid">₹${offerPrice}</span>
                 ${mrp > offerPrice ? `
-                  <div style="display:flex; align-items:center; justify-content:center; gap:3px; margin-top:1px;">
+                  <div style="display:flex; align-items:center; justify-content:center; gap:4px; margin-top:2px;">
                     <span class="pdf-mrp-cross-grid">MRP ₹${mrp}</span>
                   </div>
                 ` : ''}
@@ -1878,13 +1878,13 @@
 
               ${multi.ingredients ? `
                 <div class="pdf-card-box-grid" style="font-size:${boxFont}; line-height:${boxLh};">
-                  <strong style="color:#15803d; font-weight:800;">${escapeHtml(i18n.ingLabel)}</strong> ${escapeHtml(multi.ingredients)}
+                  <strong style="color:#15803d; font-weight:900;">${escapeHtml(i18n.ingLabel)}</strong> ${escapeHtml(multi.ingredients)}
                 </div>
               ` : ''}
 
               ${multi.dose ? `
                 <div class="pdf-card-box-grid dose" style="font-size:${boxFont}; line-height:${boxLh};">
-                  <strong style="color:#b45309; font-weight:800;">${escapeHtml(i18n.doseLabel)}</strong> ${escapeHtml(multi.dose)}
+                  <strong style="color:#b45309; font-weight:900;">${escapeHtml(i18n.doseLabel)}</strong> ${escapeHtml(multi.dose)}
                 </div>
               ` : ''}
 
@@ -1903,23 +1903,23 @@
     // Corporate feature filler card to balance the 6-slot grid on the final product page
     function renderPdfQualityGuaranteeFiller(title, icon, desc) {
       return `
-        <div class="pdf-product-card-grid" style="border: 1.5px solid #0c2340; background: #f8fbfe;">
+        <div class="pdf-product-card-grid" style="border: 2px solid #0c2340; background: #f8fbfe;">
           <div class="pdf-card-top-strip">
             <span class="pdf-cat-chip-grid" style="background:#0c2340;">✓ आधिकारिक नेटसर्फ गारंटी</span>
-            <span class="pdf-pack-chip-grid" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;">100% प्रामाणिक</span>
+            <span class="pdf-pack-chip-grid" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca; font-weight:900;">100% प्रामाणिक</span>
           </div>
           <div class="pdf-card-main-body" style="align-items:center;">
             <div class="pdf-card-left-grid" style="justify-content: center; align-items: center; border-right: 1.5px dashed #cbdfe9;">
-              <div style="width: 68px; height: 68px; border-radius: 50%; background: #0c2340; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 3px 8px rgba(12,35,64,0.12);">
+              <div style="width: 76px; height: 76px; border-radius: 50%; background: #0c2340; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 10px rgba(12,35,64,0.15);">
                 ${icon}
               </div>
             </div>
-            <div class="pdf-card-right-grid" style="justify-content: center; gap: 4px;">
-              <h4 class="pdf-product-title-grid" style="color: #0c2340; font-size: 13.5px;">${title}</h4>
-              <div class="pdf-card-desc-grid" style="color: #334155; font-size: 10px; line-height: 1.35;">
+            <div class="pdf-card-right-grid" style="justify-content: center; gap: 5px;">
+              <h4 class="pdf-product-title-grid" style="color: #0c2340; font-size: 15px;">${title}</h4>
+              <div class="pdf-card-desc-grid" style="color: #334155; font-size: 11px; line-height: 1.4;">
                 ${desc}
               </div>
-              <div style="background: #ffffff; border: 1px solid #cbdfe9; border-radius: 6px; padding: 3px 7px; font-size: 9.2px; color: #0c2340; font-weight: 800; margin-top: 2px;">
+              <div style="background: #ffffff; border: 1.5px solid #cbdfe9; border-radius: 7px; padding: 5px 10px; font-size: 11px; color: #0c2340; font-weight: 900; margin-top: 3px;">
                 📞 WhatsApp परामर्श: +91 ${escapeHtml(distPhone)}
               </div>
             </div>
@@ -2051,33 +2051,33 @@
             border-left: 5px solid #b91c1c;
           }
 
-          /* 2-Column Grid: 6 Products Per Page (2 cols x 3 rows) - Fixed 75mm Shelf Slots */
+          /* 2-Column Grid: 6 Products Per Page (2 cols x 3 rows) - Canva-Quality Architecture */
           .pdf-grid-6 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: repeat(3, 73.5mm);
-            gap: 2.5mm 3.5mm;
-            height: 226mm;
-            max-height: 226mm;
+            grid-template-rows: repeat(3, 78mm);
+            gap: 3mm 4mm;
+            height: 240mm;
+            max-height: 240mm;
             overflow: hidden;
             margin: 2px 0 3px 0;
           }
 
-          /* Individual 2-Column Product Shelf Card - Executive Magazine Architecture */
+          /* Individual 2-Column Product Shelf Card - Executive Canva Magazine Architecture */
           .pdf-product-card-grid {
             background: #ffffff;
-            border: 1.2px solid #cbd5e1;
-            border-radius: 9px;
-            padding: 5px 8px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 6px 9px;
             display: flex;
             flex-direction: column;
             gap: 4px;
-            box-shadow: 0 2px 6px rgba(12, 35, 64, 0.05);
+            box-shadow: 0 4px 12px rgba(12, 35, 64, 0.07);
             box-sizing: border-box;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
-            height: 73.5mm;
-            max-height: 73.5mm;
+            height: 78mm;
+            max-height: 78mm;
             overflow: hidden;
           }
 
@@ -2087,13 +2087,13 @@
             justify-content: space-between;
             gap: 6px;
             border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 3px;
+            padding-bottom: 4px;
             flex-shrink: 0;
           }
 
           .pdf-card-main-body {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex: 1;
             min-height: 0;
             overflow: hidden;
@@ -2101,32 +2101,33 @@
           }
 
           .pdf-card-left-grid {
-            width: 88px;
-            min-width: 88px;
-            max-width: 88px;
+            width: 114px;
+            min-width: 114px;
+            max-width: 114px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 4px;
+            gap: 5px;
             flex-shrink: 0;
             border-right: 1.5px dashed #cbdfe9;
-            padding-right: 6px;
+            padding-right: 8px;
           }
 
           .pdf-card-img-box-grid {
-            width: 82px;
-            height: 82px;
+            width: 106px;
+            height: 106px;
             background: #ffffff;
-            border: 1.2px solid #e2e8f0;
-            border-radius: 8px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            padding: 2px;
+            padding: 3px;
             box-sizing: border-box;
             flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
           }
           .pdf-card-img-box-grid img {
             width: 100%;
@@ -2137,34 +2138,33 @@
           .pdf-price-box-grid {
             text-align: center;
             width: 100%;
-            background: #fff8f8;
-            border: 1px solid #fee2e2;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #fff1f2 0%, #fee2e2 100%);
+            border: 1.5px solid #fca5a5;
+            border-radius: 8px;
             padding: 3px 2px;
             box-sizing: border-box;
             flex-shrink: 0;
           }
           .pdf-offer-price-grid {
-            font-size: 19px;
+            font-size: 21px;
             font-weight: 900;
             color: #b91c1c;
             display: block;
             line-height: 1.1;
           }
           .pdf-mrp-cross-grid {
-            font-size: 9.2px;
+            font-size: 10px;
             color: #64748b;
             text-decoration: line-through;
             font-weight: 700;
           }
           .pdf-discount-badge-grid {
-            font-size: 8.5px;
-            font-weight: 800;
-            background: #fee2e2;
-            color: #b91c1c;
-            padding: 0.5px 4px;
-            border-radius: 3px;
-            border: 1px solid #fca5a5;
+            font-size: 9px;
+            font-weight: 900;
+            background: #b91c1c;
+            color: #ffffff;
+            padding: 1.5px 6px;
+            border-radius: 4px;
             display: inline-block;
           }
 
@@ -2174,49 +2174,50 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            gap: 2.5px;
+            gap: 3px;
             overflow: hidden;
+            padding-left: 2px;
           }
           .pdf-product-title-grid {
-            font-size: 13.5px;
+            font-size: 14.8px;
             font-weight: 900;
-            color: #0f172a;
+            color: #0c2340;
             margin: 0;
             line-height: 1.22;
-            letter-spacing: -0.15px;
+            letter-spacing: -0.2px;
           }
           .pdf-cat-chip-grid {
-            font-size: 8.8px;
+            font-size: 9.5px;
             font-weight: 800;
-            padding: 1.5px 6px;
-            border-radius: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
             background: #0c2340;
             color: #ffffff;
             white-space: nowrap;
           }
           .pdf-pack-chip-grid {
-            font-size: 8.8px;
+            font-size: 9.5px;
             font-weight: 800;
-            padding: 1.5px 6px;
-            border-radius: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
             background: #eff6ff;
             color: #1e40af;
             border: 1px solid #bfdbfe;
             white-space: nowrap;
           }
           .pdf-card-desc-grid {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             color: #334155;
-            line-height: 1.32;
+            line-height: 1.34;
             margin: 1px 0 2px 0;
           }
           .pdf-card-box-grid {
             background: #f0fdf4;
-            border-left: 3px solid #16a34a;
-            border-radius: 4px;
-            padding: 2.5px 6px;
-            font-size: 9.4px;
+            border-left: 3.5px solid #16a34a;
+            border-radius: 5px;
+            padding: 3px 8px;
+            font-size: 10.2px;
             line-height: 1.28;
             color: #14532d;
             font-weight: 600;
@@ -2229,19 +2230,19 @@
           .pdf-card-trust-strip {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             flex-wrap: wrap;
             margin-top: auto;
             padding-top: 2px;
           }
           .pdf-trust-pill {
-            font-size: 8.2px;
-            font-weight: 700;
-            color: #0284c7;
+            font-size: 8.8px;
+            font-weight: 800;
+            color: #0369a1;
             background: #f0f9ff;
             border: 1px solid #bae6fd;
-            border-radius: 3px;
-            padding: 1px 5px;
+            border-radius: 4px;
+            padding: 1.5px 6px;
             white-space: nowrap;
           }
 
@@ -2540,23 +2541,23 @@
 
           <!-- ================= 2-COLUMN GRID PRODUCT PAGES (6 Products Per Page) ================= -->
           ${productPages.map((pageProds, pageIdx) => {
-            const catsOnPage = [...new Set(pageProds.map(p => getTranslatedCategory(p.category, langKey)))];
-            const fillerCount = 6 - pageProds.length;
-            const fillers = [];
+      const catsOnPage = [...new Set(pageProds.map(p => getTranslatedCategory(p.category, langKey)))];
+      const fillerCount = 6 - pageProds.length;
+      const fillers = [];
 
-            if (fillerCount > 0) {
-              const fillerData = [
-                { title: 'DSIR शोध व गुणवत्ता', icon: '🔬', desc: 'भारत सरकार मान्यता प्राप्त इन-हाउस R&D केंद्र द्वारा 100% बायो-टेक्नोलॉजी आधारित प्रामाणिक फॉर्मूलेशन।' },
-                { title: 'घर-घर सुरक्षित डिलीवरी', icon: '🚚', desc: 'सीधे कंपनी से मूल सील-पैक उत्पाद सुरक्षित होम डिलीवरी व संपूर्ण सलाहकार मार्गदर्शन के साथ उपलब्ध।' },
-                { title: '24×7 कस्टमर सपोर्ट', icon: '📞', desc: 'उत्पाद खुराक, फसल सुरक्षा या पशु पोषण सलाह हेतु सीधे हमारे अधिकृत केंद्र से संपर्क करें।' }
-              ];
-              for (let f = 0; f < fillerCount; f++) {
-                const item = fillerData[f % fillerData.length];
-                fillers.push(renderPdfQualityGuaranteeFiller(item.title, item.icon, item.desc));
-              }
-            }
+      if (fillerCount > 0) {
+        const fillerData = [
+          { title: 'DSIR शोध व गुणवत्ता', icon: '🔬', desc: 'भारत सरकार मान्यता प्राप्त इन-हाउस R&D केंद्र द्वारा 100% बायो-टेक्नोलॉजी आधारित प्रामाणिक फॉर्मूलेशन।' },
+          { title: 'घर-घर सुरक्षित डिलीवरी', icon: '🚚', desc: 'सीधे कंपनी से मूल सील-पैक उत्पाद सुरक्षित होम डिलीवरी व संपूर्ण सलाहकार मार्गदर्शन के साथ उपलब्ध।' },
+          { title: '24×7 कस्टमर सपोर्ट', icon: '📞', desc: 'उत्पाद खुराक, फसल सुरक्षा या पशु पोषण सलाह हेतु सीधे हमारे अधिकृत केंद्र से संपर्क करें।' }
+        ];
+        for (let f = 0; f < fillerCount; f++) {
+          const item = fillerData[f % fillerData.length];
+          fillers.push(renderPdfQualityGuaranteeFiller(item.title, item.icon, item.desc));
+        }
+      }
 
-            return `
+      return `
               <div class="page-break pdf-page-wrap">
 
                 <!-- Running Header -->
@@ -2569,9 +2570,9 @@
                     </div>
                   </div>
 
-                  <div style="text-align: center; font-size: 9.5px; color: #0a0f1d;">
-                    <span>${escapeHtml(i18n.presentedByHeader)} <strong style="color: #0c2340;">${escapeHtml(distName)}</strong></span>
-                    <span style="display: block; font-size: 9.5px; color: #b91c1c; font-weight: 800;">📞 WhatsApp: +91 ${escapeHtml(distPhone)}</span>
+                  <div style="text-align: center; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 9px; padding: 3px 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                    <span style="font-size: 10px; color: #475569;">${escapeHtml(i18n.presentedByHeader)} <strong style="color: #0c2340; font-size: 11.5px;">${escapeHtml(distName)}</strong></span>
+                    <span style="display: block; font-size: 14px; color: #15803d; font-weight: 900; letter-spacing: 0.4px;">📞 WhatsApp / कॉल: +91 ${escapeHtml(distPhone)}</span>
                   </div>
 
                   <div style="display: flex; align-items: center; gap: 6px;">
@@ -2601,14 +2602,14 @@
                 </div>
 
                 <!-- Running Footer -->
-                <div class="running-footer">
+                <div class="running-footer" style="font-size: 10.5px; font-weight: 800; border-top: 2px solid #0c2340; padding-top: 5px;">
                   <span>📄 ${i18n.pageLabel || 'पृष्ठ'} ${pageIdx + 2} / ${totalPages}</span>
-                  <span>🛡️ ${i18n.genuineFooter}</span>
-                  <span>${i18n.helplineFooter}</span>
+                  <span style="color: #0c2340; font-weight: 800;">🛡️ ${i18n.genuineFooter}</span>
+                  <span style="font-size: 12.5px; font-weight: 900; color: #b91c1c;">📞 24x7 हेल्पलाइन: +91 ${escapeHtml(distPhone)}</span>
                 </div>
               </div>
             `;
-          }).join('')}
+    }).join('')}
 
           <!-- ================= PAGE A: PRODUCT PHILOSOPHY, R&D & ZERO EGRESS FAMILY PROTECTION (PAGE 9) ================= -->
           <div class="page-break pdf-page-wrap">
@@ -2867,7 +2868,7 @@
       if (!printDoc) {
         window.location.href = blobUrl;
       }
-    } catch(err) {
+    } catch (err) {
       const printDoc = window.open('', '_blank');
       if (printDoc) {
         printDoc.document.open();
@@ -2895,7 +2896,7 @@
         if ('speechSynthesis' in window && !window.speechSynthesis.speaking) {
           window.toggleAudioTutorial(true);
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 1500);
   });
 
