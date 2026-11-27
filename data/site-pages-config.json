@@ -6657,19 +6657,7 @@
       "og_title": "सम्पूर्ण नेटसर्फ उत्पाद कैटलॉग (All Netsurf Products) | Aarogyam India",
       "og_description": "कृषि, पशु पोषण, स्वास्थ्य व पर्सनल केयर के सभी 39+ ऑर्गेनिक प्रोडक्ट्स। 7 भाषाओं में पर्सनलाइज्ड PDF कैटलॉग डाउनलोड करें।",
       "og_image": "/images/banners/og_image-netsurf-398382-r3uq.webp",
-      "products": [
-        {
-          "id": "ns_prod_00027",
-          "name": "Pet-Vet Breed 500 GM ",
-          "mrp": 650,
-          "price": 650,
-          "discount_pct": 0,
-          "pack_size": "500 gm",
-          "badge": "✨ New Launch",
-          "description": "पशुओं के पाचन तंत्र को मजबूत कर पेट की गैस, आफरा, दस्त व अपच से तुरंत राहत देता है तथा चारे से पोषण अवशोषण बढ़ाकर दुग्ध उत्पादन व सेहत सुधारता है।",
-          "image": "/images/products/product-------------new-pr-296198-6gyd.webp"
-        }
-      ]
+      "products": []
     },
     {
       "id": "page_health_dental_care",
@@ -8899,17 +8887,6 @@
           "badge": "FCR बूस्टर",
           "image": "/images/products/biofit-pet-vet-cattle.webp",
           "desc": "पाचन क्रिया को सुदृढ़ कर आहार की खपत (FCR) को अनुकूलित करता है और पतली बीट की समस्या रोकता है।"
-        },
-        {
-          "id": "ns_prod_00027",
-          "name": "Pet-Vet Breed 500 GM ",
-          "mrp": 650,
-          "price": 650,
-          "discount_pct": 0,
-          "pack_size": "500 gm",
-          "badge": "✨ New Launch",
-          "description": "पशुओं के पाचन तंत्र को मजबूत कर पेट की गैस, आफरा, दस्त व अपच से तुरंत राहत देता है तथा चारे से पोषण अवशोषण बढ़ाकर दुग्ध उत्पादन व सेहत सुधारता है।",
-          "image": "/images/products/product-------------new-pr-296198-6gyd.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -9364,17 +9341,6 @@
           "badge": "कोट व जॉइंट हेल्थ",
           "image": "/images/products/biofit-pet-vet-cattle.webp",
           "desc": "ओमेगा 3 व 6 फैटी एसिड, कैल्शियम और आवश्यक विटामिन्स जो फर झड़ना रोकते हैं और जोड़ों को मजबूत बनाते हैं।"
-        },
-        {
-          "id": "ns_prod_00027",
-          "name": "Pet-Vet Breed 500 GM ",
-          "mrp": 650,
-          "price": 650,
-          "discount_pct": 0,
-          "pack_size": "500 gm",
-          "badge": "✨ New Launch",
-          "description": "पशुओं के पाचन तंत्र को मजबूत कर पेट की गैस, आफरा, दस्त व अपच से तुरंत राहत देता है तथा चारे से पोषण अवशोषण बढ़ाकर दुग्ध उत्पादन व सेहत सुधारता है।",
-          "image": "/images/products/product-------------new-pr-296198-6gyd.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -9829,17 +9795,6 @@
           "badge": "पाचन सुरक्षा",
           "image": "/images/products/biofit-pet-vet-cattle.webp",
           "desc": "अनाज खाने के बाद होने वाले पेट फूलने (अफरा) और बदहजमी से तुरंत राहत दिलाता है।"
-        },
-        {
-          "id": "ns_prod_00027",
-          "name": "Pet-Vet Breed 500 GM ",
-          "mrp": 650,
-          "price": 650,
-          "discount_pct": 0,
-          "pack_size": "500 gm",
-          "badge": "✨ New Launch",
-          "description": "पशुओं के पाचन तंत्र को मजबूत कर पेट की गैस, आफरा, दस्त व अपच से तुरंत राहत देता है तथा चारे से पोषण अवशोषण बढ़ाकर दुग्ध उत्पादन व सेहत सुधारता है।",
-          "image": "/images/products/product-------------new-pr-296198-6gyd.webp"
         }
       ],
       "page_kpi_sections": [],
