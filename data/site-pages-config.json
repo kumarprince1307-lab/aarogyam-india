@@ -1644,6 +1644,17 @@
           "dose": "गाय/भैंस: 10-15 ग्राम प्रतिदिन दाने में मिलाकर दें। 60 से 90 दिन लगातार खिलाएं।",
           "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
           "whatsapp_link": "https://wa.me/917974422572"
+        },
+        {
+          "id": "ns_prod_67574",
+          "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm (कॉपी)",
+          "mrp": 399,
+          "price": 399,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
+          "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
+          "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -5832,6 +5843,17 @@
           "badge": "💧 100% सिलिकॉन स्प्रेडर",
           "description": "सुपर सिलिकॉन स्प्रेडर, स्टीकर व पेनिट्रेटर। दवा को पत्ते के आर-पार फैलाता है और बारिश में धुलने नहीं देता।",
           "image": "/images/products/product------99--biofit-bi-132062-t2y2.webp"
+        },
+        {
+          "id": "ns_prod_67574",
+          "name": "Pet-Vet Advanced Cattle Feed Supplement 500 gm (कॉपी)",
+          "mrp": 399,
+          "price": 399,
+          "discount_pct": 0,
+          "pack_size": "250 ml",
+          "badge": "🥛 प्रीमियम कैटल फीड कंसंट्रेट",
+          "description": "चेलेटेड मिनरल्स, विटामिन्स, प्रीबायोटिक व प्रोबायोटिक्स से भरपूर सम्पूर्ण पशु आहार पूरक।",
+          "image": "/images/products/product-pet-vet-advanced-c-483792-1j3n.webp"
         }
       ],
       "page_kpi_sections": [],
