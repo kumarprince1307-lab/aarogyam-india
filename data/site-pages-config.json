@@ -44,43 +44,9 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [
-        {
-          "icon": "fa-book-open",
-          "title": "120+ रंगीन पेज",
-          "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
-        },
-        {
-          "icon": "fa-bolt",
-          "title": "इंस्टेंट PDF डाउनलोड",
-          "desc": "भुगतान के तुरंत बाद आजीवन एक्सेस"
-        },
-        {
-          "icon": "fa-robot",
-          "title": "24×7 WhatsApp AI डॉक्टर",
-          "desc": "किताब पढ़ते समय तुरंत सवाल पूछें"
-        },
-        {
-          "icon": "fa-shield-halved",
-          "title": "100% सुरक्षित भुगतान",
-          "desc": "UPI, PhonePe, GPay व कार्ड्स"
-        }
-      ],
+      "kpi_cards": [],
       "marketing_cards": [],
-      "videos": [
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो",
-          "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
-          "ratio": "16:9"
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-          "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
-          "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
-          "ratio": "16:9"
-        }
-      ],
+      "videos": [],
       "reviews_heading": "",
       "reviews_badge": "",
       "reviews": [
@@ -411,7 +377,7 @@
       "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": null,
-      "admin_edited": 1795789115244,
+      "admin_edited": 1795789310458,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
@@ -9021,28 +8987,7 @@
           "solution": "7वें दिन F1 लासोटा, 14वें दिन गम्बोरो व 28वें दिन लासोटा बूस्टर वैक्सीनेशन।"
         }
       ],
-      "products": [
-        {
-          "id": "PET_VET_ADVANCED_POULTRY",
-          "name": "Pet-Vet Advanced Nutrition (पोल्ट्री ग्रोथ व इम्युनिटी)",
-          "category": "Livestock",
-          "price": 650,
-          "mrp": 750,
-          "badge": "ग्रोथ प्रमोटर",
-          "image": "/images/products/biofit-pet-vet-cattle.webp",
-          "desc": "चूजों और वयस्क मुर्गियों में रोग प्रतिरोधक क्षमता बढ़ाकर तेजी से वजन और अंडा उत्पादन बढ़ाता है।"
-        },
-        {
-          "id": "PET_VET_DIGEST_POULTRY",
-          "name": "Pet-Vet Digest (पाचन व आंत स्वास्थ्य)",
-          "category": "Livestock",
-          "price": 580,
-          "mrp": 680,
-          "badge": "FCR बूस्टर",
-          "image": "/images/products/biofit-pet-vet-cattle.webp",
-          "desc": "पाचन क्रिया को सुदृढ़ कर आहार की खपत (FCR) को अनुकूलित करता है और पतली बीट की समस्या रोकता है।"
-        }
-      ],
+      "products": [],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🩺 POULTRY DIAGNOSIS & REMEDIES",
@@ -9139,7 +9084,7 @@
           }
         ]
       },
-      "admin_edited": 1795710582947,
+      "admin_edited": 1795789310338,
       "netsurf_plan": null,
       "diet_exercise": null,
       "whatsapp_support": {
