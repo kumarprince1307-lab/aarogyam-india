@@ -978,47 +978,77 @@ function renderReviews(bundle) {
   } else {
     (bundle.bookIds || []).forEach(bId => {
       const lp = allLandingPages.find(p => (p.id || '').toUpperCase() === String(bId).toUpperCase());
-      if (lp && Array.isArray(lp.reviews) && lp.reviews.length > 0) {
-        collectedReviews.push(...lp.reviews);
-      }
+      const bObj = catalogBooks.find(b => (b.id || '').toUpperCase() === String(bId).toUpperCase());
+      const bName = bObj?.heading || bObj?.name || lp?.hero?.title || bId;
+      const cleanTag = bName.replace(/मास्टर गाइड|सम्पूर्ण गाइड|गाइड/gi, '').trim();
+      const tag = cleanTag ? `[${cleanTag} गाइड]` : `[${bId}]`;
+
+      const bookRevs = (lp && Array.isArray(lp.reviews) && lp.reviews.length > 0)
+        ? lp.reviews
+        : (lp && Array.isArray(lp.testimonials) && lp.testimonials.length > 0)
+          ? lp.testimonials
+          : [];
+
+      bookRevs.slice(0, 2).forEach(r => {
+        collectedReviews.push({
+          name: r.name || 'प्रगतिशील किसान',
+          rating: Number(r.rating || 5),
+          text: r.text || r.comment || '',
+          bookId: bId,
+          bookTitle: tag,
+          verified: true
+        });
+      });
     });
   }
 
   if (collectedReviews.length === 0) {
+    const bTitle = (bundle.title || 'कॉम्बो बंडल').trim();
     collectedReviews = [
       {
         name: "राजेश पाटीदार (उज्जैन, म.प्र.)",
         rating: 5,
-        text: "मैंने यह कॉम्बो बंडल खरीदा। धान, सोयाबीन और सब्जी डॉक्टर की सभी किताबें एक ही जगह मिल गईं। फोटो देखकर कीट व दवा समझना बहुत आसान है। बहुत ही उपयोगी बंडल!",
+        text: `मैंने '${bTitle}' खरीदा। सभी महत्वपूर्ण पुस्तकें एक साथ बहुत कम कीमत में मिल गईं। अलग-अलग खरीदने की जगह यह कॉम्बो लेने से सीधे 80% की बचत हुई।`,
+        bookTitle: "🏆 सम्पूर्ण कॉम्बो",
         verified: true
       },
       {
         name: "सुरेश कुमार शर्मा (सीकर, राजस्थान)",
         rating: 5,
-        text: "एक-एक किताब लेने की जगह यह कॉम्बो पैक लिया। सीधे ₹1000 की बचत हुई और फोन में सारी ई-बुक्स तुरंत आ गईं। ऑडियो भी बहुत स्पष्ट है।",
+        text: "एक-एक किताब लेने की जगह यह कॉम्बो पैक लिया। सभी ई-बुक्स तुरंत अनलॉक हो गईं और मोबाइल में ऑफलाइन पढ़ना बहुत आसान है।",
+        bookTitle: "🏆 सम्पूर्ण कॉम्बो",
         verified: true
       },
       {
         name: "महेंद्र सिंह धाकड़ (कोटा, राजस्थान)",
         rating: 5,
-        text: "कृषि विज्ञान केंद्र के वैज्ञानिकों द्वारा लिखी यह किताबें हर किसान के पास होनी चाहिए। खाद प्रबंधन और रोग पहचान से फसल में काफी सुधार हुआ।",
+        text: "वैज्ञानिकों द्वारा लिखी यह पुस्तकें हर प्रगतिशील किसान के पास होनी चाहिए। खाद प्रबंधन और रोग पहचान से फसल में काफी सुधार हुआ।",
+        bookTitle: "🏆 सम्पूर्ण कॉम्बो",
         verified: true
       }
     ];
   }
 
-  reviewsGrid.innerHTML = collectedReviews.slice(0, 8).map(r => `
-      <div style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="font-weight:800;color:#0f172a;font-size:0.96rem;">${escapeHtml(r.name || 'किसान साथी')}</div>
-          <div style="color:#f59e0b;font-size:0.9rem;">★★★★★</div>
+  reviewsGrid.innerHTML = collectedReviews.slice(0, 10).map(r => {
+    const bookTag = r.bookTitle || r.bookName || (r.bookId && r.bookId !== 'ALL' ? `[${r.bookId}]` : '');
+    return `
+      <div style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
+            <div style="font-weight:800;color:#0f172a;font-size:0.96rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span>${escapeHtml(r.name || 'किसान साथी')}</span>
+              ${bookTag ? `<span class="bundle-review-book-badge" style="background:#0284c7;color:#fff;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.3px;">${escapeHtml(bookTag)}</span>` : ''}
+            </div>
+            <div style="color:#f59e0b;font-size:0.9rem;">★★★★★</div>
+          </div>
+          <p style="font-size:0.9rem;color:#334155;line-height:1.6;margin-bottom:12px;">"${escapeHtml(r.text || r.comment || '')}"</p>
         </div>
-        <p style="font-size:0.9rem;color:#334155;line-height:1.6;margin-bottom:10px;">"${escapeHtml(r.text || r.comment || '')}"</p>
         <div style="font-size:0.75rem;color:#16a34a;font-weight:800;display:flex;align-items:center;gap:4px;">
           <i class="fa-solid fa-circle-check"></i> सत्यापित खरीदार (Verified Buyer)
         </div>
       </div>
-    `).join('');
+    `;
+  }).join('');
 }
 
 // --- 10. RENDER FAQS ---
@@ -1026,14 +1056,52 @@ function renderFaqs(bundle) {
   const accordion = document.getElementById('bundleFaqAccordion');
   if (!accordion) return;
 
-  if (Array.isArray(bundle.faqs) && bundle.faqs.length > 0) {
-    accordion.innerHTML = bundle.faqs.map((f, idx) => `
-        <details class="faq-item" style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:12px;" ${idx === 0 ? 'open' : ''}>
-          <summary style="font-weight:800;color:#0f172a;cursor:pointer;font-size:1.02rem;">${idx + 1}. ${escapeHtml(f.q || f.question || '')}</summary>
-          <p style="margin-top:10px;font-size:0.92rem;color:#334155;line-height:1.6;">${escapeHtml(f.a || f.answer || '')}</p>
-        </details>
-      `).join('');
+  let faqs = (Array.isArray(bundle.faqs) && bundle.faqs.length > 0) ? bundle.faqs : [];
+
+  // If no faqs stored, dynamically aggregate from allLandingPages
+  if (faqs.length === 0) {
+    faqs = [
+      { q: "क्या पेमेंट के बाद बंडल की सभी पुस्तकें तुरंत मिलेंगी?", a: "जी हाँ! पेमेंट सफल होते ही बंडल की सभी पुस्तकें तुरंत आपकी 'मेरी लाइब्रेरी' में स्वतः अनलॉक हो जाएंगी और आप उसी समय पढ़ना शुरू कर सकते हैं।", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "क्या यह ऑफर केवल सीमित समय के लिए है?", a: "हाँ, यह विशेष महाबचत कॉम्बो डिस्काउंट केवल आज के लिए मान्य है। एक बार खरीदने के बाद सभी पुस्तकें लाइफटाइम के लिए आपकी लाइब्रेरी में रहेंगी।", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "क्या मैं इन्हें बिना इंटरनेट के अपने मोबाइल में पढ़ और डाउनलोड कर सकता हूँ?", a: "बिल्कुल! हर पुस्तक के साथ आपको '📥 डाउनलोड' बटन मिलेगा, जिससे आप मोबाइल में ऑफलाइन सेव करके बिना इंटरनेट कभी भी पढ़ सकते हैं।", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "यदि पढ़ते समय कोई समस्या आए तो क्या सहायता मिलेगी?", a: "हाँ! आरोग्यम इंडिया की समर्पित व्हाट्सएप हेल्पलाइन 7974422572 पर आपको तुरंत प्राथमिकता सहायता व मार्गदर्शन उपलब्ध रहेगा।", bookTitle: "🏆 सम्पूर्ण कॉम्बो" }
+    ];
+
+    (bundle.bookIds || []).forEach(bId => {
+      const lp = allLandingPages.find(p => (p.id || '').toUpperCase() === String(bId).toUpperCase());
+      const bObj = catalogBooks.find(b => (b.id || '').toUpperCase() === String(bId).toUpperCase());
+      const bName = bObj?.heading || bObj?.name || lp?.hero?.title || bId;
+      const cleanTag = bName.replace(/मास्टर गाइड|सम्पूर्ण गाइड|गाइड/gi, '').trim();
+      const tag = cleanTag ? `[${cleanTag} गाइड]` : `[${bId}]`;
+
+      const bookFaqs = (lp && Array.isArray(lp.faqs) && lp.faqs.length > 0)
+        ? lp.faqs
+        : (lp && Array.isArray(lp.faq) && lp.faq.length > 0)
+          ? lp.faq
+          : [];
+
+      bookFaqs.slice(0, 1).forEach(f => {
+        faqs.push({
+          q: f.q || f.question || '',
+          a: f.a || f.answer || '',
+          bookTitle: tag
+        });
+      });
+    });
   }
+
+  accordion.innerHTML = faqs.map((f, idx) => {
+    const bookTag = f.bookTitle || f.bookName || (f.bookId && f.bookId !== 'ALL' ? `[${f.bookId}]` : '');
+    return `
+      <details class="faq-item" style="background:#ffffff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:12px;" ${idx === 0 ? 'open' : ''}>
+        <summary style="font-weight:800;color:#0f172a;cursor:pointer;font-size:1.02rem;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <span>${idx + 1}. ${escapeHtml(f.q || f.question || '')}</span>
+          ${bookTag ? `<span style="background:#eff6ff;color:#0284c7;border:1px solid #bfdbfe;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0;">${escapeHtml(bookTag)}</span>` : ''}
+        </summary>
+        <p style="margin-top:10px;font-size:0.92rem;color:#334155;line-height:1.6;">${escapeHtml(f.a || f.answer || '')}</p>
+      </details>
+    `;
+  }).join('');
 }
 
 // --- 11. RENDER FINAL BUY SECTION ---

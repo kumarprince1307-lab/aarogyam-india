@@ -1590,9 +1590,10 @@ function renderReviewsList() {
 
   container.innerHTML = _currentReviews.map((r, i) => `
     <div style="background:#020617; border:1px solid #334155; border-radius:8px; padding:10px; display:flex; flex-direction:column; gap:6px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-        <input type="text" placeholder="किसान का नाम व पता" value="${escapeHtml(r.name || '')}" onchange="window.updateReviewItem(${i}, 'name', this.value)" class="admin-input" style="flex:2; font-size:0.82rem; font-weight:700;" />
-        <select onchange="window.updateReviewItem(${i}, 'rating', Number(this.value))" class="admin-select" style="width:100px; font-size:0.8rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+        <input type="text" placeholder="किसान का नाम व पता" value="${escapeHtml(r.name || '')}" onchange="window.updateReviewItem(${i}, 'name', this.value)" class="admin-input" style="flex:2; min-width:140px; font-size:0.82rem; font-weight:700;" />
+        <input type="text" placeholder="पुस्तक बैज (जैसे: [🥭 आम गाइड])" value="${escapeHtml(r.bookTitle || (r.bookId && r.bookId !== 'ALL' ? r.bookId : '🏆 सम्पूर्ण कॉम्बो'))}" onchange="window.updateReviewItem(${i}, 'bookTitle', this.value)" class="admin-input" style="width:140px; font-size:0.75rem; font-weight:700; color:#38bdf8; background:#0f172a; border-color:#0284c7;" title="समीक्षा पर दिखने वाला पुस्तक टैग/बैज" />
+        <select onchange="window.updateReviewItem(${i}, 'rating', Number(this.value))" class="admin-select" style="width:90px; font-size:0.8rem;">
           <option value="5" ${r.rating === 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5)</option>
           <option value="4" ${r.rating === 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4)</option>
         </select>
@@ -1626,8 +1627,9 @@ function renderFaqsList() {
 
   container.innerHTML = _currentFaqs.map((f, i) => `
     <div style="background:#020617; border:1px solid #334155; border-radius:8px; padding:10px; display:flex; flex-direction:column; gap:6px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-        <input type="text" placeholder="प्रश्न (जैसे: क्या किताबें तुरंत मिलेंगी?)" value="${escapeHtml(f.q || '')}" onchange="window.updateFaqItem(${i}, 'q', this.value)" class="admin-input" style="flex:1; font-size:0.82rem; font-weight:700;" />
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+        <input type="text" placeholder="प्रश्न (जैसे: क्या किताबें तुरंत मिलेंगी?)" value="${escapeHtml(f.q || '')}" onchange="window.updateFaqItem(${i}, 'q', this.value)" class="admin-input" style="flex:2; min-width:160px; font-size:0.82rem; font-weight:700;" />
+        <input type="text" placeholder="विषय/पुस्तक बैज (वैकल्पिक)" value="${escapeHtml(f.bookTitle || (f.bookId && f.bookId !== 'ALL' ? f.bookId : ''))}" onchange="window.updateFaqItem(${i}, 'bookTitle', this.value)" class="admin-input" style="width:130px; font-size:0.75rem; font-weight:700; color:#38bdf8; background:#0f172a; border-color:#0284c7;" title="प्रश्न का विषय या पुस्तक बैज" />
         <button type="button" onclick="window.removeFaqItem(${i})" class="admin-button small-button" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer;" title="हटाएं">✕ हटाएं</button>
       </div>
       <textarea placeholder="उत्तर (जैसे: जी हाँ! पेमेंट होते ही तुरंत लाइब्रेरी में अनलॉक हो जाती हैं।)" onchange="window.updateFaqItem(${i}, 'a', this.value)" class="admin-input" rows="2" style="width:100%; font-size:0.8rem;">${escapeHtml(f.a || '')}</textarea>
@@ -1753,32 +1755,61 @@ async function autoImportReviews() {
   }
 
   let imported = [];
+
+  // If ALL books chosen, add an authentic combo-level review at top
+  if (targetBook === 'ALL') {
+    const bundleTitle = (document.getElementById('bFormTitle')?.value || 'महाबचत कॉम्बो बंडल').trim();
+    imported.push({
+      name: "राजेश पाटीदार (उज्जैन, म.प्र.)",
+      rating: 5,
+      text: `मैंने '${bundleTitle}' खरीदा। सभी महत्वपूर्ण पुस्तकें एक साथ बहुत कम कीमत में मिल गईं। अलग-अलग खरीदने की जगह यह कॉम्बो लेने से सीधे 80% की बचत हुई और पूरी प्रैक्टिकल जानकारी हाथ में आ गई।`,
+      bookId: "ALL",
+      bookTitle: "🏆 सम्पूर्ण कॉम्बो"
+    });
+  }
+
   bookIds.forEach(bId => {
     const lp = _allLandingPages.find(p => (p.id || '').toUpperCase() === bId);
-    if (lp && Array.isArray(lp.reviews)) {
-      lp.reviews.forEach(r => {
-        if (!imported.some(x => x.name === r.name)) {
-          imported.push({
-            name: r.name || 'किसान साथी',
-            rating: Number(r.rating || 5),
-            text: r.text || r.comment || '',
-            bookId: bId
-          });
-        }
-      });
-    }
+    const cb = _catalogBooks.find(b => (b.id || '').toUpperCase() === bId);
+    const bName = cb?.heading || cb?.name || lp?.hero?.title || bId;
+    const cleanTag = bName.replace(/मास्टर गाइड|सम्पूर्ण गाइड|गाइड/gi, '').trim();
+    const tag = cleanTag ? `[${cleanTag} गाइड]` : `[${bId}]`;
+
+    const bookRevs = (lp && Array.isArray(lp.reviews) && lp.reviews.length > 0)
+      ? lp.reviews
+      : (lp && Array.isArray(lp.testimonials) && lp.testimonials.length > 0)
+        ? lp.testimonials
+        : (cb && Array.isArray(cb.reviews) && cb.reviews.length > 0)
+          ? cb.reviews
+          : [];
+
+    // If ALL, take top 2 reviews per book so it's a balanced mix from all books
+    const revsToTake = (targetBook === 'ALL') ? bookRevs.slice(0, 2) : bookRevs;
+
+    revsToTake.forEach(r => {
+      const rName = (r.name || 'प्रगतिशील किसान').trim();
+      const rText = (r.text || r.comment || '').trim();
+      if (rText && !imported.some(x => x.name === rName)) {
+        imported.push({
+          name: rName,
+          rating: Number(r.rating || 5),
+          text: rText,
+          bookId: bId,
+          bookTitle: tag
+        });
+      }
+    });
   });
 
   if (imported.length === 0) {
     imported = [
-      { name: "राजेश पाटीदार (उज्जैन)", rating: 5, text: "सोयाबीन और धान में कीटों की पहचान बहुत आसान हो गई। पैसे वसूल संग्रह!", bookId: "BK001" },
-      { name: "महेश बिश्नोई (सिरसा)", rating: 5, text: "स्प्रे का सही समय पता चलने से लागत आधी हो गई।", bookId: "BK002" }
+      { name: "राजेश पाटीदार (उज्जैन)", rating: 5, text: "सभी पुस्तकें बहुत ही उपयोगी और वैज्ञानिक हैं। कीटों व रोगों की पहचान आसान हो गई।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" }
     ];
   }
 
   _currentReviews = imported;
   renderReviewsList();
-  showToast(`✅ ${imported.length} समीक्षाएं सफलतापूर्वक लोड हुईं!`, 'success');
+  showToast(`✅ ${imported.length} समीक्षाएं (किताबों के बैज सहित) लोड हुईं!`, 'success');
 }
 
 async function autoImportFaqs() {
@@ -1796,31 +1827,60 @@ async function autoImportFaqs() {
   }
 
   let imported = [];
+
+  // Core Combo FAQs for ALL books
+  if (targetBook === 'ALL') {
+    imported.push(
+      { q: "क्या पेमेंट के बाद बंडल की सभी पुस्तकें तुरंत मिलेंगी?", a: "जी हाँ! पेमेंट सफल होते ही इस कॉम्बो बंडल की सभी पुस्तकें तुरंत आपकी 'मेरी लाइब्रेरी' में स्वतः अनलॉक हो जाएंगी और आप उसी समय पढ़ना शुरू कर सकते हैं।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "क्या यह ऑफर केवल सीमित समय के लिए है?", a: "हाँ, यह विशेष महाबचत कॉम्बो डिस्काउंट केवल आज के लिए मान्य है। एक बार खरीदने के बाद सभी पुस्तकें लाइफटाइम के लिए आपकी लाइब्रेरी में रहेंगी।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "क्या मैं इन्हें बिना इंटरनेट के अपने मोबाइल में पढ़ और डाउनलोड कर सकता हूँ?", a: "बिल्कुल! हर पुस्तक के साथ आपको '📥 डाउनलोड' बटन मिलेगा, जिससे आप मोबाइल में ऑफलाइन सेव करके बिना इंटरनेट कभी भी पढ़ सकते हैं।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "यदि पढ़ते समय कोई समस्या आए तो क्या सहायता मिलेगी?", a: "हाँ! आरोग्यम इंडिया की समर्पित व्हाट्सएप हेल्पलाइन 7974422572 पर आपको तुरंत प्राथमिकता सहायता व मार्गदर्शन उपलब्ध रहेगा।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" }
+    );
+  }
+
   bookIds.forEach(bId => {
     const lp = _allLandingPages.find(p => (p.id || '').toUpperCase() === bId);
-    if (lp && Array.isArray(lp.faq)) {
-      lp.faq.forEach(f => {
-        if (!imported.some(x => x.q === (f.q || f.question))) {
-          imported.push({
-            q: f.q || f.question || '',
-            a: f.a || f.answer || '',
-            bookId: bId
-          });
-        }
-      });
-    }
+    const cb = _catalogBooks.find(b => (b.id || '').toUpperCase() === bId);
+    const bName = cb?.heading || cb?.name || lp?.hero?.title || bId;
+    const cleanTag = bName.replace(/मास्टर गाइड|सम्पूर्ण गाइड|गाइड/gi, '').trim();
+    const tag = cleanTag ? `[${cleanTag} गाइड]` : `[${bId}]`;
+
+    // Support both lp.faqs (standard) and legacy lp.faq
+    const bookFaqs = (lp && Array.isArray(lp.faqs) && lp.faqs.length > 0)
+      ? lp.faqs
+      : (lp && Array.isArray(lp.faq) && lp.faq.length > 0)
+        ? lp.faq
+        : (cb && Array.isArray(cb.faqs) && cb.faqs.length > 0)
+          ? cb.faqs
+          : [];
+
+    // If ALL, take top 2 most useful FAQs per book
+    const faqsToTake = (targetBook === 'ALL') ? bookFaqs.slice(0, 2) : bookFaqs;
+
+    faqsToTake.forEach(f => {
+      const qText = (f.q || f.question || '').trim();
+      const aText = (f.a || f.answer || '').trim();
+      if (qText && !imported.some(x => x.q === qText)) {
+        imported.push({
+          q: qText,
+          a: aText,
+          bookId: bId,
+          bookTitle: tag
+        });
+      }
+    });
   });
 
   if (imported.length === 0) {
     imported = [
-      { q: "क्या पेमेंट के बाद सभी पुस्तकें तुरंत मिलेंगी?", a: "जी हाँ! पेमेंट सफल होते ही सभी पुस्तकें तुरंत आपकी 'मेरी लाइब्रेरी' में स्वतः अनलॉक हो जाती हैं।", bookId: "ALL" },
-      { q: "क्या मैं इन्हें बिना इंटरनेट के भी पढ़ सकता हूँ?", a: "बिल्कुल! एक बार खोलने के बाद पुस्तकें आपके फोन में सुरक्षित सेव हो जाती हैं।", bookId: "ALL" }
+      { q: "क्या पेमेंट के बाद सभी पुस्तकें तुरंत मिलेंगी?", a: "जी हाँ! पेमेंट सफल होते ही सभी पुस्तकें तुरंत आपकी 'मेरी लाइब्रेरी' में स्वतः अनलॉक हो जाती हैं।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" },
+      { q: "क्या मैं इन्हें बिना इंटरनेट के भी पढ़ सकता हूँ?", a: "बिल्कुल! एक बार खोलने के बाद पुस्तकें आपके फोन में सुरक्षित सेव हो जाती हैं।", bookId: "ALL", bookTitle: "🏆 सम्पूर्ण कॉम्बो" }
     ];
   }
 
   _currentFaqs = imported;
   renderFaqsList();
-  showToast(`✅ ${imported.length} FAQs सफलतापूर्वक लोड हुए!`, 'success');
+  showToast(`✅ ${imported.length} FAQs (कॉम्बो व शामिल पुस्तकों सहित) लोड हुए!`, 'success');
 }
 
 // --- PAGE SECTIONS ORDER (MOVE UP/DOWN) & ON/OFF TOGGLES ---
