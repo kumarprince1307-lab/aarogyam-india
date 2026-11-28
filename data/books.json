@@ -2296,39 +2296,11 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [
-        "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp",
-        "/images/books/BK026/25.webp",
-        "/images/books/BK026/35.webp",
-        "/images/books/BK026/45.webp",
-        "/images/books/BK026/50.webp"
-      ],
-      "demo_images": [
-        "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp",
-        "/images/books/BK026/25.webp",
-        "/images/books/BK026/35.webp",
-        "/images/books/BK026/45.webp",
-        "/images/books/BK026/50.webp"
-      ],
-      "preview_images": [
-        "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp",
-        "/images/books/BK026/25.webp",
-        "/images/books/BK026/35.webp",
-        "/images/books/BK026/45.webp",
-        "/images/books/BK026/50.webp"
-      ],
-      "previewImages": [
-        "/images/books/bk026-preview-1.webp",
-        "/images/books/bk026-preview-2.webp",
-        "/images/books/BK026/25.webp",
-        "/images/books/BK026/35.webp",
-        "/images/books/BK026/45.webp",
-        "/images/books/BK026/50.webp"
-      ],
-      "demoAvailable": true,
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk026-og.webp",
@@ -2348,31 +2320,27 @@
         "highlights": [
           {
             "icon": "🐛",
-            "text": "केले में बंची टॉप, थ्रिप्स और सूंडी का प्रकोप है? प्रमुख कीटों एवं रोगों की पहचान और एकीकृत नियंत्रण समझें।"
-          },
-          {
-            "icon": "🥀",
-            "text": " पौधे में बैक्टीरियल विल्ट यानी मोक़ो का खतरा है? लक्षण, रोग फैलने के कारण और बचाव की जानकारी पाएँ।"
-          },
-          {
-            "icon": "🍂 ",
-            "text": "पत्तियों पर भूरे-काले धब्बे पड़ रहे हैं? सिगाटोका लीफ स्पॉट की पहचान और एकीकृत प्रबंधन सीखें।"
-          },
-          {
-            "icon": "💧",
-            "text": " पानी, खाद और खर्च का सही हिसाब नहीं बन पा रहा? सिंचाई, सहफसली खेती, कटाई, उपज, लागत और मुनाफे की योजना जानें।"
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
           },
           {
             "icon": "🦠",
-            "text": " पनामा विल्ट से पौधे सूख रहे हैं? शुरुआती लक्षण पहचानें और रोग फैलने से बचाव के तरीके जानें।"
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
           },
           {
-            "icon": "🌿 ",
-            "text": "केले के पौधे कमजोर और पत्तियाँ पीली हैं? पोषक तत्वों की कमी पहचानें और संतुलित खाद-पोषण समझें।"
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
           },
           {
-            "icon": "🍌",
-            "text": " घार छोटी या गुच्छे में फल कम हैं? बेहतर घार, फल सेट और वजन बढ़ाने के लिए सही प्रबंधन जानें।"
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
+          },
+          {
+            "icon": "🌱",
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹75 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
@@ -2392,7 +2360,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK026",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-25T05:16:45.227Z",
+      "updated_at": "2026-11-28T09:35:21.989Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
