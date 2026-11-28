@@ -1690,14 +1690,7 @@
       "thumbnail": "/images/books/bk023-cover.webp",
       "banner": "/images/banners/bk022-hero-banner.webp",
       "status": "active",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "download_funnel"
-      ],
+      "publish_targets": [],
       "store_badge": "best_seller",
       "badge": "best_seller",
       "isComingSoon": false,
@@ -1706,41 +1699,18 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [
-        "/images/books/bk023-preview-1.webp",
-        "/images/books/bk023-preview-2.webp",
-        "/images/books/bk023-preview-3.webp",
-        "/images/books/bk023-preview-4.webp",
-        "/images/books/bk023-preview-5.webp"
-      ],
-      "demo_images": [
-        "/images/books/bk023-preview-1.webp",
-        "/images/books/bk023-preview-2.webp",
-        "/images/books/bk023-preview-3.webp",
-        "/images/books/bk023-preview-4.webp",
-        "/images/books/bk023-preview-5.webp"
-      ],
-      "preview_images": [
-        "/images/books/bk023-preview-1.webp",
-        "/images/books/bk023-preview-2.webp",
-        "/images/books/bk023-preview-3.webp",
-        "/images/books/bk023-preview-4.webp",
-        "/images/books/bk023-preview-5.webp"
-      ],
-      "previewImages": [
-        "/images/books/bk023-preview-1.webp",
-        "/images/books/bk023-preview-2.webp",
-        "/images/books/bk023-preview-3.webp",
-        "/images/books/bk023-preview-4.webp",
-        "/images/books/bk023-preview-5.webp"
-      ],
-      "demoAvailable": true,
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk023-og.webp",
       "og_image_landscape": "/images/books/bk023-og.webp",
       "audio_layer": {
         "enabled": true,
+        "autoplay": true,
         "badge_tag": "🍎 अनार की खेती में बेहतर परिणाम चाहते हैं?",
         "main_heading": "सिर्फ 1 मिनट सुनिए और जानिए, अनार की खेती में सही जानकारी आपके लिए कितनी उपयोगी हो सकती है।",
         "main_subtitle": "⚡ अनार की खेती से जुड़ी जरूरी जानकारी, व्यावहारिक मार्गदर्शन और इस किताब की खास सुविधाओं के बारे में सुनिए।",
@@ -1752,28 +1722,28 @@
         "story_text": "नमस्कार किसान भाइयों और बागवान साथियों!\nक्या आपके अनार के बाग में फूल तो आते हैं, लेकिन फल कम बनते हैं?\nक्या छोटे फल गिर जाते हैं? फलों का आकार, रंग और गुणवत्ता आपकी उम्मीद के अनुसार नहीं बन पाती?\nकई बार सही किस्म का चुनाव, बाग की स्थापना, सिंचाई, खाद-पोषण और समय पर कीट-रोग प्रबंधन की जानकारी न होने से किसान को परेशानी होती है।\nइन्हीं जरूरतों को ध्यान में रखते हुए Aarogyam India लेकर आया है —\nअनार की खेती की सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका।\nइस किताब में आप जानेंगे अनार की प्रमुख किस्मों का चयन, बाग लगाने की सही जानकारी, पौधों की देखभाल, फूल और फल प्रबंधन, प्रमुख कीट एवं रोगों की पहचान, तुड़ाई और बाजार तक की जरूरी बातें।\nऔर सबसे खास बात!\nइस किताब के साथ आपको मिलेगा Aarogyam Sakhi का एक साल का बिल्कुल FREE AI Support।\nआप अपनी फसल, पत्तियों, कीट या रोग की फोटो भेजकर जानकारी और संभावित समाधान पूछ सकते हैं। खेती, पशुपालन और स्वास्थ्य से जुड़े सामान्य सवाल भी पूछ सकते हैं।\nतो अगर आप अनार की खेती को बेहतर तरीके से समझना चाहते हैं, तो इस 24 पेज की मार्गदर्शिका को आज ही प्राप्त करें।\nMRP 199 रुपये, लेकिन खास ऑफर में सिर्फ 75 रुपये!\nनीचे दिए गए Buy Now बटन पर क्लिक करें।\nAarogyam India — खेती का ज्ञान, किसान के नाम!",
         "highlights": [
           {
-            "icon": "🌸",
-            "text": "अनार में फूल और फल सेटिंग का सही प्रबंधन"
-          },
-          {
-            "icon": "🍃",
-            "text": "फूल और छोटे फल झड़ने की समस्या को समझें"
-          },
-          {
             "icon": "🐛",
-            "text": "अनार के प्रमुख कीटों की पहचान और प्रबंधन"
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
           },
           {
             "icon": "🦠",
-            "text": "अनार के प्रमुख रोग और उनसे बचाव"
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
           },
           {
-            "icon": "✂️ ",
-            "text": "छँटाई, ट्रेनिंग और पेड़ की सही बनावट"
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
+          },
+          {
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
           },
           {
             "icon": "🌱",
-            "text": "सिंचाई, ड्रिप और जल निकास प्रबंधन"
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹75 में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
@@ -1793,7 +1763,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK023",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-17T16:39:46.158Z",
+      "updated_at": "2026-11-28T04:22:27.062Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
