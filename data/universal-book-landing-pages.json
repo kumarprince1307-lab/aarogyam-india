@@ -6076,7 +6076,7 @@
     },
     {
       "id": "BK026",
-      "updated_at": "2026-11-28T10:59:14.391Z",
+      "updated_at": "2026-11-28T17:16:06.424Z",
       "admin_edited": true,
       "slug": "bk026",
       "book_type": "paid",
@@ -6108,9 +6108,9 @@
       "ads_gateway_enabled": false,
       "sections_order": [
         "sec_hero",
-        "sec_timer",
         "sec_kpis",
         "sec_audio",
+        "sec_timer",
         "sec_trust",
         "sec_why_buy",
         "sec_vip_stack",
@@ -6128,9 +6128,7 @@
         "sec_pdf_free"
       ],
       "hidden_sections": [
-        "sec_vip_stack",
         "sec_video",
-        "sec_suggested",
         "sec_bonuses",
         "sec_help",
         "sec_specs_toc"
