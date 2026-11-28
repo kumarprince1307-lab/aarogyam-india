@@ -8629,7 +8629,7 @@
     },
     {
       "id": "BK028",
-      "updated_at": "2026-11-28T09:30:09.171Z",
+      "updated_at": "2026-11-28T19:09:24.966Z",
       "admin_edited": true,
       "slug": "bk028",
       "book_type": "paid",
@@ -8680,7 +8680,13 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_vip_stack",
+        "sec_video",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_specs_toc"
+      ],
       "section_banners": {
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp"
       },

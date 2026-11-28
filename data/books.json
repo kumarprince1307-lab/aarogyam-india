@@ -2580,12 +2580,19 @@
       "landingPage": "/ebooks/book-landing.html?id=BK028",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-28T09:30:09.172Z",
+      "updated_at": "2026-11-28T19:09:24.967Z",
       "admin_edited": true,
       "title": "पपीते की खेती  MASTER GUIDE",
       "hasWebpPages": true,
       "hasAudioBook": true,
-      "bonuses": []
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     }
   ]
 }
