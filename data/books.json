@@ -2599,17 +2599,7 @@
       "thumbnail": "/images/books/bk028-cover.webp",
       "banner": "/images/banners/bk022-hero-banner.webp",
       "status": "active",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "download_funnel",
-        "free_shelf",
-        "demo_shelf",
-        "coming_soon_shelf"
-      ],
+      "publish_targets": [],
       "store_badge": "best_seller",
       "badge": "best_seller",
       "isComingSoon": false,
@@ -2682,7 +2672,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK028",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-18T18:28:11.678Z",
+      "updated_at": "2026-11-28T02:51:03.350Z",
       "admin_edited": true
     }
   ]
