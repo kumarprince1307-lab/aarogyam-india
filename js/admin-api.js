@@ -1963,8 +1963,8 @@ export async function fetchAvailableBooks() {
         { id: 'BK006', title: 'गेहूं मास्टर गाइड', offerPrice: 99 },
         { id: 'BK007', title: 'जैविक खेती गाइड', offerPrice: 99 },
         { id: 'BK008', title: 'सब्जी खेती गाइड', offerPrice: 99 },
-        { id: 'BK009', title: 'फूल खेती गाइड', offerPrice: 99 },
-        { id: 'BK010', title: 'पॉलीहाउस व नेटहाउस गाइड', offerPrice: 99 },
+        { id: 'BK009', title: 'मक्का मास्टर गाइड', offerPrice: 99 },
+        { id: 'BK011', title: 'पॉलीहाउस व नेटहाउस गाइड', offerPrice: 99 },
         { id: 'BK011', title: 'अनाज भंडारण गाइड', offerPrice: 99 },
         { id: 'BK012', title: 'चावल प्रोसेसिंग गाइड', offerPrice: 99 },
         { id: 'BK013', title: 'AI वेबसाइट निर्माण मास्टर गाइड', offerPrice: 99 }

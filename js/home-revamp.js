@@ -1122,7 +1122,7 @@ if (typeof window !== 'undefined') {
         jsonLp = rL.bookLandingPages || [];
       } catch (e) { }
 
-      const DELETED_BOOK_IDS = new Set(['BK010', 'BK026', 'BK027', 'BK028']);
+      const DELETED_BOOK_IDS = new Set(['BK010']);
       let deletedLpIds = [];
       try {
         deletedLpIds = JSON.parse(localStorage.getItem('AAROGYAM_DELETED_LANDING_PAGES') || '[]');

@@ -43,7 +43,7 @@
     let customLp = [];
     let freeDemoBooks = [];
     let deletedIds = [];
-    const hardcodedDeleted = ['BK010', 'BK026', 'BK027', 'BK028'];
+    const hardcodedDeleted = ['BK010'];
     try {
       customBooks = JSON.parse(localStorage.getItem('AAROGYAM_CUSTOM_BOOKS') || '[]');
       customLp = JSON.parse(localStorage.getItem('AAROGYAM_BOOK_LANDING_PAGES') || '[]');

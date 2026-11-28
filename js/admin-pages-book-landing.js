@@ -187,9 +187,27 @@ export async function initBookLandingPages() {
   // Global Undo History Stack for BLP Builder
   window._blpUndoStack = window._blpUndoStack || [];
 
+  function syncTocPointsFromDOM() {
+    const wrap = document.getElementById('blp_toc_points_list_wrap');
+    if (!wrap) return;
+    const inputs = wrap.querySelectorAll('input.admin-input');
+    if (inputs.length > 0) {
+      const pts = [];
+      inputs.forEach(inp => {
+        const val = (inp.value || '').trim();
+        if (val) pts.push(val);
+      });
+      if (pts.length > 0) currentTocPoints = pts;
+    }
+  }
+
   // Modular Single Segment Save Handler for Instant Editing (e.g. Gehu, Chana, etc.)
   window.saveBlpSpecificSegment = async function (segmentName) {
     console.log('[Book Landing] Saving individual segment:', segmentName);
+    if (typeof syncReviewsFromDOM === 'function') syncReviewsFromDOM();
+    if (typeof syncFaqsFromDOM === 'function') syncFaqsFromDOM();
+    if (typeof syncTocPointsFromDOM === 'function') syncTocPointsFromDOM();
+
     const saveBtn = document.getElementById('btn_save_book_lp');
     if (typeof showToast === 'function') {
       showToast(`💾 सेगमेंट '${segmentName}' सुरक्षित किया जा रहा है...`, 'info');
@@ -478,20 +496,21 @@ export async function initBookLandingPages() {
                   <select id="blp_import_source_book" class="admin-select" style="flex: 1; padding: 6px 8px; font-size: 0.8rem; font-weight: 700;">
                     <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड</option>
                     <option value="BK002">🩺 BK002: खेती का डॉक्टर</option>
-                    <option value="BK003">🌾 BK003: अनाज भंडारण गाइड</option>
-                    <option value="BK004">🍚 BK004: चावल प्रोसेसिंग गाइड</option>
-                    <option value="BK005">🌾 BK005: धान मास्टर गाइड</option>
                     <option value="BK006">🤖 BK006: AI वेबसाइट गाइड</option>
-                    <option value="BK007">🌾 BK007: गेहूं मास्टर गाइड</option>
-                    <option value="BK008">🌱 BK008: जैविक खेती गाइड</option>
-                    <option value="BK009">🌾 BK009: मक्का मास्टर गाइड</option>
-                    <option value="BK010">🌸 BK010: फूल खेती गाइड</option>
-                    <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
-                    <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
                     <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
-                    <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
+                    <option value="BK016">🌾 BK016: कृषि दवा सलाहकार गाइड</option>
                     <option value="BK017">🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका</option>
                     <option value="BK018">💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide</option>
+                    <option value="BK019">🌾 BK019: चना की खेती सम्पूर्ण मार्गदर्शिका</option>
+                    <option value="BK020">🌾 BK020: सरसों खेती गाइड</option>
+                    <option value="BK021">🌱 BK021: सब्जी खेती मास्टर PART 2</option>
+                    <option value="BK022">🥭 BK022: आम की खेती मास्टर गाइड</option>
+                    <option value="BK023">🍎 BK023: अनार मास्टर गाइड</option>
+                    <option value="BK024">🍇 BK024: अंगूर मास्टर गाइड</option>
+                    <option value="BK025">🌵 BK025: ड्रैगन फ्रूट मास्टर गाइड</option>
+                    <option value="BK026">🍌 BK026: केले की खेती मास्टर गाइड</option>
+                    <option value="BK028">🍈 BK028: पपीते की खेती मास्टर गाइड</option>
+                    <option value="BK029">🍈 BK029: चीकू की खेती मास्टर गाइड</option>
                   </select>
                   <button type="button" onclick="window.autoImportDemoFromSelectedBook()" class="admin-button small-button" style="background: #0284c7; color: #fff; font-weight: 800; font-size: 0.75rem; white-space: nowrap;">
                     📥 इम्पोर्ट करें
@@ -1307,20 +1326,7 @@ Instant Download & Lifetime Access
               <div>
                 <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8;">Option A: GitHub रिपॉजिटरी से PDF चुनें:</label>
                 <select id="blp_select_git_main_pdf" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600;">
-                  <option value="">-- GitHub से PDF चुनें --</option>
-                  <option value="/uploads/books/BK001_main.pdf">📄 BK001: खरीफ फसल मास्टर गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK002_main.pdf">📄 BK002: खेती का डॉक्टर (Full PDF)</option>
-                  <option value="/uploads/books/BK003_main.pdf">📄 BK003: धान मास्टर गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK004_main.pdf">📄 BK004: गेहूँ मास्टर गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK005_main.pdf">📄 BK005: सोयाबीन मास्टर गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK006_main.pdf">📄 BK006: मक्का मास्टर गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK007_main.pdf">📄 BK007: जैविक खेती गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK008_main.pdf">📄 BK008: सब्जी खेती गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK009_main.pdf">📄 BK009: फूल खेती गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK010_main.pdf">📄 BK010: पॉलीहाउस व नेटहाउस गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK011_main.pdf">📄 BK011: अनाज भंडारण गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK012_main.pdf">📄 BK012: चावल प्रोसेसिंग गाइड (Full PDF)</option>
-                  <option value="/uploads/books/BK013_main.pdf">📄 BK013: AI वेबसाइट गाइड (Full PDF)</option>
+                  <option value="">-- रिपॉजिटरी से PDF चुनें या नीचे URL दर्ज करें --</option>
                   <option value="/uploads/books/BK015_main.pdf">📄 BK015: सब्जी खेती गाइड Part 1 (24.7MB)</option>
                 </select>
               </div>
@@ -1402,20 +1408,7 @@ Instant Download & Lifetime Access
               <div>
                 <label class="admin-label" style="font-size: 0.78rem; font-weight: 700; color: #34d399;">Option A: GitHub रिपॉजिटरी से PDF चुनें:</label>
                 <select id="blp_select_git_free_pdf" class="admin-select" style="width: 100%; padding: 6px 8px; font-size: 0.8rem; font-weight: 600;">
-                  <option value="">-- GitHub से फ्री PDF चुनें --</option>
-                  <option value="/uploads/books/BK001_free.pdf">🎁 BK001: खरीफ फसल मास्टर गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK002_free.pdf">🎁 BK002: खेती का डॉक्टर (Free Demo)</option>
-                  <option value="/uploads/books/BK003_free.pdf">🎁 BK003: धान मास्टर गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK004_free.pdf">🎁 BK004: गेहूँ मास्टर गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK005_free.pdf">🎁 BK005: सोयाबीन मास्टर गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK006_free.pdf">🎁 BK006: मक्का मास्टर गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK007_free.pdf">🎁 BK007: जैविक खेती गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK008_free.pdf">🎁 BK008: सब्जी खेती गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK009_free.pdf">🎁 BK009: फूल खेती गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK010_free.pdf">🎁 BK010: पॉलीहाउस व नेटहाउस गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK011_free.pdf">🎁 BK011: अनाज भंडारण गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK012_free.pdf">🎁 BK012: चावल प्रोसेसिंग गाइड (Free Demo)</option>
-                  <option value="/uploads/books/BK013_free.pdf">🎁 BK013: AI वेबसाइट गाइड (Free Demo)</option>
+                  <option value="">-- रिपॉजिटरी से फ्री PDF चुनें या नीचे URL दर्ज करें --</option>
                   <option value="/uploads/books/BK015_free.pdf">🎁 BK015: सब्जी खेती गाइड Free Demo (PDF)</option>
                 </select>
               </div>
@@ -2032,20 +2025,21 @@ Instant Download & Lifetime Access
               <select id="fd_target_main_book" onchange="window.handleFdTargetMainBookChange(this.value)" class="admin-select" style="width: 100%; padding: 8px 10px; font-weight: 700;">
                 <option value="BK001">🌾 BK001: खरीफ फसल मास्टर गाइड 2026</option>
                 <option value="BK002">🩺 BK002: खेती का डॉक्टर (Pocket Doctor)</option>
-                <option value="BK003">🌾 BK003: अनाज भंडारण गाइड</option>
-                <option value="BK004">🍚 BK004: चावल प्रोसेसिंग गाइड</option>
-                <option value="BK005">🌾 BK005: धान मास्टर गाइड</option>
                 <option value="BK006">🤖 BK006: AI वेबसाइट गाइड</option>
-                <option value="BK007">🌾 BK007: गेहूं मास्टर गाइड</option>
-                <option value="BK008">🌱 BK008: जैविक खेती गाइड</option>
-                <option value="BK009">🌾 BK009: मक्का मास्टर गाइड</option>
-                <option value="BK010">🌸 BK010: फूल खेती गाइड</option>
-                <option value="BK011">🏡 BK011: पॉलीहाउस नेटहाउस गाइड</option>
-                <option value="BK012">🌱 BK012: सब्जी खेती गाइड</option>
                 <option value="BK015">🌱 BK015: सब्जी खेती मास्टर PART 1</option>
-                <option value="BK016">🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा</option>
+                <option value="BK016">🌾 BK016: कृषि दवा सलाहकार गाइड</option>
                 <option value="BK017">🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका</option>
                 <option value="BK018">💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide</option>
+                <option value="BK019">🌾 BK019: चना की खेती सम्पूर्ण मार्गदर्शिका</option>
+                <option value="BK020">🌾 BK020: सरसों खेती गाइड</option>
+                <option value="BK021">🌱 BK021: सब्जी खेती मास्टर PART 2</option>
+                <option value="BK022">🥭 BK022: आम की खेती मास्टर गाइड</option>
+                <option value="BK023">🍎 BK023: अनार मास्टर गाइड</option>
+                <option value="BK024">🍇 BK024: अंगूर मास्टर गाइड</option>
+                <option value="BK025">🌵 BK025: ड्रैगन फ्रूट मास्टर गाइड</option>
+                <option value="BK026">🍌 BK026: केले की खेती मास्टर गाइड</option>
+                <option value="BK028">🍈 BK028: पपीते की खेती मास्टर गाइड</option>
+                <option value="BK029">🍈 BK029: चीकू की खेती मास्टर गाइड</option>
                 <option value="ALL">🎁 ALL: सभी पुस्तकों के साथ (Universal Bonus)</option>
               </select>
               <button type="button" onclick="window.autoImportFromTargetMainBook()" class="admin-button small-button" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; margin-top: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(2,132,199,0.3);">
@@ -6435,20 +6429,21 @@ Instant Download & Lifetime Access
     const knownBooks = [
       { id: 'BK001', name: '🌾 BK001: खरीफ फसल मास्टर गाइड 2026' },
       { id: 'BK002', name: '🩺 BK002: खेती का डॉक्टर (Pocket Doctor)' },
-      { id: 'BK003', name: '🌾 BK003: अनाज भंडारण गाइड' },
-      { id: 'BK004', name: '🍚 BK004: चावल प्रोसेसिंग गाइड' },
-      { id: 'BK005', name: '🌾 BK005: धान मास्टर गाइड' },
       { id: 'BK006', name: '🤖 BK006: AI वेबसाइट गाइड' },
-      { id: 'BK007', name: '🌾 BK007: गेहूं मास्टर गाइड' },
-      { id: 'BK008', name: '🌱 BK008: जैविक खेती गाइड' },
-      { id: 'BK009', name: '🌾 BK009: मक्का मास्टर गाइड' },
-      { id: 'BK010', name: '🌸 BK010: फूल खेती गाइड' },
-      { id: 'BK011', name: '🏡 BK011: पॉलीहाउस नेटहाउस गाइड' },
-      { id: 'BK012', name: '🌱 BK012: सब्जी खेती गाइड' },
       { id: 'BK015', name: '🌱 BK015: सब्जी खेती मास्टर PART 1' },
-      { id: 'BK016', name: '🌾 BK016: कृषि दवा डायरेक्टरी — फसल के रोग, कीट और दवा' },
+      { id: 'BK016', name: '🌾 BK016: कृषि दवा सलाहकार गाइड' },
       { id: 'BK017', name: '🌾 BK017: गेहूँ की खेती — सम्पूर्ण मार्गदर्शिका' },
-      { id: 'BK018', name: '💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide' }
+      { id: 'BK018', name: '💰 BK018: घर बैठे पैसे कैसे कमाएँ? Income Guide' },
+      { id: 'BK019', name: '🌾 BK019: चना की खेती सम्पूर्ण मार्गदर्शिका' },
+      { id: 'BK020', name: '🌾 BK020: सरसों खेती गाइड' },
+      { id: 'BK021', name: '🌱 BK021: सब्जी खेती मास्टर PART 2' },
+      { id: 'BK022', name: '🥭 BK022: आम की खेती मास्टर गाइड' },
+      { id: 'BK023', name: '🍎 BK023: अनार मास्टर गाइड' },
+      { id: 'BK024', name: '🍇 BK024: अंगूर मास्टर गाइड' },
+      { id: 'BK025', name: '🌵 BK025: ड्रैगन फ्रूट मास्टर गाइड' },
+      { id: 'BK026', name: '🍌 BK026: केले की खेती मास्टर गाइड' },
+      { id: 'BK028', name: '🍈 BK028: पपीते की खेती मास्टर गाइड' },
+      { id: 'BK029', name: '🍈 BK029: चीकू की खेती मास्टर गाइड' }
     ];
 
     const bookMap = new Map();
@@ -9195,13 +9190,23 @@ Instant Download & Lifetime Access
     { id: 'BK007', name: '🌾 गेहूं मास्टर गाइड' },
     { id: 'BK008', name: '🌱 जैविक खेती गाइड' },
     { id: 'BK009', name: '🌾 मक्का मास्टर गाइड' },
-    { id: 'BK010', name: '🌸 फूल खेती गाइड' },
     { id: 'BK011', name: '🏡 पॉलीहाउस नेटहाउस गाइड' },
     { id: 'BK012', name: '🌱 सब्जी खेती गाइड' },
     { id: 'BK015', name: '🌱 सब्जी खेती मास्टर PART 1' },
     { id: 'BK016', name: '🌾 कृषि दवा डायरेक्टरी' },
     { id: 'BK017', name: '🌾 गेहूँ की खेती सम्पूर्ण मार्गदर्शिका' },
-    { id: 'BK018', name: '💰 घर बैठे पैसे कैसे कमाएँ? Income Guide' }
+    { id: 'BK018', name: '💰 घर बैठे पैसे कैसे कमाएँ? Income Guide' },
+    { id: 'BK019', name: '🌾 कपास मास्टर गाइड (Cotton Farming)' },
+    { id: 'BK020', name: '🌾 गन्ना मास्टर गाइड (Sugarcane Farming)' },
+    { id: 'BK021', name: '🌱 सब्जी खेती मास्टर गाइड Part 2' },
+    { id: 'BK022', name: '🥭 आम की वैज्ञानिक खेती मास्टर गाइड (Mango Farming)' },
+    { id: 'BK023', name: '🍎 अनार की उन्नत खेती मास्टर गाइड (Pomegranate Farming)' },
+    { id: 'BK024', name: '🍇 अंगूर की उन्नत खेती मास्टर गाइड (Grape Farming)' },
+    { id: 'BK025', name: '🍊 संतरा एवं मौसंबी वैज्ञानिक खेती (Citrus Farming)' },
+    { id: 'BK026', name: '🍌 केला की उन्नत खेती मास्टर गाइड (Banana Farming)' },
+    { id: 'BK027', name: '🍏 अमरूद की आधुनिक खेती मास्टर गाइड (Guava Farming)' },
+    { id: 'BK028', name: '🍈 पपीता की वैज्ञानिक खेती मास्टर गाइड (Papaya Farming)' },
+    { id: 'BK029', name: '🪵 चीकू (सपोटा) की उन्नत खेती मास्टर गाइड (Chiku Farming)' }
   ];
 
   function getAllRegisteredMainBooks() {
@@ -10791,6 +10796,35 @@ Instant Download & Lifetime Access
     Object.keys(pageData).forEach(key => {
       if (pageData[key] === undefined) delete pageData[key];
     });
+
+    // DEFENSIVE MERGE: If builder state had empty arrays for rich content but existing page has data, preserve existing!
+    if ((!pageData.reviews || pageData.reviews.length === 0) && existingLandingData?.reviews?.length > 0) {
+      pageData.reviews = existingLandingData.reviews;
+      pageData.testimonials = existingLandingData.reviews;
+      pageData.customer_reviews = existingLandingData.reviews;
+    }
+    if ((!pageData.faqs || pageData.faqs.length === 0) && existingLandingData?.faqs?.length > 0) {
+      pageData.faqs = existingLandingData.faqs;
+    }
+    if ((!pageData.table_of_contents || pageData.table_of_contents.length === 0) && existingLandingData?.table_of_contents?.length > 0) {
+      pageData.table_of_contents = existingLandingData.table_of_contents;
+    }
+    if ((!pageData.sections_order || pageData.sections_order.length === 0) && existingLandingData?.sections_order?.length > 0) {
+      pageData.sections_order = existingLandingData.sections_order;
+    }
+    if ((!pageData.why_read?.cards || pageData.why_read.cards.length === 0) && existingLandingData?.why_read?.cards?.length > 0) {
+      pageData.why_read = pageData.why_read || {};
+      pageData.why_read.cards = existingLandingData.why_read.cards;
+    }
+    if ((!pageData.audio_highlights || pageData.audio_highlights.length === 0) && existingLandingData?.audio_highlights?.length > 0) {
+      pageData.audio_highlights = existingLandingData.audio_highlights;
+    }
+    if ((!pageData.preview_images || pageData.preview_images.length === 0) && existingLandingData?.preview_images?.length > 0) {
+      pageData.preview_images = existingLandingData.preview_images;
+      pageData.previewImages = existingLandingData.preview_images;
+      pageData.demo_images = existingLandingData.preview_images;
+    }
+
     Object.assign(pageData, { ...existingLandingData, ...pageData });
 
     const existingIdx = allLandingPages.findIndex(p => p.id === bId);

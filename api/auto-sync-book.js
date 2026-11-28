@@ -877,11 +877,22 @@ module.exports = async function handler(req, res) {
 
     const existingLpIdx = landingJson.bookLandingPages.findIndex(p => p && p.id && String(p.id).trim().toUpperCase() === bookId);
     if (existingLpIdx >= 0) {
-      if (bookId === 'BK001' || bookId === 'BK002') {
-        landingJson.bookLandingPages[existingLpIdx] = Object.assign({}, landingJson.bookLandingPages[existingLpIdx], pageData);
-      } else {
-        landingJson.bookLandingPages[existingLpIdx] = pageData;
+      const existing = landingJson.bookLandingPages[existingLpIdx] || {};
+      const merged = Object.assign({}, existing, pageData);
+
+      // 🛡️ Data Loss Prevention: Never wipe out existing rich arrays if incoming array is empty
+      ['faqs', 'reviews', 'testimonials', 'customer_reviews', 'table_of_contents', 'sections_order'].forEach(arrayKey => {
+        if ((!Array.isArray(pageData[arrayKey]) || pageData[arrayKey].length === 0) &&
+            Array.isArray(existing[arrayKey]) && existing[arrayKey].length > 0) {
+          merged[arrayKey] = existing[arrayKey];
+        }
+      });
+      // Ensure testimonials and customer_reviews stay synced with reviews
+      if (Array.isArray(merged.reviews) && merged.reviews.length > 0) {
+        if (!Array.isArray(merged.testimonials) || merged.testimonials.length === 0) merged.testimonials = merged.reviews;
+        if (!Array.isArray(merged.customer_reviews) || merged.customer_reviews.length === 0) merged.customer_reviews = merged.reviews;
       }
+      landingJson.bookLandingPages[existingLpIdx] = merged;
     } else {
       landingJson.bookLandingPages.push(pageData);
     }
@@ -908,11 +919,14 @@ module.exports = async function handler(req, res) {
 
     const existingBookIdx = booksJson.books.findIndex(b => b && b.id && String(b.id).trim().toUpperCase() === bookId);
     if (existingBookIdx >= 0) {
-      if (bookId === 'BK001' || bookId === 'BK002') {
-        booksJson.books[existingBookIdx] = Object.assign({}, booksJson.books[existingBookIdx], bookData);
-      } else {
-        booksJson.books[existingBookIdx] = bookData;
-      }
+      const existingB = booksJson.books[existingBookIdx] || {};
+      const mergedB = Object.assign({}, existingB, bookData);
+      ['table_of_contents', 'features', 'preview_images', 'demo_images'].forEach(k => {
+        if ((!Array.isArray(bookData[k]) || bookData[k].length === 0) && Array.isArray(existingB[k]) && existingB[k].length > 0) {
+          mergedB[k] = existingB[k];
+        }
+      });
+      booksJson.books[existingBookIdx] = mergedB;
     } else {
       booksJson.books.push(bookData);
     }

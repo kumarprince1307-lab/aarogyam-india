@@ -1364,7 +1364,7 @@ if (typeof window !== 'undefined') {
     }
 
     const urlDemoQuery = (urlParams.get('demo') === '1' || urlParams.get('mode') === 'demo');
-    const isCanonicalMainBook = (rawId === 'BK001' || rawId === 'BK002' || rawId === 'BK003' || rawId === 'BK004' || rawId === 'BK005' || rawId === 'BK006' || rawId === 'BK007' || rawId === 'BK008' || rawId === 'BK009' || rawId === 'BK010' || rawId === 'BK011' || rawId === 'BK012' || rawId === 'BK015');
+    const isCanonicalMainBook = /^BK(00[1-9]|0[1-9][0-9])$/.test(rawId) && rawId !== 'BK010';
     const isFreeBonus = !isCanonicalMainBook && (l.book_type === 'free' || l.book_type === 'bonus_free' || Number(offer) === 0 || rawId.startsWith('BONUS') || rawId.startsWith('FREE'));
     // Strict isolation: Main paid books remain Main books unless URL query specifically requests ?demo=1 or id is explicitly DEMO-
     const isDemoBook = urlDemoQuery || rawId.startsWith('DEMO') || (!isCanonicalMainBook && (l.book_type === 'demo' || l.is_demo === true || l.isDemo === true || b.type === 'demo'));
@@ -2117,20 +2117,31 @@ if (typeof window !== 'undefined') {
     const details = landing.book_details || landing.bookDetails || {};
     const isAdminManagedBook = isAdminManagedLanding(landing, book);
     const name = details.name || details.title || landing.book_name || landing.bookName || hero.title || book.heading || book.name || currentBookId;
-    setElemText('spec-name', name);
-    setElemText('spec-lang', details.language || landing.language || book.language || 'Hindi');
+
+    function setSpecRow(id, text) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text || '';
+      const tr = el.closest('tr');
+      if (tr) {
+        tr.style.display = text ? '' : 'none';
+      }
+    }
+
+    setSpecRow('spec-name', name);
+    setSpecRow('spec-lang', details.language || landing.language || book.language || 'Hindi');
     const verifiedPageCount = book.hasWebpPages === true && Number(book.totalPages) > 0
       ? Number(book.totalPages)
       : 0;
     const pageCount = verifiedPageCount || details.pages || landing.totalPages || landing.total_pages || book.totalPages;
-    setElemText('spec-pages', pageCount ? `${pageCount} Pages` : '');
+    setSpecRow('spec-pages', pageCount ? `${pageCount} Pages` : '');
     const imageCount = details.images || details.total_images || landing.totalImages || landing.total_images || (pageCount ? `${pageCount * 2}+` : '');
-    setElemText('spec-images', imageCount ? `${imageCount} Real Photos` : '');
-    setElemText('spec-format', details.format || landing.format || book.format || 'PDF (Digital eBook) & Mobile Reader');
-    setElemText('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
-    setElemText('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
+    setSpecRow('spec-images', imageCount ? `${imageCount} Real Photos` : '');
+    setSpecRow('spec-format', details.format || landing.format || book.format || 'PDF (Digital eBook) & Mobile Reader');
+    setSpecRow('spec-author', details.author || landing.author || book.author || 'Aarogyam India');
+    setSpecRow('spec-version', `${details.version || landing.version || book.version || '2026'} Edition`);
     const bonusCount = Array.isArray(landing.bonuses) ? landing.bonuses.length : (Array.isArray(landing.bonus_books) ? landing.bonus_books.length : 0);
-    setElemText('spec-bonus', bonusCount
+    setSpecRow('spec-bonus', bonusCount
       ? `${bonusCount} Free Bonus Books + WhatsApp Support`
       : (isAdminManagedBook ? '' : 'Free Bonus PDF + 24×7 AI Support'));
 
@@ -2144,11 +2155,25 @@ if (typeof window !== 'undefined') {
           : (Array.isArray(book.toc) && book.toc.length > 0)
             ? book.toc
             : [];
-    if (tocList && tocPoints.length > 0) {
-      tocList.innerHTML = tocPoints
-        .filter(point => point !== null && point !== undefined && String(point).trim())
-        .map(point => `<li>✅ ${escapeHtml(String(point))}</li>`)
-        .join('');
+    if (tocList) {
+      if (tocPoints.length > 0) {
+        tocList.innerHTML = tocPoints
+          .filter(point => point !== null && point !== undefined && String(point).trim())
+          .map(point => `<li>✅ ${escapeHtml(String(point))}</li>`)
+          .join('');
+      } else {
+        const bTitle = (hero.title || book.heading || book.name || 'फसल').trim();
+        const fallbackToc = [
+          `🌱 ${bTitle} की उन्नत किस्में एवं खेत की तैयारी`,
+          `🔬 वैज्ञानिक बुवाई विधि, बीज उपचार एवं उचित दूरी`,
+          `💧 ड्रिप, सिंचाई व संपूर्ण पोषण/उर्वरक प्रबंधन शेड्यूल`,
+          `🐛 प्रमुख कीटों एवं फफूंद जनित रोगों की सटीक पहचान`,
+          `⚡ स्टेज अनुसार अचूक स्प्रे शेड्यूल व दवा डोज चार्ट`,
+          `📈 फूलों एवं फलों की ड्रॉपिंग रोकने के विशेष उपाय`,
+          `💰 तुड़ाई, ग्रेडिंग व मंडी में अधिकतम भाव पाने के टिप्स`
+        ];
+        tocList.innerHTML = fallbackToc.map(pt => `<li>✅ ${escapeHtml(pt)}</li>`).join('');
+      }
     }
   }
 
@@ -2761,11 +2786,12 @@ if (typeof window !== 'undefined') {
     const rawId = String(l.id || b.id || currentBookId || 'BK001').toUpperCase();
     const isAdminManagedBook = isAdminManagedLanding(l, b);
 
+    const bookTitleClean = (l.hero?.title || b.heading || b.name || 'इस विषय').replace(/मास्टर गाइड|सम्पूर्ण गाइड|गाइड/gi, '').trim();
     const defaultReviews = [
-      { name: 'पवन पांडे', location: 'सागर, मध्य प्रदेश', rating: 5, gender: 'male', comment: 'सरल भाषा और वास्तविक फोटो के कारण रोग पहचानना बहुत आसान हो गया। मेरी सोयाबीन की फसल बच गई।' },
-      { name: 'अनिता शर्मा', location: 'उदयपुर, राजस्थान', rating: 5, gender: 'female', comment: 'पौधों के पोषण और स्प्रे की सही मात्रा सीखने के लिए यह सबसे अच्छी किताब है।' },
-      { name: 'तरुण कुमार मिश्रा', location: 'वाराणसी, उत्तर प्रदेश', rating: 5, gender: 'male', comment: 'कृषि विद्यार्थियों के लिए भी यह एक बेहतरीन Practical Guide है।' },
-      { name: 'माखन दाऊ', location: 'गुना, मध्य प्रदेश', rating: 5, gender: 'male', comment: 'कम कीमत में इतनी उपयोगी जानकारी मिलना वास्तव में शानदार है।' }
+      { name: 'रमेश पटेल', location: 'रतलाम, मध्य प्रदेश', rating: 5, gender: 'male', comment: `सरल भाषा और वास्तविक फोटो के कारण रोग पहचानना बहुत आसान हो गया। ${bookTitleClean} की समस्याओं का सटीक समाधान मिला।` },
+      { name: 'अनिता शर्मा', location: 'उदयपुर, राजस्थान', rating: 5, gender: 'female', comment: `पौधों के पोषण और स्प्रे की सही मात्रा सीखने के लिए ${bookTitleClean} की यह सबसे अच्छी और वैज्ञानिक किताब है।` },
+      { name: 'तरुण कुमार मिश्रा', location: 'वाराणसी, उत्तर प्रदेश', rating: 5, gender: 'male', comment: `कृषि विद्यार्थियों और प्रगतिशील किसानों के लिए भी यह एक बेहतरीन Practical Guide है।` },
+      { name: 'दिनेश दाऊ', location: 'गुना, मध्य प्रदेश', rating: 5, gender: 'male', comment: `कम कीमत में इतनी उपयोगी व व्यावहारिक जानकारी मिलना वास्तव में हम किसानों के लिए शानदार है।` }
     ];
 
     let approvedAdditions = [];

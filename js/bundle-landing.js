@@ -354,7 +354,12 @@
 
     // Render Dynamic Expandable KPIs
     if (featWrap) {
-      if (Array.isArray(bundle.heroKpis) && bundle.heroKpis.length > 0) {
+      const vis = bundle.sectionVisibility || bundle.sectionsVisibility || {};
+      const isKpiDisabled = vis['sec-hero-kpis'] === false || vis['hero-kpis'] === false || bundle.heroKpis === false || (Array.isArray(bundle.heroKpis) && bundle.heroKpis.length === 0);
+      if (isKpiDisabled) {
+        featWrap.style.display = 'none';
+      } else if (Array.isArray(bundle.heroKpis) && bundle.heroKpis.length > 0) {
+        featWrap.style.display = '';
         featWrap.innerHTML = bundle.heroKpis.map(k => {
           let val = typeof k === 'object' ? (k.value || k.label || '') : String(k || '');
           let icon = typeof k === 'object' ? (k.icon || '') : '';
@@ -372,6 +377,7 @@
           `;
         }).join('');
       } else {
+        featWrap.style.display = '';
         featWrap.innerHTML = `
           <div class="hero-feature"><span>📚</span> <span>${resolvedBooks.length} संपूर्ण ई-बुक्स</span></div>
           <div class="hero-feature"><span>📄</span> <span>${totalPages}+ रंगीन पेज</span></div>
@@ -581,6 +587,13 @@ function renderVideoSection(bundle) {
   const dotsEl = document.getElementById('bundleVideosDots');
 
   if (!videoSec || !container) return;
+
+  // Check section visibility toggle from bundle admin
+  const vis = bundle.sectionVisibility || bundle.sectionsVisibility || {};
+  if (vis['sec-bundle-video'] === false) {
+    videoSec.style.setProperty('display', 'none', 'important');
+    return;
+  }
 
   // Collect videos
   if (Array.isArray(bundle.videos) && bundle.videos.length > 0) {
@@ -1261,7 +1274,7 @@ function applySectionControls(bundle) {
   if (!bundle) return;
 
   // 1. Visibility Check
-  const vis = bundle.sectionVisibility || {};
+  const vis = Object.assign({}, bundle.sectionsVisibility || {}, bundle.sectionVisibility || {});
   Object.keys(vis).forEach(secId => {
     const el = document.getElementById(secId);
     if (el) {
