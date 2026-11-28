@@ -2244,7 +2244,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK029",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-28T02:44:07.472Z",
+      "updated_at": "2026-11-28T19:06:08.741Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2310,7 +2310,14 @@
       ],
       "pageImagesPath": "images/books/BK029",
       "title": "चीकू (सपोटा) की खेती मास्टर गाइड",
-      "bonuses": []
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     },
     {
       "id": "BK026",

@@ -7237,7 +7237,7 @@
     },
     {
       "id": "BK029",
-      "updated_at": "2026-11-28T02:44:07.472Z",
+      "updated_at": "2026-11-28T19:06:08.741Z",
       "admin_edited": true,
       "slug": "bk029",
       "book_type": "paid",
@@ -7288,7 +7288,13 @@
         "sec_pdf_main",
         "sec_pdf_free"
       ],
-      "hidden_sections": [],
+      "hidden_sections": [
+        "sec_help",
+        "sec_specs_toc",
+        "sec_suggested",
+        "sec_bonuses",
+        "sec_vip_stack"
+      ],
       "section_banners": {
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
         "sec_preview": "/images/banners/bk022-sec_preview-banner.webp",
