@@ -2360,7 +2360,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK026",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-28T09:35:21.989Z",
+      "updated_at": "2026-11-28T10:12:38.554Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -2426,7 +2426,16 @@
         "../images/books/BK022/56.webp",
         "../images/books/BK022/57.webp"
       ],
-      "pageImagesPath": "images/books/BK026"
+      "pageImagesPath": "images/books/BK026",
+      "title": "🍌 केले की खेती BANANA FARMING MASTER GUIDE",
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     },
     {
       "id": "BK028",
