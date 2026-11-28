@@ -6076,7 +6076,7 @@
     },
     {
       "id": "BK026",
-      "updated_at": "2026-11-28T10:12:38.553Z",
+      "updated_at": "2026-11-28T10:14:58.382Z",
       "admin_edited": true,
       "slug": "bk026",
       "book_type": "paid",
@@ -6132,7 +6132,8 @@
         "sec_video",
         "sec_suggested",
         "sec_bonuses",
-        "sec_help"
+        "sec_help",
+        "sec_specs_toc"
       ],
       "section_banners": {
         "sec_audio": "/images/banners/bk022-sec_audio-banner.webp",
