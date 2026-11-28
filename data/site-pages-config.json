@@ -44,9 +44,43 @@
         "sec_help_support"
       ],
       "hidden_sections": [],
-      "kpi_cards": [],
+      "kpi_cards": [
+        {
+          "icon": "fa-book-open",
+          "title": "120+ रंगीन पेज",
+          "desc": "उच्च गुणवत्ता सचित्र मार्गदर्शिका"
+        },
+        {
+          "icon": "fa-bolt",
+          "title": "इंस्टेंट PDF डाउनलोड",
+          "desc": "भुगतान के तुरंत बाद आजीवन एक्सेस"
+        },
+        {
+          "icon": "fa-robot",
+          "title": "24×7 WhatsApp AI डॉक्टर",
+          "desc": "किताब पढ़ते समय तुरंत सवाल पूछें"
+        },
+        {
+          "icon": "fa-shield-halved",
+          "title": "100% सुरक्षित भुगतान",
+          "desc": "UPI, PhonePe, GPay व कार्ड्स"
+        }
+      ],
       "marketing_cards": [],
-      "videos": [],
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "📖 खरीफ मास्टर गाइड - अंदर के पेज व डेमो",
+          "desc": "300+ वास्तविक फोटो और स्प्रे साइंस चार्ट का लाइव प्रीव्यू।",
+          "ratio": "16:9"
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "title": "📲 24×7 WhatsApp AI डॉक्टर सहायता कैसे काम करती है?",
+          "desc": "किताब पढ़ते समय सवाल पूछने और तुरंत समाधान पाने का तरीका।",
+          "ratio": "16:9"
+        }
+      ],
       "reviews_heading": "",
       "reviews_badge": "",
       "reviews": [
@@ -395,7 +429,7 @@
           "pack_size": "250 ml",
           "badge": "✨ New Launch",
           "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
-          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
+          "image": "/images/products/product-aqua-feed-concentrat-106186-cpiy.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -876,7 +910,7 @@
           "pack_size": "250 ml",
           "badge": "✨ New Launch",
           "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
-          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
+          "image": "/images/products/product-aqua-feed-concentrat-106186-cpiy.webp"
         },
         {
           "id": "ns_prod_72313",
@@ -6760,7 +6794,7 @@
           "pack_size": "250 ml",
           "badge": "✨ New Launch",
           "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
-          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
+          "image": "/images/products/product-aqua-feed-concentrat-106186-cpiy.webp"
         },
         {
           "id": "ns_prod_72313",
@@ -8587,7 +8621,7 @@
           "pack_size": "250 ml",
           "badge": "✨ New Launch",
           "description": "यह सभी प्रकार की मछलियों, झींगा (Shrimp), प्रॉन और केकड़ों के लिए तैयार संतुलित ग्रोथ सप्लीमेंट पाउडर है, जो जलीय जीवों के बाहरी और आंतरिक कंकाल के स्वस्थ विकास में मदद करता है। यह पाचन तंत्र, दाना खाने की क्षमता (Feed Intake), मांसपेशियों, वजन बढ़ोतरी, बेहतर FCR और रोग प्रतिरोधक क्षमता (Immunity) को सुधारकर जीवित रहने की दर बढ़ाने में सहायक है।",
-          "image": "/images/products/product-aqua-feed-concentrat-993459-9vrx.webp"
+          "image": "/images/products/product-aqua-feed-concentrat-106186-cpiy.webp"
         }
       ],
       "page_kpi_sections": [],
@@ -9032,7 +9066,28 @@
           "solution": "7वें दिन F1 लासोटा, 14वें दिन गम्बोरो व 28वें दिन लासोटा बूस्टर वैक्सीनेशन।"
         }
       ],
-      "products": [],
+      "products": [
+        {
+          "id": "PET_VET_ADVANCED_POULTRY",
+          "name": "Pet-Vet Advanced Nutrition (पोल्ट्री ग्रोथ व इम्युनिटी)",
+          "category": "Livestock",
+          "price": 650,
+          "mrp": 750,
+          "badge": "ग्रोथ प्रमोटर",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "चूजों और वयस्क मुर्गियों में रोग प्रतिरोधक क्षमता बढ़ाकर तेजी से वजन और अंडा उत्पादन बढ़ाता है।"
+        },
+        {
+          "id": "PET_VET_DIGEST_POULTRY",
+          "name": "Pet-Vet Digest (पाचन व आंत स्वास्थ्य)",
+          "category": "Livestock",
+          "price": 580,
+          "mrp": 680,
+          "badge": "FCR बूस्टर",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "पाचन क्रिया को सुदृढ़ कर आहार की खपत (FCR) को अनुकूलित करता है और पतली बीट की समस्या रोकता है।"
+        }
+      ],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🩺 POULTRY DIAGNOSIS & REMEDIES",
@@ -9465,7 +9520,28 @@
           "solution": "6 सप्ताह की उम्र में पार्वो, 8वें सप्ताह 7-इन-1 और 12वें सप्ताह एंटी-रेबीज टीका।"
         }
       ],
-      "products": [],
+      "products": [
+        {
+          "id": "PET_VET_SHAMPOO_DOG",
+          "name": "Pet-Vet Advanced Ayurvedic Shampoo (टिक व पिस्सू सुरक्षा)",
+          "category": "Livestock",
+          "price": 450,
+          "mrp": 520,
+          "badge": "एंटी-टिक हर्बल",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "नीम और यूकेलिप्टस अर्क युक्त आयुर्वेदिक शैम्पू जो टिक्स, जूं और पिस्सुओं को प्राकृतिक रूप से दूर रखता है।"
+        },
+        {
+          "id": "PET_VET_NUTRITION_DOG",
+          "name": "Pet-Vet Advanced Vital Nutrition (चमकदार फर व हड्डियां)",
+          "category": "Livestock",
+          "price": 650,
+          "mrp": 750,
+          "badge": "कोट व जॉइंट हेल्थ",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "ओमेगा 3 व 6 फैटी एसिड, कैल्शियम और आवश्यक विटामिन्स जो फर झड़ना रोकते हैं और जोड़ों को मजबूत बनाते हैं।"
+        }
+      ],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🩺 CANINE DIAGNOSIS & REMEDIES",
@@ -9898,7 +9974,28 @@
           "solution": "वर्ष में एक बार पीपीआर (PPR) और छह माह में ईटीवी (ETV) टीका अनिवार्य।"
         }
       ],
-      "products": [],
+      "products": [
+        {
+          "id": "PET_VET_ADVANCED_GOAT",
+          "name": "Pet-Vet Advanced (बकरा-बकरी वजन वर्धक)",
+          "category": "Livestock",
+          "price": 650,
+          "mrp": 750,
+          "badge": "तेज वजन वृद्धि",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "खनिज लवणों, चेलेटेड मिनरल्स और विटामिन्स से भरपूर जो बकरों में 3-4 महीने में 10-15 किग्रा अतिरिक्त वजन बढ़ाता है।"
+        },
+        {
+          "id": "PET_VET_DIGEST_GOAT",
+          "name": "Pet-Vet Digest (गोट डाइजेशन व एसिडोसिस सुरक्षा)",
+          "category": "Livestock",
+          "price": 580,
+          "mrp": 680,
+          "badge": "पाचन सुरक्षा",
+          "image": "/images/products/biofit-pet-vet-cattle.webp",
+          "desc": "अनाज खाने के बाद होने वाले पेट फूलने (अफरा) और बदहजमी से तुरंत राहत दिलाता है।"
+        }
+      ],
       "page_kpi_sections": [],
       "clinical_breakdown": {
         "badge_text": "🩺 GOAT DIAGNOSIS & REMEDIES",
