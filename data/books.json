@@ -1629,13 +1629,20 @@
       "landingPage": "/ebooks/book-landing.html?id=BK022",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-28T04:24:34.525Z",
+      "updated_at": "2026-11-28T18:58:45.752Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
       "pageImagesPath": "images/books/BK022",
       "title": "आम की खेती (Mango Master Guide):",
-      "bonuses": []
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     },
     {
       "id": "BK023",
