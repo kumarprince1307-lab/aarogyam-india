@@ -1556,14 +1556,7 @@
       "thumbnail": "/images/books/bk022-cover.webp",
       "banner": "/images/banners/bk022-hero-banner.webp",
       "status": "active",
-      "publish_targets": [
-        "ebook_store",
-        "category_page",
-        "my_library",
-        "home_page",
-        "home_hero",
-        "download_funnel"
-      ],
+      "publish_targets": [],
       "store_badge": "new_launch",
       "badge": "new_launch",
       "isComingSoon": false,
@@ -1572,45 +1565,18 @@
       "pdf_url": "",
       "freePdf": "",
       "demoPdf": "",
-      "demoImages": [
-        "/images/books/BK022/1.webp",
-        "/images/books/BK022/5.webp",
-        "/images/books/BK022/22.webp",
-        "/images/books/BK022/27.webp",
-        "/images/books/BK022/40.webp",
-        "/images/books/BK022/55.webp"
-      ],
-      "demo_images": [
-        "/images/books/BK022/1.webp",
-        "/images/books/BK022/5.webp",
-        "/images/books/BK022/22.webp",
-        "/images/books/BK022/27.webp",
-        "/images/books/BK022/40.webp",
-        "/images/books/BK022/55.webp"
-      ],
-      "preview_images": [
-        "/images/books/BK022/1.webp",
-        "/images/books/BK022/5.webp",
-        "/images/books/BK022/22.webp",
-        "/images/books/BK022/27.webp",
-        "/images/books/BK022/40.webp",
-        "/images/books/BK022/55.webp"
-      ],
-      "previewImages": [
-        "/images/books/BK022/1.webp",
-        "/images/books/BK022/5.webp",
-        "/images/books/BK022/22.webp",
-        "/images/books/BK022/27.webp",
-        "/images/books/BK022/40.webp",
-        "/images/books/BK022/55.webp"
-      ],
-      "demoAvailable": true,
+      "demoImages": [],
+      "demo_images": [],
+      "preview_images": [],
+      "previewImages": [],
+      "demoAvailable": false,
       "demo_reader_pages": "",
       "demoPages": "",
       "og_image": "/images/books/bk022-og.webp",
       "og_image_landscape": "/images/books/bk022-og.webp",
       "audio_layer": {
         "enabled": true,
+        "autoplay": true,
         "badge_tag": "🥭 आम बागवानों के लिए खास",
         "main_heading": "क्या आपका आम का बाग आपको वह कमाई दे रहा है, जिसका आपने सपना देखा था?",
         "main_subtitle": "गलत किस्म, फूलों का झड़ना, कीट-रोग और बाग प्रबंधन की छोटी गलतियाँ आपकी मेहनत पर भारी पड़ सकती हैं। जानिए आम की खेती के वैज्ञानिक और व्यावहारिक तरीके।",
@@ -1622,32 +1588,28 @@
         "story_text": "क्या आपने भी कभी सोचा है कि आपका आम का बाग हर साल भरपूर फल दे और आपकी मेहनत का आपको अच्छा मुनाफा मिले?\nलेकिन क्या सिर्फ आम के पौधे लगा देने से ऐसा हो जाता है?\nकई बार गलत किस्म का चुनाव, फूलों का झड़ना, छोटे फलों का गिरना, कीट-रोग और खाद-पानी के प्रबंधन में छोटी-सी गलती भी पूरी फसल को प्रभावित कर सकती है।\nऔर सबसे बड़ी परेशानी यह है कि सही समय पर सही जानकारी नहीं मिलती।\nइसीलिए प्रस्तुत है — आम की खेती की सम्पूर्ण वैज्ञानिक एवं व्यावहारिक मार्गदर्शिका।\nइसमें जानिए आम की उन्नत किस्मों का चयन, पौधशाला, बाग की स्थापना, सामान्य रोपण, HDP और UHDP तकनीक, छँटाई, खाद-पोषण, सिंचाई, फूल और फल प्रबंधन, प्रमुख कीट-रोग, तुड़ाई, ग्रेडिंग और बाजार तक की जरूरी जानकारी।\nसाथ ही समझिए कि अपने बाग की लागत, उत्पादन और संभावित मुनाफे की योजना कैसे बनाएँ।\nचाहे आप नया आम का बाग लगाना चाहते हों या पुराने बाग से बेहतर परिणाम पाना चाहते हों — यह मार्गदर्शिका आपके लिए उपयोगी हो सकती है।\nकिताब के अंदर के पेज भी देखिए। विषयों को समझिए और फिर तय कीजिए कि यह किताब आपके आम के बाग के लिए कितनी उपयोगी है।\nक्योंकि अच्छी फसल सिर्फ मेहनत से नहीं, सही जानकारी और सही समय पर लिए गए फैसलों से भी बनती है।",
         "highlights": [
           {
-            "icon": "🌸",
-            "text": " आम में फूल और फल सेटिंग का सही प्रबंधन"
-          },
-          {
-            "icon": "🍃 ",
-            "text": "फूल और छोटे फल झड़ने की समस्या को समझें"
-          },
-          {
             "icon": "🐛",
-            "text": " आम के प्रमुख कीटों की पहचान और प्रबंधन"
+            "text": "300+ कीटों की पहचान: उनके तुरंत व प्रभावी नियंत्रण के अचूक उपाय."
           },
           {
-            "icon": "🦠 ",
-            "text": "आम के प्रमुख रोग और उनसे बचाव"
+            "icon": "🦠",
+            "text": "500+ रोगों का समाधान: वैज्ञानिक, सटीक और व्यावहारिक इलाज."
           },
           {
-            "icon": "✂️ ",
-            "text": "छँटाई, ट्रेनिंग और पेड़ की सही बनावट"
+            "icon": "🧪",
+            "text": "लैब जांच विधियां: मिट्टी, पानी और पौधे की प्रयोगशाला जाँच के सरल तरीके."
           },
           {
-            "icon": "💧 ",
-            "text": "सिंचाई, ड्रिप और जल निकास प्रबंधन"
+            "icon": "💧",
+            "text": "पोषण प्रबंधन: NPK और सभी माइक्रोन्यूट्रिएंट्स का वैज्ञानिक संतुलन."
+          },
+          {
+            "icon": "🌊",
+            "text": "Water Quality Guide: pH, EC, TDS व पानी की हार्डनेस सुधारने की विधि."
           },
           {
             "icon": "🌱",
-            "text": "खाद, उर्वरक और सूक्ष्म पोषक तत्वों की जानकारी"
+            "text": "उपचार विधियां: बीज उपचार, मिट्टी उपचार व जैविक उपचार स्टेप-बाय-स्टेप."
           }
         ],
         "offer_callout": "💥 धमाकेदार ऑफर: जिस संपूर्ण कृषि ज्ञान और गाइड की वास्तविक कीमत बाजार में ₹1,000 से भी ज्यादा है, वह आज विशेष लॉन्चिंग ऑफर के तहत केवल ₹75में सीधे आपके मोबाइल पर उपलब्ध कराई जा रही है!",
@@ -1667,7 +1629,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK022",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-28T04:07:58.066Z",
+      "updated_at": "2026-11-28T04:24:34.525Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
