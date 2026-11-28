@@ -1732,7 +1732,7 @@
       "landingPage": "/ebooks/book-landing.html?id=BK023",
       "checkoutPage": "/ebooks/checkout.html",
       "readerPage": "/ebooks/reader.html",
-      "updated_at": "2026-11-28T04:22:27.062Z",
+      "updated_at": "2026-11-28T18:59:51.603Z",
       "admin_edited": true,
       "hasWebpPages": true,
       "hasAudioBook": true,
@@ -1795,7 +1795,14 @@
         "../images/books/BK022/57.webp"
       ],
       "title": "अनार मास्टर गाइड (Pomegranate Master Guide)",
-      "bonuses": []
+      "bonuses": [
+        {
+          "title": "FREE AI WHATSAPP SUPPORT & SPRAY CHART",
+          "description": "किताब पढ़ते समय अगर कोई बात समझ न आए, तो WhatsApp Help पर तुरंत समाधान पाएं।",
+          "mrp": 199,
+          "image": "/images/books/kharif-fasal-hero-2.webp"
+        }
+      ]
     },
     {
       "id": "BK024",
