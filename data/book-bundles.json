@@ -292,7 +292,7 @@
     "sectionVisibility": {
       "sec-top-ribbon": true,
       "sec-hero": true,
-      "sec-bundle-video": true,
+      "sec-bundle-video": false,
       "sec-offer-timer": true,
       "sec-trust-bar": true,
       "sec-included-books": true,
@@ -304,7 +304,7 @@
       "bundleFloatingAudioPill": true
     },
     "status": "active",
-    "updated_at": "2026-11-28T03:52:37.242Z"
+    "updated_at": "2026-11-28T17:32:34.120Z"
   },
   {
     "id": "BUN001",
